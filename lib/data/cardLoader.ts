@@ -1,7 +1,7 @@
 import type { RawCardData } from './types';
 import type { CardData, CharacterCard, MissionCard, CardEffect } from '../engine/types';
-import rawCardsData from '../../output/data/naruto_mythos_tcg_complete.json';
-import rawMissionsData from '../../output/data/missions.json';
+import rawCardsData from './naruto_mythos_tcg_complete.json';
+import rawMissionsData from './missions.json';
 
 // Manual corrections for cards with split/malformed effect text in the JSON
 const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {

@@ -1,0 +1,2707 @@
+[
+  {
+    "id": "001/130",
+    "number": 1,
+    "name_fr": "HIRUZEN SARUTOBI",
+    "title_fr": "Le Professeur",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Hokage"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "POWERUP 2 another friendly Leaf Village character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/01_C_Hiruzen_Professor-9673f151-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\001-130_HIRUZEN_SARUTOBI.webp"
+  },
+  {
+    "id": "002/130",
+    "number": 2,
+    "name_fr": "HIRUZEN SARUTOBI",
+    "title_fr": "Troisième Hokage",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "003/130",
+    "number": 3,
+    "name_fr": "TSUNADE",
+    "title_fr": "Maître Ninja Médical",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Sannin"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] When any friendly character is defeated, gain 2 Chakra."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/03_C_Tsunade_Master-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\003-130_TSUNADE.webp"
+  },
+  {
+    "id": "004/130",
+    "number": 4,
+    "name_fr": "TSUNADE",
+    "title_fr": "La Création et le Renouveau",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "005/130",
+    "number": 5,
+    "name_fr": "SHIZUNE",
+    "title_fr": "Assistante de Tsunade",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "006/130",
+    "number": 6,
+    "name_fr": "SHIZUNE",
+    "title_fr": "Tir d'Aiguilles préparé",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "007/130",
+    "number": 7,
+    "name_fr": "JIRAYA",
+    "title_fr": "Ermite des Crapauds",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 4,
+    "power": 4,
+    "keywords": [
+      "Sannin"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Play a Summon character anywhere, paying 1 less."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/07_C_Jiraiya_Toad_Sage-ecd18d0d-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\007-130_JIRAYA.webp"
+  },
+  {
+    "id": "008/130",
+    "number": 8,
+    "name_fr": "JIRAYA",
+    "title_fr": "Doton, Les Marécages des Limbes",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "009/130",
+    "number": 9,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Genin du Village de la Feuille",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 3,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/9_C_Naruto_Genin-24285f41-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\009-130_NARUTO_UZUMAKI.webp"
+  },
+  {
+    "id": "010/130",
+    "number": 10,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Permutation",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "011/130",
+    "number": 11,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "Genin de l'Équipe 7",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If there's another Team 7 character in this mission, draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/11_C_Sakura_Genin-0b7bb352-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\011-130_SAKURA_HARUNO.webp"
+  },
+  {
+    "id": "012/130",
+    "number": 12,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "Maîtrise du Chakra",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "013/130",
+    "number": 13,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "Dernier du Clan Uchiwa",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 4,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] This character has -1 Power for every other non-hidden friendly character in this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/13_C_Sasuke_Last-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\013-130_SASUKE_UCHIWA.webp"
+  },
+  {
+    "id": "014/130",
+    "number": 14,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "Sharingan",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "015/130",
+    "number": 15,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "Sensei de l'Équipe 7",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] Other Team 7 characters in this mission have +1 Power."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/15_C_Kakashi_Teacher-9df8ce87-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\015-130_KAKASHI_HATAKE.webp"
+  },
+  {
+    "id": "016/130",
+    "number": 16,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "Sharingan",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "017/130",
+    "number": 17,
+    "name_fr": "CHÔJI AKIMICHI",
+    "title_fr": "Décuplement",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "018/130",
+    "number": 18,
+    "name_fr": "CHÔJI AKIMICHI",
+    "title_fr": "Le Boulet Humain",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "019/130",
+    "number": 19,
+    "name_fr": "INO YAMANAKA",
+    "title_fr": "Genin de l'Équipe 10",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 1,
+    "keywords": [
+      "Team 10"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If there's another Team 10 character in this mission, POWERUP 1 ."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/19_C_Ino_Genin-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\019-130_INO_YAMANAKA.webp"
+  },
+  {
+    "id": "020/130",
+    "number": 20,
+    "name_fr": "INO YAMANAKA",
+    "title_fr": "Transposition",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "021/130",
+    "number": 21,
+    "name_fr": "SHIKAMARU NARA",
+    "title_fr": "Genin de l'Équipe 10",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "keywords": [
+      "Team 10"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If you have the Edge, draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/21_C_Shikamaru_Genin-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\021-130_SHIKAMARU_NARA.webp"
+  },
+  {
+    "id": "022/130",
+    "number": 22,
+    "name_fr": "SHIKAMARU NARA",
+    "title_fr": "Manipulation des Ombres",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "023/130",
+    "number": 23,
+    "name_fr": "ASUMA SARUTOBI",
+    "title_fr": "Sensei de l'Équipe 10",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team 10"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Move another Team 10 character from this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/23_C_Asuma_Teacher-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\023-130_ASUMA_SARUTOBI.webp"
+  },
+  {
+    "id": "024/130",
+    "number": 24,
+    "name_fr": "ASUMA SARUTOBI",
+    "title_fr": "Lame de Chakra",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "025/130",
+    "number": 25,
+    "name_fr": "KIBA INUZUKA",
+    "title_fr": "Genin de l'Équipe 8",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Team 8"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1 ."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/25_C_Kiba_Genin-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\025-130_KIBA_INUZUKA.webp"
+  },
+  {
+    "id": "026/130",
+    "number": 26,
+    "name_fr": "KIBA INUZUKA",
+    "title_fr": "Ninpô ! La Danse du Chien !",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "027/130",
+    "number": 27,
+    "name_fr": "AKAMARU",
+    "title_fr": "Chien Ninja",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 2,
+    "keywords": [
+      "Team 8"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If there isn't a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/27_C_Akamaru_Hound-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\027-130_AKAMARU.webp"
+  },
+  {
+    "id": "028/130",
+    "number": 28,
+    "name_fr": "AKAMARU",
+    "title_fr": "Les Hommes-Bêtes Enragés",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "029/130",
+    "number": 29,
+    "name_fr": "AKAMARU",
+    "title_fr": "Le Loup Bicéphale",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "030/130",
+    "number": 30,
+    "name_fr": "HINATA HYÛGA",
+    "title_fr": "Poing Souple",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "031/130",
+    "number": 31,
+    "name_fr": "HINATA HYÛGA",
+    "title_fr": "Byakugan",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "032/130",
+    "number": 32,
+    "name_fr": "SHINO ABURAME",
+    "title_fr": "Insectes Destructeurs",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "033/130",
+    "number": 33,
+    "name_fr": "SHINO ABURAME",
+    "title_fr": "Des clones faits d'insectes",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "034/130",
+    "number": 34,
+    "name_fr": "YUHI KURENAI",
+    "title_fr": "Sensei de l'Équipe 8",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team 8"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] Other Team 8 characters costs 1 less (min.1) to play in this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/34_C_Kurenai_Teacher-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\034-130_YUHI_KURENAI.webp"
+  },
+  {
+    "id": "035/130",
+    "number": 35,
+    "name_fr": "YUHI KURENAI",
+    "title_fr": "Lien de l'Arbre : Mort",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "036/130",
+    "number": 36,
+    "name_fr": "NEJI HYÛGA",
+    "title_fr": "Poing Souple",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Team Guy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Remove up to 2 Power tokens from an enemy character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/36_C_Neji_Gentle_fist-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\036-130_NEJI_HYÛGA.webp"
+  },
+  {
+    "id": "037/130",
+    "number": 37,
+    "name_fr": "NEJI HYÛGA",
+    "title_fr": "Le « Tourbillon Divin » du Hakke",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "038/130",
+    "number": 38,
+    "name_fr": "ROCK LEE",
+    "title_fr": "Entraînement au Poing violent",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "039/130",
+    "number": 39,
+    "name_fr": "ROCK LEE",
+    "title_fr": "La Fleur du Lotus Recto",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 4,
+    "power": 4,
+    "keywords": [
+      "Team Guy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] This character doesn't lose Power tokens at the end of the round."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "POWERUP 2 ."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/39_UC_RockLee_Primary_Lotus-1920w.png",
+    "rarity_display": "Uncommon",
+    "image_file": "images\\uncommon\\039-130_ROCK_LEE.webp"
+  },
+  {
+    "id": "040/130",
+    "number": 40,
+    "name_fr": "TENTEN",
+    "title_fr": "Genin de l'Équipe Gaï",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 2,
+    "keywords": [
+      "Team Guy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] You can play this character only in a mission where you are currently winning."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/40_C_Tenten_Dreaming-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\040-130_TENTEN.webp"
+  },
+  {
+    "id": "041/130",
+    "number": 41,
+    "name_fr": "TENTEN",
+    "title_fr": "Spécialiste des armes",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "042/130",
+    "number": 42,
+    "name_fr": "GAÏ MAITO",
+    "title_fr": "Sensei de l'Équipe Gaï",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team Guy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] Other Team Guy characters in this mission have +1 Power."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/42_C_MightGuy_Teacher-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\042-130_GAÏ_MAITO.webp"
+  },
+  {
+    "id": "043/130",
+    "number": 43,
+    "name_fr": "GAÏ MAITO",
+    "title_fr": "Poing Fort",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "044/130",
+    "number": 44,
+    "name_fr": "ANKO MITARASHI",
+    "title_fr": "Surveillant des examens Chunin",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Academy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If you have at least one other friendly Leaf Village character in this mission, CHAKRA +1 ."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/44_C_Anko_Proctor-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\044-130_ANKO_MITARASHI.webp"
+  },
+  {
+    "id": "045/130",
+    "number": 45,
+    "name_fr": "ANKO MITARASHI",
+    "title_fr": "La Poigne du Serpent Spectral",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "046/130",
+    "number": 46,
+    "name_fr": "EBISU",
+    "title_fr": "Entraîneur d'Élite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Pouvoir"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If there is a friendly non-hidden character with less Power than this character in this mission, draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/46_C_Ebisu_Trainer-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\046-130_EBISU.webp"
+  },
+  {
+    "id": "047/130",
+    "number": 47,
+    "name_fr": "IRUKA",
+    "title_fr": "Instructeur de l'Académie",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Academy"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Move a [u]Naruto Uzumaki[/u] character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/47_C_Iruka_Instructor-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\047-130_IRUKA.webp"
+  },
+  {
+    "id": "048/130",
+    "number": 48,
+    "name_fr": "HAYATE GEKKO",
+    "title_fr": "Shinobi talentueux",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Pouvoir"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If this character would be defeated, hide it instead."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/48_C_Hayate_Shinobi-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\048-130_HAYATE_GEKKO.webp"
+  },
+  {
+    "id": "049/130",
+    "number": 49,
+    "name_fr": "GEMMA SHIRANUI",
+    "title_fr": "Garde d'Élite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Pouvoir"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If a friendly Leaf Village character in this mission would be hidden or defeated by enemy effects, you can defeat this character instead."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/49_C_Genma_Elite_Guard-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\049-130_GEMMA_SHIRANUI.webp"
+  },
+  {
+    "id": "050/130",
+    "number": 50,
+    "name_fr": "OROCHIMARU",
+    "title_fr": "Infiltré",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 4,
+    "power": 4,
+    "keywords": [
+      "Sannin"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "AMBUSH",
+        "description": "Look at a hidden enemy character in this mission. If it costs 3 or less, take control of that character and move it to your side."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/50_C_Orochimaru_Undercover-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\050-130_OROCHIMARU.webp"
+  },
+  {
+    "id": "051/130",
+    "number": 51,
+    "name_fr": "OROCHIMARU",
+    "title_fr": "Style d'Orochimaru : Permutation",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "052/130",
+    "number": 52,
+    "name_fr": "KABUTO YAKUSHI",
+    "title_fr": "La taupe",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "053/130",
+    "number": 53,
+    "name_fr": "KABUTO YAKUSHI",
+    "title_fr": "Destruction des blessures de guérison yin",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "054/130",
+    "number": 54,
+    "name_fr": "KABUTO YAKUSHI",
+    "title_fr": "Technique du Temple Nirvana",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "055/130",
+    "number": 55,
+    "name_fr": "KIMIMARO",
+    "title_fr": "La Danse du Camélia",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Weapon"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "AMBUSH",
+        "description": "Discard a card to hide a character in play with cost 3 or less."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/55_C_Kimimaro_Camelia_Dance-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\055-130_KIMIMARO.webp"
+  },
+  {
+    "id": "056/130",
+    "number": 56,
+    "name_fr": "KIMIMARO",
+    "title_fr": "La Danse du Mélèze",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "057/130",
+    "number": 57,
+    "name_fr": "JIRÔBÔ",
+    "title_fr": "Porteur de la Marque Maudite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Sound Four"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "POWERUP X. X is the number of missions where you have at least one friendly Sound Four character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/57_C_Jiroubou_Bearer-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\057-130_JIRÔBÔ.webp"
+  },
+  {
+    "id": "058/130",
+    "number": 58,
+    "name_fr": "JIRÔBÔ",
+    "title_fr": "La Geôle de Terre",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "059/130",
+    "number": 59,
+    "name_fr": "KIDÔMARU",
+    "title_fr": "Porteur de la Marque Maudite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 2,
+    "keywords": [
+      "Sound Four"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Move X friendly character(s). X is the number of missions where you have at least one friendly Sound Four character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/59_C_Kidomaru_Bearer-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\059-130_KIDÔMARU.webp"
+  },
+  {
+    "id": "060/130",
+    "number": 60,
+    "name_fr": "KIDÔMARU",
+    "title_fr": "Déploiement de la Toile",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "061/130",
+    "number": 61,
+    "name_fr": "SAKON",
+    "title_fr": "Porteur de la Marque Maudite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 2,
+    "keywords": [
+      "Sound Four"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Draw X card(s). X is the number of missions where you have at least one friendly Sound Four character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/61_C_Sakon_Bearer-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\061-130_SAKON.webp"
+  },
+  {
+    "id": "062/130",
+    "number": 62,
+    "name_fr": "SAKON",
+    "title_fr": "Apposition des sceaux maléfiques",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "063/130",
+    "number": 63,
+    "name_fr": "UKON",
+    "title_fr": "Possession moléculaire",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "064/130",
+    "number": 64,
+    "name_fr": "TAYUYA",
+    "title_fr": "Porteur de la Marque Maudite",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 1,
+    "keywords": [
+      "Sound Four"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] CHAKRA +X X is the number of missions where you have at least one friendly Sound Four character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/64_C_Tayuya_Bearer-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\064-130_TAYUYA.webp"
+  },
+  {
+    "id": "065/130",
+    "number": 65,
+    "name_fr": "TAYUYA",
+    "title_fr": "La Flûte Démoniaque",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "066/130",
+    "number": 66,
+    "name_fr": "DOKI",
+    "title_fr": "Invocation",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "067/130",
+    "number": 67,
+    "name_fr": "REMPART",
+    "title_fr": "Invocation",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "068/130",
+    "number": 68,
+    "name_fr": "DOSU KINUTA",
+    "title_fr": "Ouïe Surhumaine",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team Dosu"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Look at a hidden character in play."
+      },
+      {
+        "type": "AMBUSH",
+        "description": "Defeat a hidden character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/68_C_Dosu_Superhuman-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\068-130_DOSU_KINUTA.webp"
+  },
+  {
+    "id": "069/130",
+    "number": 69,
+    "name_fr": "DOSU KINUTA",
+    "title_fr": "Haut-parleur à écho résonant",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "070/130",
+    "number": 70,
+    "name_fr": "ZAKU ABUMI",
+    "title_fr": "Shinobi trop confiant",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 4,
+    "keywords": [
+      "Team Dosu"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Opponent gains 1 Chakra."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/70_C_Zaku_Shinobi-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\070-130_ZAKU_ABUMI.webp"
+  },
+  {
+    "id": "071/130",
+    "number": 71,
+    "name_fr": "ZAKU ABUMI",
+    "title_fr": "Ondes Cinglantes",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "072/130",
+    "number": 72,
+    "name_fr": "KIN TSUCHI",
+    "title_fr": "Kunoichi",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 3,
+    "keywords": [
+      "Team Dosu"
+    ],
+    "group": "Sound Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Opponent draws a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/72_C_Kin_Cruel-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\072-130_KIN_TSUCHI.webp"
+  },
+  {
+    "id": "073/130",
+    "number": 73,
+    "name_fr": "KIN TSUCHI",
+    "title_fr": "Clone du son de cloche",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "074/130",
+    "number": 74,
+    "name_fr": "GAARA",
+    "title_fr": "Genin du Village du Sable",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "POWERUP X where X is the number of friendly hidden characters in this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/74_C_Gaara_Jinchuriki-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\074-130_GAARA.webp"
+  },
+  {
+    "id": "075/130",
+    "number": 75,
+    "name_fr": "GAARA",
+    "title_fr": "Bouclier de Sable",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If this character would be moved or defeated by enemy effects, instead hide them."
+      },
+      {
+        "type": "MAIN",
+        "description": "[⧗] You can play this character while hidden paying 2 less."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/75_C_Gaara_Sand_Shield-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\075-130_GAARA.webp"
+  },
+  {
+    "id": "076/130",
+    "number": 76,
+    "name_fr": "ICHIBI",
+    "title_fr": "Métamorphose Partielle",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "077/130",
+    "number": 77,
+    "name_fr": "KANKURÔ",
+    "title_fr": "Fils de Chakra",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If there's at least one non-hidden enemy character in this mission, CHAKRA +1 ."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/77_C_Kankurou_Chakra_Threads-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\077-130_KANKURÔ.webp"
+  },
+  {
+    "id": "078/130",
+    "number": 78,
+    "name_fr": "KANKURÔ",
+    "title_fr": "Technique de Marionnettiste",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "079/130",
+    "number": 79,
+    "name_fr": "TEMARI",
+    "title_fr": "Kunoichi",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If you have the Edge, this character has +2 Power."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/79_C_Temari_Kunoichi-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\079-130_TEMARI.webp"
+  },
+  {
+    "id": "080/130",
+    "number": 80,
+    "name_fr": "TEMARI",
+    "title_fr": "La Grande Lame du Vent",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "081/130",
+    "number": 81,
+    "name_fr": "BAKI",
+    "title_fr": "Agent du Conseil",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 2,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/81_C_Baki_Council_Agent-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\081-130_BAKI.webp"
+  },
+  {
+    "id": "082/130",
+    "number": 82,
+    "name_fr": "BAKI",
+    "title_fr": "Épée de vent",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "083/130",
+    "number": 83,
+    "name_fr": "RASA",
+    "title_fr": "Quatrième Kazekage",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "084/130",
+    "number": 84,
+    "name_fr": "YASHAMARU",
+    "title_fr": "Tuteur de Gaara",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 1,
+    "keywords": [
+      "Pouvoir"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] This character has +2 Power if there's a friendly [u]Gaara[/u] in this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/84_C_Yashamaru_Careteaker-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\084-130_YASHAMARU.webp"
+  },
+  {
+    "id": "085/130",
+    "number": 85,
+    "name_fr": "YASHAMARU",
+    "title_fr": "Mission Sacrificielle",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "086/130",
+    "number": 86,
+    "name_fr": "ZABUZA MOMOCHI",
+    "title_fr": "Tranchoir",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 5,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Independent",
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/86_C_Zabuza_Kubikiribocho-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\086-130_ZABUZA_MOMOCHI.webp"
+  },
+  {
+    "id": "087/130",
+    "number": 87,
+    "name_fr": "ZABUZA MOMOCHI",
+    "title_fr": "Prison Aqueuse",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "088/130",
+    "number": 88,
+    "name_fr": "HAKU",
+    "title_fr": "Orphelin du Pays de l'Eau",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 2,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Draw 1 card. If you do, you must put 1 card from your hand on top of your deck."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/88_C_Haku_Orphan-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\088-130_HAKU.webp"
+  },
+  {
+    "id": "089/130",
+    "number": 89,
+    "name_fr": "HAKU",
+    "title_fr": "Les Démoniaques Miroirs de Glace",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "090/130",
+    "number": 90,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "Akatsuki",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 3,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Akatsuki",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/90_C_Itachi_Akatsuki-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\090-130_ITACHI_UCHIWA.webp"
+  },
+  {
+    "id": "091/130",
+    "number": 91,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "Le Kaléidoscope Hypnotique du Sharingan",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "092/130",
+    "number": 92,
+    "name_fr": "KISAME HOSHIGAKI",
+    "title_fr": "Le Ninja Déserteur du Village du Brouillard",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 4,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Akatsuki",
+    "effects": [
+      {
+        "type": "AMBUSH",
+        "description": "Remove up to 2 Power tokens from an enemy character in this mission and put them on this character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/92_C_Kisame_Rogue_Ninja-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\092-130_KISAME_HOSHIGAKI.webp"
+  },
+  {
+    "id": "093/130",
+    "number": 93,
+    "name_fr": "KISAME HOSHIGAKI",
+    "title_fr": "Samehada",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "094/130",
+    "number": 94,
+    "name_fr": "GAMA BUNTA",
+    "title_fr": "Chef des Crapauds",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 6,
+    "keywords": [
+      "Summon"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] At the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/94_C_Gamabunta_Chief_Toad-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\094-130_GAMA_BUNTA.webp"
+  },
+  {
+    "id": "095/130",
+    "number": 95,
+    "name_fr": "GAMAHIRO",
+    "title_fr": "Crapaud Armé",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 4,
+    "power": 6,
+    "keywords": [
+      "Summon"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If there's a friendly character in this mission, draw a card."
+      },
+      {
+        "type": "MAIN",
+        "description": "[⧗] At the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/95_C_Gamahiro_Armed_Toad-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\095-130_GAMAHIRO.webp"
+  },
+  {
+    "id": "096/130",
+    "number": 96,
+    "name_fr": "GAMAKITCHI",
+    "title_fr": "Fils aîné de Gama Bunta",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 2,
+    "power": 3,
+    "keywords": [
+      "Summon"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] Pay 1 less to play this character if there's a friendly [u]Naruto Uzumaki[/u] in this mission."
+      },
+      {
+        "type": "MAIN",
+        "description": "[⧗] At the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/96_C_Gamakichi_Eldest_Son-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\096-130_GAMAKITCHI.webp"
+  },
+  {
+    "id": "097/130",
+    "number": 97,
+    "name_fr": "GAMATATSU",
+    "title_fr": "Fils cadet de Gama Bunta",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 2,
+    "keywords": [
+      "Summon"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] At the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/97_C_Gamatatsu_Youngest_Son-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\097-130_GAMATATSU.webp"
+  },
+  {
+    "id": "098/130",
+    "number": 98,
+    "name_fr": "KATSUYU",
+    "title_fr": "Limace Géante",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 3,
+    "power": 5,
+    "keywords": [
+      "Summon"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "If there is a friendly [u]Tsunade[/u] in play, POWERUP 2 ."
+      },
+      {
+        "type": "MAIN",
+        "description": "[⧗] At the end of the round, you must return this character to your hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/98_C_Katsuyu_Giant_Slug-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\098-130_KATSUYU.webp"
+  },
+  {
+    "id": "099/130",
+    "number": 99,
+    "name_fr": "PAKKUN",
+    "title_fr": "Chien Ninja de Kakashi",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 1,
+    "keywords": [
+      "Ninja Hound"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Move this character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/99_C_Pakkun_Hound-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\099-130_PAKKUN.webp"
+  },
+  {
+    "id": "100/130",
+    "number": 100,
+    "name_fr": "CHIENS NINJAS",
+    "title_fr": "Chiens Ninjas de Kakashi",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 1,
+    "power": 1,
+    "keywords": [
+      "Ninja Hound"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] When this character moves to a different mission, look at a hidden character in that mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/100_C_Ninja_Hound-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\100-130_CHIENS_NINJAS.webp"
+  },
+  {
+    "id": "101/130",
+    "number": 101,
+    "name_fr": "TON TON",
+    "title_fr": "Cochon Ninja de Tsunade",
+    "rarity": "C",
+    "card_type": "character",
+    "has_visual": true,
+    "keywords": [
+      "Ninja Pig"
+    ],
+    "group": "Independent",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] If there's a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/101_C_TonTon_Pig-1920w.png",
+    "rarity_display": "Common",
+    "image_file": "images\\common\\101-130_TON_TON.webp"
+  },
+  {
+    "id": "102/130",
+    "number": 102,
+    "name_fr": "MANDA",
+    "title_fr": "Invoqué par Orochimaru",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "103/130",
+    "number": 103,
+    "name_fr": "KYODAIGUMO",
+    "title_fr": "Pluie d'araignées",
+    "rarity": "UC",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "104/130",
+    "number": 104,
+    "name_fr": "TSUNADE",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "105/130",
+    "number": 105,
+    "name_fr": "JIRAYA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "106/130",
+    "number": 106,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "107/130",
+    "number": 107,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "108/130",
+    "number": 108,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 5,
+    "power": 5,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Hide an enemy character with Power 3 or less in this mission."
+      },
+      {
+        "type": "MAIN",
+        "description": "effect: Powerup X where X is the Power of the enemy character that is being hidden."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/108_R_ART_Naruto_Shadow_Clone-1920w.png",
+    "rarity_display": "Rare Art",
+    "image_file": "images\\rare\\108-130_NARUTO_UZUMAKI.webp"
+  },
+  {
+    "id": "109/130",
+    "number": 109,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "110/130",
+    "number": 110,
+    "name_fr": "INO YAMANAKA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "111/130",
+    "number": 111,
+    "name_fr": "SHIKAMARU NARA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "112/130",
+    "number": 112,
+    "name_fr": "CHÔJI AKIMICHI",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "113/130",
+    "number": 113,
+    "name_fr": "KIBA INUZUKA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "114/130",
+    "number": 114,
+    "name_fr": "HINATA HYÛGA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "115/130",
+    "number": 115,
+    "name_fr": "SHINO ABURAME",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "116/130",
+    "number": 116,
+    "name_fr": "NEJI HYÛGA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "117/130",
+    "number": 117,
+    "name_fr": "ROCK LEE",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "118/130",
+    "number": 118,
+    "name_fr": "TENTEN",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "119/130",
+    "number": 119,
+    "name_fr": "KANKURÔ",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "120/130",
+    "number": 120,
+    "name_fr": "GAARA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 4,
+    "power": 4,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Defeat up to 1 enemy character with Power 1 or less in every mission."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "POWERUP X , where X is the number of characters defeated by the"
+      },
+      {
+        "type": "MAIN",
+        "description": "effect."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/120_R_ART_Gaara_Sand_Coffin-1920w.png",
+    "rarity_display": "Rare Art",
+    "image_file": "images\\rare\\120-130_GAARA.webp"
+  },
+  {
+    "id": "121/130",
+    "number": 121,
+    "name_fr": "TEMARI",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "122/130",
+    "number": 122,
+    "name_fr": "JIRÔBÔ",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "123/130",
+    "number": 123,
+    "name_fr": "KIMIMARO",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "124/130",
+    "number": 124,
+    "name_fr": "KIDÔMARU",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "125/130",
+    "number": 125,
+    "name_fr": "TAYUYA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "126/130",
+    "number": 126,
+    "name_fr": "OROCHIMARU",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "127/130",
+    "number": 127,
+    "name_fr": "SAKON",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "128/130",
+    "number": 128,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "129/130",
+    "number": 129,
+    "name_fr": "KYÛBI",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "130/130",
+    "number": 130,
+    "name_fr": "ICHIBI",
+    "title_fr": "",
+    "rarity": "R",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "131/130",
+    "number": 131,
+    "name_fr": "TSUNADE",
+    "title_fr": "Cinquième Hokage",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "132/130",
+    "number": 132,
+    "name_fr": "JIRAYA",
+    "title_fr": "Dans l'Estomac du Crapaud",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "133/130",
+    "number": 133,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Rasengan",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 6,
+    "power": 6,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+      },
+      {
+        "type": "MAIN",
+        "description": "effect: Instead, defeat both of them."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/133_Secret_GOLD_Naruto_Rasengan_Simulaz-1920w.png",
+    "rarity_display": "Secret",
+    "image_file": "images\\secret\\133-130_NARUTO_UZUMAKI.webp"
+  },
+  {
+    "id": "134/130",
+    "number": 134,
+    "name_fr": "KYÛBI",
+    "title_fr": "Destruction",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "135/130",
+    "number": 135,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "Corps Médical du Village de la Feuille",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 5,
+    "power": 4,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards."
+      },
+      {
+        "type": "MAIN",
+        "description": "effect: Instead, play the card paying 4 less."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/135_Secret_GOLD_Sakura_Recovery_Team_Simulaz-1920w.png",
+    "rarity_display": "Secret",
+    "image_file": "images\\secret\\135-130_SAKURA_HARUNO.webp"
+  },
+  {
+    "id": "136/130",
+    "number": 136,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "Marque maudite du Ciel",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 7,
+    "power": 8,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] When a character is defeated, gain 1 Chakra."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/136_Secret_GOLD_Sasuke_Heaven_Curse_Mark_Simulaz-1920w.png",
+    "rarity_display": "Secret",
+    "image_file": "images\\secret\\136-130_SASUKE_UCHIWA.webp"
+  },
+  {
+    "id": "137/130",
+    "number": 137,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "L'Éclair Pourfendeur",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 7,
+    "power": 7,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "UPGRADE",
+        "description": "Move this character."
+      },
+      {
+        "type": "MAIN",
+        "description": "Hide an"
+      },
+      {
+        "type": "UPGRADE",
+        "description": "d character in this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/137_Secret_GOLD_Kakashi_Lightning_Blade_Simulaz-85fa5025-1920w.png",
+    "rarity_display": "Secret",
+    "image_file": "images\\secret\\137-130_KAKASHI_HATAKE.webp"
+  },
+  {
+    "id": "138/130",
+    "number": 138,
+    "name_fr": "OROCHIMARU",
+    "title_fr": "Invocation, La Réincarnation des Âmes",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "139/130",
+    "number": 139,
+    "name_fr": "GAARA",
+    "title_fr": "Le Tombeau du Désert",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "140/130",
+    "number": 140,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "Tsukuyomi",
+    "rarity": "S",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "141/130",
+    "number": 141,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Défiant Sasuke",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "142/130",
+    "number": 142,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "Défiant Naruto",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "143/130",
+    "number": 143,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "Traquant Naruto",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 5,
+    "power": 5,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Akatsuki",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Move a friendly character to this mission."
+      },
+      {
+        "type": "AMBUSH",
+        "description": "Move an enemy character to this mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/143_M_Special_Itachi_Hunting-1920w.png",
+    "rarity_display": "Mythos",
+    "image_file": "images\\mythos\\143-130_ITACHI_UCHIWA.webp"
+  },
+  {
+    "id": "144/130",
+    "number": 144,
+    "name_fr": "KISAME HOSHIGAKI",
+    "title_fr": "Absorption du chakra",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": true,
+    "chakra": 6,
+    "power": 6,
+    "keywords": [
+      "Rogue Ninja"
+    ],
+    "group": "Akatsuki",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Steal 1 Chakra from the opponent pool."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/144_M_Special_Kisame_Chakra_absorb-1920w.png",
+    "rarity_display": "Mythos",
+    "image_file": "images\\mythos\\144-130_KISAME_HOSHIGAKI.webp"
+  },
+  {
+    "id": "145/130",
+    "number": 145,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Équipe 7 originelle",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "146/130",
+    "number": 146,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "Équipe 7 originelle",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "147/130",
+    "number": 147,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "Équipe 7 originelle",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "148/130",
+    "number": 148,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "Équipe 7 originelle",
+    "rarity": "M",
+    "card_type": "character",
+    "has_visual": false
+  },
+  {
+    "id": "104/130 A",
+    "number": 104,
+    "name_fr": "TSUNADE",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "105/130 A",
+    "number": 105,
+    "name_fr": "JIRAYA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "106/130 A",
+    "number": 106,
+    "name_fr": "KAKASHI HATAKE",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "107/130 A",
+    "number": 107,
+    "name_fr": "SASUKE UCHIWA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "108/130 A",
+    "number": 108,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "chakra": 5,
+    "power": 5,
+    "keywords": [
+      "Team 7"
+    ],
+    "group": "Leaf Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Hide an enemy character with Power 3 or less in this mission."
+      },
+      {
+        "type": "MAIN",
+        "description": "effect: Powerup X where X is the Power of the enemy character that is being hidden."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/108_R_ART_Naruto_Shadow_Clone-1920w.png",
+    "rarity_display": "Rare Art",
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\108-130_A_NARUTO_UZUMAKI.webp"
+  },
+  {
+    "id": "109/130 A",
+    "number": 109,
+    "name_fr": "SAKURA HARUNO",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "110/130 A",
+    "number": 110,
+    "name_fr": "INO YAMANAKA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "111/130 A",
+    "number": 111,
+    "name_fr": "SHIKAMARU NARA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "112/130 A",
+    "number": 112,
+    "name_fr": "CHÔJI AKIMICHI",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "113/130 A",
+    "number": 113,
+    "name_fr": "KIBA INUZUKA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "114/130 A",
+    "number": 114,
+    "name_fr": "HINATA HYÛGA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "115/130 A",
+    "number": 115,
+    "name_fr": "SHINO ABURAME",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "116/130 A",
+    "number": 116,
+    "name_fr": "NEJI HYÛGA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "117/130 A",
+    "number": 117,
+    "name_fr": "ROCK LEE",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "118/130 A",
+    "number": 118,
+    "name_fr": "TENTEN",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "119/130 A",
+    "number": 119,
+    "name_fr": "KANKURÔ",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "120/130 A",
+    "number": 120,
+    "name_fr": "GAARA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "chakra": 4,
+    "power": 4,
+    "keywords": [
+      "Team Baki"
+    ],
+    "group": "Sand Village",
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Defeat up to 1 enemy character with Power 1 or less in every mission."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "POWERUP X , where X is the number of characters defeated by the"
+      },
+      {
+        "type": "MAIN",
+        "description": "effect."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/120_R_ART_Gaara_Sand_Coffin-1920w.png",
+    "rarity_display": "Rare Art",
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\120-130_A_GAARA.webp"
+  },
+  {
+    "id": "121/130 A",
+    "number": 121,
+    "name_fr": "TEMARI",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "122/130 A",
+    "number": 122,
+    "name_fr": "JIRÔBÔ",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "123/130 A",
+    "number": 123,
+    "name_fr": "KIMIMARO",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "124/130 A",
+    "number": 124,
+    "name_fr": "KIDÔMARU",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "125/130 A",
+    "number": 125,
+    "name_fr": "TAYUYA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "126/130 A",
+    "number": 126,
+    "name_fr": "OROCHIMARU",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "127/130 A",
+    "number": 127,
+    "name_fr": "SAKON",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "128/130 A",
+    "number": 128,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "129/130 A",
+    "number": 129,
+    "name_fr": "KYÛBI",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "130/130 A",
+    "number": 130,
+    "name_fr": "ICHIBI",
+    "title_fr": "",
+    "rarity": "RA",
+    "card_type": "character",
+    "has_visual": false,
+    "is_rare_art": true
+  },
+  {
+    "id": "MSS 01",
+    "number": 1,
+    "name_fr": "Appel de soutien",
+    "name_en": "Call for support",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] POWERUP 2 a character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M1_Call-for-support-1920w.png",
+    "image_file": "images\\mission\\MSS_01_Appel_de_soutien.webp"
+  },
+  {
+    "id": "MSS 02",
+    "number": 2,
+    "name_fr": "Examen Chûnin",
+    "name_en": "Chunin Exam",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M2_Chunin-exam-1920w.png",
+    "image_file": "images\\mission\\MSS_02_Examen_Chûnin.webp"
+  },
+  {
+    "id": "MSS 03",
+    "number": 3,
+    "name_fr": "Trouver le traître",
+    "name_en": "Find the traitor",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Opponent discards a card from hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M3_Find-the-traitor-1920w.png",
+    "image_file": "images\\mission\\MSS_03_Trouver_le_traître.webp"
+  },
+  {
+    "id": "MSS 04",
+    "number": 4,
+    "name_fr": "Assassinat",
+    "name_en": "Assassination",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Defeat an enemy hidden character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M4_Assassination-1920w.png",
+    "image_file": "images\\mission\\MSS_04_Assassinat.webp"
+  },
+  {
+    "id": "MSS 05",
+    "number": 5,
+    "name_fr": "Ramener",
+    "name_en": "Bring it back",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] You must return one friendly non-hidden character in this mission to your hand, if able."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M5_Bring-it-back-9b1cfeac-1920w.png",
+    "image_file": "images\\mission\\MSS_05_Ramener.webp"
+  },
+  {
+    "id": "MSS 06",
+    "number": 6,
+    "name_fr": "Sauvetage d'un ami",
+    "name_en": "Rescue a friend",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M6_Free-a-friend-1920w.png",
+    "image_file": "images\\mission\\MSS_06_Sauvetage_dun_ami.webp"
+  },
+  {
+    "id": "MSS 07",
+    "number": 7,
+    "name_fr": "Je dois partir",
+    "name_en": "I have to go",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Move a friendly hidden character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M7_I-have-to-go-1920w.png",
+    "image_file": "images\\mission\\MSS_07_Je_dois_partir.webp"
+  },
+  {
+    "id": "MSS 08",
+    "number": 8,
+    "name_fr": "Tendre un piège",
+    "name_en": "Set a trap",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Put a card from your hand as a hidden character to any mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M8_Set-a-trap-1920w.png",
+    "image_file": "images\\mission\\MSS_08_Tendre_un_piège.webp"
+  },
+  {
+    "id": "MSS 09",
+    "number": 9,
+    "name_fr": "Protéger le chef",
+    "name_en": "Protect the leader",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": false
+  },
+  {
+    "id": "MSS 10",
+    "number": 10,
+    "name_fr": "Entraînement au chakra",
+    "name_en": "Chakra Training",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M10_Chakra-improvement-050bc0fb-1920w.png",
+    "image_file": "images\\mission\\MSS_10_Entraînement_au_chakra.webp"
+  },
+  {
+    "id": "Legendary",
+    "number": 0,
+    "name_fr": "NARUTO UZUMAKI",
+    "title_fr": "Je serai le plus grand Hokage!",
+    "rarity": "Legendary",
+    "card_type": "character",
+    "has_visual": false,
+    "numbering": "n/1000",
+    "limited_edition": 1000
+  }
+]
