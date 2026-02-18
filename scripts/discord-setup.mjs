@@ -5,12 +5,12 @@
  * - @everyone: NO access to any channel (ViewChannel denied at server level)
  * - Genin (minimum rank): sees all normal channels
  * - Chunin / Kage: same as Genin (higher ranks)
- * - Testeur: sees ONLY test channels (beta-testing, dev-internal, Test Voice)
- * - Developer / Hokage: sees everything (normal + test)
+ * - Testeur: sees ALL channels (normal + test)
+ * - Developer / Hokage: sees everything (normal + test + staff)
  * - Jonin (moderator): sees all normal channels
  *
- * If someone only has the Testeur role, they see ONLY test channels.
- * If they also have Genin, they see both normal and test channels.
+ * Testeur sees all normal channels plus the test channels.
+ * No need for Genin if you already have Testeur.
  *
  * Usage:
  *   node scripts/discord-setup.mjs YOUR_BOT_TOKEN YOUR_GUILD_ID
@@ -143,7 +143,7 @@ const ROLES = [
 // 'test'    = Testeur, Developer, Hokage ONLY
 // 'staff'   = Developer, Hokage ONLY
 
-const ACCESS_NORMAL = ['Genin', 'Chunin', 'Kage', 'Hokage', 'Jonin', 'Developer'];
+const ACCESS_NORMAL = ['Genin', 'Chunin', 'Kage', 'Hokage', 'Jonin', 'Developer', 'Testeur'];
 const ACCESS_TEST   = ['Testeur', 'Developer', 'Hokage'];
 const ACCESS_STAFF  = ['Developer', 'Hokage'];
 
@@ -798,8 +798,8 @@ async function setupServer() {
   console.log('    @everyone        -> NO access (can\'t see any channel)');
   console.log('    Genin (minimum)  -> Normal channels (Welcome, EN, FR, Competitive, Dev, Community, Voice)');
   console.log('    Chunin / Kage    -> Same as Genin');
-  console.log('    Testeur          -> ONLY test channels (beta-testing, dev-internal, Test Voice)');
-  console.log('    Developer        -> All channels (normal + test)');
+  console.log('    Testeur          -> All channels (normal + test)');
+  console.log('    Developer        -> All channels (normal + test + staff)');
   console.log('    Hokage           -> All channels (admin)');
   console.log('    Jonin            -> Normal channels + moderation');
   console.log('');
