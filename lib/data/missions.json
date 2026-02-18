@@ -1,0 +1,152 @@
+[
+  {
+    "id": "MSS 01",
+    "number": 1,
+    "name_fr": "Appel de soutien",
+    "name_en": "Call for support",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] POWERUP 2 a character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M1_Call-for-support-1920w.png",
+    "image_file": "images\\mission\\MSS_01_Appel_de_soutien.webp"
+  },
+  {
+    "id": "MSS 02",
+    "number": 2,
+    "name_fr": "Examen Chûnin",
+    "name_en": "Chunin Exam",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M2_Chunin-exam-1920w.png",
+    "image_file": "images\\mission\\MSS_02_Examen_Chûnin.webp"
+  },
+  {
+    "id": "MSS 03",
+    "number": 3,
+    "name_fr": "Trouver le traître",
+    "name_en": "Find the traitor",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Opponent discards a card from hand."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M3_Find-the-traitor-1920w.png",
+    "image_file": "images\\mission\\MSS_03_Trouver_le_traître.webp"
+  },
+  {
+    "id": "MSS 04",
+    "number": 4,
+    "name_fr": "Assassinat",
+    "name_en": "Assassination",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Defeat an enemy hidden character."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M4_Assassination-1920w.png",
+    "image_file": "images\\mission\\MSS_04_Assassinat.webp"
+  },
+  {
+    "id": "MSS 05",
+    "number": 5,
+    "name_fr": "Ramener",
+    "name_en": "Bring it back",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] You must return one friendly non-hidden character in this mission to your hand, if able."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M5_Bring-it-back-9b1cfeac-1920w.png",
+    "image_file": "images\\mission\\MSS_05_Ramener.webp"
+  },
+  {
+    "id": "MSS 06",
+    "number": 6,
+    "name_fr": "Sauvetage d'un ami",
+    "name_en": "Rescue a friend",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Draw a card."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M6_Free-a-friend-1920w.png",
+    "image_file": "images\\mission\\MSS_06_Sauvetage_dun_ami.webp"
+  },
+  {
+    "id": "MSS 07",
+    "number": 7,
+    "name_fr": "Je dois partir",
+    "name_en": "I have to go",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Move a friendly hidden character in play."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M7_I-have-to-go-1920w.png",
+    "image_file": "images\\mission\\MSS_07_Je_dois_partir.webp"
+  },
+  {
+    "id": "MSS 08",
+    "number": 8,
+    "name_fr": "Tendre un piège",
+    "name_en": "Set a trap",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "[↯] Put a card from your hand as a hidden character to any mission."
+      }
+    ],
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M8_Set-a-trap-1920w.png",
+    "image_file": "images\\mission\\MSS_08_Tendre_un_piège.webp"
+  },
+  {
+    "id": "MSS 09",
+    "number": 9,
+    "name_fr": "Protéger le chef",
+    "name_en": "Protect the leader",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": false
+  },
+  {
+    "id": "MSS 10",
+    "number": 10,
+    "name_fr": "Entraînement au chakra",
+    "name_en": "Chakra Training",
+    "rarity": "Mission",
+    "card_type": "mission",
+    "has_visual": true,
+    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M10_Chakra-improvement-050bc0fb-1920w.png",
+    "image_file": "images\\mission\\MSS_10_Entraînement_au_chakra.webp"
+  }
+]
