@@ -79,7 +79,8 @@
       "finalScore": "Final Score",
       "playAgain": "Play Again",
       "backToMenu": "Back to Menu",
-      "tieBreaker": "Tie broken by Edge Token holder"
+      "tieBreaker": "Tie broken by Edge Token holder",
+      "rankedMatch": "Ranked Match"
     },
     "opponent": "Opponent",
     "you": "You",
@@ -214,7 +215,11 @@
     "signedInAs": "Signed in as {name}",
     "createPrivateRoom": "Create Private Room",
     "findMatchDesc": "Find a random opponent near your skill level",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "casual": "Casual",
+    "ranked": "Ranked",
+    "casualDesc": "Unranked match — play for fun, no ELO changes",
+    "rankedDesc": "Ranked match — ELO rating will be updated"
   },
   "leaderboard": {
     "title": "Leaderboard",

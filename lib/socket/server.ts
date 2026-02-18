@@ -2,6 +2,8 @@ import type { Server as SocketIOServer, Socket } from 'socket.io';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, GameConfig } from '@/lib/engine/types';
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
+import { prisma } from '@/lib/db/prisma';
+import { calculateEloChanges } from '@/lib/elo/elo';
 
 interface RoomData {
   code: string;
@@ -13,6 +15,7 @@ interface RoomData {
   hostDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   isPrivate: boolean;
+  isRanked: boolean;
 }
 
 const rooms = new Map<string, RoomData>();
@@ -39,9 +42,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
-      
+
       let code: string;
       do {
         code = generateRoomCode();
@@ -57,6 +60,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         hostDeck: null,
         guestDeck: null,
         isPrivate: data.isPrivate ?? true,
+        isRanked: data.isRanked ?? false,
       };
 
       rooms.set(code, room);
@@ -168,7 +172,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Game action
-    socket.on('action:perform', (data: { action: GameAction }) => {
+    socket.on('action:perform', async (data: { action: GameAction }) => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
       const room = rooms.get(code);
@@ -217,11 +221,72 @@ export function setupSocketHandlers(io: SocketIOServer) {
         // Check game over
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
-          io.to(code).emit('game:ended', {
-            winner,
-            player1Score: room.gameState.player1.missionPoints,
-            player2Score: room.gameState.player2.missionPoints,
-          });
+          const p1Score = room.gameState.player1.missionPoints;
+          const p2Score = room.gameState.player2.missionPoints;
+
+          // Persist game result and apply ELO if ranked
+          let eloData: { player1Delta: number; player2Delta: number } | null = null;
+          try {
+            if (room.isRanked && room.hostId && room.guestId) {
+              const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
+              const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
+
+              if (player1 && player2) {
+                const eloResult = winner === 'player1' ? 'player1' : 'player2';
+                const changes = calculateEloChanges(player1.elo, player2.elo, eloResult);
+                eloData = { player1Delta: changes.player1Delta, player2Delta: changes.player2Delta };
+
+                const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+                const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+
+                await Promise.all([
+                  prisma.user.update({
+                    where: { id: room.hostId },
+                    data: { elo: changes.player1NewElo, ...p1Stats },
+                  }),
+                  prisma.user.update({
+                    where: { id: room.guestId! },
+                    data: { elo: changes.player2NewElo, ...p2Stats },
+                  }),
+                  prisma.game.create({
+                    data: {
+                      player1Id: room.hostId,
+                      player2Id: room.guestId!,
+                      isAiGame: false,
+                      status: 'completed',
+                      winnerId: winner === 'player1' ? room.hostId : room.guestId!,
+                      player1Score: p1Score,
+                      player2Score: p2Score,
+                      eloChange: changes.player1Delta,
+                      completedAt: new Date(),
+                    },
+                  }),
+                ]);
+              }
+            }
+          } catch (eloErr) {
+            console.error('[Socket] Error persisting game result:', eloErr);
+          }
+
+          // Emit to each player separately so they get their own ELO delta
+          if (room.hostSocket) {
+            io.to(room.hostSocket).emit('game:ended', {
+              winner,
+              player1Score: p1Score,
+              player2Score: p2Score,
+              isRanked: room.isRanked,
+              eloDelta: eloData?.player1Delta ?? null,
+            });
+          }
+          if (room.guestSocket) {
+            io.to(room.guestSocket).emit('game:ended', {
+              winner,
+              player1Score: p1Score,
+              player2Score: p2Score,
+              isRanked: room.isRanked,
+              eloDelta: eloData?.player2Delta ?? null,
+            });
+          }
         }
       } catch (err) {
         socket.emit('game:error', {
@@ -231,13 +296,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Matchmaking
-    socket.on('matchmaking:join', (data: { userId: string }) => {
-      console.log(`[Socket] User ${data.userId} joining matchmaking`);
-      
-      // Find an available public room
+    socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean }) => {
+      console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
+      const wantRanked = data.isRanked ?? true;
+
+      // Find an available public room with matching ranked preference
       let foundRoom: RoomData | null = null;
       for (const [, room] of rooms) {
-        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId) {
+        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked) {
           foundRoom = room;
           break;
         }
@@ -277,6 +343,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           hostDeck: null,
           guestDeck: null,
           isPrivate: false,
+          isRanked: wantRanked,
         };
 
         rooms.set(code, room);

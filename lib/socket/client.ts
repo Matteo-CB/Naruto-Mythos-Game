@@ -21,15 +21,17 @@ interface SocketStore {
     winner: string;
     player1Score: number;
     player2Score: number;
+    isRanked?: boolean;
+    eloDelta?: number | null;
   } | null;
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[]) => void;
   performAction: (action: GameAction) => void;
-  joinMatchmaking: (userId: string) => void;
+  joinMatchmaking: (userId: string, isRanked?: boolean) => void;
   leaveMatchmaking: () => void;
   clearError: () => void;
 }
@@ -138,6 +140,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           winner: string;
           player1Score: number;
           player2Score: number;
+          isRanked?: boolean;
+          eloDelta?: number | null;
         }) => {
           set({ gameEnded: true, gameResult: data });
         },
@@ -210,11 +214,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false) => {
     const { socket } = get();
     if (socket) {
       console.log('[Socket] Emitting room:create');
-      socket.emit('room:create', { userId, isPrivate });
+      socket.emit('room:create', { userId, isPrivate, isRanked });
     } else {
       console.error('[Socket] Cannot create room: not connected');
     }
@@ -245,11 +249,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  joinMatchmaking: (userId: string) => {
+  joinMatchmaking: (userId: string, isRanked = true) => {
     const { socket } = get();
     if (socket) {
       console.log('[Socket] Emitting matchmaking:join');
-      socket.emit('matchmaking:join', { userId });
+      socket.emit('matchmaking:join', { userId, isRanked });
     } else {
       console.error('[Socket] Cannot join matchmaking: not connected');
     }
