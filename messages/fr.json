@@ -28,7 +28,8 @@
     "register": "S'inscrire",
     "discord": "Discord",
     "profile": "Mon Profil",
-    "friends": "Amis"
+    "friends": "Amis",
+    "bugReport": "Signaler un Bug"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -695,5 +696,39 @@
     "decline": "Refuser",
     "cancel": "Annuler l'invitation",
     "expiresIn": "Expire dans {time}"
+  },
+  "bugReport": {
+    "title": "Signaler un Bug",
+    "subtitle": "Aidez-nous a ameliorer le jeu en signalant les bugs",
+    "signInRequired": "Vous devez etre connecte pour signaler un bug.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Decrivez le bug : ce qui s'est passe, ce que vous attendiez, etapes pour reproduire...",
+    "imageLabel": "Capture d'ecran (optionnel)",
+    "uploadImage": "Cliquez pour ajouter une capture d'ecran",
+    "imageHint": "PNG, JPG, WebP — max 5 Mo",
+    "submit": "Envoyer le Rapport",
+    "submitting": "Envoi en cours...",
+    "success": "Bug signale avec succes !",
+    "successDesc": "Merci de nous aider a ameliorer le jeu.",
+    "submitAnother": "Signaler un Autre Bug",
+    "admin": {
+      "title": "Rapports de Bugs",
+      "forbidden": "Acces refuse.",
+      "noReports": "Aucun rapport de bug.",
+      "markFixed": "Corrige",
+      "markOpen": "Rouvrir",
+      "markWontfix": "Ne sera pas corrige",
+      "filter": {
+        "all": "Tous",
+        "open": "Ouverts",
+        "fixed": "Corriges",
+        "wontfix": "Non corriges"
+      },
+      "status": {
+        "open": "Ouvert",
+        "fixed": "Corrige",
+        "wontfix": "Non corrige"
+      }
+    }
   }
 }

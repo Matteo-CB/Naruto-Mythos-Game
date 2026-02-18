@@ -61,6 +61,7 @@ const menuButtons = [
   { key: 'learn' as const, href: '/learn', primary: false },
   { key: 'quiz' as const, href: '/quiz', primary: false },
   { key: 'leaderboard' as const, href: '/leaderboard', primary: false },
+  { key: 'bugReport' as const, href: '/bug-report', primary: false },
 ];
 
 // Account buttons

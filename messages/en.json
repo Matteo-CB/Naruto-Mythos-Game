@@ -28,7 +28,8 @@
     "register": "Register",
     "discord": "Discord",
     "profile": "My Profile",
-    "friends": "Friends"
+    "friends": "Friends",
+    "bugReport": "Report a Bug"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -1011,5 +1012,39 @@
     "decline": "Decline",
     "cancel": "Cancel Invitation",
     "expiresIn": "Expires in {time}"
+  },
+  "bugReport": {
+    "title": "Bug Report",
+    "subtitle": "Help us improve the game by reporting bugs",
+    "signInRequired": "You must be signed in to report a bug.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the bug: what happened, what you expected, steps to reproduce...",
+    "imageLabel": "Screenshot (optional)",
+    "uploadImage": "Click to upload a screenshot",
+    "imageHint": "PNG, JPG, WebP — max 5 MB",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Bug report submitted!",
+    "successDesc": "Thank you for helping improve the game.",
+    "submitAnother": "Report Another Bug",
+    "admin": {
+      "title": "Bug Reports",
+      "forbidden": "Access denied.",
+      "noReports": "No bug reports yet.",
+      "markFixed": "Fixed",
+      "markOpen": "Reopen",
+      "markWontfix": "Won't Fix",
+      "filter": {
+        "all": "All",
+        "open": "Open",
+        "fixed": "Fixed",
+        "wontfix": "Won't Fix"
+      },
+      "status": {
+        "open": "Open",
+        "fixed": "Fixed",
+        "wontfix": "Won't Fix"
+      }
+    }
   }
 }
