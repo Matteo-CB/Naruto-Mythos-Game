@@ -1,0 +1,275 @@
+/* Holographic Card Effect — adapted from Pokemon TCG CSS */
+
+:root {
+  --card-mx: 50%;
+  --card-my: 50%;
+  --card-s: 1;
+  --card-o: 0;
+  --card-rx: 0deg;
+  --card-ry: 0deg;
+  --card-pos: 50% 50%;
+  --card-posx: 50%;
+  --card-posy: 50%;
+  --card-hyp: 0;
+}
+
+.holo-card {
+  --radius: 4.55% / 3.5%;
+  z-index: 10;
+  transform: translate3d(0, 0, 0.1px);
+  will-change: transform, visibility;
+  transform-style: preserve-3d;
+}
+
+.holo-card.interacting {
+  z-index: 120;
+}
+
+.holo-card__translater,
+.holo-card__rotator {
+  display: grid;
+  perspective: 600px;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.holo-card__translater {
+  width: auto;
+  position: relative;
+  transform: translate3d(0, 0, 0) scale(var(--card-s));
+}
+
+.holo-card__rotator {
+  --glow: rgba(196, 163, 90, 0.6);
+  --card-flip: 0deg;
+  transform: rotateY(calc(var(--card-ry) + var(--card-flip))) rotateX(var(--card-rx));
+  transform-style: preserve-3d;
+  box-shadow: 0px 10px 20px -5px black;
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+  transition: box-shadow 0.4s ease, transform 0.6s ease;
+}
+
+.holo-card--flipped .holo-card__rotator {
+  --card-flip: 180deg;
+}
+
+.holo-card.interacting .holo-card__rotator {
+  box-shadow:
+    0 0 10px 0px var(--glow),
+    0 0 10px 0px var(--glow),
+    0 0 30px 0px var(--glow);
+}
+
+.holo-card__rotator > * {
+  width: 100%;
+  display: grid;
+  grid-area: 1/1;
+  border-radius: var(--radius);
+  image-rendering: optimizeQuality;
+  transform-style: preserve-3d;
+}
+
+.holo-card__back {
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+.holo-card__back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.holo-card__front,
+.holo-card__front * {
+  backface-visibility: hidden;
+}
+
+.holo-card__front {
+  opacity: 1;
+  transition: opacity 0.33s ease-out;
+}
+
+/* Hide shine/glare when card is flipped (showing back) */
+.holo-card--flipped .holo-card__shine,
+.holo-card--flipped .holo-card__glare {
+  opacity: 0 !important;
+}
+
+.holo-card__front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* SHINE — holographic rainbow overlay */
+.holo-card__shine {
+  --grain: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCI+CjxmaWx0ZXIgaWQ9Im4iPgo8ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjciIG51bU9jdGF2ZXM9IjEwIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIj48L2ZlVHVyYnVsZW5jZT4KPC9maWx0ZXI+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWxsPSIjMDAwIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIiBmaWx0ZXI9InVybCgjbikiIG9wYWNpdHk9IjAuMyI+PC9yZWN0Pgo8L3N2Zz4=");
+
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: 500px;
+
+  --red: #f80e7b;
+  --yel: #eedf10;
+  --gre: #21e985;
+  --blu: #0dbde9;
+  --vio: #c929f1;
+
+  opacity: var(--card-o);
+  transition: opacity 0.25s ease;
+  mix-blend-mode: color-dodge;
+  border-radius: var(--radius);
+}
+
+/* Rare Holo V style — used for Naruto Rare/RA */
+.holo-card[data-rarity="rare"] .holo-card__shine,
+.holo-card[data-rarity="rare"] .holo-card__shine::after {
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: 500px;
+
+  background-image:
+    var(--grain),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255, 119, 115) calc(var(--space) * 1),
+      rgba(255, 237, 95, 1) calc(var(--space) * 2),
+      rgba(168, 255, 95, 1) calc(var(--space) * 3),
+      rgba(131, 255, 247, 1) calc(var(--space) * 4),
+      rgba(120, 148, 255, 1) calc(var(--space) * 5),
+      rgb(216, 117, 255) calc(var(--space) * 6),
+      rgb(255, 119, 115) calc(var(--space) * 7)
+    ),
+    repeating-linear-gradient(
+      var(--angle),
+      #0e152e 0%,
+      hsl(180, 10%, 60%) 3.8%,
+      hsl(180, 29%, 66%) 4.5%,
+      hsl(180, 10%, 60%) 5.2%,
+      #0e152e 10%,
+      #0e152e 12%
+    ),
+    radial-gradient(
+      farthest-corner circle at var(--card-mx) var(--card-my),
+      rgba(0, 0, 0, 0.1) 12%,
+      rgba(0, 0, 0, 0.15) 20%,
+      rgba(0, 0, 0, 0.25) 120%
+    );
+
+  background-blend-mode: screen, hue, hard-light;
+  background-size: var(--imgsize), 200% 700%, 300%, 200%;
+  background-position: center, 0% var(--card-posy), var(--card-posx) var(--card-posy), var(--card-posx) var(--card-posy);
+
+  filter: brightness(0.8) contrast(2.95) saturate(0.5);
+}
+
+.holo-card[data-rarity="rare"] .holo-card__shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+
+  background-image:
+    var(--grain),
+    repeating-linear-gradient(
+      0deg,
+      rgb(255, 119, 115) calc(var(--space) * 1),
+      rgba(255, 237, 95, 1) calc(var(--space) * 2),
+      rgba(168, 255, 95, 1) calc(var(--space) * 3),
+      rgba(131, 255, 247, 1) calc(var(--space) * 4),
+      rgba(120, 148, 255, 1) calc(var(--space) * 5),
+      rgb(216, 117, 255) calc(var(--space) * 6),
+      rgb(255, 119, 115) calc(var(--space) * 7)
+    ),
+    repeating-linear-gradient(
+      var(--angle),
+      #0e152e 0%,
+      hsl(180, 10%, 60%) 3.8%,
+      hsl(180, 29%, 66%) 4.5%,
+      hsl(180, 10%, 60%) 5.2%,
+      #0e152e 10%,
+      #0e152e 12%
+    ),
+    radial-gradient(
+      farthest-corner circle at var(--card-mx) var(--card-my),
+      rgba(0, 0, 0, 0.1) 12%,
+      rgba(0, 0, 0, 0.15) 20%,
+      rgba(0, 0, 0, 0.25) 120%
+    );
+
+  background-position: center, 0% var(--card-posy), calc(var(--card-posx) * -1) calc(var(--card-posy) * -1), var(--card-posx) var(--card-posy);
+  background-size: var(--imgsize), 200% 400%, 195%, 200%;
+
+  filter: brightness(1) contrast(2.5) saturate(1.75);
+  mix-blend-mode: soft-light;
+}
+
+/* Secret / Mythos — gold style */
+.holo-card[data-rarity="secret"] .holo-card__shine,
+.holo-card[data-rarity="mythos"] .holo-card__shine {
+  --angle: 110deg;
+
+  background-image:
+    repeating-linear-gradient(
+      var(--angle),
+      rgba(89, 46, 80, 0.5) 0%,
+      hsl(39, 37%, 60%) 2.5%,
+      rgb(216, 183, 92) 5%,
+      hsl(39, 37%, 60%) 7.5%,
+      rgba(14, 21, 46, 0.5) 10%,
+      rgba(14, 21, 46, 0.5) 15%
+    ),
+    var(--grain);
+
+  background-size: 600% 600%, 500px;
+  background-position: var(--card-posx) var(--card-posy), center;
+  background-blend-mode: darken;
+
+  filter: brightness(calc((var(--card-hyp) * 0.4) + 0.7)) contrast(3) saturate(0.66);
+}
+
+.holo-card[data-rarity="secret"] .holo-card__shine::after,
+.holo-card[data-rarity="mythos"] .holo-card__shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+
+  background-image:
+    repeating-linear-gradient(
+      var(--angle),
+      rgba(89, 46, 80, 0.5) 0%,
+      hsl(39, 37%, 60%) 2.5%,
+      rgb(216, 183, 92) 5%,
+      hsl(39, 37%, 60%) 7.5%,
+      rgba(14, 21, 46, 0.5) 10%,
+      rgba(14, 21, 46, 0.5) 15%
+    );
+
+  background-position: calc(var(--card-posx) * -1) calc(var(--card-posy) * -1);
+  background-size: 600% 600%;
+
+  filter: brightness(calc((var(--card-hyp) * 0.3) + 0.7)) contrast(2.5) saturate(0.66);
+  mix-blend-mode: exclusion;
+}
+
+/* GLARE — light reflection following mouse */
+.holo-card__glare {
+  opacity: var(--card-o);
+  transition: opacity 0.25s ease;
+  border-radius: var(--radius);
+
+  background-image: radial-gradient(
+    farthest-corner circle at var(--card-mx) var(--card-my),
+    rgba(255, 255, 255, 0.4) 10%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(0, 0, 0, 0.5) 90%
+  );
+
+  mix-blend-mode: overlay;
+}

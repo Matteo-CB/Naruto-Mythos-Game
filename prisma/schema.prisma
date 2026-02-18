@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  username       String       @unique
+  email          String       @unique
+  password       String
+  elo            Int          @default(1000)
+  wins           Int          @default(0)
+  losses         Int          @default(0)
+  draws          Int          @default(0)
+  createdAt      DateTime     @default(now())
+  decks          Deck[]
+  gamesAsPlayer1 Game[]       @relation("Player1")
+  gamesAsPlayer2 Game[]       @relation("Player2")
+  quizScores     QuizScore[]
+  friendshipsSent     Friendship[]  @relation("FriendshipSent")
+  friendshipsReceived Friendship[]  @relation("FriendshipReceived")
+  matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
+  matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
+}
+
+model Deck {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  cardIds    String[]
+  missionIds String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Game {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  player1Id    String?   @db.ObjectId
+  player2Id    String?   @db.ObjectId
+  player1      User?     @relation("Player1", fields: [player1Id], references: [id])
+  player2      User?     @relation("Player2", fields: [player2Id], references: [id])
+  isAiGame     Boolean   @default(false)
+  aiDifficulty String?
+  status       String
+  winnerId     String?   @db.ObjectId
+  gameState    Json?
+  player1Score Int       @default(0)
+  player2Score Int       @default(0)
+  eloChange    Int?
+  createdAt    DateTime  @default(now())
+  completedAt  DateTime?
+}
+
+model Room {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  code      String   @unique
+  hostId    String   @db.ObjectId
+  guestId   String?  @db.ObjectId
+  gameId    String?  @db.ObjectId
+  status    String
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model QuizScore {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  difficulty  Int
+  score       Int
+  correct     Int
+  total       Int
+  accuracy    Float
+  bestStreak  Int
+  completedAt DateTime @default(now())
+}
+
+model Friendship {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  sender     User     @relation("FriendshipSent", fields: [senderId], references: [id])
+  receiver   User     @relation("FriendshipReceived", fields: [receiverId], references: [id])
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([senderId, receiverId])
+}
+
+model MatchInvite {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  receiverId String   @db.ObjectId
+  sender     User     @relation("MatchInviteSent", fields: [senderId], references: [id])
+  receiver   User     @relation("MatchInviteReceived", fields: [receiverId], references: [id])
+  roomCode   String?
+  status     String
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+}
