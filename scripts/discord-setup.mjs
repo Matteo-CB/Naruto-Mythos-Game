@@ -1,21 +1,19 @@
 /**
  * Naruto Mythos TCG - Discord Server Setup Script
  *
- * This script configures an entire Discord server with:
- * - Roles with permissions and colors
- * - Categories and channels (bilingual EN/FR)
- * - Channel topics and descriptions
- * - Permission overwrites per role
- * - Welcome embeds in key channels
+ * Permission model:
+ * - @everyone: NO access to any channel (ViewChannel denied at server level)
+ * - Genin (minimum rank): sees all normal channels
+ * - Chunin / Kage: same as Genin (higher ranks)
+ * - Testeur: sees ONLY test channels (beta-testing, dev-internal, Test Voice)
+ * - Developer / Hokage: sees everything (normal + test)
+ * - Jonin (moderator): sees all normal channels
+ *
+ * If someone only has the Testeur role, they see ONLY test channels.
+ * If they also have Genin, they see both normal and test channels.
  *
  * Usage:
- *   1. Create a Discord bot at https://discord.com/developers/applications
- *   2. Copy the bot token
- *   3. Invite bot to your server with Administrator permission
- *   4. Run: node scripts/discord-setup.mjs YOUR_BOT_TOKEN YOUR_GUILD_ID
- *
- * To get your Guild ID: Enable Developer Mode in Discord settings,
- * right-click your server name -> Copy Server ID
+ *   node scripts/discord-setup.mjs YOUR_BOT_TOKEN YOUR_GUILD_ID
  */
 
 import { Client, GatewayIntentBits, PermissionsBitField, ChannelType, EmbedBuilder } from 'discord.js';
@@ -32,19 +30,19 @@ if (!BOT_TOKEN || !GUILD_ID) {
 // COLOR PALETTE (from the game's UI)
 // ──────────────────────────────────────────────
 const COLORS = {
-  gold:       0xC4A35A,  // Primary accent
-  red:        0xB33E3E,  // Danger / Akatsuki
-  green:      0x3E8B3E,  // Success / Leaf
-  purple:     0x6A6ABB,  // Mythos / Secret
-  orange:     0xB37E3E,  // B-rank
-  sand:       0xD4B896,  // Sand Village
-  dark:       0x141414,  // Surface
-  muted:      0x888888,  // Muted text
-  white:      0xE0E0E0,  // Foreground
-  sound:      0x5A5A8A,  // Sound Village
-  tester:     0x3EAAB3,  // Tester role
-  champion:   0xFFD700,  // Champion
-  mod:        0x5865F2,  // Moderator (Discord blurple)
+  gold:       0xC4A35A,
+  red:        0xB33E3E,
+  green:      0x3E8B3E,
+  purple:     0x6A6ABB,
+  orange:     0xB37E3E,
+  sand:       0xD4B896,
+  dark:       0x141414,
+  muted:      0x888888,
+  white:      0xE0E0E0,
+  sound:      0x5A5A8A,
+  tester:     0x3EAAB3,
+  champion:   0xFFD700,
+  mod:        0x5865F2,
 };
 
 // ──────────────────────────────────────────────
@@ -103,7 +101,6 @@ const ROLES = [
     position: 70,
     permissions: [],
     mentionable: false,
-    description: 'ELO 2000+',
   },
   {
     name: 'Chunin',
@@ -112,7 +109,6 @@ const ROLES = [
     position: 60,
     permissions: [],
     mentionable: false,
-    description: 'ELO 1200-1999',
   },
   {
     name: 'Genin',
@@ -121,307 +117,279 @@ const ROLES = [
     position: 50,
     permissions: [],
     mentionable: false,
-    description: 'ELO < 1200',
   },
 
   // --- Village affiliation (self-assignable) ---
-  {
-    name: 'Leaf Village',
-    color: COLORS.green,
-    hoist: false,
-    position: 30,
-    permissions: [],
-    mentionable: false,
-  },
-  {
-    name: 'Sand Village',
-    color: COLORS.sand,
-    hoist: false,
-    position: 29,
-    permissions: [],
-    mentionable: false,
-  },
-  {
-    name: 'Sound Village',
-    color: COLORS.sound,
-    hoist: false,
-    position: 28,
-    permissions: [],
-    mentionable: false,
-  },
-  {
-    name: 'Akatsuki',
-    color: COLORS.red,
-    hoist: false,
-    position: 27,
-    permissions: [],
-    mentionable: false,
-  },
-  {
-    name: 'Independent',
-    color: COLORS.muted,
-    hoist: false,
-    position: 26,
-    permissions: [],
-    mentionable: false,
-  },
+  { name: 'Leaf Village', color: COLORS.green, hoist: false, position: 30, permissions: [], mentionable: false },
+  { name: 'Sand Village', color: COLORS.sand, hoist: false, position: 29, permissions: [], mentionable: false },
+  { name: 'Sound Village', color: COLORS.sound, hoist: false, position: 28, permissions: [], mentionable: false },
+  { name: 'Akatsuki', color: COLORS.red, hoist: false, position: 27, permissions: [], mentionable: false },
+  { name: 'Independent', color: COLORS.muted, hoist: false, position: 26, permissions: [], mentionable: false },
 
   // --- Language ---
-  {
-    name: 'English',
-    color: null,
-    hoist: false,
-    position: 15,
-    permissions: [],
-    mentionable: false,
-  },
-  {
-    name: 'Francais',
-    color: null,
-    hoist: false,
-    position: 14,
-    permissions: [],
-    mentionable: false,
-  },
+  { name: 'English', color: null, hoist: false, position: 15, permissions: [], mentionable: false },
+  { name: 'Francais', color: null, hoist: false, position: 14, permissions: [], mentionable: false },
 
   // --- Notifications ---
-  {
-    name: 'Updates',
-    color: null,
-    hoist: false,
-    position: 10,
-    permissions: [],
-    mentionable: true,
-  },
-  {
-    name: 'Tournaments',
-    color: null,
-    hoist: false,
-    position: 9,
-    permissions: [],
-    mentionable: true,
-  },
-  {
-    name: 'Events',
-    color: null,
-    hoist: false,
-    position: 8,
-    permissions: [],
-    mentionable: true,
-  },
+  { name: 'Updates', color: null, hoist: false, position: 10, permissions: [], mentionable: true },
+  { name: 'Tournaments', color: null, hoist: false, position: 9, permissions: [], mentionable: true },
+  { name: 'Events', color: null, hoist: false, position: 8, permissions: [], mentionable: true },
 ];
 
 // ──────────────────────────────────────────────
-// CHANNELS DEFINITION
+// ACCESS LEVELS
 // ──────────────────────────────────────────────
+// 'normal'  = Genin, Chunin, Kage, Hokage, Jonin, Developer
+// 'test'    = Testeur, Developer, Hokage ONLY
+// 'staff'   = Developer, Hokage ONLY
 
-// Helper to deny @everyone from seeing a channel
-const PRIVATE = (everyoneId) => [
-  { id: everyoneId, deny: [PermissionsBitField.Flags.ViewChannel] },
-];
+const ACCESS_NORMAL = ['Genin', 'Chunin', 'Kage', 'Hokage', 'Jonin', 'Developer'];
+const ACCESS_TEST   = ['Testeur', 'Developer', 'Hokage'];
+const ACCESS_STAFF  = ['Developer', 'Hokage'];
 
-// Helper for read-only announcement channels
-const READ_ONLY = (everyoneId) => [
-  { id: everyoneId, deny: [PermissionsBitField.Flags.SendMessages] },
-];
+// ──────────────────────────────────────────────
+// CATEGORIES & CHANNELS DEFINITION
+// ──────────────────────────────────────────────
 
 const CATEGORIES = [
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   // WELCOME
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  WELCOME  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'rules',
-        topic: 'Server rules \u2502 Read before participating \u2502 R\u00e8gles du serveur',
-        readOnly: true,
-      },
-      {
-        name: 'announcements',
-        topic: 'Official announcements & updates \u2502 Annonces officielles et mises \u00e0 jour',
-        readOnly: true,
-      },
-      {
-        name: 'pick-your-roles',
-        topic: 'Choose your language, village, and notification preferences \u2502 Choisissez votre langue et village',
-      },
-      {
-        name: 'introductions',
-        topic: 'Introduce yourself to the community \u2502 Pr\u00e9sentez-vous \u00e0 la communaut\u00e9',
-      },
+      { name: 'rules', topic: 'Server rules \u2502 Read before participating \u2502 R\u00e8gles du serveur', readOnly: true },
+      { name: 'announcements', topic: 'Official announcements & updates \u2502 Annonces officielles', readOnly: true },
+      { name: 'pick-your-roles', topic: 'Choose your language, village, and notifications \u2502 Choisissez vos r\u00f4les' },
+      { name: 'introductions', topic: 'Introduce yourself \u2502 Pr\u00e9sentez-vous' },
     ],
   },
 
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   // ENGLISH
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  ENGLISH  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'general-en',
-        topic: 'General discussion about Naruto Mythos TCG',
-      },
-      {
-        name: 'find-a-match',
-        topic: 'Looking for an opponent? Post here with your ELO and preferred format',
-      },
-      {
-        name: 'deck-sharing-en',
-        topic: 'Share your deck builds, get feedback, discuss meta strategies',
-      },
-      {
-        name: 'strategies-en',
-        topic: 'Advanced strategies, mission control, chakra management, card combos',
-      },
-      {
-        name: 'card-discussion-en',
-        topic: 'Discuss individual card effects, power levels, and synergies',
-      },
-      {
-        name: 'help-en',
-        topic: 'Need help with rules or game mechanics? Ask here',
-      },
+      { name: 'general-en', topic: 'General discussion about Naruto Mythos TCG' },
+      { name: 'find-a-match', topic: 'Looking for an opponent? Post here with your ELO' },
+      { name: 'deck-sharing-en', topic: 'Share your deck builds, get feedback, discuss meta' },
+      { name: 'strategies-en', topic: 'Advanced strategies, mission control, chakra management, combos' },
+      { name: 'card-discussion-en', topic: 'Discuss card effects, power levels, and synergies' },
+      { name: 'help-en', topic: 'Need help with rules or game mechanics? Ask here' },
     ],
   },
 
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   // FRANCAIS
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  FRAN\u00c7AIS  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'general-fr',
-        topic: 'Discussion g\u00e9n\u00e9rale sur Naruto Mythos TCG',
-      },
-      {
-        name: 'chercher-un-match',
-        topic: 'Vous cherchez un adversaire ? Postez ici avec votre ELO',
-      },
-      {
-        name: 'partage-de-decks',
-        topic: 'Partagez vos decks, demandez des conseils, discutez du m\u00e9ta',
-      },
-      {
-        name: 'strategies-fr',
-        topic: 'Strat\u00e9gies avanc\u00e9es, contr\u00f4le de mission, gestion du chakra, combos',
-      },
-      {
-        name: 'discussion-cartes',
-        topic: 'Discutez des effets des cartes, de leur puissance et de leurs synergies',
-      },
-      {
-        name: 'aide-fr',
-        topic: 'Besoin d\'aide avec les r\u00e8gles ou les m\u00e9caniques ? Demandez ici',
-      },
+      { name: 'general-fr', topic: 'Discussion g\u00e9n\u00e9rale sur Naruto Mythos TCG' },
+      { name: 'chercher-un-match', topic: 'Vous cherchez un adversaire ? Postez ici avec votre ELO' },
+      { name: 'partage-de-decks', topic: 'Partagez vos decks, demandez des conseils, discutez du m\u00e9ta' },
+      { name: 'strategies-fr', topic: 'Strat\u00e9gies avanc\u00e9es, contr\u00f4le de mission, gestion du chakra, combos' },
+      { name: 'discussion-cartes', topic: 'Discutez des effets des cartes, de leur puissance et synergies' },
+      { name: 'aide-fr', topic: 'Besoin d\'aide avec les r\u00e8gles ou les m\u00e9caniques ? Demandez ici' },
     ],
   },
 
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   // COMPETITIVE
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  COMPETITIVE  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'leaderboard',
-        topic: 'ELO rankings and top players \u2502 Classement ELO',
-        readOnly: true,
-      },
-      {
-        name: 'tournaments',
-        topic: 'Tournament announcements and sign-ups \u2502 Annonces et inscriptions de tournois',
-        readOnly: true,
-      },
-      {
-        name: 'tournament-chat',
-        topic: 'Live tournament discussion \u2502 Discussion en direct des tournois',
-      },
-      {
-        name: 'match-results',
-        topic: 'Post your match results and screenshots \u2502 Publiez vos r\u00e9sultats',
-      },
-      {
-        name: 'hall-of-fame',
-        topic: 'Notable plays, epic comebacks, and legendary moments \u2502 Moments l\u00e9gendaires',
-        readOnly: true,
-      },
+      { name: 'leaderboard', topic: 'ELO rankings and top players \u2502 Classement ELO', readOnly: true },
+      { name: 'tournaments', topic: 'Tournament announcements and sign-ups', readOnly: true },
+      { name: 'tournament-chat', topic: 'Live tournament discussion' },
+      { name: 'match-results', topic: 'Post your match results and screenshots' },
+      { name: 'hall-of-fame', topic: 'Notable plays, epic comebacks, legendary moments', readOnly: true },
     ],
   },
 
-  // ════════════════════════════════════════════
-  // DEVELOPMENT
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
+  // DEVELOPMENT (public part — Genin+)
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  DEVELOPMENT  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'changelog',
-        topic: 'Game updates, patches, and new features \u2502 Mises \u00e0 jour du jeu',
-        readOnly: true,
-      },
-      {
-        name: 'bug-reports',
-        topic: 'Report bugs here with screenshots and steps to reproduce \u2502 Signaler des bugs',
-      },
-      {
-        name: 'suggestions',
-        topic: 'Feature requests and improvement ideas \u2502 Id\u00e9es et suggestions',
-      },
-      {
-        name: 'beta-testing',
-        topic: '[Testeur only] Beta builds, test instructions, feedback \u2502 Tests en cours',
-        restrictTo: 'Testeur',
-      },
-      {
-        name: 'dev-internal',
-        topic: '[Developer only] Internal development discussion',
-        restrictTo: 'Developer',
-      },
+      { name: 'changelog', topic: 'Game updates, patches, and new features \u2502 Mises \u00e0 jour', readOnly: true },
+      { name: 'bug-reports', topic: 'Report bugs with screenshots and steps to reproduce' },
+      { name: 'suggestions', topic: 'Feature requests and improvement ideas' },
     ],
   },
 
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
+  // TESTING (Testeur only — isolated)
+  // ═══════════════════════════════════════
+  {
+    name: '\u2550\u2550  TESTING  \u2550\u2550',
+    access: 'test',
+    channels: [
+      { name: 'beta-testing', topic: '[Testeur] Beta builds, test instructions, feedback' },
+      { name: 'dev-internal', topic: '[Staff] Internal development discussion', access: 'staff' },
+    ],
+    voiceChannels: [
+      { name: 'Test Voice' },
+    ],
+  },
+
+  // ═══════════════════════════════════════
   // COMMUNITY
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  COMMUNITY  \u2550\u2550',
+    access: 'normal',
     channels: [
-      {
-        name: 'off-topic',
-        topic: 'Talk about anything \u2502 Parlez de tout et de rien',
-      },
-      {
-        name: 'fan-art',
-        topic: 'Share your Naruto and card game fan art \u2502 Partagez vos fan arts',
-      },
-      {
-        name: 'memes',
-        topic: 'Naruto TCG memes and funny moments \u2502 M\u00e8mes et moments dr\u00f4les',
-      },
-      {
-        name: 'media-clips',
-        topic: 'Game replays, screenshots, and video content \u2502 Replays et captures',
-      },
+      { name: 'off-topic', topic: 'Talk about anything \u2502 Parlez de tout et de rien' },
+      { name: 'fan-art', topic: 'Share your Naruto fan art \u2502 Partagez vos fan arts' },
+      { name: 'memes', topic: 'Naruto TCG memes and funny moments' },
+      { name: 'media-clips', topic: 'Game replays, screenshots, video content' },
     ],
   },
 
-  // ════════════════════════════════════════════
-  // VOICE
-  // ════════════════════════════════════════════
+  // ═══════════════════════════════════════
+  // VOICE (Genin+)
+  // ═══════════════════════════════════════
   {
     name: '\u2550\u2550  VOICE  \u2550\u2550',
-    voice: true,
-    channels: [
-      { name: 'Game Voice EN', topic: '' },
-      { name: 'Game Voice FR', topic: '' },
-      { name: 'Tournament Voice', topic: '' },
-      { name: 'Chill Zone', topic: '' },
+    access: 'normal',
+    voiceChannels: [
+      { name: 'Game Voice EN' },
+      { name: 'Game Voice FR' },
+      { name: 'Tournament Voice' },
+      { name: 'Chill Zone' },
     ],
   },
 ];
+
+// ──────────────────────────────────────────────
+// PERMISSION HELPERS
+// ──────────────────────────────────────────────
+
+/**
+ * Build permission overwrites for a category based on its access level.
+ * @everyone is always denied ViewChannel.
+ * The appropriate roles are granted ViewChannel + base permissions.
+ */
+function buildCategoryOverwrites(everyoneId, roleMap, accessLevel) {
+  const overwrites = [
+    // @everyone: can't see this category
+    {
+      id: everyoneId,
+      deny: [PermissionsBitField.Flags.ViewChannel],
+    },
+  ];
+
+  const accessRoles = accessLevel === 'test' ? ACCESS_TEST
+                    : accessLevel === 'staff' ? ACCESS_STAFF
+                    : ACCESS_NORMAL;
+
+  for (const roleName of accessRoles) {
+    const role = roleMap.get(roleName);
+    if (role) {
+      overwrites.push({
+        id: role.id,
+        allow: [
+          PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ReadMessageHistory,
+          PermissionsBitField.Flags.AddReactions,
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.Speak,
+        ],
+      });
+    }
+  }
+
+  return overwrites;
+}
+
+/**
+ * Build channel-level overwrites for read-only channels.
+ * Denies SendMessages for all roles that can view, except staff.
+ */
+function buildReadOnlyOverwrites(everyoneId, roleMap, parentAccess) {
+  const overwrites = [
+    // Deny SendMessages for @everyone (belt-and-suspenders)
+    { id: everyoneId, deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages] },
+  ];
+
+  const accessRoles = parentAccess === 'test' ? ACCESS_TEST
+                    : parentAccess === 'staff' ? ACCESS_STAFF
+                    : ACCESS_NORMAL;
+
+  for (const roleName of accessRoles) {
+    const role = roleMap.get(roleName);
+    if (!role) continue;
+    const isStaff = roleName === 'Hokage' || roleName === 'Developer';
+    overwrites.push({
+      id: role.id,
+      allow: [
+        PermissionsBitField.Flags.ViewChannel,
+        PermissionsBitField.Flags.ReadMessageHistory,
+        ...(isStaff ? [PermissionsBitField.Flags.SendMessages] : []),
+      ],
+      deny: isStaff ? [] : [PermissionsBitField.Flags.SendMessages],
+    });
+  }
+
+  return overwrites;
+}
+
+/**
+ * Build channel-level overwrites for a channel with a more restrictive access
+ * than its parent category (e.g., dev-internal inside TESTING category).
+ */
+function buildChannelAccessOverwrites(everyoneId, roleMap, channelAccess) {
+  const overwrites = [
+    { id: everyoneId, deny: [PermissionsBitField.Flags.ViewChannel] },
+  ];
+
+  const accessRoles = channelAccess === 'staff' ? ACCESS_STAFF
+                    : channelAccess === 'test' ? ACCESS_TEST
+                    : ACCESS_NORMAL;
+
+  for (const roleName of accessRoles) {
+    const role = roleMap.get(roleName);
+    if (role) {
+      overwrites.push({
+        id: role.id,
+        allow: [
+          PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ReadMessageHistory,
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.Speak,
+        ],
+      });
+    }
+  }
+
+  // Deny ViewChannel for roles that had access to the parent but not this channel
+  // E.g., Testeur can see the TESTING category but not dev-internal (staff only)
+  const parentRoles = ACCESS_TEST; // TESTING category uses test access
+  for (const roleName of parentRoles) {
+    if (!accessRoles.includes(roleName)) {
+      const role = roleMap.get(roleName);
+      if (role) {
+        overwrites.push({
+          id: role.id,
+          deny: [PermissionsBitField.Flags.ViewChannel],
+        });
+      }
+    }
+  }
+
+  return overwrites;
+}
 
 // ──────────────────────────────────────────────
 // WELCOME EMBEDS
@@ -489,30 +457,24 @@ function buildRolesEmbed(roleMap) {
     .setTitle('CHOOSE YOUR ROLES / CHOISISSEZ VOS ROLES')
     .setDescription('React to pick your roles below.\nR\u00e9agissez pour choisir vos r\u00f4les ci-dessous.')
     .addFields(
-      {
-        name: '\u2694 Village Affiliation / Affiliation au Village',
-        value: villageList,
-      },
-      {
-        name: '\U0001F4AC Language / Langue',
-        value: langList,
-      },
-      {
-        name: '\U0001F514 Notifications',
-        value: notifList,
-      },
+      { name: '\u2694 Village Affiliation', value: villageList },
+      { name: '\u{1F4AC} Language / Langue', value: langList },
+      { name: '\u{1F514} Notifications', value: notifList },
     )
     .addFields(
       {
-        name: '\U0001F3C6 Rank Roles / R\u00f4les de Rang',
+        name: '\u{1F3C6} Rank Roles (Automatic)',
         value: [
-          `**Kage** \u2502 ELO 2000+ (Automatic)`,
-          `**Chunin** \u2502 ELO 1200-1999 (Automatic)`,
-          `**Genin** \u2502 ELO < 1200 (Automatic)`,
+          '**Kage** \u2502 ELO 2000+',
+          '**Chunin** \u2502 ELO 1200-1999',
+          '**Genin** \u2502 ELO < 1200',
+          '',
+          'The **Genin** role is required to access all channels.',
+          'Rank roles are assigned automatically from your in-game ELO.',
         ].join('\n'),
       },
     )
-    .setFooter({ text: 'Rank roles are assigned automatically based on your in-game ELO' })
+    .setFooter({ text: 'New members receive Genin automatically when they create an account' })
     .setTimestamp();
 }
 
@@ -558,7 +520,7 @@ function buildLeaderboardEmbed() {
       '\u2502 Chunin \u2502 1200 - 1999 ELO',
       '\u2502 Kage \u2502 2000+ ELO',
       '',
-      'Check the full leaderboard: https://naruto.daikicorp.fr/leaderboard',
+      'Full leaderboard: https://naruto.daikicorp.fr/leaderboard',
     ].join('\n'))
     .setFooter({ text: 'Only rated online matches affect ELO' })
     .setTimestamp();
@@ -635,7 +597,7 @@ async function setupServer() {
   const everyoneRole = guild.roles.everyone;
 
   // ──────────────────────────────────────────
-  // Step 1: Delete existing channels (optional safety)
+  // Step 1: Delete existing channels
   // ──────────────────────────────────────────
   console.log('  [1/6] Cleaning existing channels...');
   const existingChannels = await guild.channels.fetch();
@@ -677,12 +639,12 @@ async function setupServer() {
   console.log(`    ${roleMap.size} roles created.\n`);
 
   // ──────────────────────────────────────────
-  // Step 3: Set @everyone defaults
+  // Step 3: Set @everyone defaults — NO ViewChannel
   // ──────────────────────────────────────────
-  console.log('  [3/6] Configuring @everyone...');
+  console.log('  [3/6] Configuring @everyone (no channel access)...');
   try {
     await everyoneRole.setPermissions([
-      PermissionsBitField.Flags.ViewChannel,
+      // Basic perms only — ViewChannel is NOT included
       PermissionsBitField.Flags.SendMessages,
       PermissionsBitField.Flags.ReadMessageHistory,
       PermissionsBitField.Flags.AddReactions,
@@ -693,7 +655,7 @@ async function setupServer() {
       PermissionsBitField.Flags.Speak,
       PermissionsBitField.Flags.UseVAD,
     ]);
-    console.log('    @everyone permissions set.\n');
+    console.log('    @everyone: ViewChannel DENIED (role required to see any channel).\n');
   } catch (e) {
     console.error('    ERROR setting @everyone permissions:', e.message, '\n');
   }
@@ -707,78 +669,60 @@ async function setupServer() {
 
   for (const cat of CATEGORIES) {
     try {
+      const catAccess = cat.access || 'normal';
+
+      // Build category-level permission overwrites
+      const catOverwrites = buildCategoryOverwrites(everyoneRole.id, roleMap, catAccess);
+
       const category = await guild.channels.create({
         name: cat.name,
         type: ChannelType.GuildCategory,
+        permissionOverwrites: catOverwrites,
         reason: 'Server setup script',
       });
-      console.log(`    [Category] ${cat.name}`);
+      console.log(`    [Category] ${cat.name} (access: ${catAccess})`);
 
-      for (const ch of cat.channels) {
-        const isVoice = cat.voice === true;
-        const permissionOverwrites = [];
+      // Create text channels
+      if (cat.channels) {
+        for (const ch of cat.channels) {
+          let permissionOverwrites;
 
-        // Read-only channels
-        if (ch.readOnly) {
-          const staffRoles = ['Hokage', 'Developer'];
-          permissionOverwrites.push({
-            id: everyoneRole.id,
-            deny: [PermissionsBitField.Flags.SendMessages],
+          if (ch.readOnly) {
+            // Read-only: deny SendMessages for non-staff, inherit parent visibility
+            permissionOverwrites = buildReadOnlyOverwrites(everyoneRole.id, roleMap, catAccess);
+          } else if (ch.access && ch.access !== catAccess) {
+            // Channel has more restrictive access than its parent category
+            permissionOverwrites = buildChannelAccessOverwrites(everyoneRole.id, roleMap, ch.access);
+          }
+
+          const channel = await guild.channels.create({
+            name: ch.name,
+            type: ChannelType.GuildText,
+            parent: category.id,
+            topic: ch.topic || undefined,
+            permissionOverwrites: permissionOverwrites || undefined,
+            reason: 'Server setup script',
           });
-          for (const staffName of staffRoles) {
-            const staffRole = roleMap.get(staffName);
-            if (staffRole) {
-              permissionOverwrites.push({
-                id: staffRole.id,
-                allow: [PermissionsBitField.Flags.SendMessages],
-              });
-            }
-          }
-        }
 
-        // Restricted channels (Testeur, Developer)
-        if (ch.restrictTo) {
-          const restrictRole = roleMap.get(ch.restrictTo);
-          permissionOverwrites.push({
-            id: everyoneRole.id,
-            deny: [PermissionsBitField.Flags.ViewChannel],
+          channelMap.set(ch.name, channel);
+          const suffix = ch.readOnly ? ' [read-only]' : (ch.access ? ` [${ch.access} only]` : '');
+          console.log(`    # ${ch.name}${suffix}`);
+        }
+      }
+
+      // Create voice channels
+      if (cat.voiceChannels) {
+        for (const vc of cat.voiceChannels) {
+          const channel = await guild.channels.create({
+            name: vc.name,
+            type: ChannelType.GuildVoice,
+            parent: category.id,
+            reason: 'Server setup script',
           });
-          if (restrictRole) {
-            permissionOverwrites.push({
-              id: restrictRole.id,
-              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-            });
-          }
-          // Hokage and Developer always see everything
-          const hokage = roleMap.get('Hokage');
-          const dev = roleMap.get('Developer');
-          if (hokage) {
-            permissionOverwrites.push({
-              id: hokage.id,
-              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-            });
-          }
-          if (dev && ch.restrictTo !== 'Developer') {
-            permissionOverwrites.push({
-              id: dev.id,
-              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-            });
-          }
+
+          channelMap.set(vc.name, channel);
+          console.log(`    \u266A ${vc.name}`);
         }
-
-        const channel = await guild.channels.create({
-          name: ch.name,
-          type: isVoice ? ChannelType.GuildVoice : ChannelType.GuildText,
-          parent: category.id,
-          topic: ch.topic || undefined,
-          permissionOverwrites: permissionOverwrites.length > 0 ? permissionOverwrites : undefined,
-          reason: 'Server setup script',
-        });
-
-        channelMap.set(ch.name, channel);
-        const prefix = isVoice ? '    \u266A' : (ch.readOnly ? '    #' : (ch.restrictTo ? '    \u26BF' : '    #'));
-        const suffix = ch.readOnly ? ' [read-only]' : (ch.restrictTo ? ` [${ch.restrictTo} only]` : '');
-        console.log(`${prefix} ${ch.name}${suffix}`);
       }
     } catch (e) {
       console.error(`    ERROR creating category ${cat.name}:`, e.message);
@@ -814,7 +758,7 @@ async function setupServer() {
   console.log('');
 
   // ──────────────────────────────────────────
-  // Step 6: Set server icon and metadata
+  // Step 6: Final configuration
   // ──────────────────────────────────────────
   console.log('  [6/6] Final configuration...');
 
@@ -834,14 +778,23 @@ async function setupServer() {
   console.log(`  Roles created:    ${roleMap.size}`);
   console.log(`  Channels created: ${channelMap.size}`);
   console.log('');
+  console.log('  Permission model:');
+  console.log('    @everyone        -> NO access (can\'t see any channel)');
+  console.log('    Genin (minimum)  -> Normal channels (Welcome, EN, FR, Competitive, Dev, Community, Voice)');
+  console.log('    Chunin / Kage    -> Same as Genin');
+  console.log('    Testeur          -> ONLY test channels (beta-testing, dev-internal, Test Voice)');
+  console.log('    Developer        -> All channels (normal + test)');
+  console.log('    Hokage           -> All channels (admin)');
+  console.log('    Jonin            -> Normal channels + moderation');
+  console.log('');
   console.log('  Role IDs for reference:');
   for (const [name, role] of roleMap) {
     console.log(`    ${name.padEnd(20)} ${role.id}`);
   }
   console.log('\n  Next steps:');
-  console.log('    1. Reorder roles in Server Settings if needed');
-  console.log('    2. Set up reaction roles in #pick-your-roles (use a bot like Carl-bot)');
-  console.log('    3. Set the server icon to your game logo');
+  console.log('    1. Assign Genin to all current members (or set up auto-role on join)');
+  console.log('    2. Set up reaction roles in #pick-your-roles (Carl-bot)');
+  console.log('    3. Set the server icon');
   console.log('    4. Configure AutoMod if desired');
   console.log('    5. Remove the setup bot if no longer needed\n');
 
