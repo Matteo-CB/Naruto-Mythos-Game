@@ -40,6 +40,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     // Create a room
     socket.on('room:create', (data: { userId: string; isPrivate?: boolean }) => {
+      console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
+      
       let code: string;
       do {
         code = generateRoomCode();
@@ -61,20 +63,38 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, code);
       socket.join(code);
 
+      console.log(`[Socket] Room ${code} created by ${data.userId}`);
       socket.emit('room:created', { code });
     });
 
     // Join a room
     socket.on('room:join', (data: { code: string; userId: string }) => {
+      console.log(`[Socket] User ${data.userId} trying to join room ${data.code}`);
+      
       const room = rooms.get(data.code);
       if (!room) {
+        console.log(`[Socket] Room ${data.code} not found`);
         socket.emit('room:error', { message: 'Room not found' });
         return;
       }
 
-      if (room.guestId) {
+      // Check if user is already the host
+      if (room.hostId === data.userId) {
+        console.log(`[Socket] User ${data.userId} is the host of room ${data.code}`);
+        socket.emit('room:error', { message: 'You are the host of this room' });
+        return;
+      }
+
+      // Check if room has a guest (but allow same user to rejoin)
+      if (room.guestId && room.guestId !== data.userId) {
+        console.log(`[Socket] Room ${data.code} is full`);
         socket.emit('room:error', { message: 'Room is full' });
         return;
+      }
+
+      // If same user is rejoining, update socket
+      if (room.guestId === data.userId) {
+        console.log(`[Socket] User ${data.userId} rejoining room ${data.code}`);
       }
 
       room.guestId = data.userId;
@@ -82,6 +102,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, data.code);
       socket.join(data.code);
 
+      console.log(`[Socket] User ${data.userId} joined room ${data.code}`);
       io.to(data.code).emit('room:player-joined', {
         hostId: room.hostId,
         guestId: room.guestId,
@@ -211,6 +232,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     // Matchmaking
     socket.on('matchmaking:join', (data: { userId: string }) => {
+      console.log(`[Socket] User ${data.userId} joining matchmaking`);
+      
       // Find an available public room
       let foundRoom: RoomData | null = null;
       for (const [, room] of rooms) {
@@ -221,6 +244,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       if (foundRoom) {
+        console.log(`[Socket] Matchmaking: found room ${foundRoom.code} for user ${data.userId}`);
         // Join existing room
         foundRoom.guestId = data.userId;
         foundRoom.guestSocket = socket.id;
@@ -236,6 +260,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           code: foundRoom.code,
         });
       } else {
+        console.log(`[Socket] Matchmaking: creating new room for user ${data.userId}`);
         // Create a new public room
         let code: string;
         do {
@@ -278,15 +303,30 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     // Disconnect
     socket.on('disconnect', () => {
+      console.log(`[Socket] Player disconnecting: ${socket.id}`);
+      
       const code = playerRooms.get(socket.id);
       if (code) {
         const room = rooms.get(code);
         if (room) {
           io.to(code).emit('room:player-left', { socketId: socket.id });
+          console.log(`[Socket] Player ${socket.id} left room ${code}`);
 
-          // Clean up room if game hasn't started
-          if (!room.gameState) {
-            rooms.delete(code);
+          // Handle disconnect based on player role
+          if (room.hostSocket === socket.id) {
+            // Host disconnected - remove room if game hasn't started
+            if (!room.gameState) {
+              console.log(`[Socket] Host left room ${code} before game started, removing room`);
+              rooms.delete(code);
+            } else {
+              console.log(`[Socket] Host left room ${code} during game`);
+            }
+          } else if (room.guestSocket === socket.id) {
+            // Guest disconnected - reset guest info but keep room
+            console.log(`[Socket] Guest left room ${code}, resetting guest`);
+            room.guestId = null;
+            room.guestSocket = null;
+            room.guestDeck = null;
           }
         }
         playerRooms.delete(socket.id);
@@ -294,7 +334,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Clean up user-to-socket mapping
       removeSocketFromAll(socket.id);
 
-      console.log(`Player disconnected: ${socket.id}`);
+      console.log(`[Socket] Player disconnected: ${socket.id}`);
     });
   });
 }

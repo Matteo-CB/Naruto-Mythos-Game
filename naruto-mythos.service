@@ -1,0 +1,27 @@
+[Unit]
+Description=Naruto Mythos Game
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+WorkingDirectory=/home/naruto-mythos/naruto-game
+ExecStartPre=-/usr/bin/docker rm -f naruto-mythos
+ExecStart=/usr/bin/docker run \
+  --name naruto-mythos \
+  -p 3000:3000 \
+  -e NODE_ENV=production \
+  -e PORT=3000 \
+  -e HOSTNAME=0.0.0.0 \
+  -e DATABASE_URL=mongodb+srv://dlkdigitalagency_db_user:Wz4j5KDYHmXcm9D4@cluster0.q4izgvf.mongodb.net/naruto-mythos-tcg?appName=Cluster0 \
+  -e NEXTAUTH_SECRET=INr2Orb46FbyiuGfJNGm2pHPuy+fQVc8e1/BfUIj+6A= \
+  -e NEXTAUTH_URL=https://naruto.daikicorp.fr \
+  -e NEXT_PUBLIC_SOCKET_URL= \
+  naruto-game-app
+ExecStop=/usr/bin/docker stop -t 30 naruto-mythos
+ExecStopPost=/usr/bin/docker rm -f naruto-mythos
+
+[Install]
+WantedBy=multi-user.target

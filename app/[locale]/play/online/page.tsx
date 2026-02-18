@@ -130,30 +130,26 @@ export default function PlayOnlinePage() {
     );
   }
 
-  const handleConnect = () => {
-    if (!connected) connect();
+  const handleCreateRoom = async () => {
+    if (!connected) {
+      await connect(session.user.id);
+    }
+    createRoom(session.user.id, true);
   };
 
-  const handleCreateRoom = () => {
-    handleConnect();
-    setTimeout(() => {
-      createRoom(session.user.id, true);
-    }, 500);
-  };
-
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     if (!joinCode.trim()) return;
-    handleConnect();
-    setTimeout(() => {
-      joinRoom(joinCode.trim().toUpperCase(), session.user.id);
-    }, 500);
+    if (!connected) {
+      await connect(session.user.id);
+    }
+    joinRoom(joinCode.trim().toUpperCase(), session.user.id);
   };
 
-  const handleMatchmaking = () => {
-    handleConnect();
-    setTimeout(() => {
-      joinMatchmaking(session.user.id);
-    }, 500);
+  const handleMatchmaking = async () => {
+    if (!connected) {
+      await connect(session.user.id);
+    }
+    joinMatchmaking(session.user.id);
   };
 
   const handleDeckSelect = (deck: ResolvedDeck) => {
