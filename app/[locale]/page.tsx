@@ -342,7 +342,7 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 2.3 }}
             >
               <a
-                href="https://discord.gg/naruto-mythos"
+                href="https://discord.gg/KGMG3jADyF"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-10 w-full items-center justify-center text-sm font-medium tracking-wide transition-all"
