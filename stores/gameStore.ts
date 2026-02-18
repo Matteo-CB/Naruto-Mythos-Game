@@ -300,6 +300,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       humanPlayer,
       aiPlayer: ai,
       isAIGame: true,
+      isOnlineGame: false,
       isProcessing: false,
       gameOver: false,
       winner: null,

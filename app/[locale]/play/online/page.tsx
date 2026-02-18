@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -51,8 +51,6 @@ export default function PlayOnlinePage() {
   } = useSocketStore();
 
   const startOnlineGame = useGameStore((s) => s.startOnlineGame);
-  const updateOnlineState = useGameStore((s) => s.updateOnlineState);
-  const endOnlineGame = useGameStore((s) => s.endOnlineGame);
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -64,7 +62,10 @@ export default function PlayOnlinePage() {
 
   useEffect(() => {
     return () => {
-      disconnect();
+      // Only disconnect if the game hasn't started — we need the socket alive in /game
+      if (!useSocketStore.getState().gameStarted) {
+        disconnect();
+      }
     };
   }, [disconnect]);
 
@@ -76,28 +77,14 @@ export default function PlayOnlinePage() {
   }, [error, clearError]);
 
   // When game starts: initialize gameStore with online state and navigate to /game
+  const gameInitRef = useRef(false);
   useEffect(() => {
-    if (gameStarted && visibleState && playerRole) {
+    if (gameStarted && visibleState && playerRole && !gameInitRef.current) {
+      gameInitRef.current = true;
       startOnlineGame(visibleState, playerRole);
       router.push('/game');
     }
   }, [gameStarted, visibleState, playerRole, startOnlineGame, router]);
-
-  // Keep gameStore in sync with socket state updates during the game
-  useEffect(() => {
-    if (gameStarted && visibleState) {
-      updateOnlineState(visibleState);
-    }
-  }, [visibleState, gameStarted, updateOnlineState]);
-
-  // Handle game ended
-  const gameEnded = useSocketStore((s) => s.gameEnded);
-  const gameResult = useSocketStore((s) => s.gameResult);
-  useEffect(() => {
-    if (gameEnded && gameResult) {
-      endOnlineGame(gameResult.winner);
-    }
-  }, [gameEnded, gameResult, endOnlineGame]);
 
   // Auto-join room from match invite (via ?room= query param)
   useEffect(() => {
