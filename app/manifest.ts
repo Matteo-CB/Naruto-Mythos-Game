@@ -2,13 +2,17 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Naruto Mythos TCG',
+    name: 'Naruto Mythos TCG - Jeu de Cartes en Ligne',
     short_name: 'Naruto TCG',
-    description: 'Digital implementation of the Naruto Mythos Trading Card Game',
+    description: 'Jouez au Naruto Mythos Trading Card Game en ligne. Affrontez l\'IA ou d\'autres joueurs, construisez votre deck et grimpez le classement ELO.',
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',
     theme_color: '#c4a35a',
+    orientation: 'portrait',
+    categories: ['games', 'entertainment'],
+    lang: 'fr',
+    dir: 'ltr',
     icons: [
       { src: '/icons/icon-48x48.png', sizes: '48x48', type: 'image/png' },
       { src: '/icons/icon-72x72.png', sizes: '72x72', type: 'image/png' },
@@ -19,6 +23,14 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icons/icon-384x384.png', sizes: '384x384', type: 'image/png' },
       { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    ],
+    screenshots: [
+      {
+        src: '/images/og-image.webp',
+        sizes: '1200x630',
+        type: 'image/webp',
+        label: 'Naruto Mythos TCG - Home',
+      },
     ],
   };
 }
