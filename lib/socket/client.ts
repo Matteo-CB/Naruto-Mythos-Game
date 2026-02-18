@@ -51,7 +51,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   connect: (userId?: string) => {
     if (get().socket) return;
 
-    const socket = io({
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
+    const socket = io(socketUrl, {
       transports: ['websocket', 'polling'],
     });
 

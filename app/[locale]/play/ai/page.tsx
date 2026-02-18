@@ -7,9 +7,15 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
+import { DeckSelector } from '@/components/game/DeckSelector';
 import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
+
+interface ResolvedDeck {
+  characters: CharacterCard[];
+  missions: MissionCard[];
+}
 
 export default function PlayAIPage() {
   const t = useTranslations();
@@ -25,9 +31,9 @@ export default function PlayAIPage() {
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
+  const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
 
   useEffect(() => {
-    // Load card data dynamically
     import('@/lib/data/cardLoader').then((mod) => {
       const characters = mod.getPlayableCharacters();
       const missions = mod.getPlayableMissions();
@@ -40,17 +46,19 @@ export default function PlayAIPage() {
 
     setIsLoading(true);
 
-    // Build simple decks from available cards for now
-    // Shuffle and pick 30 characters + 3 missions for each player
-    const shuffled = [...cards.characters].sort(() => Math.random() - 0.5);
-    const missions = [...cards.missions].sort(() => Math.random() - 0.5);
+    // Use selected deck or generate random
+    const player1Deck = selectedDeck
+      ? selectedDeck.characters
+      : [...cards.characters].sort(() => Math.random() - 0.5).slice(0, 30);
+    const player1Missions = selectedDeck
+      ? selectedDeck.missions
+      : [...cards.missions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    const player1Deck = shuffled.slice(0, 30);
-    const player2Deck = shuffled.slice(0, 30).sort(() => Math.random() - 0.5);
-    const player1Missions = missions.slice(0, 3);
-    const player2Missions = missions.slice(3, 6).length >= 3
-      ? missions.slice(3, 6)
-      : missions.slice(0, 3);
+    // AI always gets a random deck
+    const shuffled = [...cards.characters].sort(() => Math.random() - 0.5);
+    const aiMissions = [...cards.missions].sort(() => Math.random() - 0.5);
+    const player2Deck = shuffled.slice(0, 30);
+    const player2Missions = aiMissions.slice(0, 3);
 
     const config: GameConfig = {
       player1: {
@@ -77,11 +85,11 @@ export default function PlayAIPage() {
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="playAI" />
-      <div className="flex-1 flex items-center justify-center px-4">
-      <div className="flex flex-col items-center gap-8 max-w-md w-full relative z-10">
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="flex flex-col items-center gap-6 max-w-md w-full relative z-10">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">{t('playAI.title')}</h1>
-          <p className="text-sm text-[#888888]">{t('playAI.selectDifficulty')}</p>
+          <p className="text-sm text-[#888888]">{t('playAI.selectDifficultyDesc')}</p>
         </div>
 
         {/* Difficulty selection */}
@@ -102,6 +110,15 @@ export default function PlayAIPage() {
             </button>
           ))}
         </div>
+
+        {/* Deck selection */}
+        {cards && (
+          <DeckSelector
+            onSelect={(deck) => setSelectedDeck(deck)}
+            allCharacters={cards.characters}
+            allMissions={cards.missions}
+          />
+        )}
 
         {/* Card count info */}
         {cards && (
