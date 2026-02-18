@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/lib/i18n/navigation';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { DeckSelector } from '@/components/game/DeckSelector';
 import { useSocketStore } from '@/lib/socket/client';
+import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 type Tab = 'create' | 'join' | 'matchmaking';
@@ -22,6 +23,7 @@ interface ResolvedDeck {
 
 export default function PlayOnlinePage() {
   const t = useTranslations();
+  const router = useRouter();
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<Tab>('create');
@@ -32,7 +34,10 @@ export default function PlayOnlinePage() {
   const {
     connected,
     roomCode,
+    playerRole,
     opponentJoined,
+    gameStarted,
+    visibleState,
     matchmakingStatus,
     error,
     connect,
@@ -44,6 +49,10 @@ export default function PlayOnlinePage() {
     leaveMatchmaking,
     clearError,
   } = useSocketStore();
+
+  const startOnlineGame = useGameStore((s) => s.startOnlineGame);
+  const updateOnlineState = useGameStore((s) => s.updateOnlineState);
+  const endOnlineGame = useGameStore((s) => s.endOnlineGame);
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -65,6 +74,30 @@ export default function PlayOnlinePage() {
       return () => clearTimeout(timer);
     }
   }, [error, clearError]);
+
+  // When game starts: initialize gameStore with online state and navigate to /game
+  useEffect(() => {
+    if (gameStarted && visibleState && playerRole) {
+      startOnlineGame(visibleState, playerRole);
+      router.push('/game');
+    }
+  }, [gameStarted, visibleState, playerRole, startOnlineGame, router]);
+
+  // Keep gameStore in sync with socket state updates during the game
+  useEffect(() => {
+    if (gameStarted && visibleState) {
+      updateOnlineState(visibleState);
+    }
+  }, [visibleState, gameStarted, updateOnlineState]);
+
+  // Handle game ended
+  const gameEnded = useSocketStore((s) => s.gameEnded);
+  const gameResult = useSocketStore((s) => s.gameResult);
+  useEffect(() => {
+    if (gameEnded && gameResult) {
+      endOnlineGame(gameResult.winner);
+    }
+  }, [gameEnded, gameResult, endOnlineGame]);
 
   // Auto-join room from match invite (via ?room= query param)
   useEffect(() => {
