@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       prisma.quizScore.count({ where }),
     ]);
 
-    const entries = scores.map((s, i) => ({
+    const entries = scores.map((s: typeof scores[number], i: number) => ({
       rank: offset + i + 1,
       username: s.user.username,
       score: s.score,

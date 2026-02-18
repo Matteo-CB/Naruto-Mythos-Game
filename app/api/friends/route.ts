@@ -24,7 +24,7 @@ export async function GET() {
       },
     });
 
-    const friends = friendships.map((f) => {
+    const friends = friendships.map((f: typeof friendships[number]) => {
       const other = f.senderId === userId ? f.receiver : f.sender;
       return {
         id: other.id,
