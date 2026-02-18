@@ -35,7 +35,7 @@ export default function LeaderboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="leaderboard" />
@@ -118,6 +118,6 @@ export default function LeaderboardPage() {
         )}
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

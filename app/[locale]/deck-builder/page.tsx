@@ -124,7 +124,7 @@ export default function DeckBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
+    <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="deck" />
@@ -400,6 +400,6 @@ export default function DeckBuilderPage() {
 
         <Footer />
       </div>
-    </div>
+    </main>
   );
 }

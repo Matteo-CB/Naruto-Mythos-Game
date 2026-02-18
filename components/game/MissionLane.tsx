@@ -110,7 +110,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
     >
       {isHidden ? (
         <img
-          src="/images/card-back.png"
+          src="/images/card-back.webp"
           alt=""
           draggable={false}
           className="w-full h-full object-cover"

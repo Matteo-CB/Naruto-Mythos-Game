@@ -73,7 +73,7 @@ export default function CollectionPage() {
   };
 
   return (
-    <div className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
+    <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="collection" />
@@ -95,16 +95,18 @@ export default function CollectionPage() {
         {/* Filters */}
         <div className="flex flex-wrap gap-3 mb-6">
           <input
-            type="text"
+            type="search"
             placeholder={t('collection.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] w-64"
+            aria-label={t('collection.search')}
           />
           <select
             value={filterRarity}
             onChange={(e) => setFilterRarity(e.target.value)}
             className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+            aria-label={t('collection.allRarities')}
           >
             <option value="all">{t('collection.allRarities')}</option>
             {RARITY_ORDER.map((r) => (
@@ -115,6 +117,7 @@ export default function CollectionPage() {
             value={filterGroup}
             onChange={(e) => setFilterGroup(e.target.value)}
             className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm focus:outline-none"
+            aria-label={t('collection.allGroups')}
           >
             <option value="all">{t('collection.allGroups')}</option>
             {groups.map((g) => (
@@ -142,6 +145,9 @@ export default function CollectionPage() {
                     alt={card.name_fr}
                     className="w-full h-full object-cover"
                     loading="lazy"
+                    decoding="async"
+                    width={140}
+                    height={196}
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-1">
@@ -166,6 +172,9 @@ export default function CollectionPage() {
           <div
             className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedCard(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedCard.name_fr}
           >
             <div
               className="bg-[#141414] border border-[#262626] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6"
@@ -179,6 +188,8 @@ export default function CollectionPage() {
                       src={getImagePath(selectedCard)!}
                       alt={selectedCard.name_fr}
                       className={`w-full ${selectedCard.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} object-cover`}
+                      loading="eager"
+                      decoding="async"
                     />
                   ) : (
                     <div className={`w-full ${selectedCard.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} bg-[#1a1a1a] flex items-center justify-center`}>
@@ -267,6 +278,7 @@ export default function CollectionPage() {
               <button
                 onClick={() => setSelectedCard(null)}
                 className="mt-4 w-full py-2 bg-[#1a1a1a] border border-[#262626] text-[#888888] text-sm hover:bg-[#222] transition-colors"
+                aria-label={t('common.cancel')}
               >
                 {t('common.cancel')}
               </button>
@@ -275,6 +287,6 @@ export default function CollectionPage() {
         )}
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

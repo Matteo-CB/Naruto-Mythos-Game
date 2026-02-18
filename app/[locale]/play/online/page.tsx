@@ -106,7 +106,8 @@ export default function PlayOnlinePage() {
 
   if (!session?.user) {
     return (
-      <div
+      <main
+        id="main-content"
         className="flex min-h-screen relative flex-col"
         style={{ backgroundColor: '#0a0a0a' }}
       >
@@ -147,7 +148,7 @@ export default function PlayOnlinePage() {
         </div>
         </div>
         <Footer />
-      </div>
+      </main>
     );
   }
 
@@ -188,7 +189,8 @@ export default function PlayOnlinePage() {
   const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards;
 
   return (
-    <div
+    <main
+      id="main-content"
       className="flex min-h-screen relative flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
@@ -414,6 +416,6 @@ export default function PlayOnlinePage() {
       </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

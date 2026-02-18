@@ -13,6 +13,7 @@ export default function LegalPage() {
 
   return (
     <div
+      id="main-content"
       className="min-h-screen relative flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >

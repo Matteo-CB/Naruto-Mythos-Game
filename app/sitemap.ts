@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/leaderboard", priority: 0.7, changeFrequency: "daily" as const },
     { path: "/learn", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/quiz", priority: 0.6, changeFrequency: "monthly" as const },
+    { path: "/bug-report", priority: 0.3, changeFrequency: "yearly" as const },
     { path: "/login", priority: 0.4, changeFrequency: "yearly" as const },
     { path: "/register", priority: 0.4, changeFrequency: "yearly" as const },
     { path: "/legal", priority: 0.2, changeFrequency: "yearly" as const },
@@ -34,6 +35,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
             locales.map((l) => [l, `${SITE_URL}/${l}${page.path}`])
           ),
         },
+        images: page.path === ""
+          ? [`${SITE_URL}/images/og-image.webp`]
+          : undefined,
       });
     }
   }

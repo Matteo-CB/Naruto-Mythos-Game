@@ -16,11 +16,11 @@ const CARD_IMAGES = {
   orochimaru: '/images/common/050-130_OROCHIMARU.webp',
   missionSupport: '/images/mission/MSS_01_Appel_de_soutien.webp',
   missionChunin: '/images/mission/MSS_02_Examen_Ch\u00FBnin.webp',
-  cardBack: '/images/card-back.png',
-  scrollKunai: '/images/icons/scroll-kunai.png',
-  shuriken: '/images/icons/shuriken.png',
-  kunai: '/images/icons/kunai.png',
-  cloud: '/images/icons/cloud-2.png',
+  cardBack: '/images/card-back.webp',
+  scrollKunai: '/images/icons/scroll-kunai.webp',
+  shuriken: '/images/icons/shuriken.webp',
+  kunai: '/images/icons/kunai.webp',
+  cloud: '/images/icons/cloud-2.webp',
 } as const;
 
 // ---------------------
