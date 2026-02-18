@@ -92,7 +92,7 @@ export default function ProfilePage({
   const winRate = total > 0 ? Math.round((profile.wins / total) * 100) : 0;
 
   return (
-    <div className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="profile" />
@@ -282,6 +282,6 @@ export default function ProfilePage({
         </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -118,12 +118,29 @@ export default function RootLayout({
   return (
     <html lang="fr" className="dark" suppressHydrationWarning>
       <head>
+        <link rel="preload" href="/fonts/njnaruto.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        <link rel="prefetch" href="/images/rare/108-130_NARUTO_UZUMAKI.webp" />
+        <link rel="preload" href="/images/icons/cloud-2.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/images/icons/cloud-5.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-9999 focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+        >
+          Skip to content
+        </a>
+        <noscript>
+          <div style={{ padding: '16px', textAlign: 'center', backgroundColor: '#1a1a0a', color: '#c4a35a', borderBottom: '1px solid #c4a35a' }}>
+            JavaScript is required to play Naruto Mythos TCG.
+          </div>
+        </noscript>
         {children}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-7R10MZLMBD"
@@ -141,6 +158,15 @@ export default function RootLayout({
             });
           `}
         </Script>
+        <noscript>
+          <img
+            src="https://www.googletagmanager.com/ns.html?id=G-7R10MZLMBD"
+            alt=""
+            width="1"
+            height="1"
+            style={{ display: 'none' }}
+          />
+        </noscript>
       </body>
     </html>
   );

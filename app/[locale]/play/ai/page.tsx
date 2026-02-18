@@ -81,7 +81,7 @@ export default function PlayAIPage() {
   };
 
   return (
-    <div className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
+    <main id="main-content" className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="playAI" />
@@ -146,6 +146,6 @@ export default function PlayAIPage() {
       </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

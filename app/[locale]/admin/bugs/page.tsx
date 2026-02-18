@@ -81,7 +81,7 @@ export default function AdminBugsPage() {
   // Not admin
   if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
     return (
-      <div className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
         <CloudBackground />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-4 relative z-10">
@@ -98,7 +98,7 @@ export default function AdminBugsPage() {
           </div>
         </div>
         <Footer />
-      </div>
+      </main>
     );
   }
 
@@ -121,7 +121,7 @@ export default function AdminBugsPage() {
   };
 
   return (
-    <div className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
 
       {/* Expanded image modal */}
@@ -268,6 +268,6 @@ export default function AdminBugsPage() {
         </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

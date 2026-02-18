@@ -15,7 +15,7 @@ interface Props {
 
 export function HoloCard({
   src,
-  backSrc = '/images/card-back.png',
+  backSrc = '/images/card-back.webp',
   alt = '',
   width = 320,
   height = 448,
@@ -105,6 +105,7 @@ export function HoloCard({
               width={width}
               height={height}
               priority
+              fetchPriority="high"
               draggable={false}
             />
           </div>

@@ -43,7 +43,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div
+    <main
+      id="main-content"
       className="min-h-screen relative flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
@@ -157,6 +158,6 @@ export default function LoginPage() {
       </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -70,7 +70,7 @@ export default function BugReportPage() {
 
   if (!session?.user) {
     return (
-      <div className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
         <CloudBackground />
         <DecorativeIcons />
         <div className="flex-1 flex items-center justify-center px-4">
@@ -100,12 +100,12 @@ export default function BugReportPage() {
           </div>
         </div>
         <Footer />
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+    <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <DecorativeIcons />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
@@ -263,6 +263,6 @@ export default function BugReportPage() {
         </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -5,16 +5,16 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 const DECORATIVE_PLACEMENTS = [
-  { src: '/images/icons/kunai.png', x: '2%',  y: '15%', size: 35, rotation: 135, opacity: 0.06, floatDelay: 0 },
-  { src: '/images/icons/kunai.png', x: '95%', y: '60%', size: 30, rotation: -45, opacity: 0.05, floatDelay: 2 },
-  { src: '/images/icons/kunai.png', x: '88%', y: '25%', size: 28, rotation: 200, opacity: 0.04, floatDelay: 4 },
-  { src: '/images/icons/shuriken.png', x: '93%', y: '8%',  size: 40, rotation: 0,   opacity: 0.05, floatDelay: 1 },
-  { src: '/images/icons/shuriken.png', x: '5%',  y: '75%', size: 35, rotation: 22,  opacity: 0.04, floatDelay: 3 },
-  { src: '/images/icons/shuriken.png', x: '48%', y: '93%', size: 30, rotation: 45,  opacity: 0.03, floatDelay: 5 },
-  { src: '/images/icons/scroll-kunai.png', x: '3%',  y: '45%', size: 45, rotation: -30, opacity: 0.05, floatDelay: 1.5 },
-  { src: '/images/icons/scroll-kunai.png', x: '90%', y: '82%', size: 40, rotation: 150, opacity: 0.04, floatDelay: 3.5 },
-  { src: '/images/icons/akatsuki-cloud.png', x: '85%', y: '45%', size: 50, rotation: 5,  opacity: 0.04, floatDelay: 2.5 },
-  { src: '/images/icons/akatsuki-cloud.png', x: '8%',  y: '90%', size: 40, rotation: -5, opacity: 0.03, floatDelay: 4.5 },
+  { src: '/images/icons/kunai.webp', x: '2%',  y: '15%', size: 35, rotation: 135, opacity: 0.06, floatDelay: 0 },
+  { src: '/images/icons/kunai.webp', x: '95%', y: '60%', size: 30, rotation: -45, opacity: 0.05, floatDelay: 2 },
+  { src: '/images/icons/kunai.webp', x: '88%', y: '25%', size: 28, rotation: 200, opacity: 0.04, floatDelay: 4 },
+  { src: '/images/icons/shuriken.webp', x: '93%', y: '8%',  size: 40, rotation: 0,   opacity: 0.05, floatDelay: 1 },
+  { src: '/images/icons/shuriken.webp', x: '5%',  y: '75%', size: 35, rotation: 22,  opacity: 0.04, floatDelay: 3 },
+  { src: '/images/icons/shuriken.webp', x: '48%', y: '93%', size: 30, rotation: 45,  opacity: 0.03, floatDelay: 5 },
+  { src: '/images/icons/scroll-kunai.webp', x: '3%',  y: '45%', size: 45, rotation: -30, opacity: 0.05, floatDelay: 1.5 },
+  { src: '/images/icons/scroll-kunai.webp', x: '90%', y: '82%', size: 40, rotation: 150, opacity: 0.04, floatDelay: 3.5 },
+  { src: '/images/icons/akatsuki-cloud.webp', x: '85%', y: '45%', size: 50, rotation: 5,  opacity: 0.04, floatDelay: 2.5 },
+  { src: '/images/icons/akatsuki-cloud.webp', x: '8%',  y: '90%', size: 40, rotation: -5, opacity: 0.03, floatDelay: 4.5 },
 ];
 
 interface DecorativeIconsProps {

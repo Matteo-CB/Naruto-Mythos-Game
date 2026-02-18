@@ -79,7 +79,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
 
       {isHidden && !canSeeCard ? (
         <img
-          src="/images/card-back.png"
+          src="/images/card-back.webp"
           alt=""
           draggable={false}
           className="w-full h-full object-cover"

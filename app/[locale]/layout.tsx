@@ -1,9 +1,12 @@
+import { Suspense } from 'react';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { SessionProvider } from 'next-auth/react';
 import { NotificationContainer } from '@/components/social/NotificationContainer';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import type { Metadata } from 'next';
 
 const SITE_URL = 'https://narutomythosgame.com';
@@ -83,6 +86,10 @@ export default async function LocaleLayout({ children, params }: Props) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+          <BreadcrumbJsonLd />
+        </Suspense>
         {children}
         <NotificationContainer />
       </NextIntlClientProvider>

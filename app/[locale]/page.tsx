@@ -13,42 +13,42 @@ import { Footer } from '@/components/Footer';
 // Cloud positions — only cloud-2, cloud-5, cloud-6
 const cloudPositions = [
   // Row 1 - top
-  { src: '/images/icons/cloud-2.png', top: '2%', left: '4%', width: 110, opacity: 0.10, rotate: -8 },
-  { src: '/images/icons/cloud-5.png', top: '5%', left: '28%', width: 80, opacity: 0.07, rotate: 5 },
-  { src: '/images/icons/cloud-6.png', top: '1%', left: '55%', width: 100, opacity: 0.11, rotate: -3 },
-  { src: '/images/icons/cloud-2.png', top: '6%', left: '80%', width: 90, opacity: 0.08, rotate: 10 },
+  { src: '/images/icons/cloud-2.webp', top: '2%', left: '4%', width: 110, opacity: 0.10, rotate: -8 },
+  { src: '/images/icons/cloud-5.webp', top: '5%', left: '28%', width: 80, opacity: 0.07, rotate: 5 },
+  { src: '/images/icons/cloud-6.webp', top: '1%', left: '55%', width: 100, opacity: 0.11, rotate: -3 },
+  { src: '/images/icons/cloud-2.webp', top: '6%', left: '80%', width: 90, opacity: 0.08, rotate: 10 },
   // Row 2
-  { src: '/images/icons/cloud-5.png', top: '18%', left: '10%', width: 75, opacity: 0.07, rotate: 15 },
-  { src: '/images/icons/cloud-6.png', top: '20%', left: '42%', width: 110, opacity: 0.09, rotate: -12 },
-  { src: '/images/icons/cloud-2.png', top: '15%', left: '72%', width: 85, opacity: 0.08, rotate: 3 },
+  { src: '/images/icons/cloud-5.webp', top: '18%', left: '10%', width: 75, opacity: 0.07, rotate: 15 },
+  { src: '/images/icons/cloud-6.webp', top: '20%', left: '42%', width: 110, opacity: 0.09, rotate: -12 },
+  { src: '/images/icons/cloud-2.webp', top: '15%', left: '72%', width: 85, opacity: 0.08, rotate: 3 },
   // Row 3
-  { src: '/images/icons/cloud-6.png', top: '35%', left: '2%', width: 95, opacity: 0.10, rotate: -5 },
-  { src: '/images/icons/cloud-5.png', top: '37%', left: '32%', width: 75, opacity: 0.07, rotate: 8 },
-  { src: '/images/icons/cloud-2.png', top: '33%', left: '60%', width: 100, opacity: 0.09, rotate: -10 },
-  { src: '/images/icons/cloud-6.png', top: '40%', left: '84%', width: 70, opacity: 0.08, rotate: 6 },
+  { src: '/images/icons/cloud-6.webp', top: '35%', left: '2%', width: 95, opacity: 0.10, rotate: -5 },
+  { src: '/images/icons/cloud-5.webp', top: '37%', left: '32%', width: 75, opacity: 0.07, rotate: 8 },
+  { src: '/images/icons/cloud-2.webp', top: '33%', left: '60%', width: 100, opacity: 0.09, rotate: -10 },
+  { src: '/images/icons/cloud-6.webp', top: '40%', left: '84%', width: 70, opacity: 0.08, rotate: 6 },
   // Row 4
-  { src: '/images/icons/cloud-5.png', top: '55%', left: '6%', width: 80, opacity: 0.08, rotate: 12 },
-  { src: '/images/icons/cloud-2.png', top: '52%', left: '38%', width: 90, opacity: 0.10, rotate: -7 },
-  { src: '/images/icons/cloud-6.png', top: '58%', left: '68%', width: 100, opacity: 0.09, rotate: 4 },
+  { src: '/images/icons/cloud-5.webp', top: '55%', left: '6%', width: 80, opacity: 0.08, rotate: 12 },
+  { src: '/images/icons/cloud-2.webp', top: '52%', left: '38%', width: 90, opacity: 0.10, rotate: -7 },
+  { src: '/images/icons/cloud-6.webp', top: '58%', left: '68%', width: 100, opacity: 0.09, rotate: 4 },
   // Row 5
-  { src: '/images/icons/cloud-2.png', top: '72%', left: '12%', width: 85, opacity: 0.09, rotate: -15 },
-  { src: '/images/icons/cloud-5.png', top: '75%', left: '48%', width: 70, opacity: 0.07, rotate: 9 },
-  { src: '/images/icons/cloud-6.png', top: '70%', left: '78%', width: 105, opacity: 0.10, rotate: -4 },
+  { src: '/images/icons/cloud-2.webp', top: '72%', left: '12%', width: 85, opacity: 0.09, rotate: -15 },
+  { src: '/images/icons/cloud-5.webp', top: '75%', left: '48%', width: 70, opacity: 0.07, rotate: 9 },
+  { src: '/images/icons/cloud-6.webp', top: '70%', left: '78%', width: 105, opacity: 0.10, rotate: -4 },
   // Row 6 - bottom
-  { src: '/images/icons/cloud-5.png', top: '82%', left: '3%', width: 90, opacity: 0.08, rotate: 7 },
-  { src: '/images/icons/cloud-2.png', top: '84%', left: '35%', width: 75, opacity: 0.07, rotate: -11 },
-  { src: '/images/icons/cloud-6.png', top: '80%', left: '62%', width: 95, opacity: 0.09, rotate: 3 },
-  { src: '/images/icons/cloud-5.png', top: '83%', left: '82%', width: 80, opacity: 0.07, rotate: -6 },
+  { src: '/images/icons/cloud-5.webp', top: '82%', left: '3%', width: 90, opacity: 0.08, rotate: 7 },
+  { src: '/images/icons/cloud-2.webp', top: '84%', left: '35%', width: 75, opacity: 0.07, rotate: -11 },
+  { src: '/images/icons/cloud-6.webp', top: '80%', left: '62%', width: 95, opacity: 0.09, rotate: 3 },
+  { src: '/images/icons/cloud-5.webp', top: '83%', left: '82%', width: 80, opacity: 0.07, rotate: -6 },
 ];
 
 // Floating decorative weapon elements
 const floatingElements = [
-  { src: '/images/icons/kunai.png', top: '10%', left: '2%', size: 36, opacity: 0.05, rotate: 45, duration: 8 },
-  { src: '/images/icons/shuriken.png', top: '22%', right: '3%', size: 30, opacity: 0.04, rotate: 0, duration: 12, spin: true },
-  { src: '/images/icons/scroll-kunai.png', top: '55%', left: '1%', size: 42, opacity: 0.05, rotate: -20, duration: 10 },
-  { src: '/images/icons/kunai.png', top: '42%', right: '2%', size: 30, opacity: 0.04, rotate: -135, duration: 9 },
-  { src: '/images/icons/shuriken.png', top: '78%', left: '4%', size: 26, opacity: 0.05, rotate: 0, duration: 14, spin: true },
-  { src: '/images/icons/akatsuki-cloud.png', top: '82%', right: '4%', size: 40, opacity: 0.04, rotate: 5, duration: 11 },
+  { src: '/images/icons/kunai.webp', top: '10%', left: '2%', size: 36, opacity: 0.05, rotate: 45, duration: 8 },
+  { src: '/images/icons/shuriken.webp', top: '22%', right: '3%', size: 30, opacity: 0.04, rotate: 0, duration: 12, spin: true },
+  { src: '/images/icons/scroll-kunai.webp', top: '55%', left: '1%', size: 42, opacity: 0.05, rotate: -20, duration: 10 },
+  { src: '/images/icons/kunai.webp', top: '42%', right: '2%', size: 30, opacity: 0.04, rotate: -135, duration: 9 },
+  { src: '/images/icons/shuriken.webp', top: '78%', left: '4%', size: 26, opacity: 0.05, rotate: 0, duration: 14, spin: true },
+  { src: '/images/icons/akatsuki-cloud.webp', top: '82%', right: '4%', size: 40, opacity: 0.04, rotate: 5, duration: 11 },
 ];
 
 // Menu button configs - game section
@@ -83,7 +83,8 @@ export default function Home() {
   const titleLetters = titleText.split('');
 
   return (
-    <div
+    <main
+      id="main-content"
       className="relative h-screen w-full overflow-hidden flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
@@ -189,8 +190,8 @@ export default function Home() {
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      duration: 0.4,
-                      delay: 0.3 + i * 0.06,
+                      duration: 0.3,
+                      delay: 0.1 + i * 0.04,
                       ease: [0.25, 0.46, 0.45, 0.94],
                     }}
                   >
@@ -206,17 +207,18 @@ export default function Home() {
               style={{ color: '#888888' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
             >
               {t('subtitle')}
             </motion.p>
 
             {/* Navigation Buttons */}
             <motion.nav
+              aria-label="Main navigation"
               className="flex w-full flex-col gap-2.5"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.5 }}
+              transition={{ duration: 0.4, delay: 0.7 }}
             >
               {menuButtons.map((btn, i) => (
                 <motion.div
@@ -224,8 +226,8 @@ export default function Home() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{
-                    duration: 0.4,
-                    delay: 1.6 + i * 0.1,
+                    duration: 0.3,
+                    delay: 0.8 + i * 0.06,
                     ease: 'easeOut',
                   }}
                 >
@@ -273,7 +275,7 @@ export default function Home() {
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ duration: 0.4, delay: 2.1 }}
+              transition={{ duration: 0.3, delay: 1.4 }}
             />
 
             {/* Account buttons */}
@@ -281,7 +283,7 @@ export default function Home() {
               className="flex w-full gap-2.5"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 2.2 }}
+              transition={{ duration: 0.3, delay: 1.5 }}
             >
               {session ? (
                 <Link
@@ -340,7 +342,7 @@ export default function Home() {
               className="mt-3 w-full"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 2.3 }}
+              transition={{ duration: 0.3, delay: 1.6 }}
             >
               <a
                 href="https://discord.gg/KGMG3jADyF"
@@ -375,7 +377,7 @@ export default function Home() {
               style={{ color: '#333333' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 2.4 }}
+              transition={{ duration: 0.4, delay: 1.7 }}
             >
               Naruto Mythos TCG
             </motion.p>
@@ -387,8 +389,8 @@ export default function Home() {
             initial={{ opacity: 0, x: 80 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
-              duration: 1.2,
-              delay: 0.6,
+              duration: 0.8,
+              delay: 0.2,
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
           >
@@ -424,6 +426,6 @@ export default function Home() {
         </div>
       </div>
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -43,7 +43,7 @@ function CardBack({ index, total }: { index: number; total: number }) {
       }}
     >
       <img
-        src="/images/card-back.png"
+        src="/images/card-back.webp"
         alt=""
         draggable={false}
         className="w-full h-full object-cover"
