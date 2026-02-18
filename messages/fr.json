@@ -79,7 +79,8 @@
       "finalScore": "Score Final",
       "playAgain": "Rejouer",
       "backToMenu": "Retour au Menu",
-      "tieBreaker": "Egalite brisee par le detenteur du Jeton d'Avantage"
+      "tieBreaker": "Egalite brisee par le detenteur du Jeton d'Avantage",
+      "rankedMatch": "Match Classe"
     },
     "opponent": "Adversaire",
     "you": "Vous",
@@ -214,7 +215,11 @@
     "signedInAs": "Connecte en tant que {name}",
     "createPrivateRoom": "Creer un Salon Prive",
     "findMatchDesc": "Trouver un adversaire aleatoire pres de votre niveau",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "casual": "Casual",
+    "ranked": "Classe",
+    "casualDesc": "Match non classe — jouez pour le plaisir, pas de changement ELO",
+    "rankedDesc": "Match classe — votre classement ELO sera mis a jour"
   },
   "leaderboard": {
     "title": "Classement",

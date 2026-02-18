@@ -103,10 +103,18 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       const res = await fetch('/api/friends/requests');
       const data = await res.json();
       if (res.ok) {
-        set({
-          incomingRequests: data.incoming ?? [],
-          outgoingRequests: data.outgoing ?? [],
-        });
+        // Transform API response (id/sender/receiver) to match FriendRequest interface (friendshipId/user)
+        const incoming: FriendRequest[] = (data.incoming ?? []).map((r: Record<string, unknown>) => ({
+          friendshipId: r.id as string,
+          user: r.sender as { id: string; username: string; elo: number },
+          createdAt: r.createdAt as string,
+        }));
+        const outgoing: FriendRequest[] = (data.outgoing ?? []).map((r: Record<string, unknown>) => ({
+          friendshipId: r.id as string,
+          user: r.receiver as { id: string; username: string; elo: number },
+          createdAt: r.createdAt as string,
+        }));
+        set({ incomingRequests: incoming, outgoingRequests: outgoing });
       }
     } catch {
       // Silently handle network errors

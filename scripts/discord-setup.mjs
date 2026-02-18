@@ -588,13 +588,27 @@ async function setupServer() {
     ],
   });
 
+  // Wait for the client to be fully ready before doing anything
+  const readyPromise = new Promise(resolve => client.once('ready', resolve));
   await client.login(BOT_TOKEN);
+  await readyPromise;
   console.log(`\n  Logged in as ${client.user.tag}\n`);
 
-  const guild = await client.guilds.fetch(GUILD_ID);
+  // Fetch the guild with full data
+  let guild = await client.guilds.fetch(GUILD_ID);
+  // Re-fetch to ensure all properties (name, memberCount) are populated
+  guild = await guild.fetch();
+  // Fetch all roles into cache so guild.roles.everyone is available
+  await guild.roles.fetch();
+
   console.log(`  Server: ${guild.name} (${guild.memberCount} members)\n`);
 
   const everyoneRole = guild.roles.everyone;
+  if (!everyoneRole) {
+    // Fallback: the @everyone role ID is always the guild ID
+    console.log('  WARNING: guild.roles.everyone not found, using guild.id as fallback');
+  }
+  const everyoneId = everyoneRole?.id || guild.id;
 
   // ──────────────────────────────────────────
   // Step 1: Delete existing channels
@@ -643,7 +657,9 @@ async function setupServer() {
   // ──────────────────────────────────────────
   console.log('  [3/6] Configuring @everyone (no channel access)...');
   try {
-    await everyoneRole.setPermissions([
+    // Fetch the @everyone role object directly if we don't have it
+    const everyoneRoleObj = everyoneRole || await guild.roles.fetch(guild.id);
+    await everyoneRoleObj.setPermissions([
       // Basic perms only — ViewChannel is NOT included
       PermissionsBitField.Flags.SendMessages,
       PermissionsBitField.Flags.ReadMessageHistory,
@@ -672,7 +688,7 @@ async function setupServer() {
       const catAccess = cat.access || 'normal';
 
       // Build category-level permission overwrites
-      const catOverwrites = buildCategoryOverwrites(everyoneRole.id, roleMap, catAccess);
+      const catOverwrites = buildCategoryOverwrites(everyoneId, roleMap, catAccess);
 
       const category = await guild.channels.create({
         name: cat.name,
@@ -689,10 +705,10 @@ async function setupServer() {
 
           if (ch.readOnly) {
             // Read-only: deny SendMessages for non-staff, inherit parent visibility
-            permissionOverwrites = buildReadOnlyOverwrites(everyoneRole.id, roleMap, catAccess);
+            permissionOverwrites = buildReadOnlyOverwrites(everyoneId, roleMap, catAccess);
           } else if (ch.access && ch.access !== catAccess) {
             // Channel has more restrictive access than its parent category
-            permissionOverwrites = buildChannelAccessOverwrites(everyoneRole.id, roleMap, ch.access);
+            permissionOverwrites = buildChannelAccessOverwrites(everyoneId, roleMap, ch.access);
           }
 
           const channel = await guild.channels.create({

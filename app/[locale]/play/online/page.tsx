@@ -30,6 +30,7 @@ export default function PlayOnlinePage() {
   const [joinCode, setJoinCode] = useState('');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [deckSelected, setDeckSelected] = useState(false);
+  const [isRanked, setIsRanked] = useState(false);
 
   const {
     connected,
@@ -154,7 +155,7 @@ export default function PlayOnlinePage() {
     if (!connected) {
       await connect(session.user.id);
     }
-    createRoom(session.user.id, true);
+    createRoom(session.user.id, true, isRanked);
   };
 
   const handleJoinRoom = async () => {
@@ -169,7 +170,7 @@ export default function PlayOnlinePage() {
     if (!connected) {
       await connect(session.user.id);
     }
-    joinMatchmaking(session.user.id);
+    joinMatchmaking(session.user.id, isRanked);
   };
 
   const handleDeckSelect = (deck: ResolvedDeck) => {
@@ -239,6 +240,37 @@ export default function PlayOnlinePage() {
         {/* Tab navigation (hide once deck selection is shown) */}
         {!showDeckSelector && !deckSelected && (
           <>
+            {/* Ranked / Unranked toggle */}
+            <div
+              className="flex w-full rounded-lg overflow-hidden"
+              style={{ border: '1px solid #262626' }}
+            >
+              <button
+                onClick={() => setIsRanked(false)}
+                className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
+                style={{
+                  backgroundColor: !isRanked ? '#141414' : '#0a0a0a',
+                  borderRight: '1px solid #262626',
+                  color: !isRanked ? '#e0e0e0' : '#555555',
+                }}
+              >
+                {t('online.casual')}
+              </button>
+              <button
+                onClick={() => setIsRanked(true)}
+                className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
+                style={{
+                  backgroundColor: isRanked ? '#141414' : '#0a0a0a',
+                  color: isRanked ? '#c4a35a' : '#555555',
+                }}
+              >
+                {t('online.ranked')}
+              </button>
+            </div>
+            <p className="text-xs" style={{ color: '#555555' }}>
+              {isRanked ? t('online.rankedDesc') : t('online.casualDesc')}
+            </p>
+
             <div className="flex w-full">
               {(['create', 'join', 'matchmaking'] as Tab[]).map((tab) => (
                 <button

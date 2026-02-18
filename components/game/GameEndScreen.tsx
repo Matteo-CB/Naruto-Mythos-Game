@@ -3,15 +3,21 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useSocketStore } from '@/lib/socket/client';
 
 export function GameEndScreen() {
   const t = useTranslations();
   const gameOver = useGameStore((s) => s.gameOver);
   const winner = useGameStore((s) => s.winner);
   const visibleState = useGameStore((s) => s.visibleState);
+  const isOnlineGame = useGameStore((s) => s.isOnlineGame);
   const resetGame = useGameStore((s) => s.resetGame);
+  const gameResult = useSocketStore((s) => s.gameResult);
 
   if (!gameOver || !visibleState) return null;
+
+  const isRanked = isOnlineGame && gameResult?.isRanked;
+  const eloDelta = gameResult?.eloDelta;
 
   const myPlayer = visibleState.myPlayer;
   const playerWon = winner === myPlayer;
@@ -158,6 +164,26 @@ export function GameEndScreen() {
             >
               {t('game.end.tieBreaker')}
             </motion.span>
+          )}
+
+          {/* ELO change for ranked matches */}
+          {isRanked && eloDelta != null && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+              className="flex flex-col items-center gap-1"
+            >
+              <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                {t('game.end.rankedMatch')}
+              </span>
+              <span
+                className="text-lg font-bold tabular-nums"
+                style={{ color: eloDelta >= 0 ? '#4a9e4a' : '#b33e3e' }}
+              >
+                {eloDelta >= 0 ? '+' : ''}{eloDelta} ELO
+              </span>
+            </motion.div>
           )}
 
           {/* Play Again button */}
