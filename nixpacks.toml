@@ -1,0 +1,13 @@
+[phases.build]
+cmds = [
+  "npm install -g pnpm",
+  "pnpm install",
+  "npx prisma generate",
+  "pnpm build"
+]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[start]
+cmd = "node --import tsx server/index.ts"
