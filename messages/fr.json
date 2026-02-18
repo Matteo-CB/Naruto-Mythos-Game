@@ -192,7 +192,10 @@
     "selectDifficultyDesc": "Selectionnez la difficulte et lancez un match",
     "difficulty": "Difficulte",
     "cardsLoaded": "{chars} personnages jouables, {missions} missions chargees",
-    "starting": "Lancement..."
+    "starting": "Lancement...",
+    "selectDeck": "Choisir votre Deck",
+    "randomDeck": "Deck Aleatoire",
+    "randomDeckDesc": "30 personnages et 3 missions aleatoires"
   },
   "online": {
     "title": "Jouer en Ligne",

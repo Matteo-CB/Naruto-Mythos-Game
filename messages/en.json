@@ -192,7 +192,10 @@
     "selectDifficultyDesc": "Select difficulty and start a match",
     "difficulty": "Difficulty",
     "cardsLoaded": "{chars} playable characters, {missions} missions loaded",
-    "starting": "Starting..."
+    "starting": "Starting...",
+    "selectDeck": "Select Your Deck",
+    "randomDeck": "Random Deck",
+    "randomDeckDesc": "30 random characters and 3 random missions"
   },
   "online": {
     "title": "Play Online",

@@ -11,6 +11,11 @@ interface SavedDeck {
   missionIds: string[];
 }
 
+interface AddCheckResult {
+  allowed: boolean;
+  reason?: string;
+}
+
 interface DeckBuilderStore {
   // Deck state
   deckName: string;
@@ -25,6 +30,9 @@ interface DeckBuilderStore {
   // Currently loaded deck ID (for tracking edits)
   loadedDeckId: string | null;
 
+  // Inline error for failed add
+  addError: string | null;
+
   // Actions
   setDeckName: (name: string) => void;
   addChar: (card: CharacterCard) => void;
@@ -32,6 +40,11 @@ interface DeckBuilderStore {
   addMission: (card: MissionCard) => void;
   removeMission: (index: number) => void;
   clearDeck: () => void;
+  clearAddError: () => void;
+
+  // Validation helpers
+  canAddChar: (card: CharacterCard) => AddCheckResult;
+  canAddMission: (card: MissionCard) => AddCheckResult;
 
   // Persistence
   saveDeck: () => Promise<void>;
@@ -39,6 +52,8 @@ interface DeckBuilderStore {
   loadDeck: (deckId: string, allChars: CharacterCard[], allMissions: MissionCard[]) => Promise<void>;
   deleteDeck: (deckId: string) => Promise<void>;
 }
+
+export type { AddCheckResult };
 
 /**
  * Normalize a card ID for version comparison.
@@ -58,23 +73,42 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   isLoading: false,
   isSaving: false,
   loadedDeckId: null,
+  addError: null,
 
   setDeckName: (name: string) => {
     set({ deckName: name });
   },
 
-  addChar: (card: CharacterCard) => {
+  canAddChar: (card: CharacterCard): AddCheckResult => {
     const { deckChars } = get();
-
-    // Enforce max 2 copies of the same version (RA variants normalized)
     const baseVersion = normalizeVersionId(card.id);
     const count = deckChars.filter(
       (c) => normalizeVersionId(c.id) === baseVersion,
     ).length;
+    if (count >= MAX_COPIES_PER_VERSION) {
+      return { allowed: false, reason: `Max ${MAX_COPIES_PER_VERSION} copies of ${card.name_fr}` };
+    }
+    return { allowed: true };
+  },
 
-    if (count >= MAX_COPIES_PER_VERSION) return;
+  canAddMission: (card: MissionCard): AddCheckResult => {
+    const { deckMissions } = get();
+    if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) {
+      return { allowed: false, reason: `Max ${MISSION_CARDS_PER_PLAYER} missions` };
+    }
+    if (deckMissions.some((m) => m.id === card.id)) {
+      return { allowed: false, reason: `${card.name_fr} already in deck` };
+    }
+    return { allowed: true };
+  },
 
-    set({ deckChars: [...deckChars, card] });
+  addChar: (card: CharacterCard) => {
+    const check = get().canAddChar(card);
+    if (!check.allowed) {
+      set({ addError: check.reason || null });
+      return;
+    }
+    set({ deckChars: [...get().deckChars, card], addError: null });
   },
 
   removeChar: (index: number) => {
@@ -85,15 +119,12 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   },
 
   addMission: (card: MissionCard) => {
-    const { deckMissions } = get();
-
-    // Enforce max 3 missions
-    if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) return;
-
-    // No duplicate mission IDs
-    if (deckMissions.some((m) => m.id === card.id)) return;
-
-    set({ deckMissions: [...deckMissions, card] });
+    const check = get().canAddMission(card);
+    if (!check.allowed) {
+      set({ addError: check.reason || null });
+      return;
+    }
+    set({ deckMissions: [...get().deckMissions, card], addError: null });
   },
 
   removeMission: (index: number) => {
@@ -109,7 +140,12 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       deckChars: [],
       deckMissions: [],
       loadedDeckId: null,
+      addError: null,
     });
+  },
+
+  clearAddError: () => {
+    set({ addError: null });
   },
 
   saveDeck: async () => {
