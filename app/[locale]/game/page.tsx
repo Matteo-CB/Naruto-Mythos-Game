@@ -23,14 +23,19 @@ export default function GamePage() {
   const router = useRouter();
   const t = useTranslations('common');
   const gameState = useGameStore((s) => s.gameState);
+  const visibleState = useGameStore((s) => s.visibleState);
+  const isOnlineGame = useGameStore((s) => s.isOnlineGame);
+
+  // For AI games, gameState must exist; for online games, visibleState must exist
+  const hasActiveGame = gameState || (isOnlineGame && visibleState);
 
   useEffect(() => {
-    if (!gameState) {
+    if (!hasActiveGame) {
       router.push('/');
     }
-  }, [gameState, router]);
+  }, [hasActiveGame, router]);
 
-  if (!gameState) {
+  if (!hasActiveGame) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <p className="text-[#888888]">{t('loading')}</p>

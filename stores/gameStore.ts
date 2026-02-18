@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig } from '@/lib/engine/types';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
+import { useSocketStore } from '@/lib/socket/client';
 
 interface AnimationEvent {
   id: string;
@@ -28,6 +29,7 @@ interface GameStore {
   humanPlayer: PlayerID;
   aiPlayer: AIPlayer | null;
   isAIGame: boolean;
+  isOnlineGame: boolean;
   isProcessing: boolean;
   gameOver: boolean;
   winner: PlayerID | null;
@@ -41,6 +43,9 @@ interface GameStore {
 
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty) => void;
+  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID) => void;
+  updateOnlineState: (visibleState: VisibleGameState) => void;
+  endOnlineGame: (winner: string) => void;
   performAction: (action: GameAction) => void;
   processAITurn: () => void;
   addAnimation: (event: Omit<AnimationEvent, 'id' | 'timestamp'>) => void;
@@ -246,12 +251,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
   humanPlayer: 'player1',
   aiPlayer: null,
   isAIGame: false,
+  isOnlineGame: false,
   isProcessing: false,
   gameOver: false,
   winner: null,
   animationQueue: [],
   isAnimating: false,
   pendingTargetSelection: null,
+
+  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID) => {
+    set({
+      gameState: null,
+      visibleState,
+      humanPlayer: playerRole,
+      aiPlayer: null,
+      isAIGame: false,
+      isOnlineGame: true,
+      isProcessing: false,
+      gameOver: false,
+      winner: null,
+      animationQueue: [],
+      pendingTargetSelection: null,
+    });
+  },
+
+  updateOnlineState: (visibleState: VisibleGameState) => {
+    set({ visibleState, isProcessing: false });
+  },
+
+  endOnlineGame: (winner: string) => {
+    set({
+      gameOver: true,
+      winner: winner as PlayerID,
+    });
+  },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty) => {
     const state = GameEngine.createGame(config);
@@ -287,7 +320,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   performAction: (action: GameAction) => {
-    const { gameState, humanPlayer, aiPlayer, isAIGame, addAnimation } = get();
+    const { gameState, humanPlayer, aiPlayer, isAIGame, isOnlineGame, addAnimation } = get();
+
+    // Online mode: send action to server via socket, don't apply locally
+    if (isOnlineGame) {
+      const socketState = useSocketStore.getState();
+      if (socketState.socket) {
+        set({ isProcessing: true });
+        socketState.performAction(action);
+      }
+      return;
+    }
+
     if (!gameState || get().isProcessing) return;
 
     set({ isProcessing: true });
@@ -447,11 +491,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   resetGame: () => {
+    // Disconnect socket if leaving an online game
+    if (get().isOnlineGame) {
+      useSocketStore.getState().disconnect();
+    }
     set({
       gameState: null,
       visibleState: null,
       aiPlayer: null,
       isAIGame: false,
+      isOnlineGame: false,
       isProcessing: false,
       gameOver: false,
       winner: null,

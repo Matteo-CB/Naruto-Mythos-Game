@@ -225,6 +225,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket) {
       console.log('[Socket] Emitting room:join', code);
       socket.emit('room:join', { code, userId });
+      set({ roomCode: code, playerRole: 'player2' });
     } else {
       console.error('[Socket] Cannot join room: not connected');
     }
