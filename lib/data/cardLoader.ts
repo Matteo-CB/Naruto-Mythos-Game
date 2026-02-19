@@ -1,13 +1,14 @@
-import type { RawCardData } from './types';
+import type { RawCardData, RawRarity } from './types';
 import type { CardData, CharacterCard, MissionCard, CardEffect } from '../engine/types';
 import rawCardsData from './naruto_mythos_tcg_complete.json';
 import rawMissionsData from './missions.json';
 
 // Manual corrections for cards with split/malformed effect text in the JSON
+// Source: official narutotcgmythos.com + rulebook (Feb 2026 audit)
 const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
   '137/130': [
     { type: 'UPGRADE', description: 'Move this character.' },
-    { type: 'MAIN', description: 'Hide an enemy character in this mission.' },
+    { type: 'MAIN', description: 'Hide an upgraded character in this mission.' },
   ],
   '120/130': [
     { type: 'MAIN', description: 'Defeat up to 1 enemy character with Power 1 or less in every mission.' },
@@ -18,13 +19,41 @@ const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
     { type: 'UPGRADE', description: 'POWERUP X, where X is the number of characters defeated by the MAIN effect.' },
   ],
   '108/130': [
-    { type: 'MAIN', description: 'Hide an enemy character with Power 3 or less in this mission.' },
-    { type: 'MAIN', description: 'effect: POWERUP X where X is the Power of the enemy character that is being hidden.' },
+    { type: 'MAIN', description: 'Put the top card of your deck as a hidden character in this mission.' },
+    { type: 'AMBUSH', description: 'Repeat the MAIN effect.' },
   ],
   '108/130 A': [
-    { type: 'MAIN', description: 'Hide an enemy character with Power 3 or less in this mission.' },
-    { type: 'MAIN', description: 'effect: POWERUP X where X is the Power of the enemy character that is being hidden.' },
+    { type: 'MAIN', description: 'Put the top card of your deck as a hidden character in this mission.' },
+    { type: 'AMBUSH', description: 'Repeat the MAIN effect.' },
   ],
+  '109/130': [
+    { type: 'MAIN', description: 'Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Instead, play the card paying 2 less.' },
+  ],
+};
+
+// Keyword corrections from official site (JSON had wrong or incomplete keywords)
+const KEYWORD_CORRECTIONS: Record<string, string[]> = {
+  '044/130': ['Special Jonin'],              // was "Academy"
+  '048/130': ['Special Jonin'],              // was "Pouvoir"
+  '036/130': ['Team Guy', 'Taijutsu'],       // missing "Taijutsu"
+  '039/130': ['Team Guy', 'Jutsu'],          // missing "Jutsu"
+  '050/130': ['Sannin', 'Sound Ninja'],      // missing "Sound Ninja"
+  '108/130': ['Team 7', 'Jutsu'],            // missing "Jutsu"
+  '108/130 A': ['Team 7', 'Jutsu'],          // missing "Jutsu"
+  '137/130': ['Team 7', 'Jutsu'],            // missing "Jutsu"
+};
+
+// Name corrections from official site
+const NAME_CORRECTIONS: Record<string, string> = {
+  '047/130': 'IRUKA UMINO',                  // was just "IRUKA"
+};
+
+// Stat corrections from official site (cost, power, rarity, title)
+const STAT_CORRECTIONS: Record<string, { chakra?: number; power?: number; rarity?: RawRarity; title_fr?: string; group?: string }> = {
+  '108/130': { chakra: 4, rarity: 'RA', title_fr: 'Believe it!' },                      // was cost 5, rarity R, no title
+  '108/130 A': { chakra: 4, title_fr: 'Believe it!' },                                   // was cost 5, no title
+  '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },  // was incomplete
 };
 
 // Mission base points (printed on the card).
@@ -54,20 +83,23 @@ function normalizeImagePath(imagePath?: string): string | undefined {
 function normalizeCard(raw: RawCardData): CardData {
   const correctedEffects = EFFECT_CORRECTIONS[raw.id];
   const effects = correctedEffects ?? (raw.effects ?? []);
+  const correctedKeywords = KEYWORD_CORRECTIONS[raw.id];
+  const correctedName = NAME_CORRECTIONS[raw.id];
+  const statCorrection = STAT_CORRECTIONS[raw.id];
 
   return {
     id: raw.id,
     number: raw.number,
-    name_fr: raw.name_fr,
-    title_fr: raw.title_fr ?? '',
+    name_fr: correctedName ?? raw.name_fr,
+    title_fr: statCorrection?.title_fr ?? raw.title_fr ?? '',
     name_en: raw.name_en,
-    rarity: raw.rarity,
+    rarity: (statCorrection?.rarity ?? raw.rarity) as CardData['rarity'],
     card_type: raw.card_type,
     has_visual: raw.has_visual || !!raw.image_file,
-    chakra: raw.chakra ?? 0,
-    power: raw.power ?? 0,
-    keywords: raw.keywords ?? [],
-    group: raw.group ?? 'Independent',
+    chakra: statCorrection?.chakra ?? raw.chakra ?? 0,
+    power: statCorrection?.power ?? raw.power ?? 0,
+    keywords: correctedKeywords ?? raw.keywords ?? [],
+    group: statCorrection?.group ?? raw.group ?? 'Independent',
     effects,
     image_file: normalizeImagePath(raw.image_file),
     is_rare_art: raw.is_rare_art ?? false,

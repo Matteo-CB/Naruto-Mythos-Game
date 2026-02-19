@@ -68,58 +68,62 @@ describe('039/130 - Rock Lee', () => {
 });
 
 // ===================================================================
-// 108/130 - NARUTO UZUMAKI (R): Hide enemy Power<=3 + UPGRADE POWERUP X
+// 108/130 - NARUTO UZUMAKI (RA): Place top card of deck as hidden + AMBUSH repeat
 // ===================================================================
-describe('108/130 - Naruto Uzumaki (R)', () => {
-  it('should hide an enemy character with Power 3 or less', () => {
+describe('108/130 - Naruto Uzumaki (RA)', () => {
+  it('MAIN should place top card of deck as hidden character in this mission', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
-      id: '108/130', number: 108, name_fr: 'Naruto Uzumaki', power: 5, chakra: 5,
+      id: '108/130', number: 108, name_fr: 'Naruto Uzumaki', power: 4, chakra: 4,
     });
-    const weakEnemy = mockCharInPlay({ instanceId: 'weak-e', controlledBy: 'player2', originalOwner: 'player2' }, {
-      name_fr: 'Weak', power: 2,
-    });
+    const deckCard = mockCharacter({ id: '001/130', name_fr: 'Hiruzen', power: 3 });
     const state = createActionPhaseState({
-      activeMissions: [makeMission('D', [naruto], [weakEnemy])],
+      activeMissions: [makeMission('D', [naruto])],
     });
+    state.player1.deck = [deckCard, ...state.player1.deck];
 
     const handler = getEffectHandler('108/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
-    const enemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'weak-e');
-    expect(enemy?.isHidden).toBe(true);
+    // A new hidden character should appear in the mission
+    const p1Chars = result.state.activeMissions[0].player1Characters;
+    expect(p1Chars.length).toBe(2); // naruto + hidden card
+    const hiddenChar = p1Chars.find(c => c.instanceId !== 'naruto-1');
+    expect(hiddenChar?.isHidden).toBe(true);
+    // Deck should have one fewer card
+    expect(result.state.player1.deck.length).toBe(state.player1.deck.length - 1);
   });
 
-  it('should not hide enemy with Power > 3', () => {
+  it('should fizzle when deck is empty', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
-      id: '108/130', number: 108, name_fr: 'Naruto', power: 5,
-    });
-    const strongEnemy = mockCharInPlay({ instanceId: 'strong-e', controlledBy: 'player2', originalOwner: 'player2' }, {
-      name_fr: 'Strong', power: 5,
+      id: '108/130', number: 108, name_fr: 'Naruto', power: 4,
     });
     const state = createActionPhaseState({
-      activeMissions: [makeMission('D', [naruto], [strongEnemy])],
+      activeMissions: [makeMission('D', [naruto])],
     });
+    state.player1.deck = [];
 
     const handler = getEffectHandler('108/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
-    const enemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'strong-e');
-    expect(enemy?.isHidden).toBe(false);
+    // No new characters placed
+    expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
 
-  it('should POWERUP X on upgrade where X = hidden enemy power', () => {
-    const naruto = mockCharInPlay({ instanceId: 'naruto-1', powerTokens: 0 }, {
-      id: '108/130', number: 108, name_fr: 'Naruto', power: 5,
+  it('AMBUSH should also place top card of deck as hidden', () => {
+    const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
+      id: '108/130', number: 108, name_fr: 'Naruto', power: 4,
     });
-    const weakEnemy = mockCharInPlay({ instanceId: 'weak-e', controlledBy: 'player2', originalOwner: 'player2' }, {
-      name_fr: 'Weak', power: 3,
-    });
+    const deckCard = mockCharacter({ id: '003/130', name_fr: 'Tsunade', power: 3 });
     const state = createActionPhaseState({
-      activeMissions: [makeMission('D', [naruto], [weakEnemy])],
+      activeMissions: [makeMission('D', [naruto])],
     });
+    state.player1.deck = [deckCard];
 
-    const handler = getEffectHandler('108/130', 'MAIN')!;
-    const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
-    const updatedNaruto = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-1');
-    expect(updatedNaruto?.powerTokens).toBe(3); // Enemy power was 3
+    const handler = getEffectHandler('108/130', 'AMBUSH')!;
+    expect(handler).toBeDefined();
+    const result = handler(makeCtx(state, 'player1', naruto, 0, 'AMBUSH'));
+    const p1Chars = result.state.activeMissions[0].player1Characters;
+    expect(p1Chars.length).toBe(2);
+    const hiddenChar = p1Chars.find(c => c.instanceId !== 'naruto-1');
+    expect(hiddenChar?.isHidden).toBe(true);
   });
 
   it('RA variant 108/130 A should use same handler', () => {
@@ -410,13 +414,39 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
 });
 
 // ===================================================================
-// 137/130 - KAKASHI HATAKE (S): Hide enemy in this mission + UPGRADE move self
+// 137/130 - KAKASHI HATAKE (S): Hide upgraded char in mission + UPGRADE move self
 // ===================================================================
 describe('137/130 - Kakashi Hatake (S)', () => {
-  it('MAIN should hide an enemy character in this mission', () => {
+  it('MAIN should hide an upgraded character in this mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
       id: '137/130', number: 137, name_fr: 'Kakashi Hatake', power: 7,
     });
+    // An upgraded enemy (stack.length >= 2)
+    const baseCard = mockCharacter({ name_fr: 'Enemy', power: 3, chakra: 3 });
+    const upgradeCard = mockCharacter({ name_fr: 'Enemy', power: 5, chakra: 5 });
+    const upgradedEnemy = mockCharInPlay({
+      instanceId: 'e1',
+      controlledBy: 'player2',
+      originalOwner: 'player2',
+      stack: [baseCard, upgradeCard],
+    }, {
+      name_fr: 'Enemy', power: 5,
+    });
+    const state = createActionPhaseState({
+      activeMissions: [makeMission('D', [kakashi], [upgradedEnemy])],
+    });
+
+    const handler = getEffectHandler('137/130', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', kakashi, 0));
+    const e = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'e1');
+    expect(e?.isHidden).toBe(true);
+  });
+
+  it('MAIN should fizzle when no upgraded character in this mission', () => {
+    const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
+      id: '137/130', number: 137, name_fr: 'Kakashi',
+    });
+    // Non-upgraded enemy (stack.length = 1)
     const enemy = mockCharInPlay({ instanceId: 'e1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'Enemy', power: 5,
     });
@@ -426,22 +456,31 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
     const handler = getEffectHandler('137/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
+    // Enemy should NOT be hidden (not upgraded)
     const e = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'e1');
-    expect(e?.isHidden).toBe(true);
+    expect(e?.isHidden).toBe(false);
   });
 
-  it('MAIN should fizzle when no visible enemy in this mission', () => {
+  it('MAIN should also target friendly upgraded characters', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
-      id: '137/130', number: 137, name_fr: 'Kakashi',
+      id: '137/130', number: 137, name_fr: 'Kakashi Hatake', power: 7,
+    });
+    const baseCard = mockCharacter({ name_fr: 'Ally', power: 2, chakra: 2 });
+    const upgradeCard = mockCharacter({ name_fr: 'Ally', power: 4, chakra: 4 });
+    const upgradedAlly = mockCharInPlay({
+      instanceId: 'ally-1',
+      stack: [baseCard, upgradeCard],
+    }, {
+      name_fr: 'Ally', power: 4,
     });
     const state = createActionPhaseState({
-      activeMissions: [makeMission('D', [kakashi])],
+      activeMissions: [makeMission('D', [kakashi, upgradedAlly])],
     });
 
     const handler = getEffectHandler('137/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
-    // No crash, no change
-    expect(result.state).toBeDefined();
+    const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
+    expect(ally?.isHidden).toBe(true);
   });
 
   it('UPGRADE should move self to another mission', () => {

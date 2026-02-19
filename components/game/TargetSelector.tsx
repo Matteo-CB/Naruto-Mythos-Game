@@ -26,8 +26,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
         : null;
 
-  const basePower = isHidden ? 0 : (character.card?.power ?? 0);
-  const totalPower = basePower + character.powerTokens;
+  const totalPower = character.effectivePower;
   const displayName = character.card?.name_fr ?? (isHidden ? '???' : 'Unknown');
 
   const handleClick = () => {

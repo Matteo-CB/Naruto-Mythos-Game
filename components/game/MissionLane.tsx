@@ -64,9 +64,8 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
       : null;
 
-  // Effective power display
-  const basePower = isHidden ? 0 : (character.card?.power ?? 0);
-  const totalPower = basePower + character.powerTokens;
+  // Effective power display (includes continuous modifiers from engine)
+  const totalPower = character.effectivePower;
 
   const handleMouseEnter = (e: React.MouseEvent) => {
     if (isHiddenEnemy || !character.card) return;
@@ -352,17 +351,12 @@ export function MissionLane({ mission, missionIndex }: MissionLaneProps) {
       ? mission.player2Characters
       : mission.player1Characters;
 
-  // Power totals
-  const myPower = myChars.reduce((sum, c) => {
-    if (c.isHidden) return sum + c.powerTokens;
-    const base = c.card?.power ?? 0;
-    return sum + base + c.powerTokens;
-  }, 0);
+  // Power totals (effectivePower includes continuous modifiers from engine)
+  const myPower = myChars.reduce((sum, c) => sum + c.effectivePower, 0);
   const oppPower = oppChars.reduce((sum, c) => {
-    if (c.isHidden && !c.isOwn) return sum; // Can't see hidden enemy power
-    if (c.isHidden) return sum + c.powerTokens;
-    const base = c.card?.power ?? 0;
-    return sum + base + c.powerTokens;
+    // Can't see hidden enemy effective power
+    if (c.isHidden && !c.isOwn) return sum;
+    return sum + c.effectivePower;
   }, 0);
 
   const handleClick = () => {
