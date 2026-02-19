@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 019/130 - INO YAMANAKA (Common)
@@ -25,7 +26,9 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
   });
 
   if (!hasOtherTeam10) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Ino Yamanaka (019): No other Team 10 character in this mission.',
+      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: '019/130' }) } };
   }
 
   // POWERUP 1 on self
@@ -46,6 +49,14 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
       ),
     };
   });
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_POWERUP',
+    `Ino Yamanaka (019): POWERUP 1 (Team 10 synergy).`,
+    'game.log.effect.powerupSelf',
+    { card: 'Ino Yamanaka', id: '019/130', amount: 1 },
+  );
 
   return { state: newState };
 }

@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 050/130 - OROCHIMARU (Common)
@@ -35,7 +36,9 @@ function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
 
   // If no hidden enemies in this mission, effect fizzles
   if (validTargets.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Orochimaru (050): No hidden enemy characters in this mission.',
+      'game.log.effect.noTarget', { card: 'OROCHIMARU', id: '050/130' }) } };
   }
 
   // Requires target selection: which hidden enemy to look at

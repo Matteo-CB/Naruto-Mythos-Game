@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 068/130 - DOSU KINUTA (Common)
@@ -13,7 +14,7 @@ import { registerEffect } from '../../EffectRegistry';
  * AMBUSH effect: When revealed from hidden, select a hidden character in play and defeat it.
  */
 function handleDosu068Main(ctx: EffectContext): EffectResult {
-  const { state } = ctx;
+  const { state, sourcePlayer } = ctx;
 
   // Find all hidden characters in play across all missions
   const validTargets: string[] = [];
@@ -27,7 +28,9 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
 
   // If no hidden characters, effect fizzles
   if (validTargets.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Dosu Kinuta (068): No hidden characters in play to look at.',
+      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: '068/130' }) } };
   }
 
   // Requires target selection: which hidden character to look at
@@ -41,7 +44,7 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
 }
 
 function handleDosu068Ambush(ctx: EffectContext): EffectResult {
-  const { state } = ctx;
+  const { state, sourcePlayer } = ctx;
 
   // Find all hidden characters in play across all missions
   const validTargets: string[] = [];
@@ -55,7 +58,9 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
 
   // If no hidden characters, effect fizzles
   if (validTargets.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Dosu Kinuta (068): No hidden characters in play to defeat.',
+      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: '068/130' }) } };
   }
 
   // Requires target selection: which hidden character to defeat

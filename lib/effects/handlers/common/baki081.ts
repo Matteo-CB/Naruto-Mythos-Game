@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 081/130 - BAKI (Common)
@@ -22,6 +23,14 @@ function handleBaki081Score(ctx: EffectContext): EffectResult {
     playerState.hand = [...playerState.hand, drawnCard];
   }
   newState[sourcePlayer] = playerState;
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'SCORE_DRAW',
+    `Baki (081): [SCORE] Drew 1 card.`,
+    'game.log.score.draw',
+    { card: 'Baki', count: 1 },
+  );
 
   return { state: newState };
 }

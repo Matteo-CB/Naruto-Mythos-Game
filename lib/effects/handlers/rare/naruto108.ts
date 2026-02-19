@@ -1,95 +1,111 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { generateInstanceId } from '../../../engine/utils/id';
 
 /**
  * Card 108/130 - NARUTO UZUMAKI "Believe it!" (RA)
  * Also applies to 108/130 A (Rare Art variant - same effects, handled by registry normalization)
- * Chakra: 4, Power: 5
+ * Chakra: 5, Power: 5
  * Group: Leaf Village, Keywords: Team 7, Jutsu
  *
- * MAIN: Put the top card of your deck as a hidden character in this mission.
- * AMBUSH: Repeat the MAIN effect.
+ * MAIN: Hide an enemy character with Power 3 or less in this mission.
+ * UPGRADE: MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.
  *
- * Source: official narutotcgmythos.com (corrected from wrong JSON data)
+ * Source: official narutotcgmythos.com (Feb 2026)
  */
 
-/**
- * Place the top card of the player's deck as a hidden character in this mission.
- * Returns the updated state after placement.
- */
-function placeTopCardAsHidden(ctx: EffectContext, label: string): EffectResult {
-  const state = { ...ctx.state };
-  const playerState = { ...state[ctx.sourcePlayer] };
-  const deck = [...playerState.deck];
-
-  if (deck.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_NO_TARGET',
-      `Naruto Uzumaki (108) ${label}: Deck is empty, cannot place a hidden character.`,
-    );
-    return { state: { ...state, log } };
-  }
-
-  // Take the top card of the deck
-  const topCard = deck.shift()!;
-  playerState.deck = deck;
-  playerState.charactersInPlay = (playerState.charactersInPlay ?? 0) + 1;
-
-  // Place as hidden character in this mission
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[ctx.sourceMissionIndex] };
-
-  const newCharacter = {
-    instanceId: generateInstanceId(),
-    card: topCard,
-    isHidden: true,
-    powerTokens: 0,
-    stack: [topCard],
-    controlledBy: ctx.sourcePlayer,
-    originalOwner: ctx.sourcePlayer,
-    missionIndex: ctx.sourceMissionIndex,
-  };
-
-  mission[friendlySide] = [...mission[friendlySide], newCharacter];
-  missions[ctx.sourceMissionIndex] = mission;
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'EFFECT_PLACE_HIDDEN',
-    `Naruto Uzumaki (108) ${label}: Placed top card of deck as hidden character in this mission.`,
-  );
-
-  return {
-    state: {
-      ...state,
-      activeMissions: missions,
-      [ctx.sourcePlayer]: playerState,
-      log,
-    },
-  };
+function getEffectivePower(char: CharacterInPlay): number {
+  if (char.isHidden) return 0;
+  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  return topCard.power + char.powerTokens;
 }
 
 function naruto108MainHandler(ctx: EffectContext): EffectResult {
-  return placeTopCardAsHidden(ctx, 'MAIN');
-}
+  let state = { ...ctx.state };
+  const isUpgrade = ctx.isUpgrade;
 
-function naruto108AmbushHandler(ctx: EffectContext): EffectResult {
-  return placeTopCardAsHidden(ctx, 'AMBUSH');
+  const enemySideKey: 'player1Characters' | 'player2Characters' =
+    ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+  // Find an enemy character with Power <= 3 in this mission
+  const thisMission = state.activeMissions[ctx.sourceMissionIndex];
+  const target = thisMission[enemySideKey].find(
+    (c) => !c.isHidden && getEffectivePower(c) <= 3,
+  );
+
+  if (!target) {
+    state = {
+      ...state,
+      log: logAction(
+        state.log, state.turn, state.phase, ctx.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        `Naruto Uzumaki (108): No valid enemy with Power 3 or less in this mission.`,
+        'game.log.effect.noTarget',
+        { card: 'NARUTO UZUMAKI', id: '108/130' },
+      ),
+    };
+    return { state };
+  }
+
+  const targetPower = getEffectivePower(target);
+
+  // Hide the target
+  const missions = [...state.activeMissions];
+  const mission = { ...missions[ctx.sourceMissionIndex] };
+  const enemyChars = [...mission[enemySideKey]];
+  const idx = enemyChars.findIndex((c) => c.instanceId === target.instanceId);
+  if (idx !== -1) {
+    enemyChars[idx] = { ...enemyChars[idx], isHidden: true };
+    mission[enemySideKey] = enemyChars;
+    missions[ctx.sourceMissionIndex] = mission;
+    state = {
+      ...state,
+      activeMissions: missions,
+      log: logAction(
+        state.log, state.turn, state.phase, ctx.sourcePlayer,
+        'EFFECT_HIDE',
+        `Naruto Uzumaki (108): Hid enemy ${target.card.name_fr} (Power ${targetPower}) in this mission.`,
+        'game.log.effect.hide',
+        { card: 'NARUTO UZUMAKI', id: '108/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+      ),
+    };
+  }
+
+  // UPGRADE: POWERUP X on self where X = the Power of the hidden character
+  if (isUpgrade && targetPower > 0) {
+    const friendlySideKey: 'player1Characters' | 'player2Characters' =
+      ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    const upgradeMissions = [...state.activeMissions];
+    const upgradeMission = { ...upgradeMissions[ctx.sourceMissionIndex] };
+    const friendlyChars = [...upgradeMission[friendlySideKey]];
+    const selfIdx = friendlyChars.findIndex((c) => c.instanceId === ctx.sourceCard.instanceId);
+    if (selfIdx !== -1) {
+      friendlyChars[selfIdx] = {
+        ...friendlyChars[selfIdx],
+        powerTokens: friendlyChars[selfIdx].powerTokens + targetPower,
+      };
+      upgradeMission[friendlySideKey] = friendlyChars;
+      upgradeMissions[ctx.sourceMissionIndex] = upgradeMission;
+      state = {
+        ...state,
+        activeMissions: upgradeMissions,
+        log: logAction(
+          state.log, state.turn, state.phase, ctx.sourcePlayer,
+          'EFFECT_POWERUP',
+          `Naruto Uzumaki (108): POWERUP ${targetPower} (Power of hidden ${target.card.name_fr}).`,
+          'game.log.effect.powerup',
+          { card: 'NARUTO UZUMAKI', id: '108/130', amount: targetPower, target: 'self' },
+        ),
+      };
+    }
+  }
+
+  return { state };
 }
 
 export function registerNaruto108Handlers(): void {
   registerEffect('108/130', 'MAIN', naruto108MainHandler);
-  registerEffect('108/130', 'AMBUSH', naruto108AmbushHandler);
+  // No AMBUSH effect for this card — the old "place top card as hidden" was incorrect
 }

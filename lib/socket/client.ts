@@ -24,6 +24,7 @@ interface SocketStore {
     isRanked?: boolean;
     eloDelta?: number | null;
   } | null;
+  playerNames: { player1: string; player2: string } | null;
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
@@ -48,6 +49,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   opponentJoined: false,
   gameStarted: false,
   gameEnded: false,
+  playerNames: null,
   gameResult: null,
 
   connect: (userId?: string) => {
@@ -122,11 +124,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         (data: {
           visibleState: VisibleGameState;
           playerRole: 'player1' | 'player2';
+          playerNames?: { player1: string; player2: string };
         }) => {
-          set({
+          const update: Partial<SocketStore> = {
             visibleState: data.visibleState,
             playerRole: data.playerRole,
-          });
+          };
+          if (data.playerNames) {
+            update.playerNames = data.playerNames;
+          }
+          set(update as SocketStore);
         },
       );
 

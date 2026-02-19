@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 
 /**
@@ -22,101 +21,59 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
 
   // Must have at least 1 card in hand to discard
   if (playerState.hand.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kimimaro (055): No cards in hand to discard.',
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '055/130' }) } };
   }
 
   // Find all non-hidden characters in play with cost <= 3
-  // Prefer enemy characters over friendly ones
-  let target: CharacterInPlay | undefined;
-  let targetMissionIndex = -1;
-  let targetSide: 'player1Characters' | 'player2Characters' | undefined;
+  const validTargets: string[] = [];
 
-  // First pass: look for enemy characters
+  // First pass: enemy characters
   const enemySide: 'player1Characters' | 'player2Characters' =
     opponent === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
+  for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 3) {
-        target = char;
-        targetMissionIndex = i;
-        targetSide = enemySide;
-        break;
+        validTargets.push(char.instanceId);
       }
     }
-    if (target) break;
   }
 
-  // Second pass: if no enemy found, look for friendly characters
-  if (!target) {
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  // Second pass: friendly characters
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      const mission = state.activeMissions[i];
-      for (const char of mission[friendlySide]) {
-        if (char.isHidden) continue;
-        // Don't hide Kimimaro himself
-        if (char.instanceId === ctx.sourceCard.instanceId) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if ((topCard.chakra ?? 0) <= 3) {
-          target = char;
-          targetMissionIndex = i;
-          targetSide = friendlySide;
-          break;
-        }
+  for (const mission of state.activeMissions) {
+    for (const char of mission[friendlySide]) {
+      if (char.isHidden) continue;
+      if (char.instanceId === ctx.sourceCard.instanceId) continue;
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if ((topCard.chakra ?? 0) <= 3) {
+        validTargets.push(char.instanceId);
       }
-      if (target) break;
     }
   }
 
   // No valid target to hide — effect fizzles (don't discard)
-  if (!target || targetMissionIndex === -1 || !targetSide) {
-    return { state };
+  if (validTargets.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kimimaro (055): No character with cost 3 or less to hide.',
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '055/130' }) } };
   }
 
-  // Step 1: Discard the last card from hand
-  const newHand = [...playerState.hand];
-  const discardedCard = newHand.pop()!;
-  const newDiscard = [...playerState.discardPile, discardedCard];
-
-  const newPlayerState = {
-    ...playerState,
-    hand: newHand,
-    discardPile: newDiscard,
-  };
-
-  // Step 2: Hide the target character
-  const newMissions = state.activeMissions.map((m, idx) => {
-    if (idx !== targetMissionIndex) return m;
-    return {
-      ...m,
-      [targetSide!]: m[targetSide!].map((c) => {
-        if (c.instanceId !== target!.instanceId) return c;
-        return { ...c, isHidden: true };
-      }),
-    };
-  });
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'EFFECT_HIDE',
-    `Kimimaro (055): Discarded ${discardedCard.name_fr} and hid ${target.card.name_fr} in mission ${targetMissionIndex}.`,
-  );
+  // Step 1: Ask player to choose a card to discard from hand
+  const handIndices = playerState.hand.map((_, i) => String(i));
 
   return {
-    state: {
-      ...state,
-      [sourcePlayer]: newPlayerState,
-      activeMissions: newMissions,
-      log,
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KIMIMARO_CHOOSE_DISCARD',
+    validTargets: handIndices,
+    description: `Kimimaro (055): Choose a card to discard, then hide a character with cost 3 or less.`,
   };
 }
 

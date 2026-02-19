@@ -33,6 +33,8 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 05 (Bring it Back): No non-hidden friendly character in this mission to return.',
+      'game.log.effect.noTarget',
+      { card: 'Ramener', id: 'MSS 05' },
     );
     return { state: { ...state, log } };
   }
@@ -61,6 +63,8 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'SCORE_RETURN',
     `MSS 05 (Bring it Back): Returned ${target.card.name_fr} from this mission to hand (mandatory).`,
+    'game.log.score.returnToHand',
+    { card: 'Ramener', target: target.card.name_fr },
   );
 
   return {

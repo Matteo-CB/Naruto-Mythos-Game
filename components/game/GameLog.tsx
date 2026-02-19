@@ -24,9 +24,14 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-function LogEntry({ entry, formatPhase }: { entry: GameLogEntry; formatPhase: (phase: GamePhase) => string }) {
+function LogEntry({ entry, formatPhase, playerDisplayNames }: {
+  entry: GameLogEntry;
+  formatPhase: (phase: GamePhase) => string;
+  playerDisplayNames: { player1: string; player2: string };
+}) {
   const t = useTranslations();
   const playerColor = entry.player === 'player1' ? '#c4a35a' : '#b33e3e';
+  const displayName = entry.player ? playerDisplayNames[entry.player] : null;
 
   return (
     <motion.div
@@ -50,11 +55,11 @@ function LogEntry({ entry, formatPhase }: { entry: GameLogEntry; formatPhase: (p
       </span>
       {entry.player && (
         <span className="shrink-0 font-medium" style={{ color: playerColor }}>
-          {entry.player === 'player1' ? t('game.log.player1') : t('game.log.player2')}
+          {displayName}
         </span>
       )}
       <span className="font-body" style={{ color: '#e0e0e0' }}>
-        {entry.details || entry.action}
+        {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
       </span>
     </motion.div>
   );
@@ -63,6 +68,7 @@ function LogEntry({ entry, formatPhase }: { entry: GameLogEntry; formatPhase: (p
 export function GameLog() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
+  const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const showGameLog = useUIStore((s) => s.showGameLog);
   const toggleGameLog = useUIStore((s) => s.toggleGameLog);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -150,7 +156,7 @@ export function GameLog() {
                 </div>
               ) : (
                 log.map((entry, i) => (
-                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} />
+                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} />
                 ))
               )}
             </div>

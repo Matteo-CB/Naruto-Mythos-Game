@@ -52,6 +52,8 @@ function revealMissionCard(state: GameState): GameState {
     'start',
     'REVEAL_MISSION',
     `Mission "${missionCard.name_fr}" revealed as rank ${rank} (${missionCard.basePoints} + ${rankBonus} bonus points).`,
+    'game.log.revealMission',
+    { name: missionCard.name_fr, rank, base: missionCard.basePoints, bonus: rankBonus },
   );
 
   return {
@@ -88,6 +90,8 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
     player,
     'GAIN_CHAKRA',
     `${player} gains ${totalChakra} chakra (${BASE_CHAKRA_PER_TURN} base + ${charCount} characters + ${chakraBonus} bonus). Total: ${playerState.chakra}.`,
+    'game.log.gainChakra',
+    { total: totalChakra, base: BASE_CHAKRA_PER_TURN, chars: charCount, bonus: chakraBonus, finalTotal: playerState.chakra },
   );
 
   return {
@@ -131,6 +135,7 @@ function drawCards(state: GameState, player: PlayerID, count: number): GameState
       player,
       'DRAW',
       `${player} has no cards to draw.`,
+      'game.log.noDraw',
     );
     return { ...state, log };
   }
@@ -148,6 +153,8 @@ function drawCards(state: GameState, player: PlayerID, count: number): GameState
     player,
     'DRAW',
     `${player} draws ${drawn} card(s).`,
+    'game.log.draw',
+    { count: drawn },
   );
 
   return {

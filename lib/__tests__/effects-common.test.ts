@@ -566,7 +566,7 @@ describe('050/130 - Orochimaru', () => {
 // 055/130 - KIMIMARO: AMBUSH - discard a card to hide a character cost<=3
 // ===================================================================
 describe('055/130 - Kimimaro', () => {
-  it('should auto-resolve: discard a card and hide valid enemy target (AMBUSH)', () => {
+  it('should require hand selection to choose which card to discard (AMBUSH)', () => {
     const kimimaro = mockCharInPlay({ instanceId: 'kim-1' }, {
       id: '055/130', number: 55, name_fr: 'Kimimaro',
     });
@@ -588,13 +588,12 @@ describe('055/130 - Kimimaro', () => {
     const handler = getEffectHandler('055/130', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kimimaro, 0, 'AMBUSH'));
-    // Card was discarded from hand
-    expect(result.state.player1.hand.length).toBe(0);
-    expect(result.state.player1.discardPile.length).toBeGreaterThan(0);
-    // Enemy character was hidden
-    const enemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'low-1');
-    expect(enemy?.isHidden).toBe(true);
-    expect(result.requiresTargetSelection).toBeUndefined();
+    // Now returns requiresTargetSelection for hand card selection
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KIMIMARO_CHOOSE_DISCARD');
+    expect(result.validTargets).toEqual(['0']); // 1 card in hand
+    // Hand unchanged until player selects
+    expect(result.state.player1.hand.length).toBe(1);
   });
 
   it('should fizzle when hand is empty', () => {
@@ -1005,7 +1004,7 @@ describe('086/130 - Zabuza Momochi', () => {
 // 088/130 - HAKU: Draw 1, then put 1 card on top of deck
 // ===================================================================
 describe('088/130 - Haku', () => {
-  it('should draw 1 card and auto-put the drawn card back on top of deck', () => {
+  it('should draw 1 card and require hand selection to choose which to put back', () => {
     const haku = mockCharInPlay({ instanceId: 'haku-1' }, {
       id: '088/130', number: 88, name_fr: 'Haku',
     });
@@ -1023,13 +1022,12 @@ describe('088/130 - Haku', () => {
 
     const handler = getEffectHandler('088/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', haku, 0));
-    // Draw 1, then auto-put the lowest-power card back on top of deck
-    // Both cards have same power, so index 0 (InHand) gets put back
-    expect(result.state.player1.hand.length).toBe(1);
-    expect(result.state.player1.hand[0].name_fr).toBe('HakuDraw');
-    expect(result.state.player1.deck.length).toBe(1);
-    expect(result.state.player1.deck[0].name_fr).toBe('InHand');
-    expect(result.requiresTargetSelection).toBeUndefined();
+    // Draws the card, then asks which to put back
+    expect(result.state.player1.hand.length).toBe(2); // InHand + HakuDraw
+    expect(result.state.player1.deck.length).toBe(0); // deck empty after draw
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('PUT_CARD_ON_DECK');
+    expect(result.validTargets).toEqual(['0', '1']); // both hand indices
   });
 
   it('should do nothing when deck is empty', () => {

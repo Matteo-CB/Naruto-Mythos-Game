@@ -51,6 +51,8 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (137): No upgraded character in this mission to hide.',
+      'game.log.effect.noTarget',
+      { card: 'KAKASHI HATAKE', id: '137/130' },
     );
     return { state: { ...state, log } };
   }
@@ -67,6 +69,8 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_HIDE',
     `Kakashi Hatake (137): Hid upgraded ${target.card.name_fr} in this mission.`,
+    'game.log.effect.hide',
+    { card: 'KAKASHI HATAKE', id: '137/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
@@ -95,6 +99,8 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (137): No other mission to move to (upgrade).',
+      'game.log.effect.noTarget',
+      { card: 'KAKASHI HATAKE', id: '137/130' },
     );
     return { state: { ...state, log } };
   }
@@ -131,6 +137,8 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_MOVE',
     `Kakashi Hatake (137): Moved self from mission ${ctx.sourceMissionIndex} to mission ${targetMissionIndex} (upgrade).`,
+    'game.log.effect.moveSelf',
+    { card: 'KAKASHI HATAKE', id: '137/130', mission: `mission ${targetMissionIndex}` },
   );
 
   return { state: { ...state, activeMissions: missions, log } };

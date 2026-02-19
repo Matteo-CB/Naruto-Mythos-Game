@@ -6,14 +6,6 @@ import { logAction } from '../engine/utils/gameLog';
  *
  * Card text: "[hourglass] Each time this character moves to a different mission,
  *            look at a hidden character in this mission."
- *
- * Call this after any handler that moves a character to a different mission,
- * to ensure the Ninja Hounds trigger fires correctly.
- *
- * @param state - Game state AFTER the move has been applied
- * @param movedChar - The character that was moved
- * @param destMissionIndex - The mission index the character was moved TO
- * @param player - The player who controls the moved character
  */
 export function checkNinjaHoundsTrigger(
   state: GameState,
@@ -49,7 +41,9 @@ export function checkNinjaHoundsTrigger(
     log: logAction(
       state.log, state.turn, state.phase, player,
       'EFFECT',
-      `Ninja Hounds (100): Moved to mission ${destMissionIndex} - looked at hidden ${hiddenChar.card.name_fr}.`,
+      `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} - looked at hidden ${hiddenChar.card.name_fr}.`,
+      'game.log.effect.lookAtHidden',
+      { card: 'Chiens Ninjas', id: '100/130', target: hiddenChar.card.name_fr },
     ),
   };
 }

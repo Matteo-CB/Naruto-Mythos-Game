@@ -46,6 +46,8 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 07 (I Have to Go): No hidden friendly character to move.',
+      'game.log.effect.noTarget',
+      { card: 'Je dois partir', id: 'MSS 07' },
     );
     return { state: { ...state, log } };
   }
@@ -67,6 +69,8 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 07 (I Have to Go): No other mission to move to.',
+      'game.log.effect.noTarget',
+      { card: 'Je dois partir', id: 'MSS 07' },
     );
     return { state: { ...state, log } };
   }
@@ -92,6 +96,8 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'SCORE_MOVE',
     `MSS 07 (I Have to Go): Moved hidden ${targetChar.card.name_fr} from mission ${fromMissionIndex} to mission ${toMissionIndex}.`,
+    'game.log.score.moveHidden',
+    { card: 'Je dois partir', target: targetChar.card.name_fr },
   );
 
   return { state: { ...state, activeMissions: missions, log } };

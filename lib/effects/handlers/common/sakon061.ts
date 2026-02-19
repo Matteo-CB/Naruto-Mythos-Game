@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 061/130 - SAKON (Common)
@@ -31,7 +32,9 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
   }
 
   if (soundFourMissionCount === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Sakon (061): No missions with friendly Sound Four characters.',
+      'game.log.effect.noTarget', { card: 'SAKON', id: '061/130' }) } };
   }
 
   // Draw X cards
@@ -50,7 +53,19 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
   playerState.hand = newHand;
   newState[sourcePlayer] = playerState;
 
-  return { state: newState };
+  const drawnCount = newHand.length - state[sourcePlayer].hand.length;
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_DRAW',
+    `Sakon (061): Drew ${drawnCount} card(s).`,
+    'game.log.effect.draw',
+    { card: 'Sakon', id: '061/130', count: String(drawnCount) },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

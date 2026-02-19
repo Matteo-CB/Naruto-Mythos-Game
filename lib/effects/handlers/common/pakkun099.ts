@@ -28,7 +28,9 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
 
   // If no other missions exist, effect fizzles
   if (destMissionIndex === -1) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Pakkun (099): No other mission to move to.',
+      'game.log.effect.noTarget', { card: 'PAKKUN', id: '099/130' }) } };
   }
 
   // Move Pakkun from source mission to destination mission
@@ -58,6 +60,8 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
     sourcePlayer,
     'EFFECT_MOVE',
     `Pakkun (099): Moved self from mission ${sourceMissionIndex} to mission ${destMissionIndex}.`,
+    'game.log.score.moveHidden',
+    { card: 'PAKKUN', target: `mission ${destMissionIndex}` },
   );
 
   return { state: { ...state, activeMissions: newMissions, log } };

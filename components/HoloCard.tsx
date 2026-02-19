@@ -10,7 +10,7 @@ interface Props {
   alt?: string;
   width?: number;
   height?: number;
-  rarity?: 'common' | 'rare' | 'secret' | 'mythos';
+  rarity?: 'common' | 'rare' | 'secret' | 'mythos' | 'legendary';
 }
 
 export function HoloCard({

@@ -23,6 +23,8 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'SCORE_NO_DRAW',
       'MSS 06 (Rescue a Friend): Deck is empty, no card drawn.',
+      'game.log.effect.noTarget',
+      { card: 'Sauvetage d\'un ami', id: 'MSS 06' },
     );
     return { state: { ...state, log } };
   }
@@ -39,6 +41,8 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'SCORE_DRAW',
     'MSS 06 (Rescue a Friend): Drew 1 card.',
+    'game.log.score.draw',
+    { card: 'Sauvetage d\'un ami', count: 1 },
   );
 
   return { state: { ...state, [ctx.sourcePlayer]: playerState, log } };

@@ -22,6 +22,7 @@ export function executeEndPhase(state: GameState): GameState {
     'end',
     'RESET_CHAKRA',
     'Both players\' chakra pools reset to 0.',
+    'game.log.resetChakra',
   );
 
   // 2. Remove power tokens (with Rock Lee exception)
@@ -64,7 +65,10 @@ function removeAllPowerTokens(state: GameState): GameState {
   return {
     ...state,
     activeMissions: missions,
-    log: logSystem(state.log, state.turn, 'end', 'REMOVE_TOKENS', 'All Power tokens removed (exceptions applied).'),
+    log: logSystem(state.log, state.turn, 'end', 'REMOVE_TOKENS',
+      'All Power tokens removed (exceptions applied).',
+      'game.log.removeTokens',
+    ),
   };
 }
 
@@ -75,7 +79,7 @@ function removeAllPowerTokens(state: GameState): GameState {
  */
 function handleEndOfRoundTriggers(state: GameState): GameState {
   let newState = { ...state };
-  const charsToReturn: { instanceId: string; player: PlayerID; reason: string }[] = [];
+  const charsToReturn: { instanceId: string; player: PlayerID; reason: string; cardName: string; isAkamaru: boolean }[] = [];
 
   for (const mission of newState.activeMissions) {
     for (const side of ['player1Characters', 'player2Characters'] as const) {
@@ -96,6 +100,8 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
               instanceId: char.instanceId,
               player: char.controlledBy,
               reason: `${topCard.name_fr} (Summon) returns to hand at end of round.`,
+              cardName: topCard.name_fr,
+              isAkamaru: false,
             });
           }
 
@@ -112,6 +118,8 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
                 instanceId: char.instanceId,
                 player: char.controlledBy,
                 reason: 'Akamaru returns to hand (no Kiba in mission).',
+                cardName: topCard.name_fr,
+                isAkamaru: true,
               });
             }
           }
@@ -130,6 +138,8 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
       toReturn.player,
       'END_RETURN',
       toReturn.reason,
+      toReturn.isAkamaru ? 'game.log.effect.akamaru' : 'game.log.effect.endReturn',
+      toReturn.isAkamaru ? undefined : { card: toReturn.cardName },
     );
   }
 

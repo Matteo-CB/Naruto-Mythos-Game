@@ -42,6 +42,8 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_DEFEAT',
           `Gaara (120): Defeated enemy ${target.card.name_fr} (Power ${getEffectivePower(target)}) in mission ${i}.`,
+          'game.log.effect.defeat',
+          { card: 'GAARA', id: '120/130', target: target.card.name_fr },
         ),
       };
     }
@@ -54,6 +56,8 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
         state.log, state.turn, state.phase, ctx.sourcePlayer,
         'EFFECT_NO_TARGET',
         'Gaara (120): No enemy characters with Power 1 or less found in any mission.',
+        'game.log.effect.noTarget',
+        { card: 'GAARA', id: '120/130' },
       ),
     };
   }
@@ -81,6 +85,8 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_POWERUP',
           `Gaara (120): POWERUP ${defeatedCount} (upgrade, X = characters defeated by MAIN).`,
+          'game.log.effect.powerupSelf',
+          { card: 'GAARA', id: '120/130', amount: defeatedCount },
         ),
       };
     }

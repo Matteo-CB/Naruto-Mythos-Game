@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 011/130 - SAKURA HARUNO (Common)
@@ -25,7 +26,9 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
   });
 
   if (!hasOtherTeam7) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Sakura Haruno (011): No other Team 7 character in this mission.',
+      'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: '011/130' }) } };
   }
 
   // Draw a card
@@ -38,6 +41,14 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
     playerState.hand = [...playerState.hand, drawnCard];
   }
   newState[sourcePlayer] = playerState;
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_DRAW',
+    `Sakura Haruno (011): Drew 1 card (Team 7 synergy).`,
+    'game.log.effect.draw',
+    { card: 'Sakura Haruno', id: '011/130', count: 1 },
+  );
 
   return { state: newState };
 }

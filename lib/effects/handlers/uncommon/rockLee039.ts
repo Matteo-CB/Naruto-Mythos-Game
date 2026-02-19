@@ -28,6 +28,7 @@ function rockLeeMainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
     'Rock Lee: Power tokens will be retained at end of round (continuous).',
+    'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: '039/130', amount: 0 },
   );
   return { state: { ...state, log } };
 }
@@ -57,6 +58,7 @@ function rockLeeUpgradeHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_POWERUP',
       'Rock Lee: POWERUP 2 (upgrade effect). Power tokens added: 2.',
+      'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: '039/130', amount: 2 },
     );
 
     return { state: { ...state, activeMissions: missions, log } };

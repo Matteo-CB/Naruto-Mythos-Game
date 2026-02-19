@@ -136,31 +136,66 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
 
       {/* Power display (bottom-right) for visible cards */}
       {!isHidden && (
-        <div
+        <motion.div
           className="absolute bottom-0.5 right-0.5 rounded px-1 py-0.5 text-[10px] font-bold tabular-nums"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.2)' : 'rgba(0, 0, 0, 0.85)',
             color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0',
+            border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.4)' : 'none',
+            boxShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.3)' : 'none',
           }}
+          animate={character.powerTokens > 0 ? {
+            boxShadow: [
+              '0 0 4px rgba(196, 163, 90, 0.2)',
+              '0 0 8px rgba(196, 163, 90, 0.4)',
+              '0 0 4px rgba(196, 163, 90, 0.2)',
+            ],
+          } : {}}
+          transition={character.powerTokens > 0 ? { repeat: Infinity, duration: 2 } : {}}
         >
           {totalPower}
-        </div>
+        </motion.div>
       )}
 
-      {/* Power tokens indicator */}
+      {/* Physical Power tokens */}
       {character.powerTokens > 0 && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="absolute top-0.5 right-0.5 rounded-full w-5 h-5 flex items-center justify-center text-[9px] font-bold"
-          style={{
-            backgroundColor: '#c4a35a',
-            color: '#0a0a0a',
-            boxShadow: '0 0 6px rgba(196, 163, 90, 0.5)',
-          }}
+        <div
+          className="absolute top-0 right-0 flex flex-col items-end gap-px p-0.5"
+          style={{ pointerEvents: 'none' }}
         >
-          +{character.powerTokens}
-        </motion.div>
+          {Array.from({ length: Math.min(character.powerTokens, 5) }).map((_, i) => (
+            <motion.div
+              key={`token-${i}`}
+              initial={{ scale: 0, y: -8 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{
+                delay: i * 0.06,
+                type: 'spring',
+                stiffness: 500,
+                damping: 18,
+              }}
+              className="rounded-full flex items-center justify-center"
+              style={{
+                width: '11px',
+                height: '11px',
+                backgroundColor: '#c4a35a',
+                border: '1px solid #a8893a',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.25)',
+              }}
+            />
+          ))}
+          {character.powerTokens > 5 && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-[7px] font-bold pr-0.5"
+              style={{ color: '#c4a35a', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+            >
+              +{character.powerTokens - 5}
+            </motion.span>
+          )}
+        </div>
       )}
 
       {/* Chakra cost (top-left) for visible cards */}

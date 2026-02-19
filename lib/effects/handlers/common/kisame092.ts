@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 092/130 - KISAME HOSHIGAKI (Common)
@@ -29,13 +30,15 @@ function handleKisame092Ambush(ctx: EffectContext): EffectResult {
 
   // If no valid targets, effect fizzles
   if (validTargets.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kisame Hoshigaki (092): No enemy with Power tokens in this mission.',
+      'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: '092/130' }) } };
   }
 
   // If exactly one target, apply automatically
   if (validTargets.length === 1) {
     const targetId = validTargets[0];
-    const newState = transferPowerTokens(state, targetId, sourceCard.instanceId, 2, sourceMissionIndex);
+    const newState = transferPowerTokens(state, targetId, sourceCard.instanceId, 2, sourceMissionIndex, sourcePlayer);
     return { state: newState };
   }
 
@@ -55,13 +58,16 @@ function transferPowerTokens(
   toInstanceId: string,
   maxTransfer: number,
   missionIndex: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
 ): import('../../EffectTypes').EffectContext['state'] {
   // First, find how many tokens the target actually has
   let tokensAvailable = 0;
+  let targetName = '';
   const mission = state.activeMissions[missionIndex];
   for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
     if (char.instanceId === fromInstanceId) {
       tokensAvailable = char.powerTokens;
+      targetName = char.card.name_fr;
       break;
     }
   }
@@ -93,6 +99,10 @@ function transferPowerTokens(
       }),
     };
   });
+
+  newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_STEAL_TOKENS',
+    `Kisame Hoshigaki (092): Stole up to ${maxTransfer} Power tokens from ${targetName}.`,
+    'game.log.effect.stealTokens', { card: 'KISAME HOSHIGAKI', id: '092/130', amount: maxTransfer, target: targetName });
 
   return newState;
 }

@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 098/130 - KATSUYU (Common)
@@ -34,7 +35,9 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
   }
 
   if (!hasTsunade) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Katsuyu (098): No friendly Tsunade in play.',
+      'game.log.effect.noTarget', { card: 'KATSUYU', id: '098/130' }) } };
   }
 
   // POWERUP 2 on self
@@ -52,6 +55,14 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
         : char,
     ),
   }));
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_POWERUP',
+    `Katsuyu (098): POWERUP 2 (Tsunade synergy).`,
+    'game.log.effect.powerupSelf',
+    { card: 'Katsuyu', id: '098/130', amount: 2 },
+  );
 
   return { state: newState };
 }

@@ -112,7 +112,8 @@ export class GameEngine {
 
     return {
       ...state,
-      log: logSystem(state.log, 1, 'setup', 'GAME_START', `Game created. ${startingPlayer} has the Edge token.`),
+      log: logSystem(state.log, 1, 'setup', 'GAME_START', `Game created. ${startingPlayer} has the Edge token.`,
+        'game.log.gameStart', { player: startingPlayer }),
     };
   }
 
@@ -183,9 +184,11 @@ export class GameEngine {
       // Return all cards to deck, shuffle, draw 5 new
       ps.deck = shuffle([...ps.deck, ...ps.hand]);
       ps.hand = ps.deck.splice(0, INITIAL_HAND_SIZE);
-      newState.log = logSystem(newState.log, 1, 'mulligan', 'MULLIGAN', `${player} mulligans their hand.`);
+      newState.log = logSystem(newState.log, 1, 'mulligan', 'MULLIGAN', `${player} mulligans their hand.`,
+        'game.log.mulligan', { player });
     } else {
-      newState.log = logSystem(newState.log, 1, 'mulligan', 'KEEP_HAND', `${player} keeps their hand.`);
+      newState.log = logSystem(newState.log, 1, 'mulligan', 'KEEP_HAND', `${player} keeps their hand.`,
+        'game.log.keepHand', { player });
     }
 
     ps.hasMulliganed = true;
@@ -282,12 +285,16 @@ export class GameEngine {
       winner = newState.edgeHolder;
     }
 
+    const winnerPts = winner === 'player1' ? p1Points : p2Points;
+    const loserPts = winner === 'player1' ? p2Points : p1Points;
     newState.log = logSystem(
       newState.log,
       newState.turn,
       'gameOver',
       'GAME_END',
-      `Game over! ${winner} wins with ${winner === 'player1' ? p1Points : p2Points} points vs ${winner === 'player1' ? p2Points : p1Points} points.`,
+      `Game over! ${winner} wins with ${winnerPts} points vs ${loserPts} points.`,
+      'game.log.gameEnd',
+      { winner, winnerPts, loserPts },
     );
 
     return newState;

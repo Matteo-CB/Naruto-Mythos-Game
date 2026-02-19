@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 074/130 - GAARA (Common, first version)
@@ -22,7 +23,9 @@ function handleGaara074Main(ctx: EffectContext): EffectResult {
   ).length;
 
   if (hiddenCount === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Gaara (074): No friendly hidden characters in this mission.',
+      'game.log.effect.noTarget', { card: 'GAARA', id: '074/130' }) } };
   }
 
   // POWERUP X on self
@@ -44,7 +47,18 @@ function handleGaara074Main(ctx: EffectContext): EffectResult {
     };
   });
 
-  return { state: newState };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_POWERUP',
+    `Gaara (074): POWERUP ${hiddenCount} on self.`,
+    'game.log.effect.powerupSelf',
+    { card: 'Gaara', id: '074/130', amount: String(hiddenCount) },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

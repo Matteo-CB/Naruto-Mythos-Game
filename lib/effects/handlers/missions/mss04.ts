@@ -36,6 +36,8 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 04 (Assassination): No hidden enemy character to defeat.',
+      'game.log.effect.noTarget',
+      { card: 'Assassinat', id: 'MSS 04' },
     );
     return { state: { ...state, log } };
   }
@@ -46,6 +48,8 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
     state.log, state.turn, state.phase, ctx.sourcePlayer,
     'SCORE_DEFEAT',
     `MSS 04 (Assassination): Defeated hidden enemy ${targetChar.card.name_fr} in mission ${targetMissionIndex}.`,
+    'game.log.score.defeat',
+    { card: 'Assassinat', target: targetChar.card.name_fr },
   );
 
   return { state: { ...state, log } };

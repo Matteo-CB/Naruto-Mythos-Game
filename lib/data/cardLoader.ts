@@ -4,7 +4,7 @@ import rawCardsData from './naruto_mythos_tcg_complete.json';
 import rawMissionsData from './missions.json';
 
 // Manual corrections for cards with split/malformed effect text in the JSON
-// Source: official narutotcgmythos.com + rulebook (Feb 2026 audit)
+// Source: official narutotcgmythos.com (Feb 2026 audit)
 const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
   '137/130': [
     { type: 'UPGRADE', description: 'Move this character.' },
@@ -19,12 +19,12 @@ const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
     { type: 'UPGRADE', description: 'POWERUP X, where X is the number of characters defeated by the MAIN effect.' },
   ],
   '108/130': [
-    { type: 'MAIN', description: 'Put the top card of your deck as a hidden character in this mission.' },
-    { type: 'AMBUSH', description: 'Repeat the MAIN effect.' },
+    { type: 'MAIN', description: 'Hide an enemy character with Power 3 or less in this mission.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.' },
   ],
   '108/130 A': [
-    { type: 'MAIN', description: 'Put the top card of your deck as a hidden character in this mission.' },
-    { type: 'AMBUSH', description: 'Repeat the MAIN effect.' },
+    { type: 'MAIN', description: 'Hide an enemy character with Power 3 or less in this mission.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.' },
   ],
   '109/130': [
     { type: 'MAIN', description: 'Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.' },
@@ -34,26 +34,28 @@ const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
 
 // Keyword corrections from official site (JSON had wrong or incomplete keywords)
 const KEYWORD_CORRECTIONS: Record<string, string[]> = {
-  '044/130': ['Special Jonin'],              // was "Academy"
-  '048/130': ['Special Jonin'],              // was "Pouvoir"
-  '036/130': ['Team Guy', 'Taijutsu'],       // missing "Taijutsu"
-  '039/130': ['Team Guy', 'Jutsu'],          // missing "Jutsu"
-  '050/130': ['Sannin', 'Sound Ninja'],      // missing "Sound Ninja"
-  '108/130': ['Team 7', 'Jutsu'],            // missing "Jutsu"
-  '108/130 A': ['Team 7', 'Jutsu'],          // missing "Jutsu"
-  '137/130': ['Team 7', 'Jutsu'],            // missing "Jutsu"
+  '044/130': ['Academy'],                       // site says "Academy"
+  '048/130': [],                                // no keywords on site
+  '036/130': ['Team Guy', 'Taijutsu'],          // missing "Taijutsu"
+  '039/130': ['Team Guy', 'Jutsu'],             // missing "Jutsu"
+  '050/130': ['Sannin', 'Team Dosu'],           // site says Sannin + Team Dosu
+  '108/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
+  '108/130 A': ['Team 7', 'Jutsu'],             // missing "Jutsu"
+  '137/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
 };
 
 // Name corrections from official site
 const NAME_CORRECTIONS: Record<string, string> = {
-  '047/130': 'IRUKA UMINO',                  // was just "IRUKA"
+  '047/130': 'IRUKA UMINO',                     // was just "IRUKA"
+  '034/130': 'KURENAI YUHI',                    // site says "Kurenai Yuhi"
+  '100/130': 'NINJA HOUND CORPS',               // site says "Ninja Hound Corps"
 };
 
 // Stat corrections from official site (cost, power, rarity, title)
 const STAT_CORRECTIONS: Record<string, { chakra?: number; power?: number; rarity?: RawRarity; title_fr?: string; group?: string }> = {
-  '108/130': { chakra: 4, rarity: 'RA', title_fr: 'Believe it!' },                      // was cost 5, rarity R, no title
-  '108/130 A': { chakra: 4, title_fr: 'Believe it!' },                                   // was cost 5, no title
-  '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },  // was incomplete
+  '108/130': { chakra: 5, power: 5, rarity: 'RA', title_fr: 'Believe it!' },
+  '108/130 A': { chakra: 5, power: 5, title_fr: 'Believe it!' },
+  '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },
 };
 
 // Mission base points (printed on the card).
@@ -72,6 +74,27 @@ const MISSION_BASE_POINTS: Record<string, number> = {
   'MSS 08': 1,
   'MSS 09': 1,
   'MSS 10': 1,
+};
+
+// The Legendary card is not in the JSON — injected manually here
+const LEGENDARY_CARD: RawCardData = {
+  id: 'L01',
+  number: 200,
+  name_fr: 'NARUTO UZUMAKI',
+  title_fr: 'Legendary',
+  rarity: 'Legendary' as RawRarity,
+  card_type: 'character',
+  has_visual: true,
+  chakra: 6,
+  power: 6,
+  keywords: ['Team 7', 'Jutsu'],
+  group: 'Leaf Village',
+  effects: [
+    { type: 'MAIN', description: 'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Instead, defeat both of them.' },
+  ],
+  image_file: 'images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp',
+  is_rare_art: false,
 };
 
 function normalizeImagePath(imagePath?: string): string | undefined {
@@ -129,16 +152,22 @@ let _playableMissions: MissionCard[] | null = null;
 
 export function getAllCards(): CardData[] {
   if (!_allCards) {
-    _allCards = (rawCardsData as RawCardData[]).map(normalizeCard);
+    const cards = (rawCardsData as RawCardData[]).map(normalizeCard);
+    // Inject legendary card
+    cards.push(normalizeCard(LEGENDARY_CARD));
+    _allCards = cards;
   }
   return _allCards;
 }
 
 export function getAllCharacters(): CharacterCard[] {
   if (!_characters) {
-    _characters = (rawCardsData as RawCardData[])
+    const chars = (rawCardsData as RawCardData[])
       .filter((c) => c.card_type === 'character')
       .map(normalizeCharacterCard);
+    // Inject legendary card
+    chars.push(normalizeCharacterCard(LEGENDARY_CARD));
+    _characters = chars;
   }
   return _characters;
 }

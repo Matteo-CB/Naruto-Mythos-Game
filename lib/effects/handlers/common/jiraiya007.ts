@@ -26,7 +26,9 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
   }
 
   if (summonCards.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jiraiya (007): No Summon characters in hand.',
+      'game.log.effect.noTarget', { card: 'JIRAIYA', id: '007/130' }) } };
   }
 
   // Auto-resolve: play first affordable summon on best mission
@@ -84,12 +86,15 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
       newState.log = logAction(
         state.log, state.turn, 'action', sourcePlayer,
         'EFFECT', `Jiraiya plays ${summon.card.name_fr} as Summon on mission ${mIdx + 1} for ${cost} chakra.`,
+        'game.log.effect.playSummon', { card: 'Jiraya', id: '007/130', target: summon.card.name_fr, mission: String(mIdx + 1), cost: String(cost) },
       );
       return { state: newState };
     }
   }
 
-  return { state };
+  return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+    'Jiraiya (007): No affordable Summon could be played on any mission.',
+    'game.log.effect.noTarget', { card: 'JIRAIYA', id: '007/130' }) } };
 }
 
 export function registerHandler(): void {

@@ -5,10 +5,20 @@ import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
+
+// Featured cards that cycle on each page refresh
+const FEATURED_CARDS = [
+  { src: '/images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Legendary', rarity: 'legendary' as const },
+  { src: '/images/rare/108-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Rare Art 108/130', rarity: 'rare' as const },
+  { src: '/images/secret/133-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Secret 133/130', rarity: 'secret' as const },
+  { src: '/images/secret/136-130_SASUKE_UCHIWA.webp', alt: 'Sasuke Uchiha — Secret 136/130', rarity: 'secret' as const },
+  { src: '/images/secret/137-130_KAKASHI_HATAKE.webp', alt: 'Kakashi Hatake — Secret 137/130', rarity: 'secret' as const },
+  { src: '/images/secret/135-130_SAKURA_HARUNO.webp', alt: 'Sakura Haruno — Secret 135/130', rarity: 'secret' as const },
+];
 
 // Cloud positions — only cloud-2, cloud-5, cloud-6
 const cloudPositions = [
@@ -74,6 +84,7 @@ export default function Home() {
   const t = useTranslations('home');
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
+  const featuredCard = useMemo(() => FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)], []);
 
   useEffect(() => {
     setMounted(true);
@@ -415,11 +426,11 @@ export default function Home() {
             />
 
             <HoloCard
-              src="/images/rare/108-130_NARUTO_UZUMAKI.webp"
-              alt="Naruto Uzumaki — Rare Card 108/130"
+              src={featuredCard.src}
+              alt={featuredCard.alt}
               width={320}
               height={448}
-              rarity="rare"
+              rarity={featuredCard.rarity}
             />
           </motion.div>
 

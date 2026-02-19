@@ -117,6 +117,8 @@ export interface GameLogEntry {
   player?: PlayerID;
   action: string;
   details: string;
+  messageKey?: string;
+  messageParams?: Record<string, string | number>;
   timestamp: number;
 }
 

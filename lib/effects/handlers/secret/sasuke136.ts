@@ -23,6 +23,8 @@ function sasuke136MainHandler(ctx: EffectContext): EffectResult {
     state.log, state.turn, state.phase, ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
     'Sasuke Uchiwa (136): Gain 1 Chakra when any character is defeated (continuous).',
+    'game.log.effect.gainChakra',
+    { card: 'SASUKE UCHIWA', id: '136/130', amount: 1 },
   );
   return { state: { ...state, log } };
 }
@@ -61,17 +63,23 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Sasuke Uchiwa (136): No valid targets for mutual destruction (upgrade).',
+      'game.log.effect.noTarget',
+      { card: 'SASUKE UCHIWA', id: '136/130' },
     );
     return { state: { ...state, log } };
   }
 
   state = defeatFriendlyCharacter(state, ctx.sourceMissionIndex, friendlyTarget.instanceId, ctx.sourcePlayer);
   state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-    `Sasuke Uchiwa (136): Defeated friendly ${friendlyTarget.card.name_fr} (mutual destruction).`) };
+    `Sasuke Uchiwa (136): Defeated friendly ${friendlyTarget.card.name_fr} (mutual destruction).`,
+    'game.log.effect.defeat',
+    { card: 'SASUKE UCHIWA', id: '136/130', target: friendlyTarget.card.name_fr }) };
 
   state = defeatEnemyCharacter(state, ctx.sourceMissionIndex, enemyTarget.instanceId, ctx.sourcePlayer);
   state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-    `Sasuke Uchiwa (136): Defeated enemy ${enemyTarget.card.name_fr} (mutual destruction).`) };
+    `Sasuke Uchiwa (136): Defeated enemy ${enemyTarget.card.name_fr} (mutual destruction).`,
+    'game.log.effect.defeat',
+    { card: 'SASUKE UCHIWA', id: '136/130', target: enemyTarget.card.name_fr }) };
 
   return { state };
 }

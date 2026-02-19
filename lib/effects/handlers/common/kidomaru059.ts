@@ -35,7 +35,9 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   }
 
   if (soundFourMissionCount === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kidomaru (059): No missions with a friendly Sound Four character.',
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '059/130' }) } };
   }
 
   // Perform up to X moves, mutating a working copy of missions
@@ -97,7 +99,9 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   }
 
   if (moveDescriptions.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kidomaru (059): No friendly characters could be moved.',
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '059/130' }) } };
   }
 
   const log = logAction(
@@ -107,6 +111,8 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
     sourcePlayer,
     'EFFECT_MOVE',
     `Kidomaru (059): Moved ${moveDescriptions.length} character(s): ${moveDescriptions.join('; ')}.`,
+    'game.log.effect.move',
+    { card: 'Kidomaru', id: '059/130', target: moveDescriptions.join('; '), mission: String(moveDescriptions.length) },
   );
 
   let newState = { ...state, activeMissions: newMissions, log };

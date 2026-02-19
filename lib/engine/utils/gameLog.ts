@@ -6,6 +6,8 @@ export function createLogEntry(
   action: string,
   details: string,
   player?: PlayerID,
+  messageKey?: string,
+  messageParams?: Record<string, string | number>,
 ): GameLogEntry {
   return {
     turn,
@@ -13,6 +15,8 @@ export function createLogEntry(
     player,
     action,
     details,
+    messageKey,
+    messageParams,
     timestamp: Date.now(),
   };
 }
@@ -24,8 +28,10 @@ export function logAction(
   player: PlayerID,
   action: string,
   details: string,
+  messageKey?: string,
+  messageParams?: Record<string, string | number>,
 ): GameLogEntry[] {
-  return [...log, createLogEntry(turn, phase, action, details, player)];
+  return [...log, createLogEntry(turn, phase, action, details, player, messageKey, messageParams)];
 }
 
 export function logSystem(
@@ -34,6 +40,8 @@ export function logSystem(
   phase: GamePhase,
   action: string,
   details: string,
+  messageKey?: string,
+  messageParams?: Record<string, string | number>,
 ): GameLogEntry[] {
-  return [...log, createLogEntry(turn, phase, action, details)];
+  return [...log, createLogEntry(turn, phase, action, details, undefined, messageKey, messageParams)];
 }

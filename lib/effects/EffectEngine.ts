@@ -276,9 +276,19 @@ export class EffectEngine {
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
     };
 
+    // Determine PendingAction type based on targetSelectionType
+    let actionType: PendingAction['type'] = 'SELECT_TARGET';
+    if (result.targetSelectionType === 'PUT_CARD_ON_DECK') {
+      actionType = 'PUT_CARD_ON_DECK';
+    } else if (result.targetSelectionType === 'DISCARD_CARD' || result.targetSelectionType === 'KIMIMARO_CHOOSE_DISCARD') {
+      actionType = 'DISCARD_CARD';
+    } else if (result.targetSelectionType === 'CHOOSE_CARD_FROM_LIST') {
+      actionType = 'CHOOSE_CARD_FROM_LIST';
+    }
+
     const pendingAction: PendingAction = {
       id: actionId,
-      type: 'SELECT_TARGET',
+      type: actionType,
       player,
       description: result.description ?? '',
       options: result.validTargets ?? [],
@@ -333,16 +343,11 @@ export class EffectEngine {
 
       case 'LOOK_AT_HIDDEN_CHARACTER':
         // Dosu MAIN: just looking at a hidden character (info reveal)
-        // In a single-player context, the player already knows their own hidden chars.
-        // For enemy hidden chars, this reveals the card info to the player.
-        newState = logAction(
-          newState.log, newState.turn, 'action', pendingEffect.sourcePlayer,
-          'EFFECT', `Looked at a hidden character.`
-        ) as unknown as GameState;
-        // Actually just use the state directly, logAction returns log array
         newState.log = logAction(
           newState.log, newState.turn, 'action', pendingEffect.sourcePlayer,
-          'EFFECT', `Looked at a hidden character.`
+          'EFFECT', `Looked at a hidden character.`,
+          'game.log.effect.lookAtHidden',
+          { card: 'Dosu Kinuta', id: pendingEffect.sourceCardId, target: '???' },
         );
         break;
 
@@ -356,6 +361,10 @@ export class EffectEngine {
 
       case 'KIMIMARO_DISCARD_AND_HIDE':
         newState = EffectEngine.kimimaroDiscardAndHide(newState, pendingEffect, targetId);
+        break;
+
+      case 'KIMIMARO_CHOOSE_DISCARD':
+        newState = EffectEngine.kimimaroChooseDiscard(newState, pendingEffect, targetId);
         break;
 
       case 'MOVE_X_FRIENDLY_CHARACTERS':
@@ -526,6 +535,8 @@ export class EffectEngine {
             charResult.player,
             'EFFECT',
             `Ninja Hounds (100): Moved to mission ${destMissionIndex} - looked at hidden ${hiddenInDest.card.name_fr}.`,
+            'game.log.effect.lookAtHidden',
+            { card: 'Chiens Ninjas', id: '100/130', target: hiddenInDest.card.name_fr },
           );
         }
       }
@@ -562,6 +573,8 @@ export class EffectEngine {
     newState.log = logAction(
       newState.log, newState.turn, 'action', pending.sourcePlayer,
       'EFFECT', `Orochimaru looks at hidden enemy: ${targetChar.card.name_fr} (cost ${actualCost}).`,
+      'game.log.effect.lookAtHidden',
+      { card: 'Orochimaru', id: '050/130', target: targetChar.card.name_fr },
     );
 
     // If cost <= 3, steal control
@@ -573,6 +586,8 @@ export class EffectEngine {
       newState.log = logAction(
         newState.log, newState.turn, 'action', pending.sourcePlayer,
         'EFFECT', `Orochimaru steals ${targetChar.card.name_fr}!`,
+        'game.log.effect.takeControl',
+        { card: 'Orochimaru', id: '050/130', target: targetChar.card.name_fr },
       );
     }
 
@@ -617,6 +632,8 @@ export class EffectEngine {
       log: logAction(
         newState.log, newState.turn, newState.phase, effectSource,
         'EFFECT_DEFEAT', `${charResult.character.card.name_fr} was defeated.`,
+        'game.log.effect.defeat',
+        { card: '???', id: '', target: charResult.character.card.name_fr },
       ),
     };
     // Trigger on-defeat effects (Tsunade 003, Sasuke 136)
@@ -710,39 +727,138 @@ export class EffectEngine {
     newState.log = logAction(
       newState.log, newState.turn, 'action', player,
       'EFFECT', `Jiraiya's effect: plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
+      'game.log.effect.playSummon',
+      { card: 'Jiraya', id: '007/130', target: card.name_fr, mission: missionIndex + 1, cost },
     );
 
     return newState;
   }
 
-  /** Kimimaro: discard a card, then hide a character. targetId format: "handIndex:targetInstanceId" */
+  /** Kimimaro step 2: hide the selected target character */
   static kimimaroDiscardAndHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
-    const parts = targetId.split(':');
-    if (parts.length < 2) return state;
-    const handIndex = parseInt(parts[0], 10);
-    const hideTargetId = parts[1];
-
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
-    const ps = newState[player];
 
-    if (isNaN(handIndex) || handIndex < 0 || handIndex >= ps.hand.length) return state;
-
-    // Discard the card
-    const discardedCard = ps.hand.splice(handIndex, 1)[0];
-    ps.discardPile.push(discardedCard);
-
-    // Hide the target character (if cost <= 3)
-    const charResult = EffectEngine.findCharByInstanceId(newState, hideTargetId);
+    // targetId is now just an instanceId (discard was already done in step 1)
+    const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
     if (!charResult) return newState;
 
     const topCard = charResult.character.stack.length > 0
       ? charResult.character.stack[charResult.character.stack.length - 1]
       : charResult.character.card;
 
-    if (topCard.chakra <= 3 && !charResult.character.isHidden) {
-      return EffectEngine.hideCharacter(newState, hideTargetId);
+    if ((topCard.chakra ?? 0) <= 3 && !charResult.character.isHidden) {
+      const hiddenState = EffectEngine.hideCharacter(newState, targetId);
+      hiddenState.log = logAction(
+        hiddenState.log, hiddenState.turn, hiddenState.phase, player,
+        'EFFECT_HIDE',
+        `Kimimaro (055): Hid ${topCard.name_fr}.`,
+        'game.log.effect.hide',
+        { card: 'Kimimaro', id: '055/130', target: topCard.name_fr, mission: String(charResult.missionIndex + 1) },
+      );
+      return hiddenState;
     }
+
+    return newState;
+  }
+
+  /**
+   * Kimimaro step 1: player chose which card to discard.
+   * Now discard it, then create a second pending to choose hide target.
+   */
+  static kimimaroChooseDiscard(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    const handIndex = parseInt(targetId, 10);
+    if (isNaN(handIndex)) return state;
+
+    const newState = deepClone(state);
+    const player = pending.sourcePlayer;
+    const ps = newState[player];
+
+    if (handIndex < 0 || handIndex >= ps.hand.length) return state;
+
+    // Discard the selected card
+    const discardedCard = ps.hand.splice(handIndex, 1)[0];
+    ps.discardPile.push(discardedCard);
+
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'EFFECT_DISCARD',
+      `Kimimaro (055): Discarded ${discardedCard.name_fr}.`,
+      'game.log.effect.discardCards',
+      { card: 'Kimimaro', id: '055/130', count: 1 },
+    );
+
+    // Find valid hide targets (cost <= 3, not hidden, not Kimimaro himself)
+    const opponent = player === 'player1' ? 'player2' : 'player1';
+    const enemySide = opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+    const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const validHideTargets: string[] = [];
+
+    for (const mission of newState.activeMissions) {
+      for (const char of mission[enemySide]) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if ((topCard.chakra ?? 0) <= 3) {
+          validHideTargets.push(char.instanceId);
+        }
+      }
+      for (const char of mission[friendlySide]) {
+        if (char.isHidden) continue;
+        if (char.instanceId === pending.sourceInstanceId) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if ((topCard.chakra ?? 0) <= 3) {
+          validHideTargets.push(char.instanceId);
+        }
+      }
+    }
+
+    if (validHideTargets.length === 0) {
+      return newState; // No valid target — card was discarded but no hide
+    }
+
+    if (validHideTargets.length === 1) {
+      // Auto-hide the only valid target
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT_HIDE',
+        `Kimimaro (055): Hid a character.`,
+        'game.log.effect.hide',
+        { card: 'Kimimaro', id: '055/130', target: validHideTargets[0], mission: '' },
+      );
+      return EffectEngine.hideCharacter(newState, validHideTargets[0]);
+    }
+
+    // Multiple targets — create a new pending for hide target selection
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: 'Choose a character to hide (cost 3 or less).',
+      targetSelectionType: 'KIMIMARO_DISCARD_AND_HIDE',
+      sourcePlayer: player,
+      requiresTargetSelection: true,
+      validTargets: validHideTargets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: pending.isUpgrade,
+    });
+
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'SELECT_TARGET',
+      player,
+      description: 'Kimimaro (055): Choose a character to hide (cost 3 or less).',
+      options: validHideTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
 
     return newState;
   }
@@ -760,6 +876,14 @@ export class EffectEngine {
 
     const card = ps.hand.splice(handIndex, 1)[0];
     ps.deck.unshift(card); // Put on top of deck
+
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'EFFECT_PUT_ON_DECK',
+      `Put ${card.name_fr} back on top of deck.`,
+      'game.log.effect.putOnDeck',
+      { card: card.name_fr, id: pending.sourceCardId },
+    );
 
     return newState;
   }
