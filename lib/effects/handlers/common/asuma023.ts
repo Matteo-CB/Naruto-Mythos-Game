@@ -1,5 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import type { CharacterInPlay } from '../../../engine/types';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 023/130 - ASUMA SARUTOBI (Common)
@@ -7,38 +9,77 @@ import { registerEffect } from '../../EffectRegistry';
  * Group: Leaf Village | Keywords: Team 10
  * MAIN: Move another Team 10 character from this mission.
  *
- * Select another friendly non-hidden Team 10 character in this mission and move it to a
- * different mission. This effect is optional (no "you must").
+ * Auto-resolves: finds the first Team 10 character (not self) in the source
+ * mission and moves it to the first available different mission. Optional effect
+ * — fizzles if no valid Team 10 target or no other mission exists.
  */
 function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
-  const friendlyChars =
-    sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const friendlyChars = mission[friendlySide];
 
-  // Find other Team 10 characters in this mission (hidden characters can be moved)
-  const validTargets: string[] = [];
+  // Find the first other Team 10 character in this mission (not self)
+  let target: CharacterInPlay | undefined;
   for (const char of friendlyChars) {
     if (char.instanceId === sourceCard.instanceId) continue;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Team 10')) {
-      validTargets.push(char.instanceId);
+      target = char;
+      break;
     }
   }
 
-  // If no valid targets, effect fizzles
-  if (validTargets.length === 0) {
+  if (!target) {
     return { state };
   }
 
-  // Requires target selection: which character to move, and to which mission
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_TEAM10_CHARACTER',
-    validTargets,
-    description: 'Select a Team 10 character in this mission to move to a different mission.',
-  };
+  // Find the first different mission to move to
+  let destMissionIndex = -1;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    if (i !== sourceMissionIndex) {
+      destMissionIndex = i;
+      break;
+    }
+  }
+
+  if (destMissionIndex === -1) {
+    return { state };
+  }
+
+  // Build new state immutably
+  const newMissions = state.activeMissions.map((m, idx) => {
+    if (idx === sourceMissionIndex) {
+      // Remove target from source mission
+      return {
+        ...m,
+        [friendlySide]: m[friendlySide].filter(
+          (c) => c.instanceId !== target!.instanceId
+        ),
+      };
+    }
+    if (idx === destMissionIndex) {
+      // Add target to destination mission
+      const movedChar = { ...target!, missionIndex: destMissionIndex };
+      return {
+        ...m,
+        [friendlySide]: [...m[friendlySide], movedChar],
+      };
+    }
+    return m;
+  });
+
+  const log = logAction(
+    state.log,
+    state.turn,
+    state.phase,
+    sourcePlayer,
+    'EFFECT_MOVE',
+    `Asuma Sarutobi (023): Moved Team 10 character ${target.card.name_fr} from mission ${sourceMissionIndex} to mission ${destMissionIndex}.`,
+  );
+
+  return { state: { ...state, activeMissions: newMissions, log } };
 }
 
 export function registerHandler(): void {

@@ -47,10 +47,11 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
   updatedMission[friendlySide] = chars;
   missions[ctx.sourceMissionIndex] = updatedMission;
 
-  // Return top card to player's hand
+  // Return the entire character stack to player's hand
+  // (a stacked character is a single entity — all cards return together)
   const playerState = { ...state[ctx.sourcePlayer] };
-  const returnCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
-  playerState.hand = [...playerState.hand, returnCard];
+  const cardsToReturn = target.stack.length > 0 ? [...target.stack] : [target.card];
+  playerState.hand = [...playerState.hand, ...cardsToReturn];
   playerState.charactersInPlay = Math.max(0, playerState.charactersInPlay - 1);
 
   const log = logAction(

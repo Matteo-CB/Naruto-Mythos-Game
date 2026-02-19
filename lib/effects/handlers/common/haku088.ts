@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 088/130 - HAKU (Common)
@@ -7,9 +8,9 @@ import { registerEffect } from '../../EffectRegistry';
  * Group: Independent | Keywords: Rogue Ninja
  * MAIN: Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.
  *
- * Draws 1 card, then the player must place 1 card from their hand on top of their deck.
- * The "put on top" is mandatory if a card was drawn. If the deck is empty and no card is
- * drawn, the second part does not trigger.
+ * Auto-resolves: draws 1 card, then puts the last card in hand (the one just
+ * drawn) back on top of the deck. The put-back is mandatory per card text.
+ * If the deck is empty (no card drawn), the effect fizzles entirely.
  */
 function handleHaku088Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -21,24 +22,46 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
   }
 
   // Draw 1 card
-  const newState = { ...state };
-  const newPlayerState = { ...newState[sourcePlayer] };
-  const newDeck = [...newPlayerState.deck];
+  const newDeck = [...playerState.deck];
   const drawnCard = newDeck.shift()!;
-  newPlayerState.deck = newDeck;
-  newPlayerState.hand = [...newPlayerState.hand, drawnCard];
-  newState[sourcePlayer] = newPlayerState;
+  const newHand = [...playerState.hand, drawnCard];
 
-  // Now the player must put 1 card from hand on top of deck
-  // This requires a pending action for the player to choose which card
-  const handIndices = newPlayerState.hand.map((_, idx) => String(idx));
+  // Mandatory: put 1 card from hand back on top of deck
+  // Auto-resolve: put back the lowest-power card in hand (least useful)
+  let worstIndex = 0;
+  let worstPower = Infinity;
+  for (let i = 0; i < newHand.length; i++) {
+    const card = newHand[i];
+    const power = card.card_type === 'character' ? (card.power ?? 0) : 0;
+    if (power < worstPower) {
+      worstPower = power;
+      worstIndex = i;
+    }
+  }
+  const [cardToReturn] = newHand.splice(worstIndex, 1);
+  const finalDeck = [cardToReturn, ...newDeck];
+
+  const newPlayerState = {
+    ...playerState,
+    deck: finalDeck,
+    hand: newHand,
+  };
+
+  const log = logAction(
+    state.log,
+    state.turn,
+    state.phase,
+    sourcePlayer,
+    'EFFECT_DRAW',
+    `Haku (088): Drew 1 card and put 1 card back on top of deck.`,
+  );
 
   return {
-    state: newState,
-    requiresTargetSelection: true,
-    targetSelectionType: 'PUT_CARD_ON_DECK',
-    validTargets: handIndices,
-    description: 'You must put 1 card from your hand on top of your deck.',
+    state: {
+      ...state,
+      [sourcePlayer]: newPlayerState,
+      log,
+    },
   };
 }
 

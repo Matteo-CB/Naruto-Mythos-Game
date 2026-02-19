@@ -18,11 +18,13 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find first friendly non-hidden character in any mission
+  // Find first friendly character in any mission (hidden characters are valid POWERUP targets per rules)
+  // Auto-resolve: prefer non-hidden characters first, then hidden
   let targetChar: CharacterInPlay | undefined;
   let targetMissionIndex = -1;
   let targetCharIndex = -1;
 
+  // First pass: try non-hidden characters
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const chars = mission[friendlySide];
@@ -35,6 +37,21 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
       }
     }
     if (targetChar) break;
+  }
+
+  // Second pass: if no non-hidden found, try hidden characters
+  if (!targetChar) {
+    for (let i = 0; i < state.activeMissions.length; i++) {
+      const mission = state.activeMissions[i];
+      const chars = mission[friendlySide];
+      for (let j = 0; j < chars.length; j++) {
+        targetChar = chars[j];
+        targetMissionIndex = i;
+        targetCharIndex = j;
+        break;
+      }
+      if (targetChar) break;
+    }
   }
 
   if (!targetChar || targetMissionIndex === -1) {

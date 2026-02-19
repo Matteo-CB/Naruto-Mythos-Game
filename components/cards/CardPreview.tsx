@@ -272,6 +272,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0 }: CardPrev
                         {effect.type}
                       </span>
                       <span
+                        className="font-body"
                         style={{
                           color: '#c0c0c0',
                           fontSize: '12px',

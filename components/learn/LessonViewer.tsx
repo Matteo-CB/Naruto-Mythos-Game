@@ -78,7 +78,7 @@ function InfoPanel({
       >
         {title}
       </div>
-      <div style={{ color: '#cccccc', fontSize: '0.85rem', lineHeight: 1.6 }}>
+      <div className="font-body" style={{ color: '#cccccc', fontSize: '0.85rem', lineHeight: 1.6 }}>
         {description}
       </div>
     </motion.div>
@@ -311,6 +311,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
                 {t(`tutorial.lessons.cardAnatomy.${a.titleKey}` as Parameters<typeof t>[0])}
               </div>
               <div
+                className="font-body"
                 style={{
                   color: '#cccccc',
                   fontSize: '0.82rem',
@@ -517,7 +518,7 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
             </span>
 
             {/* Description */}
-            <div style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55, textAlign: 'center' }}>
+            <div className="font-body" style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55, textAlign: 'center' }}>
               {t(`tutorial.lessons.playingCards.${mode.key}Bubble`)}
             </div>
           </motion.div>
@@ -762,7 +763,7 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
             <div style={{ color: '#c4a35a', fontSize: '0.92rem', fontWeight: 700, marginBottom: '6px' }}>
               {t(`tutorial.lessons.special.${s.titleKey}` as Parameters<typeof t>[0])}
             </div>
-            <div style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55 }}>
+            <div className="font-body" style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55 }}>
               {t(`tutorial.lessons.special.${s.descKey}` as Parameters<typeof t>[0])}
             </div>
           </motion.div>

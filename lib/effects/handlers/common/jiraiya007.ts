@@ -1,5 +1,8 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
+import type { CharacterInPlay } from '../../../engine/types';
 import { registerEffect } from '../../EffectRegistry';
+import { generateInstanceId } from '../../../engine/utils/id';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 007/130 - JIRAYA (Common)
@@ -7,38 +10,86 @@ import { registerEffect } from '../../EffectRegistry';
  * Group: Leaf Village | Keywords: Sannin
  * MAIN: Play a Summon character anywhere, paying 1 less.
  *
- * This effect triggers a sub-play action: the player may play a card with the "Summon" keyword
- * from their hand to any mission, with a 1 chakra cost reduction. This is optional.
- * The actual sub-play is handled by the game engine's action resolution when the player
- * selects a Summon card from their hand.
+ * Auto-resolves: plays the first affordable Summon card from hand on the current mission.
  */
 function handleJiraiya007Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const playerState = state[sourcePlayer];
 
   // Find all Summon cards in hand
-  const summonCardIndices: string[] = [];
+  const summonCards: { index: number; card: typeof playerState.hand[0] }[] = [];
   for (let i = 0; i < playerState.hand.length; i++) {
     const card = playerState.hand[i];
     if (card.keywords && card.keywords.includes('Summon')) {
-      summonCardIndices.push(String(i));
+      summonCards.push({ index: i, card });
     }
   }
 
-  // If no summon cards in hand, effect fizzles
-  if (summonCardIndices.length === 0) {
+  if (summonCards.length === 0) {
     return { state };
   }
 
-  // Request the player to choose a Summon card from hand to play
-  // The game engine will handle the actual sub-play with cost reduction
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'PLAY_SUMMON_FROM_HAND',
-    validTargets: summonCardIndices,
-    description: 'Select a Summon character from your hand to play anywhere, paying 1 less chakra.',
-  };
+  // Auto-resolve: play first affordable summon on best mission
+  const newState = { ...state };
+  const ps = { ...newState[sourcePlayer] };
+  ps.hand = [...ps.hand];
+
+  for (const summon of summonCards) {
+    const cost = Math.max(0, summon.card.chakra - 1);
+    if (ps.chakra < cost) continue;
+
+    const missionOrder = [sourceMissionIndex, ...state.activeMissions.map((_, i) => i).filter(i => i !== sourceMissionIndex)];
+
+    for (const mIdx of missionOrder) {
+      if (mIdx >= state.activeMissions.length) continue;
+      const mission = state.activeMissions[mIdx];
+      const friendlyChars = sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+      const hasSameName = friendlyChars.some(c => {
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return topCard.name_fr === summon.card.name_fr;
+      });
+      if (hasSameName) continue;
+
+      ps.chakra -= cost;
+      ps.hand.splice(summon.index, 1);
+
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card: summon.card,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [summon.card],
+        controlledBy: sourcePlayer,
+        originalOwner: sourcePlayer,
+        missionIndex: mIdx,
+      };
+
+      const newMissions = [...state.activeMissions];
+      const newMission = { ...newMissions[mIdx] };
+      if (sourcePlayer === 'player1') {
+        newMission.player1Characters = [...newMission.player1Characters, charInPlay];
+      } else {
+        newMission.player2Characters = [...newMission.player2Characters, charInPlay];
+      }
+      newMissions[mIdx] = newMission;
+
+      let charCount = 0;
+      for (const m of newMissions) {
+        charCount += (sourcePlayer === 'player1' ? m.player1Characters : m.player2Characters).length;
+      }
+      ps.charactersInPlay = charCount;
+
+      newState[sourcePlayer] = ps;
+      newState.activeMissions = newMissions;
+      newState.log = logAction(
+        state.log, state.turn, 'action', sourcePlayer,
+        'EFFECT', `Jiraiya plays ${summon.card.name_fr} as Summon on mission ${mIdx + 1} for ${cost} chakra.`,
+      );
+      return { state: newState };
+    }
+  }
+
+  return { state };
 }
 
 export function registerHandler(): void {

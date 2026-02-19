@@ -26,6 +26,7 @@ import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase } from './phases/MissionPhase';
 import { executeEndPhase } from './phases/EndPhase';
+import { EffectEngine } from '../effects/EffectEngine';
 
 export class GameEngine {
   /**
@@ -132,10 +133,15 @@ export class GameEngine {
         break;
 
       case 'action':
-        newState = executeAction(newState, player, action);
+        if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
+          // Handle pending effect target selections during action phase
+          newState = GameEngine.handlePendingAction(newState, player, action);
+        } else {
+          newState = executeAction(newState, player, action);
+        }
         // ActionPhase sets phase to 'mission' when both pass, to avoid circular dependency.
-        // We complete the transition here.
-        if (newState.phase === 'mission') {
+        // We complete the transition here (only if no pending effects remain).
+        if (newState.phase === 'mission' && newState.pendingActions.length === 0) {
           newState = GameEngine.transitionToMissionPhase(newState);
         }
         break;
@@ -292,18 +298,21 @@ export class GameEngine {
   static handlePendingAction(state: GameState, player: PlayerID, action: GameAction): GameState {
     if (action.type === 'SELECT_TARGET') {
       const newState = deepClone(state);
-      const pendingIdx = newState.pendingActions.findIndex((p) => p.id === action.pendingActionId);
-      if (pendingIdx === -1) return state;
+      const pendingAction = newState.pendingActions.find((p) => p.id === action.pendingActionId);
+      if (!pendingAction) return state;
+      if (pendingAction.player !== player) return state;
 
-      const pending = newState.pendingActions[pendingIdx];
-      if (pending.player !== player) return state;
+      // Find the associated PendingEffect
+      const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
+      if (!pendingEffect) {
+        // No effect found — just remove the pending action
+        newState.pendingActions = newState.pendingActions.filter((p) => p.id !== action.pendingActionId);
+        return newState;
+      }
 
-      // Remove the pending action
-      newState.pendingActions.splice(pendingIdx, 1);
-
-      // Apply the effect based on the selection
-      // This will be handled by the effect engine
-      return newState;
+      // Apply the targeted effect via EffectEngine
+      // applyTargetedEffect handles removing the pending effect/action and processing continuations
+      return EffectEngine.applyTargetedEffect(newState, pendingEffect, action.selectedTargets);
     }
 
     if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
@@ -312,10 +321,16 @@ export class GameEngine {
       if (effectIdx === -1) return state;
 
       const effect = newState.pendingEffects[effectIdx];
-      if (!effect.isOptional) return state; // Can't decline mandatory effects
+      if (!effect.isOptional) return state;
 
-      effect.resolved = true;
+      // Remove the effect and its associated action
       newState.pendingEffects.splice(effectIdx, 1);
+      newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+      // Process remaining effects (continuation) if any
+      if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+        return EffectEngine.processRemainingEffects(newState, effect);
+      }
 
       return newState;
     }
@@ -337,8 +352,34 @@ export class GameEngine {
         ];
       }
 
-      case 'action':
+      case 'action': {
+        // If there are pending target selections for this player, those must be resolved first
+        const pendingForPlayer = state.pendingActions.filter((p) => p.player === player);
+        if (pendingForPlayer.length > 0) {
+          const actions: GameAction[] = [];
+          for (const p of pendingForPlayer) {
+            for (const opt of p.options) {
+              actions.push({
+                type: 'SELECT_TARGET' as const,
+                pendingActionId: p.id,
+                selectedTargets: [opt],
+              });
+            }
+          }
+          // Also allow declining optional effects
+          const pendingEffects = state.pendingEffects.filter(
+            (e) => e.sourcePlayer === player && e.isOptional && !e.resolved,
+          );
+          for (const e of pendingEffects) {
+            actions.push({
+              type: 'DECLINE_OPTIONAL_EFFECT' as const,
+              pendingEffectId: e.id,
+            });
+          }
+          return actions;
+        }
         return getValidActionsForPlayer(state, player);
+      }
 
       case 'mission':
       case 'end':

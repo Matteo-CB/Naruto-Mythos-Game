@@ -365,6 +365,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Check if there are pending target selections for the human player
+    const humanPending = newState.pendingActions.filter((p) => p.player === humanPlayer);
+    if (humanPending.length > 0) {
+      const pendingAction = humanPending[0];
+      const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
+
+      set({
+        isProcessing: false,
+        pendingTargetSelection: {
+          validTargets: pendingAction.options,
+          description: pendingAction.description,
+          onSelect: (targetId: string) => {
+            get().performAction({
+              type: 'SELECT_TARGET',
+              pendingActionId: pendingAction.id,
+              selectedTargets: [targetId],
+            });
+          },
+          onDecline: pendingEffect?.isOptional ? () => {
+            if (pendingEffect) {
+              get().performAction({
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pendingEffect.id,
+              });
+            }
+          } : undefined,
+        },
+      });
+      return;
+    }
+
     // Process AI response if needed
     if (isAIGame && aiPlayer) {
       // Delay scales with whether there was an animation
@@ -391,6 +422,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const aiAnimations: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
 
     while (iterations < maxIterations) {
+      // Check if AI has pending target selections to resolve first
+      const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
+      if (aiPending.length > 0) {
+        // AI auto-resolves: pick first valid target (simple for Easy/Medium, could be smarter)
+        const pendingAction = aiPending[0];
+        if (pendingAction.options.length > 0) {
+          const selectedTarget = pendingAction.options[0]; // Pick first option
+          currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+            type: 'SELECT_TARGET',
+            pendingActionId: pendingAction.id,
+            selectedTargets: [selectedTarget],
+          });
+          iterations++;
+          continue;
+        }
+      }
+
       // Check if it's the AI's turn
       const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
       if (aiActions.length === 0) break;

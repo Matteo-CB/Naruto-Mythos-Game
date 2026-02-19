@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 099/130 - PAKKUN (Common)
@@ -7,33 +8,59 @@ import { registerEffect } from '../../EffectRegistry';
  * Group: Independent | Keywords: Ninja Hound
  * SCORE [arrow]: Move this character.
  *
- * When the player wins the mission where Pakkun is assigned, Pakkun can be moved to a
- * different mission. This is useful for repositioning Pakkun for future turns.
+ * Auto-resolves: when the player wins the mission where Pakkun is assigned,
+ * moves Pakkun to the first available other mission. If no other missions
+ * exist, the effect fizzles.
  */
 function handlePakkun099Score(ctx: EffectContext): EffectResult {
-  const { state, sourceCard, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find valid destination missions (any mission other than the current one)
-  const validTargets: string[] = [];
+  // Find the first other mission to move to
+  let destMissionIndex = -1;
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i !== sourceMissionIndex) {
-      validTargets.push(String(i));
+      destMissionIndex = i;
+      break;
     }
   }
 
   // If no other missions exist, effect fizzles
-  if (validTargets.length === 0) {
+  if (destMissionIndex === -1) {
     return { state };
   }
 
-  // Requires target selection: which mission to move to
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_SELF_TO_MISSION',
-    validTargets,
-    description: `Select a mission to move ${sourceCard.card.name_fr} to.`,
-  };
+  // Move Pakkun from source mission to destination mission
+  const newMissions = state.activeMissions.map((m, idx) => {
+    if (idx === sourceMissionIndex) {
+      return {
+        ...m,
+        [friendlySide]: m[friendlySide].filter(
+          (c) => c.instanceId !== sourceCard.instanceId
+        ),
+      };
+    }
+    if (idx === destMissionIndex) {
+      const movedChar = { ...sourceCard, missionIndex: destMissionIndex };
+      return {
+        ...m,
+        [friendlySide]: [...m[friendlySide], movedChar],
+      };
+    }
+    return m;
+  });
+
+  const log = logAction(
+    state.log,
+    state.turn,
+    state.phase,
+    sourcePlayer,
+    'EFFECT_MOVE',
+    `Pakkun (099): Moved self from mission ${sourceMissionIndex} to mission ${destMissionIndex}.`,
+  );
+
+  return { state: { ...state, activeMissions: newMissions, log } };
 }
 
 export function registerHandler(): void {

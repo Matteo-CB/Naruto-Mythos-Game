@@ -48,13 +48,22 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
   playerState.hand = hand;
   playerState.charactersInPlay += 1;
 
-  // Place as hidden on the first mission
-  const targetMissionIndex = 0;
+  // Place as hidden on any mission (auto-resolve: pick mission with fewest friendly chars)
+  const friendlySideKey: 'player1Characters' | 'player2Characters' =
+    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  let targetMissionIndex = ctx.sourceMissionIndex;
+  let minChars = Infinity;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    const count = state.activeMissions[i][friendlySideKey].length;
+    if (count < minChars) {
+      minChars = count;
+      targetMissionIndex = i;
+    }
+  }
   const missions = [...state.activeMissions];
   const targetMission = { ...missions[targetMissionIndex] };
 
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const friendlySide = friendlySideKey;
 
   const newCharacter = {
     instanceId: generateInstanceId(),

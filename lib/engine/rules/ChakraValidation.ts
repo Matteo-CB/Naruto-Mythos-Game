@@ -67,15 +67,16 @@ export function calculateEffectiveCost(
       }
     }
 
-    // Itachi 090: Play hidden paying 3 less if Sasuke Uchiha in this mission
+    // Itachi 090: Play while hidden paying 3 less if Sasuke Uchiha in this mission
+    // Only applies when revealing from hidden (isReveal), not when playing face-visible
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
-      const hasSasuke = friendlyChars.some(
-        (c) => !c.isHidden && c.card.name_fr.toUpperCase().includes('SASUKE'),
-      );
-      // Only applies when playing hidden - but the cost reduction is for the hidden play itself
-      // Actually this means you can play this character hidden for cheaper when Sasuke is present
-      if (hasSasuke) {
-        cost = Math.max(0, cost - 3);
+      if (isReveal) {
+        const hasSasuke = friendlyChars.some(
+          (c) => !c.isHidden && c.card.name_fr.toUpperCase().includes('SASUKE'),
+        );
+        if (hasSasuke) {
+          cost = Math.max(0, cost - 3);
+        }
       }
     }
   }

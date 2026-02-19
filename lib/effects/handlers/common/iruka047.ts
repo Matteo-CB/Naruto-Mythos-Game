@@ -1,5 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import type { CharacterInPlay } from '../../../engine/types';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 047/130 - IRUKA (Common)
@@ -7,42 +9,81 @@ import { registerEffect } from '../../EffectRegistry';
  * Group: Leaf Village | Keywords: Academy
  * MAIN: Move a Naruto Uzumaki character in play.
  *
- * Select a friendly character named "NARUTO UZUMAKI" in play (any mission) and move it to
- * a different mission. This effect is optional.
+ * Auto-resolves: finds the first friendly Naruto Uzumaki character across all
+ * missions and moves it to the first available different mission. Optional
+ * effect — fizzles if no Naruto found or no other mission to move to.
  */
 function handleIruka047Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly Naruto Uzumaki characters in play across all missions
-  const validTargets: string[] = [];
+  // Find the first friendly Naruto Uzumaki in play across all missions
+  let target: CharacterInPlay | undefined;
+  let fromMissionIndex = -1;
 
-  for (const mission of state.activeMissions) {
-    const friendlyChars =
-      sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    const mission = state.activeMissions[i];
+    const friendlyChars = mission[friendlySide];
 
     for (const char of friendlyChars) {
-      // Hidden characters can be moved (they are still "in play")
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      // Match by character name (name_fr is canonical)
       if (topCard.name_fr === 'NARUTO UZUMAKI') {
-        validTargets.push(char.instanceId);
+        target = char;
+        fromMissionIndex = i;
+        break;
       }
     }
+    if (target) break;
   }
 
-  // If no valid targets, effect fizzles
-  if (validTargets.length === 0) {
+  if (!target || fromMissionIndex === -1) {
     return { state };
   }
 
-  // Requires target selection: which Naruto to move and where
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_NARUTO_CHARACTER',
-    validTargets,
-    description: 'Select a Naruto Uzumaki character in play to move to a different mission.',
-  };
+  // Find the first different mission to move to
+  let destMissionIndex = -1;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    if (i !== fromMissionIndex) {
+      destMissionIndex = i;
+      break;
+    }
+  }
+
+  if (destMissionIndex === -1) {
+    return { state };
+  }
+
+  // Build new state immutably
+  const newMissions = state.activeMissions.map((m, idx) => {
+    if (idx === fromMissionIndex) {
+      return {
+        ...m,
+        [friendlySide]: m[friendlySide].filter(
+          (c) => c.instanceId !== target!.instanceId
+        ),
+      };
+    }
+    if (idx === destMissionIndex) {
+      const movedChar = { ...target!, missionIndex: destMissionIndex };
+      return {
+        ...m,
+        [friendlySide]: [...m[friendlySide], movedChar],
+      };
+    }
+    return m;
+  });
+
+  const log = logAction(
+    state.log,
+    state.turn,
+    state.phase,
+    sourcePlayer,
+    'EFFECT_MOVE',
+    `Iruka (047): Moved Naruto Uzumaki from mission ${fromMissionIndex} to mission ${destMissionIndex}.`,
+  );
+
+  return { state: { ...state, activeMissions: newMissions, log } };
 }
 
 export function registerHandler(): void {

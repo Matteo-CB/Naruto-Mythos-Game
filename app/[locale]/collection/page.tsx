@@ -266,7 +266,7 @@ export default function CollectionPage() {
                             >
                               [{effect.type}]
                             </span>
-                            <span className="text-[#aaa]">{description}</span>
+                            <span className="font-body text-[#aaa]">{description}</span>
                           </div>
                         );
                       })}

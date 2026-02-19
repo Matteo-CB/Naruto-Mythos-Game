@@ -368,7 +368,7 @@ function CardPreviewContent({
                     )}
                   </span>
                   <span
-                    className="text-[11px] leading-snug"
+                    className="font-body text-[11px] leading-snug"
                     style={{ color: "#aaaaaa" }}
                   >
                     {description}
@@ -846,7 +846,7 @@ function FullscreenCardDetail() {
                         )}
                       </span>
                       <span
-                        className="text-sm leading-relaxed"
+                        className="font-body text-sm leading-relaxed"
                         style={{ color: "#bbbbbb" }}
                       >
                         {description}

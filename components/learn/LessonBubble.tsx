@@ -163,6 +163,7 @@ export function LessonBubble({
 
           {/* Description */}
           <div
+            className="font-body"
             style={{
               color: '#cccccc',
               fontSize: '0.72rem',

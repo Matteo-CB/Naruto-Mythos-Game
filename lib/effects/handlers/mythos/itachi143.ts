@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
+import { checkNinjaHoundsTrigger } from '../../moveTriggers';
 
 /**
  * Card 143/130 - ITACHI UCHIWA "Traquant Naruto" (M)
@@ -68,7 +69,7 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
   targetMission[friendlySide] = [...targetMission[friendlySide], movedChar];
   missions[ctx.sourceMissionIndex] = targetMission;
 
-  const log = logAction(
+  let log = logAction(
     state.log,
     state.turn,
     state.phase,
@@ -77,7 +78,10 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     `Itachi Uchiwa (143): Moved friendly ${foundChar.card.name_fr} from mission ${fromMissionIndex} to this mission (${ctx.sourceMissionIndex}).`,
   );
 
-  return { state: { ...state, activeMissions: missions, log } };
+  let newState = { ...state, activeMissions: missions, log };
+  // Check Ninja Hounds 100 trigger if the moved character is Ninja Hounds
+  newState = checkNinjaHoundsTrigger(newState, movedChar, ctx.sourceMissionIndex, ctx.sourcePlayer);
+  return { state: newState };
 }
 
 function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
@@ -129,7 +133,7 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
   targetMission[enemySide] = [...targetMission[enemySide], movedChar];
   missions[ctx.sourceMissionIndex] = targetMission;
 
-  const log = logAction(
+  let log = logAction(
     state.log,
     state.turn,
     state.phase,
@@ -138,7 +142,11 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     `Itachi Uchiwa (143): Moved enemy ${foundChar.card.name_fr} from mission ${fromMissionIndex} to this mission (${ctx.sourceMissionIndex}) (ambush).`,
   );
 
-  return { state: { ...state, activeMissions: missions, log } };
+  const opponent = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
+  let newState = { ...state, activeMissions: missions, log };
+  // Check Ninja Hounds 100 trigger if the moved character is Ninja Hounds
+  newState = checkNinjaHoundsTrigger(newState, movedChar, ctx.sourceMissionIndex, opponent);
+  return { state: newState };
 }
 
 export function registerItachi143Handlers(): void {

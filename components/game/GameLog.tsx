@@ -53,7 +53,7 @@ function LogEntry({ entry, formatPhase }: { entry: GameLogEntry; formatPhase: (p
           {entry.player === 'player1' ? t('game.log.player1') : t('game.log.player2')}
         </span>
       )}
-      <span style={{ color: '#e0e0e0' }}>
+      <span className="font-body" style={{ color: '#e0e0e0' }}>
         {entry.details || entry.action}
       </span>
     </motion.div>

@@ -112,12 +112,21 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
 
   state = { ...state, [ctx.sourcePlayer]: playerState };
 
-  // Place the card on a mission (pick first available mission for automated play)
-  const targetMissionIndex = state.activeMissions.length > 0 ? 0 : ctx.sourceMissionIndex;
-  const missions = [...state.activeMissions];
-  const targetMission = { ...missions[targetMissionIndex] };
+  // Place the card on any mission ("play one character anywhere")
+  // Auto-resolve: pick the mission with fewest friendly characters to spread power
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  let targetMissionIndex = ctx.sourceMissionIndex;
+  let minChars = Infinity;
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    const count = state.activeMissions[mi][friendlySide].length;
+    if (count < minChars) {
+      minChars = count;
+      targetMissionIndex = mi;
+    }
+  }
+  const missions = [...state.activeMissions];
+  const targetMission = { ...missions[targetMissionIndex] };
 
   const newCharacter = {
     instanceId: generateInstanceId(),

@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { calculateCharacterPower } from '../../../engine/phases/PowerCalculation';
 
 /**
  * Card 046/130 - EBISU (Common)
@@ -8,10 +9,7 @@ import { registerEffect } from '../../EffectRegistry';
  * MAIN: If there is a friendly non-hidden character with less Power than this character
  * in this mission, draw a card.
  *
- * Checks if there is at least one friendly non-hidden character in the same mission
- * whose base power (printed) is strictly less than Ebisu's power. If so, draws 1 card.
- * Note: We compare base printed power, not including power tokens (as the card says
- * "less Power than this character" referring to the card stats).
+ * "Power" includes base power + power tokens + continuous modifiers (effective power).
  */
 function handleEbisu046Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -19,16 +17,15 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
   const friendlyChars =
     sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
-  const sourceTopCard =
-    sourceCard.stack.length > 0 ? sourceCard.stack[sourceCard.stack.length - 1] : sourceCard.card;
-  const sourcePower = sourceTopCard.power;
+  // Use effective power (base + tokens + continuous modifiers)
+  const sourcePower = calculateCharacterPower(state, sourceCard, sourcePlayer);
 
   // Check for a friendly non-hidden character with less Power
   const hasLesserFriendly = friendlyChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    return topCard.power < sourcePower;
+    const charPower = calculateCharacterPower(state, char, sourcePlayer);
+    return charPower < sourcePower;
   });
 
   if (!hasLesserFriendly) {

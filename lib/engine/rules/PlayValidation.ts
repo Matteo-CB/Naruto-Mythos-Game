@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
 import { calculateEffectiveCost } from './ChakraValidation';
+import { calculateCharacterPower } from '../phases/PowerCalculation';
 
 export interface ValidationResult {
   valid: boolean;
@@ -193,11 +194,12 @@ function isWinningMission(state: GameState, player: PlayerID, missionIndex: numb
   let p1Power = 0;
   let p2Power = 0;
 
+  // Use calculateCharacterPower to include continuous modifiers (Kakashi +1, Gai +1, etc.)
   for (const c of p1Chars) {
-    if (!c.isHidden) p1Power += c.card.power + c.powerTokens;
+    p1Power += calculateCharacterPower(state, c, 'player1');
   }
   for (const c of p2Chars) {
-    if (!c.isHidden) p2Power += c.card.power + c.powerTokens;
+    p2Power += calculateCharacterPower(state, c, 'player2');
   }
 
   if (player === 'player1') {
