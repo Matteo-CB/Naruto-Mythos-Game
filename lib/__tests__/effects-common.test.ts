@@ -108,17 +108,17 @@ describe('003/130 - Tsunade', () => {
 // 007/130 - JIRAIYA: Play a Summon paying 1 less
 // ===================================================================
 describe('007/130 - Jiraiya', () => {
-  it('should return target selection when Summon cards are in hand', () => {
+  it('should auto-play an affordable Summon from hand onto a mission', () => {
     const jiraiya = mockCharInPlay({ instanceId: 'jiraiya-1' }, {
       id: '007/130', number: 7, name_fr: 'Jiraya', group: 'Leaf Village', keywords: ['Sannin'],
     });
+    const summonCard = mockCharacter({ keywords: ['Summon'], name_fr: 'Gama Bunta', chakra: 3 });
+    const otherCard = mockCharacter({ keywords: ['Team 7'], name_fr: 'Naruto' });
     const state = createActionPhaseState({
       player1: {
         ...createActionPhaseState().player1,
-        hand: [
-          mockCharacter({ keywords: ['Summon'], name_fr: 'Gama Bunta' }),
-          mockCharacter({ keywords: ['Team 7'], name_fr: 'Naruto' }),
-        ],
+        hand: [summonCard, otherCard],
+        chakra: 10,
       },
       activeMissions: [{
         card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
@@ -129,9 +129,12 @@ describe('007/130 - Jiraiya', () => {
 
     const handler = getEffectHandler('007/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jiraiya, 0));
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('PLAY_SUMMON_FROM_HAND');
-    expect(result.validTargets).toEqual(['0']); // index 0 is Gama Bunta
+    // Summon was auto-played: removed from hand, placed on mission, chakra reduced by (cost - 1)
+    expect(result.state.player1.hand.length).toBe(1); // only Naruto remains
+    expect(result.state.player1.hand[0].name_fr).toBe('Naruto');
+    expect(result.state.activeMissions[0].player1Characters.length).toBe(2); // Jiraiya + Gama Bunta
+    expect(result.state.player1.chakra).toBe(10 - 2); // cost 3 - 1 discount = 2
+    expect(result.requiresTargetSelection).toBeUndefined();
   });
 
   it('should fizzle when no Summon cards in hand', () => {
@@ -563,17 +566,18 @@ describe('050/130 - Orochimaru', () => {
 // 055/130 - KIMIMARO: AMBUSH - discard a card to hide a character cost<=3
 // ===================================================================
 describe('055/130 - Kimimaro', () => {
-  it('should request target selection when hand has cards and valid targets exist (AMBUSH)', () => {
+  it('should auto-resolve: discard a card and hide valid enemy target (AMBUSH)', () => {
     const kimimaro = mockCharInPlay({ instanceId: 'kim-1' }, {
       id: '055/130', number: 55, name_fr: 'Kimimaro',
     });
     const lowCostChar = mockCharInPlay({ instanceId: 'low-1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'Low Cost', chakra: 2,
     });
+    const handCard = mockCharacter({ name_fr: 'HandCard' });
     const baseState = createActionPhaseState();
     const state: GameState = {
       ...baseState,
-      player1: { ...baseState.player1, hand: [mockCharacter()] },
+      player1: { ...baseState.player1, hand: [handCard] },
       activeMissions: [{
         card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
         player1Characters: [kimimaro],
@@ -584,7 +588,13 @@ describe('055/130 - Kimimaro', () => {
     const handler = getEffectHandler('055/130', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kimimaro, 0, 'AMBUSH'));
-    expect(result.requiresTargetSelection).toBe(true);
+    // Card was discarded from hand
+    expect(result.state.player1.hand.length).toBe(0);
+    expect(result.state.player1.discardPile.length).toBeGreaterThan(0);
+    // Enemy character was hidden
+    const enemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'low-1');
+    expect(enemy?.isHidden).toBe(true);
+    expect(result.requiresTargetSelection).toBeUndefined();
   });
 
   it('should fizzle when hand is empty', () => {
@@ -663,21 +673,37 @@ describe('057/130 - Jirobo', () => {
 // 059/130 - KIDOMARU: Move X friendly characters (X = Sound Four missions)
 // ===================================================================
 describe('059/130 - Kidomaru', () => {
-  it('should request target selection when Sound Four missions exist', () => {
+  it('should auto-move friendly characters when Sound Four missions exist', () => {
     const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
       id: '059/130', number: 59, name_fr: 'Kidomaru', keywords: ['Sound Four'], group: 'Sound Village',
     });
+    const ally = mockCharInPlay({ instanceId: 'ally-1' }, {
+      name_fr: 'Ally', keywords: [],
+    });
     const state = createActionPhaseState({
-      activeMissions: [{
-        card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
-        player1Characters: [kidomaru],
-        player2Characters: [],
-      }],
+      activeMissions: [
+        {
+          card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
+          player1Characters: [kidomaru, ally],
+          player2Characters: [],
+        },
+        {
+          card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null,
+          player1Characters: [],
+          player2Characters: [],
+        },
+      ],
     });
 
     const handler = getEffectHandler('059/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    expect(result.requiresTargetSelection).toBe(true);
+    // X=1 (one mission with Sound Four), so 1 character moved
+    // First movable char (kidomaru at index 0) was moved from mission 0 to mission 1
+    const m0Chars = result.state.activeMissions[0].player1Characters;
+    const m1Chars = result.state.activeMissions[1].player1Characters;
+    expect(m0Chars.length + m1Chars.length).toBe(2); // total chars unchanged
+    expect(m1Chars.length).toBe(1); // one char moved to mission 1
+    expect(result.requiresTargetSelection).toBeUndefined();
   });
 });
 
@@ -979,7 +1005,7 @@ describe('086/130 - Zabuza Momochi', () => {
 // 088/130 - HAKU: Draw 1, then put 1 card on top of deck
 // ===================================================================
 describe('088/130 - Haku', () => {
-  it('should draw 1 card and require putting 1 back on deck', () => {
+  it('should draw 1 card and auto-put the drawn card back on top of deck', () => {
     const haku = mockCharInPlay({ instanceId: 'haku-1' }, {
       id: '088/130', number: 88, name_fr: 'Haku',
     });
@@ -997,9 +1023,13 @@ describe('088/130 - Haku', () => {
 
     const handler = getEffectHandler('088/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', haku, 0));
-    expect(result.state.player1.hand.length).toBe(2); // InHand + HakuDraw
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('PUT_CARD_ON_DECK');
+    // Draw 1, then auto-put the lowest-power card back on top of deck
+    // Both cards have same power, so index 0 (InHand) gets put back
+    expect(result.state.player1.hand.length).toBe(1);
+    expect(result.state.player1.hand[0].name_fr).toBe('HakuDraw');
+    expect(result.state.player1.deck.length).toBe(1);
+    expect(result.state.player1.deck[0].name_fr).toBe('InHand');
+    expect(result.requiresTargetSelection).toBeUndefined();
   });
 
   it('should do nothing when deck is empty', () => {
@@ -1112,7 +1142,7 @@ describe('Summon characters (094-098)', () => {
 // 099/130 - PAKKUN: SCORE move self to another mission
 // ===================================================================
 describe('099/130 - Pakkun', () => {
-  it('should request target selection for SCORE move', () => {
+  it('should auto-move Pakkun to the first other mission on SCORE', () => {
     const pakkun = mockCharInPlay({ instanceId: 'pakkun-1' }, {
       id: '099/130', number: 99, name_fr: 'Pakkun',
     });
@@ -1126,9 +1156,11 @@ describe('099/130 - Pakkun', () => {
     const handler = getEffectHandler('099/130', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', pakkun, 0, 'SCORE'));
-    expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toContain('1'); // can move to mission 1
-    expect(result.validTargets).not.toContain('0'); // can't stay
+    // Pakkun auto-moved from mission 0 to mission 1
+    expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
+    expect(result.state.activeMissions[1].player1Characters.length).toBe(1);
+    expect(result.state.activeMissions[1].player1Characters[0].instanceId).toBe('pakkun-1');
+    expect(result.requiresTargetSelection).toBeUndefined();
   });
 
   it('should fizzle when only one mission exists', () => {

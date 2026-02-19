@@ -351,7 +351,7 @@ function ExplanationPanel({
           </span>
         )}
       </div>
-      <div className="text-sm mb-3" style={{ color: TEXT_LIGHT, lineHeight: 1.6 }}>
+      <div className="font-body text-sm mb-3" style={{ color: TEXT_LIGHT, lineHeight: 1.6 }}>
         {t(
           question.explanationKey as Parameters<typeof t>[0],
           question.explanationParams as Record<string, string> | undefined
@@ -1576,7 +1576,7 @@ function SpotErrorRenderer({
                 {isChecked ? 'X' : ''}
               </div>
 
-              <span className="text-sm" style={{ color: TEXT_LIGHT, lineHeight: 1.5 }}>
+              <span className="font-body text-sm" style={{ color: TEXT_LIGHT, lineHeight: 1.5 }}>
                 {t(
                   stmt.textKey as Parameters<typeof t>[0],
                   stmt.textParams as Record<string, string> | undefined

@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils';
 
@@ -9,14 +10,14 @@ import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils
  * Group: Leaf Village, Keywords: Team 7
  *
  * MAIN [hourglass]: When a character is defeated, gain 1 Chakra.
- *   - Continuous/passive. Triggered via defeatUtils.triggerOnDefeatEffects().
+ *   - Continuous/passive. Triggered via onDefeatTriggers.triggerOnDefeatEffects().
  *
- * UPGRADE: Must defeat a friendly non-hidden character AND an enemy character
- *          in this mission, if able.
+ * UPGRADE: You must choose a friendly non-hidden character AND any enemy character
+ *          in this mission and defeat them, if able.
  */
 
 function sasuke136MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous on-defeat trigger - handled by defeatUtils.triggerOnDefeatEffects()
+  // Continuous on-defeat trigger - handled by onDefeatTriggers.triggerOnDefeatEffects()
   const state = ctx.state;
   const log = logAction(
     state.log, state.turn, state.phase, ctx.sourcePlayer,
@@ -24,6 +25,12 @@ function sasuke136MainHandler(ctx: EffectContext): EffectResult {
     'Sasuke Uchiwa (136): Gain 1 Chakra when any character is defeated (continuous).',
   );
   return { state: { ...state, log } };
+}
+
+/** Get the effective power of a character for auto-resolution targeting. */
+function getCharPower(char: CharacterInPlay): number {
+  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  return (char.isHidden ? 0 : topCard.power) + char.powerTokens;
 }
 
 function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
@@ -35,10 +42,19 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  const friendlyTarget = mission[friendlySide].find(
+  // Pick weakest friendly (least power loss) for sacrifice
+  const friendlyTargets = mission[friendlySide].filter(
     (c) => !c.isHidden && c.instanceId !== ctx.sourceCard.instanceId,
   );
-  const enemyTarget = mission[enemySide].find(() => true);
+  const friendlyTarget = friendlyTargets.length > 0
+    ? friendlyTargets.reduce((a, b) => getCharPower(a) <= getCharPower(b) ? a : b)
+    : undefined;
+
+  // Pick strongest enemy (best strategic value) for destruction
+  const enemyTargets = mission[enemySide];
+  const enemyTarget = enemyTargets.length > 0
+    ? enemyTargets.reduce((a, b) => getCharPower(a) >= getCharPower(b) ? a : b)
+    : undefined;
 
   if (!friendlyTarget || !enemyTarget) {
     const log = logAction(

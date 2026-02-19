@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -11,6 +11,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -127,7 +133,7 @@ export default function RootLayout({
         <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased bg-[#0a0a0a] text-[#e0e0e0] min-h-screen`}
       >
         <a
           href="#main-content"

@@ -128,14 +128,19 @@ export interface PendingEffect {
   id: string;
   sourceCardId: string;
   sourceInstanceId: string;
+  sourceMissionIndex: number;
   effectType: EffectType;
   effectDescription: string;
+  targetSelectionType: string;
   sourcePlayer: PlayerID;
   requiresTargetSelection: boolean;
   validTargets: string[]; // instanceIds of valid targets
   isOptional: boolean;
   isMandatory: boolean;
   resolved: boolean;
+  isUpgrade: boolean;
+  // Continuation: remaining effect types to process after this pending is resolved
+  remainingEffectTypes?: EffectType[];
 }
 
 export interface PendingAction {
