@@ -248,16 +248,22 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     '[⧗] S\'il y a une [u]Tsunade[/u] ou une [u]Shizune[/u] alliee dans cette mission, ce personnage a +1 Puissance.',
   ],
 
-  // 108/130 - NARUTO UZUMAKI (R) - titre non renseigne
+  // 108/130 - NARUTO UZUMAKI (RA) - "Believe it!"
   '108/130': [
-    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
-    'effet : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
+    'Placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
+    'Repetez l\'effet MAIN.',
   ],
 
   // 108/130 A - NARUTO UZUMAKI (RA) - same as 108/130
   '108/130 A': [
-    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
-    'effet : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
+    'Placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
+    'Repetez l\'effet MAIN.',
+  ],
+
+  // 109/130 - SAKURA HARUNO (R) - "Ninja Medical"
+  '109/130': [
+    'Choisissez un de vos personnages Village de Konoha dans votre defausse et jouez-le n\'importe ou en payant son cout.',
+    'effet MAIN : A la place, jouez la carte en payant 2 de moins.',
   ],
 
   // 120/130 - GAARA (R) - titre non renseigne
@@ -292,10 +298,10 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
 
   // 137/130 - KAKASHI HATAKE (S) - "L'Eclair Pourfendeur"
-  // Corrected to match cardLoader EFFECT_CORRECTIONS (2 effects, not 3)
+  // Corrected: MAIN targets upgraded characters (friend or foe), not just enemies
   '137/130': [
     'Deplacez ce personnage.',
-    'Cachez un personnage ennemi dans cette mission.',
+    'Cachez un personnage ameliore dans cette mission.',
   ],
 
   // 143/130 - ITACHI UCHIWA (M) - "Traquant Naruto"

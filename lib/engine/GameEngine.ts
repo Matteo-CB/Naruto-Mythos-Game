@@ -27,6 +27,7 @@ import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase } from './phases/MissionPhase';
 import { executeEndPhase } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
+import { calculateCharacterPower } from './phases/PowerCalculation';
 
 export class GameEngine {
   /**
@@ -420,10 +421,11 @@ export class GameEngine {
     };
 
     const visibleMissions: VisibleMission[] = state.activeMissions.map((mission) => {
-      const makeVisible = (chars: CharacterInPlay[]): VisibleCharacter[] =>
+      const makeVisible = (chars: CharacterInPlay[], side: PlayerID): VisibleCharacter[] =>
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
           const canSee = isOwn || !c.isHidden;
+          const power = calculateCharacterPower(state, c, side);
           return {
             instanceId: c.instanceId,
             isHidden: c.isHidden,
@@ -434,13 +436,14 @@ export class GameEngine {
             originalOwner: c.originalOwner,
             missionIndex: c.missionIndex,
             stackSize: c.stack.length,
+            effectivePower: power,
           };
         });
 
       return {
         ...mission,
-        player1Characters: makeVisible(mission.player1Characters),
-        player2Characters: makeVisible(mission.player2Characters),
+        player1Characters: makeVisible(mission.player1Characters, 'player1'),
+        player2Characters: makeVisible(mission.player2Characters, 'player2'),
       };
     });
 

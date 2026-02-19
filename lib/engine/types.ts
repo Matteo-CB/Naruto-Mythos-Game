@@ -262,6 +262,7 @@ export interface VisibleCharacter {
   originalOwner: PlayerID;
   missionIndex: number;
   stackSize: number;
+  effectivePower: number; // Includes base power + tokens + continuous modifiers
 }
 
 // ---------------------
