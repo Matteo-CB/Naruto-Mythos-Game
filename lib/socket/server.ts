@@ -114,7 +114,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Submit deck selection
-    socket.on('room:select-deck', (data: {
+    socket.on('room:select-deck', async (data: {
       characters: CharacterCard[];
       missions: MissionCard[];
     }) => {
@@ -148,6 +148,20 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         room.gameState = GameEngine.createGame(config);
 
+        // Fetch player usernames for display
+        let hostName = 'Player 1';
+        let guestName = 'Player 2';
+        try {
+          const [hostUser, guestUser] = await Promise.all([
+            prisma.user.findUnique({ where: { id: room.hostId }, select: { username: true } }),
+            room.guestId ? prisma.user.findUnique({ where: { id: room.guestId }, select: { username: true } }) : null,
+          ]);
+          if (hostUser?.username) hostName = hostUser.username;
+          if (guestUser?.username) guestName = guestUser.username;
+        } catch {
+          // If DB lookup fails, fall back to default names
+        }
+
         // Send filtered visible state to each player
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
@@ -156,12 +170,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
           io.to(room.hostSocket).emit('game:state-update', {
             visibleState: p1State,
             playerRole: 'player1',
+            playerNames: { player1: hostName, player2: guestName },
           });
         }
         if (room.guestSocket) {
           io.to(room.guestSocket).emit('game:state-update', {
             visibleState: p2State,
             playerRole: 'player2',
+            playerNames: { player1: hostName, player2: guestName },
           });
         }
 

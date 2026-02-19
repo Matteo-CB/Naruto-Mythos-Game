@@ -45,6 +45,8 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Sakura Haruno (109): No Leaf Village character in discard pile.',
+      'game.log.effect.noTarget',
+      { card: 'SAKURA HARUNO', id: '109/130' },
     );
     return { state: { ...state, log } };
   }
@@ -73,6 +75,8 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_CHAKRA',
       `Sakura Haruno (109): Cannot afford any Leaf Village character from discard pile.`,
+      'game.log.effect.noChakra',
+      { card: 'SAKURA HARUNO', id: '109/130' },
     );
     return { state: { ...state, log } };
   }
@@ -125,6 +129,8 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_PLAY',
     `Sakura Haruno (109): Played ${chosen.card.name_fr} from discard pile to mission ${targetMissionIndex}${costDesc}.`,
+    'game.log.effect.playFromDiscard',
+    { card: 'SAKURA HARUNO', id: '109/130', target: chosen.card.name_fr, mission: `mission ${targetMissionIndex}`, cost: playCost },
   );
 
   return { state: { ...state, activeMissions: missions, log } };

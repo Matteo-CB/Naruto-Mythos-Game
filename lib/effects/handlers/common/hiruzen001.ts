@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 001/130 - HIRUZEN SARUTOBI (Common)
@@ -33,13 +34,15 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
 
   // If no valid targets, effect fizzles
   if (validTargets.length === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Hiruzen Sarutobi (001): No valid Leaf Village target for POWERUP 2.',
+      'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: '001/130' }) } };
   }
 
   // If exactly one valid target, apply automatically
   if (validTargets.length === 1) {
     const targetId = validTargets[0];
-    const newState = applyPowerup(state, targetId, 2);
+    const newState = applyPowerup(state, targetId, 2, sourcePlayer);
     return { state: newState };
   }
 
@@ -53,21 +56,29 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
   };
 }
 
-function applyPowerup(state: import('../../EffectTypes').EffectContext['state'], targetInstanceId: string, amount: number): import('../../EffectTypes').EffectContext['state'] {
+function applyPowerup(state: import('../../EffectTypes').EffectContext['state'], targetInstanceId: string, amount: number, sourcePlayer: import('../../../engine/types').PlayerID): import('../../EffectTypes').EffectContext['state'] {
+  let targetName = '';
   const newState = { ...state };
   newState.activeMissions = state.activeMissions.map((mission) => ({
     ...mission,
-    player1Characters: mission.player1Characters.map((char) =>
-      char.instanceId === targetInstanceId
-        ? { ...char, powerTokens: char.powerTokens + amount }
-        : char,
-    ),
-    player2Characters: mission.player2Characters.map((char) =>
-      char.instanceId === targetInstanceId
-        ? { ...char, powerTokens: char.powerTokens + amount }
-        : char,
-    ),
+    player1Characters: mission.player1Characters.map((char) => {
+      if (char.instanceId === targetInstanceId) {
+        targetName = char.card.name_fr;
+        return { ...char, powerTokens: char.powerTokens + amount };
+      }
+      return char;
+    }),
+    player2Characters: mission.player2Characters.map((char) => {
+      if (char.instanceId === targetInstanceId) {
+        targetName = char.card.name_fr;
+        return { ...char, powerTokens: char.powerTokens + amount };
+      }
+      return char;
+    }),
   }));
+  newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_POWERUP',
+    `Hiruzen Sarutobi (001): POWERUP ${amount} on ${targetName}.`,
+    'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: '001/130', amount, target: targetName });
   return newState;
 }
 

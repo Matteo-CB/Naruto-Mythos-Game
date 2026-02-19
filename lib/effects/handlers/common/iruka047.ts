@@ -38,7 +38,9 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
   }
 
   if (!target || fromMissionIndex === -1) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Iruka Umino (047): No Naruto Uzumaki character found in play.',
+      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: '047/130' }) } };
   }
 
   // Find the first different mission to move to
@@ -51,7 +53,9 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
   }
 
   if (destMissionIndex === -1) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Iruka Umino (047): No other mission available to move Naruto Uzumaki to.',
+      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: '047/130' }) } };
   }
 
   // Build new state immutably
@@ -81,6 +85,8 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
     sourcePlayer,
     'EFFECT_MOVE',
     `Iruka (047): Moved Naruto Uzumaki from mission ${fromMissionIndex} to mission ${destMissionIndex}.`,
+    'game.log.effect.move',
+    { card: 'Iruka', id: '047/130', target: 'Naruto Uzumaki', mission: String(destMissionIndex) },
   );
 
   return { state: { ...state, activeMissions: newMissions, log } };

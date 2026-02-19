@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 072/130 - KIN TSUCHI (Common)
@@ -24,7 +25,18 @@ function handleKin072Main(ctx: EffectContext): EffectResult {
   }
   newState[opponentPlayer] = opponentState;
 
-  return { state: newState };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_DRAW',
+    `Kin Tsuchi (072): Opponent draws 1 card.`,
+    'game.log.effect.oppDraw',
+    { card: 'Kin Tsuchi', id: '072/130', count: '1' },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

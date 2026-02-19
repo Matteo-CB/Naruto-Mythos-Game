@@ -63,6 +63,7 @@ import { registerAllRareHandlers } from './handlers/rare/index';
 import { registerAllSecretHandlers } from './handlers/secret/index';
 import { registerAllMythosHandlers } from './handlers/mythos/index';
 import { registerAllMissionHandlers } from './handlers/missions/index';
+import { registerAllLegendaryHandlers } from './handlers/legendary/index';
 
 export function initializeRegistry(): void {
   registerAllCommonHandlers();
@@ -71,6 +72,7 @@ export function initializeRegistry(): void {
   registerAllSecretHandlers();
   registerAllMythosHandlers();
   registerAllMissionHandlers();
+  registerAllLegendaryHandlers();
 }
 
 // Auto-initialize on import

@@ -35,14 +35,6 @@ function findCharacterInPlay(
 
 /**
  * Defeat a character, respecting replacement effects and triggering on-defeat effects.
- *
- * @param state - Current game state
- * @param missionIndex - Mission where the character is
- * @param charInstanceId - Instance ID of the character to defeat
- * @param side - Which side the character is on ('player1Characters' or 'player2Characters')
- * @param isEnemyEffect - Whether this defeat is caused by an enemy effect (for Hayate/Gaara/Gemma)
- * @param sourcePlayer - The player whose effect is causing the defeat (for logging)
- * @returns Updated game state. The character may have been hidden instead of defeated (replacement).
  */
 export function defeatCharacterInPlay(
   state: GameState,
@@ -85,6 +77,8 @@ export function defeatCharacterInPlay(
           targetPlayer,
           'EFFECT_REPLACEMENT',
           `${targetChar.card.name_fr} was hidden instead of defeated (replacement effect).`,
+          'game.log.effect.defeatReplacement',
+          { card: targetChar.card.name_fr },
         ),
       };
     }
@@ -106,6 +100,8 @@ export function defeatCharacterInPlay(
             targetPlayer,
             'EFFECT_SACRIFICE',
             `Gemma Shiranui sacrificed to protect ${targetChar.card.name_fr}.`,
+            'game.log.effect.sacrifice',
+            { target: targetChar.card.name_fr },
           ),
         };
         // Trigger on-defeat for the sacrificed character
@@ -127,6 +123,8 @@ export function defeatCharacterInPlay(
       sourcePlayer,
       'EFFECT_DEFEAT',
       `${targetChar.card.name_fr} was defeated.`,
+      'game.log.effect.defeat',
+      { card: '???', id: '', target: targetChar.card.name_fr },
     ),
   };
 
@@ -198,5 +196,3 @@ function removeCharacterFromPlay(
     [owner]: ownerState,
   };
 }
-
-// triggerOnDefeatEffects is imported from onDefeatTriggers.ts (shared module)

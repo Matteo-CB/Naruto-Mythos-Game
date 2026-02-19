@@ -129,6 +129,8 @@ function handlePlayCharacter(
     player,
     'PLAY_CHARACTER',
     `${player} plays ${card.name_fr} (${card.title_fr}) on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
+    'game.log.playCharacter',
+    { card: card.name_fr, title: card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
   );
 
   let newState: GameState = {
@@ -208,6 +210,8 @@ function handlePlayHidden(
     player,
     'PLAY_HIDDEN',
     `${player} plays a hidden character on mission ${missionIndex + 1}.`,
+    'game.log.playHidden',
+    { mission: missionIndex + 1 },
   );
 
   return {
@@ -269,6 +273,8 @@ function handleRevealCharacter(
     player,
     'REVEAL_CHARACTER',
     `${player} reveals ${char.card.name_fr} (${char.card.title_fr}) on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
+    'game.log.revealCharacter',
+    { card: char.card.name_fr, title: char.card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
   );
 
   let newState: GameState = {
@@ -357,6 +363,8 @@ function handleUpgradeCharacter(
     player,
     'UPGRADE_CHARACTER',
     `${player} upgrades ${existingTopCard.name_fr} to ${newCard.name_fr} (${newCard.title_fr}) on mission ${missionIndex + 1} for ${costDiff} chakra.`,
+    'game.log.upgradeCharacter',
+    { oldCard: existingTopCard.name_fr, card: newCard.name_fr, title: newCard.title_fr, mission: missionIndex + 1, cost: costDiff },
   );
 
   let newState: GameState = {
@@ -393,13 +401,15 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     edgeHolder = player;
   }
 
+  const takesEdge = firstPasser === player && state.firstPasser === null;
   const log = logAction(
     state.log,
     state.turn,
     'action',
     player,
     'PASS',
-    `${player} passes.${firstPasser === player && state.firstPasser === null ? ` ${player} takes the Edge token.` : ''}`,
+    `${player} passes.${takesEdge ? ` ${player} takes the Edge token.` : ''}`,
+    takesEdge ? 'game.log.passEdge' : 'game.log.pass',
   );
 
   // After passing, the other player becomes active (if they haven't passed)

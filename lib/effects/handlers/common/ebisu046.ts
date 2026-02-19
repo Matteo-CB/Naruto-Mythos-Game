@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { calculateCharacterPower } from '../../../engine/phases/PowerCalculation';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 046/130 - EBISU (Common)
@@ -29,7 +30,9 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
   });
 
   if (!hasLesserFriendly) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Ebisu (046): No friendly character with less Power in this mission.',
+      'game.log.effect.noTarget', { card: 'EBISU', id: '046/130' }) } };
   }
 
   // Draw a card
@@ -43,7 +46,18 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
   }
   newState[sourcePlayer] = playerState;
 
-  return { state: newState };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_DRAW',
+    `Ebisu (046): Drew 1 card.`,
+    'game.log.effect.draw',
+    { card: 'Ebisu', id: '046/130', count: '1' },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

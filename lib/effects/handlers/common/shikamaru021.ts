@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 021/130 - SHIKAMARU NARA (Common)
@@ -14,7 +15,9 @@ function handleShikamaru021Main(ctx: EffectContext): EffectResult {
 
   // Check if this player has the Edge
   if (state.edgeHolder !== sourcePlayer) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Shikamaru Nara (021): Player does not hold the Edge token.',
+      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: '021/130' }) } };
   }
 
   // Draw a card
@@ -27,6 +30,14 @@ function handleShikamaru021Main(ctx: EffectContext): EffectResult {
     playerState.hand = [...playerState.hand, drawnCard];
   }
   newState[sourcePlayer] = playerState;
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_DRAW',
+    `Shikamaru Nara (021): Drew 1 card (Edge holder).`,
+    'game.log.effect.draw',
+    { card: 'Shikamaru Nara', id: '021/130', count: 1 },
+  );
 
   return { state: newState };
 }

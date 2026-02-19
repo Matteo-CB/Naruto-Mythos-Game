@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 057/130 - JIROBO (Common)
@@ -32,7 +33,9 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
   }
 
   if (soundFourMissionCount === 0) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jirobo (057): No missions with a friendly Sound Four character.',
+      'game.log.effect.noTarget', { card: 'JIROBO', id: '057/130' }) } };
   }
 
   // POWERUP X on self
@@ -51,7 +54,18 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
     ),
   }));
 
-  return { state: newState };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_POWERUP',
+    `Jirobo (057): POWERUP ${soundFourMissionCount} on self.`,
+    'game.log.effect.powerupSelf',
+    { card: 'Jirobo', id: '057/130', amount: String(soundFourMissionCount) },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

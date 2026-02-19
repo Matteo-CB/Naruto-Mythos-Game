@@ -38,6 +38,8 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Sakura Haruno (135): Deck is empty, no cards to look at.',
+      'game.log.effect.noTarget',
+      { card: 'SAKURA HARUNO', id: '135/130' },
     );
     return { state: { ...state, log } };
   }
@@ -73,6 +75,8 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
         ctx.sourcePlayer,
         'EFFECT_DISCARD',
         'Sakura Haruno (135): No character cards in top 3, all discarded.',
+        'game.log.effect.discardCards',
+        { card: 'SAKURA HARUNO', id: '135/130', count: topCards.length },
       ),
     };
     return { state };
@@ -99,6 +103,8 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
         ctx.sourcePlayer,
         'EFFECT_NO_CHAKRA',
         `Sakura Haruno (135): Cannot afford to play ${chosenCard.name_fr} (cost ${playCost}). All cards discarded.`,
+        'game.log.effect.noChakra',
+        { card: 'SAKURA HARUNO', id: '135/130' },
       ),
     };
     return { state };
@@ -150,6 +156,8 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_PLAY',
     `Sakura Haruno (135): Played ${chosenCard.name_fr} from top of deck to mission ${targetMissionIndex}${costDesc}. Discarded ${discardCards.length} other card(s).`,
+    'game.log.effect.playFromDeck',
+    { card: 'SAKURA HARUNO', id: '135/130', target: chosenCard.name_fr, mission: `mission ${targetMissionIndex}`, cost: playCost },
   );
 
   return { state: { ...state, activeMissions: missions, log } };

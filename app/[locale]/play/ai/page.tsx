@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
@@ -19,6 +20,7 @@ interface ResolvedDeck {
 
 export default function PlayAIPage() {
   const t = useTranslations();
+  const { data: session } = useSession();
 
   const DIFFICULTIES = [
     { key: 'easy' as AIDifficulty, label: t('playAI.difficulties.easy'), description: t('playAI.difficulties.easyDesc') },
@@ -76,7 +78,7 @@ export default function PlayAIPage() {
       },
     };
 
-    startAIGame(config, difficulty);
+    startAIGame(config, difficulty, session?.user?.name ?? undefined);
     router.push('/game');
   };
 

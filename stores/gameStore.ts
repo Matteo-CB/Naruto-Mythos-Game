@@ -18,6 +18,9 @@ interface AnimationEvent {
 interface PendingTargetSelection {
   validTargets: string[]; // instanceIds
   description: string;
+  playerName?: string; // display name of the player who must choose
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND'; // type of selection
+  handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
 }
@@ -33,6 +36,7 @@ interface GameStore {
   isProcessing: boolean;
   gameOver: boolean;
   winner: PlayerID | null;
+  playerDisplayNames: { player1: string; player2: string };
 
   // Animation queue
   animationQueue: AnimationEvent[];
@@ -42,8 +46,8 @@ interface GameStore {
   pendingTargetSelection: PendingTargetSelection | null;
 
   // Actions
-  startAIGame: (config: GameConfig, difficulty: AIDifficulty) => void;
-  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID) => void;
+  startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
+  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => void;
   updateOnlineState: (visibleState: VisibleGameState) => void;
   endOnlineGame: (winner: string) => void;
   performAction: (action: GameAction) => void;
@@ -255,11 +259,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isProcessing: false,
   gameOver: false,
   winner: null,
+  playerDisplayNames: { player1: 'Player 1', player2: 'Player 2' },
   animationQueue: [],
   isAnimating: false,
   pendingTargetSelection: null,
 
-  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID) => {
+  startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
+    const humanName = playerName || 'Player';
+    const oppName = opponentName || 'Opponent';
+    const playerDisplayNames = {
+      player1: playerRole === 'player1' ? humanName : oppName,
+      player2: playerRole === 'player2' ? humanName : oppName,
+    };
     set({
       gameState: null,
       visibleState,
@@ -270,6 +281,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isProcessing: false,
       gameOver: false,
       winner: null,
+      playerDisplayNames,
       animationQueue: [],
       pendingTargetSelection: null,
     });
@@ -286,13 +298,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  startAIGame: (config: GameConfig, difficulty: AIDifficulty) => {
+  startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
     const state = GameEngine.createGame(config);
     const humanPlayer: PlayerID = config.player1.isAI ? 'player2' : 'player1';
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
     const ai = new AIPlayer(difficulty, aiPlayerSide);
 
     const visible = GameEngine.getVisibleState(state, humanPlayer);
+
+    // Build display names
+    const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    const humanName = playerName || 'Player';
+    const aiName = `AI (${difficultyLabel})`;
+    const playerDisplayNames = {
+      player1: humanPlayer === 'player1' ? humanName : aiName,
+      player2: humanPlayer === 'player2' ? humanName : aiName,
+    };
 
     set({
       gameState: state,
@@ -304,6 +325,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isProcessing: false,
       gameOver: false,
       winner: null,
+      playerDisplayNames,
       animationQueue: [],
       pendingTargetSelection: null,
     });
@@ -371,11 +393,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingAction = humanPending[0];
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
+      // Determine selection type for UI
+      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
+        pendingAction.type === 'DISCARD_CARD' ||
+        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      // Build hand card info for hand selection UI
+      let handCards: PendingTargetSelection['handCards'];
+      if (isHandSelection) {
+        const playerHand = newState[humanPlayer].hand;
+        handCards = pendingAction.options.map((indexStr) => {
+          const idx = parseInt(indexStr, 10);
+          const card = playerHand[idx];
+          return {
+            index: idx,
+            card: card ? {
+              name_fr: card.name_fr,
+              chakra: card.chakra,
+              power: card.power,
+              image_file: card.image_file,
+            } : { name_fr: '???' },
+          };
+        });
+      }
+
       set({
         isProcessing: false,
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
+          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          handCards,
           onSelect: (targetId: string) => {
             get().performAction({
               type: 'SELECT_TARGET',
@@ -553,6 +601,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isProcessing: false,
       gameOver: false,
       winner: null,
+      playerDisplayNames: { player1: 'Player 1', player2: 'Player 2' },
       animationQueue: [],
       isAnimating: false,
       pendingTargetSelection: null,

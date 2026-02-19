@@ -44,6 +44,8 @@ export function triggerOnDefeatEffects(
                 controllingPlayer,
                 'EFFECT_ON_DEFEAT',
                 `Tsunade (003): Gained 2 chakra (friendly character ${defeatedChar.card.name_fr} was defeated).`,
+                'game.log.effect.onDefeatChakra',
+                { card: 'Tsunade', id: '003/130', amount: 2, defeated: defeatedChar.card.name_fr },
               ),
             };
           }
@@ -67,6 +69,8 @@ export function triggerOnDefeatEffects(
                 controllingPlayer,
                 'EFFECT_ON_DEFEAT',
                 `Sasuke Uchiwa (136): Gained 1 chakra (character ${defeatedChar.card.name_fr} was defeated).`,
+                'game.log.effect.onDefeatChakra',
+                { card: 'Sasuke Uchiwa', id: '136/130', amount: 1, defeated: defeatedChar.card.name_fr },
               ),
             };
           }

@@ -278,8 +278,12 @@ export function TargetSelector() {
 
   if (!pendingTargetSelection || !visibleState) return null;
 
-  const { validTargets, description, onDecline } = pendingTargetSelection;
+  // Hand selection is handled by HandCardSelector
+  if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
+
+  const { validTargets, description, onDecline, playerName } = pendingTargetSelection;
   const canDecline = !!onDecline;
+  const displayName = playerName || t('game.you');
 
   return (
     <AnimatePresence>
@@ -291,6 +295,42 @@ export function TargetSelector() {
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
       >
+        {/* Player announcement banner */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          className="mb-4 px-10 py-3 rounded-lg flex items-center gap-3"
+          style={{
+            backgroundColor: 'rgba(196, 163, 90, 0.08)',
+            border: '2px solid rgba(196, 163, 90, 0.3)',
+            boxShadow: '0 0 24px rgba(196, 163, 90, 0.15)',
+          }}
+        >
+          <motion.div
+            className="rounded-full"
+            style={{
+              width: '10px',
+              height: '10px',
+              backgroundColor: '#c4a35a',
+            }}
+            animate={{
+              boxShadow: [
+                '0 0 4px rgba(196, 163, 90, 0.4)',
+                '0 0 12px rgba(196, 163, 90, 0.8)',
+                '0 0 4px rgba(196, 163, 90, 0.4)',
+              ],
+            }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+          />
+          <span
+            className="text-lg font-bold uppercase tracking-wider"
+            style={{ color: '#c4a35a' }}
+          >
+            {t('game.mustChooseTarget', { player: displayName })}
+          </span>
+        </motion.div>
+
         {/* Description bar */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -303,12 +343,6 @@ export function TargetSelector() {
             maxWidth: '600px',
           }}
         >
-          <span
-            className="text-sm font-medium uppercase tracking-wider"
-            style={{ color: '#c4a35a' }}
-          >
-            {t('game.selectTarget')}
-          </span>
           <span
             className="text-xs text-center leading-relaxed"
             style={{ color: '#e0e0e0' }}

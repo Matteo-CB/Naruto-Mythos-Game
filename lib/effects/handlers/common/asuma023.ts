@@ -32,7 +32,9 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   }
 
   if (!target) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Asuma Sarutobi (023): No other Team 10 character in this mission to move.',
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: '023/130' }) } };
   }
 
   // Find the first different mission to move to
@@ -45,7 +47,9 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   }
 
   if (destMissionIndex === -1) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Asuma Sarutobi (023): No other mission available to move Team 10 character to.',
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: '023/130' }) } };
   }
 
   // Build new state immutably
@@ -77,6 +81,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
     sourcePlayer,
     'EFFECT_MOVE',
     `Asuma Sarutobi (023): Moved Team 10 character ${target.card.name_fr} from mission ${sourceMissionIndex} to mission ${destMissionIndex}.`,
+    'game.log.effect.move', { card: 'Asuma Sarutobi', id: '023/130', target: target.card.name_fr, mission: String(destMissionIndex + 1) },
   );
 
   return { state: { ...state, activeMissions: newMissions, log } };

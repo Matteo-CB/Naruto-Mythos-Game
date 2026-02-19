@@ -17,6 +17,7 @@ import { GameLog } from "./GameLog";
 import { TurnOverlay } from "./TurnOverlay";
 import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
+import { HandCardSelector } from "./HandCardSelector";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 
 // ----- Shared color maps -----
@@ -1036,6 +1037,7 @@ export default function GameBoard() {
       <GameLog />
       <AnimationController />
       <TargetSelector />
+      <HandCardSelector />
 
       {gameOver && <GameEndScreen />}
 

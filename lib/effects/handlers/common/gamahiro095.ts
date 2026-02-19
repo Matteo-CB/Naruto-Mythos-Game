@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 095/130 - GAMAHIRO (Common)
@@ -23,7 +24,9 @@ function handleGamahiro095Main(ctx: EffectContext): EffectResult {
   );
 
   if (!hasFriendly) {
-    return { state };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Gamahiro (095): No other friendly character in this mission.',
+      'game.log.effect.noTarget', { card: 'GAMAHIRO', id: '095/130' }) } };
   }
 
   // Draw a card
@@ -36,6 +39,14 @@ function handleGamahiro095Main(ctx: EffectContext): EffectResult {
     playerState.hand = [...playerState.hand, drawnCard];
   }
   newState[sourcePlayer] = playerState;
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_DRAW',
+    `Gamahiro (095): Drew 1 card (friendly in mission).`,
+    'game.log.effect.draw',
+    { card: 'Gamahiro', id: '095/130', count: 1 },
+  );
 
   return { state: newState };
 }

@@ -45,6 +45,8 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
     'mission',
     'SCORE_MISSION',
     `Mission ${missionIndex + 1} (${mission.rank}): "${mission.card.name_fr}" - Player1: ${p1Power} power vs Player2: ${p2Power} power.`,
+    'game.log.scoreMission',
+    { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, p1Power, p2Power },
   );
 
   // Determine winner
@@ -52,7 +54,11 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
 
   if (p1Power === 0 && p2Power === 0) {
     // Both have 0 power - no winner
-    log = logSystem(log, state.turn, 'mission', 'NO_WINNER', `Neither player has power on mission ${missionIndex + 1}. No winner.`);
+    log = logSystem(log, state.turn, 'mission', 'NO_WINNER',
+      `Neither player has power on mission ${missionIndex + 1}. No winner.`,
+      'game.log.noWinner',
+      { index: missionIndex + 1 },
+    );
   } else if (p1Power > p2Power) {
     winner = 'player1';
   } else if (p2Power > p1Power) {
@@ -60,7 +66,11 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
   } else {
     // Tie - edge holder wins
     winner = state.edgeHolder;
-    log = logSystem(log, state.turn, 'mission', 'TIE_BREAK', `Tie on mission ${missionIndex + 1}. Edge holder (${state.edgeHolder}) wins.`);
+    log = logSystem(log, state.turn, 'mission', 'TIE_BREAK',
+      `Tie on mission ${missionIndex + 1}. Edge holder (${state.edgeHolder}) wins.`,
+      'game.log.tieBreak',
+      { index: missionIndex + 1 },
+    );
   }
 
   // Check minimum 1 power requirement
@@ -85,6 +95,8 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
       winner,
       'WIN_MISSION',
       `${winner} wins mission ${missionIndex + 1} for ${points} points (${mission.basePoints} base + ${mission.rankBonus} rank bonus). Total: ${ps.missionPoints}.`,
+      'game.log.winMission',
+      { index: missionIndex + 1, points, base: mission.basePoints, bonus: mission.rankBonus, total: ps.missionPoints },
     );
 
     newState = { ...newState, [winner]: ps, log };

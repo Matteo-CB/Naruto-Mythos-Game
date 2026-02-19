@@ -78,14 +78,19 @@ export default function PlayOnlinePage() {
   }, [error, clearError]);
 
   // When game starts: initialize gameStore with online state and navigate to /game
+  const playerNames = useSocketStore((s) => s.playerNames);
   const gameInitRef = useRef(false);
   useEffect(() => {
     if (gameStarted && visibleState && playerRole && !gameInitRef.current) {
       gameInitRef.current = true;
-      startOnlineGame(visibleState, playerRole);
+      const myName = session?.user?.name ?? undefined;
+      const oppName = playerNames
+        ? (playerRole === 'player1' ? playerNames.player2 : playerNames.player1)
+        : undefined;
+      startOnlineGame(visibleState, playerRole, myName, oppName);
       router.push('/game');
     }
-  }, [gameStarted, visibleState, playerRole, startOnlineGame, router]);
+  }, [gameStarted, visibleState, playerRole, startOnlineGame, router, session, playerNames]);
 
   // Auto-join room from match invite (via ?room= query param)
   useEffect(() => {

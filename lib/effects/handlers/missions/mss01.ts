@@ -62,6 +62,8 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 01 (Call for Support): No friendly character in play to receive POWERUP 2.',
+      'game.log.effect.noTarget',
+      { card: 'Appel de soutien', id: 'MSS 01' },
     );
     return { state: { ...state, log } };
   }
@@ -84,6 +86,8 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'SCORE_POWERUP',
     `MSS 01 (Call for Support): POWERUP 2 on ${targetChar.card.name_fr} in mission ${targetMissionIndex}.`,
+    'game.log.score.powerup',
+    { card: 'Appel de soutien', amount: 2, target: targetChar.card.name_fr },
   );
 
   return { state: { ...state, activeMissions: missions, log } };

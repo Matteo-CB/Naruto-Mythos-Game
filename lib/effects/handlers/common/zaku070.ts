@@ -1,5 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
+import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 070/130 - ZAKU ABUMI (Common)
@@ -19,7 +20,18 @@ function handleZaku070Main(ctx: EffectContext): EffectResult {
   opponentState.chakra = opponentState.chakra + 1;
   newState[opponentPlayer] = opponentState;
 
-  return { state: newState };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_CHAKRA',
+    `Zaku Abumi (070): Opponent gains 1 Chakra.`,
+    'game.log.effect.oppGainChakra',
+    { card: 'Zaku Abumi', id: '070/130', amount: '1' },
+  );
+
+  return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {

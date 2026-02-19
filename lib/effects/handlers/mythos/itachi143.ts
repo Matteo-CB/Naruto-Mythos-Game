@@ -51,6 +51,8 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (143): No friendly character in another mission to move here.',
+      'game.log.effect.noTarget',
+      { card: 'ITACHI UCHIWA', id: '143/130' },
     );
     return { state: { ...state, log } };
   }
@@ -76,6 +78,8 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_MOVE',
     `Itachi Uchiwa (143): Moved friendly ${foundChar.card.name_fr} from mission ${fromMissionIndex} to this mission (${ctx.sourceMissionIndex}).`,
+    'game.log.effect.move',
+    { card: 'ITACHI UCHIWA', id: '143/130', target: foundChar.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
   );
 
   let newState = { ...state, activeMissions: missions, log };
@@ -115,6 +119,8 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (143): No enemy character in another mission to move here (ambush).',
+      'game.log.effect.noTarget',
+      { card: 'ITACHI UCHIWA', id: '143/130' },
     );
     return { state: { ...state, log } };
   }
@@ -140,6 +146,8 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer,
     'EFFECT_MOVE',
     `Itachi Uchiwa (143): Moved enemy ${foundChar.card.name_fr} from mission ${fromMissionIndex} to this mission (${ctx.sourceMissionIndex}) (ambush).`,
+    'game.log.effect.move',
+    { card: 'ITACHI UCHIWA', id: '143/130', target: foundChar.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
   );
 
   const opponent = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
