@@ -416,9 +416,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // AI auto-decides mulligan
       const aiAction = ai.getAction(state);
       if (aiAction) {
-        const newState = GameEngine.applyAction(state, aiPlayerSide, aiAction);
-        const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
-        set({ gameState: newState, visibleState: newVisible });
+        try {
+          const newState = GameEngine.applyAction(state, aiPlayerSide, aiAction);
+          const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
+          set({ gameState: newState, visibleState: newVisible });
+        } catch (err) {
+          console.error('[gameStore] AI mulligan error:', err);
+        }
       }
     }
   },
@@ -446,7 +450,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       addAnimation(animEvent);
     }
 
-    const newState = GameEngine.applyAction(gameState, humanPlayer, action);
+    let newState: GameState;
+    try {
+      newState = GameEngine.applyAction(gameState, humanPlayer, action);
+    } catch (err) {
+      console.error('[gameStore] performAction error:', err);
+      set({ isProcessing: false });
+      return;
+    }
     const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
 
     set({
@@ -596,67 +607,71 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const maxIterations = 20; // Safety limit
     const aiAnimations: Array<Omit<AnimationEvent, 'id' | 'timestamp'>> = [];
 
-    while (iterations < maxIterations) {
-      // Check if AI has pending target selections to resolve first
-      const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
-      if (aiPending.length > 0) {
-        // AI auto-resolves: pick first valid target (simple for Easy/Medium, could be smarter)
-        const pendingAction = aiPending[0];
-        if (pendingAction.options.length > 0) {
-          const selectedTarget = pendingAction.options[0]; // Pick first option
-          currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
-            type: 'SELECT_TARGET',
-            pendingActionId: pendingAction.id,
-            selectedTargets: [selectedTarget],
+    try {
+      while (iterations < maxIterations) {
+        // Check if AI has pending target selections to resolve first
+        const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
+        if (aiPending.length > 0) {
+          // AI auto-resolves: pick first valid target (simple for Easy/Medium, could be smarter)
+          const pendingAction = aiPending[0];
+          if (pendingAction.options.length > 0) {
+            const selectedTarget = pendingAction.options[0]; // Pick first option
+            currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+              type: 'SELECT_TARGET',
+              pendingActionId: pendingAction.id,
+              selectedTargets: [selectedTarget],
+            });
+            iterations++;
+            continue;
+          }
+        }
+
+        // Check if it's the AI's turn
+        const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
+        if (aiActions.length === 0) break;
+
+        // Check if human also needs to act (during mulligan both can act)
+        if (currentState.phase !== 'mulligan') {
+          const humanActions = GameEngine.getValidActions(currentState, humanPlayer);
+          if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
+        }
+
+        const aiAction = aiPlayer.getAction(currentState);
+        if (!aiAction) break;
+
+        // Capture animation for this AI action
+        const animEvent = getAnimationForAIAction(aiAction, currentState, aiPlayer.player);
+        if (animEvent) {
+          aiAnimations.push(animEvent);
+        }
+
+        currentState = GameEngine.applyAction(currentState, aiPlayer.player, aiAction);
+
+        if (currentState.phase === 'gameOver') {
+          // Queue all AI animations
+          for (const anim of aiAnimations) {
+            addAnimation(anim);
+          }
+          addAnimation({
+            type: 'game-end',
+            data: { winner: GameEngine.getWinner(currentState) },
           });
-          iterations++;
-          continue;
+
+          const visible = GameEngine.getVisibleState(currentState, humanPlayer);
+          set({
+            gameState: currentState,
+            visibleState: visible,
+            gameOver: true,
+            winner: GameEngine.getWinner(currentState),
+            isProcessing: false,
+          });
+          return;
         }
+
+        iterations++;
       }
-
-      // Check if it's the AI's turn
-      const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
-      if (aiActions.length === 0) break;
-
-      // Check if human also needs to act (during mulligan both can act)
-      if (currentState.phase !== 'mulligan') {
-        const humanActions = GameEngine.getValidActions(currentState, humanPlayer);
-        if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
-      }
-
-      const aiAction = aiPlayer.getAction(currentState);
-      if (!aiAction) break;
-
-      // Capture animation for this AI action
-      const animEvent = getAnimationForAIAction(aiAction, currentState, aiPlayer.player);
-      if (animEvent) {
-        aiAnimations.push(animEvent);
-      }
-
-      currentState = GameEngine.applyAction(currentState, aiPlayer.player, aiAction);
-
-      if (currentState.phase === 'gameOver') {
-        // Queue all AI animations
-        for (const anim of aiAnimations) {
-          addAnimation(anim);
-        }
-        addAnimation({
-          type: 'game-end',
-          data: { winner: GameEngine.getWinner(currentState) },
-        });
-
-        const visible = GameEngine.getVisibleState(currentState, humanPlayer);
-        set({
-          gameState: currentState,
-          visibleState: visible,
-          gameOver: true,
-          winner: GameEngine.getWinner(currentState),
-          isProcessing: false,
-        });
-        return;
-      }
-
-      iterations++;
+    } catch (err) {
+      console.error('[gameStore] processAITurn error:', err);
     }
 
     // Queue all collected AI animations
