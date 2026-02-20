@@ -30,7 +30,8 @@
     "profile": "My Profile",
     "friends": "Friends",
     "bugReport": "Report a Bug",
-    "adminCards": "Card Management"
+    "adminCards": "Card Management",
+    "signOut": "Sign Out"
   },
   "game": {
     "turn": "Turn {turn}",
