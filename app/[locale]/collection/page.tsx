@@ -207,7 +207,7 @@ export default function CollectionPage() {
                 </div>
 
                 {/* Card info */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 font-body">
                   <h2 className="text-xl font-bold text-[#e0e0e0]">{selectedCard.name_fr}</h2>
                   <p className="text-sm text-[#888888] mb-3">{selectedCard.title_fr}</p>
 

@@ -38,7 +38,7 @@ function LogEntry({ entry, formatPhase, playerDisplayNames }: {
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex items-start gap-2 px-3 py-1.5 text-xs"
+      className="flex items-start gap-2 px-3 py-1.5 text-xs font-body"
       style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
     >
       <span className="shrink-0 tabular-nums" style={{ color: '#555555' }}>
@@ -88,20 +88,22 @@ export function GameLog() {
 
   return (
     <>
-      {/* Toggle button — positioned above the right side piles */}
-      <button
-        onClick={toggleGameLog}
-        className="fixed top-10 right-4 z-40 rounded-lg px-3 py-2 text-xs font-medium cursor-pointer"
-        style={{
-          backgroundColor: 'rgba(10, 10, 14, 0.8)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          backdropFilter: 'blur(8px)',
-          color: '#888888',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
-        }}
-      >
-        {showGameLog ? t('common.cancel') : t('game.log.title')}
-      </button>
+      {/* Toggle button — positioned above the right side piles (only visible when log is closed) */}
+      {!showGameLog && (
+        <button
+          onClick={toggleGameLog}
+          className="fixed top-10 right-4 z-40 rounded-lg px-3 py-2 text-xs font-medium cursor-pointer"
+          style={{
+            backgroundColor: 'rgba(10, 10, 14, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(8px)',
+            color: '#888888',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          {t('game.log.title')}
+        </button>
+      )}
 
       {/* Log panel */}
       <AnimatePresence>
