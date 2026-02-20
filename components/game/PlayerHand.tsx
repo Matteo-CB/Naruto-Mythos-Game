@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -41,7 +42,9 @@ function HandCard({
   const translateX = offset * 48; // spacing between cards
   const arcY = Math.abs(offset) * 3; // Arc curve
 
-  const imagePath = card.image_file
+  const { bannedIds } = useBannedCards();
+  const isBanned = bannedIds.has(card.id);
+  const imagePath = !isBanned && card.image_file
     ? (card.image_file.replace(/\\/g, '/').startsWith('/') ? card.image_file.replace(/\\/g, '/') : `/${card.image_file.replace(/\\/g, '/')}`)
     : null;
 

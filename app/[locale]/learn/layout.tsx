@@ -9,6 +9,8 @@ const FAQ_EN = [
   { q: 'How do hidden characters work?', a: 'Hidden characters are played face-down for 1 chakra. They have 0 power for scoring. You can reveal them later by paying their full chakra cost, triggering MAIN and AMBUSH effects.' },
   { q: 'What is a character upgrade?', a: 'You can play a higher-cost version of the same character over an existing one, paying only the cost difference. This triggers MAIN and UPGRADE effects.' },
   { q: 'How are missions scored?', a: 'During the Mission Phase, each mission is evaluated. The player with more total power wins the mission and earns its points (base + rank bonus). Ties go to the Edge token holder.' },
+  { q: 'What card rarities exist in Naruto Mythos TCG?', a: 'There are 7 rarities: Common (C), Uncommon (UC), Rare (R), Rare Art (RA), Secret (S), Mythos (M), and Legendary. Each rarity has unique artwork and increasingly powerful effects.' },
+  { q: 'How does the ELO ranking system work?', a: 'The ELO system rates players based on competitive match results. Win against higher-rated players to gain more points. The system uses an adaptive K-factor (32 below 2000 ELO, 16 above) for balanced progression.' },
 ];
 
 const FAQ_FR = [
@@ -18,32 +20,43 @@ const FAQ_FR = [
   { q: 'Comment fonctionnent les personnages caches ?', a: "Les personnages caches sont joues face cachee pour 1 chakra. Ils ont 0 puissance pour le score. Vous pouvez les reveler plus tard en payant leur cout complet en chakra, declenchant les effets MAIN et AMBUSH." },
   { q: "Qu'est-ce qu'une evolution de personnage ?", a: "Vous pouvez jouer une version plus couteuse du meme personnage par-dessus un existant, en ne payant que la difference de cout. Cela declenche les effets MAIN et UPGRADE." },
   { q: 'Comment les missions sont-elles evaluees ?', a: "Pendant la Phase de Mission, chaque mission est evaluee. Le joueur avec le plus de puissance totale remporte la mission et gagne ses points (base + bonus de rang). Les egalites vont au detenteur du jeton Edge." },
+  { q: 'Quelles raretes de cartes existent dans Naruto Mythos TCG ?', a: "Il existe 7 raretes : Commune (C), Peu Commune (UC), Rare (R), Rare Art (RA), Secrete (S), Mythos (M) et Legendaire. Chaque rarete possede des illustrations uniques et des effets de plus en plus puissants." },
+  { q: 'Comment fonctionne le systeme de classement ELO ?', a: "Le systeme ELO evalue les joueurs en fonction des resultats de matchs competitifs. Gagnez contre des joueurs mieux classes pour obtenir plus de points. Le systeme utilise un facteur K adaptatif (32 en dessous de 2000 ELO, 16 au-dessus) pour une progression equilibree." },
 ];
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
 
+  const title = locale === 'fr'
+    ? 'Apprendre les Regles - Tutoriel Complet | Naruto Mythos TCG'
+    : 'Learn the Rules - Complete Tutorial | Naruto Mythos TCG';
+
+  const description = locale === 'fr'
+    ? 'Maitrisez les regles du Naruto Mythos TCG avec notre tutoriel interactif complet. Apprenez les 4 phases de jeu (Debut, Action, Mission, Fin), les types d\'effets de cartes (MAIN, UPGRADE, AMBUSH, SCORE), le systeme de chakra et de puissance, les mecaniques de personnages caches, les evolutions de personnage et les strategies avancees. Comprenez le jeton Edge, le scoring des missions de rang D a A, la construction de deck et les tactiques de bluff. Guide complet pour debutants et joueurs avances du jeu de cartes Naruto Shippuden.'
+    : 'Master Naruto Mythos TCG rules with our complete interactive tutorial. Learn the 4 game phases (Start, Action, Mission, End), card effect types (MAIN, UPGRADE, AMBUSH, SCORE), the chakra and power system, hidden character mechanics, character upgrades, and advanced strategies. Understand the Edge token, mission scoring from D to A rank, deck building, and bluffing tactics. Complete guide for beginners and advanced players of the Naruto Shippuden card game.';
+
   return {
-    title: locale === 'fr' ? 'Apprendre les Regles - Naruto Mythos TCG' : 'Learn the Rules - Naruto Mythos TCG',
-    description: locale === 'fr'
-      ? 'Maitrisez les regles du Naruto Mythos TCG avec des lecons interactives. Comprenez les phases, types de cartes, effets, missions et strategies.'
-      : 'Master Naruto Mythos TCG rules with interactive lessons. Understand phases, card types, effects, missions, and advanced strategies.',
+    title,
+    description,
     alternates: {
       canonical: `${SITE_URL}/${locale}/learn`,
       languages: { en: `${SITE_URL}/en/learn`, fr: `${SITE_URL}/fr/learn` },
     },
     openGraph: {
-      title: locale === 'fr' ? 'Apprendre les Regles - Naruto Mythos TCG' : 'Learn the Rules - Naruto Mythos TCG',
-      description: locale === 'fr'
-        ? 'Maitrisez les regles du Naruto Mythos TCG avec des lecons interactives. Comprenez les phases, types de cartes, effets, missions et strategies.'
-        : 'Master Naruto Mythos TCG rules with interactive lessons. Understand phases, card types, effects, missions, and advanced strategies.',
+      title,
+      description,
+      url: `${SITE_URL}/${locale}/learn`,
+      images: [{ url: '/images/og-image.webp', width: 1200, height: 630, alt: locale === 'fr' ? 'Apprendre les regles - Naruto Mythos TCG' : 'Learn the Rules - Naruto Mythos TCG' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }
 
 export default function Layout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
-  // We need to resolve params synchronously for layout — use a server component approach
-  // The FAQ JSON-LD is rendered here so it's available to search engines
   return (
     <>
       <FAQJsonLd params={params} />

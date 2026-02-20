@@ -29,7 +29,8 @@
     "discord": "Discord",
     "profile": "Mon Profil",
     "friends": "Amis",
-    "bugReport": "Signaler un Bug"
+    "bugReport": "Signaler un Bug",
+    "adminCards": "Gestion des Cartes"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -65,6 +66,7 @@
       "playHiddenCharacter": "Jouer face cachee (1 chakra)",
       "revealCharacter": "Reveler un personnage cache",
       "upgradeCharacter": "Ameliorer un personnage",
+      "upgrade": "Evoluer",
       "passAction": "Passer (terminer vos actions)"
     },
     "log": {
@@ -802,6 +804,20 @@
         "fixed": "Corrige",
         "wontfix": "Non corrige"
       }
+    }
+  },
+  "adminCards": {
+    "title": "Gestion des Cartes",
+    "forbidden": "Acces refuse.",
+    "search": "Rechercher des cartes...",
+    "authorized": "Autorisee",
+    "banned": "Interdite",
+    "bannedCount": "{count} carte(s) interdite(s)",
+    "noCards": "Aucune carte ne correspond a vos filtres.",
+    "filter": {
+      "all": "Toutes",
+      "banned": "Interdites",
+      "authorized": "Autorisees"
     }
   }
 }

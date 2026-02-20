@@ -10,6 +10,7 @@ import type {
   PlayerID,
   MissionRank,
 } from '@/lib/engine/types';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 
 // ----- Sub-components -----
 
@@ -28,6 +29,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
   const visibleState = useGameStore((s) => s.visibleState);
+  const { bannedIds } = useBannedCards();
   const isProcessing = useGameStore((s) => s.isProcessing);
 
   const isMyTurn =
@@ -59,8 +61,10 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
   };
 
   // Image path: show for ANY card that has card data + image_file (own or opponent visible)
+  // Banned cards always show card back (no image)
+  const isBanned = hasCardData && character.card ? bannedIds.has(character.card.id) : false;
   const imagePath =
-    hasCardData && character.card?.image_file
+    !isBanned && hasCardData && character.card?.image_file
       ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
       : null;
 

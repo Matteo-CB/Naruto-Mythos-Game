@@ -114,3 +114,9 @@ model BugReport {
   status      String   @default("open")
   createdAt   DateTime @default(now())
 }
+
+model BannedCard {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  cardId   String   @unique
+  bannedAt DateTime @default(now())
+}

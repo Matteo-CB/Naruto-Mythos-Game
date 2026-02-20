@@ -5,20 +5,13 @@ import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 
-// Featured cards that cycle on each page refresh
-const FEATURED_CARDS = [
-  { src: '/images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Legendary', rarity: 'legendary' as const },
-  { src: '/images/rare/108-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Rare Art 108/130', rarity: 'rare' as const },
-  { src: '/images/secret/133-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Secret 133/130', rarity: 'secret' as const },
-  { src: '/images/secret/136-130_SASUKE_UCHIWA.webp', alt: 'Sasuke Uchiha — Secret 136/130', rarity: 'secret' as const },
-  { src: '/images/secret/137-130_KAKASHI_HATAKE.webp', alt: 'Kakashi Hatake — Secret 137/130', rarity: 'secret' as const },
-  { src: '/images/secret/135-130_SAKURA_HARUNO.webp', alt: 'Sakura Haruno — Secret 135/130', rarity: 'secret' as const },
-];
+// Featured card displayed on the home page
+const FEATURED_CARD = { src: '/images/rare/108-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Rare 108/130', rarity: 'rare' as const };
 
 // Cloud positions — only cloud-2, cloud-5, cloud-6
 const cloudPositions = [
@@ -84,7 +77,7 @@ export default function Home() {
   const t = useTranslations('home');
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
-  const featuredCard = useMemo(() => FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)], []);
+  const featuredCard = FEATURED_CARD;
 
   useEffect(() => {
     setMounted(true);
@@ -279,6 +272,44 @@ export default function Home() {
                 </motion.div>
               ))}
             </motion.nav>
+
+            {/* Admin link (only visible to admin) */}
+            {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
+              <motion.div
+                className="mt-2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 1.35, ease: 'easeOut' }}
+              >
+                <Link
+                  href="/admin/cards"
+                  className="group relative flex h-12 items-center justify-center overflow-hidden text-base font-semibold tracking-wide transition-all"
+                  style={{
+                    backgroundColor: '#141414',
+                    border: '1px solid #ef4444',
+                    color: '#ef4444',
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1.03)';
+                    target.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.15)';
+                    target.style.backgroundColor = '#1a1a1a';
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1)';
+                    target.style.boxShadow = 'none';
+                    target.style.backgroundColor = '#141414';
+                  }}
+                >
+                  <span
+                    className="absolute left-0 top-0 h-full w-1 transition-all"
+                    style={{ backgroundColor: '#ef4444' }}
+                  />
+                  {t('adminCards')}
+                </Link>
+              </motion.div>
+            )}
 
             {/* Divider */}
             <motion.div

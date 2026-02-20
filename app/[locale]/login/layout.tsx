@@ -1,23 +1,28 @@
 import type { Metadata } from 'next';
 
+const SITE_URL = 'https://narutomythosgame.com';
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const SITE_URL = 'https://narutomythosgame.com';
+
+  const title = locale === 'fr'
+    ? 'Connexion - Accedez a votre Compte | Naruto Mythos TCG'
+    : 'Sign In - Access Your Account | Naruto Mythos TCG';
+
+  const description = locale === 'fr'
+    ? 'Connectez-vous a votre compte Naruto Mythos TCG pour acceder au multijoueur en ligne, sauvegarder et charger vos decks personnalises, consulter votre classement ELO, votre historique de matchs et votre liste d\'amis. Rejoignez la communaute de joueurs et competez dans les matchs classes.'
+    : 'Sign in to your Naruto Mythos TCG account to access online multiplayer, save and load your custom decks, check your ELO ranking, match history, and friends list. Join the player community and compete in ranked matches.';
 
   return {
-    title: locale === 'fr' ? 'Connexion - Naruto Mythos TCG' : 'Sign In - Naruto Mythos TCG',
-    description: locale === 'fr'
-      ? 'Connectez-vous a votre compte Naruto Mythos TCG pour jouer en ligne, sauvegarder vos decks et suivre votre classement ELO.'
-      : 'Sign in to your Naruto Mythos TCG account to play online, save decks, and track your ELO ranking.',
+    title,
+    description,
     alternates: {
       canonical: `${SITE_URL}/${locale}/login`,
       languages: { en: `${SITE_URL}/en/login`, fr: `${SITE_URL}/fr/login` },
     },
     openGraph: {
-      title: locale === 'fr' ? 'Connexion - Naruto Mythos TCG' : 'Sign In - Naruto Mythos TCG',
-      description: locale === 'fr'
-        ? 'Connectez-vous a votre compte Naruto Mythos TCG pour jouer en ligne, sauvegarder vos decks et suivre votre classement ELO.'
-        : 'Sign in to your Naruto Mythos TCG account to play online, save decks, and track your ELO ranking.',
+      title,
+      description,
     },
     robots: { index: false },
   };

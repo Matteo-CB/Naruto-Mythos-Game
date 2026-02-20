@@ -8,6 +8,7 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { Footer } from '@/components/Footer';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 
 type AnyCard = CardData;
@@ -32,6 +33,7 @@ export default function CollectionPage() {
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const { bannedIds } = useBannedCards();
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -132,12 +134,14 @@ export default function CollectionPage() {
         {/* Card grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
           {filteredCards.map((card) => {
-            const imgPath = getImagePath(card);
+            const isBanned = bannedIds.has(card.id);
+            const imgPath = isBanned ? null : getImagePath(card);
             return (
               <button
                 key={card.id}
                 onClick={() => setSelectedCard(card)}
                 className={`relative ${card.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group`}
+                style={{ opacity: isBanned ? 0.5 : 1 }}
               >
                 {imgPath ? (
                   <img
@@ -149,6 +153,10 @@ export default function CollectionPage() {
                     width={140}
                     height={196}
                   />
+                ) : isBanned ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-1" style={{ backgroundColor: '#1a1a1a' }}>
+                    <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>MYTHOS</div>
+                  </div>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center p-1">
                     <div className="w-8 h-10 bg-[#1a1a1a] mb-1" />
@@ -183,7 +191,7 @@ export default function CollectionPage() {
               <div className={selectedCard.card_type === 'mission' ? 'flex flex-col gap-4' : 'flex gap-4'}>
                 {/* Card image */}
                 <div className={selectedCard.card_type === 'mission' ? 'w-full' : 'w-40 shrink-0'}>
-                  {getImagePath(selectedCard) ? (
+                  {!bannedIds.has(selectedCard.id) && getImagePath(selectedCard) ? (
                     <img
                       src={getImagePath(selectedCard)!}
                       alt={selectedCard.name_fr}
