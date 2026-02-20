@@ -500,15 +500,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           });
         } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-          // Cards are stored at end of discard pile; description JSON has topCards info
+          // Cards are stored at end of discard pile; effectDescription JSON has topCards info
           let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
           try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
           const playerDiscard = newState[humanPlayer].discardPile;
-          const numDrawn = topCardsInfo.length;
+          const numDrawn = topCardsInfo.length || 3;
           const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
-            const card = drawnCards[idx];
+            const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
+            const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
             return {
               index: idx,
               card: card ? {
@@ -516,6 +517,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 chakra: card.chakra,
                 power: card.power,
                 image_file: card.image_file,
+              } : info ? {
+                name_fr: info.name,
+                chakra: info.chakra,
+                power: info.power,
               } : { name_fr: '???' },
             };
           });

@@ -298,11 +298,20 @@ export class EffectEngine {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
 
+    // Extract human-readable description (some handlers store JSON with a .text field)
+    let actionDescription = result.description ?? '';
+    try {
+      const parsed = JSON.parse(actionDescription);
+      if (parsed && typeof parsed.text === 'string') {
+        actionDescription = parsed.text;
+      }
+    } catch { /* not JSON, use as-is */ }
+
     const pendingAction: PendingAction = {
       id: actionId,
       type: actionType,
       player,
-      description: result.description ?? '',
+      description: actionDescription,
       options: result.validTargets ?? [],
       minSelections: 1,
       maxSelections: 1,
