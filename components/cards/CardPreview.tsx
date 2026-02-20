@@ -2,8 +2,10 @@
 
 import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
+import CardBack from './CardBack';
 
 // ---------------------
 // Utility
@@ -51,13 +53,15 @@ export interface CardPreviewProps {
   visible: boolean;
   position?: { x: number; y: number };
   powerTokens?: number;
+  banned?: boolean;
 }
 
 // ---------------------
 // Component
 // ---------------------
-function CardPreviewInner({ card, visible, position, powerTokens = 0 }: CardPreviewProps) {
+function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = false }: CardPreviewProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const imageSrc = useMemo(
     () => (card ? normalizeImagePath(card.image_file) : null),
     [card?.image_file]
@@ -99,7 +103,9 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0 }: CardPrev
                 overflow: 'hidden',
               }}
             >
-              {card.has_visual && imageSrc ? (
+              {banned ? (
+                <CardBack />
+              ) : card.has_visual && imageSrc ? (
                 <img
                   src={imageSrc}
                   alt={card.name_fr}
@@ -258,7 +264,12 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0 }: CardPrev
                     paddingTop: '8px',
                   }}
                 >
-                  {card.effects.map((effect: CardEffect, idx: number) => (
+                  {card.effects.map((effect: CardEffect, idx: number) => {
+                    const frDescriptions = effectDescriptionsFr[card.id];
+                    const description = locale === 'fr' && frDescriptions?.[idx]
+                      ? frDescriptions[idx]
+                      : effect.description;
+                    return (
                     <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '6px' : 0 }}>
                       <span
                         style={{
@@ -279,10 +290,11 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0 }: CardPrev
                           lineHeight: 1.4,
                         }}
                       >
-                        {effect.description}
+                        {description}
                       </span>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 

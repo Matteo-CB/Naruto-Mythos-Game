@@ -29,7 +29,8 @@
     "discord": "Discord",
     "profile": "My Profile",
     "friends": "Friends",
-    "bugReport": "Report a Bug"
+    "bugReport": "Report a Bug",
+    "adminCards": "Card Management"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -65,6 +66,7 @@
       "playHiddenCharacter": "Play face-down (1 chakra)",
       "revealCharacter": "Reveal hidden character",
       "upgradeCharacter": "Upgrade character",
+      "upgrade": "Upgrade",
       "passAction": "Pass (end your actions)"
     },
     "log": {
@@ -1118,6 +1120,20 @@
         "fixed": "Fixed",
         "wontfix": "Won't Fix"
       }
+    }
+  },
+  "adminCards": {
+    "title": "Card Management",
+    "forbidden": "Access denied.",
+    "search": "Search cards...",
+    "authorized": "Authorized",
+    "banned": "Banned",
+    "bannedCount": "{count} card(s) banned",
+    "noCards": "No cards match your filters.",
+    "filter": {
+      "all": "All",
+      "banned": "Banned",
+      "authorized": "Authorized"
     }
   }
 }

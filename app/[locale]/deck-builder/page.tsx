@@ -10,6 +10,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { Footer } from '@/components/Footer';
 import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { useDeckBuilderStore } from '@/stores/deckBuilderStore';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
@@ -42,6 +43,7 @@ export default function DeckBuilderPage() {
   const canAddChar = useDeckBuilderStore((s) => s.canAddChar);
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
+  const { bannedIds } = useBannedCards();
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -63,15 +65,16 @@ export default function DeckBuilderPage() {
   }, [addError, clearAddError]);
 
   const filteredChars = useMemo(() => {
-    if (!searchQuery) return availableChars;
+    const chars = availableChars.filter((c) => !bannedIds.has(c.id));
+    if (!searchQuery) return chars;
     const q = searchQuery.toLowerCase();
-    return availableChars.filter(
+    return chars.filter(
       (c) =>
         c.name_fr.toLowerCase().includes(q) ||
         c.title_fr.toLowerCase().includes(q) ||
         c.id.includes(q),
     );
-  }, [availableChars, searchQuery]);
+  }, [availableChars, searchQuery, bannedIds]);
 
   const validation = useMemo(() => {
     return validateDeck(deckChars, deckMissions);
@@ -315,7 +318,7 @@ export default function DeckBuilderPage() {
             {t('deckBuilder.missions', { count: availableMissions.length })}
           </p>
           <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-1 mb-4">
-            {availableMissions.map((m) => {
+            {availableMissions.filter((m) => !bannedIds.has(m.id)).map((m) => {
               const mImgPath = getImagePath(m);
               const check = canAddMission(m);
               return (

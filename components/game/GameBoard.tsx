@@ -6,19 +6,21 @@ import { useTranslations, useLocale } from "next-intl";
 import { useGameStore } from "@/stores/gameStore";
 import { useUIStore } from "@/stores/uiStore";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
-import { GameInfo } from "./GameInfo";
 import { PlayerHand } from "./PlayerHand";
 import { OpponentHand } from "./OpponentHand";
+import { PlayerStatsBar } from "./PlayerStatsBar";
+import { OpponentStatsBar } from "./OpponentStatsBar";
 import { MissionLane } from "./MissionLane";
 import { ActionBar } from "./ActionBar";
 import { MulliganDialog } from "./MulliganDialog";
 import { GameEndScreen } from "./GameEndScreen";
 import { GameLog } from "./GameLog";
-import { TurnOverlay } from "./TurnOverlay";
 import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
+import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
+import { useBannedCards } from "@/lib/hooks/useBannedCards";
 
 // ----- Shared color maps -----
 
@@ -63,9 +65,12 @@ function CardPreviewContent({
   const unpinCard = useUIStore((s) => s.unpinCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
 
+  const { bannedIds } = useBannedCards();
+
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
-  const imagePath = card.image_file
+  const isBanned = bannedIds.has(card.id);
+  const imagePath = !isBanned && card.image_file
     ? card.image_file.replace(/\\/g, "/").startsWith("/")
       ? card.image_file.replace(/\\/g, "/")
       : `/${card.image_file.replace(/\\/g, "/")}`
@@ -480,13 +485,16 @@ function FullscreenCardDetail() {
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
 
+  const { bannedIds } = useBannedCards();
+
   if (!showFullscreenCard || !pinnedCard) return null;
 
   const card = pinnedCard;
   const missionContext = pinnedMissionContext;
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
-  const imagePath = card.image_file
+  const isBanned = bannedIds.has(card.id);
+  const imagePath = !isBanned && card.image_file
     ? card.image_file.replace(/\\/g, "/").startsWith("/")
       ? card.image_file.replace(/\\/g, "/")
       : `/${card.image_file.replace(/\\/g, "/")}`
@@ -875,7 +883,7 @@ export default function GameBoard() {
   const visibleState = useGameStore((s) => s.visibleState);
   const gameOver = useGameStore((s) => s.gameOver);
   const isProcessing = useGameStore((s) => s.isProcessing);
-  const showTurnTransition = useUIStore((s) => s.showTurnTransition);
+  const addAnimation = useGameStore((s) => s.addAnimation);
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
 
@@ -885,11 +893,14 @@ export default function GameBoard() {
     if (visibleState) {
       const currentTurn = visibleState.turn;
       if (prevTurnRef.current !== null && prevTurnRef.current !== currentTurn) {
-        showTurnTransition(t("game.turn", { turn: currentTurn }));
+        addAnimation({
+          type: 'turn-transition',
+          data: { turn: currentTurn },
+        });
       }
       prevTurnRef.current = currentTurn;
     }
-  }, [visibleState?.turn, showTurnTransition, visibleState, t]);
+  }, [visibleState?.turn, addAnimation, visibleState]);
 
   // Clicking the board background unpins
   const handleBoardClick = useCallback(() => {
@@ -916,7 +927,7 @@ export default function GameBoard() {
     );
   }
 
-  const { myState, opponentState, activeMissions, phase } = visibleState;
+  const { myState, opponentState, activeMissions } = visibleState;
 
   return (
     <div
@@ -935,20 +946,13 @@ export default function GameBoard() {
         style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }}
       />
 
-      <aside
-        className="shrink-0 overflow-y-auto relative z-10"
-        style={{
-          width: "190px",
-          borderRight: "1px solid rgba(255, 255, 255, 0.05)",
-          backgroundColor: "rgba(8, 8, 12, 0.88)",
-          backdropFilter: "blur(12px)",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <GameInfo />
-      </aside>
+      {/* Left side: Opponent deck + discard */}
+      <OpponentSidePiles />
 
       <main className="flex-1 flex flex-col min-w-0 relative z-10">
+        {/* Opponent stats bar */}
+        <OpponentStatsBar />
+
         {/* Opponent hand */}
         <section
           className="shrink-0 flex items-center justify-center py-1"
@@ -1027,13 +1031,18 @@ export default function GameBoard() {
         >
           <PlayerHand hand={myState.hand} chakra={myState.chakra} />
         </section>
+
+        {/* Player stats bar */}
+        <PlayerStatsBar />
       </main>
+
+      {/* Right side: Player deck + discard */}
+      <PlayerSidePiles />
 
       <CardPreview />
       <FullscreenCardDetail />
 
       <MulliganDialog />
-      <TurnOverlay />
       <GameLog />
       <AnimationController />
       <TargetSelector />

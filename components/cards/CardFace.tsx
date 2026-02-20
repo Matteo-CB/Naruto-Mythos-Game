@@ -1,7 +1,10 @@
 'use client';
 
 import { memo, useMemo } from 'react';
+import { useLocale } from 'next-intl';
 import type { CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
+import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import CardBack from './CardBack';
 
 // ---------------------
 // Utility: normalize image_file path from backslash JSON to a valid URL
@@ -34,12 +37,19 @@ export interface CardFaceProps {
   powerTokens?: number;
   className?: string;
   showEffects?: boolean;
+  banned?: boolean;
 }
 
 // ---------------------
 // Component
 // ---------------------
-function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false }: CardFaceProps) {
+function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false, banned = false }: CardFaceProps) {
+  const locale = useLocale();
+
+  // Banned cards always show card back
+  if (banned) {
+    return <CardBack className={className} />;
+  }
   const imageSrc = useMemo(() => normalizeImagePath(card.image_file), [card.image_file]);
   const rarityColor = RARITY_COLORS[card.rarity] || '#6b7280';
   const totalPower = card.card_type === 'character' ? (card.power ?? 0) + powerTokens : 0;
@@ -299,7 +309,12 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             overflow: 'auto',
           }}
         >
-          {card.effects.map((effect, idx) => (
+          {card.effects.map((effect, idx) => {
+            const frDescriptions = effectDescriptionsFr[card.id];
+            const description = locale === 'fr' && frDescriptions?.[idx]
+              ? frDescriptions[idx]
+              : effect.description;
+            return (
             <div key={idx} style={{ marginBottom: '3px' }}>
               <span
                 style={{
@@ -318,10 +333,11 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
                   lineHeight: 1.3,
                 }}
               >
-                {effect.description}
+                {description}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
