@@ -8,21 +8,23 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { Footer } from '@/components/Footer';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 
 type AnyCard = CardData;
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'M', 'Legendary', 'Mission'];
+const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RART', 'S', 'SV', 'M', 'L', 'MMS'];
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888',
   UC: '#4a9e4a',
   R: '#4a7ab5',
-  RA: '#8a5ab5',
+  RART: '#8a5ab5',
   S: '#c4a35a',
+  SV: '#c4a35a',
   M: '#b33e3e',
-  Legendary: '#c4a35a',
-  Mission: '#5a8ab5',
+  L: '#c4a35a',
+  MMS: '#5a8ab5',
 };
 
 export default function CollectionPage() {
@@ -68,11 +70,7 @@ export default function CollectionPage() {
     });
   }, [allCards, filterRarity, filterGroup, searchQuery]);
 
-  const getImagePath = (card: AnyCard): string | null => {
-    if (!card.image_file) return null;
-    const normalized = card.image_file.replace(/\\/g, '/');
-    return normalized.startsWith('/') ? normalized : '/' + normalized;
-  };
+  const getImagePath = (card: AnyCard): string | null => normalizeImagePath(card.image_file);
 
   return (
     <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">

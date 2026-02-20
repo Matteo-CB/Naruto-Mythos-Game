@@ -251,7 +251,17 @@
     "failedToLoad": "Failed to load deck",
     "failedToDelete": "Failed to delete deck",
     "savedDeckInfo": "{cards} cards, {missions} missions",
-    "remove": "Remove"
+    "remove": "Remove",
+    "importCode": "Import from code",
+    "importTitle": "Quick Import",
+    "importDesc": "Build your deck on the online deck builder, export the code, and paste it below.",
+    "importVisit": "Open Deck Builder",
+    "importPlaceholder": "Paste your export code here...",
+    "importButton": "Import",
+    "importSuccess": "Deck imported: {name} ({chars} characters, {missions} missions)",
+    "importError": "Invalid import code",
+    "importNotFound": "{count} card(s) not found: {ids}",
+    "orBuildManually": "Or build your deck manually"
   },
   "playAI": {
     "title": "Play vs AI",

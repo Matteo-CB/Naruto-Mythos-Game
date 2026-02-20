@@ -1,22 +1,27 @@
 /**
  * Common card effect handlers index.
- * Registers all 48 common card handlers with the effect registry.
+ * Registers all 54 common card handlers with the effect registry.
  */
 
 import { registerHandler as registerHiruzen001 } from './hiruzen001';
 import { registerHandler as registerTsunade003 } from './tsunade003';
+import { registerHandler as registerShizune005 } from './shizune005';
 import { registerHandler as registerJiraiya007 } from './jiraiya007';
 import { registerHandler as registerNaruto009 } from './naruto009';
 import { registerHandler as registerSakura011 } from './sakura011';
 import { registerHandler as registerSasuke013 } from './sasuke013';
 import { registerHandler as registerKakashi015 } from './kakashi015';
+import { registerHandler as registerChoji017 } from './choji017';
 import { registerHandler as registerIno019 } from './ino019';
 import { registerHandler as registerShikamaru021 } from './shikamaru021';
 import { registerHandler as registerAsuma023 } from './asuma023';
 import { registerHandler as registerKiba025 } from './kiba025';
 import { registerHandler as registerAkamaru027 } from './akamaru027';
+import { registerHandler as registerHinata030 } from './hinata030';
+import { registerHandler as registerShino032 } from './shino032';
 import { registerHandler as registerKurenai034 } from './kurenai034';
 import { registerHandler as registerNeji036 } from './neji036';
+import { registerHandler as registerRockLee038 } from './rockLee038';
 import { registerHandler as registerTenten040 } from './tenten040';
 import { registerHandler as registerGai042 } from './gai042';
 import { registerHandler as registerAnko044 } from './anko044';
@@ -25,6 +30,7 @@ import { registerHandler as registerIruka047 } from './iruka047';
 import { registerHandler as registerHayate048 } from './hayate048';
 import { registerHandler as registerGenma049 } from './genma049';
 import { registerHandler as registerOrochimaru050 } from './orochimaru050';
+import { registerHandler as registerKabuto052 } from './kabuto052';
 import { registerHandler as registerKimimaro055 } from './kimimaro055';
 import { registerHandler as registerJirobo057 } from './jirobo057';
 import { registerHandler as registerKidomaru059 } from './kidomaru059';
@@ -60,18 +66,23 @@ export function registerAllCommonHandlers(): void {
   // Leaf Village characters
   registerHiruzen001();    // 001/130 - HIRUZEN SARUTOBI: POWERUP 2 another Leaf Village
   registerTsunade003();    // 003/130 - TSUNADE: [continuous] On friendly defeat, gain 2 chakra
+  registerShizune005();    // 005/130 - SHIZUNE: [continuous] CHAKRA +1
   registerJiraiya007();    // 007/130 - JIRAYA: Play a Summon paying 1 less
   registerNaruto009();     // 009/130 - NARUTO UZUMAKI: No effects
   registerSakura011();     // 011/130 - SAKURA HARUNO: Draw if Team 7 in mission
   registerSasuke013();     // 013/130 - SASUKE UCHIWA: [continuous] -1 Power per friendly in mission
   registerKakashi015();    // 015/130 - KAKASHI HATAKE: [continuous] Team 7 +1 Power
+  registerChoji017();      // 017/130 - CHOJI AKIMICHI: POWERUP 3 self
   registerIno019();        // 019/130 - INO YAMANAKA: POWERUP 1 if Team 10 in mission
   registerShikamaru021();  // 021/130 - SHIKAMARU NARA: Draw if has Edge
   registerAsuma023();      // 023/130 - ASUMA SARUTOBI: Move Team 10 from this mission
   registerKiba025();       // 025/130 - KIBA INUZUKA: [continuous] CHAKRA +1 if Akamaru present
   registerAkamaru027();    // 027/130 - AKAMARU: [continuous] Return to hand if no Kiba
+  registerHinata030();     // 030/130 - HINATA HYUGA: Remove up to 2 Power tokens from enemy
+  registerShino032();      // 032/130 - SHINO ABURAME: Each player draws a card
   registerKurenai034();    // 034/130 - YUHI KURENAI: [continuous] Team 8 costs 1 less
   registerNeji036();       // 036/130 - NEJI HYUGA: Remove up to 2 Power tokens from enemy
+  registerRockLee038();    // 038/130 - ROCK LEE: AMBUSH POWERUP 1 self
   registerTenten040();     // 040/130 - TENTEN: [continuous] Play only in winning mission
   registerGai042();        // 042/130 - GAI MAITO: [continuous] Team Guy +1 Power
   registerAnko044();       // 044/130 - ANKO MITARASHI: [continuous] CHAKRA +1 if Leaf ally
@@ -82,6 +93,7 @@ export function registerAllCommonHandlers(): void {
 
   // Sound Village characters
   registerOrochimaru050(); // 050/130 - OROCHIMARU: AMBUSH look/steal hidden enemy
+  registerKabuto052();     // 052/130 - KABUTO YAKUSHI: AMBUSH steal top of opponent deck
   registerKimimaro055();   // 055/130 - KIMIMARO: AMBUSH discard to hide character
   registerJirobo057();     // 057/130 - JIROBO: POWERUP X (Sound Four missions)
   registerKidomaru059();   // 059/130 - KIDOMARU: Move X friendly (Sound Four missions)

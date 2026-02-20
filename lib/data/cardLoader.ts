@@ -78,7 +78,7 @@ const NAME_CORRECTIONS: Record<string, string> = {
 // Stat corrections from official site (cost, power, rarity, title)
 const STAT_CORRECTIONS: Record<string, { chakra?: number; power?: number; rarity?: RawRarity; title_fr?: string; group?: string }> = {
   'Legendary': { chakra: 6, power: 6, group: 'Leaf Village' },
-  '108/130': { chakra: 5, power: 5, rarity: 'RA', title_fr: 'Believe it!' },
+  '108/130': { chakra: 5, power: 5, title_fr: 'Believe it!' },
   '108/130 A': { chakra: 5, power: 5, title_fr: 'Believe it!' },
   '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },
   '112/130': { chakra: 5, power: 4, group: 'Leaf Village' },
@@ -102,6 +102,22 @@ const MISSION_BASE_POINTS: Record<string, number> = {
   'MSS 10': 1,
 };
 
+// Current set code
+const CURRENT_SET = 'KS';
+
+// Map raw JSON rarity to normalized rarity code
+const RARITY_MAP: Record<string, CardData['rarity']> = {
+  'C': 'C',
+  'UC': 'UC',
+  'R': 'R',
+  'RA': 'RART',
+  'S': 'S',
+  'SV': 'SV',
+  'M': 'M',
+  'Legendary': 'L',
+  'Mission': 'MMS',
+};
+
 // Legendary card is in the JSON with id "Legendary" — corrections above add its stats/effects
 
 function normalizeImagePath(imagePath?: string): string | undefined {
@@ -117,13 +133,22 @@ function normalizeCard(raw: RawCardData): CardData {
   const correctedName = NAME_CORRECTIONS[raw.id];
   const statCorrection = STAT_CORRECTIONS[raw.id];
 
+  const rawRarity = statCorrection?.rarity ?? raw.rarity;
+  const rarity = RARITY_MAP[rawRarity] ?? rawRarity as CardData['rarity'];
+  // Use csvId from JSON if present (aligned with external deck builder),
+  // otherwise compute from number + rarity
+  const cardId = (raw as unknown as { csvId?: string }).csvId
+    || `${CURRENT_SET}-${String(raw.number).padStart(3, '0')}-${rarity}`;
+
   return {
     id: raw.id,
+    cardId,
+    set: CURRENT_SET,
     number: raw.number,
     name_fr: correctedName ?? raw.name_fr,
     title_fr: statCorrection?.title_fr ?? raw.title_fr ?? '',
     name_en: raw.name_en,
-    rarity: (statCorrection?.rarity ?? raw.rarity) as CardData['rarity'],
+    rarity,
     card_type: raw.card_type,
     has_visual: raw.has_visual || !!raw.image_file,
     chakra: statCorrection?.chakra ?? raw.chakra ?? 0,

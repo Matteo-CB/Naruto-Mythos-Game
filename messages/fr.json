@@ -251,7 +251,17 @@
     "failedToLoad": "Echec du chargement du deck",
     "failedToDelete": "Echec de la suppression du deck",
     "savedDeckInfo": "{cards} cartes, {missions} missions",
-    "remove": "Retirer"
+    "remove": "Retirer",
+    "importCode": "Importer depuis un code",
+    "importTitle": "Importation rapide",
+    "importDesc": "Construisez votre deck sur le deck builder en ligne, exportez le code et collez-le ci-dessous.",
+    "importVisit": "Ouvrir le Deck Builder",
+    "importPlaceholder": "Collez votre code d'export ici...",
+    "importButton": "Importer",
+    "importSuccess": "Deck importe : {name} ({chars} personnages, {missions} missions)",
+    "importError": "Code d'import invalide",
+    "importNotFound": "{count} carte(s) introuvable(s) : {ids}",
+    "orBuildManually": "Ou construisez votre deck manuellement"
   },
   "playAI": {
     "title": "Jouer contre l'IA",

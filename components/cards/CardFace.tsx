@@ -5,15 +5,7 @@ import { useLocale } from 'next-intl';
 import type { CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import CardBack from './CardBack';
-
-// ---------------------
-// Utility: normalize image_file path from backslash JSON to a valid URL
-// ---------------------
-function normalizeImagePath(imageFile?: string): string | null {
-  if (!imageFile) return null;
-  const normalized = imageFile.replace(/\\/g, '/');
-  return normalized.startsWith('/') ? normalized : `/${normalized}`;
-}
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 // ---------------------
 // Rarity bar color mapping (no gradients, solid colors only)
@@ -22,11 +14,12 @@ const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
   UC: '#22c55e',      // green
   R: '#3b82f6',       // blue
-  RA: '#a855f7',      // purple
+  RART: '#a855f7',    // purple
   S: '#eab308',       // gold
+  SV: '#eab308',      // gold
   M: '#ef4444',       // red
-  Legendary: '#eab308', // gold
-  Mission: '#6b7280',   // gray
+  L: '#eab308',       // gold
+  MMS: '#6b7280',     // gray
 };
 
 // ---------------------
