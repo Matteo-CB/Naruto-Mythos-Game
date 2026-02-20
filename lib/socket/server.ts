@@ -197,10 +197,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Determine which player this socket is
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
 
-      // Validate it's this player's turn
-      if (room.gameState.activePlayer !== player && room.gameState.phase === 'action') {
-        socket.emit('game:error', { message: 'Not your turn' });
-        return;
+      // Validate it's this player's turn (or they have pending actions to resolve)
+      const hasPendingAction = room.gameState.pendingActions.some((p: { player: string }) => p.player === player);
+      if (room.gameState.activePlayer !== player && !hasPendingAction) {
+        if (room.gameState.phase === 'action') {
+          socket.emit('game:error', { message: 'Not your turn' });
+          return;
+        }
       }
 
       try {

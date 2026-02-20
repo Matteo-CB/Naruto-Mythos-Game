@@ -153,6 +153,10 @@ export class GameEngine {
         // Handle target selections for SCORE effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
+          // Auto-advance to end phase when all SCORE effects are resolved
+          if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
+            newState = GameEngine.transitionToEndPhase(newState);
+          }
         }
         break;
 
@@ -390,9 +394,9 @@ export class GameEngine {
       }
 
       case 'mission':
-      case 'end':
-        // Handle pending actions
-        return state.pendingActions
+      case 'end': {
+        // Handle pending actions (SELECT_TARGET + DECLINE for optional effects)
+        const actions: GameAction[] = state.pendingActions
           .filter((p) => p.player === player)
           .flatMap((p) => {
             return p.options.map((opt) => ({
@@ -401,6 +405,18 @@ export class GameEngine {
               selectedTargets: [opt],
             }));
           });
+        // Also allow declining optional effects (same pattern as action phase)
+        const pendingEffects = state.pendingEffects.filter(
+          (e) => e.sourcePlayer === player && e.isOptional && !e.resolved,
+        );
+        for (const e of pendingEffects) {
+          actions.push({
+            type: 'DECLINE_OPTIONAL_EFFECT' as const,
+            pendingEffectId: e.id,
+          });
+        }
+        return actions;
+      }
 
       default:
         return [];

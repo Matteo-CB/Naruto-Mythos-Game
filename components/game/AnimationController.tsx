@@ -27,7 +27,7 @@ function getAnimationDuration(type: AnimationType): number {
     case 'card-play':
       return 900;
     case 'card-reveal':
-      return 1000;
+      return 1200;
     case 'card-defeat':
       return 1100;
     case 'card-hide':
@@ -70,61 +70,95 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
   const cardName = (data.cardName as string) || 'Card';
   const isHidden = data.hidden === true;
   const missionRank = (data.missionRank as string) || '';
+  const cardImage = data.cardImage as string | null;
 
   return (
     <motion.div
       key="card-play"
-      initial={{ opacity: 0, y: 60, scale: 0.7 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -30, scale: 0.9 }}
-      transition={{ type: 'spring', stiffness: 180, damping: 18 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
-      <div
-        className="flex flex-col items-center gap-2 px-8 py-5 rounded-lg"
-        style={{
-          backgroundColor: 'rgba(10, 10, 10, 0.9)',
-          border: '1px solid #333333',
-          boxShadow: '0 8px 40px rgba(0, 0, 0, 0.7)',
-        }}
-      >
-        <motion.span
-          className="text-sm font-medium uppercase tracking-wider"
-          style={{ color: '#888888' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          {isHidden ? t('game.anim.cardPlayedHidden') : t('game.anim.cardPlayed')}
-        </motion.span>
-        <motion.span
-          className="text-2xl font-bold"
-          style={{ color: isHidden ? '#888888' : '#c4a35a' }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
-        >
-          {isHidden ? '???' : cardName}
-        </motion.span>
-        {missionRank && (
-          <motion.span
-            className="text-xs"
-            style={{ color: '#555555' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
-          >
-            {t('game.board.missionRank', { rank: missionRank })}
-          </motion.span>
-        )}
-        {/* Arc motion line */}
+      <div className="flex flex-col items-center gap-3">
+        {/* Physical card sliding up from bottom */}
         <motion.div
-          className="h-px w-24"
-          style={{ backgroundColor: isHidden ? '#333333' : '#c4a35a' }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
-        />
+          className="rounded-lg overflow-hidden"
+          style={{
+            width: '120px',
+            height: '168px',
+            boxShadow: isHidden
+              ? '0 8px 40px rgba(0, 0, 0, 0.8)'
+              : '0 8px 40px rgba(196, 163, 90, 0.4), 0 0 20px rgba(196, 163, 90, 0.2)',
+            border: isHidden ? '2px solid #333333' : '2px solid rgba(196, 163, 90, 0.5)',
+          }}
+          initial={{ y: 200, scale: 0.6, opacity: 0 }}
+          animate={{ y: 0, scale: 1, opacity: 1 }}
+          exit={{ y: -60, scale: 0.85, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 160, damping: 16 }}
+        >
+          {isHidden ? (
+            <img
+              src="/images/card-back.webp"
+              alt="Hidden card"
+              className="w-full h-full"
+              style={{ objectFit: 'cover' }}
+              draggable={false}
+            />
+          ) : cardImage ? (
+            <img
+              src={cardImage}
+              alt={cardName}
+              className="w-full h-full"
+              style={{ objectFit: 'cover' }}
+              draggable={false}
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: '#1a1a20' }}
+            >
+              <img
+                src="/images/card-back.webp"
+                alt={cardName}
+                className="w-full h-full"
+                style={{ objectFit: 'cover', opacity: 0.5 }}
+                draggable={false}
+              />
+            </div>
+          )}
+        </motion.div>
+
+        {/* Card name label */}
+        <motion.div
+          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
+          style={{
+            backgroundColor: 'rgba(10, 10, 10, 0.9)',
+            border: '1px solid #333333',
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <span
+            className="text-[10px] font-medium uppercase tracking-wider"
+            style={{ color: '#888888' }}
+          >
+            {isHidden ? t('game.anim.cardPlayedHidden') : t('game.anim.cardPlayed')}
+          </span>
+          <span
+            className="text-sm font-bold"
+            style={{ color: isHidden ? '#888888' : '#c4a35a' }}
+          >
+            {isHidden ? '???' : cardName}
+          </span>
+          {missionRank && (
+            <span className="text-[10px]" style={{ color: '#555555' }}>
+              {t('game.board.missionRank', { rank: missionRank })}
+            </span>
+          )}
+        </motion.div>
       </div>
     </motion.div>
   );
@@ -133,6 +167,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
 function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const cardName = (data.cardName as string) || 'Card';
+  const cardImage = data.cardImage as string | null;
 
   return (
     <motion.div
@@ -143,44 +178,98 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
-      <div className="relative flex flex-col items-center gap-3">
-        {/* Flip effect frame */}
+      <div className="flex flex-col items-center gap-3" style={{ perspective: '800px' }}>
+        {/* 3D card flip: face-down -> face-up */}
         <motion.div
-          className="px-10 py-6 rounded-lg flex flex-col items-center gap-2"
+          className="relative rounded-lg overflow-hidden"
+          style={{
+            width: '130px',
+            height: '182px',
+            transformStyle: 'preserve-3d',
+          }}
+          initial={{ rotateY: 180, scale: 0.9 }}
+          animate={{ rotateY: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+        >
+          {/* Front face (card art) */}
+          <div
+            className="absolute inset-0 rounded-lg overflow-hidden"
+            style={{
+              backfaceVisibility: 'hidden',
+              boxShadow: '0 8px 40px rgba(179, 62, 62, 0.4), 0 0 20px rgba(179, 62, 62, 0.2)',
+              border: '2px solid rgba(179, 62, 62, 0.5)',
+            }}
+          >
+            {cardImage ? (
+              <img
+                src={cardImage}
+                alt={cardName}
+                className="w-full h-full"
+                style={{ objectFit: 'cover' }}
+                draggable={false}
+              />
+            ) : (
+              <img
+                src="/images/card-back.webp"
+                alt={cardName}
+                className="w-full h-full"
+                style={{ objectFit: 'cover', opacity: 0.5 }}
+                draggable={false}
+              />
+            )}
+          </div>
+          {/* Back face (face-down) */}
+          <div
+            className="absolute inset-0 rounded-lg overflow-hidden"
+            style={{
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              border: '2px solid #333333',
+            }}
+          >
+            <img
+              src="/images/card-back.webp"
+              alt="Card back"
+              className="w-full h-full"
+              style={{ objectFit: 'cover' }}
+              draggable={false}
+            />
+          </div>
+        </motion.div>
+
+        {/* Glow pulse during flip */}
+        <motion.div
+          className="absolute rounded-lg"
+          style={{
+            width: '130px',
+            height: '182px',
+            boxShadow: '0 0 30px rgba(179, 62, 62, 0.5)',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.8, 0] }}
+          transition={{ duration: 0.7, times: [0, 0.5, 1] }}
+        />
+
+        {/* Label */}
+        <motion.div
+          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
-            border: '1px solid #333333',
-            boxShadow: '0 8px 40px rgba(0, 0, 0, 0.7)',
+            border: '1px solid rgba(179, 62, 62, 0.3)',
           }}
-          initial={{ rotateY: 90, opacity: 0 }}
-          animate={{ rotateY: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 150, damping: 15, delay: 0.1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
         >
-          <motion.span
-            className="text-sm font-medium uppercase tracking-wider"
+          <span
+            className="text-[10px] font-medium uppercase tracking-wider"
             style={{ color: '#b33e3e' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
           >
             {t('game.anim.revealed')}
-          </motion.span>
-          <motion.span
-            className="text-2xl font-bold"
-            style={{ color: '#e0e0e0' }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.35, type: 'spring' }}
-          >
+          </span>
+          <span className="text-sm font-bold" style={{ color: '#e0e0e0' }}>
             {cardName}
-          </motion.span>
-          <motion.div
-            className="h-px w-20"
-            style={{ backgroundColor: '#b33e3e' }}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.4, duration: 0.3 }}
-          />
+          </span>
         </motion.div>
       </div>
     </motion.div>
@@ -348,6 +437,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const cardName = (data.cardName as string) || 'Card';
   const previousName = (data.previousName as string) || '';
+  const cardImage = data.cardImage as string | null;
 
   return (
     <motion.div
@@ -358,54 +448,72 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
       transition={{ duration: 0.2 }}
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
-      <motion.div
-        className="px-10 py-6 rounded-lg flex flex-col items-center gap-2"
-        style={{
-          backgroundColor: 'rgba(10, 10, 10, 0.9)',
-          border: '1px solid #3e8b3e',
-          boxShadow: '0 0 30px rgba(62, 139, 62, 0.2)',
-        }}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 180, damping: 16 }}
-      >
-        <motion.span
-          className="text-sm font-medium uppercase tracking-wider"
-          style={{ color: '#3e8b3e' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
-        >
-          {t('game.anim.upgrade')}
-        </motion.span>
-        {previousName && (
-          <motion.span
-            className="text-xs"
-            style={{ color: '#555555' }}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: [1, 0], y: -10 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            {previousName}
-          </motion.span>
-        )}
-        <motion.span
-          className="text-2xl font-bold"
-          style={{ color: '#3e8b3e' }}
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, type: 'spring' }}
-        >
-          {cardName}
-        </motion.span>
+      <div className="flex flex-col items-center gap-3">
+        {/* Card image sliding in over the old card */}
         <motion.div
-          className="h-px w-24"
-          style={{ backgroundColor: '#3e8b3e' }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 0.35, duration: 0.3 }}
-        />
-      </motion.div>
+          className="rounded-lg overflow-hidden"
+          style={{
+            width: '120px',
+            height: '168px',
+            boxShadow: '0 8px 40px rgba(62, 139, 62, 0.4), 0 0 20px rgba(62, 139, 62, 0.2)',
+            border: '2px solid rgba(62, 139, 62, 0.5)',
+          }}
+          initial={{ y: 150, scale: 0.7, opacity: 0 }}
+          animate={{ y: 0, scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 160, damping: 16 }}
+        >
+          {cardImage ? (
+            <img
+              src={cardImage}
+              alt={cardName}
+              className="w-full h-full"
+              style={{ objectFit: 'cover' }}
+              draggable={false}
+            />
+          ) : (
+            <img
+              src="/images/card-back.webp"
+              alt={cardName}
+              className="w-full h-full"
+              style={{ objectFit: 'cover', opacity: 0.5 }}
+              draggable={false}
+            />
+          )}
+        </motion.div>
+
+        {/* Label */}
+        <motion.div
+          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
+          style={{
+            backgroundColor: 'rgba(10, 10, 10, 0.9)',
+            border: '1px solid rgba(62, 139, 62, 0.3)',
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <span
+            className="text-[10px] font-medium uppercase tracking-wider"
+            style={{ color: '#3e8b3e' }}
+          >
+            {t('game.anim.upgrade')}
+          </span>
+          {previousName && (
+            <motion.span
+              className="text-[10px]"
+              style={{ color: '#555555' }}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0, y: -8 }}
+              transition={{ delay: 0.4, duration: 0.4 }}
+            >
+              {previousName}
+            </motion.span>
+          )}
+          <span className="text-sm font-bold" style={{ color: '#3e8b3e' }}>
+            {cardName}
+          </span>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -707,29 +815,57 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
       transition={{ duration: 0.15 }}
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
-      <motion.div
-        className="flex flex-col items-center gap-1"
-        initial={{ y: -30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 20, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-      >
-        <span
-          className="text-sm font-medium uppercase tracking-wider"
-          style={{ color: '#888888' }}
+      <div className="flex flex-col items-center gap-3">
+        {/* Physical card shapes sliding down */}
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="rounded"
+              style={{
+                width: '48px',
+                height: '68px',
+                backgroundColor: '#1a1a20',
+                border: '1px solid #333333',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)',
+              }}
+              initial={{ y: -80, opacity: 0, rotate: -10 + i * 5 }}
+              animate={{ y: 0, opacity: 1, rotate: 0 }}
+              transition={{
+                delay: i * 0.08,
+                type: 'spring',
+                stiffness: 200,
+                damping: 16,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Label */}
+        <motion.div
+          className="flex items-center gap-2 px-4 py-1.5 rounded-md"
+          style={{
+            backgroundColor: 'rgba(10, 10, 10, 0.9)',
+            border: '1px solid #333333',
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          {t('game.anim.cardsDrawn')}
-        </span>
-        <motion.span
-          className="text-3xl font-bold tabular-nums"
-          style={{ color: '#e0e0e0' }}
-          initial={{ scale: 0.5 }}
-          animate={{ scale: [0.5, 1.1, 1] }}
-          transition={{ duration: 0.35, times: [0, 0.6, 1] }}
-        >
-          +{count}
-        </motion.span>
-      </motion.div>
+          <span
+            className="text-[10px] font-medium uppercase tracking-wider"
+            style={{ color: '#888888' }}
+          >
+            {t('game.anim.cardsDrawn')}
+          </span>
+          <span
+            className="text-lg font-bold tabular-nums"
+            style={{ color: '#e0e0e0' }}
+          >
+            +{count}
+          </span>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }

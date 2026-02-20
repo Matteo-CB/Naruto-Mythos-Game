@@ -1,7 +1,8 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
 
 // ---------------------
@@ -53,6 +54,7 @@ function MissionCardInner({
   highlight = false,
 }: MissionCardProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const imageSrc = useMemo(() => normalizeImagePath(card.image_file), [card.image_file]);
   const totalPoints = card.basePoints + rankBonus;
   const hasImage = card.has_visual && imageSrc;
@@ -252,7 +254,12 @@ function MissionCardInner({
             padding: '4px 6px',
           }}
         >
-          {card.effects.map((effect: CardEffect, idx: number) => (
+          {card.effects.map((effect: CardEffect, idx: number) => {
+            const frDescriptions = effectDescriptionsFr[card.id];
+            const description = locale === 'fr' && frDescriptions?.[idx]
+              ? frDescriptions[idx]
+              : effect.description;
+            return (
             <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '2px' : 0 }}>
               <span
                 style={{
@@ -272,10 +279,11 @@ function MissionCardInner({
                   lineHeight: 1.3,
                 }}
               >
-                {effect.description}
+                {description}
               </span>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

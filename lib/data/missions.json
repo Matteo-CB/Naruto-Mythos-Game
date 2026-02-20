@@ -13,7 +13,7 @@
         "description": "[↯] POWERUP 2 a character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M1_Call-for-support-1920w.png",
+    "image_url": "/images/mission/MSS_01_Appel_de_soutien.webp",
     "image_file": "images\\mission\\MSS_01_Appel_de_soutien.webp"
   },
   {
@@ -24,7 +24,7 @@
     "rarity": "Mission",
     "card_type": "mission",
     "has_visual": true,
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M2_Chunin-exam-1920w.png",
+    "image_url": "/images/mission/MSS_02_Examen_Chûnin.webp",
     "image_file": "images\\mission\\MSS_02_Examen_Chûnin.webp"
   },
   {
@@ -41,7 +41,7 @@
         "description": "[↯] Opponent discards a card from hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M3_Find-the-traitor-1920w.png",
+    "image_url": "/images/mission/MSS_03_Trouver_le_traître.webp",
     "image_file": "images\\mission\\MSS_03_Trouver_le_traître.webp"
   },
   {
@@ -58,7 +58,7 @@
         "description": "[↯] Defeat an enemy hidden character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M4_Assassination-1920w.png",
+    "image_url": "/images/mission/MSS_04_Assassinat.webp",
     "image_file": "images\\mission\\MSS_04_Assassinat.webp"
   },
   {
@@ -75,7 +75,7 @@
         "description": "[↯] You must return one friendly non-hidden character in this mission to your hand, if able."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M5_Bring-it-back-9b1cfeac-1920w.png",
+    "image_url": "/images/mission/MSS_05_Ramener.webp",
     "image_file": "images\\mission\\MSS_05_Ramener.webp"
   },
   {
@@ -92,7 +92,7 @@
         "description": "[↯] Draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M6_Free-a-friend-1920w.png",
+    "image_url": "/images/mission/MSS_06_Sauvetage_dun_ami.webp",
     "image_file": "images\\mission\\MSS_06_Sauvetage_dun_ami.webp"
   },
   {
@@ -109,7 +109,7 @@
         "description": "[↯] Move a friendly hidden character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M7_I-have-to-go-1920w.png",
+    "image_url": "/images/mission/MSS_07_Je_dois_partir.webp",
     "image_file": "images\\mission\\MSS_07_Je_dois_partir.webp"
   },
   {
@@ -126,7 +126,7 @@
         "description": "[↯] Put a card from your hand as a hidden character to any mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M8_Set-a-trap-1920w.png",
+    "image_url": "/images/mission/MSS_08_Tendre_un_piège.webp",
     "image_file": "images\\mission\\MSS_08_Tendre_un_piège.webp"
   },
   {
@@ -146,7 +146,7 @@
     "rarity": "Mission",
     "card_type": "mission",
     "has_visual": true,
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M10_Chakra-improvement-050bc0fb-1920w.png",
+    "image_url": "/images/mission/MSS_10_Entraînement_au_chakra.webp",
     "image_file": "images\\mission\\MSS_10_Entraînement_au_chakra.webp"
   }
 ]

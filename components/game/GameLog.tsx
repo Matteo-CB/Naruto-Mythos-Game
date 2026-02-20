@@ -88,10 +88,10 @@ export function GameLog() {
 
   return (
     <>
-      {/* Toggle button */}
+      {/* Toggle button — positioned above the right side piles */}
       <button
         onClick={toggleGameLog}
-        className="fixed bottom-4 right-4 z-40 rounded-lg px-3 py-2 text-xs font-medium cursor-pointer"
+        className="fixed top-10 right-4 z-40 rounded-lg px-3 py-2 text-xs font-medium cursor-pointer"
         style={{
           backgroundColor: 'rgba(10, 10, 14, 0.8)',
           border: '1px solid rgba(255, 255, 255, 0.08)',

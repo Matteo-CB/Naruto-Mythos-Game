@@ -256,7 +256,7 @@ describe('MSS 07 - I Have to Go', () => {
 // MSS 08 - Set a Trap: Put a card from hand as hidden character
 // ===================================================================
 describe('MSS 08 - Set a Trap', () => {
-  it('should place a card from hand as hidden character on a mission', () => {
+  it('should prompt to choose a card from hand to place as hidden character', () => {
     const handCard = mockCharacter({ name_fr: 'TrapCard' });
     const baseState = createActionPhaseState();
     const state: GameState = {
@@ -268,11 +268,10 @@ describe('MSS 08 - Set a Trap', () => {
     const handler = getEffectHandler('MSS 08', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    expect(result.state.player1.hand.length).toBe(0);
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
-    expect(result.state.activeMissions[0].player1Characters[0].isHidden).toBe(true);
-    expect(result.state.activeMissions[0].player1Characters[0].card.name_fr).toBe('TrapCard');
-    expect(result.state.player1.charactersInPlay).toBe(1);
+    // Now returns target selection: choose which card from hand
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS08_CHOOSE_CARD');
+    expect(result.validTargets).toContain('0'); // handCard at index 0
   });
 
   it('should fizzle when hand is empty', () => {
