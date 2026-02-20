@@ -349,6 +349,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
+          playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
               type: 'SELECT_TARGET',
@@ -549,6 +550,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
+          playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
               type: 'SELECT_TARGET',
