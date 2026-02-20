@@ -30,7 +30,8 @@
     "profile": "Mon Profil",
     "friends": "Amis",
     "bugReport": "Signaler un Bug",
-    "adminCards": "Gestion des Cartes"
+    "adminCards": "Gestion des Cartes",
+    "signOut": "Se deconnecter"
   },
   "game": {
     "turn": "Tour {turn}",
