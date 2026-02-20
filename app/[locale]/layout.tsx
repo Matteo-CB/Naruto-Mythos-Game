@@ -131,7 +131,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     url: 'https://hiddenlab.fr',
     logo: `${SITE_URL}/icons/icon-512x512.png`,
     sameAs: [
-      'https://discord.gg/KGMG3jADyF',
+      'https://discord.gg/BBXVUsU3hn',
     ],
   };
 
