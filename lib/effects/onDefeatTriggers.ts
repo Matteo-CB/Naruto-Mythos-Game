@@ -28,7 +28,7 @@ export function triggerOnDefeatEffects(
 
         // Tsunade 003: When any friendly character is defeated, gain 2 Chakra
         if (topCard.number === 3 && controllingPlayer === defeatedCharOwner) {
-          const hasEffect = topCard.effects.some(
+          const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
           if (hasEffect) {
@@ -53,7 +53,7 @@ export function triggerOnDefeatEffects(
 
         // Sasuke 136: When ANY character is defeated, gain 1 Chakra
         if (topCard.number === 136) {
-          const hasEffect = topCard.effects.some(
+          const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
           if (hasEffect) {

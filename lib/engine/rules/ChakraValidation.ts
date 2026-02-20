@@ -26,12 +26,12 @@ export function calculateEffectiveCost(
 
     const topCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
 
-    for (const effect of topCard.effects) {
+    for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       // Kurenai 034: Other Team 8 characters cost 1 less (min 1) in this mission
       if (topCard.number === 34 && effect.description.includes('Team 8') && effect.description.includes('less')) {
-        if (card.keywords.includes('Team 8') && card.id !== topCard.id) {
+        if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
           cost = Math.max(1, cost - 1);
         }
       }
@@ -46,7 +46,7 @@ export function calculateEffectiveCost(
   }
 
   // Self cost modifiers (the card being played)
-  for (const effect of card.effects) {
+  for (const effect of card.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
     // Gamakichi 096: Pay 1 less if Naruto in this mission

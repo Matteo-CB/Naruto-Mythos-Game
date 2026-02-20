@@ -34,7 +34,7 @@ export function calculateContinuousChakraBonus(
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
-  for (const effect of topCard.effects) {
+  for (const effect of topCard.effects ?? []) {
     if (effect.type !== 'MAIN') continue;
     if (!effect.description.includes('[⧗]')) continue;
 
@@ -81,7 +81,7 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     const hasKeyword = chars.some(
-      (c) => c.card.keywords.includes(keyword) && c.controlledBy === player,
+      (c) => (c.card.keywords ?? []).includes(keyword) && c.controlledBy === player,
     );
     if (hasKeyword) count++;
   }
@@ -120,19 +120,19 @@ export function calculateContinuousPowerModifier(
 
     const topCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
 
-    for (const effect of topCard.effects) {
+    for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       // Kakashi 015: Other Team 7 characters +1 Power
       if (topCard.number === 15 && effect.description.includes('Other Team 7')) {
-        if (char.card.keywords.includes('Team 7')) {
+        if ((char.card.keywords ?? []).includes('Team 7')) {
           modifier += 1;
         }
       }
 
       // Gai 042: Other Team Guy characters +1 Power
       if (topCard.number === 42 && effect.description.includes('Other Team Guy')) {
-        if (char.card.keywords.includes('Team Guy')) {
+        if ((char.card.keywords ?? []).includes('Team Guy')) {
           modifier += 1;
         }
       }
@@ -141,7 +141,7 @@ export function calculateContinuousPowerModifier(
 
   // Check self-modifiers
   const selfTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  for (const effect of selfTopCard.effects) {
+  for (const effect of selfTopCard.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
     // Sasuke 013: -1 Power per other non-hidden friendly in this mission
@@ -196,7 +196,7 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
 
   // Rock Lee 039 exception: doesn't lose power tokens if face-visible
   if (topCard.number === 39 && !char.isHidden) {
-    const hasRetention = topCard.effects.some(
+    const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
     );
     if (hasRetention) {
