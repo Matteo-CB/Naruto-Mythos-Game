@@ -6,7 +6,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 
@@ -328,27 +328,52 @@ export default function Home() {
               transition={{ duration: 0.3, delay: 1.5 }}
             >
               {session ? (
-                <Link
-                  href={`/profile/${session.user?.name ?? ''}`}
-                  className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all"
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: '1px solid #c4a35a',
-                    color: '#c4a35a',
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
-                    target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.backgroundColor = 'transparent';
-                    target.style.boxShadow = 'none';
-                  }}
-                >
-                  {t('profile')}
-                </Link>
+                <>
+                  <Link
+                    href={`/profile/${session.user?.name ?? ''}`}
+                    className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '1px solid #c4a35a',
+                      color: '#c4a35a',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                      target.style.boxShadow = '0 0 16px rgba(196, 163, 90, 0.12)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.backgroundColor = 'transparent';
+                      target.style.boxShadow = 'none';
+                    }}
+                  >
+                    {t('profile')}
+                  </Link>
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all cursor-pointer"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '1px solid #333333',
+                      color: '#888888',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.borderColor = '#ef4444';
+                      target.style.color = '#ef4444';
+                      target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.borderColor = '#333333';
+                      target.style.color = '#888888';
+                      target.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {t('signOut')}
+                  </button>
+                </>
               ) : (
                 accountButtons.map((btn) => (
                   <Link
