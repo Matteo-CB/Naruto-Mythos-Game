@@ -154,7 +154,7 @@ function matchesTargetCriteria(
   if (filters?.group && topCard.group !== filters.group) return false;
 
   // Keyword filter
-  if (filters?.keyword && !topCard.keywords.includes(filters.keyword)) return false;
+  if (filters?.keyword && !(topCard.keywords ?? []).includes(filters.keyword)) return false;
 
   return true;
 }

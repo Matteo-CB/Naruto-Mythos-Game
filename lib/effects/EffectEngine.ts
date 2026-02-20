@@ -465,6 +465,26 @@ export class EffectEngine {
         newState = EffectEngine.itachi143MoveEnemy(newState, pendingEffect, targetId);
         break;
 
+      // --- Gaara 139 (S) ---
+      case 'DEFEAT_ENEMY_BY_COST':
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      // --- Itachi 140 (S) UPGRADE ---
+      case 'DEFEAT_BY_COST_UPGRADE':
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      // --- Ino 020 (UC) ---
+      case 'TAKE_CONTROL_ENEMY_THIS_MISSION':
+        newState = EffectEngine.takeControlOfEnemy(newState, pendingEffect, targetId);
+        break;
+
+      // --- Kisame 093 (UC) ---
+      case 'STEAL_POWER_TOKENS_ENEMY_IN_PLAY':
+        newState = EffectEngine.stealTokensFromTarget(newState, pendingEffect, targetId, pendingEffect.isUpgrade ? 99 : 2);
+        break;
+
       default:
         // Unknown target selection type — log warning
         break;
@@ -1912,6 +1932,47 @@ export class EffectEngine {
         sourceEffectId: effectId,
       });
     }
+
+    return newState;
+  }
+
+  // =====================================
+  // Ino 020 — Take control of enemy character
+  // =====================================
+
+  /** Ino 020: take control of an enemy character in this mission. */
+  static takeControlOfEnemy(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    const charResult = EffectEngine.findCharByInstanceId(state, targetId);
+    if (!charResult) return state;
+
+    const newState = deepClone(state);
+    const player = pending.sourcePlayer;
+    const missionIndex = charResult.missionIndex;
+    const mission = newState.activeMissions[missionIndex];
+
+    const enemySide = charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    const targetIdx = mission[enemySide].findIndex((c: CharacterInPlay) => c.instanceId === targetId);
+    if (targetIdx === -1) return state;
+
+    const targetChar = { ...mission[enemySide][targetIdx], controlledBy: player };
+    const targetName = targetChar.card.name_fr;
+
+    mission[enemySide] = mission[enemySide].filter((_: CharacterInPlay, i: number) => i !== targetIdx);
+    mission[friendlySide] = [...mission[friendlySide], targetChar];
+
+    // Update character counts
+    newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
+    newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
+
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'EFFECT_TAKE_CONTROL',
+      `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
+      'game.log.effect.takeControl',
+      { card: 'INO YAMANAKA', id: '020/130', target: targetName },
+    );
 
     return newState;
   }

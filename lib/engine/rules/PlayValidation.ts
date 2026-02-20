@@ -47,7 +47,7 @@ export function validatePlayCharacter(
 
   // Tenten 040 special: can only play in mission where currently winning
   if (card.number === 40) {
-    const hasTentenRestriction = card.effects.some(
+    const hasTentenRestriction = (card.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('currently winning'),
     );
     if (hasTentenRestriction) {
