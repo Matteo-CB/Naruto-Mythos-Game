@@ -78,10 +78,12 @@ function getAnimationForAction(
       const card = playerState.hand[action.cardIndex];
       const mission = gameState.activeMissions[action.missionIndex];
       const missionRank = mission?.rank || '';
+      const imgPath = card?.image_file?.replace(/\\/g, '/');
       return {
         type: 'card-play',
         data: {
           cardName: card?.name_fr || 'Card',
+          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
           missionRank,
           hidden: false,
           player,
@@ -96,6 +98,7 @@ function getAnimationForAction(
         type: 'card-play',
         data: {
           cardName: 'Hidden Card',
+          cardImage: null,
           missionRank,
           hidden: true,
           player,
@@ -110,10 +113,12 @@ function getAnimationForAction(
         const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
         const char = chars.find(c => c.instanceId === action.characterInstanceId);
         if (char) {
+          const imgPath = char.card.image_file?.replace(/\\/g, '/');
           return {
             type: 'card-reveal',
             data: {
               cardName: char.card.name_fr,
+              cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
               player,
             },
           };
@@ -121,7 +126,7 @@ function getAnimationForAction(
       }
       return {
         type: 'card-reveal',
-        data: { cardName: 'Card', player },
+        data: { cardName: 'Card', cardImage: null, player },
       };
     }
 
@@ -136,10 +141,12 @@ function getAnimationForAction(
           previousName = target.card.name_fr;
         }
       }
+      const imgPath = card?.image_file?.replace(/\\/g, '/');
       return {
         type: 'card-upgrade',
         data: {
           cardName: card?.name_fr || 'Card',
+          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
           previousName,
           player,
         },
@@ -184,10 +191,12 @@ function getAnimationForAIAction(
       const card = aiState.hand[action.cardIndex];
       const mission = gameState.activeMissions[action.missionIndex];
       const missionRank = mission?.rank || '';
+      const imgPath = card?.image_file?.replace(/\\/g, '/');
       return {
         type: 'card-play',
         data: {
           cardName: card?.name_fr || 'Card',
+          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
           missionRank,
           hidden: false,
           player: aiPlayer,
@@ -202,6 +211,7 @@ function getAnimationForAIAction(
         type: 'card-play',
         data: {
           cardName: 'Hidden Card',
+          cardImage: null,
           missionRank,
           hidden: true,
           player: aiPlayer,
@@ -215,10 +225,12 @@ function getAnimationForAIAction(
         const chars = aiPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
         const char = chars.find(c => c.instanceId === action.characterInstanceId);
         if (char) {
+          const imgPath = char.card.image_file?.replace(/\\/g, '/');
           return {
             type: 'card-reveal',
             data: {
               cardName: char.card.name_fr,
+              cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
               player: aiPlayer,
             },
           };
@@ -226,16 +238,26 @@ function getAnimationForAIAction(
       }
       return {
         type: 'card-reveal',
-        data: { cardName: 'Card', player: aiPlayer },
+        data: { cardName: 'Card', cardImage: null, player: aiPlayer },
       };
     }
 
     case 'UPGRADE_CHARACTER': {
       const card = aiState.hand[action.cardIndex];
+      const mission = gameState.activeMissions[action.missionIndex];
+      let previousName = '';
+      if (mission) {
+        const chars = aiPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+        const target = chars.find(c => c.instanceId === action.targetInstanceId);
+        if (target) previousName = target.card.name_fr;
+      }
+      const imgPath = card?.image_file?.replace(/\\/g, '/');
       return {
         type: 'card-upgrade',
         data: {
           cardName: card?.name_fr || 'Card',
+          cardImage: imgPath ? (imgPath.startsWith('/') ? imgPath : `/${imgPath}`) : null,
+          previousName,
           player: aiPlayer,
         },
       };
@@ -288,7 +310,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   updateOnlineState: (visibleState: VisibleGameState) => {
-    set({ visibleState, isProcessing: false });
+    const humanPlayer = get().humanPlayer;
+    const pendingForMe = visibleState.pendingActions.filter((a) => a.player === humanPlayer);
+
+    if (pendingForMe.length > 0) {
+      const pendingAction = pendingForMe[0];
+      const pendingEffect = visibleState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
+
+      // Determine selection type for UI
+      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
+        pendingAction.type === 'DISCARD_CARD' ||
+        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      // Build hand card info for hand selection UI
+      let handCards: PendingTargetSelection['handCards'];
+      if (isHandSelection) {
+        const playerHand = visibleState.myState.hand;
+        handCards = pendingAction.options.map((indexStr) => {
+          const idx = parseInt(indexStr, 10);
+          const card = playerHand[idx];
+          return {
+            index: idx,
+            card: card ? {
+              name_fr: card.name_fr,
+              chakra: card.chakra,
+              power: card.power,
+              image_file: card.image_file,
+            } : { name_fr: '???' },
+          };
+        });
+      }
+
+      set({
+        visibleState,
+        isProcessing: false,
+        pendingTargetSelection: {
+          validTargets: pendingAction.options,
+          description: pendingAction.description,
+          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          handCards,
+          onSelect: (targetId: string) => {
+            get().performAction({
+              type: 'SELECT_TARGET',
+              pendingActionId: pendingAction.id,
+              selectedTargets: [targetId],
+            });
+          },
+          onDecline: pendingEffect?.isOptional ? () => {
+            if (pendingEffect) {
+              get().performAction({
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pendingEffect.id,
+              });
+            }
+          } : undefined,
+        },
+      });
+    } else {
+      set({ visibleState, isProcessing: false, pendingTargetSelection: null });
+    }
   },
 
   endOnlineGame: (winner: string) => {
@@ -401,20 +481,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Build hand card info for hand selection UI
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
-        const playerHand = newState[humanPlayer].hand;
-        handCards = pendingAction.options.map((indexStr) => {
-          const idx = parseInt(indexStr, 10);
-          const card = playerHand[idx];
-          return {
-            index: idx,
-            card: card ? {
-              name_fr: card.name_fr,
-              chakra: card.chakra,
-              power: card.power,
-              image_file: card.image_file,
-            } : { name_fr: '???' },
-          };
-        });
+        const tst = pendingEffect?.targetSelectionType ?? '';
+        // Sakura 109: indices are into the discard pile
+        // Sakura 135: indices are into drawn cards stored at end of discard pile (use JSON description)
+        if (tst === 'SAKURA109_CHOOSE_DISCARD') {
+          const playerDiscard = newState[humanPlayer].discardPile;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerDiscard[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'SAKURA135_CHOOSE_CARD') {
+          // Cards are stored at end of discard pile; description JSON has topCards info
+          let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
+          try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
+          const playerDiscard = newState[humanPlayer].discardPile;
+          const numDrawn = topCardsInfo.length;
+          const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = drawnCards[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else {
+          const playerHand = newState[humanPlayer].hand;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerHand[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        }
       }
 
       set({
@@ -574,17 +694,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectTarget: (targetId: string) => {
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection) {
-      pendingTargetSelection.onSelect(targetId);
+      const onSelect = pendingTargetSelection.onSelect;
+      // Clear BEFORE calling onSelect — performAction may set a NEW
+      // pendingTargetSelection for chained effects (e.g. MAIN → AMBUSH).
+      // Clearing after would wipe out the new pending.
       set({ pendingTargetSelection: null });
+      onSelect(targetId);
     }
   },
 
   declineTarget: () => {
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection?.onDecline) {
-      pendingTargetSelection.onDecline();
+      const onDecline = pendingTargetSelection.onDecline;
+      // Clear BEFORE calling onDecline — same chained-effect reasoning.
+      set({ pendingTargetSelection: null });
+      onDecline();
+    } else {
+      set({ pendingTargetSelection: null });
     }
-    set({ pendingTargetSelection: null });
   },
 
   resetGame: () => {

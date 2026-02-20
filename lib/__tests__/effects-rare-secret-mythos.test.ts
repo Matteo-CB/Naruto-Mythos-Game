@@ -292,7 +292,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 // 135/130 - SAKURA HARUNO (S): Look top 3, play best character
 // ===================================================================
 describe('135/130 - Sakura Haruno (S)', () => {
-  it('should play the highest-power character from top 3 of deck', () => {
+  it('should prompt to choose a character from top 3 of deck', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-s' }, {
       id: '135/130', number: 135, name_fr: 'Sakura Haruno', power: 4, chakra: 5,
     });
@@ -308,14 +308,18 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
     const handler = getEffectHandler('135/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
-    // D2 (power 5) should be played, D1 and D3 discarded
-    const chars = result.state.activeMissions[0].player1Characters;
-    const playedChar = chars.find(c => c.card.name_fr === 'D2');
-    expect(playedChar).toBeDefined();
-    expect(result.state.player1.discardPile.length).toBe(2);
+    // Now returns target selection: choose which character from top 3
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SAKURA135_CHOOSE_CARD');
+    // All 3 are characters, all affordable with 10 chakra
+    expect(result.validTargets!.length).toBe(3);
+    // Deck should be empty (cards were drawn)
+    expect(result.state.player1.deck.length).toBe(0);
+    // Drawn cards stored at end of discard pile
+    expect(result.state.player1.discardPile.length).toBe(3);
   });
 
-  it('should reduce cost by 4 on upgrade', () => {
+  it('should offer only affordable cards on upgrade (cost reduction 4)', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-s' }, {
       id: '135/130', number: 135, name_fr: 'Sakura', power: 4,
     });
@@ -329,10 +333,10 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
     const handler = getEffectHandler('135/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0, 'MAIN', true));
-    // Cost = 6 - 4 = 2, player had 5 chakra, should succeed
-    const played = result.state.activeMissions[0].player1Characters.find(c => c.card.name_fr === 'Expensive');
-    expect(played).toBeDefined();
-    expect(result.state.player1.chakra).toBe(3); // 5 - 2 = 3
+    // Cost = 6 - 4 = 2, player has 5 chakra — affordable
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SAKURA135_CHOOSE_CARD');
+    expect(result.validTargets).toContain('0');
   });
 
   it('should handle empty deck', () => {
@@ -508,7 +512,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 // 143/130 - ITACHI UCHIWA (M): MAIN move friendly + AMBUSH move enemy
 // ===================================================================
 describe('143/130 - Itachi Uchiwa (M)', () => {
-  it('MAIN should move a friendly character from another mission to this one', () => {
+  it('MAIN should prompt to choose a friendly character from another mission', () => {
     const itachi = mockCharInPlay({ instanceId: 'itachi-m' }, {
       id: '143/130', number: 143, name_fr: 'Itachi Uchiwa', power: 5,
     });
@@ -524,9 +528,11 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
 
     const handler = getEffectHandler('143/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', itachi, 0));
-    // friendlyElsewhere should be moved to mission 0
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(2);
-    expect(result.state.activeMissions[1].player1Characters.length).toBe(0);
+    // Now returns target selection: choose which friendly char to move
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('ITACHI143_CHOOSE_FRIENDLY');
+    expect(result.validTargets).toContain('fe-1');
+    expect(result.validTargets).not.toContain('itachi-m'); // Itachi is in this mission, not a valid target
   });
 
   it('MAIN should fizzle when no friendly in another mission', () => {
@@ -542,7 +548,7 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
 
-  it('AMBUSH should move an enemy character from another mission to this one', () => {
+  it('AMBUSH should prompt to choose an enemy character from another mission', () => {
     const itachi = mockCharInPlay({ instanceId: 'itachi-m' }, {
       id: '143/130', number: 143, name_fr: 'Itachi', power: 5,
     });
@@ -559,8 +565,10 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
     const handler = getEffectHandler('143/130', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', itachi, 0, 'AMBUSH'));
-    expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
-    expect(result.state.activeMissions[1].player2Characters.length).toBe(0);
+    // Now returns target selection: choose which enemy char to move
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('ITACHI143_CHOOSE_ENEMY');
+    expect(result.validTargets).toContain('ee-1');
   });
 });
 
@@ -615,7 +623,7 @@ describe('Non-common registry completeness', () => {
     { id: '137/130', types: ['MAIN', 'UPGRADE'] },
     { id: '143/130', types: ['MAIN', 'AMBUSH'] },
     { id: '144/130', types: ['MAIN'] },
-    { id: 'L01', types: ['MAIN'] },
+    { id: 'Legendary', types: ['MAIN'] },
   ];
 
   it.each(cardIds)('should have all handlers for $id', ({ id, types }) => {

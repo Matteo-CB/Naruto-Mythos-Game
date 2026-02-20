@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterCard } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { generateInstanceId } from '../../../engine/utils/id';
 
 /**
  * Card 135/130 - SAKURA HARUNO "Corps Medical du Village de la Feuille" (S)
@@ -12,30 +10,24 @@ import { generateInstanceId } from '../../../engine/utils/id';
  * MAIN: Look at the top 3 cards of your deck. Play one character anywhere
  *       and discard the other cards.
  *
- * MAIN "effect:": Instead, play the card paying 4 less.
- *   - The "effect:" modifier applies when this card is played as an upgrade.
- *   - When upgrading: the chosen card costs 4 less chakra to play.
+ * UPGRADE (effect:): Instead, play the card paying 4 less.
  *
- * Implementation notes:
- *   - For automated play: pick the highest-power card from the top 3 as the
- *     "best" card. Place it face-visible on the first available mission.
- *   - Full interactive target selection will be added in the UI phase.
- *   - The played card's chakra cost must be paid from the player's pool
- *     (with the 4-reduction if upgrading).
+ * Two-stage target selection:
+ *   Stage 1: SAKURA135_CHOOSE_CARD — choose which character card from top 3 to play
+ *   Stage 2: SAKURA135_CHOOSE_MISSION — choose which mission to play it on
+ *
+ * The handler draws the top 3 cards and stores them in the pending state.
+ * The EffectEngine methods handle the rest.
  */
 
 function sakura135MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
-  const playerState = { ...state[ctx.sourcePlayer] };
-  const deck = [...playerState.deck];
+  const { state, sourcePlayer } = ctx;
+  const playerState = state[sourcePlayer];
   const costReduction = ctx.isUpgrade ? 4 : 0;
 
-  if (deck.length === 0) {
+  if (playerState.deck.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
       'Sakura Haruno (135): Deck is empty, no cards to look at.',
       'game.log.effect.noTarget',
@@ -44,123 +36,66 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Look at top 3 cards
+  // Draw top 3 cards from deck
+  const newState = { ...state };
+  const ps = { ...newState[sourcePlayer] };
+  const deck = [...ps.deck];
   const topCards = deck.splice(0, Math.min(3, deck.length));
+  ps.deck = deck;
+  newState[sourcePlayer] = ps;
 
-  // Find the best character card to play (highest power)
-  let bestCardIndex = -1;
-  let bestPower = -1;
-
+  // Find character cards among them that the player can afford
+  const validIndices: string[] = [];
   for (let i = 0; i < topCards.length; i++) {
-    const card = topCards[i];
-    if (card.card_type === 'character') {
-      if (card.power > bestPower) {
-        bestPower = card.power;
-        bestCardIndex = i;
+    if (topCards[i].card_type === 'character') {
+      const cost = Math.max(0, topCards[i].chakra - costReduction);
+      if (ps.chakra >= cost) {
+        validIndices.push(String(i));
       }
     }
   }
 
-  if (bestCardIndex === -1) {
-    // No character cards in top 3 - discard all
-    playerState.deck = deck;
-    playerState.discardPile = [...playerState.discardPile, ...topCards];
-    state = {
-      ...state,
-      [ctx.sourcePlayer]: playerState,
-      log: logAction(
-        state.log,
-        state.turn,
-        state.phase,
-        ctx.sourcePlayer,
-        'EFFECT_DISCARD',
-        'Sakura Haruno (135): No character cards in top 3, all discarded.',
-        'game.log.effect.discardCards',
-        { card: 'SAKURA HARUNO', id: '135/130', count: topCards.length },
-      ),
-    };
-    return { state };
+  if (validIndices.length === 0) {
+    // No affordable character cards — discard all
+    ps.discardPile = [...ps.discardPile, ...topCards];
+    newState[sourcePlayer] = ps;
+    const log = logAction(
+      newState.log, newState.turn, newState.phase, sourcePlayer,
+      'EFFECT_DISCARD',
+      `Sakura Haruno (135): No affordable character in top ${topCards.length} cards, all discarded.`,
+      'game.log.effect.discardCards',
+      { card: 'SAKURA HARUNO', id: '135/130', count: topCards.length },
+    );
+    return { state: { ...newState, log } };
   }
 
-  const chosenCard = topCards[bestCardIndex] as CharacterCard;
-  const discardCards = topCards.filter((_, i) => i !== bestCardIndex);
+  // Store the drawn cards in the discard pile temporarily so the EffectEngine
+  // can recover them in the resolution stage. They are appended at the END of
+  // the discard pile, and the EffectEngine will splice them back out.
+  const cardInfo = topCards.map((c, i) => ({
+    index: i,
+    name: c.name_fr,
+    chakra: c.chakra,
+    power: c.card_type === 'character' ? c.power : 0,
+    isCharacter: c.card_type === 'character',
+  }));
 
-  // Calculate cost to play
-  const playCost = Math.max(0, chosenCard.chakra - costReduction);
+  ps.discardPile = [...ps.discardPile, ...topCards];
+  newState[sourcePlayer] = ps;
 
-  // Check if we can afford it
-  if (playerState.chakra < playCost) {
-    // Cannot afford, discard all
-    playerState.deck = deck;
-    playerState.discardPile = [...playerState.discardPile, ...topCards];
-    state = {
-      ...state,
-      [ctx.sourcePlayer]: playerState,
-      log: logAction(
-        state.log,
-        state.turn,
-        state.phase,
-        ctx.sourcePlayer,
-        'EFFECT_NO_CHAKRA',
-        `Sakura Haruno (135): Cannot afford to play ${chosenCard.name_fr} (cost ${playCost}). All cards discarded.`,
-        'game.log.effect.noChakra',
-        { card: 'SAKURA HARUNO', id: '135/130' },
-      ),
-    };
-    return { state };
-  }
-
-  // Pay the cost
-  playerState.chakra -= playCost;
-  playerState.deck = deck;
-  playerState.discardPile = [...playerState.discardPile, ...discardCards];
-  playerState.charactersInPlay += 1;
-
-  state = { ...state, [ctx.sourcePlayer]: playerState };
-
-  // Place the card on any mission ("play one character anywhere")
-  // Auto-resolve: pick the mission with fewest friendly characters to spread power
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  let targetMissionIndex = ctx.sourceMissionIndex;
-  let minChars = Infinity;
-  for (let mi = 0; mi < state.activeMissions.length; mi++) {
-    const count = state.activeMissions[mi][friendlySide].length;
-    if (count < minChars) {
-      minChars = count;
-      targetMissionIndex = mi;
-    }
-  }
-  const missions = [...state.activeMissions];
-  const targetMission = { ...missions[targetMissionIndex] };
-
-  const newCharacter = {
-    instanceId: generateInstanceId(),
-    card: chosenCard,
-    isHidden: false,
-    powerTokens: 0,
-    stack: [chosenCard],
-    controlledBy: ctx.sourcePlayer,
-    originalOwner: ctx.sourcePlayer,
-    missionIndex: targetMissionIndex,
+  return {
+    state: newState,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SAKURA135_CHOOSE_CARD',
+    validTargets: validIndices,
+    description: JSON.stringify({
+      text: ctx.isUpgrade
+        ? 'Sakura Haruno (135): Choose a character from the top cards to play (paying 4 less).'
+        : 'Sakura Haruno (135): Choose a character from the top cards to play.',
+      topCards: cardInfo,
+      costReduction,
+    }),
   };
-
-  targetMission[friendlySide] = [...targetMission[friendlySide], newCharacter];
-  missions[targetMissionIndex] = targetMission;
-
-  const costDesc = ctx.isUpgrade ? ` (cost reduced by 4, paid ${playCost})` : ` (paid ${playCost})`;
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'EFFECT_PLAY',
-    `Sakura Haruno (135): Played ${chosenCard.name_fr} from top of deck to mission ${targetMissionIndex}${costDesc}. Discarded ${discardCards.length} other card(s).`,
-    'game.log.effect.playFromDeck',
-    { card: 'SAKURA HARUNO', id: '135/130', target: chosenCard.name_fr, mission: `mission ${targetMissionIndex}`, cost: playCost },
-  );
-
-  return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerSakura135Handlers(): void {

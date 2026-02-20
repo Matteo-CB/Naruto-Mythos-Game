@@ -1,29 +1,27 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterCard } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { generateInstanceId } from '../../../engine/utils/id';
 
 /**
  * MSS 08 - "Tendre un piege" / "Set a Trap"
  *
  * SCORE [arrow]: Put a card from your hand as a hidden character to any mission.
- *   - The scoring player places a character card from their hand face-down (hidden)
- *     on any active mission.
+ *   - The scoring player chooses a card from their hand, then chooses a mission.
+ *   - The card is placed face-down (hidden) on the chosen mission.
  *   - No chakra cost is paid for this placement.
- *   - For automated play: pick the first card in hand and place on the first mission.
+ *
+ * Two-stage target selection:
+ *   Stage 1: MSS08_CHOOSE_CARD — choose which card from hand
+ *   Stage 2: MSS08_CHOOSE_MISSION — choose which mission to place it on
  */
 
 function mss08ScoreHandler(ctx: EffectContext): EffectResult {
-  const state = { ...ctx.state };
-  const playerState = { ...state[ctx.sourcePlayer] };
+  const { state, sourcePlayer } = ctx;
+  const playerState = state[sourcePlayer];
 
   if (playerState.hand.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 08 (Set a Trap): No cards in hand to place as hidden.',
       'game.log.effect.noTarget',
@@ -34,10 +32,7 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
 
   if (state.activeMissions.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'SCORE_NO_TARGET',
       'MSS 08 (Set a Trap): No active missions to place a character on.',
       'game.log.effect.noTarget',
@@ -46,61 +41,15 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Pick the first card from hand
-  const hand = [...playerState.hand];
-  const chosenCard = hand.shift()! as CharacterCard;
-  playerState.hand = hand;
-  playerState.charactersInPlay += 1;
-
-  // Place as hidden on any mission (auto-resolve: pick mission with fewest friendly chars)
-  const friendlySideKey: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  let targetMissionIndex = ctx.sourceMissionIndex;
-  let minChars = Infinity;
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const count = state.activeMissions[i][friendlySideKey].length;
-    if (count < minChars) {
-      minChars = count;
-      targetMissionIndex = i;
-    }
-  }
-  const missions = [...state.activeMissions];
-  const targetMission = { ...missions[targetMissionIndex] };
-
-  const friendlySide = friendlySideKey;
-
-  const newCharacter = {
-    instanceId: generateInstanceId(),
-    card: chosenCard,
-    isHidden: true,
-    powerTokens: 0,
-    stack: [chosenCard],
-    controlledBy: ctx.sourcePlayer,
-    originalOwner: ctx.sourcePlayer,
-    missionIndex: targetMissionIndex,
-  };
-
-  targetMission[friendlySide] = [...targetMission[friendlySide], newCharacter];
-  missions[targetMissionIndex] = targetMission;
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'SCORE_PLACE_HIDDEN',
-    `MSS 08 (Set a Trap): Placed ${chosenCard.name_fr} as hidden character on mission ${targetMissionIndex}.`,
-    'game.log.score.placeHidden',
-    { card: 'Tendre un piege', mission: `mission ${targetMissionIndex}` },
-  );
+  // Stage 1: choose which card from hand
+  const handIndices = playerState.hand.map((_, i) => String(i));
 
   return {
-    state: {
-      ...state,
-      activeMissions: missions,
-      [ctx.sourcePlayer]: playerState,
-      log,
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'MSS08_CHOOSE_CARD',
+    validTargets: handIndices,
+    description: 'MSS 08 (Set a Trap): Choose a card from your hand to place as a hidden character.',
   };
 }
 

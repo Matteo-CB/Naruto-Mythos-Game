@@ -108,7 +108,7 @@ describe('003/130 - Tsunade', () => {
 // 007/130 - JIRAIYA: Play a Summon paying 1 less
 // ===================================================================
 describe('007/130 - Jiraiya', () => {
-  it('should auto-play an affordable Summon from hand onto a mission', () => {
+  it('should prompt to choose a Summon from hand when affordable Summons exist', () => {
     const jiraiya = mockCharInPlay({ instanceId: 'jiraiya-1' }, {
       id: '007/130', number: 7, name_fr: 'Jiraya', group: 'Leaf Village', keywords: ['Sannin'],
     });
@@ -129,12 +129,11 @@ describe('007/130 - Jiraiya', () => {
 
     const handler = getEffectHandler('007/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jiraiya, 0));
-    // Summon was auto-played: removed from hand, placed on mission, chakra reduced by (cost - 1)
-    expect(result.state.player1.hand.length).toBe(1); // only Naruto remains
-    expect(result.state.player1.hand[0].name_fr).toBe('Naruto');
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(2); // Jiraiya + Gama Bunta
-    expect(result.state.player1.chakra).toBe(10 - 2); // cost 3 - 1 discount = 2
-    expect(result.requiresTargetSelection).toBeUndefined();
+    // Now returns target selection: choose which Summon from hand
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('JIRAIYA_CHOOSE_SUMMON');
+    expect(result.validTargets).toContain('0'); // summonCard at index 0
+    expect(result.validTargets).not.toContain('1'); // Naruto is not a Summon
   });
 
   it('should fizzle when no Summon cards in hand', () => {
@@ -696,13 +695,11 @@ describe('059/130 - Kidomaru', () => {
 
     const handler = getEffectHandler('059/130', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // X=1 (one mission with Sound Four), so 1 character moved
-    // First movable char (kidomaru at index 0) was moved from mission 0 to mission 1
-    const m0Chars = result.state.activeMissions[0].player1Characters;
-    const m1Chars = result.state.activeMissions[1].player1Characters;
-    expect(m0Chars.length + m1Chars.length).toBe(2); // total chars unchanged
-    expect(m1Chars.length).toBe(1); // one char moved to mission 1
-    expect(result.requiresTargetSelection).toBeUndefined();
+    // X=1 (one mission with Sound Four), so 1 move available
+    // Now returns target selection: choose which character to move
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KIDOMARU_CHOOSE_CHARACTER');
+    expect(result.validTargets!.length).toBe(2); // both chars in mission 0 are movable
   });
 });
 

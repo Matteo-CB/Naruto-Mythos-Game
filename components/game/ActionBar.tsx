@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -43,6 +44,20 @@ export function ActionBar() {
 
   const canAffordCard = selectedCard ? myState.chakra >= selectedCard.chakra : false;
   const canAffordHidden = myState.chakra >= 1;
+
+  // Compute upgrade targets: same name, strictly lower cost, on selected mission
+  const upgradeTargets = useMemo(() => {
+    if (!selectedCard || selectedMissionIndex === null || !visibleState?.activeMissions) return [];
+    const mission = visibleState.activeMissions[selectedMissionIndex];
+    if (!mission) return [];
+    const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+    return myChars.filter(c => {
+      if (c.controlledBy !== myPlayer) return false;
+      if (!c.card) return false;
+      return c.card.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase()
+        && c.card.chakra < selectedCard.chakra;
+    });
+  }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
 
   // Can reveal: need a hidden character selected as target
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
@@ -106,6 +121,17 @@ export function ActionBar() {
         characterInstanceId: selectedTargetId,
       });
     }
+    clearSelection();
+  };
+
+  const handleUpgrade = (targetInstanceId: string) => {
+    if (!cardAndMissionReady || !isMyTurn || hasPassed || selectedMissionIndex === null) return;
+    performAction({
+      type: 'UPGRADE_CHARACTER',
+      cardIndex: selectedCardIndex!,
+      missionIndex: selectedMissionIndex,
+      targetInstanceId,
+    });
     clearSelection();
   };
 
@@ -195,6 +221,22 @@ export function ActionBar() {
               variant="primary"
             />
           )}
+
+          {/* Upgrade button(s) */}
+          {cardAndMissionReady && upgradeTargets.map((target) => {
+            const topCard = target.card;
+            const upgradeCost = (selectedCard?.chakra ?? 0) - (topCard?.chakra ?? 0);
+            const canAffordUpgrade = myState.chakra >= upgradeCost;
+            return (
+              <ActionButton
+                key={target.instanceId}
+                label={`${t('game.actions.upgrade')} (${upgradeCost} ${t('game.chakra').toLowerCase()})`}
+                onClick={() => handleUpgrade(target.instanceId)}
+                disabled={!canAffordUpgrade}
+                variant="secondary"
+              />
+            );
+          })}
 
           {/* Play hidden button */}
           {cardAndMissionReady && (

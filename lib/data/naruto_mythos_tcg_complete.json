@@ -19,7 +19,7 @@
         "description": "POWERUP 2 another friendly Leaf Village character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/01_C_Hiruzen_Professor-9673f151-1920w.png",
+    "image_url": "/images/common/001-130_HIRUZEN_SARUTOBI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\001-130_HIRUZEN_SARUTOBI.webp"
   },
@@ -30,7 +30,24 @@
     "title_fr": "Troisième Hokage",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\002-130_HIRUZEN_SARUTOBI.webp",
+    "chakra": 5,
+    "power": 4,
+    "group": "Leaf Village",
+    "keywords": [
+      "Hokage"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Play a Leaf Village character anywhere paying 1 less."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "POWERUP 2 the character played with the MAIN effect."
+      }
+    ]
   },
   {
     "id": "003/130",
@@ -52,7 +69,7 @@
         "description": "[⧗] When any friendly character is defeated, gain 2 Chakra."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/03_C_Tsunade_Master-1920w.png",
+    "image_url": "/images/common/003-130_TSUNADE.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\003-130_TSUNADE.webp"
   },
@@ -103,7 +120,7 @@
         "description": "Play a Summon character anywhere, paying 1 less."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/07_C_Jiraiya_Toad_Sage-ecd18d0d-1920w.png",
+    "image_url": "/images/common/007-130_JIRAYA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\007-130_JIRAYA.webp"
   },
@@ -130,7 +147,7 @@
       "Team 7"
     ],
     "group": "Leaf Village",
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/9_C_Naruto_Genin-24285f41-1920w.png",
+    "image_url": "/images/common/009-130_NARUTO_UZUMAKI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\009-130_NARUTO_UZUMAKI.webp"
   },
@@ -163,7 +180,7 @@
         "description": "If there's another Team 7 character in this mission, draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/11_C_Sakura_Genin-0b7bb352-1920w.png",
+    "image_url": "/images/common/011-130_SAKURA_HARUNO.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\011-130_SAKURA_HARUNO.webp"
   },
@@ -196,7 +213,7 @@
         "description": "[⧗] This character has -1 Power for every other non-hidden friendly character in this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/13_C_Sasuke_Last-1920w.png",
+    "image_url": "/images/common/013-130_SASUKE_UCHIWA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\013-130_SASUKE_UCHIWA.webp"
   },
@@ -229,7 +246,7 @@
         "description": "[⧗] Other Team 7 characters in this mission have +1 Power."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/15_C_Kakashi_Teacher-9df8ce87-1920w.png",
+    "image_url": "/images/common/015-130_KAKASHI_HATAKE.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\015-130_KAKASHI_HATAKE.webp"
   },
@@ -280,7 +297,7 @@
         "description": "If there's another Team 10 character in this mission, POWERUP 1 ."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/19_C_Ino_Genin-1920w.png",
+    "image_url": "/images/common/019-130_INO_YAMANAKA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\019-130_INO_YAMANAKA.webp"
   },
@@ -291,7 +308,25 @@
     "title_fr": "Transposition",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\020-130_INO_YAMANAKA.webp",
+    "chakra": 3,
+    "power": 0,
+    "group": "Leaf Village",
+    "keywords": [
+      "Team 10",
+      "Jutsu"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Take control of an enemy character with cost 2 or less in this mission."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "MAIN effect: Instead, the cost limit is 3 or less."
+      }
+    ]
   },
   {
     "id": "021/130",
@@ -312,7 +347,7 @@
         "description": "If you have the Edge, draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/21_C_Shikamaru_Genin-1920w.png",
+    "image_url": "/images/common/021-130_SHIKAMARU_NARA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\021-130_SHIKAMARU_NARA.webp"
   },
@@ -345,7 +380,7 @@
         "description": "Move another Team 10 character from this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/23_C_Asuma_Teacher-1920w.png",
+    "image_url": "/images/common/023-130_ASUMA_SARUTOBI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\023-130_ASUMA_SARUTOBI.webp"
   },
@@ -378,7 +413,7 @@
         "description": "[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1 ."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/25_C_Kiba_Genin-1920w.png",
+    "image_url": "/images/common/025-130_KIBA_INUZUKA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\025-130_KIBA_INUZUKA.webp"
   },
@@ -411,7 +446,7 @@
         "description": "[⧗] If there isn't a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/27_C_Akamaru_Hound-1920w.png",
+    "image_url": "/images/common/027-130_AKAMARU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\027-130_AKAMARU.webp"
   },
@@ -449,7 +484,21 @@
     "title_fr": "Byakugan",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\031-130_HINATA_HYÛGA.webp",
+    "chakra": 3,
+    "power": 2,
+    "group": "Leaf Village",
+    "keywords": [
+      "Team 8",
+      "Kekkei Genkai"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "[⧗] When a non-hidden enemy character is played in this mission, gain 1 Chakra."
+      }
+    ]
   },
   {
     "id": "032/130",
@@ -489,7 +538,7 @@
         "description": "[⧗] Other Team 8 characters costs 1 less (min.1) to play in this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/34_C_Kurenai_Teacher-1920w.png",
+    "image_url": "/images/common/034-130_YUHI_KURENAI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\034-130_YUHI_KURENAI.webp"
   },
@@ -522,7 +571,7 @@
         "description": "Remove up to 2 Power tokens from an enemy character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/36_C_Neji_Gentle_fist-1920w.png",
+    "image_url": "/images/common/036-130_NEJI_HYÛGA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\036-130_NEJI_HYÛGA.webp"
   },
@@ -568,7 +617,7 @@
         "description": "POWERUP 2 ."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/39_UC_RockLee_Primary_Lotus-1920w.png",
+    "image_url": "/images/uncommon/039-130_ROCK_LEE.webp",
     "rarity_display": "Uncommon",
     "image_file": "images\\uncommon\\039-130_ROCK_LEE.webp"
   },
@@ -592,7 +641,7 @@
         "description": "[⧗] You can play this character only in a mission where you are currently winning."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/40_C_Tenten_Dreaming-1920w.png",
+    "image_url": "/images/common/040-130_TENTEN.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\040-130_TENTEN.webp"
   },
@@ -625,7 +674,7 @@
         "description": "[⧗] Other Team Guy characters in this mission have +1 Power."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/42_C_MightGuy_Teacher-1920w.png",
+    "image_url": "/images/common/042-130_GAÏ_MAITO.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\042-130_GAÏ_MAITO.webp"
   },
@@ -658,7 +707,7 @@
         "description": "[⧗] If you have at least one other friendly Leaf Village character in this mission, CHAKRA +1 ."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/44_C_Anko_Proctor-1920w.png",
+    "image_url": "/images/common/044-130_ANKO_MITARASHI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\044-130_ANKO_MITARASHI.webp"
   },
@@ -691,7 +740,7 @@
         "description": "If there is a friendly non-hidden character with less Power than this character in this mission, draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/46_C_Ebisu_Trainer-1920w.png",
+    "image_url": "/images/common/046-130_EBISU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\046-130_EBISU.webp"
   },
@@ -715,7 +764,7 @@
         "description": "Move a [u]Naruto Uzumaki[/u] character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/47_C_Iruka_Instructor-1920w.png",
+    "image_url": "/images/common/047-130_IRUKA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\047-130_IRUKA.webp"
   },
@@ -739,7 +788,7 @@
         "description": "[⧗] If this character would be defeated, hide it instead."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/48_C_Hayate_Shinobi-1920w.png",
+    "image_url": "/images/common/048-130_HAYATE_GEKKO.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\048-130_HAYATE_GEKKO.webp"
   },
@@ -763,7 +812,7 @@
         "description": "[⧗] If a friendly Leaf Village character in this mission would be hidden or defeated by enemy effects, you can defeat this character instead."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/49_C_Genma_Elite_Guard-1920w.png",
+    "image_url": "/images/common/049-130_GEMMA_SHIRANUI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\049-130_GEMMA_SHIRANUI.webp"
   },
@@ -787,7 +836,7 @@
         "description": "Look at a hidden enemy character in this mission. If it costs 3 or less, take control of that character and move it to your side."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/50_C_Orochimaru_Undercover-1920w.png",
+    "image_url": "/images/common/050-130_OROCHIMARU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\050-130_OROCHIMARU.webp"
   },
@@ -847,7 +896,7 @@
         "description": "Discard a card to hide a character in play with cost 3 or less."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/55_C_Kimimaro_Camelia_Dance-1920w.png",
+    "image_url": "/images/common/055-130_KIMIMARO.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\055-130_KIMIMARO.webp"
   },
@@ -880,7 +929,7 @@
         "description": "POWERUP X. X is the number of missions where you have at least one friendly Sound Four character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/57_C_Jiroubou_Bearer-1920w.png",
+    "image_url": "/images/common/057-130_JIRÔBÔ.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\057-130_JIRÔBÔ.webp"
   },
@@ -913,7 +962,7 @@
         "description": "Move X friendly character(s). X is the number of missions where you have at least one friendly Sound Four character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/59_C_Kidomaru_Bearer-1920w.png",
+    "image_url": "/images/common/059-130_KIDÔMARU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\059-130_KIDÔMARU.webp"
   },
@@ -946,7 +995,7 @@
         "description": "Draw X card(s). X is the number of missions where you have at least one friendly Sound Four character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/61_C_Sakon_Bearer-1920w.png",
+    "image_url": "/images/common/061-130_SAKON.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\061-130_SAKON.webp"
   },
@@ -988,7 +1037,7 @@
         "description": "[⧗] CHAKRA +X X is the number of missions where you have at least one friendly Sound Four character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/64_C_Tayuya_Bearer-1920w.png",
+    "image_url": "/images/common/064-130_TAYUYA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\064-130_TAYUYA.webp"
   },
@@ -1043,7 +1092,7 @@
         "description": "Defeat a hidden character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/68_C_Dosu_Superhuman-1920w.png",
+    "image_url": "/images/common/068-130_DOSU_KINUTA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\068-130_DOSU_KINUTA.webp"
   },
@@ -1076,7 +1125,7 @@
         "description": "Opponent gains 1 Chakra."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/70_C_Zaku_Shinobi-1920w.png",
+    "image_url": "/images/common/070-130_ZAKU_ABUMI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\070-130_ZAKU_ABUMI.webp"
   },
@@ -1109,7 +1158,7 @@
         "description": "Opponent draws a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/72_C_Kin_Cruel-1920w.png",
+    "image_url": "/images/common/072-130_KIN_TSUCHI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\072-130_KIN_TSUCHI.webp"
   },
@@ -1142,7 +1191,7 @@
         "description": "POWERUP X where X is the number of friendly hidden characters in this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/74_C_Gaara_Jinchuriki-1920w.png",
+    "image_url": "/images/common/074-130_GAARA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\074-130_GAARA.webp"
   },
@@ -1170,7 +1219,7 @@
         "description": "[⧗] You can play this character while hidden paying 2 less."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/75_C_Gaara_Sand_Shield-1920w.png",
+    "image_url": "/images/common/075-130_GAARA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\075-130_GAARA.webp"
   },
@@ -1203,7 +1252,7 @@
         "description": "[⧗] If there's at least one non-hidden enemy character in this mission, CHAKRA +1 ."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/77_C_Kankurou_Chakra_Threads-1920w.png",
+    "image_url": "/images/common/077-130_KANKURÔ.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\077-130_KANKURÔ.webp"
   },
@@ -1236,7 +1285,7 @@
         "description": "[⧗] If you have the Edge, this character has +2 Power."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/79_C_Temari_Kunoichi-1920w.png",
+    "image_url": "/images/common/079-130_TEMARI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\079-130_TEMARI.webp"
   },
@@ -1269,7 +1318,7 @@
         "description": "[↯] Draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/81_C_Baki_Council_Agent-1920w.png",
+    "image_url": "/images/common/081-130_BAKI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\081-130_BAKI.webp"
   },
@@ -1289,7 +1338,18 @@
     "title_fr": "Quatrième Kazekage",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\083-130_RASA.webp",
+    "chakra": 3,
+    "power": 3,
+    "group": "Sand Village",
+    "keywords": [],
+    "effects": [
+      {
+        "type": "SCORE",
+        "description": "Gain 1 Mission point if there is another friendly Sand Village character in this mission."
+      }
+    ]
   },
   {
     "id": "084/130",
@@ -1311,7 +1371,7 @@
         "description": "[⧗] This character has +2 Power if there's a friendly [u]Gaara[/u] in this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/84_C_Yashamaru_Careteaker-1920w.png",
+    "image_url": "/images/common/084-130_YASHAMARU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\084-130_YASHAMARU.webp"
   },
@@ -1338,7 +1398,7 @@
       "Rogue Ninja"
     ],
     "group": "Independent",
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/86_C_Zabuza_Kubikiribocho-1920w.png",
+    "image_url": "/images/common/086-130_ZABUZA_MOMOCHI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\086-130_ZABUZA_MOMOCHI.webp"
   },
@@ -1371,7 +1431,7 @@
         "description": "Draw 1 card. If you do, you must put 1 card from your hand on top of your deck."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/88_C_Haku_Orphan-1920w.png",
+    "image_url": "/images/common/088-130_HAKU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\088-130_HAKU.webp"
   },
@@ -1404,7 +1464,7 @@
         "description": "[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/90_C_Itachi_Akatsuki-1920w.png",
+    "image_url": "/images/common/090-130_ITACHI_UCHIWA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\090-130_ITACHI_UCHIWA.webp"
   },
@@ -1437,7 +1497,7 @@
         "description": "Remove up to 2 Power tokens from an enemy character in this mission and put them on this character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/92_C_Kisame_Rogue_Ninja-1920w.png",
+    "image_url": "/images/common/092-130_KISAME_HOSHIGAKI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\092-130_KISAME_HOSHIGAKI.webp"
   },
@@ -1448,7 +1508,25 @@
     "title_fr": "Samehada",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\093-130_KISAME_HOSHIGAKI.webp",
+    "chakra": 6,
+    "power": 6,
+    "group": "Akatsuki",
+    "keywords": [
+      "Rogue Ninja",
+      "Weapon"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Remove up to 2 Power tokens from an enemy character in play and put them on this character."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "MAIN effect: Instead, remove all Power tokens and put them on this character."
+      }
+    ]
   },
   {
     "id": "094/130",
@@ -1470,7 +1548,7 @@
         "description": "[⧗] At the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/94_C_Gamabunta_Chief_Toad-1920w.png",
+    "image_url": "/images/common/094-130_GAMA_BUNTA.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\094-130_GAMA_BUNTA.webp"
   },
@@ -1498,7 +1576,7 @@
         "description": "[⧗] At the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/95_C_Gamahiro_Armed_Toad-1920w.png",
+    "image_url": "/images/common/095-130_GAMAHIRO.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\095-130_GAMAHIRO.webp"
   },
@@ -1526,7 +1604,7 @@
         "description": "[⧗] At the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/96_C_Gamakichi_Eldest_Son-1920w.png",
+    "image_url": "/images/common/096-130_GAMAKITCHI.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\096-130_GAMAKITCHI.webp"
   },
@@ -1550,7 +1628,7 @@
         "description": "[⧗] At the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/97_C_Gamatatsu_Youngest_Son-1920w.png",
+    "image_url": "/images/common/097-130_GAMATATSU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\097-130_GAMATATSU.webp"
   },
@@ -1578,7 +1656,7 @@
         "description": "[⧗] At the end of the round, you must return this character to your hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/98_C_Katsuyu_Giant_Slug-1920w.png",
+    "image_url": "/images/common/098-130_KATSUYU.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\098-130_KATSUYU.webp"
   },
@@ -1602,7 +1680,7 @@
         "description": "[↯] Move this character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/99_C_Pakkun_Hound-1920w.png",
+    "image_url": "/images/common/099-130_PAKKUN.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\099-130_PAKKUN.webp"
   },
@@ -1626,7 +1704,7 @@
         "description": "[⧗] When this character moves to a different mission, look at a hidden character in that mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/100_C_Ninja_Hound-1920w.png",
+    "image_url": "/images/common/100-130_CHIENS_NINJAS.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\100-130_CHIENS_NINJAS.webp"
   },
@@ -1648,7 +1726,7 @@
         "description": "[⧗] If there's a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/101_C_TonTon_Pig-1920w.png",
+    "image_url": "/images/common/101-130_TON_TON.webp",
     "rarity_display": "Common",
     "image_file": "images\\common\\101-130_TON_TON.webp"
   },
@@ -1730,7 +1808,7 @@
         "description": "effect: Powerup X where X is the Power of the enemy character that is being hidden."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/108_R_ART_Naruto_Shadow_Clone-1920w.png",
+    "image_url": "/images/rare/108-130_NARUTO_UZUMAKI.webp",
     "rarity_display": "Rare Art",
     "image_file": "images\\rare\\108-130_NARUTO_UZUMAKI.webp"
   },
@@ -1738,10 +1816,27 @@
     "id": "109/130",
     "number": 109,
     "name_fr": "SAKURA HARUNO",
-    "title_fr": "",
+    "title_fr": "Ninja Médical",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\109-130_SAKURA_HARUNO.webp",
+    "chakra": 4,
+    "power": 3,
+    "group": "Leaf Village",
+    "keywords": [
+      "Team 7"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "MAIN effect: Instead, play the card paying 2 less."
+      }
+    ]
   },
   {
     "id": "110/130",
@@ -1861,7 +1956,7 @@
         "description": "effect."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/120_R_ART_Gaara_Sand_Coffin-1920w.png",
+    "image_url": "/images/rare/120-130_GAARA.webp",
     "rarity_display": "Rare Art",
     "image_file": "images\\rare\\120-130_GAARA.webp"
   },
@@ -1997,7 +2092,7 @@
         "description": "effect: Instead, defeat both of them."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/133_Secret_GOLD_Naruto_Rasengan_Simulaz-1920w.png",
+    "image_url": "/images/secret/133-130_NARUTO_UZUMAKI.webp",
     "rarity_display": "Secret",
     "image_file": "images\\secret\\133-130_NARUTO_UZUMAKI.webp"
   },
@@ -2034,7 +2129,7 @@
         "description": "effect: Instead, play the card paying 4 less."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/135_Secret_GOLD_Sakura_Recovery_Team_Simulaz-1920w.png",
+    "image_url": "/images/secret/135-130_SAKURA_HARUNO.webp",
     "rarity_display": "Secret",
     "image_file": "images\\secret\\135-130_SAKURA_HARUNO.webp"
   },
@@ -2062,7 +2157,7 @@
         "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/136_Secret_GOLD_Sasuke_Heaven_Curse_Mark_Simulaz-1920w.png",
+    "image_url": "/images/secret/136-130_SASUKE_UCHIWA.webp",
     "rarity_display": "Secret",
     "image_file": "images\\secret\\136-130_SASUKE_UCHIWA.webp"
   },
@@ -2094,7 +2189,7 @@
         "description": "d character in this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/137_Secret_GOLD_Kakashi_Lightning_Blade_Simulaz-85fa5025-1920w.png",
+    "image_url": "/images/secret/137-130_KAKASHI_HATAKE.webp",
     "rarity_display": "Secret",
     "image_file": "images\\secret\\137-130_KAKASHI_HATAKE.webp"
   },
@@ -2114,7 +2209,25 @@
     "title_fr": "Le Tombeau du Désert",
     "rarity": "S",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\secret\\139-130_GAARA.webp",
+    "chakra": 5,
+    "power": 4,
+    "group": "Sand Village",
+    "keywords": [
+      "Team Baki",
+      "Jutsu"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character."
+      }
+    ]
   },
   {
     "id": "140/130",
@@ -2123,7 +2236,25 @@
     "title_fr": "Tsukuyomi",
     "rarity": "S",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\secret\\140-130_ITACHI_UCHIWA.webp",
+    "chakra": 7,
+    "power": 7,
+    "group": "Akatsuki",
+    "keywords": [
+      "Rogue Ninja",
+      "Jutsu"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "The opponent discards their entire hand, then draws the same number of cards discarded in this way."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "Defeat a character in play with cost X or less, where X is the number of cards discarded by the MAIN effect."
+      }
+    ]
   },
   {
     "id": "141/130",
@@ -2167,7 +2298,7 @@
         "description": "Move an enemy character to this mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/143_M_Special_Itachi_Hunting-1920w.png",
+    "image_url": "/images/mythos/143-130_ITACHI_UCHIWA.webp",
     "rarity_display": "Mythos",
     "image_file": "images\\mythos\\143-130_ITACHI_UCHIWA.webp"
   },
@@ -2191,7 +2322,7 @@
         "description": "Steal 1 Chakra from the opponent pool."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/144_M_Special_Kisame_Chakra_absorb-1920w.png",
+    "image_url": "/images/mythos/144-130_KISAME_HOSHIGAKI.webp",
     "rarity_display": "Mythos",
     "image_file": "images\\mythos\\144-130_KISAME_HOSHIGAKI.webp"
   },
@@ -2278,7 +2409,7 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
+    "has_visual": true,
     "chakra": 5,
     "power": 5,
     "keywords": [
@@ -2295,7 +2426,7 @@
         "description": "effect: Powerup X where X is the Power of the enemy character that is being hidden."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/108_R_ART_Naruto_Shadow_Clone-1920w.png",
+    "image_url": "/images/rare_art/108-130_A_NARUTO_UZUMAKI.webp",
     "rarity_display": "Rare Art",
     "is_rare_art": true,
     "image_file": "images\\rare_art\\108-130_A_NARUTO_UZUMAKI.webp"
@@ -2304,11 +2435,28 @@
     "id": "109/130 A",
     "number": 109,
     "name_fr": "SAKURA HARUNO",
-    "title_fr": "",
+    "title_fr": "A mon tour de prendre les devants.",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\109-130_A_SAKURA_HARUNO.webp",
+    "chakra": 4,
+    "power": 3,
+    "group": "Leaf Village",
+    "keywords": [
+      "Team 7"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "MAIN effect: Instead, play the card paying 2 less."
+      }
+    ]
   },
   {
     "id": "110/130 A",
@@ -2334,11 +2482,28 @@
     "id": "112/130 A",
     "number": 112,
     "name_fr": "CHÔJI AKIMICHI",
-    "title_fr": "",
+    "title_fr": "Tu traites qui de gros ?",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\112-130_A_CHÔJI_AKIMICHI.webp",
+    "chakra": 5,
+    "power": 4,
+    "group": "Leaf Village",
+    "keywords": [
+      "Team 10"
+    ],
+    "effects": [
+      {
+        "type": "MAIN",
+        "description": "Discard a card from your hand. POWERUP X where X is the cost of the discarded card."
+      },
+      {
+        "type": "UPGRADE",
+        "description": "Repeat the MAIN effect."
+      }
+    ]
   },
   {
     "id": "113/130 A",
@@ -2417,7 +2582,7 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
+    "has_visual": true,
     "chakra": 4,
     "power": 4,
     "keywords": [
@@ -2438,7 +2603,7 @@
         "description": "effect."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/120_R_ART_Gaara_Sand_Coffin-1920w.png",
+    "image_url": "/images/rare_art/120-130_A_GAARA.webp",
     "rarity_display": "Rare Art",
     "is_rare_art": true,
     "image_file": "images\\rare_art\\120-130_A_GAARA.webp"
@@ -2557,7 +2722,7 @@
         "description": "[↯] POWERUP 2 a character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M1_Call-for-support-1920w.png",
+    "image_url": "/images/mission/MSS_01_Appel_de_soutien.webp",
     "image_file": "images\\mission\\MSS_01_Appel_de_soutien.webp"
   },
   {
@@ -2568,7 +2733,7 @@
     "rarity": "Mission",
     "card_type": "mission",
     "has_visual": true,
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M2_Chunin-exam-1920w.png",
+    "image_url": "/images/mission/MSS_02_Examen_Chûnin.webp",
     "image_file": "images\\mission\\MSS_02_Examen_Chûnin.webp"
   },
   {
@@ -2585,7 +2750,7 @@
         "description": "[↯] Opponent discards a card from hand."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M3_Find-the-traitor-1920w.png",
+    "image_url": "/images/mission/MSS_03_Trouver_le_traître.webp",
     "image_file": "images\\mission\\MSS_03_Trouver_le_traître.webp"
   },
   {
@@ -2602,7 +2767,7 @@
         "description": "[↯] Defeat an enemy hidden character."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M4_Assassination-1920w.png",
+    "image_url": "/images/mission/MSS_04_Assassinat.webp",
     "image_file": "images\\mission\\MSS_04_Assassinat.webp"
   },
   {
@@ -2619,7 +2784,7 @@
         "description": "[↯] You must return one friendly non-hidden character in this mission to your hand, if able."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M5_Bring-it-back-9b1cfeac-1920w.png",
+    "image_url": "/images/mission/MSS_05_Ramener.webp",
     "image_file": "images\\mission\\MSS_05_Ramener.webp"
   },
   {
@@ -2636,7 +2801,7 @@
         "description": "[↯] Draw a card."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M6_Free-a-friend-1920w.png",
+    "image_url": "/images/mission/MSS_06_Sauvetage_dun_ami.webp",
     "image_file": "images\\mission\\MSS_06_Sauvetage_dun_ami.webp"
   },
   {
@@ -2653,7 +2818,7 @@
         "description": "[↯] Move a friendly hidden character in play."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M7_I-have-to-go-1920w.png",
+    "image_url": "/images/mission/MSS_07_Je_dois_partir.webp",
     "image_file": "images\\mission\\MSS_07_Je_dois_partir.webp"
   },
   {
@@ -2670,7 +2835,7 @@
         "description": "[↯] Put a card from your hand as a hidden character to any mission."
       }
     ],
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M8_Set-a-trap-1920w.png",
+    "image_url": "/images/mission/MSS_08_Tendre_un_piège.webp",
     "image_file": "images\\mission\\MSS_08_Tendre_un_piège.webp"
   },
   {
@@ -2690,7 +2855,7 @@
     "rarity": "Mission",
     "card_type": "mission",
     "has_visual": true,
-    "image_url": "https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/M10_Chakra-improvement-050bc0fb-1920w.png",
+    "image_url": "/images/mission/MSS_10_Entraînement_au_chakra.webp",
     "image_file": "images\\mission\\MSS_10_Entraînement_au_chakra.webp"
   },
   {
@@ -2700,8 +2865,10 @@
     "title_fr": "Je serai le plus grand Hokage!",
     "rarity": "Legendary",
     "card_type": "character",
-    "has_visual": false,
+    "has_visual": true,
     "numbering": "n/1000",
-    "limited_edition": 1000
+    "limited_edition": 1000,
+    "image_file": "images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp",
+    "image_url": "/images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp"
   }
 ]

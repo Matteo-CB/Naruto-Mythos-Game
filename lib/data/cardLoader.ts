@@ -6,6 +6,10 @@ import rawMissionsData from './missions.json';
 // Manual corrections for cards with split/malformed effect text in the JSON
 // Source: official narutotcgmythos.com (Feb 2026 audit)
 const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
+  'Legendary': [
+    { type: 'MAIN', description: 'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Instead, defeat both of them.' },
+  ],
   '137/130': [
     { type: 'UPGRADE', description: 'Move this character.' },
     { type: 'MAIN', description: 'Hide an upgraded character in this mission.' },
@@ -30,10 +34,23 @@ const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
     { type: 'MAIN', description: 'Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.' },
     { type: 'UPGRADE', description: 'MAIN effect: Instead, play the card paying 2 less.' },
   ],
+  '133/130': [
+    { type: 'MAIN', description: 'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Instead, defeat both of them.' },
+  ],
+  '135/130': [
+    { type: 'MAIN', description: 'Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.' },
+    { type: 'UPGRADE', description: 'MAIN effect: Instead, play the card paying 4 less.' },
+  ],
+  '112/130': [
+    { type: 'MAIN', description: 'Discard a card from your hand. POWERUP X where X is the cost of the discarded card.' },
+    { type: 'UPGRADE', description: 'Repeat the MAIN effect.' },
+  ],
 };
 
 // Keyword corrections from official site (JSON had wrong or incomplete keywords)
 const KEYWORD_CORRECTIONS: Record<string, string[]> = {
+  'Legendary': ['Team 7', 'Jutsu'],
   '044/130': ['Academy'],                       // site says "Academy"
   '048/130': [],                                // no keywords on site
   '036/130': ['Team Guy', 'Taijutsu'],          // missing "Taijutsu"
@@ -42,6 +59,13 @@ const KEYWORD_CORRECTIONS: Record<string, string[]> = {
   '108/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
   '108/130 A': ['Team 7', 'Jutsu'],             // missing "Jutsu"
   '137/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
+  '075/130': ['Team Baki', 'Jutsu'],            // missing "Jutsu"
+  '120/130': ['Team Baki', 'Jutsu'],            // missing "Jutsu"
+  '120/130 A': ['Team Baki', 'Jutsu'],          // missing "Jutsu"
+  '133/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
+  '136/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
+  '112/130': ['Team 10'],                        // missing from JSON
+  '135/130': ['Team 7'],                         // confirm from site
 };
 
 // Name corrections from official site
@@ -53,9 +77,11 @@ const NAME_CORRECTIONS: Record<string, string> = {
 
 // Stat corrections from official site (cost, power, rarity, title)
 const STAT_CORRECTIONS: Record<string, { chakra?: number; power?: number; rarity?: RawRarity; title_fr?: string; group?: string }> = {
+  'Legendary': { chakra: 6, power: 6, group: 'Leaf Village' },
   '108/130': { chakra: 5, power: 5, rarity: 'RA', title_fr: 'Believe it!' },
   '108/130 A': { chakra: 5, power: 5, title_fr: 'Believe it!' },
   '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },
+  '112/130': { chakra: 5, power: 4, group: 'Leaf Village' },
 };
 
 // Mission base points (printed on the card).
@@ -76,26 +102,7 @@ const MISSION_BASE_POINTS: Record<string, number> = {
   'MSS 10': 1,
 };
 
-// The Legendary card is not in the JSON — injected manually here
-const LEGENDARY_CARD: RawCardData = {
-  id: 'L01',
-  number: 200,
-  name_fr: 'NARUTO UZUMAKI',
-  title_fr: 'Legendary',
-  rarity: 'Legendary' as RawRarity,
-  card_type: 'character',
-  has_visual: true,
-  chakra: 6,
-  power: 6,
-  keywords: ['Team 7', 'Jutsu'],
-  group: 'Leaf Village',
-  effects: [
-    { type: 'MAIN', description: 'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.' },
-    { type: 'UPGRADE', description: 'MAIN effect: Instead, defeat both of them.' },
-  ],
-  image_file: 'images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp',
-  is_rare_art: false,
-};
+// Legendary card is in the JSON with id "Legendary" — corrections above add its stats/effects
 
 function normalizeImagePath(imagePath?: string): string | undefined {
   if (!imagePath) return undefined;
@@ -152,22 +159,16 @@ let _playableMissions: MissionCard[] | null = null;
 
 export function getAllCards(): CardData[] {
   if (!_allCards) {
-    const cards = (rawCardsData as RawCardData[]).map(normalizeCard);
-    // Inject legendary card
-    cards.push(normalizeCard(LEGENDARY_CARD));
-    _allCards = cards;
+    _allCards = (rawCardsData as RawCardData[]).map(normalizeCard);
   }
   return _allCards;
 }
 
 export function getAllCharacters(): CharacterCard[] {
   if (!_characters) {
-    const chars = (rawCardsData as RawCardData[])
+    _characters = (rawCardsData as RawCardData[])
       .filter((c) => c.card_type === 'character')
       .map(normalizeCharacterCard);
-    // Inject legendary card
-    chars.push(normalizeCharacterCard(LEGENDARY_CARD));
-    _characters = chars;
   }
   return _characters;
 }
