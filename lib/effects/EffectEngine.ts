@@ -35,30 +35,34 @@ export class EffectEngine {
     if (hasMainEffect) {
       const handler = getEffectHandler(topCard.id, 'MAIN');
       if (handler) {
-        const ctx: EffectContext = {
-          state: newState,
-          sourcePlayer: player,
-          sourceCard: character,
-          sourceMissionIndex: missionIndex,
-          triggerType: 'MAIN',
-          isUpgrade,
-        };
-        const result = handler(ctx);
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'MAIN',
+            isUpgrade,
+          };
+          const result = handler(ctx);
 
-        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-          // Handler needs target selection — create pending and pause
-          const remainingEffectTypes: EffectType[] = [];
-          if (isUpgrade) {
-            const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-            if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            // Handler needs target selection — create pending and pause
+            const remainingEffectTypes: EffectType[] = [];
+            if (isUpgrade) {
+              const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
+              if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
+            }
+            newState = EffectEngine.createPendingTargetSelection(
+              newState, player, character, missionIndex, 'MAIN', isUpgrade,
+              result, remainingEffectTypes,
+            );
+            return newState;
           }
-          newState = EffectEngine.createPendingTargetSelection(
-            newState, player, character, missionIndex, 'MAIN', isUpgrade,
-            result, remainingEffectTypes,
-          );
-          return newState;
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] MAIN handler error for ${topCard.id}:`, err);
         }
-        newState = result.state;
       }
     }
 
@@ -68,24 +72,28 @@ export class EffectEngine {
       if (hasUpgradeEffect) {
         const handler = getEffectHandler(topCard.id, 'UPGRADE');
         if (handler) {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'UPGRADE',
-            isUpgrade: true,
-          };
-          const result = handler(ctx);
+          try {
+            const ctx: EffectContext = {
+              state: newState,
+              sourcePlayer: player,
+              sourceCard: character,
+              sourceMissionIndex: missionIndex,
+              triggerType: 'UPGRADE',
+              isUpgrade: true,
+            };
+            const result = handler(ctx);
 
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'UPGRADE', true,
-              result, [],
-            );
-            return newState;
+            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+              newState = EffectEngine.createPendingTargetSelection(
+                newState, player, character, missionIndex, 'UPGRADE', true,
+                result, [],
+              );
+              return newState;
+            }
+            newState = result.state;
+          } catch (err) {
+            console.error(`[EffectEngine] UPGRADE handler error for ${topCard.id}:`, err);
           }
-          newState = result.state;
         }
       }
     }
@@ -113,29 +121,33 @@ export class EffectEngine {
     if (hasMainEffect) {
       const handler = getEffectHandler(topCard.id, 'MAIN');
       if (handler) {
-        const ctx: EffectContext = {
-          state: newState,
-          sourcePlayer: player,
-          sourceCard: character,
-          sourceMissionIndex: missionIndex,
-          triggerType: 'MAIN',
-          isUpgrade: false,
-        };
-        const result = handler(ctx);
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'MAIN',
+            isUpgrade: false,
+          };
+          const result = handler(ctx);
 
-        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-          // Check if AMBUSH also needs to be processed after this
-          const remainingEffectTypes: EffectType[] = [];
-          const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
-          if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            // Check if AMBUSH also needs to be processed after this
+            const remainingEffectTypes: EffectType[] = [];
+            const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
+            if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
 
-          newState = EffectEngine.createPendingTargetSelection(
-            newState, player, character, missionIndex, 'MAIN', false,
-            result, remainingEffectTypes,
-          );
-          return newState;
+            newState = EffectEngine.createPendingTargetSelection(
+              newState, player, character, missionIndex, 'MAIN', false,
+              result, remainingEffectTypes,
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] MAIN handler error for ${topCard.id} (reveal):`, err);
         }
-        newState = result.state;
       }
     }
 
@@ -144,24 +156,28 @@ export class EffectEngine {
     if (hasAmbushEffect) {
       const handler = getEffectHandler(topCard.id, 'AMBUSH');
       if (handler) {
-        const ctx: EffectContext = {
-          state: newState,
-          sourcePlayer: player,
-          sourceCard: character,
-          sourceMissionIndex: missionIndex,
-          triggerType: 'AMBUSH',
-          isUpgrade: false,
-        };
-        const result = handler(ctx);
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'AMBUSH',
+            isUpgrade: false,
+          };
+          const result = handler(ctx);
 
-        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-          newState = EffectEngine.createPendingTargetSelection(
-            newState, player, character, missionIndex, 'AMBUSH', false,
-            result, [],
-          );
-          return newState;
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            newState = EffectEngine.createPendingTargetSelection(
+              newState, player, character, missionIndex, 'AMBUSH', false,
+              result, [],
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] AMBUSH handler error for ${topCard.id}:`, err);
         }
-        newState = result.state;
       }
     }
 
@@ -184,24 +200,28 @@ export class EffectEngine {
     if (hasMissionScore) {
       const handler = getEffectHandler(mission.card.id, 'SCORE');
       if (handler) {
-        const ctx: EffectContext = {
-          state: newState,
-          sourcePlayer: player,
-          sourceCard: null as unknown as CharacterInPlay,
-          sourceMissionIndex: missionIndex,
-          triggerType: 'SCORE',
-          isUpgrade: false,
-        };
-        const result = handler(ctx);
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: null as unknown as CharacterInPlay,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'SCORE',
+            isUpgrade: false,
+          };
+          const result = handler(ctx);
 
-        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-          newState = EffectEngine.createPendingTargetSelection(
-            newState, player, null as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
-            result, [],
-          );
-          return newState;
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            newState = EffectEngine.createPendingTargetSelection(
+              newState, player, null as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
+              result, [],
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] SCORE handler error for mission ${mission.card.id}:`, err);
         }
-        newState = result.state;
       }
     }
 
@@ -214,24 +234,28 @@ export class EffectEngine {
       if (hasCharScore) {
         const handler = getEffectHandler(topCard.id, 'SCORE');
         if (handler) {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: char,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'SCORE',
-            isUpgrade: false,
-          };
-          const result = handler(ctx);
+          try {
+            const ctx: EffectContext = {
+              state: newState,
+              sourcePlayer: player,
+              sourceCard: char,
+              sourceMissionIndex: missionIndex,
+              triggerType: 'SCORE',
+              isUpgrade: false,
+            };
+            const result = handler(ctx);
 
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            newState = EffectEngine.createPendingTargetSelection(
-              newState, player, char, missionIndex, 'SCORE', false,
-              result, [],
-            );
-            return newState;
+            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+              newState = EffectEngine.createPendingTargetSelection(
+                newState, player, char, missionIndex, 'SCORE', false,
+                result, [],
+              );
+              return newState;
+            }
+            newState = result.state;
+          } catch (err) {
+            console.error(`[EffectEngine] SCORE handler error for char ${topCard.id}:`, err);
           }
-          newState = result.state;
         }
       }
     }
