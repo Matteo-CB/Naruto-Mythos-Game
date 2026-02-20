@@ -424,7 +424,8 @@
     "title_fr": "Ninpô ! La Danse du Chien !",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\026-130_KIBA_INUZUKA.webp"
   },
   {
     "id": "027/130",
@@ -582,7 +583,8 @@
     "title_fr": "Le « Tourbillon Divin » du Hakke",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\037-130_NEJI_HYUGA.webp"
   },
   {
     "id": "038/130",
@@ -847,7 +849,8 @@
     "title_fr": "Style d'Orochimaru : Permutation",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\051-130_OROCHIMARU.webp"
   },
   {
     "id": "052/130",
@@ -940,7 +943,8 @@
     "title_fr": "La Geôle de Terre",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\058-130_JIROBO.webp"
   },
   {
     "id": "059/130",
@@ -973,7 +977,8 @@
     "title_fr": "Déploiement de la Toile",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\060-130_KIDOMARU.webp"
   },
   {
     "id": "061/130",
@@ -1006,7 +1011,8 @@
     "title_fr": "Apposition des sceaux maléfiques",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\062-130_SAKON.webp"
   },
   {
     "id": "063/130",
@@ -1015,7 +1021,8 @@
     "title_fr": "Possession moléculaire",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\063-130_UKON.webp"
   },
   {
     "id": "064/130",
@@ -1103,7 +1110,8 @@
     "title_fr": "Haut-parleur à écho résonant",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\069-130_DOSU_KINUTA.webp"
   },
   {
     "id": "070/130",
@@ -1746,7 +1754,8 @@
     "title_fr": "Pluie d'araignées",
     "rarity": "UC",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\uncommon\\103-130_KYODAIGUMO.webp"
   },
   {
     "id": "104/130",
@@ -1773,7 +1782,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\106-130_KAKASHI_HATAKE.webp"
   },
   {
     "id": "107/130",
@@ -1782,7 +1792,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\107-130_SASUKE_UCHIWA.webp"
   },
   {
     "id": "108/130",
@@ -1854,7 +1865,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\111-130_SHIKAMARU_NARA.webp"
   },
   {
     "id": "112/130",
@@ -1872,7 +1884,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\113-130_KIBA_INUZUKA.webp"
   },
   {
     "id": "114/130",
@@ -1908,7 +1921,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\117-130_ROCK_LEE.webp"
   },
   {
     "id": "118/130",
@@ -1926,7 +1940,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\119-130_KANKURO.webp"
   },
   {
     "id": "120/130",
@@ -1967,7 +1982,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\121-130_TEMARI.webp"
   },
   {
     "id": "122/130",
@@ -1985,7 +2001,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\123-130_KIMIMARO.webp"
   },
   {
     "id": "124/130",
@@ -2003,7 +2020,8 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\rare\\125-130_TAYUYA.webp"
   },
   {
     "id": "126/130",
@@ -2333,7 +2351,8 @@
     "title_fr": "Équipe 7 originelle",
     "rarity": "M",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\mythos\\145-130_NARUTO_UZUMAKI.webp"
   },
   {
     "id": "146/130",
@@ -2369,8 +2388,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\104-130_A_TSUNADE.webp"
   },
   {
     "id": "105/130 A",
@@ -2379,8 +2399,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\105-130_A_JIRAIYA.webp"
   },
   {
     "id": "106/130 A",
@@ -2389,8 +2410,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\106-130_A_KAKASHI_HATAKE.webp"
   },
   {
     "id": "107/130 A",
@@ -2399,8 +2421,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\107-130_A_SASUKE_UCHIWA.webp"
   },
   {
     "id": "108/130 A",
@@ -2475,8 +2498,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\111-130_A_SHIKAMARU_NARA.webp"
   },
   {
     "id": "112/130 A",
@@ -2512,8 +2536,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\113-130_A_KIBA_INUZUKA.webp"
   },
   {
     "id": "114/130 A",
@@ -2552,8 +2577,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\117-130_A_ROCK_LEE.webp"
   },
   {
     "id": "118/130 A",
@@ -2572,8 +2598,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\119-130_A_KANKURO.webp"
   },
   {
     "id": "120/130 A",
@@ -2615,8 +2642,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\121-130_A_TEMARI.webp"
   },
   {
     "id": "122/130 A",
@@ -2655,8 +2683,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\125-130_A_TAYUYA.webp"
   },
   {
     "id": "126/130 A",
@@ -2685,8 +2714,9 @@
     "title_fr": "",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images\\rare_art\\128-130_A_ITACHI_UCHIWA.webp"
   },
   {
     "id": "129/130 A",

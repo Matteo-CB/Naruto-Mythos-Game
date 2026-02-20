@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import type { VisibleCharacter, VisibleMission, MissionRank } from '@/lib/engine/types';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 // ----- Target Character Card -----
 
@@ -19,12 +20,9 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
   const isHidden = character.isHidden;
   const canSeeCard = character.isOwn && character.card;
 
-  const imagePath =
-    canSeeCard && character.card?.image_file
-      ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
-      : !isHidden && character.card?.image_file
-        ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
-        : null;
+  const imagePath = (canSeeCard || !isHidden)
+    ? normalizeImagePath(character.card?.image_file)
+    : null;
 
   const totalPower = character.effectivePower;
   const displayName = character.card?.name_fr ?? (isHidden ? '???' : 'Unknown');

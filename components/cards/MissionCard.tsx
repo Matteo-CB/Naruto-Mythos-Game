@@ -8,11 +8,7 @@ import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engin
 // ---------------------
 // Utility
 // ---------------------
-function normalizeImagePath(imageFile?: string): string | null {
-  if (!imageFile) return null;
-  const normalized = imageFile.replace(/\\/g, '/');
-  return normalized.startsWith('/') ? normalized : `/${normalized}`;
-}
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 const RANK_COLORS: Record<MissionRank, string> = {
   D: '#6b7280',   // gray

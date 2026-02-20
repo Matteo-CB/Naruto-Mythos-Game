@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import type { CharacterCard } from '@/lib/engine/types';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 interface DiscardPileViewerProps {
   cards: CharacterCard[];
@@ -82,11 +83,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
             ) : (
               <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
                 {cards.map((card, i) => {
-                  const imagePath = card.image_file
-                    ? card.image_file.replace(/\\/g, '/').startsWith('/')
-                      ? card.image_file.replace(/\\/g, '/')
-                      : `/${card.image_file.replace(/\\/g, '/')}`
-                    : null;
+                  const imagePath = normalizeImagePath(card.image_file);
 
                   return (
                     <motion.div

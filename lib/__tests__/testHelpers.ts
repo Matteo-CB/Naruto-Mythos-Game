@@ -17,6 +17,8 @@ import { generateInstanceId, generateGameId } from '../engine/utils/id';
 export function mockCharacter(overrides: Partial<CharacterCard> = {}): CharacterCard {
   return {
     id: overrides.id ?? '001/130',
+    cardId: overrides.cardId ?? 'KS-1-C',
+    set: overrides.set ?? 'KS',
     number: overrides.number ?? 1,
     name_fr: overrides.name_fr ?? 'Test Character',
     title_fr: overrides.title_fr ?? 'Test Title',
@@ -38,10 +40,12 @@ export function mockCharacter(overrides: Partial<CharacterCard> = {}): Character
 export function mockMission(overrides: Partial<MissionCard> = {}): MissionCard {
   return {
     id: overrides.id ?? 'MSS 01',
+    cardId: overrides.cardId ?? 'KS-1-MMS',
+    set: overrides.set ?? 'KS',
     number: overrides.number ?? 1,
     name_fr: overrides.name_fr ?? 'Test Mission',
     title_fr: overrides.title_fr ?? '',
-    rarity: 'Mission',
+    rarity: 'MMS',
     card_type: 'mission',
     has_visual: true,
     chakra: 0,

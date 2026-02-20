@@ -4,11 +4,10 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard } from '@/lib/engine/types';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
-  const imagePath = card.image_file
-    ? (card.image_file.replace(/\\/g, '/').startsWith('/') ? card.image_file.replace(/\\/g, '/') : `/${card.image_file.replace(/\\/g, '/')}`)
-    : null;
+  const imagePath = normalizeImagePath(card.image_file);
 
   return (
     <motion.div

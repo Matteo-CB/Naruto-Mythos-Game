@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 interface HandCardInfo {
   index: number;
@@ -24,11 +25,7 @@ function HandCard({
 }) {
   const { card, index } = cardInfo;
 
-  const imagePath = card.image_file
-    ? (card.image_file.replace(/\\/g, '/').startsWith('/')
-      ? card.image_file.replace(/\\/g, '/')
-      : `/${card.image_file.replace(/\\/g, '/')}`)
-    : null;
+  const imagePath = normalizeImagePath(card.image_file);
 
   return (
     <motion.div

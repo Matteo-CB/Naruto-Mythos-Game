@@ -10,32 +10,30 @@ import CardBack from './CardBack';
 // ---------------------
 // Utility
 // ---------------------
-function normalizeImagePath(imageFile?: string): string | null {
-  if (!imageFile) return null;
-  const normalized = imageFile.replace(/\\/g, '/');
-  return normalized.startsWith('/') ? normalized : `/${normalized}`;
-}
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 const RARITY_LABELS: Record<Rarity, string> = {
   C: 'Common',
   UC: 'Uncommon',
   R: 'Rare',
-  RA: 'Rare Art',
+  RART: 'Rare Art',
   S: 'Secret',
+  SV: 'Secret V',
   M: 'Mythos',
-  Legendary: 'Legendary',
-  Mission: 'Mission',
+  L: 'Legendary',
+  MMS: 'Mission',
 };
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',
   UC: '#22c55e',
   R: '#3b82f6',
-  RA: '#a855f7',
+  RART: '#a855f7',
   S: '#eab308',
+  SV: '#eab308',
   M: '#ef4444',
-  Legendary: '#eab308',
-  Mission: '#6b7280',
+  L: '#eab308',
+  MMS: '#6b7280',
 };
 
 const EFFECT_TYPE_COLORS: Record<string, string> = {

@@ -11,14 +11,19 @@ import { Footer } from '@/components/Footer';
 import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { useDeckBuilderStore } from '@/stores/deckBuilderStore';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
+  const [allChars, setAllChars] = useState<CharacterCard[]>([]);
+  const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showSavedDecks, setShowSavedDecks] = useState(false);
+  const [importCode, setImportCode] = useState('');
+  const [importMessage, setImportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Zustand store
   const deckName = useDeckBuilderStore((s) => s.deckName);
@@ -49,6 +54,8 @@ export default function DeckBuilderPage() {
     import('@/lib/data/cardLoader').then((mod) => {
       setAvailableChars(mod.getPlayableCharacters());
       setAvailableMissions(mod.getPlayableMissions());
+      setAllChars(mod.getAllCharacters());
+      setAllMissions(mod.getAllMissions());
     });
   }, []);
 
@@ -119,12 +126,83 @@ export default function DeckBuilderPage() {
     [deleteDeck, t],
   );
 
-  const getImagePath = (card: CharacterCard | MissionCard): string | null => {
-    if (!card.image_file) return null;
-    return card.image_file.startsWith('/')
-      ? card.image_file
-      : '/' + card.image_file.replace(/\\/g, '/');
-  };
+  const getImagePath = (card: CharacterCard | MissionCard): string | null => normalizeImagePath(card.image_file);
+
+  const handleImport = useCallback(() => {
+    const code = importCode.trim();
+    if (!code) return;
+
+    const parts = code.split('|');
+    if (parts.length < 2) {
+      setImportMessage({ type: 'error', text: t('deckBuilder.importError') });
+      return;
+    }
+
+    // Last part is the deck name (underscores = spaces) — only if it doesn't contain '--'
+    const lastPart = parts[parts.length - 1];
+    const hasDeckName = !lastPart.includes('--');
+    const deckNameFromCode = hasDeckName ? lastPart.replace(/_/g, ' ') : '';
+    const cardParts = hasDeckName ? parts.slice(0, -1) : parts;
+
+    // Build lookup maps by cardId — use ALL cards (not just playable) so imports
+    // work for cards without visuals and banned cards too
+    const charByCardId = new Map(allChars.map((c) => [c.cardId, c]));
+    const missionByCardId = new Map(allMissions.map((m) => [m.cardId, m]));
+
+    const chars: CharacterCard[] = [];
+    const missions: MissionCard[] = [];
+    const notFound: string[] = [];
+
+    for (const part of cardParts) {
+      const match = part.match(/^(.+)--(\d+)$/);
+      if (!match) {
+        setImportMessage({ type: 'error', text: t('deckBuilder.importError') });
+        return;
+      }
+
+      const cardId = match[1];
+      const qty = parseInt(match[2], 10);
+
+      // Check missions first (MMS rarity)
+      const mission = missionByCardId.get(cardId);
+      if (mission) {
+        for (let i = 0; i < qty; i++) missions.push(mission);
+        continue;
+      }
+
+      const char = charByCardId.get(cardId);
+      if (char) {
+        for (let i = 0; i < qty; i++) chars.push(char);
+        continue;
+      }
+
+      notFound.push(cardId);
+    }
+
+    // Apply the imported deck
+    clearDeck();
+    if (deckNameFromCode) setDeckName(deckNameFromCode);
+    for (const c of chars) addChar(c);
+    for (const m of missions) addMission(m);
+
+    if (notFound.length > 0) {
+      setImportMessage({
+        type: 'error',
+        text: t('deckBuilder.importNotFound', { count: notFound.length, ids: notFound.join(', ') }),
+      });
+    } else {
+      setImportMessage({
+        type: 'success',
+        text: t('deckBuilder.importSuccess', {
+          name: deckNameFromCode || 'Deck',
+          chars: chars.length,
+          missions: missions.length,
+        }),
+      });
+    }
+
+    setImportCode('');
+  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
 
   return (
     <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
@@ -300,19 +378,72 @@ export default function DeckBuilderPage() {
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="px-4 py-2 border-b border-[#262626]">
-          <input
-            type="text"
-            placeholder={t('collection.search')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
-          />
-        </div>
-
         {/* Available cards */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
+
+          {/* Import section — prominent */}
+          <div className="mb-5 border border-[#262626] bg-[#0e0e0e]">
+            <div className="px-4 py-3">
+              <h2 className="text-sm font-bold text-[#e0e0e0] mb-1">{t('deckBuilder.importTitle')}</h2>
+              <p className="text-xs text-[#888888] mb-3">{t('deckBuilder.importDesc')}</p>
+
+              <div className="flex items-center gap-2 mb-3">
+                <a
+                  href="https://naruto-mythos-tcg-builder.glide.page/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-[#1a1a2a] border border-[#4a7ab5]/40 text-[#4a7ab5] text-xs hover:bg-[#1f1f3a] transition-colors"
+                >
+                  {t('deckBuilder.importVisit')}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder={t('deckBuilder.importPlaceholder')}
+                  value={importCode}
+                  onChange={(e) => setImportCode(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleImport(); }}
+                  className="flex-1 px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] font-mono"
+                />
+                <button
+                  onClick={handleImport}
+                  disabled={!importCode.trim()}
+                  className="px-4 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {t('deckBuilder.importButton')}
+                </button>
+              </div>
+
+              {/* Import feedback */}
+              {importMessage && (
+                <div className={`mt-2 text-xs ${
+                  importMessage.type === 'success' ? 'text-[#3e8b3e]' : 'text-[#b33e3e]'
+                }`}>
+                  {importMessage.text}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Separator */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 h-px bg-[#262626]" />
+            <span className="text-xs text-[#555] uppercase tracking-wider">{t('deckBuilder.orBuildManually')}</span>
+            <div className="flex-1 h-px bg-[#262626]" />
+          </div>
+
+          {/* Search bar */}
+          <div className="mb-3">
+            <input
+              type="text"
+              placeholder={t('collection.search')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
+            />
+          </div>
           {/* Missions */}
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
             {t('deckBuilder.missions', { count: availableMissions.length })}

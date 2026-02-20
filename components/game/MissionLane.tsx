@@ -11,6 +11,7 @@ import type {
   MissionRank,
 } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 // ----- Sub-components -----
 
@@ -63,10 +64,9 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
   // Image path: show for ANY card that has card data + image_file (own or opponent visible)
   // Banned cards always show card back (no image)
   const isBanned = hasCardData && character.card ? bannedIds.has(character.card.id) : false;
-  const imagePath =
-    !isBanned && hasCardData && character.card?.image_file
-      ? (character.card.image_file.replace(/\\/g, '/').startsWith('/') ? character.card.image_file.replace(/\\/g, '/') : `/${character.card.image_file.replace(/\\/g, '/')}`)
-      : null;
+  const imagePath = !isBanned && hasCardData
+    ? normalizeImagePath(character.card?.image_file)
+    : null;
 
   // Effective power display (includes continuous modifiers from engine)
   const totalPower = character.effectivePower;
@@ -252,9 +252,7 @@ function MissionCardDisplay({
     A: '#b33e3e',
   };
 
-  const imagePath = mission.card.image_file
-    ? (mission.card.image_file.replace(/\\/g, '/').startsWith('/') ? mission.card.image_file.replace(/\\/g, '/') : `/${mission.card.image_file.replace(/\\/g, '/')}`)
-    : null;
+  const imagePath = normalizeImagePath(mission.card.image_file);
 
   const totalPoints = mission.basePoints + mission.rankBonus;
 

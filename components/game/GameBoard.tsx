@@ -21,6 +21,7 @@ import { HandCardSelector } from "./HandCardSelector";
 import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
+import { normalizeImagePath } from "@/lib/utils/imagePath";
 
 // ----- Shared color maps -----
 
@@ -28,11 +29,12 @@ const rarityColorMap: Record<string, string> = {
   C: "#888888",
   UC: "#3e8b3e",
   R: "#c4a35a",
-  RA: "#c4a35a",
+  RART: "#c4a35a",
   S: "#b33e3e",
+  SV: "#b33e3e",
   M: "#6a6abb",
-  Legendary: "#e0c040",
-  Mission: "#c4a35a",
+  L: "#e0c040",
+  MMS: "#c4a35a",
 };
 
 const effectTypeColorMap: Record<string, string> = {
@@ -70,11 +72,7 @@ function CardPreviewContent({
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
   const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned && card.image_file
-    ? card.image_file.replace(/\\/g, "/").startsWith("/")
-      ? card.image_file.replace(/\\/g, "/")
-      : `/${card.image_file.replace(/\\/g, "/")}`
-    : null;
+  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
 
   const rarityColor = rarityColorMap[card.rarity] ?? "#888888";
 
@@ -494,11 +492,7 @@ function FullscreenCardDetail() {
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
   const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned && card.image_file
-    ? card.image_file.replace(/\\/g, "/").startsWith("/")
-      ? card.image_file.replace(/\\/g, "/")
-      : `/${card.image_file.replace(/\\/g, "/")}`
-    : null;
+  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
 
   const rarityColor = rarityColorMap[card.rarity] ?? "#888888";
 

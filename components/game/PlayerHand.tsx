@@ -6,6 +6,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -44,9 +45,7 @@ function HandCard({
 
   const { bannedIds } = useBannedCards();
   const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned && card.image_file
-    ? (card.image_file.replace(/\\/g, '/').startsWith('/') ? card.image_file.replace(/\\/g, '/') : `/${card.image_file.replace(/\\/g, '/')}`)
-    : null;
+  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
 
   return (
     <motion.div

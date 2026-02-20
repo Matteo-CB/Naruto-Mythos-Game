@@ -5,7 +5,7 @@ export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
 export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
-export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'Legendary' | 'Mission';
+export type Rarity = 'C' | 'UC' | 'R' | 'RART' | 'S' | 'SV' | 'M' | 'L' | 'MMS';
 
 // ---------------------
 // Card Data Interfaces
@@ -18,6 +18,8 @@ export interface CardEffect {
 
 export interface CardData {
   id: string;
+  cardId: string;        // Unique card identifier: [SET]-[NUMBER]-[RARITY] e.g. "KS-108-R"
+  set: string;           // Set code e.g. "KS"
   number: number;
   name_fr: string;
   title_fr: string;
