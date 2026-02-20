@@ -12,6 +12,7 @@ import { DeckSelector } from '@/components/game/DeckSelector';
 import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -34,6 +35,7 @@ export default function PlayAIPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
+  const { bannedIds } = useBannedCards();
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -48,17 +50,21 @@ export default function PlayAIPage() {
 
     setIsLoading(true);
 
-    // Use selected deck or generate random
+    // Filter out banned cards for random decks
+    const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
+    const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
+
+    // Use selected deck or generate random (random excludes banned cards)
     const player1Deck = selectedDeck
       ? selectedDeck.characters
-      : [...cards.characters].sort(() => Math.random() - 0.5).slice(0, 30);
+      : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
     const player1Missions = selectedDeck
       ? selectedDeck.missions
-      : [...cards.missions].sort(() => Math.random() - 0.5).slice(0, 3);
+      : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    // AI always gets a random deck
-    const shuffled = [...cards.characters].sort(() => Math.random() - 0.5);
-    const aiMissions = [...cards.missions].sort(() => Math.random() - 0.5);
+    // AI always gets a random deck (excludes banned cards)
+    const shuffled = [...availableChars].sort(() => Math.random() - 0.5);
+    const aiMissions = [...availableMissions].sort(() => Math.random() - 0.5);
     const player2Deck = shuffled.slice(0, 30);
     const player2Missions = aiMissions.slice(0, 3);
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
+import { useBannedCards } from '@/lib/hooks/useBannedCards';
 
 interface SavedDeck {
   id: string;
@@ -27,6 +28,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
   const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { bannedIds } = useBannedCards();
 
   useEffect(() => {
     fetch('/api/decks')
@@ -43,9 +45,11 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
 
   const resolveAndSelect = (deckId: string | null) => {
     if (!deckId) {
-      // Random deck
-      const shuffledChars = [...allCharacters].sort(() => Math.random() - 0.5);
-      const shuffledMissions = [...allMissions].sort(() => Math.random() - 0.5);
+      // Random deck — exclude banned cards
+      const availableChars = allCharacters.filter((c) => !bannedIds.has(c.id));
+      const availableMissions = allMissions.filter((m) => !bannedIds.has(m.id));
+      const shuffledChars = [...availableChars].sort(() => Math.random() - 0.5);
+      const shuffledMissions = [...availableMissions].sort(() => Math.random() - 0.5);
       onSelect({
         characters: shuffledChars.slice(0, 30),
         missions: shuffledMissions.slice(0, 3),
