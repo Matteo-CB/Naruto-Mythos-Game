@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { useLocale } from 'next-intl';
 import type { CharacterCard, MissionCard, Rarity } from '@/lib/engine/types';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
@@ -304,9 +305,10 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         >
           {card.effects.map((effect, idx) => {
             const frDescriptions = effectDescriptionsFr[card.id];
-            const description = locale === 'fr' && frDescriptions?.[idx]
-              ? frDescriptions[idx]
-              : effect.description;
+            const enDescriptions = effectDescriptionsEn[card.id];
+            const description = locale === 'fr'
+              ? (frDescriptions?.[idx] ?? effect.description)
+              : (enDescriptions?.[idx] ?? effect.description);
             return (
             <div key={idx} style={{ marginBottom: '3px' }}>
               <span

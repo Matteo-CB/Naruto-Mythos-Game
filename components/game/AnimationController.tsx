@@ -453,14 +453,23 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
         <motion.div
           className="rounded-lg overflow-hidden"
           style={{
-            width: '120px',
-            height: '168px',
-            boxShadow: '0 8px 40px rgba(62, 139, 62, 0.4), 0 0 20px rgba(62, 139, 62, 0.2)',
-            border: '2px solid rgba(62, 139, 62, 0.5)',
+            width: '130px',
+            height: '182px',
+            border: '2px solid rgba(62, 139, 62, 0.6)',
           }}
-          initial={{ y: 150, scale: 0.7, opacity: 0 }}
-          animate={{ y: 0, scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 160, damping: 16 }}
+          initial={{ y: 180, scale: 0.6, opacity: 0, rotate: -5 }}
+          animate={{
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            rotate: 0,
+            boxShadow: [
+              '0 8px 40px rgba(62, 139, 62, 0.2), 0 0 20px rgba(62, 139, 62, 0.1)',
+              '0 8px 50px rgba(62, 139, 62, 0.5), 0 0 30px rgba(62, 139, 62, 0.3)',
+              '0 8px 40px rgba(62, 139, 62, 0.4), 0 0 20px rgba(62, 139, 62, 0.2)',
+            ],
+          }}
+          transition={{ type: 'spring', stiffness: 140, damping: 14 }}
         >
           {cardImage ? (
             <img
@@ -492,24 +501,26 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <span
-            className="text-[10px] font-medium uppercase tracking-wider"
-            style={{ color: '#3e8b3e' }}
+          <motion.span
+            className="text-[11px] font-bold uppercase tracking-widest"
+            style={{ color: '#5cb85c', letterSpacing: '0.2em' }}
+            animate={{ textShadow: ['0 0 4px rgba(92, 184, 92, 0.3)', '0 0 10px rgba(92, 184, 92, 0.6)', '0 0 4px rgba(92, 184, 92, 0.3)'] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
           >
             {t('game.anim.upgrade')}
-          </span>
+          </motion.span>
           {previousName && (
             <motion.span
               className="text-[10px]"
-              style={{ color: '#555555' }}
+              style={{ color: '#666666' }}
               initial={{ opacity: 1 }}
-              animate={{ opacity: 0, y: -8 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
+              animate={{ opacity: 0, y: -10 }}
+              transition={{ delay: 0.35, duration: 0.3 }}
             >
               {previousName}
             </motion.span>
           )}
-          <span className="text-sm font-bold" style={{ color: '#3e8b3e' }}>
+          <span className="text-sm font-bold" style={{ color: '#5cb85c' }}>
             {cardName}
           </span>
         </motion.div>
@@ -540,24 +551,31 @@ function PowerTokenAnimation({ data }: { data: Record<string, unknown> }) {
         transition={{ type: 'spring', stiffness: 250, damping: 18 }}
       >
         <motion.div
-          className="rounded-full px-6 py-3 flex items-center gap-2"
+          className="rounded-full px-7 py-3.5 flex items-center gap-3"
           style={{
-            backgroundColor: 'rgba(196, 163, 90, 0.15)',
+            backgroundColor: 'rgba(196, 163, 90, 0.12)',
             border: '2px solid #c4a35a',
-            boxShadow: '0 0 20px rgba(196, 163, 90, 0.3)',
           }}
-          initial={{ scale: 0.5 }}
-          animate={{ scale: [0.5, 1.15, 1] }}
-          transition={{ duration: 0.4, times: [0, 0.6, 1] }}
+          initial={{ scale: 0.3, opacity: 0 }}
+          animate={{
+            scale: [0.3, 1.2, 1],
+            opacity: 1,
+            boxShadow: [
+              '0 0 10px rgba(196, 163, 90, 0.2)',
+              '0 0 30px rgba(196, 163, 90, 0.5)',
+              '0 0 20px rgba(196, 163, 90, 0.3)',
+            ],
+          }}
+          transition={{ duration: 0.5, times: [0, 0.55, 1] }}
         >
           <span
-            className="text-3xl font-bold tabular-nums"
-            style={{ color: '#c4a35a' }}
+            className="text-4xl font-bold tabular-nums"
+            style={{ color: '#f0d890', textShadow: '0 0 8px rgba(196, 163, 90, 0.5)' }}
           >
             +{amount}
           </span>
           <span
-            className="text-sm font-medium uppercase"
+            className="text-sm font-bold uppercase tracking-wider"
             style={{ color: '#c4a35a' }}
           >
             {t('game.anim.power')}

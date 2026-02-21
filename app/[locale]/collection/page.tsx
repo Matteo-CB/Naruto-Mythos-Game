@@ -7,6 +7,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import { Footer } from '@/components/Footer';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
@@ -254,10 +255,10 @@ export default function CollectionPage() {
                     <div className="mt-3 space-y-2">
                       {selectedCard.effects.map((effect, i) => {
                         const frDescriptions = effectDescriptionsFr[selectedCard.id];
-                        const description =
-                          locale === 'fr' && frDescriptions?.[i]
-                            ? frDescriptions[i]
-                            : effect.description;
+                        const enDescriptions = effectDescriptionsEn[selectedCard.id];
+                        const description = locale === 'fr'
+                          ? (frDescriptions?.[i] ?? effect.description)
+                          : (enDescriptions?.[i] ?? effect.description);
                         return (
                           <div key={i} className="text-xs">
                             <span

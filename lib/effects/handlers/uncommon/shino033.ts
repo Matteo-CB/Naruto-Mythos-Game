@@ -34,20 +34,29 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
     return topCard.keywords && topCard.keywords.includes('Jutsu');
   });
 
+  let newState = { ...state };
+
+  // Refund 4 chakra if Jutsu enemy is present (reveal already paid full cost)
+  if (hasJutsuEnemy) {
+    const ps = { ...newState[sourcePlayer] };
+    ps.chakra += 4;
+    newState = { ...newState, [sourcePlayer]: ps };
+  }
+
   const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
+    newState.log,
+    newState.turn,
+    newState.phase,
     sourcePlayer,
     'EFFECT',
     hasJutsuEnemy
-      ? 'Shino Aburame (033): Ambush triggered with Jutsu enemy present - cost reduced by 4.'
+      ? 'Shino Aburame (033): Ambush - Jutsu enemy present, cost reduced by 4 (refunded).'
       : 'Shino Aburame (033): Ambush triggered - no Jutsu enemy in this mission.',
     'game.log.effect.ambush',
     { card: 'SHINO ABURAME', id: '033/130' },
   );
 
-  return { state: { ...state, log } };
+  return { state: { ...newState, log } };
 }
 
 function handleShino033Upgrade(ctx: EffectContext): EffectResult {

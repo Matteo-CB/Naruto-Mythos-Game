@@ -23,8 +23,11 @@ function getEffectivePower(char: CharacterInPlay): number {
 }
 
 function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex, isUpgrade } = ctx;
-  const powerLimit = isUpgrade ? 5 : 3;
+  const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
+  // Check if character was upgraded by looking at stack length (not isUpgrade flag,
+  // since AMBUSH fires on reveal which always passes isUpgrade=false)
+  const wasUpgraded = sourceCard && sourceCard.stack.length >= 2;
+  const powerLimit = wasUpgraded ? 5 : 3;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -85,7 +88,7 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'KIDOMARU124_DEFEAT_TARGET',
     validTargets,
-    description: isUpgrade
+    description: wasUpgraded
       ? 'Kidomaru (124) AMBUSH (UPGRADE): Choose an enemy with Power 5 or less in another mission to defeat.'
       : 'Kidomaru (124) AMBUSH: Choose an enemy with Power 3 or less in another mission to defeat.',
   };

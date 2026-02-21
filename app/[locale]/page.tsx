@@ -10,8 +10,18 @@ import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 
-// Featured card displayed on the home page
-const FEATURED_CARD = { src: '/images/rare/108-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Rare 108/130', rarity: 'rare' as const };
+// Pool of featured cards — one is picked randomly on each page load
+const FEATURED_CARDS = [
+  { src: '/images/rare/108-130_NARUTO_UZUMAKI.webp', alt: 'Naruto Uzumaki — Rare', rarity: 'rare' as const },
+  { src: '/images/rare_art/107-130_A_SASUKE_UCHIWA.webp', alt: 'Sasuke Uchiwa — Rare Art', rarity: 'rare' as const },
+  { src: '/images/rare_art/128-130_A_ITACHI_UCHIWA.webp', alt: 'Itachi Uchiwa — Rare Art', rarity: 'rare' as const },
+  { src: '/images/rare/123-130_KIMIMARO.webp', alt: 'Kimimaro — Rare', rarity: 'rare' as const },
+  { src: '/images/rare/113-130_KIBA_INUZUKA.webp', alt: 'Kiba Inuzuka — Rare', rarity: 'rare' as const },
+  { src: '/images/mythos/150-130_SHIKAMARU_NARA.webp', alt: 'Shikamaru Nara — Mythos', rarity: 'mythos' as const },
+  { src: '/images/mythos/148-130_KAKASHI_HATAKE.webp', alt: 'Kakashi Hatake — Mythos', rarity: 'mythos' as const },
+  { src: '/images/mythos/147-130_SAKURA_HARUNO.webp', alt: 'Sakura Haruno — Mythos', rarity: 'mythos' as const },
+  { src: '/images/mythos/146-130_SASUKE_UCHIWA.webp', alt: 'Sasuke Uchiwa — Mythos', rarity: 'mythos' as const },
+];
 
 // Cloud positions — only cloud-2, cloud-5, cloud-6
 const cloudPositions = [
@@ -77,7 +87,9 @@ export default function Home() {
   const t = useTranslations('home');
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
-  const featuredCard = FEATURED_CARD;
+  const [featuredCard] = useState(() =>
+    FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
+  );
 
   useEffect(() => {
     setMounted(true);

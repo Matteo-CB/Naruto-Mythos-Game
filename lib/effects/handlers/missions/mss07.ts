@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 
 /**
@@ -9,36 +8,36 @@ import { logAction } from '../../../engine/utils/gameLog';
  * SCORE [arrow]: Move a friendly hidden character in play.
  *   - The scoring player may move one of their hidden characters from any mission
  *     to a different mission.
- *   - For automated play: find the first hidden friendly character and move it
- *     to the first different mission.
+ *   - If multiple hidden characters, requires character selection.
+ *   - If multiple destination missions, requires mission selection (two-stage).
+ *   - Auto-resolves when only 1 character and 1 destination.
  */
 
 function mss07ScoreHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
+  const state = { ...ctx.state };
 
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find first hidden friendly character in any mission
-  let targetChar: CharacterInPlay | undefined;
-  let fromMissionIndex = -1;
-  let targetCharIndex = -1;
+  // Collect all hidden friendly characters across all missions
+  const validTargets: string[] = [];
+  const charMissionMap: Record<string, number> = {};
 
   for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    const chars = mission[friendlySide];
-    for (let j = 0; j < chars.length; j++) {
-      if (chars[j].isHidden) {
-        targetChar = chars[j];
-        fromMissionIndex = i;
-        targetCharIndex = j;
-        break;
+    const chars = state.activeMissions[i][friendlySide];
+    for (const c of chars) {
+      if (c.isHidden) {
+        // Check that there is at least one OTHER mission to move to
+        const hasOtherMission = state.activeMissions.length > 1;
+        if (hasOtherMission) {
+          validTargets.push(c.instanceId);
+          charMissionMap[c.instanceId] = i;
+        }
       }
     }
-    if (targetChar) break;
   }
 
-  if (!targetChar || fromMissionIndex === -1) {
+  if (validTargets.length === 0) {
     const log = logAction(
       state.log,
       state.turn,
@@ -52,34 +51,68 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Find a different mission to move to
-  let toMissionIndex = -1;
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    if (i !== fromMissionIndex) {
-      toMissionIndex = i;
-      break;
+  // If exactly one hidden friendly character, auto-resolve character selection
+  if (validTargets.length === 1) {
+    const charId = validTargets[0];
+    const fromMissionIndex = charMissionMap[charId];
+
+    // Check how many other missions are available
+    const otherMissions: string[] = [];
+    for (let i = 0; i < state.activeMissions.length; i++) {
+      if (i !== fromMissionIndex) {
+        otherMissions.push(String(i));
+      }
     }
+
+    if (otherMissions.length === 1) {
+      // Only one character and one destination: fully auto-resolve
+      return applyMss07Move(state, charId, fromMissionIndex, Number(otherMissions[0]), ctx.sourcePlayer, friendlySide);
+    }
+
+    // One character but multiple destination missions: need mission selection
+    // Encode the character ID in the description for use by the resolution handler
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'MSS07_CHOOSE_DESTINATION',
+      validTargets: otherMissions,
+      description: JSON.stringify({ text: 'MSS 07 (I Have to Go): Choose a mission to move the hidden character to.', charId, fromMissionIndex }),
+    };
   }
 
-  if (toMissionIndex === -1) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'SCORE_NO_TARGET',
-      'MSS 07 (I Have to Go): No other mission to move to.',
-      'game.log.effect.noTarget',
-      { card: 'Je dois partir', id: 'MSS 07' },
-    );
-    return { state: { ...state, log } };
+  // Multiple hidden friendly characters: require player to choose which one to move
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'MSS07_MOVE_HIDDEN',
+    validTargets,
+    description: 'MSS 07 (I Have to Go): Choose a hidden friendly character to move.',
+  };
+}
+
+function applyMss07Move(
+  state: import('../../EffectTypes').EffectContext['state'],
+  charInstanceId: string,
+  fromMissionIndex: number,
+  toMissionIndex: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
+  friendlySide: 'player1Characters' | 'player2Characters',
+): EffectResult {
+  const mission = state.activeMissions[fromMissionIndex];
+  const chars = mission[friendlySide];
+  const charIndex = chars.findIndex((c) => c.instanceId === charInstanceId);
+
+  if (charIndex === -1) {
+    return { state };
   }
+
+  const targetChar = chars[charIndex];
 
   // Remove from source mission
   const missions = [...state.activeMissions];
   const sourceMission = { ...missions[fromMissionIndex] };
   const sourceChars = [...sourceMission[friendlySide]];
-  sourceChars.splice(targetCharIndex, 1);
+  sourceChars.splice(charIndex, 1);
   sourceMission[friendlySide] = sourceChars;
   missions[fromMissionIndex] = sourceMission;
 
@@ -93,7 +126,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     state.log,
     state.turn,
     state.phase,
-    ctx.sourcePlayer,
+    sourcePlayer,
     'SCORE_MOVE',
     `MSS 07 (I Have to Go): Moved hidden ${targetChar.card.name_fr} from mission ${fromMissionIndex} to mission ${toMissionIndex}.`,
     'game.log.score.moveHidden',

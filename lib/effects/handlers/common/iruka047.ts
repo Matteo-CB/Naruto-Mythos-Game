@@ -14,13 +14,12 @@ import { logAction } from '../../../engine/utils/gameLog';
  */
 function handleIruka047Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly Naruto Uzumaki characters across all missions
+  // Find ALL Naruto Uzumaki characters across all missions (both sides)
+  // JSON: "Move a Naruto Uzumaki character in play" - no "friendly" qualifier
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
-    for (const char of mission[friendlySide]) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.name_fr === 'NARUTO UZUMAKI') {
         validTargets.push(char.instanceId);

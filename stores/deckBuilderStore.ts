@@ -164,6 +164,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, cardIds, missionIds }),
+          credentials: 'include',
         });
 
         if (!res.ok) {
@@ -176,6 +177,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, cardIds, missionIds }),
+          credentials: 'include',
         });
 
         if (!res.ok) {
@@ -198,7 +200,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     set({ isLoading: true });
 
     try {
-      const res = await fetch('/api/decks');
+      const res = await fetch('/api/decks', { credentials: 'include' });
 
       if (!res.ok) {
         // If unauthorized or error, just clear the list
@@ -228,7 +230,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     set({ isLoading: true });
 
     try {
-      const res = await fetch(`/api/decks/${deckId}`);
+      const res = await fetch(`/api/decks/${deckId}`, { credentials: 'include' });
 
       if (!res.ok) {
         throw new Error('Failed to load deck');
@@ -272,6 +274,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     try {
       const res = await fetch(`/api/decks/${deckId}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (!res.ok) {

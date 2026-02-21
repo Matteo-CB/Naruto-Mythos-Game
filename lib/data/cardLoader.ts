@@ -46,6 +46,14 @@ const EFFECT_CORRECTIONS: Record<string, CardEffect[]> = {
     { type: 'MAIN', description: 'Discard a card from your hand. POWERUP X where X is the cost of the discarded card.' },
     { type: 'UPGRADE', description: 'Repeat the MAIN effect.' },
   ],
+  '110/130': [
+    { type: 'MAIN', description: 'If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character from this mission.' },
+    { type: 'UPGRADE', description: 'MAIN effect: After moving, hide the enemy character.' },
+  ],
+  '110/130 A': [
+    { type: 'MAIN', description: 'If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character from this mission.' },
+    { type: 'UPGRADE', description: 'MAIN effect: After moving, hide the enemy character.' },
+  ],
 };
 
 // Keyword corrections from official site (JSON had wrong or incomplete keywords)
@@ -65,6 +73,8 @@ const KEYWORD_CORRECTIONS: Record<string, string[]> = {
   '133/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
   '136/130': ['Team 7', 'Jutsu'],               // missing "Jutsu"
   '112/130': ['Team 10'],                        // missing from JSON
+  '110/130': ['Team 10', 'Jutsu'],               // missing from JSON
+  '110/130 A': ['Team 10', 'Jutsu'],             // missing from JSON
   '135/130': ['Team 7'],                         // confirm from site
 };
 
@@ -82,6 +92,8 @@ const STAT_CORRECTIONS: Record<string, { chakra?: number; power?: number; rarity
   '108/130 A': { chakra: 5, power: 5, title_fr: 'Believe it!' },
   '109/130': { chakra: 4, power: 3, title_fr: 'Ninja Medical', group: 'Leaf Village' },
   '112/130': { chakra: 5, power: 4, group: 'Leaf Village' },
+  '110/130': { chakra: 5, power: 4, group: 'Leaf Village' },
+  '110/130 A': { chakra: 5, power: 4, group: 'Leaf Village' },
 };
 
 // Mission base points (printed on the card).

@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
 
@@ -264,9 +265,10 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 >
                   {card.effects.map((effect: CardEffect, idx: number) => {
                     const frDescriptions = effectDescriptionsFr[card.id];
-                    const description = locale === 'fr' && frDescriptions?.[idx]
-                      ? frDescriptions[idx]
-                      : effect.description;
+                    const enDescriptions = effectDescriptionsEn[card.id];
+                    const description = locale === 'fr'
+                      ? (frDescriptions?.[idx] ?? effect.description)
+                      : (enDescriptions?.[idx] ?? effect.description);
                     return (
                     <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '6px' : 0 }}>
                       <span
