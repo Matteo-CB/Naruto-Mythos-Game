@@ -15,14 +15,15 @@ import { logAction } from '../../../engine/utils/gameLog';
 function handleHinata030Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
 
-  // Find all non-hidden enemy characters with powerTokens > 0 across all missions
+  // Find all enemy characters with powerTokens > 0 across all missions
+  // "in play" includes hidden characters - consistent with Neji 036 (same effect)
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (!char.isHidden && char.powerTokens > 0) {
+      if (char.powerTokens > 0) {
         validTargets.push(char.instanceId);
       }
     }

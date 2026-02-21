@@ -85,7 +85,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   fetchFriends: async () => {
     set({ loading: true });
     try {
-      const res = await fetch('/api/friends');
+      const res = await fetch('/api/friends', { credentials: 'include' });
       const data = await res.json();
       if (res.ok) {
         set({ friends: data.friends ?? data });
@@ -100,7 +100,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   fetchRequests: async () => {
     set({ loading: true });
     try {
-      const res = await fetch('/api/friends/requests');
+      const res = await fetch('/api/friends/requests', { credentials: 'include' });
       const data = await res.json();
       if (res.ok) {
         // Transform API response (id/sender/receiver) to match FriendRequest interface (friendshipId/user)
@@ -126,7 +126,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   fetchPendingInvites: async () => {
     set({ loading: true });
     try {
-      const res = await fetch('/api/match-invite/pending');
+      const res = await fetch('/api/match-invite/pending', { credentials: 'include' });
       const data = await res.json();
       if (res.ok) {
         set({
@@ -148,7 +148,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     }
     set({ searchLoading: true });
     try {
-      const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`, { credentials: 'include' });
       const data = await res.json();
       if (res.ok) {
         set({ searchResults: data.users ?? data });
@@ -166,8 +166,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ receiverId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Re-fetch requests to stay in sync
         await get().fetchRequests();
@@ -183,8 +183,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ friendshipId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Optimistically remove from incoming requests
         set((state) => ({
@@ -206,8 +206,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ friendshipId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Optimistically remove from incoming requests
         set((state) => ({
@@ -225,8 +225,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     try {
       const res = await fetch(`/api/friends/${friendshipId}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Optimistically remove from friends list
         set((state) => ({
@@ -244,8 +244,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ receiverId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Re-fetch pending invites to stay in sync
         await get().fetchPendingInvites();
@@ -261,6 +261,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteId }),
+        credentials: 'include',
       });
       const data = await res.json();
       if (res.ok) {
@@ -284,8 +285,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Optimistically remove from incoming invites
         set((state) => ({
@@ -305,8 +306,8 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteId }),
+        credentials: 'include',
       });
-      const data = await res.json();
       if (res.ok) {
         // Optimistically remove from outgoing invites
         set((state) => ({

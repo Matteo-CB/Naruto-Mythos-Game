@@ -141,21 +141,24 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       {/* Power display (bottom-right) for visible cards */}
       {!isHidden && (
         <motion.div
-          className="absolute bottom-0.5 right-0.5 rounded px-1 py-0.5 text-[10px] font-bold tabular-nums"
+          className="absolute bottom-0.5 right-0.5 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums"
           style={{
-            backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.2)' : 'rgba(0, 0, 0, 0.85)',
-            color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0',
-            border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.4)' : 'none',
-            boxShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.3)' : 'none',
+            minWidth: '22px',
+            height: '18px',
+            padding: '0 4px',
+            backgroundColor: character.powerTokens > 0 ? 'rgba(196, 163, 90, 0.25)' : 'rgba(0, 0, 0, 0.85)',
+            color: character.powerTokens > 0 ? '#f0d890' : '#e0e0e0',
+            border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
+            textShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
           }}
           animate={character.powerTokens > 0 ? {
             boxShadow: [
               '0 0 4px rgba(196, 163, 90, 0.2)',
-              '0 0 8px rgba(196, 163, 90, 0.4)',
+              `0 0 ${6 + character.powerTokens * 2}px rgba(196, 163, 90, ${Math.min(0.6, 0.3 + character.powerTokens * 0.05)})`,
               '0 0 4px rgba(196, 163, 90, 0.2)',
             ],
           } : {}}
-          transition={character.powerTokens > 0 ? { repeat: Infinity, duration: 2 } : {}}
+          transition={character.powerTokens > 0 ? { repeat: Infinity, duration: 1.8 } : {}}
         >
           {totalPower}
         </motion.div>
@@ -164,37 +167,37 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       {/* Physical Power tokens */}
       {character.powerTokens > 0 && (
         <div
-          className="absolute top-0 right-0 flex flex-col items-end gap-px p-0.5"
+          className="absolute top-0.5 right-0.5 flex flex-col items-end gap-0.5"
           style={{ pointerEvents: 'none' }}
         >
           {Array.from({ length: Math.min(character.powerTokens, 5) }).map((_, i) => (
             <motion.div
               key={`token-${i}`}
-              initial={{ scale: 0, y: -8 }}
-              animate={{ scale: 1, y: 0 }}
+              initial={{ scale: 0, y: -10, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
               transition={{
-                delay: i * 0.06,
+                delay: i * 0.08,
                 type: 'spring',
-                stiffness: 500,
-                damping: 18,
+                stiffness: 400,
+                damping: 15,
               }}
-              className="rounded-full flex items-center justify-center"
+              className="rounded-full"
               style={{
-                width: '11px',
-                height: '11px',
-                backgroundColor: '#c4a35a',
+                width: '13px',
+                height: '13px',
+                background: 'radial-gradient(circle at 35% 35%, #f0d890, #c4a35a 50%, #a8893a)',
                 border: '1px solid #a8893a',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.25)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.3), 0 0 4px rgba(196, 163, 90, 0.3)',
               }}
             />
           ))}
           {character.powerTokens > 5 && (
             <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-[7px] font-bold pr-0.5"
-              style={{ color: '#c4a35a', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+              className="text-[8px] font-bold pr-0.5"
+              style={{ color: '#f0d890', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >
               +{character.powerTokens - 5}
             </motion.span>
@@ -216,17 +219,23 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
         </div>
       )}
 
-      {/* Stack size indicator */}
+      {/* Stack/upgrade indicator */}
       {character.stackSize > 1 && (
-        <div
-          className="absolute bottom-0.5 left-0.5 rounded px-0.5 py-0.5 text-[8px] font-medium"
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          className="absolute bottom-0.5 left-0.5 rounded-md px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            color: '#aaaaaa',
+            backgroundColor: 'rgba(62, 139, 62, 0.2)',
+            color: '#5cb85c',
+            border: '1px solid rgba(62, 139, 62, 0.4)',
+            textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
           }}
         >
-          x{character.stackSize}
-        </div>
+          <span style={{ fontSize: '7px' }}>UP</span>
+          <span>{character.stackSize}</span>
+        </motion.div>
       )}
     </motion.div>
   );

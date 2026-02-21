@@ -14,7 +14,7 @@ import { logAction } from '../../../engine/utils/gameLog';
 function mss03ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
   const opponentId = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
-  const opponentState = { ...state[opponentId] };
+  const opponentState = state[opponentId];
 
   if (opponentState.hand.length === 0) {
     const log = logAction(
@@ -30,25 +30,41 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Discard a random card from opponent's hand (opponent should ideally choose)
-  const hand = [...opponentState.hand];
-  const randomIndex = Math.floor(Math.random() * hand.length);
-  const [discarded] = hand.splice(randomIndex, 1);
-  opponentState.hand = hand;
-  opponentState.discardPile = [...opponentState.discardPile, discarded];
+  // If opponent has exactly 1 card, auto-resolve
+  if (opponentState.hand.length === 1) {
+    const hand = [...opponentState.hand];
+    const [discarded] = hand.splice(0, 1);
+    const updatedOpponent = {
+      ...opponentState,
+      hand,
+      discardPile: [...opponentState.discardPile, discarded],
+    };
 
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'SCORE_DISCARD',
-    `MSS 03 (Find the Traitor): Opponent discarded ${discarded.name_fr} from hand.`,
-    'game.log.score.discard',
-    { card: 'Trouver le traitre', count: 1 },
-  );
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      ctx.sourcePlayer,
+      'SCORE_DISCARD',
+      `MSS 03 (Find the Traitor): Opponent discarded ${discarded.name_fr} from hand.`,
+      'game.log.score.discard',
+      { card: 'Trouver le traitre', count: 1 },
+    );
 
-  return { state: { ...state, [opponentId]: opponentState, log } };
+    return { state: { ...state, [opponentId]: updatedOpponent, log } };
+  }
+
+  // Multiple cards: opponent chooses which card to discard
+  const handIndices = opponentState.hand.map((_, i) => String(i));
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'MSS03_OPPONENT_DISCARD',
+    validTargets: handIndices,
+    selectingPlayer: opponentId,
+    description: 'MSS 03 (Find the Traitor): Choose a card from your hand to discard.',
+  };
 }
 
 export function registerMss03Handlers(): void {

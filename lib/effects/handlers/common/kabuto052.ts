@@ -72,18 +72,41 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '052/130' }) } };
   }
 
-  // Pick the mission with fewest friendly characters
-  let bestMissionIdx = validMissionIndices[0];
-  let fewestChars = Infinity;
-  for (const mIdx of validMissionIndices) {
-    const count = newState.activeMissions[mIdx][friendlySide].length;
-    if (count < fewestChars) {
-      fewestChars = count;
-      bestMissionIdx = mIdx;
-    }
+  // If only one valid mission, auto-place
+  if (validMissionIndices.length === 1) {
+    return placeHiddenCard(newState, stolenCard, validMissionIndices[0], sourcePlayer, opponentPlayer, friendlySide);
   }
 
-  // Place the stolen card as a hidden character
+  // Multiple valid missions: let the player choose
+  // Store the stolen card temporarily in the state for retrieval after selection
+  newState = {
+    ...newState,
+    log: logAction(newState.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT',
+      'Kabuto Yakushi (052): Drew top card from opponent\'s deck. Choose a mission to place it hidden.',
+      'game.log.effect.kabutoSteal',
+      { card: 'KABUTO YAKUSHI', id: '052/130' }),
+    _pendingHiddenCard: stolenCard,
+    _pendingOriginalOwner: opponentPlayer,
+  } as typeof newState;
+
+  return {
+    state: newState,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KABUTO_CHOOSE_MISSION',
+    validTargets: validMissionIndices.map(String),
+    description: 'Kabuto Yakushi (052): Choose a mission to place the stolen card hidden.',
+  };
+}
+
+function placeHiddenCard(
+  state: EffectContext['state'],
+  stolenCard: import('../../../engine/types').CharacterCard,
+  missionIdx: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
+  opponentPlayer: import('../../../engine/types').PlayerID,
+  friendlySide: 'player1Characters' | 'player2Characters',
+): EffectResult {
   const charInPlay: CharacterInPlay = {
     instanceId: generateInstanceId(),
     card: stolenCard,
@@ -92,18 +115,18 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
     stack: [stolenCard],
     controlledBy: sourcePlayer,
     originalOwner: opponentPlayer,
-    missionIndex: bestMissionIdx,
+    missionIndex: missionIdx,
   };
 
-  const missions = [...newState.activeMissions];
-  const mission = { ...missions[bestMissionIdx] };
+  const missions = [...state.activeMissions];
+  const mission = { ...missions[missionIdx] };
   const chars = [...mission[friendlySide]];
   chars.push(charInPlay);
   mission[friendlySide] = chars;
-  missions[bestMissionIdx] = mission;
-  newState.activeMissions = missions;
+  missions[missionIdx] = mission;
 
-  // Update character count
+  let newState = { ...state, activeMissions: missions };
+
   const ps = { ...newState[sourcePlayer] };
   let charCount = 0;
   for (const m of missions) {
@@ -113,11 +136,11 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
   newState[sourcePlayer] = ps;
 
   newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
+    newState.log, newState.turn, newState.phase, sourcePlayer,
     'EFFECT',
-    `Kabuto Yakushi (052): Drew top card from opponent's deck and placed it hidden on mission ${bestMissionIdx + 1}.`,
+    `Kabuto Yakushi (052): Placed stolen card hidden on mission ${missionIdx + 1}.`,
     'game.log.effect.kabutoSteal',
-    { card: 'KABUTO YAKUSHI', id: '052/130', mission: String(bestMissionIdx + 1) },
+    { card: 'KABUTO YAKUSHI', id: '052/130', mission: String(missionIdx + 1) },
   );
 
   return { state: newState };

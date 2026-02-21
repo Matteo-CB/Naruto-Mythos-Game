@@ -118,7 +118,6 @@ export function HoloCard({
               draggable={false}
             />
           </div>
-          <div className="holo-card__shine" />
           <div className="holo-card__glare" />
         </div>
       </div>

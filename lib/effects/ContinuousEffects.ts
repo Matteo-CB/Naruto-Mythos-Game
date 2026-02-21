@@ -68,6 +68,20 @@ export function calculateContinuousChakraBonus(
       const hasNonHiddenEnemy = enemyChars.some((c) => !c.isHidden);
       if (hasNonHiddenEnemy) bonus += 1;
     }
+
+    // Shizune 005: Unconditional CHAKRA +1
+    if (topCard.id === '005/130' || topCard.number === 5) {
+      if (effect.description.includes('CHAKRA +1')) {
+        bonus += 1;
+      }
+    }
+
+    // Sakura 012 (UC): Unconditional CHAKRA +1
+    if (topCard.id === '012/130' || topCard.number === 12) {
+      if (effect.description.includes('CHAKRA +1')) {
+        bonus += 1;
+      }
+    }
   }
 
   return bonus;
@@ -189,13 +203,13 @@ export function calculateContinuousPowerModifier(
 /**
  * Determine whether a character should retain its power tokens at end of round.
  *
- * Rock Lee 039 has a continuous effect that prevents power token removal.
+ * Rock Lee 039 and Gai Maito 043 both have continuous effects that prevent power token removal.
  */
 export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Rock Lee 039 exception: doesn't lose power tokens if face-visible
-  if (topCard.number === 39 && !char.isHidden) {
+  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens if face-visible
+  if ((topCard.number === 39 || topCard.number === 43) && !char.isHidden) {
     const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
     );

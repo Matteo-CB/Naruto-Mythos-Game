@@ -11,6 +11,7 @@ import { registerTsunade104Handlers } from './tsunade104';
 import { registerJiraiya105Handlers } from './jiraiya105';
 import { registerKakashi106Handlers } from './kakashi106';
 import { registerSasuke107Handlers } from './sasuke107';
+import { registerIno110Handlers } from './ino110';
 import { registerShikamaru111Handlers } from './shikamaru111';
 import { registerKiba113Handlers } from './kiba113';
 import { registerAsuma113bHandlers } from './asuma113b';
@@ -18,6 +19,7 @@ import { registerHinata114Handlers } from './hinata114';
 import { registerNeji116Handlers } from './neji116';
 import { registerKurenai116bHandlers } from './kurenai116b';
 import { registerRockLee117Handlers } from './rockLee117';
+import { registerTenten118Handlers } from './tenten118';
 import { registerKankuro119Handlers } from './kankuro119';
 import { registerGuy119bHandlers } from './guy119b';
 import { registerTemari121Handlers } from './temari121';
@@ -43,6 +45,7 @@ export function registerAllRareHandlers(): void {
   registerJiraiya105Handlers();   // 105/130 - JIRAYA: Play Summon -3 / UPGRADE move enemy
   registerKakashi106Handlers();   // 106/130 - KAKASHI: Discard top of upgraded enemy / UPGRADE copy
   registerSasuke107Handlers();    // 107/130 - SASUKE: Must move friendly / UPGRADE POWERUP X
+  registerIno110Handlers();       // 110/130 - INO YAMANAKA: Move weakest enemy if 2+ / UPGRADE hide after move
   registerShikamaru111Handlers(); // 111/130 - SHIKAMARU: [continuous] block hidden play / UPGRADE hide P3
   registerKiba113Handlers();      // 113/130 - KIBA: Hide Akamaru+another / UPGRADE defeat both
   registerAsuma113bHandlers();    // 113b/130 - ASUMA: AMBUSH draw / MAIN discard to defeat
@@ -50,6 +53,7 @@ export function registerAllRareHandlers(): void {
   registerNeji116Handlers();      // 116/130 - NEJI: Defeat exact P4 / UPGRADE P6
   registerKurenai116bHandlers();  // 116b/130 - KURENAI: AMBUSH defeat P4 / UPGRADE move self
   registerRockLee117Handlers();   // 117/130 - ROCK LEE: [continuous] must move / UPGRADE discard POWERUP
+  registerTenten118Handlers();    // 118/130 - TENTEN: AMBUSH defeat hidden in mission, if P<=3 defeat another
   registerKankuro119Handlers();   // 119/130 - KANKURO: UPGRADE move any / MAIN defeat P3
   registerGuy119bHandlers();      // 119b/130 - MIGHT GUY: UPGRADE POWERUP 3 / MAIN discard+move enemies
   registerTemari121Handlers();    // 121/130 - TEMARI: Move friendly / UPGRADE move any

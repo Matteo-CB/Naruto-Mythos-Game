@@ -50,7 +50,7 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
       {/* Stacked card hints behind the top card */}
       {hasStack &&
         Array.from({ length: Math.min(stackSize - 1, 3) }).map((_, idx) => {
-          const offset = (idx + 1) * 3;
+          const offset = (idx + 1) * 4;
           return (
             <div
               key={`stack-${idx}`}
@@ -60,9 +60,11 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
                 top: `${offset}px`,
                 left: `${offset}px`,
                 zIndex: idx,
-                opacity: 0.4 - idx * 0.1,
-                filter: 'brightness(0.6)',
+                opacity: 0.5 - idx * 0.12,
+                filter: 'brightness(0.5)',
                 pointerEvents: 'none',
+                outline: '1px solid rgba(62, 139, 62, 0.3)',
+                borderRadius: '4px',
               }}
             >
               <CardBack />
@@ -85,30 +87,32 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
         )}
       </div>
 
-      {/* Stack count indicator */}
+      {/* Stack/upgrade count indicator */}
       {hasStack && (
         <div
           style={{
             position: 'absolute',
-            top: '-4px',
-            right: '-4px',
+            top: '-5px',
+            right: '-5px',
             zIndex: stackSize + 1,
-            backgroundColor: '#2a2a2a',
-            border: '1px solid #444444',
+            backgroundColor: 'rgba(62, 139, 62, 0.9)',
+            border: '2px solid #5cb85c',
             borderRadius: '50%',
-            width: '18px',
-            height: '18px',
+            width: '20px',
+            height: '20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: '0 0 8px rgba(62, 139, 62, 0.4), 0 2px 4px rgba(0,0,0,0.5)',
           }}
         >
           <span
             style={{
-              color: '#e0e0e0',
+              color: '#ffffff',
               fontSize: '10px',
               fontWeight: 700,
               lineHeight: 1,
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
             }}
           >
             {stackSize}

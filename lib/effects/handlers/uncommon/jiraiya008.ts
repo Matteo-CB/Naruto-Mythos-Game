@@ -23,56 +23,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
 
   let newState = { ...state };
 
-  // UPGRADE bonus: Hide an enemy character with cost 3 or less in this mission
-  if (isUpgrade) {
-    const mission = newState.activeMissions[sourceMissionIndex];
-    const enemySide: 'player1Characters' | 'player2Characters' =
-      sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-    const enemyChars = mission[enemySide];
-
-    // Find non-hidden enemies with cost <= 3
-    const hideTargets: string[] = [];
-    for (const char of enemyChars) {
-      if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if (topCard.chakra <= 3) {
-        hideTargets.push(char.instanceId);
-      }
-    }
-
-    if (hideTargets.length === 1) {
-      // Auto-hide the single target
-      const targetId = hideTargets[0];
-      const missions = [...newState.activeMissions];
-      const m = { ...missions[sourceMissionIndex] };
-      const chars = [...m[enemySide]];
-      const idx = chars.findIndex(c => c.instanceId === targetId);
-      if (idx !== -1) {
-        const targetName = chars[idx].card.name_fr;
-        chars[idx] = { ...chars[idx], isHidden: true };
-        m[enemySide] = chars;
-        missions[sourceMissionIndex] = m;
-        newState = { ...newState, activeMissions: missions };
-        newState = { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer,
-          'EFFECT_HIDE',
-          `Jiraiya (008): Hid ${targetName} (upgrade effect, cost 3 or less).`,
-          'game.log.effect.hide',
-          { card: 'JIRAYA', id: '008/130', target: targetName }) };
-      }
-    } else if (hideTargets.length > 1) {
-      // Multiple targets for the hide portion - requires target selection
-      // This will be handled separately; for now, return the hide selection
-      return {
-        state: newState,
-        requiresTargetSelection: true,
-        targetSelectionType: 'JIRAIYA_HIDE_ENEMY_COST_3',
-        validTargets: hideTargets,
-        description: 'Select an enemy character with cost 3 or less in this mission to hide (upgrade effect).',
-      };
-    }
-    // If no hide targets, upgrade hide portion fizzles but MAIN continues
-  }
-
+  // MAIN executes first (top-to-bottom), then UPGRADE hide after
   // MAIN: Play a Summon character from hand anywhere, paying 2 less
   const playerState = newState[sourcePlayer];
   const summonCards: { index: number; card: CharacterCard }[] = [];
@@ -166,6 +117,51 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
     'game.log.effect.playSummonReduced',
     { card: 'JIRAYA', id: '008/130', target: chosen.card.name_fr, mission: String(bestMissionIdx + 1), cost: String(reducedCost) },
   );
+
+  // UPGRADE: After MAIN, hide an enemy character with cost 3 or less in this mission
+  if (isUpgrade) {
+    const upgradeMission = newState.activeMissions[sourceMissionIndex];
+    const enemySide: 'player1Characters' | 'player2Characters' =
+      sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const enemyChars = upgradeMission[enemySide];
+
+    const hideTargets: string[] = [];
+    for (const char of enemyChars) {
+      if (char.isHidden) continue;
+      const tc = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (tc.chakra <= 3) {
+        hideTargets.push(char.instanceId);
+      }
+    }
+
+    if (hideTargets.length === 1) {
+      const targetId = hideTargets[0];
+      const ms = [...newState.activeMissions];
+      const m = { ...ms[sourceMissionIndex] };
+      const cs = [...m[enemySide]];
+      const idx = cs.findIndex(c => c.instanceId === targetId);
+      if (idx !== -1) {
+        const targetName = cs[idx].card.name_fr;
+        cs[idx] = { ...cs[idx], isHidden: true };
+        m[enemySide] = cs;
+        ms[sourceMissionIndex] = m;
+        newState = { ...newState, activeMissions: ms };
+        newState = { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer,
+          'EFFECT_HIDE',
+          `Jiraiya (008): Hid ${targetName} (upgrade effect, cost 3 or less).`,
+          'game.log.effect.hide',
+          { card: 'JIRAYA', id: '008/130', target: targetName }) };
+      }
+    } else if (hideTargets.length > 1) {
+      return {
+        state: newState,
+        requiresTargetSelection: true,
+        targetSelectionType: 'JIRAIYA_HIDE_ENEMY_COST_3',
+        validTargets: hideTargets,
+        description: 'Select an enemy character with cost 3 or less in this mission to hide (upgrade effect).',
+      };
+    }
+  }
 
   return { state: newState };
 }

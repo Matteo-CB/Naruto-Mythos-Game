@@ -1,0 +1,959 @@
+================================================================================
+  NARUTO MYTHOS TCG — LISTE COMPLETE DES CARTES ET EFFETS (CORRIGEE)
+  Source: Site officiel narutotcgmythos.com + Rulebook officiel
+  Date de mise a jour: 19/02/2026
+================================================================================
+
+Legende:
+  [MAIN]    = Effet principal (se declenche quand le personnage est joue face visible)
+  [UPGRADE] = Effet d'amelioration (quand le personnage est joue par-dessus un autre du meme nom)
+  [AMBUSH]  = Effet d'embuscade (uniquement quand un personnage cache est revele)
+  [SCORE]   = Effet de score (quand le joueur gagne la mission)
+  [cont.]   = Effet continu/passif (actif tant que le personnage est face visible)
+  [CORRIGE] = Donnee corrigee par rapport au JSON d'origine
+
+
+================================================================================
+  CARTES PERSONNAGES — COMMON (C)
+================================================================================
+
+001/130 — HIRUZEN SARUTOBI "Le Professeur"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Hokage
+  [MAIN] POWERUP 2 another friendly Leaf Village character.
+  ----------
+  A verifier:
+  [ ] Cible un autre personnage Leaf Village ami (pas lui-meme)
+  [ ] Ajoute bien 2 tokens de puissance
+  [ ] Si aucun autre Leaf Village ami, l'effet echoue proprement
+
+--------------------------------------------------------------------------------
+
+003/130 — TSUNADE "Maitre Ninja Medical"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Sannin
+  [MAIN][cont.] When any friendly character is defeated, gain 2 Chakra.
+  ----------
+  A verifier:
+  [ ] Effet continu — reste actif tant que Tsunade est face visible
+  [ ] Se declenche pour CHAQUE personnage ami vaincu
+  [ ] +2 chakra a chaque declenchement
+  [ ] Ne se declenche PAS si Tsunade elle-meme est vaincue
+  [ ] Fonctionne meme si le personnage vaincu est dans une autre mission
+
+--------------------------------------------------------------------------------
+
+007/130 — JIRAYA "Ermite des Crapauds"
+  Cout: 4 | Puissance: 4 | Groupe: Leaf Village | Mots-cles: Sannin
+  [MAIN] Play a Summon character anywhere, paying 1 less.
+  ----------
+  A verifier:
+  [ ] Cherche une carte Summon dans la main
+  [ ] La joue sur n'importe quelle mission (pas seulement celle de Jiraya)
+  [ ] Reduit le cout de 1 chakra
+  [ ] Si aucune carte Summon en main, l'effet echoue proprement
+
+--------------------------------------------------------------------------------
+
+009/130 — NARUTO UZUMAKI "Genin du Village de la Feuille"
+  Cout: 2 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Team 7
+  (Aucun effet)
+  ----------
+  A verifier:
+  [ ] Pas d'effet — simple carte vanille
+
+--------------------------------------------------------------------------------
+
+011/130 — SAKURA HARUNO "Genin de l'Equipe 7"
+  Cout: 2 | Puissance: 2 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN] If there's another Team 7 character in this mission, draw a card.
+  ----------
+  A verifier:
+  [ ] Condition: un AUTRE personnage Team 7 dans la meme mission
+  [ ] Pioche 1 carte si la condition est remplie
+  [ ] Si le deck est vide, pas de pioche (pas de penalite)
+  [ ] Ne pioche PAS si aucun autre Team 7 dans la mission
+
+--------------------------------------------------------------------------------
+
+013/130 — SASUKE UCHIWA "Dernier du Clan Uchiwa"
+  Cout: 2 | Puissance: 4 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN][cont.] This character has -1 Power for every other non-hidden
+                 friendly character in this mission.
+  ----------
+  A verifier:
+  [ ] Effet continu — applique en permanence
+  [ ] -1 puissance par autre personnage ami NON-cache dans la meme mission
+  [ ] Les personnages caches ne comptent PAS dans la reduction
+  [ ] La puissance effective change dynamiquement
+
+--------------------------------------------------------------------------------
+
+015/130 — KAKASHI HATAKE "Sensei de l'Equipe 7"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN][cont.] Other Team 7 characters in this mission have +1 Power.
+  ----------
+  A verifier:
+  [ ] Effet continu — buff les AUTRES Team 7 dans la meme mission
+  [ ] +1 puissance pour chaque autre Team 7
+  [ ] Ne se buffe PAS lui-meme
+  [ ] S'applique pendant le scoring des missions
+
+--------------------------------------------------------------------------------
+
+019/130 — INO YAMANAKA "Genin de l'Equipe 10"
+  Cout: 1 | Puissance: 1 | Groupe: Leaf Village | Mots-cles: Team 10
+  [MAIN] If there's another Team 10 character in this mission, POWERUP 1.
+  ----------
+  A verifier:
+  [ ] Condition: un AUTRE personnage Team 10 dans la meme mission
+  [ ] POWERUP 1 sur elle-meme si la condition est remplie
+  [ ] Si pas d'autre Team 10, pas de POWERUP
+
+--------------------------------------------------------------------------------
+
+021/130 — SHIKAMARU NARA "Genin de l'Equipe 10"
+  Cout: 1 | Puissance: 0 | Groupe: Leaf Village | Mots-cles: Team 10
+  [MAIN] If you have the Edge, draw a card.
+  ----------
+  A verifier:
+  [ ] Condition: le joueur possede le jeton Edge
+  [ ] Pioche 1 carte si la condition est remplie
+  [ ] Puissance de base = 0 (champ manquant dans le JSON, defaut a 0)
+
+--------------------------------------------------------------------------------
+
+023/130 — ASUMA SARUTOBI "Sensei de l'Equipe 10"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Team 10
+  [MAIN] Move another Team 10 character from this mission.
+  ----------
+  A verifier:
+  [ ] Deplace un AUTRE personnage Team 10 depuis cette mission
+  [ ] Vers une autre mission active
+  [ ] Si aucun autre Team 10 dans la mission, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+025/130 — KIBA INUZUKA "Genin de l'Equipe 8"
+  Cout: 2 | Puissance: 2 | Groupe: Leaf Village | Mots-cles: Team 8
+  [MAIN][cont.] If Akamaru is in the same mission, CHAKRA +1.
+  ----------
+  A verifier:
+  [ ] Effet continu — verifie si Akamaru est dans la meme mission
+  [ ] Si oui, +1 chakra supplementaire pendant la Start Phase
+  [ ] Se recalcule si Akamaru bouge ou est vaincu
+
+--------------------------------------------------------------------------------
+
+027/130 — AKAMARU "Chien Ninja"
+  Cout: 1 | Puissance: 2 | Groupe: Leaf Village | Mots-cles: Team 8
+  [MAIN][cont.] If there isn't a Kiba Inuzuka in this mission at the end of
+                 the round, you must return this character to your hand.
+  ----------
+  A verifier:
+  [ ] Effet continu — verifie pendant la End Phase
+  [ ] Si aucun Kiba Inuzuka dans la meme mission, retourne en main
+  [ ] Si Kiba est present, Akamaru reste en jeu
+  [ ] Le retour en main est OBLIGATOIRE ("you must")
+
+--------------------------------------------------------------------------------
+
+034/130 — YUHI KURENAI "Sensei de l'Equipe 8"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Team 8
+  [MAIN][cont.] Other Team 8 characters costs 1 less (min.1) to play in
+                 this mission.
+  ----------
+  A verifier:
+  [ ] Effet continu — reduction de cout pour les AUTRES Team 8
+  [ ] -1 chakra pour jouer un Team 8 dans cette mission (minimum 1)
+  [ ] Ne s'applique PAS a elle-meme
+  [ ] Le cout minimum est 1 (ne peut pas etre gratuit)
+
+--------------------------------------------------------------------------------
+
+036/130 — NEJI HYUGA "Poing Souple"
+  Cout: 2 | Puissance: 2 | Groupe: Leaf Village
+  Mots-cles: Team Guy, Taijutsu  [CORRIGE: JSON n'avait que "Team Guy"]
+  [MAIN] Remove up to 2 Power tokens from an enemy character in play.
+  ----------
+  A verifier:
+  [ ] Cible un personnage ENNEMI n'importe ou en jeu
+  [ ] Retire jusqu'a 2 tokens de puissance
+  [ ] Si l'ennemi a 1 seul token, retire 1 seul
+  [ ] Si aucun ennemi avec des tokens, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+040/130 — TENTEN "Genin de l'Equipe Gai"
+  Cout: 1 | Puissance: 2 | Groupe: Leaf Village | Mots-cles: Team Guy
+  [MAIN][cont.] You can play this character only in a mission where you are
+                 currently winning.
+  ----------
+  A verifier:
+  [ ] Restriction continue — ne peut etre jouee QUE sur une mission ou le joueur gagne
+  [ ] "Gagner" = puissance totale superieure a l'adversaire (Edge en cas d'egalite)
+  [ ] Doit utiliser la puissance effective (tokens + effets continus)
+  [ ] Si aucune mission n'est gagnee, ne peut pas etre jouee
+
+--------------------------------------------------------------------------------
+
+042/130 — GAI MAITO "Sensei de l'Equipe Gai"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Team Guy
+  [MAIN][cont.] Other Team Guy characters in this mission have +1 Power.
+  ----------
+  A verifier:
+  [ ] Effet continu — buff les AUTRES Team Guy dans la meme mission
+  [ ] +1 puissance pour chaque autre Team Guy
+  [ ] Ne se buffe PAS lui-meme
+
+--------------------------------------------------------------------------------
+
+044/130 — ANKO MITARASHI "Surveillant des examens Chunin"
+  Cout: 2 | Puissance: 2 | Groupe: Leaf Village
+  Mots-cles: Special Jonin  [CORRIGE: JSON avait "Academy" — FAUX]
+  [MAIN][cont.] If you have at least one other friendly Leaf Village character
+                 in this mission, CHAKRA +1.
+  ----------
+  A verifier:
+  [ ] Effet continu — verifie s'il y a un AUTRE Leaf Village ami
+  [ ] Si oui, +1 chakra pendant la Start Phase
+  [ ] Un seul autre suffit pour activer
+
+--------------------------------------------------------------------------------
+
+046/130 — EBISU "Entraineur d'Elite"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Pouvoir
+  [MAIN] If there is a friendly non-hidden character with less Power than this
+         character in this mission, draw a card.
+  ----------
+  A verifier:
+  [ ] Condition: un ami non-cache dans la meme mission avec MOINS de puissance
+  [ ] Doit utiliser la puissance effective (tokens + effets continus)
+  [ ] Pioche 1 carte si la condition est remplie
+
+--------------------------------------------------------------------------------
+
+047/130 — IRUKA UMINO "Instructeur de l'Academie"
+  [CORRIGE: nom complet "IRUKA UMINO" — JSON avait juste "IRUKA"]
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Academy
+  [MAIN] Move a Naruto Uzumaki character in play.
+  ----------
+  A verifier:
+  [ ] Cherche un personnage nomme "Naruto Uzumaki" en jeu
+  [ ] Le deplace vers une autre mission
+  [ ] Fonctionne sur n'importe quel Naruto (pas seulement 009)
+
+--------------------------------------------------------------------------------
+
+048/130 — HAYATE GEKKO "Shinobi talentueux"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village
+  Mots-cles: Special Jonin  [CORRIGE: JSON avait "Pouvoir" — FAUX]
+  [MAIN][cont.] If this character would be defeated, hide it instead.
+  ----------
+  A verifier:
+  [ ] Effet de remplacement — au lieu d'etre vaincu, se cache
+  [ ] Fonctionne contre les effets ennemis et les effets de jeu
+  [ ] Ne s'active qu'une seule fois (une fois cache, peut etre vaincu normalement)
+
+--------------------------------------------------------------------------------
+
+049/130 — GEMMA SHIRANUI "Garde d'Elite"
+  Cout: 3 | Puissance: 3 | Groupe: Leaf Village | Mots-cles: Pouvoir
+  [MAIN][cont.] If a friendly Leaf Village character in this mission would be
+                 hidden or defeated by enemy effects, you can defeat this
+                 character instead.
+  ----------
+  A verifier:
+  [ ] Effet de sacrifice — protege un ami Leaf Village dans la meme mission
+  [ ] Optionnel ("you can")
+  [ ] Se sacrifie a la place du personnage cible
+  [ ] Ne protege que contre les effets ENNEMIS (pas les couts ou auto-defaites)
+
+--------------------------------------------------------------------------------
+
+050/130 — OROCHIMARU "Infiltre"
+  Cout: 4 | Puissance: 4 | Groupe: Sound Village
+  Mots-cles: Sannin, Sound Ninja  [CORRIGE: JSON n'avait que "Sannin"]
+  [AMBUSH] Look at a hidden enemy character in this mission. If it costs 3 or
+           less, take control of that character and move it to your side.
+  ----------
+  A verifier:
+  [ ] Se declenche UNIQUEMENT a la revelation (AMBUSH)
+  [ ] Regarde un personnage cache ENNEMI dans la meme mission
+  [ ] Si cout <= 3, prend le controle
+  [ ] Le personnage vole passe sous controle du joueur
+  [ ] Si cout > 3, l'effet de vol echoue (mais le joueur a vu la carte)
+  [ ] Si aucun ennemi cache, l'effet echoue
+  [ ] Rappel rulebook: "Take control" = temporaire, si quitte le jeu retourne au proprietaire
+
+--------------------------------------------------------------------------------
+
+055/130 — KIMIMARO "La Danse du Camelia"
+  Cout: 3 | Puissance: 3 | Groupe: Sound Village | Mots-cles: Weapon
+  [AMBUSH] Discard a card to hide a character in play with cost 3 or less.
+  ----------
+  A verifier:
+  [ ] Se declenche UNIQUEMENT a la revelation (AMBUSH)
+  [ ] Defausse 1 carte de la main comme cout
+  [ ] Cache un personnage en jeu avec cout <= 3
+  [ ] Peut cacher un ennemi OU un ami
+  [ ] Si la main est vide, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+057/130 — JIROBO "Porteur de la Marque Maudite"
+  Cout: 2 | Puissance: 2 | Groupe: Sound Village | Mots-cles: Sound Four
+  [MAIN] POWERUP X. X is the number of missions where you have at least one
+         friendly Sound Four character.
+  ----------
+  A verifier:
+  [ ] Compte le nombre de missions avec au moins 1 Sound Four ami visible
+  [ ] POWERUP X sur lui-meme (X = ce nombre)
+  [ ] Jirobo lui-meme compte dans ce decompte
+
+--------------------------------------------------------------------------------
+
+059/130 — KIDOMARU "Porteur de la Marque Maudite"
+  Cout: 3 | Puissance: 2 | Groupe: Sound Village | Mots-cles: Sound Four
+  [MAIN] Move X friendly character(s). X is the number of missions where you
+         have at least one friendly Sound Four character.
+  ----------
+  A verifier:
+  [ ] Compte le nombre de missions avec au moins 1 Sound Four ami visible
+  [ ] Deplace X personnages amis vers d'autres missions
+  [ ] Chaque deplacement declenche le trigger de Ninja Hounds 100
+  [ ] Si moins de X personnages deplacables, deplace ce qu'il peut
+
+--------------------------------------------------------------------------------
+
+061/130 — SAKON "Porteur de la Marque Maudite"
+  Cout: 3 | Puissance: 2 | Groupe: Sound Village | Mots-cles: Sound Four
+  [MAIN] Draw X card(s). X is the number of missions where you have at least
+         one friendly Sound Four character.
+  ----------
+  A verifier:
+  [ ] Compte le nombre de missions avec au moins 1 Sound Four ami visible
+  [ ] Pioche X cartes
+  [ ] Si le deck a moins de X cartes, pioche ce qui reste
+
+--------------------------------------------------------------------------------
+
+064/130 — TAYUYA "Porteur de la Marque Maudite"
+  Cout: 2 | Puissance: 1 | Groupe: Sound Village | Mots-cles: Sound Four
+  [MAIN][cont.] CHAKRA +X. X is the number of missions where you have at least
+                 one friendly Sound Four character.
+  ----------
+  A verifier:
+  [ ] Effet continu — +X chakra pendant la Start Phase
+  [ ] X = nombre de missions avec au moins 1 Sound Four ami visible
+  [ ] Se recalcule chaque tour
+
+--------------------------------------------------------------------------------
+
+068/130 — DOSU KINUTA "Ouie Surhumaine"
+  Cout: 3 | Puissance: 3 | Groupe: Sound Village | Mots-cles: Team Dosu
+  [MAIN] Look at a hidden character in play.
+  [AMBUSH] Defeat a hidden character in play.
+  ----------
+  A verifier:
+  [ ] MAIN: Revele (regarde) un personnage cache n'importe ou en jeu
+  [ ] AMBUSH: Vainc un personnage cache n'importe ou en jeu
+  [ ] L'AMBUSH ne se declenche QU'a la revelation
+  [ ] Les deux effets ciblent n'importe quel personnage cache (ami ou ennemi)
+  [ ] Defaite declenche les triggers (Tsunade 003, Sasuke 136)
+
+--------------------------------------------------------------------------------
+
+070/130 — ZAKU ABUMI "Shinobi trop confiant"
+  Cout: 2 | Puissance: 4 | Groupe: Sound Village | Mots-cles: Team Dosu
+  [MAIN] Opponent gains 1 Chakra.
+  ----------
+  A verifier:
+  [ ] L'adversaire gagne 1 chakra (inconvenient pour le joueur)
+  [ ] Effet obligatoire
+  [ ] Forte puissance (4) comme contrepartie
+
+--------------------------------------------------------------------------------
+
+072/130 — KIN TSUCHI "Kunoichi"
+  Cout: 1 | Puissance: 3 | Groupe: Sound Village | Mots-cles: Team Dosu
+  [MAIN] Opponent draws a card.
+  ----------
+  A verifier:
+  [ ] L'adversaire pioche 1 carte (inconvenient pour le joueur)
+  [ ] Effet obligatoire
+  [ ] Si le deck adverse est vide, rien ne se passe
+
+--------------------------------------------------------------------------------
+
+074/130 — GAARA "Genin du Village du Sable"
+  Cout: 2 | Puissance: 2 | Groupe: Sand Village | Mots-cles: Team Baki
+  [MAIN] POWERUP X where X is the number of friendly hidden characters in
+         this mission.
+  ----------
+  A verifier:
+  [ ] Compte les personnages CACHES amis dans la meme mission
+  [ ] POWERUP X sur lui-meme (X = ce nombre)
+  [ ] Les personnages caches amis comptent bien
+
+--------------------------------------------------------------------------------
+
+075/130 — GAARA "Bouclier de Sable"
+  Cout: 3 | Puissance: 3 | Groupe: Sand Village | Mots-cles: Team Baki
+  [MAIN][cont.] If this character would be moved or defeated by enemy effects,
+                 instead hide them.
+  [MAIN][cont.] You can play this character while hidden paying 2 less.
+  ----------
+  A verifier:
+  [ ] Remplacement: defaite/deplacement par effets ennemis -> se cache
+  [ ] Peut etre joue/revele depuis l'etat cache en payant 2 de moins
+  [ ] La reduction de -2 s'applique au cout de revelation
+  [ ] Le remplacement ne fonctionne que contre les effets ENNEMIS
+
+--------------------------------------------------------------------------------
+
+077/130 — KANKURO "Fils de Chakra"
+  Cout: 3 | Puissance: 3 | Groupe: Sand Village | Mots-cles: Team Baki
+  [MAIN][cont.] If there's at least one non-hidden enemy character in this
+                 mission, CHAKRA +1.
+  ----------
+  A verifier:
+  [ ] Effet continu — verifie s'il y a un ennemi NON-cache dans la mission
+  [ ] Si oui, +1 chakra pendant la Start Phase
+
+--------------------------------------------------------------------------------
+
+079/130 — TEMARI "Kunoichi"
+  Cout: 2 | Puissance: 2 | Groupe: Sand Village | Mots-cles: Team Baki
+  [MAIN][cont.] If you have the Edge, this character has +2 Power.
+  ----------
+  A verifier:
+  [ ] Effet continu — +2 puissance si le joueur a le jeton Edge
+  [ ] Se recalcule dynamiquement si le Edge change de main
+
+--------------------------------------------------------------------------------
+
+081/130 — BAKI "Agent du Conseil"
+  Cout: 3 | Puissance: 2 | Groupe: Sand Village | Mots-cles: Team Baki
+  [SCORE] Draw a card.
+  ----------
+  A verifier:
+  [ ] Se declenche quand le joueur GAGNE la mission ou Baki est assigne
+  [ ] Pioche 1 carte
+  [ ] Le joueur doit avoir au moins 1 puissance pour gagner
+
+--------------------------------------------------------------------------------
+
+084/130 — YASHAMARU "Tuteur de Gaara"
+  Cout: 1 | Puissance: 1 | Groupe: Sand Village | Mots-cles: Pouvoir
+  [MAIN][cont.] This character has +2 Power if there's a friendly Gaara in
+                 this mission.
+  ----------
+  A verifier:
+  [ ] Effet continu — +2 puissance si un Gaara ami est dans la meme mission
+  [ ] Fonctionne avec n'importe quel Gaara (074, 075, 120, 120A)
+  [ ] Se recalcule si Gaara bouge ou est vaincu
+
+--------------------------------------------------------------------------------
+
+086/130 — ZABUZA MOMOCHI "Tranchoir"
+  Cout: 3 | Puissance: 5 | Groupe: Independent | Mots-cles: Rogue Ninja
+  (Aucun effet)
+  ----------
+  A verifier:
+  [ ] Pas d'effet — forte puissance vanille
+
+--------------------------------------------------------------------------------
+
+088/130 — HAKU "Orphelin du Pays de l'Eau"
+  Cout: 2 | Puissance: 2 | Groupe: Independent | Mots-cles: Rogue Ninja
+  [MAIN] Draw 1 card. If you do, you must put 1 card from your hand on top
+         of your deck.
+  ----------
+  A verifier:
+  [ ] Pioche 1 carte
+  [ ] OBLIGATOIRE: remet 1 carte de la main sur le dessus du deck
+  [ ] Si le deck est vide, rien ne se passe
+  [ ] Effet net: echange une carte (main inchangee en taille)
+
+--------------------------------------------------------------------------------
+
+090/130 — ITACHI UCHIWA "Akatsuki"
+  Cout: 3 | Puissance: 3 | Groupe: Akatsuki | Mots-cles: Rogue Ninja
+  [MAIN][cont.] If there is a Sasuke Uchiha in this mission, you can play
+                 this character while hidden paying 3 less.
+  ----------
+  A verifier:
+  [ ] Effet continu — reduction de cout de revelation
+  [ ] Condition: un Sasuke Uchiwa dans la meme mission
+  [ ] -3 chakra pour jouer/reveler ce personnage
+  [ ] Rappel rulebook: jouer depuis hidden = comme jouer depuis la main
+
+--------------------------------------------------------------------------------
+
+092/130 — KISAME HOSHIGAKI "Le Ninja Deserteur du Village du Brouillard"
+  Cout: 3 | Puissance: 4 | Groupe: Akatsuki | Mots-cles: Rogue Ninja
+  [AMBUSH] Remove up to 2 Power tokens from an enemy character in this
+           mission and put them on this character.
+  ----------
+  A verifier:
+  [ ] Se declenche UNIQUEMENT a la revelation (AMBUSH)
+  [ ] Cible un ennemi dans la MEME mission
+  [ ] Retire jusqu'a 2 tokens de l'ennemi
+  [ ] Met les tokens retires sur Kisame
+  [ ] Si aucun ennemi avec tokens, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+094/130 — GAMA BUNTA "Chef des Crapauds"
+  Cout: 3 | Puissance: 6 | Groupe: Independent | Mots-cles: Summon
+  [MAIN][cont.] At the end of the round, you must return this character to
+                 your hand.
+  ----------
+  A verifier:
+  [ ] Retour en main OBLIGATOIRE a la fin du tour (End Phase)
+  [ ] Forte puissance temporaire
+  [ ] Toute la pile (stack) retourne en main si upgraded
+
+--------------------------------------------------------------------------------
+
+095/130 — GAMAHIRO "Crapaud Arme"
+  Cout: 4 | Puissance: 6 | Groupe: Independent | Mots-cles: Summon
+  [MAIN] If there's a friendly character in this mission, draw a card.
+  [MAIN][cont.] At the end of the round, you must return this character to
+                 your hand.
+  ----------
+  A verifier:
+  [ ] Pioche si un AUTRE ami est deja dans la meme mission
+  [ ] Rappel FAQ officielle: Gamahiro ne se compte PAS lui-meme
+  [ ] Retour en main obligatoire a la End Phase
+
+--------------------------------------------------------------------------------
+
+096/130 — GAMAKITCHI "Fils aine de Gama Bunta"
+  Cout: 2 | Puissance: 3 | Groupe: Independent | Mots-cles: Summon
+  [MAIN][cont.] Pay 1 less to play this character if there's a friendly
+                 Naruto Uzumaki in this mission.
+  [MAIN][cont.] At the end of the round, you must return this character to
+                 your hand.
+  ----------
+  A verifier:
+  [ ] -1 cout si Naruto Uzumaki ami dans la meme mission
+  [ ] Retour en main obligatoire a la End Phase
+
+--------------------------------------------------------------------------------
+
+097/130 — GAMATATSU "Fils cadet de Gama Bunta"
+  Cout: 1 | Puissance: 2 | Groupe: Independent | Mots-cles: Summon
+  [MAIN][cont.] At the end of the round, you must return this character to
+                 your hand.
+  ----------
+  A verifier:
+  [ ] Retour en main obligatoire a la End Phase
+
+--------------------------------------------------------------------------------
+
+098/130 — KATSUYU "Limace Geante"
+  Cout: 3 | Puissance: 5 | Groupe: Independent | Mots-cles: Summon
+  [MAIN] If there is a friendly Tsunade in play, POWERUP 2.
+  [MAIN][cont.] At the end of the round, you must return this character to
+                 your hand.
+  ----------
+  A verifier:
+  [ ] Condition: Tsunade amie n'importe ou en jeu
+  [ ] Si oui, POWERUP 2 sur Katsuyu
+  [ ] Retour en main obligatoire a la End Phase
+
+--------------------------------------------------------------------------------
+
+099/130 — PAKKUN "Chien Ninja de Kakashi"
+  Cout: 1 | Puissance: 1 | Groupe: Independent | Mots-cles: Ninja Hound
+  [SCORE] Move this character.
+  ----------
+  A verifier:
+  [ ] Se declenche quand le joueur gagne la mission ou Pakkun est assigne
+  [ ] Deplace Pakkun vers une autre mission active
+  [ ] Le joueur doit avoir au moins 1 puissance pour gagner et declencher
+
+--------------------------------------------------------------------------------
+
+100/130 — CHIENS NINJAS "Chiens Ninjas de Kakashi"
+  Cout: 1 | Puissance: 1 | Groupe: Independent | Mots-cles: Ninja Hound
+  [MAIN][cont.] When this character moves to a different mission, look at a
+                 hidden character in that mission.
+  ----------
+  A verifier:
+  [ ] Effet continu — se declenche a chaque deplacement
+  [ ] Regarde un personnage cache dans la mission de destination
+  [ ] Fonctionne quand deplace par d'autres effets (Itachi 143, Kidomaru 059)
+
+--------------------------------------------------------------------------------
+
+101/130 — TON TON "Cochon Ninja de Tsunade"
+  Cout: 0 | Puissance: 0 | Groupe: Independent | Mots-cles: Ninja Pig
+  [MAIN][cont.] If there's a friendly Tsunade or Shizune in this mission,
+                 this character has +1 Power.
+  ----------
+  A verifier:
+  [ ] Effet continu — +1 puissance si Tsunade ou Shizune amie dans la mission
+  [ ] Cout et puissance de base = 0 (defauts du JSON)
+
+
+================================================================================
+  CARTES PERSONNAGES — UNCOMMON (UC)
+================================================================================
+
+039/130 — ROCK LEE "La Fleur du Lotus Recto"
+  Cout: 4 | Puissance: 4 | Groupe: Leaf Village
+  Mots-cles: Team Guy, Jutsu  [CORRIGE: JSON n'avait que "Team Guy"]
+  [MAIN][cont.] This character doesn't lose Power tokens at the end of the round.
+  [UPGRADE] POWERUP 2.
+  ----------
+  A verifier:
+  [ ] Continu: les tokens de puissance NE SONT PAS retires a la End Phase
+  [ ] UPGRADE: +2 tokens quand joue par-dessus un autre Rock Lee
+  [ ] Les tokens accumules persistent d'un tour a l'autre
+
+
+================================================================================
+  CARTES PERSONNAGES — RARE (R)
+================================================================================
+
+108/130 — NARUTO UZUMAKI "Believe it!" [CORRIGE INTEGRALEMENT]
+  *** CORRECTION CRITIQUE — Donnees du JSON etaient COMPLETEMENT FAUSSES ***
+  Source: Site officiel narutotcgmythos.com (page d'accueil)
+  ----------
+  Rarete: RA (Rare Art)  [CORRIGE: JSON avait "R"]
+  Cout: 4  [CORRIGE: JSON avait 5]
+  Puissance: 5
+  Groupe: Leaf Village
+  Mots-cles: Team 7, Jutsu  [CORRIGE: JSON n'avait que "Team 7"]
+  ----------
+  [MAIN] Put the top card of your deck as a hidden character in this mission.
+  [AMBUSH] Repeat the MAIN effect.
+  ----------
+  [CORRIGE] L'ancien effet dans le JSON etait totalement faux:
+    ANCIEN (FAUX): "Hide an enemy character with Power 3 or less..."
+    NOUVEAU (CORRECT): "Put the top card of your deck as a hidden character
+                        in this mission."
+  ----------
+  A verifier:
+  [ ] MAIN: Prend la carte du dessus du deck
+  [ ] La place comme personnage cache (face cachee) dans cette mission
+  [ ] Si le deck est vide, l'effet echoue
+  [ ] AMBUSH: Repete l'effet MAIN (donc 2 cartes cachees au total si revele)
+  [ ] L'AMBUSH ne se declenche QU'a la revelation depuis l'etat cache
+
+--------------------------------------------------------------------------------
+
+108/130 A — NARUTO UZUMAKI "Believe it!" (Rare Art - variante)
+  (Memes effets que 108/130 — voir ci-dessus)
+  Rappel: meme numero de collection = meme carte, max 2 copies total dans le deck
+
+--------------------------------------------------------------------------------
+
+109/130 — SAKURA HARUNO "Ninja Medical" [CARTE MANQUANTE DANS LE JSON]
+  *** NOUVELLE CARTE — Absente du JSON d'origine ***
+  Source: Site officiel narutotcgmythos.com (page d'accueil)
+  ----------
+  Rarete: R (Rare)
+  Cout: 4
+  Puissance: 3
+  Groupe: Leaf Village
+  Mots-cles: Team 7
+  ----------
+  [MAIN] Choose one of your Leaf Village characters in your discard pile
+         and play it anywhere, paying its cost.
+  [UPGRADE] MAIN effect: Instead, play the card paying 2 less.
+  ----------
+  A verifier:
+  [ ] MAIN: Cherche un personnage Leaf Village dans la defausse du joueur
+  [ ] Le joueur choisit lequel jouer
+  [ ] Le personnage est joue sur N'IMPORTE QUELLE mission
+  [ ] Le joueur doit payer le cout normal en chakra
+  [ ] UPGRADE: Au lieu de payer le cout complet, paie 2 de moins
+  [ ] Si la defausse n'a aucun Leaf Village, l'effet echoue
+  [ ] Le personnage joue depuis la defausse declenche ses propres effets MAIN
+
+--------------------------------------------------------------------------------
+
+120/130 — GAARA (Rare)
+  Cout: 4 | Puissance: 4 | Groupe: Sand Village | Mots-cles: Team Baki
+  [MAIN] Defeat up to 1 enemy character with Power 1 or less in every mission.
+  [UPGRADE] POWERUP X, where X is the number of characters defeated by the
+            MAIN effect.
+  ----------
+  A verifier:
+  [ ] Vainc jusqu'a 1 ennemi avec puissance <= 1 dans CHAQUE mission
+  [ ] "up to 1" = 0 ou 1 par mission
+  [ ] UPGRADE: POWERUP = nombre total de personnages vaincus par le MAIN
+  [ ] La defaite declenche les triggers (Tsunade 003, Sasuke 136)
+
+--------------------------------------------------------------------------------
+
+120/130 A — GAARA (Rare Art)
+  (Memes effets que 120/130)
+
+
+================================================================================
+  CARTES PERSONNAGES — SECRET (S)
+================================================================================
+
+133/130 — NARUTO UZUMAKI "Rasengan"
+  Cout: 6 | Puissance: 6 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN] Hide an enemy character with Power 5 or less in this mission and
+         another enemy character with Power 2 or less in play.
+  [UPGRADE] MAIN effect: Instead, defeat both of them.
+  ----------
+  A verifier:
+  [ ] Cache 2 cibles: 1 ennemi puissance <= 5 (meme mission) + 1 ennemi puissance <= 2 (en jeu)
+  [ ] L'UPGRADE transforme "cacher" en "vaincre"
+  [ ] Quand joue en UPGRADE, les deux cibles sont VAINCUES au lieu de cachees
+  [ ] Rappel rulebook: les effets UPGRADE modifient les effets MAIN
+  [ ] Si une seule cible est disponible, l'autre partie echoue
+
+--------------------------------------------------------------------------------
+
+135/130 — SAKURA HARUNO "Corps Medical du Village de la Feuille"
+  Cout: 5 | Puissance: 4 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN] Look at the top 3 cards of your deck. Play one character anywhere
+         and discard the other cards.
+  [UPGRADE] MAIN effect: Instead, play the card paying 4 less.
+  ----------
+  Source: Confirme par le site officiel narutotcgmythos.com
+  ----------
+  A verifier:
+  [ ] Regarde les 3 premieres cartes du deck
+  [ ] Joue 1 personnage sur N'IMPORTE QUELLE mission (pas seulement la sienne)
+  [ ] Defausse les 2 autres cartes
+  [ ] L'UPGRADE fait jouer la carte avec -4 cout au lieu du cout normal
+  [ ] Si aucun personnage dans les 3 cartes, defausse les 3
+
+--------------------------------------------------------------------------------
+
+136/130 — SASUKE UCHIWA "Marque maudite du Ciel"
+  Cout: 7 | Puissance: 8 | Groupe: Leaf Village | Mots-cles: Team 7
+  [MAIN][cont.] When a character is defeated, gain 1 Chakra.
+  [UPGRADE] You must choose a friendly non-hidden character and any enemy
+            character in this mission and defeat them, if able.
+  ----------
+  A verifier:
+  [ ] Continu: +1 chakra quand N'IMPORTE QUEL personnage est vaincu (ami ou ennemi)
+  [ ] UPGRADE: DOIT choisir 1 ami non-cache et 1 ennemi et les vaincre
+  [ ] L'UPGRADE est obligatoire ("you must ... if able")
+  [ ] Les defaites declenchent l'effet continu de Sasuke lui-meme (+1 chakra x2)
+
+--------------------------------------------------------------------------------
+
+137/130 — KAKASHI HATAKE "L'Eclair Pourfendeur" [CORRIGE]
+  *** CORRECTION CRITIQUE — Texte JSON etait casse ***
+  Source: Site officiel narutotcgmythos.com (page d'accueil)
+  ----------
+  Cout: 7 | Puissance: 7 | Groupe: Leaf Village
+  Mots-cles: Team 7, Jutsu  [CORRIGE: JSON n'avait que "Team 7"]
+  ----------
+  [UPGRADE] Move this character.
+  [MAIN] Hide an upgraded character in this mission.
+  ----------
+  [CORRIGE] L'ancien texte dans le JSON etait casse:
+    ANCIEN (CASSE): "MAIN: Hide an [coupure] d character in this mission"
+    NOUVEAU (CORRECT): "MAIN: Hide an upgraded character in this mission."
+  ----------
+  A verifier:
+  [ ] MAIN: Cache un personnage UPGRADED (pas "enemy"!) dans cette mission
+  [ ] Peut cibler un personnage ami OU ennemi, tant qu'il est upgraded
+  [ ] Un personnage upgraded = une pile de 2+ cartes du meme nom
+  [ ] UPGRADE: Deplace Kakashi vers une autre mission
+  [ ] Rappel rulebook: effets s'appliquent du haut vers le bas
+  [ ] Ordre: d'abord UPGRADE (deplacement), puis MAIN (cacher l'upgraded)
+    OU d'abord MAIN (cacher dans la mission actuelle), puis UPGRADE (deplacer)
+    -> A clarifier selon l'intention de design
+
+
+================================================================================
+  CARTES PERSONNAGES — MYTHOS (M)
+================================================================================
+
+143/130 — ITACHI UCHIWA "Traquant Naruto"
+  Cout: 5 | Puissance: 5 | Groupe: Akatsuki | Mots-cles: Rogue Ninja
+  Source: Confirme par le site officiel narutotcgmythos.com
+  [MAIN] Move a friendly character to this mission.
+  [AMBUSH] Move an enemy character to this mission.
+  ----------
+  A verifier:
+  [ ] MAIN: deplace un ami d'une autre mission vers celle-ci
+  [ ] AMBUSH: deplace un ennemi d'une autre mission vers celle-ci
+  [ ] L'AMBUSH ne se declenche QU'a la revelation
+  [ ] Les deplacements declenchent le trigger de Ninja Hounds 100
+  [ ] Rappel: ne peut pas forcer 2 personnages du meme nom dans la meme mission
+
+--------------------------------------------------------------------------------
+
+144/130 — KISAME HOSHIGAKI "Absorption du chakra"
+  Cout: 6 | Puissance: 6 | Groupe: Akatsuki | Mots-cles: Rogue Ninja
+  [MAIN] Steal 1 Chakra from the opponent pool.
+  ----------
+  A verifier:
+  [ ] Vole 1 chakra du pool adverse
+  [ ] L'adversaire perd 1 et le joueur gagne 1
+  [ ] Si l'adversaire a 0 chakra, l'effet echoue
+
+
+================================================================================
+  CARTES MISSIONS
+================================================================================
+
+MSS 01 — "Appel de soutien" (Call for Support)
+  [SCORE] POWERUP 2 a character in play.
+  ----------
+  A verifier:
+  [ ] Se declenche quand le joueur gagne cette mission
+  [ ] POWERUP 2 sur N'IMPORTE QUEL personnage en jeu (ami ou ennemi)
+  [ ] Le joueur doit avoir >= 1 puissance pour gagner
+
+--------------------------------------------------------------------------------
+
+MSS 02 — "Examen Chunin" (Chunin Exam)
+  (Aucun effet)
+  ----------
+  A verifier:
+  [ ] Pas d'effet SCORE — uniquement des points de mission
+
+--------------------------------------------------------------------------------
+
+MSS 03 — "Trouver le traitre" (Find the Traitor)
+  [SCORE] Opponent discards a card from hand.
+  ----------
+  A verifier:
+  [ ] L'adversaire defausse 1 carte de sa main
+  [ ] Si la main adverse est vide, rien ne se passe
+
+--------------------------------------------------------------------------------
+
+MSS 04 — "Assassinat" (Assassination)
+  [SCORE] Defeat an enemy hidden character.
+  ----------
+  A verifier:
+  [ ] Vainc un personnage CACHE ennemi
+  [ ] Peut cibler n'importe quel personnage cache ennemi en jeu
+  [ ] La defaite declenche les triggers (Tsunade 003, Sasuke 136)
+  [ ] Si aucun ennemi cache, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+MSS 05 — "Ramener" (Bring it Back)
+  [SCORE] You must return one friendly non-hidden character in this mission
+          to your hand, if able.
+  ----------
+  A verifier:
+  [ ] OBLIGATOIRE ("you must ... if able")
+  [ ] Retourne 1 personnage ami NON-CACHE de cette mission en main
+  [ ] Retourne la PILE ENTIERE (stack) si upgraded
+  [ ] Rappel rulebook: quand une carte quitte le jeu, toutes les cartes en dessous sont defaussees
+  [ ] Si aucun ami non-cache, l'effet est ignore
+
+--------------------------------------------------------------------------------
+
+MSS 06 — "Sauvetage d'un ami" (Rescue a Friend)
+  [SCORE] Draw a card.
+  ----------
+  A verifier:
+  [ ] Pioche 1 carte
+  [ ] Si le deck est vide, rien ne se passe
+
+--------------------------------------------------------------------------------
+
+MSS 07 — "Je dois partir" (I Have to Go)
+  [SCORE] Move a friendly hidden character in play.
+  ----------
+  A verifier:
+  [ ] Deplace un personnage CACHE ami vers une autre mission
+  [ ] Le personnage doit etre cache
+  [ ] Si aucun ami cache, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+MSS 08 — "Tendre un piege" (Set a Trap)
+  [SCORE] Put a card from your hand as a hidden character to any mission.
+  ----------
+  A verifier:
+  [ ] Prend 1 carte de la main
+  [ ] La place comme personnage cache sur N'IMPORTE QUELLE mission
+  [ ] Pas de cout de chakra pour ce placement
+  [ ] Si la main est vide, l'effet echoue
+
+--------------------------------------------------------------------------------
+
+MSS 10 — "Entrainement au chakra" (Chakra Training)
+  (Aucun effet)
+  ----------
+  A verifier:
+  [ ] Pas d'effet SCORE — uniquement des points de mission
+
+
+================================================================================
+  RESUME DES CORRECTIONS
+================================================================================
+
+CORRECTIONS CRITIQUES (effets/stats faux):
+  1. 108/130 NARUTO UZUMAKI — Effet COMPLETEMENT FAUX dans le JSON
+     - Rarete: R -> RA
+     - Cout: 5 -> 4
+     - Title: (vide) -> "Believe it!"
+     - Keywords: Team 7 -> Team 7, Jutsu
+     - Ancien effet (FAUX): "Hide an enemy character with Power 3 or less..."
+     - Nouvel effet (CORRECT): "Put the top card of your deck as a hidden
+       character in this mission. AMBUSH: Repeat the MAIN effect."
+
+  2. 137/130 KAKASHI HATAKE — Texte JSON casse
+     - Keywords: Team 7 -> Team 7, Jutsu
+     - Ancien effet (CASSE): "Hide an [coupure] d character"
+     - Nouvel effet (CORRECT): "Hide an upgraded character in this mission."
+
+  3. 109/130 SAKURA HARUNO — Carte Rare ABSENTE du JSON
+     - Nouvelle carte a ajouter: Cout 4, Power 3, Rare
+     - Effet: Choose Leaf Village char from discard, play it.
+       UPGRADE: play paying 2 less.
+
+CORRECTIONS MODEREES (keywords faux):
+  4. 044/130 ANKO MITARASHI — Keyword "Academy" -> "Special Jonin"
+  5. 048/130 HAYATE GEKKO — Keyword "Pouvoir" -> "Special Jonin"
+
+CORRECTIONS MINEURES (keywords manquants ou nom incomplet):
+  6. 036/130 NEJI HYUGA — Ajout keyword "Taijutsu"
+  7. 039/130 ROCK LEE — Ajout keyword "Jutsu"
+  8. 047/130 IRUKA — Nom complet "IRUKA UMINO"
+  9. 050/130 OROCHIMARU — Ajout keyword "Sound Ninja"
+
+
+================================================================================
+  TOTAL CARTES JOUABLES (CORRIGE)
+================================================================================
+
+  - 48 Common (C) + 1 Uncommon (UC) + 3 Rare (R) [ajout 109/130]
+    + 2 Rare Art (RA) [108 reclassifie] + 4 Secret (S) + 2 Mythos (M)
+    = 60 personnages
+  - 9 missions (MSS 01-08 + MSS 10)
+
+  Defauts appliques dans le JSON:
+  - 021/130 Shikamaru: power manquant -> 0
+  - 101/130 Ton Ton: chakra et power manquants -> 0
+  - 108/130 A et 120/130 A: has_visual false dans JSON mais image_file present
+
+
+================================================================================
+  REGLES CLES DU RULEBOOK (rappels utiles pour l'implementation)
+================================================================================
+
+  - Tous les effets sont optionnels SAUF si "you must" est ecrit
+  - Les effets s'appliquent du haut vers le bas sur la carte
+  - Si jouer un personnage declenche un effet sur une carte deja en jeu,
+    appliquer CET effet AVANT les effets du nouveau personnage
+  - Un personnage cache a 0 Power et 0 cout quand cible par un effet
+  - Pour gagner une mission: besoin d'au moins 1 Power
+  - En cas d'egalite: le joueur avec le Edge token gagne
+  - Upgrade: ne payer QUE la difference de cout en chakra
+  - Take control: temporaire, retourne au proprietaire si quitte le jeu
+  - Deck vide: si on doit piocher et le deck est vide, rien ne se passe
+  - Pas 2 personnages du meme NOM dans la meme mission du meme cote
+  - Hidden characters recoivent des Power tokens normalement
+  - Power tokens persistent quand un personnage change d'etat (hidden <-> face up)
+  - Gamahiro (FAQ): ne se compte PAS lui-meme pour son propre effet

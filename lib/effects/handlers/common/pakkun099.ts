@@ -17,23 +17,58 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find the first other mission to move to
-  let destMissionIndex = -1;
+  // Get the character name for name-uniqueness check at destination
+  const topCard = sourceCard.stack.length > 0
+    ? sourceCard.stack[sourceCard.stack.length - 1]
+    : sourceCard.card;
+  const charName = topCard.name_fr;
+
+  // Find all valid destination missions (not current, no same-name conflict)
+  const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
-    if (i !== sourceMissionIndex) {
-      destMissionIndex = i;
-      break;
+    if (i === sourceMissionIndex) continue;
+    const mission = state.activeMissions[i];
+    const friendlyChars = mission[friendlySide];
+    const hasSameName = friendlyChars.some((c) => {
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return tc.name_fr === charName;
+    });
+    if (!hasSameName) {
+      validTargets.push(String(i));
     }
   }
 
-  // If no other missions exist, effect fizzles
-  if (destMissionIndex === -1) {
+  // If no valid destinations, effect fizzles
+  if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Pakkun (099): No other mission to move to.',
       'game.log.effect.noTarget', { card: 'PAKKUN', id: '099/130' }) } };
   }
 
-  // Move Pakkun from source mission to destination mission
+  // If only one valid destination, auto-move
+  if (validTargets.length === 1) {
+    const destIdx = parseInt(validTargets[0], 10);
+    return { state: movePakkun(state, sourceCard, sourceMissionIndex, destIdx, sourcePlayer, friendlySide) };
+  }
+
+  // Multiple valid destinations: let player choose
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'PAKKUN_MOVE_DESTINATION',
+    validTargets,
+    description: 'Pakkun (099): Choose a mission to move Pakkun to.',
+  };
+}
+
+function movePakkun(
+  state: EffectContext['state'],
+  sourceCard: EffectContext['sourceCard'],
+  sourceMissionIndex: number,
+  destMissionIndex: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
+  friendlySide: 'player1Characters' | 'player2Characters',
+): EffectContext['state'] {
   const newMissions = state.activeMissions.map((m, idx) => {
     if (idx === sourceMissionIndex) {
       return {
@@ -59,12 +94,12 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
     state.phase,
     sourcePlayer,
     'EFFECT_MOVE',
-    `Pakkun (099): Moved self from mission ${sourceMissionIndex} to mission ${destMissionIndex}.`,
-    'game.log.score.moveHidden',
-    { card: 'PAKKUN', target: `mission ${destMissionIndex}` },
+    `Pakkun (099): Moved self from mission ${sourceMissionIndex + 1} to mission ${destMissionIndex + 1}.`,
+    'game.log.effect.move',
+    { card: 'PAKKUN', id: '099/130', from: String(sourceMissionIndex + 1), to: String(destMissionIndex + 1) },
   );
 
-  return { state: { ...state, activeMissions: newMissions, log } };
+  return { ...state, activeMissions: newMissions, log };
 }
 
 export function registerHandler(): void {

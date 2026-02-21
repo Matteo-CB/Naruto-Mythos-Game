@@ -136,7 +136,10 @@
     "name_en": "Protect the leader",
     "rarity": "Mission",
     "card_type": "mission",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images\\mission\\M9_Guard-a-VIP.webp",
+    "image_url": "/images/mission/M9_Guard-a-VIP.webp",
+    "rarity_display": "Mission"
   },
   {
     "id": "MSS 10",

@@ -13,8 +13,11 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   Find all non-hidden characters (any player, not self) in this mission with
  *   effective power == 4. Target selection if multiple. Defeat the selected target.
  *
- * UPGRADE: Defeat a character with exactly Power 6.
- *   When isUpgrade: look for effective power == 6 instead.
+ * UPGRADE: Defeat a character with exactly Power 6 in this mission.
+ *   This is a STANDALONE additional effect (no "MAIN effect:" prefix in JSON).
+ *   When upgrading, BOTH MAIN and UPGRADE fire independently:
+ *   - MAIN defeats a character with exactly Power 4
+ *   - UPGRADE defeats a character with exactly Power 6
  */
 
 function getEffectivePower(char: CharacterInPlay): number {
@@ -23,9 +26,17 @@ function getEffectivePower(char: CharacterInPlay): number {
   return topCard.power + char.powerTokens;
 }
 
-function neji116MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard, sourceMissionIndex, isUpgrade } = ctx;
-  const targetPower = isUpgrade ? 6 : 4;
+/**
+ * Helper: find characters with exactly the given power in the source mission,
+ * defeat one (auto if single target, prompt selection if multiple).
+ */
+function defeatCharacterWithExactPower(
+  ctx: EffectContext,
+  targetPower: number,
+  selectionType: string,
+  label: string,
+): EffectResult {
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
 
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -55,7 +66,7 @@ function neji116MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          `Neji Hyuga (116): No character with exactly Power ${targetPower} in this mission.`,
+          `Neji Hyuga (116) ${label}: No character with exactly Power ${targetPower} in this mission.`,
           'game.log.effect.noTarget',
           { card: 'NEJI HYUGA', id: '116/130' },
         ),
@@ -83,7 +94,7 @@ function neji116MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           newState.log, newState.turn, newState.phase, sourcePlayer,
           'EFFECT_DEFEAT',
-          `Neji Hyuga (116): Defeated ${targetName} (exactly Power ${targetPower}).`,
+          `Neji Hyuga (116) ${label}: Defeated ${targetName} (exactly Power ${targetPower}).`,
           'game.log.effect.defeat',
           { card: 'NEJI HYUGA', id: '116/130', target: targetName },
         ),
@@ -95,17 +106,20 @@ function neji116MainHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'NEJI116_DEFEAT_TARGET',
+    targetSelectionType: selectionType,
     validTargets: validTargets.map((t) => t.instanceId),
-    description: isUpgrade
-      ? `Neji Hyuga (116) UPGRADE: Choose a character with exactly Power 6 to defeat.`
-      : `Neji Hyuga (116): Choose a character with exactly Power 4 to defeat.`,
+    description: `Neji Hyuga (116) ${label}: Choose a character with exactly Power ${targetPower} to defeat.`,
   };
 }
 
+function neji116MainHandler(ctx: EffectContext): EffectResult {
+  // MAIN always targets Power 4, regardless of whether this is an upgrade
+  return defeatCharacterWithExactPower(ctx, 4, 'NEJI116_DEFEAT_POWER4', 'MAIN');
+}
+
 function neji116UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
-  return { state: ctx.state };
+  // UPGRADE is a standalone additional effect: defeat a character with exactly Power 6
+  return defeatCharacterWithExactPower(ctx, 6, 'NEJI116_DEFEAT_POWER6', 'UPGRADE');
 }
 
 export function registerNeji116Handlers(): void {

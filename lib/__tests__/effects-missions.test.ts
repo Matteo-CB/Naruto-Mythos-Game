@@ -79,7 +79,23 @@ describe('MSS 02 - Chunin Exam', () => {
 // MSS 03 - Find the Traitor: Opponent discards a card from hand
 // ===================================================================
 describe('MSS 03 - Find the Traitor', () => {
-  it('should make opponent discard 1 card', () => {
+  it('should auto-discard when opponent has exactly 1 card', () => {
+    const baseState = createActionPhaseState();
+    const card1 = mockCharacter({ name_fr: 'OppCard1' });
+    const state: GameState = {
+      ...baseState,
+      player2: { ...baseState.player2, hand: [card1], discardPile: [] },
+      activeMissions: [makeMission('D')],
+    };
+
+    const handler = getEffectHandler('MSS 03', 'SCORE')!;
+    expect(handler).toBeDefined();
+    const result = handler(makeCtx(state, 'player1', 0));
+    expect(result.state.player2.hand.length).toBe(0);
+    expect(result.state.player2.discardPile.length).toBe(1);
+  });
+
+  it('should require target selection when opponent has multiple cards', () => {
     const baseState = createActionPhaseState();
     const card1 = mockCharacter({ name_fr: 'OppCard1' });
     const card2 = mockCharacter({ name_fr: 'OppCard2' });
@@ -92,8 +108,13 @@ describe('MSS 03 - Find the Traitor', () => {
     const handler = getEffectHandler('MSS 03', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    expect(result.state.player2.hand.length).toBe(1);
-    expect(result.state.player2.discardPile.length).toBe(1);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS03_OPPONENT_DISCARD');
+    expect(result.validTargets).toEqual(['0', '1']);
+    expect(result.selectingPlayer).toBe('player2');
+    // State should be unchanged (no discard yet)
+    expect(result.state.player2.hand.length).toBe(2);
+    expect(result.state.player2.discardPile.length).toBe(0);
   });
 
   it('should fizzle when opponent hand is empty', () => {

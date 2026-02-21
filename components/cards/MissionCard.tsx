@@ -3,6 +3,7 @@
 import { memo, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
+import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
 
 // ---------------------
@@ -252,9 +253,10 @@ function MissionCardInner({
         >
           {card.effects.map((effect: CardEffect, idx: number) => {
             const frDescriptions = effectDescriptionsFr[card.id];
-            const description = locale === 'fr' && frDescriptions?.[idx]
-              ? frDescriptions[idx]
-              : effect.description;
+            const enDescriptions = effectDescriptionsEn[card.id];
+            const description = locale === 'fr'
+              ? (frDescriptions?.[idx] ?? effect.description)
+              : (enDescriptions?.[idx] ?? effect.description);
             return (
             <div key={idx} style={{ marginBottom: idx < card.effects.length - 1 ? '2px' : 0 }}>
               <span
