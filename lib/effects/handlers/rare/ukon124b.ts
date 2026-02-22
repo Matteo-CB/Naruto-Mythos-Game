@@ -49,7 +49,7 @@ function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Ukon (124b) AMBUSH: No enemy with Power 5 or less in this mission.',
           'game.log.effect.noTarget',
-          { card: 'UKON', id: '124b/130' },
+          { card: 'UKON', id: 'KS-124b-R' },
         ),
       },
     };
@@ -97,13 +97,13 @@ function applyHide(
         'EFFECT_HIDE',
         `Ukon (124b) AMBUSH: Hid enemy ${targetName} in this mission.`,
         'game.log.effect.hide',
-        { card: 'UKON', id: '124b/130', target: targetName },
+        { card: 'UKON', id: 'KS-124b-R', target: targetName },
       ),
     },
   };
 }
 
 export function registerUkon124bHandlers(): void {
-  registerEffect('124b/130', 'MAIN', ukon124bMainHandler);
-  registerEffect('124b/130', 'AMBUSH', ukon124bAmbushHandler);
+  registerEffect('KS-124b-R', 'MAIN', ukon124bMainHandler);
+  registerEffect('KS-124b-R', 'AMBUSH', ukon124bAmbushHandler);
 }

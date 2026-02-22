@@ -15,5 +15,5 @@ function handleKiba025Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('025/130', 'MAIN', handleKiba025Main);
+  registerEffect('KS-025-C', 'MAIN', handleKiba025Main);
 }

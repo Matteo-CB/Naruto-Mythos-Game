@@ -35,7 +35,7 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
 describe('039/130 - Rock Lee', () => {
   it('should POWERUP 2 on UPGRADE', () => {
     const lee = mockCharInPlay({ instanceId: 'lee-1', powerTokens: 1 }, {
-      id: '039/130', number: 39, name_fr: 'Rock Lee', keywords: ['Team Guy'], group: 'Leaf Village',
+      id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee', keywords: ['Team Guy'], group: 'Leaf Village',
       effects: [
         { type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' },
         { type: 'UPGRADE', description: 'POWERUP 2.' },
@@ -45,7 +45,7 @@ describe('039/130 - Rock Lee', () => {
       activeMissions: [makeMission('D', [lee])],
     });
 
-    const handler = getEffectHandler('039/130', 'UPGRADE')!;
+    const handler = getEffectHandler('KS-039-UC', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', lee, 0, 'UPGRADE', true));
     const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'lee-1');
@@ -54,14 +54,14 @@ describe('039/130 - Rock Lee', () => {
 
   it('MAIN handler should be a no-op (continuous logged)', () => {
     const lee = mockCharInPlay({ instanceId: 'lee-1' }, {
-      id: '039/130', number: 39, name_fr: 'Rock Lee',
+      id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee',
       effects: [{ type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' }],
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [lee])],
     });
 
-    const handler = getEffectHandler('039/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-039-UC', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', lee, 0));
     expect(result.state).toBeDefined();
   });
@@ -73,16 +73,16 @@ describe('039/130 - Rock Lee', () => {
 describe('108/130 - Naruto Uzumaki (RA)', () => {
   it('MAIN should hide an enemy character with Power 3 or less in this mission', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
-      id: '108/130', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
+      id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
     });
     const enemy = mockCharInPlay({ instanceId: 'enemy-1', isHidden: false, powerTokens: 0 }, {
-      id: '001/130', number: 1, name_fr: 'HIRUZEN SARUTOBI', power: 3,
+      id: 'KS-001-C', number: 1, name_fr: 'HIRUZEN SARUTOBI', power: 3,
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [naruto], [enemy])],
     });
 
-    const handler = getEffectHandler('108/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     // Enemy should be hidden
     const p2Chars = result.state.activeMissions[0].player2Characters;
@@ -91,16 +91,16 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 
   it('should fizzle when no enemy with Power 3 or less exists', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
-      id: '108/130', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5,
+      id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5,
     });
     const enemy = mockCharInPlay({ instanceId: 'enemy-1', isHidden: false, powerTokens: 0 }, {
-      id: '136/130', number: 136, name_fr: 'SASUKE UCHIHA', power: 8,
+      id: 'KS-136-S', number: 136, name_fr: 'SASUKE UCHIHA', power: 8,
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [naruto], [enemy])],
     });
 
-    const handler = getEffectHandler('108/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     // Enemy should remain visible
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(false);
@@ -108,16 +108,16 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 
   it('UPGRADE should POWERUP X where X is the power of the hidden enemy', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1', powerTokens: 0 }, {
-      id: '108/130', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
+      id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
     });
     const enemy = mockCharInPlay({ instanceId: 'enemy-1', isHidden: false, powerTokens: 0 }, {
-      id: '001/130', number: 1, name_fr: 'HIRUZEN SARUTOBI', power: 3,
+      id: 'KS-001-C', number: 1, name_fr: 'HIRUZEN SARUTOBI', power: 3,
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [naruto], [enemy])],
     });
 
-    const handler = getEffectHandler('108/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
     // Enemy should be hidden
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(true);
@@ -127,7 +127,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
   });
 
   it('RA variant 108/130 A should use same handler', () => {
-    const handler = getEffectHandler('108/130 A', 'MAIN');
+    const handler = getEffectHandler('KS-108-RA', 'MAIN');
     expect(handler).toBeDefined();
   });
 });
@@ -138,7 +138,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 describe('120/130 - Gaara (R)', () => {
   it('should defeat enemies with Power 1 or less across all missions', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r', powerTokens: 0 }, {
-      id: '120/130', number: 120, name_fr: 'Gaara', power: 4,
+      id: 'KS-120-R', number: 120, name_fr: 'Gaara', power: 4,
     });
     const weakE1 = mockCharInPlay({ instanceId: 'we1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'WeakE1', power: 1,
@@ -159,7 +159,7 @@ describe('120/130 - Gaara (R)', () => {
       ],
     };
 
-    const handler = getEffectHandler('120/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
     // weakE1 should be defeated (removed from mission 0)
     expect(result.state.activeMissions[0].player2Characters.length).toBe(0);
@@ -170,7 +170,7 @@ describe('120/130 - Gaara (R)', () => {
 
   it('should POWERUP X on upgrade where X = defeated count', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r', powerTokens: 0 }, {
-      id: '120/130', number: 120, name_fr: 'Gaara', power: 4,
+      id: 'KS-120-R', number: 120, name_fr: 'Gaara', power: 4,
     });
     const weakE1 = mockCharInPlay({ instanceId: 'we1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'W1', power: 1,
@@ -188,7 +188,7 @@ describe('120/130 - Gaara (R)', () => {
       ],
     };
 
-    const handler = getEffectHandler('120/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0, 'MAIN', true));
     const updatedGaara = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'gaara-r');
     expect(updatedGaara?.powerTokens).toBe(2); // 2 defeated
@@ -196,7 +196,7 @@ describe('120/130 - Gaara (R)', () => {
 
   it('should not defeat characters with Power > 1', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r' }, {
-      id: '120/130', number: 120, name_fr: 'Gaara',
+      id: 'KS-120-R', number: 120, name_fr: 'Gaara',
     });
     const strongE = mockCharInPlay({ instanceId: 'se1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'Strong', power: 3,
@@ -205,13 +205,13 @@ describe('120/130 - Gaara (R)', () => {
       activeMissions: [makeMission('D', [gaara], [strongE])],
     });
 
-    const handler = getEffectHandler('120/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
     expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
 
   it('RA variant 120/130 A should use same handler', () => {
-    const handler = getEffectHandler('120/130 A', 'MAIN');
+    const handler = getEffectHandler('KS-120-RA', 'MAIN');
     expect(handler).toBeDefined();
   });
 });
@@ -222,7 +222,7 @@ describe('120/130 - Gaara (R)', () => {
 describe('133/130 - Naruto Uzumaki (S)', () => {
   it('should hide Power<=5 in this mission AND Power<=2 in any mission', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
-      id: '133/130', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
+      id: 'KS-133-S', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
     });
     const target1 = mockCharInPlay({ instanceId: 't1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'T1', power: 4,
@@ -237,7 +237,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
       ],
     });
 
-    const handler = getEffectHandler('133/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     const t1 = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 't1');
     const t2 = result.state.activeMissions[1].player2Characters.find(c => c.instanceId === 't2');
@@ -247,7 +247,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
   it('should defeat both targets on upgrade', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
-      id: '133/130', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
+      id: 'KS-133-S', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
     });
     const target1 = mockCharInPlay({ instanceId: 't1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'T1', power: 4,
@@ -265,7 +265,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
       ],
     };
 
-    const handler = getEffectHandler('133/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
     expect(result.state.activeMissions[0].player2Characters.length).toBe(0); // t1 defeated
     expect(result.state.activeMissions[1].player2Characters.length).toBe(0); // t2 defeated
@@ -273,7 +273,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
   it('should not target Power > 5 in this mission', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
-      id: '133/130', number: 133, name_fr: 'Naruto', power: 6,
+      id: 'KS-133-S', number: 133, name_fr: 'Naruto', power: 6,
     });
     const strongE = mockCharInPlay({ instanceId: 'se', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'Strong', power: 7,
@@ -282,7 +282,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
       activeMissions: [makeMission('D', [naruto], [strongE])],
     });
 
-    const handler = getEffectHandler('133/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(false);
   });
@@ -294,7 +294,7 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 describe('135/130 - Sakura Haruno (S)', () => {
   it('should prompt to choose a character from top 3 of deck', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-s' }, {
-      id: '135/130', number: 135, name_fr: 'Sakura Haruno', power: 4, chakra: 5,
+      id: 'KS-135-S', number: 135, name_fr: 'Sakura Haruno', power: 4, chakra: 5,
     });
     const d1 = mockCharacter({ name_fr: 'D1', power: 2, chakra: 2 });
     const d2 = mockCharacter({ name_fr: 'D2', power: 5, chakra: 3 });
@@ -306,7 +306,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
       activeMissions: [makeMission('D', [sakura])],
     };
 
-    const handler = getEffectHandler('135/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
     // Now returns target selection: choose which character from top 3
     expect(result.requiresTargetSelection).toBe(true);
@@ -321,7 +321,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
   it('should offer only affordable cards on upgrade (cost reduction 4)', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-s' }, {
-      id: '135/130', number: 135, name_fr: 'Sakura', power: 4,
+      id: 'KS-135-S', number: 135, name_fr: 'Sakura', power: 4,
     });
     const expensive = mockCharacter({ name_fr: 'Expensive', power: 5, chakra: 6 });
     const baseState = createActionPhaseState();
@@ -331,7 +331,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
       activeMissions: [makeMission('D', [sakura])],
     };
 
-    const handler = getEffectHandler('135/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0, 'MAIN', true));
     // Cost = 6 - 4 = 2, player has 5 chakra — affordable
     expect(result.requiresTargetSelection).toBe(true);
@@ -341,7 +341,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
   it('should handle empty deck', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-s' }, {
-      id: '135/130', number: 135, name_fr: 'Sakura',
+      id: 'KS-135-S', number: 135, name_fr: 'Sakura',
     });
     const baseState = createActionPhaseState();
     const state: GameState = {
@@ -350,7 +350,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
       activeMissions: [makeMission('D', [sakura])],
     };
 
-    const handler = getEffectHandler('135/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1); // only sakura
   });
@@ -362,21 +362,21 @@ describe('135/130 - Sakura Haruno (S)', () => {
 describe('136/130 - Sasuke Uchiwa (S)', () => {
   it('MAIN should be continuous (no immediate state change except log)', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sasuke-s' }, {
-      id: '136/130', number: 136, name_fr: 'Sasuke Uchiwa', power: 8,
+      id: 'KS-136-S', number: 136, name_fr: 'Sasuke Uchiwa', power: 8,
       effects: [{ type: 'MAIN', description: '[⧗] When a character is defeated, gain 1 Chakra.' }],
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [sasuke])],
     });
 
-    const handler = getEffectHandler('136/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-136-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sasuke, 0));
     expect(result.state).toBeDefined();
   });
 
   it('UPGRADE should defeat a friendly AND enemy in this mission', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sasuke-s' }, {
-      id: '136/130', number: 136, name_fr: 'Sasuke', power: 8,
+      id: 'KS-136-S', number: 136, name_fr: 'Sasuke', power: 8,
     });
     const friendlyTarget = mockCharInPlay({ instanceId: 'ft-1', controlledBy: 'player1', originalOwner: 'player1' }, {
       name_fr: 'FriendlyVictim', power: 2,
@@ -392,7 +392,7 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
       activeMissions: [makeMission('D', [sasuke, friendlyTarget], [enemyTarget])],
     };
 
-    const handler = getEffectHandler('136/130', 'UPGRADE')!;
+    const handler = getEffectHandler('KS-136-S', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', sasuke, 0, 'UPGRADE', true));
     // Both should be defeated
@@ -405,13 +405,13 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
 
   it('UPGRADE should fizzle when no valid targets exist', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sasuke-s' }, {
-      id: '136/130', number: 136, name_fr: 'Sasuke', power: 8,
+      id: 'KS-136-S', number: 136, name_fr: 'Sasuke', power: 8,
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [sasuke])],
     });
 
-    const handler = getEffectHandler('136/130', 'UPGRADE')!;
+    const handler = getEffectHandler('KS-136-S', 'UPGRADE')!;
     const result = handler(makeCtx(state, 'player1', sasuke, 0, 'UPGRADE', true));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
@@ -423,7 +423,7 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
 describe('137/130 - Kakashi Hatake (S)', () => {
   it('MAIN should hide an upgraded character in this mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
-      id: '137/130', number: 137, name_fr: 'Kakashi Hatake', power: 7,
+      id: 'KS-137-S', number: 137, name_fr: 'Kakashi Hatake', power: 7,
     });
     // An upgraded enemy (stack.length >= 2)
     const baseCard = mockCharacter({ name_fr: 'Enemy', power: 3, chakra: 3 });
@@ -440,7 +440,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
       activeMissions: [makeMission('D', [kakashi], [upgradedEnemy])],
     });
 
-    const handler = getEffectHandler('137/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
     const e = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'e1');
     expect(e?.isHidden).toBe(true);
@@ -448,7 +448,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
   it('MAIN should fizzle when no upgraded character in this mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
-      id: '137/130', number: 137, name_fr: 'Kakashi',
+      id: 'KS-137-S', number: 137, name_fr: 'Kakashi',
     });
     // Non-upgraded enemy (stack.length = 1)
     const enemy = mockCharInPlay({ instanceId: 'e1', controlledBy: 'player2', originalOwner: 'player2' }, {
@@ -458,7 +458,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
       activeMissions: [makeMission('D', [kakashi], [enemy])],
     });
 
-    const handler = getEffectHandler('137/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
     // Enemy should NOT be hidden (not upgraded)
     const e = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'e1');
@@ -467,7 +467,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
   it('MAIN should also target friendly upgraded characters', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
-      id: '137/130', number: 137, name_fr: 'Kakashi Hatake', power: 7,
+      id: 'KS-137-S', number: 137, name_fr: 'Kakashi Hatake', power: 7,
     });
     const baseCard = mockCharacter({ name_fr: 'Ally', power: 2, chakra: 2 });
     const upgradeCard = mockCharacter({ name_fr: 'Ally', power: 4, chakra: 4 });
@@ -481,7 +481,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
       activeMissions: [makeMission('D', [kakashi, upgradedAlly])],
     });
 
-    const handler = getEffectHandler('137/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
     const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
     expect(ally?.isHidden).toBe(true);
@@ -489,7 +489,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
   it('UPGRADE should move self to another mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
-      id: '137/130', number: 137, name_fr: 'Kakashi', power: 7,
+      id: 'KS-137-S', number: 137, name_fr: 'Kakashi', power: 7,
     });
     const state = createActionPhaseState({
       activeMissions: [
@@ -498,7 +498,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
       ],
     });
 
-    const handler = getEffectHandler('137/130', 'UPGRADE')!;
+    const handler = getEffectHandler('KS-137-S', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kakashi, 0, 'UPGRADE', true));
     // Kakashi moved from mission 0 to mission 1
@@ -514,7 +514,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 describe('143/130 - Itachi Uchiwa (M)', () => {
   it('MAIN should prompt to choose a friendly character from another mission', () => {
     const itachi = mockCharInPlay({ instanceId: 'itachi-m' }, {
-      id: '143/130', number: 143, name_fr: 'Itachi Uchiwa', power: 5,
+      id: 'KS-143-M', number: 143, name_fr: 'Itachi Uchiwa', power: 5,
     });
     const friendlyElsewhere = mockCharInPlay({ instanceId: 'fe-1' }, {
       name_fr: 'FriendlyElse', power: 3,
@@ -526,7 +526,7 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
       ],
     });
 
-    const handler = getEffectHandler('143/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-143-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', itachi, 0));
     // Now returns target selection: choose which friendly char to move
     expect(result.requiresTargetSelection).toBe(true);
@@ -537,20 +537,20 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
 
   it('MAIN should fizzle when no friendly in another mission', () => {
     const itachi = mockCharInPlay({ instanceId: 'itachi-m' }, {
-      id: '143/130', number: 143, name_fr: 'Itachi',
+      id: 'KS-143-M', number: 143, name_fr: 'Itachi',
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [itachi])],
     });
 
-    const handler = getEffectHandler('143/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-143-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', itachi, 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
 
   it('AMBUSH should prompt to choose an enemy character from another mission', () => {
     const itachi = mockCharInPlay({ instanceId: 'itachi-m' }, {
-      id: '143/130', number: 143, name_fr: 'Itachi', power: 5,
+      id: 'KS-143-M', number: 143, name_fr: 'Itachi', power: 5,
     });
     const enemyElsewhere = mockCharInPlay({ instanceId: 'ee-1', controlledBy: 'player2', originalOwner: 'player2' }, {
       name_fr: 'EnemyElse', power: 3,
@@ -562,7 +562,7 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
       ],
     });
 
-    const handler = getEffectHandler('143/130', 'AMBUSH')!;
+    const handler = getEffectHandler('KS-143-M', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', itachi, 0, 'AMBUSH'));
     // Now returns target selection: choose which enemy char to move
@@ -578,7 +578,7 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
 describe('144/130 - Kisame Hoshigaki (M)', () => {
   it('should steal 1 chakra from opponent', () => {
     const kisame = mockCharInPlay({ instanceId: 'kisame-m' }, {
-      id: '144/130', number: 144, name_fr: 'Kisame Hoshigaki', power: 6,
+      id: 'KS-144-M', number: 144, name_fr: 'Kisame Hoshigaki', power: 6,
     });
     const state = createActionPhaseState({
       player1: { ...createActionPhaseState().player1, chakra: 5 },
@@ -586,7 +586,7 @@ describe('144/130 - Kisame Hoshigaki (M)', () => {
       activeMissions: [makeMission('D', [kisame])],
     });
 
-    const handler = getEffectHandler('144/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-144-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kisame, 0));
     expect(result.state.player1.chakra).toBe(6); // 5 + 1
     expect(result.state.player2.chakra).toBe(2); // 3 - 1
@@ -594,7 +594,7 @@ describe('144/130 - Kisame Hoshigaki (M)', () => {
 
   it('should not steal when opponent has 0 chakra', () => {
     const kisame = mockCharInPlay({ instanceId: 'kisame-m' }, {
-      id: '144/130', number: 144, name_fr: 'Kisame',
+      id: 'KS-144-M', number: 144, name_fr: 'Kisame',
     });
     const state = createActionPhaseState({
       player1: { ...createActionPhaseState().player1, chakra: 5 },
@@ -602,7 +602,7 @@ describe('144/130 - Kisame Hoshigaki (M)', () => {
       activeMissions: [makeMission('D', [kisame])],
     });
 
-    const handler = getEffectHandler('144/130', 'MAIN')!;
+    const handler = getEffectHandler('KS-144-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kisame, 0));
     expect(result.state.player1.chakra).toBe(5); // unchanged
     expect(result.state.player2.chakra).toBe(0); // unchanged
@@ -614,16 +614,16 @@ describe('144/130 - Kisame Hoshigaki (M)', () => {
 // ===================================================================
 describe('Non-common registry completeness', () => {
   const cardIds = [
-    { id: '039/130', types: ['MAIN', 'UPGRADE'] },
-    { id: '108/130', types: ['MAIN'] },
-    { id: '120/130', types: ['MAIN'] },
-    { id: '133/130', types: ['MAIN'] },
-    { id: '135/130', types: ['MAIN'] },
-    { id: '136/130', types: ['MAIN', 'UPGRADE'] },
-    { id: '137/130', types: ['MAIN', 'UPGRADE'] },
-    { id: '143/130', types: ['MAIN', 'AMBUSH'] },
-    { id: '144/130', types: ['MAIN'] },
-    { id: 'Legendary', types: ['MAIN'] },
+    { id: 'KS-039-UC', types: ['MAIN', 'UPGRADE'] },
+    { id: 'KS-108-R', types: ['MAIN'] },
+    { id: 'KS-120-R', types: ['MAIN'] },
+    { id: 'KS-133-S', types: ['MAIN'] },
+    { id: 'KS-135-S', types: ['MAIN'] },
+    { id: 'KS-136-S', types: ['MAIN', 'UPGRADE'] },
+    { id: 'KS-137-S', types: ['MAIN', 'UPGRADE'] },
+    { id: 'KS-143-M', types: ['MAIN', 'AMBUSH'] },
+    { id: 'KS-144-M', types: ['MAIN'] },
+    { id: 'KS-000-L', types: ['MAIN'] },
   ];
 
   it.each(cardIds)('should have all handlers for $id', ({ id, types }) => {

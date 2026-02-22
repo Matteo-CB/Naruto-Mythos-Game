@@ -81,6 +81,26 @@ export function calculateEffectiveCost(
     }
   }
 
+  // Check enemy continuous effects that increase cost
+  const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+  for (const enemy of enemyChars) {
+    if (enemy.isHidden) continue;
+
+    const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+
+    for (const effect of enemyTopCard.effects ?? []) {
+      if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+
+      // Tayuya 125 (R): Non-hidden enemy characters cost an additional 1 Chakra to play in this mission
+      if (enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
+        // Only applies to face-visible plays (non-hidden)
+        if (!isReveal) {
+          cost += 1;
+        }
+      }
+    }
+  }
+
   // Jiraiya 007 sub-play cost reduction for Summon characters
   // This is handled separately when Jiraiya's MAIN effect triggers
 

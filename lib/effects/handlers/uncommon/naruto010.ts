@@ -47,7 +47,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Naruto Uzumaki (010): No valid mission to move to.',
-      'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: '010/130' }) } };
+      'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
   }
 
   // If exactly one valid destination, auto-move
@@ -104,12 +104,12 @@ function moveCharacterToMission(
     'EFFECT_MOVE',
     `Naruto Uzumaki (010): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (ambush).`,
     'game.log.effect.moveSelf',
-    { card: 'NARUTO UZUMAKI', id: '010/130', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
+    { card: 'NARUTO UZUMAKI', id: 'KS-010-C', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
   );
 
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('010/130', 'AMBUSH', handleNaruto010Ambush);
+  registerEffect('KS-010-C', 'AMBUSH', handleNaruto010Ambush);
 }

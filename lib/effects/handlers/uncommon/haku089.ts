@@ -37,7 +37,7 @@ function handleHaku089Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       `Haku (089): ${deckOwner} deck is empty. Cannot discard.`,
       'game.log.effect.noTarget',
-      { card: 'HAKU', id: '089/130' },
+      { card: 'HAKU', id: 'KS-089-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -80,14 +80,14 @@ function handleHaku089Main(ctx: EffectContext): EffectResult {
     'EFFECT_DISCARD_AND_POWERUP',
     `Haku (089): Discarded ${discardedCard.name_fr} (cost ${discardedCard.chakra}) from ${deckOwner} deck. POWERUP ${powerupAmount}${upgradeNote}.`,
     'game.log.effect.discardPowerup',
-    { card: 'HAKU', id: '089/130', target: discardedCard.name_fr, amount: String(powerupAmount) },
+    { card: 'HAKU', id: 'KS-089-UC', target: discardedCard.name_fr, amount: String(powerupAmount) },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHaku089Handlers(): void {
-  registerEffect('089/130', 'MAIN', handleHaku089Main);
+  registerEffect('KS-089-UC', 'MAIN', handleHaku089Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to discard from own deck instead of opponent's
 }

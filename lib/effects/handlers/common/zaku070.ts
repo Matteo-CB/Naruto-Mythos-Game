@@ -28,12 +28,12 @@ function handleZaku070Main(ctx: EffectContext): EffectResult {
     'EFFECT_CHAKRA',
     `Zaku Abumi (070): Opponent gains 1 Chakra.`,
     'game.log.effect.oppGainChakra',
-    { card: 'Zaku Abumi', id: '070/130', amount: '1' },
+    { card: 'Zaku Abumi', id: 'KS-070-C', amount: '1' },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('070/130', 'MAIN', handleZaku070Main);
+  registerEffect('KS-070-C', 'MAIN', handleZaku070Main);
 }

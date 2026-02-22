@@ -31,14 +31,14 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Asuma Sarutobi (023): No other Team 10 character in this mission to move.',
-      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: '023/130' }) } };
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' }) } };
   }
 
   // Check that there is at least one other mission to move to
   if (state.activeMissions.length <= 1) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Asuma Sarutobi (023): No other mission available to move Team 10 character to.',
-      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: '023/130' }) } };
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' }) } };
   }
 
   return {
@@ -51,5 +51,5 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('023/130', 'MAIN', handleAsuma023Main);
+  registerEffect('KS-023-C', 'MAIN', handleAsuma023Main);
 }

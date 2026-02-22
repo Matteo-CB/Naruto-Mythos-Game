@@ -25,7 +25,7 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 08 (Set a Trap): No cards in hand to place as hidden.',
       'game.log.effect.noTarget',
-      { card: 'Tendre un piege', id: 'MSS 08' },
+      { card: 'Tendre un piege', id: 'KS-008-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -36,7 +36,7 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 08 (Set a Trap): No active missions to place a character on.',
       'game.log.effect.noTarget',
-      { card: 'Tendre un piege', id: 'MSS 08' },
+      { card: 'Tendre un piege', id: 'KS-008-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -54,5 +54,5 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss08Handlers(): void {
-  registerEffect('MSS 08', 'SCORE', mss08ScoreHandler);
+  registerEffect('KS-008-MMS', 'SCORE', mss08ScoreHandler);
 }

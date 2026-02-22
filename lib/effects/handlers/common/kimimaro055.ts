@@ -23,7 +23,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
   if (playerState.hand.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kimimaro (055): No cards in hand to discard.',
-      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '055/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-055-C' }) } };
   }
 
   // Find all non-hidden characters in play with cost <= 3
@@ -62,7 +62,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kimimaro (055): No character with cost 3 or less to hide.',
-      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '055/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-055-C' }) } };
   }
 
   // Step 1: Ask player to choose a card to discard from hand
@@ -78,5 +78,5 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('055/130', 'AMBUSH', handleKimimaro055Ambush);
+  registerEffect('KS-055-C', 'AMBUSH', handleKimimaro055Ambush);
 }

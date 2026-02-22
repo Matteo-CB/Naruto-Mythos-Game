@@ -39,7 +39,7 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kimimaro (123) UPGRADE: Hand is empty, cannot discard.',
           'game.log.effect.noTarget',
-          { card: 'KIMIMARO', id: '123/130' },
+          { card: 'KIMIMARO', id: 'KS-123-R' },
         ),
       },
     };
@@ -69,7 +69,7 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kimimaro (123) UPGRADE: No character with cost 5 or less in play to defeat.',
           'game.log.effect.noTarget',
-          { card: 'KIMIMARO', id: '123/130' },
+          { card: 'KIMIMARO', id: 'KS-123-R' },
         ),
       },
     };
@@ -88,6 +88,6 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKimimaro123Handlers(): void {
-  registerEffect('123/130', 'MAIN', kimimaro123MainHandler);
-  registerEffect('123/130', 'UPGRADE', kimimaro123UpgradeHandler);
+  registerEffect('KS-123-R', 'MAIN', kimimaro123MainHandler);
+  registerEffect('KS-123-R', 'UPGRADE', kimimaro123UpgradeHandler);
 }

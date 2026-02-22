@@ -33,7 +33,7 @@ function kakashi148MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_EDGE',
     'Kakashi Hatake (148): Gained the Edge token.',
     'game.log.effect.gainEdge',
-    { card: 'KAKASHI HATAKE', id: '148/130' },
+    { card: 'KAKASHI HATAKE', id: 'KS-148-M' },
   );
 
   return { state: { ...state, log } };
@@ -79,7 +79,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (148): No friendly Team 7 character with a copyable instant effect found (ambush).',
       'game.log.effect.noTarget',
-      { card: 'KAKASHI HATAKE', id: '148/130' },
+      { card: 'KAKASHI HATAKE', id: 'KS-148-M' },
     );
     return { state: { ...state, log } };
   }
@@ -94,6 +94,6 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKakashi148Handlers(): void {
-  registerEffect('148/130', 'MAIN', kakashi148MainHandler);
-  registerEffect('148/130', 'AMBUSH', kakashi148AmbushHandler);
+  registerEffect('KS-148-M', 'MAIN', kakashi148MainHandler);
+  registerEffect('KS-148-M', 'AMBUSH', kakashi148AmbushHandler);
 }

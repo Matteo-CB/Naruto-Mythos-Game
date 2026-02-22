@@ -15,5 +15,5 @@ function handleGamabunta094Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('094/130', 'MAIN', handleGamabunta094Main);
+  registerEffect('KS-094-C', 'MAIN', handleGamabunta094Main);
 }

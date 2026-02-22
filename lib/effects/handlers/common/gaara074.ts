@@ -25,7 +25,7 @@ function handleGaara074Main(ctx: EffectContext): EffectResult {
   if (hiddenCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Gaara (074): No friendly hidden characters in this mission.',
-      'game.log.effect.noTarget', { card: 'GAARA', id: '074/130' }) } };
+      'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-074-C' }) } };
   }
 
   // POWERUP X on self
@@ -55,12 +55,12 @@ function handleGaara074Main(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Gaara (074): POWERUP ${hiddenCount} on self.`,
     'game.log.effect.powerupSelf',
-    { card: 'Gaara', id: '074/130', amount: String(hiddenCount) },
+    { card: 'Gaara', id: 'KS-074-C', amount: String(hiddenCount) },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('074/130', 'MAIN', handleGaara074Main);
+  registerEffect('KS-074-C', 'MAIN', handleGaara074Main);
 }

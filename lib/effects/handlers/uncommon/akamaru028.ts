@@ -45,7 +45,7 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
   if (kibaTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Akamaru (028): No friendly Kiba Inuzuka in this mission for POWERUP 2.',
-      'game.log.effect.noTarget', { card: 'AKAMARU', id: '028/130' }) } };
+      'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' }) } };
   }
 
   // If exactly one target, auto-apply
@@ -95,13 +95,13 @@ function applyPowerupToTarget(
     'EFFECT_POWERUP',
     `Akamaru (028): POWERUP ${amount} on ${targetName} (ambush).`,
     'game.log.effect.powerup',
-    { card: 'AKAMARU', id: '028/130', amount, target: targetName },
+    { card: 'AKAMARU', id: 'KS-028-UC', amount, target: targetName },
   );
 
   return newState;
 }
 
 export function registerAkamaru028Handlers(): void {
-  registerEffect('028/130', 'MAIN', handleAkamaru028Main);
-  registerEffect('028/130', 'AMBUSH', handleAkamaru028Ambush);
+  registerEffect('KS-028-UC', 'MAIN', handleAkamaru028Main);
+  registerEffect('KS-028-UC', 'AMBUSH', handleAkamaru028Ambush);
 }

@@ -16,5 +16,5 @@ function handleItachi090Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('090/130', 'MAIN', handleItachi090Main);
+  registerEffect('KS-090-C', 'MAIN', handleItachi090Main);
 }

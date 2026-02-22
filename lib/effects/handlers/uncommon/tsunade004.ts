@@ -30,7 +30,7 @@ function handleTsunade004Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Tsunade (004): Defeated friendly characters will go to hand instead of discard pile (continuous).',
     'game.log.effect.continuous',
-    { card: 'TSUNADE', id: '004/130' },
+    { card: 'TSUNADE', id: 'KS-004-UC' },
   );
   return { state: { ...state, log } };
 }
@@ -44,7 +44,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
   if (discardPile.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tsunade (004): No characters in discard pile to recover.',
-      'game.log.effect.noTarget', { card: 'TSUNADE', id: '004/130' }) } };
+      'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' }) } };
   }
 
   // Build valid targets as indices (using card ids as identifiers)
@@ -65,7 +65,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_RECOVER',
       `Tsunade (004): Recovered ${card.name_fr} from discard pile to hand.`,
       'game.log.effect.recoverFromDiscard',
-      { card: 'TSUNADE', id: '004/130', target: card.name_fr },
+      { card: 'TSUNADE', id: 'KS-004-UC', target: card.name_fr },
     );
 
     return { state: newState };
@@ -82,6 +82,6 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerTsunade004Handlers(): void {
-  registerEffect('004/130', 'MAIN', handleTsunade004Main);
-  registerEffect('004/130', 'UPGRADE', handleTsunade004Upgrade);
+  registerEffect('KS-004-UC', 'MAIN', handleTsunade004Main);
+  registerEffect('KS-004-UC', 'UPGRADE', handleTsunade004Upgrade);
 }

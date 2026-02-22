@@ -16,5 +16,5 @@ function handleGenma049Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('049/130', 'MAIN', handleGenma049Main);
+  registerEffect('KS-049-C', 'MAIN', handleGenma049Main);
 }

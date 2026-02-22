@@ -16,5 +16,5 @@ function handleAnko044Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('044/130', 'MAIN', handleAnko044Main);
+  registerEffect('KS-044-C', 'MAIN', handleAnko044Main);
 }

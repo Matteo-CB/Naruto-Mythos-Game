@@ -35,7 +35,7 @@ function rockLee117UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Rock Lee (117) UPGRADE: Deck is empty, cannot reveal and discard.',
           'game.log.effect.noTarget',
-          { card: 'ROCK LEE', id: '117/130' },
+          { card: 'ROCK LEE', id: 'KS-117-R' },
         ),
       },
     };
@@ -57,7 +57,7 @@ function rockLee117UpgradeHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Rock Lee (117) UPGRADE: Revealed and discarded ${discardedCard.name_fr} (cost ${discardedCost}) from top of deck.`,
       'game.log.effect.discard',
-      { card: 'ROCK LEE', id: '117/130', target: discardedCard.name_fr },
+      { card: 'ROCK LEE', id: 'KS-117-R', target: discardedCard.name_fr },
     ),
   };
 
@@ -86,7 +86,7 @@ function rockLee117UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_POWERUP',
           `Rock Lee (117) UPGRADE: POWERUP ${discardedCost} (cost of discarded ${discardedCard.name_fr}).`,
           'game.log.effect.powerupSelf',
-          { card: 'ROCK LEE', id: '117/130', amount: discardedCost },
+          { card: 'ROCK LEE', id: 'KS-117-R', amount: discardedCost },
         ),
       };
     }
@@ -98,7 +98,7 @@ function rockLee117UpgradeHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         `Rock Lee (117) UPGRADE: Discarded card had cost 0, no POWERUP.`,
         'game.log.effect.powerupSelf',
-        { card: 'ROCK LEE', id: '117/130', amount: 0 },
+        { card: 'ROCK LEE', id: 'KS-117-R', amount: 0 },
       ),
     };
   }
@@ -107,6 +107,6 @@ function rockLee117UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerRockLee117Handlers(): void {
-  registerEffect('117/130', 'MAIN', rockLee117MainHandler);
-  registerEffect('117/130', 'UPGRADE', rockLee117UpgradeHandler);
+  registerEffect('KS-117-R', 'MAIN', rockLee117MainHandler);
+  registerEffect('KS-117-R', 'UPGRADE', rockLee117UpgradeHandler);
 }

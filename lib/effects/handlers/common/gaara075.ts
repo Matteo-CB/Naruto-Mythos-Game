@@ -19,5 +19,5 @@ function handleGaara075Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('075/130', 'MAIN', handleGaara075Main);
+  registerEffect('KS-075-C', 'MAIN', handleGaara075Main);
 }

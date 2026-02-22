@@ -40,7 +40,7 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Sakura Haruno (109): No affordable Leaf Village character in discard pile.',
       'game.log.effect.noTarget',
-      { card: 'SAKURA HARUNO', id: '109/130' },
+      { card: 'SAKURA HARUNO', id: 'KS-109-R' },
     );
     return { state: { ...state, log } };
   }
@@ -57,5 +57,5 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerSakura109Handlers(): void {
-  registerEffect('109/130', 'MAIN', sakura109MainHandler);
+  registerEffect('KS-109-R', 'MAIN', sakura109MainHandler);
 }

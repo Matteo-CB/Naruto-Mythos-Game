@@ -33,7 +33,7 @@ function handleHinata030Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Hinata Hyuga (030): No enemy character with Power tokens in play.',
-      'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: '030/130' }) } };
+      'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-030-C' }) } };
   }
 
   // If exactly one valid target, auto-apply
@@ -87,12 +87,12 @@ function removePowerTokens(
     'EFFECT_REMOVE_TOKENS',
     `Hinata Hyuga (030): Removed ${tokensRemoved} Power token(s) from ${targetName}.`,
     'game.log.effect.removeTokens',
-    { card: 'HINATA HYUGA', id: '030/130', amount: tokensRemoved, target: targetName },
+    { card: 'HINATA HYUGA', id: 'KS-030-C', amount: tokensRemoved, target: targetName },
   );
 
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('030/130', 'MAIN', handleHinata030Main);
+  registerEffect('KS-030-C', 'MAIN', handleHinata030Main);
 }

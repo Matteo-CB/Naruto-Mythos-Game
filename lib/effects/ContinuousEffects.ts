@@ -39,7 +39,7 @@ export function calculateContinuousChakraBonus(
     if (!effect.description.includes('[⧗]')) continue;
 
     // Kiba 025: If Akamaru is in the same mission, CHAKRA +1
-    if (topCard.id === '025/130' || topCard.number === 25) {
+    if (topCard.id === 'KS-025-C' || topCard.number === 25) {
       const hasAkamaru = friendlyChars.some(
         (c) => !c.isHidden && c.card.name_fr.toUpperCase() === 'AKAMARU',
       );
@@ -47,7 +47,7 @@ export function calculateContinuousChakraBonus(
     }
 
     // Anko 044: If another friendly Leaf Village in this mission, CHAKRA +1
-    if (topCard.id === '044/130' || topCard.number === 44) {
+    if (topCard.id === 'KS-044-C' || topCard.number === 44) {
       const hasOtherLeaf = friendlyChars.some(
         (c) =>
           c.instanceId !== char.instanceId &&
@@ -58,27 +58,59 @@ export function calculateContinuousChakraBonus(
     }
 
     // Tayuya 064: CHAKRA +X, X = missions with friendly Sound Four
-    if (topCard.id === '064/130' || topCard.number === 64) {
+    if (topCard.id === 'KS-064-C' || topCard.number === 64) {
       const soundFourMissions = countMissionsWithKeyword(state, player, 'Sound Four');
       bonus += soundFourMissions;
     }
 
     // Kankuro 077: If non-hidden enemy in this mission, CHAKRA +1
-    if (topCard.id === '077/130' || topCard.number === 77) {
+    if (topCard.id === 'KS-077-C' || topCard.number === 77) {
       const hasNonHiddenEnemy = enemyChars.some((c) => !c.isHidden);
       if (hasNonHiddenEnemy) bonus += 1;
     }
 
     // Shizune 005: Unconditional CHAKRA +1
-    if (topCard.id === '005/130' || topCard.number === 5) {
+    if (topCard.id === 'KS-005-C' || topCard.number === 5) {
       if (effect.description.includes('CHAKRA +1')) {
         bonus += 1;
       }
     }
 
     // Sakura 012 (UC): Unconditional CHAKRA +1
-    if (topCard.id === '012/130' || topCard.number === 12) {
+    if (topCard.id === 'KS-012-UC' || topCard.number === 12) {
       if (effect.description.includes('CHAKRA +1')) {
+        bonus += 1;
+      }
+    }
+
+    // Sakura 147 (M): If you don't have the Edge, CHAKRA +2
+    if (topCard.number === 147 && effect.description.includes('CHAKRA +2') && effect.description.includes('Edge')) {
+      if (state.edgeHolder !== player) {
+        bonus += 2;
+      }
+    }
+  }
+
+  return bonus;
+}
+
+/**
+ * Calculate CHAKRA bonus from mission SCORE [⧗] effects.
+ * Called once per player per Start Phase (not per character).
+ *
+ * MSS-10 "Chakra Training": After won, both players get CHAKRA +1.
+ */
+export function calculateMissionChakraBonus(state: GameState, player: PlayerID): number {
+  let bonus = 0;
+
+  for (const mission of state.activeMissions) {
+    if (!mission.wonBy) continue;
+
+    for (const effect of mission.card.effects ?? []) {
+      if (effect.type !== 'SCORE' || !effect.description.includes('[⧗]')) continue;
+
+      // MSS-10: CHAKRA +1 for both players
+      if (effect.description.includes('CHAKRA +1') && effect.description.includes('both players')) {
         bonus += 1;
       }
     }
@@ -119,13 +151,33 @@ export function calculateContinuousPowerModifier(
   missionIndex: number,
   char: CharacterInPlay,
 ): number {
-  if (char.isHidden) return 0;
+  // Hidden characters normally have 0 power, but Kurenai 035 gives them +2
+  if (char.isHidden) {
+    const mission = state.activeMissions[missionIndex];
+    if (!mission) return 0;
+    const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    let hiddenBonus = 0;
+    for (const friendly of friendlyChars) {
+      if (friendly.isHidden || friendly.instanceId === char.instanceId) continue;
+      const fTop = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+      // Kurenai 035 (UC): Hidden friendly characters in this mission have +2 Power
+      if (fTop.number === 35) {
+        const hasEffect = (fTop.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+2 Power'),
+        );
+        if (hasEffect) hiddenBonus += 2;
+      }
+    }
+    return hiddenBonus;
+  }
 
   const mission = state.activeMissions[missionIndex];
   if (!mission) return 0;
 
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   let modifier = 0;
+
+  const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
   // Check all friendly characters in the same mission for continuous power effects on others
   for (const friendly of friendlyChars) {
@@ -148,6 +200,55 @@ export function calculateContinuousPowerModifier(
       if (topCard.number === 42 && effect.description.includes('Other Team Guy')) {
         if ((char.card.keywords ?? []).includes('Team Guy')) {
           modifier += 1;
+        }
+      }
+    }
+  }
+
+  // Check ENEMY characters for continuous power debuffs on this character
+  for (const enemy of enemyChars) {
+    if (enemy.isHidden) continue;
+    const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+
+    for (const effect of enemyTopCard.effects ?? []) {
+      if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+
+      // Itachi 128 (R): Every enemy in this mission has -1 Power
+      if (enemyTopCard.number === 128) {
+        modifier -= 1;
+      }
+
+      // Rempart 067 (UC): The strongest non-hidden enemy character has Power = 0
+      // We handle this below as a special case since it only affects the strongest
+    }
+  }
+
+  // Rempart 067 special case: if enemy has Rempart in this mission, and this char
+  // is the strongest non-hidden character on our side, reduce power to 0
+  for (const enemy of enemyChars) {
+    if (enemy.isHidden) continue;
+    const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+    if (enemyTopCard.number === 67) {
+      const hasRempartEffect = (enemyTopCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+      );
+      if (hasRempartEffect) {
+        // Find the strongest non-hidden friendly character
+        let maxPower = -1;
+        let strongestId = '';
+        for (const f of friendlyChars) {
+          if (f.isHidden) continue;
+          const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
+          const basePower = (fTop.power ?? 0) + f.powerTokens;
+          if (basePower > maxPower) {
+            maxPower = basePower;
+            strongestId = f.instanceId;
+          }
+        }
+        // If this character is the strongest, reduce to 0
+        if (strongestId === char.instanceId && maxPower > 0) {
+          const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          modifier -= (selfTop.power ?? 0) + char.powerTokens;
         }
       }
     }
@@ -190,6 +291,32 @@ export function calculateContinuousPowerModifier(
           (c.card.name_fr.toUpperCase() === 'TSUNADE' || c.card.name_fr.toUpperCase() === 'SHIZUNE'),
       );
       if (hasTsunadeOrShizune) modifier += 1;
+    }
+  }
+
+  // -------------------------------------------------------
+  // Mission SCORE [⧗] effects that modify power continuously
+  // -------------------------------------------------------
+  // These apply after the mission has been won (wonBy set)
+  for (const mEffect of mission.card.effects ?? []) {
+    if (mEffect.type !== 'SCORE' || !mEffect.description.includes('[⧗]')) continue;
+
+    // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
+    if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
+      if (mission.wonBy) {
+        modifier += 1;
+      }
+    }
+
+    // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
+    if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
+      if (mission.wonBy) {
+        const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const basePower = (selfTop.power ?? 0) + char.powerTokens;
+        if (basePower >= 4) {
+          modifier += 1;
+        }
+      }
     }
   }
 

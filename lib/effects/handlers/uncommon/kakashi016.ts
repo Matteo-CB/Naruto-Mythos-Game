@@ -51,7 +51,7 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
     const limitStr = isUpgrade ? 'any cost' : 'cost 4 or less';
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Kakashi Hatake (016): No enemy character (${limitStr}) with a copyable instant effect in play.`,
-      'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: '016/130' }) } };
+      'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'KS-016-UC' }) } };
   }
 
   // Requires target selection: which enemy character's effect to copy
@@ -66,7 +66,7 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerKakashi016Handlers(): void {
-  registerEffect('016/130', 'MAIN', handleKakashi016Main);
+  registerEffect('KS-016-UC', 'MAIN', handleKakashi016Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to remove the cost limit
 }

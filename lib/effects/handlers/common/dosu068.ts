@@ -30,7 +30,7 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Dosu Kinuta (068): No hidden characters in play to look at.',
-      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: '068/130' }) } };
+      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' }) } };
   }
 
   // Requires target selection: which hidden character to look at
@@ -60,7 +60,7 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Dosu Kinuta (068): No hidden characters in play to defeat.',
-      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: '068/130' }) } };
+      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' }) } };
   }
 
   // Requires target selection: which hidden character to defeat
@@ -74,6 +74,6 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('068/130', 'MAIN', handleDosu068Main);
-  registerEffect('068/130', 'AMBUSH', handleDosu068Ambush);
+  registerEffect('KS-068-C', 'MAIN', handleDosu068Main);
+  registerEffect('KS-068-C', 'AMBUSH', handleDosu068Ambush);
 }

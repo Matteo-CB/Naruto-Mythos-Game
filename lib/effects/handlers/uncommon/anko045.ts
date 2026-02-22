@@ -38,7 +38,7 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Anko Mitarashi (045): No hidden enemy character in play to defeat.',
-      'game.log.effect.noTarget', { card: 'ANKO MITARASHI', id: '045/130' }) } };
+      'game.log.effect.noTarget', { card: 'ANKO MITARASHI', id: 'KS-045-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -48,7 +48,7 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
     let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
     newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
       `Anko Mitarashi (045): Defeated a hidden enemy character in mission ${missionIdx + 1} (ambush).`,
-      'game.log.effect.defeat', { card: 'ANKO MITARASHI', id: '045/130', target: '' }) };
+      'game.log.effect.defeat', { card: 'ANKO MITARASHI', id: 'KS-045-UC', target: '' }) };
     return { state: newState };
   }
 
@@ -63,5 +63,5 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('045/130', 'AMBUSH', handleAnko045Ambush);
+  registerEffect('KS-045-UC', 'AMBUSH', handleAnko045Ambush);
 }

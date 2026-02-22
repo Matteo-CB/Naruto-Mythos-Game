@@ -27,7 +27,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
   if (opponentState.deck.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kabuto Yakushi (052): Opponent deck is empty, effect fizzles.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '052/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
   // Draw top card from opponent's deck
@@ -69,7 +69,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
 
     return { state: { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kabuto Yakushi (052): No valid mission for the stolen card, discarded.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '052/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
   // If only one valid mission, auto-place
@@ -85,7 +85,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'EFFECT',
       'Kabuto Yakushi (052): Drew top card from opponent\'s deck. Choose a mission to place it hidden.',
       'game.log.effect.kabutoSteal',
-      { card: 'KABUTO YAKUSHI', id: '052/130' }),
+      { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }),
     _pendingHiddenCard: stolenCard,
     _pendingOriginalOwner: opponentPlayer,
   } as typeof newState;
@@ -140,12 +140,12 @@ function placeHiddenCard(
     'EFFECT',
     `Kabuto Yakushi (052): Placed stolen card hidden on mission ${missionIdx + 1}.`,
     'game.log.effect.kabutoSteal',
-    { card: 'KABUTO YAKUSHI', id: '052/130', mission: String(missionIdx + 1) },
+    { card: 'KABUTO YAKUSHI', id: 'KS-052-C', mission: String(missionIdx + 1) },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('052/130', 'AMBUSH', handleKabuto052Ambush);
+  registerEffect('KS-052-C', 'AMBUSH', handleKabuto052Ambush);
 }

@@ -24,7 +24,7 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_DRAW',
       'MSS 06 (Rescue a Friend): Deck is empty, no card drawn.',
       'game.log.effect.noTarget',
-      { card: 'Sauvetage d\'un ami', id: 'MSS 06' },
+      { card: 'Sauvetage d\'un ami', id: 'KS-006-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -49,5 +49,5 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss06Handlers(): void {
-  registerEffect('MSS 06', 'SCORE', mss06ScoreHandler);
+  registerEffect('KS-006-MMS', 'SCORE', mss06ScoreHandler);
 }

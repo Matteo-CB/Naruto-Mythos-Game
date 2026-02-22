@@ -49,7 +49,7 @@ function handleBaki082Score(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'Baki (082): [SCORE] No hidden characters in play to defeat.',
       'game.log.effect.noTarget',
-      { card: 'BAKI', id: '082/130' },
+      { card: 'BAKI', id: 'KS-082-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -95,7 +95,7 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Baki (082): No enemy with Power 1 or less in this mission (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'BAKI', id: '082/130' },
+      { card: 'BAKI', id: 'KS-082-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -111,7 +111,7 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_DEFEAT',
       'Baki (082): Defeated enemy with Power 1 or less in this mission (upgrade).',
       'game.log.effect.defeat',
-      { card: 'BAKI', id: '082/130' },
+      { card: 'BAKI', id: 'KS-082-UC' },
     );
     return { state: { ...newState, log } };
   }
@@ -155,7 +155,7 @@ function defeatHiddenCharacter(
           'SCORE_DEFEAT',
           `Baki (082): [SCORE] Defeated hidden character ${targetChar.card.name_fr}.`,
           'game.log.score.defeat',
-          { card: 'BAKI', id: '082/130', target: targetChar.card.name_fr },
+          { card: 'BAKI', id: 'KS-082-UC', target: targetChar.card.name_fr },
         );
         return { ...newState, log };
       }
@@ -165,6 +165,6 @@ function defeatHiddenCharacter(
 }
 
 export function registerBaki082Handlers(): void {
-  registerEffect('082/130', 'SCORE', handleBaki082Score);
-  registerEffect('082/130', 'UPGRADE', handleBaki082Upgrade);
+  registerEffect('KS-082-UC', 'SCORE', handleBaki082Score);
+  registerEffect('KS-082-UC', 'UPGRADE', handleBaki082Upgrade);
 }

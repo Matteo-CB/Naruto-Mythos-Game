@@ -36,7 +36,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       `Zabuza Momochi (087): ${nonHiddenEnemies.length === 0 ? 'No' : nonHiddenEnemies.length} non-hidden enemy character(s) in this mission (need exactly 1).`,
       'game.log.effect.noTarget',
-      { card: 'ZABUZA MOMOCHI', id: '087/130' },
+      { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -54,7 +54,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
       'EFFECT_DEFEAT',
       `Zabuza Momochi (087): Defeated ${target.card.name_fr} (upgrade - defeat instead of hide).`,
       'game.log.effect.defeat',
-      { card: 'ZABUZA MOMOCHI', id: '087/130', target: target.card.name_fr },
+      { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: target.card.name_fr },
     );
     return { state: { ...newState, log } };
   }
@@ -79,7 +79,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
       'EFFECT_HIDE',
       `Zabuza Momochi (087): Hid ${target.card.name_fr} (only non-hidden enemy in mission).`,
       'game.log.effect.hide',
-      { card: 'ZABUZA MOMOCHI', id: '087/130', target: target.card.name_fr },
+      { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: target.card.name_fr },
     );
 
     return { state: { ...newState, activeMissions: missions, log } };
@@ -89,7 +89,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerZabuza087Handlers(): void {
-  registerEffect('087/130', 'MAIN', handleZabuza087Main);
+  registerEffect('KS-087-UC', 'MAIN', handleZabuza087Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to defeat instead of hide
 }

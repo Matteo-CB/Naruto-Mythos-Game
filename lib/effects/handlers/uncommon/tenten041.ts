@@ -41,7 +41,7 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tenten (041): No hidden character in this mission to defeat.',
-      'game.log.effect.noTarget', { card: 'TENTEN', id: '041/130' }) } };
+      'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -56,7 +56,7 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
     let newState = defeatCharacterInPlay(state, sourceMissionIndex, targetId, side, isEnemy, sourcePlayer);
     newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
       'Tenten (041): Defeated a hidden character in this mission.',
-      'game.log.effect.defeat', { card: 'TENTEN', id: '041/130', target: '' }) };
+      'game.log.effect.defeat', { card: 'TENTEN', id: 'KS-041-UC', target: '' }) };
     return { state: newState };
   }
 
@@ -92,7 +92,7 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tenten (041): No other friendly Leaf Village character in play to power up.',
-      'game.log.effect.noTarget', { card: 'TENTEN', id: '041/130' }) } };
+      'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -146,13 +146,13 @@ function powerUpTarget(
     'EFFECT_POWERUP',
     `Tenten (041): POWERUP ${amount} on ${targetName} (upgrade).`,
     'game.log.effect.powerup',
-    { card: 'TENTEN', id: '041/130', amount: String(amount), target: targetName },
+    { card: 'TENTEN', id: 'KS-041-UC', amount: String(amount), target: targetName },
   );
 
   return newState;
 }
 
 export function registerTenten041Handlers(): void {
-  registerEffect('041/130', 'MAIN', handleTenten041Main);
-  registerEffect('041/130', 'UPGRADE', handleTenten041Upgrade);
+  registerEffect('KS-041-UC', 'MAIN', handleTenten041Main);
+  registerEffect('KS-041-UC', 'UPGRADE', handleTenten041Upgrade);
 }

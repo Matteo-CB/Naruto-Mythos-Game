@@ -30,14 +30,14 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Iruka Umino (047): No Naruto Uzumaki character found in play.',
-      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: '047/130' }) } };
+      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: 'KS-047-C' }) } };
   }
 
   // Check that there is at least one other mission available
   if (state.activeMissions.length <= 1) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Iruka Umino (047): No other mission available to move Naruto Uzumaki to.',
-      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: '047/130' }) } };
+      'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: 'KS-047-C' }) } };
   }
 
   return {
@@ -50,5 +50,5 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('047/130', 'MAIN', handleIruka047Main);
+  registerEffect('KS-047-C', 'MAIN', handleIruka047Main);
 }

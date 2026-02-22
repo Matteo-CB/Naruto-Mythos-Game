@@ -15,5 +15,5 @@ function handleGai042Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('042/130', 'MAIN', handleGai042Main);
+  registerEffect('KS-042-C', 'MAIN', handleGai042Main);
 }

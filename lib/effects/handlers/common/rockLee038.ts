@@ -36,7 +36,7 @@ function handleRockLee038Ambush(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Rock Lee (038): POWERUP 1 on self (ambush).',
       'game.log.effect.powerupSelf',
-      { card: 'ROCK LEE', id: '038/130', amount: 1 },
+      { card: 'ROCK LEE', id: 'KS-038-C', amount: 1 },
     );
 
     return { state: { ...state, activeMissions: missions, log } };
@@ -46,5 +46,5 @@ function handleRockLee038Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('038/130', 'AMBUSH', handleRockLee038Ambush);
+  registerEffect('KS-038-C', 'AMBUSH', handleRockLee038Ambush);
 }

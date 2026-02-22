@@ -36,7 +36,7 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 01 (Call for Support): No friendly character in play to receive POWERUP 2.',
       'game.log.effect.noTarget',
-      { card: 'Appel de soutien', id: 'MSS 01' },
+      { card: 'Appel de soutien', id: 'KS-001-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -92,5 +92,5 @@ function applyMss01Powerup(
 }
 
 export function registerMss01Handlers(): void {
-  registerEffect('MSS 01', 'SCORE', mss01ScoreHandler);
+  registerEffect('KS-001-MMS', 'SCORE', mss01ScoreHandler);
 }

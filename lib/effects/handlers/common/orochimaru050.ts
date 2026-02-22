@@ -38,7 +38,7 @@ function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Orochimaru (050): No hidden enemy characters in this mission.',
-      'game.log.effect.noTarget', { card: 'OROCHIMARU', id: '050/130' }) } };
+      'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-050-C' }) } };
   }
 
   // Requires target selection: which hidden enemy to look at
@@ -54,5 +54,5 @@ function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('050/130', 'AMBUSH', handleOrochimaru050Ambush);
+  registerEffect('KS-050-C', 'AMBUSH', handleOrochimaru050Ambush);
 }

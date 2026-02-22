@@ -39,7 +39,7 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
       'SCORE_DEFEAT_FAILED',
       'Yashamaru (085): [SCORE] Self-defeat was prevented. Cannot defeat another character.',
       'game.log.score.defeatFailed',
-      { card: 'YASHAMARU', id: '085/130' },
+      { card: 'YASHAMARU', id: 'KS-085-UC' },
     );
     return { state: { ...newState, log } };
   }
@@ -52,7 +52,7 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
     'SCORE_SELF_DEFEAT',
     'Yashamaru (085): [SCORE] Defeated self.',
     'game.log.score.selfDefeat',
-    { card: 'YASHAMARU', id: '085/130' },
+    { card: 'YASHAMARU', id: 'KS-085-UC' },
   );
   newState = { ...newState, log: selfDefeatLog };
 
@@ -72,7 +72,7 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'Yashamaru (085): [SCORE] No other characters in this mission to defeat.',
       'game.log.effect.noTarget',
-      { card: 'YASHAMARU', id: '085/130' },
+      { card: 'YASHAMARU', id: 'KS-085-UC' },
     );
     return { state: { ...newState, log } };
   }
@@ -95,7 +95,7 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
       'SCORE_DEFEAT',
       `Yashamaru (085): [SCORE] Also defeated ${targetChar.card.name_fr} in this mission.`,
       'game.log.score.defeat',
-      { card: 'YASHAMARU', id: '085/130', target: targetChar.card.name_fr },
+      { card: 'YASHAMARU', id: 'KS-085-UC', target: targetChar.card.name_fr },
     );
     return { state: { ...finalState, log } };
   }
@@ -113,5 +113,5 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('085/130', 'SCORE', handleYashamaru085Score);
+  registerEffect('KS-085-UC', 'SCORE', handleYashamaru085Score);
 }

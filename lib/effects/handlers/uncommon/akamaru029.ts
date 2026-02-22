@@ -30,7 +30,7 @@ function handleAkamaru029Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Akamaru (029): Can be played as an upgrade over Kiba Inuzuka (continuous).',
     'game.log.effect.continuous',
-    { card: 'AKAMARU', id: '029/130' },
+    { card: 'AKAMARU', id: 'KS-029-UC' },
   );
   return { state: { ...state, log } };
 }
@@ -48,7 +48,7 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
   if (nonHiddenEnemies.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Akamaru (029): No non-hidden enemy character in this mission to hide (upgrade effect).',
-      'game.log.effect.noTarget', { card: 'AKAMARU', id: '029/130' }) } };
+      'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-029-UC' }) } };
   }
 
   // Find the one with lowest cost
@@ -79,7 +79,7 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_HIDE',
       `Akamaru (029): Hid ${targetName} (lowest cost enemy in this mission, upgrade effect).`,
       'game.log.effect.hide',
-      { card: 'AKAMARU', id: '029/130', target: targetName },
+      { card: 'AKAMARU', id: 'KS-029-UC', target: targetName },
     );
 
     return { state: { ...newState, log } };
@@ -89,6 +89,6 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerAkamaru029Handlers(): void {
-  registerEffect('029/130', 'MAIN', handleAkamaru029Main);
-  registerEffect('029/130', 'UPGRADE', handleAkamaru029Upgrade);
+  registerEffect('KS-029-UC', 'MAIN', handleAkamaru029Main);
+  registerEffect('KS-029-UC', 'UPGRADE', handleAkamaru029Upgrade);
 }

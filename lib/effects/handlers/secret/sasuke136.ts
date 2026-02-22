@@ -24,7 +24,7 @@ function sasuke136MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Sasuke Uchiwa (136): Gain 1 Chakra when any character is defeated (continuous).',
     'game.log.effect.gainChakra',
-    { card: 'SASUKE UCHIWA', id: '136/130', amount: 1 },
+    { card: 'SASUKE UCHIWA', id: 'KS-136-S', amount: 1 },
   );
   return { state: { ...state, log } };
 }
@@ -64,7 +64,7 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Sasuke Uchiwa (136): No valid targets for mutual destruction (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'SASUKE UCHIWA', id: '136/130' },
+      { card: 'SASUKE UCHIWA', id: 'KS-136-S' },
     );
     return { state: { ...state, log } };
   }
@@ -73,18 +73,18 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
   state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
     `Sasuke Uchiwa (136): Defeated friendly ${friendlyTarget.card.name_fr} (mutual destruction).`,
     'game.log.effect.defeat',
-    { card: 'SASUKE UCHIWA', id: '136/130', target: friendlyTarget.card.name_fr }) };
+    { card: 'SASUKE UCHIWA', id: 'KS-136-S', target: friendlyTarget.card.name_fr }) };
 
   state = defeatEnemyCharacter(state, ctx.sourceMissionIndex, enemyTarget.instanceId, ctx.sourcePlayer);
   state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
     `Sasuke Uchiwa (136): Defeated enemy ${enemyTarget.card.name_fr} (mutual destruction).`,
     'game.log.effect.defeat',
-    { card: 'SASUKE UCHIWA', id: '136/130', target: enemyTarget.card.name_fr }) };
+    { card: 'SASUKE UCHIWA', id: 'KS-136-S', target: enemyTarget.card.name_fr }) };
 
   return { state };
 }
 
 export function registerSasuke136Handlers(): void {
-  registerEffect('136/130', 'MAIN', sasuke136MainHandler);
-  registerEffect('136/130', 'UPGRADE', sasuke136UpgradeHandler);
+  registerEffect('KS-136-S', 'MAIN', sasuke136MainHandler);
+  registerEffect('KS-136-S', 'UPGRADE', sasuke136UpgradeHandler);
 }

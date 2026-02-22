@@ -38,7 +38,7 @@ function handleTenten118Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tenten (118): No hidden characters in this mission to defeat.',
-      'game.log.effect.noTarget', { card: 'TENTEN', id: '118/130' }) } };
+      'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-118-R' }) } };
   }
 
   // Requires target selection: which hidden character in this mission to defeat
@@ -54,7 +54,7 @@ function handleTenten118Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerTenten118Handlers(): void {
-  registerEffect('118/130', 'AMBUSH', handleTenten118Ambush);
+  registerEffect('KS-118-R', 'AMBUSH', handleTenten118Ambush);
   // RA variant shares the same effect handler
-  registerEffect('118/130 A', 'AMBUSH', handleTenten118Ambush);
+  registerEffect('KS-118-RA', 'AMBUSH', handleTenten118Ambush);
 }

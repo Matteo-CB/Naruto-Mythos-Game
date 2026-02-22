@@ -32,7 +32,7 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
   if (!hasLesserFriendly) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Ebisu (046): No friendly character with less Power in this mission.',
-      'game.log.effect.noTarget', { card: 'EBISU', id: '046/130' }) } };
+      'game.log.effect.noTarget', { card: 'EBISU', id: 'KS-046-C' }) } };
   }
 
   // Draw a card
@@ -54,12 +54,12 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Ebisu (046): Drew 1 card.`,
     'game.log.effect.draw',
-    { card: 'Ebisu', id: '046/130', count: '1' },
+    { card: 'Ebisu', id: 'KS-046-C', count: '1' },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('046/130', 'MAIN', handleEbisu046Main);
+  registerEffect('KS-046-C', 'MAIN', handleEbisu046Main);
 }

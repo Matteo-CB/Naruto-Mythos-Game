@@ -50,7 +50,7 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Jiraya (132): No affordable Summon character in hand to play.',
       'game.log.effect.noTarget',
-      { card: 'JIRAYA', id: '132/130' },
+      { card: 'JIRAYA', id: 'KS-132-S' },
     );
     return { state: { ...state, log } };
   }
@@ -118,7 +118,7 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_PLAY',
       `Jiraya (132): Played ${playedCard.name_fr} (Summon) on mission ${bestMissionIndex} paying ${chosen.reducedCost} (reduced by 5).`,
       'game.log.effect.playSummon',
-      { card: 'JIRAYA', id: '132/130', target: playedCard.name_fr, cost: chosen.reducedCost },
+      { card: 'JIRAYA', id: 'KS-132-S', target: playedCard.name_fr, cost: chosen.reducedCost },
     ),
   };
 
@@ -170,7 +170,7 @@ function applyUpgradeEffect(state: GameState, ctx: EffectContext): GameState {
           'EFFECT_DEFEAT',
           `Jiraya (132): Defeated enemy ${target.card.name_fr} in mission ${i} (upgrade, exceeds 2 per mission).`,
           'game.log.effect.defeat',
-          { card: 'JIRAYA', id: '132/130', target: target.card.name_fr },
+          { card: 'JIRAYA', id: 'KS-132-S', target: target.card.name_fr },
         ),
       };
     }
@@ -185,6 +185,6 @@ function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerJiraiya132Handlers(): void {
-  registerEffect('132/130', 'MAIN', jiraiya132MainHandler);
-  registerEffect('132/130', 'UPGRADE', jiraiya132UpgradeHandler);
+  registerEffect('KS-132-S', 'MAIN', jiraiya132MainHandler);
+  registerEffect('KS-132-S', 'UPGRADE', jiraiya132UpgradeHandler);
 }

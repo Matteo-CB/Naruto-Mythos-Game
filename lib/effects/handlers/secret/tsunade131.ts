@@ -57,7 +57,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Tsunade (131): No friendly Leaf Village characters in play to power up.',
       'game.log.effect.noTarget',
-      { card: 'TSUNADE', id: '131/130' },
+      { card: 'TSUNADE', id: 'KS-131-S' },
     );
     return { state: { ...state, log } };
   }
@@ -67,12 +67,12 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Tsunade (131): POWERUP 1 on ${poweredUpCount} friendly Leaf Village character(s).`,
     'game.log.effect.powerupMultiple',
-    { card: 'TSUNADE', id: '131/130', amount: 1, count: poweredUpCount },
+    { card: 'TSUNADE', id: 'KS-131-S', amount: 1, count: poweredUpCount },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerTsunade131Handlers(): void {
-  registerEffect('131/130', 'MAIN', tsunade131MainHandler);
+  registerEffect('KS-131-S', 'MAIN', tsunade131MainHandler);
 }

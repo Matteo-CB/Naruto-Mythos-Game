@@ -143,6 +143,79 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
     );
   }
 
+  // Rock Lee 117 (R): At end of round, must move to another mission, if able
+  newState = handleRockLee117Move(newState);
+
+  return newState;
+}
+
+/**
+ * Rock Lee 117 (R): At end of round, must move to another mission, if able.
+ */
+function handleRockLee117Move(state: GameState): GameState {
+  let newState = { ...state };
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const mission = newState.activeMissions[mIdx];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      const chars = mission[side];
+
+      for (const char of chars) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.number !== 117) continue;
+
+        const hasMove = (topCard.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('move this character'),
+        );
+        if (!hasMove) continue;
+
+        // Find a valid destination (any other mission, respecting name uniqueness)
+        let destIdx = -1;
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === mIdx) continue;
+          // Check name uniqueness at destination
+          const destMission = newState.activeMissions[i];
+          const destChars = player === 'player1' ? destMission.player1Characters : destMission.player2Characters;
+          const hasSameName = destChars.some(
+            (c) => !c.isHidden && c.card.name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
+          );
+          if (!hasSameName) {
+            destIdx = i;
+            break;
+          }
+        }
+
+        if (destIdx === -1) continue; // No valid destination — "if able" clause
+
+        // Move the character
+        const missions = [...newState.activeMissions];
+        const srcMission = { ...missions[mIdx] };
+        const destMission = { ...missions[destIdx] };
+
+        srcMission[side] = srcMission[side].filter((c: CharacterInPlay) => c.instanceId !== char.instanceId);
+        const movedChar = { ...char, missionIndex: destIdx };
+        destMission[side] = [...destMission[side], movedChar];
+
+        missions[mIdx] = srcMission;
+        missions[destIdx] = destMission;
+        newState.activeMissions = missions;
+
+        newState.log = logAction(
+          newState.log, state.turn, 'end', player,
+          'EFFECT_MOVE',
+          `Rock Lee (117): Moves to mission ${destIdx + 1} at end of round.`,
+          'game.log.effect.endMove',
+          { card: 'ROCK LEE', id: 'KS-117-R' },
+        );
+
+        // Only one Rock Lee 117 per player typically, but break inner loops to avoid mutation issues
+        break;
+      }
+    }
+  }
+
   return newState;
 }
 

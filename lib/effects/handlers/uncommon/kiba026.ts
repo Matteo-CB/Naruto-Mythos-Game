@@ -45,7 +45,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
           'EFFECT_DRAW',
           `Kiba Inuzuka (026): Drew ${akamaruCards.length} Akamaru card(s) from top 3 of deck (upgrade effect).`,
           'game.log.effect.draw',
-          { card: 'KIBA INUZUKA', id: '026/130', count: akamaruCards.length },
+          { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: akamaruCards.length },
         ) };
       } else {
         newState = { ...newState, log: logAction(
@@ -53,7 +53,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
           'EFFECT',
           'Kiba Inuzuka (026): Looked at top 3 of deck, no Akamaru found (upgrade effect).',
           'game.log.effect.lookAtDeck',
-          { card: 'KIBA INUZUKA', id: '026/130' },
+          { card: 'KIBA INUZUKA', id: 'KS-026-UC' },
         ) };
       }
     }
@@ -71,7 +71,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
   if (nonHiddenEnemies.length === 0) {
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kiba Inuzuka (026): No non-hidden enemy character in this mission to hide.',
-      'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: '026/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' }) } };
   }
 
   // Find the one with lowest cost
@@ -102,7 +102,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
       'EFFECT_HIDE',
       `Kiba Inuzuka (026): Hid ${targetName} (lowest cost enemy in this mission).`,
       'game.log.effect.hide',
-      { card: 'KIBA INUZUKA', id: '026/130', target: targetName },
+      { card: 'KIBA INUZUKA', id: 'KS-026-UC', target: targetName },
     ) };
   }
 
@@ -110,7 +110,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerKiba026Handlers(): void {
-  registerEffect('026/130', 'MAIN', handleKiba026Main);
+  registerEffect('KS-026-UC', 'MAIN', handleKiba026Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to apply the Akamaru search
 }

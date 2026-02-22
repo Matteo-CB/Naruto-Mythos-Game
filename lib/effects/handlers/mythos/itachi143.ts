@@ -37,7 +37,7 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (143): No friendly character in another mission to move here.',
       'game.log.effect.noTarget',
-      { card: 'ITACHI UCHIWA', id: '143/130' },
+      { card: 'ITACHI UCHIWA', id: 'KS-143-M' },
     );
     return { state: { ...state, log } };
   }
@@ -71,7 +71,7 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (143): No enemy character in another mission to move here (ambush).',
       'game.log.effect.noTarget',
-      { card: 'ITACHI UCHIWA', id: '143/130' },
+      { card: 'ITACHI UCHIWA', id: 'KS-143-M' },
     );
     return { state: { ...state, log } };
   }
@@ -86,6 +86,6 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerItachi143Handlers(): void {
-  registerEffect('143/130', 'MAIN', itachi143MainHandler);
-  registerEffect('143/130', 'AMBUSH', itachi143AmbushHandler);
+  registerEffect('KS-143-M', 'MAIN', itachi143MainHandler);
+  registerEffect('KS-143-M', 'AMBUSH', itachi143AmbushHandler);
 }

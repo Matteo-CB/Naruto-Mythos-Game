@@ -22,11 +22,11 @@ function naruto145MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Naruto Uzumaki (145): Hidden characters in this mission gain +1 Power while you hold the Edge token (continuous).',
     'game.log.effect.continuous',
-    { card: 'NARUTO UZUMAKI', id: '145/130' },
+    { card: 'NARUTO UZUMAKI', id: 'KS-145-M' },
   );
   return { state: { ...ctx.state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('145/130', 'MAIN', naruto145MainHandler);
+  registerEffect('KS-145-M', 'MAIN', naruto145MainHandler);
 }

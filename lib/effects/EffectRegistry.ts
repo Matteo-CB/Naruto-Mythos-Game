@@ -28,12 +28,30 @@ export function getEffectHandler(cardId: string, effectType: EffectType): Effect
     if (handler) return handler;
   }
 
-  // Try normalized ID (strip " A" suffix for RA variants which use same effects)
-  const normalizedId = cardId.replace(/\s*A$/, '').trim();
-  if (normalizedId !== cardId) {
-    const normalizedHandlers = registry.get(normalizedId);
-    if (normalizedHandlers) {
-      return normalizedHandlers.get(effectType);
+  // RA variants share the same effects as their R counterpart
+  const raFallbackId = cardId.replace(/-RA$/, '-R');
+  if (raFallbackId !== cardId) {
+    const raHandlers = registry.get(raFallbackId);
+    if (raHandlers) {
+      return raHandlers.get(effectType);
+    }
+  }
+
+  // MV (Mythos Variant) falls back to M (Mythos) counterpart
+  const mvFallbackId = cardId.replace(/-MV$/, '-M');
+  if (mvFallbackId !== cardId) {
+    const mvHandlers = registry.get(mvFallbackId);
+    if (mvHandlers) {
+      return mvHandlers.get(effectType);
+    }
+  }
+
+  // SV (Secret Variant) falls back to S (Secret) counterpart
+  const svFallbackId = cardId.replace(/-SV$/, '-S');
+  if (svFallbackId !== cardId) {
+    const svHandlers = registry.get(svFallbackId);
+    if (svHandlers) {
+      return svHandlers.get(effectType);
     }
   }
 

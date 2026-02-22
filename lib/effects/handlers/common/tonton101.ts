@@ -16,5 +16,5 @@ function handleTonton101Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('101/130', 'MAIN', handleTonton101Main);
+  registerEffect('KS-101-C', 'MAIN', handleTonton101Main);
 }

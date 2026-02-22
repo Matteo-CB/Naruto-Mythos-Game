@@ -30,7 +30,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_CONTINUOUS',
       'Rock Lee (151): Must move to another mission at end of round (continuous).',
       'game.log.effect.continuous',
-      { card: 'ROCK LEE', id: '151/130' },
+      { card: 'ROCK LEE', id: 'KS-151-M' },
     ),
   };
 
@@ -47,7 +47,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Rock Lee (151): Deck is empty, cannot reveal top card (upgrade fizzle).',
           'game.log.effect.noTarget',
-          { card: 'ROCK LEE', id: '151/130' },
+          { card: 'ROCK LEE', id: 'KS-151-M' },
         ),
       };
       return { state };
@@ -68,7 +68,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DISCARD',
         `Rock Lee (151): Revealed and discarded ${topCard.name_fr} (cost ${topCard.chakra}) from top of deck (upgrade).`,
         'game.log.effect.revealDiscard',
-        { card: 'ROCK LEE', id: '151/130', target: topCard.name_fr, cost: topCard.chakra },
+        { card: 'ROCK LEE', id: 'KS-151-M', target: topCard.name_fr, cost: topCard.chakra },
       ),
     };
 
@@ -98,7 +98,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
             'EFFECT_POWERUP',
             `Rock Lee (151): POWERUP ${powerupAmount} (cost of discarded ${topCard.name_fr}).`,
             'game.log.effect.powerupSelf',
-            { card: 'ROCK LEE', id: '151/130', amount: powerupAmount },
+            { card: 'ROCK LEE', id: 'KS-151-M', amount: powerupAmount },
           ),
         };
       }
@@ -110,7 +110,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_POWERUP',
           `Rock Lee (151): Discarded card had cost 0, no power tokens added (upgrade).`,
           'game.log.effect.powerupSelf',
-          { card: 'ROCK LEE', id: '151/130', amount: 0 },
+          { card: 'ROCK LEE', id: 'KS-151-M', amount: 0 },
         ),
       };
     }
@@ -125,6 +125,6 @@ function rockLee151UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerRockLee151Handlers(): void {
-  registerEffect('151/130', 'MAIN', rockLee151MainHandler);
-  registerEffect('151/130', 'UPGRADE', rockLee151UpgradeHandler);
+  registerEffect('KS-151-M', 'MAIN', rockLee151MainHandler);
+  registerEffect('KS-151-M', 'UPGRADE', rockLee151UpgradeHandler);
 }

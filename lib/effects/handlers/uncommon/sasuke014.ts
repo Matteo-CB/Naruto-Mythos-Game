@@ -29,7 +29,7 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     'EFFECT_LOOK',
     `Sasuke Uchiwa (014): Looks at ${opponentPlayer}'s hand.`,
     'game.log.effect.lookAtHand',
-    { card: 'SASUKE UCHIWA', id: '014/130', target: opponentPlayer },
+    { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: opponentPlayer },
   ) };
 
   // If not an upgrade, just look
@@ -43,7 +43,7 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     // No cards to discard from own hand, upgrade portion fizzles
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sasuke Uchiwa (014): No cards in hand to discard (upgrade effect fizzles).',
-      'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: '014/130' }) } };
+      'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' }) } };
   }
 
   // Requires target selection: choose a card from own hand to discard
@@ -66,6 +66,6 @@ function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerSasuke014Handlers(): void {
-  registerEffect('014/130', 'AMBUSH', handleSasuke014Ambush);
-  registerEffect('014/130', 'UPGRADE', handleSasuke014Upgrade);
+  registerEffect('KS-014-UC', 'AMBUSH', handleSasuke014Ambush);
+  registerEffect('KS-014-UC', 'UPGRADE', handleSasuke014Upgrade);
 }

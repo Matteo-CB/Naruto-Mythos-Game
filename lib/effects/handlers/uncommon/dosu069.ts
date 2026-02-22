@@ -40,7 +40,7 @@ function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Dosu Kinuta (069): No hidden characters in play to look at.',
       'game.log.effect.noTarget',
-      { card: 'DOSU KINUTA', id: '069/130' },
+      { card: 'DOSU KINUTA', id: 'KS-069-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -79,7 +79,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Dosu Kinuta (069): No hidden enemy characters in play.',
       'game.log.effect.noTarget',
-      { card: 'DOSU KINUTA', id: '069/130' },
+      { card: 'DOSU KINUTA', id: 'KS-069-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -94,6 +94,6 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerDosu069Handlers(): void {
-  registerEffect('069/130', 'UPGRADE', handleDosu069Upgrade);
-  registerEffect('069/130', 'MAIN', handleDosu069Main);
+  registerEffect('KS-069-UC', 'UPGRADE', handleDosu069Upgrade);
+  registerEffect('KS-069-UC', 'MAIN', handleDosu069Main);
 }

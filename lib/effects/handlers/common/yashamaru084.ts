@@ -15,5 +15,5 @@ function handleYashamaru084Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('084/130', 'MAIN', handleYashamaru084Main);
+  registerEffect('KS-084-C', 'MAIN', handleYashamaru084Main);
 }

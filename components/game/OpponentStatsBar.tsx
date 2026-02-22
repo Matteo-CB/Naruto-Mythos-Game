@@ -1,10 +1,11 @@
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 
-export function OpponentStatsBar() {
+export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
@@ -79,7 +80,7 @@ export function OpponentStatsBar() {
       <StatPill label={t('game.score')} value={opponentState.missionPoints} color="#e0e0e0" />
     </div>
   );
-}
+});
 
 function StatPill({ label, value, color }: { label: string; value: number; color: string }) {
   return (

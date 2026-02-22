@@ -40,7 +40,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tayuya (065): No friendly Sound Village character in play to power up.',
-      'game.log.effect.noTarget', { card: 'TAYUYA', id: '065/130' }) } };
+      'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -66,7 +66,7 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
   if (ps.deck.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tayuya (065): Deck is empty, nothing to look at.',
-      'game.log.effect.noTarget', { card: 'TAYUYA', id: '065/130' }) } };
+      'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
   // Look at top 3 cards
@@ -102,7 +102,7 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT',
       `Tayuya (065): Looked at top ${lookCount} card(s) of deck. No Summon cards found. Cards put back on top.`,
       'game.log.effect.lookAtDeck',
-      { card: 'TAYUYA', id: '065/130', count: String(lookCount) },
+      { card: 'TAYUYA', id: 'KS-065-UC', count: String(lookCount) },
     );
     return { state: { ...newState, log } };
   }
@@ -115,7 +115,7 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Tayuya (065): Looked at top ${lookCount} card(s), drew ${summonCards.length} Summon card(s): ${summonCards.join(', ')}. Rest put back on top.`,
     'game.log.effect.draw',
-    { card: 'TAYUYA', id: '065/130', count: String(summonCards.length) },
+    { card: 'TAYUYA', id: 'KS-065-UC', count: String(summonCards.length) },
   );
 
   return { state: { ...newState, log } };
@@ -156,13 +156,13 @@ function powerUpTarget(
     'EFFECT_POWERUP',
     `Tayuya (065): POWERUP ${amount} on ${targetName} (ambush).`,
     'game.log.effect.powerup',
-    { card: 'TAYUYA', id: '065/130', amount: String(amount), target: targetName },
+    { card: 'TAYUYA', id: 'KS-065-UC', amount: String(amount), target: targetName },
   );
 
   return newState;
 }
 
 export function registerTayuya065Handlers(): void {
-  registerEffect('065/130', 'AMBUSH', handleTayuya065Ambush);
-  registerEffect('065/130', 'UPGRADE', handleTayuya065Upgrade);
+  registerEffect('KS-065-UC', 'AMBUSH', handleTayuya065Ambush);
+  registerEffect('KS-065-UC', 'UPGRADE', handleTayuya065Upgrade);
 }

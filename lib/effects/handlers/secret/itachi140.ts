@@ -43,7 +43,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (140): Opponent hand is already empty, nothing to discard.',
       'game.log.effect.noTarget',
-      { card: 'ITACHI UCHIWA', id: '140/130' },
+      { card: 'ITACHI UCHIWA', id: 'KS-140-S' },
     );
 
     // Even with 0 discards, the upgrade cannot trigger meaningfully (X=0 means cost <= 0)
@@ -69,7 +69,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Itachi Uchiwa (140): Opponent discarded ${handSize} card(s) from hand.`,
       'game.log.effect.opponentDiscard',
-      { card: 'ITACHI UCHIWA', id: '140/130', amount: handSize },
+      { card: 'ITACHI UCHIWA', id: 'KS-140-S', amount: handSize },
     ),
   };
 
@@ -92,7 +92,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DRAW',
       `Itachi Uchiwa (140): Opponent drew ${drawCount} card(s) (replaced discarded hand).`,
       'game.log.effect.opponentDraw',
-      { card: 'ITACHI UCHIWA', id: '140/130', amount: drawCount },
+      { card: 'ITACHI UCHIWA', id: 'KS-140-S', amount: drawCount },
     ),
   };
 
@@ -125,7 +125,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           `Itachi Uchiwa (140): No enemy character with cost ${x} or less to defeat (upgrade).`,
           'game.log.effect.noTarget',
-          { card: 'ITACHI UCHIWA', id: '140/130' },
+          { card: 'ITACHI UCHIWA', id: 'KS-140-S' },
         ),
       };
       return { state };
@@ -155,7 +155,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Itachi Uchiwa (140): Defeated enemy ${target.char.card.name_fr} (cost <= ${x}, upgrade).`,
         'game.log.effect.defeat',
-        { card: 'ITACHI UCHIWA', id: '140/130', target: target.char.card.name_fr },
+        { card: 'ITACHI UCHIWA', id: 'KS-140-S', target: target.char.card.name_fr },
       ),
     };
   }
@@ -169,6 +169,6 @@ function itachi140UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerItachi140Handlers(): void {
-  registerEffect('140/130', 'MAIN', itachi140MainHandler);
-  registerEffect('140/130', 'UPGRADE', itachi140UpgradeHandler);
+  registerEffect('KS-140-S', 'MAIN', itachi140MainHandler);
+  registerEffect('KS-140-S', 'UPGRADE', itachi140UpgradeHandler);
 }

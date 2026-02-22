@@ -52,7 +52,7 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           `Kidomaru (124) AMBUSH: No enemy with Power ${powerLimit} or less in other missions.`,
           'game.log.effect.noTarget',
-          { card: 'KIDOMARU', id: '124/130' },
+          { card: 'KIDOMARU', id: 'KS-124-R' },
         ),
       },
     };
@@ -75,7 +75,7 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
             'EFFECT_DEFEAT',
             `Kidomaru (124) AMBUSH: Defeated ${targetName} (Power ${getEffectivePower(targetChar)}) in mission ${i}.`,
             'game.log.effect.defeat',
-            { card: 'KIDOMARU', id: '124/130', target: targetName },
+            { card: 'KIDOMARU', id: 'KS-124-R', target: targetName },
           ),
         };
         return { state: newState };
@@ -100,6 +100,6 @@ function kidomaru124UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKidomaru124Handlers(): void {
-  registerEffect('124/130', 'AMBUSH', kidomaru124AmbushHandler);
-  registerEffect('124/130', 'UPGRADE', kidomaru124UpgradeHandler);
+  registerEffect('KS-124-R', 'AMBUSH', kidomaru124AmbushHandler);
+  registerEffect('KS-124-R', 'UPGRADE', kidomaru124UpgradeHandler);
 }

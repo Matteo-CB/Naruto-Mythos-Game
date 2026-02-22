@@ -105,6 +105,77 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
     newState = EffectEngine.resolveScoreEffects(newState, winner, missionIndex);
   }
 
+  // Orochimaru 051 (UC): If you lost this mission, move Orochimaru to another mission
+  newState = handleOrochimaru051Move(newState, missionIndex, winner);
+
+  return newState;
+}
+
+/**
+ * Orochimaru 051 (UC): [⧗] If you lost this mission during Mission Evaluation, move to another mission.
+ */
+function handleOrochimaru051Move(state: GameState, missionIndex: number, winner: PlayerID | null): GameState {
+  let newState = state;
+  const mission = newState.activeMissions[missionIndex];
+
+  for (const side of ['player1Characters', 'player2Characters'] as const) {
+    const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+    // Only trigger for the losing player
+    if (winner === player || winner === null) continue;
+
+    const chars = mission[side];
+    for (const char of chars) {
+      if (char.isHidden) continue;
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (topCard.number !== 51) continue;
+
+      const hasMove = (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
+      );
+      if (!hasMove) continue;
+
+      // Find a valid destination
+      let destIdx = -1;
+      for (let i = 0; i < newState.activeMissions.length; i++) {
+        if (i === missionIndex) continue;
+        const destMission = newState.activeMissions[i];
+        const destChars = player === 'player1' ? destMission.player1Characters : destMission.player2Characters;
+        const hasSameName = destChars.some(
+          (c) => !c.isHidden && c.card.name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
+        );
+        if (!hasSameName) {
+          destIdx = i;
+          break;
+        }
+      }
+
+      if (destIdx === -1) continue;
+
+      // Move the character
+      const missions = [...newState.activeMissions];
+      const srcMission = { ...missions[missionIndex] };
+      const destMission = { ...missions[destIdx] };
+
+      srcMission[side] = srcMission[side].filter((c) => c.instanceId !== char.instanceId);
+      const movedChar = { ...char, missionIndex: destIdx };
+      destMission[side] = [...destMission[side], movedChar];
+
+      missions[missionIndex] = srcMission;
+      missions[destIdx] = destMission;
+      newState = { ...newState, activeMissions: missions };
+
+      newState.log = logAction(
+        newState.log, newState.turn, 'mission', player,
+        'EFFECT_MOVE',
+        `Orochimaru (051): Lost mission ${missionIndex + 1}, moves to mission ${destIdx + 1}.`,
+        'game.log.effect.orochimaru051Move',
+        { card: 'OROCHIMARU', id: 'KS-051-UC' },
+      );
+
+      break;
+    }
+  }
+
   return newState;
 }
 

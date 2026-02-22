@@ -15,5 +15,5 @@ function handleTemari079Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('079/130', 'MAIN', handleTemari079Main);
+  registerEffect('KS-079-C', 'MAIN', handleTemari079Main);
 }

@@ -16,5 +16,5 @@ function handleAkamaru027Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('027/130', 'MAIN', handleAkamaru027Main);
+  registerEffect('KS-027-C', 'MAIN', handleAkamaru027Main);
 }

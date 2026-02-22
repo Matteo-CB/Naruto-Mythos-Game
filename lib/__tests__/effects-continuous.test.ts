@@ -24,12 +24,12 @@ describe('Chakra Bonuses', () => {
   describe('Kiba 025 - CHAKRA +1 if Akamaru', () => {
     it('should give +1 chakra when Akamaru is in the same mission', () => {
       const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
-        id: '025/130', number: 25, name_fr: 'Kiba Inuzuka',
+        id: 'KS-025-C', number: 25, name_fr: 'Kiba Inuzuka',
         effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
         keywords: ['Team 8'], group: 'Leaf Village',
       });
       const akamaru = mockCharInPlay({ instanceId: 'aka-1' }, {
-        id: '027/130', number: 27, name_fr: 'AKAMARU', group: 'Leaf Village',
+        id: 'KS-027-C', number: 27, name_fr: 'AKAMARU', group: 'Leaf Village',
       });
       const state = createActionPhaseState({
         activeMissions: [makeMission('D', [kiba, akamaru])],
@@ -41,7 +41,7 @@ describe('Chakra Bonuses', () => {
 
     it('should not give bonus when Akamaru is absent', () => {
       const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
-        id: '025/130', number: 25, name_fr: 'Kiba Inuzuka',
+        id: 'KS-025-C', number: 25, name_fr: 'Kiba Inuzuka',
         effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
       });
       const state = createActionPhaseState({
@@ -54,7 +54,7 @@ describe('Chakra Bonuses', () => {
 
     it('should not give bonus when Akamaru is hidden', () => {
       const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
-        id: '025/130', number: 25, name_fr: 'Kiba Inuzuka',
+        id: 'KS-025-C', number: 25, name_fr: 'Kiba Inuzuka',
         effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
       });
       const hiddenAkamaru = mockCharInPlay({ instanceId: 'aka-h', isHidden: true }, {
@@ -73,7 +73,7 @@ describe('Chakra Bonuses', () => {
   describe('Anko 044 - CHAKRA +1 if friendly Leaf Village', () => {
     it('should give +1 when another Leaf Village ally is present', () => {
       const anko = mockCharInPlay({ instanceId: 'anko-1' }, {
-        id: '044/130', number: 44, name_fr: 'Anko Mitarashi',
+        id: 'KS-044-C', number: 44, name_fr: 'Anko Mitarashi',
         effects: [{ type: 'MAIN', description: '[⧗] If there is another friendly Leaf Village character in this mission, CHAKRA +1.' }],
         group: 'Leaf Village',
       });
@@ -90,7 +90,7 @@ describe('Chakra Bonuses', () => {
 
     it('should not count self as another Leaf Village', () => {
       const anko = mockCharInPlay({ instanceId: 'anko-1' }, {
-        id: '044/130', number: 44, name_fr: 'Anko',
+        id: 'KS-044-C', number: 44, name_fr: 'Anko',
         effects: [{ type: 'MAIN', description: '[⧗] If there is another friendly Leaf Village character in this mission, CHAKRA +1.' }],
         group: 'Leaf Village',
       });
@@ -107,7 +107,7 @@ describe('Chakra Bonuses', () => {
   describe('Tayuya 064 - CHAKRA +X (Sound Four missions)', () => {
     it('should give chakra equal to number of missions with Sound Four', () => {
       const tayuya = mockCharInPlay({ instanceId: 'tay-1' }, {
-        id: '064/130', number: 64, name_fr: 'Tayuya',
+        id: 'KS-064-C', number: 64, name_fr: 'Tayuya',
         effects: [{ type: 'MAIN', description: '[⧗] CHAKRA +X. X is the number of missions with friendly Sound Four.' }],
         keywords: ['Sound Four'], group: 'Sound Village',
       });
@@ -130,7 +130,7 @@ describe('Chakra Bonuses', () => {
   describe('Kankuro 077 - CHAKRA +1 if enemy present', () => {
     it('should give +1 when non-hidden enemy present', () => {
       const kankuro = mockCharInPlay({ instanceId: 'kan-1' }, {
-        id: '077/130', number: 77, name_fr: 'Kankuro',
+        id: 'KS-077-C', number: 77, name_fr: 'Kankuro',
         effects: [{ type: 'MAIN', description: '[⧗] If there is an enemy non-hidden character in this mission, CHAKRA +1.' }],
         group: 'Sand Village',
       });
@@ -147,7 +147,7 @@ describe('Chakra Bonuses', () => {
 
     it('should not give bonus when only hidden enemy present', () => {
       const kankuro = mockCharInPlay({ instanceId: 'kan-1' }, {
-        id: '077/130', number: 77, name_fr: 'Kankuro',
+        id: 'KS-077-C', number: 77, name_fr: 'Kankuro',
         effects: [{ type: 'MAIN', description: '[⧗] If there is an enemy non-hidden character in this mission, CHAKRA +1.' }],
       });
       const hiddenEnemy = mockCharInPlay({ instanceId: 'he', isHidden: true, controlledBy: 'player2', originalOwner: 'player2' }, {});
@@ -169,7 +169,7 @@ describe('Power Modifiers', () => {
   describe('Kakashi 015 - Team 7 +1 Power', () => {
     it('should give +1 power to other Team 7 characters', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
-        id: '015/130', number: 15, name_fr: 'Kakashi',
+        id: 'KS-015-C', number: 15, name_fr: 'Kakashi',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team 7 characters in this mission gain +1 Power.' }],
         keywords: ['Team 7'], group: 'Leaf Village',
       });
@@ -186,7 +186,7 @@ describe('Power Modifiers', () => {
 
     it('should not buff non-Team-7 characters', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
-        id: '015/130', number: 15, name_fr: 'Kakashi',
+        id: 'KS-015-C', number: 15, name_fr: 'Kakashi',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team 7 characters in this mission gain +1 Power.' }],
         keywords: ['Team 7'],
       });
@@ -203,7 +203,7 @@ describe('Power Modifiers', () => {
 
     it('should not buff self', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
-        id: '015/130', number: 15, name_fr: 'Kakashi',
+        id: 'KS-015-C', number: 15, name_fr: 'Kakashi',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team 7 characters in this mission gain +1 Power.' }],
         keywords: ['Team 7'],
       });
@@ -220,7 +220,7 @@ describe('Power Modifiers', () => {
   describe('Gai 042 - Team Guy +1 Power', () => {
     it('should give +1 power to Team Guy characters', () => {
       const gai = mockCharInPlay({ instanceId: 'gai-1' }, {
-        id: '042/130', number: 42, name_fr: 'Gai Maito',
+        id: 'KS-042-C', number: 42, name_fr: 'Gai Maito',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team Guy characters in this mission gain +1 Power.' }],
         keywords: ['Team Guy'], group: 'Leaf Village',
       });
@@ -240,7 +240,7 @@ describe('Power Modifiers', () => {
   describe('Sasuke 013 - debuff per friendly', () => {
     it('should lose -1 per other non-hidden friendly', () => {
       const sasuke = mockCharInPlay({ instanceId: 'sas-1' }, {
-        id: '013/130', number: 13, name_fr: 'Sasuke',
+        id: 'KS-013-C', number: 13, name_fr: 'Sasuke',
         effects: [{ type: 'MAIN', description: '[⧗] -1 Power for every other non-hidden friendly character in this mission.' }],
         keywords: ['Team 7'],
       });
@@ -257,7 +257,7 @@ describe('Power Modifiers', () => {
 
     it('should have 0 modifier when alone', () => {
       const sasuke = mockCharInPlay({ instanceId: 'sas-1' }, {
-        id: '013/130', number: 13, name_fr: 'Sasuke',
+        id: 'KS-013-C', number: 13, name_fr: 'Sasuke',
         effects: [{ type: 'MAIN', description: '[⧗] -1 Power for every other non-hidden friendly character in this mission.' }],
       });
       const state = createActionPhaseState({
@@ -273,7 +273,7 @@ describe('Power Modifiers', () => {
   describe('Temari 079 - +2 Power with Edge', () => {
     it('should give +2 power when player has Edge', () => {
       const temari = mockCharInPlay({ instanceId: 'tem-1' }, {
-        id: '079/130', number: 79, name_fr: 'Temari',
+        id: 'KS-079-C', number: 79, name_fr: 'Temari',
         effects: [{ type: 'MAIN', description: '[⧗] +2 Power if you have the Edge.' }],
         group: 'Sand Village',
       });
@@ -288,7 +288,7 @@ describe('Power Modifiers', () => {
 
     it('should not give bonus when opponent has Edge', () => {
       const temari = mockCharInPlay({ instanceId: 'tem-1' }, {
-        id: '079/130', number: 79, name_fr: 'Temari',
+        id: 'KS-079-C', number: 79, name_fr: 'Temari',
         effects: [{ type: 'MAIN', description: '[⧗] +2 Power if you have the Edge.' }],
       });
       const state = createActionPhaseState({
@@ -305,7 +305,7 @@ describe('Power Modifiers', () => {
   describe('Yashamaru 084 - +2 Power if Gaara', () => {
     it('should give +2 when friendly Gaara is in the same mission', () => {
       const yashamaru = mockCharInPlay({ instanceId: 'yash-1' }, {
-        id: '084/130', number: 84, name_fr: 'Yashamaru',
+        id: 'KS-084-C', number: 84, name_fr: 'Yashamaru',
         effects: [{ type: 'MAIN', description: '[⧗] +2 Power if there is a friendly [u]Gaara[/u] in this mission.' }],
         group: 'Sand Village',
       });
@@ -322,7 +322,7 @@ describe('Power Modifiers', () => {
 
     it('should not give bonus when no Gaara', () => {
       const yashamaru = mockCharInPlay({ instanceId: 'yash-1' }, {
-        id: '084/130', number: 84, name_fr: 'Yashamaru',
+        id: 'KS-084-C', number: 84, name_fr: 'Yashamaru',
         effects: [{ type: 'MAIN', description: '[⧗] +2 Power if there is a friendly [u]Gaara[/u] in this mission.' }],
       });
       const state = createActionPhaseState({
@@ -338,7 +338,7 @@ describe('Power Modifiers', () => {
   describe('Ton Ton 101 - +1 Power if Tsunade/Shizune', () => {
     it('should give +1 when Tsunade is in the same mission', () => {
       const tonton = mockCharInPlay({ instanceId: 'tt-1' }, {
-        id: '101/130', number: 101, name_fr: 'Ton Ton',
+        id: 'KS-101-C', number: 101, name_fr: 'Ton Ton',
         effects: [{ type: 'MAIN', description: '[⧗] +1 Power if there is a friendly Tsunade or Shizune in this mission.' }],
       });
       const tsunade = mockCharInPlay({ instanceId: 'tsu-1' }, {
@@ -354,7 +354,7 @@ describe('Power Modifiers', () => {
 
     it('should give +1 when Shizune is in the same mission', () => {
       const tonton = mockCharInPlay({ instanceId: 'tt-1' }, {
-        id: '101/130', number: 101, name_fr: 'Ton Ton',
+        id: 'KS-101-C', number: 101, name_fr: 'Ton Ton',
         effects: [{ type: 'MAIN', description: '[⧗] +1 Power if there is a friendly Tsunade or Shizune in this mission.' }],
       });
       const shizune = mockCharInPlay({ instanceId: 'shiz-1' }, {
@@ -370,7 +370,7 @@ describe('Power Modifiers', () => {
 
     it('should not give bonus without Tsunade or Shizune', () => {
       const tonton = mockCharInPlay({ instanceId: 'tt-1' }, {
-        id: '101/130', number: 101, name_fr: 'Ton Ton',
+        id: 'KS-101-C', number: 101, name_fr: 'Ton Ton',
         effects: [{ type: 'MAIN', description: '[⧗] +1 Power if there is a friendly Tsunade or Shizune in this mission.' }],
       });
       const state = createActionPhaseState({
@@ -386,12 +386,12 @@ describe('Power Modifiers', () => {
   describe('Combined modifiers', () => {
     it('Kakashi + Gai should stack on a Team 7 + Team Guy character', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
-        id: '015/130', number: 15, name_fr: 'Kakashi',
+        id: 'KS-015-C', number: 15, name_fr: 'Kakashi',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team 7 characters in this mission gain +1 Power.' }],
         keywords: ['Team 7'],
       });
       const gai = mockCharInPlay({ instanceId: 'gai-1' }, {
-        id: '042/130', number: 42, name_fr: 'Gai',
+        id: 'KS-042-C', number: 42, name_fr: 'Gai',
         effects: [{ type: 'MAIN', description: '[⧗] Other Team Guy characters in this mission gain +1 Power.' }],
         keywords: ['Team Guy'],
       });
@@ -417,7 +417,7 @@ describe('Power Token Retention', () => {
   describe('Rock Lee 039 - retains power tokens', () => {
     it('should retain power tokens when face-visible', () => {
       const lee = mockCharInPlay({ instanceId: 'lee-1', powerTokens: 3 }, {
-        id: '039/130', number: 39, name_fr: 'Rock Lee',
+        id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee',
         effects: [{ type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' }],
       });
       expect(shouldRetainPowerTokens(lee)).toBe(true);
@@ -425,7 +425,7 @@ describe('Power Token Retention', () => {
 
     it('should NOT retain when hidden', () => {
       const lee = mockCharInPlay({ instanceId: 'lee-h', isHidden: true, powerTokens: 3 }, {
-        id: '039/130', number: 39, name_fr: 'Rock Lee',
+        id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee',
         effects: [{ type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' }],
       });
       expect(shouldRetainPowerTokens(lee)).toBe(false);
@@ -435,7 +435,7 @@ describe('Power Token Retention', () => {
   describe('Other characters - do not retain', () => {
     it('should not retain for normal characters', () => {
       const naruto = mockCharInPlay({ powerTokens: 5 }, {
-        id: '009/130', number: 9, name_fr: 'Naruto',
+        id: 'KS-009-C', number: 9, name_fr: 'Naruto',
       });
       expect(shouldRetainPowerTokens(naruto)).toBe(false);
     });
@@ -448,7 +448,7 @@ describe('Power Token Retention', () => {
 describe('Hidden characters', () => {
   it('hidden characters should give 0 chakra bonus', () => {
     const hiddenKiba = mockCharInPlay({ instanceId: 'kiba-h', isHidden: true }, {
-      id: '025/130', number: 25, name_fr: 'Kiba',
+      id: 'KS-025-C', number: 25, name_fr: 'Kiba',
       effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
     });
     const state = createActionPhaseState({
@@ -461,7 +461,7 @@ describe('Hidden characters', () => {
 
   it('hidden characters should give 0 power modifier', () => {
     const hiddenTemari = mockCharInPlay({ instanceId: 'tem-h', isHidden: true }, {
-      id: '079/130', number: 79, name_fr: 'Temari',
+      id: 'KS-079-C', number: 79, name_fr: 'Temari',
       effects: [{ type: 'MAIN', description: '[⧗] +2 Power if you have the Edge.' }],
     });
     const state = createActionPhaseState({

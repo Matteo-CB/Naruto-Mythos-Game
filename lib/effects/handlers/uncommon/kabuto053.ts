@@ -44,7 +44,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   if (playerState.discardPile.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kabuto Yakushi (053): Discard pile is empty. Nothing to play.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '053/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' }) } };
   }
 
   const topDiscard = playerState.discardPile[playerState.discardPile.length - 1];
@@ -53,7 +53,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   if (topDiscard.card_type !== 'character') {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kabuto Yakushi (053): Top of discard pile is not a character card.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '053/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' }) } };
   }
 
   const reducedCost = Math.max(0, (topDiscard.chakra ?? 0) - 3);
@@ -62,7 +62,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   if (playerState.chakra < reducedCost) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Kabuto Yakushi (053): Not enough chakra to play ${topDiscard.name_fr} (needs ${reducedCost}, has ${playerState.chakra}).`,
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '053/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' }) } };
   }
 
   // Find valid missions (no same-name conflict)
@@ -84,7 +84,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   if (validMissions.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Kabuto Yakushi (053): No valid mission to play ${topDiscard.name_fr} on (name conflict).`,
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '053/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' }) } };
   }
 
   // If only one valid mission, auto-play
@@ -154,14 +154,14 @@ function playFromDiscard(
     'EFFECT',
     `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
     'game.log.effect.playFromDiscard',
-    { card: 'KABUTO YAKUSHI', id: '053/130', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
+    { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
   );
 
   return newState;
 }
 
 export function registerKabuto053Handlers(): void {
-  registerEffect('053/130', 'MAIN', handleKabuto053Main);
+  registerEffect('KS-053-UC', 'MAIN', handleKabuto053Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to first prompt for discard
 }

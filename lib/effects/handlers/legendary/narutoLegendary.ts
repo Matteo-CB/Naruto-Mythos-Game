@@ -115,5 +115,5 @@ function narutoLegendaryMainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerNarutoLegendaryHandlers(): void {
-  registerEffect('Legendary', 'MAIN', narutoLegendaryMainHandler);
+  registerEffect('KS-000-L', 'MAIN', narutoLegendaryMainHandler);
 }

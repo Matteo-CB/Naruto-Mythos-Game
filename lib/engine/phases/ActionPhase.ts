@@ -149,6 +149,9 @@ function handlePlayCharacter(
     newState = EffectEngine.resolvePlayEffects(newState, player, playedChar, missionIndex, false);
   }
 
+  // Trigger on-play continuous reactions from opponent's characters in this mission
+  newState = triggerOnPlayReactions(newState, player, missionIndex);
+
   return newState;
 }
 
@@ -291,6 +294,9 @@ function handleRevealCharacter(
   if (revealedChar) {
     newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
+
+  // Trigger on-play reactions (reveal counts as playing a character)
+  newState = triggerOnPlayReactions(newState, player, missionIndex);
 
   return newState;
 }
@@ -519,4 +525,62 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
     count += chars.length;
   }
   return count;
+}
+
+/**
+ * Trigger continuous on-play reactions from opponent's characters.
+ * Called when a player plays a non-hidden character on a mission.
+ *
+ * - Neji 037 (UC): POWERUP 1 when a non-hidden enemy character is played in this mission
+ * - Hinata 031 (UC): Gain 1 Chakra when a non-hidden enemy character is played in this mission
+ */
+function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number): GameState {
+  let newState = { ...state };
+  const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
+  const mission = newState.activeMissions[missionIndex];
+  const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
+
+  for (const char of opponentChars) {
+    if (char.isHidden) continue;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
+    for (const effect of topCard.effects ?? []) {
+      if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+
+      // Neji 037 (UC): POWERUP 1 when a non-hidden enemy plays in this mission
+      if (topCard.number === 37 && effect.description.includes('POWERUP 1')) {
+        const missions = [...newState.activeMissions];
+        const updatedMission = { ...missions[missionIndex] };
+        const side = opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        updatedMission[side] = updatedMission[side].map((c: CharacterInPlay) =>
+          c.instanceId === char.instanceId ? { ...c, powerTokens: c.powerTokens + 1 } : c,
+        );
+        missions[missionIndex] = updatedMission;
+        newState.activeMissions = missions;
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', opponent,
+          'EFFECT_CONTINUOUS',
+          `Neji Hyuga (037): POWERUP 1 — enemy played a non-hidden character in this mission.`,
+          'game.log.effect.neji037',
+          { card: 'NEJI HYUGA', id: 'KS-037-UC' },
+        );
+      }
+
+      // Hinata 031 (UC): Gain 1 Chakra when enemy plays non-hidden in this mission
+      if (topCard.number === 31 && effect.description.includes('1 Chakra')) {
+        const ps = { ...newState[opponent] };
+        ps.chakra += 1;
+        newState = { ...newState, [opponent]: ps };
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', opponent,
+          'EFFECT_CONTINUOUS',
+          `Hinata Hyuga (031): Gained 1 Chakra — enemy played a non-hidden character in this mission.`,
+          'game.log.effect.hinata031',
+          { card: 'HINATA HYUGA', id: 'KS-031-UC' },
+        );
+      }
+    }
+  }
+
+  return newState;
 }

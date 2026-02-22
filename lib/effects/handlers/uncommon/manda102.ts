@@ -44,7 +44,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Manda (102): No enemy character with keyword "Summon" in this mission.',
       'game.log.effect.noTarget',
-      { card: 'MANDA', id: '102/130' },
+      { card: 'MANDA', id: 'KS-102-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -63,7 +63,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
       'EFFECT_DEFEAT',
       `Manda (102): [AMBUSH] Defeated enemy Summon ${targetName} in this mission.`,
       'game.log.effect.defeat',
-      { card: 'MANDA', id: '102/130', target: targetName },
+      { card: 'MANDA', id: 'KS-102-UC', target: targetName },
     );
     return { state: { ...newState, log } };
   }
@@ -90,12 +90,12 @@ function handleManda102Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Manda (102): Must return to hand at end of round (continuous).',
     'game.log.effect.continuous',
-    { card: 'MANDA', id: '102/130' },
+    { card: 'MANDA', id: 'KS-102-UC' },
   );
   return { state: { ...state, log } };
 }
 
 export function registerManda102Handlers(): void {
-  registerEffect('102/130', 'AMBUSH', handleManda102Ambush);
-  registerEffect('102/130', 'MAIN', handleManda102Main);
+  registerEffect('KS-102-UC', 'AMBUSH', handleManda102Ambush);
+  registerEffect('KS-102-UC', 'MAIN', handleManda102Main);
 }

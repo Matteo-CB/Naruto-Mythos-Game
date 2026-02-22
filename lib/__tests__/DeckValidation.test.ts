@@ -5,7 +5,7 @@ import { mockCharacter, mockMission, createTestDeck } from './testHelpers';
 describe('Deck Validation', () => {
   it('should accept a valid deck', () => {
     const deck = createTestDeck(30);
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(true);
@@ -14,7 +14,7 @@ describe('Deck Validation', () => {
 
   it('should reject a deck with fewer than 30 character cards', () => {
     const deck = createTestDeck(25);
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
@@ -23,7 +23,7 @@ describe('Deck Validation', () => {
 
   it('should reject a deck without exactly 3 missions', () => {
     const deck = createTestDeck(30);
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' })]; // Only 2
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' })]; // Only 2
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
@@ -33,10 +33,10 @@ describe('Deck Validation', () => {
   it('should reject a deck with more than 2 copies of the same version', () => {
     const deck = createTestDeck(27);
     // Add 3 copies of the same card
-    const duplicate = mockCharacter({ id: '001/130', name_fr: 'Hiruzen' });
+    const duplicate = mockCharacter({ id: 'KS-001-C', name_fr: 'Hiruzen' });
     deck.push(duplicate, duplicate, duplicate);
 
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
@@ -46,11 +46,11 @@ describe('Deck Validation', () => {
   it('should treat RA variants as the same version (strip A suffix)', () => {
     const deck = createTestDeck(28);
     // Add 1 normal + 1 RA of the same card (should be 2 of same version)
-    const normal = mockCharacter({ id: '108/130', name_fr: 'Naruto' });
-    const rareArt = mockCharacter({ id: '108/130 A', name_fr: 'Naruto', is_rare_art: true });
+    const normal = mockCharacter({ id: 'KS-108-R', name_fr: 'Naruto' });
+    const rareArt = mockCharacter({ id: 'KS-108-RA', name_fr: 'Naruto', is_rare_art: true });
     deck.push(normal, rareArt);
 
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(true); // 2 copies of same version = OK
@@ -58,11 +58,11 @@ describe('Deck Validation', () => {
 
   it('should reject 3 copies even when mixing normal and RA', () => {
     const deck = createTestDeck(27);
-    const normal = mockCharacter({ id: '108/130', name_fr: 'Naruto' });
-    const rareArt = mockCharacter({ id: '108/130 A', name_fr: 'Naruto', is_rare_art: true });
+    const normal = mockCharacter({ id: 'KS-108-R', name_fr: 'Naruto' });
+    const rareArt = mockCharacter({ id: 'KS-108-RA', name_fr: 'Naruto', is_rare_art: true });
     deck.push(normal, normal, rareArt); // 3 copies of version 108/130
 
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
@@ -73,13 +73,13 @@ describe('Deck Validation', () => {
     const deck = createTestDeck(26);
     // Different versions (different card numbers)
     deck.push(
-      mockCharacter({ id: '074/130', name_fr: 'Gaara', chakra: 2 }),
-      mockCharacter({ id: '074/130', name_fr: 'Gaara', chakra: 2 }),
-      mockCharacter({ id: '075/130', name_fr: 'Gaara', chakra: 4 }),
-      mockCharacter({ id: '075/130', name_fr: 'Gaara', chakra: 4 }),
+      mockCharacter({ id: 'KS-074-C', name_fr: 'Gaara', chakra: 2 }),
+      mockCharacter({ id: 'KS-074-C', name_fr: 'Gaara', chakra: 2 }),
+      mockCharacter({ id: 'KS-075-C', name_fr: 'Gaara', chakra: 4 }),
+      mockCharacter({ id: 'KS-075-C', name_fr: 'Gaara', chakra: 4 }),
     );
 
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(true); // 2 of each version = OK
@@ -88,13 +88,13 @@ describe('Deck Validation', () => {
   it('should reject cards without visuals', () => {
     const deck = createTestDeck(29);
     const noVisual = mockCharacter({
-      id: '999/130',
+      id: 'KS-999-C',
       name_fr: 'No Visual',
       has_visual: false,
     });
     deck.push(noVisual);
 
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
@@ -103,7 +103,7 @@ describe('Deck Validation', () => {
 
   it('should accept larger decks (no max)', () => {
     const deck = createTestDeck(50);
-    const missions = [mockMission(), mockMission({ id: 'MSS 02' }), mockMission({ id: 'MSS 03' })];
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
 
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(true);

@@ -30,7 +30,7 @@ function guy119bMainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Might Guy (119b): Hand is empty, cannot discard.',
           'game.log.effect.noTarget',
-          { card: 'MIGHT GUY', id: '119b/130' },
+          { card: 'MIGHT GUY', id: 'KS-119b-R' },
         ),
       },
     };
@@ -59,7 +59,7 @@ function guy119bMainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Might Guy (119b): No non-hidden enemy characters in play to move.',
           'game.log.effect.noTarget',
-          { card: 'MIGHT GUY', id: '119b/130' },
+          { card: 'MIGHT GUY', id: 'KS-119b-R' },
         ),
       },
     };
@@ -106,13 +106,13 @@ function guy119bUpgradeHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         'Might Guy (119b) UPGRADE: POWERUP 3 on self.',
         'game.log.effect.powerupSelf',
-        { card: 'MIGHT GUY', id: '119b/130', amount: 3 },
+        { card: 'MIGHT GUY', id: 'KS-119b-R', amount: 3 },
       ),
     },
   };
 }
 
 export function registerGuy119bHandlers(): void {
-  registerEffect('119b/130', 'MAIN', guy119bMainHandler);
-  registerEffect('119b/130', 'UPGRADE', guy119bUpgradeHandler);
+  registerEffect('KS-119b-R', 'MAIN', guy119bMainHandler);
+  registerEffect('KS-119b-R', 'UPGRADE', guy119bUpgradeHandler);
 }

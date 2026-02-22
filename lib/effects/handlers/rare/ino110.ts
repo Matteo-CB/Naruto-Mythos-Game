@@ -38,7 +38,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           `Ino Yamanaka (110) MAIN: Fewer than 2 enemy characters in this mission.`,
           'game.log.effect.noTarget',
-          { card: 'INO YAMANAKA', id: '110/130' },
+          { card: 'INO YAMANAKA', id: 'KS-110-R' },
         ),
       },
     };
@@ -55,7 +55,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           `Ino Yamanaka (110) MAIN: No non-hidden enemy characters in this mission.`,
           'game.log.effect.noTarget',
-          { card: 'INO YAMANAKA', id: '110/130' },
+          { card: 'INO YAMANAKA', id: 'KS-110-R' },
         ),
       },
     };
@@ -109,6 +109,6 @@ function ino110UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerIno110Handlers(): void {
-  registerEffect('110/130', 'MAIN', ino110MainHandler);
-  registerEffect('110/130', 'UPGRADE', ino110UpgradeHandler);
+  registerEffect('KS-110-R', 'MAIN', ino110MainHandler);
+  registerEffect('KS-110-R', 'UPGRADE', ino110UpgradeHandler);
 }

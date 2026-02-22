@@ -12,5 +12,5 @@ function handleNaruto009Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('009/130', 'MAIN', handleNaruto009Main);
+  registerEffect('KS-009-C', 'MAIN', handleNaruto009Main);
 }

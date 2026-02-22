@@ -59,7 +59,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
         style={{ opacity: 0.15, pointerEvents: 'none' }}
       >
         <img
-          src="/images/rare/108-130_NARUTO_UZUMAKI.webp"
+          src="/images/cards/KS/rare/KS-108-R.webp"
           alt=""
           draggable={false}
           style={{
@@ -74,7 +74,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
         style={{ opacity: 0.15, pointerEvents: 'none' }}
       >
         <img
-          src="/images/secret/133-130_NARUTO_UZUMAKI.webp"
+          src="/images/cards/KS/secret/KS-133-S.webp"
           alt=""
           draggable={false}
           style={{

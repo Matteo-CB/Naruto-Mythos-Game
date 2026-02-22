@@ -36,5 +36,5 @@ function handleBaki081Score(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('081/130', 'SCORE', handleBaki081Score);
+  registerEffect('KS-081-C', 'SCORE', handleBaki081Score);
 }

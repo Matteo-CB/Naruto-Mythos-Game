@@ -5,7 +5,7 @@ export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 
 export type TurnNumber = 1 | 2 | 3 | 4;
 export type MissionRank = 'D' | 'C' | 'B' | 'A';
 export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
-export type Rarity = 'C' | 'UC' | 'R' | 'RART' | 'S' | 'SV' | 'M' | 'L' | 'MMS';
+export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'MMS';
 
 // ---------------------
 // Card Data Interfaces

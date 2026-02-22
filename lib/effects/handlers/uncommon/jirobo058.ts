@@ -58,7 +58,7 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
     const scope = isUpgrade ? 'in play' : 'in this mission';
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Jirobo (058): No other friendly Sound Four characters ${scope}.`,
-      'game.log.effect.noTarget', { card: 'JIROBO', id: '058/130' }) } };
+      'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' }) } };
   }
 
   const scope = isUpgrade ? 'across all missions (upgrade)' : 'in this mission';
@@ -70,14 +70,14 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Jirobo (058): POWERUP 1 on ${poweredUpCount} Sound Four character(s) ${scope}: ${poweredUpNames.join(', ')}.`,
     'game.log.effect.powerup',
-    { card: 'JIROBO', id: '058/130', amount: String(poweredUpCount), target: poweredUpNames.join(', ') },
+    { card: 'JIROBO', id: 'KS-058-UC', amount: String(poweredUpCount), target: poweredUpNames.join(', ') },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerJirobo058Handlers(): void {
-  registerEffect('058/130', 'MAIN', handleJirobo058Main);
+  registerEffect('KS-058-UC', 'MAIN', handleJirobo058Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to expand scope to all missions
 }

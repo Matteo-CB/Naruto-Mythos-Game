@@ -31,7 +31,7 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
   if (affordableSummonIndices.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jiraiya (007): No affordable Summon characters in hand.',
-      'game.log.effect.noTarget', { card: 'JIRAIYA', id: '007/130' }) } };
+      'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-007-C' }) } };
   }
 
   return {
@@ -44,5 +44,5 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('007/130', 'MAIN', handleJiraiya007Main);
+  registerEffect('KS-007-C', 'MAIN', handleJiraiya007Main);
 }

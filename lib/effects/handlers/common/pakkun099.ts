@@ -42,7 +42,7 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Pakkun (099): No other mission to move to.',
-      'game.log.effect.noTarget', { card: 'PAKKUN', id: '099/130' }) } };
+      'game.log.effect.noTarget', { card: 'PAKKUN', id: 'KS-099-C' }) } };
   }
 
   // If only one valid destination, auto-move
@@ -96,12 +96,12 @@ function movePakkun(
     'EFFECT_MOVE',
     `Pakkun (099): Moved self from mission ${sourceMissionIndex + 1} to mission ${destMissionIndex + 1}.`,
     'game.log.effect.move',
-    { card: 'PAKKUN', id: '099/130', from: String(sourceMissionIndex + 1), to: String(destMissionIndex + 1) },
+    { card: 'PAKKUN', id: 'KS-099-C', from: String(sourceMissionIndex + 1), to: String(destMissionIndex + 1) },
   );
 
   return { ...state, activeMissions: newMissions, log };
 }
 
 export function registerHandler(): void {
-  registerEffect('099/130', 'SCORE', handlePakkun099Score);
+  registerEffect('KS-099-C', 'SCORE', handlePakkun099Score);
 }

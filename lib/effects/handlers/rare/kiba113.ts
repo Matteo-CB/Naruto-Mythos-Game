@@ -55,7 +55,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kiba Inuzuka (113): No friendly non-hidden Akamaru in play.',
           'game.log.effect.noTarget',
-          { card: 'KIBA INUZUKA', id: '113/130' },
+          { card: 'KIBA INUZUKA', id: 'KS-113-R' },
         ),
       },
     };
@@ -73,7 +73,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kiba Inuzuka (113) UPGRADE: Defeated friendly Akamaru in mission ${akamaruMissionIdx}.`,
         'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: '113/130', target: akamaruChar.card.name_fr },
+        { card: 'KIBA INUZUKA', id: 'KS-113-R', target: akamaruChar.card.name_fr },
       ),
     };
   } else {
@@ -93,7 +93,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_HIDE',
           `Kiba Inuzuka (113): Hid friendly Akamaru in mission ${akamaruMissionIdx}.`,
           'game.log.effect.hide',
-          { card: 'KIBA INUZUKA', id: '113/130', target: 'Akamaru' },
+          { card: 'KIBA INUZUKA', id: 'KS-113-R', target: 'Akamaru' },
         ),
       };
     }
@@ -123,7 +123,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kiba Inuzuka (113): No other character in this mission to target.',
           'game.log.effect.noTarget',
-          { card: 'KIBA INUZUKA', id: '113/130' },
+          { card: 'KIBA INUZUKA', id: 'KS-113-R' },
         ),
       },
     };
@@ -146,7 +146,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_DEFEAT',
           `Kiba Inuzuka (113) UPGRADE: Defeated ${target.char.card.name_fr} in this mission.`,
           'game.log.effect.defeat',
-          { card: 'KIBA INUZUKA', id: '113/130', target: target.char.card.name_fr },
+          { card: 'KIBA INUZUKA', id: 'KS-113-R', target: target.char.card.name_fr },
         ),
       };
     } else {
@@ -167,7 +167,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
             'EFFECT_HIDE',
             `Kiba Inuzuka (113): Hid ${target.char.card.name_fr} in this mission.`,
             'game.log.effect.hide',
-            { card: 'KIBA INUZUKA', id: '113/130', target: target.char.card.name_fr },
+            { card: 'KIBA INUZUKA', id: 'KS-113-R', target: target.char.card.name_fr },
           ),
         };
       }
@@ -195,6 +195,6 @@ function kiba113UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKiba113Handlers(): void {
-  registerEffect('113/130', 'MAIN', kiba113MainHandler);
-  registerEffect('113/130', 'UPGRADE', kiba113UpgradeHandler);
+  registerEffect('KS-113-R', 'MAIN', kiba113MainHandler);
+  registerEffect('KS-113-R', 'UPGRADE', kiba113UpgradeHandler);
 }

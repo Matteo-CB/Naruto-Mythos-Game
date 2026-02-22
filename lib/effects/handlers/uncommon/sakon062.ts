@@ -52,7 +52,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sakon (062): No friendly Sound Four character with a copyable instant effect in play.',
-      'game.log.effect.noTarget', { card: 'SAKON', id: '062/130' }) } };
+      'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-062-UC' }) } };
   }
 
   // If exactly one target, still require selection (engine needs to know which effect to copy)
@@ -66,5 +66,5 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('062/130', 'AMBUSH', handleSakon062Ambush);
+  registerEffect('KS-062-UC', 'AMBUSH', handleSakon062Ambush);
 }

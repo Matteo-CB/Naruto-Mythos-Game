@@ -16,7 +16,7 @@ import { generateInstanceId, generateGameId } from '../engine/utils/id';
  */
 export function mockCharacter(overrides: Partial<CharacterCard> = {}): CharacterCard {
   return {
-    id: overrides.id ?? '001/130',
+    id: overrides.id ?? 'KS-001-C',
     cardId: overrides.cardId ?? 'KS-1-C',
     set: overrides.set ?? 'KS',
     number: overrides.number ?? 1,
@@ -39,7 +39,7 @@ export function mockCharacter(overrides: Partial<CharacterCard> = {}): Character
  */
 export function mockMission(overrides: Partial<MissionCard> = {}): MissionCard {
   return {
-    id: overrides.id ?? 'MSS 01',
+    id: overrides.id ?? 'KS-001-MMS',
     cardId: overrides.cardId ?? 'KS-1-MMS',
     set: overrides.set ?? 'KS',
     number: overrides.number ?? 1,
@@ -103,14 +103,14 @@ export function createTestDeck(count: number = 30): CharacterCard[] {
  */
 export function createTestConfig(overrides: Partial<GameConfig> = {}): GameConfig {
   const missions1 = [
-    mockMission({ id: 'MSS 01', name_fr: 'Mission A', basePoints: 2 }),
-    mockMission({ id: 'MSS 02', name_fr: 'Mission B', basePoints: 3 }),
-    mockMission({ id: 'MSS 03', name_fr: 'Mission C', basePoints: 4 }),
+    mockMission({ id: 'KS-001-MMS', name_fr: 'Mission A', basePoints: 2 }),
+    mockMission({ id: 'KS-002-MMS', name_fr: 'Mission B', basePoints: 3 }),
+    mockMission({ id: 'KS-003-MMS', name_fr: 'Mission C', basePoints: 4 }),
   ];
   const missions2 = [
-    mockMission({ id: 'MSS 04', name_fr: 'Mission D', basePoints: 2 }),
-    mockMission({ id: 'MSS 05', name_fr: 'Mission E', basePoints: 3 }),
-    mockMission({ id: 'MSS 06', name_fr: 'Mission F', basePoints: 4 }),
+    mockMission({ id: 'KS-004-MMS', name_fr: 'Mission D', basePoints: 2 }),
+    mockMission({ id: 'KS-005-MMS', name_fr: 'Mission E', basePoints: 3 }),
+    mockMission({ id: 'KS-006-MMS', name_fr: 'Mission F', basePoints: 4 }),
   ];
 
   return {
@@ -149,11 +149,11 @@ export function createActionPhaseState(overrides: Partial<GameState> = {}): Game
       isAI: false,
       deck: createTestDeck(20),
       hand: [
-        mockCharacter({ id: '010/130', name_fr: 'Naruto', chakra: 3, power: 3 }),
-        mockCharacter({ id: '020/130', name_fr: 'Sasuke', chakra: 4, power: 4 }),
-        mockCharacter({ id: '030/130', name_fr: 'Sakura', chakra: 2, power: 1 }),
-        mockCharacter({ id: '040/130', name_fr: 'Kakashi', chakra: 5, power: 5 }),
-        mockCharacter({ id: '050/130', name_fr: 'Iruka', chakra: 1, power: 1 }),
+        mockCharacter({ id: 'KS-010-C', name_fr: 'Naruto', chakra: 3, power: 3 }),
+        mockCharacter({ id: 'KS-020-UC', name_fr: 'Sasuke', chakra: 4, power: 4 }),
+        mockCharacter({ id: 'KS-030-C', name_fr: 'Sakura', chakra: 2, power: 1 }),
+        mockCharacter({ id: 'KS-040-C', name_fr: 'Kakashi', chakra: 5, power: 5 }),
+        mockCharacter({ id: 'KS-050-C', name_fr: 'Iruka', chakra: 1, power: 1 }),
       ],
       discardPile: [],
       missionCards: [],
@@ -170,11 +170,11 @@ export function createActionPhaseState(overrides: Partial<GameState> = {}): Game
       isAI: false,
       deck: createTestDeck(20),
       hand: [
-        mockCharacter({ id: '060/130', name_fr: 'Gaara', chakra: 3, power: 3 }),
-        mockCharacter({ id: '070/130', name_fr: 'Temari', chakra: 2, power: 2 }),
-        mockCharacter({ id: '080/130', name_fr: 'Kankuro', chakra: 2, power: 2 }),
-        mockCharacter({ id: '090/130', name_fr: 'Baki', chakra: 4, power: 3 }),
-        mockCharacter({ id: '100/130', name_fr: 'Shikamaru', chakra: 1, power: 1 }),
+        mockCharacter({ id: 'KS-060-UC', name_fr: 'Gaara', chakra: 3, power: 3 }),
+        mockCharacter({ id: 'KS-070-C', name_fr: 'Temari', chakra: 2, power: 2 }),
+        mockCharacter({ id: 'KS-080-UC', name_fr: 'Kankuro', chakra: 2, power: 2 }),
+        mockCharacter({ id: 'KS-090-C', name_fr: 'Baki', chakra: 4, power: 3 }),
+        mockCharacter({ id: 'KS-100-C', name_fr: 'Shikamaru', chakra: 1, power: 1 }),
       ],
       discardPile: [],
       missionCards: [],

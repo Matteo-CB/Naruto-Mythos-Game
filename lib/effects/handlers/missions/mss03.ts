@@ -25,7 +25,7 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 03 (Find the Traitor): Opponent has no cards in hand to discard.',
       'game.log.effect.noTarget',
-      { card: 'Trouver le traitre', id: 'MSS 03' },
+      { card: 'Trouver le traitre', id: 'KS-003-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -68,5 +68,5 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss03Handlers(): void {
-  registerEffect('MSS 03', 'SCORE', mss03ScoreHandler);
+  registerEffect('KS-003-MMS', 'SCORE', mss03ScoreHandler);
 }

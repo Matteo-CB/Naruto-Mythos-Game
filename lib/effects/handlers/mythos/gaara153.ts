@@ -59,7 +59,7 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_DEFEAT',
           `Gaara (153): Defeated enemy ${target.card.name_fr} (Power ${targetPower}) in mission ${i}.`,
           'game.log.effect.defeat',
-          { card: 'GAARA', id: '153/130', target: target.card.name_fr },
+          { card: 'GAARA', id: 'KS-153-M', target: target.card.name_fr },
         ),
       };
     }
@@ -73,7 +73,7 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_NO_TARGET',
         'Gaara (153): No enemy characters with Power 1 or less found in any mission.',
         'game.log.effect.noTarget',
-        { card: 'GAARA', id: '153/130' },
+        { card: 'GAARA', id: 'KS-153-M' },
       ),
     };
   }
@@ -104,7 +104,7 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_POWERUP',
           `Gaara (153): POWERUP ${defeatedCount} (upgrade, X = characters defeated by MAIN).`,
           'game.log.effect.powerupSelf',
-          { card: 'GAARA', id: '153/130', amount: defeatedCount },
+          { card: 'GAARA', id: 'KS-153-M', amount: defeatedCount },
         ),
       };
     }
@@ -119,6 +119,6 @@ function gaara153UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerGaara153Handlers(): void {
-  registerEffect('153/130', 'MAIN', gaara153MainHandler);
-  registerEffect('153/130', 'UPGRADE', gaara153UpgradeHandler);
+  registerEffect('KS-153-M', 'MAIN', gaara153MainHandler);
+  registerEffect('KS-153-M', 'UPGRADE', gaara153UpgradeHandler);
 }

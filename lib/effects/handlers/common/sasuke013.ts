@@ -16,5 +16,5 @@ function handleSasuke013Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('013/130', 'MAIN', handleSasuke013Main);
+  registerEffect('KS-013-C', 'MAIN', handleSasuke013Main);
 }

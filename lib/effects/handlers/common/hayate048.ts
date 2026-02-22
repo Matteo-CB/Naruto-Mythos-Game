@@ -15,5 +15,5 @@ function handleHayate048Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('048/130', 'MAIN', handleHayate048Main);
+  registerEffect('KS-048-C', 'MAIN', handleHayate048Main);
 }

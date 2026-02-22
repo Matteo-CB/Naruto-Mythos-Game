@@ -1,7 +1,7 @@
 import type { GameState, PlayerID, TurnNumber, MissionRank, CharacterInPlay } from '../types';
 import { BASE_CHAKRA_PER_TURN, CARDS_DRAWN_PER_TURN, TURN_TO_RANK, RANK_BONUS } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
-import { calculateContinuousChakraBonus } from '../../effects/ContinuousEffects';
+import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../../effects/ContinuousEffects';
 
 /**
  * Execute the Start Phase:
@@ -77,7 +77,7 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
     charCount += chars.length;
   }
 
-  // Calculate CHAKRA +X bonuses from continuous effects
+  // Calculate CHAKRA +X bonuses from continuous effects (characters + missions)
   const chakraBonus = calculateChakraBonus(state, player);
 
   const totalChakra = BASE_CHAKRA_PER_TURN + charCount + chakraBonus;
@@ -117,6 +117,9 @@ export function calculateChakraBonus(state: GameState, player: PlayerID): number
       bonus += calculateContinuousChakraBonus(state, player, missionIndex, char);
     }
   }
+
+  // Add mission SCORE [⧗] chakra bonuses (e.g., MSS-10 "Chakra Training")
+  bonus += calculateMissionChakraBonus(state, player);
 
   return bonus;
 }

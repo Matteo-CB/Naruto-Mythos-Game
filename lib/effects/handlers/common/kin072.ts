@@ -33,12 +33,12 @@ function handleKin072Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Kin Tsuchi (072): Opponent draws 1 card.`,
     'game.log.effect.oppDraw',
-    { card: 'Kin Tsuchi', id: '072/130', count: '1' },
+    { card: 'Kin Tsuchi', id: 'KS-072-C', count: '1' },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('072/130', 'MAIN', handleKin072Main);
+  registerEffect('KS-072-C', 'MAIN', handleKin072Main);
 }

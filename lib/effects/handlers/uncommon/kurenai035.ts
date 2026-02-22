@@ -36,7 +36,7 @@ function handleKurenai035Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Yuhi Kurenai (035): Enemy characters cannot move from this mission (continuous).',
     'game.log.effect.continuous',
-    { card: 'YUHI KURENAI', id: '035/130' },
+    { card: 'YUHI KURENAI', id: 'KS-035-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -61,7 +61,7 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Yuhi Kurenai (035): No enemy character with Power 1 or less in this mission.',
-      'game.log.effect.noTarget', { card: 'YUHI KURENAI', id: '035/130' }) } };
+      'game.log.effect.noTarget', { card: 'YUHI KURENAI', id: 'KS-035-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -69,7 +69,7 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
     let newState = defeatEnemyCharacter(state, sourceMissionIndex, validTargets[0], sourcePlayer);
     newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
       'Yuhi Kurenai (035): Defeated an enemy character with Power 1 or less (upgrade).',
-      'game.log.effect.defeat', { card: 'YUHI KURENAI', id: '035/130', target: '' }) };
+      'game.log.effect.defeat', { card: 'YUHI KURENAI', id: 'KS-035-UC', target: '' }) };
     return { state: newState };
   }
 
@@ -84,6 +84,6 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerKurenai035Handlers(): void {
-  registerEffect('035/130', 'MAIN', handleKurenai035Main);
-  registerEffect('035/130', 'UPGRADE', handleKurenai035Upgrade);
+  registerEffect('KS-035-UC', 'MAIN', handleKurenai035Main);
+  registerEffect('KS-035-UC', 'UPGRADE', handleKurenai035Upgrade);
 }

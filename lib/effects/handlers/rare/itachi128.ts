@@ -46,7 +46,7 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Itachi Uchiwa (128) UPGRADE: No other friendly characters in play to move.',
           'game.log.effect.noTarget',
-          { card: 'ITACHI UCHIWA', id: '128/130' },
+          { card: 'ITACHI UCHIWA', id: 'KS-128-R' },
         ),
       },
     };
@@ -62,6 +62,6 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerItachi128Handlers(): void {
-  registerEffect('128/130', 'MAIN', itachi128MainHandler);
-  registerEffect('128/130', 'UPGRADE', itachi128UpgradeHandler);
+  registerEffect('KS-128-R', 'MAIN', itachi128MainHandler);
+  registerEffect('KS-128-R', 'UPGRADE', itachi128UpgradeHandler);
 }

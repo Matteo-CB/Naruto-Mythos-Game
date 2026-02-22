@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -25,7 +26,7 @@ interface HandCardProps {
   onPin: (card: CharacterCard) => void;
 }
 
-function HandCard({
+const HandCard = React.memo(function HandCard({
   card,
   index,
   total,
@@ -47,28 +48,35 @@ function HandCard({
   const isBanned = bannedIds.has(card.id);
   const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
 
+  // Memoize animation objects to prevent unnecessary Framer Motion recalculations
+  const animateProps = useMemo(() => ({
+    y: isSelected ? -20 : 0,
+    opacity: 1,
+    rotate: rotation,
+    x: translateX,
+    scale: isSelected ? 1.08 : 1,
+  }), [isSelected, rotation, translateX]);
+
+  const hoverProps = useMemo(() => ({
+    y: isSelected ? -20 : -12,
+    scale: 1.06,
+    zIndex: 100,
+  }), [isSelected]);
+
+  const transitionProps = useMemo(() => ({
+    type: 'spring' as const,
+    stiffness: 300,
+    damping: 25,
+    delay: index * 0.04,
+  }), [index]);
+
   return (
     <motion.div
       layout
       initial={{ y: 100, opacity: 0, rotate: 0 }}
-      animate={{
-        y: isSelected ? -20 : 0,
-        opacity: 1,
-        rotate: rotation,
-        x: translateX,
-        scale: isSelected ? 1.08 : 1,
-      }}
-      whileHover={{
-        y: isSelected ? -20 : -12,
-        scale: 1.06,
-        zIndex: 100,
-      }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 25,
-        delay: index * 0.04,
-      }}
+      animate={animateProps}
+      whileHover={hoverProps}
+      transition={transitionProps}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(index);
@@ -159,9 +167,9 @@ function HandCard({
       )}
     </motion.div>
   );
-}
+});
 
-export function PlayerHand({ hand, chakra }: PlayerHandProps) {
+export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: PlayerHandProps) {
   const t = useTranslations();
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);
   const selectCard = useUIStore((s) => s.selectCard);
@@ -176,14 +184,14 @@ export function PlayerHand({ hand, chakra }: PlayerHandProps) {
     visibleState?.phase === 'action' &&
     !isProcessing;
 
-  const handleSelect = (index: number) => {
+  const handleSelect = useCallback((index: number) => {
     if (!isMyTurn) return;
     if (selectedCardIndex === index) {
       selectCard(null);
     } else {
       selectCard(index);
     }
-  };
+  }, [isMyTurn, selectedCardIndex, selectCard]);
 
   return (
     <div className="flex flex-col items-center gap-1.5">
@@ -222,4 +230,4 @@ export function PlayerHand({ hand, chakra }: PlayerHandProps) {
       </span>
     </div>
   );
-}
+});

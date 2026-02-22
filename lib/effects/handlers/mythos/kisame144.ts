@@ -28,7 +28,7 @@ function kisame144MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kisame Hoshigaki (144): Opponent has no chakra to steal.',
       'game.log.effect.noTarget',
-      { card: 'KISAME HOSHIGAKI', id: '144/130' },
+      { card: 'KISAME HOSHIGAKI', id: 'KS-144-M' },
     );
     return { state: { ...state, log } };
   }
@@ -45,7 +45,7 @@ function kisame144MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_STEAL_CHAKRA',
     `Kisame Hoshigaki (144): Stole 1 Chakra from opponent. Player: ${playerState.chakra}, Opponent: ${opponentState.chakra}.`,
     'game.log.effect.stealChakra',
-    { card: 'KISAME HOSHIGAKI', id: '144/130', amount: 1 },
+    { card: 'KISAME HOSHIGAKI', id: 'KS-144-M', amount: 1 },
   );
 
   return {
@@ -59,5 +59,5 @@ function kisame144MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKisame144Handlers(): void {
-  registerEffect('144/130', 'MAIN', kisame144MainHandler);
+  registerEffect('KS-144-M', 'MAIN', kisame144MainHandler);
 }

@@ -52,7 +52,7 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (137): No upgraded character in this mission to hide.',
       'game.log.effect.noTarget',
-      { card: 'KAKASHI HATAKE', id: '137/130' },
+      { card: 'KAKASHI HATAKE', id: 'KS-137-S' },
     );
     return { state: { ...state, log } };
   }
@@ -70,7 +70,7 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_HIDE',
     `Kakashi Hatake (137): Hid upgraded ${target.card.name_fr} in this mission.`,
     'game.log.effect.hide',
-    { card: 'KAKASHI HATAKE', id: '137/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+    { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
@@ -100,7 +100,7 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (137): No other mission to move to (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'KAKASHI HATAKE', id: '137/130' },
+      { card: 'KAKASHI HATAKE', id: 'KS-137-S' },
     );
     return { state: { ...state, log } };
   }
@@ -138,13 +138,13 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     'EFFECT_MOVE',
     `Kakashi Hatake (137): Moved self from mission ${ctx.sourceMissionIndex} to mission ${targetMissionIndex} (upgrade).`,
     'game.log.effect.moveSelf',
-    { card: 'KAKASHI HATAKE', id: '137/130', mission: `mission ${targetMissionIndex}` },
+    { card: 'KAKASHI HATAKE', id: 'KS-137-S', mission: `mission ${targetMissionIndex}` },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerKakashi137Handlers(): void {
-  registerEffect('137/130', 'MAIN', kakashi137MainHandler);
-  registerEffect('137/130', 'UPGRADE', kakashi137UpgradeHandler);
+  registerEffect('KS-137-S', 'MAIN', kakashi137MainHandler);
+  registerEffect('KS-137-S', 'UPGRADE', kakashi137UpgradeHandler);
 }

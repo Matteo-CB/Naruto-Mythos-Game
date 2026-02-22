@@ -15,5 +15,5 @@ function handleKankuro077Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('077/130', 'MAIN', handleKankuro077Main);
+  registerEffect('KS-077-C', 'MAIN', handleKankuro077Main);
 }

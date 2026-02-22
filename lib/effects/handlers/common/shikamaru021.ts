@@ -17,7 +17,7 @@ function handleShikamaru021Main(ctx: EffectContext): EffectResult {
   if (state.edgeHolder !== sourcePlayer) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shikamaru Nara (021): Player does not hold the Edge token.',
-      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: '021/130' }) } };
+      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-021-C' }) } };
   }
 
   // Draw a card
@@ -36,12 +36,12 @@ function handleShikamaru021Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Shikamaru Nara (021): Drew 1 card (Edge holder).`,
     'game.log.effect.draw',
-    { card: 'Shikamaru Nara', id: '021/130', count: 1 },
+    { card: 'Shikamaru Nara', id: 'KS-021-C', count: 1 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('021/130', 'MAIN', handleShikamaru021Main);
+  registerEffect('KS-021-C', 'MAIN', handleShikamaru021Main);
 }

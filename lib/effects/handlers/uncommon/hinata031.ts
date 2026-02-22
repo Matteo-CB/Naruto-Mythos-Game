@@ -29,11 +29,11 @@ function handleHinata031Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Hinata Hyuga (031): Byakugan active - gain 1 Chakra when a non-hidden enemy character is played in this mission (continuous).',
     'game.log.effect.continuous',
-    { card: 'HINATA HYUGA', id: '031/130' },
+    { card: 'HINATA HYUGA', id: 'KS-031-UC' },
   );
   return { state: { ...state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('031/130', 'MAIN', handleHinata031Main);
+  registerEffect('KS-031-UC', 'MAIN', handleHinata031Main);
 }

@@ -26,5 +26,5 @@ function kyubi129MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKyubi129Handlers(): void {
-  registerEffect('129/130', 'MAIN', kyubi129MainHandler);
+  registerEffect('KS-129-R', 'MAIN', kyubi129MainHandler);
 }

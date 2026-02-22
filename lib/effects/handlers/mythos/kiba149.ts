@@ -58,7 +58,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kiba Inuzuka (149): No friendly non-hidden Akamaru in play, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'KIBA INUZUKA', id: '149/130' },
+      { card: 'KIBA INUZUKA', id: 'KS-149-M' },
     );
     return { state: { ...state, log } };
   }
@@ -73,7 +73,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kiba Inuzuka (149): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: '149/130', target: akamaru.card.name_fr },
+        { card: 'KIBA INUZUKA', id: 'KS-149-M', target: akamaru.card.name_fr },
       ),
     };
   } else {
@@ -94,7 +94,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_HIDE',
           `Kiba Inuzuka (149): Hid friendly ${akamaru.card.name_fr}.`,
           'game.log.effect.hide',
-          { card: 'KIBA INUZUKA', id: '149/130', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
+          { card: 'KIBA INUZUKA', id: 'KS-149-M', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
         ),
       };
     }
@@ -126,7 +126,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_NO_TARGET',
         'Kiba Inuzuka (149): No other non-hidden character in this mission to target.',
         'game.log.effect.noTarget',
-        { card: 'KIBA INUZUKA', id: '149/130' },
+        { card: 'KIBA INUZUKA', id: 'KS-149-M' },
       ),
     };
     return { state };
@@ -166,7 +166,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kiba Inuzuka (149): Defeated ${targetChar?.card.name_fr ?? 'character'} in this mission (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: '149/130', target: targetChar?.card.name_fr ?? 'unknown' },
+        { card: 'KIBA INUZUKA', id: 'KS-149-M', target: targetChar?.card.name_fr ?? 'unknown' },
       ),
     };
   } else {
@@ -192,7 +192,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
             'EFFECT_HIDE',
             `Kiba Inuzuka (149): Hid ${targetChar.card.name_fr} in this mission.`,
             'game.log.effect.hide',
-            { card: 'KIBA INUZUKA', id: '149/130', target: targetChar.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+            { card: 'KIBA INUZUKA', id: 'KS-149-M', target: targetChar.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
           ),
         };
         break;
@@ -209,6 +209,6 @@ function kiba149UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKiba149Handlers(): void {
-  registerEffect('149/130', 'MAIN', kiba149MainHandler);
-  registerEffect('149/130', 'UPGRADE', kiba149UpgradeHandler);
+  registerEffect('KS-149-M', 'MAIN', kiba149MainHandler);
+  registerEffect('KS-149-M', 'UPGRADE', kiba149UpgradeHandler);
 }

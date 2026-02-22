@@ -28,7 +28,7 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
   if (!hasOtherTeam10) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Ino Yamanaka (019): No other Team 10 character in this mission.',
-      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: '019/130' }) } };
+      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-019-C' }) } };
   }
 
   // POWERUP 1 on self
@@ -55,12 +55,12 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Ino Yamanaka (019): POWERUP 1 (Team 10 synergy).`,
     'game.log.effect.powerupSelf',
-    { card: 'Ino Yamanaka', id: '019/130', amount: 1 },
+    { card: 'Ino Yamanaka', id: 'KS-019-C', amount: 1 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('019/130', 'MAIN', handleIno019Main);
+  registerEffect('KS-019-C', 'MAIN', handleIno019Main);
 }
