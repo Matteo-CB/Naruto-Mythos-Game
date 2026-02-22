@@ -21,6 +21,7 @@ const RARITY_LABELS: Record<Rarity, string> = {
   S: 'Secret',
   SV: 'Secret V',
   M: 'Mythos',
+  MV: 'Mythos V',
   L: 'Legendary',
   MMS: 'Mission',
 };
@@ -33,6 +34,7 @@ const RARITY_COLORS: Record<Rarity, string> = {
   S: '#eab308',
   SV: '#eab308',
   M: '#ef4444',
+  MV: '#ef4444',
   L: '#eab308',
   MMS: '#6b7280',
 };
