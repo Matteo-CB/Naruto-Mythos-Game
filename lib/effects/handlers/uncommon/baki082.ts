@@ -77,10 +77,9 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 1 in this mission
+  // Find enemies with effective power <= 1 in this mission (hidden = power 0, valid)
   const validTargets: string[] = [];
   for (const char of enemyChars) {
-    if (char.isHidden) continue;
     if (getEffectivePower(char) <= 1) {
       validTargets.push(char.instanceId);
     }

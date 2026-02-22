@@ -80,6 +80,7 @@
       "keepHand": "{player} keeps their hand.",
       "revealMission": "Mission \"{name}\" revealed as rank {rank} ({base} + {bonus} bonus pts).",
       "gainChakra": "Gains {total} chakra ({base} base + {chars} characters + {bonus} bonus). Total: {finalTotal}.",
+      "chakraBonus": "{card}: CHAKRA +{bonus} ({reason})",
       "draw": "Draws {count} card(s).",
       "noDraw": "No cards to draw.",
       "playCharacter": "Plays {card} ({title}) on mission {mission} for {cost} chakra.",
@@ -130,7 +131,9 @@
         "discardCards": "{card} ({id}): Discarded {count} card(s).",
         "putOnDeck": "Put {card} back on top of deck.",
         "costReduction": "Cost reduced by {amount}, paid {cost}.",
-        "skipped": "{card} ({id}): Effect skipped."
+        "skipped": "{card} ({id}): Effect skipped.",
+        "copySuccess": "{card} copies {target}'s {effectType} effect!",
+        "copyFailed": "Effect copy failed: target no longer valid."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",

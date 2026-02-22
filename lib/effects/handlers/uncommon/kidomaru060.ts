@@ -75,14 +75,13 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find non-hidden enemy characters with effective power <= 1 across all missions
+  // Find enemy characters with effective power <= 1 across all missions (hidden = power 0, valid)
   const validTargets: string[] = [];
   const targetMissionMap: Record<string, number> = {};
 
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     for (const char of mission[enemySide]) {
-      if (char.isHidden) continue;
       if (getEffectivePower(char) <= 1) {
         validTargets.push(char.instanceId);
         targetMissionMap[char.instanceId] = i;

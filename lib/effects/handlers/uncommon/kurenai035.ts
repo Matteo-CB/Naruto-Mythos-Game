@@ -49,10 +49,9 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
     opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemy characters with effective power <= 1
+  // Find enemy characters with effective power <= 1 (hidden = power 0, valid targets)
   const validTargets: string[] = [];
   for (const char of enemyChars) {
-    if (char.isHidden) continue;
     if (getEffectivePower(char) <= 1) {
       validTargets.push(char.instanceId);
     }

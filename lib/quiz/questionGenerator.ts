@@ -283,7 +283,7 @@ type Gen = (
   rng: () => number
 ) => QuizQuestion | null;
 
-// --------------- STATS ---------------
+// --------------- STATS (no images — must recall from memory) ---------------
 
 const genChakraCostMC: Gen = (chars, _, rng) => {
   const card = pickOne(
@@ -300,7 +300,6 @@ const genChakraCostMC: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.whatChakraCost',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     options,
     correctIndex: options.indexOf(card.chakra.toString()),
     explanationKey: 'quiz.exp.chakraCost',
@@ -323,7 +322,6 @@ const genPowerMC: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.whatPower',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     options,
     correctIndex: options.indexOf(card.power.toString()),
     explanationKey: 'quiz.exp.power',
@@ -341,7 +339,6 @@ const genChakraFill: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.enterChakraCost',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     correctAnswer: card.chakra,
     unitKey: 'quiz.unit.chakra',
     explanationKey: 'quiz.exp.chakraCost',
@@ -359,7 +356,6 @@ const genPowerFill: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.enterPower',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     correctAnswer: card.power,
     explanationKey: 'quiz.exp.power',
     explanationParams: { name: card.name_fr, value: card.power.toString() },
@@ -385,7 +381,6 @@ const genStatsTF: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: isCost ? 'quiz.q.hasCostTF' : 'quiz.q.hasPowerTF',
     questionParams: { name: card.name_fr, value: displayValue.toString() },
-    questionImage: card.image_file,
     correctAnswer: isTrue,
     explanationKey: isCost ? 'quiz.exp.chakraCost' : 'quiz.exp.power',
     explanationParams: { name: card.name_fr, value: stat.toString() },
@@ -393,7 +388,6 @@ const genStatsTF: Gen = (chars, _, rng) => {
 };
 
 const genMatchChakraPairs: Gen = (chars, _, rng) => {
-  // Pick 4 cards with distinct chakra costs
   const distinct: CharacterCard[] = [];
   const usedCosts = new Set<number>();
   for (const c of shuffle(distinctByName(chars), rng)) {
@@ -413,7 +407,6 @@ const genMatchChakraPairs: Gen = (chars, _, rng) => {
     pairs: distinct.map((c) => ({
       left: c.name_fr,
       right: c.chakra.toString(),
-      leftImage: c.image_file,
     })),
     explanationKey: 'quiz.exp.correctMatch',
   };
@@ -439,7 +432,6 @@ const genMatchPowerPairs: Gen = (chars, _, rng) => {
     pairs: distinct.map((c) => ({
       left: c.name_fr,
       right: c.power.toString(),
-      leftImage: c.image_file,
     })),
     explanationKey: 'quiz.exp.correctMatch',
   };
@@ -463,7 +455,7 @@ const genSortByPower: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 3,
     questionTextKey: 'quiz.q.sortByPower',
-    items: sorted.map((c) => ({ label: c.name_fr, image: c.image_file })),
+    items: sorted.map((c) => ({ label: c.name_fr })),
     correctOrder: sorted.map((_, i) => i),
     explanationKey: 'quiz.exp.correctOrder',
     explanationParams: {
@@ -490,7 +482,7 @@ const genSortByChakra: Gen = (chars, _, rng) => {
     category: 'stats',
     difficulty: 3,
     questionTextKey: 'quiz.q.sortByChakra',
-    items: sorted.map((c) => ({ label: c.name_fr, image: c.image_file })),
+    items: sorted.map((c) => ({ label: c.name_fr })),
     correctOrder: sorted.map((_, i) => i),
     explanationKey: 'quiz.exp.correctOrder',
     explanationParams: {
@@ -499,7 +491,7 @@ const genSortByChakra: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- IDENTITY ---------------
+// --------------- IDENTITY (images allowed for recognition) ---------------
 
 const genIdentifyCard: Gen = (chars, _, rng) => {
   const unique = distinctByName(chars).filter((c) => c.image_file);
@@ -535,7 +527,6 @@ const genRarityMC: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.whatRarity',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
@@ -577,7 +568,6 @@ const genTitleMC: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.whatTitle',
     questionParams: { name: correct.name_fr },
-    questionImage: correct.image_file,
     options,
     correctIndex: options.indexOf(correct.title_fr),
     explanationKey: 'quiz.exp.title',
@@ -585,7 +575,7 @@ const genTitleMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- EFFECTS ---------------
+// --------------- EFFECTS (no images) ---------------
 
 const genEffectTypeMC: Gen = (chars, _, rng) => {
   const withEffects = chars.filter((c) => c.effects.length > 0);
@@ -593,7 +583,6 @@ const genEffectTypeMC: Gen = (chars, _, rng) => {
   const card = pickOne(withEffects, rng);
   const types = [...new Set(card.effects.map((e) => e.type))];
   const correctKey = EFFECT_TYPE_KEY[types[0]];
-  // All 4 effect types as options
   const options = ALL_EFFECT_TYPES.map((t) => EFFECT_TYPE_KEY[t]);
   return {
     id: uid('et-mc'),
@@ -602,7 +591,6 @@ const genEffectTypeMC: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.whatEffectType',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
@@ -625,7 +613,6 @@ const genEffectTF: Gen = (chars, _, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.hasEffectTF',
     questionParams: { name: card.name_fr, type: chosenType },
-    questionImage: card.image_file,
     correctAnswer: isTrue,
     explanationKey: 'quiz.exp.effectType',
     explanationParams: { name: card.name_fr, types: [...cardTypes].join(', ') },
@@ -633,7 +620,6 @@ const genEffectTF: Gen = (chars, _, rng) => {
 };
 
 const genMatchEffectTypes: Gen = (chars, _, rng) => {
-  // Pick 4 cards with distinct primary effect types
   const byType: Record<string, CharacterCard[]> = {};
   for (const c of distinctByName(chars)) {
     if (c.effects.length > 0) {
@@ -655,13 +641,12 @@ const genMatchEffectTypes: Gen = (chars, _, rng) => {
     pairs: selected.map((c) => ({
       left: c.name_fr,
       right: c.effects[0].type,
-      leftImage: c.image_file,
     })),
     explanationKey: 'quiz.exp.correctMatch',
   };
 };
 
-// --------------- GROUPS & KEYWORDS ---------------
+// --------------- GROUPS & KEYWORDS (no images) ---------------
 
 const genGroupMC: Gen = (chars, _, rng) => {
   const card = pickOne(chars, rng);
@@ -677,7 +662,6 @@ const genGroupMC: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.whatGroup',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     options,
     optionsAreKeys: true,
     correctIndex: options.indexOf(correctKey),
@@ -708,7 +692,6 @@ const genKeywordTF: Gen = (chars, _, rng) => {
     difficulty: 3,
     questionTextKey: 'quiz.q.hasKeywordTF',
     questionParams: { name: card.name_fr, keyword },
-    questionImage: card.image_file,
     correctAnswer: isTrue,
     explanationKey: 'quiz.exp.keyword',
     explanationParams: { name: card.name_fr, keywords: card.keywords.join(', ') },
@@ -716,7 +699,6 @@ const genKeywordTF: Gen = (chars, _, rng) => {
 };
 
 const genMatchGroupPairs: Gen = (chars, _, rng) => {
-  // Pick 4 cards from different groups
   const byGroup: Record<string, CharacterCard[]> = {};
   for (const c of distinctByName(chars)) {
     if (!byGroup[c.group]) byGroup[c.group] = [];
@@ -735,14 +717,12 @@ const genMatchGroupPairs: Gen = (chars, _, rng) => {
     pairs: selected.map((c) => ({
       left: c.name_fr,
       right: c.group,
-      leftImage: c.image_file,
     })),
     explanationKey: 'quiz.exp.correctMatch',
   };
 };
 
 const genCategorySortGroup: Gen = (chars, _, rng) => {
-  // Pick 2-3 groups and 6-8 characters to sort
   const byGroup: Record<string, CharacterCard[]> = {};
   for (const c of distinctByName(chars)) {
     if (!byGroup[c.group]) byGroup[c.group] = [];
@@ -753,11 +733,11 @@ const genCategorySortGroup: Gen = (chars, _, rng) => {
   );
   if (availableGroups.length < 2) return null;
   const selectedGroups = pick(availableGroups, Math.min(3, availableGroups.length), rng);
-  const items: Array<{ label: string; correctCategory: number; image?: string }> = [];
+  const items: Array<{ label: string; correctCategory: number }> = [];
   for (let gi = 0; gi < selectedGroups.length; gi++) {
     const groupCards = pick(byGroup[selectedGroups[gi]], 2, rng);
     for (const c of groupCards) {
-      items.push({ label: c.name_fr, correctCategory: gi, image: c.image_file });
+      items.push({ label: c.name_fr, correctCategory: gi });
     }
   }
   return {
@@ -809,7 +789,6 @@ const genMissionEffectMC: Gen = (_, missions, rng) => {
     difficulty: 3,
     questionTextKey: 'quiz.q.missionEffect',
     questionParams: { name: correct.name_fr },
-    questionImage: correct.image_file,
     options,
     correctIndex: options.indexOf(correctDesc),
     explanationKey: 'quiz.exp.missionIs',
@@ -820,7 +799,6 @@ const genMissionEffectMC: Gen = (_, missions, rng) => {
 // --------------- ADVANCED ---------------
 
 const genUpgradeCostFill: Gen = (chars, _, rng) => {
-  // Pick two cards with same name but different costs
   const nameMap: Record<string, CharacterCard[]> = {};
   for (const c of chars) {
     if (!nameMap[c.name_fr]) nameMap[c.name_fr] = [];
@@ -856,7 +834,6 @@ const genUpgradeCostFill: Gen = (chars, _, rng) => {
     }
   }
 
-  // Fallback: generate with random plausible costs
   const from = Math.floor(rng() * 4) + 1;
   const to = from + Math.floor(rng() * 4) + 1;
   return {
@@ -884,12 +861,9 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
   );
   if (!card) return null;
 
-  // Generate 4 statements, one with an error
   const errorIndex = Math.floor(rng() * 4);
-
   const statements: SpotErrorQuestion['statements'] = [];
 
-  // Statement 0: chakra cost
   const wrongChakra = card.chakra + (rng() > 0.5 ? 1 : -1);
   statements.push({
     textKey: 'quiz.stmt.costIs',
@@ -900,7 +874,6 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
     isError: errorIndex === 0,
   });
 
-  // Statement 1: power
   const wrongPower = card.power + (rng() > 0.5 ? 1 : -1);
   statements.push({
     textKey: 'quiz.stmt.powerIs',
@@ -911,7 +884,6 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
     isError: errorIndex === 1,
   });
 
-  // Statement 2: group
   const otherGroups = ALL_GROUPS.filter((g) => g !== card.group);
   const wrongGroup = otherGroups.length > 0 ? pickOne(otherGroups, rng) : card.group;
   statements.push({
@@ -923,7 +895,6 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
     isError: errorIndex === 2,
   });
 
-  // Statement 3: effect type
   const cardTypes = card.effects.map((e) => e.type);
   const otherTypes = ALL_EFFECT_TYPES.filter((t) => !cardTypes.includes(t));
   const wrongType = otherTypes.length > 0 ? pickOne(otherTypes, rng) : cardTypes[0];
@@ -943,7 +914,6 @@ const genSpotErrorCard: Gen = (chars, _, rng) => {
     difficulty: 3,
     questionTextKey: 'quiz.q.spotError',
     questionParams: { name: card.name_fr },
-    questionImage: card.image_file,
     statements,
     explanationKey: 'quiz.exp.spotError',
     explanationParams: { name: card.name_fr },
@@ -961,11 +931,11 @@ const genCategorySortRarity: Gen = (chars, _, rng) => {
   );
   if (available.length < 2) return null;
   const selectedRarities = pick(available, Math.min(3, available.length), rng);
-  const items: Array<{ label: string; correctCategory: number; image?: string }> = [];
+  const items: Array<{ label: string; correctCategory: number }> = [];
   for (let ri = 0; ri < selectedRarities.length; ri++) {
     const rarityCards = pick(byRarity[selectedRarities[ri]], 2, rng);
     for (const c of rarityCards) {
-      items.push({ label: c.name_fr, correctCategory: ri, image: c.image_file });
+      items.push({ label: c.name_fr, correctCategory: ri });
     }
   }
   return {
@@ -977,6 +947,419 @@ const genCategorySortRarity: Gen = (chars, _, rng) => {
     categories: selectedRarities.map((r) => RARITY_KEY[r]),
     items: shuffle(items, rng),
     explanationKey: 'quiz.exp.correctMatch',
+  };
+};
+
+// =====================================================================
+// NEW SCENARIO & STRATEGY GENERATORS
+// =====================================================================
+
+// --- Which character belongs to a keyword group? (no image) ---
+const genTeamMemberMC: Gen = (chars, _, rng) => {
+  const keywordMap: Record<string, CharacterCard[]> = {};
+  for (const c of distinctByName(chars)) {
+    for (const kw of c.keywords) {
+      if (!keywordMap[kw]) keywordMap[kw] = [];
+      keywordMap[kw].push(c);
+    }
+  }
+  const keywords = Object.keys(keywordMap).filter(
+    (k) => keywordMap[k].length >= 2 && keywordMap[k].length < distinctByName(chars).length * 0.5
+  );
+  if (keywords.length === 0) return null;
+
+  const keyword = pickOne(keywords, rng);
+  const members = keywordMap[keyword];
+  const nonMembers = distinctByName(chars).filter((c) => !c.keywords.includes(keyword));
+  if (nonMembers.length < 3) return null;
+
+  const correct = pickOne(members, rng);
+  const distractors = pick(nonMembers, 3, rng);
+  const options = shuffle([correct.name_fr, ...distractors.map((c) => c.name_fr)], rng);
+
+  return {
+    id: uid('tm-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.whichTeamMember',
+    questionParams: { keyword },
+    options,
+    correctIndex: options.indexOf(correct.name_fr),
+    explanationKey: 'quiz.exp.teamMember',
+    explanationParams: { name: correct.name_fr, keyword },
+  };
+};
+
+// --- Which character does NOT belong to a group? (no image) ---
+const genNotInGroupMC: Gen = (chars, _, rng) => {
+  const groups = ALL_GROUPS.filter((g) => chars.some((c) => c.group === g));
+  if (groups.length < 2) return null;
+
+  const group = pickOne(groups, rng);
+  const inGroup = distinctByName(chars).filter((c) => c.group === group);
+  const notInGroup = distinctByName(chars).filter((c) => c.group !== group);
+  if (inGroup.length < 3 || notInGroup.length < 1) return null;
+
+  const correct = pickOne(notInGroup, rng);
+  const distractors = pick(inGroup, 3, rng);
+  const options = shuffle([correct.name_fr, ...distractors.map((c) => c.name_fr)], rng);
+  const groupKey = GROUP_KEY[group] || group;
+
+  return {
+    id: uid('ng-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.whichNotInGroup',
+    questionParams: { group: groupKey },
+    options,
+    optionsAreKeys: false,
+    correctIndex: options.indexOf(correct.name_fr),
+    explanationKey: 'quiz.exp.notInGroup',
+    explanationParams: { name: correct.name_fr, group },
+  };
+};
+
+// --- Which character has the highest power? (no image) ---
+const genHigherPowerMC: Gen = (chars, _, rng) => {
+  const distinct: CharacterCard[] = [];
+  const usedNames = new Set<string>();
+  const usedPowers = new Set<number>();
+  for (const c of shuffle(chars, rng)) {
+    if (!usedNames.has(c.name_fr) && !usedPowers.has(c.power) && c.power > 0) {
+      distinct.push(c);
+      usedNames.add(c.name_fr);
+      usedPowers.add(c.power);
+      if (distinct.length === 4) break;
+    }
+  }
+  if (distinct.length < 4) return null;
+
+  const sorted = [...distinct].sort((a, b) => b.power - a.power);
+  const correct = sorted[0];
+  const options = shuffle(distinct.map((c) => c.name_fr), rng);
+
+  return {
+    id: uid('hp-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.higherPower',
+    options,
+    correctIndex: options.indexOf(correct.name_fr),
+    explanationKey: 'quiz.exp.higherPower',
+    explanationParams: { name: correct.name_fr, value: correct.power.toString() },
+  };
+};
+
+// --- Start Phase chakra calculation (no image) ---
+const genStartPhaseChakraFill: Gen = (_, __, rng) => {
+  const charCount = Math.floor(rng() * 5) + 1; // 1-5 characters
+  const total = 5 + charCount;
+
+  return {
+    id: uid('sc-fn'),
+    type: 'fillNumber',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.startPhaseChakra',
+    questionParams: { count: charCount.toString() },
+    correctAnswer: total,
+    unitKey: 'quiz.unit.chakra',
+    explanationKey: 'quiz.exp.startPhaseChakra',
+    explanationParams: {
+      base: '5',
+      count: charCount.toString(),
+      total: total.toString(),
+    },
+  };
+};
+
+// --- Mission total points calculation (no image) ---
+const genMissionPointsFill: Gen = (_, __, rng) => {
+  const basePoints = Math.floor(rng() * 3) + 1; // 1-3
+  const turn = Math.floor(rng() * 4) + 1; // 1-4
+  const rankBonus = turn; // D=1, C=2, B=3, A=4
+  const total = basePoints + rankBonus;
+  const ranks = ['D', 'C', 'B', 'A'];
+
+  return {
+    id: uid('mp-fn'),
+    type: 'fillNumber',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.missionTotalPoints',
+    questionParams: {
+      base: basePoints.toString(),
+      rank: ranks[turn - 1],
+      bonus: rankBonus.toString(),
+    },
+    correctAnswer: total,
+    unitKey: 'quiz.unit.points',
+    explanationKey: 'quiz.exp.missionTotalPoints',
+    explanationParams: {
+      base: basePoints.toString(),
+      bonus: rankBonus.toString(),
+      total: total.toString(),
+    },
+  };
+};
+
+// --- Who wins the mission? (scenario) ---
+const genWhoWinsMissionMC: Gen = (_, __, rng) => {
+  const variant = rng();
+  let p1Power: number, p2Power: number;
+  if (variant < 0.15) {
+    // Both 0 — nobody wins
+    p1Power = 0;
+    p2Power = 0;
+  } else if (variant < 0.4) {
+    // Tie — edge decides
+    const power = Math.floor(rng() * 6) + 1;
+    p1Power = power;
+    p2Power = power;
+  } else {
+    p1Power = Math.floor(rng() * 7) + 1;
+    p2Power = Math.floor(rng() * 7) + 1;
+    if (p1Power === p2Power) p2Power = Math.min(7, p1Power + 1);
+  }
+
+  const edgePlayer = Math.floor(rng() * 2) + 1; // 1 or 2
+
+  let winnerKey: string;
+  if (p1Power === 0 && p2Power === 0) {
+    winnerKey = 'quiz.opt.noOne';
+  } else if (p1Power > p2Power) {
+    winnerKey = 'quiz.opt.player1';
+  } else if (p2Power > p1Power) {
+    winnerKey = 'quiz.opt.player2';
+  } else {
+    winnerKey = edgePlayer === 1 ? 'quiz.opt.player1' : 'quiz.opt.player2';
+  }
+
+  const options = ['quiz.opt.player1', 'quiz.opt.player2', 'quiz.opt.noOne'];
+
+  return {
+    id: uid('ww-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.whoWinsMission',
+    questionParams: {
+      p1Power: p1Power.toString(),
+      p2Power: p2Power.toString(),
+      edge: edgePlayer.toString(),
+    },
+    options,
+    optionsAreKeys: true,
+    correctIndex: options.indexOf(winnerKey),
+    explanationKey: 'quiz.exp.whoWinsMission',
+    explanationParams: { p1Power: p1Power.toString(), p2Power: p2Power.toString(), edge: edgePlayer.toString() },
+  };
+};
+
+// --- Can you legally upgrade? (T/F) ---
+const genUpgradeLegalTF: Gen = (chars, _, rng) => {
+  const nameMap: Record<string, CharacterCard[]> = {};
+  for (const c of chars) {
+    if (!nameMap[c.name_fr]) nameMap[c.name_fr] = [];
+    nameMap[c.name_fr].push(c);
+  }
+  const upgradable = Object.entries(nameMap).filter(([, cards]) => {
+    const costs = [...new Set(cards.map((c) => c.chakra))];
+    return costs.length >= 2;
+  });
+
+  if (upgradable.length === 0) return null;
+
+  const [name, cards] = pickOne(upgradable, rng);
+  const costs = [...new Set(cards.map((c) => c.chakra))].sort((a, b) => a - b);
+
+  // Randomly decide if we present a legal or illegal scenario
+  const isLegal = rng() > 0.4;
+  let fromCost: number, toCost: number;
+
+  if (isLegal) {
+    // Legal: to > from
+    fromCost = costs[0];
+    toCost = costs[costs.length - 1];
+    if (toCost <= fromCost) return null;
+  } else {
+    // Illegal: to <= from (same cost or lower)
+    if (costs.length >= 2) {
+      toCost = costs[0];
+      fromCost = costs[costs.length - 1];
+    } else {
+      fromCost = costs[0];
+      toCost = costs[0]; // same cost
+    }
+  }
+
+  return {
+    id: uid('ul-tf'),
+    type: 'trueFalse',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: 'quiz.q.canUpgrade',
+    questionParams: { name, fromCost: fromCost.toString(), toCost: toCost.toString() },
+    correctAnswer: isLegal,
+    explanationKey: 'quiz.exp.canUpgrade',
+    explanationParams: { name, fromCost: fromCost.toString(), toCost: toCost.toString() },
+  };
+};
+
+// --- Hidden character rules (T/F) ---
+const genHiddenRulesTF: Gen = (_, __, rng) => {
+  const scenarios = [
+    {
+      key: 'quiz.q.hiddenPower',
+      params: {},
+      answer: false,
+      expKey: 'quiz.exp.hiddenPower',
+    },
+    {
+      key: 'quiz.q.hiddenCostPlay',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.hiddenCostPlay',
+    },
+    {
+      key: 'quiz.q.hiddenChakraBonus',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.hiddenChakraBonus',
+    },
+    {
+      key: 'quiz.q.hiddenSameName',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.hiddenSameName',
+    },
+  ];
+
+  const scenario = pickOne(scenarios, rng);
+  return {
+    id: uid('hr-tf'),
+    type: 'trueFalse',
+    category: 'scenario',
+    difficulty: 3,
+    questionTextKey: scenario.key,
+    questionParams: scenario.params,
+    correctAnswer: scenario.answer,
+    explanationKey: scenario.expKey,
+  };
+};
+
+// --- Mission rank on turn X ---
+const genMissionRankMC: Gen = (_, __, rng) => {
+  const turn = Math.floor(rng() * 4) + 1;
+  const ranks = ['D', 'C', 'B', 'A'];
+  const correctRank = ranks[turn - 1];
+  const options = shuffle([...ranks], rng);
+
+  return {
+    id: uid('mr-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 1,
+    questionTextKey: 'quiz.q.missionRank',
+    questionParams: { turn: turn.toString() },
+    options,
+    correctIndex: options.indexOf(correctRank),
+    explanationKey: 'quiz.exp.missionRank',
+    explanationParams: { turn: turn.toString(), rank: correctRank },
+  };
+};
+
+// --- Can you afford to play this card? (T/F) ---
+const genCanAffordTF: Gen = (chars, _, rng) => {
+  const card = pickOne(chars.filter((c) => c.chakra > 0), rng);
+  if (!card) return null;
+
+  const isAffordable = rng() > 0.4;
+  let chakra: number;
+  if (isAffordable) {
+    chakra = card.chakra + Math.floor(rng() * 3); // enough
+  } else {
+    chakra = Math.max(0, card.chakra - Math.floor(rng() * 2) - 1); // not enough
+  }
+  const canAfford = chakra >= card.chakra;
+
+  return {
+    id: uid('ca-tf'),
+    type: 'trueFalse',
+    category: 'scenario',
+    difficulty: 1,
+    questionTextKey: 'quiz.q.canAfford',
+    questionParams: { name: card.name_fr, chakra: chakra.toString(), cost: card.chakra.toString() },
+    correctAnswer: canAfford,
+    explanationKey: 'quiz.exp.canAfford',
+    explanationParams: { name: card.name_fr, chakra: chakra.toString(), cost: card.chakra.toString() },
+  };
+};
+
+// --- Effect recall: what does this character's effect do? (no image) ---
+const genEffectRecallMC: Gen = (chars, _, rng) => {
+  const withEffects = chars.filter((c) => c.effects.length > 0 && c.effects[0].description.length > 15);
+  if (withEffects.length < 4) return null;
+
+  const selected = pick(distinctByName(withEffects), 4, rng);
+  if (selected.length < 4) return null;
+
+  const correct = selected[0];
+  const correctDesc = correct.effects[0].description;
+  // Truncate to first 80 chars for readability
+  const truncate = (s: string) => s.length > 80 ? s.substring(0, 77) + '...' : s;
+  const options = shuffle(selected.map((c) => truncate(c.effects[0].description)), rng);
+
+  return {
+    id: uid('er-mc'),
+    type: 'multipleChoice',
+    category: 'scenario',
+    difficulty: 3,
+    questionTextKey: 'quiz.q.effectRecall',
+    questionParams: { name: correct.name_fr, type: correct.effects[0].type },
+    options,
+    correctIndex: options.indexOf(truncate(correctDesc)),
+    explanationKey: 'quiz.exp.effectRecall',
+    explanationParams: { name: correct.name_fr },
+  };
+};
+
+// --- Edge token: who plays first? (T/F) ---
+const genEdgeRuleTF: Gen = (_, __, rng) => {
+  const scenarios = [
+    {
+      key: 'quiz.q.edgeFirst',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.edgeFirst',
+    },
+    {
+      key: 'quiz.q.edgePassFirst',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.edgePassFirst',
+    },
+    {
+      key: 'quiz.q.edgeTiebreaker',
+      params: {},
+      answer: true,
+      expKey: 'quiz.exp.edgeTiebreaker',
+    },
+  ];
+
+  const scenario = pickOne(scenarios, rng);
+  return {
+    id: uid('er-tf'),
+    type: 'trueFalse',
+    category: 'scenario',
+    difficulty: 2,
+    questionTextKey: scenario.key,
+    questionParams: scenario.params,
+    correctAnswer: scenario.answer,
+    explanationKey: scenario.expKey,
   };
 };
 
@@ -1002,51 +1385,66 @@ export function generateQuizQuestions(
   const missions = getPlayableMissions();
   const totalCount = count ?? QUESTION_COUNTS[difficulty] ?? 15;
 
-  // Select generators by difficulty
+  // Select generators by difficulty — scenario/strategy questions get high weights
   const generators: Array<{ gen: Gen; weight: number }> = [];
 
-  // Difficulty 1+: basic stats, identity, groups
+  // Difficulty 1+: basic stats (low weight), identity, groups, + new scenario questions
   generators.push(
-    { gen: genChakraCostMC, weight: 3 },
-    { gen: genPowerMC, weight: 3 },
-    { gen: genChakraFill, weight: 2 },
-    { gen: genPowerFill, weight: 2 },
-    { gen: genStatsTF, weight: 3 },
+    { gen: genChakraCostMC, weight: 1 },
+    { gen: genPowerMC, weight: 1 },
+    { gen: genChakraFill, weight: 1 },
+    { gen: genPowerFill, weight: 1 },
+    { gen: genStatsTF, weight: 1 },
     { gen: genIdentifyCard, weight: 3 },
-    { gen: genGroupMC, weight: 3 }
+    { gen: genGroupMC, weight: 2 },
+    // New scenario questions at d1+
+    { gen: genMissionRankMC, weight: 3 },
+    { gen: genCanAffordTF, weight: 3 },
   );
 
-  // Difficulty 2+: matching, rarities, effects, missions
+  // Difficulty 2+: matching, rarities, effects, missions + more scenarios
   if (difficulty >= 2) {
     generators.push(
-      { gen: genMatchChakraPairs, weight: 2 },
-      { gen: genMatchPowerPairs, weight: 2 },
+      { gen: genMatchChakraPairs, weight: 1 },
+      { gen: genMatchPowerPairs, weight: 1 },
       { gen: genRarityMC, weight: 2 },
       { gen: genMatchImagePairs, weight: 2 },
-      { gen: genEffectTypeMC, weight: 3 },
-      { gen: genEffectTF, weight: 2 },
-      { gen: genMatchGroupPairs, weight: 2 },
+      { gen: genEffectTypeMC, weight: 2 },
+      { gen: genEffectTF, weight: 1 },
+      { gen: genMatchGroupPairs, weight: 1 },
       { gen: genIdentifyMission, weight: 2 },
-      { gen: genTitleMC, weight: 2 }
+      { gen: genTitleMC, weight: 2 },
+      // New scenario questions at d2+
+      { gen: genTeamMemberMC, weight: 3 },
+      { gen: genNotInGroupMC, weight: 3 },
+      { gen: genHigherPowerMC, weight: 3 },
+      { gen: genStartPhaseChakraFill, weight: 3 },
+      { gen: genMissionPointsFill, weight: 3 },
+      { gen: genWhoWinsMissionMC, weight: 4 },
+      { gen: genUpgradeLegalTF, weight: 3 },
+      { gen: genEdgeRuleTF, weight: 2 },
     );
   }
 
-  // Difficulty 3+: sorting, advanced, spot-the-error
+  // Difficulty 3+: sorting, advanced, spot-the-error + hard scenarios
   if (difficulty >= 3) {
     generators.push(
-      { gen: genSortByPower, weight: 2 },
-      { gen: genSortByChakra, weight: 2 },
-      { gen: genMatchEffectTypes, weight: 2 },
+      { gen: genSortByPower, weight: 1 },
+      { gen: genSortByChakra, weight: 1 },
+      { gen: genMatchEffectTypes, weight: 1 },
       { gen: genKeywordTF, weight: 2 },
       { gen: genCategorySortGroup, weight: 2 },
-      { gen: genCategorySortRarity, weight: 2 },
+      { gen: genCategorySortRarity, weight: 1 },
       { gen: genUpgradeCostFill, weight: 2 },
-      { gen: genSpotErrorCard, weight: 3 },
-      { gen: genMissionEffectMC, weight: 2 }
+      { gen: genSpotErrorCard, weight: 2 },
+      { gen: genMissionEffectMC, weight: 2 },
+      // New hard scenario questions
+      { gen: genHiddenRulesTF, weight: 3 },
+      { gen: genEffectRecallMC, weight: 4 },
     );
   }
 
-  // Get rules questions (lazy import to avoid circular dependency at type level)
+  // Get rules questions — increase proportion to 30-35%
   let rulesQs: QuizQuestion[] = [];
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1055,7 +1453,7 @@ export function generateQuizQuestions(
   } catch {
     // Rules questions not available
   }
-  const selectedRules = pick(rulesQs, Math.ceil(totalCount * 0.2), rng);
+  const selectedRules = pick(rulesQs, Math.ceil(totalCount * 0.3), rng);
 
   // Generate card-based questions
   const cardQsNeeded = totalCount - selectedRules.length;
@@ -1064,7 +1462,6 @@ export function generateQuizQuestions(
   let attempts = 0;
 
   while (cardQs.length < cardQsNeeded && attempts < cardQsNeeded * 8) {
-    // Weighted random generator selection
     let r = rng() * totalWeight;
     let selectedGen = generators[0].gen;
     for (const { gen, weight } of generators) {

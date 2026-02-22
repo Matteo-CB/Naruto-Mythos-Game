@@ -30,7 +30,8 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
-    const target = enemyChars.find((c) => !c.isHidden && getEffectivePower(c) <= 1);
+    // Hidden characters have power 0, which is <= 1, so they are valid targets
+    const target = enemyChars.find((c) => getEffectivePower(c) <= 1);
 
     if (target) {
       state = defeatEnemyCharacter(state, i, target.instanceId, ctx.sourcePlayer);

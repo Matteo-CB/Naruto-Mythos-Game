@@ -10,6 +10,7 @@ import type { CharacterInPlay } from '../../../engine/types';
  *
  * MAIN: If there are 2 or more enemy characters in this mission,
  *   move the weakest non-hidden enemy character from this mission.
+ *   The player chooses which mission to move the target to.
  *
  * UPGRADE: MAIN effect: After moving, hide the enemy character.
  */
@@ -44,6 +45,22 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
+  // Must have at least one other mission to move to
+  if (state.activeMissions.length <= 1) {
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          `Ino Yamanaka (110) MAIN: Only one mission in play, cannot move characters.`,
+          'game.log.effect.noTarget',
+          { card: 'INO YAMANAKA', id: 'KS-110-R' },
+        ),
+      },
+    };
+  }
+
   // Find non-hidden enemies and their effective power
   const nonHiddenEnemies = enemies.filter((c) => !c.isHidden);
   if (nonHiddenEnemies.length === 0) {
@@ -71,25 +88,21 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
   // Filter to weakest enemies (may be multiple tied)
   const weakest = nonHiddenEnemies.filter((c) => getEffectivePower(c) === minPower);
 
-  // If only one weakest and only one other mission, auto-resolve
+  // If exactly one weakest enemy, skip enemy selection step — go directly to destination choice.
+  // The INO110_CHOOSE_ENEMY handler in EffectEngine will handle destination selection + upgrade hide.
   if (weakest.length === 1) {
-    const otherMissions: string[] = [];
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      if (i !== sourceMissionIndex) otherMissions.push(String(i));
-    }
-    if (otherMissions.length === 1) {
-      // Auto-resolve: move to the only other mission
-      return {
-        state,
-        requiresTargetSelection: false,
-        autoMoveTarget: weakest[0].instanceId,
-        autoMoveDestination: parseInt(otherMissions[0], 10),
-        isUpgrade,
-      } as EffectResult & { autoMoveTarget: string; autoMoveDestination: number };
-    }
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'INO110_CHOOSE_ENEMY',
+      validTargets: [weakest[0].instanceId],
+      description: isUpgrade
+        ? `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission, then hide them.`
+        : `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission.`,
+    };
   }
 
-  // Need target selection: which weakest enemy to move
+  // Multiple tied for weakest — player must choose which one to move
   const validTargets = weakest.map((c) => c.instanceId);
 
   return {

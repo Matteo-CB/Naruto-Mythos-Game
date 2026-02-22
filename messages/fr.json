@@ -80,6 +80,7 @@
       "keepHand": "{player} garde sa main.",
       "revealMission": "Mission \"{name}\" revelee rang {rank} ({base} + {bonus} pts bonus).",
       "gainChakra": "Gagne {total} chakra ({base} base + {chars} personnages + {bonus} bonus). Total : {finalTotal}.",
+      "chakraBonus": "{card} : CHAKRA +{bonus} ({reason})",
       "draw": "Pioche {count} carte(s).",
       "noDraw": "Pas de cartes a piocher.",
       "playCharacter": "Joue {card} ({title}) sur mission {mission} pour {cost} chakra.",
@@ -130,7 +131,9 @@
         "discardCards": "{card} ({id}) : Defausse {count} carte(s).",
         "putOnDeck": "Remet {card} sur le dessus du deck.",
         "costReduction": "Cout reduit de {amount}, paye {cost}.",
-        "skipped": "{card} ({id}) : Effet passe."
+        "skipped": "{card} ({id}) : Effet passe.",
+        "copySuccess": "{card} copie l'effet {effectType} de {target} !",
+        "copyFailed": "Copie d'effet echouee : cible invalide."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
