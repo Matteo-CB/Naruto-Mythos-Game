@@ -16,10 +16,12 @@ interface RoomData {
   guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   isPrivate: boolean;
   isRanked: boolean;
+  createdAt: number;
 }
 
 const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
+const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -30,7 +32,59 @@ function generateRoomCode(): string {
   return code;
 }
 
+/**
+ * Clean up any existing room for this socket before joining matchmaking.
+ * Prevents stale rooms from accumulating.
+ */
+function cleanupPlayerRoom(socket: Socket): void {
+  const existingCode = playerRooms.get(socket.id);
+  if (!existingCode) return;
+  const existingRoom = rooms.get(existingCode);
+  if (!existingRoom) {
+    playerRooms.delete(socket.id);
+    return;
+  }
+  // If this socket is the host of a room with no game running, remove it
+  if (existingRoom.hostSocket === socket.id && !existingRoom.gameState) {
+    rooms.delete(existingCode);
+    socket.leave(existingCode);
+  }
+  // If this socket is the guest, clear guest info
+  if (existingRoom.guestSocket === socket.id) {
+    existingRoom.guestId = null;
+    existingRoom.guestSocket = null;
+    existingRoom.guestDeck = null;
+    socket.leave(existingCode);
+  }
+  playerRooms.delete(socket.id);
+}
+
+/**
+ * Periodically clean stale public matchmaking rooms (no guest, no game, TTL expired).
+ */
+function cleanupStaleRooms(): void {
+  const now = Date.now();
+  for (const [code, room] of rooms) {
+    if (!room.isPrivate && !room.guestId && !room.gameState) {
+      // Check if host socket is still connected
+      // We can't easily check socket liveness here, but we can check TTL
+      // Rooms older than TTL without a guest are stale
+      if (!room.createdAt || now - room.createdAt > MATCHMAKING_ROOM_TTL_MS) {
+        console.log(`[Socket] Cleaning stale matchmaking room ${code}`);
+        rooms.delete(code);
+        // Clean up playerRooms for the host socket
+        if (room.hostSocket) {
+          playerRooms.delete(room.hostSocket);
+        }
+      }
+    }
+  }
+}
+
 export function setupSocketHandlers(io: SocketIOServer) {
+  // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
+  setInterval(() => cleanupStaleRooms(), 60_000);
+
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
 
@@ -44,6 +98,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
     // Create a room
     socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
+
+      // Clean up any existing room this player might be in
+      cleanupPlayerRoom(socket);
 
       let code: string;
       do {
@@ -61,6 +118,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestDeck: null,
         isPrivate: data.isPrivate ?? true,
         isRanked: data.isRanked ?? false,
+        createdAt: Date.now(),
       };
 
       rooms.set(code, room);
@@ -345,12 +403,28 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
 
+      // Clean up any existing room/matchmaking state for this player
+      cleanupPlayerRoom(socket);
+
+      // Also clean stale rooms before searching
+      cleanupStaleRooms();
+
       // Find an available public room with matching ranked preference
+      // Verify the host socket is still connected before matching
       let foundRoom: RoomData | null = null;
-      for (const [, room] of rooms) {
+      for (const [code, room] of rooms) {
         if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked) {
-          foundRoom = room;
-          break;
+          // Verify host socket is still live
+          const hostSocketObj = io.sockets.sockets.get(room.hostSocket);
+          if (hostSocketObj && hostSocketObj.connected) {
+            foundRoom = room;
+            break;
+          } else {
+            // Stale room — host disconnected without cleanup
+            console.log(`[Socket] Matchmaking: removing stale room ${code} (host socket disconnected)`);
+            rooms.delete(code);
+            playerRooms.delete(room.hostSocket);
+          }
         }
       }
 
@@ -367,8 +441,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestId: foundRoom.guestId,
         });
 
-        io.to(foundRoom.code).emit('matchmaking:found', {
+        // Send matchmaking:found with role info so both players know who they are
+        if (foundRoom.hostSocket) {
+          io.to(foundRoom.hostSocket).emit('matchmaking:found', {
+            code: foundRoom.code,
+            playerRole: 'player1',
+          });
+        }
+        socket.emit('matchmaking:found', {
           code: foundRoom.code,
+          playerRole: 'player2',
         });
       } else {
         console.log(`[Socket] Matchmaking: creating new room for user ${data.userId}`);
@@ -389,6 +471,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestDeck: null,
           isPrivate: false,
           isRanked: wantRanked,
+          createdAt: Date.now(),
         };
 
         rooms.set(code, room);
@@ -405,11 +488,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
-      // Only remove if waiting (no guest yet)
-      if (!room.guestId) {
+      // Only remove if waiting (no guest yet) and not a started game
+      if (!room.guestId && !room.gameState) {
         rooms.delete(code);
         playerRooms.delete(socket.id);
         socket.leave(code);
+        console.log(`[Socket] Matchmaking: user left queue, room ${code} removed`);
       }
     });
 

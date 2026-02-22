@@ -29,13 +29,12 @@ function getEffectivePower(char: CharacterInPlay): number {
 function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all non-hidden characters with effective power <= 4 across all missions
+  // Find all characters with effective power <= 4 across all missions (hidden = power 0, valid)
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       // Exclude self
       if (char.instanceId === sourceCard.instanceId) continue;
-      if (char.isHidden) continue;
       if (getEffectivePower(char) <= 4) {
         validTargets.push(char.instanceId);
       }

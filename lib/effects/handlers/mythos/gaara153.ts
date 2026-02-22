@@ -35,12 +35,11 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
 
-    // Find the weakest non-hidden enemy with power <= 1
+    // Find the weakest enemy with power <= 1 (hidden chars have power 0, valid targets)
     let target: CharacterInPlay | undefined;
     let targetPower = Infinity;
 
     for (const char of enemyChars) {
-      if (char.isHidden) continue;
       const power = getEffectivePower(char);
       if (power <= 1 && power < targetPower) {
         target = char;

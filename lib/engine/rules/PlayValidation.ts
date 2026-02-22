@@ -36,7 +36,8 @@ export function validatePlayCharacter(
     // Hidden characters' names aren't checked for uniqueness until revealed
     // But face-visible characters are checked
     if (!c.isHidden) {
-      return c.card.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
     }
     return false;
   });
@@ -130,8 +131,11 @@ export function validateRevealCharacter(
     return { valid: false, reason: 'Cannot reveal opponent\'s character.' };
   }
 
+  // Use topCard for upgraded hidden characters
+  const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
   // Check chakra cost
-  const effectiveCost = calculateEffectiveCost(state, player, char.card, missionIndex, true);
+  const effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   const ps = state[player];
   if (ps.chakra < effectiveCost) {
     return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.` };
@@ -141,13 +145,14 @@ export function validateRevealCharacter(
   const sameName = chars.some((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
-      return c.card.name_fr.toUpperCase() === char.card.name_fr.toUpperCase();
+      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
     }
     return false;
   });
 
   if (sameName) {
-    return { valid: false, reason: `Already have a visible ${char.card.name_fr} on this mission.` };
+    return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.` };
   }
 
   return { valid: true };

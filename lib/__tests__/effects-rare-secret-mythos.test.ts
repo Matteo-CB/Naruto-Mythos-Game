@@ -617,6 +617,7 @@ describe('Non-common registry completeness', () => {
     { id: 'KS-039-UC', types: ['MAIN', 'UPGRADE'] },
     { id: 'KS-108-R', types: ['MAIN'] },
     { id: 'KS-120-R', types: ['MAIN'] },
+    { id: 'KS-110-R', types: ['MAIN', 'UPGRADE'] },
     { id: 'KS-133-S', types: ['MAIN'] },
     { id: 'KS-135-S', types: ['MAIN'] },
     { id: 'KS-136-S', types: ['MAIN', 'UPGRADE'] },
@@ -631,5 +632,139 @@ describe('Non-common registry completeness', () => {
       const handler = getEffectHandler(id, type as 'MAIN' | 'UPGRADE' | 'AMBUSH');
       expect(handler, `Missing handler for ${id} ${type}`).toBeDefined();
     }
+  });
+});
+
+// ===================================================================
+// 110/130 - INO YAMANAKA (R): Move weakest enemy + UPGRADE hide
+// ===================================================================
+describe('110/130 - Ino Yamanaka (R)', () => {
+  it('MAIN should fizzle when fewer than 2 enemy characters in mission', () => {
+    const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
+      id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
+    });
+    const enemy = mockCharInPlay(
+      { instanceId: 'enemy-1', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'GAARA', power: 3 },
+    );
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [ino], [enemy]),
+        makeMission('C'),
+      ],
+    });
+
+    const handler = getEffectHandler('KS-110-R', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', ino, 0));
+    expect(result.requiresTargetSelection).toBeFalsy();
+    // Should have logged a no-target message
+    expect(result.state.log.some((l: { details?: string }) =>
+      l.details?.includes('Fewer than 2')
+    )).toBe(true);
+  });
+
+  it('MAIN should identify weakest enemy and return target selection', () => {
+    const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
+      id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
+    });
+    const enemy1 = mockCharInPlay(
+      { instanceId: 'enemy-weak', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'WEAK GUY', power: 1 },
+    );
+    const enemy2 = mockCharInPlay(
+      { instanceId: 'enemy-strong', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'STRONG GUY', power: 5 },
+    );
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [ino], [enemy1, enemy2]),
+        makeMission('C'),
+      ],
+    });
+
+    const handler = getEffectHandler('KS-110-R', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', ino, 0));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('INO110_CHOOSE_ENEMY');
+    // Only the weakest should be a valid target
+    expect(result.validTargets).toEqual(['enemy-weak']);
+  });
+
+  it('MAIN should offer multiple targets when tied for weakest', () => {
+    const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
+      id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
+    });
+    const enemy1 = mockCharInPlay(
+      { instanceId: 'enemy-a', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'GUY A', power: 2 },
+    );
+    const enemy2 = mockCharInPlay(
+      { instanceId: 'enemy-b', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'GUY B', power: 2 },
+    );
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [ino], [enemy1, enemy2]),
+        makeMission('C'),
+      ],
+    });
+
+    const handler = getEffectHandler('KS-110-R', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', ino, 0));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.validTargets).toHaveLength(2);
+    expect(result.validTargets).toContain('enemy-a');
+    expect(result.validTargets).toContain('enemy-b');
+  });
+
+  it('MAIN should fizzle when only one mission in play', () => {
+    const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
+      id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
+    });
+    const enemy1 = mockCharInPlay(
+      { instanceId: 'enemy-1', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'GUY A', power: 2 },
+    );
+    const enemy2 = mockCharInPlay(
+      { instanceId: 'enemy-2', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'GUY B', power: 3 },
+    );
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [ino], [enemy1, enemy2]),
+      ],
+    });
+
+    const handler = getEffectHandler('KS-110-R', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', ino, 0));
+    expect(result.requiresTargetSelection).toBeFalsy();
+    expect(result.state.log.some((l: { details?: string }) =>
+      l.details?.includes('Only one mission')
+    )).toBe(true);
+  });
+
+  it('UPGRADE flag should be passed through for hide effect', () => {
+    const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
+      id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
+    });
+    const enemy1 = mockCharInPlay(
+      { instanceId: 'enemy-weak', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'WEAK GUY', power: 1 },
+    );
+    const enemy2 = mockCharInPlay(
+      { instanceId: 'enemy-strong', controlledBy: 'player2', originalOwner: 'player2' },
+      { name_fr: 'STRONG GUY', power: 5 },
+    );
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [ino], [enemy1, enemy2]),
+        makeMission('C'),
+      ],
+    });
+
+    const handler = getEffectHandler('KS-110-R', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', ino, 0, 'MAIN', true));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.description).toContain('hide');
   });
 });

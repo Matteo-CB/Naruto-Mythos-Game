@@ -102,12 +102,12 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
       ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
     const x = handSize; // Number of cards discarded
 
-    // Find enemy characters with cost <= X
+    // Find enemy characters with cost <= X (hidden = cost 0, valid targets)
     const validTargets: { char: CharacterInPlay; missionIndex: number }[] = [];
     for (let i = 0; i < state.activeMissions.length; i++) {
       for (const char of state.activeMissions[i][enemySide]) {
-        if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        // Hidden characters have cost 0 when targeted by enemy effects
+        const topCard = char.isHidden ? { chakra: 0 } : (char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card);
         if (topCard.chakra <= x) {
           validTargets.push({ char, missionIndex: i });
         }

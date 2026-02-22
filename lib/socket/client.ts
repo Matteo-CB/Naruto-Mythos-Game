@@ -217,9 +217,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ matchmakingStatus: 'waiting' });
       });
 
-      socket.on('matchmaking:found', (data: { code: string }) => {
-        console.log('[Socket] Matchmaking found:', data.code);
-        set({ matchmakingStatus: 'found', roomCode: data.code });
+      socket.on('matchmaking:found', (data: { code: string; playerRole?: 'player1' | 'player2' }) => {
+        console.log('[Socket] Matchmaking found:', data.code, 'role:', data.playerRole);
+        set({
+          matchmakingStatus: 'found',
+          roomCode: data.code,
+          playerRole: data.playerRole || null,
+          opponentJoined: true,
+        });
       });
 
       // --- Social events (delegated to socialStore) ---
@@ -326,6 +331,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   joinMatchmaking: (userId: string, isRanked = true) => {
     const { socket, connected } = get();
     if (socket && connected) {
+      // Reset state before joining matchmaking to avoid stale data from previous sessions
+      set({
+        roomCode: null,
+        playerRole: null,
+        visibleState: null,
+        matchmakingStatus: 'idle',
+        opponentJoined: false,
+        gameStarted: false,
+        gameEnded: false,
+        gameResult: null,
+        playerNames: null,
+        error: null,
+      });
       console.log('[Socket] Emitting matchmaking:join');
       socket.emit('matchmaking:join', { userId, isRanked });
     } else {

@@ -114,6 +114,9 @@ export class EffectEngine {
     let newState = deepClone(state);
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
 
+    // Detect if the character was previously upgraded (stack has 2+ cards)
+    const wasUpgraded = character.stack.length >= 2;
+
     // Resolve MAIN effects
     const hasMainEffect = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
@@ -128,7 +131,7 @@ export class EffectEngine {
             sourceCard: character,
             sourceMissionIndex: missionIndex,
             triggerType: 'MAIN',
-            isUpgrade: false,
+            isUpgrade: wasUpgraded,
           };
           const result = handler(ctx);
 
@@ -139,7 +142,7 @@ export class EffectEngine {
             if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
 
             newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'MAIN', false,
+              newState, player, character, missionIndex, 'MAIN', wasUpgraded,
               result, remainingEffectTypes,
             );
             return newState;
@@ -163,13 +166,13 @@ export class EffectEngine {
             sourceCard: character,
             sourceMissionIndex: missionIndex,
             triggerType: 'AMBUSH',
-            isUpgrade: false,
+            isUpgrade: wasUpgraded,
           };
           const result = handler(ctx);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'AMBUSH', false,
+              newState, player, character, missionIndex, 'AMBUSH', wasUpgraded,
               result, [],
             );
             return newState;
@@ -635,16 +638,100 @@ export class EffectEngine {
         break;
 
       // =============================================
-      // MOVE types (character selection — use moveCharacterToMission)
+      // MOVE types (two-stage: character selection → destination selection)
       // =============================================
       case 'JIRAIYA105_MOVE_ENEMY':
       case 'KANKURO119_MOVE_CHARACTER':
       case 'TEMARI121_MOVE_FRIENDLY':
       case 'TEMARI121_MOVE_ANY':
       case 'ITACHI128_MOVE_FRIENDLY':
-      case 'ITACHI152_CHOOSE_MOVE':
-        newState = EffectEngine.moveCharacterToMission(newState, targetId);
+      case 'ITACHI152_CHOOSE_MOVE': {
+        // Stage 1: player chose which character to move. Now prompt for destination mission.
+        const moveCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (moveCharResult) {
+          const validDestMissions: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i !== moveCharResult.missionIndex) {
+              // Check name uniqueness at destination
+              if (EffectEngine.validateNameUniquenessForMove(newState, moveCharResult.character, i, moveCharResult.player)) {
+                validDestMissions.push(String(i));
+              }
+            }
+          }
+          if (validDestMissions.length === 0) {
+            // No valid destination — can't move
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_BLOCKED',
+              `Cannot move ${moveCharResult.character.card.name_fr} — no valid destination mission.`,
+              'game.log.effect.moveBlocked',
+              { target: moveCharResult.character.card.name_fr },
+            );
+          } else if (validDestMissions.length === 1) {
+            // Only one valid destination — auto-move
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, targetId, parseInt(validDestMissions[0], 10),
+              moveCharResult.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+            );
+          } else {
+            // Multiple valid destinations — prompt for selection
+            const moveEffectId = generateInstanceId();
+            const moveActionId = generateInstanceId();
+            // Map the original type to a destination type
+            const destType = pendingEffect.targetSelectionType + '_DESTINATION';
+            newState.pendingEffects.push({
+              id: moveEffectId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: targetId }),
+              targetSelectionType: destType,
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validDestMissions,
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: pendingEffect.isUpgrade,
+            });
+            newState.pendingActions.push({
+              id: moveActionId,
+              type: 'SELECT_TARGET',
+              player: pendingEffect.sourcePlayer,
+              description: `Choose a mission to move the character to.`,
+              options: validDestMissions,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: moveEffectId,
+            });
+          }
+        }
         break;
+      }
+      // Stage 2 destination handlers for the above move types
+      case 'JIRAIYA105_MOVE_ENEMY_DESTINATION':
+      case 'KANKURO119_MOVE_CHARACTER_DESTINATION':
+      case 'TEMARI121_MOVE_FRIENDLY_DESTINATION':
+      case 'TEMARI121_MOVE_ANY_DESTINATION':
+      case 'ITACHI128_MOVE_FRIENDLY_DESTINATION':
+      case 'ITACHI152_CHOOSE_MOVE_DESTINATION': {
+        const destMissionIdx = parseInt(targetId, 10);
+        if (!isNaN(destMissionIdx)) {
+          let moveCharId = '';
+          try { moveCharId = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          if (moveCharId) {
+            const moveCharRes = EffectEngine.findCharByInstanceId(newState, moveCharId);
+            if (moveCharRes) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, moveCharId, destMissionIdx,
+                moveCharRes.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+              );
+            }
+          }
+        }
+        break;
+      }
 
       // --- MOVE types (destination selection — use moveSelfToMission) ---
       case 'KURENAI116B_MOVE_SELF':
@@ -851,14 +938,32 @@ export class EffectEngine {
       case 'INO110_CHOOSE_ENEMY': {
         // Stage 1: player chose which weakest enemy to move. Now prompt for destination.
         const ino110Char = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (ino110Char) {
+        if (!ino110Char) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET',
+            'Ino Yamanaka (110): Target character no longer in play.',
+            'game.log.effect.noTarget',
+            { card: 'INO YAMANAKA', id: 'KS-110-R' },
+          );
+          break;
+        }
+        {
           const validDests: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
             if (i !== ino110Char.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, ino110Char.character, i, ino110Char.player)) {
               validDests.push(String(i));
             }
           }
-          if (validDests.length === 1) {
+          if (validDests.length === 0) {
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_NO_TARGET',
+              `Ino Yamanaka (110): No valid destination mission to move ${ino110Char.character.card.name_fr}.`,
+              'game.log.effect.noTarget',
+              { card: 'INO YAMANAKA', id: 'KS-110-R' },
+            );
+          } else if (validDests.length === 1) {
             newState = EffectEngine.moveCharToMissionDirectPublic(
               newState, targetId, parseInt(validDests[0], 10),
               ino110Char.player, 'Ino Yamanaka', 'KS-110-R',
@@ -867,7 +972,7 @@ export class EffectEngine {
             if (pendingEffect.isUpgrade) {
               newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
             }
-          } else if (validDests.length > 1) {
+          } else {
             const ino110EffId = generateInstanceId();
             const ino110ActId = generateInstanceId();
             newState.pendingEffects.push({
@@ -1734,20 +1839,121 @@ export class EffectEngine {
 
       // =============================================
       // KAKASHI_COPY_EFFECT / SAKON062_COPY_EFFECT: copy another character's effect
-      // Simplified: these are complex effects that require deep integration.
+      // Finds the target's first copyable instant effect, looks up its handler,
+      // and executes it with the copier (Kakashi/Sakon) as the source context.
       // =============================================
       case 'KAKASHI_COPY_EFFECT':
-      case 'SAKON062_COPY_EFFECT':
-        // These effects require reading another card's effects and re-executing them.
-        // Log that the effect was triggered but complex copy could not be resolved.
+      case 'SAKON062_COPY_EFFECT': {
+        // Find the target character whose effect we're copying
+        const copyTargetResult = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!copyTargetResult) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            `Effect copy: target character no longer in play.`,
+            'game.log.effect.copyFailed',
+            { card: pendingEffect.sourceCardId },
+          );
+          break;
+        }
+
+        const copyTargetChar = copyTargetResult.character;
+        const copyTargetTopCard = copyTargetChar.stack.length > 0
+          ? copyTargetChar.stack[copyTargetChar.stack.length - 1]
+          : copyTargetChar.card;
+
+        // Find copyable instant effects on the target (non-UPGRADE, non-SCORE, non-continuous)
+        const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
+          if (eff.type === 'UPGRADE' || eff.type === 'SCORE') return false;
+          if (eff.description.includes('[⧗]')) return false;
+          // Skip "effect:" modifier lines
+          if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+          return true;
+        });
+
+        if (copyableEffects.length === 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            `Effect copy: ${copyTargetTopCard.name_fr} has no copyable instant effect.`,
+            'game.log.effect.copyFailed',
+            { card: pendingEffect.sourceCardId },
+          );
+          break;
+        }
+
+        // Use the first copyable effect (MAIN takes priority, then AMBUSH)
+        const effectToCopy = copyableEffects[0];
+        const copiedEffectType = effectToCopy.type as EffectType;
+
+        // Look up the registered handler for the target card's effect
+        const copiedHandler = getEffectHandler(copyTargetTopCard.id, copiedEffectType);
+        if (!copiedHandler) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            `Effect copy: no handler for ${copyTargetTopCard.name_fr} (${copiedEffectType}).`,
+            'game.log.effect.copyFailed',
+            { card: pendingEffect.sourceCardId },
+          );
+          break;
+        }
+
+        // Find the copier character (Kakashi/Sakon) in current state
+        const copierResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!copierResult) {
+          // Copier was removed from play
+          break;
+        }
+
+        const copierTopCard = copierResult.character.stack.length > 0
+          ? copierResult.character.stack[copierResult.character.stack.length - 1]
+          : copierResult.character.card;
+
+        // Log the copy
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT',
-          `Effect copy triggered but auto-resolved (target: ${targetId}).`,
-          'game.log.effect.copy',
-          { card: pendingEffect.sourceCardId },
+          `${copierTopCard.name_fr} copies ${copyTargetTopCard.name_fr}'s ${copiedEffectType} effect!`,
+          'game.log.effect.copySuccess',
+          { card: copierTopCard.name_fr, target: copyTargetTopCard.name_fr, effectType: copiedEffectType },
         );
+
+        // Execute the copied handler with the copier as source
+        const copyCtx: EffectContext = {
+          state: newState,
+          sourcePlayer: pendingEffect.sourcePlayer,
+          sourceCard: copierResult.character,
+          sourceMissionIndex: copierResult.missionIndex,
+          triggerType: copiedEffectType,
+          isUpgrade: false, // Copy never counts as upgrade
+        };
+
+        try {
+          const copyResult = copiedHandler(copyCtx);
+
+          if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
+            // The copied effect needs target selection — create a new pending effect
+            // Use copyResult.state as base (handler may have modified state)
+            newState = EffectEngine.createPendingTargetSelection(
+              copyResult.state,
+              pendingEffect.sourcePlayer,
+              copierResult.character,
+              copierResult.missionIndex,
+              copiedEffectType,
+              false,
+              copyResult,
+              [],
+            );
+          } else {
+            // The copied effect resolved immediately (or fizzled with no targets)
+            newState = copyResult.state;
+          }
+        } catch (err) {
+          console.error(`[EffectEngine] Error executing copied effect from ${copyTargetTopCard.id}:`, err);
+        }
         break;
+      }
 
       default:
         // Unknown target selection type — log warning

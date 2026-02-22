@@ -108,10 +108,11 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
           // Akamaru 027: If no Kiba in this mission, return to hand
           if (topCard.number === 27 && effect.description.includes('Kiba Inuzuka')) {
             const hasKiba = chars.some(
-              (c) =>
-                c.instanceId !== char.instanceId &&
-                !c.isHidden &&
-                c.card.name_fr.toUpperCase().includes('KIBA'),
+              (c) => {
+                if (c.instanceId === char.instanceId || c.isHidden) return false;
+                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr.toUpperCase().includes('KIBA');
+              },
             );
             if (!hasKiba) {
               charsToReturn.push({

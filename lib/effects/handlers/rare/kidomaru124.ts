@@ -31,13 +31,13 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find non-hidden enemies in OTHER missions with effective power <= powerLimit
+  // Find enemies in OTHER missions with effective power <= powerLimit (hidden = power 0, valid)
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue; // Skip this mission
     const mission = state.activeMissions[i];
     for (const char of mission[enemySide]) {
-      if (!char.isHidden && getEffectivePower(char) <= powerLimit) {
+      if (getEffectivePower(char) <= powerLimit) {
         validTargets.push(char.instanceId);
       }
     }

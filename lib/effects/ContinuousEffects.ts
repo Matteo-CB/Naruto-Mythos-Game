@@ -41,7 +41,11 @@ export function calculateContinuousChakraBonus(
     // Kiba 025: If Akamaru is in the same mission, CHAKRA +1
     if (topCard.id === 'KS-025-C' || topCard.number === 25) {
       const hasAkamaru = friendlyChars.some(
-        (c) => !c.isHidden && c.card.name_fr.toUpperCase() === 'AKAMARU',
+        (c) => {
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase() === 'AKAMARU';
+        },
       );
       if (hasAkamaru) bonus += 1;
     }
@@ -49,10 +53,11 @@ export function calculateContinuousChakraBonus(
     // Anko 044: If another friendly Leaf Village in this mission, CHAKRA +1
     if (topCard.id === 'KS-044-C' || topCard.number === 44) {
       const hasOtherLeaf = friendlyChars.some(
-        (c) =>
-          c.instanceId !== char.instanceId &&
-          !c.isHidden &&
-          c.card.group === 'Leaf Village',
+        (c) => {
+          if (c.instanceId === char.instanceId || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.group === 'Leaf Village';
+        },
       );
       if (hasOtherLeaf) bonus += 1;
     }
@@ -127,7 +132,10 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     const hasKeyword = chars.some(
-      (c) => (c.card.keywords ?? []).includes(keyword) && c.controlledBy === player,
+      (c) => {
+        const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return (top.keywords ?? []).includes(keyword) && c.controlledBy === player;
+      },
     );
     if (hasKeyword) count++;
   }
@@ -191,14 +199,16 @@ export function calculateContinuousPowerModifier(
 
       // Kakashi 015: Other Team 7 characters +1 Power
       if (topCard.number === 15 && effect.description.includes('Other Team 7')) {
-        if ((char.card.keywords ?? []).includes('Team 7')) {
+        const charTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if ((charTop.keywords ?? []).includes('Team 7')) {
           modifier += 1;
         }
       }
 
       // Gai 042: Other Team Guy characters +1 Power
       if (topCard.number === 42 && effect.description.includes('Other Team Guy')) {
-        if ((char.card.keywords ?? []).includes('Team Guy')) {
+        const charTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if ((charTop.keywords ?? []).includes('Team Guy')) {
           modifier += 1;
         }
       }
@@ -277,7 +287,11 @@ export function calculateContinuousPowerModifier(
     // Yashamaru 084: +2 Power if friendly Gaara in this mission
     if (selfTopCard.number === 84 && effect.description.includes('Gaara')) {
       const hasGaara = friendlyChars.some(
-        (c) => c.instanceId !== char.instanceId && !c.isHidden && c.card.name_fr.toUpperCase() === 'GAARA',
+        (c) => {
+          if (c.instanceId === char.instanceId || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase() === 'GAARA';
+        },
       );
       if (hasGaara) modifier += 2;
     }
@@ -285,10 +299,11 @@ export function calculateContinuousPowerModifier(
     // Ton Ton 101: +1 Power if Tsunade or Shizune in this mission
     if (selfTopCard.number === 101 && (effect.description.includes('Tsunade') || effect.description.includes('Shizune'))) {
       const hasTsunadeOrShizune = friendlyChars.some(
-        (c) =>
-          c.instanceId !== char.instanceId &&
-          !c.isHidden &&
-          (c.card.name_fr.toUpperCase() === 'TSUNADE' || c.card.name_fr.toUpperCase() === 'SHIZUNE'),
+        (c) => {
+          if (c.instanceId === char.instanceId || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase() === 'TSUNADE' || cTop.name_fr.toUpperCase() === 'SHIZUNE';
+        },
       );
       if (hasTsunadeOrShizune) modifier += 1;
     }

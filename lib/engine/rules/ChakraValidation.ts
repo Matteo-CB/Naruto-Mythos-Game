@@ -52,7 +52,11 @@ export function calculateEffectiveCost(
     // Gamakichi 096: Pay 1 less if Naruto in this mission
     if (card.number === 96 && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
       const hasNaruto = friendlyChars.some(
-        (c) => !c.isHidden && c.card.name_fr.toUpperCase().includes('NARUTO UZUMAKI'),
+        (c) => {
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase().includes('NARUTO UZUMAKI');
+        },
       );
       if (hasNaruto) {
         cost = Math.max(0, cost - 1);
@@ -72,7 +76,11 @@ export function calculateEffectiveCost(
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
         const hasSasuke = friendlyChars.some(
-          (c) => !c.isHidden && c.card.name_fr.toUpperCase().includes('SASUKE'),
+          (c) => {
+            if (c.isHidden) return false;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return cTop.name_fr.toUpperCase().includes('SASUKE');
+          },
         );
         if (hasSasuke) {
           cost = Math.max(0, cost - 3);
