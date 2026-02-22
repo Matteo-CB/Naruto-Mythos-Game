@@ -77,71 +77,92 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE: Move this character to another mission.
-  let state = { ...ctx.state };
-  const missions = [...state.activeMissions];
+  // UPGRADE: Move this character to another mission (respecting name uniqueness).
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find a different mission to move to (pick first available that is not current)
-  let targetMissionIndex = -1;
-  for (let i = 0; i < missions.length; i++) {
-    if (i !== ctx.sourceMissionIndex) {
-      targetMissionIndex = i;
-      break;
+  const topCard = sourceCard.stack.length > 0
+    ? sourceCard.stack[sourceCard.stack.length - 1]
+    : sourceCard.card;
+  const charName = topCard.name_fr;
+
+  // Find valid destination missions (not current, no same-name conflict)
+  const validMissions: string[] = [];
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    if (i === sourceMissionIndex) continue;
+    const mission = state.activeMissions[i];
+    const friendlyChars = mission[friendlySide];
+    const hasSameName = friendlyChars.some((c) => {
+      if (c.instanceId === sourceCard.instanceId) return false;
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return tc.name_fr === charName;
+    });
+    if (!hasSameName) {
+      validMissions.push(String(i));
     }
   }
 
-  if (targetMissionIndex === -1) {
-    // Only one mission exists, cannot move
+  if (validMissions.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Kakashi Hatake (137): No other mission to move to (upgrade).',
+      'Kakashi Hatake (137): No valid mission to move to (upgrade).',
       'game.log.effect.noTarget',
       { card: 'KAKASHI HATAKE', id: 'KS-137-S' },
     );
     return { state: { ...state, log } };
   }
 
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-  // Remove from current mission
-  const sourceMission = { ...missions[ctx.sourceMissionIndex] };
-  const sourceChars = [...sourceMission[friendlySide]];
-  const charIndex = sourceChars.findIndex((c) => c.instanceId === ctx.sourceCard.instanceId);
-
-  if (charIndex === -1) {
-    return { state };
+  // Auto-move if only one valid destination
+  if (validMissions.length === 1) {
+    const destIdx = parseInt(validMissions[0], 10);
+    const newState = moveKakashi137(state, sourceCard, sourceMissionIndex, destIdx, sourcePlayer, friendlySide);
+    return { state: newState };
   }
 
-  const movedChar = {
-    ...sourceChars[charIndex],
-    missionIndex: targetMissionIndex,
+  // Multiple destinations: require target selection
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KAKASHI137_MOVE_SELF',
+    validTargets: validMissions,
+    description: 'Kakashi Hatake (137) UPGRADE: Select a mission to move this character to.',
   };
-  sourceChars.splice(charIndex, 1);
-  sourceMission[friendlySide] = sourceChars;
-  missions[ctx.sourceMissionIndex] = sourceMission;
+}
 
-  // Add to target mission
-  const targetMission = { ...missions[targetMissionIndex] };
-  targetMission[friendlySide] = [...targetMission[friendlySide], movedChar];
-  missions[targetMissionIndex] = targetMission;
+function moveKakashi137(
+  state: EffectContext['state'],
+  sourceCard: EffectContext['sourceCard'],
+  fromMissionIdx: number,
+  toMissionIdx: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
+  friendlySide: 'player1Characters' | 'player2Characters',
+): EffectContext['state'] {
+  const missions = [...state.activeMissions];
+  const fromMission = { ...missions[fromMissionIdx] };
+  const toMission = { ...missions[toMissionIdx] };
+
+  const fromChars = [...fromMission[friendlySide]];
+  const charIdx = fromChars.findIndex((c) => c.instanceId === sourceCard.instanceId);
+  if (charIdx === -1) return state;
+
+  const movedChar = { ...fromChars[charIdx], missionIndex: toMissionIdx };
+  fromChars.splice(charIdx, 1);
+  fromMission[friendlySide] = fromChars;
+  toMission[friendlySide] = [...toMission[friendlySide], movedChar];
+  missions[fromMissionIdx] = fromMission;
+  missions[toMissionIdx] = toMission;
 
   const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
+    state.log, state.turn, state.phase, sourcePlayer,
     'EFFECT_MOVE',
-    `Kakashi Hatake (137): Moved self from mission ${ctx.sourceMissionIndex} to mission ${targetMissionIndex} (upgrade).`,
+    `Kakashi Hatake (137): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (upgrade).`,
     'game.log.effect.moveSelf',
-    { card: 'KAKASHI HATAKE', id: 'KS-137-S', mission: `mission ${targetMissionIndex}` },
+    { card: 'KAKASHI HATAKE', id: 'KS-137-S', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
   );
 
-  return { state: { ...state, activeMissions: missions, log } };
+  return { ...state, activeMissions: missions, log };
 }
 
 export function registerKakashi137Handlers(): void {

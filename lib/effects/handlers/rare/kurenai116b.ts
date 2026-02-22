@@ -81,10 +81,22 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find other missions to move to
+  const topCard = sourceCard.stack.length > 0
+    ? sourceCard.stack[sourceCard.stack.length - 1]
+    : sourceCard.card;
+  const charName = topCard.name_fr;
+
+  // Find other missions to move to (no same-name conflict at destination)
   const validMissions: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
-    if (i !== sourceMissionIndex) {
+    if (i === sourceMissionIndex) continue;
+    const mission = state.activeMissions[i];
+    const friendlyChars = mission[friendlySide];
+    const hasSameName = friendlyChars.some((c) => {
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return tc.name_fr === charName;
+    });
+    if (!hasSameName) {
       validMissions.push(String(i));
     }
   }

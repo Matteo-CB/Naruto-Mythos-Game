@@ -24,7 +24,7 @@ import { generateGameId } from './utils/id';
 import { logSystem } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
-import { executeMissionPhase } from './phases/MissionPhase';
+import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
 import { executeEndPhase } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
@@ -153,8 +153,15 @@ export class GameEngine {
         // Handle target selections for SCORE effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
-          // Auto-advance to end phase when all SCORE effects are resolved
+          // After resolving the pending action, resume scoring remaining missions/effects
           if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
+            if (newState.missionScoringProgress) {
+              // Resume scoring from where we left off
+              newState = resumeMissionScoring(newState);
+              // If resumption created new pending actions, wait for resolution
+              if (newState.pendingActions.length > 0) break;
+            }
+            // All SCORE effects resolved — advance to end phase
             newState = GameEngine.transitionToEndPhase(newState);
           }
         }
@@ -253,6 +260,7 @@ export class GameEngine {
   static transitionToEndPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'end';
+    newState.missionScoringProgress = undefined;
 
     // Execute end phase logic
     newState = executeEndPhase(newState);

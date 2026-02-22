@@ -89,6 +89,32 @@ let _characters: CharacterCard[] | null = null;
 let _missions: MissionCard[] | null = null;
 let _playableCharacters: CharacterCard[] | null = null;
 let _playableMissions: MissionCard[] | null = null;
+let _oldIdToNewId: Map<string, string> | null = null;
+
+/**
+ * Returns a map from old card IDs (e.g. "001/130", "MSS 01") to new IDs (e.g. "KS-001-C").
+ * Used to resolve saved decks that reference legacy IDs.
+ */
+export function getOldIdMap(): Map<string, string> {
+  if (!_oldIdToNewId) {
+    _oldIdToNewId = new Map();
+    for (const raw of rawCardList) {
+      if (raw.old_id) {
+        _oldIdToNewId.set(raw.old_id, raw.id);
+      }
+    }
+  }
+  return _oldIdToNewId;
+}
+
+/**
+ * Resolve a card ID that may be in old or new format.
+ * Returns the new-format ID, or the original if no mapping found.
+ */
+export function resolveCardId(id: string): string {
+  const oldMap = getOldIdMap();
+  return oldMap.get(id) ?? id;
+}
 
 export function getAllCards(): CardData[] {
   if (!_allCards) {

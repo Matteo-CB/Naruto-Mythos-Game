@@ -158,25 +158,37 @@ export default function PlayOnlinePage() {
   }
 
   const handleCreateRoom = async () => {
-    if (!connected) {
-      await connect(session.user.id);
+    try {
+      if (!connected) {
+        await connect(session.user.id);
+      }
+      createRoom(session.user.id, true, isRanked);
+    } catch {
+      // Error is already set in the socket store by connect()
     }
-    createRoom(session.user.id, true, isRanked);
   };
 
   const handleJoinRoom = async () => {
     if (!joinCode.trim()) return;
-    if (!connected) {
-      await connect(session.user.id);
+    try {
+      if (!connected) {
+        await connect(session.user.id);
+      }
+      joinRoom(joinCode.trim().toUpperCase(), session.user.id);
+    } catch {
+      // Error is already set in the socket store by connect()
     }
-    joinRoom(joinCode.trim().toUpperCase(), session.user.id);
   };
 
   const handleMatchmaking = async () => {
-    if (!connected) {
-      await connect(session.user.id);
+    try {
+      if (!connected) {
+        await connect(session.user.id);
+      }
+      joinMatchmaking(session.user.id, isRanked);
+    } catch {
+      // Error is already set in the socket store by connect()
     }
-    joinMatchmaking(session.user.id, isRanked);
   };
 
   const handleDeckSelect = (deck: ResolvedDeck) => {

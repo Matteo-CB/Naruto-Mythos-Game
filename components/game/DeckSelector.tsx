@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { resolveCardId } from '@/lib/data/cardLoader';
 
 interface SavedDeck {
   id: string;
@@ -65,14 +66,20 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
 
     const characters: CharacterCard[] = [];
     for (const id of deck.cardIds) {
-      const card = charMap.get(id);
+      const resolved = resolveCardId(id);
+      const card = charMap.get(resolved);
       if (card) characters.push(card);
     }
 
     const missions: MissionCard[] = [];
     for (const id of deck.missionIds) {
-      const card = missionMap.get(id);
+      const resolved = resolveCardId(id);
+      const card = missionMap.get(resolved);
       if (card) missions.push(card);
+    }
+
+    if (characters.length === 0) {
+      console.warn('[DeckSelector] Deck resolved to 0 characters — IDs may be outdated:', deck.cardIds.slice(0, 5));
     }
 
     onSelect({ characters, missions });

@@ -54,13 +54,21 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Pin card on click (for own cards and opponent visible cards)
+    if (!isMyTurn) {
+      // When not your turn, just pin for preview (if data available)
+      if (!isHiddenEnemy && character.card) {
+        pinCard(character.card);
+      }
+      return;
+    }
+    if (isRevealable) {
+      // Don't pin when selecting for reveal — keep the ActionBar visible
+      selectTarget(character.instanceId);
+      return;
+    }
+    // For non-revealable own cards or opponent visible cards, pin for preview
     if (!isHiddenEnemy && character.card) {
       pinCard(character.card);
-    }
-    if (!isMyTurn) return;
-    if (isRevealable) {
-      selectTarget(character.instanceId);
     }
   };
 

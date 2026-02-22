@@ -183,15 +183,31 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: Ta
     ...mission.player2Characters,
   ];
 
+  // Check if the valid targets are mission indices (e.g. '0', '1', '2') vs character instance IDs
+  const isMissionTarget = validTargets.includes(String(missionIndex));
+
   // Check if any character in this mission is a valid target
-  const hasValidTargets = allChars.some(c => validTargets.includes(c.instanceId));
+  const hasValidCharTargets = allChars.some(c => validTargets.includes(c.instanceId));
+  const hasValidTargets = isMissionTarget || hasValidCharTargets;
+
+  const handleMissionClick = () => {
+    if (isMissionTarget) {
+      onSelect(String(missionIndex));
+    }
+  };
 
   return (
     <div
       className="flex flex-col items-center gap-2 px-2"
+      onClick={isMissionTarget ? handleMissionClick : undefined}
       style={{
         opacity: hasValidTargets ? 1 : 0.4,
         minWidth: '120px',
+        cursor: isMissionTarget ? 'pointer' : 'default',
+        borderRadius: '8px',
+        border: isMissionTarget ? '2px solid #c4a35a' : '2px solid transparent',
+        boxShadow: isMissionTarget ? '0 0 14px rgba(196, 163, 90, 0.4)' : 'none',
+        padding: '8px',
       }}
     >
       {/* Mission rank label */}

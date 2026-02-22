@@ -14,8 +14,14 @@ const getAllowedOrigin = () => {
   if (dev) {
     return 'http://localhost:3000';
   }
-  // In production, use NEXTAUTH_URL or default to the VPS URL
-  return process.env.NEXTAUTH_URL || process.env.SERVER_DOMAIN || '*';
+  // In production, prefer SERVER_DOMAIN (the actual deployed URL)
+  // NEXTAUTH_URL may be set to localhost in .env and shouldn't be used for CORS
+  if (process.env.SERVER_DOMAIN) {
+    const domain = process.env.SERVER_DOMAIN;
+    return domain.startsWith('http') ? domain : `https://${domain}`;
+  }
+  // Fallback: allow all origins (safe since we're behind VPS's proxy)
+  return '*';
 };
 
 const app = next({ dev, hostname, port });

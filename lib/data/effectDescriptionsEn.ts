@@ -259,7 +259,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 099/130 - PAKKUN (C) - "Kakashi\'s Ninja Dog"
   'KS-099-C': [
-    '[↯] Move this character.',
+    '[↯] Move this character to another mission.',
   ],
 
   // 100/130 - NINJA HOUNDS (C) - "Kakashi\'s Ninja Dogs"
@@ -302,7 +302,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 010/130 - NARUTO UZUMAKI (UC) - "Sexy Jutsu"
   'KS-010-C': [
-    'Move this character.',
+    'Move this character to another mission.',
   ],
 
   // 012/130 - SAKURA HARUNO (UC) - "Inner Sakura"
@@ -325,8 +325,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Expansion Jutsu"
   'KS-018-UC': [
-    '[⧗] When this character moves, hide it.',
-    'Move this character.',
+    '[⧗] When this character moves to another mission, hide an enemy character with less Power there.',
+    'Move this character to another mission.',
   ],
 
   // 020/130 - INO YAMANAKA (UC) - "Mind Transfer Jutsu"
@@ -371,7 +371,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 033/130 - SHINO ABURAME (UC) - "Parasitic Insects"
   'KS-033-UC': [
     'All characters played by the opponent cost 1 more this turn.',
-    'Move this character.',
+    'Move this character to another mission.',
   ],
 
   // 035/130 - KURENAI YUHI (UC) - "Demonic Illusion"
@@ -505,8 +505,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 080/130 - TEMARI (UC) - "Wind Scythe Jutsu"
   'KS-080-UC': [
-    'Move a friendly Sand Village character in play.',
-    'Move this character.',
+    'Move a friendly Sand Village character to another mission.',
+    'Move this character to another mission.',
   ],
 
   // 082/130 - BAKI (UC) - "Blade of Wind"
@@ -661,7 +661,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 116b/130 - KURENAI YUHI (R) - "Flower Petal Escape"
   'KS-116b-R': [
     'Defeat an enemy character with Power 4 or less in this mission.',
-    'Move this character.',
+    'Move this character to another mission.',
   ],
 
   // 117/130 - ROCK LEE (R) - "Loopy Fist"
@@ -805,7 +805,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 137/130 - KAKASHI HATAKE (S) - "Lightning Blade"
   'KS-137-S': [
-    'Move this character.',
+    'Move this character to another mission.',
     'Hide an upgraded character in this mission.',
   ],
 

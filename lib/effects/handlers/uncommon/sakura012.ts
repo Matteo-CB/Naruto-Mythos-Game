@@ -56,8 +56,8 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
     return { state: newState };
   }
 
-  // Build valid targets: indices of cards in hand
-  const validTargets = ps.hand.map((_, idx) => `hand_${idx}`);
+  // Build valid targets: indices of cards in hand (plain numbers for parseInt compatibility)
+  const validTargets = ps.hand.map((_, idx) => String(idx));
 
   if (validTargets.length === 1) {
     // Only one card in hand, auto-discard

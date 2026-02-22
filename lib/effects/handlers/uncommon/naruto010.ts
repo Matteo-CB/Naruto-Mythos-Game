@@ -39,7 +39,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
     });
 
     if (!hasSameName) {
-      validTargets.push(`mission_${mIdx}`);
+      validTargets.push(String(mIdx));
     }
   }
 
@@ -52,7 +52,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
 
   // If exactly one valid destination, auto-move
   if (validTargets.length === 1) {
-    const destMissionIdx = parseInt(validTargets[0].replace('mission_', ''), 10);
+    const destMissionIdx = parseInt(validTargets[0], 10);
     const newState = moveCharacterToMission(state, sourceCard.instanceId, sourceMissionIndex, destMissionIdx, sourcePlayer);
     return { state: newState };
   }

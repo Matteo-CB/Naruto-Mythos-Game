@@ -433,9 +433,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Online mode: send action to server via socket, don't apply locally
     if (isOnlineGame) {
       const socketState = useSocketStore.getState();
-      if (socketState.socket) {
+      if (socketState.socket && socketState.connected) {
         set({ isProcessing: true });
         socketState.performAction(action);
+
+        // Safety timeout: if server doesn't respond in 10s, unblock the UI
+        setTimeout(() => {
+          if (get().isProcessing && get().isOnlineGame) {
+            console.warn('[gameStore] Online action timeout — unblocking UI');
+            set({ isProcessing: false });
+          }
+        }, 10000);
+      } else {
+        console.error('[gameStore] Cannot perform online action: socket not connected');
       }
       return;
     }
@@ -680,6 +690,97 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
+
+    // Check if there are pending target selections for the human player
+    // (e.g. SCORE effects from mission phase that need human input)
+    const humanPendingAfterAI = currentState.pendingActions.filter((p) => p.player === humanPlayer);
+    if (humanPendingAfterAI.length > 0) {
+      const pendingAction = humanPendingAfterAI[0];
+      const pendingEffect = currentState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
+
+      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
+        pendingAction.type === 'DISCARD_CARD' ||
+        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      let handCards: PendingTargetSelection['handCards'];
+      if (isHandSelection) {
+        const tst = pendingEffect?.targetSelectionType ?? '';
+        if (tst === 'SAKURA109_CHOOSE_DISCARD') {
+          const playerDiscard = currentState[humanPlayer].discardPile;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerDiscard[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'SAKURA135_CHOOSE_CARD') {
+          let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
+          try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
+          const playerDiscard = currentState[humanPlayer].discardPile;
+          const numDrawn = topCardsInfo.length || 3;
+          const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
+            const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+              } : info ? {
+                name_fr: info.name, chakra: info.chakra, power: info.power,
+              } : { name_fr: '???' },
+            };
+          });
+        } else {
+          const playerHand = currentState[humanPlayer].hand;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerHand[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        }
+      }
+
+      set({
+        gameState: currentState,
+        visibleState: visible,
+        isProcessing: false,
+        pendingTargetSelection: {
+          validTargets: pendingAction.options,
+          description: pendingAction.description,
+          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          handCards,
+          playerName: get().playerDisplayNames[humanPlayer],
+          onSelect: (targetId: string) => {
+            get().performAction({
+              type: 'SELECT_TARGET',
+              pendingActionId: pendingAction.id,
+              selectedTargets: [targetId],
+            });
+          },
+          onDecline: pendingEffect?.isOptional ? () => {
+            if (pendingEffect) {
+              get().performAction({
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pendingEffect.id,
+              });
+            }
+          } : undefined,
+        },
+      });
+      return;
+    }
+
     set({
       gameState: currentState,
       visibleState: visible,

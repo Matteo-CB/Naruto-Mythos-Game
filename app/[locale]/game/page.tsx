@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -34,19 +34,33 @@ export default function GamePage() {
   const socketGameStarted = useSocketStore((s) => s.gameStarted);
   const socketGameEnded = useSocketStore((s) => s.gameEnded);
   const socketGameResult = useSocketStore((s) => s.gameResult);
+  const socketConnected = useSocketStore((s) => s.connected);
+  const socketError = useSocketStore((s) => s.error);
 
   // For AI games, gameState must exist; for online games, visibleState must exist
   const hasActiveGame = gameState || (isOnlineGame && visibleState);
 
+  // Delay redirect to give Zustand time to propagate state from startOnlineGame
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hasActiveGame) {
-      router.push('/');
+      // Give a brief delay before redirecting — state may be propagating
+      redirectTimerRef.current = setTimeout(() => {
+        if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState) {
+          router.push('/');
+        }
+      }, 500);
     }
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
   }, [hasActiveGame, router]);
 
   // Sync socket state updates to gameStore for online games
   useEffect(() => {
     if (isOnlineGame && socketGameStarted && socketVisibleState) {
+      console.log('[GamePage] Syncing socket state to gameStore, phase:', socketVisibleState.phase,
+        'hand:', socketVisibleState.myState?.hand?.length ?? 0);
       updateOnlineState(socketVisibleState);
     }
   }, [isOnlineGame, socketGameStarted, socketVisibleState, updateOnlineState]);
@@ -58,6 +72,9 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
+  // Show connection lost banner for online games
+  const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
+
   if (!hasActiveGame) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
@@ -66,5 +83,20 @@ export default function GamePage() {
     );
   }
 
-  return <GameBoard />;
+  return (
+    <>
+      <GameBoard />
+      {showConnectionLost && (
+        <div
+          className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium"
+          style={{
+            backgroundColor: 'rgba(179, 62, 62, 0.9)',
+            color: '#e0e0e0',
+          }}
+        >
+          {socketError || 'Connection lost. Reconnecting...'}
+        </div>
+      )}
+    </>
+  );
 }
