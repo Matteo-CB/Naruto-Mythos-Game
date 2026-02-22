@@ -12,19 +12,7 @@ import CardBack from './CardBack';
 // Utility
 // ---------------------
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-
-const RARITY_LABELS: Record<Rarity, string> = {
-  C: 'Common',
-  UC: 'Uncommon',
-  R: 'Rare',
-  RA: 'Rare Art',
-  S: 'Secret',
-  SV: 'Secret V',
-  M: 'Mythos',
-  MV: 'Mythos V',
-  L: 'Legendary',
-  MMS: 'Mission',
-};
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',
@@ -109,7 +97,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               ) : card.has_visual && imageSrc ? (
                 <img
                   src={imageSrc}
-                  alt={card.name_fr}
+                  alt={getCardName(card, locale as 'en' | 'fr')}
                   draggable={false}
                   style={{
                     width: '100%',
@@ -137,7 +125,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                       letterSpacing: '0.08em',
                     }}
                   >
-                    {card.name_fr}
+                    {getCardName(card, locale as 'en' | 'fr')}
                   </span>
                 </div>
               )}
@@ -161,7 +149,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     fontWeight: 600,
                   }}
                 >
-                  {RARITY_LABELS[card.rarity]}
+                  {getRarityLabel(card.rarity, locale as 'en' | 'fr')}
                 </span>
               </div>
             </div>
@@ -178,9 +166,9 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     lineHeight: 1.2,
                   }}
                 >
-                  {card.name_fr}
+                  {getCardName(card, locale as 'en' | 'fr')}
                 </div>
-                {card.title_fr && (
+                {getCardTitle(card, locale as 'en' | 'fr') && (
                   <div
                     style={{
                       color: '#888888',
@@ -189,7 +177,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                       marginTop: '2px',
                     }}
                   >
-                    {card.title_fr}
+                    {getCardTitle(card, locale as 'en' | 'fr')}
                   </div>
                 )}
               </div>
@@ -238,7 +226,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                         border: '1px solid #2a2a2a',
                       }}
                     >
-                      {kw}
+                      {getCardKeyword(kw, locale as 'en' | 'fr')}
                     </span>
                   ))}
                 </div>
@@ -253,7 +241,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                     marginBottom: '8px',
                   }}
                 >
-                  {card.group}
+                  {getCardGroup(card.group, locale as 'en' | 'fr')}
                 </div>
               )}
 

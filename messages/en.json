@@ -182,7 +182,8 @@
       "validTargets": "{count} valid targets",
       "validTargetOne": "{count} valid target",
       "skip": "Skip",
-      "base": "Base"
+      "base": "Base",
+      "up": "UP"
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",
@@ -1145,6 +1146,48 @@
       "all": "All",
       "banned": "Banned",
       "authorized": "Authorized"
+    }
+  },
+  "cardData": {
+    "rarity": {
+      "C": "Common",
+      "UC": "Uncommon",
+      "R": "Rare",
+      "RA": "Rare Art",
+      "S": "Secret",
+      "SV": "Secret V",
+      "M": "Mythos",
+      "MV": "Mythos V",
+      "L": "Legendary",
+      "MMS": "Mission"
+    },
+    "groups": {
+      "Leaf Village": "Leaf Village",
+      "Sand Village": "Sand Village",
+      "Sound Village": "Sound Village",
+      "Akatsuki": "Akatsuki",
+      "Independent": "Independent"
+    },
+    "keywords": {
+      "Team 7": "Team 7",
+      "Team 8": "Team 8",
+      "Team 10": "Team 10",
+      "Team Guy": "Team Guy",
+      "Team Baki": "Team Baki",
+      "Sannin": "Sannin",
+      "Summon": "Summon",
+      "Hokage": "Hokage",
+      "Rogue Ninja": "Rogue Ninja",
+      "Sound Four": "Sound Four",
+      "Sound Ninja": "Sound Ninja",
+      "Kekkei Genkai": "Kekkei Genkai",
+      "Taijutsu": "Taijutsu",
+      "Jutsu": "Jutsu",
+      "Weapon": "Weapon",
+      "Tailed Beast": "Tailed Beast",
+      "Ninja Hound": "Ninja Hound",
+      "Ninja Pig": "Ninja Pig",
+      "Special Jonin": "Special Jonin"
     }
   }
 }

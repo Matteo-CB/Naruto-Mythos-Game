@@ -10,6 +10,7 @@ import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engin
 // Utility
 // ---------------------
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 const RANK_COLORS: Record<MissionRank, string> = {
   D: '#6b7280',   // gray
@@ -88,7 +89,7 @@ function MissionCardInner({
       {hasImage ? (
         <img
           src={imageSrc}
-          alt={card.name_fr}
+          alt={getCardName(card, locale as 'en' | 'fr')}
           draggable={false}
           style={{
             position: 'absolute',
@@ -221,9 +222,9 @@ function MissionCardInner({
             textShadow: '0 1px 4px rgba(0,0,0,0.9)',
           }}
         >
-          {card.name_fr}
+          {getCardName(card, locale as 'en' | 'fr')}
         </div>
-        {card.name_en && (
+        {card.name_en && card.name_fr && card.name_en !== card.name_fr && (
           <div
             style={{
               color: '#888888',
@@ -233,7 +234,7 @@ function MissionCardInner({
               textShadow: '0 1px 3px rgba(0,0,0,0.9)',
             }}
           >
-            {card.name_en}
+            {locale === 'en' ? card.name_fr : card.name_en}
           </div>
         )}
       </div>

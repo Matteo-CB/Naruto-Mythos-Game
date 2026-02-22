@@ -11,6 +11,7 @@ import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import { Footer } from '@/components/Footer';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 
 type AnyCard = CardData;
@@ -60,9 +61,12 @@ export default function CollectionPage() {
       if (filterGroup !== 'all' && card.group !== filterGroup) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
+        const localeName = getCardName(card, locale as 'en' | 'fr').toLowerCase();
+        const localeTitle = getCardTitle(card, locale as 'en' | 'fr').toLowerCase();
         if (
+          !localeName.includes(q) &&
+          !localeTitle.includes(q) &&
           !card.name_fr.toLowerCase().includes(q) &&
-          !card.title_fr.toLowerCase().includes(q) &&
           !card.id.toLowerCase().includes(q)
         ) {
           return false;
@@ -112,7 +116,7 @@ export default function CollectionPage() {
           >
             <option value="all">{t('collection.allRarities')}</option>
             {RARITY_ORDER.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>{getRarityLabel(r, locale as 'en' | 'fr')}</option>
             ))}
           </select>
           <select
@@ -123,7 +127,7 @@ export default function CollectionPage() {
           >
             <option value="all">{t('collection.allGroups')}</option>
             {groups.map((g) => (
-              <option key={g} value={g}>{g}</option>
+              <option key={g} value={g}>{getCardGroup(g, locale as 'en' | 'fr')}</option>
             ))}
           </select>
         </div>
@@ -146,7 +150,7 @@ export default function CollectionPage() {
                 {imgPath ? (
                   <img
                     src={imgPath}
-                    alt={card.name_fr}
+                    alt={getCardName(card, locale as 'en' | 'fr')}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     decoding="async"
@@ -161,7 +165,7 @@ export default function CollectionPage() {
                   <div className="w-full h-full flex flex-col items-center justify-center p-1">
                     <div className="w-8 h-10 bg-[#1a1a1a] mb-1" />
                     <span className="text-[8px] text-[#555] text-center leading-tight">
-                      {card.name_fr}
+                      {getCardName(card, locale as 'en' | 'fr')}
                     </span>
                   </div>
                 )}
@@ -182,7 +186,7 @@ export default function CollectionPage() {
             onClick={() => setSelectedCard(null)}
             role="dialog"
             aria-modal="true"
-            aria-label={selectedCard.name_fr}
+            aria-label={getCardName(selectedCard, locale as 'en' | 'fr')}
           >
             <div
               className="bg-[#141414] border border-[#262626] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6"
@@ -194,7 +198,7 @@ export default function CollectionPage() {
                   {!bannedIds.has(selectedCard.id) && getImagePath(selectedCard) ? (
                     <img
                       src={getImagePath(selectedCard)!}
-                      alt={selectedCard.name_fr}
+                      alt={getCardName(selectedCard, locale as 'en' | 'fr')}
                       className={`w-full ${selectedCard.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} object-cover`}
                       loading="eager"
                       decoding="async"
@@ -208,15 +212,15 @@ export default function CollectionPage() {
 
                 {/* Card info */}
                 <div className="flex-1 min-w-0 font-body">
-                  <h2 className="text-xl font-bold text-[#e0e0e0]">{selectedCard.name_fr}</h2>
-                  <p className="text-sm text-[#888888] mb-3">{selectedCard.title_fr}</p>
+                  <h2 className="text-xl font-bold text-[#e0e0e0]">{getCardName(selectedCard, locale as 'en' | 'fr')}</h2>
+                  <p className="text-sm text-[#888888] mb-3">{getCardTitle(selectedCard, locale as 'en' | 'fr')}</p>
 
                   <div className="flex gap-4 mb-3 text-sm">
                     <span className="text-[#888888]">
                       ID: <span className="text-[#e0e0e0]">{selectedCard.id}</span>
                     </span>
                     <span style={{ color: RARITY_COLORS[selectedCard.rarity] }}>
-                      {selectedCard.rarity}
+                      {getRarityLabel(selectedCard.rarity, locale as 'en' | 'fr')}
                     </span>
                   </div>
 
@@ -241,13 +245,13 @@ export default function CollectionPage() {
 
                   {selectedCard.group && (
                     <p className="text-xs text-[#888888] mb-2">
-                      {t('collection.details.group')}: <span className="text-[#e0e0e0]">{selectedCard.group}</span>
+                      {t('collection.details.group')}: <span className="text-[#e0e0e0]">{getCardGroup(selectedCard.group, locale as 'en' | 'fr')}</span>
                     </p>
                   )}
 
                   {selectedCard.keywords && selectedCard.keywords.length > 0 && (
                     <p className="text-xs text-[#888888] mb-3">
-                      {t('collection.details.keywords')}: <span className="text-[#e0e0e0]">{selectedCard.keywords.join(', ')}</span>
+                      {t('collection.details.keywords')}: <span className="text-[#e0e0e0]">{selectedCard.keywords.map((kw) => getCardKeyword(kw, locale as 'en' | 'fr')).join(', ')}</span>
                     </p>
                   )}
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
@@ -12,9 +12,11 @@ import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { useDeckBuilderStore } from '@/stores/deckBuilderStore';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
@@ -77,11 +79,12 @@ export default function DeckBuilderPage() {
     const q = searchQuery.toLowerCase();
     return chars.filter(
       (c) =>
+        getCardName(c, locale as 'en' | 'fr').toLowerCase().includes(q) ||
+        getCardTitle(c, locale as 'en' | 'fr').toLowerCase().includes(q) ||
         c.name_fr.toLowerCase().includes(q) ||
-        c.title_fr.toLowerCase().includes(q) ||
         c.id.includes(q),
     );
-  }, [availableChars, searchQuery, bannedIds]);
+  }, [availableChars, searchQuery, bannedIds, locale]);
 
   const validation = useMemo(() => {
     return validateDeck(deckChars, deckMissions);
@@ -322,7 +325,7 @@ export default function DeckBuilderPage() {
                     {m ? (
                       <>
                         {mImg && (
-                          <img src={mImg} alt={m.name_fr} className="w-full h-full object-cover" />
+                          <img src={mImg} alt={getCardName(m, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
                         )}
                         <button
                           onClick={() => removeMission(i)}
@@ -331,7 +334,7 @@ export default function DeckBuilderPage() {
                           X
                         </button>
                         <div className="absolute inset-x-0 bottom-0 bg-black/75 px-0.5">
-                          <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{m.name_fr}</span>
+                          <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{getCardName(m, locale as 'en' | 'fr')}</span>
                         </div>
                       </>
                     ) : (
@@ -356,7 +359,7 @@ export default function DeckBuilderPage() {
                     className="w-10 h-14 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0 group"
                   >
                     {img ? (
-                      <img src={img} alt={card.name_fr} className="w-full h-full object-cover" />
+                      <img src={img} alt={getCardName(card, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="text-[6px] text-[#555]">{card.chakra}/{card.power}</span>
@@ -457,19 +460,19 @@ export default function DeckBuilderPage() {
                   key={m.id}
                   onClick={() => addMission(m)}
                   className="relative w-full mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                  title={m.name_fr}
+                  title={getCardName(m, locale as 'en' | 'fr')}
                 >
                   {mImgPath ? (
                     <img
                       src={mImgPath}
-                      alt={m.name_fr}
+                      alt={getCardName(m, locale as 'en' | 'fr')}
                       className="w-full h-full object-cover"
                       loading="lazy"
                       style={{ opacity: check.allowed ? 1 : 0.3 }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-[#555]">{m.name_fr}</span>
+                      <span className="text-[7px] text-[#555]">{getCardName(m, locale as 'en' | 'fr')}</span>
                     </div>
                   )}
                   {/* Hover overlay */}
@@ -481,7 +484,7 @@ export default function DeckBuilderPage() {
                     )}
                   </div>
                   <div className="absolute inset-x-0 bottom-0 px-0.5 py-px" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
-                    <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{m.name_fr}</span>
+                    <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{getCardName(m, locale as 'en' | 'fr')}</span>
                   </div>
                 </button>
               );
@@ -501,18 +504,18 @@ export default function DeckBuilderPage() {
                   key={card.id}
                   onClick={() => addChar(card)}
                   className="relative w-full card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                  title={`${card.name_fr} - ${card.title_fr} (${card.chakra}/${card.power})`}
+                  title={`${getCardName(card, locale as 'en' | 'fr')} - ${getCardTitle(card, locale as 'en' | 'fr')} (${card.chakra}/${card.power})`}
                 >
                   {imgPath ? (
                     <img
                       src={imgPath}
-                      alt={card.name_fr}
+                      alt={getCardName(card, locale as 'en' | 'fr')}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-[#555]">{card.name_fr}</span>
+                      <span className="text-[7px] text-[#555]">{getCardName(card, locale as 'en' | 'fr')}</span>
                     </div>
                   )}
                   {/* Hover overlay */}

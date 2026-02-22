@@ -182,7 +182,8 @@
       "validTargets": "{count} cibles valides",
       "validTargetOne": "{count} cible valide",
       "skip": "Passer",
-      "base": "Base"
+      "base": "Base",
+      "up": "AME"
     },
     "anim": {
       "cardPlayedHidden": "Carte jouee face cachee",
@@ -829,6 +830,48 @@
       "all": "Toutes",
       "banned": "Interdites",
       "authorized": "Autorisees"
+    }
+  },
+  "cardData": {
+    "rarity": {
+      "C": "Commune",
+      "UC": "Peu commune",
+      "R": "Rare",
+      "RA": "Rare Art",
+      "S": "Secrète",
+      "SV": "Secrète V",
+      "M": "Mythos",
+      "MV": "Mythos V",
+      "L": "Légendaire",
+      "MMS": "Mission"
+    },
+    "groups": {
+      "Leaf Village": "Village de Konoha",
+      "Sand Village": "Village du Sable",
+      "Sound Village": "Village du Son",
+      "Akatsuki": "Akatsuki",
+      "Independent": "Indépendant"
+    },
+    "keywords": {
+      "Team 7": "Équipe 7",
+      "Team 8": "Équipe 8",
+      "Team 10": "Équipe 10",
+      "Team Guy": "Équipe Gaï",
+      "Team Baki": "Équipe Baki",
+      "Sannin": "Sannin",
+      "Summon": "Invocation",
+      "Hokage": "Hokage",
+      "Rogue Ninja": "Ninja Déserteur",
+      "Sound Four": "Quatre du Son",
+      "Sound Ninja": "Ninja du Son",
+      "Kekkei Genkai": "Kekkei Genkai",
+      "Taijutsu": "Taijutsu",
+      "Jutsu": "Jutsu",
+      "Weapon": "Arme",
+      "Tailed Beast": "Bijû",
+      "Ninja Hound": "Chien Ninja",
+      "Ninja Pig": "Cochon Ninja",
+      "Special Jonin": "Jônin Spécial"
     }
   }
 }

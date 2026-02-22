@@ -2,10 +2,11 @@
 
 import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import type { VisibleCharacter, VisibleMission, MissionRank } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 // ----- Target Character Card -----
 
@@ -17,6 +18,7 @@ interface TargetCharacterProps {
 
 function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacterProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const isHidden = character.isHidden;
   const canSeeCard = character.isOwn && character.card;
 
@@ -25,7 +27,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
     : null;
 
   const totalPower = character.effectivePower;
-  const displayName = character.card?.name_fr ?? (isHidden ? '???' : 'Unknown');
+  const displayName = character.card ? getCardName(character.card, locale as 'en' | 'fr') : (isHidden ? '???' : 'Unknown');
 
   const handleClick = () => {
     if (isValidTarget) {
@@ -168,6 +170,7 @@ interface TargetMissionLaneProps {
 
 function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: TargetMissionLaneProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const rankColors: Record<MissionRank, string> = {
     D: '#3e8b3e',
     C: '#c4a35a',
@@ -210,7 +213,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: Ta
           maxWidth: '110px',
         }}
       >
-        {mission.card.name_fr}
+        {getCardName(mission.card, locale as 'en' | 'fr')}
       </span>
 
       {/* Opponent characters (top) */}

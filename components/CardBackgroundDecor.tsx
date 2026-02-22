@@ -27,7 +27,7 @@ const CARD_SETS: Record<Variant, [string, string]> = {
     '/images/cards/KS/mythos/KS-144-M.webp',
   ],
   learn: [
-    '/images/cards/KS/rare/KS-108-R.webp',
+    '/images/cards/KS/rare_art/KS-108-RA.webp',
     '/images/cards/KS/secret/KS-135-S.webp',
   ],
   quiz: [
@@ -40,7 +40,7 @@ const CARD_SETS: Record<Variant, [string, string]> = {
   ],
   playOnline: [
     '/images/cards/KS/mythos/KS-143-M.webp',
-    '/images/cards/KS/rare/KS-108-R.webp',
+    '/images/cards/KS/rare_art/KS-108-RA.webp',
   ],
   auth: [
     '/images/cards/KS/secret/KS-133-S.webp',

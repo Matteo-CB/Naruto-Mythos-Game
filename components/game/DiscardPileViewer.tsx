@@ -1,8 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 interface DiscardPileViewerProps {
   cards: CharacterCard[];
@@ -11,6 +13,7 @@ interface DiscardPileViewerProps {
 }
 
 export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerProps) {
+  const locale = useLocale();
   return (
     <AnimatePresence>
       <motion.div
@@ -100,7 +103,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                       {imagePath ? (
                         <img
                           src={imagePath}
-                          alt={card.name_fr}
+                          alt={getCardName(card, locale as 'en' | 'fr')}
                           draggable={false}
                           className="w-full rounded"
                           style={{ aspectRatio: '5/7', objectFit: 'cover' }}
@@ -119,9 +122,9 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                       <span
                         className="text-[9px] text-center leading-tight w-full truncate"
                         style={{ color: '#999999' }}
-                        title={card.name_fr}
+                        title={getCardName(card, locale as 'en' | 'fr')}
                       >
-                        {card.name_fr}
+                        {getCardName(card, locale as 'en' | 'fr')}
                       </span>
                     </motion.div>
                   );
