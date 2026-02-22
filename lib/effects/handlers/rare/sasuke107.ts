@@ -38,7 +38,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Sasuke Uchiwa (107): No other non-hidden friendly characters in this mission to move.',
           'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: '107/130' },
+          { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
         ),
       },
     };
@@ -61,7 +61,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Sasuke Uchiwa (107): No other missions available to move characters to.',
           'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: '107/130' },
+          { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
         ),
       },
     };
@@ -105,7 +105,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_MOVE',
         `Sasuke Uchiwa (107): Moved ${charToMove.card.name_fr} from mission ${sourceMissionIndex} to mission ${bestMissionIdx}.`,
         'game.log.effect.move',
-        { card: 'SASUKE UCHIWA', id: '107/130', target: charToMove.card.name_fr, from: sourceMissionIndex, to: bestMissionIdx },
+        { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charToMove.card.name_fr, from: sourceMissionIndex, to: bestMissionIdx },
       ),
     };
   }
@@ -138,7 +138,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_POWERUP',
           `Sasuke Uchiwa (107) UPGRADE: POWERUP ${movedCount} (characters moved).`,
           'game.log.effect.powerupSelf',
-          { card: 'SASUKE UCHIWA', id: '107/130', amount: movedCount },
+          { card: 'SASUKE UCHIWA', id: 'KS-107-R', amount: movedCount },
         ),
       };
     }
@@ -153,6 +153,6 @@ function sasuke107UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerSasuke107Handlers(): void {
-  registerEffect('107/130', 'MAIN', sasuke107MainHandler);
-  registerEffect('107/130', 'UPGRADE', sasuke107UpgradeHandler);
+  registerEffect('KS-107-R', 'MAIN', sasuke107MainHandler);
+  registerEffect('KS-107-R', 'UPGRADE', sasuke107UpgradeHandler);
 }

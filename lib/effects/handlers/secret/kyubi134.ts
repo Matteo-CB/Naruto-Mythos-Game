@@ -32,7 +32,7 @@ function kyubi134MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Kyubi (134): Cannot be hidden or defeated by enemy effects (continuous).',
     'game.log.effect.continuous',
-    { card: 'KYUBI', id: '134/130' },
+    { card: 'KYUBI', id: 'KS-134-S' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -61,7 +61,7 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kyubi (134): No non-hidden characters to hide (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'KYUBI', id: '134/130' },
+      { card: 'KYUBI', id: 'KS-134-S' },
     );
     return { state: { ...state, log } };
   }
@@ -111,7 +111,7 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kyubi (134): No characters with total power 6 or less to hide (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'KYUBI', id: '134/130' },
+      { card: 'KYUBI', id: 'KS-134-S' },
     );
     return { state: { ...state, log } };
   }
@@ -137,13 +137,13 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
     'EFFECT_HIDE',
     `Kyubi (134): Hid ${selected.length} character(s) (total Power ${totalPower}): ${hiddenNames.join(', ')} (upgrade).`,
     'game.log.effect.hideMultiple',
-    { card: 'KYUBI', id: '134/130', count: selected.length, totalPower },
+    { card: 'KYUBI', id: 'KS-134-S', count: selected.length, totalPower },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerKyubi134Handlers(): void {
-  registerEffect('134/130', 'MAIN', kyubi134MainHandler);
-  registerEffect('134/130', 'UPGRADE', kyubi134UpgradeHandler);
+  registerEffect('KS-134-S', 'MAIN', kyubi134MainHandler);
+  registerEffect('KS-134-S', 'UPGRADE', kyubi134UpgradeHandler);
 }

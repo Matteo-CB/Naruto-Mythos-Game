@@ -55,7 +55,7 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kin Tsuchi (073): No non-hidden enemy character with Power 4 or less in play.',
       'game.log.effect.noTarget',
-      { card: 'KIN TSUCHI', id: '073/130' },
+      { card: 'KIN TSUCHI', id: 'KS-073-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -70,7 +70,7 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kin Tsuchi (073): No cards in hand to discard.',
       'game.log.effect.noTarget',
-      { card: 'KIN TSUCHI', id: '073/130' },
+      { card: 'KIN TSUCHI', id: 'KS-073-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -101,7 +101,7 @@ function handleKin073Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kin Tsuchi (073): Deck is empty, cannot place hidden character.',
       'game.log.effect.noTarget',
-      { card: 'KIN TSUCHI', id: '073/130' },
+      { card: 'KIN TSUCHI', id: 'KS-073-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -149,13 +149,13 @@ function handleKin073Upgrade(ctx: EffectContext): EffectResult {
     'EFFECT_PLACE_HIDDEN',
     'Kin Tsuchi (073): Placed top card of deck as hidden character in this mission (upgrade).',
     'game.log.effect.placeHidden',
-    { card: 'KIN TSUCHI', id: '073/130' },
+    { card: 'KIN TSUCHI', id: 'KS-073-UC' },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerKin073Handlers(): void {
-  registerEffect('073/130', 'MAIN', handleKin073Main);
-  registerEffect('073/130', 'UPGRADE', handleKin073Upgrade);
+  registerEffect('KS-073-UC', 'MAIN', handleKin073Main);
+  registerEffect('KS-073-UC', 'UPGRADE', handleKin073Upgrade);
 }

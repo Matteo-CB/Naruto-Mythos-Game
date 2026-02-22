@@ -31,7 +31,7 @@ function handleNeji037Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Neji Hyuga (037): Gains POWERUP 1 when a non-hidden enemy is played in this mission (continuous).',
     'game.log.effect.continuous',
-    { card: 'NEJI HYUGA', id: '037/130' },
+    { card: 'NEJI HYUGA', id: 'KS-037-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -56,7 +56,7 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Neji Hyuga (037): No enemy character with Power tokens in this mission.',
-      'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: '037/130' }) } };
+      'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-037-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -112,13 +112,13 @@ function removeAllPowerTokens(
     'EFFECT_REMOVE_TOKENS',
     `Neji Hyuga (037): Removed all Power tokens (${tokensRemoved}) from ${targetName} (upgrade).`,
     'game.log.effect.removeTokens',
-    { card: 'NEJI HYUGA', id: '037/130', amount: tokensRemoved, target: targetName },
+    { card: 'NEJI HYUGA', id: 'KS-037-UC', amount: tokensRemoved, target: targetName },
   );
 
   return newState;
 }
 
 export function registerNeji037Handlers(): void {
-  registerEffect('037/130', 'MAIN', handleNeji037Main);
-  registerEffect('037/130', 'UPGRADE', handleNeji037Upgrade);
+  registerEffect('KS-037-UC', 'MAIN', handleNeji037Main);
+  registerEffect('KS-037-UC', 'UPGRADE', handleNeji037Upgrade);
 }

@@ -51,7 +51,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kankuro (078): No character with Power 4 or less in play to move.',
       'game.log.effect.noTarget',
-      { card: 'KANKURO', id: '078/130' },
+      { card: 'KANKURO', id: 'KS-078-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -79,7 +79,7 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kankuro (078): No characters in hand to play hidden.',
       'game.log.effect.noTarget',
-      { card: 'KANKURO', id: '078/130' },
+      { card: 'KANKURO', id: 'KS-078-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -97,6 +97,6 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerKankuro078Handlers(): void {
-  registerEffect('078/130', 'AMBUSH', handleKankuro078Ambush);
-  registerEffect('078/130', 'UPGRADE', handleKankuro078Upgrade);
+  registerEffect('KS-078-UC', 'AMBUSH', handleKankuro078Ambush);
+  registerEffect('KS-078-UC', 'UPGRADE', handleKankuro078Upgrade);
 }

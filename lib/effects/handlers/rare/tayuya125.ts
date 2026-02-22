@@ -49,7 +49,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Tayuya (125) UPGRADE: No affordable Sound Village character in hand (cost reduced by 2).',
           'game.log.effect.noTarget',
-          { card: 'TAYUYA', id: '125/130' },
+          { card: 'TAYUYA', id: 'KS-125-R' },
         ),
       },
     };
@@ -65,6 +65,6 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerTayuya125Handlers(): void {
-  registerEffect('125/130', 'MAIN', tayuya125MainHandler);
-  registerEffect('125/130', 'UPGRADE', tayuya125UpgradeHandler);
+  registerEffect('KS-125-R', 'MAIN', tayuya125MainHandler);
+  registerEffect('KS-125-R', 'UPGRADE', tayuya125UpgradeHandler);
 }

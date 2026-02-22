@@ -41,7 +41,7 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Doki (066): No friendly Sound Four character in this mission. Cannot steal chakra.',
       'game.log.effect.noTarget',
-      { card: 'DOKI', id: '066/130' },
+      { card: 'DOKI', id: 'KS-066-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -66,13 +66,13 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
     'EFFECT_STEAL_CHAKRA',
     `Doki (066): Sound Four ally present - stole ${stealAmount} Chakra from opponent.`,
     'game.log.effect.stealChakra',
-    { card: 'DOKI', id: '066/130', amount: String(stealAmount) },
+    { card: 'DOKI', id: 'KS-066-UC', amount: String(stealAmount) },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerDoki066Handlers(): void {
-  registerEffect('066/130', 'MAIN', handleDoki066Main);
+  registerEffect('KS-066-UC', 'MAIN', handleDoki066Main);
   // The continuous [hourglass] return-to-hand effect is handled by EndPhase.ts
 }

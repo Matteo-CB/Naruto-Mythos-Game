@@ -68,7 +68,7 @@ function defeatCharacterWithExactPower(
           'EFFECT_NO_TARGET',
           `Neji Hyuga (116) ${label}: No character with exactly Power ${targetPower} in this mission.`,
           'game.log.effect.noTarget',
-          { card: 'NEJI HYUGA', id: '116/130' },
+          { card: 'NEJI HYUGA', id: 'KS-116-R' },
         ),
       },
     };
@@ -96,7 +96,7 @@ function defeatCharacterWithExactPower(
           'EFFECT_DEFEAT',
           `Neji Hyuga (116) ${label}: Defeated ${targetName} (exactly Power ${targetPower}).`,
           'game.log.effect.defeat',
-          { card: 'NEJI HYUGA', id: '116/130', target: targetName },
+          { card: 'NEJI HYUGA', id: 'KS-116-R', target: targetName },
         ),
       },
     };
@@ -123,6 +123,6 @@ function neji116UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerNeji116Handlers(): void {
-  registerEffect('116/130', 'MAIN', neji116MainHandler);
-  registerEffect('116/130', 'UPGRADE', neji116UpgradeHandler);
+  registerEffect('KS-116-R', 'MAIN', neji116MainHandler);
+  registerEffect('KS-116-R', 'UPGRADE', neji116UpgradeHandler);
 }

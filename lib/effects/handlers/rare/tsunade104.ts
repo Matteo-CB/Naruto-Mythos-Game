@@ -30,7 +30,7 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Tsunade (104): No extra chakra to spend for POWERUP.',
           'game.log.effect.noTarget',
-          { card: 'TSUNADE', id: '104/130' },
+          { card: 'TSUNADE', id: 'KS-104-R' },
         ),
       },
     };
@@ -66,7 +66,7 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         `Tsunade (104): Spent ${extraChakra} extra chakra for POWERUP ${extraChakra}.`,
         'game.log.effect.powerupSelf',
-        { card: 'TSUNADE', id: '104/130', amount: extraChakra },
+        { card: 'TSUNADE', id: 'KS-104-R', amount: extraChakra },
       ),
     },
   };
@@ -78,6 +78,6 @@ function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerTsunade104Handlers(): void {
-  registerEffect('104/130', 'MAIN', tsunade104MainHandler);
-  registerEffect('104/130', 'UPGRADE', tsunade104UpgradeHandler);
+  registerEffect('KS-104-R', 'MAIN', tsunade104MainHandler);
+  registerEffect('KS-104-R', 'UPGRADE', tsunade104UpgradeHandler);
 }

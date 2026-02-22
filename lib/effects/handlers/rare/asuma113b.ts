@@ -31,7 +31,7 @@ function asuma113bAmbushHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Asuma Sarutobi (113b) AMBUSH: Deck is empty, cannot draw.',
           'game.log.effect.noTarget',
-          { card: 'ASUMA SARUTOBI', id: '113b/130' },
+          { card: 'ASUMA SARUTOBI', id: 'KS-113b-R' },
         ),
       },
     };
@@ -55,7 +55,7 @@ function asuma113bAmbushHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DRAW',
         `Asuma Sarutobi (113b) AMBUSH: Drew 1 card.`,
         'game.log.effect.draw',
-        { card: 'ASUMA SARUTOBI', id: '113b/130', amount: 1 },
+        { card: 'ASUMA SARUTOBI', id: 'KS-113b-R', amount: 1 },
       ),
     },
   };
@@ -74,7 +74,7 @@ function asuma113bMainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Asuma Sarutobi (113b): Hand is empty, cannot discard.',
           'game.log.effect.noTarget',
-          { card: 'ASUMA SARUTOBI', id: '113b/130' },
+          { card: 'ASUMA SARUTOBI', id: 'KS-113b-R' },
         ),
       },
     };
@@ -93,6 +93,6 @@ function asuma113bMainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerAsuma113bHandlers(): void {
-  registerEffect('113b/130', 'AMBUSH', asuma113bAmbushHandler);
-  registerEffect('113b/130', 'MAIN', asuma113bMainHandler);
+  registerEffect('KS-113b-R', 'AMBUSH', asuma113bAmbushHandler);
+  registerEffect('KS-113b-R', 'MAIN', asuma113bMainHandler);
 }

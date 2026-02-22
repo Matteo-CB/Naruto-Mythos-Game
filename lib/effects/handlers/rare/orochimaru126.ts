@@ -54,7 +54,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Orochimaru (126) SCORE: No non-hidden enemy characters in play.',
           'game.log.effect.noTarget',
-          { card: 'OROCHIMARU', id: '126/130' },
+          { card: 'OROCHIMARU', id: 'KS-126-R' },
         ),
       },
     };
@@ -75,7 +75,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Orochimaru (126) SCORE: Defeated weakest enemy ${target.char.card.name_fr} (Power ${target.power}).`,
         'game.log.effect.defeat',
-        { card: 'OROCHIMARU', id: '126/130', target: target.char.card.name_fr },
+        { card: 'OROCHIMARU', id: 'KS-126-R', target: target.char.card.name_fr },
       ),
     };
     return { state: newState };
@@ -120,13 +120,13 @@ function orochimaru126UpgradeHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         'Orochimaru (126) UPGRADE: POWERUP 3 on self.',
         'game.log.effect.powerupSelf',
-        { card: 'OROCHIMARU', id: '126/130', amount: 3 },
+        { card: 'OROCHIMARU', id: 'KS-126-R', amount: 3 },
       ),
     },
   };
 }
 
 export function registerOrochimaru126Handlers(): void {
-  registerEffect('126/130', 'SCORE', orochimaru126ScoreHandler);
-  registerEffect('126/130', 'UPGRADE', orochimaru126UpgradeHandler);
+  registerEffect('KS-126-R', 'SCORE', orochimaru126ScoreHandler);
+  registerEffect('KS-126-R', 'UPGRADE', orochimaru126UpgradeHandler);
 }

@@ -29,7 +29,7 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_EDGE',
       `Sasuke Uchiwa (146): Gave the Edge token to opponent.`,
       'game.log.effect.giveEdge',
-      { card: 'SASUKE UCHIWA', id: '146/130' },
+      { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
     ),
   };
 
@@ -58,7 +58,7 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         `Sasuke Uchiwa (146): POWERUP 3 on self.`,
         'game.log.effect.powerupSelf',
-        { card: 'SASUKE UCHIWA', id: '146/130', amount: 3 },
+        { card: 'SASUKE UCHIWA', id: 'KS-146-M', amount: 3 },
       ),
     };
   }
@@ -67,5 +67,5 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('146/130', 'MAIN', sasuke146MainHandler);
+  registerEffect('KS-146-M', 'MAIN', sasuke146MainHandler);
 }

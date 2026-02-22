@@ -609,7 +609,7 @@ export class EffectEngine {
           if (validMissions.length === 1) {
             newState = EffectEngine.moveCharToMissionDirectPublic(
               newState, targetId, parseInt(validMissions[0], 10),
-              charResult.player, 'Shikamaru Nara', '022/130',
+              charResult.player, 'Shikamaru Nara', 'KS-022-UC',
             );
           } else if (validMissions.length > 1) {
             const effectId = generateInstanceId();
@@ -654,7 +654,7 @@ export class EffectEngine {
             if (charRes) {
               newState = EffectEngine.moveCharToMissionDirectPublic(
                 newState, charInstanceId, destMission,
-                charRes.player, 'Shikamaru Nara', '022/130',
+                charRes.player, 'Shikamaru Nara', 'KS-022-UC',
               );
             }
           }
@@ -669,12 +669,14 @@ export class EffectEngine {
         if (ino110Char) {
           const validDests: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (i !== ino110Char.missionIndex) validDests.push(String(i));
+            if (i !== ino110Char.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, ino110Char.character, i, ino110Char.player)) {
+              validDests.push(String(i));
+            }
           }
           if (validDests.length === 1) {
             newState = EffectEngine.moveCharToMissionDirectPublic(
               newState, targetId, parseInt(validDests[0], 10),
-              ino110Char.player, 'Ino Yamanaka', '110/130',
+              ino110Char.player, 'Ino Yamanaka', 'KS-110-R',
             );
             // If upgrade, also hide the moved character
             if (pendingEffect.isUpgrade) {
@@ -723,7 +725,7 @@ export class EffectEngine {
             if (ino110CharRes) {
               newState = EffectEngine.moveCharToMissionDirectPublic(
                 newState, ino110CharId, ino110Dest,
-                ino110CharRes.player, 'Ino Yamanaka', '110/130',
+                ino110CharRes.player, 'Ino Yamanaka', 'KS-110-R',
               );
               // If upgrade, also hide the moved character
               if (pendingEffect.isUpgrade) {
@@ -831,7 +833,7 @@ export class EffectEngine {
                   newState = EffectEngine.moveCharToMissionDirectPublic(
                     newState, char.instanceId, destIdx,
                     pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1',
-                    'Might Guy', '119b/130',
+                    'Might Guy', 'KS-119b-R',
                   );
                   break;
                 }
@@ -964,7 +966,7 @@ export class EffectEngine {
               'EFFECT_POWERUP',
               `Sasuke Uchiwa (142): POWERUP ${powerupAmount} (X+1, X=${enemyCount} enemy characters in this mission).`,
               'game.log.effect.powerupSelf',
-              { card: 'SASUKE UCHIWA', id: '142/130', amount: powerupAmount },
+              { card: 'SASUKE UCHIWA', id: 'KS-142-M', amount: powerupAmount },
             );
           }
         }
@@ -986,7 +988,7 @@ export class EffectEngine {
       // SPECIAL types
       // =============================================
       case 'TAYUYA125_CHOOSE_SOUND':
-        newState = EffectEngine.playCharFromHandWithReduction(newState, pendingEffect, targetId, 2, 'Sound Village', 'Tayuya', '125/130');
+        newState = EffectEngine.playCharFromHandWithReduction(newState, pendingEffect, targetId, 2, 'Sound Village', 'Tayuya', 'KS-125-R');
         break;
 
       case 'ICHIBI130_CHOOSE_MISSION': {
@@ -1007,7 +1009,7 @@ export class EffectEngine {
             'EFFECT_DEFEAT',
             `Ichibi (130) UPGRADE: Defeated ${defeatedCount} hidden enemy character(s) in mission ${missionIdx_i + 1}.`,
             'game.log.effect.defeat',
-            { card: 'ICHIBI', id: '130/130', target: `${defeatedCount} hidden enemies` },
+            { card: 'ICHIBI', id: 'KS-130-R', target: `${defeatedCount} hidden enemies` },
           );
         }
         break;
@@ -1054,7 +1056,7 @@ export class EffectEngine {
             'EFFECT',
             `Kakashi Hatake (148): Copied the effect of ${copyTopCard.name_fr}.`,
             'game.log.effect.copyEffect',
-            { card: 'KAKASHI HATAKE', id: '148/130', target: copyTopCard.name_fr },
+            { card: 'KAKASHI HATAKE', id: 'KS-148-M', target: copyTopCard.name_fr },
           );
         }
         break;
@@ -1096,7 +1098,7 @@ export class EffectEngine {
               'EFFECT',
               `Kabuto Yakushi (052): Placed stolen card hidden on mission ${missionIdx_kb + 1}.`,
               'game.log.effect.kabutoSteal',
-              { card: 'KABUTO YAKUSHI', id: '052/130', mission: String(missionIdx_kb + 1) },
+              { card: 'KABUTO YAKUSHI', id: 'KS-052-C', mission: String(missionIdx_kb + 1) },
             );
           }
         }
@@ -1251,6 +1253,19 @@ export class EffectEngine {
     if (!charResult) return state;
     if (charResult.missionIndex === destMissionIndex) return state;
 
+    // Enforce same-name-per-mission rule
+    if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
+      const loggedState = deepClone(state);
+      loggedState.log = logAction(
+        loggedState.log, loggedState.turn, loggedState.phase, charResult.player,
+        'EFFECT_BLOCKED',
+        `Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} — a character with the same name already exists there.`,
+        'game.log.effect.moveBlocked',
+        { target: charResult.character.card.name_fr },
+      );
+      return loggedState;
+    }
+
     const newState = deepClone(state);
     const srcMission = newState.activeMissions[charResult.missionIndex];
     const destMission = newState.activeMissions[destMissionIndex];
@@ -1287,7 +1302,7 @@ export class EffectEngine {
             'EFFECT',
             `Ninja Hounds (100): Moved to mission ${destMissionIndex} - looked at hidden ${hiddenInDest.card.name_fr}.`,
             'game.log.effect.lookAtHidden',
-            { card: 'Chiens Ninjas', id: '100/130', target: hiddenInDest.card.name_fr },
+            { card: 'Chiens Ninjas', id: 'KS-100-C', target: hiddenInDest.card.name_fr },
           );
         }
       }
@@ -1325,11 +1340,15 @@ export class EffectEngine {
       newState.log, newState.turn, 'action', pending.sourcePlayer,
       'EFFECT', `Orochimaru looks at hidden enemy: ${targetChar.card.name_fr} (cost ${actualCost}).`,
       'game.log.effect.lookAtHidden',
-      { card: 'Orochimaru', id: '050/130', target: targetChar.card.name_fr },
+      { card: 'Orochimaru', id: 'KS-050-C', target: targetChar.card.name_fr },
     );
 
-    // If cost <= 3, steal control
+    // If cost <= 3, steal control (but check same-name constraint first)
     if (actualCost <= 3) {
+      // Enforce same-name-per-mission: check if stealing would create a name duplicate
+      // The stolen character stays hidden, so it doesn't violate name uniqueness while hidden.
+      // However, if it were visible, we'd need to check. Since Orochimaru targets hidden chars,
+      // they remain hidden after steal, so name uniqueness is not violated.
       mission[enemyKey].splice(targetCharIdx, 1);
       targetChar.controlledBy = pending.sourcePlayer;
       mission[friendlyKey].push(targetChar);
@@ -1338,7 +1357,7 @@ export class EffectEngine {
         newState.log, newState.turn, 'action', pending.sourcePlayer,
         'EFFECT', `Orochimaru steals ${targetChar.card.name_fr}!`,
         'game.log.effect.takeControl',
-        { card: 'Orochimaru', id: '050/130', target: targetChar.card.name_fr },
+        { card: 'Orochimaru', id: 'KS-050-C', target: targetChar.card.name_fr },
       );
     }
 
@@ -1736,7 +1755,7 @@ export class EffectEngine {
       newState.log, newState.turn, 'action', player,
       'EFFECT', `Jiraiya's effect: plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
       'game.log.effect.playSummon',
-      { card: 'Jiraya', id: '007/130', target: card.name_fr, mission: missionIndex + 1, cost },
+      { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: missionIndex + 1, cost },
     );
 
     return newState;
@@ -1762,7 +1781,7 @@ export class EffectEngine {
         'EFFECT_HIDE',
         `Kimimaro (055): Hid ${topCard.name_fr}.`,
         'game.log.effect.hide',
-        { card: 'Kimimaro', id: '055/130', target: topCard.name_fr, mission: String(charResult.missionIndex + 1) },
+        { card: 'Kimimaro', id: 'KS-055-C', target: topCard.name_fr, mission: String(charResult.missionIndex + 1) },
       );
       return hiddenState;
     }
@@ -1793,7 +1812,7 @@ export class EffectEngine {
       'EFFECT_DISCARD',
       `Kimimaro (055): Discarded ${discardedCard.name_fr}.`,
       'game.log.effect.discardCards',
-      { card: 'Kimimaro', id: '055/130', count: 1 },
+      { card: 'Kimimaro', id: 'KS-055-C', count: 1 },
     );
 
     // Find valid hide targets (cost <= 3, not hidden, not Kimimaro himself)
@@ -1831,7 +1850,7 @@ export class EffectEngine {
         'EFFECT_HIDE',
         `Kimimaro (055): Hid a character.`,
         'game.log.effect.hide',
-        { card: 'Kimimaro', id: '055/130', target: validHideTargets[0], mission: '' },
+        { card: 'Kimimaro', id: 'KS-055-C', target: validHideTargets[0], mission: '' },
       );
       return EffectEngine.hideCharacter(newState, validHideTargets[0]);
     }
@@ -2334,7 +2353,7 @@ export class EffectEngine {
     state.log = logAction(
       state.log, state.turn, 'action', player,
       'EFFECT', `Jiraiya plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
-      'game.log.effect.playSummon', { card: 'Jiraya', id: '007/130', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+      'game.log.effect.playSummon', { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
     );
 
     return state;
@@ -2352,17 +2371,19 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
     if (!charResult) return state;
 
-    // Find valid destination missions (any other than the character's current)
+    // Find valid destination missions (any other than the character's current, respecting name uniqueness)
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
-      if (i !== charResult.missionIndex) validMissions.push(String(i));
+      if (i !== charResult.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, charResult.character, i, charResult.player)) {
+        validMissions.push(String(i));
+      }
     }
 
     if (validMissions.length === 0) return state;
 
     if (validMissions.length === 1) {
       // Auto-resolve: move to the only other mission
-      return EffectEngine.moveCharToMissionDirect(newState, targetId, parseInt(validMissions[0], 10), player, 'Asuma Sarutobi', '023/130');
+      return EffectEngine.moveCharToMissionDirect(newState, targetId, parseInt(validMissions[0], 10), player, 'Asuma Sarutobi', 'KS-023-C');
     }
 
     // Create stage 2: choose destination
@@ -2409,7 +2430,7 @@ export class EffectEngine {
     let charInstanceId = '';
     try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
     if (!charInstanceId) return state;
-    return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Asuma Sarutobi', '023/130');
+    return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Asuma Sarutobi', 'KS-023-C');
   }
 
   // =====================================
@@ -2424,16 +2445,18 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
     if (!charResult) return state;
 
-    // Find valid destination missions (any other than Naruto's current mission)
+    // Find valid destination missions (any other than Naruto's current, respecting name uniqueness)
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
-      if (i !== charResult.missionIndex) validMissions.push(String(i));
+      if (i !== charResult.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, charResult.character, i, charResult.player)) {
+        validMissions.push(String(i));
+      }
     }
 
     if (validMissions.length === 0) return state;
 
     if (validMissions.length === 1) {
-      return EffectEngine.moveCharToMissionDirect(newState, targetId, parseInt(validMissions[0], 10), player, 'Iruka Umino', '047/130');
+      return EffectEngine.moveCharToMissionDirect(newState, targetId, parseInt(validMissions[0], 10), player, 'Iruka Umino', 'KS-047-C');
     }
 
     const effectId = generateInstanceId();
@@ -2479,7 +2502,7 @@ export class EffectEngine {
     let charInstanceId = '';
     try { charInstanceId = JSON.parse(pending.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
     if (!charInstanceId) return state;
-    return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Iruka Umino', '047/130');
+    return EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Iruka Umino', 'KS-047-C');
   }
 
   // =====================================
@@ -2501,10 +2524,12 @@ export class EffectEngine {
       movesRemaining = desc.movesRemaining ?? 1;
     } catch { /* ignore */ }
 
-    // Find valid destination missions
+    // Find valid destination missions (respecting name uniqueness)
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
-      if (i !== charResult.missionIndex) validMissions.push(String(i));
+      if (i !== charResult.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, charResult.character, i, charResult.player)) {
+        validMissions.push(String(i));
+      }
     }
 
     if (validMissions.length === 0) return state;
@@ -2512,7 +2537,7 @@ export class EffectEngine {
     if (validMissions.length === 1) {
       // Auto-resolve destination, then check for more moves
       let result = EffectEngine.moveCharToMissionDirect(
-        newState, targetId, parseInt(validMissions[0], 10), player, 'Kidomaru', '059/130',
+        newState, targetId, parseInt(validMissions[0], 10), player, 'Kidomaru', 'KS-059-C',
       );
       const remaining = movesRemaining - 1;
       if (remaining > 0) {
@@ -2574,7 +2599,7 @@ export class EffectEngine {
 
     if (!charInstanceId) return state;
 
-    let result = EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Kidomaru', '059/130');
+    let result = EffectEngine.moveCharToMissionDirect(newState, charInstanceId, destMission, player, 'Kidomaru', 'KS-059-C');
 
     const remaining = movesRemaining - 1;
     if (remaining > 0) {
@@ -2769,7 +2794,7 @@ export class EffectEngine {
       'EFFECT_PLAY',
       `Sakura Haruno (109): Played ${card.name_fr} from discard pile to mission ${missionIndex + 1}${costDesc}.`,
       'game.log.effect.playFromDiscard',
-      { card: 'SAKURA HARUNO', id: '109/130', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
     );
 
     return state;
@@ -2821,7 +2846,7 @@ export class EffectEngine {
         'EFFECT_NO_CHAKRA',
         `Sakura Haruno (135): Cannot afford to play ${chosenCard.name_fr} (cost ${cost}). All cards discarded.`,
         'game.log.effect.noChakra',
-        { card: 'SAKURA HARUNO', id: '135/130' },
+        { card: 'SAKURA HARUNO', id: 'KS-135-S' },
       );
       return newState;
     }
@@ -2937,7 +2962,7 @@ export class EffectEngine {
       'EFFECT_PLAY',
       `Sakura Haruno (135): Played ${card.name_fr} from top of deck to mission ${missionIndex + 1}${costDesc}.`,
       'game.log.effect.playFromDeck',
-      { card: 'SAKURA HARUNO', id: '135/130', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
     );
 
     return state;
@@ -2969,7 +2994,7 @@ export class EffectEngine {
       'EFFECT_DISCARD',
       `Choji Akimichi (112): Discarded ${discardedCard.name_fr} (cost ${discardedCost}) from hand.`,
       'game.log.effect.discard',
-      { card: 'CHOJI AKIMICHI', id: '112/130', target: discardedCard.name_fr, cost: discardedCost },
+      { card: 'CHOJI AKIMICHI', id: 'KS-112-R', target: discardedCard.name_fr, cost: discardedCost },
     );
 
     // Apply POWERUP X on Choji
@@ -2993,7 +3018,7 @@ export class EffectEngine {
           'EFFECT_POWERUP',
           `Choji Akimichi (112): POWERUP ${discardedCost} (cost of discarded card).`,
           'game.log.effect.powerupSelf',
-          { card: 'CHOJI AKIMICHI', id: '112/130', amount: discardedCost },
+          { card: 'CHOJI AKIMICHI', id: 'KS-112-R', amount: discardedCost },
         );
       }
     }
@@ -3045,9 +3070,34 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) return state;
 
-    const newState = deepClone(state);
     const player = pending.sourcePlayer;
     const missionIndex = charResult.missionIndex;
+
+    // Enforce same-name-per-mission: check if taking control would create a name duplicate
+    // When control changes, the character moves to the player's side of the same mission
+    if (!charResult.character.isHidden) {
+      const destMission = state.activeMissions[missionIndex];
+      const friendlyCharsInMission = player === 'player1'
+        ? destMission.player1Characters
+        : destMission.player2Characters;
+      const charName = charResult.character.card.name_fr.toUpperCase();
+      const hasSameName = friendlyCharsInMission.some(
+        (c) => !c.isHidden && c.card.name_fr.toUpperCase() === charName,
+      );
+      if (hasSameName) {
+        const blockedState = deepClone(state);
+        blockedState.log = logAction(
+          blockedState.log, blockedState.turn, blockedState.phase, player,
+          'EFFECT_BLOCKED',
+          `Ino Yamanaka (020): Cannot take control of ${charResult.character.card.name_fr} — a character with the same name already exists on your side of this mission.`,
+          'game.log.effect.takeControlBlocked',
+          { card: 'INO YAMANAKA', id: 'KS-020-UC', target: charResult.character.card.name_fr },
+        );
+        return blockedState;
+      }
+    }
+
+    const newState = deepClone(state);
     const mission = newState.activeMissions[missionIndex];
 
     const enemySide = charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -3071,7 +3121,7 @@ export class EffectEngine {
       'EFFECT_TAKE_CONTROL',
       `Ino Yamanaka (020): Takes control of ${targetName} in this mission.`,
       'game.log.effect.takeControl',
-      { card: 'INO YAMANAKA', id: '020/130', target: targetName },
+      { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName },
     );
 
     return newState;
@@ -3085,7 +3135,7 @@ export class EffectEngine {
   static itachi143MoveFriendly(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
-    return EffectEngine.moveCharToMissionDirect(newState, targetId, pending.sourceMissionIndex, player, 'Itachi Uchiwa', '143/130');
+    return EffectEngine.moveCharToMissionDirect(newState, targetId, pending.sourceMissionIndex, player, 'Itachi Uchiwa', 'KS-143-M');
   }
 
   /** Itachi 143 AMBUSH: move an enemy character to Itachi's mission. */
@@ -3093,12 +3143,46 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     const opponent = player === 'player1' ? 'player2' : 'player1';
-    return EffectEngine.moveCharToMissionDirect(newState, targetId, pending.sourceMissionIndex, opponent, 'Itachi Uchiwa', '143/130');
+    return EffectEngine.moveCharToMissionDirect(newState, targetId, pending.sourceMissionIndex, opponent, 'Itachi Uchiwa', 'KS-143-M');
   }
 
   // =====================================
   // Shared: Move character to a specific mission
   // =====================================
+
+  /**
+   * Validate that moving a character to a mission does not violate the
+   * same-name-per-mission rule. A player cannot have two visible characters
+   * with the same name on the same mission.
+   *
+   * Returns true if the move is allowed, false if it would violate the constraint.
+   */
+  static validateNameUniquenessForMove(
+    state: GameState,
+    charToMove: CharacterInPlay,
+    destMissionIndex: number,
+    controllingPlayer: PlayerID,
+  ): boolean {
+    // Hidden characters don't violate name uniqueness (their name is unknown)
+    if (charToMove.isHidden) return true;
+
+    const destMission = state.activeMissions[destMissionIndex];
+    if (!destMission) return true;
+
+    const charName = charToMove.card.name_fr.toUpperCase();
+    const friendlyChars = controllingPlayer === 'player1'
+      ? destMission.player1Characters
+      : destMission.player2Characters;
+
+    // Check if any existing visible character on this mission (controlled by same player)
+    // has the same name (excluding the character being moved itself)
+    return !friendlyChars.some(
+      (c) =>
+        c.instanceId !== charToMove.instanceId &&
+        !c.isHidden &&
+        c.card.name_fr.toUpperCase() === charName,
+    );
+  }
 
   /** Move a character (by instanceId) to a specific mission. Used by multiple handlers. */
   private static moveCharToMissionDirect(
@@ -3112,6 +3196,68 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(state, charInstanceId);
     if (!charResult) return state;
     if (charResult.missionIndex === destMissionIndex) return state;
+
+    // Enforce same-name-per-mission rule
+    if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
+      state.log = logAction(
+        state.log, state.turn, state.phase, charOwner,
+        'EFFECT_BLOCKED',
+        `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} — a character with the same name already exists there.`,
+        'game.log.effect.moveBlocked',
+        { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
+      );
+      return state;
+    }
+
+    // Check Gaara 075 continuous protection: cannot be moved by enemy effects
+    if (charResult.player !== charOwner) {
+      // This is an enemy effect moving the character
+      const topCard = charResult.character.stack.length > 0
+        ? charResult.character.stack[charResult.character.stack.length - 1]
+        : charResult.character.card;
+      if (topCard.number === 75 && !charResult.character.isHidden) {
+        const hasMoveProtection = (topCard.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated by enemy'),
+        );
+        if (hasMoveProtection) {
+          state.log = logAction(
+            state.log, state.turn, state.phase, charOwner,
+            'EFFECT_BLOCKED',
+            `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} — Gaara's continuous effect protects against enemy effects.`,
+            'game.log.effect.moveBlocked',
+            { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
+          );
+          return state;
+        }
+      }
+    }
+
+    // Kurenai 035 (UC): Enemy characters cannot move from this mission
+    // Check if the source mission has a Kurenai 035 on the opposing side
+    {
+      const sourceMission = state.activeMissions[charResult.missionIndex];
+      const opponentSide = charResult.player === 'player1' ? 'player2Characters' : 'player1Characters';
+      const opponentChars = sourceMission[opponentSide];
+      for (const opp of opponentChars) {
+        if (opp.isHidden) continue;
+        const oppTop = opp.stack.length > 0 ? opp.stack[opp.stack.length - 1] : opp.card;
+        if (oppTop.number === 35) {
+          const hasRestriction = (oppTop.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot move'),
+          );
+          if (hasRestriction) {
+            state.log = logAction(
+              state.log, state.turn, state.phase, charOwner,
+              'EFFECT_BLOCKED',
+              `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} — Kurenai blocks enemy movement from this mission.`,
+              'game.log.effect.moveBlocked',
+              { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
+            );
+            return state;
+          }
+        }
+      }
+    }
 
     const friendlySide: 'player1Characters' | 'player2Characters' =
       charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -3210,6 +3356,17 @@ export class EffectEngine {
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated by enemy') && e.description.includes('hide'),
       );
       if (hasReplacement) {
+        return { replaced: true, replacement: 'hide' };
+      }
+    }
+
+    // Ichibi 130 (R): Can't be hidden or defeated by enemy effects
+    if (topCard.number === 130 && isEnemyEffect) {
+      const hasProtection = (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
+      );
+      if (hasProtection) {
+        // Ichibi is immune — defeat is simply blocked (not replaced by hide)
         return { replaced: true, replacement: 'hide' };
       }
     }

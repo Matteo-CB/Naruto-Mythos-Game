@@ -36,7 +36,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Hiruzen Sarutobi (001): No valid Leaf Village target for POWERUP 2.',
-      'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: '001/130' }) } };
+      'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' }) } };
   }
 
   // If exactly one valid target, apply automatically
@@ -78,10 +78,10 @@ function applyPowerup(state: import('../../EffectTypes').EffectContext['state'],
   }));
   newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_POWERUP',
     `Hiruzen Sarutobi (001): POWERUP ${amount} on ${targetName}.`,
-    'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: '001/130', amount, target: targetName });
+    'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C', amount, target: targetName });
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('001/130', 'MAIN', handleHiruzen001Main);
+  registerEffect('KS-001-C', 'MAIN', handleHiruzen001Main);
 }

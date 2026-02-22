@@ -37,7 +37,7 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
   if (!hasTsunade) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Katsuyu (098): No friendly Tsunade in play.',
-      'game.log.effect.noTarget', { card: 'KATSUYU', id: '098/130' }) } };
+      'game.log.effect.noTarget', { card: 'KATSUYU', id: 'KS-098-C' }) } };
   }
 
   // POWERUP 2 on self
@@ -61,12 +61,12 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Katsuyu (098): POWERUP 2 (Tsunade synergy).`,
     'game.log.effect.powerupSelf',
-    { card: 'Katsuyu', id: '098/130', amount: 2 },
+    { card: 'Katsuyu', id: 'KS-098-C', amount: 2 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('098/130', 'MAIN', handleKatsuyu098Main);
+  registerEffect('KS-098-C', 'MAIN', handleKatsuyu098Main);
 }

@@ -43,7 +43,7 @@ function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kurenai Yuhi (116b) AMBUSH: No enemy with Power 4 or less in this mission.',
           'game.log.effect.noTarget',
-          { card: 'KURENAI YUHI', id: '116b/130' },
+          { card: 'KURENAI YUHI', id: 'KS-116b-R' },
         ),
       },
     };
@@ -61,7 +61,7 @@ function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kurenai Yuhi (116b) AMBUSH: Defeated ${targetName} (Power ${getEffectivePower(targetChar!)}).`,
         'game.log.effect.defeat',
-        { card: 'KURENAI YUHI', id: '116b/130', target: targetName },
+        { card: 'KURENAI YUHI', id: 'KS-116b-R', target: targetName },
       ),
     };
     return { state: newState };
@@ -98,7 +98,7 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kurenai Yuhi (116b) UPGRADE: No other mission to move to.',
           'game.log.effect.noTarget',
-          { card: 'KURENAI YUHI', id: '116b/130' },
+          { card: 'KURENAI YUHI', id: 'KS-116b-R' },
         ),
       },
     };
@@ -155,13 +155,13 @@ function applyMoveSelf(
         'EFFECT_MOVE',
         `Kurenai Yuhi (116b) UPGRADE: Moved self from mission ${fromMissionIdx} to mission ${toMissionIdx}.`,
         'game.log.effect.move',
-        { card: 'KURENAI YUHI', id: '116b/130', target: 'self', from: fromMissionIdx, to: toMissionIdx },
+        { card: 'KURENAI YUHI', id: 'KS-116b-R', target: 'self', from: fromMissionIdx, to: toMissionIdx },
       ),
     },
   };
 }
 
 export function registerKurenai116bHandlers(): void {
-  registerEffect('116b/130', 'AMBUSH', kurenai116bAmbushHandler);
-  registerEffect('116b/130', 'UPGRADE', kurenai116bUpgradeHandler);
+  registerEffect('KS-116b-R', 'AMBUSH', kurenai116bAmbushHandler);
+  registerEffect('KS-116b-R', 'UPGRADE', kurenai116bUpgradeHandler);
 }

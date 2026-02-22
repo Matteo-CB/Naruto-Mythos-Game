@@ -34,7 +34,7 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
   if (soundFourMissionCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sakon (061): No missions with friendly Sound Four characters.',
-      'game.log.effect.noTarget', { card: 'SAKON', id: '061/130' }) } };
+      'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-061-C' }) } };
   }
 
   // Draw X cards
@@ -62,12 +62,12 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Sakon (061): Drew ${drawnCount} card(s).`,
     'game.log.effect.draw',
-    { card: 'Sakon', id: '061/130', count: String(drawnCount) },
+    { card: 'Sakon', id: 'KS-061-C', count: String(drawnCount) },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('061/130', 'MAIN', handleSakon061Main);
+  registerEffect('KS-061-C', 'MAIN', handleSakon061Main);
 }

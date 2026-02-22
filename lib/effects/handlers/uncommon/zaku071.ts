@@ -43,7 +43,7 @@ function handleZaku071Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       `Zaku Abumi (071): You do not have fewer non-hidden characters than the enemy in this mission (${friendlyNonHiddenCount} vs ${enemyNonHiddenCount}).`,
       'game.log.effect.noTarget',
-      { card: 'ZAKU ABUMI', id: '071/130' },
+      { card: 'ZAKU ABUMI', id: 'KS-071-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -63,7 +63,7 @@ function handleZaku071Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Zaku Abumi (071): No enemy characters to move in this mission.',
       'game.log.effect.noTarget',
-      { card: 'ZAKU ABUMI', id: '071/130' },
+      { card: 'ZAKU ABUMI', id: 'KS-071-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -103,7 +103,7 @@ function handleZaku071Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Zaku Abumi (071): POWERUP 2 (upgrade effect). Power tokens added: 2.',
       'game.log.effect.powerupSelf',
-      { card: 'ZAKU ABUMI', id: '071/130', amount: 2 },
+      { card: 'ZAKU ABUMI', id: 'KS-071-UC', amount: 2 },
     );
 
     return { state: { ...newState, activeMissions: missions, log } };
@@ -113,6 +113,6 @@ function handleZaku071Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerZaku071Handlers(): void {
-  registerEffect('071/130', 'MAIN', handleZaku071Main);
-  registerEffect('071/130', 'UPGRADE', handleZaku071Upgrade);
+  registerEffect('KS-071-UC', 'MAIN', handleZaku071Main);
+  registerEffect('KS-071-UC', 'UPGRADE', handleZaku071Upgrade);
 }

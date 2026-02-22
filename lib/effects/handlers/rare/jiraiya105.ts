@@ -41,7 +41,7 @@ function jiraiya105MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Jiraiya (105): No affordable Summon characters in hand (cost reduced by 3).',
           'game.log.effect.noTarget',
-          { card: 'JIRAIYA', id: '105/130' },
+          { card: 'JIRAIYA', id: 'KS-105-R' },
         ),
       },
     };
@@ -80,7 +80,7 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Jiraiya (105) UPGRADE: No enemy characters in this mission to move.',
           'game.log.effect.noTarget',
-          { card: 'JIRAIYA', id: '105/130' },
+          { card: 'JIRAIYA', id: 'KS-105-R' },
         ),
       },
     };
@@ -96,6 +96,6 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerJiraiya105Handlers(): void {
-  registerEffect('105/130', 'MAIN', jiraiya105MainHandler);
-  registerEffect('105/130', 'UPGRADE', jiraiya105UpgradeHandler);
+  registerEffect('KS-105-R', 'MAIN', jiraiya105MainHandler);
+  registerEffect('KS-105-R', 'UPGRADE', jiraiya105UpgradeHandler);
 }

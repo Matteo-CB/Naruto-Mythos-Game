@@ -198,13 +198,13 @@ describe('Action Phase', () => {
       // Place a low-cost Naruto on the board
       const lowNaruto = mockCharInPlay(
         { controlledBy: 'player1', missionIndex: 0 },
-        { id: '010/130', name_fr: 'Naruto', title_fr: 'Genin', chakra: 3, power: 3 },
+        { id: 'KS-010-C', name_fr: 'Naruto', title_fr: 'Genin', chakra: 3, power: 3 },
       );
       state.activeMissions[0].player1Characters.push(lowNaruto);
 
       // Put a higher-cost Naruto in hand
       state.player1.hand[0] = mockCharacter({
-        id: '011/130',
+        id: 'KS-011-C',
         name_fr: 'Naruto',
         title_fr: 'Rasengan',
         chakra: 5,

@@ -29,7 +29,7 @@ const rarityColorMap: Record<string, string> = {
   C: "#888888",
   UC: "#3e8b3e",
   R: "#c4a35a",
-  RART: "#c4a35a",
+  RA: "#c4a35a",
   S: "#b33e3e",
   SV: "#b33e3e",
   M: "#6a6abb",

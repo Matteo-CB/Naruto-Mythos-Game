@@ -42,25 +42,15 @@ const TEXT_DIM = '#888888';
 // =====================================================================
 
 function extractCardInfoFromPath(imagePath: string): { number: string; name: string } {
-  // Normalize slashes
   const path = imagePath.replace(/\\/g, '/');
-  // Get filename without extension, e.g. "108-130_NARUTO_UZUMAKI"
+  // Get filename without extension, e.g. "KS-108-R"
   const filename = path.split('/').pop()?.replace(/\.\w+$/, '') ?? '';
-  // Match pattern like "108-130_NAME" or "108-130 A_NAME" or "MSS 01_NAME"
-  const missionMatch = filename.match(/^(MSS[\s_]\d+)[\s_](.+)$/i);
-  if (missionMatch) {
-    const num = missionMatch[1].replace('_', ' ');
-    const name = missionMatch[2].replace(/_/g, ' ');
-    return { number: num, name };
+  // Match new format: KS-XXX-RARITY
+  const ksMatch = filename.match(/^KS-(\d+[a-z]?)-(\w+)$/);
+  if (ksMatch) {
+    return { number: ksMatch[1], name: ksMatch[2] };
   }
-  const match = filename.match(/^(\d+)-(\d+)(?:\s*[A-Z])?[_\s](.+)$/);
-  if (match) {
-    const number = `${match[1]}/${match[2]}`;
-    const name = match[3].replace(/_/g, ' ');
-    return { number, name };
-  }
-  // Fallback
-  return { number: '', name: filename.replace(/_/g, ' ') };
+  return { number: '', name: filename };
 }
 
 // =====================================================================

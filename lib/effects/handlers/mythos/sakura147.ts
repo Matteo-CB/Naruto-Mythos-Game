@@ -21,11 +21,11 @@ function sakura147MainHandler(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Sakura Haruno (147): CHAKRA +2 while you do not hold the Edge token (continuous).',
     'game.log.effect.continuous',
-    { card: 'SAKURA HARUNO', id: '147/130' },
+    { card: 'SAKURA HARUNO', id: 'KS-147-M' },
   );
   return { state: { ...ctx.state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('147/130', 'MAIN', sakura147MainHandler);
+  registerEffect('KS-147-M', 'MAIN', sakura147MainHandler);
 }

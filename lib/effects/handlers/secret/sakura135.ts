@@ -31,7 +31,7 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Sakura Haruno (135): Deck is empty, no cards to look at.',
       'game.log.effect.noTarget',
-      { card: 'SAKURA HARUNO', id: '135/130' },
+      { card: 'SAKURA HARUNO', id: 'KS-135-S' },
     );
     return { state: { ...state, log } };
   }
@@ -64,7 +64,7 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Sakura Haruno (135): No affordable character in top ${topCards.length} cards, all discarded.`,
       'game.log.effect.discardCards',
-      { card: 'SAKURA HARUNO', id: '135/130', count: topCards.length },
+      { card: 'SAKURA HARUNO', id: 'KS-135-S', count: topCards.length },
     );
     return { state: { ...newState, log } };
   }
@@ -99,5 +99,5 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerSakura135Handlers(): void {
-  registerEffect('135/130', 'MAIN', sakura135MainHandler);
+  registerEffect('KS-135-S', 'MAIN', sakura135MainHandler);
 }

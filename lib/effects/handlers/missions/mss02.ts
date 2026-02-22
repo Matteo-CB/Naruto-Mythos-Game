@@ -14,5 +14,5 @@ function mss02ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss02Handlers(): void {
-  registerEffect('MSS 02', 'SCORE', mss02ScoreHandler);
+  registerEffect('KS-002-MMS', 'SCORE', mss02ScoreHandler);
 }

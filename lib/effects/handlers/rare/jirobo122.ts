@@ -61,7 +61,7 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         `Jirobo (122): POWERUP ${totalChars} (total characters in this mission).`,
         'game.log.effect.powerupSelf',
-        { card: 'JIROBO', id: '122/130', amount: totalChars },
+        { card: 'JIROBO', id: 'KS-122-R', amount: totalChars },
       ),
     },
   };
@@ -88,7 +88,7 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Jirobo (122) UPGRADE: No enemy with Power 1 or less in this mission.',
           'game.log.effect.noTarget',
-          { card: 'JIROBO', id: '122/130' },
+          { card: 'JIROBO', id: 'KS-122-R' },
         ),
       },
     };
@@ -106,7 +106,7 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Jirobo (122) UPGRADE: Defeated ${targetName} (Power ${targetChar ? getEffectivePower(targetChar) : 0}).`,
         'game.log.effect.defeat',
-        { card: 'JIROBO', id: '122/130', target: targetName },
+        { card: 'JIROBO', id: 'KS-122-R', target: targetName },
       ),
     };
     return { state: newState };
@@ -122,6 +122,6 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerJirobo122Handlers(): void {
-  registerEffect('122/130', 'MAIN', jirobo122MainHandler);
-  registerEffect('122/130', 'UPGRADE', jirobo122UpgradeHandler);
+  registerEffect('KS-122-R', 'MAIN', jirobo122MainHandler);
+  registerEffect('KS-122-R', 'UPGRADE', jirobo122UpgradeHandler);
 }

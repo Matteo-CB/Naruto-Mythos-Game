@@ -25,7 +25,7 @@ function choji112MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Choji Akimichi (112): Hand is empty, cannot discard.',
       'game.log.effect.noTarget',
-      { card: 'CHOJI AKIMICHI', id: '112/130' },
+      { card: 'CHOJI AKIMICHI', id: 'KS-112-R' },
     );
     return { state: { ...state, log } };
   }
@@ -50,6 +50,6 @@ function choji112UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerChoji112Handlers(): void {
-  registerEffect('112/130', 'MAIN', choji112MainHandler);
-  registerEffect('112/130', 'UPGRADE', choji112UpgradeHandler);
+  registerEffect('KS-112-R', 'MAIN', choji112MainHandler);
+  registerEffect('KS-112-R', 'UPGRADE', choji112UpgradeHandler);
 }

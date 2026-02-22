@@ -53,7 +53,7 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
       ? 'Shino Aburame (033): Ambush - Jutsu enemy present, cost reduced by 4 (refunded).'
       : 'Shino Aburame (033): Ambush triggered - no Jutsu enemy in this mission.',
     'game.log.effect.ambush',
-    { card: 'SHINO ABURAME', id: '033/130' },
+    { card: 'SHINO ABURAME', id: 'KS-033-UC' },
   );
 
   return { state: { ...newState, log } };
@@ -90,7 +90,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shino Aburame (033): No valid mission to move to.',
-      'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: '033/130' }) } };
+      'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
   // If only one valid destination, auto-apply
@@ -144,13 +144,13 @@ function moveCharacter(
     'EFFECT_MOVE',
     `Shino Aburame (033): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (upgrade).`,
     'game.log.effect.move',
-    { card: 'SHINO ABURAME', id: '033/130', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
+    { card: 'SHINO ABURAME', id: 'KS-033-UC', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
   );
 
   return { ...state, activeMissions: missions, log };
 }
 
 export function registerShino033Handlers(): void {
-  registerEffect('033/130', 'AMBUSH', handleShino033Ambush);
-  registerEffect('033/130', 'UPGRADE', handleShino033Upgrade);
+  registerEffect('KS-033-UC', 'AMBUSH', handleShino033Ambush);
+  registerEffect('KS-033-UC', 'UPGRADE', handleShino033Upgrade);
 }

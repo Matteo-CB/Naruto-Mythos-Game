@@ -78,6 +78,23 @@ export function validatePlayHidden(
     return { valid: false, reason: `Not enough chakra to play hidden (need ${HIDDEN_PLAY_COST}).` };
   }
 
+  // Shikamaru 111 (R): Opponent cannot play characters hidden in this mission
+  const opponent = player === 'player1' ? 'player2' : 'player1';
+  const mission = state.activeMissions[missionIndex];
+  const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
+  for (const c of opponentChars) {
+    if (c.isHidden) continue;
+    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    if (topCard.number === 111) {
+      const hasRestriction = (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
+      );
+      if (hasRestriction) {
+        return { valid: false, reason: 'Shikamaru Nara blocks playing characters hidden in this mission.' };
+      }
+    }
+  }
+
   // Hidden characters can coexist with same name until revealed
   // No name uniqueness check for hidden play
 
@@ -162,10 +179,16 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.' };
   }
 
-  // Must be same name
   const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
-  if (newCard.name_fr.toUpperCase() !== topCard.name_fr.toUpperCase()) {
-    return { valid: false, reason: 'Upgrade must be same character name.' };
+
+  // Check special upgrade rules
+  const isFlexibleUpgrade = checkFlexibleUpgrade(newCard, topCard);
+
+  if (!isFlexibleUpgrade) {
+    // Standard upgrade: must be same name
+    if (newCard.name_fr.toUpperCase() !== topCard.name_fr.toUpperCase()) {
+      return { valid: false, reason: 'Upgrade must be same character name.' };
+    }
   }
 
   // Must have strictly higher cost
@@ -181,6 +204,53 @@ export function validateUpgradeCharacter(
   }
 
   return { valid: true };
+}
+
+/**
+ * Check if a card has a flexible upgrade rule that allows upgrading over
+ * a different-name character.
+ *
+ * - Orochimaru 051 (UC) / 138 (S): Can upgrade any non-Summon, non-Orochimaru
+ * - Akamaru 029 (UC): Can upgrade over Kiba Inuzuka
+ * - Ichibi 076 (UC): Can upgrade any Gaara
+ */
+function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
+  // Already same name — standard upgrade, no special rule needed
+  if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
+
+  // Orochimaru 051/138: Can upgrade over any non-Summon, non-Orochimaru
+  if (newCard.number === 51 || newCard.number === 138) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'),
+    );
+    if (hasFlexible) {
+      const isSummon = (targetCard.keywords ?? []).includes('Summon');
+      const isOrochimaru = targetCard.name_fr.toUpperCase().includes('OROCHIMARU');
+      return !isSummon && !isOrochimaru;
+    }
+  }
+
+  // Akamaru 029 (UC): Can upgrade over Kiba Inuzuka
+  if (newCard.number === 29) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Kiba Inuzuka'),
+    );
+    if (hasFlexible) {
+      return targetCard.name_fr.toUpperCase().includes('KIBA INUZUKA');
+    }
+  }
+
+  // Ichibi 076 (UC): Can upgrade any Gaara
+  if (newCard.number === 76) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+    );
+    if (hasFlexible) {
+      return targetCard.name_fr.toUpperCase() === 'GAARA';
+    }
+  }
+
+  return false;
 }
 
 /**

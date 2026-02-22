@@ -34,7 +34,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_CONTINUOUS',
       'Shikamaru Nara (150): Opponent cannot play characters hidden in this mission (continuous).',
       'game.log.effect.continuous',
-      { card: 'SHIKAMARU NARA', id: '150/130' },
+      { card: 'SHIKAMARU NARA', id: 'KS-150-M' },
     ),
   };
 
@@ -56,7 +56,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Shikamaru Nara (150): No enemy with Power 3 or less in this mission to hide (upgrade).',
           'game.log.effect.noTarget',
-          { card: 'SHIKAMARU NARA', id: '150/130' },
+          { card: 'SHIKAMARU NARA', id: 'KS-150-M' },
         ),
       };
       return { state };
@@ -92,7 +92,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_HIDE',
           `Shikamaru Nara (150): Hid enemy ${target.card.name_fr} in this mission (upgrade).`,
           'game.log.effect.hide',
-          { card: 'SHIKAMARU NARA', id: '150/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+          { card: 'SHIKAMARU NARA', id: 'KS-150-M', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
         ),
       };
     }
@@ -107,6 +107,6 @@ function shikamaru150UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerShikamaru150Handlers(): void {
-  registerEffect('150/130', 'MAIN', shikamaru150MainHandler);
-  registerEffect('150/130', 'UPGRADE', shikamaru150UpgradeHandler);
+  registerEffect('KS-150-M', 'MAIN', shikamaru150MainHandler);
+  registerEffect('KS-150-M', 'UPGRADE', shikamaru150UpgradeHandler);
 }

@@ -33,7 +33,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shikamaru Nara (022): No enemy character in play to move.',
-      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: '022/130' }) } };
+      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
   }
 
   // Requires target selection: which enemy to move (then which mission to move to)
@@ -47,5 +47,5 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('022/130', 'AMBUSH', handleShikamaru022Ambush);
+  registerEffect('KS-022-UC', 'AMBUSH', handleShikamaru022Ambush);
 }

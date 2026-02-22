@@ -56,7 +56,7 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
       state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
         `Naruto Uzumaki (133): Defeated enemy ${target1.card.name_fr} in this mission (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'NARUTO UZUMAKI', id: '133/130', target: target1.card.name_fr }) };
+        { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target1.card.name_fr }) };
     } else {
       const missions = [...state.activeMissions];
       const mission = { ...missions[ctx.sourceMissionIndex] };
@@ -69,14 +69,14 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
         state = { ...state, activeMissions: missions, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_HIDE',
           `Naruto Uzumaki (133): Hid enemy ${target1.card.name_fr} in this mission.`,
           'game.log.effect.hide',
-          { card: 'NARUTO UZUMAKI', id: '133/130', target: target1.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` }) };
+          { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target1.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` }) };
       }
     }
   } else {
     state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_NO_TARGET',
       'Naruto Uzumaki (133): No valid enemy with Power 5 or less in this mission.',
       'game.log.effect.noTarget',
-      { card: 'NARUTO UZUMAKI', id: '133/130' }) };
+      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' }) };
   }
 
   // Apply to target 2
@@ -86,7 +86,7 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
       state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
         `Naruto Uzumaki (133): Defeated enemy ${target2.card.name_fr} in mission ${target2MissionIndex} (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'NARUTO UZUMAKI', id: '133/130', target: target2.card.name_fr }) };
+        { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target2.card.name_fr }) };
     } else {
       const missions = [...state.activeMissions];
       const mission = { ...missions[target2MissionIndex] };
@@ -99,19 +99,19 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
         state = { ...state, activeMissions: missions, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_HIDE',
           `Naruto Uzumaki (133): Hid enemy ${target2.card.name_fr} in mission ${target2MissionIndex}.`,
           'game.log.effect.hide',
-          { card: 'NARUTO UZUMAKI', id: '133/130', target: target2.card.name_fr, mission: `mission ${target2MissionIndex}` }) };
+          { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target2.card.name_fr, mission: `mission ${target2MissionIndex}` }) };
       }
     }
   } else {
     state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_NO_TARGET',
       'Naruto Uzumaki (133): No valid second enemy with Power 2 or less in play.',
       'game.log.effect.noTarget',
-      { card: 'NARUTO UZUMAKI', id: '133/130' }) };
+      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' }) };
   }
 
   return { state };
 }
 
 export function registerNaruto133Handlers(): void {
-  registerEffect('133/130', 'MAIN', naruto133MainHandler);
+  registerEffect('KS-133-S', 'MAIN', naruto133MainHandler);
 }

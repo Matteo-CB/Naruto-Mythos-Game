@@ -43,7 +43,7 @@ export function checkNinjaHoundsTrigger(
       'EFFECT',
       `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} - looked at hidden ${hiddenChar.card.name_fr}.`,
       'game.log.effect.lookAtHidden',
-      { card: 'Chiens Ninjas', id: '100/130', target: hiddenChar.card.name_fr },
+      { card: 'Chiens Ninjas', id: 'KS-100-C', target: hiddenChar.card.name_fr },
     ),
   };
 }

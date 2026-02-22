@@ -28,7 +28,7 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
   if (!hasOtherTeam7) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sakura Haruno (011): No other Team 7 character in this mission.',
-      'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: '011/130' }) } };
+      'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-011-C' }) } };
   }
 
   // Draw a card
@@ -47,12 +47,12 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Sakura Haruno (011): Drew 1 card (Team 7 synergy).`,
     'game.log.effect.draw',
-    { card: 'Sakura Haruno', id: '011/130', count: 1 },
+    { card: 'Sakura Haruno', id: 'KS-011-C', count: 1 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('011/130', 'MAIN', handleSakura011Main);
+  registerEffect('KS-011-C', 'MAIN', handleSakura011Main);
 }

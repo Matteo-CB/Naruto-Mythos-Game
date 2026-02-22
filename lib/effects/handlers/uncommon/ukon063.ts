@@ -28,11 +28,11 @@ function handleUkon063Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Ukon (063): Can be played as upgrade over any Sound Village character (continuous).',
     'game.log.effect.continuous',
-    { card: 'UKON', id: '063/130' },
+    { card: 'UKON', id: 'KS-063-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('063/130', 'MAIN', handleUkon063Main);
+  registerEffect('KS-063-UC', 'MAIN', handleUkon063Main);
 }

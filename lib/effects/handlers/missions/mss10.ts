@@ -14,5 +14,5 @@ function mss10ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss10Handlers(): void {
-  registerEffect('MSS 10', 'SCORE', mss10ScoreHandler);
+  registerEffect('KS-010-MMS', 'SCORE', mss10ScoreHandler);
 }

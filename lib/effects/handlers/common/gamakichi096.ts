@@ -19,5 +19,5 @@ function handleGamakichi096Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('096/130', 'MAIN', handleGamakichi096Main);
+  registerEffect('KS-096-C', 'MAIN', handleGamakichi096Main);
 }

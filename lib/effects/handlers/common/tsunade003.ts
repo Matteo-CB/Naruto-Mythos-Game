@@ -19,5 +19,5 @@ function handleTsunade003Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('003/130', 'MAIN', handleTsunade003Main);
+  registerEffect('KS-003-C', 'MAIN', handleTsunade003Main);
 }

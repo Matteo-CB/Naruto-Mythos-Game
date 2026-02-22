@@ -12,5 +12,5 @@ function handleZabuza086Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('086/130', 'MAIN', handleZabuza086Main);
+  registerEffect('KS-086-C', 'MAIN', handleZabuza086Main);
 }

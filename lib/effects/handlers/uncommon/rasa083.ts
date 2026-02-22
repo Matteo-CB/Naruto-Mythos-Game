@@ -38,7 +38,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'Rasa (083): No other friendly Sand Village character in this mission. No bonus point.',
       'game.log.effect.noTarget',
-      { card: 'RASA', id: '083/130' },
+      { card: 'RASA', id: 'KS-083-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -57,7 +57,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
     'SCORE_BONUS_POINT',
     'Rasa (083): Another Sand Village character present - gained 1 bonus Mission point.',
     'game.log.score.bonusPoint',
-    { card: 'RASA', id: '083/130', amount: 1 },
+    { card: 'RASA', id: 'KS-083-UC', amount: 1 },
   );
   newState.log = log;
 
@@ -65,5 +65,5 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('083/130', 'SCORE', handleRasa083Score);
+  registerEffect('KS-083-UC', 'SCORE', handleRasa083Score);
 }

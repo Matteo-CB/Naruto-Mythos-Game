@@ -16,5 +16,5 @@ function handleTayuya064Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('064/130', 'MAIN', handleTayuya064Main);
+  registerEffect('KS-064-C', 'MAIN', handleTayuya064Main);
 }

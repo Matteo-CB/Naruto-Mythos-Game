@@ -35,7 +35,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   if (soundFourMissionCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (059): No missions with a friendly Sound Four character.',
-      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '059/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
   // Find all movable friendly characters (those in missions with at least one other mission)
@@ -51,7 +51,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (059): No friendly characters could be moved.',
-      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '059/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
   return {
@@ -67,5 +67,5 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('059/130', 'MAIN', handleKidomaru059Main);
+  registerEffect('KS-059-C', 'MAIN', handleKidomaru059Main);
 }

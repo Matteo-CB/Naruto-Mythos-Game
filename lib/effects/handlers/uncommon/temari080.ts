@@ -53,7 +53,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Temari (080): No other friendly Sand Village character in play to move.',
       'game.log.effect.noTarget',
-      { card: 'TEMARI', id: '080/130' },
+      { card: 'TEMARI', id: 'KS-080-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -103,7 +103,7 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Temari (080): No valid mission to move this character to (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'TEMARI', id: '080/130' },
+      { card: 'TEMARI', id: 'KS-080-UC' },
     );
     return { state: { ...state, log } };
   }
@@ -120,7 +120,7 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_MOVE',
       `Temari (080): Moved self to mission ${targetMissionIdx + 1} (upgrade).`,
       'game.log.effect.move',
-      { card: 'TEMARI', id: '080/130', mission: String(targetMissionIdx + 1) },
+      { card: 'TEMARI', id: 'KS-080-UC', mission: String(targetMissionIdx + 1) },
     );
     return { state: { ...newState, log } };
   }
@@ -166,6 +166,6 @@ function moveCharacter(
 }
 
 export function registerTemari080Handlers(): void {
-  registerEffect('080/130', 'MAIN', handleTemari080Main);
-  registerEffect('080/130', 'UPGRADE', handleTemari080Upgrade);
+  registerEffect('KS-080-UC', 'MAIN', handleTemari080Main);
+  registerEffect('KS-080-UC', 'UPGRADE', handleTemari080Upgrade);
 }

@@ -33,7 +33,7 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
     // Cannot draw, effect fizzles (no discard required either since "if you do so")
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sakura Haruno (012): Deck is empty, cannot draw (upgrade effect fizzles).',
-      'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: '012/130' }) } };
+      'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-012-UC' }) } };
   }
 
   const newDeck = [...ps.deck];
@@ -47,7 +47,7 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     'Sakura Haruno (012): Drew 1 card (upgrade effect). Must discard 1 card.',
     'game.log.effect.draw',
-    { card: 'SAKURA HARUNO', id: '012/130', count: 1 },
+    { card: 'SAKURA HARUNO', id: 'KS-012-UC', count: 1 },
   ) };
 
   // Must discard 1 card from hand - requires target selection
@@ -72,7 +72,7 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Sakura Haruno (012): Discarded ${discardedCard.name_fr} (upgrade effect).`,
       'game.log.effect.discard',
-      { card: 'SAKURA HARUNO', id: '012/130', target: discardedCard.name_fr },
+      { card: 'SAKURA HARUNO', id: 'KS-012-UC', target: discardedCard.name_fr },
     ) };
 
     return { state: newState };
@@ -88,6 +88,6 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerSakura012Handlers(): void {
-  registerEffect('012/130', 'MAIN', handleSakura012Main);
-  registerEffect('012/130', 'UPGRADE', handleSakura012Upgrade);
+  registerEffect('KS-012-UC', 'MAIN', handleSakura012Main);
+  registerEffect('KS-012-UC', 'UPGRADE', handleSakura012Upgrade);
 }

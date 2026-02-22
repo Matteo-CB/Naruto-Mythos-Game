@@ -20,7 +20,7 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
   if (playerState.deck.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Haku (088): Deck is empty, cannot draw.',
-      'game.log.effect.noTarget', { card: 'HAKU', id: '088/130' }) } };
+      'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-088-C' }) } };
   }
 
   // Draw 1 card
@@ -42,7 +42,7 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Haku (088): Drew 1 card. Must put 1 card back on top of deck.`,
     'game.log.effect.draw',
-    { card: 'HAKU', id: '088/130', count: 1 },
+    { card: 'HAKU', id: 'KS-088-C', count: 1 },
   );
 
   const newState = {
@@ -64,5 +64,5 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('088/130', 'MAIN', handleHaku088Main);
+  registerEffect('KS-088-C', 'MAIN', handleHaku088Main);
 }

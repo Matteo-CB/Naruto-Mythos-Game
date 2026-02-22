@@ -15,5 +15,5 @@ function handleKurenai034Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('034/130', 'MAIN', handleKurenai034Main);
+  registerEffect('KS-034-C', 'MAIN', handleKurenai034Main);
 }

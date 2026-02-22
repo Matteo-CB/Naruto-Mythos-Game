@@ -36,7 +36,7 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
   if (state.activeMissions.length <= 1) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (060): Only one mission in play, cannot move characters.',
-      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '060/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-060-UC' }) } };
   }
 
   // Find all characters in this mission (not self)
@@ -56,7 +56,7 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (060): No other characters in this mission to move.',
-      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '060/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-060-UC' }) } };
   }
 
   // Require target selection for which character to move
@@ -93,7 +93,7 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (060): No enemy character with Power 1 or less in play.',
-      'game.log.effect.noTarget', { card: 'KIDOMARU', id: '060/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-060-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -103,7 +103,7 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
     let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
     newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
       `Kidomaru (060): Defeated an enemy character with Power 1 or less in mission ${missionIdx + 1} (ambush).`,
-      'game.log.effect.defeat', { card: 'KIDOMARU', id: '060/130', target: '' }) };
+      'game.log.effect.defeat', { card: 'KIDOMARU', id: 'KS-060-UC', target: '' }) };
     return { state: newState };
   }
 
@@ -118,6 +118,6 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerKidomaru060Handlers(): void {
-  registerEffect('060/130', 'MAIN', handleKidomaru060Main);
-  registerEffect('060/130', 'AMBUSH', handleKidomaru060Ambush);
+  registerEffect('KS-060-UC', 'MAIN', handleKidomaru060Main);
+  registerEffect('KS-060-UC', 'AMBUSH', handleKidomaru060Ambush);
 }

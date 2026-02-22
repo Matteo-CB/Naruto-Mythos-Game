@@ -42,7 +42,7 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_NO_TARGET',
         `Naruto Uzumaki (108): No valid enemy with Power 3 or less in this mission.`,
         'game.log.effect.noTarget',
-        { card: 'NARUTO UZUMAKI', id: '108/130' },
+        { card: 'NARUTO UZUMAKI', id: 'KS-108-R' },
       ),
     };
     return { state };
@@ -67,7 +67,7 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_HIDE',
         `Naruto Uzumaki (108): Hid enemy ${target.card.name_fr} (Power ${targetPower}) in this mission.`,
         'game.log.effect.hide',
-        { card: 'NARUTO UZUMAKI', id: '108/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+        { card: 'NARUTO UZUMAKI', id: 'KS-108-R', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
       ),
     };
   }
@@ -96,7 +96,7 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_POWERUP',
           `Naruto Uzumaki (108): POWERUP ${targetPower} (Power of hidden ${target.card.name_fr}).`,
           'game.log.effect.powerup',
-          { card: 'NARUTO UZUMAKI', id: '108/130', amount: targetPower, target: 'self' },
+          { card: 'NARUTO UZUMAKI', id: 'KS-108-R', amount: targetPower, target: 'self' },
         ),
       };
     }
@@ -106,6 +106,6 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerNaruto108Handlers(): void {
-  registerEffect('108/130', 'MAIN', naruto108MainHandler);
+  registerEffect('KS-108-R', 'MAIN', naruto108MainHandler);
   // No AMBUSH effect for this card — the old "place top card as hidden" was incorrect
 }

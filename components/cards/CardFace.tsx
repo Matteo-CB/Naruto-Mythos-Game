@@ -15,7 +15,7 @@ const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
   UC: '#22c55e',      // green
   R: '#3b82f6',       // blue
-  RART: '#a855f7',    // purple
+  RA: '#a855f7',    // purple
   S: '#eab308',       // gold
   SV: '#eab308',      // gold
   M: '#ef4444',       // red

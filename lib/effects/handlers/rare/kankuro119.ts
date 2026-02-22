@@ -43,7 +43,7 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kankuro (119): No enemy with Power 3 or less in this mission.',
           'game.log.effect.noTarget',
-          { card: 'KANKURO', id: '119/130' },
+          { card: 'KANKURO', id: 'KS-119-R' },
         ),
       },
     };
@@ -61,7 +61,7 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kankuro (119): Defeated ${targetName} (Power ${targetChar ? getEffectivePower(targetChar) : 0}).`,
         'game.log.effect.defeat',
-        { card: 'KANKURO', id: '119/130', target: targetName },
+        { card: 'KANKURO', id: 'KS-119-R', target: targetName },
       ),
     };
     return { state: newState };
@@ -104,7 +104,7 @@ function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kankuro (119) UPGRADE: No characters in play to move.',
           'game.log.effect.noTarget',
-          { card: 'KANKURO', id: '119/130' },
+          { card: 'KANKURO', id: 'KS-119-R' },
         ),
       },
     };
@@ -120,6 +120,6 @@ function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKankuro119Handlers(): void {
-  registerEffect('119/130', 'MAIN', kankuro119MainHandler);
-  registerEffect('119/130', 'UPGRADE', kankuro119UpgradeHandler);
+  registerEffect('KS-119-R', 'MAIN', kankuro119MainHandler);
+  registerEffect('KS-119-R', 'UPGRADE', kankuro119UpgradeHandler);
 }

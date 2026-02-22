@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -223,17 +224,27 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       {character.stackSize > 1 && (
         <motion.div
           initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          animate={{
+            scale: 1,
+            boxShadow: [
+              '0 0 3px rgba(62, 139, 62, 0.2)',
+              '0 0 8px rgba(62, 139, 62, 0.5)',
+              '0 0 3px rgba(62, 139, 62, 0.2)',
+            ],
+          }}
+          transition={{
+            scale: { type: 'spring', stiffness: 400, damping: 20 },
+            boxShadow: { repeat: Infinity, duration: 2.5 },
+          }}
           className="absolute bottom-0.5 left-0.5 rounded-md px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5"
           style={{
-            backgroundColor: 'rgba(62, 139, 62, 0.2)',
+            backgroundColor: 'rgba(62, 139, 62, 0.25)',
             color: '#5cb85c',
-            border: '1px solid rgba(62, 139, 62, 0.4)',
+            border: '1px solid rgba(62, 139, 62, 0.5)',
             textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
           }}
         >
-          <span style={{ fontSize: '7px' }}>UP</span>
+          <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>UP</span>
           <span>{character.stackSize}</span>
         </motion.div>
       )}
@@ -366,7 +377,7 @@ interface MissionLaneProps {
   missionIndex: number;
 }
 
-export function MissionLane({ mission, missionIndex }: MissionLaneProps) {
+export const MissionLane = React.memo(function MissionLane({ mission, missionIndex }: MissionLaneProps) {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -397,13 +408,18 @@ export function MissionLane({ mission, missionIndex }: MissionLaneProps) {
       ? mission.player2Characters
       : mission.player1Characters;
 
-  // Power totals (effectivePower includes continuous modifiers from engine)
-  const myPower = myChars.reduce((sum, c) => sum + c.effectivePower, 0);
-  const oppPower = oppChars.reduce((sum, c) => {
-    // Can't see hidden enemy effective power
-    if (c.isHidden && !c.isOwn) return sum;
-    return sum + c.effectivePower;
-  }, 0);
+  // Power totals (memoized to avoid recomputation on every render)
+  const myPower = useMemo(
+    () => myChars.reduce((sum, c) => sum + c.effectivePower, 0),
+    [myChars],
+  );
+  const oppPower = useMemo(
+    () => oppChars.reduce((sum, c) => {
+      if (c.isHidden && !c.isOwn) return sum;
+      return sum + c.effectivePower;
+    }, 0),
+    [oppChars],
+  );
 
   const handleClick = () => {
     if (!isTargetable) return;
@@ -518,4 +534,4 @@ export function MissionLane({ mission, missionIndex }: MissionLaneProps) {
       </div>
     </motion.div>
   );
-}
+});

@@ -33,7 +33,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     'EFFECT_LOOK_HAND',
     `Itachi Uchiwa (091): Looked at opponent's hand (${opponentHand.length} cards).`,
     'game.log.effect.lookHand',
-    { card: 'ITACHI UCHIWA', id: '091/130', count: String(opponentHand.length) },
+    { card: 'ITACHI UCHIWA', id: 'KS-091-UC', count: String(opponentHand.length) },
   );
 
   const newState = { ...state, log };
@@ -53,7 +53,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Itachi Uchiwa (091): Opponent has no cards in hand to discard (upgrade).',
       'game.log.effect.noTarget',
-      { card: 'ITACHI UCHIWA', id: '091/130' },
+      { card: 'ITACHI UCHIWA', id: 'KS-091-UC' },
     );
     return { state: { ...newState, log: noTargetLog } };
   }
@@ -74,7 +74,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD_FROM_HAND',
       `Itachi Uchiwa (091): Discarded ${discardedCard.name_fr} from opponent's hand (upgrade).`,
       'game.log.effect.discardFromHand',
-      { card: 'ITACHI UCHIWA', id: '091/130', target: discardedCard.name_fr },
+      { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: discardedCard.name_fr },
     );
     return { state: { ...newState, log: discardLog } };
   }
@@ -92,7 +92,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerItachi091Handlers(): void {
-  registerEffect('091/130', 'MAIN', handleItachi091Main);
+  registerEffect('KS-091-UC', 'MAIN', handleItachi091Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to add the discard step
 }

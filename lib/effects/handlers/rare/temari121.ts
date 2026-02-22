@@ -42,7 +42,7 @@ function temari121MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Temari (121) MAIN: No friendly characters in play to move.',
           'game.log.effect.noTarget',
-          { card: 'TEMARI', id: '121/130' },
+          { card: 'TEMARI', id: 'KS-121-R' },
         ),
       },
     };
@@ -89,7 +89,7 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Temari (121) UPGRADE: No characters in play to move.',
           'game.log.effect.noTarget',
-          { card: 'TEMARI', id: '121/130' },
+          { card: 'TEMARI', id: 'KS-121-R' },
         ),
       },
     };
@@ -105,6 +105,6 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerTemari121Handlers(): void {
-  registerEffect('121/130', 'MAIN', temari121MainHandler);
-  registerEffect('121/130', 'UPGRADE', temari121UpgradeHandler);
+  registerEffect('KS-121-R', 'MAIN', temari121MainHandler);
+  registerEffect('KS-121-R', 'UPGRADE', temari121UpgradeHandler);
 }

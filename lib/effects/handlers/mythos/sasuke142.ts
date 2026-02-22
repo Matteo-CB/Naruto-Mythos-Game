@@ -27,7 +27,7 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Sasuke Uchiwa (142): No cards in hand to discard, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'SASUKE UCHIWA', id: '142/130' },
+      { card: 'SASUKE UCHIWA', id: 'KS-142-M' },
     );
     return { state: { ...state, log } };
   }
@@ -58,7 +58,7 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Sasuke Uchiwa (142): Discarded ${discarded.name_fr} from hand.`,
       'game.log.effect.discardSelf',
-      { card: 'SASUKE UCHIWA', id: '142/130', target: discarded.name_fr },
+      { card: 'SASUKE UCHIWA', id: 'KS-142-M', target: discarded.name_fr },
     ),
   };
 
@@ -95,7 +95,7 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_POWERUP',
         `Sasuke Uchiwa (142): POWERUP ${powerupAmount} (X+1, X=${enemyCount} enemy characters in this mission).`,
         'game.log.effect.powerupSelf',
-        { card: 'SASUKE UCHIWA', id: '142/130', amount: powerupAmount },
+        { card: 'SASUKE UCHIWA', id: 'KS-142-M', amount: powerupAmount },
       ),
     };
   }
@@ -104,5 +104,5 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerSasuke142Handlers(): void {
-  registerEffect('142/130', 'MAIN', sasuke142MainHandler);
+  registerEffect('KS-142-M', 'MAIN', sasuke142MainHandler);
 }

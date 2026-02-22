@@ -43,7 +43,7 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Kakashi Hatake (106): No upgraded enemy characters to de-evolve.',
           'game.log.effect.noTarget',
-          { card: 'KAKASHI HATAKE', id: '106/130' },
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
         ),
       },
     };
@@ -114,7 +114,7 @@ function applyDevolve(
           'EFFECT_DEVOLVE',
           `Kakashi Hatake (106): Discarded top card ${discardedCard.name_fr} from enemy ${newTopCard.name_fr}'s stack.`,
           'game.log.effect.devolve',
-          { card: 'KAKASHI HATAKE', id: '106/130', target: discardedCard.name_fr },
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
         ),
       };
 
@@ -129,7 +129,7 @@ function applyDevolve(
             'EFFECT_COPY',
             `Kakashi Hatake (106) UPGRADE: Copied non-Upgrade effect of ${discardedCard.name_fr}.`,
             'game.log.effect.copy',
-            { card: 'KAKASHI HATAKE', id: '106/130', target: discardedCard.name_fr },
+            { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
           ),
         };
       }
@@ -147,6 +147,6 @@ function kakashi106UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKakashi106Handlers(): void {
-  registerEffect('106/130', 'MAIN', kakashi106MainHandler);
-  registerEffect('106/130', 'UPGRADE', kakashi106UpgradeHandler);
+  registerEffect('KS-106-R', 'MAIN', kakashi106MainHandler);
+  registerEffect('KS-106-R', 'UPGRADE', kakashi106UpgradeHandler);
 }

@@ -11,11 +11,11 @@ import Image from 'next/image';
 const TOTAL_LESSONS = 8;
 
 const CARD_IMAGES = {
-  narutoRare: '/images/rare/108-130_NARUTO_UZUMAKI.webp',
-  narutoCommon: '/images/common/009-130_NARUTO_UZUMAKI.webp',
-  orochimaru: '/images/common/050-130_OROCHIMARU.webp',
-  missionSupport: '/images/mission/MSS_01_Appel_de_soutien.webp',
-  missionChunin: '/images/mission/MSS_02_Examen_Ch\u00FBnin.webp',
+  narutoRare: '/images/cards/KS/rare/KS-108-R.webp',
+  narutoCommon: '/images/cards/KS/common/KS-009-C.webp',
+  orochimaru: '/images/cards/KS/common/KS-050-C.webp',
+  missionSupport: '/images/cards/KS/mission/KS-001-MMS.webp',
+  missionChunin: '/images/cards/KS/mission/KS-002-MMS.webp',
   cardBack: '/images/card-back.webp',
   scrollKunai: '/images/icons/scroll-kunai.webp',
   shuriken: '/images/icons/shuriken.webp',

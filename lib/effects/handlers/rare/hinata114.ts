@@ -47,7 +47,7 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Hinata Hyuga (114): POWERUP 2 on self.',
       'game.log.effect.powerupSelf',
-      { card: 'HINATA HYUGA', id: '114/130', amount: 2 },
+      { card: 'HINATA HYUGA', id: 'KS-114-R', amount: 2 },
     ),
   };
 
@@ -75,7 +75,7 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Hinata Hyuga (114): No other character in play for POWERUP 1.',
           'game.log.effect.noTarget',
-          { card: 'HINATA HYUGA', id: '114/130' },
+          { card: 'HINATA HYUGA', id: 'KS-114-R' },
         ),
       },
     };
@@ -128,7 +128,7 @@ function applyPowerup1(
         'EFFECT_POWERUP',
         `Hinata Hyuga (114): POWERUP 1 on ${targetName}.`,
         'game.log.effect.powerup',
-        { card: 'HINATA HYUGA', id: '114/130', amount: 1, target: targetName },
+        { card: 'HINATA HYUGA', id: 'KS-114-R', amount: 1, target: targetName },
       ),
     },
   };
@@ -158,7 +158,7 @@ function hinata114UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Hinata Hyuga (114) UPGRADE: No enemy character with Power tokens.',
           'game.log.effect.noTarget',
-          { card: 'HINATA HYUGA', id: '114/130' },
+          { card: 'HINATA HYUGA', id: 'KS-114-R' },
         ),
       },
     };
@@ -216,13 +216,13 @@ function applyRemoveTokens(
         'EFFECT_REMOVE_TOKENS',
         `Hinata Hyuga (114) UPGRADE: Removed ${removedAmount} Power tokens from ${targetName}.`,
         'game.log.effect.removeTokens',
-        { card: 'HINATA HYUGA', id: '114/130', amount: removedAmount, target: targetName },
+        { card: 'HINATA HYUGA', id: 'KS-114-R', amount: removedAmount, target: targetName },
       ),
     },
   };
 }
 
 export function registerHinata114Handlers(): void {
-  registerEffect('114/130', 'MAIN', hinata114MainHandler);
-  registerEffect('114/130', 'UPGRADE', hinata114UpgradeHandler);
+  registerEffect('KS-114-R', 'MAIN', hinata114MainHandler);
+  registerEffect('KS-114-R', 'UPGRADE', hinata114UpgradeHandler);
 }

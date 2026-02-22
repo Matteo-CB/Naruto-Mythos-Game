@@ -35,7 +35,7 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
   if (soundFourMissionCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jirobo (057): No missions with a friendly Sound Four character.',
-      'game.log.effect.noTarget', { card: 'JIROBO', id: '057/130' }) } };
+      'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-057-C' }) } };
   }
 
   // POWERUP X on self
@@ -62,12 +62,12 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
     'EFFECT_POWERUP',
     `Jirobo (057): POWERUP ${soundFourMissionCount} on self.`,
     'game.log.effect.powerupSelf',
-    { card: 'Jirobo', id: '057/130', amount: String(soundFourMissionCount) },
+    { card: 'Jirobo', id: 'KS-057-C', amount: String(soundFourMissionCount) },
   );
 
   return { state: { ...newState, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('057/130', 'MAIN', handleJirobo057Main);
+  registerEffect('KS-057-C', 'MAIN', handleJirobo057Main);
 }

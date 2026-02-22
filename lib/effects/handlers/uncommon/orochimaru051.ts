@@ -32,7 +32,7 @@ function handleOrochimaru051Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Orochimaru (051): If this mission is lost, this character will move to another mission (continuous).',
     'game.log.effect.continuous',
-    { card: 'OROCHIMARU', id: '051/130' },
+    { card: 'OROCHIMARU', id: 'KS-051-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -60,7 +60,7 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Orochimaru (051): No hidden enemy character in play to defeat.',
-      'game.log.effect.noTarget', { card: 'OROCHIMARU', id: '051/130' }) } };
+      'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-051-UC' }) } };
   }
 
   // Auto-apply if exactly one target
@@ -70,7 +70,7 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
     let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
     newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
       `Orochimaru (051): Defeated a hidden enemy character in mission ${missionIdx + 1} (upgrade).`,
-      'game.log.effect.defeat', { card: 'OROCHIMARU', id: '051/130', target: '' }) };
+      'game.log.effect.defeat', { card: 'OROCHIMARU', id: 'KS-051-UC', target: '' }) };
     return { state: newState };
   }
 
@@ -85,6 +85,6 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerOrochimaru051Handlers(): void {
-  registerEffect('051/130', 'MAIN', handleOrochimaru051Main);
-  registerEffect('051/130', 'UPGRADE', handleOrochimaru051Upgrade);
+  registerEffect('KS-051-UC', 'MAIN', handleOrochimaru051Main);
+  registerEffect('KS-051-UC', 'UPGRADE', handleOrochimaru051Upgrade);
 }

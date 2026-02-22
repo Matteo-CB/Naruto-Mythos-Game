@@ -33,11 +33,11 @@ function handleIchibi076Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Ichibi (076): Can upgrade any Gaara. Immune to enemy hide/defeat effects (continuous).',
     'game.log.effect.continuous',
-    { card: 'ICHIBI', id: '076/130' },
+    { card: 'ICHIBI', id: 'KS-076-UC' },
   );
   return { state: { ...state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('076/130', 'MAIN', handleIchibi076Main);
+  registerEffect('KS-076-UC', 'MAIN', handleIchibi076Main);
 }

@@ -15,5 +15,5 @@ function handleTenten040Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('040/130', 'MAIN', handleTenten040Main);
+  registerEffect('KS-040-C', 'MAIN', handleTenten040Main);
 }

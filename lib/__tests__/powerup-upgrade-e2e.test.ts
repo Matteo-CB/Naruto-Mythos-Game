@@ -8,25 +8,25 @@ import { GameEngine } from '../engine/GameEngine';
 import { mockCharacter, mockCharInPlay, mockMission, createActionPhaseState } from './testHelpers';
 import type { GameState, CharacterInPlay, TurnNumber } from '../engine/types';
 import { generateInstanceId, generateGameId } from '../engine/utils/id';
-import { getPlayableCharacters } from '../data/cardLoader';
+import { getAllCharacters } from '../data/cardLoader';
 import { getEffectHandler } from '../effects/EffectRegistry';
 
-// Load real card data
-const allChars = getPlayableCharacters();
+// Load ALL card data (including cards without visuals, needed for upgrade tests)
+const allChars = getAllCharacters();
 function findCard(id: string) {
   return allChars.find(c => c.id === id);
 }
 
 describe('POWERUP end-to-end', () => {
   it('Hiruzen 001 should POWERUP 2 on a single friendly Leaf Village target', () => {
-    const hiruzen = findCard('001/130')!;
+    const hiruzen = findCard('KS-001-C')!;
     expect(hiruzen).toBeDefined();
     expect(hiruzen.effects?.some(e => e.type === 'MAIN')).toBe(true);
 
     // A friendly Leaf Village character already on mission 0
     const ally = mockCharInPlay(
       { instanceId: 'ally-leaf', controlledBy: 'player1', missionIndex: 0 },
-      { id: '003/130', name_fr: 'TSUNADE', group: 'Leaf Village', power: 2, chakra: 2 },
+      { id: 'KS-003-C', name_fr: 'TSUNADE', group: 'Leaf Village', power: 2, chakra: 2 },
     );
 
     const state = createActionPhaseState({
@@ -65,7 +65,7 @@ describe('POWERUP end-to-end', () => {
   });
 
   it('Hiruzen 001 should fizzle if no Leaf Village target', () => {
-    const hiruzen = findCard('001/130')!;
+    const hiruzen = findCard('KS-001-C')!;
 
     // Only non-Leaf Village ally
     const ally = mockCharInPlay(
@@ -103,7 +103,7 @@ describe('POWERUP end-to-end', () => {
   });
 
   it('Gaara 074 should POWERUP X where X = number of hidden allies in this mission', () => {
-    const gaara = findCard('074/130')!;
+    const gaara = findCard('KS-074-C')!;
     expect(gaara).toBeDefined();
 
     // Two hidden allies in the same mission
@@ -142,7 +142,7 @@ describe('POWERUP end-to-end', () => {
 
     // Gaara should have powerTokens = 2 (2 hidden allies)
     const playedGaara = newState.activeMissions[0].player1Characters.find(
-      c => c.card.id === '074/130'
+      c => c.card.id === 'KS-074-C'
     );
     expect(playedGaara).toBeDefined();
     expect(playedGaara!.powerTokens).toBe(2);
@@ -151,8 +151,8 @@ describe('POWERUP end-to-end', () => {
 
 describe('UPGRADE end-to-end', () => {
   it('Upgrading Naruto 009 to Naruto 108 should trigger MAIN and UPGRADE effects', () => {
-    const naruto009 = findCard('009/130')!;
-    const naruto108 = findCard('108/130')!;
+    const naruto009 = findCard('KS-009-C')!;
+    const naruto108 = findCard('KS-108-R')!;
     expect(naruto009).toBeDefined();
     expect(naruto108).toBeDefined();
 
@@ -168,7 +168,7 @@ describe('UPGRADE end-to-end', () => {
     // Enemy with power 3 in the same mission
     const enemy = mockCharInPlay(
       { instanceId: 'enemy-1', controlledBy: 'player2', originalOwner: 'player2', missionIndex: 0 },
-      { id: '099/130', name_fr: 'Enemy', power: 3, chakra: 2 },
+      { id: 'KS-099-C', name_fr: 'Enemy', power: 3, chakra: 2 },
     );
 
     const state = createActionPhaseState({
@@ -199,7 +199,7 @@ describe('UPGRADE end-to-end', () => {
     const upgraded = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
     expect(upgraded).toBeDefined();
     expect(upgraded!.stack.length).toBe(2);
-    expect(upgraded!.card.id).toBe('108/130');
+    expect(upgraded!.card.id).toBe('KS-108-R');
 
     // MAIN effect: enemy should be hidden (power 3 <= 3)
     const updatedEnemy = newState.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
@@ -214,8 +214,8 @@ describe('UPGRADE end-to-end', () => {
   });
 
   it('Upgrading Gaara 074 to Gaara 120 should defeat weak enemies and POWERUP X', () => {
-    const gaara074 = findCard('074/130')!;
-    const gaara120 = findCard('120/130')!;
+    const gaara074 = findCard('KS-074-C')!;
+    const gaara120 = findCard('KS-120-R')!;
     expect(gaara074).toBeDefined();
     expect(gaara120).toBeDefined();
 
@@ -276,7 +276,7 @@ describe('UPGRADE end-to-end', () => {
     const upgraded = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'gaara-in-play');
     expect(upgraded).toBeDefined();
     expect(upgraded!.stack.length).toBe(2);
-    expect(upgraded!.card.id).toBe('120/130');
+    expect(upgraded!.card.id).toBe('KS-120-R');
 
     // MAIN effect: weak enemies should be defeated
     const m0Enemies = newState.activeMissions[0].player2Characters;
@@ -290,13 +290,13 @@ describe('UPGRADE end-to-end', () => {
   });
 
   it('Rock Lee 039 UPGRADE should POWERUP 2', () => {
-    const rockLee = findCard('039/130')!;
+    const rockLee = findCard('KS-039-UC')!;
     expect(rockLee).toBeDefined();
 
     // A lower cost Rock Lee already on board
     const leeOnBoard = mockCharInPlay(
       { instanceId: 'lee-in-play', controlledBy: 'player1', missionIndex: 0, powerTokens: 1 },
-      { id: '039/130', name_fr: rockLee.name_fr, chakra: rockLee.chakra - 1, power: rockLee.power - 1, keywords: ['Team Guy'], group: 'Leaf Village',
+      { id: 'KS-039-UC', name_fr: rockLee.name_fr, chakra: rockLee.chakra - 1, power: rockLee.power - 1, keywords: ['Team Guy'], group: 'Leaf Village',
         effects: [
           { type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' },
           { type: 'UPGRADE', description: 'POWERUP 2.' },
@@ -337,7 +337,7 @@ describe('UPGRADE end-to-end', () => {
 
 describe('Card data integrity for effects', () => {
   it('all cards with EFFECT_CORRECTIONS should have effects loaded', () => {
-    const correctedIds = ['108/130', '120/130', '133/130', '137/130', '109/130', '112/130', '135/130'];
+    const correctedIds = ['KS-108-R', 'KS-120-R', 'KS-133-S', 'KS-137-S', 'KS-109-R', 'KS-112-R', 'KS-135-S'];
     for (const id of correctedIds) {
       const card = findCard(id);
       if (!card) continue; // Card might not be playable
@@ -348,8 +348,8 @@ describe('Card data integrity for effects', () => {
 
   it('effect handlers should be registered for key cards', () => {
     const cardsWithHandlers = [
-      '001/130', '003/130', '007/130', '009/130', '011/130', '013/130', '015/130',
-      '039/130', '074/130', '108/130', '120/130', '133/130', '135/130', '136/130', '137/130',
+      'KS-001-C', 'KS-003-C', 'KS-007-C', 'KS-009-C', 'KS-011-C', 'KS-013-C', 'KS-015-C',
+      'KS-039-UC', 'KS-074-C', 'KS-108-R', 'KS-120-R', 'KS-133-S', 'KS-135-S', 'KS-136-S', 'KS-137-S',
     ];
     for (const id of cardsWithHandlers) {
       const handler = getEffectHandler(id, 'MAIN');
@@ -358,9 +358,9 @@ describe('Card data integrity for effects', () => {
   });
 
   it('Naruto cards should have matching names for upgrade chain', () => {
-    const naruto009 = findCard('009/130');
-    const naruto108 = findCard('108/130');
-    const naruto133 = findCard('133/130');
+    const naruto009 = findCard('KS-009-C');
+    const naruto108 = findCard('KS-108-R');
+    const naruto133 = findCard('KS-133-S');
 
     if (naruto009 && naruto108) {
       expect(naruto009.name_fr.toUpperCase()).toBe(naruto108.name_fr.toUpperCase());

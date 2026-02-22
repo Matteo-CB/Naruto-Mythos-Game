@@ -42,7 +42,7 @@ describe('MSS 01 - Call for Support', () => {
       activeMissions: [makeMission('D', [ally])],
     });
 
-    const handler = getEffectHandler('MSS 01', 'SCORE')!;
+    const handler = getEffectHandler('KS-001-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
@@ -54,7 +54,7 @@ describe('MSS 01 - Call for Support', () => {
       activeMissions: [makeMission('D')],
     });
 
-    const handler = getEffectHandler('MSS 01', 'SCORE')!;
+    const handler = getEffectHandler('KS-001-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state).toBeDefined();
   });
@@ -65,7 +65,7 @@ describe('MSS 01 - Call for Support', () => {
 // ===================================================================
 describe('MSS 02 - Chunin Exam', () => {
   it('should have a handler registered (no-op or none)', () => {
-    const handler = getEffectHandler('MSS 02', 'SCORE');
+    const handler = getEffectHandler('KS-002-MMS', 'SCORE');
     // MSS 02 may or may not have a handler. If it does, it should be a no-op.
     if (handler) {
       const state = createActionPhaseState();
@@ -88,7 +88,7 @@ describe('MSS 03 - Find the Traitor', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 03', 'SCORE')!;
+    const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.player2.hand.length).toBe(0);
@@ -105,7 +105,7 @@ describe('MSS 03 - Find the Traitor', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 03', 'SCORE')!;
+    const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.requiresTargetSelection).toBe(true);
@@ -125,7 +125,7 @@ describe('MSS 03 - Find the Traitor', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 03', 'SCORE')!;
+    const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.player2.hand.length).toBe(0);
     expect(result.state.player2.discardPile.length).toBe(0);
@@ -147,7 +147,7 @@ describe('MSS 04 - Assassination', () => {
       activeMissions: [makeMission('D', [], [hiddenEnemy])],
     };
 
-    const handler = getEffectHandler('MSS 04', 'SCORE')!;
+    const handler = getEffectHandler('KS-004-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     // Hidden enemy should be defeated (removed)
@@ -162,7 +162,7 @@ describe('MSS 04 - Assassination', () => {
       activeMissions: [makeMission('D', [], [visibleEnemy])],
     });
 
-    const handler = getEffectHandler('MSS 04', 'SCORE')!;
+    const handler = getEffectHandler('KS-004-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
@@ -183,7 +183,7 @@ describe('MSS 05 - Bring it Back', () => {
       activeMissions: [makeMission('D', [ally])],
     };
 
-    const handler = getEffectHandler('MSS 05', 'SCORE')!;
+    const handler = getEffectHandler('KS-005-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
@@ -197,7 +197,7 @@ describe('MSS 05 - Bring it Back', () => {
       activeMissions: [makeMission('D', [hidden])],
     });
 
-    const handler = getEffectHandler('MSS 05', 'SCORE')!;
+    const handler = getEffectHandler('KS-005-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
@@ -216,7 +216,7 @@ describe('MSS 06 - Rescue a Friend', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 06', 'SCORE')!;
+    const handler = getEffectHandler('KS-006-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.player1.hand.length).toBe(1);
@@ -231,7 +231,7 @@ describe('MSS 06 - Rescue a Friend', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 06', 'SCORE')!;
+    const handler = getEffectHandler('KS-006-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.player1.hand.length).toBe(0);
   });
@@ -250,7 +250,7 @@ describe('MSS 07 - I Have to Go', () => {
       ],
     });
 
-    const handler = getEffectHandler('MSS 07', 'SCORE')!;
+    const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
@@ -267,7 +267,7 @@ describe('MSS 07 - I Have to Go', () => {
       ],
     });
 
-    const handler = getEffectHandler('MSS 07', 'SCORE')!;
+    const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
@@ -286,7 +286,7 @@ describe('MSS 08 - Set a Trap', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 08', 'SCORE')!;
+    const handler = getEffectHandler('KS-008-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
     // Now returns target selection: choose which card from hand
@@ -303,7 +303,7 @@ describe('MSS 08 - Set a Trap', () => {
       activeMissions: [makeMission('D')],
     };
 
-    const handler = getEffectHandler('MSS 08', 'SCORE')!;
+    const handler = getEffectHandler('KS-008-MMS', 'SCORE')!;
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
   });
@@ -314,7 +314,7 @@ describe('MSS 08 - Set a Trap', () => {
 // ===================================================================
 describe('MSS 10 - Chakra Training', () => {
   it('should have a handler registered (no-op or none)', () => {
-    const handler = getEffectHandler('MSS 10', 'SCORE');
+    const handler = getEffectHandler('KS-010-MMS', 'SCORE');
     if (handler) {
       const state = createActionPhaseState({ activeMissions: [makeMission('D')] });
       const result = handler(makeCtx(state, 'player1', 0));
@@ -327,7 +327,7 @@ describe('MSS 10 - Chakra Training', () => {
 // Registry completeness check
 // ===================================================================
 describe('Mission handler registry', () => {
-  const missionIds = ['MSS 01', 'MSS 03', 'MSS 04', 'MSS 05', 'MSS 06', 'MSS 07', 'MSS 08'];
+  const missionIds = ['KS-001-MMS', 'KS-003-MMS', 'KS-004-MMS', 'KS-005-MMS', 'KS-006-MMS', 'KS-007-MMS', 'KS-008-MMS'];
 
   it.each(missionIds)('should have SCORE handler for %s', (mssId) => {
     const handler = getEffectHandler(mssId, 'SCORE');

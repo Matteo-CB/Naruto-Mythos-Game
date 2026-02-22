@@ -32,11 +32,11 @@ function handleRempart067Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Rempart (067): Strongest enemy in this mission has Power = 0 (continuous). Must return to hand at end of round.',
     'game.log.effect.continuous',
-    { card: 'REMPART', id: '067/130' },
+    { card: 'REMPART', id: 'KS-067-UC' },
   );
   return { state: { ...state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('067/130', 'MAIN', handleRempart067Main);
+  registerEffect('KS-067-UC', 'MAIN', handleRempart067Main);
 }

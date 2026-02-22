@@ -37,7 +37,7 @@ function handleKisame093Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kisame Hoshigaki (093): No enemy with Power tokens in play.',
-      'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: '093/130' }) } };
+      'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: 'KS-093-UC' }) } };
   }
 
   // If exactly one target, apply automatically
@@ -115,14 +115,14 @@ function transferPowerTokens(
     'EFFECT_STEAL_TOKENS',
     `Kisame Hoshigaki (093): Stole ${transferDesc} Power tokens from ${targetName}.`,
     'game.log.effect.stealTokens',
-    { card: 'KISAME HOSHIGAKI', id: '093/130', amount: tokensToTransfer, target: targetName },
+    { card: 'KISAME HOSHIGAKI', id: 'KS-093-UC', amount: tokensToTransfer, target: targetName },
   );
 
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('093/130', 'MAIN', handleKisame093Main);
+  registerEffect('KS-093-UC', 'MAIN', handleKisame093Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to transfer ALL tokens instead of max 2
 }

@@ -27,7 +27,7 @@ function handleGai043Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Gai Maito (043): Power tokens will be retained at end of round (continuous).',
     'game.log.effect.continuous',
-    { card: 'GAI MAITO', id: '043/130' },
+    { card: 'GAI MAITO', id: 'KS-043-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -59,7 +59,7 @@ function handleGai043Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Gai Maito (043): POWERUP 3 (upgrade effect). Power tokens added: 3.',
       'game.log.effect.powerupSelf',
-      { card: 'GAI MAITO', id: '043/130', amount: 3 },
+      { card: 'GAI MAITO', id: 'KS-043-UC', amount: 3 },
     );
 
     return { state: { ...state, activeMissions: missions, log } };
@@ -69,6 +69,6 @@ function handleGai043Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerGai043Handlers(): void {
-  registerEffect('043/130', 'MAIN', handleGai043Main);
-  registerEffect('043/130', 'UPGRADE', handleGai043Upgrade);
+  registerEffect('KS-043-UC', 'MAIN', handleGai043Main);
+  registerEffect('KS-043-UC', 'UPGRADE', handleGai043Upgrade);
 }

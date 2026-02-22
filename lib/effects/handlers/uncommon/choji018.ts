@@ -31,7 +31,7 @@ function handleChoji018Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Choji Akimichi (018): After moving, will hide an enemy character with less Power in the destination mission (continuous).',
     'game.log.effect.continuous',
-    { card: 'CHOJI AKIMICHI', id: '018/130' },
+    { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' },
   );
   return { state: { ...state, log } };
 }
@@ -70,7 +70,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Choji Akimichi (018): No valid mission to move to (upgrade effect fizzles).',
-      'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: '018/130' }) } };
+      'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
   // If exactly one valid destination, auto-move
@@ -127,13 +127,13 @@ function moveCharacterToMission(
     'EFFECT_MOVE',
     `Choji Akimichi (018): Moved self from mission ${fromMissionIdx + 1} to mission ${toMissionIdx + 1} (upgrade effect).`,
     'game.log.effect.moveSelf',
-    { card: 'CHOJI AKIMICHI', id: '018/130', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
+    { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', from: String(fromMissionIdx + 1), to: String(toMissionIdx + 1) },
   );
 
   return newState;
 }
 
 export function registerChoji018Handlers(): void {
-  registerEffect('018/130', 'MAIN', handleChoji018Main);
-  registerEffect('018/130', 'UPGRADE', handleChoji018Upgrade);
+  registerEffect('KS-018-UC', 'MAIN', handleChoji018Main);
+  registerEffect('KS-018-UC', 'UPGRADE', handleChoji018Upgrade);
 }

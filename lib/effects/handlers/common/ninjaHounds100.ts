@@ -17,5 +17,5 @@ function handleNinjaHounds100Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('100/130', 'MAIN', handleNinjaHounds100Main);
+  registerEffect('KS-100-C', 'MAIN', handleNinjaHounds100Main);
 }

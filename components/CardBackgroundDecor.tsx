@@ -15,40 +15,40 @@ type Variant =
 
 const CARD_SETS: Record<Variant, [string, string]> = {
   collection: [
-    '/images/rare/120-130_GAARA.webp',
-    '/images/secret/136-130_SASUKE_UCHIWA.webp',
+    '/images/cards/KS/rare/KS-120-R.webp',
+    '/images/cards/KS/secret/KS-136-S.webp',
   ],
   deck: [
-    '/images/rare_art/108-130_A_NARUTO_UZUMAKI.webp',
-    '/images/secret/137-130_KAKASHI_HATAKE.webp',
+    '/images/cards/KS/rare_art/KS-108-RA.webp',
+    '/images/cards/KS/secret/KS-137-S.webp',
   ],
   leaderboard: [
-    '/images/mythos/143-130_ITACHI_UCHIWA.webp',
-    '/images/mythos/144-130_KISAME_HOSHIGAKI.webp',
+    '/images/cards/KS/mythos/KS-143-M.webp',
+    '/images/cards/KS/mythos/KS-144-M.webp',
   ],
   learn: [
-    '/images/rare/108-130_NARUTO_UZUMAKI.webp',
-    '/images/secret/135-130_SAKURA_HARUNO.webp',
+    '/images/cards/KS/rare/KS-108-R.webp',
+    '/images/cards/KS/secret/KS-135-S.webp',
   ],
   quiz: [
-    '/images/rare_art/120-130_A_GAARA.webp',
-    '/images/secret/133-130_NARUTO_UZUMAKI.webp',
+    '/images/cards/KS/rare_art/KS-120-RA.webp',
+    '/images/cards/KS/secret/KS-133-S.webp',
   ],
   playAI: [
-    '/images/secret/136-130_SASUKE_UCHIWA.webp',
-    '/images/secret/137-130_KAKASHI_HATAKE.webp',
+    '/images/cards/KS/secret/KS-136-S.webp',
+    '/images/cards/KS/secret/KS-137-S.webp',
   ],
   playOnline: [
-    '/images/mythos/143-130_ITACHI_UCHIWA.webp',
-    '/images/rare/108-130_NARUTO_UZUMAKI.webp',
+    '/images/cards/KS/mythos/KS-143-M.webp',
+    '/images/cards/KS/rare/KS-108-R.webp',
   ],
   auth: [
-    '/images/secret/133-130_NARUTO_UZUMAKI.webp',
-    '/images/rare/120-130_GAARA.webp',
+    '/images/cards/KS/secret/KS-133-S.webp',
+    '/images/cards/KS/rare/KS-120-R.webp',
   ],
   profile: [
-    '/images/mythos/144-130_KISAME_HOSHIGAKI.webp',
-    '/images/secret/135-130_SAKURA_HARUNO.webp',
+    '/images/cards/KS/mythos/KS-144-M.webp',
+    '/images/cards/KS/secret/KS-135-S.webp',
   ],
 };
 

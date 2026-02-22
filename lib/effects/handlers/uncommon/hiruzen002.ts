@@ -35,7 +35,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
   if (leafCards.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Hiruzen Sarutobi (002): No Leaf Village characters in hand.',
-      'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: '002/130' }) } };
+      'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC' }) } };
   }
 
   // Sort by power descending to pick highest-power affordable card
@@ -113,7 +113,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
       'EFFECT',
       `Hiruzen Sarutobi (002): Plays ${leaf.card.name_fr} on mission ${bestMissionIdx + 1} for ${reducedCost} chakra (1 less)${upgradeNote}.`,
       'game.log.effect.playLeafReduced',
-      { card: 'HIRUZEN SARUTOBI', id: '002/130', target: leaf.card.name_fr, mission: String(bestMissionIdx + 1), cost: String(reducedCost) },
+      { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: leaf.card.name_fr, mission: String(bestMissionIdx + 1), cost: String(reducedCost) },
     );
 
     return { state: newState };
@@ -121,11 +121,11 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
 
   return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
     'Hiruzen Sarutobi (002): No affordable Leaf Village character could be played on any mission.',
-    'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: '002/130' }) } };
+    'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC' }) } };
 }
 
 export function registerHandler(): void {
-  registerEffect('002/130', 'MAIN', handleHiruzen002Main);
+  registerEffect('KS-002-UC', 'MAIN', handleHiruzen002Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to apply POWERUP 2
 }

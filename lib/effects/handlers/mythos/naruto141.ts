@@ -35,7 +35,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Naruto Uzumaki (141): No cards in hand to discard, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'NARUTO UZUMAKI', id: '141/130' },
+      { card: 'NARUTO UZUMAKI', id: 'KS-141-M' },
     );
     return { state: { ...state, log } };
   }
@@ -75,7 +75,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DISCARD',
       `Naruto Uzumaki (141): Discarded ${discarded.name_fr} from hand.`,
       'game.log.effect.discardSelf',
-      { card: 'NARUTO UZUMAKI', id: '141/130', target: discarded.name_fr },
+      { card: 'NARUTO UZUMAKI', id: 'KS-141-M', target: discarded.name_fr },
     ),
   };
 
@@ -88,7 +88,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_NO_TARGET',
         'Naruto Uzumaki (141): No enemy with Power 4 or less in this mission to hide.',
         'game.log.effect.noTarget',
-        { card: 'NARUTO UZUMAKI', id: '141/130' },
+        { card: 'NARUTO UZUMAKI', id: 'KS-141-M' },
       ),
     };
     return { state };
@@ -124,7 +124,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_HIDE',
         `Naruto Uzumaki (141): Hid enemy ${target.card.name_fr} in this mission.`,
         'game.log.effect.hide',
-        { card: 'NARUTO UZUMAKI', id: '141/130', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+        { card: 'NARUTO UZUMAKI', id: 'KS-141-M', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
       ),
     };
   }
@@ -133,5 +133,5 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerNaruto141Handlers(): void {
-  registerEffect('141/130', 'MAIN', naruto141MainHandler);
+  registerEffect('KS-141-M', 'MAIN', naruto141MainHandler);
 }

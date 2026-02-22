@@ -38,7 +38,7 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 05 (Bring it Back): No non-hidden friendly character in this mission to return.',
       'game.log.effect.noTarget',
-      { card: 'Ramener', id: 'MSS 05' },
+      { card: 'Ramener', id: 'KS-005-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -111,5 +111,5 @@ function applyMss05ReturnToHand(
 }
 
 export function registerMss05Handlers(): void {
-  registerEffect('MSS 05', 'SCORE', mss05ScoreHandler);
+  registerEffect('KS-005-MMS', 'SCORE', mss05ScoreHandler);
 }

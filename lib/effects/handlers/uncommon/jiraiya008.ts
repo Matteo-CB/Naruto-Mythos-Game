@@ -40,7 +40,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
   if (summonCards.length === 0) {
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jiraiya (008): No affordable Summon character in hand.',
-      'game.log.effect.noTarget', { card: 'JIRAYA', id: '008/130' }) } };
+      'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' }) } };
   }
 
   // For simplicity, pick the highest-power affordable Summon card
@@ -73,7 +73,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
   if (bestMissionIdx === -1) {
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jiraiya (008): No valid mission to place the Summon character.',
-      'game.log.effect.noTarget', { card: 'JIRAYA', id: '008/130' }) } };
+      'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' }) } };
   }
 
   // Pay reduced cost and play the card
@@ -115,7 +115,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
     'EFFECT',
     `Jiraiya (008): Plays ${chosen.card.name_fr} (Summon) on mission ${bestMissionIdx + 1} for ${reducedCost} chakra (2 less).`,
     'game.log.effect.playSummonReduced',
-    { card: 'JIRAYA', id: '008/130', target: chosen.card.name_fr, mission: String(bestMissionIdx + 1), cost: String(reducedCost) },
+    { card: 'JIRAYA', id: 'KS-008-UC', target: chosen.card.name_fr, mission: String(bestMissionIdx + 1), cost: String(reducedCost) },
   );
 
   // UPGRADE: After MAIN, hide an enemy character with cost 3 or less in this mission
@@ -150,7 +150,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
           'EFFECT_HIDE',
           `Jiraiya (008): Hid ${targetName} (upgrade effect, cost 3 or less).`,
           'game.log.effect.hide',
-          { card: 'JIRAYA', id: '008/130', target: targetName }) };
+          { card: 'JIRAYA', id: 'KS-008-UC', target: targetName }) };
       }
     } else if (hideTargets.length > 1) {
       return {
@@ -167,7 +167,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerJiraiya008Handlers(): void {
-  registerEffect('008/130', 'MAIN', handleJiraiya008Main);
+  registerEffect('KS-008-UC', 'MAIN', handleJiraiya008Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to apply the hide effect
 }

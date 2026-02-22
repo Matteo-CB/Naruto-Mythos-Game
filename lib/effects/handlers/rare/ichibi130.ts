@@ -48,7 +48,7 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Ichibi (130) UPGRADE: No hidden enemy characters in any mission.',
           'game.log.effect.noTarget',
-          { card: 'ICHIBI', id: '130/130' },
+          { card: 'ICHIBI', id: 'KS-130-R' },
         ),
       },
     };
@@ -97,7 +97,7 @@ function defeatAllHiddenEnemies(
       'EFFECT_DEFEAT',
       `Ichibi (130) UPGRADE: Defeated ${defeatedCount} hidden enemy character(s) in mission ${missionIndex}.`,
       'game.log.effect.defeat',
-      { card: 'ICHIBI', id: '130/130', target: `${defeatedCount} hidden enemies` },
+      { card: 'ICHIBI', id: 'KS-130-R', target: `${defeatedCount} hidden enemies` },
     ),
   };
 
@@ -105,6 +105,6 @@ function defeatAllHiddenEnemies(
 }
 
 export function registerIchibi130Handlers(): void {
-  registerEffect('130/130', 'MAIN', ichibi130MainHandler);
-  registerEffect('130/130', 'UPGRADE', ichibi130UpgradeHandler);
+  registerEffect('KS-130-R', 'MAIN', ichibi130MainHandler);
+  registerEffect('KS-130-R', 'UPGRADE', ichibi130UpgradeHandler);
 }

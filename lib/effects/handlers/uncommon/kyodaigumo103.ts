@@ -30,11 +30,11 @@ function handleKyodaigumo103Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Kyodaigumo (103): At end of round, will hide a character with Power <= own Power, then return to hand (continuous).',
     'game.log.effect.continuous',
-    { card: 'KYODAIGUMO', id: '103/130' },
+    { card: 'KYODAIGUMO', id: 'KS-103-UC' },
   );
   return { state: { ...state, log } };
 }
 
 export function registerHandler(): void {
-  registerEffect('103/130', 'MAIN', handleKyodaigumo103Main);
+  registerEffect('KS-103-UC', 'MAIN', handleKyodaigumo103Main);
 }

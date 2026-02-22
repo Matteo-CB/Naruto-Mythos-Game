@@ -26,7 +26,7 @@ function handleGamahiro095Main(ctx: EffectContext): EffectResult {
   if (!hasFriendly) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Gamahiro (095): No other friendly character in this mission.',
-      'game.log.effect.noTarget', { card: 'GAMAHIRO', id: '095/130' }) } };
+      'game.log.effect.noTarget', { card: 'GAMAHIRO', id: 'KS-095-C' }) } };
   }
 
   // Draw a card
@@ -45,12 +45,12 @@ function handleGamahiro095Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     `Gamahiro (095): Drew 1 card (friendly in mission).`,
     'game.log.effect.draw',
-    { card: 'Gamahiro', id: '095/130', count: 1 },
+    { card: 'Gamahiro', id: 'KS-095-C', count: 1 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('095/130', 'MAIN', handleGamahiro095Main);
+  registerEffect('KS-095-C', 'MAIN', handleGamahiro095Main);
 }

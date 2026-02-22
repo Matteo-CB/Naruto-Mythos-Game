@@ -50,7 +50,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Gaara (139): No friendly hidden characters in play, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'GAARA', id: '139/130' },
+      { card: 'GAARA', id: 'KS-139-S' },
     );
     return { state: { ...state, log } };
   }
@@ -76,7 +76,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       `Gaara (139): No enemy character with cost less than ${hiddenCount} (hidden count).`,
       'game.log.effect.noTarget',
-      { card: 'GAARA', id: '139/130' },
+      { card: 'GAARA', id: 'KS-139-S' },
     );
     return { state: { ...state, log } };
   }
@@ -111,7 +111,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_DEFEAT',
       `Gaara (139): Defeated enemy ${defeatedName} (cost ${defeatedCost}, hidden count ${hiddenCount}).`,
       'game.log.effect.defeat',
-      { card: 'GAARA', id: '139/130', target: defeatedName },
+      { card: 'GAARA', id: 'KS-139-S', target: defeatedName },
     ),
   };
 
@@ -156,7 +156,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
             'EFFECT_HIDE',
             `Gaara (139): Hid enemy ${hideTarget.card.name_fr} in mission ${hideMissionIndex} (upgrade, same name, lower cost).`,
             'game.log.effect.hide',
-            { card: 'GAARA', id: '139/130', target: hideTarget.card.name_fr, mission: `mission ${hideMissionIndex}` },
+            { card: 'GAARA', id: 'KS-139-S', target: hideTarget.card.name_fr, mission: `mission ${hideMissionIndex}` },
           ),
         };
       }
@@ -171,7 +171,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           `Gaara (139): No other enemy ${defeatedName} with lower cost to hide (upgrade).`,
           'game.log.effect.noTarget',
-          { card: 'GAARA', id: '139/130' },
+          { card: 'GAARA', id: 'KS-139-S' },
         ),
       };
     }
@@ -186,6 +186,6 @@ function gaara139UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerGaara139Handlers(): void {
-  registerEffect('139/130', 'MAIN', gaara139MainHandler);
-  registerEffect('139/130', 'UPGRADE', gaara139UpgradeHandler);
+  registerEffect('KS-139-S', 'MAIN', gaara139MainHandler);
+  registerEffect('KS-139-S', 'UPGRADE', gaara139UpgradeHandler);
 }

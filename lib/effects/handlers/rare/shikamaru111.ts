@@ -50,7 +50,7 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
           'EFFECT_NO_TARGET',
           'Shikamaru Nara (111) UPGRADE: No enemy character with Power 3 or less in this mission.',
           'game.log.effect.noTarget',
-          { card: 'SHIKAMARU NARA', id: '111/130' },
+          { card: 'SHIKAMARU NARA', id: 'KS-111-R' },
         ),
       },
     };
@@ -98,13 +98,13 @@ function applyHide(
         'EFFECT_HIDE',
         `Shikamaru Nara (111) UPGRADE: Hid enemy ${targetName} in this mission.`,
         'game.log.effect.hide',
-        { card: 'SHIKAMARU NARA', id: '111/130', target: targetName },
+        { card: 'SHIKAMARU NARA', id: 'KS-111-R', target: targetName },
       ),
     },
   };
 }
 
 export function registerShikamaru111Handlers(): void {
-  registerEffect('111/130', 'MAIN', shikamaru111MainHandler);
-  registerEffect('111/130', 'UPGRADE', shikamaru111UpgradeHandler);
+  registerEffect('KS-111-R', 'MAIN', shikamaru111MainHandler);
+  registerEffect('KS-111-R', 'UPGRADE', shikamaru111UpgradeHandler);
 }

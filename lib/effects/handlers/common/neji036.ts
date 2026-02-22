@@ -33,7 +33,7 @@ function handleNeji036Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Neji Hyuga (036): No enemy with Power tokens to remove.',
-      'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: '036/130' }) } };
+      'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-036-C' }) } };
   }
 
   // If exactly one target, apply automatically
@@ -80,10 +80,10 @@ function removePowerTokens(
   }));
   newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_REMOVE_TOKENS',
     `Neji Hyuga (036): Removed up to ${maxRemove} Power tokens from ${targetName}.`,
-    'game.log.effect.removeTokens', { card: 'NEJI HYUGA', id: '036/130', amount: maxRemove, target: targetName });
+    'game.log.effect.removeTokens', { card: 'NEJI HYUGA', id: 'KS-036-C', amount: maxRemove, target: targetName });
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('036/130', 'MAIN', handleNeji036Main);
+  registerEffect('KS-036-C', 'MAIN', handleNeji036Main);
 }

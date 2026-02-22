@@ -32,7 +32,7 @@ function handleKimimaro056Main(ctx: EffectContext): EffectResult {
     'EFFECT_CONTINUOUS',
     'Kimimaro (056): Enemy effects targeting this character require opponent to pay 1 Chakra (continuous).',
     'game.log.effect.continuous',
-    { card: 'KIMIMARO', id: '056/130' },
+    { card: 'KIMIMARO', id: 'KS-056-UC' },
   );
   return { state: { ...ctx.state, log } };
 }
@@ -45,7 +45,7 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
   if (playerState.hand.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kimimaro (056): No cards in hand to discard.',
-      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '056/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' }) } };
   }
 
   // Find all non-hidden characters in play with cost <= 4 (not self)
@@ -74,7 +74,7 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
   if (validHideTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kimimaro (056): No character with cost 4 or less to hide.',
-      'game.log.effect.noTarget', { card: 'KIMIMARO', id: '056/130' }) } };
+      'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' }) } };
   }
 
   // Step 1: Ask player to choose a card to discard from hand
@@ -90,6 +90,6 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerKimimaro056Handlers(): void {
-  registerEffect('056/130', 'MAIN', handleKimimaro056Main);
-  registerEffect('056/130', 'UPGRADE', handleKimimaro056Upgrade);
+  registerEffect('KS-056-UC', 'MAIN', handleKimimaro056Main);
+  registerEffect('KS-056-UC', 'UPGRADE', handleKimimaro056Upgrade);
 }

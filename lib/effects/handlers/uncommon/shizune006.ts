@@ -38,7 +38,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
       'EFFECT_CHAKRA',
       'Shizune (006): Gained 2 Chakra (upgrade effect).',
       'game.log.effect.gainChakra',
-      { card: 'SHIZUNE', id: '006/130', amount: 2 },
+      { card: 'SHIZUNE', id: 'KS-006-UC', amount: 2 },
     ) };
   }
 
@@ -59,7 +59,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shizune (006): No enemy character with Power 3 or less in play to move.',
-      'game.log.effect.noTarget', { card: 'SHIZUNE', id: '006/130' }) } };
+      'game.log.effect.noTarget', { card: 'SHIZUNE', id: 'KS-006-UC' }) } };
   }
 
   // Requires target selection: which enemy to move (and then which mission to move to)
@@ -73,7 +73,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerShizune006Handlers(): void {
-  registerEffect('006/130', 'MAIN', handleShizune006Main);
+  registerEffect('KS-006-UC', 'MAIN', handleShizune006Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to apply the 2 Chakra bonus
 }

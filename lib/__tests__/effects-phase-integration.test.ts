@@ -47,7 +47,7 @@ describe('EndPhase - Power Token Removal', () => {
 
   it('Rock Lee should retain power tokens', () => {
     const lee = mockCharInPlay({ instanceId: 'lee-1', powerTokens: 4 }, {
-      id: '039/130', number: 39, name_fr: 'Rock Lee',
+      id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee',
       effects: [{ type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' }],
     });
     const normalChar = mockCharInPlay({ instanceId: 'nc', powerTokens: 2 }, { name_fr: 'Normal' });
@@ -70,7 +70,7 @@ describe('EndPhase - Power Token Removal', () => {
 describe('EndPhase - Summon Returns', () => {
   it('should return Summon characters to hand at end of round', () => {
     const gamaBunta = mockCharInPlay({ instanceId: 'gb-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '094/130', number: 94, name_fr: 'Gama Bunta',
+      id: 'KS-094-C', number: 94, name_fr: 'Gama Bunta',
       effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, you must return this character to your hand.' }],
       keywords: ['Summon'],
     });
@@ -90,12 +90,12 @@ describe('EndPhase - Summon Returns', () => {
 
   it('should return multiple summons from different missions', () => {
     const gamahiro = mockCharInPlay({ instanceId: 'gh-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '095/130', number: 95, name_fr: 'Gamahiro',
+      id: 'KS-095-C', number: 95, name_fr: 'Gamahiro',
       effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, you must return this character to your hand.' }],
       keywords: ['Summon'],
     });
     const gamatatsu = mockCharInPlay({ instanceId: 'gt-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '097/130', number: 97, name_fr: 'Gamatatsu',
+      id: 'KS-097-C', number: 97, name_fr: 'Gamatatsu',
       effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, you must return this character to your hand.' }],
       keywords: ['Summon'],
     });
@@ -123,7 +123,7 @@ describe('EndPhase - Summon Returns', () => {
 describe('EndPhase - Akamaru Return', () => {
   it('should return Akamaru to hand when no Kiba in same mission', () => {
     const akamaru = mockCharInPlay({ instanceId: 'aka-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '027/130', number: 27, name_fr: 'Akamaru',
+      id: 'KS-027-C', number: 27, name_fr: 'Akamaru',
       effects: [{ type: 'MAIN', description: '[⧗] If there is no friendly [u]Kiba Inuzuka[/u] in this mission at end of round, return to hand.' }],
     });
     const baseState = createActionPhaseState();
@@ -142,11 +142,11 @@ describe('EndPhase - Akamaru Return', () => {
 
   it('should keep Akamaru when Kiba is in the same mission', () => {
     const akamaru = mockCharInPlay({ instanceId: 'aka-1' }, {
-      id: '027/130', number: 27, name_fr: 'Akamaru',
+      id: 'KS-027-C', number: 27, name_fr: 'Akamaru',
       effects: [{ type: 'MAIN', description: '[⧗] If there is no friendly [u]Kiba Inuzuka[/u] in this mission at end of round, return to hand.' }],
     });
     const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
-      id: '025/130', number: 25, name_fr: 'KIBA INUZUKA',
+      id: 'KS-025-C', number: 25, name_fr: 'KIBA INUZUKA',
     });
     const state = createActionPhaseState({
       phase: 'end',
@@ -181,11 +181,11 @@ describe('EndPhase - Chakra Reset', () => {
 describe('StartPhase - Chakra Bonus Calculation', () => {
   it('should calculate Kiba + Akamaru chakra bonus', () => {
     const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
-      id: '025/130', number: 25, name_fr: 'Kiba Inuzuka',
+      id: 'KS-025-C', number: 25, name_fr: 'Kiba Inuzuka',
       effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
     });
     const akamaru = mockCharInPlay({ instanceId: 'aka-1' }, {
-      id: '027/130', number: 27, name_fr: 'AKAMARU',
+      id: 'KS-027-C', number: 27, name_fr: 'AKAMARU',
     });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [kiba, akamaru])],
@@ -197,12 +197,12 @@ describe('StartPhase - Chakra Bonus Calculation', () => {
 
   it('should calculate combined Kankuro + Anko chakra bonus', () => {
     const kankuro = mockCharInPlay({ instanceId: 'kan-1' }, {
-      id: '077/130', number: 77, name_fr: 'Kankuro',
+      id: 'KS-077-C', number: 77, name_fr: 'Kankuro',
       effects: [{ type: 'MAIN', description: '[⧗] If there is an enemy non-hidden character in this mission, CHAKRA +1.' }],
       group: 'Sand Village',
     });
     const anko = mockCharInPlay({ instanceId: 'anko-1' }, {
-      id: '044/130', number: 44, name_fr: 'Anko',
+      id: 'KS-044-C', number: 44, name_fr: 'Anko',
       effects: [{ type: 'MAIN', description: '[⧗] If there is another friendly Leaf Village character in this mission, CHAKRA +1.' }],
       group: 'Leaf Village',
     });
@@ -221,7 +221,7 @@ describe('StartPhase - Chakra Bonus Calculation', () => {
 
   it('should not count hidden characters for chakra bonus', () => {
     const hiddenKiba = mockCharInPlay({ instanceId: 'kiba-h', isHidden: true }, {
-      id: '025/130', number: 25, name_fr: 'Kiba',
+      id: 'KS-025-C', number: 25, name_fr: 'Kiba',
       effects: [{ type: 'MAIN', description: '[⧗] If there is a friendly [u]Akamaru[/u] in this mission, CHAKRA +1.' }],
     });
     const akamaru = mockCharInPlay({ instanceId: 'aka-1' }, { name_fr: 'AKAMARU' });
@@ -252,7 +252,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
 
   it('should include base power + tokens + continuous modifiers', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
-      id: '015/130', number: 15, name_fr: 'Kakashi',
+      id: 'KS-015-C', number: 15, name_fr: 'Kakashi',
       effects: [{ type: 'MAIN', description: '[⧗] Other Team 7 characters in this mission gain +1 Power.' }],
       keywords: ['Team 7'], power: 4,
     });
@@ -269,7 +269,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
 
   it('Temari should get +2 with Edge', () => {
     const temari = mockCharInPlay({ instanceId: 'tem-1', missionIndex: 0 }, {
-      id: '079/130', number: 79, name_fr: 'Temari', power: 3,
+      id: 'KS-079-C', number: 79, name_fr: 'Temari', power: 3,
       effects: [{ type: 'MAIN', description: '[⧗] +2 Power if you have the Edge.' }],
     });
     const state = createActionPhaseState({
@@ -283,7 +283,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
 
   it('Sasuke debuff should reduce power (min 0)', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sas-1', missionIndex: 0 }, {
-      id: '013/130', number: 13, name_fr: 'Sasuke', power: 2,
+      id: 'KS-013-C', number: 13, name_fr: 'Sasuke', power: 2,
       effects: [{ type: 'MAIN', description: '[⧗] -1 Power for every other non-hidden friendly character in this mission.' }],
     });
     const a1 = mockCharInPlay({ instanceId: 'a1' }, { name_fr: 'A1' });
@@ -304,10 +304,10 @@ describe('PowerCalculation - with continuous modifiers', () => {
 describe('ChakraValidation - Cost Reduction', () => {
   it('Kurenai 034 should reduce Team 8 cost by 1', () => {
     const kurenai = mockCharInPlay({ instanceId: 'kur-1' }, {
-      id: '034/130', number: 34, name_fr: 'Kurenai',
+      id: 'KS-034-C', number: 34, name_fr: 'Kurenai',
       effects: [{ type: 'MAIN', description: '[⧗] Other Team 8 characters in this mission cost 1 less (minimum 1).' }],
     });
-    const team8Card = mockCharacter({ id: '025/130', number: 25, name_fr: 'Kiba', keywords: ['Team 8'], chakra: 3 });
+    const team8Card = mockCharacter({ id: 'KS-025-C', number: 25, name_fr: 'Kiba', keywords: ['Team 8'], chakra: 3 });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [kurenai])],
     });
@@ -318,7 +318,7 @@ describe('ChakraValidation - Cost Reduction', () => {
 
   it('Kurenai should not reduce non-Team 8', () => {
     const kurenai = mockCharInPlay({ instanceId: 'kur-1' }, {
-      id: '034/130', number: 34, name_fr: 'Kurenai',
+      id: 'KS-034-C', number: 34, name_fr: 'Kurenai',
       effects: [{ type: 'MAIN', description: '[⧗] Other Team 8 characters in this mission cost 1 less (minimum 1).' }],
     });
     const nonTeam8 = mockCharacter({ name_fr: 'NonTeam8', keywords: ['Team 7'], chakra: 3 });
@@ -337,7 +337,7 @@ describe('ChakraValidation - Cost Reduction', () => {
 describe('Defeat Replacement - Hayate 048', () => {
   it('should hide Hayate instead of defeating him', () => {
     const hayate = mockCharInPlay({ instanceId: 'hay-1', controlledBy: 'player2', originalOwner: 'player2' }, {
-      id: '048/130', number: 48, name_fr: 'Hayate Gekko',
+      id: 'KS-048-C', number: 48, name_fr: 'Hayate Gekko',
       effects: [{ type: 'MAIN', description: '[⧗] If this character would be defeated, hide it instead.' }],
       group: 'Leaf Village',
     });
@@ -357,7 +357,7 @@ describe('Defeat Replacement - Hayate 048', () => {
 describe('Defeat Replacement - Gaara 075', () => {
   it('should hide Gaara 075 instead of defeat by enemy effect', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-1', controlledBy: 'player2', originalOwner: 'player2' }, {
-      id: '075/130', number: 75, name_fr: 'Gaara',
+      id: 'KS-075-C', number: 75, name_fr: 'Gaara',
       effects: [{ type: 'MAIN', description: '[⧗] If this character would be defeated by enemy effects, hide instead.' }],
       group: 'Sand Village',
     });
@@ -372,7 +372,7 @@ describe('Defeat Replacement - Gaara 075', () => {
 
   it('should NOT replace when defeat is from friendly effect', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-1', controlledBy: 'player2', originalOwner: 'player2' }, {
-      id: '075/130', number: 75, name_fr: 'Gaara',
+      id: 'KS-075-C', number: 75, name_fr: 'Gaara',
       effects: [{ type: 'MAIN', description: '[⧗] If this character would be defeated by enemy effects, hide instead.' }],
     });
     const state = createActionPhaseState({
@@ -393,7 +393,7 @@ describe('Defeat Replacement - Gemma 049', () => {
       name_fr: 'LeafAlly', group: 'Leaf Village',
     });
     const gemma = mockCharInPlay({ instanceId: 'gemma-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '049/130', number: 49, name_fr: 'Gemma Shiranui',
+      id: 'KS-049-C', number: 49, name_fr: 'Gemma Shiranui',
       effects: [{ type: 'MAIN', description: '[⧗] If a friendly Leaf Village character in this mission would be hidden or defeated by enemy effects, you can defeat this character instead.' }],
       group: 'Leaf Village',
     });
@@ -412,7 +412,7 @@ describe('Defeat Replacement - Gemma 049', () => {
       name_fr: 'SandAlly', group: 'Sand Village',
     });
     const gemma = mockCharInPlay({ instanceId: 'gemma-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: '049/130', number: 49, name_fr: 'Gemma',
+      id: 'KS-049-C', number: 49, name_fr: 'Gemma',
       effects: [{ type: 'MAIN', description: '[⧗] If a friendly Leaf Village character in this mission would be hidden or defeated by enemy effects, you can defeat this character instead.' }],
       group: 'Leaf Village',
     });
@@ -431,7 +431,7 @@ describe('Defeat Replacement - Gemma 049', () => {
 describe('defeatUtils - On-Defeat Triggers', () => {
   it('should trigger Tsunade 003 on friendly defeat (+2 chakra)', () => {
     const tsunade = mockCharInPlay({ instanceId: 'tsu-1' }, {
-      id: '003/130', number: 3, name_fr: 'Tsunade',
+      id: 'KS-003-C', number: 3, name_fr: 'Tsunade',
       effects: [{ type: 'MAIN', description: '[⧗] When a friendly character is defeated, gain 2 chakra.' }],
       group: 'Leaf Village',
     });
@@ -459,7 +459,7 @@ describe('defeatUtils - On-Defeat Triggers', () => {
 
   it('should trigger Sasuke 136 on any defeat (+1 chakra)', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sas-136' }, {
-      id: '136/130', number: 136, name_fr: 'Sasuke Uchiwa',
+      id: 'KS-136-S', number: 136, name_fr: 'Sasuke Uchiwa',
       effects: [{ type: 'MAIN', description: '[⧗] When a character is defeated, gain 1 Chakra.' }],
       group: 'Leaf Village',
     });
@@ -484,11 +484,11 @@ describe('defeatUtils - On-Defeat Triggers', () => {
 
   it('should trigger both Tsunade 003 and Sasuke 136 together', () => {
     const tsunade = mockCharInPlay({ instanceId: 'tsu-1' }, {
-      id: '003/130', number: 3, name_fr: 'Tsunade',
+      id: 'KS-003-C', number: 3, name_fr: 'Tsunade',
       effects: [{ type: 'MAIN', description: '[⧗] When a friendly character is defeated, gain 2 chakra.' }],
     });
     const sasuke = mockCharInPlay({ instanceId: 'sas-136' }, {
-      id: '136/130', number: 136, name_fr: 'Sasuke Uchiwa',
+      id: 'KS-136-S', number: 136, name_fr: 'Sasuke Uchiwa',
       effects: [{ type: 'MAIN', description: '[⧗] When a character is defeated, gain 1 Chakra.' }],
     });
     const victim = mockCharInPlay({ instanceId: 'vic', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -536,7 +536,7 @@ describe('defeatUtils - Normal defeat', () => {
 describe('EffectEngine - resolveScoreEffects', () => {
   it('should trigger character SCORE effects for the winner', () => {
     const baki = mockCharInPlay({ instanceId: 'baki-1' }, {
-      id: '081/130', number: 81, name_fr: 'Baki',
+      id: 'KS-081-C', number: 81, name_fr: 'Baki',
       effects: [{ type: 'SCORE', description: '[↯] Draw a card.' }],
     });
     const deckCard = mockCharacter({ name_fr: 'BakiDrawn' });

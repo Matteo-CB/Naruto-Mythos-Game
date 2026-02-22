@@ -46,7 +46,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 07 (I Have to Go): No hidden friendly character to move.',
       'game.log.effect.noTarget',
-      { card: 'Je dois partir', id: 'MSS 07' },
+      { card: 'Je dois partir', id: 'KS-007-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -137,5 +137,5 @@ function applyMss07Move(
 }
 
 export function registerMss07Handlers(): void {
-  registerEffect('MSS 07', 'SCORE', mss07ScoreHandler);
+  registerEffect('KS-007-MMS', 'SCORE', mss07ScoreHandler);
 }

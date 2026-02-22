@@ -15,5 +15,5 @@ function handleGamatatsu097Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('097/130', 'MAIN', handleGamatatsu097Main);
+  registerEffect('KS-097-C', 'MAIN', handleGamatatsu097Main);
 }

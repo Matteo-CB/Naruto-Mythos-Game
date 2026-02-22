@@ -15,12 +15,12 @@ import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/
 
 type AnyCard = CardData;
 
-const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RART', 'S', 'SV', 'M', 'L', 'MMS'];
+const RARITY_ORDER: Rarity[] = ['C', 'UC', 'R', 'RA', 'S', 'SV', 'M', 'L', 'MMS'];
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888',
   UC: '#4a9e4a',
   R: '#4a7ab5',
-  RART: '#8a5ab5',
+  RA: '#8a5ab5',
   S: '#c4a35a',
   SV: '#c4a35a',
   M: '#b33e3e',

@@ -36,7 +36,7 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
       'SCORE_NO_TARGET',
       'MSS 04 (Assassination): No hidden enemy character to defeat.',
       'game.log.effect.noTarget',
-      { card: 'Assassinat', id: 'MSS 04' },
+      { card: 'Assassinat', id: 'KS-004-MMS' },
     );
     return { state: { ...state, log } };
   }
@@ -68,5 +68,5 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerMss04Handlers(): void {
-  registerEffect('MSS 04', 'SCORE', mss04ScoreHandler);
+  registerEffect('KS-004-MMS', 'SCORE', mss04ScoreHandler);
 }

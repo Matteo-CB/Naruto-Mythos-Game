@@ -52,7 +52,7 @@ function handleKabuto054Upgrade(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Kabuto Yakushi (054): POWERUP 1 (upgrade effect).',
       'game.log.effect.powerupSelf',
-      { card: 'KABUTO YAKUSHI', id: '054/130', amount: 1 },
+      { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', amount: 1 },
     );
 
     return { state: { ...state, activeMissions: missions, log } };
@@ -71,7 +71,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   if (selfPower <= 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kabuto Yakushi (054): Self has 0 power, cannot hide characters with less.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '054/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
   // Find all other characters in this mission with effective power < self power
@@ -112,7 +112,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   if (hiddenCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Kabuto Yakushi (054): No characters with less than ${selfPower} power in this mission.`,
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: '054/130' }) } };
+      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
   const log = logAction(
@@ -123,13 +123,13 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
     'EFFECT_HIDE',
     `Kabuto Yakushi (054): Hid ${hiddenCount} character(s) with less than ${selfPower} power in this mission.`,
     'game.log.effect.hide',
-    { card: 'KABUTO YAKUSHI', id: '054/130', count: String(hiddenCount) },
+    { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount) },
   );
 
   return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerKabuto054Handlers(): void {
-  registerEffect('054/130', 'UPGRADE', handleKabuto054Upgrade);
-  registerEffect('054/130', 'MAIN', handleKabuto054Main);
+  registerEffect('KS-054-UC', 'UPGRADE', handleKabuto054Upgrade);
+  registerEffect('KS-054-UC', 'MAIN', handleKabuto054Main);
 }

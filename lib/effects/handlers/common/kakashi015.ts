@@ -15,5 +15,5 @@ function handleKakashi015Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('015/130', 'MAIN', handleKakashi015Main);
+  registerEffect('KS-015-C', 'MAIN', handleKakashi015Main);
 }

@@ -18,5 +18,5 @@ function handleShizune005Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('005/130', 'MAIN', handleShizune005Main);
+  registerEffect('KS-005-C', 'MAIN', handleShizune005Main);
 }

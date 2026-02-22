@@ -44,7 +44,7 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
     const limitStr = isUpgrade ? '3' : '2';
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Ino Yamanaka (020): No enemy character with cost ${limitStr} or less in this mission.`,
-      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: '020/130' }) } };
+      'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-020-UC' }) } };
   }
 
   // If exactly one target, auto-apply
@@ -119,14 +119,14 @@ function takeControlOfCharacter(
     'EFFECT_TAKE_CONTROL',
     `Ino Yamanaka (020): Takes control of ${targetName} (cost <= ${costLimit}) in this mission.`,
     'game.log.effect.takeControl',
-    { card: 'INO YAMANAKA', id: '020/130', target: targetName, costLimit: String(costLimit) },
+    { card: 'INO YAMANAKA', id: 'KS-020-UC', target: targetName, costLimit: String(costLimit) },
   );
 
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('020/130', 'MAIN', handleIno020Main);
+  registerEffect('KS-020-UC', 'MAIN', handleIno020Main);
   // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
   // The MAIN handler checks isUpgrade to adjust the cost threshold from 2 to 3
 }

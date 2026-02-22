@@ -32,7 +32,7 @@ function handleKisame092Ambush(ctx: EffectContext): EffectResult {
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kisame Hoshigaki (092): No enemy with Power tokens in this mission.',
-      'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: '092/130' }) } };
+      'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: 'KS-092-C' }) } };
   }
 
   // If exactly one target, apply automatically
@@ -102,11 +102,11 @@ function transferPowerTokens(
 
   newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_STEAL_TOKENS',
     `Kisame Hoshigaki (092): Stole up to ${maxTransfer} Power tokens from ${targetName}.`,
-    'game.log.effect.stealTokens', { card: 'KISAME HOSHIGAKI', id: '092/130', amount: maxTransfer, target: targetName });
+    'game.log.effect.stealTokens', { card: 'KISAME HOSHIGAKI', id: 'KS-092-C', amount: maxTransfer, target: targetName });
 
   return newState;
 }
 
 export function registerHandler(): void {
-  registerEffect('092/130', 'AMBUSH', handleKisame092Ambush);
+  registerEffect('KS-092-C', 'AMBUSH', handleKisame092Ambush);
 }

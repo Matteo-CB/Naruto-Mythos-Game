@@ -36,7 +36,7 @@ function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     'Asuma Sarutobi (024): Drew 1 card (ambush).',
     'game.log.effect.draw',
-    { card: 'ASUMA SARUTOBI', id: '024/130', count: 1 },
+    { card: 'ASUMA SARUTOBI', id: 'KS-024-UC', count: 1 },
   ) };
 
   // Step 2: Discard a card to POWERUP 3
@@ -45,7 +45,7 @@ function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
   if (currentPs.hand.length === 0) {
     return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Asuma Sarutobi (024): No cards in hand to discard for POWERUP 3.',
-      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: '024/130' }) } };
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-024-UC' }) } };
   }
 
   // Requires target selection: choose a card from hand to discard (for POWERUP 3)
@@ -61,5 +61,5 @@ function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('024/130', 'AMBUSH', handleAsuma024Ambush);
+  registerEffect('KS-024-UC', 'AMBUSH', handleAsuma024Ambush);
 }

@@ -42,12 +42,12 @@ function handleShino032Main(ctx: EffectContext): EffectResult {
     'EFFECT_DRAW',
     'Shino Aburame (032): Each player draws a card.',
     'game.log.effect.bothDraw',
-    { card: 'SHINO ABURAME', id: '032/130', count: 1 },
+    { card: 'SHINO ABURAME', id: 'KS-032-C', count: 1 },
   );
 
   return { state: newState };
 }
 
 export function registerHandler(): void {
-  registerEffect('032/130', 'MAIN', handleShino032Main);
+  registerEffect('KS-032-C', 'MAIN', handleShino032Main);
 }

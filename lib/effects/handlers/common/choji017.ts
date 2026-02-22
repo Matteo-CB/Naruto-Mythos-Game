@@ -34,7 +34,7 @@ function handleChoji017Main(ctx: EffectContext): EffectResult {
       'EFFECT_POWERUP',
       'Choji Akimichi (017): POWERUP 3 on self.',
       'game.log.effect.powerupSelf',
-      { card: 'CHOJI AKIMICHI', id: '017/130', amount: 3 },
+      { card: 'CHOJI AKIMICHI', id: 'KS-017-C', amount: 3 },
     );
 
     return { state: { ...state, activeMissions: missions, log } };
@@ -44,5 +44,5 @@ function handleChoji017Main(ctx: EffectContext): EffectResult {
 }
 
 export function registerHandler(): void {
-  registerEffect('017/130', 'MAIN', handleChoji017Main);
+  registerEffect('KS-017-C', 'MAIN', handleChoji017Main);
 }
