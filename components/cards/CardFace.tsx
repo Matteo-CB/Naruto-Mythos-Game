@@ -7,6 +7,7 @@ import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 
 // ---------------------
 // Rarity bar color mapping (no gradients, solid colors only)
@@ -62,7 +63,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
       {hasImage ? (
         <img
           src={imageSrc}
-          alt={card.name_fr}
+          alt={getCardName(card, locale as 'en' | 'fr')}
           draggable={false}
           style={{
             position: 'absolute',
@@ -231,9 +232,9 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             whiteSpace: 'nowrap',
           }}
         >
-          {card.name_fr}
+          {getCardName(card, locale as 'en' | 'fr')}
         </div>
-        {card.title_fr && (
+        {getCardTitle(card, locale as 'en' | 'fr') && (
           <div
             style={{
               color: '#888888',
@@ -246,7 +247,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               whiteSpace: 'nowrap',
             }}
           >
-            {card.title_fr}
+            {getCardTitle(card, locale as 'en' | 'fr')}
           </div>
         )}
       </div>
@@ -271,7 +272,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               letterSpacing: '0.05em',
             }}
           >
-            {card.name_fr}
+            {getCardName(card, locale as 'en' | 'fr')}
           </span>
         </div>
       )}

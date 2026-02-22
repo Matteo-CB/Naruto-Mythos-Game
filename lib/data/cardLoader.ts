@@ -48,6 +48,7 @@ function normalizeCard(raw: RawJsonCard): CardData {
     name_fr: raw.name_fr,
     title_fr: raw.title_fr || '',
     name_en: raw.name_en || undefined,
+    title_en: raw.title_en || undefined,
     rarity: raw.rarity as Rarity,
     card_type: raw.card_type,
     has_visual: raw.has_visual || !!raw.image_file,

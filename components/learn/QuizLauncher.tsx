@@ -59,7 +59,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
         style={{ opacity: 0.15, pointerEvents: 'none' }}
       >
         <img
-          src="/images/cards/KS/rare/KS-108-R.webp"
+          src="/images/cards/KS/rare_art/KS-108-RA.webp"
           alt=""
           draggable={false}
           style={{

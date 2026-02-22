@@ -161,7 +161,7 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/njnaruto.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
-        <link rel="prefetch" href="/images/cards/KS/rare/KS-108-R.webp" />
+        <link rel="prefetch" href="/images/cards/KS/rare_art/KS-108-RA.webp" />
         <link rel="preload" href="/images/icons/cloud-2.webp" as="image" type="image/webp" />
         <link rel="preload" href="/images/icons/cloud-5.webp" as="image" type="image/webp" />
         <link rel="preload" href="/images/icons/cloud-6.webp" as="image" type="image/webp" />

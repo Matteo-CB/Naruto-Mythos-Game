@@ -2,12 +2,13 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -37,6 +38,7 @@ const HandCard = React.memo(function HandCard({
   onPreviewHide,
   onPin,
 }: HandCardProps) {
+  const locale = useLocale();
   // Fan effect: spread cards with rotation
   const midpoint = (total - 1) / 2;
   const offset = index - midpoint;
@@ -118,7 +120,7 @@ const HandCard = React.memo(function HandCard({
           style={{ backgroundColor: '#1a1a1a' }}
         >
           <span className="text-[9px] text-center px-1" style={{ color: '#555555' }}>
-            {card.name_fr}
+            {getCardName(card, locale as 'en' | 'fr')}
           </span>
         </div>
       )}
@@ -134,7 +136,7 @@ const HandCard = React.memo(function HandCard({
           className="text-[9px] font-medium truncate leading-tight"
           style={{ color: '#e0e0e0', maxWidth: '60px' }}
         >
-          {card.name_fr}
+          {getCardName(card, locale as 'en' | 'fr')}
         </span>
         <span
           className="text-[10px] font-bold tabular-nums"

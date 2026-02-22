@@ -1,12 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
+  const locale = useLocale();
   const imagePath = normalizeImagePath(card.image_file);
 
   return (
@@ -45,7 +47,7 @@ function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
             className="text-[10px] text-center px-1"
             style={{ color: '#555555' }}
           >
-            {card.name_fr}
+            {getCardName(card, locale as 'en' | 'fr')}
           </span>
         </div>
       )}
@@ -59,7 +61,7 @@ function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
           className="text-[10px] font-medium truncate leading-tight"
           style={{ color: '#e0e0e0', maxWidth: '65px' }}
         >
-          {card.name_fr}
+          {getCardName(card, locale as 'en' | 'fr')}
         </span>
         <span
           className="text-[11px] font-bold tabular-nums"

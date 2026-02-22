@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type {
@@ -13,6 +13,7 @@ import type {
 } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 // ----- Sub-components -----
 
@@ -25,6 +26,7 @@ interface CharacterSlotProps {
 
 function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSlotProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const selectTarget = useUIStore((s) => s.selectTarget);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const showPreview = useUIStore((s) => s.showPreview);
@@ -132,7 +134,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
               style={{ backgroundColor: '#1a1a1a' }}
             >
               <span className="text-[8px] text-center px-0.5" style={{ color: '#888888' }}>
-                {character.card?.name_fr ?? '???'}
+                {character.card ? getCardName(character.card, locale as 'en' | 'fr') : '???'}
               </span>
             </div>
           )}
@@ -244,7 +246,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
             textShadow: '0 0 4px rgba(62, 139, 62, 0.4)',
           }}
         >
-          <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>UP</span>
+          <span style={{ fontSize: '7px', letterSpacing: '0.5px' }}>{t('game.board.up')}</span>
           <span>{character.stackSize}</span>
         </motion.div>
       )}
@@ -262,6 +264,7 @@ function MissionCardDisplay({
   index: number;
 }) {
   const t = useTranslations();
+  const locale = useLocale();
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
@@ -319,7 +322,7 @@ function MissionCardDisplay({
           style={{ backgroundColor: '#1a1a1a', minHeight: '65px' }}
         >
           <span className="text-[9px] text-center px-1" style={{ color: '#888888' }}>
-            {mission.card.name_fr}
+            {getCardName(mission.card, locale as 'en' | 'fr')}
           </span>
         </div>
       )}

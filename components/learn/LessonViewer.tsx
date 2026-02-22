@@ -11,7 +11,7 @@ import Image from 'next/image';
 const TOTAL_LESSONS = 8;
 
 const CARD_IMAGES = {
-  narutoRare: '/images/cards/KS/rare/KS-108-R.webp',
+  narutoRare: '/images/cards/KS/rare_art/KS-108-RA.webp',
   narutoCommon: '/images/cards/KS/common/KS-009-C.webp',
   orochimaru: '/images/cards/KS/common/KS-050-C.webp',
   missionSupport: '/images/cards/KS/mission/KS-001-MMS.webp',

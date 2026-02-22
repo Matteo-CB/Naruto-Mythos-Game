@@ -24,6 +24,7 @@ export interface CardData {
   name_fr: string;
   title_fr: string;
   name_en?: string;
+  title_en?: string;
   rarity: Rarity;
   card_type: 'character' | 'mission';
   has_visual: boolean;

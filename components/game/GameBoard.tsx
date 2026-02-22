@@ -22,6 +22,7 @@ import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 
 // ----- Shared color maps -----
 
@@ -101,7 +102,7 @@ function CardPreviewContent({
         >
           <img
             src={imagePath}
-            alt={card.name_fr}
+            alt={getCardName(card, locale as 'en' | 'fr')}
             draggable={false}
             className="w-full h-full"
             style={{ objectFit: "contain" }}
@@ -157,20 +158,20 @@ function CardPreviewContent({
           className="text-sm font-bold leading-tight"
           style={{ color: "#e0e0e0" }}
         >
-          {card.name_fr}
+          {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
         {/* English name for missions */}
-        {isMission && card.name_en && (
+        {isMission && card.name_en && locale !== 'en' && (
           <span className="text-xs -mt-1" style={{ color: "#666666" }}>
             {card.name_en}
           </span>
         )}
 
         {/* Title */}
-        {card.title_fr && (
+        {(card.title_fr || card.title_en) && (
           <span className="text-xs" style={{ color: "#999999" }}>
-            {card.title_fr}
+            {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
 
@@ -310,7 +311,7 @@ function CardPreviewContent({
                   border: "1px solid rgba(255, 255, 255, 0.04)",
                 }}
               >
-                {kw}
+                {getCardKeyword(kw, locale as 'en' | 'fr')}
               </span>
             ))}
           </div>
@@ -319,7 +320,7 @@ function CardPreviewContent({
         {/* Group */}
         {card.group && (
           <span className="text-[10px]" style={{ color: "#777777" }}>
-            {t("collection.details.group")}: {card.group}
+            {t("collection.details.group")}: {getCardGroup(card.group, locale as 'en' | 'fr')}
           </span>
         )}
 
@@ -553,7 +554,7 @@ function FullscreenCardDetail() {
             >
               <img
                 src={imagePath}
-                alt={card.name_fr}
+                alt={getCardName(card, locale as 'en' | 'fr')}
                 draggable={false}
                 className="w-full h-full"
                 style={{ objectFit: "contain" }}
@@ -613,25 +614,25 @@ function FullscreenCardDetail() {
                 className="text-lg font-bold leading-tight"
                 style={{ color: "#e0e0e0" }}
               >
-                {card.name_fr}
+                {getCardName(card, locale as 'en' | 'fr')}
               </span>
             </div>
 
             {/* English name for missions */}
-            {isMission && card.name_en && (
+            {isMission && card.name_en && locale !== 'en' && (
               <span className="text-sm -mt-1" style={{ color: "#666666" }}>
                 {card.name_en}
               </span>
             )}
 
             {/* Title */}
-            {card.title_fr && (
+            {(card.title_fr || card.title_en) && (
               <div className="flex flex-col gap-0.5">
                 <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
                   {t("card.title")}
                 </span>
                 <span className="text-sm" style={{ color: "#999999" }}>
-                  {card.title_fr}
+                  {getCardTitle(card, locale as 'en' | 'fr')}
                 </span>
               </div>
             )}
@@ -776,7 +777,7 @@ function FullscreenCardDetail() {
                         border: "1px solid rgba(255, 255, 255, 0.04)",
                       }}
                     >
-                      {kw}
+                      {getCardKeyword(kw, locale as 'en' | 'fr')}
                     </span>
                   ))}
                 </div>
@@ -790,7 +791,7 @@ function FullscreenCardDetail() {
                   {t("collection.details.group")}
                 </span>
                 <span className="text-sm" style={{ color: "#999999" }}>
-                  {card.group}
+                  {getCardGroup(card.group, locale as 'en' | 'fr')}
                 </span>
               </div>
             )}

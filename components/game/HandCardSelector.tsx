@@ -2,14 +2,17 @@
 
 import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 
 interface HandCardInfo {
   index: number;
   card: {
     name_fr: string;
+    name_en?: string;
+    title_en?: string;
     chakra?: number;
     power?: number;
     image_file?: string;
@@ -23,6 +26,7 @@ function HandCard({
   cardInfo: HandCardInfo;
   onSelect: (index: string) => void;
 }) {
+  const locale = useLocale();
   const { card, index } = cardInfo;
 
   const imagePath = normalizeImagePath(card.image_file);
@@ -76,7 +80,7 @@ function HandCard({
           style={{ backgroundColor: '#1a1a1a' }}
         >
           <span className="text-[10px] text-center px-1" style={{ color: '#888888' }}>
-            {card.name_fr}
+            {getCardName(card as Parameters<typeof getCardName>[0], locale as 'en' | 'fr')}
           </span>
         </div>
       )}
@@ -116,7 +120,7 @@ function HandCard({
           color: '#c4a35a',
         }}
       >
-        {card.name_fr}
+        {getCardName(card as Parameters<typeof getCardName>[0], locale as 'en' | 'fr')}
       </div>
     </motion.div>
   );
