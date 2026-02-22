@@ -423,12 +423,12 @@ describe('Power Token Retention', () => {
       expect(shouldRetainPowerTokens(lee)).toBe(true);
     });
 
-    it('should NOT retain when hidden', () => {
+    it('should STILL retain when hidden (Rock Lee keeps tokens even face-down)', () => {
       const lee = mockCharInPlay({ instanceId: 'lee-h', isHidden: true, powerTokens: 3 }, {
         id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee',
         effects: [{ type: 'MAIN', description: '[⧗] This character doesn\'t lose Power tokens at the end of the round.' }],
       });
-      expect(shouldRetainPowerTokens(lee)).toBe(false);
+      expect(shouldRetainPowerTokens(lee)).toBe(true);
     });
   });
 

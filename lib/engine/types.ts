@@ -123,8 +123,14 @@ export interface GameState {
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
   turnMissionRevealed: boolean;
+  /** Prevents executeMissionPhase from running twice in the same turn */
+  missionScoredThisTurn: boolean;
   /** Tracks progress through mission scoring when SCORE effects require target selection */
   missionScoringProgress?: MissionScoringProgress;
+  /** Which player forfeited (abandon or timeout) — if set, game is over */
+  forfeitedBy?: PlayerID;
+  /** Consecutive timeout count per player (online timer) */
+  consecutiveTimeouts: { player1: number; player2: number };
 }
 
 export interface GameLogEntry {
@@ -211,7 +217,8 @@ export type GameAction =
   | { type: 'PASS' }
   | { type: 'MULLIGAN'; doMulligan: boolean }
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
-  | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string };
+  | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }
+  | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' };
 
 // ---------------------
 // Game Configuration
@@ -250,6 +257,7 @@ export interface VisibleGameState {
   log: GameLogEntry[];
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
+  forfeitedBy?: PlayerID;
 }
 
 export interface VisibleOpponentState {

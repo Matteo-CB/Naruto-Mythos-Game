@@ -17,7 +17,15 @@ interface RoomData {
   isPrivate: boolean;
   isRanked: boolean;
   createdAt: number;
+  // Timer fields
+  actionTimer: ReturnType<typeof setTimeout> | null;
+  timerDeadline: number | null;
+  disconnectTimer: ReturnType<typeof setTimeout> | null;
 }
+
+const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
+const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
+const DISCONNECT_GRACE_MS = 30_000; // 30 seconds before disconnect = forfeit
 
 const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
@@ -81,6 +89,189 @@ function cleanupStaleRooms(): void {
   }
 }
 
+function clearActionTimer(room: RoomData): void {
+  if (room.actionTimer) {
+    clearTimeout(room.actionTimer);
+    room.actionTimer = null;
+    room.timerDeadline = null;
+  }
+}
+
+/**
+ * Persist game result and apply ELO, then emit game:ended to both players.
+ * Shared between normal game end, manual forfeit, and auto-timeout forfeit.
+ */
+async function finalizeGameEnd(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+  winReason: 'score' | 'forfeit' | 'timeout' = 'score',
+): Promise<void> {
+  if (!room.gameState) return;
+
+  clearActionTimer(room);
+
+  const winner = GameEngine.getWinner(room.gameState);
+  if (!winner) return;
+
+  const p1Score = room.gameState.player1.missionPoints;
+  const p2Score = room.gameState.player2.missionPoints;
+
+  let eloData: { player1Delta: number; player2Delta: number } | null = null;
+  try {
+    if (room.isRanked && room.hostId && room.guestId) {
+      const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
+      const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
+
+      if (player1 && player2) {
+        const eloResult = winner === 'player1' ? 'player1' : 'player2';
+        const changes = calculateEloChanges(player1.elo, player2.elo, eloResult);
+        eloData = { player1Delta: changes.player1Delta, player2Delta: changes.player2Delta };
+
+        const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+        const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+
+        await Promise.all([
+          prisma.user.update({
+            where: { id: room.hostId },
+            data: { elo: changes.player1NewElo, ...p1Stats },
+          }),
+          prisma.user.update({
+            where: { id: room.guestId! },
+            data: { elo: changes.player2NewElo, ...p2Stats },
+          }),
+          prisma.game.create({
+            data: {
+              player1Id: room.hostId,
+              player2Id: room.guestId!,
+              isAiGame: false,
+              status: 'completed',
+              winnerId: winner === 'player1' ? room.hostId : room.guestId!,
+              player1Score: p1Score,
+              player2Score: p2Score,
+              eloChange: changes.player1Delta,
+              completedAt: new Date(),
+            },
+          }),
+        ]);
+      }
+    }
+  } catch (eloErr) {
+    console.error('[Socket] Error persisting game result:', eloErr);
+  }
+
+  if (room.hostSocket) {
+    io.to(room.hostSocket).emit('game:ended', {
+      winner,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      isRanked: room.isRanked,
+      eloDelta: eloData?.player1Delta ?? null,
+      winReason,
+    });
+  }
+  if (room.guestSocket) {
+    io.to(room.guestSocket).emit('game:ended', {
+      winner,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      isRanked: room.isRanked,
+      eloDelta: eloData?.player2Delta ?? null,
+      winReason,
+    });
+  }
+}
+
+/**
+ * Start (or restart) the action timer for the active player.
+ * On timeout: auto-pass first, then auto-forfeit after MAX_CONSECUTIVE_TIMEOUTS.
+ */
+function startActionTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  clearActionTimer(room);
+
+  if (!room.gameState) return;
+  // Only run timer during action phase (also excludes gameOver)
+  if (room.gameState.phase !== 'action') return;
+
+  const activePlayer = room.gameState.activePlayer;
+  const targetSocket = activePlayer === 'player1' ? room.hostSocket : room.guestSocket;
+
+  const deadline = Date.now() + ACTION_TIMEOUT_MS;
+  room.timerDeadline = deadline;
+
+  // Notify the active player of the deadline
+  if (targetSocket) {
+    io.to(targetSocket).emit('game:action-deadline', { deadline });
+  }
+
+  room.actionTimer = setTimeout(async () => {
+    if (!room.gameState || room.gameState.phase !== 'action') return;
+
+    const player = room.gameState.activePlayer;
+    const timeouts = room.gameState.consecutiveTimeouts[player] + 1;
+    room.gameState.consecutiveTimeouts[player] = timeouts;
+
+    console.log(`[Socket] Timer expired for ${player} in room ${code} (timeout #${timeouts})`);
+
+    if (timeouts >= MAX_CONSECUTIVE_TIMEOUTS) {
+      // Auto-forfeit after too many timeouts
+      console.log(`[Socket] Auto-forfeit for ${player} after ${timeouts} consecutive timeouts`);
+      room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'FORFEIT', reason: 'timeout' });
+
+      // Broadcast final state
+      broadcastState(room, io);
+      await finalizeGameEnd(room, code, io, 'timeout');
+    } else {
+      // Auto-pass
+      console.log(`[Socket] Auto-pass for ${player} in room ${code}`);
+      room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'PASS' });
+
+      // Notify the timed-out player
+      if (targetSocket) {
+        io.to(targetSocket).emit('game:auto-passed');
+      }
+
+      // Broadcast updated state
+      broadcastState(room, io);
+
+      // Check if game ended (both passed → mission phase → end phase → game over)
+      const winner = GameEngine.getWinner(room.gameState);
+      if (winner) {
+        await finalizeGameEnd(room, code, io, 'score');
+      } else if (room.gameState.phase === 'action') {
+        // Restart timer for next active player
+        startActionTimer(room, code, io);
+      }
+    }
+  }, ACTION_TIMEOUT_MS);
+}
+
+/**
+ * Broadcast visible state to both players.
+ */
+function broadcastState(room: RoomData, io: SocketIOServer): void {
+  if (!room.gameState) return;
+  const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+  const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+
+  if (room.hostSocket) {
+    io.to(room.hostSocket).emit('game:state-update', {
+      visibleState: p1State,
+      playerRole: 'player1',
+    });
+  }
+  if (room.guestSocket) {
+    io.to(room.guestSocket).emit('game:state-update', {
+      visibleState: p2State,
+      playerRole: 'player2',
+    });
+  }
+}
+
 export function setupSocketHandlers(io: SocketIOServer) {
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
@@ -119,6 +310,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isPrivate: data.isPrivate ?? true,
         isRanked: data.isRanked ?? false,
         createdAt: Date.now(),
+        actionTimer: null,
+        timerDeadline: null,
+        disconnectTimer: null,
       };
 
       rooms.set(code, room);
@@ -255,6 +449,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         io.to(code).emit('game:started');
         console.log(`[Socket] Game started event emitted to room ${code}`);
+
+        // Start action timer once game reaches action phase
+        // (mulligan phase doesn't use the timer — timer starts on first action phase)
+        if (room.gameState.phase === 'action') {
+          startActionTimer(room, code, io);
+        }
       } else {
         const who = socket.id === room.hostSocket ? 'host' : 'guest';
         console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);
@@ -298,22 +498,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
         );
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
-        // Broadcast updated visible state to each player
-        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-        const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+        // Reset consecutive timeouts for this player (they acted voluntarily)
+        if (data.action.type !== 'PASS' || room.gameState.consecutiveTimeouts[player] === 0) {
+          room.gameState.consecutiveTimeouts[player] = 0;
+        }
 
-        if (room.hostSocket) {
-          io.to(room.hostSocket).emit('game:state-update', {
-            visibleState: p1State,
-            playerRole: 'player1',
-          });
-        }
-        if (room.guestSocket) {
-          io.to(room.guestSocket).emit('game:state-update', {
-            visibleState: p2State,
-            playerRole: 'player2',
-          });
-        }
+        // Broadcast updated visible state to each player
+        broadcastState(room, io);
 
         // Broadcast the action for narration
         io.to(code).emit('game:action-performed', {
@@ -324,78 +515,38 @@ export function setupSocketHandlers(io: SocketIOServer) {
         // Check game over
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
-          const p1Score = room.gameState.player1.missionPoints;
-          const p2Score = room.gameState.player2.missionPoints;
-
-          // Persist game result and apply ELO if ranked
-          let eloData: { player1Delta: number; player2Delta: number } | null = null;
-          try {
-            if (room.isRanked && room.hostId && room.guestId) {
-              const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
-              const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
-
-              if (player1 && player2) {
-                const eloResult = winner === 'player1' ? 'player1' : 'player2';
-                const changes = calculateEloChanges(player1.elo, player2.elo, eloResult);
-                eloData = { player1Delta: changes.player1Delta, player2Delta: changes.player2Delta };
-
-                const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-                const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-
-                await Promise.all([
-                  prisma.user.update({
-                    where: { id: room.hostId },
-                    data: { elo: changes.player1NewElo, ...p1Stats },
-                  }),
-                  prisma.user.update({
-                    where: { id: room.guestId! },
-                    data: { elo: changes.player2NewElo, ...p2Stats },
-                  }),
-                  prisma.game.create({
-                    data: {
-                      player1Id: room.hostId,
-                      player2Id: room.guestId!,
-                      isAiGame: false,
-                      status: 'completed',
-                      winnerId: winner === 'player1' ? room.hostId : room.guestId!,
-                      player1Score: p1Score,
-                      player2Score: p2Score,
-                      eloChange: changes.player1Delta,
-                      completedAt: new Date(),
-                    },
-                  }),
-                ]);
-              }
-            }
-          } catch (eloErr) {
-            console.error('[Socket] Error persisting game result:', eloErr);
-          }
-
-          // Emit to each player separately so they get their own ELO delta
-          if (room.hostSocket) {
-            io.to(room.hostSocket).emit('game:ended', {
-              winner,
-              player1Score: p1Score,
-              player2Score: p2Score,
-              isRanked: room.isRanked,
-              eloDelta: eloData?.player1Delta ?? null,
-            });
-          }
-          if (room.guestSocket) {
-            io.to(room.guestSocket).emit('game:ended', {
-              winner,
-              player1Score: p1Score,
-              player2Score: p2Score,
-              isRanked: room.isRanked,
-              eloDelta: eloData?.player2Delta ?? null,
-            });
-          }
+          await finalizeGameEnd(room, code, io, 'score');
+        } else if (room.gameState.phase === 'action') {
+          // Restart timer for next active player
+          startActionTimer(room, code, io);
+        } else {
+          // Phase changed (mission, end, etc.) — clear timer
+          clearActionTimer(room);
         }
       } catch (err) {
         socket.emit('game:error', {
           message: err instanceof Error ? err.message : 'Invalid action',
         });
       }
+    });
+
+    // Forfeit (manual abandon)
+    socket.on('action:forfeit', async (data: { reason: 'abandon' | 'timeout' }) => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room || !room.gameState || room.gameState.phase === 'gameOver') return;
+
+      const player = socket.id === room.hostSocket ? 'player1' : 'player2';
+      console.log(`[Socket] Forfeit from ${player} in room ${code}, reason: ${data.reason}`);
+
+      room.gameState = GameEngine.applyAction(room.gameState, player, {
+        type: 'FORFEIT',
+        reason: data.reason,
+      });
+
+      broadcastState(room, io);
+      await finalizeGameEnd(room, code, io, data.reason === 'timeout' ? 'timeout' : 'forfeit');
     });
 
     // Matchmaking
@@ -472,6 +623,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           isPrivate: false,
           isRanked: wantRanked,
           createdAt: Date.now(),
+          actionTimer: null,
+          timerDeadline: null,
+          disconnectTimer: null,
         };
 
         rooms.set(code, room);
@@ -500,7 +654,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     // Disconnect
     socket.on('disconnect', () => {
       console.log(`[Socket] Player disconnecting: ${socket.id}`);
-      
+
       const code = playerRooms.get(socket.id);
       if (code) {
         const room = rooms.get(code);
@@ -508,17 +662,34 @@ export function setupSocketHandlers(io: SocketIOServer) {
           io.to(code).emit('room:player-left', { socketId: socket.id });
           console.log(`[Socket] Player ${socket.id} left room ${code}`);
 
-          // Handle disconnect based on player role
-          if (room.hostSocket === socket.id) {
-            // Host disconnected - remove room if game hasn't started
+          const isHost = room.hostSocket === socket.id;
+          const player = isHost ? 'player1' : 'player2';
+
+          // Handle disconnect during an active game
+          if (room.gameState && room.gameState.phase !== 'gameOver') {
+            console.log(`[Socket] ${player} disconnected during game in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
+            clearActionTimer(room);
+
+            room.disconnectTimer = setTimeout(async () => {
+              if (!room.gameState || room.gameState.phase === 'gameOver') return;
+
+              console.log(`[Socket] Grace period expired for ${player} in room ${code}, auto-forfeiting`);
+              room.gameState = GameEngine.applyAction(room.gameState, player, {
+                type: 'FORFEIT',
+                reason: 'abandon',
+              });
+
+              broadcastState(room, io);
+              await finalizeGameEnd(room, code, io, 'forfeit');
+            }, DISCONNECT_GRACE_MS);
+          } else if (isHost) {
+            // Host disconnected before game started - remove room
             if (!room.gameState) {
               console.log(`[Socket] Host left room ${code} before game started, removing room`);
               rooms.delete(code);
-            } else {
-              console.log(`[Socket] Host left room ${code} during game`);
             }
           } else if (room.guestSocket === socket.id) {
-            // Guest disconnected - reset guest info but keep room
+            // Guest disconnected before game started - reset guest info
             console.log(`[Socket] Guest left room ${code}, resetting guest`);
             room.guestId = null;
             room.guestSocket = null;

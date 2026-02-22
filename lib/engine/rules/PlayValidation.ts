@@ -142,7 +142,7 @@ export function validateRevealCharacter(
   }
 
   // Name uniqueness check after reveal
-  const sameName = chars.some((c) => {
+  const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
       const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
@@ -151,7 +151,16 @@ export function validateRevealCharacter(
     return false;
   });
 
-  if (sameName) {
+  if (sameNameChar) {
+    // Allow reveal-for-upgrade: if the revealed card has strictly higher cost
+    // than the existing same-name visible character, treat this as a reveal + upgrade
+    const existingTopCard = sameNameChar.stack.length > 0
+      ? sameNameChar.stack[sameNameChar.stack.length - 1]
+      : sameNameChar.card;
+    if (charTopCard.chakra > existingTopCard.chakra) {
+      // Valid: this will be a reveal-for-upgrade
+      return { valid: true };
+    }
     return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.` };
   }
 
@@ -277,11 +286,14 @@ function isWinningMission(state: GameState, player: PlayerID, missionIndex: numb
     p2Power += calculateCharacterPower(state, c, 'player2');
   }
 
+  // Must have at least 1 power to be considered "winning" (same as mission scoring rules)
   if (player === 'player1') {
+    if (p1Power === 0) return false;
     if (p1Power > p2Power) return true;
     if (p1Power === p2Power && state.edgeHolder === 'player1') return true;
     return false;
   } else {
+    if (p2Power === 0) return false;
     if (p2Power > p1Power) return true;
     if (p1Power === p2Power && state.edgeHolder === 'player2') return true;
     return false;

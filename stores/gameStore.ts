@@ -5,6 +5,8 @@ import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig } fr
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
 import { useSocketStore } from '@/lib/socket/client';
+import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/PlayValidation';
+import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 
 interface AnimationEvent {
   id: string;
@@ -45,6 +47,9 @@ interface GameStore {
   // Target selection
   pendingTargetSelection: PendingTargetSelection | null;
 
+  // Action error feedback (e.g., name uniqueness violation)
+  actionError: string | null;
+
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => void;
@@ -58,7 +63,9 @@ interface GameStore {
   setPendingTargetSelection: (selection: PendingTargetSelection | null) => void;
   selectTarget: (targetId: string) => void;
   declineTarget: () => void;
+  clearActionError: () => void;
   resetGame: () => void;
+  endAIGameAsForfeit: () => void;
 }
 
 let animationIdCounter = 0;
@@ -285,6 +292,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   animationQueue: [],
   isAnimating: false,
   pendingTargetSelection: null,
+  actionError: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
     const humanName = playerName || 'Player';
@@ -468,11 +476,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ isProcessing: false });
       return;
     }
+
+    // Detect rejected play actions (hand size unchanged = validation failed)
+    if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER') {
+      const oldHandSize = gameState[humanPlayer].hand.length;
+      const newHandSize = newState[humanPlayer].hand.length;
+      if (oldHandSize === newHandSize) {
+        // Action was rejected — get the specific validation reason
+        let errorReason = '';
+        if (action.type === 'PLAY_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
+          const card = gameState[humanPlayer].hand[action.cardIndex];
+          const effCost = calculateEffectiveCost(gameState, humanPlayer, card, action.missionIndex, false);
+          const result = validatePlayCharacter(gameState, humanPlayer, card, action.missionIndex, effCost);
+          errorReason = result.reason ?? '';
+        } else if (action.type === 'PLAY_HIDDEN' && action.cardIndex < gameState[humanPlayer].hand.length) {
+          const card = gameState[humanPlayer].hand[action.cardIndex];
+          const result = validatePlayHidden(gameState, humanPlayer, card, action.missionIndex);
+          errorReason = result.reason ?? '';
+        } else if (action.type === 'UPGRADE_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
+          errorReason = 'Invalid upgrade target.';
+        }
+        set({ isProcessing: false, actionError: errorReason || 'Action not allowed.' });
+        // Auto-clear error after 4 seconds
+        setTimeout(() => {
+          if (get().actionError) set({ actionError: null });
+        }, 4000);
+        return;
+      }
+    }
+
+    // Clear any previous error on successful action
     const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
 
     set({
       gameState: newState,
       visibleState: newVisible,
+      actionError: null,
     });
 
     // Check if game is over
@@ -622,10 +661,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Check if AI has pending target selections to resolve first
         const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
         if (aiPending.length > 0) {
-          // AI auto-resolves: pick first valid target (simple for Easy/Medium, could be smarter)
           const pendingAction = aiPending[0];
           if (pendingAction.options.length > 0) {
-            const selectedTarget = pendingAction.options[0]; // Pick first option
+            // Pick first valid target (simple; could be smarter per difficulty)
+            const selectedTarget = pendingAction.options[0];
             currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
               type: 'SELECT_TARGET',
               pendingActionId: pendingAction.id,
@@ -633,8 +672,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
             iterations++;
             continue;
+          } else {
+            // No valid targets — decline the optional effect or force-cleanup
+            const pendingEffect = currentState.pendingEffects.find(
+              (e) => e.id === pendingAction.sourceEffectId,
+            );
+            if (pendingEffect?.isOptional) {
+              currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pendingEffect.id,
+              });
+            } else {
+              // Non-optional effect with no valid targets — force cleanup to prevent freeze
+              console.warn('[gameStore] AI: force-cleaning non-optional pending with no targets:', pendingAction.id);
+              currentState = {
+                ...currentState,
+                pendingActions: currentState.pendingActions.filter((p) => p.id !== pendingAction.id),
+                pendingEffects: pendingEffect
+                  ? currentState.pendingEffects.filter((e) => e.id !== pendingEffect.id)
+                  : currentState.pendingEffects,
+              };
+            }
+            iterations++;
+            continue;
           }
         }
+
+        // If human has pending actions (from AI card effects), break to let them resolve
+        const humanPending = currentState.pendingActions.filter((p) => p.player === humanPlayer);
+        if (humanPending.length > 0) break;
 
         // Check if it's the AI's turn
         const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
@@ -682,6 +748,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch (err) {
       console.error('[gameStore] processAITurn error:', err);
+      // Force cleanup any dangling AI pending actions to prevent game freeze
+      const danglingAIPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
+      if (danglingAIPending.length > 0) {
+        console.warn('[gameStore] Cleaning up', danglingAIPending.length, 'dangling AI pending actions after error');
+        const danglingEffectIds = new Set(danglingAIPending.map((p) => p.sourceEffectId));
+        currentState = {
+          ...currentState,
+          pendingActions: currentState.pendingActions.filter((p) => p.player !== aiPlayer.player),
+          pendingEffects: currentState.pendingEffects.filter((e) => !danglingEffectIds.has(e.id)),
+        };
+      }
+    }
+
+    // Safety: if we hit max iterations with AI pending actions still present, clean up
+    if (iterations >= maxIterations) {
+      const stuckPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
+      if (stuckPending.length > 0) {
+        console.warn('[gameStore] AI hit max iterations with', stuckPending.length, 'pending actions — force cleanup');
+        const stuckEffectIds = new Set(stuckPending.map((p) => p.sourceEffectId));
+        currentState = {
+          ...currentState,
+          pendingActions: currentState.pendingActions.filter((p) => p.player !== aiPlayer.player),
+          pendingEffects: currentState.pendingEffects.filter((e) => !stuckEffectIds.has(e.id)),
+        };
+      }
     }
 
     // Queue all collected AI animations
@@ -838,6 +929,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  clearActionError: () => {
+    set({ actionError: null });
+  },
+
   resetGame: () => {
     // Disconnect socket if leaving an online game
     if (get().isOnlineGame) {
@@ -856,6 +951,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       animationQueue: [],
       isAnimating: false,
       pendingTargetSelection: null,
+      actionError: null,
     });
+  },
+
+  endAIGameAsForfeit: () => {
+    const { humanPlayer } = get();
+    const winner = humanPlayer === 'player1' ? 'player2' : 'player1';
+    set({ gameOver: true, winner });
   },
 }));

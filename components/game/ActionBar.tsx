@@ -1,21 +1,30 @@
 'use client';
 
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSocketStore } from '@/lib/socket/client';
 
 export function ActionBar() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
+  const actionError = useGameStore((s) => s.actionError);
+  const clearActionError = useGameStore((s) => s.clearActionError);
+  const isOnlineGame = useGameStore((s) => s.isOnlineGame);
+  const endAIGameAsForfeit = useGameStore((s) => s.endAIGameAsForfeit);
 
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);
   const selectedMissionIndex = useUIStore((s) => s.selectedMissionIndex);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const clearSelection = useUIStore((s) => s.clearSelection);
+
+  const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
+  const socketForfeit = useSocketStore((s) => s.forfeit);
+  const actionDeadline = useSocketStore((s) => s.actionDeadline);
 
   if (!visibleState) return null;
 
@@ -80,23 +89,28 @@ export function ActionBar() {
   // Handlers
   const handlePlayVisible = () => {
     if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed) return;
+    clearActionError();
     performAction({
       type: 'PLAY_CHARACTER',
       cardIndex: selectedCardIndex!,
       missionIndex: selectedMissionIndex!,
       hidden: false,
     });
-    clearSelection();
+    // Only clear selection if no error (action was accepted)
+    const error = useGameStore.getState().actionError;
+    if (!error) clearSelection();
   };
 
   const handlePlayHidden = () => {
     if (!cardAndMissionReady || !canAffordHidden || !isMyTurn || hasPassed) return;
+    clearActionError();
     performAction({
       type: 'PLAY_HIDDEN',
       cardIndex: selectedCardIndex!,
       missionIndex: selectedMissionIndex!,
     });
-    clearSelection();
+    const error = useGameStore.getState().actionError;
+    if (!error) clearSelection();
   };
 
   const handleReveal = () => {
@@ -131,13 +145,15 @@ export function ActionBar() {
 
   const handleUpgrade = (targetInstanceId: string) => {
     if (!cardAndMissionReady || !isMyTurn || hasPassed || selectedMissionIndex === null) return;
+    clearActionError();
     performAction({
       type: 'UPGRADE_CHARACTER',
       cardIndex: selectedCardIndex!,
       missionIndex: selectedMissionIndex,
       targetInstanceId,
     });
-    clearSelection();
+    const error = useGameStore.getState().actionError;
+    if (!error) clearSelection();
   };
 
   const handlePass = () => {
@@ -147,33 +163,62 @@ export function ActionBar() {
   };
 
   const handleCancel = () => {
+    clearActionError();
     clearSelection();
   };
 
-  // Don't show during non-action phases (except a minimal display)
+  const confirmAbandon = () => {
+    setShowAbandonConfirm(false);
+    if (isOnlineGame) {
+      socketForfeit('abandon');
+    } else {
+      endAIGameAsForfeit();
+    }
+  };
+
+  // Don't show during non-action phases (except a minimal display + abandon button)
   if (!isActionPhase) {
     return (
-      <div
-        className="flex items-center justify-center py-1.5 px-4 rounded-full"
-        style={{
-          backgroundColor: 'rgba(10, 10, 14, 0.85)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        <span className="text-xs" style={{ color: '#888888' }}>
-          {phase === 'mulligan'
-            ? t('game.mulligan.description')
-            : phase === 'start'
-              ? `${t('game.phase.start')}...`
-              : phase === 'mission'
-                ? `${t('game.phase.mission')}...`
-                : phase === 'end'
-                  ? `${t('game.phase.end')}...`
-                  : ''}
-        </span>
-      </div>
+      <>
+        <div
+          className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-full"
+          style={{
+            backgroundColor: 'rgba(10, 10, 14, 0.85)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <span className="text-xs" style={{ color: '#888888' }}>
+            {phase === 'mulligan'
+              ? t('game.mulligan.description')
+              : phase === 'start'
+                ? `${t('game.phase.start')}...`
+                : phase === 'mission'
+                  ? `${t('game.phase.mission')}...`
+                  : phase === 'end'
+                    ? `${t('game.phase.end')}...`
+                    : ''}
+          </span>
+          {isOnlineGame && (
+            <ActionButton
+              label={t('game.actions.abandon')}
+              onClick={() => setShowAbandonConfirm(true)}
+              disabled={false}
+              variant="danger"
+            />
+          )}
+        </div>
+        <AnimatePresence>
+          {showAbandonConfirm && (
+            <AbandonConfirmDialog
+              onConfirm={confirmAbandon}
+              onCancel={() => setShowAbandonConfirm(false)}
+              t={t}
+            />
+          )}
+        </AnimatePresence>
+      </>
     );
   }
 
@@ -204,14 +249,26 @@ export function ActionBar() {
 
       {isMyTurn && !hasPassed && (
         <>
+          {/* Action error message */}
+          {actionError && (
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-xs font-medium px-2 py-0.5 rounded"
+              style={{ color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
+            >
+              {actionError}
+            </motion.span>
+          )}
+
           {/* Selection hint */}
-          {!hasCardSelected && !hasTargetSelected && (
+          {!actionError && !hasCardSelected && !hasTargetSelected && (
             <span className="text-xs" style={{ color: '#888888' }}>
               {t('game.selectTarget')}
             </span>
           )}
 
-          {hasCardSelected && !hasMissionSelected && (
+          {!actionError && hasCardSelected && !hasMissionSelected && (
             <span className="text-xs" style={{ color: '#888888' }}>
               {t('game.selectMission')}
             </span>
@@ -273,6 +330,11 @@ export function ActionBar() {
             />
           )}
 
+          {/* Timer display (online only) */}
+          {isOnlineGame && isMyTurn && actionDeadline && (
+            <ActionTimer deadline={actionDeadline} />
+          )}
+
           {/* Pass button */}
           <ActionButton
             label={t('game.pass')}
@@ -282,6 +344,27 @@ export function ActionBar() {
           />
         </>
       )}
+
+      {/* Abandon button (always visible in online games during action phase) */}
+      {isOnlineGame && (
+        <ActionButton
+          label={t('game.actions.abandon')}
+          onClick={() => setShowAbandonConfirm(true)}
+          disabled={false}
+          variant="danger"
+        />
+      )}
+
+      {/* Abandon confirmation dialog */}
+      <AnimatePresence>
+        {showAbandonConfirm && (
+          <AbandonConfirmDialog
+            onConfirm={confirmAbandon}
+            onCancel={() => setShowAbandonConfirm(false)}
+            t={t}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -361,5 +444,114 @@ function ActionButton({
     >
       {label}
     </motion.button>
+  );
+}
+
+// ----- Timer component -----
+
+function ActionTimer({ deadline }: { deadline: number }) {
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    Math.max(0, Math.ceil((deadline - Date.now()) / 1000)),
+  );
+
+  useEffect(() => {
+    setSecondsLeft(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  const minutes = Math.floor(secondsLeft / 60);
+  const seconds = secondsLeft % 60;
+  const isWarning = secondsLeft <= 30;
+
+  return (
+    <motion.span
+      className="text-xs font-bold tabular-nums px-2 py-0.5 rounded"
+      style={{
+        color: isWarning ? '#b33e3e' : '#888888',
+        backgroundColor: isWarning ? 'rgba(179, 62, 62, 0.12)' : 'transparent',
+      }}
+      animate={isWarning ? { opacity: [1, 0.5, 1] } : { opacity: 1 }}
+      transition={isWarning ? { repeat: Infinity, duration: 1 } : {}}
+    >
+      {minutes}:{seconds.toString().padStart(2, '0')}
+    </motion.span>
+  );
+}
+
+// ----- Abandon confirmation dialog -----
+
+function AbandonConfirmDialog({
+  onConfirm,
+  onCancel,
+  t,
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+      onClick={onCancel}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="flex flex-col items-center gap-4 rounded-xl p-8"
+        style={{
+          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          border: '1px solid rgba(179, 62, 62, 0.3)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7)',
+          minWidth: '320px',
+        }}
+      >
+        <span className="text-lg font-bold" style={{ color: '#e0e0e0' }}>
+          {t('game.actions.abandonConfirmTitle')}
+        </span>
+        <span className="text-sm" style={{ color: '#888888' }}>
+          {t('game.actions.abandonConfirmMessage')}
+        </span>
+        <div className="flex gap-3 mt-2">
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={onConfirm}
+            className="px-6 py-2 rounded-md text-sm font-medium cursor-pointer"
+            style={{
+              backgroundColor: 'rgba(179, 62, 62, 0.2)',
+              border: '1px solid rgba(179, 62, 62, 0.5)',
+              color: '#b33e3e',
+            }}
+          >
+            {t('game.actions.abandonConfirm')}
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={onCancel}
+            className="px-6 py-2 rounded-md text-sm font-medium cursor-pointer"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#888888',
+            }}
+          >
+            {t('game.actions.abandonCancel')}
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }

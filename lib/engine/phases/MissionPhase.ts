@@ -241,22 +241,10 @@ function resolveRemainingScoreEffects(
   let newState = { ...state };
   const mission = newState.activeMissions[missionIndex];
 
-  // If mission card SCORE wasn't done, process it first
+  // If mission card SCORE wasn't done, it means we're resuming after its pending was resolved.
+  // The handler already ran and created a pending; that pending has now been resolved.
+  // Mark it as done and proceed to character SCORE effects — do NOT re-run the handler.
   if (!progress.missionCardScoreDone) {
-    const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
-    if (hasMissionScore) {
-      const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, mission.card.id, null);
-      if (result.pending) {
-        newState = result.state;
-        newState.missionScoringProgress = {
-          ...progress,
-          missionCardScoreDone: false,
-        };
-        return newState;
-      }
-      newState = result.state;
-    }
-    // Update progress
     progress = { ...progress, missionCardScoreDone: true };
   }
 

@@ -25,8 +25,10 @@ interface SocketStore {
     player2Score: number;
     isRanked?: boolean;
     eloDelta?: number | null;
+    winReason?: 'score' | 'forfeit' | 'timeout';
   } | null;
   playerNames: { player1: string; player2: string } | null;
+  actionDeadline: number | null;
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
@@ -37,6 +39,7 @@ interface SocketStore {
   joinMatchmaking: (userId: string, isRanked?: boolean) => void;
   leaveMatchmaking: () => void;
   clearError: () => void;
+  forfeit: (reason: 'abandon' | 'timeout') => void;
 }
 
 export const useSocketStore = create<SocketStore>((set, get) => ({
@@ -53,6 +56,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   gameEnded: false,
   playerNames: null,
   gameResult: null,
+  actionDeadline: null,
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -204,11 +208,23 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           player2Score: number;
           isRanked?: boolean;
           eloDelta?: number | null;
+          winReason?: 'score' | 'forfeit' | 'timeout';
         }) => {
-          console.log('[Socket] Game ended, winner:', data.winner);
-          set({ gameEnded: true, gameResult: data });
+          console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason);
+          set({ gameEnded: true, gameResult: data, actionDeadline: null });
         },
       );
+
+      // --- Timer events ---
+
+      socket.on('game:action-deadline', (data: { deadline: number }) => {
+        set({ actionDeadline: data.deadline });
+      });
+
+      socket.on('game:auto-passed', () => {
+        console.log('[Socket] You were auto-passed due to timeout');
+        set({ actionDeadline: null });
+      });
 
       // --- Matchmaking events ---
 
@@ -279,6 +295,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameStarted: false,
         gameEnded: false,
         gameResult: null,
+        actionDeadline: null,
       });
     }
   },
@@ -342,6 +359,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameEnded: false,
         gameResult: null,
         playerNames: null,
+        actionDeadline: null,
         error: null,
       });
       console.log('[Socket] Emitting matchmaking:join');
@@ -361,4 +379,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  forfeit: (reason: 'abandon' | 'timeout') => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      console.log('[Socket] Emitting action:forfeit, reason:', reason);
+      socket.emit('action:forfeit', { reason });
+    }
+  },
 }));

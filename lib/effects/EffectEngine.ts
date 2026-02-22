@@ -377,7 +377,8 @@ export class EffectEngine {
       tst === 'SAKURA135_CHOOSE_CARD' ||
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
-      tst === 'RECOVER_FROM_DISCARD'
+      tst === 'RECOVER_FROM_DISCARD' ||
+      tst === 'HIRUZEN002_CHOOSE_CARD'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
@@ -419,6 +420,10 @@ export class EffectEngine {
   ): GameState {
     let newState = deepClone(state);
     const targetId = selectedTargets[0]; // Most effects select 1 target
+
+    // Kimimaro 056 continuous protection: if an enemy effect targets this character,
+    // the opponent must pay 1 chakra (if able). The effect still happens regardless.
+    newState = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
 
     switch (pendingEffect.targetSelectionType) {
       case 'POWERUP_2_LEAF_VILLAGE':
@@ -1955,6 +1960,84 @@ export class EffectEngine {
         break;
       }
 
+      // --- Hiruzen 002: Choose Leaf character from hand ---
+      case 'HIRUZEN002_CHOOSE_CARD': {
+        const player = pendingEffect.sourcePlayer;
+        const cardIndex = parseInt(targetId, 10);
+        const ps = newState[player];
+        if (cardIndex < 0 || cardIndex >= ps.hand.length) break;
+
+        const card = ps.hand[cardIndex];
+        const reducedCost = Math.max(0, card.chakra - 1);
+        if (ps.chakra < reducedCost) break;
+
+        // Find valid missions for this card (no same-name character present)
+        const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const validMissions: string[] = [];
+        for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+          const mission = newState.activeMissions[mIdx];
+          const hasSameName = mission[friendlySide].some((c: CharacterInPlay) => {
+            if (c.isHidden) return false;
+            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+          });
+          if (!hasSameName) validMissions.push(String(mIdx));
+        }
+
+        if (validMissions.length === 0) break;
+
+        // Auto-resolve if only one valid mission
+        if (validMissions.length === 1) {
+          newState = EffectEngine.hiruzen002PlaceCard(newState, pendingEffect, cardIndex, parseInt(validMissions[0], 10));
+          break;
+        }
+
+        // Multiple valid missions — create second pending for mission selection
+        // Store the chosen card index in the effect description as JSON
+        const isUpgrade = pendingEffect.isUpgrade;
+        const effectId2 = generateInstanceId();
+        const actionId2 = generateInstanceId();
+        const pe2: PendingEffect = {
+          id: effectId2,
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ cardIndex, isUpgrade }),
+          targetSelectionType: 'HIRUZEN002_CHOOSE_MISSION',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: validMissions,
+          isOptional: true,
+          isMandatory: false,
+          resolved: false,
+          isUpgrade: isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        };
+        const pa2: PendingAction = {
+          id: actionId2,
+          type: 'SELECT_TARGET',
+          player,
+          description: `Hiruzen Sarutobi (002): Choose a mission to play ${card.name_fr} on (cost ${reducedCost}).`,
+          options: validMissions,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId2,
+        };
+        newState.pendingEffects = [...newState.pendingEffects, pe2];
+        newState.pendingActions = [...newState.pendingActions, pa2];
+        break;
+      }
+
+      // --- Hiruzen 002: Choose mission to place the card ---
+      case 'HIRUZEN002_CHOOSE_MISSION': {
+        let parsed: { cardIndex: number; isUpgrade?: boolean } = { cardIndex: -1 };
+        try { parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const missionIdx = parseInt(targetId, 10);
+        newState = EffectEngine.hiruzen002PlaceCard(newState, pendingEffect, parsed.cardIndex, missionIdx);
+        break;
+      }
+
       default:
         // Unknown target selection type — log warning
         console.warn(`[EffectEngine] Unknown targetSelectionType: ${pendingEffect.targetSelectionType}`);
@@ -2981,6 +3064,118 @@ export class EffectEngine {
   // =====================================
 
   /** MSS 05: Player chose a character to return to hand. */
+  // =====================================
+  // Kimimaro 056 — Continuous protection
+  // =====================================
+
+  /**
+   * Check if the target of an effect is Kimimaro 056 with the continuous protection.
+   * If so, the opponent (effect source) must pay 1 chakra if able.
+   */
+  static applyKimimaro056Protection(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    // Find the targeted character across all missions
+    for (const mission of state.activeMissions) {
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        for (const char of mission[side]) {
+          if (char.instanceId !== targetId) continue;
+          if (char.isHidden) return state; // Hidden = no continuous effects
+
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.number !== 56) return state;
+
+          // Check if this card has the continuous protection effect
+          const hasProtection = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
+          );
+          if (!hasProtection) return state;
+
+          // Only triggers for enemy effects (not friendly)
+          const charOwner = char.controlledBy;
+          if (charOwner === pending.sourcePlayer) return state; // Friendly effect, no protection
+
+          // Opponent must pay 1 chakra if able
+          const opponent = pending.sourcePlayer;
+          if (state[opponent].chakra >= 1) {
+            state[opponent].chakra -= 1;
+            state.log = logAction(
+              state.log, state.turn, state.phase, charOwner,
+              'EFFECT_CONTINUOUS',
+              `Kimimaro (056): ${opponent} pays 1 Chakra for targeting this character.`,
+              'game.log.effect.kimimaro056Protection',
+              { card: 'KIMIMARO', id: 'KS-056-UC' },
+            );
+          }
+          return state;
+        }
+      }
+    }
+    return state;
+  }
+
+  // =====================================
+  // Hiruzen 002 — Place chosen Leaf character
+  // =====================================
+
+  static hiruzen002PlaceCard(state: GameState, pending: PendingEffect, cardIndex: number, missionIndex: number): GameState {
+    const newState = deepClone(state);
+    const player = pending.sourcePlayer;
+    const ps = newState[player];
+
+    if (cardIndex < 0 || cardIndex >= ps.hand.length) return state;
+    if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) return state;
+
+    const card = ps.hand[cardIndex];
+    const reducedCost = Math.max(0, card.chakra - 1);
+    if (ps.chakra < reducedCost) return state;
+
+    // Pay reduced cost
+    ps.chakra -= reducedCost;
+    ps.hand.splice(cardIndex, 1);
+
+    const isUpgrade = pending.isUpgrade;
+    const charInPlay: CharacterInPlay = {
+      instanceId: generateInstanceId(),
+      card,
+      isHidden: false,
+      powerTokens: isUpgrade ? 2 : 0, // UPGRADE: POWERUP 2 on the played character
+      stack: [card],
+      controlledBy: player,
+      originalOwner: player,
+      missionIndex,
+    };
+
+    const mission = { ...newState.activeMissions[missionIndex] };
+    if (player === 'player1') {
+      mission.player1Characters = [...mission.player1Characters, charInPlay];
+    } else {
+      mission.player2Characters = [...mission.player2Characters, charInPlay];
+    }
+    newState.activeMissions = [...newState.activeMissions];
+    newState.activeMissions[missionIndex] = mission;
+
+    // Update character count
+    let charCount = 0;
+    for (const m of newState.activeMissions) {
+      charCount += (player === 'player1' ? m.player1Characters : m.player2Characters).length;
+    }
+    ps.charactersInPlay = charCount;
+
+    const upgradeNote = isUpgrade ? ' with POWERUP 2 (upgrade)' : '';
+    newState.log = logAction(
+      newState.log, newState.turn, 'action', player,
+      'EFFECT',
+      `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${upgradeNote}.`,
+      'game.log.effect.playLeafReduced',
+      { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
+    );
+
+    return newState;
+  }
+
+  // =====================================
+  // MSS 05 — Bring it Back
+  // =====================================
+
   static mss05ReturnToHand(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;

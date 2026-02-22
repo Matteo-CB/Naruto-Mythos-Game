@@ -251,13 +251,85 @@ function handleRevealCharacter(
   if (!char.isHidden) return state;
   if (char.controlledBy !== player) return state;
 
-  const effectiveCost = calculateEffectiveCost(state, player, char.card, missionIndex, true);
+  const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Pay printed chakra cost
+  // Check if this reveal is an upgrade over an existing same-name character
+  const upgradeTarget = chars.find((c) => {
+    if (c.instanceId === characterInstanceId) return false;
+    if (c.isHidden) return false;
+    const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase()
+      && charTopCard.chakra > cTop.chakra;
+  });
+
+  let effectiveCost: number;
+  if (upgradeTarget) {
+    // Reveal-for-upgrade: pay only the difference in cost
+    const existingTopCard = upgradeTarget.stack.length > 0
+      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+      : upgradeTarget.card;
+    effectiveCost = charTopCard.chakra - existingTopCard.chakra;
+  } else {
+    effectiveCost = calculateEffectiveCost(state, player, char.card, missionIndex, true);
+  }
+
+  // Pay cost
   const ps = { ...state[player] };
   if (ps.chakra < effectiveCost) return state;
   ps.chakra -= effectiveCost;
 
+  if (upgradeTarget) {
+    // Reveal-for-upgrade: merge stacks — put the revealed card's stack on top of the existing one
+    const upgradeTargetIdx = chars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
+    const upgraded = { ...upgradeTarget };
+    upgraded.stack = [...upgraded.stack, ...char.stack];
+    upgraded.card = charTopCard;
+    upgraded.powerTokens += char.powerTokens; // Transfer power tokens
+    upgraded.isHidden = false;
+
+    // Remove the revealed hidden character and update the upgrade target
+    const updatedChars = chars.filter((c) => c.instanceId !== characterInstanceId);
+    const mergedIdx = updatedChars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
+    if (mergedIdx !== -1) updatedChars[mergedIdx] = upgraded;
+
+    if (player === 'player1') {
+      mission.player1Characters = updatedChars;
+    } else {
+      mission.player2Characters = updatedChars;
+    }
+    missions[missionIndex] = mission;
+    ps.charactersInPlay = countPlayerCharsInMissions(missions, player);
+
+    const log = logAction(
+      state.log, state.turn, 'action', player,
+      'REVEAL_UPGRADE',
+      `${player} reveals ${charTopCard.name_fr} (${charTopCard.title_fr}) to upgrade existing ${upgradeTarget.card.name_fr} on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
+      'game.log.revealUpgrade',
+      { card: charTopCard.name_fr, title: charTopCard.title_fr, mission: missionIndex + 1, cost: effectiveCost },
+    );
+
+    let newState: GameState = {
+      ...state,
+      [player]: ps,
+      activeMissions: missions,
+      log,
+    };
+
+    // Trigger MAIN + UPGRADE + AMBUSH effects via EffectEngine
+    const updatedMission = newState.activeMissions[missionIndex];
+    const updatedMissionChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
+    const upgradedChar = updatedMissionChars.find((c) => c.instanceId === upgradeTarget.instanceId);
+    if (upgradedChar) {
+      // Resolve as reveal effects with upgrade flag (MAIN + UPGRADE + AMBUSH)
+      newState = EffectEngine.resolvePlayEffects(newState, player, upgradedChar, missionIndex, true);
+    }
+
+    // Trigger on-play reactions (reveal counts as playing a character)
+    newState = triggerOnPlayReactions(newState, player, missionIndex);
+    return newState;
+  }
+
+  // Normal reveal (no upgrade)
   // Reveal the character
   char.isHidden = false;
   chars[charIdx] = char;

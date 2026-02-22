@@ -76,14 +76,14 @@ export function calculateContinuousChakraBonus(
 
     // Shizune 005: Unconditional CHAKRA +1
     if (topCard.id === 'KS-005-C' || topCard.number === 5) {
-      if (effect.description.includes('CHAKRA +1')) {
+      if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
     }
 
     // Sakura 012 (UC): Unconditional CHAKRA +1
     if (topCard.id === 'KS-012-UC' || topCard.number === 12) {
-      if (effect.description.includes('CHAKRA +1')) {
+      if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
     }
@@ -350,8 +350,8 @@ export function calculateContinuousPowerModifier(
 export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens if face-visible
-  if ((topCard.number === 39 || topCard.number === 43) && !char.isHidden) {
+  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens (even when hidden)
+  if (topCard.number === 39 || topCard.number === 43) {
     const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
     );
