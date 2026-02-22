@@ -14,8 +14,14 @@ const getAllowedOrigin = () => {
   if (dev) {
     return 'http://localhost:3000';
   }
-  // In production, use NEXTAUTH_URL or default to the Railway URL
-  return process.env.NEXTAUTH_URL || process.env.RAILWAY_PUBLIC_DOMAIN || '*';
+  // In production, prefer RAILWAY_PUBLIC_DOMAIN (the actual deployed URL)
+  // NEXTAUTH_URL may be set to localhost in .env and shouldn't be used for CORS
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    const domain = process.env.RAILWAY_PUBLIC_DOMAIN;
+    return domain.startsWith('http') ? domain : `https://${domain}`;
+  }
+  // Fallback: allow all origins (safe since we're behind Railway's proxy)
+  return '*';
 };
 
 const app = next({ dev, hostname, port });

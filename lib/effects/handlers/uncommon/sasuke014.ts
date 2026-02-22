@@ -46,8 +46,8 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' }) } };
   }
 
-  // Requires target selection: choose a card from own hand to discard
-  const validTargets = playerState.hand.map((_, idx) => `hand_${idx}`);
+  // Requires target selection: choose a card from own hand to discard (plain numbers for parseInt compatibility)
+  const validTargets = playerState.hand.map((_, idx) => String(idx));
 
   return {
     state: newState,

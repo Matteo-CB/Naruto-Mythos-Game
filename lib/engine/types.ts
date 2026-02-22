@@ -97,6 +97,17 @@ export interface PlayerState {
 // Game State
 // ---------------------
 
+export interface MissionScoringProgress {
+  /** Index into rankOrder ['D','C','B','A'] — which rank we're currently scoring */
+  currentRankIndex: number;
+  /** Whether the mission card's SCORE effect has been processed for the current mission */
+  missionCardScoreDone: boolean;
+  /** instanceIds of characters whose SCORE effects have already been processed on the current mission */
+  processedCharacterIds: string[];
+  /** The player who won the current mission (needed for resumption) */
+  winner: PlayerID;
+}
+
 export interface GameState {
   gameId: string;
   turn: TurnNumber;
@@ -112,6 +123,8 @@ export interface GameState {
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
   turnMissionRevealed: boolean;
+  /** Tracks progress through mission scoring when SCORE effects require target selection */
+  missionScoringProgress?: MissionScoringProgress;
 }
 
 export interface GameLogEntry {

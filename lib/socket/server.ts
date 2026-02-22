@@ -131,6 +131,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       // Check if both players have selected decks
       if (room.hostDeck && room.guestDeck) {
+        console.log(`[Socket] Both decks submitted in room ${code}, creating game...`);
+        console.log(`[Socket] Host deck: ${room.hostDeck.characters.length} characters, ${room.hostDeck.missions.length} missions`);
+        console.log(`[Socket] Guest deck: ${room.guestDeck.characters.length} characters, ${room.guestDeck.missions.length} missions`);
+
         const config: GameConfig = {
           player1: {
             userId: room.hostId,
@@ -147,6 +151,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
 
         room.gameState = GameEngine.createGame(config);
+        console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
+        console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
 
         // Fetch player usernames for display
         let hostName = 'Player 1';
@@ -165,6 +171,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         // Send filtered visible state to each player
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+        console.log(`[Socket] P1 visible: hand=${p1State.myState.hand.length}, phase=${p1State.phase}`);
+        console.log(`[Socket] P2 visible: hand=${p2State.myState.hand.length}, phase=${p2State.phase}`);
 
         if (room.hostSocket) {
           io.to(room.hostSocket).emit('game:state-update', {
@@ -172,6 +180,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
             playerRole: 'player1',
             playerNames: { player1: hostName, player2: guestName },
           });
+          console.log(`[Socket] Sent state-update to host socket ${room.hostSocket}`);
+        } else {
+          console.error(`[Socket] Host socket is null! Cannot send state-update`);
         }
         if (room.guestSocket) {
           io.to(room.guestSocket).emit('game:state-update', {
@@ -179,10 +190,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
             playerRole: 'player2',
             playerNames: { player1: hostName, player2: guestName },
           });
+          console.log(`[Socket] Sent state-update to guest socket ${room.guestSocket}`);
+        } else {
+          console.error(`[Socket] Guest socket is null! Cannot send state-update`);
         }
 
         io.to(code).emit('game:started');
+        console.log(`[Socket] Game started event emitted to room ${code}`);
       } else {
+        const who = socket.id === room.hostSocket ? 'host' : 'guest';
+        console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);
         socket.emit('room:deck-accepted');
       }
     });
@@ -190,17 +207,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
     // Game action
     socket.on('action:perform', async (data: { action: GameAction }) => {
       const code = playerRooms.get(socket.id);
-      if (!code) return;
+      if (!code) {
+        console.warn(`[Socket] action:perform from ${socket.id}: no room found`);
+        return;
+      }
       const room = rooms.get(code);
-      if (!room || !room.gameState) return;
+      if (!room || !room.gameState) {
+        console.warn(`[Socket] action:perform: room ${code} has no game state`);
+        return;
+      }
 
       // Determine which player this socket is
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
+      console.log(`[Socket] action:perform from ${player}: ${data.action.type}, phase: ${room.gameState.phase}`);
 
       // Validate it's this player's turn (or they have pending actions to resolve)
       const hasPendingAction = room.gameState.pendingActions.some((p: { player: string }) => p.player === player);
       if (room.gameState.activePlayer !== player && !hasPendingAction) {
         if (room.gameState.phase === 'action') {
+          console.log(`[Socket] Rejected action from ${player}: not their turn`);
           socket.emit('game:error', { message: 'Not your turn' });
           return;
         }
@@ -213,6 +238,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           player,
           data.action,
         );
+        console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
         // Broadcast updated visible state to each player
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');

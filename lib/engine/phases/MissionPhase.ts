@@ -1,7 +1,9 @@
-import type { GameState, PlayerID, ActiveMission } from '../types';
+import type { GameState, PlayerID, ActiveMission, MissionScoringProgress } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
 import { EffectEngine } from '../../effects/EffectEngine';
+
+const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
 /**
  * Execute the Mission Phase:
@@ -12,27 +14,80 @@ import { EffectEngine } from '../../effects/EffectEngine';
  * 3. Must have at least 1 power to win
  * 4. Winner gains mission points (base + rank bonus)
  * 5. Trigger SCORE effects
+ *
+ * If a SCORE effect requires target selection, we save progress and return.
+ * resumeMissionScoring() picks up where we left off.
  */
 export function executeMissionPhase(state: GameState): GameState {
-  let newState = { ...state };
-
-  // Reset wonBy for fresh scoring this turn (all active missions are scored every turn)
-  newState.activeMissions = newState.activeMissions.map((m) => ({ ...m, wonBy: null }));
+  let newState: GameState = { ...state, missionScoringProgress: undefined };
 
   // Score missions by rank order: D, C, B, A
-  const rankOrder = ['D', 'C', 'B', 'A'];
-
-  for (const rank of rankOrder) {
+  for (let rankIdx = 0; rankIdx < RANK_ORDER.length; rankIdx++) {
+    const rank = RANK_ORDER[rankIdx];
     const missionIdx = newState.activeMissions.findIndex((m) => m.rank === rank);
     if (missionIdx === -1) continue;
 
-    newState = scoreMission(newState, missionIdx);
+    newState = scoreMission(newState, missionIdx, rankIdx);
+
+    // If a SCORE effect created a pending action, stop and wait for resolution
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
   }
 
   return newState;
 }
 
-function scoreMission(state: GameState, missionIndex: number): GameState {
+/**
+ * Resume mission scoring after a SCORE pending action has been resolved.
+ * Continues from where we left off using missionScoringProgress.
+ */
+export function resumeMissionScoring(state: GameState): GameState {
+  let newState = { ...state };
+  const progress = newState.missionScoringProgress;
+
+  if (!progress) {
+    // No progress saved — nothing to resume
+    return newState;
+  }
+
+  // Resume SCORE effects for the current mission's remaining characters
+  const currentRank = RANK_ORDER[progress.currentRankIndex];
+  const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
+
+  if (missionIdx !== -1) {
+    // Resume character SCORE effects on the current mission
+    newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
+
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
+
+    // Handle Orochimaru 051 move for the current mission (if not done yet)
+    const mission = newState.activeMissions[missionIdx];
+    newState = handleOrochimaru051Move(newState, missionIdx, mission.wonBy ?? null);
+  }
+
+  // Clear progress for this mission — continue to remaining missions
+  newState = { ...newState, missionScoringProgress: undefined };
+
+  // Continue scoring from the next rank
+  for (let rankIdx = progress.currentRankIndex + 1; rankIdx < RANK_ORDER.length; rankIdx++) {
+    const rank = RANK_ORDER[rankIdx];
+    const nextMissionIdx = newState.activeMissions.findIndex((m) => m.rank === rank);
+    if (nextMissionIdx === -1) continue;
+
+    newState = scoreMission(newState, nextMissionIdx, rankIdx);
+
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
+  }
+
+  return newState;
+}
+
+function scoreMission(state: GameState, missionIndex: number, rankIndex: number): GameState {
   const mission = state.activeMissions[missionIndex];
 
   // Calculate total power for each player
@@ -101,12 +156,137 @@ function scoreMission(state: GameState, missionIndex: number): GameState {
 
     newState = { ...newState, [winner]: ps, log };
 
-    // Trigger SCORE effects via EffectEngine (registered handlers for each card)
-    newState = EffectEngine.resolveScoreEffects(newState, winner, missionIndex);
+    // Trigger SCORE effects via EffectEngine
+    newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
+
+    // If a SCORE effect needs target selection, return with progress saved
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
   }
 
   // Orochimaru 051 (UC): If you lost this mission, move Orochimaru to another mission
   newState = handleOrochimaru051Move(newState, missionIndex, winner);
+
+  return newState;
+}
+
+/**
+ * Resolve SCORE effects for a mission, saving progress when target selection is needed.
+ */
+function resolveScoreEffectsWithProgress(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+): GameState {
+  let newState = { ...state };
+  const mission = newState.activeMissions[missionIndex];
+  const processedCharIds: string[] = [];
+
+  // Mission card SCORE effects
+  const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
+  if (hasMissionScore) {
+    const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, mission.card.id, null);
+    if (result.pending) {
+      // Save progress: mission card SCORE not done, no characters processed
+      newState = result.state;
+      newState.missionScoringProgress = {
+        currentRankIndex: rankIndex,
+        missionCardScoreDone: false,
+        processedCharacterIds: [],
+        winner: player,
+      };
+      return newState;
+    }
+    newState = result.state;
+  }
+
+  // Winner's character SCORE effects
+  const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  for (const char of chars) {
+    if (char.isHidden) continue;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
+    if (!hasCharScore) continue;
+
+    const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, topCard.id, char);
+    processedCharIds.push(char.instanceId);
+
+    if (result.pending) {
+      newState = result.state;
+      newState.missionScoringProgress = {
+        currentRankIndex: rankIndex,
+        missionCardScoreDone: true,
+        processedCharacterIds: [...processedCharIds],
+        winner: player,
+      };
+      return newState;
+    }
+    newState = result.state;
+  }
+
+  return newState;
+}
+
+/**
+ * Resume remaining character SCORE effects after a pending was resolved.
+ */
+function resolveRemainingScoreEffects(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  progress: MissionScoringProgress,
+): GameState {
+  let newState = { ...state };
+  const mission = newState.activeMissions[missionIndex];
+
+  // If mission card SCORE wasn't done, process it first
+  if (!progress.missionCardScoreDone) {
+    const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
+    if (hasMissionScore) {
+      const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, mission.card.id, null);
+      if (result.pending) {
+        newState = result.state;
+        newState.missionScoringProgress = {
+          ...progress,
+          missionCardScoreDone: false,
+        };
+        return newState;
+      }
+      newState = result.state;
+    }
+    // Update progress
+    progress = { ...progress, missionCardScoreDone: true };
+  }
+
+  // Continue with character SCORE effects, skipping already-processed ones
+  const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const processedCharIds = [...progress.processedCharacterIds];
+
+  for (const char of chars) {
+    if (char.isHidden) continue;
+    if (processedCharIds.includes(char.instanceId)) continue;
+
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
+    if (!hasCharScore) continue;
+
+    const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, topCard.id, char);
+    processedCharIds.push(char.instanceId);
+
+    if (result.pending) {
+      newState = result.state;
+      newState.missionScoringProgress = {
+        currentRankIndex: progress.currentRankIndex,
+        missionCardScoreDone: true,
+        processedCharacterIds: [...processedCharIds],
+        winner: player,
+      };
+      return newState;
+    }
+    newState = result.state;
+  }
 
   return newState;
 }

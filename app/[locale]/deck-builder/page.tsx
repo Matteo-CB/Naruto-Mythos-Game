@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
@@ -17,6 +18,7 @@ import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
 export default function DeckBuilderPage() {
   const t = useTranslations();
   const locale = useLocale();
+  const { data: session } = useSession();
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
@@ -206,6 +208,43 @@ export default function DeckBuilderPage() {
 
     setImportCode('');
   }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
+
+  if (!session?.user) {
+    return (
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+        <CloudBackground />
+        <DecorativeIcons />
+        <CardBackgroundDecor variant="deck" />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
+            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
+              {t('deckBuilder.title')}
+            </h1>
+            <p className="text-sm" style={{ color: '#888888' }}>
+              {t('online.signInRequired')}
+            </p>
+            <div className="flex gap-3">
+              <Link
+                href="/login"
+                className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
+                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+              >
+                {t('common.signIn')}
+              </Link>
+              <Link
+                href="/"
+                className="px-6 py-2.5 text-sm"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {t('common.back')}
+              </Link>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">

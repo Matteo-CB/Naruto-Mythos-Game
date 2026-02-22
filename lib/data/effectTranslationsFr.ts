@@ -235,7 +235,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 099/130 - PAKKUN (C) - "Chien Ninja de Kakashi"
   'KS-099-C': [
-    '[↯] Deplacez ce personnage.',
+    '[↯] Deplacez ce personnage sur une autre mission.',
   ],
 
   // 100/130 - CHIENS NINJAS (C) - "Chiens Ninjas de Kakashi"
@@ -300,7 +300,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 137/130 - KAKASHI HATAKE (S) - "L'Eclair Pourfendeur"
   // Corrected: MAIN targets upgraded characters (friend or foe), not just enemies
   'KS-137-S': [
-    'Deplacez ce personnage.',
+    'Deplacez ce personnage sur une autre mission.',
     'Cachez un personnage ameliore dans cette mission.',
   ],
 
@@ -350,7 +350,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 010/130 - NARUTO UZUMAKI (UC) - "Sexy Meta"
   'KS-010-C': [
-    'Deplacez ce personnage.',
+    'Deplacez ce personnage sur une autre mission.',
   ],
 
   // 012/130 - SAKURA HARUNO (UC) - "Sakura Interieure"
@@ -378,8 +378,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Jutsu de Decuplement"
   'KS-018-UC': [
-    '[⧗] Quand ce personnage est deplace, cachez-le.',
-    'Deplacez ce personnage.',
+    '[⧗] Quand ce personnage est deplace sur une autre mission, cachez un personnage ennemi avec moins de Puissance.',
+    'Deplacez ce personnage sur une autre mission.',
   ],
 
   // 020/130 - INO YAMANAKA (UC) - "Transfert de l\'Esprit"
@@ -434,7 +434,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 033/130 - SHINO ABURAME (UC) - "Insectes Parasites"
   'KS-033-UC': [
     'Tous les personnages joues par l\'adversaire coutent 1 de plus ce tour.',
-    'Deplacez ce personnage.',
+    'Deplacez ce personnage sur une autre mission.',
   ],
 
   // 035/130 - KURENAI YUHI (UC) - "Illusion Demoniaque"
@@ -572,8 +572,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 080/130 - TEMARI (UC) - "Lame de Vent"
   'KS-080-UC': [
-    'Deplacez un personnage Village du Sable allie en jeu.',
-    'Deplacez ce personnage.',
+    'Deplacez un personnage Village du Sable allie sur une autre mission.',
+    'Deplacez ce personnage sur une autre mission.',
   ],
 
   // 082/130 - BAKI (UC) - "Lame de Vent"
@@ -716,7 +716,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 116b/130 - KURENAI YUHI (R) - "Evasion de Petales"
   'KS-116b-R': [
     'Vainquez un personnage ennemi avec une Puissance de 4 ou moins dans cette mission.',
-    'Deplacez ce personnage.',
+    'Deplacez ce personnage sur une autre mission.',
   ],
 
   // 117/130 - ROCK LEE (R) - "Poing Loufoque"

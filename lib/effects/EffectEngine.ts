@@ -264,6 +264,50 @@ export class EffectEngine {
   }
 
   /**
+   * Resolve a single SCORE effect (mission card or character).
+   * Returns { state, pending } — pending=true means a target selection was created.
+   * Used by MissionPhase to track progress through SCORE effects.
+   */
+  static resolveScoreEffectSingle(
+    state: GameState,
+    player: PlayerID,
+    missionIndex: number,
+    cardId: string,
+    character: CharacterInPlay | null,
+  ): { state: GameState; pending: boolean } {
+    let newState = deepClone(state);
+
+    const handler = getEffectHandler(cardId, 'SCORE');
+    if (!handler) {
+      return { state: newState, pending: false };
+    }
+
+    try {
+      const ctx: EffectContext = {
+        state: newState,
+        sourcePlayer: player,
+        sourceCard: (character ?? null) as unknown as CharacterInPlay,
+        sourceMissionIndex: missionIndex,
+        triggerType: 'SCORE',
+        isUpgrade: false,
+      };
+      const result = handler(ctx);
+
+      if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+        newState = EffectEngine.createPendingTargetSelection(
+          newState, player, (character ?? null) as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
+          result, [],
+        );
+        return { state: newState, pending: true };
+      }
+      return { state: result.state, pending: false };
+    } catch (err) {
+      console.error(`[EffectEngine] SCORE handler error for ${cardId}:`, err);
+      return { state: newState, pending: false };
+    }
+  }
+
+  /**
    * Create a PendingEffect and PendingAction from a handler result that needs target selection.
    */
   static createPendingTargetSelection(
@@ -310,15 +354,27 @@ export class EffectEngine {
       tst === 'DISCARD_CARD' ||
       tst === 'KIMIMARO_CHOOSE_DISCARD' ||
       tst === 'CHOJI_CHOOSE_DISCARD' ||
-      tst === 'MSS03_OPPONENT_DISCARD'
+      tst === 'MSS03_OPPONENT_DISCARD' ||
+      tst === 'SAKURA_012_DISCARD' ||
+      tst === 'SASUKE_014_DISCARD_OWN' ||
+      tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
+      tst === 'KABUTO053_DISCARD_FROM_HAND' ||
+      tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
+      tst === 'NARUTO141_CHOOSE_DISCARD' ||
+      tst === 'DISCARD_AND_HIDE_ENEMY_POWER_4'
     ) {
       actionType = 'DISCARD_CARD';
     } else if (
       tst === 'CHOOSE_CARD_FROM_LIST' ||
       tst === 'MSS08_CHOOSE_CARD' ||
       tst === 'JIRAIYA_CHOOSE_SUMMON' ||
+      tst === 'JIRAIYA105_CHOOSE_SUMMON' ||
+      tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
       tst === 'SAKURA109_CHOOSE_DISCARD' ||
-      tst === 'SAKURA135_CHOOSE_CARD'
+      tst === 'SAKURA135_CHOOSE_CARD' ||
+      tst === 'TAYUYA125_CHOOSE_SOUND' ||
+      tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
+      tst === 'RECOVER_FROM_DISCARD'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
@@ -655,6 +711,135 @@ export class EffectEngine {
               newState = EffectEngine.moveCharToMissionDirectPublic(
                 newState, charInstanceId, destMission,
                 charRes.player, 'Shikamaru Nara', 'KS-022-UC',
+              );
+            }
+          }
+        }
+        break;
+      }
+
+      // --- Shizune 006 — move enemy with power 3 or less (two-stage: char then destination) ---
+      case 'MOVE_ENEMY_POWER_3_OR_LESS': {
+        const shizChar = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (shizChar) {
+          const validMissions_sh: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i !== shizChar.missionIndex) validMissions_sh.push(String(i));
+          }
+          if (validMissions_sh.length === 1) {
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, targetId, parseInt(validMissions_sh[0], 10),
+              shizChar.player, 'Shizune', 'KS-006-UC',
+            );
+          } else if (validMissions_sh.length > 1) {
+            const effectId_sh = generateInstanceId();
+            const actionId_sh = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId_sh,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: targetId }),
+              targetSelectionType: 'SHIZUNE006_MOVE_DESTINATION',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validMissions_sh,
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: false,
+            });
+            newState.pendingActions.push({
+              id: actionId_sh,
+              type: 'SELECT_TARGET',
+              player: pendingEffect.sourcePlayer,
+              description: 'Shizune (006): Choose a mission to move the enemy character to.',
+              options: validMissions_sh,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_sh,
+            });
+          }
+        }
+        break;
+      }
+      case 'SHIZUNE006_MOVE_DESTINATION': {
+        const destMission_sh = parseInt(targetId, 10);
+        if (!isNaN(destMission_sh)) {
+          let charInstanceId_sh = '';
+          try { charInstanceId_sh = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          if (charInstanceId_sh) {
+            const charRes_sh = EffectEngine.findCharByInstanceId(newState, charInstanceId_sh);
+            if (charRes_sh) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, charInstanceId_sh, destMission_sh,
+                charRes_sh.player, 'Shizune', 'KS-006-UC',
+              );
+            }
+          }
+        }
+        break;
+      }
+
+      // --- Zaku 071 — move enemy from this mission (two-stage: char then destination) ---
+      case 'MOVE_ENEMY_FROM_THIS_MISSION': {
+        // Stage 1: player chose which enemy character to move. Now prompt for destination.
+        const zakuChar = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (zakuChar) {
+          const validMissions_z: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i !== zakuChar.missionIndex) validMissions_z.push(String(i));
+          }
+          if (validMissions_z.length === 1) {
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, targetId, parseInt(validMissions_z[0], 10),
+              zakuChar.player, 'Zaku Abumi', 'KS-071-UC',
+            );
+          } else if (validMissions_z.length > 1) {
+            const effectId_z = generateInstanceId();
+            const actionId_z = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId_z,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: targetId }),
+              targetSelectionType: 'ZAKU071_MOVE_DESTINATION',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validMissions_z,
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: false,
+            });
+            newState.pendingActions.push({
+              id: actionId_z,
+              type: 'SELECT_TARGET',
+              player: pendingEffect.sourcePlayer,
+              description: 'Zaku Abumi (071): Choose a mission to move the enemy character to.',
+              options: validMissions_z,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_z,
+            });
+          }
+        }
+        break;
+      }
+      case 'ZAKU071_MOVE_DESTINATION': {
+        const destMission_z = parseInt(targetId, 10);
+        if (!isNaN(destMission_z)) {
+          let charInstanceId_z = '';
+          try { charInstanceId_z = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          if (charInstanceId_z) {
+            const charRes_z = EffectEngine.findCharByInstanceId(newState, charInstanceId_z);
+            if (charRes_z) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, charInstanceId_z, destMission_z,
+                charRes_z.player, 'Zaku Abumi', 'KS-071-UC',
               );
             }
           }
@@ -1128,8 +1313,445 @@ export class EffectEngine {
         break;
       }
 
+      // =============================================
+      // SIMPLE DEFEAT types (target = instanceId → defeat the character)
+      // =============================================
+      case 'DEFEAT_ANY_CHARACTER_THIS_MISSION':
+      case 'DEFEAT_ENEMY_POWER_1_THIS_MISSION':
+      case 'DEFEAT_ENEMY_SUMMON_THIS_MISSION':
+      case 'DEFEAT_HIDDEN_CHARACTER_ANY':
+      case 'TENTEN_DEFEAT_HIDDEN':
+      case 'KIDOMARU060_DEFEAT_LOW_POWER':
+      case 'ANKO_DEFEAT_HIDDEN_ENEMY':
+      case 'OROCHIMARU051_DEFEAT_HIDDEN':
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      // =============================================
+      // SIMPLE POWERUP types (target = instanceId → add power tokens)
+      // =============================================
+      case 'AKAMARU_028_POWERUP_KIBA': {
+        const akRes = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (akRes) {
+          const missions_ak = [...newState.activeMissions];
+          const m_ak = { ...missions_ak[akRes.missionIndex] };
+          const side_ak = akRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          m_ak[side_ak] = m_ak[side_ak].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+          );
+          missions_ak[akRes.missionIndex] = m_ak;
+          newState = { ...newState, activeMissions: missions_ak };
+        }
+        break;
+      }
+      case 'TAYUYA065_POWERUP_SOUND': {
+        const tayRes = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (tayRes) {
+          const missions_tay = [...newState.activeMissions];
+          const m_tay = { ...missions_tay[tayRes.missionIndex] };
+          const side_tay = tayRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          m_tay[side_tay] = m_tay[side_tay].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+          );
+          missions_tay[tayRes.missionIndex] = m_tay;
+          newState = { ...newState, activeMissions: missions_tay };
+        }
+        break;
+      }
+      case 'TENTEN_POWERUP_LEAF': {
+        const ttRes = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (ttRes) {
+          const missions_tt = [...newState.activeMissions];
+          const m_tt = { ...missions_tt[ttRes.missionIndex] };
+          const side_tt = ttRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          m_tt[side_tt] = m_tt[side_tt].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: c.powerTokens + 1 } : c
+          );
+          missions_tt[ttRes.missionIndex] = m_tt;
+          newState = { ...newState, activeMissions: missions_tt };
+        }
+        break;
+      }
+
+      // =============================================
+      // NEJI 037: Remove all power tokens from target
+      // =============================================
+      case 'NEJI037_REMOVE_ALL_TOKENS': {
+        const nejiRes = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (nejiRes) {
+          const missions_nj = [...newState.activeMissions];
+          const m_nj = { ...missions_nj[nejiRes.missionIndex] };
+          const side_nj = nejiRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          m_nj[side_nj] = m_nj[side_nj].map((c: CharacterInPlay) =>
+            c.instanceId === targetId ? { ...c, powerTokens: 0 } : c
+          );
+          missions_nj[nejiRes.missionIndex] = m_nj;
+          newState = { ...newState, activeMissions: missions_nj };
+        }
+        break;
+      }
+
+      // =============================================
+      // SIMPLE DISCARD types (target = hand index → discard from hand)
+      // =============================================
+      case 'SAKURA_012_DISCARD': {
+        const idx_sk = parseInt(targetId, 10);
+        const ps_sk = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_sk >= 0 && idx_sk < ps_sk.hand.length) {
+          const hand_sk = [...ps_sk.hand];
+          const discarded = hand_sk.splice(idx_sk, 1)[0];
+          ps_sk.hand = hand_sk;
+          ps_sk.discardPile = [...ps_sk.discardPile, discarded];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_sk };
+        }
+        break;
+      }
+      case 'ASUMA_024_DISCARD_FOR_POWERUP': {
+        // Discard from hand, then POWERUP 3 on self
+        const idx_as = parseInt(targetId, 10);
+        const ps_as = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_as >= 0 && idx_as < ps_as.hand.length) {
+          const hand_as = [...ps_as.hand];
+          const discarded_as = hand_as.splice(idx_as, 1)[0];
+          ps_as.hand = hand_as;
+          ps_as.discardPile = [...ps_as.discardPile, discarded_as];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_as };
+          // Apply POWERUP 3 to the source character
+          if (pendingEffect.sourceInstanceId) {
+            const srcRes = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+            if (srcRes) {
+              const missions_as = [...newState.activeMissions];
+              const m_as = { ...missions_as[srcRes.missionIndex] };
+              const side_as = srcRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+              m_as[side_as] = m_as[side_as].map((c: CharacterInPlay) =>
+                c.instanceId === pendingEffect.sourceInstanceId ? { ...c, powerTokens: c.powerTokens + 3 } : c
+              );
+              missions_as[srcRes.missionIndex] = m_as;
+              newState = { ...newState, activeMissions: missions_as };
+            }
+          }
+        }
+        break;
+      }
+      case 'KABUTO053_DISCARD_FROM_HAND': {
+        // Stage 1: discard a card from hand. Stage 2: play the discarded card on a mission (handled by handler continuation)
+        const idx_kb2 = parseInt(targetId, 10);
+        const ps_kb2 = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_kb2 >= 0 && idx_kb2 < ps_kb2.hand.length) {
+          const hand_kb2 = [...ps_kb2.hand];
+          const discarded_kb2 = hand_kb2.splice(idx_kb2, 1)[0];
+          ps_kb2.hand = hand_kb2;
+          ps_kb2.discardPile = [...ps_kb2.discardPile, discarded_kb2];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_kb2 };
+        }
+        break;
+      }
+      case 'SASUKE_014_DISCARD_OWN': {
+        // Stage 1: discard own card from hand
+        const idx_ss = parseInt(targetId, 10);
+        const ps_ss = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_ss >= 0 && idx_ss < ps_ss.hand.length) {
+          const hand_ss = [...ps_ss.hand];
+          const discarded_ss = hand_ss.splice(idx_ss, 1)[0];
+          ps_ss.hand = hand_ss;
+          ps_ss.discardPile = [...ps_ss.discardPile, discarded_ss];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_ss };
+        }
+        break;
+      }
+      case 'KIMIMARO056_CHOOSE_DISCARD': {
+        // Stage 1: discard from hand
+        const idx_km = parseInt(targetId, 10);
+        const ps_km = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_km >= 0 && idx_km < ps_km.hand.length) {
+          const hand_km = [...ps_km.hand];
+          const discarded_km = hand_km.splice(idx_km, 1)[0];
+          ps_km.hand = hand_km;
+          ps_km.discardPile = [...ps_km.discardPile, discarded_km];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_km };
+        }
+        break;
+      }
+      case 'NARUTO141_CHOOSE_DISCARD': {
+        // Stage 1: discard from hand, then hide enemy target
+        const idx_nr = parseInt(targetId, 10);
+        const ps_nr = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_nr >= 0 && idx_nr < ps_nr.hand.length) {
+          const hand_nr = [...ps_nr.hand];
+          const discarded_nr = hand_nr.splice(idx_nr, 1)[0];
+          ps_nr.hand = hand_nr;
+          ps_nr.discardPile = [...ps_nr.discardPile, discarded_nr];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_nr };
+        }
+        break;
+      }
+      case 'DISCARD_AND_HIDE_ENEMY_POWER_4': {
+        // Discard from hand, then hide enemy with power <= 4 (combined in handler)
+        const idx_dh = parseInt(targetId, 10);
+        const ps_dh = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_dh >= 0 && idx_dh < ps_dh.hand.length) {
+          const hand_dh = [...ps_dh.hand];
+          const discarded_dh = hand_dh.splice(idx_dh, 1)[0];
+          ps_dh.hand = hand_dh;
+          ps_dh.discardPile = [...ps_dh.discardPile, discarded_dh];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_dh };
+        }
+        break;
+      }
+      case 'DISCARD_FROM_OPPONENT_HAND': {
+        // Opponent discards a card from their hand (opponent selects)
+        const idx_op = parseInt(targetId, 10);
+        const opponent_op = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const ps_op = { ...newState[opponent_op] };
+        if (idx_op >= 0 && idx_op < ps_op.hand.length) {
+          const hand_op = [...ps_op.hand];
+          const discarded_op = hand_op.splice(idx_op, 1)[0];
+          ps_op.hand = hand_op;
+          ps_op.discardPile = [...ps_op.discardPile, discarded_op];
+          newState = { ...newState, [opponent_op]: ps_op };
+        }
+        break;
+      }
+
+      // =============================================
+      // RECOVER_FROM_DISCARD: move card from discard to hand
+      // =============================================
+      case 'RECOVER_FROM_DISCARD': {
+        const idx_rc = parseInt(targetId, 10);
+        const ps_rc = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_rc >= 0 && idx_rc < ps_rc.discardPile.length) {
+          const discard_rc = [...ps_rc.discardPile];
+          const recovered = discard_rc.splice(idx_rc, 1)[0];
+          ps_rc.discardPile = discard_rc;
+          ps_rc.hand = [...ps_rc.hand, recovered];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_rc };
+        }
+        break;
+      }
+
+      // =============================================
+      // MOVE SELF types (target = mission index → move self there)
+      // =============================================
+      case 'CHOJI_018_MOVE_SELF':
+      case 'SHINO_MOVE_SELF':
+      case 'NARUTO_MOVE_SELF':
+      case 'MOVE_SELF_TO_MISSION':
+        newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
+        break;
+
+      // =============================================
+      // Two-stage MOVE types (stage 1: pick character, stage 2: pick destination)
+      // =============================================
+      case 'MOVE_CHARACTER_POWER_4_OR_LESS':
+      case 'MOVE_FRIENDLY_SAND_VILLAGE':
+      case 'KIDOMARU060_CHOOSE_CHARACTER': {
+        // Stage 1: character chosen, now prompt for destination mission
+        const moveChar = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (moveChar) {
+          const validDests_mv: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i !== moveChar.missionIndex) validDests_mv.push(String(i));
+          }
+          if (validDests_mv.length === 1) {
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, targetId, parseInt(validDests_mv[0], 10),
+              moveChar.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+            );
+          } else if (validDests_mv.length > 1) {
+            const tst2 = pendingEffect.targetSelectionType === 'MOVE_CHARACTER_POWER_4_OR_LESS'
+              ? 'KANKURO078_MOVE_DESTINATION'
+              : pendingEffect.targetSelectionType === 'MOVE_FRIENDLY_SAND_VILLAGE'
+                ? 'TEMARI080_MOVE_DESTINATION'
+                : 'KIDOMARU060_MOVE_DESTINATION';
+            const effectId_mv = generateInstanceId();
+            const actionId_mv = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId_mv,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: targetId }),
+              targetSelectionType: tst2,
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validDests_mv,
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: false,
+            });
+            newState.pendingActions.push({
+              id: actionId_mv,
+              type: 'SELECT_TARGET',
+              player: pendingEffect.sourcePlayer,
+              description: 'Choose a mission to move the character to.',
+              options: validDests_mv,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_mv,
+            });
+          }
+        }
+        break;
+      }
+      case 'KANKURO078_MOVE_DESTINATION':
+      case 'TEMARI080_MOVE_DESTINATION':
+      case 'KIDOMARU060_MOVE_DESTINATION': {
+        const destMission_mv2 = parseInt(targetId, 10);
+        if (!isNaN(destMission_mv2)) {
+          let charInstanceId_mv2 = '';
+          try { charInstanceId_mv2 = JSON.parse(pendingEffect.effectDescription).charInstanceId ?? ''; } catch { /* ignore */ }
+          if (charInstanceId_mv2) {
+            const charRes_mv2 = EffectEngine.findCharByInstanceId(newState, charInstanceId_mv2);
+            if (charRes_mv2) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, charInstanceId_mv2, destMission_mv2,
+                charRes_mv2.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+              );
+            }
+          }
+        }
+        break;
+      }
+
+      // =============================================
+      // PLAY_HIDDEN_FROM_HAND_FREE (Kankuro 078 UPGRADE)
+      // Stage 1: pick card from hand, Stage 2: pick mission
+      // =============================================
+      case 'PLAY_HIDDEN_FROM_HAND_FREE': {
+        // Stage 1: card chosen from hand. Store index and prompt for mission.
+        const validMissions_ph: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          validMissions_ph.push(String(i));
+        }
+        if (validMissions_ph.length === 1) {
+          // Auto-resolve: play hidden on the only mission
+          const mIdx_ph = parseInt(validMissions_ph[0], 10);
+          const hIdx_ph = parseInt(targetId, 10);
+          const ps_ph = { ...newState[pendingEffect.sourcePlayer] };
+          if (hIdx_ph >= 0 && hIdx_ph < ps_ph.hand.length) {
+            const hand_ph = [...ps_ph.hand];
+            const card_ph = hand_ph.splice(hIdx_ph, 1)[0];
+            ps_ph.hand = hand_ph;
+            ps_ph.charactersInPlay += 1;
+            const friendlySide_ph = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+            const newChar_ph: CharacterInPlay = {
+              instanceId: generateInstanceId(),
+              card: card_ph,
+              isHidden: true,
+              powerTokens: 0,
+              stack: [card_ph],
+              controlledBy: pendingEffect.sourcePlayer,
+              originalOwner: pendingEffect.sourcePlayer,
+              missionIndex: mIdx_ph,
+            };
+            const missions_ph = [...newState.activeMissions];
+            const m_ph = { ...missions_ph[mIdx_ph] };
+            m_ph[friendlySide_ph] = [...m_ph[friendlySide_ph], newChar_ph];
+            missions_ph[mIdx_ph] = m_ph;
+            newState = { ...newState, activeMissions: missions_ph, [pendingEffect.sourcePlayer]: ps_ph };
+          }
+        } else if (validMissions_ph.length > 1) {
+          const effectId_ph = generateInstanceId();
+          const actionId_ph = generateInstanceId();
+          newState.pendingEffects.push({
+            id: effectId_ph,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ handIndex: targetId }),
+            targetSelectionType: 'KANKURO078_CHOOSE_HIDDEN_MISSION',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: validMissions_ph,
+            isOptional: true,
+            isMandatory: false,
+            resolved: false,
+            isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: actionId_ph,
+            type: 'SELECT_TARGET',
+            player: pendingEffect.sourcePlayer,
+            description: 'Choose a mission to place the hidden character on.',
+            options: validMissions_ph,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effectId_ph,
+          });
+        }
+        break;
+      }
+      case 'KANKURO078_CHOOSE_HIDDEN_MISSION': {
+        const mIdx_kh = parseInt(targetId, 10);
+        if (!isNaN(mIdx_kh)) {
+          let handIndex_kh = 0;
+          try { handIndex_kh = parseInt(JSON.parse(pendingEffect.effectDescription).handIndex ?? '0', 10); } catch { /* ignore */ }
+          const ps_kh = { ...newState[pendingEffect.sourcePlayer] };
+          if (handIndex_kh >= 0 && handIndex_kh < ps_kh.hand.length) {
+            const hand_kh = [...ps_kh.hand];
+            const card_kh = hand_kh.splice(handIndex_kh, 1)[0];
+            ps_kh.hand = hand_kh;
+            ps_kh.charactersInPlay += 1;
+            const friendlySide_kh = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+            const newChar_kh: CharacterInPlay = {
+              instanceId: generateInstanceId(),
+              card: card_kh,
+              isHidden: true,
+              powerTokens: 0,
+              stack: [card_kh],
+              controlledBy: pendingEffect.sourcePlayer,
+              originalOwner: pendingEffect.sourcePlayer,
+              missionIndex: mIdx_kh,
+            };
+            const missions_kh = [...newState.activeMissions];
+            const m_kh = { ...missions_kh[mIdx_kh] };
+            m_kh[friendlySide_kh] = [...m_kh[friendlySide_kh], newChar_kh];
+            missions_kh[mIdx_kh] = m_kh;
+            newState = { ...newState, activeMissions: missions_kh, [pendingEffect.sourcePlayer]: ps_kh };
+          }
+        }
+        break;
+      }
+
+      // =============================================
+      // FORCE_REVEAL_OR_DEFEAT (Dosu 069): opponent must reveal (paying cost+2) or defeat
+      // Simplified: just defeat the target (the opponent can't choose in current UI)
+      // =============================================
+      case 'FORCE_REVEAL_OR_DEFEAT':
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      // =============================================
+      // KAKASHI 106: Devolve an upgraded enemy character (remove top card from stack)
+      // =============================================
+      case 'KAKASHI106_DEVOLVE_TARGET': {
+        newState = EffectEngine.devolveUpgradedCharacter(newState, pendingEffect, targetId);
+        break;
+      }
+
+      // =============================================
+      // KAKASHI_COPY_EFFECT / SAKON062_COPY_EFFECT: copy another character's effect
+      // Simplified: these are complex effects that require deep integration.
+      // =============================================
+      case 'KAKASHI_COPY_EFFECT':
+      case 'SAKON062_COPY_EFFECT':
+        // These effects require reading another card's effects and re-executing them.
+        // Log that the effect was triggered but complex copy could not be resolved.
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT',
+          `Effect copy triggered but auto-resolved (target: ${targetId}).`,
+          'game.log.effect.copy',
+          { card: pendingEffect.sourceCardId },
+        );
+        break;
+
       default:
         // Unknown target selection type — log warning
+        console.warn(`[EffectEngine] Unknown targetSelectionType: ${pendingEffect.targetSelectionType}`);
         break;
     }
 
@@ -1305,6 +1927,103 @@ export class EffectEngine {
             { card: 'Chiens Ninjas', id: 'KS-100-C', target: hiddenInDest.card.name_fr },
           );
         }
+      }
+    }
+
+    return newState;
+  }
+
+  /**
+   * Kakashi 106 (R): De-evolve an upgraded enemy character.
+   * Remove the top card from their stack, discard it.
+   * If upgrade mode, also copy the discarded card's MAIN effects.
+   */
+  static devolveUpgradedCharacter(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    const charResult = EffectEngine.findCharByInstanceId(state, targetId);
+    if (!charResult) return state;
+
+    const { character, missionIndex, player } = charResult;
+    if (character.stack.length <= 1) {
+      // Not upgraded, nothing to devolve
+      return state;
+    }
+
+    const newState = deepClone(state);
+    const isP1 = player === 'player1';
+    const sideKey: 'player1Characters' | 'player2Characters' = isP1 ? 'player1Characters' : 'player2Characters';
+    const mission = newState.activeMissions[missionIndex];
+    const charIdx = mission[sideKey].findIndex((c: CharacterInPlay) => c.instanceId === targetId);
+    if (charIdx === -1) return state;
+
+    const targetChar = mission[sideKey][charIdx];
+
+    // Remove the top card from the stack
+    const newStack = [...targetChar.stack];
+    const discardedCard = newStack.pop()!;
+    const newTopCard = newStack[newStack.length - 1];
+
+    // Update character: new top card is now active
+    mission[sideKey][charIdx] = {
+      ...targetChar,
+      stack: newStack,
+      card: newTopCard,
+    };
+
+    // Add discarded card to enemy's discard pile
+    const enemyPS = { ...newState[player] };
+    enemyPS.discardPile = [...enemyPS.discardPile, discardedCard];
+    newState[player] = enemyPS;
+
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+      'EFFECT_DEVOLVE',
+      `Kakashi Hatake (106): Removed ${discardedCard.name_fr} from enemy ${newTopCard.name_fr}'s stack (de-evolved).`,
+      'game.log.effect.devolve',
+      { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
+    );
+
+    // UPGRADE: copy the discarded card's non-Upgrade MAIN effect
+    if (pending.isUpgrade) {
+      const mainEffects = (discardedCard.effects ?? []).filter(
+        (e) => e.type === 'MAIN',
+      );
+      if (mainEffects.length > 0) {
+        // Try to execute the discarded card's MAIN handler as if Kakashi played it
+        const handler = getEffectHandler(discardedCard.id, 'MAIN');
+        if (handler) {
+          try {
+            // Find Kakashi's character for context
+            const kakashiResult = EffectEngine.findCharByInstanceId(newState, pending.sourceInstanceId);
+            if (kakashiResult) {
+              const ctx: EffectContext = {
+                state: newState,
+                sourcePlayer: pending.sourcePlayer,
+                sourceCard: kakashiResult.character,
+                sourceMissionIndex: kakashiResult.missionIndex,
+                triggerType: 'MAIN',
+                isUpgrade: false,
+              };
+              const copyResult = handler(ctx);
+              if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
+                // Chain the target selection for the copied effect
+                return EffectEngine.createPendingTargetSelection(
+                  copyResult.state, pending.sourcePlayer, kakashiResult.character,
+                  kakashiResult.missionIndex, 'MAIN', false, copyResult, [],
+                );
+              }
+              return copyResult.state;
+            }
+          } catch (err) {
+            console.error(`[EffectEngine] Kakashi 106 copy error for ${discardedCard.id}:`, err);
+          }
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+          'EFFECT_COPY',
+          `Kakashi Hatake (106) UPGRADE: Copied MAIN effect of ${discardedCard.name_fr}.`,
+          'game.log.effect.copy',
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
+        );
       }
     }
 

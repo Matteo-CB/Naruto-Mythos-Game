@@ -48,8 +48,8 @@ function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-024-UC' }) } };
   }
 
-  // Requires target selection: choose a card from hand to discard (for POWERUP 3)
-  const validTargets = currentPs.hand.map((_, idx) => `hand_${idx}`);
+  // Requires target selection: choose a card from hand to discard (plain numbers for parseInt compatibility)
+  const validTargets = currentPs.hand.map((_, idx) => String(idx));
 
   return {
     state: newState,

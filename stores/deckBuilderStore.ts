@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
+import { resolveCardId } from '@/lib/data/cardLoader';
 
 interface SavedDeck {
   id: string;
@@ -243,19 +244,21 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         missionIds: string[];
       };
 
-      // Resolve card IDs back to full card objects
+      // Resolve card IDs back to full card objects (supports old IDs via fallback)
       const charMap = new Map(allChars.map((c) => [c.id, c]));
       const missionMap = new Map(allMissions.map((m) => [m.id, m]));
 
       const resolvedChars: CharacterCard[] = [];
       for (const id of cardIds) {
-        const card = charMap.get(id);
+        const resolved = resolveCardId(id);
+        const card = charMap.get(resolved);
         if (card) resolvedChars.push(card);
       }
 
       const resolvedMissions: MissionCard[] = [];
       for (const id of missionIds) {
-        const card = missionMap.get(id);
+        const resolved = resolveCardId(id);
+        const card = missionMap.get(resolved);
         if (card) resolvedMissions.push(card);
       }
 

@@ -100,7 +100,10 @@ export function ActionBar() {
   };
 
   const handleReveal = () => {
-    if (!canReveal || !canAffordReveal || !selectedTargetId) return;
+    if (!canReveal || !canAffordReveal || !selectedTargetId) {
+      console.warn('[ActionBar] handleReveal blocked:', { canReveal, canAffordReveal, selectedTargetId });
+      return;
+    }
     // Find which mission the target is on
     let targetMissionIndex = -1;
     if (visibleState.activeMissions) {
@@ -120,6 +123,8 @@ export function ActionBar() {
         missionIndex: targetMissionIndex,
         characterInstanceId: selectedTargetId,
       });
+    } else {
+      console.warn('[ActionBar] handleReveal: character not found in any mission', { selectedTargetId });
     }
     clearSelection();
   };
