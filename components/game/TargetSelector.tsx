@@ -166,9 +166,10 @@ interface TargetMissionLaneProps {
   missionIndex: number;
   validTargets: string[];
   onSelect: (instanceId: string) => void;
+  myPlayer: string;
 }
 
-function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: TargetMissionLaneProps) {
+function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPlayer }: TargetMissionLaneProps) {
   const t = useTranslations();
   const locale = useLocale();
   const rankColors: Record<MissionRank, string> = {
@@ -236,7 +237,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: Ta
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.opponent')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
-          {mission.player2Characters.map(char => (
+          {(myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters).map(char => (
             <TargetCharacter
               key={char.instanceId}
               character={char}
@@ -259,7 +260,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect }: Ta
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.you')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
-          {mission.player1Characters.map(char => (
+          {(myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters).map(char => (
             <TargetCharacter
               key={char.instanceId}
               character={char}
@@ -393,6 +394,7 @@ export function TargetSelector() {
               missionIndex={index}
               validTargets={validTargets}
               onSelect={handleSelect}
+              myPlayer={visibleState.myPlayer}
             />
           ))}
         </motion.div>

@@ -68,7 +68,12 @@
       "revealCharacter": "Reveler un personnage cache",
       "upgradeCharacter": "Ameliorer un personnage",
       "upgrade": "Evoluer",
-      "passAction": "Passer (terminer vos actions)"
+      "passAction": "Passer (terminer vos actions)",
+      "abandon": "Abandonner",
+      "abandonConfirmTitle": "Abandonner la partie ?",
+      "abandonConfirmMessage": "Cela comptera comme une defaite.",
+      "abandonConfirm": "Confirmer",
+      "abandonCancel": "Annuler"
     },
     "log": {
       "title": "Journal de Partie",
@@ -154,7 +159,14 @@
       "playAgain": "Rejouer",
       "backToMenu": "Retour au Menu",
       "tieBreaker": "Egalite brisee par le detenteur du Jeton d'Avantage",
-      "rankedMatch": "Match Classe"
+      "rankedMatch": "Match Classe",
+      "opponentAbandoned": "L'adversaire a abandonne",
+      "youAbandoned": "Vous avez abandonne",
+      "opponentTimedOut": "L'adversaire a depasse le temps",
+      "youTimedOut": "Temps depasse"
+    },
+    "timer": {
+      "autoPassed": "Temps ecoule — passe automatique"
     },
     "opponent": "Adversaire",
     "you": "Vous",

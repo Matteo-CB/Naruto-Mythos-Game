@@ -108,6 +108,8 @@ export class GameEngine {
       pendingEffects: [],
       pendingActions: [],
       turnMissionRevealed: false,
+      missionScoredThisTurn: false,
+      consecutiveTimeouts: { player1: 0, player2: 0 },
     };
 
     return {
@@ -123,6 +125,13 @@ export class GameEngine {
    */
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
     let newState = deepClone(state);
+
+    // FORFEIT can happen in any phase — handle before the phase switch
+    if (action.type === 'FORFEIT') {
+      newState.phase = 'gameOver';
+      newState.forfeitedBy = player;
+      return newState;
+    }
 
     switch (newState.phase) {
       case 'mulligan':
@@ -143,7 +152,7 @@ export class GameEngine {
         }
         // ActionPhase sets phase to 'mission' when both pass, to avoid circular dependency.
         // We complete the transition here (only if no pending effects remain).
-        if (newState.phase === 'mission' && newState.pendingActions.length === 0) {
+        if (newState.phase === 'mission' && newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
           newState = GameEngine.transitionToMissionPhase(newState);
         }
         break;
@@ -221,6 +230,7 @@ export class GameEngine {
     let newState = deepClone(state);
     newState.phase = 'start';
     newState.turnMissionRevealed = false;
+    newState.missionScoredThisTurn = false;
     newState.player1.hasPassed = false;
     newState.player2.hasPassed = false;
     newState.firstPasser = null;
@@ -239,8 +249,15 @@ export class GameEngine {
    * Transition to mission phase and execute scoring.
    */
   static transitionToMissionPhase(state: GameState): GameState {
+    // Guard: prevent double execution of mission scoring in the same turn
+    if (state.missionScoredThisTurn) {
+      console.warn('[GameEngine] transitionToMissionPhase called twice in the same turn — skipping');
+      return GameEngine.transitionToEndPhase(state);
+    }
+
     let newState = deepClone(state);
     newState.phase = 'mission';
+    newState.missionScoredThisTurn = true;
 
     // Execute mission scoring
     newState = executeMissionPhase(newState);
@@ -495,6 +512,7 @@ export class GameEngine {
         (e) => e.sourcePlayer === player || !e.requiresTargetSelection,
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
+      forfeitedBy: state.forfeitedBy,
     };
   }
 
@@ -503,6 +521,11 @@ export class GameEngine {
    */
   static getWinner(state: GameState): PlayerID | null {
     if (state.phase !== 'gameOver') return null;
+
+    // Forfeit: the other player wins
+    if (state.forfeitedBy) {
+      return state.forfeitedBy === 'player1' ? 'player2' : 'player1';
+    }
 
     const p1Points = state.player1.missionPoints;
     const p2Points = state.player2.missionPoints;

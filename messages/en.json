@@ -68,7 +68,12 @@
       "revealCharacter": "Reveal hidden character",
       "upgradeCharacter": "Upgrade character",
       "upgrade": "Upgrade",
-      "passAction": "Pass (end your actions)"
+      "passAction": "Pass (end your actions)",
+      "abandon": "Abandon",
+      "abandonConfirmTitle": "Abandon the game?",
+      "abandonConfirmMessage": "This will count as a defeat.",
+      "abandonConfirm": "Confirm",
+      "abandonCancel": "Cancel"
     },
     "log": {
       "title": "Game Log",
@@ -154,7 +159,14 @@
       "playAgain": "Play Again",
       "backToMenu": "Back to Menu",
       "tieBreaker": "Tie broken by Edge Token holder",
-      "rankedMatch": "Ranked Match"
+      "rankedMatch": "Ranked Match",
+      "opponentAbandoned": "Opponent Abandoned",
+      "youAbandoned": "You Abandoned",
+      "opponentTimedOut": "Opponent Timed Out",
+      "youTimedOut": "You Timed Out"
+    },
+    "timer": {
+      "autoPassed": "Time expired — auto-passed"
     },
     "opponent": "Opponent",
     "you": "You",

@@ -18,17 +18,30 @@ export function GameEndScreen() {
 
   const isRanked = isOnlineGame && gameResult?.isRanked;
   const eloDelta = gameResult?.eloDelta;
+  const winReason = gameResult?.winReason;
 
   const myPlayer = visibleState.myPlayer;
   const playerWon = winner === myPlayer;
   const isDraw = winner === null;
+  const isForfeit = winReason === 'forfeit' || winReason === 'timeout';
 
   const myScore = visibleState.myState.missionPoints;
   const oppScore = visibleState.opponentState.missionPoints;
 
+  // Check if the forfeit was by the viewing player or the opponent
+  const forfeitedByMe = isForfeit && visibleState.forfeitedBy === myPlayer;
+
   let headingText: string;
   let headingColor: string;
-  if (isDraw) {
+  if (isForfeit) {
+    if (forfeitedByMe) {
+      headingText = winReason === 'timeout' ? t('game.end.youTimedOut') : t('game.end.youAbandoned');
+      headingColor = '#b33e3e';
+    } else {
+      headingText = winReason === 'timeout' ? t('game.end.opponentTimedOut') : t('game.end.opponentAbandoned');
+      headingColor = '#c4a35a';
+    }
+  } else if (isDraw) {
     headingText = t('game.end.draw');
     headingColor = '#888888';
   } else if (playerWon) {
