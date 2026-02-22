@@ -15,10 +15,11 @@ const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
   UC: '#22c55e',      // green
   R: '#3b82f6',       // blue
-  RA: '#a855f7',    // purple
+  RA: '#a855f7',      // purple
   S: '#eab308',       // gold
-  SV: '#eab308',      // gold
+  SV: '#eab308',      // gold (Secret Variant)
   M: '#ef4444',       // red
+  MV: '#ef4444',      // red (Mythos Variant)
   L: '#eab308',       // gold
   MMS: '#6b7280',     // gray
 };
