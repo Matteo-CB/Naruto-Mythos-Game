@@ -904,6 +904,91 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   ],
 
   // =====================
+  // LEGENDARY (L)
+  // =====================
+
+  // 000/130 - NARUTO UZUMAKI (L) - "Legendary"
+  'KS-000-L': [
+    'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
+    'MAIN effect: Instead, defeat both of them.',
+  ],
+
+  // =====================
+  // MOVIE VARIANT (MV)
+  // =====================
+
+  // 108/130 - NARUTO UZUMAKI (MV) - "Movie Variant"
+  'KS-108-MV': [
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.',
+  ],
+
+  // =====================
+  // RARE ART (RA) — cards without R equivalent entries
+  // =====================
+
+  'KS-104-RA': [
+    'Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.',
+    'POWERUP X.',
+  ],
+  'KS-105-RA': [
+    'Play a Summon character anywhere, paying 3 less.',
+    'Move any enemy character from this mission.',
+  ],
+  'KS-106-RA': [
+    'Discard the top card of an upgraded enemy character in play.',
+    'MAIN effect: Copy any non-Upgrade instant effect from the discarded enemy character.',
+  ],
+  'KS-107-RA': [
+    'You must move all other non-hidden friendly characters from this mission, if able.',
+    'POWERUP X where X is the number of characters moved this way.',
+  ],
+  'KS-109-RA': [
+    'Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.',
+    'MAIN effect: Instead, play the card paying 2 less.',
+  ],
+  'KS-111-RA': [
+    '[⧗] The opponent cannot play characters while hidden in this mission.',
+    'Hide an enemy character with Power 3 or less in this mission.',
+  ],
+  'KS-112-RA': [
+    'Discard a card from your hand. POWERUP X where X is the cost of the discarded card.',
+    'Repeat the MAIN effect.',
+  ],
+  'KS-113-RA': [
+    'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
+    'MAIN effect: Instead, defeat both of them.',
+  ],
+  'KS-117-RA': [
+    '[⧗] At the end of the round, you must move this character to another mission, if able.',
+    'Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.',
+  ],
+  'KS-119-RA': [
+    'Move any character in play.',
+    'Defeat an enemy character with Power 3 or less in this mission.',
+  ],
+  'KS-121-RA': [
+    'Move any friendly character in play.',
+    'Move any character in play.',
+  ],
+  'KS-123-RA': [
+    '[⧗] At the end of the round, you must defeat this character if you have no cards in hand.',
+    'Discard a card to defeat a character in play with cost 5 or less.',
+  ],
+  'KS-125-RA': [
+    '[⧗] Non-hidden enemy characters cost an additional 1 Chakra to play in this mission.',
+    'Play a Sound Village character, paying 2 less.',
+  ],
+  'KS-126-RA': [
+    'Defeat the weakest non-hidden enemy character in play.',
+    'POWERUP 3.',
+  ],
+  'KS-128-RA': [
+    'Move a friendly character in play.',
+    '[⧗] Every enemy character in this mission has -1 Power.',
+  ],
+
+  // =====================
   // MISSION CARDS
   // =====================
 

@@ -914,6 +914,91 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
 
   // =====================
+  // LEGENDARY (L)
+  // =====================
+
+  // 000/130 - NARUTO UZUMAKI (L) - "Legendaire"
+  'KS-000-L': [
+    'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
+    'effet MAIN : A la place, vainquez-les tous les deux.',
+  ],
+
+  // =====================
+  // MOVIE VARIANT (MV)
+  // =====================
+
+  // 108/130 - NARUTO UZUMAKI (MV) - "Variante Film"
+  'KS-108-MV': [
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'effet MAIN : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
+  ],
+
+  // =====================
+  // RARE ART (RA) — cartes sans entree R equivalente
+  // =====================
+
+  'KS-104-RA': [
+    'Depensez n\'importe quelle quantite de Chakra supplementaire. POWERUP X, ou X est la quantite de Chakra supplementaire depensee.',
+    'POWERUP X.',
+  ],
+  'KS-105-RA': [
+    'Jouez un personnage Invocation n\'importe ou en payant 3 de moins.',
+    'Deplacez n\'importe quel personnage ennemi depuis cette mission.',
+  ],
+  'KS-106-RA': [
+    'Defaussez la carte du dessus d\'un personnage ennemi ameliore en jeu.',
+    'effet MAIN : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
+  ],
+  'KS-107-RA': [
+    'Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
+    'POWERUP X ou X est le nombre de personnages deplaces de cette facon.',
+  ],
+  'KS-109-RA': [
+    'Choisissez un de vos personnages Village de Konoha dans votre defausse et jouez-le n\'importe ou en payant son cout.',
+    'effet MAIN : A la place, jouez la carte en payant 2 de moins.',
+  ],
+  'KS-111-RA': [
+    '[⧗] L\'adversaire ne peut pas jouer de personnages en cache dans cette mission.',
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+  ],
+  'KS-112-RA': [
+    'Defaussez une carte de votre main. POWERUP X ou X est le cout de la carte defaussee.',
+    'Repetez l\'effet MAIN.',
+  ],
+  'KS-113-RA': [
+    'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
+    'effet MAIN : A la place, vainquez-les tous les deux.',
+  ],
+  'KS-117-RA': [
+    '[⧗] A la fin du tour, vous devez deplacer ce personnage vers une autre mission, si possible.',
+    'Revelez et defaussez la carte du dessus de votre deck : POWERUP X ou X est le cout de la carte defaussee.',
+  ],
+  'KS-119-RA': [
+    'Deplacez n\'importe quel personnage en jeu.',
+    'Vainquez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+  ],
+  'KS-121-RA': [
+    'Deplacez n\'importe quel personnage allie en jeu.',
+    'Deplacez n\'importe quel personnage en jeu.',
+  ],
+  'KS-123-RA': [
+    '[⧗] A la fin du tour, vous devez vaincre ce personnage si vous n\'avez plus de cartes en main.',
+    'Defaussez une carte pour vaincre un personnage en jeu avec un cout de 5 ou moins.',
+  ],
+  'KS-125-RA': [
+    '[⧗] Les personnages ennemis non caches coutent 1 Chakra supplementaire a jouer dans cette mission.',
+    'Jouez un personnage Village du Son en payant 2 de moins.',
+  ],
+  'KS-126-RA': [
+    'Vainquez le personnage ennemi non cache le plus faible en jeu.',
+    'POWERUP 3.',
+  ],
+  'KS-128-RA': [
+    'Deplacez un personnage allie en jeu.',
+    '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
+  ],
+
+  // =====================
   // MISSION CARDS
   // =====================
 

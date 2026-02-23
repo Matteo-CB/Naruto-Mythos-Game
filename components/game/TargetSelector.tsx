@@ -184,6 +184,12 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
     ...mission.player2Characters,
   ];
 
+  // Calculate total power per side
+  const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
+  const myPower = myChars.reduce((sum, c) => sum + (c.isHidden ? 0 : c.effectivePower), 0);
+  const oppPower = oppChars.reduce((sum, c) => sum + (c.isHidden && !c.isOwn ? 0 : c.effectivePower), 0);
+
   // Check if the valid targets are mission indices (e.g. '0', '1', '2') vs character instance IDs
   const isMissionTarget = validTargets.includes(String(missionIndex));
 
@@ -232,6 +238,26 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
       >
         {getCardName(mission.card, locale as 'en' | 'fr')}
       </span>
+
+      {/* Power comparison bar */}
+      <div
+        className="flex items-center justify-center gap-2 w-full rounded px-2 py-0.5"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      >
+        <span
+          className="text-[10px] font-bold tabular-nums"
+          style={{ color: myPower > oppPower ? '#4aff6b' : myPower < oppPower ? '#ff6b6b' : '#888888' }}
+        >
+          {myPower}
+        </span>
+        <span className="text-[9px]" style={{ color: '#555555' }}>vs</span>
+        <span
+          className="text-[10px] font-bold tabular-nums"
+          style={{ color: oppPower > myPower ? '#ff6b6b' : oppPower < myPower ? '#4aff6b' : '#888888' }}
+        >
+          {oppPower}
+        </span>
+      </div>
 
       {/* Opponent characters (top) */}
       <div className="flex flex-col items-center gap-1">
