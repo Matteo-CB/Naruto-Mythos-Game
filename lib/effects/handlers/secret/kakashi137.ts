@@ -128,6 +128,7 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KAKASHI137_MOVE_SELF',
     validTargets: validMissions,
     description: 'Kakashi Hatake (137) UPGRADE: Select a mission to move this character to.',
+    descriptionKey: 'game.effect.desc.kakashi137MoveSelf',
   };
 }
 

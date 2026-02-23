@@ -62,6 +62,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SAKON062_COPY_EFFECT',
     validTargets,
     description: 'Select a friendly Sound Four character to copy an instant effect from.',
+    descriptionKey: 'game.effect.desc.sakon062CopyEffect',
   };
 }
 

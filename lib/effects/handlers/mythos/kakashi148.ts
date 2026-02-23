@@ -90,6 +90,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KAKASHI148_COPY_EFFECT',
     validTargets,
     description: 'Kakashi Hatake (148): Choose a friendly Team 7 character whose instant effect to copy.',
+    descriptionKey: 'game.effect.desc.kakashi148CopyEffect',
   };
 }
 

@@ -40,6 +40,9 @@ function choji112MainHandler(ctx: EffectContext): EffectResult {
     description: ctx.isUpgrade
       ? 'Choji Akimichi (112): Choose a card to discard for POWERUP (1st of 2).'
       : 'Choji Akimichi (112): Choose a card to discard for POWERUP.',
+    descriptionKey: ctx.isUpgrade
+      ? 'game.effect.desc.choji112DiscardUpgrade'
+      : 'game.effect.desc.choji112Discard',
   };
 }
 

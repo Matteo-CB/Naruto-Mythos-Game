@@ -49,6 +49,7 @@ function handleKisame092Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'STEAL_POWER_TOKENS_ENEMY_THIS_MISSION',
     validTargets,
     description: 'Select an enemy character in this mission to steal up to 2 Power tokens from.',
+    descriptionKey: 'game.effect.desc.kisame092StealTokens',
   };
 }
 

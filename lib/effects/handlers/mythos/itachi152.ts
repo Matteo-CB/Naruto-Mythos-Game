@@ -69,6 +69,7 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
         targetSelectionType: 'ITACHI152_CHOOSE_MOVE',
         validTargets,
         description: 'Itachi Uchiha (152): Choose a friendly character to move to another mission.',
+        descriptionKey: 'game.effect.desc.itachi152MoveFriendly',
       };
     }
 

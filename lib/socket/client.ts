@@ -16,6 +16,7 @@ interface SocketStore {
   visibleState: VisibleGameState | null;
   matchmakingStatus: 'idle' | 'waiting' | 'found';
   error: string | null;
+  errorKey: string | null;
   opponentJoined: boolean;
   gameStarted: boolean;
   gameEnded: boolean;
@@ -51,6 +52,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   visibleState: null,
   matchmakingStatus: 'idle',
   error: null,
+  errorKey: null,
   opponentJoined: false,
   gameStarted: false,
   gameEnded: false,
@@ -91,7 +93,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         if (!socket.connected) {
           console.error('[Socket] Connection timed out after', CONNECT_TIMEOUT_MS, 'ms');
           socket.disconnect();
-          set({ error: 'Connection timed out. Server may be unavailable.' });
+          set({ error: 'Connection timed out. Server may be unavailable.', errorKey: 'game.error.connectionTimeout' });
           reject(new Error('Socket connection timed out'));
         }
       }, CONNECT_TIMEOUT_MS);
@@ -99,7 +101,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('connect', () => {
         clearTimeout(timeoutId);
         console.log('[Socket] Connected:', socket.id);
-        set({ connected: true, userId: userId || null, error: null });
+        set({ connected: true, userId: userId || null, error: null, errorKey: null });
 
         // Register the user with the socket server for social features
         if (userId) {
@@ -115,13 +117,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
         // If the server disconnected us, show an error
         if (reason === 'io server disconnect' || reason === 'transport close') {
-          set({ error: 'Lost connection to server.' });
+          set({ error: 'Lost connection to server.', errorKey: 'game.error.connectionLost' });
         }
       });
 
       socket.on('reconnect', (attemptNumber: number) => {
         console.log('[Socket] Reconnected after', attemptNumber, 'attempts');
-        set({ connected: true, error: null });
+        set({ connected: true, error: null, errorKey: null });
 
         // Re-register user on reconnect
         const uid = get().userId;
@@ -132,7 +134,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('reconnect_failed', () => {
         console.error('[Socket] Reconnection failed after all attempts');
-        set({ error: 'Unable to reconnect to server.' });
+        set({ error: 'Unable to reconnect to server.', errorKey: 'game.error.reconnectFailed' });
       });
 
       socket.on('connect_error', (err) => {
@@ -307,7 +309,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.emit('room:create', { userId, isPrivate, isRanked });
     } else {
       console.error('[Socket] Cannot create room: not connected');
-      set({ error: 'Not connected to server.' });
+      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
   },
 
@@ -319,7 +321,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       set({ roomCode: code, playerRole: 'player2' });
     } else {
       console.error('[Socket] Cannot join room: not connected');
-      set({ error: 'Not connected to server.' });
+      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
   },
 
@@ -330,7 +332,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.emit('room:select-deck', { characters, missions });
     } else {
       console.error('[Socket] Cannot select deck: not connected');
-      set({ error: 'Not connected to server.' });
+      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
   },
 
@@ -341,7 +343,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.emit('action:perform', { action });
     } else {
       console.error('[Socket] Cannot perform action: not connected');
-      set({ error: 'Not connected to server.' });
+      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
   },
 
@@ -366,7 +368,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.emit('matchmaking:join', { userId, isRanked });
     } else {
       console.error('[Socket] Cannot join matchmaking: not connected');
-      set({ error: 'Not connected to server.' });
+      set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
     }
   },
 
@@ -378,7 +380,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, errorKey: null }),
 
   forfeit: (reason: 'abandon' | 'timeout') => {
     const { socket, connected } = get();

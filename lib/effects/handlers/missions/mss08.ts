@@ -50,6 +50,7 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS08_CHOOSE_CARD',
     validTargets: handIndices,
     description: 'MSS 08 (Set a Trap): Choose a card from your hand to place as a hidden character.',
+    descriptionKey: 'game.effect.desc.mss08ChooseCard',
   };
 }
 

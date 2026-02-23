@@ -74,6 +74,7 @@ function guy119bMainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'GUY119B_CHOOSE_DISCARD',
     validTargets: handIndices,
     description: 'Might Guy (119b): Choose a card to discard. Non-hidden enemies with total Power <= discarded card\'s Power will be moved.',
+    descriptionKey: 'game.effect.desc.guy119bDiscard',
   };
 }
 

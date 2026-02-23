@@ -46,6 +46,7 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'IRUKA_CHOOSE_NARUTO',
     validTargets,
     description: 'Iruka Umino (047): Choose a Naruto Uzumaki character to move.',
+    descriptionKey: 'game.effect.desc.iruka047MoveNaruto',
   };
 }
 

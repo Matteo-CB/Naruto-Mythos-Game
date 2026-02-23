@@ -36,6 +36,7 @@ export default function GamePage() {
   const socketGameResult = useSocketStore((s) => s.gameResult);
   const socketConnected = useSocketStore((s) => s.connected);
   const socketError = useSocketStore((s) => s.error);
+  const socketErrorKey = useSocketStore((s) => s.errorKey);
 
   // For AI games, gameState must exist; for online games, visibleState must exist
   const hasActiveGame = gameState || (isOnlineGame && visibleState);
@@ -94,7 +95,7 @@ export default function GamePage() {
             color: '#e0e0e0',
           }}
         >
-          {socketError || 'Connection lost. Reconnecting...'}
+          {socketErrorKey ? t(socketErrorKey) : socketError || t('game.error.connectionLost')}
         </div>
       )}
     </>

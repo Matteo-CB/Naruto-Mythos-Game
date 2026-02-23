@@ -66,6 +66,7 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KIDOMARU060_CHOOSE_CHARACTER',
     validTargets,
     description: 'Kidomaru (060): Choose a character in this mission to move to another mission.',
+    descriptionKey: 'game.effect.desc.kidomaru060MoveCharacter',
   };
 }
 
@@ -113,6 +114,7 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KIDOMARU060_DEFEAT_LOW_POWER',
     validTargets,
     description: 'Select an enemy character with Power 1 or less in play to defeat.',
+    descriptionKey: 'game.effect.desc.kidomaru060DefeatLowPower',
   };
 }
 

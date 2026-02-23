@@ -141,6 +141,9 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
       description: useDefeat
         ? 'Kiba Inuzuka (149): Choose another character in this mission to defeat.'
         : 'Kiba Inuzuka (149): Choose another character in this mission to hide.',
+      descriptionKey: useDefeat
+        ? 'game.effect.desc.kiba149Defeat'
+        : 'game.effect.desc.kiba149Hide',
     };
   }
 

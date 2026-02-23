@@ -40,6 +40,7 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'SASUKE142_CHOOSE_DISCARD',
       validTargets: playerState.hand.map((_, i) => String(i)),
       description: 'Sasuke Uchiwa (142): Choose a card from your hand to discard.',
+      descriptionKey: 'game.effect.desc.sasuke142Discard',
     };
   }
 

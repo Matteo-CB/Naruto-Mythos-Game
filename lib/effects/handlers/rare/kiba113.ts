@@ -186,6 +186,9 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     description: isUpgrade
       ? 'Kiba Inuzuka (113) UPGRADE: Choose a character in this mission to defeat.'
       : 'Kiba Inuzuka (113): Choose a character in this mission to hide.',
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.kiba113Defeat'
+      : 'game.effect.desc.kiba113Hide',
   };
 }
 

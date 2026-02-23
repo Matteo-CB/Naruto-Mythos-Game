@@ -62,6 +62,9 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
     description: ctx.isUpgrade
       ? 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (the discarded card\'s non-Upgrade effect will be copied).'
       : 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (discard top card of stack).',
+    descriptionKey: ctx.isUpgrade
+      ? 'game.effect.desc.kakashi106DevolveUpgrade'
+      : 'game.effect.desc.kakashi106Devolve',
   };
 }
 

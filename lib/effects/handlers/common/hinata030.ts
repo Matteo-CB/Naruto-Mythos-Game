@@ -50,6 +50,7 @@ function handleHinata030Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'REMOVE_POWER_TOKENS_ENEMY',
     validTargets,
     description: 'Select an enemy character to remove up to 2 Power tokens from.',
+    descriptionKey: 'game.effect.desc.hinata030RemoveTokens',
   };
 }
 

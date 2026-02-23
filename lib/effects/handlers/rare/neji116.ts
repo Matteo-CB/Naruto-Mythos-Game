@@ -109,6 +109,8 @@ function defeatCharacterWithExactPower(
     targetSelectionType: selectionType,
     validTargets: validTargets.map((t) => t.instanceId),
     description: `Neji Hyuga (116) ${label}: Choose a character with exactly Power ${targetPower} to defeat.`,
+    descriptionKey: label === 'MAIN' ? 'game.effect.desc.neji116DefeatPower4' : 'game.effect.desc.neji116DefeatPower6',
+    descriptionParams: { power: targetPower },
   };
 }
 

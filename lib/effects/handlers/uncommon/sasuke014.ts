@@ -55,6 +55,7 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SASUKE_014_DISCARD_OWN',
     validTargets,
     description: 'Discard 1 card from your hand to then discard 1 card from the opponent\'s hand.',
+    descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
   };
 }
 

@@ -75,6 +75,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DEFEAT_ENEMY_SUMMON_THIS_MISSION',
     validTargets,
     description: 'Manda (102) AMBUSH: Select an enemy character with keyword "Summon" in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.manda102DefeatSummon',
   };
 }
 

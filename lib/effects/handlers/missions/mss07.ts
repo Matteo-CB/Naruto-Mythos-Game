@@ -77,6 +77,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'MSS07_CHOOSE_DESTINATION',
       validTargets: otherMissions,
       description: JSON.stringify({ text: 'MSS 07 (I Have to Go): Choose a mission to move the hidden character to.', charId, fromMissionIndex }),
+      descriptionKey: 'game.effect.desc.mss07ChooseDestination',
     };
   }
 
@@ -87,6 +88,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS07_MOVE_HIDDEN',
     validTargets,
     description: 'MSS 07 (I Have to Go): Choose a hidden friendly character to move.',
+    descriptionKey: 'game.effect.desc.mss07MoveHidden',
   };
 }
 

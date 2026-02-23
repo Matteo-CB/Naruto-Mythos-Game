@@ -118,6 +118,7 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'JIROBO122_DEFEAT_TARGET',
     validTargets,
     description: 'Jirobo (122) UPGRADE: Choose an enemy character with Power 1 or less to defeat.',
+    descriptionKey: 'game.effect.desc.jirobo122Defeat',
   };
 }
 

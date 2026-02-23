@@ -107,6 +107,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SHINO_MOVE_SELF',
     validTargets,
     description: 'Select a mission to move Shino Aburame to.',
+    descriptionKey: 'game.effect.desc.shino033MoveSelf',
   };
 }
 

@@ -64,6 +64,7 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS04_DEFEAT_HIDDEN',
     validTargets,
     description: 'MSS 04 (Assassination): Choose a hidden enemy character to defeat.',
+    descriptionKey: 'game.effect.desc.mss04DefeatHidden',
   };
 }
 

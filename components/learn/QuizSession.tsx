@@ -96,28 +96,39 @@ function CardThumbnail({
   src,
   size = 52,
   blurred = false,
+  censorZone,
 }: {
   src?: string;
   size?: number;
   blurred?: boolean;
+  censorZone?: 'name' | 'none';
 }) {
   if (!src) return null;
   const path = src.replace(/\\/g, '/');
   const fullPath = path.startsWith('/') ? path : `/${path}`;
+  const height = Math.round(size * 1.4);
   return (
-    <img
-      src={fullPath}
-      alt=""
-      draggable={false}
-      style={{
-        width: `${size}px`,
-        height: `${Math.round(size * 1.4)}px`,
-        borderRadius: '6px',
-        objectFit: 'cover',
-        flexShrink: 0,
-        filter: blurred ? 'blur(8px)' : 'none',
-      }}
-    />
+    <div style={{ position: 'relative', width: `${size}px`, height: `${height}px`, flexShrink: 0 }}>
+      <img
+        src={fullPath}
+        alt=""
+        draggable={false}
+        style={{
+          width: `${size}px`,
+          height: `${height}px`,
+          borderRadius: '6px',
+          objectFit: 'cover',
+          filter: blurred ? 'blur(8px)' : 'none',
+        }}
+      />
+      {censorZone === 'name' && !blurred && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: '16%', backgroundColor: '#000',
+          borderRadius: '6px 6px 0 0', zIndex: 1,
+        }} />
+      )}
+    </div>
   );
 }
 
@@ -221,9 +232,11 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
 function QuestionImage({
   src,
   blurred = false,
+  censorZone,
 }: {
   src?: string;
   blurred?: boolean;
+  censorZone?: 'name' | 'none';
 }) {
   if (!src) return null;
   const path = src.replace(/\\/g, '/');
@@ -245,6 +258,13 @@ function QuestionImage({
             transition: 'filter 0.3s ease',
           }}
         />
+        {censorZone === 'name' && !blurred && (
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            height: '16%', backgroundColor: '#000',
+            borderRadius: '10px 10px 0 0', zIndex: 2,
+          }} />
+        )}
         {blurred && cardInfo && (
           <div
             style={{
@@ -525,12 +545,14 @@ function MatchPairsRenderer({
   showingAnswer,
   userAnswer,
   blurThumbnails = false,
+  censorZone,
 }: {
   question: MatchPairsQuestion;
   onSubmit: (answer: QuizAnswer) => void;
   showingAnswer: boolean;
   userAnswer: QuizAnswer | null;
   blurThumbnails?: boolean;
+  censorZone?: 'name' | 'none';
 }) {
   const t = useTranslations('learn');
   const pairs = question.pairs;
@@ -687,7 +709,7 @@ function MatchPairsRenderer({
                   minWidth: 0,
                 }}
               >
-                <CardThumbnail src={pair.leftImage} size={44} blurred={blurThumbnails} />
+                <CardThumbnail src={pair.leftImage} size={44} blurred={blurThumbnails} censorZone={censorZone} />
                 <span className="text-sm truncate" style={{ color: TEXT_LIGHT }}>
                   {pair.left}
                 </span>
@@ -724,6 +746,7 @@ function MatchPairsRenderer({
                       src={pairs[placedRightIdx]?.rightImage}
                       size={36}
                       blurred={blurThumbnails}
+                      censorZone={censorZone}
                     />
                     <span
                       className="text-sm truncate"
@@ -774,6 +797,7 @@ function MatchPairsRenderer({
                   src={pairs[rightIdx]?.rightImage}
                   size={36}
                   blurred={blurThumbnails}
+                  censorZone={censorZone}
                 />
                 <span className="text-sm" style={{ color: TEXT_LIGHT }}>
                   {pairs[rightIdx]?.right}
@@ -1618,12 +1642,14 @@ function QuestionRenderer({
   showingAnswer,
   userAnswer,
   blurThumbnails,
+  censorZone,
 }: {
   question: QuizQuestion;
   onSubmit: (answer: QuizAnswer) => void;
   showingAnswer: boolean;
   userAnswer: QuizAnswer | null;
   blurThumbnails: boolean;
+  censorZone?: 'name' | 'none';
 }) {
   switch (question.type) {
     case 'multipleChoice':
@@ -1652,6 +1678,7 @@ function QuestionRenderer({
           showingAnswer={showingAnswer}
           userAnswer={userAnswer}
           blurThumbnails={blurThumbnails}
+          censorZone={censorZone}
         />
       );
     case 'sortOrder':
@@ -1878,6 +1905,7 @@ export function QuizSession() {
                   !!question.questionImage
                 )
               }
+              censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
             {/* Question text */}
@@ -1904,6 +1932,7 @@ export function QuizSession() {
                   !!question.questionImage
                 )
               }
+              censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
             {/* Timeout indicator */}

@@ -37,6 +37,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
       targetSelectionType: 'KABUTO053_DISCARD_FROM_HAND',
       validTargets: handIndices,
       description: 'Kabuto Yakushi (053): Choose a card from your hand to discard (upgrade effect).',
+      descriptionKey: 'game.effect.desc.kabuto053DiscardFromHand',
     };
   }
 
@@ -101,6 +102,8 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
     validTargets: validMissions,
     description: `Kabuto Yakushi (053): Choose a mission to play ${topDiscard.name_fr} on (cost ${reducedCost}).`,
+    descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
+    descriptionParams: { cardName: topDiscard.name_fr, cost: String(reducedCost) },
   };
 }
 

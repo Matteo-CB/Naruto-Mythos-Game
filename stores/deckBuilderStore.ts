@@ -15,6 +15,8 @@ interface SavedDeck {
 interface AddCheckResult {
   allowed: boolean;
   reason?: string;
+  reasonKey?: string;
+  reasonParams?: Record<string, string | number>;
 }
 
 interface DeckBuilderStore {
@@ -33,6 +35,8 @@ interface DeckBuilderStore {
 
   // Inline error for failed add
   addError: string | null;
+  addErrorKey: string | null;
+  addErrorParams: Record<string, string | number> | null;
 
   // Actions
   setDeckName: (name: string) => void;
@@ -75,6 +79,8 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   isSaving: false,
   loadedDeckId: null,
   addError: null,
+  addErrorKey: null,
+  addErrorParams: null,
 
   setDeckName: (name: string) => {
     set({ deckName: name });
@@ -87,7 +93,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       (c) => normalizeVersionId(c.id) === baseVersion,
     ).length;
     if (count >= MAX_COPIES_PER_VERSION) {
-      return { allowed: false, reason: `Max ${MAX_COPIES_PER_VERSION} copies of ${card.name_fr}` };
+      return { allowed: false, reason: `Max ${MAX_COPIES_PER_VERSION} copies of ${card.name_fr}`, reasonKey: 'deckBuilder.error.maxCopies', reasonParams: { max: MAX_COPIES_PER_VERSION, name: card.name_fr } };
     }
     return { allowed: true };
   },
@@ -95,10 +101,10 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   canAddMission: (card: MissionCard): AddCheckResult => {
     const { deckMissions } = get();
     if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) {
-      return { allowed: false, reason: `Max ${MISSION_CARDS_PER_PLAYER} missions` };
+      return { allowed: false, reason: `Max ${MISSION_CARDS_PER_PLAYER} missions`, reasonKey: 'deckBuilder.error.maxMissions', reasonParams: { max: MISSION_CARDS_PER_PLAYER } };
     }
     if (deckMissions.some((m) => m.id === card.id)) {
-      return { allowed: false, reason: `${card.name_fr} already in deck` };
+      return { allowed: false, reason: `${card.name_fr} already in deck`, reasonKey: 'deckBuilder.error.alreadyInDeck', reasonParams: { name: card.name_fr } };
     }
     return { allowed: true };
   },
@@ -106,10 +112,10 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   addChar: (card: CharacterCard) => {
     const check = get().canAddChar(card);
     if (!check.allowed) {
-      set({ addError: check.reason || null });
+      set({ addError: check.reason || null, addErrorKey: check.reasonKey || null, addErrorParams: check.reasonParams || null });
       return;
     }
-    set({ deckChars: [...get().deckChars, card], addError: null });
+    set({ deckChars: [...get().deckChars, card], addError: null, addErrorKey: null, addErrorParams: null });
   },
 
   removeChar: (index: number) => {
@@ -122,10 +128,10 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   addMission: (card: MissionCard) => {
     const check = get().canAddMission(card);
     if (!check.allowed) {
-      set({ addError: check.reason || null });
+      set({ addError: check.reason || null, addErrorKey: check.reasonKey || null, addErrorParams: check.reasonParams || null });
       return;
     }
-    set({ deckMissions: [...get().deckMissions, card], addError: null });
+    set({ deckMissions: [...get().deckMissions, card], addError: null, addErrorKey: null, addErrorParams: null });
   },
 
   removeMission: (index: number) => {
@@ -146,7 +152,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   },
 
   clearAddError: () => {
-    set({ addError: null });
+    set({ addError: null, addErrorKey: null, addErrorParams: null });
   },
 
   saveDeck: async () => {

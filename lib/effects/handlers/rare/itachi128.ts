@@ -58,6 +58,7 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ITACHI128_MOVE_FRIENDLY',
     validTargets,
     description: 'Itachi Uchiwa (128) UPGRADE: Choose a friendly character in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.itachi128MoveFriendly',
   };
 }
 

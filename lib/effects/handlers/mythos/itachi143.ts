@@ -48,6 +48,7 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ITACHI143_CHOOSE_FRIENDLY',
     validTargets,
     description: 'Itachi Uchiwa (143): Choose a friendly character to move to this mission.',
+    descriptionKey: 'game.effect.desc.itachi143MoveFriendly',
   };
 }
 
@@ -82,6 +83,7 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ITACHI143_CHOOSE_ENEMY',
     validTargets,
     description: 'Itachi Uchiwa (143): Choose an enemy character to move to this mission.',
+    descriptionKey: 'game.effect.desc.itachi143MoveEnemy',
   };
 }
 

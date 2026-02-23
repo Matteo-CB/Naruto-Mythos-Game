@@ -61,6 +61,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TAYUYA125_CHOOSE_SOUND',
     validTargets: affordableIndices,
     description: 'Tayuya (125) UPGRADE: Choose a Sound Village character from your hand to play (paying 2 less).',
+    descriptionKey: 'game.effect.desc.tayuya125PlaySound',
   };
 }
 

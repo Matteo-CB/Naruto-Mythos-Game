@@ -38,6 +38,8 @@ export default function DeckBuilderPage() {
   const isSaving = useDeckBuilderStore((s) => s.isSaving);
   const loadedDeckId = useDeckBuilderStore((s) => s.loadedDeckId);
   const addError = useDeckBuilderStore((s) => s.addError);
+  const addErrorKey = useDeckBuilderStore((s) => s.addErrorKey);
+  const addErrorParams = useDeckBuilderStore((s) => s.addErrorParams);
 
   const setDeckName = useDeckBuilderStore((s) => s.setDeckName);
   const addChar = useDeckBuilderStore((s) => s.addChar);
@@ -304,7 +306,7 @@ export default function DeckBuilderPage() {
             <span className="text-xs text-[#b33e3e]">{saveError}</span>
           )}
           {addError && (
-            <span className="text-xs text-[#b33e3e] animate-pulse">{addError}</span>
+            <span className="text-xs text-[#b33e3e] animate-pulse">{addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError}</span>
           )}
           {validation.valid && (
             <span className="text-xs text-[#3e8b3e]">{t('deckBuilder.validation.valid')}</span>

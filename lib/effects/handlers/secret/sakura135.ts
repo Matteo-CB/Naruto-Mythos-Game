@@ -95,6 +95,9 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
       topCards: cardInfo,
       costReduction,
     }),
+    descriptionKey: ctx.isUpgrade
+      ? 'game.effect.desc.sakura135ChooseCardUpgrade'
+      : 'game.effect.desc.sakura135ChooseCard',
   };
 }
 

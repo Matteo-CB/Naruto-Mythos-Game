@@ -59,6 +59,7 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ANKO_DEFEAT_HIDDEN_ENEMY',
     validTargets,
     description: 'Select a hidden enemy character in play to defeat.',
+    descriptionKey: 'game.effect.desc.anko045DefeatHidden',
   };
 }
 

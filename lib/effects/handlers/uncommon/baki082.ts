@@ -68,6 +68,7 @@ function handleBaki082Score(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER_ANY',
     validTargets,
     description: 'Baki (082) SCORE: Select a hidden character in play to defeat.',
+    descriptionKey: 'game.effect.desc.baki082ScoreDefeatHidden',
   };
 }
 
@@ -122,6 +123,7 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DEFEAT_ENEMY_POWER_1_THIS_MISSION',
     validTargets,
     description: 'Baki (082) UPGRADE: Select an enemy character with Power 1 or less in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.baki082UpgradeDefeatLowPower',
   };
 }
 

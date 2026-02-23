@@ -40,6 +40,7 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
     validTargets,
     description: 'Select a hidden character in play to look at.',
+    descriptionKey: 'game.effect.desc.dosu068Look',
   };
 }
 
@@ -70,6 +71,7 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER',
     validTargets,
     description: 'Select a hidden character in play to defeat.',
+    descriptionKey: 'game.effect.desc.dosu068Defeat',
   };
 }
 

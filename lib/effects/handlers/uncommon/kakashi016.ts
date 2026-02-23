@@ -62,6 +62,8 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KAKASHI_COPY_EFFECT',
     validTargets,
     description: `Select an enemy character (${limitStr}) to copy their non-upgrade instant effect.`,
+    descriptionKey: 'game.effect.desc.kakashi016CopyEffect',
+    descriptionParams: { costLimit: limitStr },
   };
 }
 

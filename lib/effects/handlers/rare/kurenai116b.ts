@@ -73,6 +73,7 @@ function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KURENAI116B_DEFEAT_TARGET',
     validTargets,
     description: 'Kurenai Yuhi (116b) AMBUSH: Choose an enemy character with Power 4 or less to defeat.',
+    descriptionKey: 'game.effect.desc.kurenai116bDefeat',
   };
 }
 
@@ -128,6 +129,7 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KURENAI116B_MOVE_SELF',
     validTargets: validMissions,
     description: 'Kurenai Yuhi (116b) UPGRADE: Choose a mission to move this character to.',
+    descriptionKey: 'game.effect.desc.kurenai116bMoveSelf',
   };
 }
 

@@ -57,6 +57,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'NARUTO141_CHOOSE_DISCARD',
       validTargets: playerState.hand.map((_, i) => String(i)),
       description: 'Naruto Uzumaki (141): Choose a card from your hand to discard.',
+      descriptionKey: 'game.effect.desc.naruto141Discard',
     };
   }
 
@@ -101,6 +102,7 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'NARUTO141_CHOOSE_HIDE_TARGET',
       validTargets: validEnemies.map((c) => c.instanceId),
       description: 'Naruto Uzumaki (141): Choose an enemy with Power 4 or less to hide.',
+      descriptionKey: 'game.effect.desc.naruto141HideEnemy',
     };
   }
 

@@ -172,6 +172,8 @@ export interface PendingAction {
   type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK';
   player: PlayerID;
   description: string;
+  descriptionKey?: string;
+  descriptionParams?: Record<string, string | number>;
   options: string[]; // instanceIds, card indices, etc.
   minSelections: number;
   maxSelections: number;

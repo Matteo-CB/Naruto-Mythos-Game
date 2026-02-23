@@ -84,6 +84,7 @@ function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SAKURA_012_DISCARD',
     validTargets,
     description: 'You drew a card. You must discard 1 card from your hand.',
+    descriptionKey: 'game.effect.desc.sakura012Discard',
   };
 }
 

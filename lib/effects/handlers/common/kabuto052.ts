@@ -96,6 +96,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KABUTO_CHOOSE_MISSION',
     validTargets: validMissionIndices.map(String),
     description: 'Kabuto Yakushi (052): Choose a mission to place the stolen card hidden.',
+    descriptionKey: 'game.effect.desc.kabuto052PlaceHidden',
   };
 }
 

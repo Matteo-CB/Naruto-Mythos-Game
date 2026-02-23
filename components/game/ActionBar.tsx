@@ -13,6 +13,8 @@ export function ActionBar() {
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const actionError = useGameStore((s) => s.actionError);
+  const actionErrorKey = useGameStore((s) => s.actionErrorKey);
+  const actionErrorParams = useGameStore((s) => s.actionErrorParams);
   const clearActionError = useGameStore((s) => s.clearActionError);
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
   const endAIGameAsForfeit = useGameStore((s) => s.endAIGameAsForfeit);
@@ -274,7 +276,7 @@ export function ActionBar() {
               className="text-xs font-medium px-2 py-0.5 rounded"
               style={{ color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
             >
-              {actionError}
+              {actionErrorKey ? t(actionErrorKey, actionErrorParams ?? {}) : actionError}
             </motion.span>
           )}
 

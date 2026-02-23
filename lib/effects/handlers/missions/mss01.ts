@@ -53,6 +53,7 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS01_POWERUP_TARGET',
     validTargets,
     description: 'MSS 01 (Call for Support): Choose a friendly character to give POWERUP 2.',
+    descriptionKey: 'game.effect.desc.mss01Powerup',
   };
 }
 

@@ -88,6 +88,8 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'OROCHIMARU126_DEFEAT_WEAKEST',
     validTargets: weakest.map((w) => w.char.instanceId),
     description: `Orochimaru (126) SCORE: Multiple enemies tied for weakest (Power ${minPower}). Choose which to defeat.`,
+    descriptionKey: 'game.effect.desc.orochimaru126DefeatWeakest',
+    descriptionParams: { power: minPower },
   };
 }
 

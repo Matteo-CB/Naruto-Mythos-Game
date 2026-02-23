@@ -84,6 +84,7 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DISCARD_AND_HIDE_ENEMY_POWER_4',
     validTargets: validEnemyTargets,
     description: 'Kin Tsuchi (073): Discard a card from hand, then select a non-hidden enemy character with Power 4 or less in play to hide.',
+    descriptionKey: 'game.effect.desc.kin073DiscardAndHide',
   };
 }
 

@@ -69,6 +69,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MOVE_ENEMY_POWER_3_OR_LESS',
     validTargets,
     description: 'Select an enemy character with Power 3 or less to move to another mission.',
+    descriptionKey: 'game.effect.desc.shizune006MoveEnemy',
   };
 }
 

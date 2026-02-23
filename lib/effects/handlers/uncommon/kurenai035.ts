@@ -79,6 +79,7 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KURENAI_DEFEAT_LOW_POWER',
     validTargets,
     description: 'Select an enemy character with Power 1 or less in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.kurenai035DefeatLowPower',
   };
 }
 

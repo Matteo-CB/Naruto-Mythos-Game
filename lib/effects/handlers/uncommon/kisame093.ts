@@ -58,6 +58,9 @@ function handleKisame093Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'STEAL_POWER_TOKENS_ENEMY_IN_PLAY',
     validTargets,
     description: desc,
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.kisame093StealAllTokens'
+      : 'game.effect.desc.kisame093StealTokens',
   };
 }
 

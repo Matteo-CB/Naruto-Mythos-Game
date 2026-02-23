@@ -62,6 +62,8 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
     validTargets,
     description: `Select an enemy character with cost ${limitStr} or less in this mission to take control of.`,
+    descriptionKey: 'game.effect.desc.ino020TakeControl',
+    descriptionParams: { costLimit: limitStr },
   };
 }
 

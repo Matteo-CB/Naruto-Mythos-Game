@@ -74,6 +74,8 @@ function handleZaku071Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MOVE_ENEMY_FROM_THIS_MISSION',
     validTargets,
     description: `Zaku Abumi (071): You have fewer non-hidden characters (${friendlyNonHiddenCount} vs ${enemyNonHiddenCount}). Select an enemy character in this mission to move to another mission.`,
+    descriptionKey: 'game.effect.desc.zaku071MoveEnemy',
+    descriptionParams: { friendlyCount: String(friendlyNonHiddenCount), enemyCount: String(enemyNonHiddenCount) },
   };
 }
 

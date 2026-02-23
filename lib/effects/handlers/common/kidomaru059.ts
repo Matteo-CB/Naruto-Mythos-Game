@@ -63,6 +63,8 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
       text: `Kidomaru (059): Choose a friendly character to move (${soundFourMissionCount} move(s) available).`,
       movesRemaining: soundFourMissionCount,
     }),
+    descriptionKey: 'game.effect.desc.kidomaru059MoveCharacter',
+    descriptionParams: { moves: soundFourMissionCount },
   };
 }
 

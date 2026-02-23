@@ -58,6 +58,7 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
     targetSelectionType: 'PAKKUN_MOVE_DESTINATION',
     validTargets,
     description: 'Pakkun (099): Choose a mission to move Pakkun to.',
+    descriptionKey: 'game.effect.desc.pakkun099Move',
   };
 }
 

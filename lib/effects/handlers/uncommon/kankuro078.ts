@@ -61,6 +61,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MOVE_CHARACTER_POWER_4_OR_LESS',
     validTargets,
     description: 'Kankuro (078) AMBUSH: Select any character with Power 4 or less in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.kankuro078MoveCharacter',
   };
 }
 
@@ -92,6 +93,7 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'PLAY_HIDDEN_FROM_HAND_FREE',
     validTargets,
     description: 'Kankuro (078) UPGRADE: Select a character from your hand to play hidden on any mission (free, 1 less than normal hidden cost).',
+    descriptionKey: 'game.effect.desc.kankuro078PlayHiddenFree',
   };
 }
 
