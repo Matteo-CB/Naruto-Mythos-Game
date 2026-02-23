@@ -198,7 +198,13 @@
       "validTargetOne": "{count} cible valide",
       "skip": "Passer",
       "base": "Base",
-      "up": "AME"
+      "up": "AME",
+      "confirm": "OK"
+    },
+    "effect": {
+      "orochimaruReveal": "Orochimaru — Infiltration",
+      "orochimaruSteal": "Cout 3 ou moins — Prise de controle !",
+      "orochimaruTooExpensive": "Cout trop eleve — Impossible de prendre le controle."
     },
     "anim": {
       "cardPlayedHidden": "Carte jouee face cachee",

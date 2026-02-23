@@ -198,7 +198,13 @@
       "validTargetOne": "{count} valid target",
       "skip": "Skip",
       "base": "Base",
-      "up": "UP"
+      "up": "UP",
+      "confirm": "OK"
+    },
+    "effect": {
+      "orochimaruReveal": "Orochimaru — Infiltration",
+      "orochimaruSteal": "Cost 3 or less — Taking control!",
+      "orochimaruTooExpensive": "Cost too high — Cannot take control."
     },
     "anim": {
       "cardPlayedHidden": "Card Played Hidden",

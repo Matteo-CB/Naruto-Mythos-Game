@@ -25,7 +25,7 @@ import { logSystem } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
-import { executeEndPhase } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 
@@ -177,7 +177,24 @@ export class GameEngine {
         break;
 
       case 'end':
-        // End phase is automatic
+        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move)
+        if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
+          newState = GameEngine.handlePendingAction(newState, player, action);
+          // After resolving, check if more Rock Lee moves need processing
+          if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
+            // Continue processing remaining Rock Lee moves, then finish end phase
+            newState = handleRockLee117Move(newState);
+            if (newState.pendingActions.length > 0) break; // More choices needed
+
+            // All end-of-round effects resolved — finish end phase transition
+            if (newState.turn >= TOTAL_TURNS) {
+              newState = GameEngine.endGame(newState);
+            } else {
+              newState.turn = (newState.turn + 1) as TurnNumber;
+              newState = GameEngine.transitionToStartPhase(newState);
+            }
+          }
+        }
         break;
 
       case 'gameOver':
@@ -281,6 +298,11 @@ export class GameEngine {
 
     // Execute end phase logic
     newState = executeEndPhase(newState);
+
+    // If there are pending actions from end-of-round effects (Rock Lee 117/151 move), wait
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
@@ -474,11 +496,13 @@ export class GameEngine {
           const isOwn = c.controlledBy === player;
           const canSee = isOwn || !c.isHidden;
           const power = calculateCharacterPower(state, c, side);
+          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
           return {
             instanceId: c.instanceId,
             isHidden: c.isHidden,
             isOwn,
             card: canSee ? c.card : undefined,
+            topCard: canSee ? topCard : undefined,
             powerTokens: c.powerTokens,
             controlledBy: c.controlledBy,
             originalOwner: c.originalOwner,

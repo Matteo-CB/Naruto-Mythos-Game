@@ -54,7 +54,7 @@ export function ActionBar() {
   const canAffordCard = selectedCard ? myState.chakra >= selectedCard.chakra : false;
   const canAffordHidden = myState.chakra >= 1;
 
-  // Compute upgrade targets: same name, strictly lower cost, on selected mission
+  // Compute upgrade targets: same name (or flexible upgrade), strictly lower cost, on selected mission
   const upgradeTargets = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState?.activeMissions) return [];
     const mission = visibleState.activeMissions[selectedMissionIndex];
@@ -62,9 +62,26 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
-      if (!c.card) return false;
-      return c.card.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase()
-        && c.card.chakra < selectedCard.chakra;
+      // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
+      const charCard = c.topCard ?? c.card;
+      if (!charCard) return false;
+      const sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
+      // Flexible upgrade: Orochimaru 051/138 can upgrade over non-Summon, non-Orochimaru
+      const isFlexible = (selectedCard.number === 51 || selectedCard.number === 138)
+        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'))
+        && !(charCard.keywords ?? []).includes('Summon')
+        && !charCard.name_fr.toUpperCase().includes('OROCHIMARU');
+      // Akamaru 029 can upgrade over Kiba Inuzuka
+      const isAkamaruUpgrade = selectedCard.number === 29
+        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('Kiba Inuzuka'))
+        && charCard.name_fr.toUpperCase().includes('KIBA INUZUKA');
+      // Ichibi 076 can upgrade any Gaara
+      const isIchibiUpgrade = selectedCard.number === 76
+        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
+        && charCard.name_fr.toUpperCase() === 'GAARA';
+
+      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade;
+      return nameOk && charCard.chakra < selectedCard.chakra;
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
 
@@ -286,8 +303,8 @@ export function ActionBar() {
 
           {/* Upgrade button(s) */}
           {cardAndMissionReady && upgradeTargets.map((target) => {
-            const topCard = target.card;
-            const upgradeCost = (selectedCard?.chakra ?? 0) - (topCard?.chakra ?? 0);
+            const charCard = target.topCard ?? target.card;
+            const upgradeCost = (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
             const canAffordUpgrade = myState.chakra >= upgradeCost;
             return (
               <ActionButton

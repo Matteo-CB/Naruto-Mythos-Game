@@ -299,9 +299,133 @@ export function TargetSelector() {
   // Hand selection is handled by HandCardSelector
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
-  const { validTargets, description, onDecline, playerName } = pendingTargetSelection;
+  const { validTargets, description, onDecline, playerName, revealedCard } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
+  const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
+
+  // Info reveal mode: show the revealed card with a confirm button
+  if (isInfoReveal && revealedCard) {
+    const imagePath = revealedCard.image_file ? normalizeImagePath(revealedCard.image_file) : null;
+    const resultColor = revealedCard.canSteal ? '#c4a35a' : '#b33e3e';
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+        >
+          {/* Title */}
+          <motion.span
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm font-bold uppercase tracking-widest mb-6"
+            style={{ color: '#c4a35a' }}
+          >
+            {t('game.effect.orochimaruReveal')}
+          </motion.span>
+
+          {/* Card display */}
+          <motion.div
+            initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
+            animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 }}
+            className="relative mb-6"
+            style={{
+              width: '180px',
+              height: '252px',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              border: `2px solid ${resultColor}`,
+              boxShadow: `0 0 30px ${resultColor}40, 0 8px 32px rgba(0, 0, 0, 0.6)`,
+            }}
+          >
+            {imagePath ? (
+              <div
+                className="w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url('${imagePath}')` }}
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ backgroundColor: '#1a1a1a' }}
+              >
+                <span className="text-sm text-center px-2" style={{ color: '#888888' }}>
+                  {revealedCard.name_fr}
+                </span>
+              </div>
+            )}
+
+            {/* Card name overlay */}
+            <div
+              className="absolute inset-x-0 bottom-0 px-2 py-2 text-center"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+            >
+              <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>
+                {revealedCard.name_fr}
+              </div>
+              <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>
+                {t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}
+              </div>
+            </div>
+
+            {/* Chakra badge */}
+            <div
+              className="absolute top-1.5 left-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold"
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                color: '#4a9eff',
+                border: '1px solid #4a9eff',
+              }}
+            >
+              {revealedCard.chakra}
+            </div>
+          </motion.div>
+
+          {/* Result text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mb-6 text-center"
+          >
+            <span
+              className="text-sm font-medium"
+              style={{ color: resultColor }}
+            >
+              {revealedCard.canSteal
+                ? t('game.effect.orochimaruSteal')
+                : t('game.effect.orochimaruTooExpensive')}
+            </span>
+          </motion.div>
+
+          {/* Confirm button */}
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleSelect('confirm')}
+            className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+            style={{
+              backgroundColor: resultColor,
+              color: '#0a0a0a',
+              border: `1px solid ${resultColor}`,
+              boxShadow: `0 4px 16px ${resultColor}40`,
+            }}
+          >
+            {t('game.board.confirm')}
+          </motion.button>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
 
   return (
     <AnimatePresence>

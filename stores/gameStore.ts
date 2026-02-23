@@ -21,8 +21,9 @@ interface PendingTargetSelection {
   validTargets: string[]; // instanceIds
   description: string;
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL'; // type of selection
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
+  revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean }; // for Orochimaru reveal
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
 }
@@ -349,14 +350,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
 
+      // Detect Orochimaru reveal result (info display with card image)
+      const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
+      let revealedCard: PendingTargetSelection['revealedCard'];
+      if (isOroReveal && pendingEffect) {
+        try {
+          const rd = JSON.parse(pendingEffect.effectDescription);
+          revealedCard = {
+            name_fr: rd.cardName,
+            chakra: rd.cardCost,
+            power: rd.cardPower,
+            image_file: rd.cardImageFile,
+            canSteal: rd.canSteal,
+          };
+        } catch { /* ignore */ }
+      }
+
       set({
         visibleState,
         isProcessing: false,
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
-          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
+          revealedCard,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -477,11 +495,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Detect rejected play actions (hand size unchanged = validation failed)
+    // Detect rejected play actions.
+    // Use log length instead of hand size: MAIN effects (e.g. Ebisu draw) can restore
+    // hand size after a card is played, causing false "action not allowed" errors.
+    // Every successful action adds at least one log entry; rejected actions add none.
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER') {
-      const oldHandSize = gameState[humanPlayer].hand.length;
-      const newHandSize = newState[humanPlayer].hand.length;
-      if (oldHandSize === newHandSize) {
+      const logGrew = newState.log.length > gameState.log.length;
+      if (!logGrew) {
         // Action was rejected — get the specific validation reason
         let errorReason = '';
         if (action.type === 'PLAY_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
@@ -603,13 +623,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
+      // Detect Orochimaru reveal result (info display with card image)
+      const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
+      let revealedCard: PendingTargetSelection['revealedCard'];
+      if (isOroReveal && pendingEffect) {
+        try {
+          const rd = JSON.parse(pendingEffect.effectDescription);
+          revealedCard = {
+            name_fr: rd.cardName,
+            chakra: rd.cardCost,
+            power: rd.cardPower,
+            image_file: rd.cardImageFile,
+            canSteal: rd.canSteal,
+          };
+        } catch { /* ignore */ }
+      }
+
       set({
         isProcessing: false,
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
-          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
+          revealedCard,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
