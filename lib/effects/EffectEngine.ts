@@ -48,13 +48,14 @@ export class EffectEngine {
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             // Handler needs target selection — create pending and pause
+            // Use result.state to preserve any state changes the handler already made
             const remainingEffectTypes: EffectType[] = [];
             if (isUpgrade) {
               const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
               if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
             }
             newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'MAIN', isUpgrade,
+              result.state, player, character, missionIndex, 'MAIN', isUpgrade,
               result, remainingEffectTypes,
             );
             return newState;
@@ -84,8 +85,9 @@ export class EffectEngine {
             const result = handler(ctx);
 
             if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+              // Use result.state to preserve any state changes the handler already made
               newState = EffectEngine.createPendingTargetSelection(
-                newState, player, character, missionIndex, 'UPGRADE', true,
+                result.state, player, character, missionIndex, 'UPGRADE', true,
                 result, [],
               );
               return newState;
@@ -141,8 +143,9 @@ export class EffectEngine {
             const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
             if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
 
+            // Use result.state to preserve any state changes the handler already made
             newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'MAIN', wasUpgraded,
+              result.state, player, character, missionIndex, 'MAIN', wasUpgraded,
               result, remainingEffectTypes,
             );
             return newState;
@@ -171,8 +174,9 @@ export class EffectEngine {
           const result = handler(ctx);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            // Use result.state to preserve any state changes the handler already made
             newState = EffectEngine.createPendingTargetSelection(
-              newState, player, character, missionIndex, 'AMBUSH', wasUpgraded,
+              result.state, player, character, missionIndex, 'AMBUSH', wasUpgraded,
               result, [],
             );
             return newState;
@@ -297,8 +301,10 @@ export class EffectEngine {
       const result = handler(ctx);
 
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+        // Use result.state (not newState) to preserve any state changes the handler already made
+        // (e.g., Yashamaru self-defeat before requiring target selection for the second defeat)
         newState = EffectEngine.createPendingTargetSelection(
-          newState, player, (character ?? null) as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
+          result.state, player, (character ?? null) as unknown as CharacterInPlay, missionIndex, 'SCORE', false,
           result, [],
         );
         return { state: newState, pending: true };
@@ -449,6 +455,10 @@ export class EffectEngine {
 
       case 'OROCHIMARU_LOOK_AND_STEAL':
         newState = EffectEngine.orochimaruLookAndSteal(newState, pendingEffect, targetId);
+        break;
+
+      case 'OROCHIMARU_REVEAL_RESULT':
+        newState = EffectEngine.orochimaruExecuteSteal(newState, pendingEffect);
         break;
 
       case 'LOOK_AT_HIDDEN_CHARACTER':
@@ -737,6 +747,11 @@ export class EffectEngine {
         }
         break;
       }
+
+      // --- Rock Lee 117/151 end-of-round move ---
+      case 'ROCK_LEE_END_MOVE':
+        newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
+        break;
 
       // --- MOVE types (destination selection — use moveSelfToMission) ---
       case 'KURENAI116B_MOVE_SELF':
@@ -2327,7 +2342,10 @@ export class EffectEngine {
     return EffectEngine.moveCharacterToMission(state, `${pending.sourceInstanceId}:${destMissionIndex}`);
   }
 
-  /** Orochimaru AMBUSH: look at hidden enemy, if cost <= 3 steal control */
+  /** Orochimaru AMBUSH: look at hidden enemy, if cost <= 3 steal control.
+   * Stage 1: Look at the card and create a reveal pending action so the player sees it.
+   * Stage 2 (OROCHIMARU_REVEAL_RESULT): Execute the steal if applicable.
+   */
   static orochimaruLookAndSteal(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult || !charResult.character.isHidden) return state;
@@ -2335,39 +2353,107 @@ export class EffectEngine {
     const newState = deepClone(state);
     const mission = newState.activeMissions[charResult.missionIndex];
     const enemyKey = charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
-    const friendlyKey = pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const targetCharIdx = mission[enemyKey].findIndex((c: CharacterInPlay) => c.instanceId === targetId);
     if (targetCharIdx === -1) return state;
 
     const targetChar = mission[enemyKey][targetCharIdx];
     const actualCost = targetChar.card.chakra;
+    const canSteal = actualCost <= 3;
 
     // Log the look
     newState.log = logAction(
       newState.log, newState.turn, 'action', pending.sourcePlayer,
       'EFFECT', `Orochimaru looks at hidden enemy: ${targetChar.card.name_fr} (cost ${actualCost}).`,
       'game.log.effect.lookAtHidden',
-      { card: 'Orochimaru', id: 'KS-050-C', target: targetChar.card.name_fr },
+      { card: 'Orochimaru', id: pending.sourceCardId, target: targetChar.card.name_fr },
     );
 
-    // If cost <= 3, steal control (but check same-name constraint first)
-    if (actualCost <= 3) {
-      // Enforce same-name-per-mission: check if stealing would create a name duplicate
-      // The stolen character stays hidden, so it doesn't violate name uniqueness while hidden.
-      // However, if it were visible, we'd need to check. Since Orochimaru targets hidden chars,
-      // they remain hidden after steal, so name uniqueness is not violated.
-      mission[enemyKey].splice(targetCharIdx, 1);
-      targetChar.controlledBy = pending.sourcePlayer;
-      mission[friendlyKey].push(targetChar);
+    // Create a reveal pending action so the player sees the card before the steal
+    const revealEffectId = generateInstanceId();
+    const revealActionId = generateInstanceId();
+    const revealData = JSON.stringify({
+      targetInstanceId: targetId,
+      cardName: targetChar.card.name_fr,
+      cardCost: actualCost,
+      cardPower: targetChar.card.power,
+      cardImageFile: targetChar.card.image_file,
+      canSteal,
+      missionIndex: charResult.missionIndex,
+    });
 
-      newState.log = logAction(
-        newState.log, newState.turn, 'action', pending.sourcePlayer,
-        'EFFECT', `Orochimaru steals ${targetChar.card.name_fr}!`,
-        'game.log.effect.takeControl',
-        { card: 'Orochimaru', id: 'KS-050-C', target: targetChar.card.name_fr },
-      );
+    newState.pendingEffects.push({
+      id: revealEffectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: 'MAIN' as const,
+      effectDescription: revealData,
+      targetSelectionType: 'OROCHIMARU_REVEAL_RESULT',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: ['confirm'],
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: false,
+    });
+    newState.pendingActions.push({
+      id: revealActionId,
+      type: 'SELECT_TARGET',
+      player: pending.sourcePlayer,
+      description: canSteal
+        ? `Orochimaru revealed: ${targetChar.card.name_fr} (Cost ${actualCost}). Taking control!`
+        : `Orochimaru revealed: ${targetChar.card.name_fr} (Cost ${actualCost}). Too expensive to steal.`,
+      options: ['confirm'],
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: revealEffectId,
+    });
+
+    return newState;
+  }
+
+  /** Orochimaru AMBUSH stage 2: Execute the steal after player has seen the revealed card. */
+  static orochimaruExecuteSteal(state: GameState, pending: PendingEffect): GameState {
+    let parsed: { targetInstanceId: string; canSteal: boolean; cardName: string; missionIndex: number };
+    try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
+
+    if (!parsed.canSteal) {
+      // Cost > 3, cannot steal — just log
+      return {
+        ...state,
+        log: logAction(
+          state.log, state.turn, 'action', pending.sourcePlayer,
+          'EFFECT', `${parsed.cardName} costs too much — Orochimaru cannot take control.`,
+          'game.log.effect.orochimaruCannotSteal',
+          { card: 'Orochimaru', id: pending.sourceCardId, target: parsed.cardName },
+        ),
+      };
     }
+
+    // Execute the steal
+    const newState = deepClone(state);
+    const charResult = EffectEngine.findCharByInstanceId(newState, parsed.targetInstanceId);
+    if (!charResult) return state;
+
+    const mission = newState.activeMissions[charResult.missionIndex];
+    const enemyKey = charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const friendlyKey = pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+    const targetCharIdx = mission[enemyKey].findIndex((c: CharacterInPlay) => c.instanceId === parsed.targetInstanceId);
+    if (targetCharIdx === -1) return state;
+
+    const targetChar = mission[enemyKey][targetCharIdx];
+    mission[enemyKey].splice(targetCharIdx, 1);
+    targetChar.controlledBy = pending.sourcePlayer;
+    mission[friendlyKey].push(targetChar);
+
+    newState.log = logAction(
+      newState.log, newState.turn, 'action', pending.sourcePlayer,
+      'EFFECT', `Orochimaru steals ${parsed.cardName}!`,
+      'game.log.effect.takeControl',
+      { card: 'Orochimaru', id: pending.sourceCardId, target: parsed.cardName },
+    );
 
     return newState;
   }

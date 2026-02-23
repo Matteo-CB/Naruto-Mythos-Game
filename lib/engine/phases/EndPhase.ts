@@ -151,10 +151,18 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
 }
 
 /**
- * Rock Lee 117 (R): At end of round, must move to another mission, if able.
+ * Rock Lee 117 (R) / 151 (M): At end of round, must move to another mission, if able.
+ * If there's exactly 1 valid destination, auto-move. If multiple destinations,
+ * create a pending action so the player can choose.
+ *
+ * @param processedIds Set of instanceIds already processed this end phase (to prevent re-processing)
  */
-function handleRockLee117Move(state: GameState): GameState {
+export function handleRockLee117Move(
+  state: GameState,
+  processedIds?: Set<string>,
+): GameState {
   let newState = { ...state };
+  const processed = processedIds ?? new Set<string>();
 
   for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
     const mission = newState.activeMissions[mIdx];
@@ -163,56 +171,92 @@ function handleRockLee117Move(state: GameState): GameState {
       const chars = mission[side];
 
       for (const char of chars) {
+        if (processed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.number !== 117) continue;
+        // Rock Lee 117 (R) and 151 (M) both have the continuous move effect
+        if (topCard.number !== 117 && topCard.number !== 151) continue;
 
         const hasMove = (topCard.effects ?? []).some(
-          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('move this character'),
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+            (e.description.includes('move this character') || e.description.includes('must move')),
         );
         if (!hasMove) continue;
 
-        // Find a valid destination (any other mission, respecting name uniqueness)
-        let destIdx = -1;
+        // Find ALL valid destinations (any other mission, respecting name uniqueness)
+        const validDests: number[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           if (i === mIdx) continue;
-          // Check name uniqueness at destination
           const destMission = newState.activeMissions[i];
           const destChars = player === 'player1' ? destMission.player1Characters : destMission.player2Characters;
           const hasSameName = destChars.some(
-            (c) => !c.isHidden && c.card.name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
+            (c) => !c.isHidden && (c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card)
+              .name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
           );
           if (!hasSameName) {
-            destIdx = i;
-            break;
+            validDests.push(i);
           }
         }
 
-        if (destIdx === -1) continue; // No valid destination — "if able" clause
+        if (validDests.length === 0) continue; // No valid destination — "if able" clause
 
-        // Move the character
-        const missions = [...newState.activeMissions];
-        const srcMission = { ...missions[mIdx] };
-        const destMission = { ...missions[destIdx] };
+        if (validDests.length === 1) {
+          // Auto-move: only 1 valid destination
+          const destIdx = validDests[0];
+          const missions = [...newState.activeMissions];
+          const srcMission = { ...missions[mIdx] };
+          const destMission = { ...missions[destIdx] };
 
-        srcMission[side] = srcMission[side].filter((c: CharacterInPlay) => c.instanceId !== char.instanceId);
-        const movedChar = { ...char, missionIndex: destIdx };
-        destMission[side] = [...destMission[side], movedChar];
+          srcMission[side] = srcMission[side].filter((c: CharacterInPlay) => c.instanceId !== char.instanceId);
+          const movedChar = { ...char, missionIndex: destIdx };
+          destMission[side] = [...destMission[side], movedChar];
 
-        missions[mIdx] = srcMission;
-        missions[destIdx] = destMission;
-        newState.activeMissions = missions;
+          missions[mIdx] = srcMission;
+          missions[destIdx] = destMission;
+          newState.activeMissions = missions;
 
-        newState.log = logAction(
-          newState.log, state.turn, 'end', player,
-          'EFFECT_MOVE',
-          `Rock Lee (117): Moves to mission ${destIdx + 1} at end of round.`,
-          'game.log.effect.endMove',
-          { card: 'ROCK LEE', id: 'KS-117-R' },
-        );
+          newState.log = logAction(
+            newState.log, state.turn, 'end', player,
+            'EFFECT_MOVE',
+            `Rock Lee (${topCard.number}): Moves to mission ${destIdx + 1} at end of round.`,
+            'game.log.effect.endMove',
+            { card: 'ROCK LEE', id: topCard.id },
+          );
+          processed.add(char.instanceId);
+          break; // Break inner loop to avoid mutation issues, outer loop continues
+        }
 
-        // Only one Rock Lee 117 per player typically, but break inner loops to avoid mutation issues
-        break;
+        // Multiple destinations: let the player choose
+        const effectId = `rl117-endmove-${char.instanceId}`;
+        const actionId = `rl117-endmove-action-${char.instanceId}`;
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId,
+          sourceCardId: topCard.id,
+          sourceInstanceId: char.instanceId,
+          sourceMissionIndex: mIdx,
+          effectType: 'MAIN' as const,
+          effectDescription: `Rock Lee (${topCard.number}): Must move to another mission.`,
+          targetSelectionType: 'ROCK_LEE_END_MOVE',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: validDests.map(String),
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: actionId,
+          type: 'SELECT_TARGET',
+          player,
+          description: `Rock Lee (${topCard.number}): Choose a mission to move to at end of round.`,
+          options: validDests.map(String),
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId,
+        }];
+        // Return immediately — wait for player to choose
+        return newState;
       }
     }
   }

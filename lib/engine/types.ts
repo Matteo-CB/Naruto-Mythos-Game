@@ -283,6 +283,7 @@ export interface VisibleCharacter {
   isHidden: boolean;
   isOwn: boolean; // Can the viewing player see this card?
   card?: CharacterCard; // Only present if visible to the viewer
+  topCard?: CharacterCard; // Top of the evolution stack (differs from card when upgraded)
   powerTokens: number;
   controlledBy: PlayerID;
   originalOwner: PlayerID;
