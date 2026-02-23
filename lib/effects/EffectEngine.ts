@@ -476,6 +476,10 @@ export class EffectEngine {
         // Acknowledgment only — no additional action needed
         break;
 
+      case 'TAYUYA065_UPGRADE_REVEAL':
+        // Acknowledgment only — no additional action needed
+        break;
+
       case 'SASUKE014_HAND_REVEAL':
         newState = EffectEngine.sasuke014ResolveReveal(newState, pendingEffect);
         break;
@@ -4286,6 +4290,9 @@ export class EffectEngine {
         && (card.chakra ?? 0) > (topCard.chakra ?? 0);
     });
 
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
     if (existingIdx >= 0) {
       // Upgrade the existing character
       const existing = mission[friendlySide][existingIdx];
@@ -4298,6 +4305,8 @@ export class EffectEngine {
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
       state.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
 
       const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
       state.log = logAction(
@@ -4323,6 +4332,7 @@ export class EffectEngine {
       mission[friendlySide] = [...mission[friendlySide], newChar];
       missions[missionIndex] = mission;
       state.activeMissions = missions;
+      placedChar = newChar;
 
       ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
 
@@ -4335,6 +4345,9 @@ export class EffectEngine {
         { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
       );
     }
+
+    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
+    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
     return state;
   }
@@ -4501,6 +4514,9 @@ export class EffectEngine {
         && (card.chakra ?? 0) > (topCard.chakra ?? 0);
     });
 
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
     if (existingIdx >= 0) {
       // Upgrade the existing character
       const existing = mission[friendlySide][existingIdx];
@@ -4514,6 +4530,8 @@ export class EffectEngine {
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
       state.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
 
       const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
       state.log = logAction(
@@ -4539,6 +4557,7 @@ export class EffectEngine {
       mission[friendlySide] = [...mission[friendlySide], newChar];
       missions[missionIndex] = mission;
       state.activeMissions = missions;
+      placedChar = newChar;
 
       ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
 
@@ -4551,6 +4570,9 @@ export class EffectEngine {
         { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
       );
     }
+
+    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
+    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
     return state;
   }
@@ -4785,13 +4807,33 @@ export class EffectEngine {
     if (!charResult) return state;
     if (charResult.missionIndex === destMissionIndex) return state;
 
-    // Enforce same-name-per-mission rule
+    // Enforce same-name-per-mission rule (FAQ: if forced by an effect, discard the moved character)
     if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
+      // Remove character from source mission and discard it (FAQ Rule: "discard the new one without applying effects")
+      const friendlySideDiscard: 'player1Characters' | 'player2Characters' =
+        charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
+      const missions = [...state.activeMissions];
+      const srcMission = { ...missions[charResult.missionIndex] };
+      const discardedChar = srcMission[friendlySideDiscard].find(c => c.instanceId === charInstanceId);
+      srcMission[friendlySideDiscard] = srcMission[friendlySideDiscard].filter(c => c.instanceId !== charInstanceId);
+      missions[charResult.missionIndex] = srcMission;
+      state.activeMissions = missions;
+
+      // Add all cards in the stack to the original owner's discard pile
+      if (discardedChar) {
+        const owner = discardedChar.originalOwner ?? charResult.player;
+        const ownerState = { ...state[owner] };
+        const cardsToDiscard = discardedChar.stack.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
+        ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
+        ownerState.charactersInPlay = EffectEngine.countCharsForPlayer({ ...state, [owner]: ownerState }, owner);
+        state[owner] = ownerState;
+      }
+
       state.log = logAction(
         state.log, state.turn, state.phase, charOwner,
-        'EFFECT_BLOCKED',
-        `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} — a character with the same name already exists there.`,
-        'game.log.effect.moveBlocked',
+        'EFFECT_DISCARD',
+        `${effectCardName} (${effectCardId}): ${charResult.character.card.name_fr} moved to mission ${destMissionIndex + 1} but discarded due to same-name conflict.`,
+        'game.log.effect.moveNameConflictDiscard',
         { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
       );
       return state;

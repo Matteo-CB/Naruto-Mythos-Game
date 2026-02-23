@@ -338,7 +338,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 006/130 - SHIZUNE (UC) - "Brouillard Empoisonne"
   'KS-006-UC': [
-    'Deplacez un personnage ennemi avec une Puissance de 3 ou moins depuis cette mission.',
+    'Deplacez un personnage ennemi en jeu avec une Puissance de 3 ou moins.',
     'Gagnez 2 Chakra supplementaires.',
   ],
 
@@ -530,7 +530,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 066/130 - DOKI (UC) - "Demon"
   'KS-066-UC': [
-    'Volez 1 Chakra a l\'adversaire s\'il y a un personnage Quartet du Son allie en jeu.',
+    'Volez 1 Chakra a l\'adversaire s\'il y a un personnage Quartet du Son allie dans cette mission.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
@@ -950,5 +950,20 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // MSS 08 - Tendre un piege / Set a Trap
   'KS-008-MMS': [
     '[↯] Placez une carte de votre main en tant que personnage cache sur n\'importe quelle mission.',
+  ],
+
+  // MSS 02 - Examen Chunin / Chunin Exam
+  'KS-002-MMS': [
+    '[⧗] Tous les personnages non caches dans cette mission ont +1 Puissance.',
+  ],
+
+  // MSS 09 - Proteger le chef / Protect the Leader
+  'KS-009-MMS': [
+    '[⧗] Les personnages avec une Puissance de 4 ou plus dans cette mission ont +1 Puissance.',
+  ],
+
+  // MSS 10 - Entrainement au chakra / Chakra Training
+  'KS-010-MMS': [
+    '[⧗] CHAKRA +1 pour les deux joueurs.',
   ],
 };

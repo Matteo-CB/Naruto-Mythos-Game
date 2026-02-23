@@ -63,6 +63,7 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS03_OPPONENT_DISCARD',
     validTargets: handIndices,
     selectingPlayer: opponentId,
+    isMandatory: true,
     description: 'MSS 03 (Find the Traitor): Choose a card from your hand to discard.',
     descriptionKey: 'game.effect.desc.mss03OpponentDiscard',
   };

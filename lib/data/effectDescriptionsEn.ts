@@ -290,7 +290,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 006/130 - SHIZUNE (UC) - "Poison Mist"
   'KS-006-UC': [
-    'Move an enemy character with Power 3 or less from this mission.',
+    'Move an enemy character in play with Power 3 or less.',
     'Gain 2 additional Chakra.',
   ],
 
@@ -463,7 +463,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 066/130 - DOKI (UC) - "Demon"
   'KS-066-UC': [
-    'Steal 1 Chakra from the opponent if there is a friendly Sound Four character in play.',
+    'Steal 1 Chakra from the opponent if there is a friendly Sound Four character in this mission.',
     '[⧗] At the end of the round, you must return this character to your hand.',
   ],
 
@@ -940,5 +940,20 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // MSS 08 - Set a Trap
   'KS-008-MMS': [
     '[↯] Put a card from your hand as a hidden character on any mission.',
+  ],
+
+  // MSS 02 - Chunin Exam
+  'KS-002-MMS': [
+    '[⧗] All non-hidden characters in this mission have +1 Power.',
+  ],
+
+  // MSS 09 - Protect the Leader
+  'KS-009-MMS': [
+    '[⧗] Characters with 4 Power or more in this mission have +1 Power.',
+  ],
+
+  // MSS 10 - Chakra Training
+  'KS-010-MMS': [
+    '[⧗] CHAKRA +1 for both players.',
   ],
 };
