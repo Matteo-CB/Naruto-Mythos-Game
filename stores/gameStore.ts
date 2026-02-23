@@ -356,10 +356,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal;
+      const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
+      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
       if (isInfoReveal && pendingEffect) {
         try {
@@ -383,6 +385,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.itachi091DiscardResult'
                 : 'game.effect.itachi091RevealResult',
+            };
+          } else if (isDosuLookReveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false,
+              revealTitleKey: 'game.effect.dosuLookRevealTitle',
+              revealResultKey: 'game.effect.dosuLookRevealResult',
+            };
+          } else if (isSasuke014Reveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false,
+              revealTitleKey: 'game.effect.sasuke014RevealTitle',
+              revealResultKey: rd.isUpgrade
+                ? 'game.effect.sasuke014DiscardResult'
+                : 'game.effect.sasuke014RevealResult',
             };
           }
         } catch { /* ignore */ }
@@ -665,6 +689,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
+          // Source player selects from opponent's hand
+          const opponentPlayer = humanPlayer === 'player1' ? 'player2' : 'player1';
+          const opponentHand = newState[opponentPlayer].hand;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = opponentHand[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
         } else {
           const playerHand = newState[humanPlayer].hand;
           handCards = pendingAction.options.map((indexStr) => {
@@ -683,10 +724,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal;
+      const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
+      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
       if (isInfoReveal && pendingEffect) {
         try {
@@ -705,11 +748,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
               chakra: rd.cardCost,
               power: rd.cardPower,
               image_file: rd.cardImageFile,
-              canSteal: false, // not used for Itachi
+              canSteal: false,
               revealTitleKey: 'game.effect.itachi091RevealTitle',
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.itachi091DiscardResult'
                 : 'game.effect.itachi091RevealResult',
+            };
+          } else if (isDosuLookReveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false,
+              revealTitleKey: 'game.effect.dosuLookRevealTitle',
+              revealResultKey: 'game.effect.dosuLookRevealResult',
+            };
+          } else if (isSasuke014Reveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false,
+              revealTitleKey: 'game.effect.sasuke014RevealTitle',
+              revealResultKey: rd.isUpgrade
+                ? 'game.effect.sasuke014DiscardResult'
+                : 'game.effect.sasuke014RevealResult',
             };
           }
         } catch { /* ignore */ }
@@ -971,6 +1036,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
+          // Source player selects from opponent's hand
+          const opponentPlayer = humanPlayer === 'player1' ? 'player2' : 'player1';
+          const opponentHand = currentState[opponentPlayer].hand;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = opponentHand[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
         } else {
           const playerHand = currentState[humanPlayer].hand;
           handCards = pendingAction.options.map((indexStr) => {
@@ -986,10 +1065,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, etc.)
       const isOroRevealAI = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091RevealAI = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI;
+      const isDosuLookRevealAI = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
+      const isSasuke014RevealAI = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
+      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI || isDosuLookRevealAI || isSasuke014RevealAI;
       let revealedCardAI: PendingTargetSelection['revealedCard'];
       if (isInfoRevealAI && pendingEffect) {
         try {
@@ -1005,6 +1086,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               image_file: rd.cardImageFile, canSteal: false,
               revealTitleKey: 'game.effect.itachi091RevealTitle',
               revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
+            };
+          } else if (isDosuLookRevealAI) {
+            revealedCardAI = {
+              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+              image_file: rd.cardImageFile, canSteal: false,
+              revealTitleKey: 'game.effect.dosuLookRevealTitle',
+              revealResultKey: 'game.effect.dosuLookRevealResult',
+            };
+          } else if (isSasuke014RevealAI) {
+            revealedCardAI = {
+              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+              image_file: rd.cardImageFile, canSteal: false,
+              revealTitleKey: 'game.effect.sasuke014RevealTitle',
+              revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
             };
           }
         } catch { /* ignore */ }

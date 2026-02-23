@@ -92,6 +92,13 @@ function seededShuffle<T>(arr: T[], seed: string): T[] {
 // SMALL CARD THUMBNAIL
 // =====================================================================
 
+/** Detect if the card name is at the bottom of the card image (Secret/Mission layouts). */
+function isNameAtBottom(src?: string): boolean {
+  if (!src) return false;
+  const p = src.replace(/\\/g, '/').toLowerCase();
+  return p.includes('/secret/') || p.includes('/mission/') || p.includes('-s.') || p.includes('-mms.');
+}
+
 function CardThumbnail({
   src,
   size = 52,
@@ -107,6 +114,7 @@ function CardThumbnail({
   const path = src.replace(/\\/g, '/');
   const fullPath = path.startsWith('/') ? path : `/${path}`;
   const height = Math.round(size * 1.4);
+  const nameBottom = isNameAtBottom(src);
   return (
     <div style={{ position: 'relative', width: `${size}px`, height: `${height}px`, flexShrink: 0 }}>
       <img
@@ -121,11 +129,18 @@ function CardThumbnail({
           filter: blurred ? 'blur(8px)' : 'none',
         }}
       />
-      {censorZone === 'name' && !blurred && (
+      {censorZone === 'name' && !blurred && !nameBottom && (
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
           height: '16%', backgroundColor: '#000',
           borderRadius: '6px 6px 0 0', zIndex: 1,
+        }} />
+      )}
+      {censorZone === 'name' && !blurred && nameBottom && (
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          height: '35%', backgroundColor: '#000',
+          borderRadius: '0 0 6px 6px', zIndex: 1,
         }} />
       )}
     </div>
@@ -258,11 +273,18 @@ function QuestionImage({
             transition: 'filter 0.3s ease',
           }}
         />
-        {censorZone === 'name' && !blurred && (
+        {censorZone === 'name' && !blurred && !isNameAtBottom(src) && (
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0,
             height: '16%', backgroundColor: '#000',
             borderRadius: '10px 10px 0 0', zIndex: 2,
+          }} />
+        )}
+        {censorZone === 'name' && !blurred && isNameAtBottom(src) && (
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            height: '35%', backgroundColor: '#000',
+            borderRadius: '0 0 10px 10px', zIndex: 2,
           }} />
         )}
         {blurred && cardInfo && (

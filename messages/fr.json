@@ -212,6 +212,11 @@
       "itachi091RevealTitle": "Itachi — Mangekyo Sharingan",
       "itachi091RevealResult": "Carte aleatoire revelee de la main adverse.",
       "itachi091DiscardResult": "La carte sera defaussee. L'adversaire pioche un remplacement.",
+      "dosuLookRevealTitle": "Dosu Kinuta — Personnage cache revele",
+      "dosuLookRevealResult": "Vous avez regarde ce personnage cache.",
+      "sasuke014RevealTitle": "Sasuke — Sharingan",
+      "sasuke014RevealResult": "Carte aleatoire revelee de la main adverse.",
+      "sasuke014DiscardResult": "Vous pouvez defausser une carte pour en defausser une de la main adverse.",
       "desc": {
         "chooseMissionMove": "Choisissez une mission pour y deplacer le personnage.",
         "chooseMissionPlaceHidden": "Choisissez une mission pour y placer le personnage cache.",
@@ -259,6 +264,7 @@
         "choji018MoveSelf": "Selectionnez une mission pour y deplacer Choji Akimichi.",
         "dosu069LookAtHidden": "Selectionnez un personnage cache en jeu a regarder.",
         "dosu069ForceRevealOrDefeat": "Selectionnez un personnage cache ennemi. L'adversaire doit le reveler (payer cout + 2) ou le vaincre.",
+        "dosuLookReveal": "Dosu Kinuta : {target} revele (Cout {cost}, Puissance {power}).",
         "hiruzen002PlayLeaf": "Choisissez un personnage Village de Konoha de votre main a jouer (cout -1).",
         "hiruzen002PlayLeafUpgrade": "Choisissez un personnage Village de Konoha de votre main a jouer (cout -1, + POWERUP 2).",
         "ino020TakeControl": "Selectionnez un personnage ennemi avec cout {costLimit} ou moins pour en prendre le controle.",
@@ -285,6 +291,9 @@
         "sakon062CopyEffect": "Selectionnez un personnage allie Quatre du Son pour copier un de ses effets.",
         "sakura012Discard": "Vous avez pioche une carte. Vous devez defausser 1 carte de votre main.",
         "sasuke014DiscardOwn": "Defaussez 1 carte de votre main pour ensuite defausser 1 carte de la main adverse.",
+        "sasuke014DiscardOpponent": "Choisissez une carte de la main adverse a defausser.",
+        "sasuke014Reveal": "Sasuke (014) : {target} revele de la main adverse.",
+        "sasuke014RevealUpgrade": "Sasuke (014) : {target} revele. Vous pouvez defausser une carte pour en defausser une de la main adverse.",
         "shikamaru022MoveEnemy": "Selectionnez un personnage ennemi a deplacer vers une autre mission.",
         "shino033MoveSelf": "Selectionnez une mission pour y deplacer Shino Aburame.",
         "shizune006MoveEnemy": "Selectionnez un personnage ennemi avec Puissance 3 ou moins a deplacer.",
@@ -417,7 +426,8 @@
     "close": "Fermer",
     "cardsShown": "{count} cartes affichees",
     "basePoints": "Points de Base",
-    "id": "ID"
+    "id": "ID",
+    "missions": "Missions"
   },
   "deckBuilder": {
     "title": "Constructeur de Deck",

@@ -229,6 +229,7 @@ export function validateUpgradeCharacter(
  * - Orochimaru 051 (UC) / 138 (S): Can upgrade any non-Summon, non-Orochimaru
  * - Akamaru 029 (UC): Can upgrade over Kiba Inuzuka
  * - Ichibi 076 (UC): Can upgrade any Gaara
+ * - Ukon 063 (UC) / 124b (R): Can upgrade any Sound Village character
  */
 function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
   // Already same name — standard upgrade, no special rule needed
@@ -263,6 +264,16 @@ function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard)
     );
     if (hasFlexible) {
       return targetCard.name_fr.toUpperCase() === 'GAARA';
+    }
+  }
+
+  // Ukon 063 (UC) / 124b (R): Can upgrade over any Sound Village character
+  if (newCard.number === 63 || newCard.number === 124) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
+    );
+    if (hasFlexible) {
+      return (targetCard.group ?? '') === 'Sound Village';
     }
   }
 

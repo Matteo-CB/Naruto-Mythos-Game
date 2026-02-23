@@ -81,8 +81,12 @@ export function ActionBar() {
       const isIchibiUpgrade = selectedCard.number === 76
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
         && charCard.name_fr.toUpperCase() === 'GAARA';
+      // Ukon 063/124 can upgrade any Sound Village character
+      const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
+        && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
+        && (charCard.group ?? '') === 'Sound Village';
 
-      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade;
+      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade;
       return nameOk && charCard.chakra < selectedCard.chakra;
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);

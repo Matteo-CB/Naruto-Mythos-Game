@@ -37,6 +37,8 @@ export default function GamePage() {
   const socketConnected = useSocketStore((s) => s.connected);
   const socketError = useSocketStore((s) => s.error);
   const socketErrorKey = useSocketStore((s) => s.errorKey);
+  const socketErrorParams = useSocketStore((s) => s.errorParams);
+  const socketClearError = useSocketStore((s) => s.clearError);
 
   // For AI games, gameState must exist; for online games, visibleState must exist
   const hasActiveGame = gameState || (isOnlineGame && visibleState);
@@ -72,6 +74,27 @@ export default function GamePage() {
       endOnlineGame(socketGameResult.winner);
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
+
+  // Bridge socket game:error to gameStore actionError for online games
+  useEffect(() => {
+    if (isOnlineGame && socketError) {
+      useGameStore.setState({
+        actionError: socketError,
+        actionErrorKey: socketErrorKey,
+        actionErrorParams: socketErrorParams,
+        isProcessing: false,
+      });
+      socketClearError();
+      // Auto-clear error after 4 seconds (same as AI mode)
+      const timer = setTimeout(() => {
+        const store = useGameStore.getState();
+        if (store.actionError) {
+          useGameStore.setState({ actionError: null, actionErrorKey: null, actionErrorParams: null });
+        }
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOnlineGame, socketError, socketErrorKey, socketErrorParams, socketClearError]);
 
   // Show connection lost banner for online games
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;

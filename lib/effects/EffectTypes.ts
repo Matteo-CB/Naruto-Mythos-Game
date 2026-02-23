@@ -29,6 +29,8 @@ export interface EffectResult {
   descriptionParams?: Record<string, string | number>;
   /** Override which player performs the target selection (e.g., opponent discards in MSS 03). */
   selectingPlayer?: PlayerID;
+  /** If true, the effect cannot be skipped (e.g., "you must" effects). */
+  isMandatory?: boolean;
 }
 
 /**

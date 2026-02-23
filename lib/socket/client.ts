@@ -17,6 +17,7 @@ interface SocketStore {
   matchmakingStatus: 'idle' | 'waiting' | 'found';
   error: string | null;
   errorKey: string | null;
+  errorParams: Record<string, string | number> | null;
   opponentJoined: boolean;
   gameStarted: boolean;
   gameEnded: boolean;
@@ -53,6 +54,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   matchmakingStatus: 'idle',
   error: null,
   errorKey: null,
+  errorParams: null,
   opponentJoined: false,
   gameStarted: false,
   gameEnded: false,
@@ -197,9 +199,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         },
       );
 
-      socket.on('game:error', (data: { message: string }) => {
+      socket.on('game:error', (data: { message: string; errorKey?: string; errorParams?: Record<string, string | number> }) => {
         console.error('[Socket] Game error:', data.message);
-        set({ error: data.message });
+        set({ error: data.message, errorKey: data.errorKey ?? null, errorParams: data.errorParams ?? null });
       });
 
       socket.on(
@@ -380,7 +382,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null, errorKey: null }),
+  clearError: () => set({ error: null, errorKey: null, errorParams: null }),
 
   forfeit: (reason: 'abandon' | 'timeout') => {
     const { socket, connected } = get();

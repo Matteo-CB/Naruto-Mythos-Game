@@ -7,55 +7,68 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Chakra: 3 | Power: 4
  * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
  *
- * AMBUSH: Look at the opponent's hand.
- *   - The "look" is informational. Log that the player sees the opponent's hand.
- *   - The UI handles showing the opponent's hand to the source player.
+ * AMBUSH: Look at a random card in the opponent's hand.
+ *   - Pick 1 random card from the opponent's hand and reveal it via INFO_REVEAL UI.
  *
- * UPGRADE: AMBUSH effect: In addition, discard 1 card. If you do so, choose 1 card
- *   in the opponent's hand and discard it.
- *   - When triggered as an upgrade with AMBUSH, in addition to looking:
- *     1. The player must discard 1 card from their own hand (target selection).
- *     2. If they do, they then choose 1 card from the opponent's hand to discard (target selection).
+ * UPGRADE: AMBUSH effect: In addition, discard 1 card from your hand.
+ *   If you do so, choose 1 card in the opponent's hand and discard it.
+ *   - After the reveal, player discards 1 own card, then picks 1 opponent card to discard.
  */
+
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, isUpgrade } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const opponentHand = state[opponentPlayer].hand;
 
-  let newState = { ...state };
-
-  // Base AMBUSH: Look at opponent's hand
-  newState = { ...newState, log: logAction(
-    newState.log, newState.turn, newState.phase, sourcePlayer,
-    'EFFECT_LOOK',
-    `Sasuke Uchiwa (014): Looks at ${opponentPlayer}'s hand.`,
-    'game.log.effect.lookAtHand',
-    { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: opponentPlayer },
-  ) };
-
-  // If not an upgrade, just look
-  if (!isUpgrade) {
-    return { state: newState };
+  if (opponentHand.length === 0) {
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Sasuke Uchiwa (014): Opponent has no cards in hand.',
+      'game.log.effect.noTarget',
+      { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
+    );
+    return { state: { ...state, log } };
   }
 
-  // UPGRADE addition: discard 1 card from own hand, then discard 1 from opponent's hand
-  const playerState = newState[sourcePlayer];
-  if (playerState.hand.length === 0) {
-    // No cards to discard from own hand, upgrade portion fizzles
-    return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Sasuke Uchiwa (014): No cards in hand to discard (upgrade effect fizzles).',
-      'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' }) } };
-  }
+  // Pick a random card from opponent's hand
+  const randomIndex = Math.floor(Math.random() * opponentHand.length);
+  const revealedCard = opponentHand[randomIndex];
 
-  // Requires target selection: choose a card from own hand to discard (plain numbers for parseInt compatibility)
-  const validTargets = playerState.hand.map((_, idx) => String(idx));
+  // Log the look action
+  const log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_LOOK_HAND',
+    `Sasuke Uchiwa (014): Revealed a random card from opponent's hand: ${revealedCard.name_fr}.`,
+    'game.log.effect.sasuke014Reveal',
+    { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: revealedCard.name_fr },
+  );
+
+  const newState = { ...state, log };
+
+  // Embed card data as JSON in description (parsed by gameStore for INFO_REVEAL UI)
+  const revealData = JSON.stringify({
+    text: isUpgrade
+      ? `Sasuke (014): Revealed ${revealedCard.name_fr}. You may now discard a card to discard one from the opponent's hand.`
+      : `Sasuke (014): Revealed ${revealedCard.name_fr} from opponent's hand.`,
+    cardName: revealedCard.name_fr,
+    cardCost: revealedCard.chakra,
+    cardPower: revealedCard.power,
+    cardImageFile: revealedCard.image_file,
+    isUpgrade,
+    randomIndex,
+  });
 
   return {
     state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE_014_DISCARD_OWN',
-    validTargets,
-    description: 'Discard 1 card from your hand to then discard 1 card from the opponent\'s hand.',
-    descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+    targetSelectionType: 'SASUKE014_HAND_REVEAL',
+    validTargets: ['confirm'],
+    description: revealData,
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.sasuke014RevealUpgrade'
+      : 'game.effect.desc.sasuke014Reveal',
+    descriptionParams: { target: revealedCard.name_fr },
   };
 }
 
