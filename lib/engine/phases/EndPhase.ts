@@ -155,14 +155,14 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
  * If there's exactly 1 valid destination, auto-move. If multiple destinations,
  * create a pending action so the player can choose.
  *
- * @param processedIds Set of instanceIds already processed this end phase (to prevent re-processing)
+ * Uses state.endPhaseMovedIds to track which Rock Lees have already been moved
+ * this End Phase, preventing infinite re-processing across multiple calls.
  */
 export function handleRockLee117Move(
   state: GameState,
-  processedIds?: Set<string>,
 ): GameState {
   let newState = { ...state };
-  const processed = processedIds ?? new Set<string>();
+  const alreadyMoved = new Set<string>(newState.endPhaseMovedIds ?? []);
 
   for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
     const mission = newState.activeMissions[mIdx];
@@ -171,7 +171,7 @@ export function handleRockLee117Move(
       const chars = mission[side];
 
       for (const char of chars) {
-        if (processed.has(char.instanceId)) continue;
+        if (alreadyMoved.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         // Rock Lee 117 (R) and 151 (M) both have the continuous move effect
@@ -222,11 +222,14 @@ export function handleRockLee117Move(
             'game.log.effect.endMove',
             { card: 'ROCK LEE', id: topCard.id },
           );
-          processed.add(char.instanceId);
+          alreadyMoved.add(char.instanceId);
+          newState.endPhaseMovedIds = [...alreadyMoved];
           break; // Break inner loop to avoid mutation issues, outer loop continues
         }
 
         // Multiple destinations: let the player choose
+        alreadyMoved.add(char.instanceId);
+        newState.endPhaseMovedIds = [...alreadyMoved];
         const effectId = `rl117-endmove-${char.instanceId}`;
         const actionId = `rl117-endmove-action-${char.instanceId}`;
         newState.pendingEffects = [...newState.pendingEffects, {
@@ -250,6 +253,7 @@ export function handleRockLee117Move(
           type: 'SELECT_TARGET',
           player,
           description: `Rock Lee (${topCard.number}): Choose a mission to move to at end of round.`,
+          descriptionKey: 'game.effect.desc.rockLeeEndMove',
           options: validDests.map(String),
           minSelections: 1,
           maxSelections: 1,

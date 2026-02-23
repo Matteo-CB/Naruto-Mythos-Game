@@ -463,6 +463,10 @@ export class EffectEngine {
         newState = EffectEngine.orochimaruExecuteSteal(newState, pendingEffect);
         break;
 
+      case 'ITACHI091_HAND_REVEAL':
+        newState = EffectEngine.itachi091ResolveReveal(newState, pendingEffect);
+        break;
+
       case 'LOOK_AT_HIDDEN_CHARACTER':
         // Dosu MAIN: just looking at a hidden character (info reveal)
         newState.log = logAction(
@@ -2469,6 +2473,57 @@ export class EffectEngine {
       'game.log.effect.takeControl',
       { card: 'Orochimaru', id: pending.sourceCardId, target: parsed.cardName },
     );
+
+    return newState;
+  }
+
+  /**
+   * Itachi 091 "Mangekyo Sharingan": Resolve the hand reveal.
+   * After the player acknowledges the revealed card:
+   * - If isUpgrade: discard the revealed card from opponent's hand, opponent draws 1 card.
+   * - If not upgrade: nothing more to do.
+   */
+  static itachi091ResolveReveal(state: GameState, pending: PendingEffect): GameState {
+    let parsed: { cardName: string; isUpgrade: boolean; randomIndex: number };
+    try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
+
+    if (!parsed.isUpgrade) {
+      // Base MAIN: just the reveal, nothing more
+      return state;
+    }
+
+    // UPGRADE: discard the revealed card from opponent's hand, opponent draws 1 card
+    const newState = deepClone(state);
+    const opponentPlayer = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const ps = newState[opponentPlayer];
+
+    if (parsed.randomIndex >= 0 && parsed.randomIndex < ps.hand.length) {
+      const hand = [...ps.hand];
+      const discardedCard = hand.splice(parsed.randomIndex, 1)[0];
+      ps.hand = hand;
+      ps.discardPile = [...ps.discardPile, discardedCard];
+
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', pending.sourcePlayer,
+        'EFFECT_DISCARD_FROM_HAND',
+        `Itachi (091) UPGRADE: Discarded ${discardedCard.name_fr} from opponent's hand.`,
+        'game.log.effect.itachi091Discard',
+        { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: discardedCard.name_fr },
+      );
+
+      // Opponent draws 1 card
+      if (ps.deck.length > 0) {
+        const drawn = ps.deck.shift()!;
+        ps.hand = [...ps.hand, drawn];
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', opponentPlayer,
+          'DRAW',
+          `${opponentPlayer} draws 1 card (Itachi 091 upgrade replacement).`,
+          'game.log.effect.itachi091Draw',
+          { card: 'ITACHI UCHIWA', id: 'KS-091-UC' },
+        );
+      }
+    }
 
     return newState;
   }

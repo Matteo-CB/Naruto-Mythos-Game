@@ -267,9 +267,11 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
 function MissionCardDisplay({
   mission,
   index,
+  myPlayer,
 }: {
   mission: VisibleMission;
   index: number;
+  myPlayer: PlayerID;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -358,7 +360,7 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
-      {/* Won indicator */}
+      {/* Won/Lost indicator */}
       {mission.wonBy && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
@@ -370,10 +372,10 @@ function MissionCardDisplay({
             className="text-sm font-bold px-3 py-1 rounded"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
-              color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e',
+              color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
             }}
           >
-            {t('game.board.won')}
+            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
           </span>
         </motion.div>
       )}
@@ -510,7 +512,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
             }}
           />
         )}
-        <MissionCardDisplay mission={mission} index={missionIndex} />
+        <MissionCardDisplay mission={mission} index={missionIndex} myPlayer={myPlayer} />
       </div>
 
       {/* Player characters */}

@@ -127,6 +127,11 @@ export interface GameState {
   missionScoredThisTurn: boolean;
   /** Tracks progress through mission scoring when SCORE effects require target selection */
   missionScoringProgress?: MissionScoringProgress;
+  /** Instance IDs of Rock Lee characters already moved during this End Phase */
+  endPhaseMovedIds?: string[];
+  /** Set when all mission scoring is complete but End Phase hasn't run yet.
+   * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
+  missionScoringComplete?: boolean;
   /** Which player forfeited (abandon or timeout) — if set, game is over */
   forfeitedBy?: PlayerID;
   /** Consecutive timeout count per player (online timer) */
@@ -220,7 +225,8 @@ export type GameAction =
   | { type: 'MULLIGAN'; doMulligan: boolean }
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
   | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }
-  | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' };
+  | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' }
+  | { type: 'ADVANCE_PHASE' };
 
 // ---------------------
 // Game Configuration

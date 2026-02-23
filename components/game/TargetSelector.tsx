@@ -307,7 +307,8 @@ export function TargetSelector() {
   // Info reveal mode: show the revealed card with a confirm button
   if (isInfoReveal && revealedCard) {
     const imagePath = revealedCard.image_file ? normalizeImagePath(revealedCard.image_file) : null;
-    const resultColor = revealedCard.canSteal ? '#c4a35a' : '#b33e3e';
+    const hasCustomKeys = !!revealedCard.revealTitleKey;
+    const resultColor = hasCustomKeys ? '#c4a35a' : (revealedCard.canSteal ? '#c4a35a' : '#b33e3e');
 
     return (
       <AnimatePresence>
@@ -327,7 +328,9 @@ export function TargetSelector() {
             className="text-sm font-bold uppercase tracking-widest mb-6"
             style={{ color: '#c4a35a' }}
           >
-            {t('game.effect.orochimaruReveal')}
+            {revealedCard.revealTitleKey
+              ? t(revealedCard.revealTitleKey)
+              : t('game.effect.orochimaruReveal')}
           </motion.span>
 
           {/* Card display */}
@@ -398,9 +401,11 @@ export function TargetSelector() {
               className="text-sm font-medium"
               style={{ color: resultColor }}
             >
-              {revealedCard.canSteal
-                ? t('game.effect.orochimaruSteal')
-                : t('game.effect.orochimaruTooExpensive')}
+              {revealedCard.revealResultKey
+                ? t(revealedCard.revealResultKey)
+                : revealedCard.canSteal
+                  ? t('game.effect.orochimaruSteal')
+                  : t('game.effect.orochimaruTooExpensive')}
             </span>
           </motion.div>
 

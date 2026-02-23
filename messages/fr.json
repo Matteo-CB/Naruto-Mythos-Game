@@ -138,7 +138,10 @@
         "costReduction": "Cout reduit de {amount}, paye {cost}.",
         "skipped": "{card} ({id}) : Effet passe.",
         "copySuccess": "{card} copie l'effet {effectType} de {target} !",
-        "copyFailed": "Copie d'effet echouee : cible invalide."
+        "copyFailed": "Copie d'effet echouee : cible invalide.",
+        "itachi091Reveal": "{card} ({id}) : {target} revelee de la main adverse.",
+        "itachi091Discard": "{card} ({id}) : {target} defaussee de la main adverse.",
+        "itachi091Draw": "{card} ({id}) : L'adversaire pioche 1 carte de remplacement."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -186,6 +189,7 @@
       "pwr": "PUI",
       "pts": "pts",
       "won": "Gagne",
+      "lost": "Perdu",
       "handCount": "Main : {count}",
       "opponentHandCount": "Main adverse : {count}",
       "phaseLabel": "Phase",
@@ -205,6 +209,9 @@
       "orochimaruReveal": "Orochimaru — Infiltration",
       "orochimaruSteal": "Cout 3 ou moins — Prise de controle !",
       "orochimaruTooExpensive": "Cout trop eleve — Impossible de prendre le controle.",
+      "itachi091RevealTitle": "Itachi — Mangekyo Sharingan",
+      "itachi091RevealResult": "Carte aleatoire revelee de la main adverse.",
+      "itachi091DiscardResult": "La carte sera defaussee. L'adversaire pioche un remplacement.",
       "desc": {
         "chooseMissionMove": "Choisissez une mission pour y deplacer le personnage.",
         "chooseMissionPlaceHidden": "Choisissez une mission pour y placer le personnage cache.",
@@ -256,6 +263,8 @@
         "hiruzen002PlayLeafUpgrade": "Choisissez un personnage Village de Konoha de votre main a jouer (cout -1, + POWERUP 2).",
         "ino020TakeControl": "Selectionnez un personnage ennemi avec cout {costLimit} ou moins pour en prendre le controle.",
         "itachi091DiscardFromHand": "Selectionnez une carte de la main adverse a defausser.",
+        "itachi091Reveal": "Itachi (091) : {target} revelee de la main adverse.",
+        "itachi091RevealUpgrade": "Itachi (091) : {target} revelee. Cette carte sera defaussee.",
         "jiraiya008HideEnemy": "Selectionnez un personnage ennemi avec cout 3 ou moins a cacher.",
         "kabuto053DiscardFromHand": "Choisissez une carte de votre main a defausser.",
         "kabuto053ChooseMission": "Choisissez une mission pour y jouer {cardName} (cout {cost}).",
@@ -345,7 +354,8 @@
         "mss05ReturnToHand": "Choisissez un personnage allie dans cette mission a remettre en main.",
         "mss07ChooseDestination": "Choisissez une mission pour y deplacer le personnage cache.",
         "mss07MoveHidden": "Choisissez un personnage cache allie a deplacer.",
-        "mss08ChooseCard": "Choisissez une carte de votre main a placer comme personnage cache."
+        "mss08ChooseCard": "Choisissez une carte de votre main a placer comme personnage cache.",
+        "rockLeeEndMove": "Rock Lee : Choisissez une mission ou le deplacer (fin de round)."
       }
     },
     "anim": {
