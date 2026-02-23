@@ -50,6 +50,7 @@ function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'OROCHIMARU_LOOK_AND_STEAL',
     validTargets,
     description: 'Select a hidden enemy character in this mission to look at. If it costs 3 or less, take control of it.',
+    descriptionKey: 'game.effect.desc.orochimaru050LookSteal',
   };
 }
 

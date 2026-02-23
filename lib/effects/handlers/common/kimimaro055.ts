@@ -74,6 +74,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KIMIMARO_CHOOSE_DISCARD',
     validTargets: handIndices,
     description: `Kimimaro (055): Choose a card to discard, then hide a character with cost 3 or less.`,
+    descriptionKey: 'game.effect.desc.kimimaro055DiscardAndHide',
   };
 }
 

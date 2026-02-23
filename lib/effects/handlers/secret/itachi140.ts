@@ -138,6 +138,8 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
         targetSelectionType: 'DEFEAT_BY_COST_UPGRADE',
         validTargets: validTargets.map((t) => t.char.instanceId),
         description: `Itachi Uchiwa (140): Select an enemy character with cost ${x} or less to defeat (upgrade).`,
+        descriptionKey: 'game.effect.desc.itachi140DefeatByCost',
+        descriptionParams: { cost: x },
       };
     }
 

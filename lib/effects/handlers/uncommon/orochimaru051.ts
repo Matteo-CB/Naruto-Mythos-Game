@@ -81,6 +81,7 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'OROCHIMARU051_DEFEAT_HIDDEN',
     validTargets,
     description: 'Select a hidden enemy character in play to defeat.',
+    descriptionKey: 'game.effect.desc.orochimaru051DefeatHidden',
   };
 }
 

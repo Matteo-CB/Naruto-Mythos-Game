@@ -64,6 +64,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MOVE_FRIENDLY_SAND_VILLAGE',
     validTargets,
     description: 'Temari (080): Select a friendly Sand Village character to move to another mission.',
+    descriptionKey: 'game.effect.desc.temari080MoveFriendly',
   };
 }
 
@@ -131,6 +132,7 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MOVE_SELF_TO_MISSION',
     validTargets: validMissions,
     description: 'Temari (080) UPGRADE: Select a mission to move this character to.',
+    descriptionKey: 'game.effect.desc.temari080MoveSelf',
   };
 }
 

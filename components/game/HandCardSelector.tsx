@@ -147,7 +147,7 @@ export function HandCardSelector() {
     return null;
   }
 
-  const { handCards, description, onDecline, playerName } = pendingTargetSelection;
+  const { handCards, description, descriptionKey, descriptionParams, onDecline, playerName } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
 
@@ -212,7 +212,7 @@ export function HandCardSelector() {
           }}
         >
           <span className="text-xs text-center leading-relaxed" style={{ color: '#e0e0e0' }}>
-            {description}
+            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </span>
         </motion.div>
 

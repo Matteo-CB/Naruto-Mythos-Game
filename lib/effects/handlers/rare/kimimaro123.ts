@@ -84,6 +84,7 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KIMIMARO123_CHOOSE_DISCARD',
     validTargets: handIndices,
     description: 'Kimimaro (123) UPGRADE: Choose a card to discard. Then choose a character with cost 5 or less to defeat.',
+    descriptionKey: 'game.effect.desc.kimimaro123Discard',
   };
 }
 

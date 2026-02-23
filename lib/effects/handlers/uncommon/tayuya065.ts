@@ -56,6 +56,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TAYUYA065_POWERUP_SOUND',
     validTargets,
     description: 'Select a friendly Sound Village character in play to give POWERUP 2.',
+    descriptionKey: 'game.effect.desc.tayuya065PowerupSound',
   };
 }
 

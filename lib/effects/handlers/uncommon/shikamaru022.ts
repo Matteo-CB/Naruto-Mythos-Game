@@ -43,6 +43,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'SHIKAMARU_MOVE_ENEMY',
     validTargets,
     description: 'Select an enemy character to move to another mission.',
+    descriptionKey: 'game.effect.desc.shikamaru022MoveEnemy',
   };
 }
 

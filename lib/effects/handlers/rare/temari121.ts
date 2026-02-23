@@ -54,6 +54,7 @@ function temari121MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TEMARI121_MOVE_FRIENDLY',
     validTargets,
     description: 'Temari (121) MAIN: Choose a friendly character in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.temari121MoveFriendly',
   };
 }
 
@@ -101,6 +102,7 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TEMARI121_MOVE_ANY',
     validTargets,
     description: 'Temari (121) UPGRADE: Choose any character in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.temari121MoveAny',
   };
 }
 

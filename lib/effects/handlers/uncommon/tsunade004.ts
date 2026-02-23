@@ -78,6 +78,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'RECOVER_FROM_DISCARD',
     validTargets,
     description: 'Choose a character from your discard pile to put into your hand.',
+    descriptionKey: 'game.effect.desc.tsunade004RecoverFromDiscard',
   };
 }
 

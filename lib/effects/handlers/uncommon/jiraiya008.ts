@@ -159,6 +159,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
         targetSelectionType: 'JIRAIYA_HIDE_ENEMY_COST_3',
         validTargets: hideTargets,
         description: 'Select an enemy character with cost 3 or less in this mission to hide (upgrade effect).',
+        descriptionKey: 'game.effect.desc.jiraiya008HideEnemy',
       };
     }
   }

@@ -23,6 +23,10 @@ export interface EffectResult {
   targetSelectionType?: string;
   validTargets?: string[];
   description?: string;
+  /** i18n key for the description (used by TargetSelector/HandCardSelector for translation). */
+  descriptionKey?: string;
+  /** Interpolation params for descriptionKey. */
+  descriptionParams?: Record<string, string | number>;
   /** Override which player performs the target selection (e.g., opponent discards in MSS 03). */
   selectingPlayer?: PlayerID;
 }

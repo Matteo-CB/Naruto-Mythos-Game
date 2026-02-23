@@ -72,6 +72,7 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'NEJI037_REMOVE_ALL_TOKENS',
     validTargets,
     description: 'Select an enemy character in this mission to remove all Power tokens from.',
+    descriptionKey: 'game.effect.desc.neji037RemoveTokens',
   };
 }
 

@@ -73,6 +73,7 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KANKURO119_DEFEAT_TARGET',
     validTargets,
     description: 'Kankuro (119): Choose an enemy character with Power 3 or less to defeat.',
+    descriptionKey: 'game.effect.desc.kankuro119Defeat',
   };
 }
 
@@ -116,6 +117,7 @@ function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KANKURO119_MOVE_CHARACTER',
     validTargets,
     description: 'Kankuro (119) UPGRADE: Choose a character in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.kankuro119MoveCharacter',
   };
 }
 

@@ -87,6 +87,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'CHOJI_018_MOVE_SELF',
     validTargets,
     description: 'Select a mission to move Choji Akimichi to (upgrade effect).',
+    descriptionKey: 'game.effect.desc.choji018MoveSelf',
   };
 }
 

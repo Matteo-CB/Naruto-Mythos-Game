@@ -51,6 +51,7 @@ function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
     validTargets,
     description: 'Dosu Kinuta (069) UPGRADE: Select a hidden character in play to look at.',
+    descriptionKey: 'game.effect.desc.dosu069LookAtHidden',
   };
 }
 
@@ -90,6 +91,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'FORCE_REVEAL_OR_DEFEAT',
     validTargets,
     description: 'Dosu Kinuta (069): Select a hidden enemy character. Opponent must reveal them (paying cost + 2 chakra) or defeat them.',
+    descriptionKey: 'game.effect.desc.dosu069ForceRevealOrDefeat',
   };
 }
 

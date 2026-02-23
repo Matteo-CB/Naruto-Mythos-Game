@@ -88,6 +88,8 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'DEFEAT_ENEMY_BY_COST',
       validTargets: validTargets.map((t) => t.char.instanceId),
       description: `Gaara (139): Select an enemy character with cost less than ${hiddenCount} to defeat.`,
+      descriptionKey: 'game.effect.desc.gaara139Defeat',
+      descriptionParams: { hiddenCount },
     };
   }
 

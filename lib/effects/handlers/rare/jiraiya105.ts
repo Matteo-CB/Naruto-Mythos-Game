@@ -53,6 +53,7 @@ function jiraiya105MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
     validTargets: affordableSummonIndices,
     description: 'Jiraiya (105): Choose a Summon character from your hand to play (paying 3 less).',
+    descriptionKey: 'game.effect.desc.jiraiya105ChooseSummon',
   };
 }
 
@@ -92,6 +93,7 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'JIRAIYA105_MOVE_ENEMY',
     validTargets: allValidTargets,
     description: 'Jiraiya (105) UPGRADE: Choose an enemy character in this mission to move to another mission.',
+    descriptionKey: 'game.effect.desc.jiraiya105MoveEnemy',
   };
 }
 

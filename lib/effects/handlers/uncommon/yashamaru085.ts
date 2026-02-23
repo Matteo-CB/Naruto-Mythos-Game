@@ -109,6 +109,7 @@ function handleYashamaru085Score(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DEFEAT_ANY_CHARACTER_THIS_MISSION',
     validTargets,
     description: 'Yashamaru (085) SCORE: Self was defeated. Select another character in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.yashamaru085ScoreDefeatAnother',
   };
 }
 

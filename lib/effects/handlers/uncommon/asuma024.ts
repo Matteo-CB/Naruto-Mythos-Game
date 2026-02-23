@@ -57,6 +57,7 @@ function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ASUMA_024_DISCARD_FOR_POWERUP',
     validTargets,
     description: 'Discard a card from your hand to give Asuma POWERUP 3. (Optional - decline to skip POWERUP.)',
+    descriptionKey: 'game.effect.desc.asuma024DiscardForPowerup',
   };
 }
 

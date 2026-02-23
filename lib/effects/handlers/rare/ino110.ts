@@ -99,6 +99,10 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
       description: isUpgrade
         ? `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission, then hide them.`
         : `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission.`,
+      descriptionKey: isUpgrade
+        ? 'game.effect.desc.ino110MoveAndHide'
+        : 'game.effect.desc.ino110Move',
+      descriptionParams: { target: weakest[0].card.name_fr, power: getEffectivePower(weakest[0]) },
     };
   }
 
@@ -113,6 +117,9 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     description: isUpgrade
       ? 'Ino Yamanaka (110) MAIN+UPGRADE: Choose the weakest enemy character to move and hide.'
       : 'Ino Yamanaka (110) MAIN: Choose the weakest enemy character to move from this mission.',
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.ino110ChooseMoveHide'
+      : 'game.effect.desc.ino110ChooseMove',
   };
 }
 

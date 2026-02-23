@@ -6,6 +6,8 @@ import { calculateCharacterPower } from '../phases/PowerCalculation';
 export interface ValidationResult {
   valid: boolean;
   reason?: string;
+  reasonKey?: string;
+  reasonParams?: Record<string, string | number>;
 }
 
 /**
@@ -20,13 +22,13 @@ export function validatePlayCharacter(
 ): ValidationResult {
   // Mission must exist
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
-    return { valid: false, reason: 'Invalid mission index.' };
+    return { valid: false, reason: 'Invalid mission index.', reasonKey: 'game.error.invalidMission' };
   }
 
   // Must have enough chakra
   const ps = state[player];
   if (ps.chakra < effectiveCost) {
-    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.` };
+    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
   }
 
   // Name uniqueness: no other character with the same name by this player on this mission
@@ -43,7 +45,7 @@ export function validatePlayCharacter(
   });
 
   if (sameName) {
-    return { valid: false, reason: `Already have a ${card.name_fr} on this mission.` };
+    return { valid: false, reason: `Already have a ${card.name_fr} on this mission.`, reasonKey: 'game.error.duplicateName', reasonParams: { name: card.name_fr } };
   }
 
   // Tenten 040 special: can only play in mission where currently winning
@@ -53,7 +55,7 @@ export function validatePlayCharacter(
     );
     if (hasTentenRestriction) {
       if (!isWinningMission(state, player, missionIndex)) {
-        return { valid: false, reason: 'Tenten can only be played on a mission where you are currently winning.' };
+        return { valid: false, reason: 'Tenten can only be played on a mission where you are currently winning.', reasonKey: 'game.error.tentenRestriction' };
       }
     }
   }
@@ -71,12 +73,12 @@ export function validatePlayHidden(
   missionIndex: number,
 ): ValidationResult {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
-    return { valid: false, reason: 'Invalid mission index.' };
+    return { valid: false, reason: 'Invalid mission index.', reasonKey: 'game.error.invalidMission' };
   }
 
   const ps = state[player];
   if (ps.chakra < HIDDEN_PLAY_COST) {
-    return { valid: false, reason: `Not enough chakra to play hidden (need ${HIDDEN_PLAY_COST}).` };
+    return { valid: false, reason: `Not enough chakra to play hidden (need ${HIDDEN_PLAY_COST}).`, reasonKey: 'game.error.notEnoughChakraHidden', reasonParams: { need: HIDDEN_PLAY_COST } };
   }
 
   // Shikamaru 111 (R): Opponent cannot play characters hidden in this mission
@@ -91,7 +93,7 @@ export function validatePlayHidden(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
       );
       if (hasRestriction) {
-        return { valid: false, reason: 'Shikamaru Nara blocks playing characters hidden in this mission.' };
+        return { valid: false, reason: 'Shikamaru Nara blocks playing characters hidden in this mission.', reasonKey: 'game.error.shikamaruBlock' };
       }
     }
   }
@@ -112,7 +114,7 @@ export function validateRevealCharacter(
   characterInstanceId: string,
 ): ValidationResult {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
-    return { valid: false, reason: 'Invalid mission index.' };
+    return { valid: false, reason: 'Invalid mission index.', reasonKey: 'game.error.invalidMission' };
   }
 
   const mission = state.activeMissions[missionIndex];
@@ -120,15 +122,15 @@ export function validateRevealCharacter(
   const char = chars.find((c) => c.instanceId === characterInstanceId);
 
   if (!char) {
-    return { valid: false, reason: 'Character not found.' };
+    return { valid: false, reason: 'Character not found.', reasonKey: 'game.error.characterNotFound' };
   }
 
   if (!char.isHidden) {
-    return { valid: false, reason: 'Character is already face-up.' };
+    return { valid: false, reason: 'Character is already face-up.', reasonKey: 'game.error.alreadyFaceUp' };
   }
 
   if (char.controlledBy !== player) {
-    return { valid: false, reason: 'Cannot reveal opponent\'s character.' };
+    return { valid: false, reason: 'Cannot reveal opponent\'s character.', reasonKey: 'game.error.cannotRevealOpponent' };
   }
 
   // Use topCard for upgraded hidden characters
@@ -138,7 +140,7 @@ export function validateRevealCharacter(
   const effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   const ps = state[player];
   if (ps.chakra < effectiveCost) {
-    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.` };
+    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
   }
 
   // Name uniqueness check after reveal
@@ -161,7 +163,7 @@ export function validateRevealCharacter(
       // Valid: this will be a reveal-for-upgrade
       return { valid: true };
     }
-    return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.` };
+    return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
   }
 
   return { valid: true };
@@ -178,7 +180,7 @@ export function validateUpgradeCharacter(
   targetInstanceId: string,
 ): ValidationResult {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
-    return { valid: false, reason: 'Invalid mission index.' };
+    return { valid: false, reason: 'Invalid mission index.', reasonKey: 'game.error.invalidMission' };
   }
 
   const mission = state.activeMissions[missionIndex];
@@ -186,11 +188,11 @@ export function validateUpgradeCharacter(
   const target = chars.find((c) => c.instanceId === targetInstanceId);
 
   if (!target) {
-    return { valid: false, reason: 'Target character not found.' };
+    return { valid: false, reason: 'Target character not found.', reasonKey: 'game.error.targetNotFound' };
   }
 
   if (target.controlledBy !== player) {
-    return { valid: false, reason: 'Cannot upgrade opponent\'s character.' };
+    return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
   const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
@@ -201,20 +203,20 @@ export function validateUpgradeCharacter(
   if (!isFlexibleUpgrade) {
     // Standard upgrade: must be same name
     if (newCard.name_fr.toUpperCase() !== topCard.name_fr.toUpperCase()) {
-      return { valid: false, reason: 'Upgrade must be same character name.' };
+      return { valid: false, reason: 'Upgrade must be same character name.', reasonKey: 'game.error.upgradeSameName' };
     }
   }
 
   // Must have strictly higher cost
   if (newCard.chakra <= topCard.chakra) {
-    return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.` };
+    return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.`, reasonKey: 'game.error.upgradeHigherCost', reasonParams: { newCost: newCard.chakra, currentCost: topCard.chakra } };
   }
 
   // Pay only the difference
   const costDiff = newCard.chakra - topCard.chakra;
   const ps = state[player];
   if (ps.chakra < costDiff) {
-    return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.` };
+    return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakraUpgrade', reasonParams: { need: costDiff, have: ps.chakra } };
   }
 
   return { valid: true };

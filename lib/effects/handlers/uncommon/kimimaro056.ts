@@ -86,6 +86,7 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KIMIMARO056_CHOOSE_DISCARD',
     validTargets: handIndices,
     description: 'Kimimaro (056): Choose a card to discard, then hide a character with cost 4 or less.',
+    descriptionKey: 'game.effect.desc.kimimaro056DiscardAndHide',
   };
 }
 

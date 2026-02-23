@@ -20,6 +20,8 @@ interface AnimationEvent {
 interface PendingTargetSelection {
   validTargets: string[]; // instanceIds
   description: string;
+  descriptionKey?: string; // i18n key for translated description
+  descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL'; // type of selection
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
@@ -50,6 +52,8 @@ interface GameStore {
 
   // Action error feedback (e.g., name uniqueness violation)
   actionError: string | null;
+  actionErrorKey: string | null;
+  actionErrorParams: Record<string, string | number> | null;
 
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
@@ -294,6 +298,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isAnimating: false,
   pendingTargetSelection: null,
   actionError: null,
+  actionErrorKey: null,
+  actionErrorParams: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
     const humanName = playerName || 'Player';
@@ -372,6 +378,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
+          descriptionKey: pendingAction.descriptionKey,
+          descriptionParams: pendingAction.descriptionParams,
           selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
@@ -504,22 +512,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (!logGrew) {
         // Action was rejected — get the specific validation reason
         let errorReason = '';
+        let errorKey: string | null = null;
+        let errorParams: Record<string, string | number> | null = null;
         if (action.type === 'PLAY_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
           const card = gameState[humanPlayer].hand[action.cardIndex];
           const effCost = calculateEffectiveCost(gameState, humanPlayer, card, action.missionIndex, false);
           const result = validatePlayCharacter(gameState, humanPlayer, card, action.missionIndex, effCost);
           errorReason = result.reason ?? '';
+          errorKey = result.reasonKey ?? null;
+          errorParams = result.reasonParams ?? null;
         } else if (action.type === 'PLAY_HIDDEN' && action.cardIndex < gameState[humanPlayer].hand.length) {
           const card = gameState[humanPlayer].hand[action.cardIndex];
           const result = validatePlayHidden(gameState, humanPlayer, card, action.missionIndex);
           errorReason = result.reason ?? '';
+          errorKey = result.reasonKey ?? null;
+          errorParams = result.reasonParams ?? null;
         } else if (action.type === 'UPGRADE_CHARACTER' && action.cardIndex < gameState[humanPlayer].hand.length) {
           errorReason = 'Invalid upgrade target.';
+          errorKey = 'game.error.invalidUpgradeTarget';
         }
-        set({ isProcessing: false, actionError: errorReason || 'Action not allowed.' });
+        set({
+          isProcessing: false,
+          actionError: errorReason || 'Action not allowed.',
+          actionErrorKey: errorKey || 'game.error.actionNotAllowed',
+          actionErrorParams: errorParams,
+        });
         // Auto-clear error after 4 seconds
         setTimeout(() => {
-          if (get().actionError) set({ actionError: null });
+          if (get().actionError) set({ actionError: null, actionErrorKey: null, actionErrorParams: null });
         }, 4000);
         return;
       }
@@ -532,6 +552,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameState: newState,
       visibleState: newVisible,
       actionError: null,
+      actionErrorKey: null,
+      actionErrorParams: null,
     });
 
     // Check if game is over
@@ -644,6 +666,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
+          descriptionKey: pendingAction.descriptionKey,
+          descriptionParams: pendingAction.descriptionParams,
           selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
@@ -886,6 +910,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingTargetSelection: {
           validTargets: pendingAction.options,
           description: pendingAction.description,
+          descriptionKey: pendingAction.descriptionKey,
+          descriptionParams: pendingAction.descriptionParams,
           selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           playerName: get().playerDisplayNames[humanPlayer],

@@ -88,6 +88,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'DISCARD_FROM_OPPONENT_HAND',
     validTargets,
     description: 'Itachi Uchiwa (091) UPGRADE: Select a card from opponent\'s hand to discard.',
+    descriptionKey: 'game.effect.desc.itachi091DiscardFromHand',
   };
 }
 

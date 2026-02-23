@@ -62,6 +62,7 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'AKAMARU_028_POWERUP_KIBA',
     validTargets: kibaTargets,
     description: 'Select a friendly Kiba Inuzuka in this mission to give POWERUP 2.',
+    descriptionKey: 'game.effect.desc.akamaru028PowerupKiba',
   };
 }
 

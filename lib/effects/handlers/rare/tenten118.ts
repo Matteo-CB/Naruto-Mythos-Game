@@ -50,6 +50,7 @@ function handleTenten118Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION',
     validTargets,
     description: 'Select a hidden character in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.tenten118DefeatHidden',
   };
 }
 

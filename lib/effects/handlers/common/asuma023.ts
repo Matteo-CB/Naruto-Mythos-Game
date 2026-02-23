@@ -47,6 +47,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ASUMA_CHOOSE_TEAM10',
     validTargets,
     description: 'Asuma Sarutobi (023): Choose a Team 10 character in this mission to move.',
+    descriptionKey: 'game.effect.desc.asuma023MoveTeam10',
   };
 }
 

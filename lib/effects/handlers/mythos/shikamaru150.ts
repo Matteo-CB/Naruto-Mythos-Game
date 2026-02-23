@@ -69,6 +69,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
         targetSelectionType: 'SHIKAMARU150_CHOOSE_HIDE',
         validTargets: validTargets.map((c) => c.instanceId),
         description: 'Shikamaru Nara (150): Choose an enemy with Power 3 or less in this mission to hide.',
+        descriptionKey: 'game.effect.desc.shikamaru150HideEnemy',
       };
     }
 

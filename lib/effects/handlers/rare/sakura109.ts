@@ -53,6 +53,9 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
     description: ctx.isUpgrade
       ? 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play (paying 2 less).'
       : 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play.',
+    descriptionKey: ctx.isUpgrade
+      ? 'game.effect.desc.sakura109PlayFromDiscardUpgrade'
+      : 'game.effect.desc.sakura109PlayFromDiscard',
   };
 }
 

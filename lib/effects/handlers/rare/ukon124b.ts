@@ -66,6 +66,7 @@ function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'UKON124B_HIDE_TARGET',
     validTargets,
     description: 'Ukon (124b) AMBUSH: Choose an enemy character with Power 5 or less to hide.',
+    descriptionKey: 'game.effect.desc.ukon124bHide',
   };
 }
 

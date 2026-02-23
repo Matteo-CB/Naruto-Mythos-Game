@@ -92,6 +92,7 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'HINATA114_POWERUP_TARGET',
     validTargets,
     description: 'Hinata Hyuga (114): Choose another character in play to give POWERUP 1.',
+    descriptionKey: 'game.effect.desc.hinata114Powerup',
   };
 }
 
@@ -175,6 +176,7 @@ function hinata114UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'HINATA114_REMOVE_TOKENS',
     validTargets,
     description: 'Hinata Hyuga (114) UPGRADE: Choose an enemy character to remove all Power tokens from.',
+    descriptionKey: 'game.effect.desc.hinata114RemoveTokens',
   };
 }
 

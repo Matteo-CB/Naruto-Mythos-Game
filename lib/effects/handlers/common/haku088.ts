@@ -60,6 +60,7 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'PUT_CARD_ON_DECK',
     validTargets: handIndices,
     description: `Haku (088): Choose a card from your hand to put on top of your deck.`,
+    descriptionKey: 'game.effect.desc.haku088PutBack',
   };
 }
 

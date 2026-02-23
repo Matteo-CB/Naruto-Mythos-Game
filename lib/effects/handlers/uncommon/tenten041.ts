@@ -67,6 +67,7 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TENTEN_DEFEAT_HIDDEN',
     validTargets,
     description: 'Select a hidden character in this mission to defeat.',
+    descriptionKey: 'game.effect.desc.tenten041DefeatHidden',
   };
 }
 
@@ -108,6 +109,7 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TENTEN_POWERUP_LEAF',
     validTargets,
     description: 'Select a friendly Leaf Village character in play to give POWERUP 1.',
+    descriptionKey: 'game.effect.desc.tenten041PowerupLeaf',
   };
 }
 

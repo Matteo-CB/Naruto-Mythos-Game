@@ -53,6 +53,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'POWERUP_2_LEAF_VILLAGE',
     validTargets,
     description: 'Select a friendly Leaf Village character to give POWERUP 2.',
+    descriptionKey: 'game.effect.desc.hiruzen001Powerup',
   };
 }
 

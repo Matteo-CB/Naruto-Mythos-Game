@@ -299,7 +299,7 @@ export function TargetSelector() {
   // Hand selection is handled by HandCardSelector
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
-  const { validTargets, description, onDecline, playerName, revealedCard } = pendingTargetSelection;
+  const { validTargets, description, descriptionKey, descriptionParams, onDecline, playerName, revealedCard } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
@@ -489,7 +489,7 @@ export function TargetSelector() {
             className="text-xs text-center leading-relaxed"
             style={{ color: '#e0e0e0' }}
           >
-            {description}
+            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </span>
           <span
             className="text-[10px]"

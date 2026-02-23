@@ -27,6 +27,8 @@ interface BaseQuestion {
   questionTextKey: string;
   questionParams?: Record<string, string>;
   questionImage?: string;
+  /** Which zone to censor on card images (e.g., 'name' hides the name band at top). */
+  censorZone?: 'name' | 'none';
   explanationKey: string;
   explanationParams?: Record<string, string>;
 }
@@ -506,6 +508,7 @@ const genIdentifyCard: Gen = (chars, _, rng) => {
     difficulty: 1,
     questionTextKey: 'quiz.q.identifyCard',
     questionImage: correct.image_file,
+    censorZone: 'name' as const,
     options,
     correctIndex: options.indexOf(correct.name_fr),
     explanationKey: 'quiz.exp.cardIs',
@@ -545,6 +548,7 @@ const genMatchImagePairs: Gen = (chars, _, rng) => {
     category: 'identity',
     difficulty: 2,
     questionTextKey: 'quiz.q.matchImage',
+    censorZone: 'name' as const,
     pairs: selected.map((c) => ({
       left: c.name_fr,
       right: c.name_fr,
@@ -767,6 +771,7 @@ const genIdentifyMission: Gen = (_, missions, rng) => {
     difficulty: 2,
     questionTextKey: 'quiz.q.identifyMission',
     questionImage: correct.image_file,
+    censorZone: 'name' as const,
     options,
     correctIndex: options.indexOf(correct.name_fr),
     explanationKey: 'quiz.exp.missionIs',

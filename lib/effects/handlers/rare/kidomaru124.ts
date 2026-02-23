@@ -91,6 +91,9 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
     description: wasUpgraded
       ? 'Kidomaru (124) AMBUSH (UPGRADE): Choose an enemy with Power 5 or less in another mission to defeat.'
       : 'Kidomaru (124) AMBUSH: Choose an enemy with Power 3 or less in another mission to defeat.',
+    descriptionKey: wasUpgraded
+      ? 'game.effect.desc.kidomaru124DefeatUpgrade'
+      : 'game.effect.desc.kidomaru124Defeat',
   };
 }
 

@@ -40,6 +40,7 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
     targetSelectionType: 'JIRAIYA_CHOOSE_SUMMON',
     validTargets: affordableSummonIndices,
     description: 'Jiraiya (007): Choose a Summon character from your hand to play (paying 1 less).',
+    descriptionKey: 'game.effect.desc.jiraiya007ChooseSummon',
   };
 }
 

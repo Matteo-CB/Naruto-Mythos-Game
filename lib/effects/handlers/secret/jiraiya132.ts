@@ -63,6 +63,7 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'JIRAIYA132_CHOOSE_SUMMON',
       validTargets: affordableSummons.map((s) => String(s.handIndex)),
       description: 'Jiraya (132): Choose a Summon character from your hand to play (paying 5 less).',
+      descriptionKey: 'game.effect.desc.jiraiya132ChooseSummon',
     };
   }
 

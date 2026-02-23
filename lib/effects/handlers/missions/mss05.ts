@@ -55,6 +55,7 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'MSS05_RETURN_TO_HAND',
     validTargets,
     description: 'MSS 05 (Bring it Back): Choose a friendly character in this mission to return to your hand (mandatory).',
+    descriptionKey: 'game.effect.desc.mss05ReturnToHand',
   };
 }
 

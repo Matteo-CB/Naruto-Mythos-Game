@@ -89,6 +89,7 @@ function asuma113bMainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'ASUMA113B_CHOOSE_DISCARD',
     validTargets: handIndices,
     description: 'Asuma Sarutobi (113b): Choose a card from your hand to discard. Then defeat a character with Power equal to or less than the discarded card\'s Power.',
+    descriptionKey: 'game.effect.desc.asuma113bDiscard',
   };
 }
 

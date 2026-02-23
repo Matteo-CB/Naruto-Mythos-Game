@@ -64,6 +64,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'NARUTO_MOVE_SELF',
     validTargets,
     description: 'Select a mission to move Naruto Uzumaki to.',
+    descriptionKey: 'game.effect.desc.naruto010MoveSelf',
   };
 }
 

@@ -71,6 +71,9 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     description: isUpgrade
       ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character from your hand to play (cost -1, + POWERUP 2).'
       : 'Hiruzen Sarutobi (002): Choose a Leaf Village character from your hand to play (cost -1).',
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.hiruzen002PlayLeafUpgrade'
+      : 'game.effect.desc.hiruzen002PlayLeaf',
   };
 }
 
