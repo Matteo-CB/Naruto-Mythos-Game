@@ -135,16 +135,16 @@ export default function CollectionPage() {
         {/* Card count */}
         <p className="text-xs text-[#555] mb-4">{t('collection.total', { count: filteredCards.length })}</p>
 
-        {/* Card grid */}
+        {/* Character card grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-          {filteredCards.map((card) => {
+          {filteredCards.filter((c) => c.card_type !== 'mission').map((card) => {
             const isBanned = bannedIds.has(card.id);
             const imgPath = isBanned ? null : getImagePath(card);
             return (
               <button
                 key={card.id}
                 onClick={() => setSelectedCard(card)}
-                className={`relative ${card.card_type === 'mission' ? 'mission-aspect' : 'card-aspect'} bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group`}
+                className="relative card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
                 style={{ opacity: isBanned ? 0.5 : 1 }}
               >
                 {imgPath ? (
@@ -178,6 +178,59 @@ export default function CollectionPage() {
             );
           })}
         </div>
+
+        {/* Mission cards section */}
+        {filteredCards.some((c) => c.card_type === 'mission') && (
+          <>
+            <div className="mt-8 mb-4 flex items-center gap-3">
+              <div className="flex-1 h-px bg-[#262626]" />
+              <span className="text-sm font-bold text-[#888888] uppercase tracking-wider">{t('collection.missions')}</span>
+              <div className="flex-1 h-px bg-[#262626]" />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {filteredCards.filter((c) => c.card_type === 'mission').map((card) => {
+                const isBanned = bannedIds.has(card.id);
+                const imgPath = isBanned ? null : getImagePath(card);
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => setSelectedCard(card)}
+                    className="relative mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                    style={{ opacity: isBanned ? 0.5 : 1 }}
+                  >
+                    {imgPath ? (
+                      <img
+                        src={imgPath}
+                        alt={getCardName(card, locale as 'en' | 'fr')}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                        width={200}
+                        height={140}
+                      />
+                    ) : isBanned ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-1" style={{ backgroundColor: '#1a1a1a' }}>
+                        <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#333333' }}>MYTHOS</div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-1">
+                        <div className="w-10 h-7 bg-[#1a1a1a] mb-1" />
+                        <span className="text-[8px] text-[#555] text-center leading-tight">
+                          {getCardName(card, locale as 'en' | 'fr')}
+                        </span>
+                      </div>
+                    )}
+                    {/* Rarity bar */}
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-0.5"
+                      style={{ backgroundColor: RARITY_COLORS[card.rarity] ?? '#555' }}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {/* Card detail modal */}
         {selectedCard && (

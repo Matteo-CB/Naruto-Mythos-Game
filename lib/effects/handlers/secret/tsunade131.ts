@@ -9,7 +9,7 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Group: Leaf Village, Keywords: Sannin
  *
  * MAIN: POWERUP 1 every friendly Leaf Village character in play.
- *   - Iterates all missions, finds all friendly Leaf Village characters (not self).
+ *   - Iterates all missions, finds all friendly Leaf Village characters (including self).
  *   - Adds 1 power token to each.
  *   - If no valid targets, logs and fizzles gracefully.
  */
@@ -30,10 +30,8 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
 
     for (let j = 0; j < friendlyChars.length; j++) {
       const char = friendlyChars[j];
-      // Skip self
-      if (char.instanceId === ctx.sourceCard.instanceId) continue;
 
-      // Check if this character is Leaf Village
+      // Check if this character is Leaf Village (includes self — card says "every", not "every other")
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.group === 'Leaf Village') {
         friendlyChars[j] = {

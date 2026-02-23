@@ -347,8 +347,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: result.validTargets ?? [],
-      isOptional: true, // All effects with target selection are optional per game rules
-      isMandatory: false,
+      isOptional: !result.isMandatory,
+      isMandatory: result.isMandatory ?? false,
       resolved: false,
       isUpgrade,
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
@@ -366,6 +366,7 @@ export class EffectEngine {
       tst === 'MSS03_OPPONENT_DISCARD' ||
       tst === 'SAKURA_012_DISCARD' ||
       tst === 'SASUKE_014_DISCARD_OWN' ||
+      tst === 'SASUKE_014_DISCARD_OPPONENT' ||
       tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
       tst === 'KABUTO053_DISCARD_FROM_HAND' ||
       tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
@@ -468,13 +469,15 @@ export class EffectEngine {
         break;
 
       case 'LOOK_AT_HIDDEN_CHARACTER':
-        // Dosu MAIN: just looking at a hidden character (info reveal)
-        newState.log = logAction(
-          newState.log, newState.turn, 'action', pendingEffect.sourcePlayer,
-          'EFFECT', `Looked at a hidden character.`,
-          'game.log.effect.lookAtHidden',
-          { card: 'Dosu Kinuta', id: pendingEffect.sourceCardId, target: '???' },
-        );
+        newState = EffectEngine.dosuLookAtHidden(newState, pendingEffect, targetId);
+        break;
+
+      case 'DOSU_LOOK_REVEAL':
+        // Acknowledgment only — no additional action needed
+        break;
+
+      case 'SASUKE014_HAND_REVEAL':
+        newState = EffectEngine.sasuke014ResolveReveal(newState, pendingEffect);
         break;
 
       case 'DEFEAT_HIDDEN_CHARACTER':
@@ -1587,7 +1590,7 @@ export class EffectEngine {
         break;
       }
       case 'SASUKE_014_DISCARD_OWN': {
-        // Stage 1: discard own card from hand
+        // Stage 1: discard own card from hand, then chain to opponent hand discard
         const idx_ss = parseInt(targetId, 10);
         const ps_ss = { ...newState[pendingEffect.sourcePlayer] };
         if (idx_ss >= 0 && idx_ss < ps_ss.hand.length) {
@@ -1596,6 +1599,50 @@ export class EffectEngine {
           ps_ss.hand = hand_ss;
           ps_ss.discardPile = [...ps_ss.discardPile, discarded_ss];
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps_ss };
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD',
+            `Sasuke Uchiwa (014) UPGRADE: Discarded ${discarded_ss.name_fr} from own hand.`,
+            'game.log.effect.sasuke014DiscardOwn',
+            { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discarded_ss.name_fr },
+          );
+
+          // Stage 2: choose a card from opponent's hand to discard
+          const opponentPlayer_ss = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const oppHand_ss = newState[opponentPlayer_ss].hand;
+          if (oppHand_ss.length > 0) {
+            const validOppTargets = oppHand_ss.map((_: unknown, i: number) => String(i));
+            const effectId_ss = generateInstanceId();
+            const actionId_ss = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId_ss,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: '',
+              targetSelectionType: 'SASUKE_014_DISCARD_OPPONENT',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validOppTargets,
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: true,
+            });
+            newState.pendingActions.push({
+              id: actionId_ss,
+              type: 'DISCARD_CARD',
+              player: pendingEffect.sourcePlayer,
+              description: 'Choose a card from the opponent\'s hand to discard.',
+              descriptionKey: 'game.effect.desc.sasuke014DiscardOpponent',
+              options: validOppTargets,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_ss,
+            });
+          }
         }
         break;
       }
@@ -1649,6 +1696,28 @@ export class EffectEngine {
           ps_op.hand = hand_op;
           ps_op.discardPile = [...ps_op.discardPile, discarded_op];
           newState = { ...newState, [opponent_op]: ps_op };
+        }
+        break;
+      }
+      case 'SASUKE_014_DISCARD_OPPONENT': {
+        // Stage 2 of Sasuke 014 UPGRADE: source player chooses a card from opponent's hand to discard
+        const idx_so = parseInt(targetId, 10);
+        const opp_so = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const ps_so = { ...newState[opp_so] };
+        if (idx_so >= 0 && idx_so < ps_so.hand.length) {
+          const hand_so = [...ps_so.hand];
+          const discarded_so = hand_so.splice(idx_so, 1)[0];
+          ps_so.hand = hand_so;
+          ps_so.discardPile = [...ps_so.discardPile, discarded_so];
+          newState = { ...newState, [opp_so]: ps_so };
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD_FROM_HAND',
+            `Sasuke Uchiwa (014) UPGRADE: Discarded ${discarded_so.name_fr} from opponent's hand.`,
+            'game.log.effect.sasuke014DiscardOpponent',
+            { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discarded_so.name_fr },
+          );
         }
         break;
       }
@@ -2478,6 +2547,73 @@ export class EffectEngine {
   }
 
   /**
+   * Dosu LOOK_AT_HIDDEN_CHARACTER: After selecting the hidden target,
+   * look at it and create an INFO_REVEAL pending to show the card info.
+   */
+  static dosuLookAtHidden(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    const charResult = EffectEngine.findCharByInstanceId(state, targetId);
+    if (!charResult || !charResult.character.isHidden) {
+      return {
+        ...state,
+        log: logAction(state.log, state.turn, 'action', pending.sourcePlayer,
+          'EFFECT_NO_TARGET', 'Dosu Kinuta: Target is no longer hidden.',
+          'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: pending.sourceCardId }),
+      };
+    }
+
+    const targetChar = charResult.character;
+    const newState = deepClone(state);
+
+    newState.log = logAction(
+      newState.log, newState.turn, 'action', pending.sourcePlayer,
+      'EFFECT', `Dosu Kinuta: Looked at hidden character ${targetChar.card.name_fr}.`,
+      'game.log.effect.lookAtHidden',
+      { card: 'DOSU KINUTA', id: pending.sourceCardId, target: targetChar.card.name_fr },
+    );
+
+    // Create a secondary INFO_REVEAL pending to show the card
+    const revealEffectId = generateInstanceId();
+    const revealActionId = generateInstanceId();
+    const revealData = JSON.stringify({
+      cardName: targetChar.card.name_fr,
+      cardCost: targetChar.card.chakra,
+      cardPower: targetChar.card.power,
+      cardImageFile: targetChar.card.image_file,
+    });
+
+    newState.pendingEffects.push({
+      id: revealEffectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: 'MAIN' as const,
+      effectDescription: revealData,
+      targetSelectionType: 'DOSU_LOOK_REVEAL',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: ['confirm'],
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: false,
+    });
+    newState.pendingActions.push({
+      id: revealActionId,
+      type: 'SELECT_TARGET',
+      player: pending.sourcePlayer,
+      description: `Dosu Kinuta: Revealed ${targetChar.card.name_fr} (Cost ${targetChar.card.chakra}, Power ${targetChar.card.power}).`,
+      descriptionKey: 'game.effect.desc.dosuLookReveal',
+      descriptionParams: { target: targetChar.card.name_fr, cost: String(targetChar.card.chakra), power: String(targetChar.card.power) },
+      options: ['confirm'],
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: revealEffectId,
+    });
+
+    return newState;
+  }
+
+  /**
    * Itachi 091 "Mangekyo Sharingan": Resolve the hand reveal.
    * After the player acknowledges the revealed card:
    * - If isUpgrade: discard the revealed card from opponent's hand, opponent draws 1 card.
@@ -2524,6 +2660,71 @@ export class EffectEngine {
         );
       }
     }
+
+    return newState;
+  }
+
+  /**
+   * Sasuke 014 "Sharingan": Resolve the hand reveal.
+   * After the player acknowledges the revealed card:
+   * - If isUpgrade: create pending for SASUKE_014_DISCARD_OWN (player discards own card, then chains to opponent discard)
+   * - If not upgrade: nothing more to do.
+   */
+  static sasuke014ResolveReveal(state: GameState, pending: PendingEffect): GameState {
+    let parsed: { isUpgrade: boolean };
+    try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
+
+    if (!parsed.isUpgrade) {
+      // Base AMBUSH: just the reveal, nothing more
+      return state;
+    }
+
+    // UPGRADE: chain to SASUKE_014_DISCARD_OWN (player must discard 1 from own hand)
+    const newState = deepClone(state);
+    const ps = newState[pending.sourcePlayer];
+
+    if (ps.hand.length === 0) {
+      // No cards to discard from own hand — upgrade portion fizzles
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Sasuke Uchiwa (014) UPGRADE: No cards in hand to discard, upgrade effect fizzles.',
+        'game.log.effect.noTarget',
+        { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
+      );
+      return newState;
+    }
+
+    const validTargets = ps.hand.map((_: unknown, idx: number) => String(idx));
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: '',
+      targetSelectionType: 'SASUKE_014_DISCARD_OWN',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: true,
+    });
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'DISCARD_CARD',
+      player: pending.sourcePlayer,
+      description: 'Discard 1 card from your hand to then discard 1 card from the opponent\'s hand.',
+      descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+      options: validTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
 
     return newState;
   }
@@ -3984,11 +4185,23 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const hasSameName = mission[friendlySide].some(c => {
+      const sameNameChar = mission[friendlySide].find(c => {
+        if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr === chosenCard.name_fr;
+        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
-      if (!hasSameName) validMissions.push(String(i));
+
+      if (!sameNameChar) {
+        // No same-name → fresh play is valid
+        validMissions.push(String(i));
+      } else {
+        // Same-name exists → check if upgrade is valid (strictly higher chakra)
+        const existingTopCard = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+          validMissions.push(String(i));
+        }
+      }
     }
 
     if (validMissions.length === 0) {
@@ -4053,7 +4266,7 @@ export class EffectEngine {
     return EffectEngine.sakura109Place(newState, player, missionIndex, cost, isUpgrade);
   }
 
-  /** Sakura 109 helper: place the card (last in discard) on the mission. */
+  /** Sakura 109 helper: place the card (last in discard) on the mission. Handles both fresh play and upgrade. */
   private static sakura109Place(state: GameState, player: PlayerID, missionIndex: number, cost: number, isUpgrade: boolean): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
@@ -4062,33 +4275,66 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const newChar: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card: card as any,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card as any],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
-
     const missions = [...state.activeMissions];
     const mission = { ...missions[missionIndex] };
-    mission[friendlySide] = [...mission[friendlySide], newChar];
-    missions[missionIndex] = mission;
-    state.activeMissions = missions;
 
-    ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide].findIndex(c => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    });
 
-    const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
-    state.log = logAction(
-      state.log, state.turn, state.phase, player,
-      'EFFECT_PLAY',
-      `Sakura Haruno (109): Played ${card.name_fr} from discard pile to mission ${missionIndex + 1}${costDesc}.`,
-      'game.log.effect.playFromDiscard',
-      { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
-    );
+    if (existingIdx >= 0) {
+      // Upgrade the existing character
+      const existing = mission[friendlySide][existingIdx];
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card: card as any,
+        stack: [...existing.stack, card as any],
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+
+      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
+      state.log = logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_UPGRADE',
+        `Sakura Haruno (109): Upgraded ${card.name_fr} from discard pile on mission ${missionIndex + 1}${costDesc}.`,
+        'game.log.effect.upgradeFromDiscard',
+        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      );
+    } else {
+      // Fresh play
+      const newChar: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card: card as any,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [card as any],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex,
+      };
+
+      mission[friendlySide] = [...mission[friendlySide], newChar];
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+
+      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
+      state.log = logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_PLAY',
+        `Sakura Haruno (109): Played ${card.name_fr} from discard pile to mission ${missionIndex + 1}${costDesc}.`,
+        'game.log.effect.playFromDiscard',
+        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      );
+    }
 
     return state;
   }
@@ -4147,18 +4393,30 @@ export class EffectEngine {
     // Pay cost
     ps.chakra -= cost;
 
-    // Find valid missions
+    // Find valid missions (fresh play or upgrade)
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const hasSameName = mission[friendlySide].some(c => {
+      const sameNameChar = mission[friendlySide].find(c => {
+        if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr === chosenCard.name_fr;
+        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
-      if (!hasSameName) validMissions.push(String(i));
+
+      if (!sameNameChar) {
+        // No same-name character → fresh play is valid
+        validMissions.push(String(i));
+      } else {
+        // Same-name exists → check if upgrade is valid (strictly higher chakra)
+        const existingTopCard = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+          validMissions.push(String(i));
+        }
+      }
     }
 
     if (validMissions.length === 0) {
@@ -4223,7 +4481,7 @@ export class EffectEngine {
     return EffectEngine.sakura135Place(newState, player, missionIndex, cost, isUpgrade);
   }
 
-  /** Sakura 135 helper: place card (last in discard) on mission. */
+  /** Sakura 135 helper: place card (last in discard) on mission. Handles both fresh play and upgrade. */
   private static sakura135Place(state: GameState, player: PlayerID, missionIndex: number, cost: number, isUpgrade: boolean): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
@@ -4232,33 +4490,67 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const newChar: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card: card as any,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card as any],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
-
     const missions = [...state.activeMissions];
     const mission = { ...missions[missionIndex] };
-    mission[friendlySide] = [...mission[friendlySide], newChar];
-    missions[missionIndex] = mission;
-    state.activeMissions = missions;
 
-    ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide].findIndex(c => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    });
 
-    const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
-    state.log = logAction(
-      state.log, state.turn, state.phase, player,
-      'EFFECT_PLAY',
-      `Sakura Haruno (135): Played ${card.name_fr} from top of deck to mission ${missionIndex + 1}${costDesc}.`,
-      'game.log.effect.playFromDeck',
-      { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
-    );
+    if (existingIdx >= 0) {
+      // Upgrade the existing character
+      const existing = mission[friendlySide][existingIdx];
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card: card as any,
+        stack: [...existing.stack, card as any],
+        // Power tokens transfer through upgrade
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+
+      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
+      state.log = logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_UPGRADE',
+        `Sakura Haruno (135): Upgraded ${card.name_fr} on mission ${missionIndex + 1}${costDesc}.`,
+        'game.log.effect.upgradeFromDeck',
+        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      );
+    } else {
+      // Fresh play
+      const newChar: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card: card as any,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [card as any],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex,
+      };
+
+      mission[friendlySide] = [...mission[friendlySide], newChar];
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+
+      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
+      state.log = logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_PLAY',
+        `Sakura Haruno (135): Played ${card.name_fr} from top of deck to mission ${missionIndex + 1}${costDesc}.`,
+        'game.log.effect.playFromDeck',
+        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+      );
+    }
 
     return state;
   }

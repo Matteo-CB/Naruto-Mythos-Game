@@ -343,7 +343,8 @@ function CardPreviewContent({
 
           {card.effects && card.effects.length > 0 ? (
             card.effects.map((effect, i) => {
-              const frDescriptions = effectDescriptionsFr[card.id];
+              const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
+              const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
               const description =
                 locale === "fr" && frDescriptions?.[i]
                   ? frDescriptions[i]
@@ -820,7 +821,8 @@ function FullscreenCardDetail() {
 
               {card.effects && card.effects.length > 0 ? (
                 card.effects.map((effect, i) => {
-                  const frDescriptions = effectDescriptionsFr[card.id];
+                  const raFallbackId2 = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
+                  const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId2 ? effectDescriptionsFr[raFallbackId2] : undefined);
                   const description =
                     locale === "fr" && frDescriptions?.[i]
                       ? frDescriptions[i]

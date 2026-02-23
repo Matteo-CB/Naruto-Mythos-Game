@@ -4,6 +4,8 @@ import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, G
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
+import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
+import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 
 interface RoomData {
   code: string;
@@ -490,12 +492,59 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       try {
+        // Save old log length to detect silently rejected actions
+        const oldLogLength = room.gameState.log.length;
+        const prevState = room.gameState;
+
         // Apply action server-side (authoritative)
         room.gameState = GameEngine.applyAction(
           room.gameState,
           player,
           data.action,
         );
+
+        // Detect silently rejected play actions (validation failed, state unchanged)
+        const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
+        if (isPlayAction && room.gameState.log.length === oldLogLength) {
+          // Action was rejected — get the specific validation reason
+          let errorMessage = 'Action not allowed.';
+          let errorKey = 'game.error.actionNotAllowed';
+          let errorParams: Record<string, string | number> | undefined;
+          try {
+            const playerState = prevState[player as 'player1' | 'player2'];
+            if (data.action.type === 'PLAY_CHARACTER' && data.action.cardIndex < playerState.hand.length) {
+              const card = playerState.hand[data.action.cardIndex];
+              const effCost = calculateEffectiveCost(prevState, player as 'player1' | 'player2', card, data.action.missionIndex, false);
+              const result = validatePlayCharacter(prevState, player as 'player1' | 'player2', card, data.action.missionIndex, effCost);
+              if (result.reason) errorMessage = result.reason;
+              if (result.reasonKey) errorKey = result.reasonKey;
+              if (result.reasonParams) errorParams = result.reasonParams;
+            } else if (data.action.type === 'PLAY_HIDDEN' && data.action.cardIndex < playerState.hand.length) {
+              const card = playerState.hand[data.action.cardIndex];
+              const result = validatePlayHidden(prevState, player as 'player1' | 'player2', card, data.action.missionIndex);
+              if (result.reason) errorMessage = result.reason;
+              if (result.reasonKey) errorKey = result.reasonKey;
+              if (result.reasonParams) errorParams = result.reasonParams;
+            } else if (data.action.type === 'REVEAL_CHARACTER') {
+              const result = validateRevealCharacter(prevState, player as 'player1' | 'player2', data.action.missionIndex, data.action.characterInstanceId);
+              if (result.reason) errorMessage = result.reason;
+              if (result.reasonKey) errorKey = result.reasonKey;
+              if (result.reasonParams) errorParams = result.reasonParams;
+            } else if (data.action.type === 'UPGRADE_CHARACTER' && data.action.cardIndex < playerState.hand.length) {
+              const card = playerState.hand[data.action.cardIndex];
+              const result = validateUpgradeCharacter(prevState, player as 'player1' | 'player2', card, data.action.missionIndex, data.action.targetInstanceId);
+              if (result.reason) errorMessage = result.reason;
+              if (result.reasonKey) errorKey = result.reasonKey;
+              if (result.reasonParams) errorParams = result.reasonParams;
+            }
+          } catch { /* use generic message */ }
+          console.log(`[Socket] Action rejected for ${player}: ${errorMessage}`);
+          socket.emit('game:error', { message: errorMessage, errorKey, errorParams });
+          // Broadcast unchanged state so client resets isProcessing
+          broadcastState(room, io);
+          return;
+        }
+
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
         // Reset consecutive timeouts for this player (they acted voluntarily)

@@ -95,7 +95,9 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
           if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
           // Summon return: "At the end of the round, you must return this character to your hand"
-          if (effect.description.includes('end of the round') && effect.description.includes('return this character')) {
+          // Also matches "take back this character in hand" (Doki 066 variant)
+          const descLower = effect.description.toLowerCase();
+          if (descLower.includes('end of the round') && (descLower.includes('return this character') || descLower.includes('take back this character'))) {
             charsToReturn.push({
               instanceId: char.instanceId,
               player: char.controlledBy,

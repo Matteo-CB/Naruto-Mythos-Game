@@ -502,14 +502,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 058/130 - JIROBO (UC) - "Barriere de Terre"
   'KS-058-UC': [
-    'POWERUP 1 sur chaque personnage Quartet du Son allie en jeu.',
+    'POWERUP 1 sur chaque personnage Quartet du Son allie dans cette mission.',
     'effet MAIN : A la place, POWERUP 1 sur chaque personnage Quartet du Son allie dans toutes les missions.',
   ],
 
   // 060/130 - KIDOMARU (UC) - "Toile d\'Araignee"
   'KS-060-UC': [
-    'Deplacez un personnage allie depuis cette mission.',
-    'Vainquez un personnage ennemi avec une Puissance de 1 ou moins dans cette mission.',
+    'Deplacez un personnage hors de cette mission.',
+    'Vainquez un personnage ennemi en jeu dont la Puissance est de 1 ou moins.',
   ],
 
   // 062/130 - SAKON (UC) - "Demon Parasite"
@@ -524,8 +524,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 065/130 - TAYUYA (UC) - "Flute Demoniaque"
   'KS-065-UC': [
-    'POWERUP 2 sur un personnage du Son allie en jeu.',
-    'Cherchez un personnage Invocation dans votre deck et jouez-le dans cette mission gratuitement.',
+    'POWERUP 2 sur un personnage Village du Son allie en jeu.',
+    'Regardez les 3 cartes du dessus de votre deck, revelez et piochez tous les personnages d\'Invocation, puis remettez les autres cartes.',
   ],
 
   // 066/130 - DOKI (UC) - "Demon"
@@ -566,7 +566,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 078/130 - KANKURO (UC) - "Maitre des Marionnettes"
   'KS-078-UC': [
-    'Deplacez un personnage ennemi avec une Puissance de 4 ou moins vers cette mission.',
+    'Deplacez n\'importe quel personnage avec une Puissance de 4 ou moins.',
     'Jouez un personnage en cache dans cette mission en payant 1 de moins.',
   ],
 

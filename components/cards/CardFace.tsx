@@ -306,8 +306,9 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}
         >
           {card.effects.map((effect, idx) => {
-            const frDescriptions = effectDescriptionsFr[card.id];
-            const enDescriptions = effectDescriptionsEn[card.id];
+            const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
+            const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+            const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
             const description = locale === 'fr'
               ? (frDescriptions?.[idx] ?? effect.description)
               : (enDescriptions?.[idx] ?? effect.description);

@@ -435,14 +435,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 058/130 - JIROBO (UC) - "Earth Barrier"
   'KS-058-UC': [
-    'POWERUP 1 each friendly Sound Four character in play.',
+    'POWERUP 1 each friendly Sound Four character in this mission.',
     'MAIN effect: Instead, POWERUP 1 each friendly Sound Four character in every mission.',
   ],
 
   // 060/130 - KIDOMARU (UC) - "Spider Web"
   'KS-060-UC': [
-    'Move a friendly character from this mission.',
-    'Defeat an enemy character with Power 1 or less in this mission.',
+    'Move a character out of this mission.',
+    'Defeat an enemy character with Power 1 or less in play.',
   ],
 
   // 062/130 - SAKON (UC) - "Parasite Demon"
@@ -457,8 +457,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 065/130 - TAYUYA (UC) - "Demon Flute"
   'KS-065-UC': [
-    'POWERUP 2 a friendly Sound character in play.',
-    'Search your deck for a Summon character and play it in this mission for free.',
+    'POWERUP 2 a friendly Sound Village character in play.',
+    'Look at the top 3 cards of your deck, reveal and draw all Summon characters, then put back the others.',
   ],
 
   // 066/130 - DOKI (UC) - "Demon"
@@ -499,7 +499,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 078/130 - KANKURO (UC) - "Puppet Master"
   'KS-078-UC': [
-    'Move an enemy character with Power 4 or less to this mission.',
+    'Move any character with Power 4 or less to another mission.',
     'Play a character while hidden in this mission, paying 1 less.',
   ],
 
