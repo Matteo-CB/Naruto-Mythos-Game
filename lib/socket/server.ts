@@ -244,6 +244,19 @@ function startActionTimer(
       const winner = GameEngine.getWinner(room.gameState);
       if (winner) {
         await finalizeGameEnd(room, code, io, 'score');
+      } else if (room.gameState.missionScoringComplete) {
+        // Mission scoring done — auto-advance after brief pause
+        setTimeout(async () => {
+          if (!room.gameState || !room.gameState.missionScoringComplete) return;
+          room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+          broadcastState(room, io);
+          const winnerAfterEnd = GameEngine.getWinner(room.gameState);
+          if (winnerAfterEnd) {
+            await finalizeGameEnd(room, code, io, 'score');
+          } else if (room.gameState.phase === 'action') {
+            startActionTimer(room, code, io);
+          }
+        }, 1500);
       } else if (room.gameState.phase === 'action') {
         // Restart timer for next active player
         startActionTimer(room, code, io);
@@ -565,6 +578,21 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
           await finalizeGameEnd(room, code, io, 'score');
+        } else if (room.gameState.missionScoringComplete) {
+          // Mission scoring done — wait briefly so clients see SCORE results, then auto-advance
+          clearActionTimer(room);
+          setTimeout(async () => {
+            if (!room.gameState || !room.gameState.missionScoringComplete) return;
+            room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+            broadcastState(room, io);
+
+            const winnerAfterEnd = GameEngine.getWinner(room.gameState);
+            if (winnerAfterEnd) {
+              await finalizeGameEnd(room, code, io, 'score');
+            } else if (room.gameState.phase === 'action') {
+              startActionTimer(room, code, io);
+            }
+          }, 1500);
         } else if (room.gameState.phase === 'action') {
           // Restart timer for next active player
           startActionTimer(room, code, io);
