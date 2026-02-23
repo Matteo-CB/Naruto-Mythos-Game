@@ -138,7 +138,10 @@
         "costReduction": "Cost reduced by {amount}, paid {cost}.",
         "skipped": "{card} ({id}): Effect skipped.",
         "copySuccess": "{card} copies {target}'s {effectType} effect!",
-        "copyFailed": "Effect copy failed: target no longer valid."
+        "copyFailed": "Effect copy failed: target no longer valid.",
+        "itachi091Reveal": "{card} ({id}): Revealed {target} from opponent's hand.",
+        "itachi091Discard": "{card} ({id}): Discarded {target} from opponent's hand.",
+        "itachi091Draw": "{card} ({id}): Opponent draws 1 replacement card."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -186,6 +189,7 @@
       "pwr": "PWR",
       "pts": "pts",
       "won": "Won",
+      "lost": "Lost",
       "handCount": "Hand: {count}",
       "opponentHandCount": "Opponent Hand: {count}",
       "phaseLabel": "Phase",
@@ -205,6 +209,9 @@
       "orochimaruReveal": "Orochimaru — Infiltration",
       "orochimaruSteal": "Cost 3 or less — Taking control!",
       "orochimaruTooExpensive": "Cost too high — Cannot take control.",
+      "itachi091RevealTitle": "Itachi — Mangekyo Sharingan",
+      "itachi091RevealResult": "Random card revealed from opponent's hand.",
+      "itachi091DiscardResult": "Card will be discarded. Opponent draws a replacement.",
       "desc": {
         "chooseMissionMove": "Choose a mission to move the character to.",
         "chooseMissionPlaceHidden": "Choose a mission to place the hidden character on.",
@@ -256,6 +263,8 @@
         "hiruzen002PlayLeafUpgrade": "Choose a Leaf Village character from your hand to play (cost -1, + POWERUP 2).",
         "ino020TakeControl": "Select an enemy character with cost {costLimit} or less to take control of.",
         "itachi091DiscardFromHand": "Select a card from opponent's hand to discard.",
+        "itachi091Reveal": "Itachi (091): Revealed {target} from opponent's hand.",
+        "itachi091RevealUpgrade": "Itachi (091): Revealed {target}. This card will be discarded.",
         "jiraiya008HideEnemy": "Select an enemy character with cost 3 or less to hide.",
         "kabuto053DiscardFromHand": "Choose a card from your hand to discard.",
         "kabuto053ChooseMission": "Choose a mission to play {cardName} on (cost {cost}).",
@@ -345,7 +354,8 @@
         "mss05ReturnToHand": "Choose a friendly character in this mission to return to your hand.",
         "mss07ChooseDestination": "Choose a mission to move the hidden character to.",
         "mss07MoveHidden": "Choose a hidden friendly character to move.",
-        "mss08ChooseCard": "Choose a card from your hand to place as a hidden character."
+        "mss08ChooseCard": "Choose a card from your hand to place as a hidden character.",
+        "rockLeeEndMove": "Rock Lee: Choose a mission to move to (end of round)."
       }
     },
     "anim": {

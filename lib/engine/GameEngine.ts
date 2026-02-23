@@ -158,7 +158,12 @@ export class GameEngine {
         break;
 
       case 'mission':
-        // Mission phase is automatic - triggered by both passing
+        // ADVANCE_PHASE: UI has shown the scored state, now advance to End Phase
+        if (action.type === 'ADVANCE_PHASE') {
+          newState.missionScoringComplete = undefined;
+          newState = GameEngine.transitionToEndPhase(newState);
+          break;
+        }
         // Handle target selections for SCORE effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
@@ -170,8 +175,8 @@ export class GameEngine {
               // If resumption created new pending actions, wait for resolution
               if (newState.pendingActions.length > 0) break;
             }
-            // All SCORE effects resolved — advance to end phase
-            newState = GameEngine.transitionToEndPhase(newState);
+            // All SCORE effects resolved — pause for UI to show results
+            newState.missionScoringComplete = true;
           }
         }
         break;
@@ -187,6 +192,7 @@ export class GameEngine {
             if (newState.pendingActions.length > 0) break; // More choices needed
 
             // All end-of-round effects resolved — finish end phase transition
+            newState.endPhaseMovedIds = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -284,8 +290,10 @@ export class GameEngine {
       return newState;
     }
 
-    // Otherwise transition to end phase
-    return GameEngine.transitionToEndPhase(newState);
+    // All scoring done — pause so UI can show SCORE results (POWERUP tokens, etc.)
+    // before End Phase removes them. The caller sends ADVANCE_PHASE to proceed.
+    newState.missionScoringComplete = true;
+    return newState;
   }
 
   /**
@@ -303,6 +311,9 @@ export class GameEngine {
     if (newState.pendingActions.length > 0) {
       return newState;
     }
+
+    // Clean up end phase tracking
+    newState.endPhaseMovedIds = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {

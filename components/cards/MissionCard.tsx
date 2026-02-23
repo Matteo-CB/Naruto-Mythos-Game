@@ -34,6 +34,7 @@ export interface MissionCardProps {
   rank: MissionRank;
   rankBonus: number;
   wonBy?: PlayerID | null;
+  myPlayer?: PlayerID;
   className?: string;
   onClick?: () => void;
   highlight?: boolean;
@@ -47,6 +48,7 @@ function MissionCardInner({
   rank,
   rankBonus,
   wonBy,
+  myPlayer,
   className = '',
   onClick,
   highlight = false,
@@ -286,34 +288,38 @@ function MissionCardInner({
         </div>
       )}
 
-      {/* Won-by indicator overlay */}
-      {wonBy && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '40%',
-            left: '10%',
-            right: '10%',
-            textAlign: 'center',
-            backgroundColor: 'rgba(0,0,0,0.75)',
-            borderRadius: '4px',
-            padding: '4px 8px',
-            border: '1px solid #22c55e',
-          }}
-        >
-          <span
+      {/* Won/Lost indicator overlay */}
+      {wonBy && (() => {
+        const didWin = myPlayer ? wonBy === myPlayer : true;
+        const indicatorColor = didWin ? '#22c55e' : '#b33e3e';
+        return (
+          <div
             style={{
-              color: '#22c55e',
-              fontSize: '0.55em',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              position: 'absolute',
+              top: '40%',
+              left: '10%',
+              right: '10%',
+              textAlign: 'center',
+              backgroundColor: 'rgba(0,0,0,0.75)',
+              borderRadius: '4px',
+              padding: '4px 8px',
+              border: `1px solid ${indicatorColor}`,
             }}
           >
-            {t('game.board.won')} - {wonBy === 'player1' ? t('game.log.player1') : t('game.log.player2')}
-          </span>
-        </div>
-      )}
+            <span
+              style={{
+                color: indicatorColor,
+                fontSize: '0.55em',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              {didWin ? t('game.board.won') : t('game.board.lost')}
+            </span>
+          </div>
+        );
+      })()}
     </div>
   );
 }

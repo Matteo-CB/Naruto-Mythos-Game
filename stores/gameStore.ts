@@ -25,7 +25,7 @@ interface PendingTargetSelection {
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL'; // type of selection
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
-  revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean }; // for Orochimaru reveal
+  revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
 }
@@ -356,19 +356,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
 
-      // Detect Orochimaru reveal result (info display with card image)
+      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
+      const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
-      if (isOroReveal && pendingEffect) {
+      if (isInfoReveal && pendingEffect) {
         try {
           const rd = JSON.parse(pendingEffect.effectDescription);
-          revealedCard = {
-            name_fr: rd.cardName,
-            chakra: rd.cardCost,
-            power: rd.cardPower,
-            image_file: rd.cardImageFile,
-            canSteal: rd.canSteal,
-          };
+          if (isOroReveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: rd.canSteal,
+            };
+          } else if (isItachi091Reveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false,
+              revealTitleKey: 'game.effect.itachi091RevealTitle',
+              revealResultKey: rd.isUpgrade
+                ? 'game.effect.itachi091DiscardResult'
+                : 'game.effect.itachi091RevealResult',
+            };
+          }
         } catch { /* ignore */ }
       }
 
@@ -380,7 +396,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
           playerName: get().playerDisplayNames[get().humanPlayer],
@@ -570,6 +586,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Mission scoring complete — show scored state briefly, then auto-advance to End Phase
+    if (newState.missionScoringComplete) {
+      set({ isProcessing: false });
+      setTimeout(() => {
+        const currentGs = get().gameState;
+        if (!currentGs || !currentGs.missionScoringComplete) return;
+        const hp = get().humanPlayer;
+        const advanced = GameEngine.applyAction(currentGs, hp, { type: 'ADVANCE_PHASE' });
+        const vis = GameEngine.getVisibleState(advanced, hp);
+        set({ gameState: advanced, visibleState: vis });
+        if (advanced.phase === 'gameOver') {
+          get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
+          set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+        } else if (get().isAIGame && get().aiPlayer) {
+          setTimeout(() => get().processAITurn(), 500);
+        } else {
+          set({ isProcessing: false });
+        }
+      }, 1500);
+      return;
+    }
+
     // Check if there are pending target selections for the human player
     const humanPending = newState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPending.length > 0) {
@@ -645,19 +683,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      // Detect Orochimaru reveal result (info display with card image)
+      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
+      const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
-      if (isOroReveal && pendingEffect) {
+      if (isInfoReveal && pendingEffect) {
         try {
           const rd = JSON.parse(pendingEffect.effectDescription);
-          revealedCard = {
-            name_fr: rd.cardName,
-            chakra: rd.cardCost,
-            power: rd.cardPower,
-            image_file: rd.cardImageFile,
-            canSteal: rd.canSteal,
-          };
+          if (isOroReveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: rd.canSteal,
+            };
+          } else if (isItachi091Reveal) {
+            revealedCard = {
+              name_fr: rd.cardName,
+              chakra: rd.cardCost,
+              power: rd.cardPower,
+              image_file: rd.cardImageFile,
+              canSteal: false, // not used for Itachi
+              revealTitleKey: 'game.effect.itachi091RevealTitle',
+              revealResultKey: rd.isUpgrade
+                ? 'game.effect.itachi091DiscardResult'
+                : 'game.effect.itachi091RevealResult',
+            };
+          }
         } catch { /* ignore */ }
       }
 
@@ -668,7 +722,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isOroReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
           playerName: get().playerDisplayNames[get().humanPlayer],
@@ -763,6 +817,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const humanPending = currentState.pendingActions.filter((p) => p.player === humanPlayer);
         if (humanPending.length > 0) break;
 
+        // Mission scoring complete — break to show scored state, then auto-advance
+        if (currentState.missionScoringComplete) break;
+
         // Check if it's the AI's turn
         const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
         if (aiActions.length === 0) break;
@@ -843,6 +900,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
 
+    // Mission scoring complete — show scored state, then auto-advance to End Phase
+    if (currentState.missionScoringComplete) {
+      set({
+        gameState: currentState,
+        visibleState: visible,
+        isProcessing: false,
+      });
+      setTimeout(() => {
+        const currentGs = get().gameState;
+        if (!currentGs || !currentGs.missionScoringComplete) return;
+        const hp = get().humanPlayer;
+        const advanced = GameEngine.applyAction(currentGs, hp, { type: 'ADVANCE_PHASE' });
+        const vis = GameEngine.getVisibleState(advanced, hp);
+        set({ gameState: advanced, visibleState: vis });
+        if (advanced.phase === 'gameOver') {
+          get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
+          set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+        } else if (get().isAIGame && get().aiPlayer) {
+          setTimeout(() => get().processAITurn(), 500);
+        } else {
+          set({ isProcessing: false });
+        }
+      }, 1500);
+      return;
+    }
+
     // Check if there are pending target selections for the human player
     // (e.g. SCORE effects from mission phase that need human input)
     const humanPendingAfterAI = currentState.pendingActions.filter((p) => p.player === humanPlayer);
@@ -903,6 +986,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
+      // Detect info reveal types (Orochimaru, Itachi 091, etc.)
+      const isOroRevealAI = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
+      const isItachi091RevealAI = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
+      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI;
+      let revealedCardAI: PendingTargetSelection['revealedCard'];
+      if (isInfoRevealAI && pendingEffect) {
+        try {
+          const rd = JSON.parse(pendingEffect.effectDescription);
+          if (isOroRevealAI) {
+            revealedCardAI = {
+              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+              image_file: rd.cardImageFile, canSteal: rd.canSteal,
+            };
+          } else if (isItachi091RevealAI) {
+            revealedCardAI = {
+              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+              image_file: rd.cardImageFile, canSteal: false,
+              revealTitleKey: 'game.effect.itachi091RevealTitle',
+              revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
+            };
+          }
+        } catch { /* ignore */ }
+      }
+
       set({
         gameState: currentState,
         visibleState: visible,
@@ -912,8 +1019,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
+          revealedCard: revealedCardAI,
           playerName: get().playerDisplayNames[humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -931,6 +1039,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           } : undefined,
         },
+      });
+      return;
+    }
+
+    // Check if game ended during pending action resolution in the AI loop
+    // (e.g. End Phase pending → resolve → endGame, but loop exited before line 787 check)
+    if (currentState.phase === 'gameOver') {
+      for (const anim of aiAnimations) {
+        addAnimation(anim);
+      }
+      addAnimation({
+        type: 'game-end',
+        data: { winner: GameEngine.getWinner(currentState) },
+      });
+      set({
+        gameState: currentState,
+        visibleState: visible,
+        gameOver: true,
+        winner: GameEngine.getWinner(currentState),
+        isProcessing: false,
       });
       return;
     }
