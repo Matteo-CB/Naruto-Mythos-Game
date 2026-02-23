@@ -312,10 +312,11 @@ export default function CollectionPage() {
                   {selectedCard.effects && selectedCard.effects.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {selectedCard.effects.map((effect, i) => {
-                        const frDescriptions = effectDescriptionsFr[selectedCard.id];
-                        const enDescriptions = effectDescriptionsEn[selectedCard.id];
+                        const raFallbackId = selectedCard.id.endsWith('-RA') ? selectedCard.id.replace('-RA', '-R') : undefined;
+                        const frDescriptions = effectDescriptionsFr[selectedCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+                        const enDescriptions = effectDescriptionsEn[selectedCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
                         const description = locale === 'fr'
-                          ? (frDescriptions?.[i] ?? effect.description)
+                          ? (frDescriptions?.[i] ?? enDescriptions?.[i] ?? effect.description)
                           : (enDescriptions?.[i] ?? effect.description);
                         return (
                           <div key={i} className="text-xs">
