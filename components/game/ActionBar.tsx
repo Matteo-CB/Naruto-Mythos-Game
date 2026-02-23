@@ -94,15 +94,31 @@ export function ActionBar() {
   // Can reveal: need a hidden character selected as target
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
 
-  // Determine chakra cost for reveal
+  // Determine chakra cost for reveal (checks if reveal would be an upgrade — pays only the difference)
   let revealCost = 0;
+  let isRevealUpgrade = false;
   if (hasTargetSelected && visibleState.activeMissions) {
     for (const m of visibleState.activeMissions) {
       const myChars =
         myPlayer === 'player1' ? m.player1Characters : m.player2Characters;
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
-        revealCost = target.card.chakra;
+        const hiddenTopCard = target.topCard ?? target.card;
+        // Check if there's a visible same-name character with lower cost on the same mission (upgrade)
+        const upgradeOver = myChars.find((c) => {
+          if (c.instanceId === selectedTargetId || c.isHidden) return false;
+          const cTop = c.topCard ?? c.card;
+          if (!cTop) return false;
+          return cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase()
+            && hiddenTopCard.chakra > cTop.chakra;
+        });
+        if (upgradeOver) {
+          const existingTop = upgradeOver.topCard ?? upgradeOver.card;
+          revealCost = hiddenTopCard.chakra - (existingTop?.chakra ?? 0);
+          isRevealUpgrade = true;
+        } else {
+          revealCost = hiddenTopCard.chakra;
+        }
         break;
       }
     }
@@ -297,31 +313,32 @@ export function ActionBar() {
             </span>
           )}
 
-          {/* Play visible button */}
+          {/* Upgrade button(s) — shown first when available */}
+          {cardAndMissionReady && upgradeTargets.map((target) => {
+            const charCard = target.topCard ?? target.card;
+            const upgradeCost = (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
+            const canAffordUpgrade = myState.chakra >= upgradeCost;
+            const targetName = charCard?.name_fr ?? '';
+            return (
+              <ActionButton
+                key={target.instanceId}
+                label={`${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`}
+                onClick={() => handleUpgrade(target.instanceId)}
+                disabled={!canAffordUpgrade}
+                variant="primary"
+              />
+            );
+          })}
+
+          {/* Play visible button — secondary when upgrade targets exist */}
           {cardAndMissionReady && (
             <ActionButton
               label={`${t('game.play')} (${selectedCard?.chakra ?? 0} ${t('game.chakra').toLowerCase()})`}
               onClick={handlePlayVisible}
               disabled={!canAffordCard}
-              variant="primary"
+              variant={upgradeTargets.length > 0 ? "secondary" : "primary"}
             />
           )}
-
-          {/* Upgrade button(s) */}
-          {cardAndMissionReady && upgradeTargets.map((target) => {
-            const charCard = target.topCard ?? target.card;
-            const upgradeCost = (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
-            const canAffordUpgrade = myState.chakra >= upgradeCost;
-            return (
-              <ActionButton
-                key={target.instanceId}
-                label={`${t('game.actions.upgrade')} (${upgradeCost} ${t('game.chakra').toLowerCase()})`}
-                onClick={() => handleUpgrade(target.instanceId)}
-                disabled={!canAffordUpgrade}
-                variant="secondary"
-              />
-            );
-          })}
 
           {/* Play hidden button */}
           {cardAndMissionReady && (
@@ -336,7 +353,9 @@ export function ActionBar() {
           {/* Reveal button */}
           {canReveal && (
             <ActionButton
-              label={`${t('game.reveal')} (${revealCost} ${t('game.chakra').toLowerCase()})`}
+              label={isRevealUpgrade
+                ? `${t('game.reveal')} + ${t('game.actions.upgrade')} (${revealCost} ${t('game.chakra').toLowerCase()})`
+                : `${t('game.reveal')} (${revealCost} ${t('game.chakra').toLowerCase()})`}
               onClick={handleReveal}
               disabled={!canAffordReveal}
               variant="primary"

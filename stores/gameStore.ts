@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig } from '@/lib/engine/types';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
+import { aiSelectTarget } from '@/lib/ai/targetSelection';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -26,6 +27,7 @@ interface PendingTargetSelection {
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL'; // type of selection
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
+  revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean }>; // for multi-card reveal (Tayuya 065)
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
 }
@@ -356,13 +358,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Tayuya 065, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
       const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal;
+      const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
+      let revealedCards: PendingTargetSelection['revealedCards'];
       if (isInfoReveal && pendingEffect) {
         try {
           const rd = JSON.parse(pendingEffect.effectDescription);
@@ -408,6 +412,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? 'game.effect.sasuke014DiscardResult'
                 : 'game.effect.sasuke014RevealResult',
             };
+          } else if (isTayuya065Reveal) {
+            revealedCard = {
+              name_fr: 'Tayuya',
+              chakra: 0,
+              power: 0,
+              canSteal: false,
+              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
+              revealResultKey: rd.drawnCount > 0
+                ? 'game.effect.tayuya065UpgradeRevealDrawn'
+                : 'game.effect.tayuya065UpgradeRevealNone',
+            };
+            revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
+              name_fr: c.name,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isSummon: c.isSummon,
+            }));
           }
         } catch { /* ignore */ }
       }
@@ -423,6 +445,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
+          revealedCards,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -724,13 +747,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
       const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal;
+      const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
+      let revealedCards: PendingTargetSelection['revealedCards'];
       if (isInfoReveal && pendingEffect) {
         try {
           const rd = JSON.parse(pendingEffect.effectDescription);
@@ -776,6 +801,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? 'game.effect.sasuke014DiscardResult'
                 : 'game.effect.sasuke014RevealResult',
             };
+          } else if (isTayuya065Reveal) {
+            revealedCard = {
+              name_fr: 'Tayuya',
+              chakra: 0,
+              power: 0,
+              canSteal: false,
+              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
+              revealResultKey: rd.drawnCount > 0
+                ? 'game.effect.tayuya065UpgradeRevealDrawn'
+                : 'game.effect.tayuya065UpgradeRevealNone',
+            };
+            revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
+              name_fr: c.name,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isSummon: c.isSummon,
+            }));
           }
         } catch { /* ignore */ }
       }
@@ -790,6 +833,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard,
+          revealedCards,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -843,8 +887,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (aiPending.length > 0) {
           const pendingAction = aiPending[0];
           if (pendingAction.options.length > 0) {
-            // Pick first valid target (simple; could be smarter per difficulty)
-            const selectedTarget = pendingAction.options[0];
+            // Check if this is an optional effect the Easy AI might decline
+            const pendingEffectForOpt = currentState.pendingEffects.find(
+              (e) => e.id === pendingAction.sourceEffectId,
+            );
+            if (pendingEffectForOpt?.isOptional && aiPlayer.difficulty === 'easy') {
+              // Easy AI: 50% chance to decline optional effects
+              if (Math.random() < 0.5) {
+                currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+                  type: 'DECLINE_OPTIONAL_EFFECT',
+                  pendingEffectId: pendingEffectForOpt.id,
+                });
+                iterations++;
+                continue;
+              }
+            }
+
+            // Smart AI target selection based on difficulty
+            const selectedTarget = aiSelectTarget(
+              pendingAction.options,
+              pendingAction,
+              currentState,
+              aiPlayer.player,
+              aiPlayer.difficulty,
+            );
             currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
               type: 'SELECT_TARGET',
               pendingActionId: pendingAction.id,
@@ -1065,13 +1131,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
       const isOroRevealAI = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091RevealAI = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookRevealAI = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
       const isSasuke014RevealAI = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
-      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI || isDosuLookRevealAI || isSasuke014RevealAI;
+      const isTayuya065RevealAI = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
+      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI || isDosuLookRevealAI || isSasuke014RevealAI || isTayuya065RevealAI;
       let revealedCardAI: PendingTargetSelection['revealedCard'];
+      let revealedCardsAI: PendingTargetSelection['revealedCards'];
       if (isInfoRevealAI && pendingEffect) {
         try {
           const rd = JSON.parse(pendingEffect.effectDescription);
@@ -1101,6 +1169,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               revealTitleKey: 'game.effect.sasuke014RevealTitle',
               revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
             };
+          } else if (isTayuya065RevealAI) {
+            revealedCardAI = {
+              name_fr: 'Tayuya', chakra: 0, power: 0,
+              canSteal: false,
+              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
+              revealResultKey: rd.drawnCount > 0 ? 'game.effect.tayuya065UpgradeRevealDrawn' : 'game.effect.tayuya065UpgradeRevealNone',
+            };
+            revealedCardsAI = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
+              name_fr: c.name, chakra: c.chakra, power: c.power, image_file: c.image_file, isSummon: c.isSummon,
+            }));
           }
         } catch { /* ignore */ }
       }
@@ -1117,6 +1195,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
           handCards,
           revealedCard: revealedCardAI,
+          revealedCards: revealedCardsAI,
           playerName: get().playerDisplayNames[humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({

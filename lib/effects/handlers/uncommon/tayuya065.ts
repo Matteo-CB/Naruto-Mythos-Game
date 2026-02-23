@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
+import { generateInstanceId } from '../../../engine/utils/id';
 
 /**
  * Card 065/130 - TAYUYA (UC)
@@ -61,7 +62,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
 }
 
 function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const ps = { ...state[sourcePlayer] };
 
   if (ps.deck.length === 0) {
@@ -94,32 +95,73 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
 
   const newState = { ...state, [sourcePlayer]: ps };
 
-  if (summonCards.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT',
-      `Tayuya (065): Looked at top ${lookCount} card(s) of deck. No Summon cards found. Cards put back on top.`,
-      'game.log.effect.lookAtDeck',
-      { card: 'TAYUYA', id: 'KS-065-UC', count: String(lookCount) },
-    );
-    return { state: { ...newState, log } };
-  }
+  const logMsg = summonCards.length === 0
+    ? `Tayuya (065): Looked at top ${lookCount} card(s) of deck. No Summon cards found. Cards put back on top.`
+    : `Tayuya (065): Looked at top ${lookCount} card(s), drew ${summonCards.length} Summon card(s): ${summonCards.join(', ')}. Rest put back on top.`;
 
   const log = logAction(
     state.log,
     state.turn,
     state.phase,
     sourcePlayer,
-    'EFFECT_DRAW',
-    `Tayuya (065): Looked at top ${lookCount} card(s), drew ${summonCards.length} Summon card(s): ${summonCards.join(', ')}. Rest put back on top.`,
-    'game.log.effect.draw',
-    { card: 'TAYUYA', id: 'KS-065-UC', count: String(summonCards.length) },
+    summonCards.length === 0 ? 'EFFECT' : 'EFFECT_DRAW',
+    logMsg,
+    summonCards.length === 0 ? 'game.log.effect.lookAtDeck' : 'game.log.effect.draw',
+    { card: 'TAYUYA', id: 'KS-065-UC', count: String(summonCards.length || lookCount) },
   );
 
-  return { state: { ...newState, log } };
+  // Create reveal data for the UI (only visible to the source player)
+  const revealData = JSON.stringify({
+    text: `Looked at top ${lookCount} card(s)`,
+    drawnCount: summonCards.length,
+    topCards: topCards.map(c => ({
+      name: c.name_fr,
+      chakra: c.chakra,
+      power: c.power,
+      image_file: c.image_file,
+      isSummon: !!(c.keywords && c.keywords.includes('Summon')),
+    })),
+  });
+
+  // Create a secondary INFO_REVEAL pending to show the looked-at cards
+  const revealEffectId = generateInstanceId();
+  const revealActionId = generateInstanceId();
+
+  const topCard = sourceCard.stack.length > 0
+    ? sourceCard.stack[sourceCard.stack.length - 1]
+    : sourceCard.card;
+
+  const stateWithLog = { ...newState, log };
+  stateWithLog.pendingEffects = [...stateWithLog.pendingEffects, {
+    id: revealEffectId,
+    sourceCardId: topCard.id,
+    sourceInstanceId: sourceCard.instanceId,
+    sourceMissionIndex: ctx.sourceMissionIndex,
+    effectType: 'UPGRADE' as const,
+    effectDescription: revealData,
+    targetSelectionType: 'TAYUYA065_UPGRADE_REVEAL',
+    sourcePlayer,
+    requiresTargetSelection: true,
+    validTargets: ['confirm'],
+    isOptional: false,
+    isMandatory: true,
+    resolved: false,
+    isUpgrade: true,
+  }];
+  stateWithLog.pendingActions = [...stateWithLog.pendingActions, {
+    id: revealActionId,
+    type: 'SELECT_TARGET' as const,
+    player: sourcePlayer,
+    description: `Tayuya (065): Looked at ${lookCount} card(s), drew ${summonCards.length} Summon.`,
+    descriptionKey: 'game.effect.desc.tayuya065UpgradeReveal',
+    descriptionParams: { looked: String(lookCount), drawn: String(summonCards.length) },
+    options: ['confirm'],
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: revealEffectId,
+  }];
+
+  return { state: stateWithLog };
 }
 
 function powerUpTarget(

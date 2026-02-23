@@ -304,6 +304,142 @@ export function TargetSelector() {
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
 
+  // Multi-card reveal mode (Tayuya 065 UPGRADE etc.)
+  if (isInfoReveal && pendingTargetSelection.revealedCards && pendingTargetSelection.revealedCards.length > 0) {
+    const cards = pendingTargetSelection.revealedCards;
+    const resultColor = '#c4a35a';
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+        >
+          {/* Title */}
+          <motion.span
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm font-bold uppercase tracking-widest mb-6"
+            style={{ color: '#c4a35a' }}
+          >
+            {revealedCard?.revealTitleKey
+              ? t(revealedCard.revealTitleKey)
+              : t('game.effect.tayuya065UpgradeRevealTitle')}
+          </motion.span>
+
+          {/* Cards grid */}
+          <div className="flex gap-4 mb-6">
+            {cards.map((card, idx) => {
+              const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
+              const borderColor = card.isSummon ? '#4aff6b' : '#555555';
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
+                  animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.15 }}
+                  className="relative"
+                  style={{
+                    width: '140px',
+                    height: '196px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    border: `2px solid ${borderColor}`,
+                    boxShadow: card.isSummon
+                      ? `0 0 20px ${borderColor}40, 0 4px 16px rgba(0, 0, 0, 0.6)`
+                      : '0 4px 16px rgba(0, 0, 0, 0.6)',
+                  }}
+                >
+                  {imgPath ? (
+                    <div
+                      className="w-full h-full bg-cover bg-center"
+                      style={{ backgroundImage: `url('${imgPath}')` }}
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ backgroundColor: '#1a1a1a' }}
+                    >
+                      <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
+                        {card.name_fr}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Card name overlay */}
+                  <div
+                    className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+                  >
+                    <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
+                      {card.name_fr}
+                    </div>
+                    <div className="text-[9px] mt-0.5" style={{ color: card.isSummon ? '#4aff6b' : '#888888' }}>
+                      {card.isSummon ? t('game.effect.tayuya065Summon') : t('game.effect.tayuya065PutBack')}
+                    </div>
+                  </div>
+
+                  {/* Chakra badge */}
+                  <div
+                    className="absolute top-1 left-1 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-bold"
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      color: '#4a9eff',
+                      border: '1px solid #4a9eff',
+                    }}
+                  >
+                    {card.chakra}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Result text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mb-6 text-center"
+          >
+            <span
+              className="text-sm font-medium"
+              style={{ color: resultColor }}
+            >
+              {revealedCard?.revealResultKey
+                ? t(revealedCard.revealResultKey)
+                : t('game.effect.tayuya065UpgradeRevealNone')}
+            </span>
+          </motion.div>
+
+          {/* Confirm button */}
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleSelect('confirm')}
+            className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+            style={{
+              backgroundColor: resultColor,
+              color: '#0a0a0a',
+              border: `1px solid ${resultColor}`,
+              boxShadow: `0 4px 16px ${resultColor}40`,
+            }}
+          >
+            {t('game.board.confirm')}
+          </motion.button>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   // Info reveal mode: show the revealed card with a confirm button
   if (isInfoReveal && revealedCard) {
     const imagePath = revealedCard.image_file ? normalizeImagePath(revealedCard.image_file) : null;

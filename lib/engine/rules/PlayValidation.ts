@@ -136,14 +136,7 @@ export function validateRevealCharacter(
   // Use topCard for upgraded hidden characters
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Check chakra cost
-  const effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
-  const ps = state[player];
-  if (ps.chakra < effectiveCost) {
-    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
-  }
-
-  // Name uniqueness check after reveal
+  // Name uniqueness check — detect reveal-for-upgrade before chakra check
   const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
@@ -153,17 +146,26 @@ export function validateRevealCharacter(
     return false;
   });
 
+  let effectiveCost: number;
   if (sameNameChar) {
     // Allow reveal-for-upgrade: if the revealed card has strictly higher cost
-    // than the existing same-name visible character, treat this as a reveal + upgrade
     const existingTopCard = sameNameChar.stack.length > 0
       ? sameNameChar.stack[sameNameChar.stack.length - 1]
       : sameNameChar.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      // Valid: this will be a reveal-for-upgrade
-      return { valid: true };
+      // Reveal-for-upgrade: cost is the difference
+      effectiveCost = charTopCard.chakra - existingTopCard.chakra;
+    } else {
+      return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     }
-    return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+  } else {
+    effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  }
+
+  // Check chakra cost (uses upgrade difference if applicable)
+  const ps = state[player];
+  if (ps.chakra < effectiveCost) {
+    return { valid: false, reason: `Not enough chakra. Need ${effectiveCost}, have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
   }
 
   return { valid: true };

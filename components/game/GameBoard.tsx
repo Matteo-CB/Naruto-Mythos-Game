@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useGameStore } from "@/stores/gameStore";
 import { useUIStore } from "@/stores/uiStore";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
+import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
 import { PlayerHand } from "./PlayerHand";
 import { OpponentHand } from "./OpponentHand";
 import { PlayerStatsBar } from "./PlayerStatsBar";
@@ -345,10 +346,11 @@ function CardPreviewContent({
             card.effects.map((effect, i) => {
               const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
               const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+              const enDescriptions = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
               const description =
-                locale === "fr" && frDescriptions?.[i]
-                  ? frDescriptions[i]
-                  : effect.description;
+                locale === "fr"
+                  ? (frDescriptions?.[i] ?? enDescriptions?.[i] ?? effect.description)
+                  : (enDescriptions?.[i] ?? effect.description);
 
               return (
                 <div
@@ -823,10 +825,11 @@ function FullscreenCardDetail() {
                 card.effects.map((effect, i) => {
                   const raFallbackId2 = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
                   const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId2 ? effectDescriptionsFr[raFallbackId2] : undefined);
+                  const enDescriptions2 = effectDescriptionsEn[card.id] ?? (raFallbackId2 ? effectDescriptionsEn[raFallbackId2] : undefined);
                   const description =
-                    locale === "fr" && frDescriptions?.[i]
-                      ? frDescriptions[i]
-                      : effect.description;
+                    locale === "fr"
+                      ? (frDescriptions?.[i] ?? enDescriptions2?.[i] ?? effect.description)
+                      : (enDescriptions2?.[i] ?? effect.description);
 
                   return (
                     <div
