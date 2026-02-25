@@ -20,6 +20,7 @@ import { AnimationController } from "./AnimationController";
 import { TargetSelector } from "./TargetSelector";
 import { HandCardSelector } from "./HandCardSelector";
 import { OpponentSidePiles, PlayerSidePiles } from "./SidePiles";
+import { GameScaleProvider, useGameScale } from "./GameScaleContext";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
@@ -879,7 +880,16 @@ function FullscreenCardDetail() {
 // ----- Main Game Board -----
 
 export default function GameBoard() {
+  return (
+    <GameScaleProvider>
+      <GameBoardInner />
+    </GameScaleProvider>
+  );
+}
+
+function GameBoardInner() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const gameOver = useGameStore((s) => s.gameOver);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -958,7 +968,7 @@ export default function GameBoard() {
           className="shrink-0 flex items-center justify-center py-1"
           style={{
             borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
-            height: "85px",
+            height: dims.opponentHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.45)",
             backdropFilter: "blur(6px)",
           }}
@@ -984,8 +994,8 @@ export default function GameBoard() {
                     key={`empty-${i}`}
                     className="flex flex-col items-center justify-center rounded-xl"
                     style={{
-                      minWidth: "230px",
-                      maxWidth: "320px",
+                      minWidth: dims.emptyLaneMinW + "px",
+                      maxWidth: dims.emptyLaneMaxW + "px",
                       flex: "1 1 0",
                       backgroundColor: "rgba(10, 10, 10, 0.2)",
                       border: "1px solid rgba(255, 255, 255, 0.03)",
@@ -995,7 +1005,7 @@ export default function GameBoard() {
                       className="rounded-lg mission-aspect flex items-center justify-center"
                       style={{
                         width: "100%",
-                        maxWidth: "140px",
+                        maxWidth: dims.missionMaxW + "px",
                         minHeight: "50px",
                         border: "2px dashed rgba(255, 255, 255, 0.06)",
                       }}
@@ -1024,7 +1034,7 @@ export default function GameBoard() {
           className="shrink-0 flex items-center justify-center"
           style={{
             borderTop: "1px solid rgba(255, 255, 255, 0.03)",
-            height: "150px",
+            height: dims.playerHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.45)",
             backdropFilter: "blur(6px)",
           }}

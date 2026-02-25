@@ -119,7 +119,7 @@ export default function CollectionPage() {
             placeholder={t('collection.search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] w-64"
+            className="px-3 py-2 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] w-full sm:w-64"
             aria-label={t('collection.search')}
           />
           <select

@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useGameScale } from './GameScaleContext';
 
 interface HandCardInfo {
   index: number;
@@ -27,6 +28,7 @@ function HandCard({
   onSelect: (index: string) => void;
 }) {
   const locale = useLocale();
+  const dims = useGameScale();
   const { card, index } = cardInfo;
 
   const imagePath = normalizeImagePath(card.image_file);
@@ -42,8 +44,8 @@ function HandCard({
       onClick={() => onSelect(String(index))}
       className="relative no-select"
       style={{
-        width: '110px',
-        height: '154px',
+        width: dims.handSelectorCard.w + 'px',
+        height: dims.handSelectorCard.h + 'px',
         borderRadius: '8px',
         border: '2px solid rgba(196, 163, 90, 0.5)',
         overflow: 'hidden',

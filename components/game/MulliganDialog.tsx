@@ -6,9 +6,11 @@ import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useGameScale } from './GameScaleContext';
 
 function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
   const locale = useLocale();
+  const dims = useGameScale();
   const imagePath = normalizeImagePath(card.image_file);
 
   return (
@@ -23,8 +25,8 @@ function MulliganCard({ card, index }: { card: CharacterCard; index: number }) {
       }}
       className="relative card-aspect no-select"
       style={{
-        width: '115px',
-        height: '161px',
+        width: dims.mulliganCard.w + 'px',
+        height: dims.mulliganCard.h + 'px',
         borderRadius: '8px',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         overflow: 'hidden',

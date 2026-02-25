@@ -123,7 +123,7 @@ export default function LearnPage() {
       <CardBackgroundDecor variant="learn" />
 
       <header
-        className="relative z-20 flex items-center justify-between px-6 py-3"
+        className="relative z-20 flex items-center justify-between px-4 sm:px-6 py-3"
         style={{ borderBottom: '1px solid rgba(196, 163, 90, 0.15)' }}
       >
         <Link
@@ -139,7 +139,7 @@ export default function LearnPage() {
         </Link>
 
         <h1
-          className="text-xl font-bold tracking-wider"
+          className="hidden sm:block text-xl font-bold tracking-wider"
           style={{ color: '#c4a35a' }}
         >
           {t('title')}
@@ -155,7 +155,7 @@ export default function LearnPage() {
       >
         <button
           onClick={() => setActiveTab('rules')}
-          className="px-5 py-2 text-sm font-medium rounded-t transition-colors"
+          className="px-3 sm:px-5 py-2 text-sm font-medium rounded-t transition-colors"
           style={{
             color: activeTab === 'rules' ? '#0a0a0a' : '#c4a35a',
             backgroundColor: activeTab === 'rules' ? '#c4a35a' : 'transparent',
@@ -167,7 +167,7 @@ export default function LearnPage() {
         </button>
         <button
           onClick={() => setActiveTab('quiz')}
-          className="px-5 py-2 text-sm font-medium rounded-t transition-colors"
+          className="px-3 sm:px-5 py-2 text-sm font-medium rounded-t transition-colors"
           style={{
             color: activeTab === 'quiz' ? '#0a0a0a' : '#c4a35a',
             backgroundColor: activeTab === 'quiz' ? '#c4a35a' : 'transparent',

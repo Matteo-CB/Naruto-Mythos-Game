@@ -14,6 +14,7 @@ import type {
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useGameScale } from './GameScaleContext';
 
 // ----- Sub-components -----
 
@@ -27,6 +28,7 @@ interface CharacterSlotProps {
 function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSlotProps) {
   const t = useTranslations();
   const locale = useLocale();
+  const dims = useGameScale();
   const selectTarget = useUIStore((s) => s.selectTarget);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const showPreview = useUIStore((s) => s.showPreview);
@@ -107,8 +109,8 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       onMouseLeave={handleMouseLeave}
       className="relative no-select"
       style={{
-        width: '72px',
-        height: '100px',
+        width: dims.missionCard.w + 'px',
+        height: dims.missionCard.h + 'px',
         borderRadius: '5px',
         cursor: isRevealable ? 'pointer' : (!isHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
@@ -275,6 +277,7 @@ function MissionCardDisplay({
 }) {
   const t = useTranslations();
   const locale = useLocale();
+  const dims = useGameScale();
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
@@ -294,7 +297,7 @@ function MissionCardDisplay({
       className="relative mission-aspect no-select"
       style={{
         width: '100%',
-        maxWidth: '140px',
+        maxWidth: dims.missionMaxW + 'px',
         borderRadius: '8px',
         border: `2px solid ${rankColors[mission.rank]}`,
         overflow: 'hidden',
@@ -393,6 +396,7 @@ interface MissionLaneProps {
 
 export const MissionLane = React.memo(function MissionLane({ mission, missionIndex }: MissionLaneProps) {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);
@@ -453,8 +457,8 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       onClick={handleClick}
       className="flex flex-col items-center gap-0.5 rounded-xl px-1.5 py-1 h-full"
       style={{
-        minWidth: '230px',
-        maxWidth: '320px',
+        minWidth: dims.emptyLaneMinW + 'px',
+        maxWidth: dims.emptyLaneMaxW + 'px',
         flex: '1 1 0',
         cursor: isTargetable ? 'pointer' : 'default',
         backgroundColor: 'rgba(10, 10, 10, 0.35)',

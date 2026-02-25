@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import type { VisibleCharacter, VisibleMission, MissionRank } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useGameScale } from './GameScaleContext';
 
 // ----- Target Character Card -----
 
@@ -19,6 +20,7 @@ interface TargetCharacterProps {
 function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacterProps) {
   const t = useTranslations();
   const locale = useLocale();
+  const dims = useGameScale();
   const isHidden = character.isHidden;
   const canSeeCard = character.isOwn && character.card;
 
@@ -43,8 +45,8 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       onClick={handleClick}
       className="relative no-select"
       style={{
-        width: '64px',
-        height: '90px',
+        width: dims.targetCard.w + 'px',
+        height: dims.targetCard.h + 'px',
         borderRadius: '5px',
         border: isValidTarget
           ? '2px solid #c4a35a'
@@ -304,6 +306,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
 
 export function TargetSelector() {
   const t = useTranslations();
+  const dims = useGameScale();
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
   const declineTarget = useGameStore((s) => s.declineTarget);
@@ -371,8 +374,8 @@ export function TargetSelector() {
                   transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.15 }}
                   className="relative"
                   style={{
-                    width: '140px',
-                    height: '196px',
+                    width: dims.previewMed.w + 'px',
+                    height: dims.previewMed.h + 'px',
                     borderRadius: '8px',
                     overflow: 'hidden',
                     border: `2px solid ${borderColor}`,
@@ -502,8 +505,8 @@ export function TargetSelector() {
             transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 }}
             className="relative mb-6"
             style={{
-              width: '180px',
-              height: '252px',
+              width: dims.previewLg.w + 'px',
+              height: dims.previewLg.h + 'px',
               borderRadius: '10px',
               overflow: 'hidden',
               border: `2px solid ${resultColor}`,

@@ -80,17 +80,18 @@ export default function LeaderboardPage() {
             {t('noPlayers')}
           </p>
         ) : (
-          <div style={{ border: '1px solid #262626' }}>
+          <div className="overflow-x-auto" style={{ border: '1px solid #262626' }}>
             {/* Header */}
             <div
-              className="grid grid-cols-6 gap-2 px-4 py-3 text-xs uppercase tracking-wider"
-              style={{ backgroundColor: '#141414', color: '#888888' }}
+              className="grid grid-cols-3 sm:grid-cols-6 gap-2 px-4 py-3 text-xs uppercase tracking-wider"
+              style={{ backgroundColor: '#141414', color: '#888888', minWidth: '0' }}
             >
               <span>{t('rank')}</span>
-              <span className="col-span-2">{t('player')}</span>
+              <span>{t('player')}</span>
               <span>{t('elo')}</span>
-              <span>{t('wins')}/{t('losses')}/{t('draws')}</span>
-              <span>{t('winRate')}</span>
+              <span className="hidden sm:block">{t('wins')}/{t('losses')}/{t('draws')}</span>
+              <span className="hidden sm:block">{t('winRate')}</span>
+              <span className="hidden sm:block" />
             </div>
 
             {/* Rows */}
@@ -102,7 +103,7 @@ export default function LeaderboardPage() {
               return (
                 <div
                   key={user.id}
-                  className="grid grid-cols-6 gap-2 px-4 py-3 text-sm"
+                  className="grid grid-cols-3 sm:grid-cols-6 gap-2 px-4 py-3 text-sm"
                   style={{ borderTop: '1px solid #262626' }}
                 >
                   <span style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}>
@@ -110,16 +111,17 @@ export default function LeaderboardPage() {
                   </span>
                   <Link
                     href={`/profile/${user.username}` as '/'}
-                    className="col-span-2 underline"
+                    className="underline truncate"
                     style={{ color: '#e0e0e0' }}
                   >
                     {user.username}
                   </Link>
                   <span style={{ color: '#e0e0e0' }}>{user.elo}</span>
-                  <span style={{ color: '#888888' }}>
+                  <span className="hidden sm:block" style={{ color: '#888888' }}>
                     {user.wins}/{user.losses}/{user.draws}
                   </span>
-                  <span style={{ color: '#888888' }}>{winRate}%</span>
+                  <span className="hidden sm:block" style={{ color: '#888888' }}>{winRate}%</span>
+                  <span className="hidden sm:block" />
                 </div>
               );
             })}

@@ -5,16 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { DiscardPileViewer } from './DiscardPileViewer';
+import { useGameScale } from './GameScaleContext';
 
-// Card dimensions for the piles
-const CARD_W = 56;
-const CARD_H = 78;
+// Card dimensions now come from useGameScale()
 
 // ---------------------
 // Deck pile visual
 // ---------------------
 function DeckPile({ count, accentColor }: { count: number; accentColor: string }) {
   const t = useTranslations();
+  const dims = useGameScale();
+  const CARD_W = dims.sideCard.w;
+  const CARD_H = dims.sideCard.h;
   const stackLayers = Math.min(count, 4);
 
   return (
@@ -94,6 +96,9 @@ function DiscardPile({
   onClick: () => void;
 }) {
   const t = useTranslations();
+  const dims = useGameScale();
+  const CARD_W = dims.sideCard.w;
+  const CARD_H = dims.sideCard.h;
   const stackLayers = Math.min(count, 3);
 
   return (
@@ -184,6 +189,7 @@ function DiscardPile({
 // ---------------------
 export function OpponentSidePiles() {
   const visibleState = useGameStore((s) => s.visibleState);
+  const dims = useGameScale();
   if (!visibleState) return null;
 
   const { opponentState } = visibleState;
@@ -194,7 +200,7 @@ export function OpponentSidePiles() {
     <aside
       className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
       style={{
-        width: '80px',
+        width: dims.sidePileW + 'px',
         backgroundColor: 'rgba(8, 8, 12, 0.5)',
         backdropFilter: 'blur(4px)',
         borderRight: '1px solid rgba(255, 255, 255, 0.04)',
@@ -216,6 +222,7 @@ export function OpponentSidePiles() {
 export function PlayerSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
+  const dims = useGameScale();
   const [showDiscard, setShowDiscard] = useState(false);
 
   if (!visibleState) return null;
@@ -229,7 +236,7 @@ export function PlayerSidePiles() {
       <aside
         className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
         style={{
-          width: '80px',
+          width: dims.sidePileW + 'px',
           backgroundColor: 'rgba(8, 8, 12, 0.5)',
           backdropFilter: 'blur(4px)',
           borderLeft: '1px solid rgba(255, 255, 255, 0.04)',

@@ -7,9 +7,11 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { useGameScale } from './GameScaleContext';
 
 export function ActionBar() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
@@ -484,6 +486,7 @@ function ActionButton({
   variant: ButtonVariant;
 }) {
   const styles = variantStyles[variant];
+  const dims = useGameScale();
 
   return (
     <motion.button
@@ -491,7 +494,7 @@ function ActionButton({
       whileTap={disabled ? {} : { scale: 0.96 }}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className="px-4 py-1.5 rounded-md text-xs font-medium cursor-pointer"
+      className={`rounded-md font-medium cursor-pointer ${dims.isCompact ? 'px-2.5 py-1 text-[10px]' : 'px-4 py-1.5 text-xs'}`}
       style={{
         backgroundColor: disabled ? 'rgba(255, 255, 255, 0.02)' : styles.bg,
         border: `1px solid ${disabled ? 'rgba(255, 255, 255, 0.05)' : styles.border}`,
