@@ -1,11 +1,25 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 
 /**
+ * Get the top card from a character, supporting both CharacterInPlay (has .stack)
+ * and VisibleCharacter (has .topCard). This allows calculateEffectiveCost to work
+ * with both server-side GameState and client-side VisibleGameState.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getTopCard(char: any): CharacterCard | undefined {
+  if (char.stack?.length > 0) return char.stack[char.stack.length - 1];
+  if (char.topCard) return char.topCard;
+  return char.card;
+}
+
+/**
  * Calculate the effective cost to play a character card,
  * considering all cost modifiers from continuous effects.
+ * Works with both GameState (server) and VisibleGameState (client).
  */
 export function calculateEffectiveCost(
-  state: GameState,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
   player: PlayerID,
   card: CharacterCard,
   missionIndex: number,
@@ -13,18 +27,21 @@ export function calculateEffectiveCost(
 ): number {
   let cost = card.chakra;
 
-  if (missionIndex < 0 || missionIndex >= state.activeMissions.length) {
+  if (missionIndex < 0 || missionIndex >= (state.activeMissions?.length ?? 0)) {
     return cost;
   }
 
   const mission = state.activeMissions[missionIndex];
+  if (!mission) return cost;
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  if (!friendlyChars) return cost;
 
   // Check cost modifiers from continuous effects in this mission
   for (const friendly of friendlyChars) {
     if (friendly.isHidden) continue;
 
-    const topCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+    const topCard = getTopCard(friendly);
+    if (!topCard) continue;
 
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
@@ -38,7 +55,7 @@ export function calculateEffectiveCost(
 
       // Gamakichi 096: Pay 1 less if Naruto Uzumaki in this mission
       // This applies to Gamakichi itself when being played
-      if (card.number === 96 && topCard.name_fr.toUpperCase().includes('NARUTO UZUMAKI')) {
+      if (card.number === 96 && topCard.name_fr?.toUpperCase().includes('NARUTO UZUMAKI')) {
         // Naruto is already in the mission - Gamakichi costs 1 less
         cost = Math.max(0, cost - 1);
       }
@@ -52,10 +69,10 @@ export function calculateEffectiveCost(
     // Gamakichi 096: Pay 1 less if Naruto in this mission
     if (card.number === 96 && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
       const hasNaruto = friendlyChars.some(
-        (c) => {
+        (c: any) => {
           if (c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-          return cTop.name_fr.toUpperCase().includes('NARUTO UZUMAKI');
+          const cTop = getTopCard(c);
+          return cTop?.name_fr?.toUpperCase().includes('NARUTO UZUMAKI');
         },
       );
       if (hasNaruto) {
@@ -76,10 +93,10 @@ export function calculateEffectiveCost(
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
         const hasSasuke = friendlyChars.some(
-          (c) => {
+          (c: any) => {
             if (c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            return cTop.name_fr.toUpperCase().includes('SASUKE');
+            const cTop = getTopCard(c);
+            return cTop?.name_fr?.toUpperCase().includes('SASUKE');
           },
         );
         if (hasSasuke) {
@@ -91,10 +108,12 @@ export function calculateEffectiveCost(
 
   // Check enemy continuous effects that increase cost
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+  if (!enemyChars) return Math.max(0, cost);
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
 
-    const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+    const enemyTopCard = getTopCard(enemy);
+    if (!enemyTopCard) continue;
 
     for (const effect of enemyTopCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
