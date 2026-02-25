@@ -2633,12 +2633,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "[↯] Defeat a hidden character in play.",
+          "description": "[↯] Defeat a hidden enemy character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description": "POWERUP 1 on each friendly Sand Village character in this mission.",
           "description_fr": ""
         }
       ],

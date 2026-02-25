@@ -92,9 +92,11 @@ export function calculateEffectiveCost(
     // Only applies when revealing from hidden (isReveal), not when playing face-visible
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
-        const hasSasuke = friendlyChars.some(
+        // Check ALL characters in this mission (friendly + enemy, visible + hidden)
+        const enemySide = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+        const allChars = [...(friendlyChars || []), ...(enemySide || [])];
+        const hasSasuke = allChars.some(
           (c: any) => {
-            if (c.isHidden) return false;
             const cTop = getTopCard(c);
             return cTop?.name_fr?.toUpperCase().includes('SASUKE');
           },
@@ -118,12 +120,10 @@ export function calculateEffectiveCost(
     for (const effect of enemyTopCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Tayuya 125 (R): Non-hidden enemy characters cost an additional 1 Chakra to play in this mission
+      // Tayuya 125 (R/RA): Non-hidden enemy characters cost an additional 1 Chakra to play in this mission
+      // Applies to both face-visible plays and reveals (not hidden plays, which use flat cost of 1)
       if (enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
-        // Only applies to face-visible plays (non-hidden)
-        if (!isReveal) {
-          cost += 1;
-        }
+        cost += 1;
       }
     }
   }

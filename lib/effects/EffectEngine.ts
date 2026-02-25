@@ -329,6 +329,13 @@ export class EffectEngine {
     result: EffectResult,
     remainingEffectTypes: EffectType[],
   ): GameState {
+    // Safeguard: if validTargets is empty, skip creating the pending effect entirely
+    // This prevents stuck UI when a handler returns requiresTargetSelection with no valid targets
+    if (!result.validTargets || result.validTargets.length === 0) {
+      console.warn(`[EffectEngine] Skipping pending target selection with empty validTargets for ${result.targetSelectionType}`);
+      return result.state;
+    }
+
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -1808,7 +1815,7 @@ export class EffectEngine {
         break;
       }
       case 'KIMIMARO056_CHOOSE_DISCARD': {
-        // Stage 1: discard from hand
+        // Stage 1: discard from hand, then stage 2: hide a character with cost ≤ 4
         const idx_km = parseInt(targetId, 10);
         const ps_km = { ...newState[pendingEffect.sourcePlayer] };
         if (idx_km >= 0 && idx_km < ps_km.hand.length) {
@@ -1817,7 +1824,122 @@ export class EffectEngine {
           ps_km.hand = hand_km;
           ps_km.discardPile = [...ps_km.discardPile, discarded_km];
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps_km };
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD',
+            `Kimimaro (056) UPGRADE: Discarded ${discarded_km.name_fr} from hand.`,
+            'game.log.effect.discard',
+            { card: 'KIMIMARO', id: 'KS-056-UC', target: discarded_km.name_fr },
+          );
+
+          // Stage 2: find valid characters to hide (cost ≤ 4, not Kimimaro itself, not already hidden)
+          const validHideTargets_km: string[] = [];
+          for (const mission_km of newState.activeMissions) {
+            for (const char_km of [...mission_km.player1Characters, ...mission_km.player2Characters]) {
+              if (char_km.isHidden) continue;
+              if (char_km.instanceId === pendingEffect.sourceInstanceId) continue;
+              const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
+              if ((topCard_km.chakra ?? 0) <= 4) {
+                validHideTargets_km.push(char_km.instanceId);
+              }
+            }
+          }
+
+          if (validHideTargets_km.length === 1) {
+            // Auto-hide the single target
+            const autoTarget_km = validHideTargets_km[0];
+            const missions_km = newState.activeMissions.map(m => ({
+              ...m,
+              player1Characters: m.player1Characters.map(c =>
+                c.instanceId === autoTarget_km ? { ...c, isHidden: true } : c
+              ),
+              player2Characters: m.player2Characters.map(c =>
+                c.instanceId === autoTarget_km ? { ...c, isHidden: true } : c
+              ),
+            }));
+            newState = { ...newState, activeMissions: missions_km };
+            let hiddenName_km = '';
+            for (const m of missions_km) {
+              for (const c of [...m.player1Characters, ...m.player2Characters]) {
+                if (c.instanceId === autoTarget_km) {
+                  const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  hiddenName_km = tc.name_fr;
+                }
+              }
+            }
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_HIDE',
+              `Kimimaro (056) UPGRADE: Hid ${hiddenName_km}.`,
+              'game.log.effect.hide',
+              { card: 'KIMIMARO', id: 'KS-056-UC', target: hiddenName_km },
+            );
+          } else if (validHideTargets_km.length > 1) {
+            // Create stage 2 pending effect/action for choosing which character to hide
+            const effectId_km = generateInstanceId();
+            const actionId_km = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: effectId_km,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: '',
+              targetSelectionType: 'KIMIMARO056_CHOOSE_HIDE',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validHideTargets_km,
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: pendingEffect.isUpgrade,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: actionId_km,
+              type: 'SELECT_TARGET' as PendingAction['type'],
+              player: pendingEffect.sourcePlayer,
+              description: 'Kimimaro (056): Choose a character to hide (cost 4 or less).',
+              descriptionKey: 'game.effect.desc.kimimaro056ChooseHide',
+              descriptionParams: {},
+              options: validHideTargets_km,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_km,
+            }];
+          }
         }
+        break;
+      }
+      case 'KIMIMARO056_CHOOSE_HIDE': {
+        // Stage 2: hide the selected character (cost ≤ 4)
+        const targetInstanceId_kmh = targetId;
+        const missions_kmh = newState.activeMissions.map(m => ({
+          ...m,
+          player1Characters: m.player1Characters.map(c =>
+            c.instanceId === targetInstanceId_kmh ? { ...c, isHidden: true } : c
+          ),
+          player2Characters: m.player2Characters.map(c =>
+            c.instanceId === targetInstanceId_kmh ? { ...c, isHidden: true } : c
+          ),
+        }));
+        newState = { ...newState, activeMissions: missions_kmh };
+        let hiddenName_kmh = '';
+        for (const m of missions_kmh) {
+          for (const c of [...m.player1Characters, ...m.player2Characters]) {
+            if (c.instanceId === targetInstanceId_kmh) {
+              const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              hiddenName_kmh = tc.name_fr;
+            }
+          }
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_HIDE',
+          `Kimimaro (056) UPGRADE: Hid ${hiddenName_kmh}.`,
+          'game.log.effect.hide',
+          { card: 'KIMIMARO', id: 'KS-056-UC', target: hiddenName_kmh },
+        );
         break;
       }
       case 'NARUTO141_CHOOSE_DISCARD': {
@@ -2408,6 +2530,206 @@ export class EffectEngine {
         try { parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const missionIdx = parseInt(targetId, 10);
         newState = EffectEngine.hiruzen002PlaceCard(newState, pendingEffect, parsed.cardIndex, missionIdx);
+        break;
+      }
+
+      case 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT': {
+        // Jiraiya 132 UPGRADE: opponent chooses which of their characters to defeat
+        // until <= 2 per mission. Chain more selections if needed.
+        let jirDesc: { missionIndex?: number; sourcePlayer?: string } = {};
+        try { jirDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        const missionIdx_j = jirDesc.missionIndex ?? 0;
+        const jirSourcePlayer = (jirDesc.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
+
+        // Defeat the opponent's selected character
+        newState = EffectEngine.defeatCharacter(newState, targetId, jirSourcePlayer);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, jirSourcePlayer,
+          'EFFECT_DEFEAT',
+          `Jiraya (132) UPGRADE: Opponent's character defeated in mission ${missionIdx_j + 1}.`,
+          'game.log.effect.defeat',
+          { card: 'JIRAYA', id: 'KS-132-S', target: targetId },
+        );
+
+        // Check if any mission still has > 2 enemy characters
+        const enemySide_j: 'player1Characters' | 'player2Characters' =
+          jirSourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const opponent_j = jirSourcePlayer === 'player1' ? 'player2' : 'player1';
+
+        for (let mi_j = 0; mi_j < newState.activeMissions.length; mi_j++) {
+          const mission_j = newState.activeMissions[mi_j];
+          const enemyChars_j = mission_j[enemySide_j];
+
+          if (enemyChars_j.length > 2) {
+            // Chain another selection for the opponent
+            const chainData_j = JSON.stringify({
+              missionIndex: mi_j,
+              sourcePlayer: jirSourcePlayer,
+              text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${mi_j + 1} (${enemyChars_j.length} > 2).`,
+            });
+            const effectId_j = generateInstanceId();
+            const actionId_j = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: effectId_j,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: chainData_j,
+              targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
+              sourcePlayer: jirSourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: enemyChars_j.map((c: CharacterInPlay) => c.instanceId),
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: pendingEffect.isUpgrade,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: actionId_j,
+              type: 'SELECT_TARGET' as PendingAction['type'],
+              player: opponent_j,
+              description: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${mi_j + 1} (${enemyChars_j.length} > 2).`,
+              descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
+              descriptionParams: { mission: String(mi_j + 1), count: String(enemyChars_j.length) },
+              options: enemyChars_j.map((c: CharacterInPlay) => c.instanceId),
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_j,
+            }];
+            break;
+          }
+        }
+        break;
+      }
+
+      case 'GAARA120_CHOOSE_DEFEAT': {
+        // Gaara 120 MAIN: defeat selected enemy in this mission, then continue to remaining missions
+        let gaaraDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; missionIndex?: number } = {};
+        try { gaaraDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        const missionIdx_g = gaaraDesc.missionIndex ?? 0;
+        let defeatedCount_g = gaaraDesc.defeatedCount ?? 0;
+
+        // Defeat selected target
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        defeatedCount_g++;
+        let defeatName_g = '';
+        for (const m of newState.activeMissions) {
+          for (const c of [...m.player1Characters, ...m.player2Characters]) {
+            if (c.instanceId === targetId) {
+              const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              defeatName_g = tc.name_fr;
+            }
+          }
+        }
+        // If not found in play anymore, it was defeated
+        if (!defeatName_g) defeatName_g = 'enemy';
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT',
+          `Gaara (120): Defeated enemy ${defeatName_g} in mission ${missionIdx_g + 1}.`,
+          'game.log.effect.defeat',
+          { card: 'GAARA', id: 'KS-120-R', target: defeatName_g },
+        );
+
+        // Continue checking remaining missions
+        const startMission_g = gaaraDesc.nextMissionIndex ?? (missionIdx_g + 1);
+        const enemySide_g: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        let chainedToNext = false;
+        for (let mi = startMission_g; mi < newState.activeMissions.length; mi++) {
+          const mission_g = newState.activeMissions[mi];
+          const validTargets_g = mission_g[enemySide_g].filter((c: CharacterInPlay) => {
+            if (c.isHidden) return true; // hidden = power 0
+            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return (topCard.power + c.powerTokens) <= 1;
+          });
+
+          if (validTargets_g.length === 0) continue;
+
+          if (validTargets_g.length === 1) {
+            // Auto-defeat
+            newState = EffectEngine.defeatCharacter(newState, validTargets_g[0].instanceId, pendingEffect.sourcePlayer);
+            defeatedCount_g++;
+            const autoName = validTargets_g[0].card.name_fr;
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT',
+              `Gaara (120): Defeated enemy ${autoName} in mission ${mi + 1}.`,
+              'game.log.effect.defeat',
+              { card: 'GAARA', id: 'KS-120-R', target: autoName },
+            );
+            continue;
+          }
+
+          // Multiple targets — chain another selection
+          const chainData_g = JSON.stringify({
+            defeatedCount: defeatedCount_g,
+            nextMissionIndex: mi + 1,
+            isUpgrade: gaaraDesc.isUpgrade,
+            sourceInstanceId: gaaraDesc.sourceInstanceId,
+            sourceMissionIndex: gaaraDesc.sourceMissionIndex,
+            missionIndex: mi,
+          });
+          const effectId_g = generateInstanceId();
+          const actionId_g = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: effectId_g,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: chainData_g,
+            targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: validTargets_g.map((c: CharacterInPlay) => c.instanceId),
+            isOptional: true,
+            isMandatory: false,
+            resolved: false,
+            isUpgrade: pendingEffect.isUpgrade,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: actionId_g,
+            type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${mi + 1}.`,
+            descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
+            descriptionParams: { mission: String(mi + 1) },
+            options: validTargets_g.map((c: CharacterInPlay) => c.instanceId),
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effectId_g,
+          }];
+          chainedToNext = true;
+          break;
+        }
+
+        // If no more chained selections, apply UPGRADE powerup
+        if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
+          const friendlySide_g: 'player1Characters' | 'player2Characters' =
+            pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+          const upgMission = { ...newState.activeMissions[gaaraDesc.sourceMissionIndex] };
+          const upgChars = [...upgMission[friendlySide_g]];
+          const selfIdx_g = upgChars.findIndex((c: CharacterInPlay) => c.instanceId === gaaraDesc.sourceInstanceId);
+          if (selfIdx_g !== -1) {
+            upgChars[selfIdx_g] = { ...upgChars[selfIdx_g], powerTokens: upgChars[selfIdx_g].powerTokens + defeatedCount_g };
+            upgMission[friendlySide_g] = upgChars;
+            const missions_g = [...newState.activeMissions];
+            missions_g[gaaraDesc.sourceMissionIndex] = upgMission;
+            newState = { ...newState, activeMissions: missions_g };
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_POWERUP',
+              `Gaara (120): POWERUP ${defeatedCount_g} (upgrade).`,
+              'game.log.effect.powerupSelf',
+              { card: 'GAARA', id: 'KS-120-R', amount: defeatedCount_g },
+            );
+          }
+        }
         break;
       }
 

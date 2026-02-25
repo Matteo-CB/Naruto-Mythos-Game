@@ -113,7 +113,7 @@ export const metadata: Metadata = {
       "Jeu de cartes Naruto Shippuden gratuit en ligne. 186 cartes uniques, IA intelligente, multijoueur temps reel, deck builder, classement ELO et quiz. Jouez maintenant sans telechargement.",
     images: [
       {
-        url: "/images/og-image.webp",
+        url: `${SITE_URL}/images/og-image.webp?v=2`,
         width: 1200,
         height: 630,
         alt: "Naruto Mythos TCG - Trading Card Game",
@@ -126,7 +126,7 @@ export const metadata: Metadata = {
     title: "Naruto Mythos TCG - Jeu de Cartes Naruto Gratuit",
     description:
       "Jeu de cartes Naruto Shippuden gratuit. 186 cartes, IA sur 4 niveaux, multijoueur temps reel, deck builder et classement ELO. Jouez maintenant dans votre navigateur.",
-    images: ["/images/og-image.webp"],
+    images: [`${SITE_URL}/images/og-image.webp?v=2`],
   },
   icons: {
     icon: [
