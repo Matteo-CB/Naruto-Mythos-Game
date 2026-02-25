@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 054/130 - KABUTO YAKUSHI (UC)
@@ -20,12 +21,6 @@ import { logAction } from '../../../engine/utils/gameLog';
  *   - Note: When isUpgrade, the UPGRADE POWERUP 1 is applied first, so self's power
  *     is already incremented before the MAIN effect evaluates.
  */
-
-function getEffectivePower(char: import('../../../engine/types').CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleKabuto054Upgrade(ctx: EffectContext): EffectResult {
   // UPGRADE: POWERUP 1 on self
@@ -68,7 +63,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
 
   // Get effective power of self
-  const selfPower = getEffectivePower(sourceCard);
+  const selfPower = getEffectivePower(state, sourceCard, sourcePlayer);
 
   if (selfPower <= 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
@@ -81,6 +76,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   const missions = [...state.activeMissions];
   const missionCopy = { ...missions[sourceMissionIndex] };
 
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -88,7 +84,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   for (let i = 0; i < enemyChars.length; i++) {
     const char = enemyChars[i];
     if (char.isHidden) continue;
-    const charPower = getEffectivePower(char);
+    const charPower = getEffectivePower(state, char, opponentPlayer);
     if (charPower < selfPower) {
       enemyChars[i] = { ...char, isHidden: true };
       hiddenCount++;

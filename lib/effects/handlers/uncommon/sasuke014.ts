@@ -7,12 +7,10 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Chakra: 3 | Power: 4
  * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
  *
- * AMBUSH: Look at a random card in the opponent's hand.
- *   - Pick 1 random card from the opponent's hand and reveal it via INFO_REVEAL UI.
+ * AMBUSH: Look at a card in the opponent's hand (player picks face-down).
  *
  * UPGRADE: AMBUSH effect: In addition, discard 1 card from your hand.
  *   If you do so, choose 1 card in the opponent's hand and discard it.
- *   - After the reveal, player discards 1 own card, then picks 1 opponent card to discard.
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
@@ -31,51 +29,24 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Pick a random card from opponent's hand
-  const randomIndex = Math.floor(Math.random() * opponentHand.length);
-  const revealedCard = opponentHand[randomIndex];
-
-  // Log the look action
-  const log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_LOOK_HAND',
-    `Sasuke Uchiwa (014): Revealed a random card from opponent's hand: ${revealedCard.name_fr}.`,
-    'game.log.effect.sasuke014Reveal',
-    { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: revealedCard.name_fr },
-  );
-
-  const newState = { ...state, log };
-
-  // Embed card data as JSON in description (parsed by gameStore for INFO_REVEAL UI)
-  const revealData = JSON.stringify({
-    text: isUpgrade
-      ? `Sasuke (014): Revealed ${revealedCard.name_fr}. You may now discard a card to discard one from the opponent's hand.`
-      : `Sasuke (014): Revealed ${revealedCard.name_fr} from opponent's hand.`,
-    cardName: revealedCard.name_fr,
-    cardCost: revealedCard.chakra,
-    cardPower: revealedCard.power,
-    cardImageFile: revealedCard.image_file,
-    isUpgrade,
-    randomIndex,
-  });
+  // Player chooses which face-down card to look at
+  const validTargets = opponentHand.map((_c, i) => String(i));
 
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE014_HAND_REVEAL',
-    validTargets: ['confirm'],
-    description: revealData,
-    descriptionKey: isUpgrade
-      ? 'game.effect.desc.sasuke014RevealUpgrade'
-      : 'game.effect.desc.sasuke014Reveal',
-    descriptionParams: { target: revealedCard.name_fr },
+    targetSelectionType: 'SASUKE014_CHOOSE_HAND_CARD',
+    validTargets,
+    description: JSON.stringify({
+      text: 'Sasuke Uchiwa (014): Choose a card from the opponent\'s hand to look at.',
+      isUpgrade,
+    }),
+    descriptionKey: 'game.effect.desc.sasuke014ChooseHandCard',
   };
 }
 
 function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
-  // The UPGRADE modifies the AMBUSH effect. When this card is played as an upgrade
-  // and then its AMBUSH triggers, the AMBUSH handler checks ctx.isUpgrade.
-  // This UPGRADE handler is a no-op since the logic is integrated into the AMBUSH handler.
+  // The UPGRADE modifies the AMBUSH effect. The logic is integrated into the AMBUSH handler.
   return { state: ctx.state };
 }
 

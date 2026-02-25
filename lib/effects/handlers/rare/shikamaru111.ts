@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 111/130 - SHIKAMARU NARA (R)
@@ -17,12 +18,6 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   Target selection if multiple valid targets. Hide the selected target.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function shikamaru111MainHandler(ctx: EffectContext): EffectResult {
   // Continuous play restriction - handled by the engine's action validation.
   // No-op handler to register the card.
@@ -31,6 +26,7 @@ function shikamaru111MainHandler(ctx: EffectContext): EffectResult {
 
 function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const mission = state.activeMissions[sourceMissionIndex];
@@ -38,7 +34,7 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
 
   // Find non-hidden enemies with effective power <= 3
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(c) <= 3)
+    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {

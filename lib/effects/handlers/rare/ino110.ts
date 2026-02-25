@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 110/130 - INO YAMANAKA (R)
@@ -15,14 +16,9 @@ import type { CharacterInPlay } from '../../../engine/types';
  * UPGRADE: MAIN effect: After moving, hide the enemy character.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function ino110MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex, isUpgrade } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const mission = state.activeMissions[sourceMissionIndex];
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -81,12 +77,12 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
   // Find the minimum effective power among non-hidden enemies
   let minPower = Infinity;
   for (const c of nonHiddenEnemies) {
-    const ep = getEffectivePower(c);
+    const ep = getEffectivePower(state, c, opponentPlayer);
     if (ep < minPower) minPower = ep;
   }
 
   // Filter to weakest enemies (may be multiple tied)
-  const weakest = nonHiddenEnemies.filter((c) => getEffectivePower(c) === minPower);
+  const weakest = nonHiddenEnemies.filter((c) => getEffectivePower(state, c, opponentPlayer) === minPower);
 
   // If exactly one weakest enemy, skip enemy selection step — go directly to destination choice.
   // The INO110_CHOOSE_ENEMY handler in EffectEngine will handle destination selection + upgrade hide.
@@ -97,12 +93,12 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
       targetSelectionType: 'INO110_CHOOSE_ENEMY',
       validTargets: [weakest[0].instanceId],
       description: isUpgrade
-        ? `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission, then hide them.`
-        : `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(weakest[0])}) to another mission.`,
+        ? `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(state, weakest[0], opponentPlayer)}) to another mission, then hide them.`
+        : `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(state, weakest[0], opponentPlayer)}) to another mission.`,
       descriptionKey: isUpgrade
         ? 'game.effect.desc.ino110MoveAndHide'
         : 'game.effect.desc.ino110Move',
-      descriptionParams: { target: weakest[0].card.name_fr, power: getEffectivePower(weakest[0]) },
+      descriptionParams: { target: weakest[0].card.name_fr, power: getEffectivePower(state, weakest[0], opponentPlayer) },
     };
   }
 

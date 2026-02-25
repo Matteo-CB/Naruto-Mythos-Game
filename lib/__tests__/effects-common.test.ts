@@ -363,7 +363,7 @@ describe('034/130 - Yuhi Kurenai', () => {
 // 036/130 - NEJI: Remove up to 2 Power tokens from enemy character
 // ===================================================================
 describe('036/130 - Neji Hyuga', () => {
-  it('should remove 2 power tokens from the only valid enemy target', () => {
+  it('should require target selection for the only valid enemy target with power tokens', () => {
     const neji = mockCharInPlay({ instanceId: 'neji-1' }, {
       id: 'KS-036-C', number: 36, name_fr: 'Neji', keywords: ['Team Guy'], group: 'Leaf Village',
     });
@@ -380,8 +380,9 @@ describe('036/130 - Neji Hyuga', () => {
 
     const handler = getEffectHandler('KS-036-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', neji, 0));
-    const updatedEnemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
-    expect(updatedEnemy?.powerTokens).toBe(1); // 3 - 2 = 1
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('REMOVE_POWER_TOKENS_ENEMY');
+    expect(result.validTargets).toContain('enemy-1');
   });
 
   it('should fizzle when no enemy has power tokens', () => {
@@ -1063,7 +1064,7 @@ describe('090/130 - Itachi Uchiha (C)', () => {
 // 092/130 - KISAME (C): AMBUSH steal up to 2 Power tokens from enemy
 // ===================================================================
 describe('092/130 - Kisame Hoshigaki (C)', () => {
-  it('should steal power tokens from a single valid enemy (AMBUSH)', () => {
+  it('should require target selection for a single valid enemy with power tokens (AMBUSH)', () => {
     const kisame = mockCharInPlay({ instanceId: 'kisame-1', powerTokens: 0 }, {
       id: 'KS-092-C', number: 92, name_fr: 'Kisame', group: 'Akatsuki',
     });
@@ -1081,10 +1082,9 @@ describe('092/130 - Kisame Hoshigaki (C)', () => {
     const handler = getEffectHandler('KS-092-C', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kisame, 0, 'AMBUSH'));
-    const updatedEnemy = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
-    const updatedKisame = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'kisame-1');
-    expect(updatedEnemy?.powerTokens).toBe(1); // 3 - 2 = 1
-    expect(updatedKisame?.powerTokens).toBe(2); // 0 + 2 = 2
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('STEAL_POWER_TOKENS_ENEMY_THIS_MISSION');
+    expect(result.validTargets).toContain('enemy-1');
   });
 
   it('should fizzle when no enemy has power tokens', () => {
@@ -1137,7 +1137,7 @@ describe('Summon characters (094-098)', () => {
 // 099/130 - PAKKUN: SCORE move self to another mission
 // ===================================================================
 describe('099/130 - Pakkun', () => {
-  it('should auto-move Pakkun to the first other mission on SCORE', () => {
+  it('should require target selection to choose destination mission on SCORE', () => {
     const pakkun = mockCharInPlay({ instanceId: 'pakkun-1' }, {
       id: 'KS-099-C', number: 99, name_fr: 'Pakkun',
     });
@@ -1151,11 +1151,9 @@ describe('099/130 - Pakkun', () => {
     const handler = getEffectHandler('KS-099-C', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', pakkun, 0, 'SCORE'));
-    // Pakkun auto-moved from mission 0 to mission 1
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
-    expect(result.state.activeMissions[1].player1Characters.length).toBe(1);
-    expect(result.state.activeMissions[1].player1Characters[0].instanceId).toBe('pakkun-1');
-    expect(result.requiresTargetSelection).toBeUndefined();
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('PAKKUN_MOVE_DESTINATION');
+    expect(result.validTargets).toContain('1'); // mission index 1 is a valid destination
   });
 
   it('should fizzle when only one mission exists', () => {

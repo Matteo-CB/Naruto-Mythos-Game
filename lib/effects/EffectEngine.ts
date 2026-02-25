@@ -104,6 +104,126 @@ export class EffectEngine {
   }
 
   /**
+   * Resolve effects when a hidden character is revealed AND upgrades an existing character.
+   * Triggers MAIN + UPGRADE + AMBUSH effects (all three).
+   */
+  static resolveRevealUpgradeEffects(
+    state: GameState,
+    player: PlayerID,
+    character: CharacterInPlay,
+    missionIndex: number,
+  ): GameState {
+    let newState = deepClone(state);
+    const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+
+    // Resolve MAIN effects
+    const hasMainEffect = (topCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
+    );
+    if (hasMainEffect) {
+      const handler = getEffectHandler(topCard.id, 'MAIN');
+      if (handler) {
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'MAIN',
+            isUpgrade: true,
+          };
+          const result = handler(ctx);
+
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            // Queue remaining: UPGRADE then AMBUSH
+            const remainingEffectTypes: EffectType[] = [];
+            const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
+            if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
+            const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
+            if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
+
+            newState = EffectEngine.createPendingTargetSelection(
+              result.state, player, character, missionIndex, 'MAIN', true,
+              result, remainingEffectTypes,
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] MAIN handler error for ${topCard.id} (reveal-upgrade):`, err);
+        }
+      }
+    }
+
+    // Resolve UPGRADE effects
+    const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
+    if (hasUpgradeEffect) {
+      const handler = getEffectHandler(topCard.id, 'UPGRADE');
+      if (handler) {
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'UPGRADE',
+            isUpgrade: true,
+          };
+          const result = handler(ctx);
+
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            // Queue remaining: AMBUSH
+            const remainingEffectTypes: EffectType[] = [];
+            const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
+            if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
+
+            newState = EffectEngine.createPendingTargetSelection(
+              result.state, player, character, missionIndex, 'UPGRADE', true,
+              result, remainingEffectTypes,
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] UPGRADE handler error for ${topCard.id} (reveal-upgrade):`, err);
+        }
+      }
+    }
+
+    // Resolve AMBUSH effects
+    const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
+    if (hasAmbushEffect) {
+      const handler = getEffectHandler(topCard.id, 'AMBUSH');
+      if (handler) {
+        try {
+          const ctx: EffectContext = {
+            state: newState,
+            sourcePlayer: player,
+            sourceCard: character,
+            sourceMissionIndex: missionIndex,
+            triggerType: 'AMBUSH',
+            isUpgrade: true,
+          };
+          const result = handler(ctx);
+
+          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+            newState = EffectEngine.createPendingTargetSelection(
+              result.state, player, character, missionIndex, 'AMBUSH', true,
+              result, [],
+            );
+            return newState;
+          }
+          newState = result.state;
+        } catch (err) {
+          console.error(`[EffectEngine] AMBUSH handler error for ${topCard.id} (reveal-upgrade):`, err);
+        }
+      }
+    }
+
+    return newState;
+  }
+
+  /**
    * Resolve effects when a hidden character is revealed.
    * Triggers MAIN and AMBUSH effects.
    */
@@ -377,6 +497,7 @@ export class EffectEngine {
       tst === 'ASUMA_024_DISCARD_FOR_POWERUP' ||
       tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
       tst === 'NARUTO141_CHOOSE_DISCARD' ||
+      tst === 'SASUKE142_CHOOSE_DISCARD' ||
       tst === 'DISCARD_AND_HIDE_ENEMY_POWER_4'
     ) {
       actionType = 'DISCARD_CARD';
@@ -384,6 +505,7 @@ export class EffectEngine {
       tst === 'CHOOSE_CARD_FROM_LIST' ||
       tst === 'MSS08_CHOOSE_CARD' ||
       tst === 'JIRAIYA_CHOOSE_SUMMON' ||
+      tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA105_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
       tst === 'SAKURA109_CHOOSE_DISCARD' ||
@@ -392,7 +514,8 @@ export class EffectEngine {
       tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
-      tst === 'KABUTO053_CHOOSE_FROM_DISCARD'
+      tst === 'SASUKE014_CHOOSE_HAND_CARD' ||
+      tst === 'ITACHI091_CHOOSE_HAND_CARD'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
@@ -471,6 +594,76 @@ export class EffectEngine {
         newState = EffectEngine.orochimaruExecuteSteal(newState, pendingEffect);
         break;
 
+      case 'ITACHI091_CHOOSE_HAND_CARD': {
+        // Player chose a face-down card from opponent's hand — reveal it
+        const chosenIdx091 = parseInt(targetId, 10);
+        if (!isNaN(chosenIdx091)) {
+          const opponentPlayer091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const oppHand091 = newState[opponentPlayer091].hand;
+          if (chosenIdx091 >= 0 && chosenIdx091 < oppHand091.length) {
+            const revealedCard091 = oppHand091[chosenIdx091];
+            let parsed091: { isUpgrade?: boolean } = {};
+            try { parsed091 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+            const isUpgrade091 = parsed091.isUpgrade ?? false;
+
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_LOOK_HAND',
+              `Itachi Uchiwa (091): Revealed ${revealedCard091.name_fr} from opponent's hand.`,
+              'game.log.effect.itachi091Reveal',
+              { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: revealedCard091.name_fr },
+            );
+
+            // Create INFO_REVEAL pending
+            const revealData091 = JSON.stringify({
+              text: isUpgrade091
+                ? `Itachi (091): Revealed ${revealedCard091.name_fr}. This card will be discarded.`
+                : `Itachi (091): Revealed ${revealedCard091.name_fr} from opponent's hand.`,
+              cardName: revealedCard091.name_fr,
+              cardCost: revealedCard091.chakra,
+              cardPower: revealedCard091.power,
+              cardImageFile: revealedCard091.image_file,
+              isUpgrade: isUpgrade091,
+              chosenIndex: chosenIdx091,
+            });
+
+            const effectId091 = generateInstanceId();
+            const actionId091 = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId091,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: revealData091,
+              targetSelectionType: 'ITACHI091_HAND_REVEAL',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: ['confirm'],
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: isUpgrade091,
+            });
+            newState.pendingActions.push({
+              id: actionId091,
+              type: 'INFO_REVEAL',
+              player: pendingEffect.sourcePlayer,
+              description: revealData091,
+              descriptionKey: isUpgrade091
+                ? 'game.effect.desc.itachi091RevealUpgrade'
+                : 'game.effect.desc.itachi091Reveal',
+              descriptionParams: { target: revealedCard091.name_fr },
+              options: ['confirm'],
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId091,
+            });
+          }
+        }
+        break;
+      }
+
       case 'ITACHI091_HAND_REVEAL':
         newState = EffectEngine.itachi091ResolveReveal(newState, pendingEffect);
         break;
@@ -486,6 +679,76 @@ export class EffectEngine {
       case 'TAYUYA065_UPGRADE_REVEAL':
         // Acknowledgment only — no additional action needed
         break;
+
+      case 'SASUKE014_CHOOSE_HAND_CARD': {
+        // Player chose a face-down card from opponent's hand — reveal it
+        const chosenIdx014 = parseInt(targetId, 10);
+        if (!isNaN(chosenIdx014)) {
+          const opponentPlayer014 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const oppHand014 = newState[opponentPlayer014].hand;
+          if (chosenIdx014 >= 0 && chosenIdx014 < oppHand014.length) {
+            const revealedCard014 = oppHand014[chosenIdx014];
+            let parsed014: { isUpgrade?: boolean } = {};
+            try { parsed014 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+            const isUpgrade014 = parsed014.isUpgrade ?? false;
+
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_LOOK_HAND',
+              `Sasuke Uchiwa (014): Revealed ${revealedCard014.name_fr} from opponent's hand.`,
+              'game.log.effect.sasuke014Reveal',
+              { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: revealedCard014.name_fr },
+            );
+
+            // Create INFO_REVEAL pending
+            const revealData014 = JSON.stringify({
+              text: isUpgrade014
+                ? `Sasuke (014): Revealed ${revealedCard014.name_fr}. You may now discard a card to discard one from the opponent's hand.`
+                : `Sasuke (014): Revealed ${revealedCard014.name_fr} from opponent's hand.`,
+              cardName: revealedCard014.name_fr,
+              cardCost: revealedCard014.chakra,
+              cardPower: revealedCard014.power,
+              cardImageFile: revealedCard014.image_file,
+              isUpgrade: isUpgrade014,
+              chosenIndex: chosenIdx014,
+            });
+
+            const effectId014 = generateInstanceId();
+            const actionId014 = generateInstanceId();
+            newState.pendingEffects.push({
+              id: effectId014,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: revealData014,
+              targetSelectionType: 'SASUKE014_HAND_REVEAL',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: ['confirm'],
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: isUpgrade014,
+            });
+            newState.pendingActions.push({
+              id: actionId014,
+              type: 'INFO_REVEAL',
+              player: pendingEffect.sourcePlayer,
+              description: revealData014,
+              descriptionKey: isUpgrade014
+                ? 'game.effect.desc.sasuke014RevealUpgrade'
+                : 'game.effect.desc.sasuke014Reveal',
+              descriptionParams: { target: revealedCard014.name_fr },
+              options: ['confirm'],
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId014,
+            });
+          }
+        }
+        break;
+      }
 
       case 'SASUKE014_HAND_REVEAL':
         newState = EffectEngine.sasuke014ResolveReveal(newState, pendingEffect);
@@ -723,8 +986,76 @@ export class EffectEngine {
 
       // --- Gaara 139 (S) ---
       case 'DEFEAT_ENEMY_BY_COST':
+      case 'GAARA139_DEFEAT_BY_COST': {
+        // Find the target character's name and cost BEFORE defeating
+        const gaara139Info = EffectEngine.findCharByInstanceId(newState, targetId);
+        const gaara139DefeatedName = gaara139Info ? gaara139Info.character.card.name_fr : '';
+        const gaara139DefeatedCost = gaara139Info
+          ? (gaara139Info.character.stack.length > 0
+              ? gaara139Info.character.stack[gaara139Info.character.stack.length - 1]
+              : gaara139Info.character.card
+            ).chakra
+          : 0;
+
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+
+        // If upgrade, chain hide effect for another enemy with same name and lower cost
+        if (pendingEffect.isUpgrade && gaara139DefeatedName) {
+          const opponentPlayer = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const gaara139EnemySide: 'player1Characters' | 'player2Characters' =
+            opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+          const hideTargets: string[] = [];
+          for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+            for (const ch of newState.activeMissions[mi][gaara139EnemySide]) {
+              if (ch.isHidden) continue;
+              if (ch.instanceId === targetId) continue;
+              const tc = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              if (tc.name_fr === gaara139DefeatedName && tc.chakra < gaara139DefeatedCost) {
+                hideTargets.push(ch.instanceId);
+              }
+            }
+          }
+
+          if (hideTargets.length > 0) {
+            // Chain hide effect
+            const charResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+            if (charResult) {
+              const hideEffectId = generateInstanceId();
+              const hideActionId = generateInstanceId();
+              newState.pendingEffects = [...newState.pendingEffects, {
+                id: hideEffectId,
+                sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: charResult.missionIndex,
+                effectType: 'UPGRADE' as const,
+                effectDescription: `Gaara (139) UPGRADE: Hide an enemy ${gaara139DefeatedName} with cost less than ${gaara139DefeatedCost}.`,
+                targetSelectionType: 'GAARA139_HIDE_SAME_NAME',
+                sourcePlayer: pendingEffect.sourcePlayer,
+                requiresTargetSelection: true,
+                validTargets: hideTargets,
+                isOptional: true,
+                isMandatory: false,
+                resolved: false,
+                isUpgrade: true,
+              }];
+              newState.pendingActions = [...newState.pendingActions, {
+                id: hideActionId,
+                type: 'SELECT_TARGET' as const,
+                player: pendingEffect.sourcePlayer,
+                description: `Gaara (139) UPGRADE: Hide an enemy ${gaara139DefeatedName} with cost less than ${gaara139DefeatedCost}.`,
+                descriptionKey: 'game.effect.desc.gaara139HideSameName',
+                descriptionParams: { target: gaara139DefeatedName, cost: String(gaara139DefeatedCost) },
+                options: hideTargets,
+                minSelections: 1,
+                maxSelections: 1,
+                sourceEffectId: hideEffectId,
+              }];
+            }
+          }
+        }
         break;
+      }
 
       // --- Itachi 140 (S) UPGRADE ---
       case 'DEFEAT_BY_COST_UPGRADE':
@@ -753,8 +1084,16 @@ export class EffectEngine {
       case 'OROCHIMARU126_DEFEAT_WEAKEST':
       case 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION':
       case 'KIBA149_CHOOSE_DEFEAT_TARGET':
+      case 'SASUKE136_CHOOSE_ENEMY':
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
+
+      // --- Sasuke 136 S: Two-stage defeat (friendly then enemy) ---
+      case 'SASUKE136_CHOOSE_FRIENDLY': {
+        // Stage 1: defeat the chosen friendly character
+        newState = EffectEngine.defeatFriendlyForSasuke136(newState, pendingEffect, targetId);
+        break;
+      }
 
       // =============================================
       // HIDE types
@@ -766,8 +1105,41 @@ export class EffectEngine {
       case 'SHIKAMARU150_CHOOSE_HIDE':
       case 'NARUTO141_CHOOSE_HIDE_TARGET':
       case 'JIRAIYA_HIDE_ENEMY_COST_3':
+      case 'CHOJI018_HIDE_ENEMY':
+      case 'GAARA139_HIDE_SAME_NAME':
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
+
+      // --- Naruto 133 S: Two-stage hide/defeat ---
+      case 'NARUTO133_CHOOSE_TARGET1': {
+        // Stage 1: hide or defeat the chosen enemy (Power ≤5 in this mission)
+        newState = EffectEngine.naruto133ApplyTarget1(newState, pendingEffect, targetId);
+        break;
+      }
+      case 'NARUTO133_CHOOSE_TARGET2': {
+        // Stage 2: hide or defeat a second enemy (Power ≤2 in any mission)
+        let parsed133t2: { useDefeat?: boolean } = {};
+        try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (parsed133t2.useDefeat) {
+          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        }
+        break;
+      }
+
+      // --- Naruto 108 R: Player chooses hide target ---
+      case 'NARUTO108_CHOOSE_HIDE_TARGET': {
+        // Hide the chosen target, then apply POWERUP if upgrade
+        newState = EffectEngine.naruto108ApplyHide(newState, pendingEffect, targetId);
+        break;
+      }
+
+      // --- Kyubi 134 S: Iterative multi-hide ---
+      case 'KYUBI134_CHOOSE_HIDE_TARGETS': {
+        newState = EffectEngine.kyubi134ApplyHide(newState, pendingEffect, targetId);
+        break;
+      }
 
       // =============================================
       // Itachi 128 — single-stage: move chosen friendly character to Itachi's mission
@@ -780,7 +1152,7 @@ export class EffectEngine {
         if (moveRes128) {
           newState = EffectEngine.moveCharToMissionDirectPublic(
             newState, targetId, dest128,
-            moveRes128.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+            moveRes128.player, 'ITACHI UCHIWA', pendingEffect.sourceCardId,
           );
         }
         break;
@@ -892,6 +1264,33 @@ export class EffectEngine {
       case 'PAKKUN_MOVE_DESTINATION':
         newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
         break;
+
+      case 'KAKASHI137_HIDE_UPGRADED': {
+        // Hide the selected upgraded character
+        const kakRes = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (kakRes) {
+          const kakSide: 'player1Characters' | 'player2Characters' =
+            kakRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const kakMissions = [...newState.activeMissions];
+          const kakMission = { ...kakMissions[kakRes.missionIndex] };
+          const kakChars = [...kakMission[kakSide]];
+          const kakIdx = kakChars.findIndex((c) => c.instanceId === targetId);
+          if (kakIdx !== -1) {
+            kakChars[kakIdx] = { ...kakChars[kakIdx], isHidden: true };
+            kakMission[kakSide] = kakChars;
+            kakMissions[kakRes.missionIndex] = kakMission;
+            newState.activeMissions = kakMissions;
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_HIDE',
+              `Kakashi Hatake (137): Hid upgraded ${kakRes.character.card.name_fr}.`,
+              'game.log.effect.hide',
+              { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: kakRes.character.card.name_fr, mission: String(kakRes.missionIndex + 1) },
+            );
+          }
+        }
+        break;
+      }
 
       // --- Shikamaru 022 — move enemy character (two-stage: char then destination) ---
       case 'SHIKAMARU_MOVE_ENEMY': {
@@ -1427,6 +1826,10 @@ export class EffectEngine {
       // =============================================
       // PLAY SUMMON types
       // =============================================
+      case 'JIRAIYA008_CHOOSE_SUMMON':
+        newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 2);
+        break;
+
       case 'JIRAIYA105_CHOOSE_SUMMON':
         newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 3);
         break;
@@ -1699,67 +2102,6 @@ export class EffectEngine {
         }
         break;
       }
-      case 'KABUTO053_CHOOSE_FROM_DISCARD': {
-        // Stage 1: Player chose a character from discard pile. Stage 2: choose mission.
-        const discardIdx_kb = parseInt(targetId, 10);
-        const player_kb = pendingEffect.sourcePlayer;
-        const ps_kb = newState[player_kb];
-
-        if (discardIdx_kb >= 0 && discardIdx_kb < ps_kb.discardPile.length) {
-          const card_kb = ps_kb.discardPile[discardIdx_kb];
-          const reducedCost_kb = Math.max(0, (card_kb.chakra ?? 0) - 3);
-          const friendlySide_kb = player_kb === 'player1' ? 'player1Characters' : 'player2Characters';
-
-          // Find valid missions (no same-name conflict)
-          const validMissions_kb: string[] = [];
-          for (let i = 0; i < newState.activeMissions.length; i++) {
-            const mission = newState.activeMissions[i];
-            const hasSameName = mission[friendlySide_kb as 'player1Characters' | 'player2Characters'].some((c: CharacterInPlay) => {
-              const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              return tc.name_fr === card_kb.name_fr;
-            });
-            if (!hasSameName) validMissions_kb.push(String(i));
-          }
-
-          if (validMissions_kb.length === 1) {
-            // Auto-play on the single valid mission
-            newState = EffectEngine.kabuto053PlayFromDiscard(newState, player_kb, parseInt(validMissions_kb[0], 10), reducedCost_kb, discardIdx_kb);
-          } else if (validMissions_kb.length > 1) {
-            // Create second pending for mission selection
-            const effectId_kb = generateInstanceId();
-            const actionId_kb = generateInstanceId();
-            newState.pendingEffects = [...newState.pendingEffects, {
-              id: effectId_kb,
-              sourceCardId: pendingEffect.sourceCardId,
-              sourceInstanceId: pendingEffect.sourceInstanceId,
-              sourceMissionIndex: pendingEffect.sourceMissionIndex,
-              effectType: pendingEffect.effectType,
-              effectDescription: JSON.stringify({ discardIndex: discardIdx_kb, reducedCost: reducedCost_kb }),
-              targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
-              sourcePlayer: player_kb,
-              requiresTargetSelection: true,
-              validTargets: validMissions_kb,
-              isOptional: true,
-              isMandatory: false,
-              resolved: false,
-              isUpgrade: pendingEffect.isUpgrade,
-            }];
-            newState.pendingActions = [...newState.pendingActions, {
-              id: actionId_kb,
-              type: 'SELECT_TARGET' as PendingAction['type'],
-              player: player_kb,
-              description: `Kabuto Yakushi (053): Choose a mission to play ${card_kb.name_fr} on (cost ${reducedCost_kb}).`,
-              descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
-              descriptionParams: { cardName: card_kb.name_fr, cost: String(reducedCost_kb) },
-              options: validMissions_kb,
-              minSelections: 1,
-              maxSelections: 1,
-              sourceEffectId: effectId_kb,
-            }];
-          }
-        }
-        break;
-      }
       case 'SASUKE_014_DISCARD_OWN': {
         // Stage 1: discard own card from hand, then chain to opponent hand discard
         const idx_ss = parseInt(targetId, 10);
@@ -1945,19 +2287,6 @@ export class EffectEngine {
         );
         break;
       }
-      case 'NARUTO141_CHOOSE_DISCARD': {
-        // Stage 1: discard from hand, then hide enemy target
-        const idx_nr = parseInt(targetId, 10);
-        const ps_nr = { ...newState[pendingEffect.sourcePlayer] };
-        if (idx_nr >= 0 && idx_nr < ps_nr.hand.length) {
-          const hand_nr = [...ps_nr.hand];
-          const discarded_nr = hand_nr.splice(idx_nr, 1)[0];
-          ps_nr.hand = hand_nr;
-          ps_nr.discardPile = [...ps_nr.discardPile, discarded_nr];
-          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_nr };
-        }
-        break;
-      }
       case 'DISCARD_AND_HIDE_ENEMY_POWER_4': {
         // Discard from hand, then hide enemy with power <= 4 (combined in handler)
         const idx_dh = parseInt(targetId, 10);
@@ -2027,7 +2356,24 @@ export class EffectEngine {
       // =============================================
       // MOVE SELF types (target = mission index → move self there)
       // =============================================
-      case 'CHOJI_018_MOVE_SELF':
+      case 'CHOJI_018_MOVE_SELF': {
+        // Move Choji, then trigger post-move hide
+        newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
+        const destMIdx018 = parseInt(targetId, 10);
+        if (!isNaN(destMIdx018)) {
+          const { postMoveHide } = require('./handlers/uncommon/choji018');
+          const hideResult = postMoveHide(newState, pendingEffect.sourceInstanceId, destMIdx018, pendingEffect.sourcePlayer);
+          if (hideResult.requiresTargetSelection && hideResult.validTargets && hideResult.validTargets.length > 0) {
+            return EffectEngine.createPendingTargetSelection(
+              hideResult.state, pendingEffect.sourcePlayer,
+              EffectEngine.findCharByInstanceId(hideResult.state, pendingEffect.sourceInstanceId)?.character ?? { instanceId: pendingEffect.sourceInstanceId, card: { id: pendingEffect.sourceCardId } as any, isHidden: false, powerTokens: 0, stack: [], controlledBy: pendingEffect.sourcePlayer, originalOwner: pendingEffect.sourcePlayer, missionIndex: destMIdx018 },
+              destMIdx018, 'UPGRADE', false, hideResult, [],
+            );
+          }
+          newState = hideResult.state;
+        }
+        break;
+      }
       case 'SHINO_MOVE_SELF':
       case 'NARUTO_MOVE_SELF':
       case 'MOVE_SELF_TO_MISSION':
@@ -3206,7 +3552,7 @@ export class EffectEngine {
    * - If not upgrade: nothing more to do.
    */
   static itachi091ResolveReveal(state: GameState, pending: PendingEffect): GameState {
-    let parsed: { cardName: string; isUpgrade: boolean; randomIndex: number };
+    let parsed: { cardName: string; isUpgrade: boolean; chosenIndex: number; randomIndex?: number };
     try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
 
     if (!parsed.isUpgrade) {
@@ -3219,9 +3565,10 @@ export class EffectEngine {
     const opponentPlayer = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
     const ps = newState[opponentPlayer];
 
-    if (parsed.randomIndex >= 0 && parsed.randomIndex < ps.hand.length) {
+    const cardIndex = parsed.chosenIndex ?? parsed.randomIndex ?? -1;
+    if (cardIndex >= 0 && cardIndex < ps.hand.length) {
       const hand = [...ps.hand];
-      const discardedCard = hand.splice(parsed.randomIndex, 1)[0];
+      const discardedCard = hand.splice(cardIndex, 1)[0];
       ps.hand = hand;
       ps.discardPile = [...ps.discardPile, discardedCard];
 
@@ -3403,6 +3750,296 @@ export class EffectEngine {
     return state;
   }
 
+  /** Sasuke 136 Stage 1: defeat the chosen friendly, then prompt for enemy target */
+  static defeatFriendlyForSasuke136(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    // Defeat the friendly character
+    let newState = EffectEngine.defeatCharacter(state, targetId, pending.sourcePlayer);
+
+    // Find enemy targets in the source mission
+    let missionIdx = pending.sourceMissionIndex;
+    try {
+      const parsed = JSON.parse(pending.effectDescription);
+      if (parsed.missionIndex !== undefined) missionIdx = parsed.missionIndex;
+    } catch { /* ignore */ }
+
+    const mission = newState.activeMissions[missionIdx];
+    if (!mission) return newState;
+
+    const enemySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const enemyTargets = mission[enemySide].map((c) => c.instanceId);
+
+    if (enemyTargets.length === 0) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Sasuke Uchiwa (136) UPGRADE: No enemy character to defeat after sacrifice.',
+        'game.log.effect.noTarget',
+        { card: 'SASUKE UCHIWA', id: 'KS-136-S' },
+      );
+      return newState;
+    }
+
+    if (enemyTargets.length === 1) {
+      // Auto-defeat the only enemy
+      return EffectEngine.defeatCharacter(newState, enemyTargets[0], pending.sourcePlayer);
+    }
+
+    // Stage 2: choose enemy to defeat
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: missionIdx,
+      effectType: 'UPGRADE',
+      effectDescription: '',
+      targetSelectionType: 'SASUKE136_CHOOSE_ENEMY',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: enemyTargets,
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: true,
+    });
+
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'SELECT_TARGET',
+      player: pending.sourcePlayer,
+      description: 'Sasuke Uchiwa (136) UPGRADE: Choose an enemy character to defeat.',
+      descriptionKey: 'game.effect.desc.sasuke136ChooseEnemy',
+      options: enemyTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
+
+    return newState;
+  }
+
+  /** Naruto 133 S — Stage 1: hide/defeat target 1, then chain to target 2 */
+  static naruto133ApplyTarget1(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    let parsed: { missionIndex?: number; useDefeat?: boolean } = {};
+    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    const useDefeat = parsed.useDefeat ?? false;
+
+    // Apply hide or defeat to target 1
+    let newState: GameState;
+    if (useDefeat) {
+      newState = EffectEngine.defeatCharacter(state, targetId, pending.sourcePlayer);
+    } else {
+      newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
+    }
+
+    // Now find valid targets for Stage 2: enemy Power ≤ 2 in ANY mission
+    const enemySideKey: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+    const validTarget2: string[] = [];
+    for (let i = 0; i < newState.activeMissions.length; i++) {
+      for (const char of newState.activeMissions[i][enemySideKey]) {
+        if (!char.isHidden) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const power = topCard.power + char.powerTokens;
+          if (power <= 2) {
+            validTarget2.push(char.instanceId);
+          }
+        }
+      }
+    }
+
+    if (validTarget2.length === 0) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Naruto Uzumaki (133): No valid second enemy with Power 2 or less in play.',
+        'game.log.effect.noTarget',
+        { card: 'NARUTO UZUMAKI', id: 'KS-133-S' },
+      );
+      return newState;
+    }
+
+    if (validTarget2.length === 1) {
+      // Auto-apply to the only target
+      if (useDefeat) {
+        return EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
+      } else {
+        return EffectEngine.hideCharacterWithLog(newState, validTarget2[0], pending.sourcePlayer);
+      }
+    }
+
+    // Stage 2: player chooses second target
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: JSON.stringify({ useDefeat, target1Id: targetId }),
+      targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: validTarget2,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: pending.isUpgrade,
+    });
+
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'SELECT_TARGET',
+      player: pending.sourcePlayer,
+      description: useDefeat
+        ? 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to defeat (any mission).'
+        : 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to hide (any mission).',
+      descriptionKey: useDefeat
+        ? 'game.effect.desc.naruto133ChooseDefeat2'
+        : 'game.effect.desc.naruto133ChooseHide2',
+      options: validTarget2,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
+
+    return newState;
+  }
+
+  /** Naruto 108 R — hide target and apply POWERUP if upgrade */
+  static naruto108ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    let parsed: { isUpgrade?: boolean } = {};
+    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    const isUpgrade = parsed.isUpgrade ?? false;
+
+    // Get the target's power BEFORE hiding
+    const charResult = EffectEngine.findCharByInstanceId(state, targetId);
+    if (!charResult) return state;
+    const topCard = charResult.character.stack.length > 0
+      ? charResult.character.stack[charResult.character.stack.length - 1]
+      : charResult.character.card;
+    const targetPower = topCard.power + charResult.character.powerTokens;
+
+    // Hide the target
+    let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
+
+    // UPGRADE: POWERUP X on self where X = Power of hidden character
+    if (isUpgrade && targetPower > 0) {
+      const friendlySideKey: 'player1Characters' | 'player2Characters' =
+        pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+      const missions = [...newState.activeMissions];
+      const mission = { ...missions[pending.sourceMissionIndex] };
+      const friendlyChars = [...mission[friendlySideKey]];
+      const selfIdx = friendlyChars.findIndex((c) => c.instanceId === pending.sourceInstanceId);
+      if (selfIdx !== -1) {
+        friendlyChars[selfIdx] = {
+          ...friendlyChars[selfIdx],
+          powerTokens: friendlyChars[selfIdx].powerTokens + targetPower,
+        };
+        mission[friendlySideKey] = friendlyChars;
+        missions[pending.sourceMissionIndex] = mission;
+        newState = {
+          ...newState,
+          activeMissions: missions,
+          log: logAction(
+            newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+            'EFFECT_POWERUP',
+            `Naruto Uzumaki (108): POWERUP ${targetPower} (Power of hidden ${charResult.character.card.name_fr}).`,
+            'game.log.effect.powerup',
+            { card: 'NARUTO UZUMAKI', id: 'KS-108-R', amount: targetPower, target: 'self' },
+          ),
+        };
+      }
+    }
+
+    return newState;
+  }
+
+  /** Kyubi 134 S — iterative multi-hide: hide target, then offer more picks if budget remains */
+  static kyubi134ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
+    let parsed: { remainingPower?: number; hiddenIds?: string[] } = {};
+    try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    let remainingPower = parsed.remainingPower ?? 6;
+    const hiddenIds = parsed.hiddenIds ?? [];
+
+    // Get target's power before hiding
+    const charResult = EffectEngine.findCharByInstanceId(state, targetId);
+    if (!charResult || charResult.character.isHidden) return state;
+    const topCard = charResult.character.stack.length > 0
+      ? charResult.character.stack[charResult.character.stack.length - 1]
+      : charResult.character.card;
+    const targetPower = topCard.power + charResult.character.powerTokens;
+
+    // Hide the target
+    let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
+    remainingPower -= targetPower;
+    hiddenIds.push(targetId);
+
+    if (remainingPower <= 0) return newState; // No budget left
+
+    // Find remaining valid targets (not already hidden, not self, power fits in budget)
+    const validNext: string[] = [];
+    for (let i = 0; i < newState.activeMissions.length; i++) {
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        for (const char of newState.activeMissions[i][side]) {
+          if (char.isHidden) continue;
+          if (char.instanceId === pending.sourceInstanceId) continue; // not self (Kyubi)
+          if (hiddenIds.includes(char.instanceId)) continue;
+          const tc = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const pw = tc.power + char.powerTokens;
+          if (pw <= remainingPower && pw > 0) {
+            validNext.push(char.instanceId);
+          }
+        }
+      }
+    }
+
+    if (validNext.length === 0) return newState; // No more valid targets
+
+    // Offer another pick (optional — player can decline)
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: 'UPGRADE',
+      effectDescription: JSON.stringify({ remainingPower, hiddenIds }),
+      targetSelectionType: 'KYUBI134_CHOOSE_HIDE_TARGETS',
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: validNext,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: true,
+    });
+
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'SELECT_TARGET',
+      player: pending.sourcePlayer,
+      description: `Kyubi (134) UPGRADE: Choose another character to hide (remaining power budget: ${remainingPower}).`,
+      descriptionKey: 'game.effect.desc.kyubi134ChooseHide',
+      descriptionParams: { remaining: String(remainingPower) },
+      options: validNext,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
+
+    return newState;
+  }
+
   /** Hide a character and log the action */
   static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetInstanceId);
@@ -3464,18 +4101,27 @@ export class EffectEngine {
     ps.hand.splice(handIndex, 1);
     ps.chakra -= cost;
 
-    // Find valid missions (no same-name character already there)
+    // Find valid missions (fresh play or upgrade over same-name with lower cost)
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const hasSameName = mission[friendlySide].some(c => {
+      const sameNameChar = mission[friendlySide].find(c => {
+        if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr === chosenCard.name_fr;
+        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
-      if (!hasSameName) validMissions.push(String(i));
+      if (!sameNameChar) {
+        validMissions.push(String(i));
+      } else {
+        const existingTopCard = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+          validMissions.push(String(i));
+        }
+      }
     }
 
     if (validMissions.length === 0) {
@@ -3553,18 +4199,27 @@ export class EffectEngine {
     ps.hand.splice(handIndex, 1);
     ps.chakra -= cost;
 
-    // Find valid missions (no same-name character already there)
+    // Find valid missions (fresh play or upgrade over same-name with lower cost)
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const hasSameName = mission[friendlySide].some(c => {
+      const sameNameChar = mission[friendlySide].find(c => {
+        if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr === chosenCard.name_fr;
+        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
-      if (!hasSameName) validMissions.push(String(i));
+      if (!sameNameChar) {
+        validMissions.push(String(i));
+      } else {
+        const existingTopCard = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+          validMissions.push(String(i));
+        }
+      }
     }
 
     if (validMissions.length === 0) {
@@ -3618,7 +4273,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Generic helper: place the card (last in discard) onto a mission as a face-visible character */
+  /** Generic helper: place the card (last in discard) onto a mission as a face-visible character, with upgrade support + MAIN effect triggering */
   private static genericPlaceOnMission(state: GameState, player: PlayerID, missionIndex: number, cost: number, cardName: string, cardId: string, costReduction: number): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
@@ -3627,31 +4282,70 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const charInPlay: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card: card as any,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card as any],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
-
     const missions = [...state.activeMissions];
     const mission = { ...missions[missionIndex] };
-    mission[friendlySide] = [...mission[friendlySide], charInPlay];
-    missions[missionIndex] = mission;
 
-    ps.charactersInPlay = EffectEngine.countCharsForPlayer({ ...state, activeMissions: missions }, player);
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide].findIndex(c => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    });
 
-    state.activeMissions = missions;
-    state.log = logAction(
-      state.log, state.turn, 'action', player,
-      'EFFECT', `${cardName} (${cardId}): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${cost} chakra (reduced by ${costReduction}).`,
-      'game.log.effect.playSummon',
-      { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
-    );
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
+    if (existingIdx >= 0) {
+      const existing = mission[friendlySide][existingIdx];
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card: card as any,
+        stack: [...existing.stack, card as any],
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
+
+      state.log = logAction(
+        state.log, state.turn, 'action', player,
+        'EFFECT_UPGRADE',
+        `${cardName} (${cardId}): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${cost} chakra (reduced by ${costReduction}).`,
+        'game.log.effect.upgradeFromHand',
+        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+      );
+    } else {
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card: card as any,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [card as any],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex,
+      };
+
+      mission[friendlySide] = [...mission[friendlySide], charInPlay];
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = charInPlay;
+
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+
+      state.log = logAction(
+        state.log, state.turn, 'action', player,
+        'EFFECT', `${cardName} (${cardId}): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${cost} chakra (reduced by ${costReduction}).`,
+        'game.log.effect.playSummon',
+        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+      );
+    }
+
+    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
+    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
     return state;
   }
@@ -3688,32 +4382,10 @@ export class EffectEngine {
     // Remove from hand
     ps.hand.splice(cardIndex, 1);
 
-    // Create character in play
-    const charInPlay: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
+    // Store in discard temporarily and use jiraiyaPlaceOnMission (handles upgrades + MAIN effects)
+    ps.discardPile.push(card);
 
-    const mission = newState.activeMissions[missionIndex];
-    const key = player === 'player1' ? 'player1Characters' : 'player2Characters';
-    mission[key].push(charInPlay);
-
-    ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
-
-    newState.log = logAction(
-      newState.log, newState.turn, 'action', player,
-      'EFFECT', `Jiraiya's effect: plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
-      'game.log.effect.playSummon',
-      { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: missionIndex + 1, cost },
-    );
-
-    return newState;
+    return EffectEngine.jiraiyaPlaceOnMission(newState, player, missionIndex, cost);
   }
 
   /** Kimimaro step 2: hide the selected target character */
@@ -4079,41 +4751,78 @@ export class EffectEngine {
     }
     ps.chakra -= cost;
 
-    const charInPlay: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex: missionIdx,
-    };
+    const friendlySide: 'player1Characters' | 'player2Characters' =
+      player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const mission = { ...newState.activeMissions[missionIdx] };
-    if (player === 'player1') {
-      mission.player1Characters = [...mission.player1Characters, charInPlay];
+    const missions = [...newState.activeMissions];
+    const mission = { ...missions[missionIdx] };
+
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide].findIndex(c => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    });
+
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
+    if (existingIdx >= 0) {
+      const existing = mission[friendlySide][existingIdx];
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card,
+        stack: [...existing.stack, card],
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIdx] = mission;
+      newState.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
+
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT_UPGRADE',
+        `Kabuto Yakushi (053): Upgraded ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
+        'game.log.effect.upgradeFromDiscard',
+        { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
+      );
     } else {
-      mission.player2Characters = [...mission.player2Characters, charInPlay];
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [card],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex: missionIdx,
+      };
+
+      mission[friendlySide] = [...mission[friendlySide], charInPlay];
+      missions[missionIdx] = mission;
+      newState.activeMissions = missions;
+      placedChar = charInPlay;
+
+      let charCount = 0;
+      for (const m of newState.activeMissions) {
+        charCount += (player === 'player1' ? m.player1Characters : m.player2Characters).length;
+      }
+      ps.charactersInPlay = charCount;
+
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT',
+        `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
+        'game.log.effect.playFromDiscard',
+        { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
+      );
     }
-    newState.activeMissions = [...newState.activeMissions];
-    newState.activeMissions[missionIdx] = mission;
 
-    let charCount = 0;
-    for (const m of newState.activeMissions) {
-      charCount += (player === 'player1' ? m.player1Characters : m.player2Characters).length;
-    }
-    ps.charactersInPlay = charCount;
-
-    newState.log = logAction(
-      newState.log, newState.turn, newState.phase, player,
-      'EFFECT',
-      `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
-      'game.log.effect.playFromDiscard',
-      { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
-    );
-
-    return newState;
+    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
+    return EffectEngine.resolvePlayEffects(newState, player, placedChar, missionIdx, isCardUpgrade);
   }
 
   static hiruzen002PlaceCard(state: GameState, pending: PendingEffect, cardIndex: number, missionIndex: number): GameState {
@@ -4371,18 +5080,27 @@ export class EffectEngine {
     ps.hand.splice(handIndex, 1);
     ps.chakra -= cost;
 
-    // Find valid missions (no same-name character already there)
+    // Find valid missions (fresh play or upgrade over same-name with lower cost)
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const hasSameName = mission[friendlySide].some(c => {
+      const sameNameChar = mission[friendlySide].find(c => {
+        if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr === chosenCard.name_fr;
+        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
-      if (!hasSameName) validMissions.push(String(i));
+      if (!sameNameChar) {
+        validMissions.push(String(i));
+      } else {
+        const existingTopCard = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+          validMissions.push(String(i));
+        }
+      }
     }
 
     if (validMissions.length === 0) {
@@ -4456,30 +5174,71 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const charInPlay: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card: card as any,
-      isHidden: false,
-      powerTokens: 0,
-      stack: [card as any],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
-
     const missions = [...state.activeMissions];
     const mission = { ...missions[missionIndex] };
-    mission[friendlySide] = [...mission[friendlySide], charInPlay];
-    missions[missionIndex] = mission;
 
-    ps.charactersInPlay = EffectEngine.countCharsForPlayer({ ...state, activeMissions: missions }, player);
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide].findIndex(c => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    });
 
-    state.activeMissions = missions;
-    state.log = logAction(
-      state.log, state.turn, 'action', player,
-      'EFFECT', `Jiraiya plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
-      'game.log.effect.playSummon', { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
-    );
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
+    if (existingIdx >= 0) {
+      // Upgrade the existing character
+      const existing = mission[friendlySide][existingIdx];
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card: card as any,
+        stack: [...existing.stack, card as any],
+      };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
+
+      state.log = logAction(
+        state.log, state.turn, 'action', player,
+        'EFFECT_UPGRADE',
+        `Jiraiya effect: Upgraded ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
+        'game.log.effect.upgradeSummon',
+        { card: 'Jiraya', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+      );
+    } else {
+      // Fresh play
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card: card as any,
+        isHidden: false,
+        powerTokens: 0,
+        stack: [card as any],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex,
+      };
+
+      mission[friendlySide] = [...mission[friendlySide], charInPlay];
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = charInPlay;
+
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+
+      state.log = logAction(
+        state.log, state.turn, 'action', player,
+        'EFFECT', `Jiraiya effect: Plays ${card.name_fr} as Summon on mission ${missionIndex + 1} for ${cost} chakra.`,
+        'game.log.effect.playSummon', { card: 'Jiraya', id: 'KS-007-C', target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+      );
+    }
+
+    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
+    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
     return state;
   }

@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils';
 
 /**
  * Card 136/130 - SASUKE UCHIWA "Marque maudite du Ciel" (S)
@@ -14,6 +12,8 @@ import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils
  *
  * UPGRADE: You must choose a friendly non-hidden character AND any enemy character
  *          in this mission and defeat them, if able.
+ *   Stage 1: Player chooses which friendly to sacrifice
+ *   Stage 2: Player chooses which enemy to destroy
  */
 
 function sasuke136MainHandler(ctx: EffectContext): EffectResult {
@@ -29,14 +29,8 @@ function sasuke136MainHandler(ctx: EffectContext): EffectResult {
   return { state: { ...state, log } };
 }
 
-/** Get the effective power of a character for auto-resolution targeting. */
-function getCharPower(char: CharacterInPlay): number {
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return (char.isHidden ? 0 : topCard.power) + char.powerTokens;
-}
-
 function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
+  const state = ctx.state;
   const mission = state.activeMissions[ctx.sourceMissionIndex];
 
   const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -44,21 +38,13 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pick weakest friendly (least power loss) for sacrifice
+  // Find eligible friendly targets (non-hidden, not Sasuke himself)
   const friendlyTargets = mission[friendlySide].filter(
     (c) => !c.isHidden && c.instanceId !== ctx.sourceCard.instanceId,
   );
-  const friendlyTarget = friendlyTargets.length > 0
-    ? friendlyTargets.reduce((a, b) => getCharPower(a) <= getCharPower(b) ? a : b)
-    : undefined;
-
-  // Pick strongest enemy (best strategic value) for destruction
   const enemyTargets = mission[enemySide];
-  const enemyTarget = enemyTargets.length > 0
-    ? enemyTargets.reduce((a, b) => getCharPower(a) >= getCharPower(b) ? a : b)
-    : undefined;
 
-  if (!friendlyTarget || !enemyTarget) {
+  if (friendlyTargets.length === 0 || enemyTargets.length === 0) {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
@@ -69,19 +55,19 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  state = defeatFriendlyCharacter(state, ctx.sourceMissionIndex, friendlyTarget.instanceId, ctx.sourcePlayer);
-  state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-    `Sasuke Uchiwa (136): Defeated friendly ${friendlyTarget.card.name_fr} (mutual destruction).`,
-    'game.log.effect.defeat',
-    { card: 'SASUKE UCHIWA', id: 'KS-136-S', target: friendlyTarget.card.name_fr }) };
-
-  state = defeatEnemyCharacter(state, ctx.sourceMissionIndex, enemyTarget.instanceId, ctx.sourcePlayer);
-  state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-    `Sasuke Uchiwa (136): Defeated enemy ${enemyTarget.card.name_fr} (mutual destruction).`,
-    'game.log.effect.defeat',
-    { card: 'SASUKE UCHIWA', id: 'KS-136-S', target: enemyTarget.card.name_fr }) };
-
-  return { state };
+  // Stage 1: Player chooses which friendly to sacrifice
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SASUKE136_CHOOSE_FRIENDLY',
+    validTargets: friendlyTargets.map((c) => c.instanceId),
+    isMandatory: true,
+    description: JSON.stringify({
+      missionIndex: ctx.sourceMissionIndex,
+      text: 'Sasuke Uchiwa (136) UPGRADE: Choose a friendly character to defeat.',
+    }),
+    descriptionKey: 'game.effect.desc.sasuke136ChooseFriendly',
+  };
 }
 
 export function registerSasuke136Handlers(): void {

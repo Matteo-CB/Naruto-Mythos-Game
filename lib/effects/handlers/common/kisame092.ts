@@ -35,14 +35,6 @@ function handleKisame092Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: 'KS-092-C' }) } };
   }
 
-  // If exactly one target, apply automatically
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const newState = transferPowerTokens(state, targetId, sourceCard.instanceId, 2, sourceMissionIndex, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: requires selection
   return {
     state,
     requiresTargetSelection: true,

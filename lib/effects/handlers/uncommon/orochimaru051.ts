@@ -63,18 +63,6 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-051-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const missionIdx = targetMissionMap[targetId];
-    let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
-    newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
-      `Orochimaru (051): Defeated a hidden enemy character in mission ${missionIdx + 1} (upgrade).`,
-      'game.log.effect.defeat', { card: 'OROCHIMARU', id: 'KS-051-UC', target: '' }) };
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
   return {
     state,
     requiresTargetSelection: true,

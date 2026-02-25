@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter } from '../../defeatUtils';
 
 /**
  * Card 139/130 - GAARA "Le Tombeau du Desert" (S)
@@ -56,7 +54,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
   }
 
   // Find all visible enemy characters with cost strictly less than hiddenCount
-  const validTargets: { char: CharacterInPlay; missionIndex: number }[] = [];
+  const validTargets: { char: import('../../../engine/types').CharacterInPlay; missionIndex: number }[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][enemySide]) {
       if (char.isHidden) continue;
@@ -81,105 +79,16 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  if (validTargets.length > 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'DEFEAT_ENEMY_BY_COST',
-      validTargets: validTargets.map((t) => t.char.instanceId),
-      description: `Gaara (139): Select an enemy character with cost less than ${hiddenCount} to defeat.`,
-      descriptionKey: 'game.effect.desc.gaara139Defeat',
-      descriptionParams: { hiddenCount },
-    };
-  }
-
-  // Exactly 1 valid target: auto-apply
-  const target = validTargets[0];
-  const defeatedName = target.char.card.name_fr;
-  const defeatedCost = (target.char.stack.length > 0
-    ? target.char.stack[target.char.stack.length - 1]
-    : target.char.card
-  ).chakra;
-
-  state = defeatEnemyCharacter(state, target.missionIndex, target.char.instanceId, ctx.sourcePlayer);
-
-  state = {
-    ...state,
-    log: logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_DEFEAT',
-      `Gaara (139): Defeated enemy ${defeatedName} (cost ${defeatedCost}, hidden count ${hiddenCount}).`,
-      'game.log.effect.defeat',
-      { card: 'GAARA', id: 'KS-139-S', target: defeatedName },
-    ),
+  // Always let player choose (optional effect)
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'GAARA139_DEFEAT_BY_COST',
+    validTargets: validTargets.map((t) => t.char.instanceId),
+    description: `Gaara (139): Select an enemy character with cost less than ${hiddenCount} to defeat.`,
+    descriptionKey: 'game.effect.desc.gaara139Defeat',
+    descriptionParams: { hiddenCount },
   };
-
-  // UPGRADE addition: hide another enemy character with same name and lower cost
-  if (ctx.isUpgrade) {
-    let hideTarget: CharacterInPlay | null = null;
-    let hideMissionIndex = -1;
-
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      for (const char of state.activeMissions[i][enemySide]) {
-        if (char.isHidden) continue;
-        if (char.instanceId === target.char.instanceId) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.name_fr === defeatedName && topCard.chakra < defeatedCost) {
-          hideTarget = char;
-          hideMissionIndex = i;
-          break;
-        }
-      }
-      if (hideTarget) break;
-    }
-
-    if (hideTarget && hideMissionIndex !== -1) {
-      const missions = [...state.activeMissions];
-      const mission = { ...missions[hideMissionIndex] };
-      const enemyChars = [...mission[enemySide]];
-      const idx = enemyChars.findIndex((c) => c.instanceId === hideTarget!.instanceId);
-
-      if (idx !== -1) {
-        enemyChars[idx] = { ...enemyChars[idx], isHidden: true };
-        mission[enemySide] = enemyChars;
-        missions[hideMissionIndex] = mission;
-
-        state = {
-          ...state,
-          activeMissions: missions,
-          log: logAction(
-            state.log,
-            state.turn,
-            state.phase,
-            ctx.sourcePlayer,
-            'EFFECT_HIDE',
-            `Gaara (139): Hid enemy ${hideTarget.card.name_fr} in mission ${hideMissionIndex} (upgrade, same name, lower cost).`,
-            'game.log.effect.hide',
-            { card: 'GAARA', id: 'KS-139-S', target: hideTarget.card.name_fr, mission: `mission ${hideMissionIndex}` },
-          ),
-        };
-      }
-    } else {
-      state = {
-        ...state,
-        log: logAction(
-          state.log,
-          state.turn,
-          state.phase,
-          ctx.sourcePlayer,
-          'EFFECT_NO_TARGET',
-          `Gaara (139): No other enemy ${defeatedName} with lower cost to hide (upgrade).`,
-          'game.log.effect.noTarget',
-          { card: 'GAARA', id: 'KS-139-S' },
-        ),
-      };
-    }
-  }
-
-  return { state };
 }
 
 function gaara139UpgradeHandler(ctx: EffectContext): EffectResult {

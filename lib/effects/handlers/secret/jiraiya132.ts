@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { generateInstanceId } from '../../../engine/utils/id';
 
 /**
  * Card 132/130 - JIRAYA (S)
@@ -47,75 +45,16 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If multiple valid targets, return target selection
-  if (affordableSummons.length > 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'JIRAIYA132_CHOOSE_SUMMON',
-      validTargets: affordableSummons.map((s) => String(s.handIndex)),
-      description: 'Jiraya (132): Choose a Summon character from your hand to play (paying 5 less).',
-      descriptionKey: 'game.effect.desc.jiraiya132ChooseSummon',
-    };
-  }
-
-  // Auto-resolve: pick the single affordable Summon
-  const chosen = affordableSummons[0];
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-  // Find mission with fewest friendly characters
-  let bestMissionIndex = 0;
-  let fewestChars = Infinity;
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const count = state.activeMissions[i][friendlySide].length;
-    if (count < fewestChars) {
-      fewestChars = count;
-      bestMissionIndex = i;
-    }
-  }
-
-  // Remove from hand, pay cost, place on mission
-  const hand = [...playerState.hand];
-  const playedCard = hand.splice(chosen.handIndex, 1)[0];
-  playerState.hand = hand;
-  playerState.chakra -= chosen.reducedCost;
-  playerState.charactersInPlay += 1;
-
-  const newChar: CharacterInPlay = {
-    instanceId: generateInstanceId(),
-    card: playedCard,
-    isHidden: false,
-    powerTokens: 0,
-    stack: [playedCard],
-    controlledBy: ctx.sourcePlayer,
-    originalOwner: ctx.sourcePlayer,
-    missionIndex: bestMissionIndex,
+  // Player chooses which Summon to play (stage 1)
+  // Stage 2 (mission choice) is handled by playSummonFromHandWithReduction in EffectEngine
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'JIRAIYA132_CHOOSE_SUMMON',
+    validTargets: affordableSummons.map((s) => String(s.handIndex)),
+    description: 'Jiraya (132): Choose a Summon character from your hand to play (paying 5 less).',
+    descriptionKey: 'game.effect.desc.jiraiya132ChooseSummon',
   };
-
-  const missions = [...state.activeMissions];
-  const targetMission = { ...missions[bestMissionIndex] };
-  targetMission[friendlySide] = [...targetMission[friendlySide], newChar];
-  missions[bestMissionIndex] = targetMission;
-
-  state = {
-    ...state,
-    activeMissions: missions,
-    [ctx.sourcePlayer]: playerState,
-  };
-
-  state = {
-    ...state,
-    log: logAction(
-      state.log, state.turn, state.phase, ctx.sourcePlayer,
-      'EFFECT_PLAY',
-      `Jiraya (132): Played ${playedCard.name_fr} (Summon) on mission ${bestMissionIndex} paying ${chosen.reducedCost} (reduced by 5).`,
-      'game.log.effect.playSummon',
-      { card: 'JIRAYA', id: 'KS-132-S', target: playedCard.name_fr, cost: chosen.reducedCost },
-    ),
-  };
-
-  return { state };
 }
 
 function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {

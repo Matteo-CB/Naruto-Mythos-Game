@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 035/130 - YUHI KURENAI (UC)
@@ -18,12 +19,6 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  *   - If exactly one valid target, auto-apply.
  *   - If multiple targets, require target selection.
  */
-
-function getEffectivePower(char: import('../../../engine/types').CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleKurenai035Main(ctx: EffectContext): EffectResult {
   // Continuous effect [hourglass] - enemy characters cannot move from this mission.
@@ -52,7 +47,7 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
   // Find enemy characters with effective power <= 1 (hidden = power 0, valid targets)
   const validTargets: string[] = [];
   for (const char of enemyChars) {
-    if (getEffectivePower(char) <= 1) {
+    if (getEffectivePower(state, char, opponentPlayer) <= 1) {
       validTargets.push(char.instanceId);
     }
   }
@@ -63,16 +58,6 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'YUHI KURENAI', id: 'KS-035-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    let newState = defeatEnemyCharacter(state, sourceMissionIndex, validTargets[0], sourcePlayer);
-    newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
-      'Yuhi Kurenai (035): Defeated an enemy character with Power 1 or less (upgrade).',
-      'game.log.effect.defeat', { card: 'YUHI KURENAI', id: 'KS-035-UC', target: '' }) };
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
   return {
     state,
     requiresTargetSelection: true,

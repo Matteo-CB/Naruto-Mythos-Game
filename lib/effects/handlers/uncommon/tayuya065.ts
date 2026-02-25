@@ -44,13 +44,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const newState = powerUpTarget(state, validTargets[0], 2, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

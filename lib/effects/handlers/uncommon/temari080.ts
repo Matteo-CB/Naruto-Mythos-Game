@@ -109,23 +109,6 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If exactly one valid mission, auto-apply
-  if (validMissions.length === 1) {
-    const targetMissionIdx = parseInt(validMissions[0], 10);
-    const newState = moveCharacter(state, sourceCard.instanceId, sourceMissionIndex, targetMissionIdx, friendlySide);
-    const log = logAction(
-      newState.log,
-      newState.turn,
-      newState.phase,
-      sourcePlayer,
-      'EFFECT_MOVE',
-      `Temari (080): Moved self to mission ${targetMissionIdx + 1} (upgrade).`,
-      'game.log.effect.move',
-      { card: 'TEMARI', id: 'KS-080-UC', mission: String(targetMissionIdx + 1) },
-    );
-    return { state: { ...newState, log } };
-  }
-
   return {
     state,
     requiresTargetSelection: true,

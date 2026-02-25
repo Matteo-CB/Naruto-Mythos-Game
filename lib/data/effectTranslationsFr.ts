@@ -248,16 +248,16 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     '[⧗] S\'il y a une [u]Tsunade[/u] ou une [u]Shizune[/u] alliee dans cette mission, ce personnage a +1 Puissance.',
   ],
 
-  // 108/130 - NARUTO UZUMAKI (RA) - "Believe it!"
+  // 108/130 - NARUTO UZUMAKI (R) - "Believe it!"
   'KS-108-R': [
-    'Placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
-    'Repetez l\'effet MAIN.',
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'Effet MAIN : POWERUP X ou X est la Puissance du personnage ennemi cache.',
   ],
 
   // 108/130 A - NARUTO UZUMAKI (RA) - same as 108/130
   'KS-108-RA': [
-    'Placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
-    'Repetez l\'effet MAIN.',
+    'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
+    'Effet MAIN : POWERUP X ou X est la Puissance du personnage ennemi cache.',
   ],
 
   // 109/130 - SAKURA HARUNO (R) - "Ninja Medical"
@@ -485,7 +485,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 053/130 - KABUTO YAKUSHI (UC) - "Jutsu des Ames Mortes"
   'KS-053-UC': [
     'Piochez une carte.',
-    'Jouez un personnage depuis votre defausse n\'importe ou en payant son cout moins 3.',
+    'Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.',
   ],
 
   // 054/130 - KABUTO YAKUSHI (UC) - "Scalpel de Chakra"
@@ -496,8 +496,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 056/130 - KIMIMARO (UC) - "Pulsion Osseuse"
   'KS-056-UC': [
-    '[⧗] Les personnages ennemis coutent 1 de plus a jouer dans cette mission.',
-    'Defaussez une carte pour cacher un personnage en jeu avec un cout de 5 ou moins.',
+    '[⧗] Si ce personnage est affecte par un effet ennemi, l\'adversaire doit payer 1 Chakra, s\'il en est capable.',
+    'Defaussez une carte pour cacher un personnage en jeu avec un cout de 4 ou moins.',
   ],
 
   // 058/130 - JIROBO (UC) - "Barriere de Terre"
@@ -787,10 +787,10 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'POWERUP 3.',
   ],
 
-  // 128/130 - ITACHI UCHIWA (R) - "Amaterasu"
+  // 128/130 - ITACHI UCHIWA (R) - "Je les controle tous."
   'KS-128-R': [
-    'Deplacez un personnage allie en jeu.',
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
+    'Deplacez un personnage allie vers cette mission.',
   ],
 
   // 129/130 - KYUBI (R) - "Manteau du Demon Renard"
@@ -994,8 +994,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'POWERUP 3.',
   ],
   'KS-128-RA': [
-    'Deplacez un personnage allie en jeu.',
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
+    'Deplacez un personnage allie vers cette mission.',
   ],
 
   // =====================

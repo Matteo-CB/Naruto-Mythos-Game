@@ -188,7 +188,8 @@ describe('UPGRADE end-to-end', () => {
       }],
     });
 
-    const newState = GameEngine.applyAction(state, 'player1', {
+    // Step 1: Apply the upgrade action — this creates a pending target selection for MAIN effect
+    const stateAfterUpgrade = GameEngine.applyAction(state, 'player1', {
       type: 'UPGRADE_CHARACTER',
       cardIndex: 0,
       missionIndex: 0,
@@ -196,21 +197,34 @@ describe('UPGRADE end-to-end', () => {
     });
 
     // Stack should be upgraded
-    const upgraded = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
+    const upgraded = stateAfterUpgrade.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
     expect(upgraded).toBeDefined();
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-108-R');
 
-    // MAIN effect: enemy should be hidden (power 3 <= 3)
-    const updatedEnemy = newState.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
-    expect(updatedEnemy!.isHidden).toBe(true);
-
-    // UPGRADE effect: POWERUP X where X = enemy power (3)
-    expect(upgraded!.powerTokens).toBe(3);
-
     // Chakra should be reduced by the cost difference (108 cost - 009 cost)
     const costDiff = naruto108.chakra - naruto009.chakra;
-    expect(newState.player1.chakra).toBe(20 - costDiff);
+    expect(stateAfterUpgrade.player1.chakra).toBe(20 - costDiff);
+
+    // MAIN effect requires target selection (enemy with power 3 <= 3)
+    expect(stateAfterUpgrade.pendingActions.length).toBeGreaterThan(0);
+    const pendingAction = stateAfterUpgrade.pendingActions[0];
+    expect(pendingAction.options).toContain('enemy-1');
+
+    // Step 2: Resolve the pending target selection by selecting the enemy
+    const finalState = GameEngine.applyAction(stateAfterUpgrade, 'player1', {
+      type: 'SELECT_TARGET',
+      pendingActionId: pendingAction.id,
+      selectedTargets: ['enemy-1'],
+    });
+
+    // MAIN effect: enemy should be hidden (power 3 <= 3)
+    const updatedEnemy = finalState.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
+    expect(updatedEnemy!.isHidden).toBe(true);
+
+    // UPGRADE effect: POWERUP X where X = enemy power (3) — applied inside naruto108ApplyHide
+    const finalUpgraded = finalState.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
+    expect(finalUpgraded!.powerTokens).toBe(3);
   });
 
   it('Upgrading Gaara 074 to Gaara 120 should defeat weak enemies and POWERUP X', () => {

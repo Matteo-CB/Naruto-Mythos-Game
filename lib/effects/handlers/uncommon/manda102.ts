@@ -49,26 +49,6 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If exactly one target, auto-defeat
-  if (validTargets.length === 1) {
-    let newState = defeatEnemyCharacter(state, sourceMissionIndex, validTargets[0], sourcePlayer);
-    // Find the target name for logging
-    const targetChar = enemyChars.find((c) => c.instanceId === validTargets[0]);
-    const targetName = targetChar ? targetChar.card.name_fr : 'unknown';
-    const log = logAction(
-      newState.log,
-      newState.turn,
-      newState.phase,
-      sourcePlayer,
-      'EFFECT_DEFEAT',
-      `Manda (102): [AMBUSH] Defeated enemy Summon ${targetName} in this mission.`,
-      'game.log.effect.defeat',
-      { card: 'MANDA', id: 'KS-102-UC', target: targetName },
-    );
-    return { state: { ...newState, log } };
-  }
-
-  // Multiple targets: requires selection
   return {
     state,
     requiresTargetSelection: true,

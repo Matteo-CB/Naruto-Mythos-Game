@@ -36,7 +36,7 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
 // MSS 01 - Call for Support: POWERUP 2 a character in play
 // ===================================================================
 describe('MSS 01 - Call for Support', () => {
-  it('should POWERUP 2 the first non-hidden friendly character', () => {
+  it('should require target selection for POWERUP 2 when a friendly character exists', () => {
     const ally = mockCharInPlay({ instanceId: 'ally-1', powerTokens: 0 }, { name_fr: 'Ally' });
     const state = createActionPhaseState({
       activeMissions: [makeMission('D', [ally])],
@@ -45,8 +45,9 @@ describe('MSS 01 - Call for Support', () => {
     const handler = getEffectHandler('KS-001-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
-    expect(updated?.powerTokens).toBe(2);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS01_POWERUP_TARGET');
+    expect(result.validTargets).toContain('ally-1');
   });
 
   it('should fizzle when no friendly characters exist', () => {

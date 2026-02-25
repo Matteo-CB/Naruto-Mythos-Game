@@ -3,6 +3,7 @@ import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 116/130 - NEJI HYUGA (R)
@@ -20,12 +21,6 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   - UPGRADE defeats a character with exactly Power 6
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 /**
  * Helper: find characters with exactly the given power in the source mission,
  * defeat one (auto if single target, prompt selection if multiple).
@@ -37,6 +32,7 @@ function defeatCharacterWithExactPower(
   label: string,
 ): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -49,12 +45,12 @@ function defeatCharacterWithExactPower(
   const validTargets: Array<{ instanceId: string; isEnemy: boolean }> = [];
 
   for (const char of mission[friendlySide]) {
-    if (char.instanceId !== sourceCard.instanceId && !char.isHidden && getEffectivePower(char) === targetPower) {
+    if (char.instanceId !== sourceCard.instanceId && !char.isHidden && getEffectivePower(state, char, sourcePlayer) === targetPower) {
       validTargets.push({ instanceId: char.instanceId, isEnemy: false });
     }
   }
   for (const char of mission[enemySide]) {
-    if (!char.isHidden && getEffectivePower(char) === targetPower) {
+    if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) === targetPower) {
       validTargets.push({ instanceId: char.instanceId, isEnemy: true });
     }
   }

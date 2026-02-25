@@ -78,11 +78,6 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    return applyPowerup1(newState, validTargets[0], sourcePlayer);
-  }
-
   return {
     state: newState,
     requiresTargetSelection: true,
@@ -160,11 +155,6 @@ function hinata114UpgradeHandler(ctx: EffectContext): EffectResult {
         ),
       },
     };
-  }
-
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    return applyRemoveTokens(state, validTargets[0], sourcePlayer, enemySide);
   }
 
   return {

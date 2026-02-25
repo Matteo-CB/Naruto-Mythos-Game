@@ -59,13 +59,7 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-037-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const newState = removeAllPowerTokens(state, validTargets[0], sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

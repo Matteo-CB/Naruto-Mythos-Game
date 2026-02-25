@@ -93,14 +93,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
-  // If only one valid destination, auto-apply
-  if (validTargets.length === 1) {
-    const destIdx = parseInt(validTargets[0], 10);
-    const newState = moveCharacter(state, sourceCard.instanceId, sourceMissionIndex, destIdx, sourcePlayer, friendlySide);
-    return { state: newState };
-  }
-
-  // Multiple destinations: require target selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

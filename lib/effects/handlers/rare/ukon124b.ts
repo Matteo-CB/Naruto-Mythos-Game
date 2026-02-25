@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 124b/130 - UKON (R)
@@ -16,12 +17,6 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   Find non-hidden enemies in this mission with effective power <= 5. Target selection. Hide.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function ukon124bMainHandler(ctx: EffectContext): EffectResult {
   // Continuous effect: can be played as upgrade over any Sound Village character.
   // Handled by the engine's upgrade validation logic.
@@ -30,6 +25,7 @@ function ukon124bMainHandler(ctx: EffectContext): EffectResult {
 
 function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const mission = state.activeMissions[sourceMissionIndex];
@@ -37,7 +33,7 @@ function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
 
   // Find non-hidden enemies with effective power <= 5
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(c) <= 5)
+    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 5)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {

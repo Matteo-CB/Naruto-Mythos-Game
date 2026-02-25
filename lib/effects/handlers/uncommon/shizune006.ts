@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 006/130 - SHIZUNE "Tir d'Aiguilles prepare" (UC)
@@ -15,12 +16,6 @@ import { logAction } from '../../../engine/utils/gameLog';
  * UPGRADE: Gain 2 Chakra.
  *   - When triggered as an upgrade, also add 2 to the player's chakra pool.
  */
-
-function getEffectivePower(char: import('../../../engine/types').CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleShizune006Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, isUpgrade } = ctx;
@@ -43,13 +38,14 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
   }
 
   // MAIN: Move an enemy character with Power 3 or less
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   const validTargets: string[] = [];
   for (const mission of newState.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (!char.isHidden && getEffectivePower(char) <= 3) {
+      if (!char.isHidden && getEffectivePower(newState, char, opponentPlayer) <= 3) {
         validTargets.push(char.instanceId);
       }
     }

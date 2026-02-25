@@ -44,14 +44,6 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-020-UC' }) } };
   }
 
-  // If exactly one target, auto-apply
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const newState = takeControlOfCharacter(state, targetId, sourceMissionIndex, sourcePlayer, opponentPlayer, costLimit);
-    return { state: newState };
-  }
-
-  // Multiple targets: requires selection
   const limitStr = isUpgrade ? '3' : '2';
   return {
     state,

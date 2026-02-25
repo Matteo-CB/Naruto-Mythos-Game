@@ -2,7 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 133/130 - NARUTO UZUMAKI "Rasengan" (S)
@@ -13,103 +13,99 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  *       AND another enemy character with Power 2 or less in play (any mission).
  *
  * MAIN "effect:": Instead, defeat both of them (applies on upgrade).
+ *
+ * Two-stage target selection:
+ *   Stage 1: NARUTO133_CHOOSE_TARGET1 — pick enemy Power ≤ 5 in this mission
+ *   Stage 2: NARUTO133_CHOOSE_TARGET2 — pick enemy Power ≤ 2 in any mission
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function naruto133MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
+  const state = ctx.state;
   const useDefeat = ctx.isUpgrade;
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
 
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   // Target 1: enemy with Power <= 5 in THIS mission
   const thisMission = state.activeMissions[ctx.sourceMissionIndex];
-  const target1 = thisMission[enemySideKey].find((c) => !c.isHidden && getEffectivePower(c) <= 5);
+  const validTarget1 = thisMission[enemySideKey]
+    .filter((c) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 5)
+    .map((c) => c.instanceId);
 
-  // Target 2: another enemy with Power <= 2 in any mission
-  let target2: CharacterInPlay | undefined;
-  let target2MissionIndex = -1;
-
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    for (const char of state.activeMissions[i][enemySideKey]) {
-      if (char.isHidden) continue;
-      if (target1 && char.instanceId === target1.instanceId) continue;
-      if (getEffectivePower(char) <= 2) {
-        target2 = char;
-        target2MissionIndex = i;
-        break;
-      }
-    }
-    if (target2) break;
-  }
-
-  // Apply to target 1
-  if (target1) {
-    if (useDefeat) {
-      state = defeatEnemyCharacter(state, ctx.sourceMissionIndex, target1.instanceId, ctx.sourcePlayer);
-      state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-        `Naruto Uzumaki (133): Defeated enemy ${target1.card.name_fr} in this mission (upgrade).`,
-        'game.log.effect.defeat',
-        { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target1.card.name_fr }) };
-    } else {
-      const missions = [...state.activeMissions];
-      const mission = { ...missions[ctx.sourceMissionIndex] };
-      const enemyChars = [...mission[enemySideKey]];
-      const idx = enemyChars.findIndex((c) => c.instanceId === target1.instanceId);
-      if (idx !== -1) {
-        enemyChars[idx] = { ...enemyChars[idx], isHidden: true };
-        mission[enemySideKey] = enemyChars;
-        missions[ctx.sourceMissionIndex] = mission;
-        state = { ...state, activeMissions: missions, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_HIDE',
-          `Naruto Uzumaki (133): Hid enemy ${target1.card.name_fr} in this mission.`,
-          'game.log.effect.hide',
-          { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target1.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` }) };
-      }
-    }
-  } else {
-    state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_NO_TARGET',
+  if (validTarget1.length === 0) {
+    const log = logAction(
+      state.log, state.turn, state.phase, ctx.sourcePlayer,
+      'EFFECT_NO_TARGET',
       'Naruto Uzumaki (133): No valid enemy with Power 5 or less in this mission.',
       'game.log.effect.noTarget',
-      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' }) };
+      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' },
+    );
+    // Still check for target 2
+    return checkTarget2Only(ctx, { ...state, log }, useDefeat);
   }
 
-  // Apply to target 2
-  if (target2 && target2MissionIndex >= 0) {
-    if (useDefeat) {
-      state = defeatEnemyCharacter(state, target2MissionIndex, target2.instanceId, ctx.sourcePlayer);
-      state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_DEFEAT',
-        `Naruto Uzumaki (133): Defeated enemy ${target2.card.name_fr} in mission ${target2MissionIndex} (upgrade).`,
-        'game.log.effect.defeat',
-        { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target2.card.name_fr }) };
-    } else {
-      const missions = [...state.activeMissions];
-      const mission = { ...missions[target2MissionIndex] };
-      const enemyChars = [...mission[enemySideKey]];
-      const idx = enemyChars.findIndex((c) => c.instanceId === target2.instanceId);
-      if (idx !== -1) {
-        enemyChars[idx] = { ...enemyChars[idx], isHidden: true };
-        mission[enemySideKey] = enemyChars;
-        missions[target2MissionIndex] = mission;
-        state = { ...state, activeMissions: missions, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_HIDE',
-          `Naruto Uzumaki (133): Hid enemy ${target2.card.name_fr} in mission ${target2MissionIndex}.`,
-          'game.log.effect.hide',
-          { card: 'NARUTO UZUMAKI', id: 'KS-133-S', target: target2.card.name_fr, mission: `mission ${target2MissionIndex}` }) };
+  // Stage 1: player chooses target 1
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
+    validTargets: validTarget1,
+    description: JSON.stringify({
+      missionIndex: ctx.sourceMissionIndex,
+      useDefeat,
+      text: useDefeat
+        ? 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to defeat in this mission.'
+        : 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to hide in this mission.',
+    }),
+    descriptionKey: useDefeat
+      ? 'game.effect.desc.naruto133ChooseDefeat1'
+      : 'game.effect.desc.naruto133ChooseHide1',
+  };
+}
+
+/** When no target1 exists, check if target2 is available */
+function checkTarget2Only(ctx: EffectContext, state: EffectContext['state'], useDefeat: boolean): EffectResult {
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const enemySideKey: 'player1Characters' | 'player2Characters' =
+    ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+  const validTarget2: string[] = [];
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    for (const char of state.activeMissions[i][enemySideKey]) {
+      if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 2) {
+        validTarget2.push(char.instanceId);
       }
     }
-  } else {
-    state = { ...state, log: logAction(state.log, state.turn, state.phase, ctx.sourcePlayer, 'EFFECT_NO_TARGET',
-      'Naruto Uzumaki (133): No valid second enemy with Power 2 or less in play.',
-      'game.log.effect.noTarget',
-      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' }) };
   }
 
-  return { state };
+  if (validTarget2.length === 0) {
+    const log = logAction(
+      state.log, state.turn, state.phase, ctx.sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Naruto Uzumaki (133): No valid second enemy with Power 2 or less in play.',
+      'game.log.effect.noTarget',
+      { card: 'NARUTO UZUMAKI', id: 'KS-133-S' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
+    validTargets: validTarget2,
+    description: JSON.stringify({
+      useDefeat,
+      target1Id: null,
+      text: useDefeat
+        ? 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to defeat (any mission).'
+        : 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to hide (any mission).',
+    }),
+    descriptionKey: useDefeat
+      ? 'game.effect.desc.naruto133ChooseDefeat2'
+      : 'game.effect.desc.naruto133ChooseHide2',
+  };
 }
 
 export function registerNaruto133Handlers(): void {

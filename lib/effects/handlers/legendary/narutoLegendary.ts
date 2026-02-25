@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card L01 - NARUTO UZUMAKI (Legendary)
@@ -16,21 +16,16 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Same effect as 133/130 Secret Naruto but on a different card.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function narutoLegendaryMainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex, isUpgrade } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   // Target 1: enemy with Power <= 5 in THIS mission
   const thisMission = state.activeMissions[sourceMissionIndex];
   const target1Candidates = thisMission[enemySideKey].filter(
-    (c) => !c.isHidden && getEffectivePower(c) <= 5
+    (c) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 5
   );
 
   if (target1Candidates.length === 0) {

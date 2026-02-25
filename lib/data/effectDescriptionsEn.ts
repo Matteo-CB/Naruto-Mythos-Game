@@ -742,10 +742,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP 3.',
   ],
 
-  // 128/130 - ITACHI UCHIHA (R) - "Amaterasu"
+  // 128/130 - ITACHI UCHIHA (R) - "I control them all."
   'KS-128-R': [
-    'Move a friendly character in play.',
     '[⧗] Every enemy character in this mission has -1 Power.',
+    'Move a friendly character to this mission.',
   ],
 
   // 129/130 - KYUBI (R) - "Demon Fox Cloak"
@@ -984,8 +984,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP 3.',
   ],
   'KS-128-RA': [
-    'Move a friendly character in play.',
     '[⧗] Every enemy character in this mission has -1 Power.',
+    'Move a friendly character to this mission.',
   ],
 
   // =====================

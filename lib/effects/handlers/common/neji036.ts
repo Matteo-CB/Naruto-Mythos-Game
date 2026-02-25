@@ -36,14 +36,6 @@ function handleNeji036Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-036-C' }) } };
   }
 
-  // If exactly one target, apply automatically
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const newState = removePowerTokens(state, targetId, 2, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: requires selection
   return {
     state,
     requiresTargetSelection: true,

@@ -72,12 +72,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
-  // If only one valid mission, auto-place
-  if (validMissionIndices.length === 1) {
-    return placeHiddenCard(newState, stolenCard, validMissionIndices[0], sourcePlayer, opponentPlayer, friendlySide);
-  }
-
-  // Multiple valid missions: let the player choose
+  // Let the player choose which mission
   // Store the stolen card temporarily in the state for retrieval after selection
   newState = {
     ...newState,

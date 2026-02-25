@@ -1,8 +1,8 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 153/130 - GAARA (M)
@@ -18,16 +18,11 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  *     POWERUP on self with that count.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function gaara153MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
   let defeatedCount = 0;
 
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -36,11 +31,11 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
     const enemyChars = mission[enemySide];
 
     // Find the weakest enemy with power <= 1 (hidden chars have power 0, valid targets)
-    let target: CharacterInPlay | undefined;
+    let target: typeof enemyChars[number] | undefined;
     let targetPower = Infinity;
 
     for (const char of enemyChars) {
-      const power = getEffectivePower(char);
+      const power = getEffectivePower(state, char, opponentPlayer);
       if (power <= 1 && power < targetPower) {
         target = char;
         targetPower = power;

@@ -3,6 +3,7 @@ import type { CharacterInPlay } from '../../../engine/types';
 import { registerEffect } from '../../EffectRegistry';
 import { generateInstanceId } from '../../../engine/utils/id';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 073/130 - KIN TSUCHI "Genjutsu Bells" (UC)
@@ -22,12 +23,6 @@ import { logAction } from '../../../engine/utils/gameLog';
  *   - If deck is empty, effect fizzles.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function handleKin073Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
@@ -39,7 +34,7 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     const enemyChars =
       opponentPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     for (const char of enemyChars) {
-      if (!char.isHidden && getEffectivePower(char) <= 4) {
+      if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 4) {
         validEnemyTargets.push(char.instanceId);
       }
     }
