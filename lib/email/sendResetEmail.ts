@@ -36,7 +36,7 @@ export async function sendResetEmail(email: string, token: string, locale: strin
   `;
 
   const { error } = await resend.emails.send({
-    from: 'Naruto Mythos <onboarding@resend.dev>',
+    from: 'Naruto Mythos <noreply@narutomythosgame.com>',
     to: email,
     subject,
     html,
