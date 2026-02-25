@@ -57,7 +57,11 @@ export function ActionBar() {
   // Compute effective cost when card + mission are selected (accounts for Tayuya, Kurenai, etc.)
   const effectiveCost = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState) return selectedCard?.chakra ?? 0;
-    return calculateEffectiveCost(visibleState as any, myPlayer, selectedCard, selectedMissionIndex, false);
+    try {
+      return calculateEffectiveCost(visibleState, myPlayer, selectedCard, selectedMissionIndex, false);
+    } catch {
+      return selectedCard.chakra;
+    }
   }, [selectedCard, selectedMissionIndex, visibleState, myPlayer]);
 
   const baseCost = selectedCard?.chakra ?? 0;
