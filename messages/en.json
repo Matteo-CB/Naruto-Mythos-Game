@@ -31,6 +31,7 @@
     "discord": "Discord",
     "profile": "My Profile",
     "friends": "Friends",
+    "betaTag": "BETA",
     "betaBanner": "We are in testing phase. Some cards may be missing and some effects may not work! You can help us by joining our Discord and reporting bugs in the dedicated channel.",
     "adminCards": "Card Management",
     "signOut": "Sign Out"

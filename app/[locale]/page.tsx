@@ -187,7 +187,7 @@ export default function Home() {
 
           {/* LEFT SIDE: Title + Navigation */}
           <div className="flex flex-col items-start flex-shrink-0" style={{ maxWidth: '420px' }}>
-            {/* Title - animated letter by letter */}
+            {/* Title - animated letter by letter + beta badge */}
             <div className="mb-2">
               <div className="flex items-center flex-wrap">
                 {titleLetters.map((letter, i) => (
@@ -209,6 +209,19 @@ export default function Home() {
                     {letter === ' ' ? '\u00A0' : letter}
                   </motion.span>
                 ))}
+                <motion.span
+                  className="ml-3 self-start mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
+                  style={{
+                    color: '#c4a35a',
+                    border: '1px solid rgba(196, 163, 90, 0.4)',
+                    backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                  }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  {t('betaTag')}
+                </motion.span>
               </div>
             </div>
 
@@ -443,22 +456,6 @@ export default function Home() {
               >
                 {t('discord')}
               </a>
-            </motion.div>
-
-            {/* Beta banner */}
-            <motion.div
-              className="mt-4 w-full px-4 py-3 text-center"
-              style={{
-                border: '1px solid rgba(196, 163, 90, 0.2)',
-                backgroundColor: 'rgba(196, 163, 90, 0.03)',
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 1.65 }}
-            >
-              <p className="text-xs leading-relaxed" style={{ color: '#888888' }}>
-                {t('betaBanner')}
-              </p>
             </motion.div>
 
             {/* Footer text */}
