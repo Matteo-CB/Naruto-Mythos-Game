@@ -10,10 +10,12 @@ import { logAction } from '../../../engine/utils/gameLog';
  * UPGRADE: POWERUP 1 (self).
  *   - Add 1 power token to this character when played as an upgrade.
  *
- * MAIN: Hide all other characters in this mission with less Power than this character.
+ * MAIN: Hide all non-hidden enemy characters in this mission with less Power than this character.
+ *   (French: "Cachez tous les personnages ennemis non caches avec une Puissance
+ *    inferieure a celle de ce personnage dans cette mission.")
  *   - Get effective power of self (printed power + power tokens; if hidden, 0).
- *   - Find ALL other characters (friendly and enemy) in this mission whose effective
- *     power is strictly less than self's effective power.
+ *   - Find all ENEMY characters in this mission whose effective power is strictly
+ *     less than self's effective power.
  *   - Hide them all (set isHidden = true).
  *   - Note: When isUpgrade, the UPGRADE POWERUP 1 is applied first, so self's power
  *     is already incremented before the MAIN effect evaluates.
@@ -74,38 +76,25 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
-  // Find all other characters in this mission with effective power < self power
+  // Find all ENEMY characters in this mission with effective power < self power
   let hiddenCount = 0;
   const missions = [...state.activeMissions];
   const missionCopy = { ...missions[sourceMissionIndex] };
 
-  // Process player1Characters
-  const p1Chars = [...missionCopy.player1Characters];
-  for (let i = 0; i < p1Chars.length; i++) {
-    const char = p1Chars[i];
-    if (char.instanceId === sourceCard.instanceId) continue;
-    if (char.isHidden) continue; // Already hidden; also their effective power is 0 which is < selfPower but they're already hidden
-    const charPower = getEffectivePower(char);
-    if (charPower < selfPower) {
-      p1Chars[i] = { ...char, isHidden: true };
-      hiddenCount++;
-    }
-  }
-  missionCopy.player1Characters = p1Chars;
+  const enemySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Process player2Characters
-  const p2Chars = [...missionCopy.player2Characters];
-  for (let i = 0; i < p2Chars.length; i++) {
-    const char = p2Chars[i];
-    if (char.instanceId === sourceCard.instanceId) continue;
+  const enemyChars = [...missionCopy[enemySide]];
+  for (let i = 0; i < enemyChars.length; i++) {
+    const char = enemyChars[i];
     if (char.isHidden) continue;
     const charPower = getEffectivePower(char);
     if (charPower < selfPower) {
-      p2Chars[i] = { ...char, isHidden: true };
+      enemyChars[i] = { ...char, isHidden: true };
       hiddenCount++;
     }
   }
-  missionCopy.player2Characters = p2Chars;
+  missionCopy[enemySide] = enemyChars;
 
   missions[sourceMissionIndex] = missionCopy;
 

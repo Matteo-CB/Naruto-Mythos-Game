@@ -543,7 +543,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 069/130 - DOSU KINUTA (UC) - "Bras Melodieux"
   'KS-069-UC': [
     'Regardez un personnage cache en jeu.',
-    'Forcez un personnage ennemi cache dans cette mission a se reveler ou a etre vaincu.',
+    'Choisissez un personnage ennemi cache en jeu. L\'adversaire doit soit le jouer en payant 2 de plus, soit le vaincre.',
   ],
 
   // 071/130 - ZAKU ABUMI (UC) - "Onde Sonore Tranchante"
@@ -567,7 +567,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 078/130 - KANKURO (UC) - "Maitre des Marionnettes"
   'KS-078-UC': [
     'Deplacez n\'importe quel personnage avec une Puissance de 4 ou moins.',
-    'Jouez un personnage en cache dans cette mission en payant 1 de moins.',
+    'Jouez un personnage allie tout en etant cache, en payant 1 de moins.',
   ],
 
   // 080/130 - TEMARI (UC) - "Lame de Vent"
