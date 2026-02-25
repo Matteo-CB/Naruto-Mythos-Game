@@ -113,6 +113,16 @@ export default function LoginPage() {
             />
           </div>
 
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs"
+              style={{ color: '#c4a35a' }}
+            >
+              {t('auth.forgotPassword')}
+            </Link>
+          </div>
+
           {error && (
             <p className="text-xs" style={{ color: '#b33e3e' }}>
               {error}
