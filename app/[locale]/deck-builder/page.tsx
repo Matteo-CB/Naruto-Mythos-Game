@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import { useSession } from 'next-auth/react';
-import { Link } from '@/lib/i18n/navigation';
-import { CloudBackground } from '@/components/CloudBackground';
-import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
-import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import { Footer } from '@/components/Footer';
-import { validateDeck } from '@/lib/engine/rules/DeckValidation';
-import { useDeckBuilderStore } from '@/stores/deckBuilderStore';
-import { useBannedCards } from '@/lib/hooks/useBannedCards';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
+import { Link } from "@/lib/i18n/navigation";
+import { CloudBackground } from "@/components/CloudBackground";
+import { DecorativeIcons } from "@/components/DecorativeIcons";
+import { CardBackgroundDecor } from "@/components/CardBackgroundDecor";
+import type { CharacterCard, MissionCard } from "@/lib/engine/types";
+import { Footer } from "@/components/Footer";
+import { validateDeck } from "@/lib/engine/rules/DeckValidation";
+import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
+import { useBannedCards } from "@/lib/hooks/useBannedCards";
+import { normalizeImagePath } from "@/lib/utils/imagePath";
+import { getCardName, getCardTitle } from "@/lib/utils/cardLocale";
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
@@ -23,11 +23,16 @@ export default function DeckBuilderPage() {
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [charPage, setCharPage] = useState(1);
+  const CHARS_PER_PAGE = 24;
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showSavedDecks, setShowSavedDecks] = useState(false);
-  const [importCode, setImportCode] = useState('');
-  const [importMessage, setImportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [importCode, setImportCode] = useState("");
+  const [importMessage, setImportMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Zustand store
   const deckName = useDeckBuilderStore((s) => s.deckName);
@@ -57,7 +62,7 @@ export default function DeckBuilderPage() {
   const { bannedIds } = useBannedCards();
 
   useEffect(() => {
-    import('@/lib/data/cardLoader').then((mod) => {
+    import("@/lib/data/cardLoader").then((mod) => {
       setAvailableChars(mod.getPlayableCharacters());
       setAvailableMissions(mod.getPlayableMissions());
       setAllChars(mod.getAllCharacters());
@@ -83,12 +88,27 @@ export default function DeckBuilderPage() {
     const q = searchQuery.toLowerCase();
     return chars.filter(
       (c) =>
-        getCardName(c, locale as 'en' | 'fr').toLowerCase().includes(q) ||
-        getCardTitle(c, locale as 'en' | 'fr').toLowerCase().includes(q) ||
+        getCardName(c, locale as "en" | "fr")
+          .toLowerCase()
+          .includes(q) ||
+        getCardTitle(c, locale as "en" | "fr")
+          .toLowerCase()
+          .includes(q) ||
         c.name_fr.toLowerCase().includes(q) ||
         c.id.includes(q),
     );
   }, [availableChars, searchQuery, bannedIds, locale]);
+
+  // Reset page when search changes
+  useEffect(() => {
+    setCharPage(1);
+  }, [searchQuery]);
+
+  const totalCharPages = Math.max(1, Math.ceil(filteredChars.length / CHARS_PER_PAGE));
+  const paginatedChars = useMemo(() => {
+    const start = (charPage - 1) * CHARS_PER_PAGE;
+    return filteredChars.slice(start, start + CHARS_PER_PAGE);
+  }, [filteredChars, charPage]);
 
   const validation = useMemo(() => {
     return validateDeck(deckChars, deckMissions);
@@ -100,7 +120,7 @@ export default function DeckBuilderPage() {
       await saveDeck();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : t('deckBuilder.failedToSave');
+        err instanceof Error ? err.message : t("deckBuilder.failedToSave");
       setSaveError(message);
     }
   }, [saveDeck, t]);
@@ -112,7 +132,7 @@ export default function DeckBuilderPage() {
         await loadDeck(deckId, availableChars, availableMissions);
       } catch (err: unknown) {
         const message =
-          err instanceof Error ? err.message : t('deckBuilder.failedToLoad');
+          err instanceof Error ? err.message : t("deckBuilder.failedToLoad");
         setSaveError(message);
       }
     },
@@ -126,29 +146,30 @@ export default function DeckBuilderPage() {
         await deleteDeck(deckId);
       } catch (err: unknown) {
         const message =
-          err instanceof Error ? err.message : t('deckBuilder.failedToDelete');
+          err instanceof Error ? err.message : t("deckBuilder.failedToDelete");
         setSaveError(message);
       }
     },
     [deleteDeck, t],
   );
 
-  const getImagePath = (card: CharacterCard | MissionCard): string | null => normalizeImagePath(card.image_file);
+  const getImagePath = (card: CharacterCard | MissionCard): string | null =>
+    normalizeImagePath(card.image_file);
 
   const handleImport = useCallback(() => {
     const code = importCode.trim();
     if (!code) return;
 
-    const parts = code.split('|');
+    const parts = code.split("|");
     if (parts.length < 2) {
-      setImportMessage({ type: 'error', text: t('deckBuilder.importError') });
+      setImportMessage({ type: "error", text: t("deckBuilder.importError") });
       return;
     }
 
     // Last part is the deck name (underscores = spaces) — only if it doesn't contain '--'
     const lastPart = parts[parts.length - 1];
-    const hasDeckName = !lastPart.includes('--');
-    const deckNameFromCode = hasDeckName ? lastPart.replace(/_/g, ' ') : '';
+    const hasDeckName = !lastPart.includes("--");
+    const deckNameFromCode = hasDeckName ? lastPart.replace(/_/g, " ") : "";
     const cardParts = hasDeckName ? parts.slice(0, -1) : parts;
 
     // Build lookup maps by cardId — use ALL cards (not just playable) so imports
@@ -163,7 +184,7 @@ export default function DeckBuilderPage() {
     for (const part of cardParts) {
       const match = part.match(/^(.+)--(\d+)$/);
       if (!match) {
-        setImportMessage({ type: 'error', text: t('deckBuilder.importError') });
+        setImportMessage({ type: "error", text: t("deckBuilder.importError") });
         return;
       }
 
@@ -194,51 +215,74 @@ export default function DeckBuilderPage() {
 
     if (notFound.length > 0) {
       setImportMessage({
-        type: 'error',
-        text: t('deckBuilder.importNotFound', { count: notFound.length, ids: notFound.join(', ') }),
+        type: "error",
+        text: t("deckBuilder.importNotFound", {
+          count: notFound.length,
+          ids: notFound.join(", "),
+        }),
       });
     } else {
       setImportMessage({
-        type: 'success',
-        text: t('deckBuilder.importSuccess', {
-          name: deckNameFromCode || 'Deck',
+        type: "success",
+        text: t("deckBuilder.importSuccess", {
+          name: deckNameFromCode || "Deck",
           chars: chars.length,
           missions: missions.length,
         }),
       });
     }
 
-    setImportCode('');
-  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
+    setImportCode("");
+  }, [
+    importCode,
+    allChars,
+    allMissions,
+    clearDeck,
+    setDeckName,
+    addChar,
+    addMission,
+    t,
+  ]);
 
   if (!session?.user) {
     return (
-      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
+      <main
+        id="main-content"
+        className="flex min-h-screen relative flex-col"
+        style={{ backgroundColor: "#0a0a0a" }}
+      >
         <CloudBackground />
         <DecorativeIcons />
         <CardBackgroundDecor variant="deck" />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
-            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
-              {t('deckBuilder.title')}
+            <h1
+              className="text-2xl font-bold tracking-wider uppercase"
+              style={{ color: "#c4a35a" }}
+            >
+              {t("deckBuilder.title")}
             </h1>
-            <p className="text-sm" style={{ color: '#888888' }}>
-              {t('online.signInRequired')}
+            <p className="text-sm" style={{ color: "#888888" }}>
+              {t("online.signInRequired")}
             </p>
             <div className="flex gap-3">
               <Link
                 href="/login"
                 className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
-                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                style={{ backgroundColor: "#c4a35a", color: "#0a0a0a" }}
               >
-                {t('common.signIn')}
+                {t("common.signIn")}
               </Link>
               <Link
                 href="/"
                 className="px-6 py-2.5 text-sm"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+                style={{
+                  backgroundColor: "#141414",
+                  border: "1px solid #262626",
+                  color: "#888888",
+                }}
               >
-                {t('common.back')}
+                {t("common.back")}
               </Link>
             </div>
           </div>
@@ -249,7 +293,10 @@ export default function DeckBuilderPage() {
   }
 
   return (
-    <main id="main-content" className="min-h-screen relative bg-[#0a0a0a] flex flex-col">
+    <main
+      id="main-content"
+      className="min-h-screen relative bg-[#0a0a0a] flex flex-col"
+    >
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="deck" />
@@ -261,11 +308,11 @@ export default function DeckBuilderPage() {
             href="/"
             className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
           >
-            {t('common.back')}
+            {t("common.back")}
           </Link>
           <input
             type="text"
-            placeholder={t('deckBuilder.deckName')}
+            placeholder={t("deckBuilder.deckName")}
             value={deckName}
             onChange={(e) => setDeckName(e.target.value)}
             className="flex-1 max-w-xs px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
@@ -275,41 +322,49 @@ export default function DeckBuilderPage() {
             disabled={isSaving || !validation.valid}
             className="px-3 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSaving ? t('common.loading') : t('deckBuilder.saveDeck')}
+            {isSaving ? t("common.loading") : t("deckBuilder.saveDeck")}
           </button>
           <button
             onClick={clearDeck}
             className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
           >
-            {t('deckBuilder.clearDeck')}
+            {t("deckBuilder.clearDeck")}
           </button>
           <button
             onClick={() => setShowSavedDecks(!showSavedDecks)}
             className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
           >
-            {t('deckBuilder.loadDeck')}
+            {t("deckBuilder.loadDeck")}
           </button>
         </div>
 
         {/* Rules panel */}
         <div className="px-4 py-2 border-b border-[#262626] flex items-center gap-4 flex-wrap">
-          <span className={`text-xs ${deckChars.length >= 30 ? 'text-[#3e8b3e]' : 'text-[#b33e3e]'}`}>
-            {t('deckBuilder.characters', { count: deckChars.length })} / 30 min
+          <span
+            className={`text-xs ${deckChars.length >= 30 ? "text-[#3e8b3e]" : "text-[#b33e3e]"}`}
+          >
+            {t("deckBuilder.characters", { count: deckChars.length })} / 30 min
           </span>
-          <span className={`text-xs ${deckMissions.length === 3 ? 'text-[#3e8b3e]' : 'text-[#b33e3e]'}`}>
-            {t('deckBuilder.missions', { count: deckMissions.length })} / 3
+          <span
+            className={`text-xs ${deckMissions.length === 3 ? "text-[#3e8b3e]" : "text-[#b33e3e]"}`}
+          >
+            {t("deckBuilder.missions", { count: deckMissions.length })} / 3
           </span>
           <span className="text-xs text-[#555]">
-            {t('deckBuilder.maxCopies')}
+            {t("deckBuilder.maxCopies")}
           </span>
           {saveError && (
             <span className="text-xs text-[#b33e3e]">{saveError}</span>
           )}
           {addError && (
-            <span className="text-xs text-[#b33e3e] animate-pulse">{addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError}</span>
+            <span className="text-xs text-[#b33e3e] animate-pulse">
+              {addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError}
+            </span>
           )}
           {validation.valid && (
-            <span className="text-xs text-[#3e8b3e]">{t('deckBuilder.validation.valid')}</span>
+            <span className="text-xs text-[#3e8b3e]">
+              {t("deckBuilder.validation.valid")}
+            </span>
           )}
         </div>
 
@@ -317,10 +372,14 @@ export default function DeckBuilderPage() {
         {showSavedDecks && (
           <div className="px-4 py-2 border-b border-[#262626] bg-[#0e0e0e]">
             {isLoading && (
-              <p className="text-xs text-[#555] italic">{t('common.loading')}</p>
+              <p className="text-xs text-[#555] italic">
+                {t("common.loading")}
+              </p>
             )}
             {!isLoading && savedDecks.length === 0 && (
-              <p className="text-xs text-[#555] italic">{t('deckBuilder.noSavedDecks')}</p>
+              <p className="text-xs text-[#555] italic">
+                {t("deckBuilder.noSavedDecks")}
+              </p>
             )}
             <div className="flex gap-2 flex-wrap">
               {savedDecks.map((deck) => (
@@ -328,8 +387,8 @@ export default function DeckBuilderPage() {
                   key={deck.id}
                   className={`flex items-center gap-2 px-3 py-1.5 bg-[#141414] border text-xs ${
                     loadedDeckId === deck.id
-                      ? 'border-[#3e8b3e]/50'
-                      : 'border-[#262626]'
+                      ? "border-[#3e8b3e]/50"
+                      : "border-[#262626]"
                   }`}
                 >
                   <button
@@ -366,7 +425,11 @@ export default function DeckBuilderPage() {
                     {m ? (
                       <>
                         {mImg && (
-                          <img src={mImg} alt={getCardName(m, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
+                          <img
+                            src={mImg}
+                            alt={getCardName(m, locale as "en" | "fr")}
+                            className="w-full h-full object-cover"
+                          />
                         )}
                         <button
                           onClick={() => removeMission(i)}
@@ -375,7 +438,9 @@ export default function DeckBuilderPage() {
                           X
                         </button>
                         <div className="absolute inset-x-0 bottom-0 bg-black/75 px-0.5">
-                          <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{getCardName(m, locale as 'en' | 'fr')}</span>
+                          <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">
+                            {getCardName(m, locale as "en" | "fr")}
+                          </span>
                         </div>
                       </>
                     ) : (
@@ -400,10 +465,16 @@ export default function DeckBuilderPage() {
                     className="w-10 h-14 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0 group"
                   >
                     {img ? (
-                      <img src={img} alt={getCardName(card, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
+                      <img
+                        src={img}
+                        alt={getCardName(card, locale as "en" | "fr")}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[6px] text-[#555]">{card.chakra}/{card.power}</span>
+                        <span className="text-[6px] text-[#555]">
+                          {card.chakra}/{card.power}
+                        </span>
                       </div>
                     )}
                     <button
@@ -416,7 +487,9 @@ export default function DeckBuilderPage() {
                 );
               })}
               {deckChars.length === 0 && (
-                <p className="text-xs text-[#555] italic self-center">{t('deckBuilder.clickToAdd')}</p>
+                <p className="text-xs text-[#555] italic self-center">
+                  {t("deckBuilder.clickToAdd")}
+                </p>
               )}
             </div>
           </div>
@@ -424,31 +497,36 @@ export default function DeckBuilderPage() {
 
         {/* Available cards */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
-
           {/* Import section — prominent */}
           <div className="mb-5 border border-[#262626] bg-[#0e0e0e]">
             <div className="px-4 py-3">
-              <h2 className="text-sm font-bold text-[#e0e0e0] mb-1">{t('deckBuilder.importTitle')}</h2>
-              <p className="text-xs text-[#888888] mb-3">{t('deckBuilder.importDesc')}</p>
+              <h2 className="text-sm font-bold text-[#e0e0e0] mb-1">
+                {t("deckBuilder.importTitle")}
+              </h2>
+              <p className="text-xs text-[#888888] mb-3">
+                {t("deckBuilder.importDesc")}
+              </p>
 
               <div className="flex items-center gap-2 mb-3">
                 <a
-                  href="https://naruto-mythos-tcg-builder.glide.page/"
+                  href="https://shinobuilder.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-[#1a1a2a] border border-[#4a7ab5]/40 text-[#4a7ab5] text-xs hover:bg-[#1f1f3a] transition-colors"
                 >
-                  {t('deckBuilder.importVisit')}
+                  {t("deckBuilder.importVisit")}
                 </a>
               </div>
 
               <div className="flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder={t('deckBuilder.importPlaceholder')}
+                  placeholder={t("deckBuilder.importPlaceholder")}
                   value={importCode}
                   onChange={(e) => setImportCode(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleImport(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleImport();
+                  }}
                   className="flex-1 px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] font-mono"
                 />
                 <button
@@ -456,15 +534,19 @@ export default function DeckBuilderPage() {
                   disabled={!importCode.trim()}
                   className="px-4 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {t('deckBuilder.importButton')}
+                  {t("deckBuilder.importButton")}
                 </button>
               </div>
 
               {/* Import feedback */}
               {importMessage && (
-                <div className={`mt-2 text-xs ${
-                  importMessage.type === 'success' ? 'text-[#3e8b3e]' : 'text-[#b33e3e]'
-                }`}>
+                <div
+                  className={`mt-2 text-xs ${
+                    importMessage.type === "success"
+                      ? "text-[#3e8b3e]"
+                      : "text-[#b33e3e]"
+                  }`}
+                >
                   {importMessage.text}
                 </div>
               )}
@@ -474,7 +556,9 @@ export default function DeckBuilderPage() {
           {/* Separator */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-[#262626]" />
-            <span className="text-xs text-[#555] uppercase tracking-wider">{t('deckBuilder.orBuildManually')}</span>
+            <span className="text-xs text-[#555] uppercase tracking-wider">
+              {t("deckBuilder.orBuildManually")}
+            </span>
             <div className="flex-1 h-px bg-[#262626]" />
           </div>
 
@@ -482,7 +566,7 @@ export default function DeckBuilderPage() {
           <div className="mb-3">
             <input
               type="text"
-              placeholder={t('collection.search')}
+              placeholder={t("collection.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
@@ -490,54 +574,67 @@ export default function DeckBuilderPage() {
           </div>
           {/* Missions */}
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
-            {t('deckBuilder.missions', { count: availableMissions.length })}
+            {t("deckBuilder.missions", { count: availableMissions.length })}
           </p>
           <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-1 mb-4">
-            {availableMissions.filter((m) => !bannedIds.has(m.id)).map((m) => {
-              const mImgPath = getImagePath(m);
-              const check = canAddMission(m);
-              return (
-                <button
-                  key={m.id}
-                  onClick={() => addMission(m)}
-                  className="relative w-full mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                  title={getCardName(m, locale as 'en' | 'fr')}
-                >
-                  {mImgPath ? (
-                    <img
-                      src={mImgPath}
-                      alt={getCardName(m, locale as 'en' | 'fr')}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      style={{ opacity: check.allowed ? 1 : 0.3 }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-[#555]">{getCardName(m, locale as 'en' | 'fr')}</span>
-                    </div>
-                  )}
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    {check.allowed ? (
-                      <span className="text-[#3e8b3e] text-lg font-bold">+</span>
+            {availableMissions
+              .filter((m) => !bannedIds.has(m.id))
+              .map((m) => {
+                const mImgPath = getImagePath(m);
+                const check = canAddMission(m);
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => addMission(m)}
+                    className="relative w-full mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                    title={getCardName(m, locale as "en" | "fr")}
+                  >
+                    {mImgPath ? (
+                      <img
+                        src={mImgPath}
+                        alt={getCardName(m, locale as "en" | "fr")}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        style={{ opacity: check.allowed ? 1 : 0.3 }}
+                      />
                     ) : (
-                      <span className="text-[8px] text-[#b33e3e] text-center px-1">{check.reason}</span>
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[7px] text-[#555]">
+                          {getCardName(m, locale as "en" | "fr")}
+                        </span>
+                      </div>
                     )}
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 px-0.5 py-px" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
-                    <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">{getCardName(m, locale as 'en' | 'fr')}</span>
-                  </div>
-                </button>
-              );
-            })}
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      {check.allowed ? (
+                        <span className="text-[#3e8b3e] text-lg font-bold">
+                          +
+                        </span>
+                      ) : (
+                        <span className="text-[8px] text-[#b33e3e] text-center px-1">
+                          {check.reason}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="absolute inset-x-0 bottom-0 px-0.5 py-px"
+                      style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
+                    >
+                      <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">
+                        {getCardName(m, locale as "en" | "fr")}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
           </div>
 
           {/* Characters */}
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
-            {t('deckBuilder.characters', { count: filteredChars.length })}
+            {t("deckBuilder.characters", { count: filteredChars.length })}
           </p>
           <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1">
-            {filteredChars.map((card) => {
+            {paginatedChars.map((card) => {
               const imgPath = getImagePath(card);
               const check = canAddChar(card);
               return (
@@ -545,35 +642,68 @@ export default function DeckBuilderPage() {
                   key={card.id}
                   onClick={() => addChar(card)}
                   className="relative w-full card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                  title={`${getCardName(card, locale as 'en' | 'fr')} - ${getCardTitle(card, locale as 'en' | 'fr')} (${card.chakra}/${card.power})`}
+                  title={`${getCardName(card, locale as "en" | "fr")} - ${getCardTitle(card, locale as "en" | "fr")} (${card.chakra}/${card.power})`}
                 >
                   {imgPath ? (
                     <img
                       src={imgPath}
-                      alt={getCardName(card, locale as 'en' | 'fr')}
+                      alt={getCardName(card, locale as "en" | "fr")}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-[#555]">{getCardName(card, locale as 'en' | 'fr')}</span>
+                      <span className="text-[7px] text-[#555]">
+                        {getCardName(card, locale as "en" | "fr")}
+                      </span>
                     </div>
                   )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5">
                     {check.allowed ? (
                       <>
-                        <span className="text-[#3e8b3e] text-lg font-bold leading-none">+</span>
-                        <span className="text-[8px] text-[#e0e0e0]">{card.chakra}/{card.power}</span>
+                        <span className="text-[#3e8b3e] text-lg font-bold leading-none">
+                          +
+                        </span>
+                        <span className="text-[8px] text-[#e0e0e0]">
+                          {card.chakra}/{card.power}
+                        </span>
                       </>
                     ) : (
-                      <span className="text-[7px] text-[#b33e3e] text-center px-1 leading-tight">{check.reason}</span>
+                      <span className="text-[7px] text-[#b33e3e] text-center px-1 leading-tight">
+                        {check.reason}
+                      </span>
                     )}
                   </div>
                 </button>
               );
             })}
           </div>
+
+          {/* Pagination */}
+          {totalCharPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-3">
+              <button
+                onClick={() => setCharPage((p) => Math.max(1, p - 1))}
+                disabled={charPage <= 1}
+                className="px-2 py-1 text-[10px] transition-colors disabled:opacity-30"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {t('common.previous')}
+              </button>
+              <span className="text-[10px]" style={{ color: '#888888' }}>
+                {charPage} / {totalCharPages}
+              </span>
+              <button
+                onClick={() => setCharPage((p) => Math.min(totalCharPages, p + 1))}
+                disabled={charPage >= totalCharPages}
+                className="px-2 py-1 text-[10px] transition-colors disabled:opacity-30"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {t('common.next')}
+              </button>
+            </div>
+          )}
         </div>
 
         <Footer />

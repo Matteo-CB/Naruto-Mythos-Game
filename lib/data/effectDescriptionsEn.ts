@@ -1041,4 +1041,24 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   'KS-010-MMS': [
     '[⧗] CHAKRA +1 for both players.',
   ],
+
+  // =====================
+  // SECRET V (SV) — Gold variants of Secret cards
+  // =====================
+
+  'KS-131-SV': [
+    'POWERUP 1 every friendly Leaf Village character in play.',
+  ],
+  'KS-133-SV': [
+    'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
+    'effect: Instead, defeat both of them.',
+  ],
+  'KS-136-SV': [
+    '[⧗] When a character is defeated, gain 1 Chakra.',
+    'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
+  ],
+  'KS-137-SV': [
+    'Move this character to another mission.',
+    'Hide an upgraded character in this mission.',
+  ],
 };

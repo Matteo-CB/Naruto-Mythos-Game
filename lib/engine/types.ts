@@ -170,6 +170,8 @@ export interface PendingEffect {
   isUpgrade: boolean;
   // Continuation: remaining effect types to process after this pending is resolved
   remainingEffectTypes?: EffectType[];
+  // When the selecting player differs from the source player (e.g., opponent choices)
+  selectingPlayer?: PlayerID;
 }
 
 export interface PendingAction {

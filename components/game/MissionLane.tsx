@@ -134,7 +134,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
           {imagePath ? (
             <div
               className="w-full h-full bg-cover bg-center"
-              style={{ backgroundImage: `url('${imagePath}')` }}
+              style={{ backgroundImage: `url('${imagePath}')`, imageRendering: 'crisp-edges' }}
             />
           ) : (
             <div
@@ -324,6 +324,7 @@ function MissionCardDisplay({
           style={{
             backgroundImage: `url('${imagePath}')`,
             minHeight: '65px',
+            imageRendering: 'crisp-edges',
           }}
         />
       ) : (

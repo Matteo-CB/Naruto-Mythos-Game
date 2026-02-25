@@ -8,13 +8,10 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Group: Leaf Village | Keywords: Team 10, Jutsu
  *
  * MAIN: Take control of an enemy character with cost 2 or less in this mission.
- *   - Targets non-hidden enemy characters in this mission with printed chakra cost <= 2.
+ *   - Targets enemy characters in this mission with effective cost <= 2.
+ *   - Hidden characters have cost 0 when targeted by enemy effects (per rules), so they qualify.
  *   - If exactly 1 valid target, auto-apply: change controlledBy to source player.
  *   - If multiple targets, return requiresTargetSelection.
- *   - Hidden characters have cost 0 when targeted by enemy effects, so they are valid
- *     targets if their effective cost (0) is <= 2, but since the effect says "take control"
- *     and hidden characters have cost 0, they qualify. However, the effect text implies
- *     visible characters (you need to know the cost). We target non-hidden characters only.
  *
  * UPGRADE: MAIN effect: Instead, the cost limit is 3 or less.
  *   - When triggered as upgrade, the cost threshold changes from 2 to 3.
@@ -29,12 +26,12 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
 
   const costLimit = isUpgrade ? 3 : 2;
 
-  // Find non-hidden enemy characters with cost <= costLimit
+  // Find enemy characters with cost <= costLimit (hidden characters have cost 0 per rules)
   const validTargets: string[] = [];
   for (const char of enemyChars) {
-    if (char.isHidden) continue;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    if (topCard.chakra <= costLimit) {
+    const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+    if (effectiveCost <= costLimit) {
       validTargets.push(char.instanceId);
     }
   }

@@ -12,7 +12,10 @@
     "register": "S'inscrire",
     "language": "Langue",
     "legal": "Mentions l\u00e9gales",
-    "createdBy": "Cr\u00e9\u00e9 par"
+    "createdBy": "Cr\u00e9\u00e9 par",
+    "previous": "Pr\u00e9c\u00e9dent",
+    "next": "Suivant",
+    "page": "Page"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -22,14 +25,13 @@
     "collection": "Collection",
     "deckBuilder": "Constructeur de Deck",
     "leaderboard": "Classement",
-    "learn": "Apprendre le jeu",
-    "quiz": "Quiz",
+    "learn": "Apprendre & Quiz",
     "signIn": "Se connecter",
     "register": "S'inscrire",
     "discord": "Discord",
     "profile": "Mon Profil",
     "friends": "Amis",
-    "bugReport": "Signaler un Bug",
+    "betaBanner": "Nous sommes en phase de test. Des cartes peuvent manquer et des effets peuvent ne pas \u00eatre fonctionnels ! Vous pouvez nous aider en rejoignant le Discord et en communiquant les bugs dans le salon d\u00e9di\u00e9.",
     "adminCards": "Gestion des Cartes",
     "signOut": "Se deconnecter"
   },
@@ -629,6 +631,7 @@
   },
   "learn": {
     "title": "Apprendre le jeu",
+    "rulesTab": "R\u00e8gles",
     "tabs": { "tutorial": "Tutoriel", "quiz": "Quiz" },
     "tutorial": {
       "prev": "Precedent",

@@ -106,15 +106,26 @@
       "title_fr": "La Création et le Renouveau",
       "title_en": "Creation Rebirth",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 4,
+      "power": 4,
+      "keywords": ["Sannin", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Defeated friendly characters go into your hand instead of your discard pile.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Choose one character in your discard pile and put them into your hand.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Uncommon",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "004/130"
     },
     "KS-005-C": {
@@ -1418,15 +1429,21 @@
       "title_fr": "La Poigne du Serpent Spectral",
       "title_en": "Shadow Snake Hands",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 3,
+      "power": 4,
+      "keywords": ["Special Jonin", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Defeat a hidden enemy character in play.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Uncommon",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "045/130"
     },
     "KS-046-C": {
@@ -1623,16 +1640,22 @@
       "name_fr": "KABUTO YAKUSHI",
       "title_fr": "La taupe",
       "title_en": "The Mole",
-      "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
-      "image_url": "",
-      "rarity_display": "",
-      "image_file": "",
-      "data_complete": false,
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": ["Sound Village"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Draw the top card of the opponent's deck and put it hidden in any mission under your control.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-052-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-052-C.webp",
+      "data_complete": true,
       "old_id": "052/130"
     },
     "KS-053-UC": {
@@ -2045,7 +2068,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "[↯] POWERUP 2 a friendly Sound Village character in play.",
+          "description": "POWERUP 2 a friendly Sound Village character in play.",
           "description_fr": ""
         },
         {
@@ -2307,15 +2330,26 @@
       "title_fr": "Clone du son de cloche",
       "title_en": "Bell Clone",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 4,
+      "power": 4,
+      "keywords": ["Team Dosu", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card to hide an enemy character with Power 4 or less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Put the top card of your deck as a hidden character in this mission.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Uncommon",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "073/130"
     },
     "KS-074-C": {
@@ -2395,15 +2429,26 @@
       "title_fr": "Métamorphose Partielle",
       "title_en": "Partial Transformation",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 6,
+      "power": 9,
+      "keywords": ["Tailed Beast"],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Gaara.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Uncommon",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "076/130"
     },
     "KS-077-C": {
@@ -2825,7 +2870,7 @@
       "name_fr": "ITACHI UCHIWA",
       "title_fr": "Akatsuki",
       "title_en": "Akatsuki",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 3,
       "power": 3,
       "keywords": [
@@ -2839,9 +2884,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/common/KS-090-C.webp",
       "rarity_display": "Common",
-      "image_file": "",
+      "image_file": "images/cards/KS/common/KS-090-C.webp",
       "data_complete": true,
       "old_id": "090/130"
     },
@@ -3901,18 +3946,29 @@
       "card_type": "character",
       "name_en": "JIROBO",
       "name_fr": "JIRÔBÔ",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Poing d'Arhat",
+      "title_en": "Arhat Fist",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Sound Four", "Taijutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP X where X is the number of characters in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Rare",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "122/130"
     },
     "KS-123-R": {
@@ -3958,18 +4014,29 @@
       "card_type": "character",
       "name_en": "KIDOMARU",
       "name_fr": "KIDÔMARU",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Arc d'Araignée : Déchirure Féroce",
+      "title_en": "Spider Bow: Fierce Rip",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Defeat an enemy character with Power 3 or less in another mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "AMBUSH effect: Instead, the Power limit is 5 or less.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Rare",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "124/130"
     },
     "KS-125-R": {
@@ -4108,18 +4175,29 @@
       "card_type": "character",
       "name_en": "NINE-TAILS",
       "name_fr": "KYÛBI",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Manteau du Démon Renard",
+      "title_en": "Demon Fox Cloak",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 7,
+      "power": 10,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": ""
+        }
+      ],
       "image_url": "",
-      "rarity_display": "",
+      "rarity_display": "Rare",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "129/130"
     },
     "KS-130-R": {
@@ -5262,7 +5340,7 @@
       "name_en": "JIRAIYA",
       "name_fr": "JIRAYA",
       "title_fr": "Ermite du Mont Myoboku",
-      "title_en": "Sage of Mount Myoboku",
+      "title_en": "Hermit of Mount Myoboku",
       "has_visual": true,
       "chakra": 6,
       "power": 6,
@@ -5409,8 +5487,8 @@
       "card_type": "character",
       "name_en": "SAKURA HARUNO",
       "name_fr": "SAKURA HARUNO",
-      "title_fr": "Sakura Haruno",
-      "title_en": "Sakura Haruno",
+      "title_fr": "Maintenant c'est à moi de prendre les devants.",
+      "title_en": "Now it's my turn to take the lead.",
       "has_visual": true,
       "chakra": 4,
       "power": 3,
@@ -5483,7 +5561,7 @@
       "name_en": "SHIKAMARU NARA",
       "name_fr": "SHIKAMARU NARA",
       "title_fr": "Quelle galère...",
-      "title_en": "What a drag...",
+      "title_en": "This whole thing's a drag...",
       "has_visual": true,
       "chakra": 6,
       "power": 5,
@@ -5519,8 +5597,8 @@
       "card_type": "character",
       "name_en": "CHOJI AKIMICHI",
       "name_fr": "CHÔJI AKIMICHI",
-      "title_fr": "Chôji Akimichi",
-      "title_en": "Choji Akimichi",
+      "title_fr": "C'est qui que tu traites de gros ?",
+      "title_en": "Who you calling fat?",
       "has_visual": true,
       "chakra": 5,
       "power": 4,
@@ -5690,7 +5768,7 @@
       "name_en": "ROCK LEE",
       "name_fr": "ROCK LEE",
       "title_fr": "Je te rendrai fier, Sensei.",
-      "title_en": "I'll make you proud, Sensei.",
+      "title_en": "I will make you proud, Sensei.",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -5726,8 +5804,8 @@
       "card_type": "character",
       "name_en": "TENTEN",
       "name_fr": "TENTEN",
-      "title_fr": "Tenten",
-      "title_en": "Tenten",
+      "title_fr": "Les Deux Dragons Ascendants",
+      "title_en": "Twin Rising Dragons",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -5758,8 +5836,8 @@
       "card_type": "character",
       "name_en": "KANKURO",
       "name_fr": "KANKURÔ",
-      "title_fr": "Spectacle de marionnettes",
-      "title_en": "Puppet Show",
+      "title_fr": "...On va faire un spectacle de marionnettes !",
+      "title_en": "...We'll have a Puppet Show!",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -5795,8 +5873,8 @@
       "card_type": "character",
       "name_en": "GAARA",
       "name_fr": "GAARA",
-      "title_fr": "Gaara",
-      "title_en": "Gaara",
+      "title_fr": "Le Cercueil de Sable",
+      "title_en": "Sand Coffin",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -5833,7 +5911,7 @@
       "name_en": "TEMARI",
       "name_fr": "TEMARI",
       "title_fr": "C'est fini.",
-      "title_en": "It's over.",
+      "title_en": "It's finished.",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -5869,8 +5947,8 @@
       "card_type": "character",
       "name_en": "JIROBO",
       "name_fr": "JIRÔBÔ",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Poing d'Arhat",
+      "title_en": "Arhat Fist",
       "has_visual": false,
       "chakra": 0,
       "power": 0,
@@ -5893,7 +5971,7 @@
       "name_en": "KIMIMARO",
       "name_fr": "KIMIMARO",
       "title_fr": "C'est terminé.",
-      "title_en": "It's finished.",
+      "title_en": "It's over.",
       "has_visual": true,
       "chakra": 6,
       "power": 8,
@@ -5928,8 +6006,8 @@
       "card_type": "character",
       "name_en": "KIDOMARU",
       "name_fr": "KIDÔMARU",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Arc d'Araignée : Déchirure Féroce",
+      "title_en": "Spider Bow: Fierce Rip",
       "has_visual": false,
       "chakra": 0,
       "power": 0,
@@ -5988,8 +6066,8 @@
       "card_type": "character",
       "name_en": "OROCHIMARU",
       "name_fr": "OROCHIMARU",
-      "title_fr": "Orochimaru",
-      "title_en": "Orochimaru",
+      "title_fr": "Ne te mets pas en travers de mon chemin.",
+      "title_en": "Stay out of my way.",
       "has_visual": true,
       "chakra": 7,
       "power": 7,
@@ -6047,8 +6125,8 @@
       "card_type": "character",
       "name_en": "ITACHI UCHIHA",
       "name_fr": "ITACHI UCHIWA",
-      "title_fr": "Itachi Uchiwa",
-      "title_en": "Itachi Uchiha",
+      "title_fr": "Je les contrôle tous.",
+      "title_en": "I control them all.",
       "has_visual": true,
       "chakra": 6,
       "power": 6,
@@ -6083,8 +6161,8 @@
       "card_type": "character",
       "name_en": "NINE-TAILS",
       "name_fr": "KYÛBI",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Manteau du Démon Renard",
+      "title_en": "Demon Fox Cloak",
       "has_visual": false,
       "chakra": 0,
       "power": 0,
@@ -6106,8 +6184,8 @@
       "card_type": "character",
       "name_en": "ONE-TAIL",
       "name_fr": "ICHIBI",
-      "title_fr": "Ichibi",
-      "title_en": "One-Tail",
+      "title_fr": "J'espère que tu es prêt à mourir !",
+      "title_en": "I hope you're ready to die!",
       "has_visual": true,
       "chakra": 7,
       "power": 10,
@@ -6134,6 +6212,133 @@
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "130/130 A"
+    },
+    "KS-131-SV": {
+      "id": "KS-131-SV",
+      "rarity": "SV",
+      "number": "131",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Cinquième Hokage",
+      "title_en": "Fifth Hokage",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 6,
+      "keywords": ["Sannin", "Hokage"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 1 every friendly Leaf Village character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-131-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-131-SV.webp",
+      "data_complete": true,
+      "old_id": "131/130"
+    },
+    "KS-133-SV": {
+      "id": "KS-133-SV",
+      "rarity": "SV",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Rasengan",
+      "title_en": "Rasengan",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-133-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-133-SV.webp",
+      "data_complete": true,
+      "old_id": "133/130"
+    },
+    "KS-136-SV": {
+      "id": "KS-136-SV",
+      "rarity": "SV",
+      "number": "136",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Marque maudite du Ciel",
+      "title_en": "Curse Mark of Heaven",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 8,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a character is defeated, gain 1 Chakra.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-136-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-136-SV.webp",
+      "data_complete": true,
+      "old_id": "136/130"
+    },
+    "KS-137-SV": {
+      "id": "KS-137-SV",
+      "rarity": "SV",
+      "number": "137",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "L'Éclair Pourfendeur",
+      "title_en": "Lightning Blade",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Hide an upgraded character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-137-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-137-SV.webp",
+      "data_complete": true,
+      "old_id": "137/130"
     }
   }
 }
