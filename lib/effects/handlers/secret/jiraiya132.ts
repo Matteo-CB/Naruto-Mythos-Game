@@ -1,9 +1,8 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
-import type { CharacterInPlay, GameState } from '../../../engine/types';
+import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 import { generateInstanceId } from '../../../engine/utils/id';
-import { defeatEnemyCharacter } from '../../defeatUtils';
 
 /**
  * Card 132/130 - JIRAYA (S)
@@ -13,20 +12,13 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  * MAIN: Play a Summon character from your hand anywhere, paying 5 less.
  *   - Find all character cards in hand with the "Summon" keyword.
  *   - The player can afford the card at (cost - 5, minimum 0).
- *   - For auto-resolution: pick the best affordable Summon and place it on the
- *     mission with the fewest friendly characters.
  *   - If no Summon characters in hand or none affordable, fizzles.
  *
- * UPGRADE: Opponent must defeat their characters until at most 2 are assigned per mission.
- *   - For each mission, count enemy characters. If more than 2, defeat the weakest
- *     excess characters automatically.
+ * UPGRADE: The opponent must choose characters to be defeated until they
+ *   only have up to 2 assigned per mission.
+ *   - The OPPONENT selects which of their characters to defeat.
+ *   - Processed one mission at a time, one defeat at a time.
  */
-
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
@@ -123,66 +115,42 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // UPGRADE: Opponent must defeat their characters until at most 2 per mission
-  if (ctx.isUpgrade) {
-    state = applyUpgradeEffect(state, ctx);
-  }
-
   return { state };
 }
 
-/**
- * UPGRADE: For each mission, if the opponent has more than 2 characters,
- * defeat the weakest excess characters.
- */
-function applyUpgradeEffect(state: GameState, ctx: EffectContext): GameState {
+function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {
+  let state = { ...ctx.state };
+  const opponent = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
+  // Check each mission for > 2 enemy characters
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
 
-    while (enemyChars.length > 2) {
-      // Fresh read each iteration (defeatEnemyCharacter mutates state)
-      const currentMission = state.activeMissions[i];
-      const currentEnemyChars = currentMission[enemySide];
-
-      if (currentEnemyChars.length <= 2) break;
-
-      // Find the weakest character to defeat
-      let weakestIdx = 0;
-      let weakestPower = getEffectivePower(currentEnemyChars[0]);
-      for (let j = 1; j < currentEnemyChars.length; j++) {
-        const p = getEffectivePower(currentEnemyChars[j]);
-        if (p < weakestPower) {
-          weakestPower = p;
-          weakestIdx = j;
-        }
-      }
-
-      const target = currentEnemyChars[weakestIdx];
-      state = defeatEnemyCharacter(state, i, target.instanceId, ctx.sourcePlayer);
-
-      state = {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, ctx.sourcePlayer,
-          'EFFECT_DEFEAT',
-          `Jiraya (132): Defeated enemy ${target.card.name_fr} in mission ${i} (upgrade, exceeds 2 per mission).`,
-          'game.log.effect.defeat',
-          { card: 'JIRAYA', id: 'KS-132-S', target: target.card.name_fr },
-        ),
+    if (enemyChars.length > 2) {
+      // Opponent must choose which to defeat (one at a time)
+      const validTargets = enemyChars.map((c) => c.instanceId);
+      return {
+        state,
+        requiresTargetSelection: true,
+        targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
+        validTargets,
+        selectingPlayer: opponent,
+        description: JSON.stringify({
+          missionIndex: i,
+          sourcePlayer: ctx.sourcePlayer,
+          text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${i + 1} (${enemyChars.length} > 2).`,
+        }),
+        descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
+        descriptionParams: { mission: String(i + 1), count: String(enemyChars.length) },
       };
     }
   }
 
-  return state;
-}
-
-function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
-  return { state: ctx.state };
+  // All missions already have <= 2 enemy characters
+  return { state };
 }
 
 export function registerJiraiya132Handlers(): void {

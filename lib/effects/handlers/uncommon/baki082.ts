@@ -1,39 +1,32 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import type { CharacterInPlay } from '../../../engine/types';
 import { registerEffect } from '../../EffectRegistry';
-import { defeatEnemyCharacter } from '../../defeatUtils';
 import { logAction } from '../../../engine/utils/gameLog';
 
 /**
  * Card 082/130 - BAKI "Wind Blade" (UC)
- * Chakra: 5 | Power: 3
+ * Chakra: 4 | Power: 4
  * Group: Sand Village | Keywords: Team Baki
  *
- * SCORE [arrow]: Defeat a hidden character in play (any player, any mission).
+ * SCORE [arrow]: Defeat a hidden enemy character in play (any mission).
  *   - When the player wins the mission where Baki is assigned, they may defeat
- *     any single hidden character in play.
- *   - If multiple hidden characters exist, requires target selection.
- *   - If exactly one hidden character, auto-apply.
+ *     any single hidden ENEMY character in play.
+ *   - If multiple hidden enemy characters exist, requires target selection.
+ *   - If exactly one hidden enemy character, auto-apply.
  *
- * UPGRADE: Defeat an enemy with Power 1 or less in this mission.
- *   - When played as upgrade, immediately defeat a non-hidden enemy character
- *     in this mission with effective power <= 1.
- *   - If multiple valid targets, requires target selection.
+ * UPGRADE: POWERUP 1 on each friendly Sand Village character in this mission.
+ *   - When played as upgrade, place 1 power token on each friendly Sand Village
+ *     character assigned to this mission.
  */
-
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleBaki082Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
 
-  // Find all hidden characters in play across all missions (any player)
+  // Find all hidden ENEMY characters in play across all missions
+  const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
-    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+    for (const char of mission[enemySide]) {
       if (char.isHidden) {
         validTargets.push(char.instanceId);
       }
@@ -74,57 +67,38 @@ function handleBaki082Score(ctx: EffectContext): EffectResult {
 
 function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
-  const mission = state.activeMissions[sourceMissionIndex];
-  const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-  const enemyChars = mission[enemySide];
+  const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find enemies with effective power <= 1 in this mission (hidden = power 0, valid)
-  const validTargets: string[] = [];
-  for (const char of enemyChars) {
-    if (getEffectivePower(char) <= 1) {
-      validTargets.push(char.instanceId);
-    }
-  }
+  // POWERUP 1 on each friendly Sand Village character in this mission
+  let count = 0;
+  const updatedMissions = state.activeMissions.map((m, i) => {
+    if (i !== sourceMissionIndex) return m;
+    return {
+      ...m,
+      [friendlySide]: m[friendlySide].map((c: CharacterInPlay) => {
+        if (c.isHidden) return c;
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        if (topCard.group === 'Sand Village') {
+          count++;
+          return { ...c, powerTokens: c.powerTokens + 1 };
+        }
+        return c;
+      }),
+    };
+  });
 
-  if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Baki (082): No enemy with Power 1 or less in this mission (upgrade).',
-      'game.log.effect.noTarget',
-      { card: 'BAKI', id: 'KS-082-UC' },
-    );
-    return { state: { ...state, log } };
-  }
-
-  // If exactly one target, auto-defeat
-  if (validTargets.length === 1) {
-    const newState = defeatEnemyCharacter(state, sourceMissionIndex, validTargets[0], sourcePlayer);
-    const log = logAction(
-      newState.log,
-      newState.turn,
-      newState.phase,
-      sourcePlayer,
-      'EFFECT_DEFEAT',
-      'Baki (082): Defeated enemy with Power 1 or less in this mission (upgrade).',
-      'game.log.effect.defeat',
-      { card: 'BAKI', id: 'KS-082-UC' },
-    );
-    return { state: { ...newState, log } };
-  }
-
-  // Multiple targets: requires selection
-  return {
-    state,
-    requiresTargetSelection: true,
-    targetSelectionType: 'DEFEAT_ENEMY_POWER_1_THIS_MISSION',
-    validTargets,
-    description: 'Baki (082) UPGRADE: Select an enemy character with Power 1 or less in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.baki082UpgradeDefeatLowPower',
-  };
+  let newState = { ...state, activeMissions: updatedMissions };
+  const log = logAction(
+    newState.log,
+    newState.turn,
+    newState.phase,
+    sourcePlayer,
+    'EFFECT_POWERUP',
+    `Baki (082) UPGRADE: POWERUP 1 on ${count} friendly Sand Village character(s) in this mission.`,
+    'game.log.effect.powerup',
+    { card: 'BAKI', id: 'KS-082-UC', count: String(count) },
+  );
+  return { state: { ...newState, log } };
 }
 
 /**

@@ -651,7 +651,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 107/130 - SASUKE UCHIWA (R) - "Chidori"
   'KS-107-R': [
-    'Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
+    '[↯] Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
     'POWERUP X ou X est le nombre de personnages deplaces de cette facon.',
   ],
 
@@ -950,7 +950,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'effet MAIN : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
   ],
   'KS-107-RA': [
-    'Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
+    '[↯] Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
     'POWERUP X ou X est le nombre de personnages deplaces de cette facon.',
   ],
   'KS-109-RA': [
