@@ -38,6 +38,8 @@ export default function CollectionPage() {
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const CARDS_PER_PAGE = 24;
   const { bannedIds } = useBannedCards();
 
   useEffect(() => {
@@ -75,6 +77,18 @@ export default function CollectionPage() {
       return true;
     });
   }, [allCards, filterRarity, filterGroup, searchQuery]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterRarity, filterGroup, searchQuery]);
+
+  const characterCards = useMemo(() => filteredCards.filter((c) => c.card_type !== 'mission'), [filteredCards]);
+  const totalCharPages = Math.max(1, Math.ceil(characterCards.length / CARDS_PER_PAGE));
+  const paginatedChars = useMemo(() => {
+    const start = (currentPage - 1) * CARDS_PER_PAGE;
+    return characterCards.slice(start, start + CARDS_PER_PAGE);
+  }, [characterCards, currentPage]);
 
   const getImagePath = (card: AnyCard): string | null => normalizeImagePath(card.image_file);
 
@@ -137,7 +151,7 @@ export default function CollectionPage() {
 
         {/* Character card grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-          {filteredCards.filter((c) => c.card_type !== 'mission').map((card) => {
+          {paginatedChars.map((card) => {
             const isBanned = bannedIds.has(card.id);
             const imgPath = isBanned ? null : getImagePath(card);
             return (
@@ -178,6 +192,31 @@ export default function CollectionPage() {
             );
           })}
         </div>
+
+        {/* Pagination controls */}
+        {totalCharPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            >
+              {t('common.previous')}
+            </button>
+            <span className="text-xs" style={{ color: '#888888' }}>
+              {currentPage} / {totalCharPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalCharPages, p + 1))}
+              disabled={currentPage >= totalCharPages}
+              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            >
+              {t('common.next')}
+            </button>
+          </div>
+        )}
 
         {/* Mission cards section */}
         {filteredCards.some((c) => c.card_type === 'mission') && (

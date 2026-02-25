@@ -23,16 +23,24 @@ export default function LeaderboardPage() {
   const tc = useTranslations('common');
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPlayers, setTotalPlayers] = useState(0);
+  const PLAYERS_PER_PAGE = 20;
 
   useEffect(() => {
-    fetch('/api/leaderboard?limit=50')
+    setLoading(true);
+    const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
+    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.users || []);
+        setTotalPlayers(data.total || 0);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [currentPage]);
+
+  const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
 
   return (
     <main id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
@@ -89,6 +97,7 @@ export default function LeaderboardPage() {
             {users.map((user, index) => {
               const total = user.wins + user.losses + user.draws;
               const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+              const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
 
               return (
                 <div
@@ -96,8 +105,8 @@ export default function LeaderboardPage() {
                   className="grid grid-cols-6 gap-2 px-4 py-3 text-sm"
                   style={{ borderTop: '1px solid #262626' }}
                 >
-                  <span style={{ color: index < 3 ? '#c4a35a' : '#888888' }}>
-                    {index + 1}
+                  <span style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}>
+                    {globalRank}
                   </span>
                   <Link
                     href={`/profile/${user.username}` as '/'}
@@ -114,6 +123,31 @@ export default function LeaderboardPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            >
+              {tc('previous')}
+            </button>
+            <span className="text-xs" style={{ color: '#888888' }}>
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
+              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+            >
+              {tc('next')}
+            </button>
           </div>
         )}
       </div>

@@ -56,10 +56,7 @@ const cloudPositions = [
 
 // Floating decorative weapon elements
 const floatingElements = [
-  { src: '/images/icons/kunai.webp', top: '10%', left: '2%', size: 36, opacity: 0.05, rotate: 45, duration: 8 },
   { src: '/images/icons/shuriken.webp', top: '22%', right: '3%', size: 30, opacity: 0.04, rotate: 0, duration: 12, spin: true },
-  { src: '/images/icons/scroll-kunai.webp', top: '55%', left: '1%', size: 42, opacity: 0.05, rotate: -20, duration: 10 },
-  { src: '/images/icons/kunai.webp', top: '42%', right: '2%', size: 30, opacity: 0.04, rotate: -135, duration: 9 },
   { src: '/images/icons/shuriken.webp', top: '78%', left: '4%', size: 26, opacity: 0.05, rotate: 0, duration: 14, spin: true },
   { src: '/images/icons/akatsuki-cloud.webp', top: '82%', right: '4%', size: 40, opacity: 0.04, rotate: 5, duration: 11 },
 ];
@@ -72,9 +69,7 @@ const menuButtons = [
   { key: 'collection' as const, href: '/collection', primary: false },
   { key: 'deckBuilder' as const, href: '/deck-builder', primary: false },
   { key: 'learn' as const, href: '/learn', primary: false },
-  { key: 'quiz' as const, href: '/quiz', primary: false },
   { key: 'leaderboard' as const, href: '/leaderboard', primary: false },
-  { key: 'bugReport' as const, href: '/bug-report', primary: false },
 ];
 
 // Account buttons
@@ -448,6 +443,22 @@ export default function Home() {
               >
                 {t('discord')}
               </a>
+            </motion.div>
+
+            {/* Beta banner */}
+            <motion.div
+              className="mt-4 w-full px-4 py-3 text-center"
+              style={{
+                border: '1px solid rgba(196, 163, 90, 0.2)',
+                backgroundColor: 'rgba(196, 163, 90, 0.03)',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 1.65 }}
+            >
+              <p className="text-xs leading-relaxed" style={{ color: '#888888' }}>
+                {t('betaBanner')}
+              </p>
             </motion.div>
 
             {/* Footer text */}

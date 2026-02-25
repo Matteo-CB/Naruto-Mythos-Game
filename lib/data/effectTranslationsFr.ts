@@ -1051,4 +1051,24 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   'KS-010-MMS': [
     '[⧗] CHAKRA +1 pour les deux joueurs.',
   ],
+
+  // =====================
+  // SECRET V (SV) — Variantes dorées des cartes Secret
+  // =====================
+
+  'KS-131-SV': [
+    'POWERUP 1 à chaque personnage ami Village de Konoha en jeu.',
+  ],
+  'KS-133-SV': [
+    'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
+    'effet : À la place, éliminez-les tous les deux.',
+  ],
+  'KS-136-SV': [
+    '[⧗] Quand un personnage est éliminé, gagnez 1 Chakra.',
+    'Vous devez choisir un personnage ami non caché et un personnage ennemi dans cette mission et les éliminer, si possible.',
+  ],
+  'KS-137-SV': [
+    'Déplacez ce personnage vers une autre mission.',
+    'Cachez un personnage amélioré dans cette mission.',
+  ],
 };
