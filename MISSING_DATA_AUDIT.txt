@@ -1,0 +1,245 @@
+# DONNEES MANQUANTES - CARTES SANS VISUEL
+# Mis a jour: 2026-02-25
+#
+# Ce fichier ne liste QUE les cartes sans image qui ont des donnees manquantes.
+# Les cartes sans image mais avec toutes leurs donnees ne sont PAS listees ici
+# (elles ont juste besoin d'un visuel).
+#
+# FORMAT:
+#   ??? = valeur inconnue a remplir
+#   (copier KS-xxx-R) = variante Rare Art, copier les donnees de la version R
+#
+# LEGENDE TAGS:
+#   [STATS]    = chakra et/ou power manquants
+#   [EFFECTS]  = pas d'effets renseignes
+#   [KEYWORDS] = pas de keywords
+#   [TEXT]      = titre manquant
+#   [GROUP]    = groupe/faction manquant ou "Independent" par defaut
+#
+# ============================================================
+# CARTES COMPLETES (SEULEMENT BESOIN D'IMAGE) - pour reference
+# ============================================================
+# KS-004-UC  TSUNADE - La Creation et le Renouveau (C4/P4)
+# KS-045-UC  ANKO MITARASHI - La Poigne du Serpent Spectral (C3/P4)
+# KS-073-UC  KIN TSUCHI - Clone du son de cloche (C4/P4)
+# KS-076-UC  ICHIBI - Metamorphose Partielle (C6/P9)
+# KS-108-R   NARUTO UZUMAKI - Believe it! (C5/P5)
+# KS-112-R   CHOJI AKIMICHI - C'est qui que tu traites de gros ? (C5/P4)
+# KS-116-RA  NEJI HYUGA - Hakke Soixante-Quatre Paumes (C6/P5)
+# KS-122-R   JIROBO - Poing d'Arhat (C5/P6)
+# KS-124-R   KIDOMARU - Arc d'Araignee : Dechirure Feroce (C5/P5)
+# KS-126-R   OROCHIMARU - Otez-vous de mon chemin. (C7/P7)
+# KS-128-R   ITACHI UCHIWA - Je les controle tous. (C6/P6)
+# KS-129-R   KYUBI - Manteau du Demon Renard (C7/P10)
+# KS-130-R   ICHIBI - J'espere que tu es pret a mourir ! (C7/P10) [GROUP manquant]
+# ============================================================
+
+
+################################################################
+# RARE — DONNEES MANQUANTES
+################################################################
+
+[KS-115-R] [STATS] [EFFECTS] [KEYWORDS] [TEXT] [GROUP]
+name_fr = SHINO ABURAME
+name_en = SHINO ABURAME
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = ???
+effects =
+  ???
+
+[KS-127-R] [STATS] [EFFECTS] [KEYWORDS] [TEXT] [GROUP]
+name_fr = SAKON
+name_en = SAKON
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = ???
+effects =
+  ???
+
+
+################################################################
+# RARE ART — DONNEES MANQUANTES
+# Les RA sont des variantes d'art alternatif des cartes R.
+# Memes stats/effets que la version R, art different.
+################################################################
+
+[KS-115-RA] [STATS] [EFFECTS] [KEYWORDS] [TEXT] [GROUP]
+# Variante Rare Art de KS-115-R (SHINO ABURAME)
+# -> Copier TOUTES les donnees de KS-115-R une fois remplies
+name_fr = SHINO ABURAME
+title_fr = ???  (copier KS-115-R)
+title_en = ???  (copier KS-115-R)
+chakra = ???    (copier KS-115-R)
+power = ???     (copier KS-115-R)
+keywords = ???  (copier KS-115-R)
+group = ???     (copier KS-115-R)
+effects = ???   (copier KS-115-R)
+
+[KS-122-RA] [STATS] [EFFECTS] [KEYWORDS] [GROUP]
+# Variante Rare Art de KS-122-R (JIROBO)
+# -> Copier les donnees de KS-122-R : C5/P6, Sound Four+Taijutsu, Sound Village
+name_fr = JIRÔBÔ
+title_fr = Poing d'Arhat  (deja present)
+title_en = Arhat Fist      (deja present)
+chakra = ???    (copier KS-122-R = 5)
+power = ???     (copier KS-122-R = 6)
+keywords = ???  (copier KS-122-R = Sound Four, Taijutsu)
+group = ???     (copier KS-122-R = Sound Village)
+effects = ???   (copier KS-122-R)
+
+[KS-124-RA] [STATS] [EFFECTS] [KEYWORDS] [GROUP]
+# Variante Rare Art de KS-124-R (KIDOMARU)
+# -> Copier les donnees de KS-124-R : C5/P5, Sound Four+Jutsu, Sound Village
+name_fr = KIDÔMARU
+title_fr = Arc d'Araignee : Dechirure Feroce  (deja present)
+title_en = Spider Bow: Fierce Rip               (deja present)
+chakra = ???    (copier KS-124-R = 5)
+power = ???     (copier KS-124-R = 5)
+keywords = ???  (copier KS-124-R = Sound Four, Jutsu)
+group = ???     (copier KS-124-R = Sound Village)
+effects = ???   (copier KS-124-R)
+
+[KS-127-RA] [STATS] [EFFECTS] [KEYWORDS] [TEXT] [GROUP]
+# Variante Rare Art de KS-127-R (SAKON)
+# -> Copier TOUTES les donnees de KS-127-R une fois remplies
+name_fr = SAKON
+title_fr = ???  (copier KS-127-R)
+title_en = ???  (copier KS-127-R)
+chakra = ???    (copier KS-127-R)
+power = ???     (copier KS-127-R)
+keywords = ???  (copier KS-127-R)
+group = ???     (copier KS-127-R)
+effects = ???   (copier KS-127-R)
+
+[KS-129-RA] [STATS] [EFFECTS] [KEYWORDS] [GROUP]
+# Variante Rare Art de KS-129-R (KYUBI)
+# -> Copier les donnees de KS-129-R : C7/P10, Tailed Beast, Leaf Village
+name_fr = KYÛBI
+title_fr = Manteau du Demon Renard  (deja present)
+title_en = Demon Fox Cloak           (deja present)
+chakra = ???    (copier KS-129-R = 7)
+power = ???     (copier KS-129-R = 10)
+keywords = ???  (copier KS-129-R = Tailed Beast)
+group = ???     (copier KS-129-R = Leaf Village)
+effects = ???   (copier KS-129-R)
+
+
+################################################################
+# SECRET — DONNEES MANQUANTES
+################################################################
+
+[KS-134-S] [STATS] [EFFECTS] [KEYWORDS] [GROUP]
+name_fr = KYÛBI
+name_en = NINE-TAILS
+title_fr = Destruction      (deja present)
+title_en = Destruction      (deja present)
+chakra = ???
+power = ???
+keywords = ???
+group = ???
+effects =
+  ???
+
+
+################################################################
+# MYTHOS — DONNEES MANQUANTES
+################################################################
+
+[KS-145-M] [STATS] [EFFECTS] [KEYWORDS] [GROUP]
+name_fr = NARUTO UZUMAKI
+name_en = NARUTO UZUMAKI
+title_fr = Equipe 7 originelle  (deja present)
+title_en = Original Team 7      (deja present)
+chakra = ???
+power = ???
+keywords = ???
+group = ???
+effects =
+  ???
+
+[KS-149-M] [STATS] [EFFECTS] [KEYWORDS] [TEXT]
+name_fr = KIBA INUZUKA
+name_en = KIBA INUZUKA
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = Leaf Village
+effects =
+  ???
+
+[KS-150-M] [STATS] [EFFECTS] [KEYWORDS] [TEXT]
+name_fr = SHIKAMARU NARA
+name_en = SHIKAMARU NARA
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = Leaf Village
+effects =
+  ???
+
+[KS-151-M] [STATS] [EFFECTS] [KEYWORDS] [TEXT]
+name_fr = ROCK LEE
+name_en = ROCK LEE
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = Leaf Village
+effects =
+  ???
+
+[KS-152-M] [STATS] [EFFECTS] [KEYWORDS] [TEXT]
+name_fr = ITACHI UCHIWA
+name_en = ITACHI UCHIHA
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = Akatsuki
+effects =
+  ???
+
+[KS-153-M] [STATS] [EFFECTS] [KEYWORDS] [TEXT]
+name_fr = GAARA
+name_en = GAARA
+title_fr = ???
+title_en = ???
+chakra = ???
+power = ???
+keywords = ???
+group = Sand Village
+effects =
+  ???
+
+
+################################################################
+# RESUME
+################################################################
+#
+# TOTAL CARTES SANS VISUEL: 27
+#   - 13 avec donnees completes (besoin image seulement)
+#   - 14 avec donnees manquantes:
+#       2 Rare (R):   KS-115-R Shino, KS-127-R Sakon — TOUT manque
+#       5 Rare Art:   KS-115-RA, KS-122-RA, KS-124-RA, KS-127-RA, KS-129-RA
+#                     -> 3 peuvent copier depuis leur version R deja complete
+#                     -> 2 attendent que leur version R soit remplie
+#       1 Secret (S): KS-134-S Kyubi — stats + effets manquent
+#       6 Mythos (M): KS-145, KS-149, KS-150, KS-151, KS-152, KS-153
+#                     — TOUT ou presque manque
+#
+# NOTE: KS-130-R (ICHIBI) a toutes ses donnees sauf group="Independent"
+#        qui devrait probablement etre "Sand Village"
+#

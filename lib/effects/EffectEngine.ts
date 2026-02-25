@@ -514,8 +514,7 @@ export class EffectEngine {
       tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
-      tst === 'SASUKE014_CHOOSE_HAND_CARD' ||
-      tst === 'ITACHI091_CHOOSE_HAND_CARD'
+      tst === 'SASUKE014_CHOOSE_HAND_CARD'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
@@ -594,78 +593,8 @@ export class EffectEngine {
         newState = EffectEngine.orochimaruExecuteSteal(newState, pendingEffect);
         break;
 
-      case 'ITACHI091_CHOOSE_HAND_CARD': {
-        // Player chose a face-down card from opponent's hand — reveal it
-        const chosenIdx091 = parseInt(targetId, 10);
-        if (!isNaN(chosenIdx091)) {
-          const opponentPlayer091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const oppHand091 = newState[opponentPlayer091].hand;
-          if (chosenIdx091 >= 0 && chosenIdx091 < oppHand091.length) {
-            const revealedCard091 = oppHand091[chosenIdx091];
-            let parsed091: { isUpgrade?: boolean } = {};
-            try { parsed091 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-            const isUpgrade091 = parsed091.isUpgrade ?? false;
-
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_LOOK_HAND',
-              `Itachi Uchiwa (091): Revealed ${revealedCard091.name_fr} from opponent's hand.`,
-              'game.log.effect.itachi091Reveal',
-              { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: revealedCard091.name_fr },
-            );
-
-            // Create INFO_REVEAL pending
-            const revealData091 = JSON.stringify({
-              text: isUpgrade091
-                ? `Itachi (091): Revealed ${revealedCard091.name_fr}. This card will be discarded.`
-                : `Itachi (091): Revealed ${revealedCard091.name_fr} from opponent's hand.`,
-              cardName: revealedCard091.name_fr,
-              cardCost: revealedCard091.chakra,
-              cardPower: revealedCard091.power,
-              cardImageFile: revealedCard091.image_file,
-              isUpgrade: isUpgrade091,
-              chosenIndex: chosenIdx091,
-            });
-
-            const effectId091 = generateInstanceId();
-            const actionId091 = generateInstanceId();
-            newState.pendingEffects.push({
-              id: effectId091,
-              sourceCardId: pendingEffect.sourceCardId,
-              sourceInstanceId: pendingEffect.sourceInstanceId,
-              sourceMissionIndex: pendingEffect.sourceMissionIndex,
-              effectType: pendingEffect.effectType,
-              effectDescription: revealData091,
-              targetSelectionType: 'ITACHI091_HAND_REVEAL',
-              sourcePlayer: pendingEffect.sourcePlayer,
-              requiresTargetSelection: true,
-              validTargets: ['confirm'],
-              isOptional: false,
-              isMandatory: true,
-              resolved: false,
-              isUpgrade: isUpgrade091,
-            });
-            newState.pendingActions.push({
-              id: actionId091,
-              type: 'INFO_REVEAL',
-              player: pendingEffect.sourcePlayer,
-              description: revealData091,
-              descriptionKey: isUpgrade091
-                ? 'game.effect.desc.itachi091RevealUpgrade'
-                : 'game.effect.desc.itachi091Reveal',
-              descriptionParams: { target: revealedCard091.name_fr },
-              options: ['confirm'],
-              minSelections: 1,
-              maxSelections: 1,
-              sourceEffectId: effectId091,
-            });
-          }
-        }
-        break;
-      }
-
       case 'ITACHI091_HAND_REVEAL':
-        newState = EffectEngine.itachi091ResolveReveal(newState, pendingEffect);
+        // Acknowledgment only — handler already applied discard+draw for upgrade
         break;
 
       case 'LOOK_AT_HIDDEN_CHARACTER':
