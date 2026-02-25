@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
+import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 
 export function ActionBar() {
   const t = useTranslations();
@@ -53,7 +54,19 @@ export function ActionBar() {
       ? myState.hand[selectedCardIndex]
       : null;
 
-  const canAffordCard = selectedCard ? myState.chakra >= selectedCard.chakra : false;
+  // Compute effective cost when card + mission are selected (accounts for Tayuya, Kurenai, etc.)
+  const effectiveCost = useMemo(() => {
+    if (!selectedCard || selectedMissionIndex === null || !visibleState) return selectedCard?.chakra ?? 0;
+    return calculateEffectiveCost(visibleState as any, myPlayer, selectedCard, selectedMissionIndex, false);
+  }, [selectedCard, selectedMissionIndex, visibleState, myPlayer]);
+
+  const baseCost = selectedCard?.chakra ?? 0;
+  const costModifier = effectiveCost - baseCost;
+  const costLabel = costModifier !== 0
+    ? `${baseCost}${costModifier > 0 ? '+' : ''}${costModifier}`
+    : `${baseCost}`;
+
+  const canAffordCard = selectedCard ? myState.chakra >= effectiveCost : false;
   const canAffordHidden = myState.chakra >= 1;
 
   // Compute upgrade targets: same name (or flexible upgrade), strictly lower cost, on selected mission
@@ -333,7 +346,7 @@ export function ActionBar() {
           {/* Play visible button — secondary when upgrade targets exist */}
           {cardAndMissionReady && (
             <ActionButton
-              label={`${t('game.play')} (${selectedCard?.chakra ?? 0} ${t('game.chakra').toLowerCase()})`}
+              label={`${t('game.play')} (${costLabel} ${t('game.chakra').toLowerCase()})`}
               onClick={handlePlayVisible}
               disabled={!canAffordCard}
               variant={upgradeTargets.length > 0 ? "secondary" : "primary"}

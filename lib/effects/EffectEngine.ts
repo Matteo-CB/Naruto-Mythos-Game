@@ -1162,7 +1162,7 @@ export class EffectEngine {
       // POWERUP types
       // =============================================
       case 'HINATA114_POWERUP_TARGET':
-        newState = EffectEngine.applyPowerupToTarget(newState, targetId, 2);
+        newState = EffectEngine.applyPowerupToTarget(newState, targetId, 1);
         break;
 
       // =============================================

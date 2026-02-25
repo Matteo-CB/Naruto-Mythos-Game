@@ -8,9 +8,9 @@ import type { CharacterInPlay } from '../../../engine/types';
  * Chakra: 3, Power: 2
  * Group: Leaf Village, Keywords: Team 8
  *
- * MAIN: POWERUP 2 (self); then POWERUP 1 on another character in play (any player).
+ * MAIN: POWERUP 2 (self); then POWERUP 1 on another friendly character in play.
  *   First applies POWERUP 2 on self, then requires target selection for
- *   which other character in play receives POWERUP 1.
+ *   which other friendly character in play receives POWERUP 1.
  *
  * UPGRADE: Remove all Power tokens from an enemy character in play.
  *   When isUpgrade: find enemies with powerTokens > 0. Target selection. Set tokens to 0.
@@ -51,15 +51,12 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // Step 2: Find all other characters in play (any player) for POWERUP 1
+  // Step 2: Find all other friendly characters in play for POWERUP 1
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const validTargets: string[] = [];
   for (const mission of newState.activeMissions) {
-    for (const char of mission.player1Characters) {
-      if (char.instanceId !== sourceCard.instanceId) {
-        validTargets.push(char.instanceId);
-      }
-    }
-    for (const char of mission.player2Characters) {
+    for (const char of mission[friendlySide]) {
       if (char.instanceId !== sourceCard.instanceId) {
         validTargets.push(char.instanceId);
       }
@@ -73,7 +70,7 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           newState.log, newState.turn, newState.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Hinata Hyuga (114): No other character in play for POWERUP 1.',
+          'Hinata Hyuga (114): No other friendly character in play for POWERUP 1.',
           'game.log.effect.noTarget',
           { card: 'HINATA HYUGA', id: 'KS-114-R' },
         ),
@@ -91,7 +88,7 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'HINATA114_POWERUP_TARGET',
     validTargets,
-    description: 'Hinata Hyuga (114): Choose another character in play to give POWERUP 1.',
+    description: 'Hinata Hyuga (114): Choose another friendly character in play to give POWERUP 1.',
     descriptionKey: 'game.effect.desc.hinata114Powerup',
   };
 }
