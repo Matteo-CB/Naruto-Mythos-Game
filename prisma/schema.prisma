@@ -16,6 +16,8 @@ model User {
   wins           Int          @default(0)
   losses         Int          @default(0)
   draws          Int          @default(0)
+  resetToken       String?
+  resetTokenExpiry DateTime?
   createdAt      DateTime     @default(now())
   decks          Deck[]
   gamesAsPlayer1 Game[]       @relation("Player1")

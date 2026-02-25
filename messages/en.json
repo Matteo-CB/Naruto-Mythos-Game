@@ -604,7 +604,22 @@
     "passwordTooShort": "Password must be at least 6 characters",
     "usernameLengthError": "Username must be between 3 and 20 characters",
     "registrationFailed": "Registration failed",
-    "signInFailed": "Account created but sign-in failed. Please log in manually."
+    "signInFailed": "Account created but sign-in failed. Please log in manually.",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Reset Password",
+    "forgotPasswordDescription": "Enter your email address and we'll send you a reset link.",
+    "sendResetLink": "Send Reset Link",
+    "sending": "Sending...",
+    "resetEmailSent": "If an account exists with this email, a reset link has been sent. Check your inbox.",
+    "resetPasswordTitle": "New Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resetPassword": "Reset Password",
+    "resetting": "Resetting...",
+    "resetSuccess": "Password updated successfully.",
+    "resetSuccessLogin": "You can now sign in with your new password.",
+    "invalidResetLink": "This reset link is invalid or has expired.",
+    "goToLogin": "Back to Login"
   },
   "card": {
     "effectTypes": {

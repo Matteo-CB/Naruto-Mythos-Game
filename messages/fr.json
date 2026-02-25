@@ -604,7 +604,22 @@
     "passwordTooShort": "Le mot de passe doit contenir au moins 6 caracteres",
     "usernameLengthError": "Le nom d'utilisateur doit contenir entre 3 et 20 caracteres",
     "registrationFailed": "L'inscription a echoue",
-    "signInFailed": "Compte cree mais la connexion a echoue. Veuillez vous connecter manuellement."
+    "signInFailed": "Compte cree mais la connexion a echoue. Veuillez vous connecter manuellement.",
+    "forgotPassword": "Mot de passe oublie ?",
+    "forgotPasswordTitle": "Reinitialiser le mot de passe",
+    "forgotPasswordDescription": "Entrez votre adresse email et nous vous enverrons un lien de reinitialisation.",
+    "sendResetLink": "Envoyer le lien",
+    "sending": "Envoi en cours...",
+    "resetEmailSent": "Si un compte existe avec cet email, un lien de reinitialisation a ete envoye. Verifiez votre boite de reception.",
+    "resetPasswordTitle": "Nouveau mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "resetPassword": "Reinitialiser",
+    "resetting": "Reinitialisation...",
+    "resetSuccess": "Mot de passe mis a jour avec succes.",
+    "resetSuccessLogin": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+    "invalidResetLink": "Ce lien de reinitialisation est invalide ou a expire.",
+    "goToLogin": "Retour a la connexion"
   },
   "card": {
     "effectTypes": {
