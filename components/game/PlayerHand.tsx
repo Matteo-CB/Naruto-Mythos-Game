@@ -9,6 +9,7 @@ import type { CharacterCard } from '@/lib/engine/types';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useGameScale } from './GameScaleContext';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -39,12 +40,13 @@ const HandCard = React.memo(function HandCard({
   onPin,
 }: HandCardProps) {
   const locale = useLocale();
+  const dims = useGameScale();
   // Fan effect: spread cards with rotation
   const midpoint = (total - 1) / 2;
   const offset = index - midpoint;
   const rotation = offset * 2.5; // degrees per position from center
-  const translateX = offset * 48; // spacing between cards
-  const arcY = Math.abs(offset) * 3; // Arc curve
+  const translateX = offset * dims.handFanSpacing; // spacing between cards
+  const arcY = Math.abs(offset) * dims.handFanArc; // Arc curve
 
   const { bannedIds } = useBannedCards();
   const isBanned = bannedIds.has(card.id);
@@ -91,8 +93,8 @@ const HandCard = React.memo(function HandCard({
       onMouseLeave={() => onPreviewHide()}
       className="absolute no-select cursor-pointer"
       style={{
-        width: '80px',
-        height: '112px',
+        width: dims.handCard.w + 'px',
+        height: dims.handCard.h + 'px',
         borderRadius: '7px',
         border: isSelected
           ? '2px solid #c4a35a'
@@ -173,6 +175,7 @@ const HandCard = React.memo(function HandCard({
 
 export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: PlayerHandProps) {
   const t = useTranslations();
+  const dims = useGameScale();
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);
   const selectCard = useUIStore((s) => s.selectCard);
   const showPreview = useUIStore((s) => s.showPreview);
@@ -200,7 +203,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
       {/* Fanned cards */}
       <div
         className="relative flex items-center justify-center"
-        style={{ height: '110px', minWidth: '400px' }}
+        style={{ height: dims.handContainerH + 'px', minWidth: dims.handMinW + 'px' }}
       >
         {hand.map((card, i) => {
           // A card can be played if the player can afford at least 1 chakra (hidden play)

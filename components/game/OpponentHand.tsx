@@ -2,17 +2,19 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useGameScale } from './GameScaleContext';
 
 interface OpponentHandProps {
   handSize: number;
 }
 
 function CardBack({ index, total }: { index: number; total: number }) {
+  const dims = useGameScale();
   // Fan effect: spread cards with rotation around a central arc
   const midpoint = (total - 1) / 2;
   const offset = index - midpoint;
   const rotation = offset * 2; // degrees per card from center
-  const translateX = offset * 18; // horizontal spacing
+  const translateX = offset * dims.opponentFanSpacing; // horizontal spacing
   const translateY = Math.abs(offset) * 1.2; // Slight arc at edges
 
   return (
@@ -32,8 +34,8 @@ function CardBack({ index, total }: { index: number; total: number }) {
       }}
       className="absolute card-aspect no-select"
       style={{
-        width: '44px',
-        height: '62px',
+        width: dims.opponentCard.w + 'px',
+        height: dims.opponentCard.h + 'px',
         borderRadius: '5px',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         transform: `translateY(${translateY}px)`,
@@ -54,6 +56,7 @@ function CardBack({ index, total }: { index: number; total: number }) {
 
 export function OpponentHand({ handSize }: OpponentHandProps) {
   const t = useTranslations();
+  const dims = useGameScale();
   return (
     <div className="flex flex-col items-center gap-1.5">
       {/* Hand size label */}
@@ -67,7 +70,7 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
       {/* Fanned card backs */}
       <div
         className="relative flex items-center justify-center"
-        style={{ height: '56px', minWidth: '250px' }}
+        style={{ height: dims.opponentContainerH + 'px', minWidth: dims.opponentMinW + 'px' }}
       >
         {Array.from({ length: handSize }).map((_, i) => (
           <CardBack key={i} index={i} total={handSize} />

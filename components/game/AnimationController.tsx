@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useGameScale } from './GameScaleContext';
 
 // ----- Duration mapping -----
 
@@ -67,6 +68,7 @@ interface AnimationEvent {
 
 function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
+  const dims = useGameScale();
   const cardName = (data.cardName as string) || 'Card';
   const isHidden = data.hidden === true;
   const missionRank = (data.missionRank as string) || '';
@@ -86,8 +88,8 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
         <motion.div
           className="rounded-lg overflow-hidden"
           style={{
-            width: '120px',
-            height: '168px',
+            width: dims.animHand.w + 'px',
+            height: dims.animHand.h + 'px',
             boxShadow: isHidden
               ? '0 8px 40px rgba(0, 0, 0, 0.8)'
               : '0 8px 40px rgba(196, 163, 90, 0.4), 0 0 20px rgba(196, 163, 90, 0.2)',
@@ -166,6 +168,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
 
 function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
+  const dims = useGameScale();
   const cardName = (data.cardName as string) || 'Card';
   const cardImage = data.cardImage as string | null;
 
@@ -183,8 +186,8 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
         <motion.div
           className="relative rounded-lg overflow-hidden"
           style={{
-            width: '130px',
-            height: '182px',
+            width: dims.animBoard.w + 'px',
+            height: dims.animBoard.h + 'px',
             transformStyle: 'preserve-3d',
           }}
           initial={{ rotateY: 180, scale: 0.9 }}
@@ -241,8 +244,8 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
         <motion.div
           className="absolute rounded-lg"
           style={{
-            width: '130px',
-            height: '182px',
+            width: dims.animBoard.w + 'px',
+            height: dims.animBoard.h + 'px',
             boxShadow: '0 0 30px rgba(179, 62, 62, 0.5)',
           }}
           initial={{ opacity: 0 }}
@@ -435,6 +438,7 @@ function CardMoveAnimation({ data }: { data: Record<string, unknown> }) {
 
 function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
+  const dims = useGameScale();
   const cardName = (data.cardName as string) || 'Card';
   const previousName = (data.previousName as string) || '';
   const cardImage = data.cardImage as string | null;
@@ -453,8 +457,8 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
         <motion.div
           className="rounded-lg overflow-hidden"
           style={{
-            width: '130px',
-            height: '182px',
+            width: dims.animBoard.w + 'px',
+            height: dims.animBoard.h + 'px',
             border: '2px solid rgba(62, 139, 62, 0.6)',
           }}
           initial={{ y: 180, scale: 0.6, opacity: 0, rotate: -5 }}
@@ -822,6 +826,7 @@ function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
 
 function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
+  const dims = useGameScale();
   const count = (data.count as number) || 1;
 
   return (
@@ -841,8 +846,8 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
               key={i}
               className="rounded"
               style={{
-                width: '48px',
-                height: '68px',
+                width: dims.animDeck.w + 'px',
+                height: dims.animDeck.h + 'px',
                 backgroundColor: '#1a1a20',
                 border: '1px solid #333333',
                 boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)',
