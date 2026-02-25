@@ -187,8 +187,8 @@ export default function Home() {
 
           {/* LEFT SIDE: Title + Navigation */}
           <div className="flex w-full flex-col items-start flex-shrink-0 lg:max-w-[420px]">
-            {/* Title + beta text row */}
-            <div className="mb-1 flex items-baseline gap-4 flex-wrap">
+            {/* Title */}
+            <div className="mb-1">
               <div className="flex items-center flex-wrap">
                 {titleLetters.map((letter, i) => (
                   <motion.span
@@ -210,15 +210,6 @@ export default function Home() {
                   </motion.span>
                 ))}
               </div>
-              <motion.span
-                className="text-[10px] leading-tight sm:text-[11px]"
-                style={{ color: '#666666' }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
-              >
-                {t('betaBanner')}
-              </motion.span>
             </div>
 
             {/* Subtitle */}
