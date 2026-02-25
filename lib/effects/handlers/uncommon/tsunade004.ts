@@ -51,27 +51,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
   // We'll use discard pile card IDs for target selection
   const validTargets: string[] = discardPile.map((_, idx) => `discard_${idx}`);
 
-  if (validTargets.length === 1) {
-    // Only one card in discard - auto-apply
-    const card = discardPile[0];
-    const newState = { ...state };
-    const ps = { ...newState[sourcePlayer] };
-    ps.hand = [...ps.hand, card];
-    ps.discardPile = ps.discardPile.slice(1);
-    newState[sourcePlayer] = ps;
-
-    newState.log = logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_RECOVER',
-      `Tsunade (004): Recovered ${card.name_fr} from discard pile to hand.`,
-      'game.log.effect.recoverFromDiscard',
-      { card: 'TSUNADE', id: 'KS-004-UC', target: card.name_fr },
-    );
-
-    return { state: newState };
-  }
-
-  // Multiple cards in discard - requires target selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

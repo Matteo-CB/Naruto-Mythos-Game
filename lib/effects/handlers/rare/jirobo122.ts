@@ -1,8 +1,8 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter } from '../../defeatUtils';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 122/130 - JIROBO (R)
@@ -16,12 +16,6 @@ import type { CharacterInPlay } from '../../../engine/types';
  * UPGRADE: Defeat an enemy with Power 1 or less in this mission.
  *   When isUpgrade: find non-hidden enemies with effective power <= 1. Target selection. Defeat.
  */
-
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -69,6 +63,7 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
 
 function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const mission = state.activeMissions[sourceMissionIndex];
@@ -76,7 +71,7 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
 
   // Find non-hidden enemies with effective power <= 1
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(c) <= 1)
+    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 1)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {
@@ -92,24 +87,6 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
         ),
       },
     };
-  }
-
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    const targetChar = enemyChars.find((c: CharacterInPlay) => c.instanceId === validTargets[0]);
-    const targetName = targetChar ? targetChar.card.name_fr : 'Unknown';
-    let newState = defeatEnemyCharacter(state, sourceMissionIndex, validTargets[0], sourcePlayer);
-    newState = {
-      ...newState,
-      log: logAction(
-        newState.log, newState.turn, newState.phase, sourcePlayer,
-        'EFFECT_DEFEAT',
-        `Jirobo (122) UPGRADE: Defeated ${targetName} (Power ${targetChar ? getEffectivePower(targetChar) : 0}).`,
-        'game.log.effect.defeat',
-        { card: 'JIROBO', id: 'KS-122-R', target: targetName },
-      ),
-    };
-    return { state: newState };
   }
 
   return {

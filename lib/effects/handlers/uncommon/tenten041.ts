@@ -44,23 +44,6 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    // Determine which side the target is on
-    const isP1 = mission.player1Characters.some((c) => c.instanceId === targetId);
-    const side: 'player1Characters' | 'player2Characters' = isP1 ? 'player1Characters' : 'player2Characters';
-    const isEnemy = (side === 'player1Characters' && sourcePlayer === 'player2') ||
-                    (side === 'player2Characters' && sourcePlayer === 'player1');
-
-    let newState = defeatCharacterInPlay(state, sourceMissionIndex, targetId, side, isEnemy, sourcePlayer);
-    newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
-      'Tenten (041): Defeated a hidden character in this mission.',
-      'game.log.effect.defeat', { card: 'TENTEN', id: 'KS-041-UC', target: '' }) };
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
   return {
     state,
     requiresTargetSelection: true,
@@ -96,13 +79,6 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const newState = powerUpTarget(state, validTargets[0], 1, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
   return {
     state,
     requiresTargetSelection: true,

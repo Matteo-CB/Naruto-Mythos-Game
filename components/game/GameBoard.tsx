@@ -976,8 +976,8 @@ function GameBoardInner() {
           <OpponentHand handSize={opponentState.handSize} />
         </section>
 
-        {/* Mission area with floating ActionBar */}
-        <section className="flex-1 flex flex-col min-h-0 relative">
+        {/* Mission area with ActionBar */}
+        <section className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex items-stretch justify-center px-3 py-0.5 min-h-0 overflow-hidden">
             <div className="flex gap-1.5 items-stretch justify-center w-full">
               {activeMissions.map((mission, index) => (
@@ -1023,8 +1023,8 @@ function GameBoardInner() {
             </div>
           </div>
 
-          {/* ActionBar floating at bottom of mission area */}
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20" style={{ pointerEvents: 'auto' }}>
+          {/* ActionBar below missions */}
+          <div className="shrink-0 flex justify-center py-0.5" style={{ pointerEvents: 'auto' }}>
             <ActionBar />
           </div>
         </section>

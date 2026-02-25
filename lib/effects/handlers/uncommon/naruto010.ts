@@ -50,14 +50,6 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
   }
 
-  // If exactly one valid destination, auto-move
-  if (validTargets.length === 1) {
-    const destMissionIdx = parseInt(validTargets[0], 10);
-    const newState = moveCharacterToMission(state, sourceCard.instanceId, sourceMissionIndex, destMissionIdx, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple valid destinations: requires target selection
   return {
     state,
     requiresTargetSelection: true,

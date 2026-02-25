@@ -25,7 +25,7 @@ export default function DeckBuilderPage() {
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [charPage, setCharPage] = useState(1);
-  const CHARS_PER_PAGE = 24;
+  const CHARS_PER_PAGE = 40;
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showSavedDecks, setShowSavedDecks] = useState(false);
   const [importCode, setImportCode] = useState("");
@@ -576,7 +576,7 @@ export default function DeckBuilderPage() {
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
             {t("deckBuilder.missions", { count: availableMissions.length })}
           </p>
-          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-1 mb-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 mb-4">
             {availableMissions
               .filter((m) => !bannedIds.has(m.id))
               .map((m) => {
@@ -595,11 +595,12 @@ export default function DeckBuilderPage() {
                         alt={getCardName(m, locale as "en" | "fr")}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
                         style={{ opacity: check.allowed ? 1 : 0.3 }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[7px] text-[#555]">
+                        <span className="text-[9px] text-[#555]">
                           {getCardName(m, locale as "en" | "fr")}
                         </span>
                       </div>
@@ -607,20 +608,20 @@ export default function DeckBuilderPage() {
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       {check.allowed ? (
-                        <span className="text-[#3e8b3e] text-lg font-bold">
+                        <span className="text-[#3e8b3e] text-xl font-bold">
                           +
                         </span>
                       ) : (
-                        <span className="text-[8px] text-[#b33e3e] text-center px-1">
+                        <span className="text-[10px] text-[#b33e3e] text-center px-1">
                           {check.reason}
                         </span>
                       )}
                     </div>
                     <div
-                      className="absolute inset-x-0 bottom-0 px-0.5 py-px"
+                      className="absolute inset-x-0 bottom-0 px-1 py-0.5"
                       style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
                     >
-                      <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">
+                      <span className="text-[9px] text-[#e0e0e0] leading-tight block truncate">
                         {getCardName(m, locale as "en" | "fr")}
                       </span>
                     </div>
@@ -633,7 +634,7 @@ export default function DeckBuilderPage() {
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
             {t("deckBuilder.characters", { count: filteredChars.length })}
           </p>
-          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-1">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
             {paginatedChars.map((card) => {
               const imgPath = getImagePath(card);
               const check = canAddChar(card);
@@ -650,27 +651,28 @@ export default function DeckBuilderPage() {
                       alt={getCardName(card, locale as "en" | "fr")}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[7px] text-[#555]">
+                      <span className="text-[9px] text-[#555]">
                         {getCardName(card, locale as "en" | "fr")}
                       </span>
                     </div>
                   )}
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
                     {check.allowed ? (
                       <>
-                        <span className="text-[#3e8b3e] text-lg font-bold leading-none">
+                        <span className="text-[#3e8b3e] text-xl font-bold leading-none">
                           +
                         </span>
-                        <span className="text-[8px] text-[#e0e0e0]">
+                        <span className="text-[10px] text-[#e0e0e0]">
                           {card.chakra}/{card.power}
                         </span>
                       </>
                     ) : (
-                      <span className="text-[7px] text-[#b33e3e] text-center px-1 leading-tight">
+                      <span className="text-[9px] text-[#b33e3e] text-center px-1 leading-tight">
                         {check.reason}
                       </span>
                     )}

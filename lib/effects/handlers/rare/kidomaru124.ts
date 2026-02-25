@@ -1,8 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter } from '../../defeatUtils';
-import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 124/130 - KIDOMARU (R)
@@ -16,14 +15,9 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   When isUpgrade: use power <= 5 instead of 3.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   // Check if character was upgraded by looking at stack length (not isUpgrade flag,
   // since AMBUSH fires on reveal which always passes isUpgrade=false)
   const wasUpgraded = sourceCard && sourceCard.stack.length >= 2;
@@ -37,7 +31,7 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
     if (i === sourceMissionIndex) continue; // Skip this mission
     const mission = state.activeMissions[i];
     for (const char of mission[enemySide]) {
-      if (getEffectivePower(char) <= powerLimit) {
+      if (getEffectivePower(state, char, opponentPlayer) <= powerLimit) {
         validTargets.push(char.instanceId);
       }
     }
@@ -56,31 +50,6 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
         ),
       },
     };
-  }
-
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    // Find the target's mission index for defeat
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      if (i === sourceMissionIndex) continue;
-      const mission = state.activeMissions[i];
-      const targetChar = mission[enemySide].find((c: CharacterInPlay) => c.instanceId === validTargets[0]);
-      if (targetChar) {
-        const targetName = targetChar.card.name_fr;
-        let newState = defeatEnemyCharacter(state, i, validTargets[0], sourcePlayer);
-        newState = {
-          ...newState,
-          log: logAction(
-            newState.log, newState.turn, newState.phase, sourcePlayer,
-            'EFFECT_DEFEAT',
-            `Kidomaru (124) AMBUSH: Defeated ${targetName} (Power ${getEffectivePower(targetChar)}) in mission ${i}.`,
-            'game.log.effect.defeat',
-            { card: 'KIDOMARU', id: 'KS-124-R', target: targetName },
-          ),
-        };
-        return { state: newState };
-      }
-    }
   }
 
   return {

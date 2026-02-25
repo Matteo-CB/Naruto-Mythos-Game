@@ -3,6 +3,7 @@ import { registerEffect } from '../../EffectRegistry';
 import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 120/130 - GAARA (R)
@@ -17,16 +18,11 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  * UPGRADE: POWERUP X, where X is the number of characters defeated by the MAIN effect.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function gaara120MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
   let defeatedCount = 0;
 
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -34,7 +30,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
-    const validTargets = enemyChars.filter((c) => getEffectivePower(c) <= 1);
+    const validTargets = enemyChars.filter((c) => getEffectivePower(state, c, opponentPlayer) <= 1);
 
     if (validTargets.length === 0) {
       continue;
@@ -50,7 +46,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_DEFEAT',
-          `Gaara (120): Defeated enemy ${validTargets[0].card.name_fr} (Power ${getEffectivePower(validTargets[0])}) in mission ${i}.`,
+          `Gaara (120): Defeated enemy ${validTargets[0].card.name_fr} (Power ${getEffectivePower(state, validTargets[0], opponentPlayer)}) in mission ${i}.`,
           'game.log.effect.defeat',
           { card: 'GAARA', id: 'KS-120-R', target: validTargets[0].card.name_fr },
         ),

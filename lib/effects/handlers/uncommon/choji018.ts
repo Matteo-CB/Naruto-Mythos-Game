@@ -9,19 +9,12 @@ import { logAction } from '../../../engine/utils/gameLog';
  *
  * MAIN [continuous]: After you move this character, hide an enemy character in this
  * mission with less Power than this character.
- *   - This is a continuous/passive effect. The actual trigger logic is handled in
- *     ContinuousEffects.ts (checked when a character is moved).
- *   - The MAIN handler here is a no-op that logs the continuous effect activation.
  *
  * UPGRADE: Move this character.
- *   - When triggered as upgrade, find other missions where this character can move
- *     (no same-name conflict). If multiple valid destinations, require target selection.
- *   - Move self to the chosen mission.
- *   - After moving, the continuous MAIN effect should trigger (hiding an enemy with less Power).
+ *   - After moving, the continuous MAIN triggers: hide an enemy with less Power
+ *     in the destination mission. Player chooses if multiple targets.
  */
 function handleChoji018Main(ctx: EffectContext): EffectResult {
-  // Continuous effect [hourglass] - after moving, hide an enemy with less Power.
-  // This is passively checked in ContinuousEffects.ts.
   const state = ctx.state;
   const log = logAction(
     state.log,
@@ -73,14 +66,15 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // If exactly one valid destination, auto-move
+  // If exactly one valid destination, auto-move then trigger post-move hide
   if (validTargets.length === 1) {
     const destMissionIdx = parseInt(validTargets[0], 10);
     const newState = moveCharacterToMission(state, sourceCard.instanceId, sourceMissionIndex, destMissionIdx, sourcePlayer);
-    return { state: newState };
+    return postMoveHide(newState, sourceCard.instanceId, destMissionIdx, sourcePlayer);
   }
 
   // Multiple valid destinations: requires target selection
+  // Post-move hide will be handled in EffectEngine's CHOJI_018_MOVE_SELF case
   return {
     state,
     requiresTargetSelection: true,
@@ -88,6 +82,87 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     validTargets,
     description: 'Select a mission to move Choji Akimichi to (upgrade effect).',
     descriptionKey: 'game.effect.desc.choji018MoveSelf',
+  };
+}
+
+/**
+ * After Choji moves, find non-hidden enemy characters at his destination with less Power.
+ * If 0: log no target. If 1: auto-hide. If multiple: return target selection.
+ */
+export function postMoveHide(
+  state: import('../../EffectTypes').EffectContext['state'],
+  chojiInstanceId: string,
+  destMissionIdx: number,
+  sourcePlayer: import('../../../engine/types').PlayerID,
+): EffectResult {
+  const enemySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  const mission = state.activeMissions[destMissionIdx];
+  const chojiChar = mission[friendlySide].find(c => c.instanceId === chojiInstanceId);
+  if (!chojiChar) return { state };
+
+  const chojiPower = (chojiChar.stack.length > 0
+    ? chojiChar.stack[chojiChar.stack.length - 1].power
+    : chojiChar.card.power) + chojiChar.powerTokens;
+
+  // Find non-hidden enemies with less power
+  const hideTargets: string[] = [];
+  for (const enemy of mission[enemySide]) {
+    if (enemy.isHidden) continue;
+    const enemyPower = (enemy.stack.length > 0
+      ? enemy.stack[enemy.stack.length - 1].power
+      : enemy.card.power) + enemy.powerTokens;
+    if (enemyPower < chojiPower) {
+      hideTargets.push(enemy.instanceId);
+    }
+  }
+
+  if (hideTargets.length === 0) {
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Choji Akimichi (018): No enemy character with less Power to hide after moving.',
+      'game.log.effect.noTarget',
+      { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  if (hideTargets.length === 1) {
+    // Auto-hide single target
+    const targetId = hideTargets[0];
+    const missions = [...state.activeMissions];
+    const m = { ...missions[destMissionIdx] };
+    const chars = [...m[enemySide]];
+    const idx = chars.findIndex(c => c.instanceId === targetId);
+    if (idx !== -1) {
+      const targetName = chars[idx].card.name_fr;
+      chars[idx] = { ...chars[idx], isHidden: true };
+      m[enemySide] = chars;
+      missions[destMissionIdx] = m;
+      const log = logAction(
+        state.log, state.turn, state.phase, sourcePlayer,
+        'EFFECT_HIDE',
+        `Choji Akimichi (018): Hid ${targetName} after moving (less Power).`,
+        'game.log.effect.hide',
+        { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', target: targetName },
+      );
+      return { state: { ...state, activeMissions: missions, log } };
+    }
+    return { state };
+  }
+
+  // Multiple targets: player chooses
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'CHOJI018_HIDE_ENEMY',
+    validTargets: hideTargets,
+    description: 'Choji Akimichi (018): Choose an enemy character with less Power to hide.',
+    descriptionKey: 'game.effect.desc.choji018HideEnemy',
   };
 }
 

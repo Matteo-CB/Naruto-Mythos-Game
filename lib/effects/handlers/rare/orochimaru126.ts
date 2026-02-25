@@ -3,6 +3,7 @@ import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter } from '../../defeatUtils';
 import type { CharacterInPlay } from '../../../engine/types';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 126/130 - OROCHIMARU (R)
@@ -18,14 +19,9 @@ import type { CharacterInPlay } from '../../../engine/types';
  *   When isUpgrade: POWERUP 3 on self.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -39,7 +35,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
         candidates.push({
           char,
           missionIndex: i,
-          power: getEffectivePower(char),
+          power: getEffectivePower(state, char, opponentPlayer),
         });
       }
     }

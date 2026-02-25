@@ -71,7 +71,7 @@ describe('039/130 - Rock Lee', () => {
 // 108/130 - NARUTO UZUMAKI (RA): Hide enemy Power<=3 + UPGRADE POWERUP X
 // ===================================================================
 describe('108/130 - Naruto Uzumaki (RA)', () => {
-  it('MAIN should hide an enemy character with Power 3 or less in this mission', () => {
+  it('MAIN should require target selection to hide an enemy with Power 3 or less', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1' }, {
       id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
     });
@@ -84,9 +84,9 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 
     const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
-    // Enemy should be hidden
-    const p2Chars = result.state.activeMissions[0].player2Characters;
-    expect(p2Chars[0].isHidden).toBe(true);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('NARUTO108_CHOOSE_HIDE_TARGET');
+    expect(result.validTargets).toContain('enemy-1');
   });
 
   it('should fizzle when no enemy with Power 3 or less exists', () => {
@@ -106,7 +106,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(false);
   });
 
-  it('UPGRADE should POWERUP X where X is the power of the hidden enemy', () => {
+  it('UPGRADE should require target selection with isUpgrade flag for POWERUP bonus', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1', powerTokens: 0 }, {
       id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
     });
@@ -119,11 +119,13 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 
     const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
-    // Enemy should be hidden
-    expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(true);
-    // Naruto should have POWERUP 3 (enemy's power)
-    const updatedNaruto = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-1');
-    expect(updatedNaruto?.powerTokens).toBe(3);
+    // Should require target selection (same handler, isUpgrade passed in description)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('NARUTO108_CHOOSE_HIDE_TARGET');
+    expect(result.validTargets).toContain('enemy-1');
+    // The description should contain isUpgrade flag for the resolution step
+    const desc = JSON.parse(result.description!);
+    expect(desc.isUpgrade).toBe(true);
   });
 
   it('RA variant 108/130 A should use same handler', () => {
@@ -220,7 +222,7 @@ describe('120/130 - Gaara (R)', () => {
 // 133/130 - NARUTO UZUMAKI "Rasengan" (S): Hide Power<=5 this mission + Power<=2 anywhere
 // ===================================================================
 describe('133/130 - Naruto Uzumaki (S)', () => {
-  it('should hide Power<=5 in this mission AND Power<=2 in any mission', () => {
+  it('should require stage 1 target selection for Power<=5 in this mission', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
       id: 'KS-133-S', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
     });
@@ -239,13 +241,15 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
     const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
-    const t1 = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 't1');
-    const t2 = result.state.activeMissions[1].player2Characters.find(c => c.instanceId === 't2');
-    expect(t1?.isHidden).toBe(true);
-    expect(t2?.isHidden).toBe(true);
+    // Stage 1: choose target with Power<=5 in this mission
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('NARUTO133_CHOOSE_TARGET1');
+    expect(result.validTargets).toContain('t1');
+    const desc = JSON.parse(result.description!);
+    expect(desc.useDefeat).toBe(false);
   });
 
-  it('should defeat both targets on upgrade', () => {
+  it('should require stage 1 target selection with defeat flag on upgrade', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
       id: 'KS-133-S', number: 133, name_fr: 'Naruto Uzumaki', power: 6,
     });
@@ -267,8 +271,12 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
     const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
-    expect(result.state.activeMissions[0].player2Characters.length).toBe(0); // t1 defeated
-    expect(result.state.activeMissions[1].player2Characters.length).toBe(0); // t2 defeated
+    // Stage 1: choose target with Power<=5 in this mission (defeat mode)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('NARUTO133_CHOOSE_TARGET1');
+    expect(result.validTargets).toContain('t1');
+    const desc = JSON.parse(result.description!);
+    expect(desc.useDefeat).toBe(true);
   });
 
   it('should not target Power > 5 in this mission', () => {
@@ -374,7 +382,7 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
     expect(result.state).toBeDefined();
   });
 
-  it('UPGRADE should defeat a friendly AND enemy in this mission', () => {
+  it('UPGRADE should require target selection to choose friendly to sacrifice', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sasuke-s' }, {
       id: 'KS-136-S', number: 136, name_fr: 'Sasuke', power: 8,
     });
@@ -395,12 +403,11 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
     const handler = getEffectHandler('KS-136-S', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', sasuke, 0, 'UPGRADE', true));
-    // Both should be defeated
-    const p1Chars = result.state.activeMissions[0].player1Characters;
-    const p2Chars = result.state.activeMissions[0].player2Characters;
-    expect(p1Chars.length).toBe(1); // only sasuke remains
-    expect(p1Chars[0].instanceId).toBe('sasuke-s');
-    expect(p2Chars.length).toBe(0); // enemy defeated
+    // Stage 1: choose which friendly to sacrifice
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SASUKE136_CHOOSE_FRIENDLY');
+    expect(result.validTargets).toContain('ft-1');
+    expect(result.isMandatory).toBe(true);
   });
 
   it('UPGRADE should fizzle when no valid targets exist', () => {
@@ -421,7 +428,7 @@ describe('136/130 - Sasuke Uchiwa (S)', () => {
 // 137/130 - KAKASHI HATAKE (S): Hide upgraded char in mission + UPGRADE move self
 // ===================================================================
 describe('137/130 - Kakashi Hatake (S)', () => {
-  it('MAIN should hide an upgraded character in this mission', () => {
+  it('MAIN should require target selection to hide an upgraded character in this mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
       id: 'KS-137-S', number: 137, name_fr: 'Kakashi Hatake', power: 7,
     });
@@ -442,8 +449,9 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
     const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
-    const e = result.state.activeMissions[0].player2Characters.find(c => c.instanceId === 'e1');
-    expect(e?.isHidden).toBe(true);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KAKASHI137_HIDE_UPGRADED');
+    expect(result.validTargets).toContain('e1');
   });
 
   it('MAIN should fizzle when no upgraded character in this mission', () => {
@@ -465,7 +473,7 @@ describe('137/130 - Kakashi Hatake (S)', () => {
     expect(e?.isHidden).toBe(false);
   });
 
-  it('MAIN should also target friendly upgraded characters', () => {
+  it('MAIN should include friendly upgraded characters as valid targets', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
       id: 'KS-137-S', number: 137, name_fr: 'Kakashi Hatake', power: 7,
     });
@@ -483,11 +491,12 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
     const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
-    const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
-    expect(ally?.isHidden).toBe(true);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KAKASHI137_HIDE_UPGRADED');
+    expect(result.validTargets).toContain('ally-1');
   });
 
-  it('UPGRADE should move self to another mission', () => {
+  it('UPGRADE should require target selection to choose destination mission', () => {
     const kakashi = mockCharInPlay({ instanceId: 'kakashi-s' }, {
       id: 'KS-137-S', number: 137, name_fr: 'Kakashi', power: 7,
     });
@@ -501,10 +510,9 @@ describe('137/130 - Kakashi Hatake (S)', () => {
     const handler = getEffectHandler('KS-137-S', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kakashi, 0, 'UPGRADE', true));
-    // Kakashi moved from mission 0 to mission 1
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
-    expect(result.state.activeMissions[1].player1Characters.length).toBe(1);
-    expect(result.state.activeMissions[1].player1Characters[0].instanceId).toBe('kakashi-s');
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KAKASHI137_MOVE_SELF');
+    expect(result.validTargets).toContain('1'); // mission index 1
   });
 });
 

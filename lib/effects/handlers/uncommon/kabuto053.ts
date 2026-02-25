@@ -1,7 +1,5 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
-import type { CharacterInPlay } from '../../../engine/types';
 import { registerEffect } from '../../EffectRegistry';
-import { generateInstanceId } from '../../../engine/utils/id';
 import { logAction } from '../../../engine/utils/gameLog';
 
 /**
@@ -12,11 +10,11 @@ import { logAction } from '../../../engine/utils/gameLog';
  * UPGRADE: Draw a card.
  *   (French: "Piochez une carte.")
  *
- * MAIN: Play a character from your discard pile anywhere paying 3 less.
- *   (French: "Jouez un personnage depuis votre defausse n'importe ou en payant son cout moins 3.")
- *   - The player browses their entire discard pile and picks a character they can afford.
- *   - If only one affordable character, auto-select it.
- *   - Then choose which mission to play it on (respecting same-name restriction).
+ * MAIN: Play the top character from your discard pile anywhere, paying 3 less.
+ *   (French: "Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.")
+ *   - Always the top card (last added) — no browsing/choosing.
+ *   - If the top card is not a character or not affordable, fizzles.
+ *   - Player chooses which mission to play it on.
  */
 
 function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
@@ -70,7 +68,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Kabuto Yakushi (053): Discard pile is empty. Nothing to play.',
+          'Kabuto Yakushi (053): Discard pile is empty.',
           'game.log.effect.noTarget',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
         ),
@@ -78,44 +76,19 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find all character cards in discard pile that the player can afford (cost - 3)
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  // Top of discard pile = last element in the array
+  const topCardIndex = playerState.discardPile.length - 1;
+  const topCard = playerState.discardPile[topCardIndex];
 
-  const affordableIndices: string[] = [];
-  for (let i = 0; i < playerState.discardPile.length; i++) {
-    const card = playerState.discardPile[i];
-    if (card.card_type === 'character') {
-      const reducedCost = Math.max(0, (card.chakra ?? 0) - 3);
-      if (playerState.chakra >= reducedCost) {
-        // Also check: is there at least one valid mission for this card?
-        let hasValidMission = false;
-        for (let mi = 0; mi < state.activeMissions.length; mi++) {
-          const mission = state.activeMissions[mi];
-          const hasSameName = mission[friendlySide].some((c) => {
-            const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            return tc.name_fr === card.name_fr;
-          });
-          if (!hasSameName) {
-            hasValidMission = true;
-            break;
-          }
-        }
-        if (hasValidMission) {
-          affordableIndices.push(String(i));
-        }
-      }
-    }
-  }
-
-  if (affordableIndices.length === 0) {
+  // Must be a character card
+  if (topCard.card_type !== 'character') {
     return {
       state: {
         ...state,
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Kabuto Yakushi (053): No affordable character in discard pile to play.',
+          `Kabuto Yakushi (053): Top card of discard (${topCard.name_fr}) is not a character.`,
           'game.log.effect.noTarget',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
         ),
@@ -123,113 +96,74 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If only one affordable character, auto-select it and go to mission selection
-  if (affordableIndices.length === 1) {
-    const discardIdx = parseInt(affordableIndices[0], 10);
-    const card = playerState.discardPile[discardIdx];
-    const reducedCost = Math.max(0, (card.chakra ?? 0) - 3);
-
-    const validMissions: string[] = [];
-    for (let mi = 0; mi < state.activeMissions.length; mi++) {
-      const mission = state.activeMissions[mi];
-      const hasSameName = mission[friendlySide].some((c) => {
-        const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return tc.name_fr === card.name_fr;
-      });
-      if (!hasSameName) validMissions.push(String(mi));
-    }
-
-    if (validMissions.length === 1) {
-      // Auto-play: single card, single mission — resolve directly
-      const missionIdx = parseInt(validMissions[0], 10);
-      const newState = playFromDiscardByIndex(state, sourcePlayer, discardIdx, missionIdx, reducedCost);
-      return { state: newState };
-    }
-
-    // Single card, multiple missions
+  const reducedCost = Math.max(0, (topCard.chakra ?? 0) - 3);
+  if (playerState.chakra < reducedCost) {
     return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
-      validTargets: validMissions,
-      description: JSON.stringify({
-        discardIndex: discardIdx,
-        reducedCost,
-        text: `Kabuto Yakushi (053): Choose a mission to play ${card.name_fr} on (cost ${reducedCost}).`,
-      }),
-      descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
-      descriptionParams: { cardName: card.name_fr, cost: String(reducedCost) },
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          `Kabuto Yakushi (053): Cannot afford ${topCard.name_fr} (cost ${reducedCost}).`,
+          'game.log.effect.noTarget',
+          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
+        ),
+      },
     };
   }
 
-  // Multiple affordable characters: let the player browse and choose
+  // Find valid missions (fresh play or upgrade over same-name with lower cost)
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  const validMissions: string[] = [];
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    const mission = state.activeMissions[mi];
+    const sameNameChar = mission[friendlySide].find((c) => {
+      if (c.isHidden) return false;
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
+    });
+    if (!sameNameChar) {
+      validMissions.push(String(mi));
+    } else {
+      const existingTopCard = sameNameChar.stack.length > 0
+        ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+      if ((topCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
+        validMissions.push(String(mi));
+      }
+    }
+  }
+
+  if (validMissions.length === 0) {
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          `Kabuto Yakushi (053): No valid mission for ${topCard.name_fr}.`,
+          'game.log.effect.noTarget',
+          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
+        ),
+      },
+    };
+  }
+
+  // Always go through target selection so EffectEngine handles upgrade + MAIN effects
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO053_CHOOSE_FROM_DISCARD',
-    validTargets: affordableIndices,
-    description: 'Kabuto Yakushi (053): Choose a character from your discard pile to play (paying 3 less).',
-    descriptionKey: 'game.effect.desc.kabuto053ChooseFromDiscard',
+    targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
+    validTargets: validMissions,
+    description: JSON.stringify({
+      discardIndex: topCardIndex,
+      reducedCost,
+      text: `Kabuto Yakushi (053): Choose a mission to play ${topCard.name_fr} on (cost ${reducedCost}).`,
+    }),
+    descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
+    descriptionParams: { cardName: topCard.name_fr, cost: String(reducedCost) },
   };
-}
-
-/**
- * Play a character from the discard pile by index onto a mission.
- * Exported for use by EffectEngine in target resolution.
- */
-export function playFromDiscardByIndex(
-  state: import('../../EffectTypes').EffectContext['state'],
-  sourcePlayer: import('../../../engine/types').PlayerID,
-  discardIndex: number,
-  missionIdx: number,
-  cost: number,
-): import('../../EffectTypes').EffectContext['state'] {
-  const newState = { ...state };
-  const ps = { ...newState[sourcePlayer] };
-  const newDiscardPile = [...ps.discardPile];
-  const card = newDiscardPile.splice(discardIndex, 1)[0];
-  if (!card) return state;
-
-  ps.chakra -= cost;
-  ps.discardPile = newDiscardPile;
-
-  const charInPlay: CharacterInPlay = {
-    instanceId: generateInstanceId(),
-    card,
-    isHidden: false,
-    powerTokens: 0,
-    stack: [card],
-    controlledBy: sourcePlayer,
-    originalOwner: sourcePlayer,
-    missionIndex: missionIdx,
-  };
-
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[missionIdx] };
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  mission[friendlySide] = [...mission[friendlySide], charInPlay];
-  missions[missionIdx] = mission;
-
-  // Update character count
-  let charCount = 0;
-  for (const m of missions) {
-    charCount += (sourcePlayer === 'player1' ? m.player1Characters : m.player2Characters).length;
-  }
-  ps.charactersInPlay = charCount;
-
-  newState[sourcePlayer] = ps;
-  newState.activeMissions = missions;
-
-  newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT',
-    `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
-    'game.log.effect.playFromDiscard',
-    { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
-  );
-
-  return newState;
 }
 
 export function registerKabuto053Handlers(): void {

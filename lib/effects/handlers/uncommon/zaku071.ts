@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 071/130 - ZAKU ABUMI "Air Slice" (UC)
@@ -17,12 +18,6 @@ import { logAction } from '../../../engine/utils/gameLog';
  * UPGRADE: POWERUP 2 (self).
  *   - When played as an upgrade, add 2 power tokens to this character.
  */
-
-function getEffectivePower(char: import('../../../engine/types').CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleZaku071Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;

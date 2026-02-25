@@ -3,6 +3,7 @@ import { registerEffect } from '../../EffectRegistry';
 import type { CharacterInPlay } from '../../../engine/types';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 149/130 - KIBA INUZUKA (M)
@@ -19,12 +20,6 @@ import { defeatEnemyCharacter, defeatFriendlyCharacter } from '../../defeatUtils
  * UPGRADE: MAIN effect changes: instead of hiding, defeat both targets.
  *   - When isUpgrade: defeat the Akamaru and defeat the other character.
  */
-
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function kiba149MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
@@ -132,78 +127,18 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     return { state };
   }
 
-  if (validTargets.length > 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: useDefeat ? 'KIBA149_CHOOSE_DEFEAT_TARGET' : 'KIBA149_CHOOSE_HIDE_TARGET',
-      validTargets,
-      description: useDefeat
-        ? 'Kiba Inuzuka (149): Choose another character in this mission to defeat.'
-        : 'Kiba Inuzuka (149): Choose another character in this mission to hide.',
-      descriptionKey: useDefeat
-        ? 'game.effect.desc.kiba149Defeat'
-        : 'game.effect.desc.kiba149Hide',
-    };
-  }
-
-  // Auto-resolve: single target
-  const targetId = validTargets[0];
-
-  if (useDefeat) {
-    // Determine if the target is friendly or enemy
-    const isFriendly = thisMission[friendlySide].some((c) => c.instanceId === targetId);
-    if (isFriendly) {
-      state = defeatFriendlyCharacter(state, ctx.sourceMissionIndex, targetId, ctx.sourcePlayer);
-    } else {
-      state = defeatEnemyCharacter(state, ctx.sourceMissionIndex, targetId, ctx.sourcePlayer);
-    }
-
-    const targetChar = [...thisMission[friendlySide], ...thisMission[enemySide]]
-      .find((c) => c.instanceId === targetId);
-
-    state = {
-      ...state,
-      log: logAction(
-        state.log, state.turn, state.phase, ctx.sourcePlayer,
-        'EFFECT_DEFEAT',
-        `Kiba Inuzuka (149): Defeated ${targetChar?.card.name_fr ?? 'character'} in this mission (upgrade).`,
-        'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: 'KS-149-M', target: targetChar?.card.name_fr ?? 'unknown' },
-      ),
-    };
-  } else {
-    // Hide the target
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[ctx.sourceMissionIndex] };
-
-    // Check both sides for the target
-    for (const side of [friendlySide, enemySide] as const) {
-      const chars = [...mission[side]];
-      const idx = chars.findIndex((c) => c.instanceId === targetId);
-      if (idx !== -1) {
-        const targetChar = chars[idx];
-        chars[idx] = { ...chars[idx], isHidden: true };
-        mission[side] = chars;
-        missions[ctx.sourceMissionIndex] = mission;
-
-        state = {
-          ...state,
-          activeMissions: missions,
-          log: logAction(
-            state.log, state.turn, state.phase, ctx.sourcePlayer,
-            'EFFECT_HIDE',
-            `Kiba Inuzuka (149): Hid ${targetChar.card.name_fr} in this mission.`,
-            'game.log.effect.hide',
-            { card: 'KIBA INUZUKA', id: 'KS-149-M', target: targetChar.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
-          ),
-        };
-        break;
-      }
-    }
-  }
-
-  return { state };
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: useDefeat ? 'KIBA149_CHOOSE_DEFEAT_TARGET' : 'KIBA149_CHOOSE_HIDE_TARGET',
+    validTargets,
+    description: useDefeat
+      ? 'Kiba Inuzuka (149): Choose another character in this mission to defeat.'
+      : 'Kiba Inuzuka (149): Choose another character in this mission to hide.',
+    descriptionKey: useDefeat
+      ? 'game.effect.desc.kiba149Defeat'
+      : 'game.effect.desc.kiba149Hide',
+  };
 }
 
 function kiba149UpgradeHandler(ctx: EffectContext): EffectResult {

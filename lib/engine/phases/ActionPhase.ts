@@ -320,8 +320,8 @@ function handleRevealCharacter(
     const updatedMissionChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
     const upgradedChar = updatedMissionChars.find((c) => c.instanceId === upgradeTarget.instanceId);
     if (upgradedChar) {
-      // Resolve as reveal effects with upgrade flag (MAIN + UPGRADE + AMBUSH)
-      newState = EffectEngine.resolvePlayEffects(newState, player, upgradedChar, missionIndex, true);
+      // Resolve all three effect types: MAIN + UPGRADE + AMBUSH
+      newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex);
     }
 
     // Trigger on-play reactions (reveal counts as playing a character)

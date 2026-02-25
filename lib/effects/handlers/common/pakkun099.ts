@@ -45,13 +45,6 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'PAKKUN', id: 'KS-099-C' }) } };
   }
 
-  // If only one valid destination, auto-move
-  if (validTargets.length === 1) {
-    const destIdx = parseInt(validTargets[0], 10);
-    return { state: movePakkun(state, sourceCard, sourceMissionIndex, destIdx, sourcePlayer, friendlySide) };
-  }
-
-  // Multiple valid destinations: let player choose
   return {
     state,
     requiresTargetSelection: true,

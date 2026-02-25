@@ -17,38 +17,21 @@ import { logAction } from '../../../engine/utils/gameLog';
 function kakashi137MainHandler(ctx: EffectContext): EffectResult {
   // MAIN: Hide an upgraded character in this mission (friend or foe, stack >= 2).
   let state = { ...ctx.state };
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[ctx.sourceMissionIndex] };
+  const mission = state.activeMissions[ctx.sourceMissionIndex];
 
-  // Search both sides for an upgraded, non-hidden character (not self)
-  let targetSide: 'player1Characters' | 'player2Characters' | null = null;
-  let targetIndex = -1;
-  let target: CharacterInPlay | null = null;
-
+  // Collect ALL valid targets: upgraded, non-hidden characters (not self)
+  const validTargets: string[] = [];
   for (const side of ['player1Characters', 'player2Characters'] as const) {
-    const chars = mission[side];
-    for (let i = 0; i < chars.length; i++) {
-      const c = chars[i];
-      if (
-        !c.isHidden &&
-        c.stack.length >= 2 &&
-        c.instanceId !== ctx.sourceCard.instanceId
-      ) {
-        targetSide = side;
-        targetIndex = i;
-        target = c;
-        break;
+    for (const c of mission[side]) {
+      if (!c.isHidden && c.stack.length >= 2 && c.instanceId !== ctx.sourceCard.instanceId) {
+        validTargets.push(c.instanceId);
       }
     }
-    if (target) break;
   }
 
-  if (!target || !targetSide || targetIndex === -1) {
+  if (validTargets.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
+      state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Kakashi Hatake (137): No upgraded character in this mission to hide.',
       'game.log.effect.noTarget',
@@ -57,23 +40,45 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  const chars = [...mission[targetSide]];
-  chars[targetIndex] = { ...target, isHidden: true };
-  mission[targetSide] = chars;
-  missions[ctx.sourceMissionIndex] = mission;
+  // Always let player choose (optional effect)
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KAKASHI137_HIDE_UPGRADED',
+    validTargets,
+    description: 'Kakashi Hatake (137): Choose an upgraded character in this mission to hide.',
+    descriptionKey: 'game.effect.desc.kakashi137HideUpgraded',
+  };
+}
 
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'EFFECT_HIDE',
-    `Kakashi Hatake (137): Hid upgraded ${target.card.name_fr} in this mission.`,
-    'game.log.effect.hide',
-    { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
-  );
+function hideUpgradedCharacter(
+  state: EffectContext['state'],
+  ctx: EffectContext,
+  targetInstanceId: string,
+): EffectContext['state'] {
+  const missions = [...state.activeMissions];
+  const mission = { ...missions[ctx.sourceMissionIndex] };
 
-  return { state: { ...state, activeMissions: missions, log } };
+  for (const side of ['player1Characters', 'player2Characters'] as const) {
+    const chars = [...mission[side]];
+    const idx = chars.findIndex((c) => c.instanceId === targetInstanceId);
+    if (idx !== -1) {
+      const target = chars[idx];
+      chars[idx] = { ...target, isHidden: true };
+      mission[side] = chars;
+      missions[ctx.sourceMissionIndex] = mission;
+
+      const log = logAction(
+        state.log, state.turn, state.phase, ctx.sourcePlayer,
+        'EFFECT_HIDE',
+        `Kakashi Hatake (137): Hid upgraded ${target.card.name_fr} in this mission.`,
+        'game.log.effect.hide',
+        { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
+      );
+      return { ...state, activeMissions: missions, log };
+    }
+  }
+  return state;
 }
 
 function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
@@ -114,14 +119,7 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Auto-move if only one valid destination
-  if (validMissions.length === 1) {
-    const destIdx = parseInt(validMissions[0], 10);
-    const newState = moveKakashi137(state, sourceCard, sourceMissionIndex, destIdx, sourcePlayer, friendlySide);
-    return { state: newState };
-  }
-
-  // Multiple destinations: require target selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

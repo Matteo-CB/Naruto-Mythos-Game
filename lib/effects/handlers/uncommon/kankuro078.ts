@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import type { CharacterInPlay } from '../../../engine/types';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 078/130 - KANKURO "Puppet Master" (UC)
@@ -20,12 +21,6 @@ import { logAction } from '../../../engine/utils/gameLog';
  *   - Requires target selection for which card to play and which mission to place it on.
  */
 
-function getEffectivePower(char: CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
-
 function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
@@ -35,7 +30,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       // Exclude self
       if (char.instanceId === sourceCard.instanceId) continue;
-      if (getEffectivePower(char) <= 4) {
+      if (getEffectivePower(state, char, char.controlledBy) <= 4) {
         validTargets.push(char.instanceId);
       }
     }

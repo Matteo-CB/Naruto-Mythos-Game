@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
 import { defeatEnemyCharacter } from '../../defeatUtils';
+import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 060/130 - KIDOMARU (UC)
@@ -18,15 +19,8 @@ import { defeatEnemyCharacter } from '../../defeatUtils';
  *
  * AMBUSH: Defeat an enemy character with Power 1 or less in play (any mission).
  *   - Find non-hidden enemy characters with effective power <= 1 across all missions.
- *   - If exactly one valid target, auto-apply.
  *   - If multiple targets, require target selection.
  */
-
-function getEffectivePower(char: import('../../../engine/types').CharacterInPlay): number {
-  if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.power + char.powerTokens;
-}
 
 function handleKidomaru060Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -78,14 +72,12 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
 
   // Find enemy characters with effective power <= 1 across all missions (hidden = power 0, valid)
   const validTargets: string[] = [];
-  const targetMissionMap: Record<string, number> = {};
 
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     for (const char of mission[enemySide]) {
-      if (getEffectivePower(char) <= 1) {
+      if (getEffectivePower(state, char, opponentPlayer) <= 1) {
         validTargets.push(char.instanceId);
-        targetMissionMap[char.instanceId] = i;
       }
     }
   }
@@ -96,18 +88,7 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-060-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const missionIdx = targetMissionMap[targetId];
-    let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
-    newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
-      `Kidomaru (060): Defeated an enemy character with Power 1 or less in mission ${missionIdx + 1} (ambush).`,
-      'game.log.effect.defeat', { card: 'KIDOMARU', id: 'KS-060-UC', target: '' }) };
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
+  // Require target selection
   return {
     state,
     requiresTargetSelection: true,

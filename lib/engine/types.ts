@@ -176,7 +176,7 @@ export interface PendingEffect {
 
 export interface PendingAction {
   id: string;
-  type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK';
+  type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK' | 'INFO_REVEAL';
   player: PlayerID;
   description: string;
   descriptionKey?: string;

@@ -41,12 +41,7 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If exactly one valid target, auto-resolve
-  if (validTargets.length === 1) {
-    return applyMss01Powerup(state, validTargets[0], ctx.sourcePlayer, friendlySide);
-  }
-
-  // Multiple valid targets: require player selection
+  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,
