@@ -96,7 +96,7 @@ export default function Home() {
   return (
     <main
       id="main-content"
-      className="relative h-screen w-full overflow-hidden flex flex-col"
+      className="relative min-h-screen w-full overflow-y-auto flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
       {/* === BACKGROUND CLOUD PATTERN === */}
@@ -177,23 +177,23 @@ export default function Home() {
       </div>
 
       {/* === LANGUAGE SWITCHER (top-right) === */}
-      <div className="absolute top-4 right-6 z-50">
+      <div className="absolute top-3 right-4 z-50 sm:top-4 sm:right-6">
         <LanguageSwitcher />
       </div>
 
-      {/* === MAIN CONTENT: side-by-side layout === */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-8">
-        <div className="flex w-full max-w-5xl items-center justify-between gap-8">
+      {/* === MAIN CONTENT: side-by-side on desktop, stacked on mobile === */}
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-6 sm:px-8 sm:py-0">
+        <div className="flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 
           {/* LEFT SIDE: Title + Navigation */}
-          <div className="flex flex-col items-start flex-shrink-0" style={{ maxWidth: '420px' }}>
-            {/* Title - animated letter by letter + beta badge */}
-            <div className="mb-2">
+          <div className="flex w-full flex-col items-start flex-shrink-0 lg:max-w-[420px]">
+            {/* Title + beta text row */}
+            <div className="mb-1 flex items-baseline gap-4 flex-wrap">
               <div className="flex items-center flex-wrap">
                 {titleLetters.map((letter, i) => (
                   <motion.span
                     key={`letter-${i}`}
-                    className="inline-block text-5xl font-black tracking-wider"
+                    className="inline-block text-3xl font-black tracking-wider sm:text-4xl lg:text-5xl"
                     style={{
                       color: '#c4a35a',
                       textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px rgba(196, 163, 90, 0.1)',
@@ -209,25 +209,21 @@ export default function Home() {
                     {letter === ' ' ? '\u00A0' : letter}
                   </motion.span>
                 ))}
-                <motion.span
-                  className="ml-3 self-start mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-                  style={{
-                    color: '#c4a35a',
-                    border: '1px solid rgba(196, 163, 90, 0.4)',
-                    backgroundColor: 'rgba(196, 163, 90, 0.06)',
-                  }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                >
-                  {t('betaTag')}
-                </motion.span>
               </div>
+              <motion.span
+                className="text-[10px] leading-tight sm:text-[11px]"
+                style={{ color: '#666666' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
+              >
+                {t('betaBanner')}
+              </motion.span>
             </div>
 
             {/* Subtitle */}
             <motion.p
-              className="mb-8 text-sm font-medium uppercase tracking-[0.35em]"
+              className="mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
               style={{ color: '#888888' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -239,7 +235,7 @@ export default function Home() {
             {/* Navigation Buttons */}
             <motion.nav
               aria-label="Main navigation"
-              className="flex w-full flex-col gap-2.5"
+              className="flex w-full flex-col gap-2"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.7 }}
@@ -257,7 +253,7 @@ export default function Home() {
                 >
                   <Link
                     href={btn.href}
-                    className="group relative flex h-12 items-center justify-center overflow-hidden text-base font-semibold tracking-wide transition-all"
+                    className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                     style={{
                       backgroundColor: '#141414',
                       border: btn.primary ? '1px solid #c4a35a' : '1px solid #262626',
@@ -303,7 +299,7 @@ export default function Home() {
               >
                 <Link
                   href="/admin/cards"
-                  className="group relative flex h-12 items-center justify-center overflow-hidden text-base font-semibold tracking-wide transition-all"
+                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                   style={{
                     backgroundColor: '#141414',
                     border: '1px solid #ef4444',
@@ -333,7 +329,7 @@ export default function Home() {
 
             {/* Divider */}
             <motion.div
-              className="my-3 h-px w-full"
+              className="my-2.5 h-px w-full sm:my-3"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
@@ -351,7 +347,7 @@ export default function Home() {
                 <>
                   <Link
                     href={`/profile/${session.user?.name ?? ''}`}
-                    className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all"
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
                       border: '1px solid #c4a35a',
@@ -372,7 +368,7 @@ export default function Home() {
                   </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
-                    className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all cursor-pointer"
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all cursor-pointer sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
                       border: '1px solid #333333',
@@ -399,7 +395,7 @@ export default function Home() {
                   <Link
                     key={btn.key}
                     href={btn.href}
-                    className="flex h-10 flex-1 items-center justify-center text-sm font-medium tracking-wide transition-all"
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',
                       border: '1px solid #333333',
@@ -426,7 +422,7 @@ export default function Home() {
 
             {/* Discord link */}
             <motion.div
-              className="mt-3 w-full"
+              className="mt-2.5 w-full sm:mt-3"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 1.6 }}
@@ -435,7 +431,7 @@ export default function Home() {
                 href="https://discord.gg/BBXVUsU3hn"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-full items-center justify-center text-sm font-medium tracking-wide transition-all"
+                className="flex h-9 w-full items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                 style={{
                   backgroundColor: 'transparent',
                   border: '1px solid #444444',
@@ -460,7 +456,7 @@ export default function Home() {
 
             {/* Footer text */}
             <motion.p
-              className="mt-6 text-xs tracking-widest uppercase"
+              className="mt-4 text-[10px] tracking-widest uppercase sm:mt-6 sm:text-xs"
               style={{ color: '#333333' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -470,9 +466,9 @@ export default function Home() {
             </motion.p>
           </div>
 
-          {/* RIGHT SIDE: Holographic Naruto card */}
+          {/* RIGHT SIDE: Holographic card — hidden on small screens */}
           <motion.div
-            className="relative flex-shrink-0 flex items-center justify-center"
+            className="relative hidden flex-shrink-0 items-center justify-center lg:flex"
             initial={{ opacity: 0, x: 80 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
