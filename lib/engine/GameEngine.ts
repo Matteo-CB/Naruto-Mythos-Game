@@ -21,7 +21,7 @@ import {
 import { deepClone } from './utils/deepClone';
 import { shuffle } from './utils/shuffle';
 import { generateGameId } from './utils/id';
-import { logSystem } from './utils/gameLog';
+import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
@@ -392,6 +392,32 @@ export class GameEngine {
 
       const effect = newState.pendingEffects[effectIdx];
       if (!effect.isOptional) return state;
+
+      // Special case: Dosu 069 — declining means the opponent lets the character be defeated
+      if (effect.targetSelectionType === 'DOSU069_OPPONENT_CHOICE') {
+        let parsed: { targetInstanceId?: string; sourcePlayer?: string } = {};
+        try { parsed = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const defeatTargetId = parsed.targetInstanceId ?? (effect.validTargets?.[0] ?? '');
+        const dosuPlayer = (parsed.sourcePlayer ?? effect.sourcePlayer) as import('./types').PlayerID;
+        if (defeatTargetId) {
+          // Defeat the character
+          const defeated = EffectEngine.defeatCharacter(newState, defeatTargetId, dosuPlayer);
+          // Remove the effect and action
+          defeated.pendingEffects = defeated.pendingEffects.filter((e) => e.id !== effect.id);
+          defeated.pendingActions = defeated.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+          defeated.log = logAction(
+            defeated.log, defeated.turn, defeated.phase, dosuPlayer,
+            'EFFECT_DEFEAT',
+            `Dosu Kinuta (069): Hidden character was defeated (opponent chose not to reveal).`,
+            'game.log.effect.dosu069AutoDefeat',
+            { card: 'DOSU KINUTA', id: 'KS-069-UC' },
+          );
+          if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+            return EffectEngine.processRemainingEffects(defeated, effect);
+          }
+          return defeated;
+        }
+      }
 
       // Remove the effect and its associated action
       newState.pendingEffects.splice(effectIdx, 1);

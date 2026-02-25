@@ -1678,12 +1678,12 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Discard a card.",
+          "description": "Draw a card.",
           "description_fr": ""
         },
         {
           "type": "MAIN",
-          "description": "Play the character at the top of your discard pile paying 3 less.",
+          "description": "Play a character from your discard pile anywhere paying 3 less.",
           "description_fr": ""
         }
       ],
@@ -1718,7 +1718,7 @@
         },
         {
           "type": "MAIN",
-          "description": "Hide all other characters in this mission with less Power than this character.",
+          "description": "Hide all non-hidden enemy characters in this mission with less Power than this character.",
           "description_fr": ""
         }
       ],

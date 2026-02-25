@@ -5,14 +5,15 @@ import { logAction } from '../../../engine/utils/gameLog';
 /**
  * Card 068/130 - DOSU KINUTA (Common)
  * Chakra: 3 | Power: 3
- * Group: Sound Village | Keywords: Team Dosu
- * MAIN: Look at a hidden character in play.
- * AMBUSH: Defeat a hidden character in play.
+ * Group: Sound Village | Keywords: Sound Ninja
  *
- * MAIN effect: The player selects any hidden character in play (friendly or enemy) and
- * looks at it (reveals it to themselves without flipping it face-up).
- * AMBUSH effect: When revealed from hidden, select a hidden character in play and defeat it.
+ * MAIN: Look at a hidden character in play.
+ *   Player selects any hidden character (any player, any mission) and sees it.
+ *
+ * AMBUSH: [↯] Defeat a hidden character in play.
+ *   When Dosu is revealed from hidden, defeat any hidden character in play.
  */
+
 function handleDosu068Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
 
@@ -26,21 +27,28 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no hidden characters, effect fizzles
   if (validTargets.length === 0) {
-    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Dosu Kinuta (068): No hidden characters in play to look at.',
-      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' }) } };
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Dosu Kinuta (068): No hidden characters in play to look at.',
+          'game.log.effect.noTarget',
+          { card: 'DOSU KINUTA', id: 'KS-068-C' },
+        ),
+      },
+    };
   }
 
-  // Requires target selection: which hidden character to look at
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
     validTargets,
-    description: 'Select a hidden character in play to look at.',
-    descriptionKey: 'game.effect.desc.dosu068Look',
+    description: 'Dosu Kinuta (068): Select a hidden character in play to look at.',
+    descriptionKey: 'game.effect.desc.dosu068LookAtHidden',
   };
 }
 
@@ -57,20 +65,27 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no hidden characters, effect fizzles
   if (validTargets.length === 0) {
-    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Dosu Kinuta (068): No hidden characters in play to defeat.',
-      'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' }) } };
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Dosu Kinuta (068): No hidden characters in play to defeat.',
+          'game.log.effect.noTarget',
+          { card: 'DOSU KINUTA', id: 'KS-068-C' },
+        ),
+      },
+    };
   }
 
-  // Requires target selection: which hidden character to defeat
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER',
     validTargets,
-    description: 'Select a hidden character in play to defeat.',
+    description: 'Dosu Kinuta (068) AMBUSH: Select a hidden character in play to defeat.',
     descriptionKey: 'game.effect.desc.dosu068Defeat',
   };
 }

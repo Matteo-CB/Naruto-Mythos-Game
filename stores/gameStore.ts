@@ -342,20 +342,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Build hand card info for hand selection UI
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
-        const playerHand = visibleState.myState.hand;
-        handCards = pendingAction.options.map((indexStr) => {
-          const idx = parseInt(indexStr, 10);
-          const card = playerHand[idx];
-          return {
-            index: idx,
-            card: card ? {
-              name_fr: card.name_fr,
-              chakra: card.chakra,
-              power: card.power,
-              image_file: card.image_file,
-            } : { name_fr: '???' },
-          };
-        });
+        const tst = pendingEffect?.targetSelectionType ?? '';
+        if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD') {
+          const playerDiscard = visibleState.myState.discardPile;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerDiscard[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else {
+          const playerHand = visibleState.myState.hand;
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = playerHand[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        }
       }
 
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Tayuya 065, etc.)
@@ -672,7 +690,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const tst = pendingEffect?.targetSelectionType ?? '';
         // Sakura 109: indices are into the discard pile
         // Sakura 135: indices are into drawn cards stored at end of discard pile (use JSON description)
-        if (tst === 'SAKURA109_CHOOSE_DISCARD') {
+        if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
           const playerDiscard = newState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
@@ -1071,7 +1089,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
         const tst = pendingEffect?.targetSelectionType ?? '';
-        if (tst === 'SAKURA109_CHOOSE_DISCARD') {
+        if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
           const playerDiscard = currentState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);

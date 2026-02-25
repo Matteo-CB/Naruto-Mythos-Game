@@ -114,10 +114,12 @@ export function ActionBar() {
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
 
   // Determine chakra cost for reveal (checks if reveal would be an upgrade — pays only the difference)
+  // Also applies cost reduction effects (e.g., Itachi 090 pays 3 less with Sasuke, Gaara 075 pays 2 less)
   let revealCost = 0;
   let isRevealUpgrade = false;
   if (hasTargetSelected && visibleState.activeMissions) {
-    for (const m of visibleState.activeMissions) {
+    for (let mi = 0; mi < visibleState.activeMissions.length; mi++) {
+      const m = visibleState.activeMissions[mi];
       const myChars =
         myPlayer === 'player1' ? m.player1Characters : m.player2Characters;
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
@@ -136,7 +138,9 @@ export function ActionBar() {
           revealCost = hiddenTopCard.chakra - (existingTop?.chakra ?? 0);
           isRevealUpgrade = true;
         } else {
-          revealCost = hiddenTopCard.chakra;
+          // Use calculateEffectiveCost to apply reveal cost reductions
+          // (Itachi 090: -3 with Sasuke, Gaara 075: -2 when hidden)
+          revealCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
         }
         break;
       }
