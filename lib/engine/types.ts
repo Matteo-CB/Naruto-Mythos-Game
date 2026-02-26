@@ -183,7 +183,7 @@ export interface PendingEffect {
 
 export interface PendingAction {
   id: string;
-  type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK' | 'INFO_REVEAL';
+  type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK' | 'INFO_REVEAL' | 'CHOOSE_EFFECT';
   player: PlayerID;
   description: string;
   descriptionKey?: string;

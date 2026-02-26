@@ -8,25 +8,47 @@ datasource db {
 }
 
 model User {
-  id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  username       String       @unique
-  email          String       @unique
-  password       String
-  elo            Int          @default(1000)
-  wins           Int          @default(0)
-  losses         Int          @default(0)
-  draws          Int          @default(0)
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  createdAt      DateTime     @default(now())
-  decks          Deck[]
-  gamesAsPlayer1 Game[]       @relation("Player1")
-  gamesAsPlayer2 Game[]       @relation("Player2")
-  quizScores     QuizScore[]
+  id                String       @id @default(auto()) @map("_id") @db.ObjectId
+  username          String       @unique
+  email             String       @unique
+  password          String       @default("")
+  elo               Int          @default(500)
+  wins              Int          @default(0)
+  losses            Int          @default(0)
+  draws             Int          @default(0)
+  discordId         String?
+  discordUsername   String?
+  discordHighestElo Int          @default(0)
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime     @default(now())
+  decks             Deck[]
+  gamesAsPlayer1    Game[]       @relation("Player1")
+  gamesAsPlayer2    Game[]       @relation("Player2")
+  quizScores        QuizScore[]
   friendshipsSent     Friendship[]  @relation("FriendshipSent")
   friendshipsReceived Friendship[]  @relation("FriendshipReceived")
   matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
   matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
+  accounts          Account[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Deck {
@@ -121,4 +143,10 @@ model BannedCard {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   cardId   String   @unique
   bannedAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  key            String  @unique
+  leaguesEnabled Boolean @default(false)
 }

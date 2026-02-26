@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ username: string }> },
 ) {
   try {
     const { username } = await params;
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
+    const perPage = 20;
 
     const user = await prisma.user.findUnique({
       where: { username },
@@ -17,6 +20,7 @@ export async function GET(
         wins: true,
         losses: true,
         draws: true,
+        discordUsername: true,
         createdAt: true,
         decks: {
           select: {
@@ -33,29 +37,41 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get recent games
-    const recentGames = await prisma.game.findMany({
-      where: {
-        OR: [{ player1Id: user.id }, { player2Id: user.id }],
-        status: 'completed',
-      },
-      select: {
-        id: true,
-        player1: { select: { username: true } },
-        player2: { select: { username: true } },
-        isAiGame: true,
-        aiDifficulty: true,
-        winnerId: true,
-        player1Score: true,
-        player2Score: true,
-        eloChange: true,
-        completedAt: true,
-      },
-      orderBy: { completedAt: 'desc' },
-      take: 20,
-    });
+    const gameFilter = {
+      OR: [{ player1Id: user.id }, { player2Id: user.id }],
+      status: 'completed' as const,
+    };
 
-    return NextResponse.json({ ...user, recentGames });
+    // Get total game count + paginated games
+    const [totalGames, games] = await Promise.all([
+      prisma.game.count({ where: gameFilter }),
+      prisma.game.findMany({
+        where: gameFilter,
+        select: {
+          id: true,
+          player1: { select: { username: true } },
+          player2: { select: { username: true } },
+          isAiGame: true,
+          aiDifficulty: true,
+          winnerId: true,
+          player1Score: true,
+          player2Score: true,
+          eloChange: true,
+          completedAt: true,
+          gameState: true,
+        },
+        orderBy: { completedAt: 'desc' },
+        skip: (page - 1) * perPage,
+        take: perPage,
+      }),
+    ]);
+
+    const recentGames = games.map(({ gameState, ...rest }) => ({
+      ...rest,
+      hasReplay: gameState !== null,
+    }));
+
+    return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },

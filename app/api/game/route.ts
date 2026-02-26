@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
+import { syncDiscordRole } from '@/lib/discord/roleSync';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { gameId, winnerId, player1Score, player2Score } = body;
+    const { gameId, winnerId, player1Score, player2Score, gameLog } = body;
 
     const game = await prisma.game.findUnique({ where: { id: gameId } });
     if (!game) {
@@ -109,6 +110,10 @@ export async function PUT(request: NextRequest) {
             },
           }),
         ]);
+
+        // Sync Discord roles (fire-and-forget)
+        syncDiscordRole(game.player1Id).catch(() => {});
+        syncDiscordRole(game.player2Id).catch(() => {});
       }
     }
 
@@ -121,6 +126,7 @@ export async function PUT(request: NextRequest) {
         player2Score,
         eloChange,
         completedAt: new Date(),
+        ...(gameLog ? { gameState: gameLog } : {}),
       },
     });
 

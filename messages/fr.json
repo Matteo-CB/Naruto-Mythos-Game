@@ -213,7 +213,12 @@
       "opponentAbandoned": "L'adversaire a abandonne",
       "youAbandoned": "Vous avez abandonne",
       "opponentTimedOut": "L'adversaire a depasse le temps",
-      "youTimedOut": "Temps depasse"
+      "youTimedOut": "Temps depasse",
+      "saveReplay": "Enregistrer la partie",
+      "savingReplay": "Enregistrement...",
+      "replaySaved": "Partie enregistree",
+      "watchReplay": "Voir le Replay",
+      "saveError": "Echec de l'enregistrement"
     },
     "timer": {
       "autoPassed": "Temps ecoule — passe automatique"
@@ -228,6 +233,7 @@
     "mustChoose": "{player} doit choisir",
     "mustChooseTarget": "{player} doit choisir une cible",
     "mustChooseCard": "{player} doit choisir une carte de sa main",
+    "mustChooseEffect": "{player} doit choisir un effet a copier",
     "waitingForChoice": "En attente du choix de {player}...",
     "chooseCardToReturn": "Choisissez une carte a remettre sur le dessus de votre deck",
     "chooseCardToDiscard": "Choisissez une carte a defausser",
@@ -426,6 +432,7 @@
         "itachi143MoveEnemy": "Choisissez un personnage ennemi a deplacer vers cette mission.",
         "itachi152MoveFriendly": "Choisissez un personnage allie a deplacer vers une autre mission.",
         "kakashi148CopyEffect": "Choisissez un personnage allie Equipe 7 dont copier l'effet.",
+        "chooseEffectToCopy": "Choisissez quel effet de {target} copier.",
         "kiba149Hide": "Choisissez un autre personnage dans cette mission a cacher.",
         "kiba149Defeat": "Choisissez un autre personnage dans cette mission a vaincre.",
         "naruto141Discard": "Choisissez une carte de votre main a defausser.",
@@ -620,7 +627,45 @@
     "stats": "Statistiques",
     "recentGames": "Parties Recentes",
     "decks": "Decks",
-    "noGames": "Aucune partie jouee"
+    "noGames": "Aucune partie jouee",
+    "replay": "Replay",
+    "loadMore": "Charger plus",
+    "discordLinked": "Discord",
+    "rank": "Rang",
+    "rankNames": {
+      "academyStudent": "Etudiant de l'Academie",
+      "genin": "Genin",
+      "chunin": "Chunin",
+      "specialJonin": "Jonin Special",
+      "eliteJonin": "Jonin d'Elite",
+      "legendarySannin": "Sannin Legendaire",
+      "kage": "Kage",
+      "sageOfSixPaths": "Rikudo Sennin"
+    }
+  },
+  "replay": {
+    "title": "Recapitulatif",
+    "loading": "Chargement du replay...",
+    "notFound": "Partie introuvable",
+    "noLog": "Aucune donnee de replay disponible pour cette partie",
+    "vsLabel": "vs",
+    "missionSummary": "Resultats des Missions",
+    "eventTimeline": "Chronologie",
+    "turnLabel": "Tour {turn}",
+    "allTurns": "Tous les Tours",
+    "autoPlay": "Lecture auto",
+    "pause": "Pause",
+    "speed": "Vitesse",
+    "slow": "Lent",
+    "normal": "Normal",
+    "fast": "Rapide",
+    "points": "{points} pts",
+    "rank": "Rang {rank}",
+    "missionWon": "Gagnee",
+    "missionLost": "Perdue",
+    "aiGame": "vs IA ({difficulty})",
+    "onlineGame": "Match en Ligne",
+    "back": "Retour"
   },
   "auth": {
     "signIn": "Se Connecter",
@@ -654,7 +699,10 @@
     "resetSuccess": "Mot de passe mis a jour avec succes.",
     "resetSuccessLogin": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
     "invalidResetLink": "Ce lien de reinitialisation est invalide ou a expire.",
-    "goToLogin": "Retour a la connexion"
+    "goToLogin": "Retour a la connexion",
+    "signInWithDiscord": "Se connecter avec Discord",
+    "signUpWithDiscord": "S'inscrire avec Discord",
+    "orSeparator": "ou"
   },
   "card": {
     "effectTypes": {

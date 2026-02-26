@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
+import { EloBadge } from '@/components/EloBadge';
 
 interface LeaderboardUser {
   id: string;
@@ -25,7 +26,15 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPlayers, setTotalPlayers] = useState(0);
+  const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const PLAYERS_PER_PAGE = 20;
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => setLeaguesEnabled(data.leaguesEnabled ?? false))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -116,7 +125,10 @@ export default function LeaderboardPage() {
                   >
                     {user.username}
                   </Link>
-                  <span style={{ color: '#e0e0e0' }}>{user.elo}</span>
+                  <span className="flex items-center gap-2">
+                    {leaguesEnabled && <EloBadge elo={user.elo} size="sm" showElo={false} />}
+                    <span style={{ color: '#e0e0e0' }}>{user.elo}</span>
+                  </span>
                   <span className="hidden sm:block" style={{ color: '#888888' }}>
                     {user.wins}/{user.losses}/{user.draws}
                   </span>

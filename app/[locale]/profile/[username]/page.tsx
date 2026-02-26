@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useCallback, use } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/i18n/navigation';
@@ -10,6 +10,7 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
+import { EloBadgeLarge } from '@/components/EloBadge';
 
 interface ProfileData {
   id: string;
@@ -18,6 +19,7 @@ interface ProfileData {
   wins: number;
   losses: number;
   draws: number;
+  discordUsername: string | null;
   createdAt: string;
   decks: Array<{ id: string; name: string; createdAt: string }>;
   recentGames: Array<{
@@ -31,7 +33,11 @@ interface ProfileData {
     player2Score: number;
     eloChange: number | null;
     completedAt: string | null;
+    hasReplay: boolean;
   }>;
+  totalGames: number;
+  page: number;
+  perPage: number;
 }
 
 export default function ProfilePage({
@@ -45,23 +51,52 @@ export default function ProfilePage({
   const { data: session } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [leaguesEnabled, setLeaguesEnabled] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/profile/${username}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Not found');
-        return res.json();
-      })
-      .then((data) => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => setLeaguesEnabled(data.leaguesEnabled ?? false))
+      .catch(() => {});
+  }, []);
+
+  const fetchProfile = useCallback(async (page: number, append = false) => {
+    if (append) setLoadingMore(true);
+    else setLoading(true);
+
+    try {
+      const res = await fetch(`/api/profile/${username}?page=${page}`);
+      if (!res.ok) throw new Error('Not found');
+      const data: ProfileData = await res.json();
+
+      if (append && profile) {
+        setProfile({
+          ...data,
+          recentGames: [...profile.recentGames, ...data.recentGames],
+        });
+      } else {
         setProfile(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Player not found');
-        setLoading(false);
-      });
+      }
+      setCurrentPage(page);
+    } catch {
+      setError('Player not found');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [username, profile]);
+
+  useEffect(() => {
+    fetchProfile(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
+
+  const hasMore = profile
+    ? profile.recentGames.length < profile.totalGames
+    : false;
 
   if (loading) {
     return (
@@ -128,18 +163,39 @@ export default function ProfilePage({
           </div>
         </div>
 
-        {/* ELO and Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        {/* Discord indicator */}
+        {profile.discordUsername && (
           <div
-            className="rounded-lg p-6 text-center"
+            className="flex items-center gap-2 mb-4 px-3 py-2 rounded"
             style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
           >
-            <p className="text-xs uppercase tracking-wider mb-2" style={{ color: '#888888' }}>
-              {t('elo')}
-            </p>
-            <p className="text-4xl font-bold" style={{ color: '#c4a35a' }}>
-              {profile.elo}
-            </p>
+            <svg width="16" height="12" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.8 40.8 0 00-1.8 3.7 54 54 0 00-16.2 0A37.3 37.3 0 0025.4.3a.2.2 0 00-.2-.1 58.4 58.4 0 00-14.7 4.6.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.9 9.1.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.7.2.2 0 01 0-.4l1.1-.9a.2.2 0 01.2 0 42 42 0 0035.8 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.7.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.7 45.6v-.1c1.4-15-2.3-28-9.8-39.5a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7zm22.9 0c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7z" fill="#5865F2"/>
+            </svg>
+            <span className="text-xs" style={{ color: '#5865F2' }}>
+              {profile.discordUsername}
+            </span>
+          </div>
+        )}
+
+        {/* ELO Badge and Stats */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div
+            className="rounded-lg p-6 flex items-center justify-center"
+            style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          >
+            {leaguesEnabled ? (
+              <EloBadgeLarge elo={profile.elo} />
+            ) : (
+              <div className="text-center">
+                <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
+                  ELO
+                </p>
+                <p className="text-3xl font-bold" style={{ color: '#e0e0e0' }}>
+                  {profile.elo}
+                </p>
+              </div>
+            )}
           </div>
           <div
             className="rounded-lg p-6"
@@ -268,6 +324,19 @@ export default function ProfilePage({
                           {isPlayer1 ? game.eloChange : -game.eloChange}
                         </span>
                       )}
+                      {game.hasReplay && (
+                        <Link
+                          href={`/replay/${game.id}`}
+                          className="text-xs px-2 py-0.5 rounded"
+                          style={{
+                            backgroundColor: '#1a1a2e',
+                            color: '#4a9e4a',
+                            border: '1px solid #4a9e4a40',
+                          }}
+                        >
+                          {t('replay')}
+                        </Link>
+                      )}
                       {game.completedAt && (
                         <span className="text-xs" style={{ color: '#555555' }}>
                           {new Date(game.completedAt).toLocaleDateString()}
@@ -277,6 +346,25 @@ export default function ProfilePage({
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Load More */}
+          {hasMore && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => fetchProfile(currentPage + 1, true)}
+                disabled={loadingMore}
+                className="px-6 py-2 text-sm rounded cursor-pointer"
+                style={{
+                  backgroundColor: '#141414',
+                  border: '1px solid #262626',
+                  color: '#888888',
+                  opacity: loadingMore ? 0.5 : 1,
+                }}
+              >
+                {loadingMore ? tc('loading') : t('loadMore')}
+              </button>
             </div>
           )}
         </div>
