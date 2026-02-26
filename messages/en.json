@@ -15,7 +15,9 @@
     "createdBy": "Created by",
     "previous": "Previous",
     "next": "Next",
-    "page": "Page"
+    "page": "Page",
+    "rotateDevice": "Rotate your device to landscape mode to play",
+    "fullscreen": "Fullscreen"
   },
   "home": {
     "title": "NARUTO MYTHOS",

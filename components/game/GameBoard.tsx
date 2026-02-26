@@ -439,6 +439,7 @@ function CardPreviewContent({
 // ----- Card Preview Panel (fixed right-side) -----
 
 function CardPreview() {
+  const dims = useGameScale();
   const previewCard = useUIStore((s) => s.previewCard);
   const previewMissionContext = useUIStore((s) => s.previewMissionContext);
   const pinnedCard = useUIStore((s) => s.pinnedCard);
@@ -448,7 +449,8 @@ function CardPreview() {
   const displayMissionContext = pinnedCard ? pinnedMissionContext : previewMissionContext;
   const isPinned = !!pinnedCard;
 
-  if (!displayCard) return null;
+  // Hide the side panel on mobile — users can still tap cards for fullscreen detail
+  if (!displayCard || dims.isMobile) return null;
 
   return (
     <AnimatePresence>

@@ -44,6 +44,8 @@ const BASE = {
 export interface GameDimensions {
   scale: number;
   isCompact: boolean;
+  /** True on phone-sized landscape screens (vh < 500) */
+  isMobile: boolean;
   // Card sizes
   handCard: { w: number; h: number };
   missionCard: { w: number; h: number };
@@ -82,34 +84,47 @@ export interface GameDimensions {
 
 function computeScale(vw: number, vh: number): number {
   const raw = Math.min(vw / 1400, vh / 900);
-  return Math.max(0.55, Math.min(raw, 1.0));
+  // On phones (vh < 500), allow scaling down to 0.38 for a better fit
+  const minScale = vh < 500 ? 0.38 : 0.55;
+  return Math.max(minScale, Math.min(raw, 1.0));
 }
 
 function s(base: number, scale: number): number {
   return Math.round(base * scale);
 }
 
-function buildDimensions(scale: number): GameDimensions {
+function buildDimensions(scale: number, vw: number, vh: number): GameDimensions {
+  const isMobile = vh < 500;
+
+  // On mobile, use tighter spacing and smaller lane widths
+  const emptyLaneMinW = isMobile ? Math.round(120 * scale) : s(BASE.emptyLaneMinW, scale);
+  const emptyLaneMaxW = isMobile ? Math.round(180 * scale) : s(BASE.emptyLaneMaxW, scale);
+  const missionMaxW = isMobile ? Math.round(110 * scale) : s(BASE.missionMaxW, scale);
+  const sidePileW = isMobile ? Math.round(50 * scale) : s(BASE.sidePileW, scale);
+  const handMinW = isMobile ? Math.round(280 * scale) : s(BASE.handMinW, scale);
+  const opponentMinW = isMobile ? Math.round(180 * scale) : s(BASE.opponentMinW, scale);
+
   return {
     scale,
     isCompact: scale < 0.8,
+    isMobile,
     handCard: { w: s(BASE.handCardW, scale), h: s(BASE.handCardH, scale) },
     missionCard: { w: s(BASE.missionCardW, scale), h: s(BASE.missionCardH, scale) },
     sideCard: { w: s(BASE.sideCardW, scale), h: s(BASE.sideCardH, scale) },
     opponentCard: { w: s(BASE.opponentCardW, scale), h: s(BASE.opponentCardH, scale) },
     opponentHandH: s(BASE.opponentHandH, scale),
     playerHandH: s(BASE.playerHandH, scale),
-    sidePileW: s(BASE.sidePileW, scale),
+    sidePileW,
     handFanSpacing: s(BASE.handFanSpacing, scale),
     handFanArc: s(BASE.handFanArc, scale),
     handContainerH: s(BASE.handContainerH, scale),
-    handMinW: s(BASE.handMinW, scale),
+    handMinW,
     opponentFanSpacing: s(BASE.opponentFanSpacing, scale),
     opponentContainerH: s(BASE.opponentContainerH, scale),
-    opponentMinW: s(BASE.opponentMinW, scale),
-    missionMaxW: s(BASE.missionMaxW, scale),
-    emptyLaneMinW: s(BASE.emptyLaneMinW, scale),
-    emptyLaneMaxW: s(BASE.emptyLaneMaxW, scale),
+    opponentMinW,
+    missionMaxW,
+    emptyLaneMinW,
+    emptyLaneMaxW,
     animHand: { w: s(BASE.animHandW, scale), h: s(BASE.animHandH, scale) },
     animBoard: { w: s(BASE.animBoardW, scale), h: s(BASE.animBoardH, scale) },
     animDeck: { w: s(BASE.animDeckW, scale), h: s(BASE.animDeckH, scale) },
@@ -156,14 +171,14 @@ function getServerSnapshot() {
 
 // ── Context ────────────────────────────────────────────────────────
 
-const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.0));
+const GameScaleContext = createContext<GameDimensions>(buildDimensions(1.0, 1400, 900));
 
 export function GameScaleProvider({ children }: { children: React.ReactNode }) {
   const sizeKey = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const dims = useMemo(() => {
     const [w, h] = sizeKey.split('x').map(Number);
-    return buildDimensions(computeScale(w, h));
+    return buildDimensions(computeScale(w, h), w, h);
   }, [sizeKey]);
 
   return (
