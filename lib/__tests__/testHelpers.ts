@@ -71,6 +71,7 @@ export function mockCharInPlay(
     instanceId: overrides.instanceId ?? generateInstanceId(),
     card,
     isHidden: overrides.isHidden ?? false,
+    wasRevealedAtLeastOnce: overrides.wasRevealedAtLeastOnce ?? !(overrides.isHidden ?? false),
     powerTokens: overrides.powerTokens ?? 0,
     stack: overrides.stack ?? [card],
     controlledBy: overrides.controlledBy ?? 'player1',

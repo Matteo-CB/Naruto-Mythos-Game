@@ -271,9 +271,77 @@ export function handleRockLee117Move(
 }
 
 /**
+ * Akamaru 028 (UC): At end of round, the player may OPTIONALLY return this card to their hand.
+ * Creates pending actions for each Akamaru 028 in play (non-hidden).
+ * Uses state.endPhaseAkamaru028Ids to track which have been processed.
+ */
+export function handleAkamaru028Return(state: GameState): GameState {
+  let newState = { ...state };
+  const alreadyProcessed = new Set<string>(newState.endPhaseAkamaru028Ids ?? []);
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const mission = newState.activeMissions[mIdx];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      const chars = mission[side];
+
+      for (const char of chars) {
+        if (alreadyProcessed.has(char.instanceId)) continue;
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.number !== 28) continue;
+
+        // Check for the continuous end-of-round return effect
+        const hasReturnEffect = (topCard.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+        );
+        if (!hasReturnEffect) continue;
+
+        alreadyProcessed.add(char.instanceId);
+        newState.endPhaseAkamaru028Ids = [...alreadyProcessed];
+
+        const effectId = `akamaru028-return-${char.instanceId}`;
+        const actionId = `akamaru028-return-action-${char.instanceId}`;
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId,
+          sourceCardId: topCard.id,
+          sourceInstanceId: char.instanceId,
+          sourceMissionIndex: mIdx,
+          effectType: 'MAIN' as const,
+          effectDescription: `Akamaru (028): You may return this character to your hand.`,
+          targetSelectionType: 'AKAMARU028_RETURN_TO_HAND',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: [char.instanceId],
+          isOptional: true,
+          isMandatory: false,
+          resolved: false,
+          isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: actionId,
+          type: 'SELECT_TARGET',
+          player,
+          description: `Akamaru (028): Return this character to your hand?`,
+          descriptionKey: 'game.effect.desc.akamaru028ReturnToHand',
+          options: [char.instanceId],
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId,
+        }];
+        // Return immediately — wait for player to choose (or decline)
+        return newState;
+      }
+    }
+  }
+
+  return newState;
+}
+
+/**
  * Remove a character from play and return to owner's hand.
  */
-function returnCharacterToHand(state: GameState, instanceId: string, player: PlayerID): GameState {
+export function returnCharacterToHand(state: GameState, instanceId: string, player: PlayerID): GameState {
   const newState = { ...state };
   const missions = [...newState.activeMissions];
 

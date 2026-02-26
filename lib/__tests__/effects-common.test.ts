@@ -664,7 +664,7 @@ describe('057/130 - Jirobo', () => {
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
     const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
-    expect(updated?.powerTokens).toBe(0); // jirobo is hidden, so 0 Sound Four missions
+    expect(updated?.powerTokens).toBe(1); // hidden Sound Four still counts for mission presence
   });
 });
 

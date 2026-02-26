@@ -383,6 +383,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
+          // Opponent's hand cards shown as face-down (card backs)
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            return {
+              index: idx,
+              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
+            };
+          });
         } else {
           const playerHand = visibleState.myState.hand;
           handCards = pendingAction.options.map((indexStr) => {
@@ -784,6 +793,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            return {
+              index: idx,
+              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
+            };
+          });
         } else {
           const playerHand = newState[humanPlayer].hand;
           handCards = pendingAction.options.map((indexStr) => {
@@ -1183,6 +1200,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            return {
+              index: idx,
+              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
+            };
+          });
         } else {
           const playerHand = currentState[humanPlayer].hand;
           handCards = pendingAction.options.map((indexStr) => {
@@ -1313,13 +1338,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   addAnimation: (event) => {
     const id = `anim-${++animationIdCounter}`;
+    const now = Date.now();
     const animEvent: AnimationEvent = {
       ...event,
       id,
-      timestamp: Date.now(),
+      timestamp: now,
     };
     set((state) => ({
-      animationQueue: [...state.animationQueue, animEvent],
+      // Prune old events (>10s) to prevent unbounded queue growth
+      animationQueue: [
+        ...state.animationQueue.filter((a) => now - a.timestamp < 10_000),
+        animEvent,
+      ],
     }));
   },
 

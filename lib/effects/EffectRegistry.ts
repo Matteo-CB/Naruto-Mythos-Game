@@ -76,24 +76,12 @@ export function getRegisteredCardIds(): string[] {
 }
 
 // =============================================================
-// Import and register all handlers
+// Import and register all handlers from all sets
 // =============================================================
-import { registerAllCommonHandlers } from './handlers/common/index';
-import { registerAllUncommonHandlers } from './handlers/uncommon/index';
-import { registerAllRareHandlers } from './handlers/rare/index';
-import { registerAllSecretHandlers } from './handlers/secret/index';
-import { registerAllMythosHandlers } from './handlers/mythos/index';
-import { registerAllMissionHandlers } from './handlers/missions/index';
-import { registerAllLegendaryHandlers } from './handlers/legendary/index';
+import { registerAllSetHandlers } from './handlers/index';
 
 export function initializeRegistry(): void {
-  registerAllCommonHandlers();
-  registerAllUncommonHandlers();
-  registerAllRareHandlers();
-  registerAllSecretHandlers();
-  registerAllMythosHandlers();
-  registerAllMissionHandlers();
-  registerAllLegendaryHandlers();
+  registerAllSetHandlers();
 }
 
 // Auto-initialize on import

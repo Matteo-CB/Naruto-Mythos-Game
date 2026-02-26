@@ -1,0 +1,6443 @@
+{
+  "cards": {
+    "KS-001-C": {
+      "id": "KS-001-C",
+      "rarity": "C",
+      "number": "001",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HIRUZEN SARUTOBI",
+      "name_fr": "HIRUZEN SARUTOBI",
+      "title_fr": "Le Professeur",
+      "title_en": "The Professor",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 2 another friendly Leaf Village character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-001-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-001-C.webp",
+      "data_complete": true,
+      "old_id": "001/130"
+    },
+    "KS-002-UC": {
+      "id": "KS-002-UC",
+      "rarity": "UC",
+      "number": "002",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HIRUZEN SARUTOBI",
+      "name_fr": "HIRUZEN SARUTOBI",
+      "title_fr": "Troisième Hokage",
+      "title_en": "Third Hokage",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Leaf Village character anywhere paying 1 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 2 the character played with the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-002-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-002-UC.webp",
+      "data_complete": true,
+      "old_id": "002/130"
+    },
+    "KS-003-C": {
+      "id": "KS-003-C",
+      "rarity": "C",
+      "number": "003",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Maître Ninja Médical",
+      "title_en": "Master Medical Ninja",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When any friendly character is defeated, gain 2 Chakra.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-003-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-003-C.webp",
+      "data_complete": true,
+      "old_id": "003/130"
+    },
+    "KS-004-UC": {
+      "id": "KS-004-UC",
+      "rarity": "UC",
+      "number": "004",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "La Création et le Renouveau",
+      "title_en": "Mitotic Regeneration",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": ["Sannin", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Defeated friendly characters go into your hand instead of your discard pile.",
+          "description_fr": "[⧗] Les personnages amis vaincus vont dans votre main au lieu de votre pile de défausse."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Choose one character in your discard pile and put them into your hand.",
+          "description_fr": "Choisissez un personnage dans votre défausse et ajoutez-le à votre main."
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-004-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-004-UC.webp",
+      "data_complete": true,
+      "old_id": "004/130"
+    },
+    "KS-005-C": {
+      "id": "KS-005-C",
+      "rarity": "C",
+      "number": "005",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIZUNE",
+      "name_fr": "SHIZUNE",
+      "title_fr": "Assistante de Tsunade",
+      "title_en": "Tsunade's Assistant",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 1,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Chakra + 1",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-005-C.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/common/KS-005-C.webp",
+      "data_complete": true,
+      "old_id": "005/130"
+    },
+    "KS-006-UC": {
+      "id": "KS-006-UC",
+      "rarity": "UC",
+      "number": "006",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIZUNE",
+      "name_fr": "SHIZUNE",
+      "title_fr": "Tir d'Aiguilles préparé",
+      "title_en": "Prepared Needle Shot",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move an enemy character with Power 3 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Gain 2 Chakra.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-006-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-006-UC.webp",
+      "data_complete": true,
+      "old_id": "006/130"
+    },
+    "KS-007-C": {
+      "id": "KS-007-C",
+      "rarity": "C",
+      "number": "007",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Ermite des Crapauds",
+      "title_en": "Toad Sage",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 1 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-007-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-007-C.webp",
+      "data_complete": true,
+      "old_id": "007/130"
+    },
+    "KS-008-UC": {
+      "id": "KS-008-UC",
+      "rarity": "UC",
+      "number": "008",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Doton, Les Marécages des Limbes",
+      "title_en": "Earth Style: Swamp of the Underworld",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 2 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide an enemy character with cost 3 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-008-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-008-UC.webp",
+      "data_complete": true,
+      "old_id": "008/130"
+    },
+    "KS-009-C": {
+      "id": "KS-009-C",
+      "rarity": "C",
+      "number": "009",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Genin du Village de la Feuille",
+      "title_en": "Leaf Village Genin",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [],
+      "image_url": "/images/cards/KS/common/KS-009-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-009-C.webp",
+      "data_complete": true,
+      "old_id": "009/130"
+    },
+    "KS-010-C": {
+      "id": "KS-010-C",
+      "rarity": "C",
+      "number": "010",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Permutation",
+      "title_en": "Substitution Jutsu",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move this character from this mission",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-010-C.webp",
+      "rarity_display": "C",
+      "image_file": "images/cards/KS/common/KS-010-C.webp",
+      "data_complete": true,
+      "old_id": "010/130"
+    },
+    "KS-011-C": {
+      "id": "KS-011-C",
+      "rarity": "C",
+      "number": "011",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Genin de l'Équipe 7",
+      "title_en": "Team 7 Genin",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there's another Team 7 character in this mission, draw a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-011-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-011-C.webp",
+      "data_complete": true,
+      "old_id": "011/130"
+    },
+    "KS-012-UC": {
+      "id": "KS-012-UC",
+      "rarity": "UC",
+      "number": "012",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Maîtrise du Chakra",
+      "title_en": "Chakra Mastery",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] CHAKRA +1.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Draw 1 card. If you do so, you must discard 1 card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-012-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-012-UC.webp",
+      "data_complete": true,
+      "old_id": "012/130"
+    },
+    "KS-013-C": {
+      "id": "KS-013-C",
+      "rarity": "C",
+      "number": "013",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Dernier du Clan Uchiwa",
+      "title_en": "Last of the Uchiha Clan",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has -1 Power for every other non-hidden friendly character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-013-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-013-C.webp",
+      "data_complete": true,
+      "old_id": "013/130"
+    },
+    "KS-014-UC": {
+      "id": "KS-014-UC",
+      "rarity": "UC",
+      "number": "014",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Sharingan",
+      "title_en": "Sharingan",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 4,
+      "keywords": [
+        "Team 7",
+        "Kekkei Genkai"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Look at the opponent's hand.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "AMBUSH effect: In addition, discard 1 card. If you do so, choose 1 card in the opponent's hand and discard it.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-014-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-014-UC.webp",
+      "data_complete": true,
+      "old_id": "014/130"
+    },
+    "KS-015-C": {
+      "id": "KS-015-C",
+      "rarity": "C",
+      "number": "015",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Sensei de l'Équipe 7",
+      "title_en": "Team 7 Sensei",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Other Team 7 characters in this mission have +1 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-015-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-015-C.webp",
+      "data_complete": true,
+      "old_id": "015/130"
+    },
+    "KS-016-UC": {
+      "id": "KS-016-UC",
+      "rarity": "UC",
+      "number": "016",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Sharingan",
+      "title_en": "Sharingan",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Copy a non-upgrade instant effect ([↯]) of an enemy character with cost 4 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, there's no cost limit.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-016-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-016-UC.webp",
+      "data_complete": true,
+      "old_id": "016/130"
+    },
+    "KS-017-C": {
+      "id": "KS-017-C",
+      "rarity": "C",
+      "number": "017",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "title_fr": "Décuplement",
+      "title_en": "Expansion Jutsu",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Powerup 3",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-017-C.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/common/KS-017-C.webp",
+      "data_complete": true,
+      "old_id": "017/130"
+    },
+    "KS-018-UC": {
+      "id": "KS-018-UC",
+      "rarity": "UC",
+      "number": "018",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "title_fr": "Le Boulet Humain",
+      "title_en": "Human Boulder",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] After you move this character, hide an enemy character in this mission with less Power than this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-018-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-018-UC.webp",
+      "data_complete": true,
+      "old_id": "018/130"
+    },
+    "KS-019-C": {
+      "id": "KS-019-C",
+      "rarity": "C",
+      "number": "019",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "title_fr": "Genin de l'Équipe 10",
+      "title_en": "Team 10 Genin",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there's another Team 10 character in this mission, POWERUP 1.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-019-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-019-C.webp",
+      "data_complete": true,
+      "old_id": "019/130"
+    },
+    "KS-020-UC": {
+      "id": "KS-020-UC",
+      "rarity": "UC",
+      "number": "020",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "title_fr": "Transposition",
+      "title_en": "Transposition",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 0,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Take control of an enemy character with cost 2 or less in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, the cost limit is 3 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-020-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-020-UC.webp",
+      "data_complete": true,
+      "old_id": "020/130"
+    },
+    "KS-021-C": {
+      "id": "KS-021-C",
+      "rarity": "C",
+      "number": "021",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "title_fr": "Genin de l'Équipe 10",
+      "title_en": "Team 10 Genin",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 0,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If you have the Edge, draw a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-021-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-021-C.webp",
+      "data_complete": true,
+      "old_id": "021/130"
+    },
+    "KS-022-UC": {
+      "id": "KS-022-UC",
+      "rarity": "UC",
+      "number": "022",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "title_fr": "Manipulation des Ombres",
+      "title_en": "Shadow Possession",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move an enemy character played during the opponent's previous turn.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-022-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-022-UC.webp",
+      "data_complete": true,
+      "old_id": "022/130"
+    },
+    "KS-023-C": {
+      "id": "KS-023-C",
+      "rarity": "C",
+      "number": "023",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ASUMA SARUTOBI",
+      "name_fr": "ASUMA SARUTOBI",
+      "title_fr": "Sensei de l'Équipe 10",
+      "title_en": "Team 10 Sensei",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move another Team 10 character from this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-023-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-023-C.webp",
+      "data_complete": true,
+      "old_id": "023/130"
+    },
+    "KS-024-UC": {
+      "id": "KS-024-UC",
+      "rarity": "UC",
+      "number": "024",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ASUMA SARUTOBI",
+      "name_fr": "ASUMA SARUTOBI",
+      "title_fr": "Lame de Chakra",
+      "title_en": "Chakra Blade",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Draw a card. Then, discard a card to POWERUP 3.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-024-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-024-UC.webp",
+      "data_complete": true,
+      "old_id": "024/130"
+    },
+    "KS-025-C": {
+      "id": "KS-025-C",
+      "rarity": "C",
+      "number": "025",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "title_fr": "Genin de l'Équipe 8",
+      "title_en": "Team 8 Genin",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1 .",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-025-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-025-C.webp",
+      "data_complete": true,
+      "old_id": "025/130"
+    },
+    "KS-026-UC": {
+      "id": "KS-026-UC",
+      "rarity": "UC",
+      "number": "026",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "title_fr": "Ninpô ! La Danse du Chien !",
+      "title_en": "Ninja Art: Beast Mimicry!",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide the non-hidden enemy character with the lowest cost in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Look at the 3 top cards of your deck, reveal and draw any [u]Akamaru[/u] characters, then put back the other cards.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-026-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-026-UC.webp",
+      "data_complete": true,
+      "old_id": "026/130"
+    },
+    "KS-027-C": {
+      "id": "KS-027-C",
+      "rarity": "C",
+      "number": "027",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "AKAMARU",
+      "name_fr": "AKAMARU",
+      "title_fr": "Chien Ninja",
+      "title_en": "Ninja Hound",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there isn't a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-027-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-027-C.webp",
+      "data_complete": true,
+      "old_id": "027/130"
+    },
+    "KS-028-UC": {
+      "id": "KS-028-UC",
+      "rarity": "UC",
+      "number": "028",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "AKAMARU",
+      "name_fr": "AKAMARU",
+      "title_fr": "Les Hommes-Bêtes Enragés",
+      "title_en": "Raging Man-Beast",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you may return this card to your hand.",
+          "description_fr": ""
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] POWERUP 2 a friendly [u]Kiba Inuzuka[/u] in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-028-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-028-UC.webp",
+      "data_complete": true,
+      "old_id": "028/130"
+    },
+    "KS-029-UC": {
+      "id": "KS-029-UC",
+      "rarity": "UC",
+      "number": "029",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "AKAMARU",
+      "name_fr": "AKAMARU",
+      "title_fr": "Le Loup Bicéphale",
+      "title_en": "Two-Headed Wolf",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Kiba Inuzuka.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide the non-hidden enemy character with the lowest cost in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-029-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-029-UC.webp",
+      "data_complete": true,
+      "old_id": "029/130"
+    },
+    "KS-030-C": {
+      "id": "KS-030-C",
+      "rarity": "C",
+      "number": "030",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Poing Souple",
+      "title_en": "Gentle Fist",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team 8",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Remove up to 2 Power tokens from an enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-030-C.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/common/KS-030-C.webp",
+      "data_complete": true,
+      "old_id": "030/130"
+    },
+    "KS-031-UC": {
+      "id": "KS-031-UC",
+      "rarity": "UC",
+      "number": "031",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Byakugan",
+      "title_en": "Byakugan",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Team 8",
+        "Kekkei Genkai"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a non-hidden enemy character is played in this mission, gain 1 Chakra.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-031-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-031-UC.webp",
+      "data_complete": true,
+      "old_id": "031/130"
+    },
+    "KS-032-C": {
+      "id": "KS-032-C",
+      "rarity": "C",
+      "number": "032",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "title_fr": "Insectes Destructeurs",
+      "title_en": "Destruction Bugs",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Each player draws a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-032-C.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/common/KS-032-C.webp",
+      "data_complete": true,
+      "old_id": "032/130"
+    },
+    "KS-033-UC": {
+      "id": "KS-033-UC",
+      "rarity": "UC",
+      "number": "033",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "title_fr": "Des clones faits d'insectes",
+      "title_en": "Bug Clone Technique",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Play this character paying 4 less if there is an enemy Jutsu character in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-033-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-033-UC.webp",
+      "data_complete": true,
+      "old_id": "033/130"
+    },
+    "KS-034-C": {
+      "id": "KS-034-C",
+      "rarity": "C",
+      "number": "034",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KURENAI YUHI",
+      "name_fr": "KURENAI YUHI",
+      "title_fr": "Sensei de l'Équipe 8",
+      "title_en": "Team 8 Sensei",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Other Team 8 characters costs 1 less (min.1) to play in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-034-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-034-C.webp",
+      "data_complete": true,
+      "old_id": "034/130"
+    },
+    "KS-035-UC": {
+      "id": "KS-035-UC",
+      "rarity": "UC",
+      "number": "035",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KURENAI YUHI",
+      "name_fr": "KURENAI YUHI",
+      "title_fr": "Lien de l'Arbre : Mort",
+      "title_en": "Sawarabi no Mai: Bracken Dance",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Enemy characters cannot move from this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-035-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-035-UC.webp",
+      "data_complete": true,
+      "old_id": "035/130"
+    },
+    "KS-036-C": {
+      "id": "KS-036-C",
+      "rarity": "C",
+      "number": "036",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "title_fr": "Poing Souple",
+      "title_en": "Gentle Fist",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Remove up to 2 Power tokens from an enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-036-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-036-C.webp",
+      "data_complete": true,
+      "old_id": "036/130"
+    },
+    "KS-037-UC": {
+      "id": "KS-037-UC",
+      "rarity": "UC",
+      "number": "037",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "title_fr": "Le « Tourbillon Divin » du Hakke",
+      "title_en": "Eight Trigrams Rotation",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a non-hidden enemy character is played in this mission, POWERUP 1.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Remove all Power tokens from an enemy character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-037-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-037-UC.webp",
+      "data_complete": true,
+      "old_id": "037/130"
+    },
+    "KS-038-C": {
+      "id": "KS-038-C",
+      "rarity": "C",
+      "number": "038",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Entraînement au Poing violent",
+      "title_en": "Strong Fist Training",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Powerup 1",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-038-C.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/common/KS-038-C.webp",
+      "data_complete": true,
+      "old_id": "038/130"
+    },
+    "KS-039-UC": {
+      "id": "KS-039-UC",
+      "rarity": "UC",
+      "number": "039",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "La Fleur du Lotus Recto",
+      "title_en": "Primary Lotus",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 2.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-039-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-039-UC.webp",
+      "data_complete": true,
+      "old_id": "039/130"
+    },
+    "KS-040-C": {
+      "id": "KS-040-C",
+      "rarity": "C",
+      "number": "040",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "title_fr": "Genin de l'Équipe Gaï",
+      "title_en": "Team Guy Genin",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character only in a mission where you are currently winning.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-040-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-040-C.webp",
+      "data_complete": true,
+      "old_id": "040/130"
+    },
+    "KS-041-UC": {
+      "id": "KS-041-UC",
+      "rarity": "UC",
+      "number": "041",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "title_fr": "Spécialiste des armes",
+      "title_en": "Weapons Specialist",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat a hidden character in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 1 another Leaf Village character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-041-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-041-UC.webp",
+      "data_complete": true,
+      "old_id": "041/130"
+    },
+    "KS-042-C": {
+      "id": "KS-042-C",
+      "rarity": "C",
+      "number": "042",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "MIGHT GUY",
+      "name_fr": "GAÏ MAITO",
+      "title_fr": "Sensei de l'Équipe Gaï",
+      "title_en": "Team Guy Sensei",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Guy"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Other Team Guy characters in this mission have +1 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-042-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-042-C.webp",
+      "data_complete": true,
+      "old_id": "042/130"
+    },
+    "KS-043-UC": {
+      "id": "KS-043-UC",
+      "rarity": "UC",
+      "number": "043",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "MIGHT GUY",
+      "name_fr": "GAÏ MAITO",
+      "title_fr": "Poing Fort",
+      "title_en": "Cherry Blossom Impact",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character doesn't lose Power tokens at the end of the round.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 3.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-043-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-043-UC.webp",
+      "data_complete": true,
+      "old_id": "043/130"
+    },
+    "KS-044-C": {
+      "id": "KS-044-C",
+      "rarity": "C",
+      "number": "044",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ANKO MITARASHI",
+      "name_fr": "ANKO MITARASHI",
+      "title_fr": "Surveillant des examens Chunin",
+      "title_en": "Chunin Exam Proctor",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have at least one other friendly Leaf Village character in this mission, CHAKRA +1.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-044-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-044-C.webp",
+      "data_complete": true,
+      "old_id": "044/130"
+    },
+    "KS-045-UC": {
+      "id": "KS-045-UC",
+      "rarity": "UC",
+      "number": "045",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ANKO MITARASHI",
+      "name_fr": "ANKO MITARASHI",
+      "title_fr": "La Poigne du Serpent Spectral",
+      "title_en": "Shadow Snake Hands",
+      "has_visual": false,
+      "chakra": 3,
+      "power": 4,
+      "keywords": ["Special Jonin", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Defeat a hidden enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Uncommon",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "045/130"
+    },
+    "KS-046-C": {
+      "id": "KS-046-C",
+      "rarity": "C",
+      "number": "046",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "EBISU",
+      "name_fr": "EBISU",
+      "title_fr": "Entraîneur d'Élite",
+      "title_en": "Elite Trainer",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there is a friendly non-hidden character with less Power than this character in this mission, draw a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-046-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-046-C.webp",
+      "data_complete": true,
+      "old_id": "046/130"
+    },
+    "KS-047-C": {
+      "id": "KS-047-C",
+      "rarity": "C",
+      "number": "047",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "IRUKA UMINO",
+      "name_fr": "IRUKA UMINO",
+      "title_fr": "Instructeur de l'Académie",
+      "title_en": "Academy Instructor",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move a [u]Naruto Uzumaki[/u] character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-047-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-047-C.webp",
+      "data_complete": true,
+      "old_id": "047/130"
+    },
+    "KS-048-C": {
+      "id": "KS-048-C",
+      "rarity": "C",
+      "number": "048",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HAYATE GEKKO",
+      "name_fr": "HAYATE GEKKO",
+      "title_fr": "Shinobi talentueux",
+      "title_en": "Talented Shinobi",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If this character would be defeated, hide it instead.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-048-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-048-C.webp",
+      "data_complete": true,
+      "old_id": "048/130"
+    },
+    "KS-049-C": {
+      "id": "KS-049-C",
+      "rarity": "C",
+      "number": "049",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GENMA SHIRANUI",
+      "name_fr": "GEMMA SHIRANUI",
+      "title_fr": "Garde d'Élite",
+      "title_en": "Elite Guard",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Special Jonin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If a friendly Leaf Village character in this mission would be hidden or defeated by enemy effects, you can defeat this character instead.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-049-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-049-C.webp",
+      "data_complete": true,
+      "old_id": "049/130"
+    },
+    "KS-050-C": {
+      "id": "KS-050-C",
+      "rarity": "C",
+      "number": "050",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Infiltré",
+      "title_en": "Infiltrator",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sannin",
+        "Sound Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Look at a hidden enemy character in this mission. If it costs 3 or less, take control of that character and move it to your side.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-050-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-050-C.webp",
+      "data_complete": true,
+      "old_id": "050/130"
+    },
+    "KS-051-UC": {
+      "id": "KS-051-UC",
+      "rarity": "UC",
+      "number": "051",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Style d'Orochimaru : Permutation",
+      "title_en": "Orochimaru Style: Substitution",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you lost this mission during the Mission Evaluation phase, move this character to another mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat a hidden enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-051-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-051-UC.webp",
+      "data_complete": true,
+      "old_id": "051/130"
+    },
+    "KS-052-C": {
+      "id": "KS-052-C",
+      "rarity": "C",
+      "number": "052",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KABUTO YAKUSHI",
+      "name_fr": "KABUTO YAKUSHI",
+      "title_fr": "La taupe",
+      "title_en": "The Mole",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": ["Sound Village"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Draw the top card of the opponent's deck and put it hidden in any mission under your control.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-052-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-052-C.webp",
+      "data_complete": true,
+      "old_id": "052/130"
+    },
+    "KS-053-UC": {
+      "id": "KS-053-UC",
+      "rarity": "UC",
+      "number": "053",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KABUTO YAKUSHI",
+      "name_fr": "KABUTO YAKUSHI",
+      "title_fr": "Destruction des blessures de guérison yin",
+      "title_en": "Yin Healing Wound Destruction",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Draw a card.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Play a character from your discard pile anywhere paying 3 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-053-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-053-UC.webp",
+      "data_complete": true,
+      "old_id": "053/130"
+    },
+    "KS-054-UC": {
+      "id": "KS-054-UC",
+      "rarity": "UC",
+      "number": "054",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KABUTO YAKUSHI",
+      "name_fr": "KABUTO YAKUSHI",
+      "title_fr": "Technique du Temple Nirvana",
+      "title_en": "Temple of Nirvana Technique",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 1.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Hide all non-hidden enemy characters in this mission with less Power than this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-054-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-054-UC.webp",
+      "data_complete": true,
+      "old_id": "054/130"
+    },
+    "KS-055-C": {
+      "id": "KS-055-C",
+      "rarity": "C",
+      "number": "055",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "title_fr": "La Danse du Camélia",
+      "title_en": "Dance of the Camellia",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Weapon"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Discard a card to hide a character in play with cost 3 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-055-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-055-C.webp",
+      "data_complete": true,
+      "old_id": "055/130"
+    },
+    "KS-056-UC": {
+      "id": "KS-056-UC",
+      "rarity": "UC",
+      "number": "056",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "title_fr": "La Danse du Mélèze",
+      "title_en": "Dance of the Larch",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 6,
+      "keywords": [
+        "Kekkei Genkai"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If this character is affected by an enemy effect, the opponent must pay 1 Chakra, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard a card to hide a character in play with cost 4 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-056-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-056-UC.webp",
+      "data_complete": true,
+      "old_id": "056/130"
+    },
+    "KS-057-C": {
+      "id": "KS-057-C",
+      "rarity": "C",
+      "number": "057",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIROBO",
+      "name_fr": "JIRÔBÔ",
+      "title_fr": "Porteur de la Marque Maudite",
+      "title_en": "Curse Mark Bearer",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP X. X is the number of missions where you have at least one friendly Sound Four character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-057-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-057-C.webp",
+      "data_complete": true,
+      "old_id": "057/130"
+    },
+    "KS-058-UC": {
+      "id": "KS-058-UC",
+      "rarity": "UC",
+      "number": "058",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIROBO",
+      "name_fr": "JIRÔBÔ",
+      "title_fr": "La Geôle de Terre",
+      "title_en": "Earth Prison",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 1 to all other friendly Sound Four characters in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Apply the MAIN effect to Sound Four characters in the other missions.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-058-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-058-UC.webp",
+      "data_complete": true,
+      "old_id": "058/130"
+    },
+    "KS-059-C": {
+      "id": "KS-059-C",
+      "rarity": "C",
+      "number": "059",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "title_fr": "Porteur de la Marque Maudite",
+      "title_en": "Curse Mark Bearer",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move X friendly character(s). X is the number of missions where you have at least one friendly Sound Four character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-059-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-059-C.webp",
+      "data_complete": true,
+      "old_id": "059/130"
+    },
+    "KS-060-UC": {
+      "id": "KS-060-UC",
+      "rarity": "UC",
+      "number": "060",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "title_fr": "Déploiement de la Toile",
+      "title_en": "Spider Web Deploy",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move a character from this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat an enemy character with Power 1 or less in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-060-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-060-UC.webp",
+      "data_complete": true,
+      "old_id": "060/130"
+    },
+    "KS-061-C": {
+      "id": "KS-061-C",
+      "rarity": "C",
+      "number": "061",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "title_fr": "Porteur de la Marque Maudite",
+      "title_en": "Curse Mark Bearer",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Draw X card(s). X is the number of missions where you have at least one friendly Sound Four character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-061-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-061-C.webp",
+      "data_complete": true,
+      "old_id": "061/130"
+    },
+    "KS-062-UC": {
+      "id": "KS-062-UC",
+      "rarity": "UC",
+      "number": "062",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "title_fr": "Apposition des sceaux maléfiques",
+      "title_en": "Five Elements Seal",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Copy an instant effect ([↯]) of another friendly Sound Four character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-062-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-062-UC.webp",
+      "data_complete": true,
+      "old_id": "062/130"
+    },
+    "KS-063-UC": {
+      "id": "KS-063-UC",
+      "rarity": "UC",
+      "number": "063",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "UKON",
+      "name_fr": "UKON",
+      "title_fr": "Possession moléculaire",
+      "title_en": "Molecular Possession",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Sound Four",
+        "Kekkei Genkai"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over any Sound Village character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-063-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-063-UC.webp",
+      "data_complete": true,
+      "old_id": "063/130"
+    },
+    "KS-064-C": {
+      "id": "KS-064-C",
+      "rarity": "C",
+      "number": "064",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "title_fr": "Porteur de la Marque Maudite",
+      "title_en": "Curse Mark Bearer",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 1,
+      "keywords": [
+        "Sound Four"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] CHAKRA +X X is the number of missions where you have at least one friendly Sound Four character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-064-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-064-C.webp",
+      "data_complete": true,
+      "old_id": "064/130"
+    },
+    "KS-065-UC": {
+      "id": "KS-065-UC",
+      "rarity": "UC",
+      "number": "065",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "title_fr": "La Flûte Démoniaque",
+      "title_en": "Demonic Flute",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "POWERUP 2 a friendly Sound Village character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Look at the 3 top cards of your deck, reveal and draw any Summon characters, then put back the other cards.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-065-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-065-UC.webp",
+      "data_complete": true,
+      "old_id": "065/130"
+    },
+    "KS-066-UC": {
+      "id": "KS-066-UC",
+      "rarity": "UC",
+      "number": "066",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "DOKI",
+      "name_fr": "DOKI",
+      "title_fr": "Invocation",
+      "title_en": "Summoning",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If you have a Sound Four character in this mission, steal 1 Chakra from the opponent.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must take back this character in hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-066-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-066-UC.webp",
+      "data_complete": true,
+      "old_id": "066/130"
+    },
+    "KS-067-UC": {
+      "id": "KS-067-UC",
+      "rarity": "UC",
+      "number": "067",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "RASHOMON",
+      "name_fr": "REMPART",
+      "title_fr": "Invocation",
+      "title_en": "Summoning",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 0,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The strongest enemy character in this mission loses all Power tokens and has its Power set to 0.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-067-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-067-UC.webp",
+      "data_complete": true,
+      "old_id": "067/130"
+    },
+    "KS-068-C": {
+      "id": "KS-068-C",
+      "rarity": "C",
+      "number": "068",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "DOSU KINUTA",
+      "name_fr": "DOSU KINUTA",
+      "title_fr": "Ouïe Surhumaine",
+      "title_en": "Superhuman Hearing",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Sound Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Look at a hidden character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat a hidden character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-068-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-068-C.webp",
+      "data_complete": true,
+      "old_id": "068/130"
+    },
+    "KS-069-UC": {
+      "id": "KS-069-UC",
+      "rarity": "UC",
+      "number": "069",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "DOSU KINUTA",
+      "name_fr": "DOSU KINUTA",
+      "title_fr": "Haut-parleur à écho résonant",
+      "title_en": "Resonating Echo Speaker",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Sound Ninja",
+        "Weapon"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Look at a hidden character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Choose a hidden enemy character in play. Opponent must either play them paying 2 more, or defeat them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-069-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-069-UC.webp",
+      "data_complete": true,
+      "old_id": "069/130"
+    },
+    "KS-070-C": {
+      "id": "KS-070-C",
+      "rarity": "C",
+      "number": "070",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ZAKU ABUMI",
+      "name_fr": "ZAKU ABUMI",
+      "title_fr": "Shinobi trop confiant",
+      "title_en": "Overconfident Shinobi",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 4,
+      "keywords": [
+        "Sound Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Opponent gains 1 Chakra.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-070-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-070-C.webp",
+      "data_complete": true,
+      "old_id": "070/130"
+    },
+    "KS-071-UC": {
+      "id": "KS-071-UC",
+      "rarity": "UC",
+      "number": "071",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ZAKU ABUMI",
+      "name_fr": "ZAKU ABUMI",
+      "title_fr": "Ondes Cinglantes",
+      "title_en": "Slicing Sound Waves",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Sound Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If you have less non-hidden characters than the opponent in this mission, move an enemy character from this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 2.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-071-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-071-UC.webp",
+      "data_complete": true,
+      "old_id": "071/130"
+    },
+    "KS-072-C": {
+      "id": "KS-072-C",
+      "rarity": "C",
+      "number": "072",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIN TSUCHI",
+      "name_fr": "KIN TSUCHI",
+      "title_fr": "Kunoichi",
+      "title_en": "Kunoichi",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 3,
+      "keywords": [
+        "Sound Ninja"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Opponent draws a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-072-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-072-C.webp",
+      "data_complete": true,
+      "old_id": "072/130"
+    },
+    "KS-073-UC": {
+      "id": "KS-073-UC",
+      "rarity": "UC",
+      "number": "073",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIN TSUCHI",
+      "name_fr": "KIN TSUCHI",
+      "title_fr": "Clone du son de cloche",
+      "title_en": "Bell Sound Clone",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": ["Sound Ninja", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card to hide an enemy character with Power 4 or less.",
+          "description_fr": "Défaussez une carte pour cacher un personnage ennemi avec une Puissance de 4 ou moins."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Put the top card of your deck as a hidden character in this mission.",
+          "description_fr": "Placez la carte du dessus de votre deck comme personnage caché dans cette mission."
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-073-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-073-UC.webp",
+      "data_complete": true,
+      "old_id": "073/130"
+    },
+    "KS-074-C": {
+      "id": "KS-074-C",
+      "rarity": "C",
+      "number": "074",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Genin du Village du Sable",
+      "title_en": "Sand Village Genin",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP X where X is the number of friendly hidden characters in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-074-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-074-C.webp",
+      "data_complete": true,
+      "old_id": "074/130"
+    },
+    "KS-075-C": {
+      "id": "KS-075-C",
+      "rarity": "C",
+      "number": "075",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Bouclier de Sable",
+      "title_en": "Sand Shield",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If this character would be moved or defeated by enemy effects, instead hide them.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character while hidden paying 2 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-075-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-075-C.webp",
+      "data_complete": true,
+      "old_id": "075/130"
+    },
+    "KS-076-UC": {
+      "id": "KS-076-UC",
+      "rarity": "UC",
+      "number": "076",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ONE-TAIL",
+      "name_fr": "ICHIBI",
+      "title_fr": "Métamorphose Partielle",
+      "title_en": "Partial Transformation",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 9,
+      "keywords": ["Tailed Beast"],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Gaara.",
+          "description_fr": "[⧗] Vous pouvez jouer ce personnage comme une amélioration par-dessus Gaara."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis."
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-076-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-076-UC.webp",
+      "data_complete": true,
+      "old_id": "076/130"
+    },
+    "KS-077-C": {
+      "id": "KS-077-C",
+      "rarity": "C",
+      "number": "077",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "title_fr": "Fils de Chakra",
+      "title_en": "Chakra Threads",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there's at least one non-hidden enemy character in this mission, CHAKRA +1 .",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-077-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-077-C.webp",
+      "data_complete": true,
+      "old_id": "077/130"
+    },
+    "KS-078-UC": {
+      "id": "KS-078-UC",
+      "rarity": "UC",
+      "number": "078",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "title_fr": "Technique de Marionnettiste",
+      "title_en": "Puppet Master Jutsu",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move any character with Power 4 or less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Play a friendly character while hidden, paying 1 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-078-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-078-UC.webp",
+      "data_complete": true,
+      "old_id": "078/130"
+    },
+    "KS-079-C": {
+      "id": "KS-079-C",
+      "rarity": "C",
+      "number": "079",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "title_fr": "Kunoichi",
+      "title_en": "Kunoichi",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have the Edge, this character has +2 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-079-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-079-C.webp",
+      "data_complete": true,
+      "old_id": "079/130"
+    },
+    "KS-080-UC": {
+      "id": "KS-080-UC",
+      "rarity": "UC",
+      "number": "080",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "title_fr": "La Grande Lame du Vent",
+      "title_en": "Cyclone Scythe Jutsu",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move another friendly Sand Village character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-080-UC.webp",
+      "rarity_display": "Uncommon",
+      "image_file": "images/cards/KS/uncommon/KS-080-UC.webp",
+      "data_complete": true,
+      "old_id": "080/130"
+    },
+    "KS-081-C": {
+      "id": "KS-081-C",
+      "rarity": "C",
+      "number": "081",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "BAKI",
+      "name_fr": "BAKI",
+      "title_fr": "Agent du Conseil",
+      "title_en": "Council Agent",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 2,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Draw a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-081-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-081-C.webp",
+      "data_complete": true,
+      "old_id": "081/130"
+    },
+    "KS-082-UC": {
+      "id": "KS-082-UC",
+      "rarity": "UC",
+      "number": "082",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "BAKI",
+      "name_fr": "BAKI",
+      "title_fr": "Épée de vent",
+      "title_en": "Sword of Kusanagi",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Defeat a hidden enemy character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 1 on each friendly Sand Village character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-082-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-082-UC.webp",
+      "data_complete": true,
+      "old_id": "082/130"
+    },
+    "KS-083-UC": {
+      "id": "KS-083-UC",
+      "rarity": "UC",
+      "number": "083",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "RASA",
+      "name_fr": "RASA",
+      "title_fr": "Quatrième Kazekage",
+      "title_en": "Fourth Kazekage",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Gain 1 Mission point if there's another friendly Sand Village character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-083-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-083-UC.webp",
+      "data_complete": true,
+      "old_id": "083/130"
+    },
+    "KS-084-C": {
+      "id": "KS-084-C",
+      "rarity": "C",
+      "number": "084",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "YASHAMARU",
+      "name_fr": "YASHAMARU",
+      "title_fr": "Tuteur de Gaara",
+      "title_en": "Gaara's Guardian",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 1,
+      "keywords": [],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] This character has +2 Power if there's a friendly [u]Gaara[/u] in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-084-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-084-C.webp",
+      "data_complete": true,
+      "old_id": "084/130"
+    },
+    "KS-085-UC": {
+      "id": "KS-085-UC",
+      "rarity": "UC",
+      "number": "085",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "YASHAMARU",
+      "name_fr": "YASHAMARU",
+      "title_fr": "Mission Sacrificielle",
+      "title_en": "Sacrificial Mission",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Defeat this character. If you do so, defeat another character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-085-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-085-UC.webp",
+      "data_complete": true,
+      "old_id": "085/130"
+    },
+    "KS-086-C": {
+      "id": "KS-086-C",
+      "rarity": "C",
+      "number": "086",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_fr": "ZABUZA MOMOCHI",
+      "title_fr": "Tranchoir",
+      "title_en": "Wind Blade",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Independent",
+      "effects": [],
+      "image_url": "/images/cards/KS/common/KS-086-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-086-C.webp",
+      "data_complete": true,
+      "old_id": "086/130"
+    },
+    "KS-087-UC": {
+      "id": "KS-087-UC",
+      "rarity": "UC",
+      "number": "087",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_fr": "ZABUZA MOMOCHI",
+      "title_fr": "Prison Aqueuse",
+      "title_en": "Water Prison",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there's only one non-hidden enemy character in this mission, hide them.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-087-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-087-UC.webp",
+      "data_complete": true,
+      "old_id": "087/130"
+    },
+    "KS-088-C": {
+      "id": "KS-088-C",
+      "rarity": "C",
+      "number": "088",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HAKU",
+      "name_fr": "HAKU",
+      "title_fr": "Orphelin du Pays de l'Eau",
+      "title_en": "Orphan of the Land of Water",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 2,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-088-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-088-C.webp",
+      "data_complete": true,
+      "old_id": "088/130"
+    },
+    "KS-089-UC": {
+      "id": "KS-089-UC",
+      "rarity": "UC",
+      "number": "089",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HAKU",
+      "name_fr": "HAKU",
+      "title_fr": "Les Démoniaques Miroirs de Glace",
+      "title_en": "Demonic Mirroring Ice Crystals",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 2,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard the top card of your opponent's deck. POWERUP X where X is the cost of the discarded card.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, discard the top card from your deck.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-089-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-089-UC.webp",
+      "data_complete": true,
+      "old_id": "089/130"
+    },
+    "KS-090-C": {
+      "id": "KS-090-C",
+      "rarity": "C",
+      "number": "090",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Akatsuki",
+      "title_en": "Akatsuki",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-090-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-090-C.webp",
+      "data_complete": true,
+      "old_id": "090/130"
+    },
+    "KS-091-UC": {
+      "id": "KS-091-UC",
+      "rarity": "UC",
+      "number": "091",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Le Kaléidoscope Hypnotique du Sharingan",
+      "title_en": "Mangekyo Sharingan",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja",
+        "Kekkei Genkai"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Look at the opponent's hand.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, choose 1 card in the opponent's hand and discard it.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-091-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-091-UC.webp",
+      "data_complete": true,
+      "old_id": "091/130"
+    },
+    "KS-092-C": {
+      "id": "KS-092-C",
+      "rarity": "C",
+      "number": "092",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KISAME HOSHIGAKI",
+      "name_fr": "KISAME HOSHIGAKI",
+      "title_fr": "Le Ninja Déserteur du Village du Brouillard",
+      "title_en": "Rogue Ninja of the Mist",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 4,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Remove up to 2 Power tokens from an enemy character in this mission and put them on this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-092-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-092-C.webp",
+      "data_complete": true,
+      "old_id": "092/130"
+    },
+    "KS-093-UC": {
+      "id": "KS-093-UC",
+      "rarity": "UC",
+      "number": "093",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KISAME HOSHIGAKI",
+      "name_fr": "KISAME HOSHIGAKI",
+      "title_fr": "Samehada",
+      "title_en": "Samehada",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja",
+        "Weapon"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Remove up to 2 Power tokens from an enemy character in play and put them on this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, remove all Power tokens and put them on this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-093-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-093-UC.webp",
+      "data_complete": true,
+      "old_id": "093/130"
+    },
+    "KS-094-C": {
+      "id": "KS-094-C",
+      "rarity": "C",
+      "number": "094",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAMA BUNTA",
+      "name_fr": "GAMA BUNTA",
+      "title_fr": "Chef des Crapauds",
+      "title_en": "Chief Toad",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 6,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-094-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-094-C.webp",
+      "data_complete": true,
+      "old_id": "094/130"
+    },
+    "KS-095-C": {
+      "id": "KS-095-C",
+      "rarity": "C",
+      "number": "095",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAMAHIRO",
+      "name_fr": "GAMAHIRO",
+      "title_fr": "Crapaud Armé",
+      "title_en": "Armed Toad",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 6,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there's a friendly character in this mission, draw a card.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-095-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-095-C.webp",
+      "data_complete": true,
+      "old_id": "095/130"
+    },
+    "KS-096-C": {
+      "id": "KS-096-C",
+      "rarity": "C",
+      "number": "096",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAMAKITCHI",
+      "name_fr": "GAMAKITCHI",
+      "title_fr": "Fils aîné de Gama Bunta",
+      "title_en": "Gamabunta's Eldest Son",
+      "has_visual": true,
+      "chakra": 2,
+      "power": 3,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Pay 1 less to play this character if there's a friendly [u]Naruto Uzumaki[/u] in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-096-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-096-C.webp",
+      "data_complete": true,
+      "old_id": "096/130"
+    },
+    "KS-097-C": {
+      "id": "KS-097-C",
+      "rarity": "C",
+      "number": "097",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAMATATSU",
+      "name_fr": "GAMATATSU",
+      "title_fr": "Fils cadet de Gama Bunta",
+      "title_en": "Gamabunta's Youngest Son",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 2,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-097-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-097-C.webp",
+      "data_complete": true,
+      "old_id": "097/130"
+    },
+    "KS-098-C": {
+      "id": "KS-098-C",
+      "rarity": "C",
+      "number": "098",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KATSUYU",
+      "name_fr": "KATSUYU",
+      "title_fr": "Limace Géante",
+      "title_en": "Giant Slug",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 5,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there is a friendly [u]Tsunade[/u] in play, POWERUP 2.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-098-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-098-C.webp",
+      "data_complete": true,
+      "old_id": "098/130"
+    },
+    "KS-099-C": {
+      "id": "KS-099-C",
+      "rarity": "C",
+      "number": "099",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "PAKKUN",
+      "name_fr": "PAKKUN",
+      "title_fr": "Chien Ninja de Kakashi",
+      "title_en": "Kakashi's Ninja Dog",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Ninja Hound"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Move this character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-099-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-099-C.webp",
+      "data_complete": true,
+      "old_id": "099/130"
+    },
+    "KS-100-C": {
+      "id": "KS-100-C",
+      "rarity": "C",
+      "number": "100",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NINJA HOUND CORPS",
+      "name_fr": "NINJA HOUND CORPS",
+      "title_fr": "Chiens Ninjas de Kakashi",
+      "title_en": "Kakashi's Ninja Hounds",
+      "has_visual": true,
+      "chakra": 1,
+      "power": 1,
+      "keywords": [
+        "Ninja Hound"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When this character moves to a different mission, look at a hidden character in that mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-100-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-100-C.webp",
+      "data_complete": true,
+      "old_id": "100/130"
+    },
+    "KS-101-C": {
+      "id": "KS-101-C",
+      "rarity": "C",
+      "number": "101",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TONTON",
+      "name_fr": "TON TON",
+      "title_fr": "Cochon Ninja de Tsunade",
+      "title_en": "Tsunade's Ninja Pig",
+      "has_visual": true,
+      "chakra": 0,
+      "power": 0,
+      "keywords": [
+        "Ninja Pig"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If there's a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/common/KS-101-C.webp",
+      "rarity_display": "Common",
+      "image_file": "images/cards/KS/common/KS-101-C.webp",
+      "data_complete": true,
+      "old_id": "101/130"
+    },
+    "KS-102-UC": {
+      "id": "KS-102-UC",
+      "rarity": "UC",
+      "number": "102",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "MANDA",
+      "name_fr": "MANDA",
+      "title_fr": "Invoqué par Orochimaru",
+      "title_en": "Summoned by Orochimaru",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 5,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat an enemy Summon character in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-102-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-102-UC.webp",
+      "data_complete": true,
+      "old_id": "102/130"
+    },
+    "KS-103-UC": {
+      "id": "KS-103-UC",
+      "rarity": "UC",
+      "number": "103",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KYODAIGUMO",
+      "name_fr": "KYODAIGUMO",
+      "title_fr": "Pluie d'araignées",
+      "title_en": "Spider Rain",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Summon"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, hide a character with Power equal or less than this character. Then, you must return this character to your hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/uncommon/KS-103-UC.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/uncommon/KS-103-UC.webp",
+      "data_complete": true,
+      "old_id": "103/130"
+    },
+    "KS-104-R": {
+      "id": "KS-104-R",
+      "rarity": "R",
+      "number": "104",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Sannin Légendaire",
+      "title_en": "Legendary Sannin",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-104-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-104-R.webp",
+      "data_complete": true,
+      "old_id": "104/130"
+    },
+    "KS-105-R": {
+      "id": "KS-105-R",
+      "rarity": "R",
+      "number": "105",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Jutsu d'Invocation",
+      "title_en": "Summoning Jutsu",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 3 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move any enemy character from this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-105-R.webp",
+      "rarity_display": "Rare",
+      "image_file": "images/cards/KS/rare/KS-105-R.webp",
+      "data_complete": true,
+      "old_id": "105/130"
+    },
+    "KS-106-R": {
+      "id": "KS-106-R",
+      "rarity": "R",
+      "number": "106",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Scellement du Maléfice",
+      "title_en": "Curse Sealing",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard the top card of an upgraded enemy character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Copy any non-Upgrade instant effect ([↯]) from the discarded enemy character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-106-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-106-R.webp",
+      "data_complete": true,
+      "old_id": "106/130"
+    },
+    "KS-107-R": {
+      "id": "KS-107-R",
+      "rarity": "R",
+      "number": "107",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Chidori",
+      "title_en": "Chidori",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-107-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-107-R.webp",
+      "data_complete": true,
+      "old_id": "107/130"
+    },
+    "KS-108-R": {
+      "id": "KS-108-R",
+      "rarity": "R",
+      "number": "108",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Believe it!",
+      "title_en": "Believe it!",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Rare",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "108/130"
+    },
+    "KS-109-R": {
+      "id": "KS-109-R",
+      "rarity": "R",
+      "number": "109",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Ninja Medical",
+      "title_en": "Medical Ninja",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, play the card paying 2 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-109-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-109-R.webp",
+      "data_complete": true,
+      "old_id": "109/130"
+    },
+    "KS-110-R": {
+      "id": "KS-110-R",
+      "rarity": "R",
+      "number": "110",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "title_fr": "Jutsu de Destruction Mentale",
+      "title_en": "Mind Destruction Jutsu",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: After moving them, hide the enemy character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-110-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-110-R.webp",
+      "data_complete": true,
+      "old_id": "110/130"
+    },
+    "KS-111-R": {
+      "id": "KS-111-R",
+      "rarity": "R",
+      "number": "111",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "title_fr": "Jutsu d'Étranglement par l'Ombre",
+      "title_en": "Shadow Strangle Jutsu",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent cannot play characters while hidden in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-111-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-111-R.webp",
+      "data_complete": true,
+      "old_id": "111/130"
+    },
+    "KS-112-R": {
+      "id": "KS-112-R",
+      "rarity": "R",
+      "number": "112",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "title_fr": "C'est qui que tu traites de gros ?",
+      "title_en": "Who are you calling fat?",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Repeat the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "112/130"
+    },
+    "KS-113-R": {
+      "id": "KS-113-R",
+      "rarity": "R",
+      "number": "113",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "title_fr": "Croc sur Croc",
+      "title_en": "Fang over Fang",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-113-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-113-R.webp",
+      "data_complete": true,
+      "old_id": "113/130"
+    },
+    "KS-114-R": {
+      "id": "KS-114-R",
+      "rarity": "R",
+      "number": "114",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Protective Eight Trigrams Sixty-Four Palms",
+      "title_en": "Protective Eight Trigrams Sixty-Four Palms",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 2. POWERUP 1 another character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Remove all Power tokens from an enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-114-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-114-R.webp",
+      "data_complete": true,
+      "old_id": "114/130"
+    },
+    "KS-115-R": {
+      "id": "KS-115-R",
+      "rarity": "R",
+      "number": "115",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "title_fr": "",
+      "title_en": "",
+      "has_visual": false,
+      "chakra": 0,
+      "power": 0,
+      "keywords": [],
+      "group": "Independent",
+      "effects": [],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": false,
+      "old_id": "115/130"
+    },
+    "KS-116-R": {
+      "id": "KS-116-R",
+      "rarity": "R",
+      "number": "116",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "title_fr": "Hakke Soixante-Quatre Paumes",
+      "title_en": "Eight Trigrams Sixty-Four Palms",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat a character with exactly Power 4 in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat a character with exactly Power 6 in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-116-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-116-R.webp",
+      "data_complete": true,
+      "old_id": "116/130"
+    },
+    "KS-117-R": {
+      "id": "KS-117-R",
+      "rarity": "R",
+      "number": "117",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Poing Ivre",
+      "title_en": "Drunken Fist",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must move this character to another mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-117-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-117-R.webp",
+      "data_complete": true,
+      "old_id": "117/130"
+    },
+    "KS-118-R": {
+      "id": "KS-118-R",
+      "rarity": "R",
+      "number": "118",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "title_fr": "Rising Twin Dragons",
+      "title_en": "Rising Twin Dragons",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat a hidden character in this mission. If the defeated character had a printed Power of 3 or less, defeat a hidden character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-118-R.webp",
+      "rarity_display": "Rare",
+      "image_file": "images/cards/KS/rare/KS-118-R.webp",
+      "data_complete": true,
+      "old_id": "118/130"
+    },
+    "KS-119-R": {
+      "id": "KS-119-R",
+      "rarity": "R",
+      "number": "119",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "title_fr": "Technique Secrète Noire : Vierge de Fer",
+      "title_en": "Black Secret Technique: Iron Maiden",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move any character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-119-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-119-R.webp",
+      "data_complete": true,
+      "old_id": "119/130"
+    },
+    "KS-120-R": {
+      "id": "KS-120-R",
+      "rarity": "R",
+      "number": "120",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Cercueil de Sable",
+      "title_en": "Sand Coffin",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X, where X is the number of characters defeated by the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-120-R.webp",
+      "rarity_display": "Rare Art",
+      "image_file": "images/cards/KS/rare/KS-120-R.webp",
+      "data_complete": true,
+      "old_id": "120/130"
+    },
+    "KS-121-R": {
+      "id": "KS-121-R",
+      "rarity": "R",
+      "number": "121",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "title_fr": "Jutsu de la Faux du Vent",
+      "title_en": "Sickle Weasel Jutsu",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move any friendly character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move any character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-121-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-121-R.webp",
+      "data_complete": true,
+      "old_id": "121/130"
+    },
+    "KS-122-R": {
+      "id": "KS-122-R",
+      "rarity": "R",
+      "number": "122",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIROBO",
+      "name_fr": "JIRÔBÔ",
+      "title_fr": "Poing d'Arhat",
+      "title_en": "Arhat Fist",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Sound Four", "Taijutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP X where X is the number of characters in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Rare",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "122/130"
+    },
+    "KS-123-R": {
+      "id": "KS-123-R",
+      "rarity": "R",
+      "number": "123",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "title_fr": "Marque Maudite de la Terre",
+      "title_en": "Curse Mark of Earth",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "At the end of the round, you must defeat this character if you have no cards in hand.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard a card to defeat a character in play with cost 5 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-123-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-123-R.webp",
+      "data_complete": true,
+      "old_id": "123/130"
+    },
+    "KS-124-R": {
+      "id": "KS-124-R",
+      "rarity": "R",
+      "number": "124",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "title_fr": "Arc d'Araignée : Déchirure Féroce",
+      "title_en": "Spider Bow: Fierce Rip",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "Defeat an enemy character with Power 3 or less in another mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "AMBUSH effect: Instead, the Power limit is 5 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Rare",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "124/130"
+    },
+    "KS-125-R": {
+      "id": "KS-125-R",
+      "rarity": "R",
+      "number": "125",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "title_fr": "Flûte Démoniaque : Chaînes de Fantasia",
+      "title_en": "Demonic Flute: Phantom Sound Chains",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Non-hidden enemy characters cost an additional 1 Chakra to play in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Play a Sound Village character, paying 2 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare/KS-125-R.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare/KS-125-R.webp",
+      "data_complete": true,
+      "old_id": "125/130"
+    },
+    "KS-126-R": {
+      "id": "KS-126-R",
+      "rarity": "R",
+      "number": "126",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Ôtez-vous de mon chemin.",
+      "title_en": "Get out of my way.",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "Defeat the weakest non-hidden enemy character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 3.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Rare",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "126/130"
+    },
+    "KS-127-R": {
+      "id": "KS-127-R",
+      "rarity": "R",
+      "number": "127",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "title_fr": "",
+      "title_en": "",
+      "has_visual": false,
+      "chakra": 0,
+      "power": 0,
+      "keywords": [],
+      "group": "Independent",
+      "effects": [],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": false,
+      "old_id": "127/130"
+    },
+    "KS-128-R": {
+      "id": "KS-128-R",
+      "rarity": "R",
+      "number": "128",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Je les contrôle tous.",
+      "title_en": "I control them all.",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Every enemy character in this mission has -1 Power.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "128/130"
+    },
+    "KS-129-R": {
+      "id": "KS-129-R",
+      "rarity": "R",
+      "number": "129",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NINE-TAILS",
+      "name_fr": "KYÛBI",
+      "title_fr": "Manteau du Démon Renard",
+      "title_en": "Demon Fox Cloak",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 10,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Rare",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "129/130"
+    },
+    "KS-130-R": {
+      "id": "KS-130-R",
+      "rarity": "R",
+      "number": "130",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ONE-TAIL",
+      "name_fr": "ICHIBI",
+      "title_fr": "J'espère que tu es prêt à mourir !",
+      "title_en": "I hope you're ready to die!",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 10,
+      "keywords": [
+        "Tailed Beast",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Choose a mission and defeat all hidden enemy characters assigned to it.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "130/130"
+    },
+    "KS-131-S": {
+      "id": "KS-131-S",
+      "rarity": "S",
+      "number": "131",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Cinquième Hokage",
+      "title_en": "Fifth Hokage",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 6,
+      "keywords": [
+        "Sannin",
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 1 every friendly Leaf Village character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-131-S.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/secret/KS-131-S.webp",
+      "data_complete": true,
+      "old_id": "131/130"
+    },
+    "KS-132-S": {
+      "id": "KS-132-S",
+      "rarity": "S",
+      "number": "132",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Dans l'Estomac du Crapaud",
+      "title_en": "Inside the Toad's Stomach",
+      "has_visual": true,
+      "chakra": 8,
+      "power": 8,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 5 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-132-S.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/secret/KS-132-S.webp",
+      "data_complete": true,
+      "old_id": "132/130"
+    },
+    "KS-133-S": {
+      "id": "KS-133-S",
+      "rarity": "S",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Rasengan",
+      "title_en": "Rasengan",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-133-S.webp",
+      "rarity_display": "Secret",
+      "image_file": "images/cards/KS/secret/KS-133-S.webp",
+      "data_complete": true,
+      "old_id": "133/130"
+    },
+    "KS-134-S": {
+      "id": "KS-134-S",
+      "rarity": "S",
+      "number": "134",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NINE-TAILED FOX",
+      "name_fr": "KYÛBI",
+      "title_fr": "Destruction",
+      "title_en": "The Beast Awakens",
+      "has_visual": false,
+      "chakra": 8,
+      "power": 12,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide any number of non-hidden characters in play with total Power of 6 or less."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "134/130"
+    },
+    "KS-135-S": {
+      "id": "KS-135-S",
+      "rarity": "S",
+      "number": "135",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Corps Médical du Village de la Feuille",
+      "title_en": "Leaf Village Medical Corps",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, play the card paying 4 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-135-S.webp",
+      "rarity_display": "Secret",
+      "image_file": "images/cards/KS/secret/KS-135-S.webp",
+      "data_complete": true,
+      "old_id": "135/130"
+    },
+    "KS-136-S": {
+      "id": "KS-136-S",
+      "rarity": "S",
+      "number": "136",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Marque maudite du Ciel",
+      "title_en": "Curse Mark of Heaven",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 8,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a character is defeated, gain 1 Chakra.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-136-S.webp",
+      "rarity_display": "Secret",
+      "image_file": "images/cards/KS/secret/KS-136-S.webp",
+      "data_complete": true,
+      "old_id": "136/130"
+    },
+    "KS-137-S": {
+      "id": "KS-137-S",
+      "rarity": "S",
+      "number": "137",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "L'Éclair Pourfendeur",
+      "title_en": "Lightning Blade",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Hide an upgraded character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-137-S.webp",
+      "rarity_display": "Secret",
+      "image_file": "images/cards/KS/secret/KS-137-S.webp",
+      "data_complete": true,
+      "old_id": "137/130"
+    },
+    "KS-138-S": {
+      "id": "KS-138-S",
+      "rarity": "S",
+      "number": "138",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Invocation, La Réincarnation des Âmes",
+      "title_en": "Summoning: Impure World Reincarnation",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade to any character that is not a Summon nor Orochimaru.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Gain 2 Mission points if the character you upgraded from had Power 6 or more.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-138-S.webp",
+      "rarity_display": "Secret",
+      "image_file": "images/cards/KS/secret/KS-138-S.webp",
+      "data_complete": true,
+      "old_id": "138/130"
+    },
+    "KS-139-S": {
+      "id": "KS-139-S",
+      "rarity": "S",
+      "number": "139",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Le Tombeau du Désert",
+      "title_en": "Sand Burial",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-139-S.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/secret/KS-139-S.webp",
+      "data_complete": true,
+      "old_id": "139/130"
+    },
+    "KS-140-S": {
+      "id": "KS-140-S",
+      "rarity": "S",
+      "number": "140",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Tsukuyomi",
+      "title_en": "Tsukuyomi",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "The opponent discards their entire hand, then draws the same number of cards discarded in this way.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat a character in play with cost X or less, where X is the number of cards discarded by the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-140-S.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/secret/KS-140-S.webp",
+      "data_complete": true,
+      "old_id": "140/130"
+    },
+    "KS-141-M": {
+      "id": "KS-141-M",
+      "rarity": "M",
+      "number": "141",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Défiant Sasuke",
+      "title_en": "Defying Sasuke",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card. If you do, hide an enemy character with Power 4 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-141-M.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mythos/KS-141-M.webp",
+      "data_complete": true,
+      "old_id": "141/130"
+    },
+    "KS-142-M": {
+      "id": "KS-142-M",
+      "rarity": "M",
+      "number": "142",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Défiant Naruto",
+      "title_en": "Defying Naruto",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card. If you do, POWERUP X+1 where X is the number of enemy characters in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-142-M.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mythos/KS-142-M.webp",
+      "data_complete": true,
+      "old_id": "142/130"
+    },
+    "KS-143-M": {
+      "id": "KS-143-M",
+      "rarity": "M",
+      "number": "143",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Traquant Naruto",
+      "title_en": "Hunting Naruto",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move a friendly character to this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Move an enemy character to this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-143-M.webp",
+      "rarity_display": "Mythos",
+      "image_file": "images/cards/KS/mythos/KS-143-M.webp",
+      "data_complete": true,
+      "old_id": "143/130"
+    },
+    "KS-144-M": {
+      "id": "KS-144-M",
+      "rarity": "M",
+      "number": "144",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KISAME HOSHIGAKI",
+      "name_fr": "KISAME HOSHIGAKI",
+      "title_fr": "Absorption du chakra",
+      "title_en": "Chakra Absorption",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Steal 1 Chakra from the opponent pool.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-144-M.webp",
+      "rarity_display": "Mythos",
+      "image_file": "images/cards/KS/mythos/KS-144-M.webp",
+      "data_complete": true,
+      "old_id": "144/130"
+    },
+    "KS-145-M": {
+      "id": "KS-145-M",
+      "rarity": "M",
+      "number": "145",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Équipe 7 originelle",
+      "title_en": "Original Team 7",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Team 7"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have the Edge, your hidden characters in this mission have +1 Power."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "145/130"
+    },
+    "KS-146-M": {
+      "id": "KS-146-M",
+      "rarity": "M",
+      "number": "146",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Équipe 7 originelle",
+      "title_en": "Original Team 7",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Give the Edge to the opponent. If you do so, POWERUP 3.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-146-M.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mythos/KS-146-M.webp",
+      "data_complete": true,
+      "old_id": "146/130"
+    },
+    "KS-147-M": {
+      "id": "KS-147-M",
+      "rarity": "M",
+      "number": "147",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Équipe 7 originelle",
+      "title_en": "Original Team 7",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you don't have the Edge, CHAKRA +2.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-147-M.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mythos/KS-147-M.webp",
+      "data_complete": true,
+      "old_id": "147/130"
+    },
+    "KS-148-M": {
+      "id": "KS-148-M",
+      "rarity": "M",
+      "number": "148",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Équipe 7 originelle",
+      "title_en": "Original Team 7",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Gain the Edge.",
+          "description_fr": ""
+        },
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Copy an instant effect ([↯]) of another friendly Team 7 character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos/KS-148-M.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mythos/KS-148-M.webp",
+      "data_complete": true,
+      "old_id": "148/130"
+    },
+    "KS-001-MMS": {
+      "id": "KS-001-MMS",
+      "rarity": "MMS",
+      "number": "001",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Call for support",
+      "name_fr": "Appel de soutien",
+      "title_fr": "Appel de soutien",
+      "title_en": "Call for Support",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] POWERUP 2 a character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-001-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-001-MMS.webp",
+      "basePoints": 1,
+      "data_complete": true,
+      "old_id": "MSS 01"
+    },
+    "KS-002-MMS": {
+      "id": "KS-002-MMS",
+      "rarity": "MMS",
+      "number": "002",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Chunin Exam",
+      "name_fr": "Examen Chûnin",
+      "title_fr": "Examen Chûnin",
+      "title_en": "Chunin Exam",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[⧗] All non-hidden characters in this mission have +1 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-002-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-002-MMS.webp",
+      "basePoints": 2,
+      "data_complete": true,
+      "old_id": "MSS 02"
+    },
+    "KS-003-MMS": {
+      "id": "KS-003-MMS",
+      "rarity": "MMS",
+      "number": "003",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Find the traitor",
+      "name_fr": "Trouver le traître",
+      "title_fr": "Trouver le traître",
+      "title_en": "Find the Traitor",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Opponent discards a card from hand.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-003-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-003-MMS.webp",
+      "basePoints": 1,
+      "data_complete": true,
+      "old_id": "MSS 03"
+    },
+    "KS-004-MMS": {
+      "id": "KS-004-MMS",
+      "rarity": "MMS",
+      "number": "004",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Assassination",
+      "name_fr": "Assassinat",
+      "title_fr": "Assassinat",
+      "title_en": "Assassination",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Defeat an enemy hidden character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-004-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-004-MMS.webp",
+      "basePoints": 1,
+      "data_complete": true,
+      "old_id": "MSS 04"
+    },
+    "KS-005-MMS": {
+      "id": "KS-005-MMS",
+      "rarity": "MMS",
+      "number": "005",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Bring it back",
+      "name_fr": "Ramener",
+      "title_fr": "Ramener",
+      "title_en": "Bring It Back",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] You must return one friendly non-hidden character in this mission to your hand, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-005-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-005-MMS.webp",
+      "basePoints": 3,
+      "data_complete": true,
+      "old_id": "MSS 05"
+    },
+    "KS-006-MMS": {
+      "id": "KS-006-MMS",
+      "rarity": "MMS",
+      "number": "006",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Rescue a friend",
+      "name_fr": "Sauvetage d'un ami",
+      "title_fr": "Sauvetage d'un ami",
+      "title_en": "Rescue a Friend",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Draw a card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-006-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-006-MMS.webp",
+      "basePoints": 1,
+      "data_complete": true,
+      "old_id": "MSS 06"
+    },
+    "KS-007-MMS": {
+      "id": "KS-007-MMS",
+      "rarity": "MMS",
+      "number": "007",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "I have to go",
+      "name_fr": "Je dois partir",
+      "title_fr": "Je dois partir",
+      "title_en": "I Have to Go",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Move a friendly hidden character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-007-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-007-MMS.webp",
+      "basePoints": 2,
+      "data_complete": true,
+      "old_id": "MSS 07"
+    },
+    "KS-008-MMS": {
+      "id": "KS-008-MMS",
+      "rarity": "MMS",
+      "number": "008",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Set a trap",
+      "name_fr": "Tendre un piège",
+      "title_fr": "Tendre un piège",
+      "title_en": "Set a Trap",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[↯] Place a card from your hand as a hidden character to any mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-008-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-008-MMS.webp",
+      "basePoints": 2,
+      "data_complete": true,
+      "old_id": "MSS 08"
+    },
+    "KS-009-MMS": {
+      "id": "KS-009-MMS",
+      "rarity": "MMS",
+      "number": "009",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Protect the leader",
+      "name_fr": "Protéger le chef",
+      "title_fr": "Protéger le chef",
+      "title_en": "Protect the Leader",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[⧗] Characters with 4 Power or more in this mission have +1 Power.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-009-MMS.webp",
+      "rarity_display": "Mission",
+      "image_file": "images/cards/KS/mission/KS-009-MMS.webp",
+      "basePoints": 2,
+      "data_complete": true,
+      "old_id": "MSS 09"
+    },
+    "KS-010-MMS": {
+      "id": "KS-010-MMS",
+      "rarity": "MMS",
+      "number": "010",
+      "set": "KS",
+      "card_type": "mission",
+      "name_en": "Chakra Training",
+      "name_fr": "Entraînement au chakra",
+      "title_fr": "Entraînement au chakra",
+      "title_en": "Chakra Training",
+      "has_visual": true,
+      "chakra": "",
+      "power": "",
+      "keywords": [],
+      "group": "",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "[⧗] CHAKRA +1 for both players.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mission/KS-010-MMS.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/mission/KS-010-MMS.webp",
+      "basePoints": 2,
+      "data_complete": true,
+      "old_id": "MSS 10"
+    },
+    "KS-000-L": {
+      "id": "KS-000-L",
+      "rarity": "L",
+      "number": "000",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Je serai le plus grand Hokage!",
+      "title_en": "I'm gonna be the greatest Hokage!",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/legendary/KS-000-L.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/legendary/KS-000-L.webp",
+      "data_complete": true,
+      "old_id": "Legendary"
+    },
+    "KS-149-M": {
+      "id": "KS-149-M",
+      "rarity": "M",
+      "number": "149",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "title_fr": "Crocs sur crocs",
+      "title_en": "Fang Over Fang",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 8"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "149/130",
+      "is_rare_art": false
+    },
+    "KS-150-M": {
+      "id": "KS-150-M",
+      "rarity": "M",
+      "number": "150",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "title_fr": "Étranglement de l'ombre",
+      "title_en": "Shadow Strangle Jutsu",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 5,
+      "keywords": ["Team 10", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent cannot play characters while hidden in this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide an enemy character with Power 3 or less in this mission."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos",
+      "image_file": "images/cards/KS/mythos/KS-150-M.webp",
+      "data_complete": true,
+      "old_id": "150/130",
+      "is_rare_art": false
+    },
+    "KS-151-M": {
+      "id": "KS-151-M",
+      "rarity": "M",
+      "number": "151",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Poing de l'ivresse",
+      "title_en": "Loopy Fist",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Team Guy", "Taijutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must move this character to another mission, if able."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "151/130",
+      "is_rare_art": false
+    },
+    "KS-152-M": {
+      "id": "KS-152-M",
+      "rarity": "M",
+      "number": "152",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Amaterasu",
+      "title_en": "Amaterasu",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Rogue Ninja", "Jutsu"],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Every enemy character in this mission has -1 Power."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "152/130",
+      "is_rare_art": false
+    },
+    "KS-153-M": {
+      "id": "KS-153-M",
+      "rarity": "M",
+      "number": "153",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Cercueil de Sable",
+      "title_en": "Sand Burial",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 4,
+      "keywords": ["Team Baki", "Jutsu"],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character."
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": "153/130",
+      "is_rare_art": false
+    },
+    "KS-108-MV": {
+      "id": "KS-108-MV",
+      "rarity": "MV",
+      "number": "108",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Je n'fuirai pas !",
+      "title_en": "I won't run away!",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-108-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-108-MV.webp",
+      "data_complete": false,
+      "old_id": "108/130 V"
+    },
+    "KS-104-RA": {
+      "id": "KS-104-RA",
+      "rarity": "RA",
+      "number": "104",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "\"Je suis la Cinquième Hokage du Village de Konoha !\"",
+      "title_en": "\"I'm the Fifth Hokage of the Leaf Village!\"",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-104-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-104-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "104/130 A"
+    },
+    "KS-105-RA": {
+      "id": "KS-105-RA",
+      "rarity": "RA",
+      "number": "105",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIRAIYA",
+      "name_fr": "JIRAYA",
+      "title_fr": "Ermite du Mont Myoboku",
+      "title_en": "Hermit of Mount Myoboku",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Play a Summon character anywhere, paying 3 less.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move any enemy character from this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-105-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-105-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "105/130 A"
+    },
+    "KS-106-RA": {
+      "id": "KS-106-RA",
+      "rarity": "RA",
+      "number": "106",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Le Ninja Copieur",
+      "title_en": "The Copy Ninja",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard the top card of an upgraded enemy character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Copy any non-Upgrade instant effect ([↯]) from the discarded enemy character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-106-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-106-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "106/130 A"
+    },
+    "KS-107-RA": {
+      "id": "KS-107-RA",
+      "rarity": "RA",
+      "number": "107",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Le dernier Uchiwa",
+      "title_en": "The Last Uchiha",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "You must move all other non-hidden friendly characters from this mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X where X is the number of the characters moved this way.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-107-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-107-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "107/130 A"
+    },
+    "KS-108-RA": {
+      "id": "KS-108-RA",
+      "rarity": "RA",
+      "number": "108",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Believe it!",
+      "title_en": "Believe it!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-108-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-108-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "108/130 A"
+    },
+    "KS-109-RA": {
+      "id": "KS-109-RA",
+      "rarity": "RA",
+      "number": "109",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Maintenant c'est à moi de prendre les devants.",
+      "title_en": "Now it's my turn to take the lead.",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 3,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Choose one of your Leaf Village characters in your discard pile and play it anywhere, paying its cost.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, play the card paying 2 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-109-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-109-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "109/130 A"
+    },
+    "KS-110-RA": {
+      "id": "KS-110-RA",
+      "rarity": "RA",
+      "number": "110",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "title_fr": "Jutsu de Transfert d'Esprit",
+      "title_en": "Mind Transfer Jutsu",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "If there are 2 or more enemy characters in this mission, move the weakest non-hidden enemy character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: After moving them, hide the enemy character.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-110-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-110-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "110/130 A"
+    },
+    "KS-111-RA": {
+      "id": "KS-111-RA",
+      "rarity": "RA",
+      "number": "111",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "title_fr": "Quelle galère...",
+      "title_en": "This whole thing's a drag...",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent cannot play characters while hidden in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-111-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-111-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "111/130 A"
+    },
+    "KS-112-RA": {
+      "id": "KS-112-RA",
+      "rarity": "RA",
+      "number": "112",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "title_fr": "C'est qui que tu traites de gros ?",
+      "title_en": "Who you calling fat?",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 4,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Discard a card from your hand. POWERUP X where X is the cost of the discarded card in this way.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Repeat the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-112-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-112-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "112/130 A"
+    },
+    "KS-113-RA": {
+      "id": "KS-113-RA",
+      "rarity": "RA",
+      "number": "113",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "title_fr": "Reste avec moi Akamaru.",
+      "title_en": "Stay with me Akamaru.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-113-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-113-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "113/130 A"
+    },
+    "KS-114-RA": {
+      "id": "KS-114-RA",
+      "rarity": "RA",
+      "number": "114",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "title_fr": "Plus question de se cacher!",
+      "title_en": "No more hiding!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 2. POWERUP 1 another character.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Remove all Power tokens from an enemy character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-114-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-114-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "114/130 A"
+    },
+    "KS-115-RA": {
+      "id": "KS-115-RA",
+      "rarity": "RA",
+      "number": "115",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "title_fr": "",
+      "title_en": "",
+      "has_visual": false,
+      "chakra": 0,
+      "power": 0,
+      "keywords": [],
+      "group": "Independent",
+      "effects": [],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": false,
+      "old_id": "115/130 A"
+    },
+    "KS-116-RA": {
+      "id": "KS-116-RA",
+      "rarity": "RA",
+      "number": "116",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "title_fr": "Hakke Soixante-Quatre Paumes",
+      "title_en": "Eight Trigrams Sixty-Four Palms",
+      "has_visual": false,
+      "chakra": 6,
+      "power": 5,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat a character with exactly Power 4 in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat a character with exactly Power 6 in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "116/130 A"
+    },
+    "KS-117-RA": {
+      "id": "KS-117-RA",
+      "rarity": "RA",
+      "number": "117",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ROCK LEE",
+      "name_fr": "ROCK LEE",
+      "title_fr": "Je te rendrai fier, Sensei.",
+      "title_en": "I will make you proud, Sensei.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must move this character to another mission, if able.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-117-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-117-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "117/130 A"
+    },
+    "KS-118-RA": {
+      "id": "KS-118-RA",
+      "rarity": "RA",
+      "number": "118",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TENTEN",
+      "name_fr": "TENTEN",
+      "title_fr": "Les Deux Dragons Ascendants",
+      "title_en": "Twin Rising Dragons",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Defeat a hidden character in this mission. If the defeated character had a printed Power of 3 or less, defeat a hidden character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-118-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-118-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "118/130 A"
+    },
+    "KS-119-RA": {
+      "id": "KS-119-RA",
+      "rarity": "RA",
+      "number": "119",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "title_fr": "...On va faire un spectacle de marionnettes !",
+      "title_en": "...We'll have a Puppet Show!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move any character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with Power 3 or less in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-119-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-119-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "119/130 A"
+    },
+    "KS-120-RA": {
+      "id": "KS-120-RA",
+      "rarity": "RA",
+      "number": "120",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "GAARA",
+      "name_fr": "GAARA",
+      "title_fr": "Le Cercueil de Sable",
+      "title_en": "Sand Coffin",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X, where X is the number of characters defeated by the MAIN effect.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-120-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-120-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "120/130 A"
+    },
+    "KS-121-RA": {
+      "id": "KS-121-RA",
+      "rarity": "RA",
+      "number": "121",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "title_fr": "C'est fini.",
+      "title_en": "It's finished.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Move any friendly character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move any character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-121-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-121-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "121/130 A"
+    },
+    "KS-122-RA": {
+      "id": "KS-122-RA",
+      "rarity": "RA",
+      "number": "122",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "JIROBO",
+      "name_fr": "JIRÔBÔ",
+      "title_fr": "Poing d'Arhat",
+      "title_en": "Arhat Fist",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Sound Four", "Taijutsu"],
+      "group": "Sound Village",
+      "effects": [
+        { "type": "MAIN", "description": "POWERUP X where X is the number of characters in this mission.", "description_fr": "POWERUP X ou X est le nombre de personnages dans cette mission." },
+        { "type": "UPGRADE", "description": "Defeat an enemy character with Power 1 or less in this mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 1 ou moins dans cette mission." }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "122/130 A"
+    },
+    "KS-123-RA": {
+      "id": "KS-123-RA",
+      "rarity": "RA",
+      "number": "123",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIMIMARO",
+      "name_fr": "KIMIMARO",
+      "title_fr": "C'est terminé.",
+      "title_en": "It's over.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "At the end of the round, you must defeat this character if you have no cards in hand.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Discard a card to defeat a character in play with cost 5 or less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-123-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-123-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "123/130 A"
+    },
+    "KS-124-RA": {
+      "id": "KS-124-RA",
+      "rarity": "RA",
+      "number": "124",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KIDOMARU",
+      "name_fr": "KIDÔMARU",
+      "title_fr": "Arc d'Araignée : Déchirure Féroce",
+      "title_en": "Spider Bow: Fierce Rip",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        { "type": "AMBUSH", "description": "Defeat an enemy character with Power 3 or less in another mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission." },
+        { "type": "UPGRADE", "description": "AMBUSH effect: Instead, the Power limit is 5 or less.", "description_fr": "Effet EMBUSCADE : La limite de Puissance est désormais 5 ou moins." }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "124/130 A"
+    },
+    "KS-125-RA": {
+      "id": "KS-125-RA",
+      "rarity": "RA",
+      "number": "125",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TAYUYA",
+      "name_fr": "TAYUYA",
+      "title_fr": "Cette flûte est ma seule arme!",
+      "title_en": "This flute is my only weapon!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Non-hidden enemy characters cost an additional 1 Chakra to play in this mission.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Play a Sound Village character, paying 2 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-125-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-125-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "125/130 A"
+    },
+    "KS-126-RA": {
+      "id": "KS-126-RA",
+      "rarity": "RA",
+      "number": "126",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "title_fr": "Ne te mets pas en travers de mon chemin.",
+      "title_en": "Stay out of my way.",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "SCORE",
+          "description": "Defeat the weakest non-hidden enemy character in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP 3.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-126-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-126-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "126/130 A"
+    },
+    "KS-127-RA": {
+      "id": "KS-127-RA",
+      "rarity": "RA",
+      "number": "127",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKON",
+      "name_fr": "SAKON",
+      "title_fr": "",
+      "title_en": "",
+      "has_visual": false,
+      "chakra": 0,
+      "power": 0,
+      "keywords": [],
+      "group": "Independent",
+      "effects": [],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": false,
+      "old_id": "127/130 A"
+    },
+    "KS-128-RA": {
+      "id": "KS-128-RA",
+      "rarity": "RA",
+      "number": "128",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "Je les contrôle tous.",
+      "title_en": "I control them all.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Every enemy character in this mission has -1 Power.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-128-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-128-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "128/130 A"
+    },
+    "KS-129-RA": {
+      "id": "KS-129-RA",
+      "rarity": "RA",
+      "number": "129",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NINE-TAILS",
+      "name_fr": "KYÛBI",
+      "title_fr": "Manteau du Démon Renard",
+      "title_en": "Demon Fox Cloak",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 10,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        { "type": "MAIN", "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.", "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur Naruto Uzumaki." },
+        { "type": "MAIN", "description": "[⧗] Can't be hidden or defeated by enemy effects.", "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis." }
+      ],
+      "image_url": "",
+      "rarity_display": "",
+      "image_file": "",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "129/130 A"
+    },
+    "KS-130-RA": {
+      "id": "KS-130-RA",
+      "rarity": "RA",
+      "number": "130",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "ONE-TAIL",
+      "name_fr": "ICHIBI",
+      "title_fr": "J'espère que tu es prêt à mourir !",
+      "title_en": "I hope you're ready to die!",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 10,
+      "keywords": [
+        "Tailed Beast",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Choose a mission and defeat all hidden enemy characters assigned to it.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/rare_art/KS-130-RA.webp",
+      "rarity_display": "",
+      "image_file": "images/cards/KS/rare_art/KS-130-RA.webp",
+      "is_rare_art": true,
+      "data_complete": true,
+      "old_id": "130/130 A"
+    },
+    "KS-131-SV": {
+      "id": "KS-131-SV",
+      "rarity": "SV",
+      "number": "131",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Cinquième Hokage",
+      "title_en": "Fifth Hokage",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 6,
+      "keywords": ["Sannin", "Hokage"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "POWERUP 1 every friendly Leaf Village character in play.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-131-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-131-SV.webp",
+      "data_complete": true,
+      "old_id": "131/130"
+    },
+    "KS-133-SV": {
+      "id": "KS-133-SV",
+      "rarity": "SV",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Rasengan",
+      "title_en": "Rasengan",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-133-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-133-SV.webp",
+      "data_complete": true,
+      "old_id": "133/130"
+    },
+    "KS-133-MV": {
+      "id": "KS-133-MV",
+      "rarity": "MV",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Je vais me prendre un bol de nouilles chez Ichiraku !",
+      "title_en": "I'm Going to Get a Bowl of Noodles at Ichiraku!",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them."
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-133-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-133-MV.webp",
+      "data_complete": true,
+      "old_id": "133/130"
+    },
+    "KS-136-SV": {
+      "id": "KS-136-SV",
+      "rarity": "SV",
+      "number": "136",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Marque maudite du Ciel",
+      "title_en": "Curse Mark of Heaven",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 8,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a character is defeated, gain 1 Chakra.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-136-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-136-SV.webp",
+      "data_complete": true,
+      "old_id": "136/130"
+    },
+    "KS-137-SV": {
+      "id": "KS-137-SV",
+      "rarity": "SV",
+      "number": "137",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "L'Éclair Pourfendeur",
+      "title_en": "Lightning Blade",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Hide an upgraded character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret_v/KS-137-SV.webp",
+      "rarity_display": "Secret V",
+      "image_file": "images/cards/KS/secret_v/KS-137-SV.webp",
+      "data_complete": true,
+      "old_id": "137/130"
+    }
+  }
+}

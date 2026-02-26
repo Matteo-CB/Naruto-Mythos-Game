@@ -1,0 +1,98 @@
+import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import type { CharacterInPlay } from '@/lib/engine/types';
+import { registerEffect } from '@/lib/effects/EffectRegistry';
+import { logAction } from '@/lib/engine/utils/gameLog';
+import { getEffectivePower } from '@/lib/effects/powerUtils';
+
+/**
+ * Card 078/130 - KANKURO "Puppet Master" (UC)
+ * Chakra: 5 | Power: 4
+ * Group: Sand Village | Keywords: Team Baki
+ *
+ * AMBUSH: Move any character with Power 4 or less in play (any mission, any player)
+ *   to another mission.
+ *   - Find all non-hidden characters across all missions with effective power <= 4 (excluding self).
+ *   - Requires target selection: which character to move, then which mission to move them to.
+ *   - Triggered only when Kankuro is revealed from hidden (AMBUSH).
+ *
+ * UPGRADE: Play a friendly character from hand while hidden, paying 1 less.
+ *   - When played as upgrade, select a character from hand to play hidden on any mission.
+ *   - Normal hidden cost is 1 chakra; paying 1 less means it's free (0 cost).
+ *   - Requires target selection for which card to play and which mission to place it on.
+ */
+
+function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer, sourceCard } = ctx;
+
+  // Find all characters with effective power <= 4 across all missions (hidden = power 0, valid)
+  const validTargets: string[] = [];
+  for (const mission of state.activeMissions) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+      // Exclude self
+      if (char.instanceId === sourceCard.instanceId) continue;
+      if (getEffectivePower(state, char, char.controlledBy) <= 4) {
+        validTargets.push(char.instanceId);
+      }
+    }
+  }
+
+  if (validTargets.length === 0) {
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Kankuro (078): No character with Power 4 or less in play to move.',
+      'game.log.effect.noTarget',
+      { card: 'KANKURO', id: 'KS-078-UC' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'MOVE_CHARACTER_POWER_4_OR_LESS',
+    validTargets,
+    description: 'Kankuro (078) AMBUSH: Select any character with Power 4 or less in play to move to another mission.',
+    descriptionKey: 'game.effect.desc.kankuro078MoveCharacter',
+  };
+}
+
+function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer } = ctx;
+  const playerState = state[sourcePlayer];
+
+  // Find characters in hand that could be played hidden
+  if (playerState.hand.length === 0) {
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Kankuro (078): No characters in hand to play hidden.',
+      'game.log.effect.noTarget',
+      { card: 'KANKURO', id: 'KS-078-UC' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  // All hand cards are valid targets for hidden play (paying 1 less = free)
+  const validTargets = playerState.hand.map((_, i) => String(i));
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'PLAY_HIDDEN_FROM_HAND_FREE',
+    validTargets,
+    description: 'Kankuro (078) UPGRADE: Select a character from your hand to play hidden on any mission (free, 1 less than normal hidden cost).',
+    descriptionKey: 'game.effect.desc.kankuro078PlayHiddenFree',
+  };
+}
+
+export function registerKankuro078Handlers(): void {
+  registerEffect('KS-078-UC', 'AMBUSH', handleKankuro078Ambush);
+  registerEffect('KS-078-UC', 'UPGRADE', handleKankuro078Upgrade);
+}

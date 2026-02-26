@@ -111,6 +111,7 @@ function handlePlayCharacter(
     instanceId: generateInstanceId(),
     card,
     isHidden: false,
+    wasRevealedAtLeastOnce: true, // played face-visible
     powerTokens: 0,
     stack: [card],
     controlledBy: player,
@@ -196,6 +197,7 @@ function handlePlayHidden(
     instanceId: generateInstanceId(),
     card,
     isHidden: true,
+    wasRevealedAtLeastOnce: false, // never revealed yet
     powerTokens: 0,
     stack: [card],
     controlledBy: player,
@@ -298,6 +300,7 @@ function handleRevealCharacter(
     upgraded.card = charTopCard;
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
     upgraded.isHidden = false;
+    upgraded.wasRevealedAtLeastOnce = true;
 
     // Remove the revealed hidden character and update the upgrade target
     const updatedChars = chars.filter((c) => c.instanceId !== characterInstanceId);
@@ -344,6 +347,7 @@ function handleRevealCharacter(
   // Normal reveal (no upgrade)
   // Reveal the character
   char.isHidden = false;
+  char.wasRevealedAtLeastOnce = true;
   chars[charIdx] = char;
 
   if (player === 'player1') {
