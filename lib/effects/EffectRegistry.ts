@@ -37,12 +37,15 @@ export function getEffectHandler(cardId: string, effectType: EffectType): Effect
     }
   }
 
-  // MV (Mythos Variant) falls back to M (Mythos) counterpart
-  const mvFallbackId = cardId.replace(/-MV$/, '-M');
-  if (mvFallbackId !== cardId) {
-    const mvHandlers = registry.get(mvFallbackId);
-    if (mvHandlers) {
-      return mvHandlers.get(effectType);
+  // MV (Mythos Variant) falls back to M, then R, then S counterpart
+  if (cardId.endsWith('-MV')) {
+    const baseId = cardId.replace(/-MV$/, '');
+    for (const suffix of ['-M', '-R', '-S']) {
+      const fallbackHandlers = registry.get(baseId + suffix);
+      if (fallbackHandlers) {
+        const handler = fallbackHandlers.get(effectType);
+        if (handler) return handler;
+      }
     }
   }
 

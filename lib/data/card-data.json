@@ -6342,6 +6342,37 @@
       "data_complete": true,
       "old_id": "133/130"
     },
+    "KS-133-MV": {
+      "id": "KS-133-MV",
+      "rarity": "MV",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Je vais me prendre un bol de nouilles chez Ichiraku !",
+      "title_en": "I'm Going to Get a Bowl of Noodles at Ichiraku!",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them."
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-133-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-133-MV.webp",
+      "data_complete": true,
+      "old_id": "133/130"
+    },
     "KS-136-SV": {
       "id": "KS-136-SV",
       "rarity": "SV",

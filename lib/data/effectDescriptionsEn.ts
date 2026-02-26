@@ -1053,6 +1053,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
     'effect: Instead, defeat both of them.',
   ],
+  'KS-133-MV': [
+    'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
+    'MAIN effect: Instead, defeat both of them.',
+  ],
   'KS-136-SV': [
     '[⧗] When a character is defeated, gain 1 Chakra.',
     'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
