@@ -128,6 +128,11 @@ export function calculateEffectiveCost(
     }
   }
 
+  // Turn-wide cost increases (e.g., Shino 033 MAIN)
+  if (state.playCostIncrease) {
+    cost += state.playCostIncrease[player] ?? 0;
+  }
+
   // Jiraiya 007 sub-play cost reduction for Summon characters
   // This is handled separately when Jiraiya's MAIN effect triggers
 

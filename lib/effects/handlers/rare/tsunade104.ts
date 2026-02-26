@@ -7,21 +7,18 @@ import { logAction } from '../../../engine/utils/gameLog';
  * Chakra: 5, Power: 4
  * Group: Leaf Village, Keywords: Sannin
  *
- * MAIN: Spend extra Chakra to POWERUP X where X = extra amount spent.
- *   The player can voluntarily spend additional chakra beyond the card's cost.
- *   For auto-resolve: spend all remaining chakra as POWERUP on self.
+ * MAIN: Spend any amount of additional Chakra. POWERUP X, where X is the
+ *   amount of additional Chakra spent. Player chooses from 0..N.
  *
- * UPGRADE: POWERUP X (same logic — spend remaining chakra as POWERUP on self).
+ * UPGRADE: POWERUP X (same logic).
  */
 
 function tsunade104MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
+  const maxChakra = playerState.chakra;
 
-  // Auto-resolve: spend all remaining chakra as POWERUP on self
-  const extraChakra = playerState.chakra;
-
-  if (extraChakra <= 0) {
+  if (maxChakra <= 0) {
     return {
       state: {
         ...state,
@@ -36,45 +33,26 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Deduct the extra chakra from the player's pool
-  const newPlayerState = { ...playerState, chakra: 0 };
-
-  // POWERUP X on self
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[sourceMissionIndex] };
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const friendlyChars = [...mission[friendlySide]];
-  const selfIndex = friendlyChars.findIndex((c) => c.instanceId === sourceCard.instanceId);
-
-  if (selfIndex !== -1) {
-    friendlyChars[selfIndex] = {
-      ...friendlyChars[selfIndex],
-      powerTokens: friendlyChars[selfIndex].powerTokens + extraChakra,
-    };
-    mission[friendlySide] = friendlyChars;
-    missions[sourceMissionIndex] = mission;
+  // Build options: 0 through maxChakra (0 means decline)
+  const validTargets: string[] = [];
+  for (let i = 0; i <= maxChakra; i++) {
+    validTargets.push(String(i));
   }
 
   return {
-    state: {
-      ...state,
-      [sourcePlayer]: newPlayerState,
-      activeMissions: missions,
-      log: logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_POWERUP',
-        `Tsunade (104): Spent ${extraChakra} extra chakra for POWERUP ${extraChakra}.`,
-        'game.log.effect.powerupSelf',
-        { card: 'TSUNADE', id: 'KS-104-R', amount: extraChakra },
-      ),
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'TSUNADE104_CHOOSE_CHAKRA',
+    validTargets,
+    description: `Tsunade (104): Choose how much extra chakra to spend (0-${maxChakra}). POWERUP X.`,
+    descriptionKey: 'game.effect.desc.tsunade104ChooseChakra',
+    descriptionParams: { max: maxChakra },
   };
 }
 
 function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler (same behavior when isUpgrade is true).
-  return { state: ctx.state };
+  // UPGRADE has the same "spend extra chakra for POWERUP" logic
+  return tsunade104MainHandler(ctx);
 }
 
 export function registerTsunade104Handlers(): void {

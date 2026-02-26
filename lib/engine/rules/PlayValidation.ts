@@ -137,6 +137,7 @@ export function validateRevealCharacter(
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
   // Name uniqueness check — detect reveal-for-upgrade before chakra check
+  // Check same-name upgrade target
   const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
@@ -146,17 +147,27 @@ export function validateRevealCharacter(
     return false;
   });
 
+  // Also check flexible upgrade targets (Orochimaru 138, Akamaru 029, Ichibi 076, etc.)
+  const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
+    if (c.instanceId === characterInstanceId || c.isHidden) return false;
+    const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    return checkFlexibleUpgrade(charTopCard, cTop) && charTopCard.chakra > cTop.chakra;
+  }) : null;
+
+  const upgradeTarget = sameNameChar ?? flexibleUpgradeTarget;
+
   let effectiveCost: number;
-  if (sameNameChar) {
-    // Allow reveal-for-upgrade: if the revealed card has strictly higher cost
-    const existingTopCard = sameNameChar.stack.length > 0
-      ? sameNameChar.stack[sameNameChar.stack.length - 1]
-      : sameNameChar.card;
+  if (upgradeTarget) {
+    const existingTopCard = upgradeTarget.stack.length > 0
+      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+      : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
       // Reveal-for-upgrade: cost is the difference
       effectiveCost = charTopCard.chakra - existingTopCard.chakra;
-    } else {
+    } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
+    } else {
+      effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
     }
   } else {
     effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
@@ -233,7 +244,7 @@ export function validateUpgradeCharacter(
  * - Ichibi 076 (UC): Can upgrade any Gaara
  * - Ukon 063 (UC) / 124b (R): Can upgrade any Sound Village character
  */
-function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
+export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
   // Already same name — standard upgrade, no special rule needed
   if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
 

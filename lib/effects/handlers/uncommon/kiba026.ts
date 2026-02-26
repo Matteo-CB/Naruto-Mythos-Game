@@ -111,6 +111,5 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
 
 export function registerKiba026Handlers(): void {
   registerEffect('KS-026-UC', 'MAIN', handleKiba026Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to apply the Akamaru search
+  registerEffect('KS-026-UC', 'UPGRADE', handleKiba026Main);
 }

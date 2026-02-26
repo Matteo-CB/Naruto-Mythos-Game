@@ -12,6 +12,9 @@ import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../
 export function executeStartPhase(state: GameState): GameState {
   let newState = { ...state };
 
+  // Reset turn-wide cost modifiers (Shino 033, etc.)
+  newState.playCostIncrease = undefined;
+
   // 1. Reveal mission card
   newState = revealMissionCard(newState);
 

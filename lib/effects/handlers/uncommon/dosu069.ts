@@ -56,18 +56,17 @@ function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
 }
 
 function handleDosu069Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find hidden enemy characters in Dosu's mission only
-  const mission = state.activeMissions[sourceMissionIndex];
-  if (!mission) return { state };
-
+  // Find hidden enemy characters in play (any mission)
   const validTargets: string[] = [];
-  for (const char of mission[enemySide]) {
-    if (char.isHidden) {
-      validTargets.push(char.instanceId);
+  for (const mission of state.activeMissions) {
+    for (const char of mission[enemySide]) {
+      if (char.isHidden) {
+        validTargets.push(char.instanceId);
+      }
     }
   }
 
@@ -78,7 +77,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
       state.phase,
       sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Dosu Kinuta (069): No hidden enemy characters in this mission.',
+      'Dosu Kinuta (069): No hidden enemy characters in play.',
       'game.log.effect.noTarget',
       { card: 'DOSU KINUTA', id: 'KS-069-UC' },
     );
@@ -90,7 +89,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'FORCE_REVEAL_OR_DEFEAT',
     validTargets,
-    description: 'Dosu Kinuta (069): Choose a hidden enemy character in this mission. Opponent must play them paying 2 more, or defeat them.',
+    description: 'Dosu Kinuta (069): Choose a hidden enemy character in play. Opponent must play them paying 2 more, or defeat them.',
     descriptionKey: 'game.effect.desc.dosu069ForceRevealOrDefeat',
   };
 }

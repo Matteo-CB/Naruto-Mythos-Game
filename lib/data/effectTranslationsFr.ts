@@ -423,7 +423,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 031/130 - HINATA HYUGA (UC) - "Byakugan"
   'KS-031-UC': [
-    '[⧗] Quand un personnage ennemi est joue dans cette mission, gagnez 1 Chakra.',
+    '[⧗] Lorsqu\'un personnage ennemi non caché est joué dans cette mission, gagnez 1 Chakra.',
   ],
 
   // 032/130 - SHINO ABURAME (C) - "Insectes Destructeurs"
@@ -661,11 +661,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 110/130 - INO YAMANAKA (R) - "Destruction de l'Esprit"
   'KS-110-R': [
-    'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible depuis cette mission.',
+    'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible.',
     'effet MAIN : Apres l\'avoir deplace, cachez le personnage ennemi.',
   ],
   'KS-110-RA': [
-    'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible depuis cette mission.',
+    'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible.',
     'effet MAIN : Apres l\'avoir deplace, cachez le personnage ennemi.',
   ],
 
