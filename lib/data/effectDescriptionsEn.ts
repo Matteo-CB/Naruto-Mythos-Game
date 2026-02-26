@@ -533,7 +533,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 089/130 - HAKU (UC) - "Crystal Ice Mirrors"
   'KS-089-UC': [
-    'Discard the top X cards of the opponent\'s deck, where X is the number of friendly characters in this mission. POWERUP X.',
+    'Discard the top card of the opponent\'s deck. POWERUP X where X is the cost of the discarded card.',
     'MAIN effect: Instead, discard from your own deck.',
   ],
 
@@ -551,7 +551,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 102/130 - MANDA (UC) - "King of Snakes"
   'KS-102-UC': [
-    'Defeat a Summon character in play.',
+    'AMBUSH [↯] Defeat an enemy Summon character in this mission.',
     '[⧗] At the end of the round, you must return this character to your hand.',
   ],
 

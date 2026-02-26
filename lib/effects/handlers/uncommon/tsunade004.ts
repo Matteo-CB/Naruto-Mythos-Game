@@ -47,9 +47,8 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' }) } };
   }
 
-  // Build valid targets as indices (using card ids as identifiers)
-  // We'll use discard pile card IDs for target selection
-  const validTargets: string[] = discardPile.map((_, idx) => `discard_${idx}`);
+  // Build valid targets as string indices into the discard pile
+  const validTargets: string[] = discardPile.map((_, idx) => String(idx));
 
   // Always let player choose (optional effect)
   return {

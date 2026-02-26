@@ -6,20 +6,20 @@ import { logAction } from '../../../engine/utils/gameLog';
 import { getEffectivePower } from '../../powerUtils';
 
 /**
- * Card 073/130 - KIN TSUCHI "Genjutsu Bells" (UC)
- * Chakra: 3 | Power: 3
- * Group: Sound Village | Keywords: Team Dosu
+ * Card 073/130 - KIN TSUCHI "Bell Sound Clone" (UC)
+ * Chakra: 4 | Power: 4
+ * Group: Sound Village | Keywords: Sound Ninja, Jutsu
  *
- * MAIN: Discard a card from your hand to hide an enemy character with Power 4 or less in play.
+ * MAIN: Discard a card from your hand to hide an enemy character with Power 4 or less.
  *   - Two-step process:
- *     1. Player selects a card from their hand to discard.
- *     2. Player selects a non-hidden enemy character with effective power <= 4 to hide.
- *   - If no valid enemy targets exist, the effect fizzles (no discard needed).
- *   - Requires target selection (the engine handles multi-step resolution).
+ *     Step 1 (KIN073_CHOOSE_ENEMY): Player selects a non-hidden enemy with power <= 4 to hide.
+ *     Step 2 (KIN073_CHOOSE_DISCARD): Player selects a card from hand to discard as cost.
+ *   - If no valid enemy targets exist, the effect fizzles.
+ *   - If hand is empty, the effect fizzles.
+ *   - Effect is optional (no "you must").
  *
  * UPGRADE: Put the top card of your deck as a hidden character in this mission.
  *   - Takes deck[0], places it as a face-down (hidden) character in this mission.
- *   - Uses generateInstanceId() for the new character in play.
  *   - If deck is empty, effect fizzles.
  */
 
@@ -28,7 +28,19 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const playerState = state[sourcePlayer];
 
-  // First check if there are valid enemy targets (non-hidden with effective power <= 4)
+  // Check if player has cards in hand to discard
+  if (playerState.hand.length === 0) {
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Kin Tsuchi (073): No cards in hand to discard.',
+      'game.log.effect.noTarget',
+      { card: 'KIN TSUCHI', id: 'KS-073-UC' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  // Find valid enemy targets (non-hidden with effective power <= 4)
   const validEnemyTargets: string[] = [];
   for (const mission of state.activeMissions) {
     const enemyChars =
@@ -40,13 +52,9 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no valid enemy targets, effect fizzles
   if (validEnemyTargets.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
       'Kin Tsuchi (073): No non-hidden enemy character with Power 4 or less in play.',
       'game.log.effect.noTarget',
@@ -55,31 +63,16 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Check if player has cards in hand to discard (excluding the source card itself if still in hand)
-  if (playerState.hand.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Kin Tsuchi (073): No cards in hand to discard.',
-      'game.log.effect.noTarget',
-      { card: 'KIN TSUCHI', id: 'KS-073-UC' },
-    );
-    return { state: { ...state, log } };
-  }
-
-  // Require target selection: first select a card to discard, then select enemy to hide
-  // The engine resolves this as a multi-step pending action.
-  // We return the enemy targets; the engine pairs this with a discard step.
+  // Step 1: Player chooses enemy to hide
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'DISCARD_AND_HIDE_ENEMY_POWER_4',
+    targetSelectionType: 'KIN073_CHOOSE_ENEMY',
     validTargets: validEnemyTargets,
-    description: 'Kin Tsuchi (073): Discard a card from hand, then select a non-hidden enemy character with Power 4 or less in play to hide.',
-    descriptionKey: 'game.effect.desc.kin073DiscardAndHide',
+    description: JSON.stringify({
+      text: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
+    }),
+    descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
   };
 }
 
@@ -90,10 +83,7 @@ function handleKin073Upgrade(ctx: EffectContext): EffectResult {
   // If deck is empty, effect fizzles
   if (playerState.deck.length === 0) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
       'Kin Tsuchi (073): Deck is empty, cannot place hidden character.',
       'game.log.effect.noTarget',
@@ -138,10 +128,7 @@ function handleKin073Upgrade(ctx: EffectContext): EffectResult {
   newState.activeMissions = missions;
 
   const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
+    state.log, state.turn, state.phase, sourcePlayer,
     'EFFECT_PLACE_HIDDEN',
     'Kin Tsuchi (073): Placed top card of deck as hidden character in this mission (upgrade).',
     'game.log.effect.placeHidden',

@@ -498,7 +498,7 @@ export class EffectEngine {
       tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
       tst === 'NARUTO141_CHOOSE_DISCARD' ||
       tst === 'SASUKE142_CHOOSE_DISCARD' ||
-      tst === 'DISCARD_AND_HIDE_ENEMY_POWER_4'
+      tst === 'KIN073_CHOOSE_DISCARD'
     ) {
       actionType = 'DISCARD_CARD';
     } else if (
@@ -1216,6 +1216,270 @@ export class EffectEngine {
               'game.log.effect.hide',
               { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: kakRes.character.card.name_fr, mission: String(kakRes.missionIndex + 1) },
             );
+          }
+        }
+        break;
+      }
+
+      // --- Sasuke 107 R: Player chose destination mission for a character being moved ---
+      case 'SASUKE107_CHOOSE_DESTINATION': {
+        const destMission107 = parseInt(targetId, 10);
+        if (isNaN(destMission107)) break;
+
+        let parsed107: {
+          charInstanceId?: string;
+          remainingCharIds?: string[];
+          movedCount?: number;
+          isUpgrade?: boolean;
+          sasukeInstanceId?: string;
+          sourceMissionIndex?: number;
+        } = {};
+        try { parsed107 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        const charId107 = parsed107.charInstanceId ?? '';
+        const remaining107 = parsed107.remainingCharIds ?? [];
+        let movedCount107 = parsed107.movedCount ?? 0;
+        const isUpgrade107 = parsed107.isUpgrade ?? false;
+        const sasukeId107 = parsed107.sasukeInstanceId ?? '';
+        const srcMission107 = parsed107.sourceMissionIndex ?? 0;
+        const player107 = pendingEffect.sourcePlayer;
+        const friendlySide107: 'player1Characters' | 'player2Characters' =
+          player107 === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        // Move the character to the chosen mission (with upgrade support)
+        if (charId107) {
+          // Find and remove from source mission
+          let movedChar107: CharacterInPlay | null = null;
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            const chars = newState.activeMissions[i][friendlySide107];
+            const idx = chars.findIndex((c) => c.instanceId === charId107);
+            if (idx !== -1) {
+              movedChar107 = chars[idx];
+              chars.splice(idx, 1);
+              break;
+            }
+          }
+
+          if (movedChar107) {
+            const movedTopCard107 = movedChar107.stack.length > 0
+              ? movedChar107.stack[movedChar107.stack.length - 1]
+              : movedChar107.card;
+            const movedName107 = movedTopCard107.name_fr.toUpperCase();
+            const destChars107 = newState.activeMissions[destMission107][friendlySide107];
+
+            // Check for upgrade at destination
+            const upgradeIdx107 = destChars107.findIndex((c) => {
+              if (c.isHidden) return false;
+              const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return ct.name_fr.toUpperCase() === movedName107
+                && (movedTopCard107.chakra ?? 0) > (ct.chakra ?? 0);
+            });
+
+            if (upgradeIdx107 !== -1) {
+              // Merge stacks (upgrade at destination)
+              const existing = destChars107[upgradeIdx107];
+              const movedStack = movedChar107.stack.length > 0 ? movedChar107.stack : [movedChar107.card];
+              destChars107[upgradeIdx107] = {
+                ...existing,
+                card: movedTopCard107,
+                stack: [...existing.stack, ...movedStack],
+                powerTokens: existing.powerTokens + movedChar107.powerTokens,
+              };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, player107,
+                'EFFECT_MOVE',
+                `Sasuke Uchiwa (107): Moved and upgraded ${movedChar107.card.name_fr} on mission ${destMission107 + 1}.`,
+                'game.log.effect.move',
+                { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr, from: srcMission107, to: destMission107 },
+              );
+            } else {
+              // Place as new character
+              movedChar107.missionIndex = destMission107;
+              destChars107.push(movedChar107);
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, player107,
+                'EFFECT_MOVE',
+                `Sasuke Uchiwa (107): Moved ${movedChar107.card.name_fr} to mission ${destMission107 + 1}.`,
+                'game.log.effect.move',
+                { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr, from: srcMission107, to: destMission107 },
+              );
+            }
+
+            movedCount107++;
+          }
+        }
+
+        // Process remaining characters
+        let nextIdx107 = 0;
+        while (nextIdx107 < remaining107.length) {
+          const nextCharId = remaining107[nextIdx107];
+          // Check if char still exists
+          let nextCharExists = false;
+          let nextCharName = '';
+          for (const m of newState.activeMissions) {
+            const c = m[friendlySide107].find((ch) => ch.instanceId === nextCharId);
+            if (c) { nextCharExists = true; nextCharName = c.card.name_fr; break; }
+          }
+          if (!nextCharExists) { nextIdx107++; continue; }
+
+          // Get valid missions for this char
+          const nextValidMissions: string[] = [];
+          let nextChar107: CharacterInPlay | null = null;
+          for (const m of newState.activeMissions) {
+            const c = m[friendlySide107].find((ch) => ch.instanceId === nextCharId);
+            if (c) { nextChar107 = c; break; }
+          }
+          if (!nextChar107) { nextIdx107++; continue; }
+
+          const nextTopCard = nextChar107.stack.length > 0
+            ? nextChar107.stack[nextChar107.stack.length - 1]
+            : nextChar107.card;
+          const nextName = nextTopCard.name_fr.toUpperCase();
+          const nextCost = nextTopCard.chakra ?? 0;
+
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i === srcMission107) continue;
+            const destChars = newState.activeMissions[i][friendlySide107];
+            const sameNameChar = destChars.find((c) => {
+              if (c.isHidden) return false;
+              const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return ct.name_fr.toUpperCase() === nextName;
+            });
+            if (!sameNameChar) {
+              nextValidMissions.push(String(i));
+            } else {
+              const existingTop = sameNameChar.stack.length > 0
+                ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+              if (nextCost > (existingTop.chakra ?? 0)) {
+                nextValidMissions.push(String(i));
+              }
+            }
+          }
+
+          if (nextValidMissions.length === 0) {
+            // Can't move — skip
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, player107,
+              'EFFECT_NO_TARGET',
+              `Sasuke Uchiwa (107): Cannot move ${nextCharName} — no valid destination.`,
+              'game.log.effect.noTarget',
+              { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
+            );
+            nextIdx107++;
+            continue;
+          }
+
+          if (nextValidMissions.length === 1) {
+            // Auto-move
+            const autoDestIdx = parseInt(nextValidMissions[0], 10);
+            let autoMovedChar: CharacterInPlay | null = null;
+            for (let i = 0; i < newState.activeMissions.length; i++) {
+              const chars = newState.activeMissions[i][friendlySide107];
+              const cIdx = chars.findIndex((c) => c.instanceId === nextCharId);
+              if (cIdx !== -1) {
+                autoMovedChar = chars[cIdx];
+                chars.splice(cIdx, 1);
+                break;
+              }
+            }
+            if (autoMovedChar) {
+              const autoTopCard = autoMovedChar.stack.length > 0
+                ? autoMovedChar.stack[autoMovedChar.stack.length - 1] : autoMovedChar.card;
+              const autoName = autoTopCard.name_fr.toUpperCase();
+              const autoDestChars = newState.activeMissions[autoDestIdx][friendlySide107];
+              const autoUpIdx = autoDestChars.findIndex((c) => {
+                if (c.isHidden) return false;
+                const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return ct.name_fr.toUpperCase() === autoName && (autoTopCard.chakra ?? 0) > (ct.chakra ?? 0);
+              });
+              if (autoUpIdx !== -1) {
+                const existing = autoDestChars[autoUpIdx];
+                const movedStack = autoMovedChar.stack.length > 0 ? autoMovedChar.stack : [autoMovedChar.card];
+                autoDestChars[autoUpIdx] = {
+                  ...existing,
+                  card: autoTopCard,
+                  stack: [...existing.stack, ...movedStack],
+                  powerTokens: existing.powerTokens + autoMovedChar.powerTokens,
+                };
+              } else {
+                autoMovedChar.missionIndex = autoDestIdx;
+                autoDestChars.push(autoMovedChar);
+              }
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, player107,
+                'EFFECT_MOVE',
+                `Sasuke Uchiwa (107): Moved ${nextCharName} to mission ${autoDestIdx + 1}.`,
+                'game.log.effect.move',
+                { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName, from: srcMission107, to: autoDestIdx },
+              );
+              movedCount107++;
+            }
+            nextIdx107++;
+            continue;
+          }
+
+          // Multiple valid missions — create new pending for player choice
+          const nextEffectId = generateInstanceId();
+          const nextActionId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nextEffectId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({
+              charInstanceId: nextCharId,
+              remainingCharIds: remaining107.slice(nextIdx107 + 1),
+              movedCount: movedCount107,
+              isUpgrade: isUpgrade107,
+              sasukeInstanceId: sasukeId107,
+              sourceMissionIndex: srcMission107,
+            }),
+            targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION',
+            sourcePlayer: player107,
+            requiresTargetSelection: true,
+            validTargets: nextValidMissions,
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: isUpgrade107,
+          });
+          newState.pendingActions.push({
+            id: nextActionId,
+            type: 'SELECT_TARGET',
+            player: player107,
+            description: `Sasuke Uchiwa (107): Choose a mission to move ${nextCharName} to.`,
+            descriptionKey: 'game.effect.desc.sasuke107ChooseDestination',
+            descriptionParams: { target: nextCharName },
+            options: nextValidMissions,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: nextEffectId,
+          });
+          break; // Stop processing — wait for player choice
+        }
+
+        // If we got through all remaining chars (or there were none left), apply POWERUP
+        if (nextIdx107 >= remaining107.length && isUpgrade107 && movedCount107 > 0 && sasukeId107) {
+          // Find Sasuke in source mission and add power tokens
+          const sasukeMissions = newState.activeMissions;
+          for (let i = 0; i < sasukeMissions.length; i++) {
+            const chars = sasukeMissions[i][friendlySide107];
+            const sIdx = chars.findIndex((c) => c.instanceId === sasukeId107);
+            if (sIdx !== -1) {
+              chars[sIdx] = {
+                ...chars[sIdx],
+                powerTokens: chars[sIdx].powerTokens + movedCount107,
+              };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, player107,
+                'EFFECT_POWERUP',
+                `Sasuke Uchiwa (107) UPGRADE: POWERUP ${movedCount107} (characters moved).`,
+                'game.log.effect.powerupSelf',
+                { card: 'SASUKE UCHIWA', id: 'KS-107-R', amount: movedCount107 },
+              );
+              break;
+            }
           }
         }
         break;
@@ -2216,16 +2480,76 @@ export class EffectEngine {
         );
         break;
       }
-      case 'DISCARD_AND_HIDE_ENEMY_POWER_4': {
-        // Discard from hand, then hide enemy with power <= 4 (combined in handler)
-        const idx_dh = parseInt(targetId, 10);
-        const ps_dh = { ...newState[pendingEffect.sourcePlayer] };
-        if (idx_dh >= 0 && idx_dh < ps_dh.hand.length) {
-          const hand_dh = [...ps_dh.hand];
-          const discarded_dh = hand_dh.splice(idx_dh, 1)[0];
-          ps_dh.hand = hand_dh;
-          ps_dh.discardPile = [...ps_dh.discardPile, discarded_dh];
-          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_dh };
+      case 'KIN073_CHOOSE_ENEMY': {
+        // Step 1: Player chose an enemy to hide. Now prompt for discard from hand.
+        const enemyInstanceId_k73 = targetId;
+        const ps_k73 = newState[pendingEffect.sourcePlayer];
+        if (ps_k73.hand.length === 1) {
+          // Auto-discard the only card in hand, then hide the enemy
+          const hand_k73 = [...ps_k73.hand];
+          const discarded_k73 = hand_k73.splice(0, 1)[0];
+          newState = {
+            ...newState,
+            [pendingEffect.sourcePlayer]: {
+              ...ps_k73,
+              hand: hand_k73,
+              discardPile: [...ps_k73.discardPile, discarded_k73],
+            },
+          };
+          newState = EffectEngine.hideCharacterWithLog(newState, enemyInstanceId_k73, pendingEffect.sourcePlayer);
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${discarded_k73.name_fr} to hide enemy.`,
+            'game.log.effect.kin073Discard',
+            { card: 'KIN TSUCHI', id: 'KS-073-UC', target: discarded_k73.name_fr },
+          );
+        } else {
+          // Multiple cards in hand — prompt for discard (Step 2)
+          const handIndices_k73 = ps_k73.hand.map((_: unknown, i: number) => String(i));
+          const charResult_k73 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          const step2Result: EffectResult = {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'KIN073_CHOOSE_DISCARD',
+            validTargets: handIndices_k73,
+            description: JSON.stringify({ enemyInstanceId: enemyInstanceId_k73, text: 'Kin Tsuchi (073): Choose a card from your hand to discard.' }),
+            descriptionKey: 'game.effect.desc.kin073ChooseDiscard',
+          };
+          return EffectEngine.createPendingTargetSelection(
+            newState,
+            pendingEffect.sourcePlayer,
+            charResult_k73?.character ?? null,
+            pendingEffect.sourceMissionIndex,
+            'MAIN',
+            false,
+            step2Result,
+            [],
+          );
+        }
+        break;
+      }
+      case 'KIN073_CHOOSE_DISCARD': {
+        // Step 2: Player chose a card to discard. Now apply the hide.
+        let parsed_k73d: { enemyInstanceId?: string } = {};
+        try { parsed_k73d = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const enemyId_k73d = parsed_k73d.enemyInstanceId;
+        const idx_k73d = parseInt(targetId, 10);
+        const ps_k73d = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_k73d >= 0 && idx_k73d < ps_k73d.hand.length) {
+          const hand_k73d = [...ps_k73d.hand];
+          const discarded_k73d = hand_k73d.splice(idx_k73d, 1)[0];
+          ps_k73d.hand = hand_k73d;
+          ps_k73d.discardPile = [...ps_k73d.discardPile, discarded_k73d];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_k73d };
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${discarded_k73d.name_fr} to hide enemy.`,
+            'game.log.effect.kin073Discard',
+            { card: 'KIN TSUCHI', id: 'KS-073-UC', target: discarded_k73d.name_fr },
+          );
+        }
+        if (enemyId_k73d) {
+          newState = EffectEngine.hideCharacterWithLog(newState, enemyId_k73d, pendingEffect.sourcePlayer);
         }
         break;
       }
@@ -2305,7 +2629,6 @@ export class EffectEngine {
       }
       case 'SHINO_MOVE_SELF':
       case 'NARUTO_MOVE_SELF':
-      case 'MOVE_SELF_TO_MISSION':
         newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
         break;
 
@@ -3608,6 +3931,10 @@ export class EffectEngine {
       state, charResult.character, charResult.player, charResult.missionIndex, true,
     );
     if (replacement.replaced) {
+      if (replacement.replacement === 'immune') {
+        // Character is immune to defeat — do nothing
+        return state;
+      }
       if (replacement.replacement === 'hide') {
         return EffectEngine.hideCharacter(state, targetId);
       }
@@ -3652,10 +3979,19 @@ export class EffectEngine {
 
     const defeated = mission[key].splice(idx, 1)[0];
 
-    // Add all cards in the stack to the original owner's discard pile
+    // Tsunade 004 UC: [⧗] Defeated friendly characters go to hand instead of discard pile
     const owner = defeated.originalOwner;
-    for (const card of defeated.stack) {
-      newState[owner].discardPile.push(card);
+    const hasTsunade004 = EffectEngine.hasTsunade004Active(newState, charResult.player);
+    if (hasTsunade004 && charResult.player === owner) {
+      // Cards go to owner's hand instead of discard pile
+      for (const card of defeated.stack) {
+        newState[owner].hand.push(card);
+      }
+    } else {
+      // Normal: add all cards in the stack to the original owner's discard pile
+      for (const card of defeated.stack) {
+        newState[owner].discardPile.push(card);
+      }
     }
 
     // Update character count
@@ -3771,12 +4107,11 @@ export class EffectEngine {
     const validTarget2: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][enemySideKey]) {
-        if (!char.isHidden) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-          const power = topCard.power + char.powerTokens;
-          if (power <= 2) {
-            validTarget2.push(char.instanceId);
-          }
+        // Hidden chars have 0 power → valid targets for Power ≤ 2
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const power = char.isHidden ? 0 : topCard.power + char.powerTokens;
+        if (power <= 2) {
+          validTarget2.push(char.instanceId);
         }
       }
     }
@@ -3969,11 +4304,46 @@ export class EffectEngine {
     return newState;
   }
 
+  /** Check if Tsunade 004 UC is face-visible on a player's side (defeat → hand redirect) */
+  static hasTsunade004Active(state: GameState, player: PlayerID): boolean {
+    for (const mission of state.activeMissions) {
+      const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+      for (const char of chars) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.number === 4 && topCard.rarity === 'UC') {
+          const hasEffect = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('hand instead'),
+          );
+          if (hasEffect) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /** Check if a character is immune to hide by enemy effects (Ichibi 076/130, Kyubi 129) */
+  static isImmuneToEnemyHide(char: CharacterInPlay): boolean {
+    if (char.isHidden) return false;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    if (topCard.number === 76 || topCard.number === 129 || topCard.number === 130) {
+      return (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
+      );
+    }
+    return false;
+  }
+
   /** Hide a character and log the action */
   static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetInstanceId);
     if (!charResult) return state;
     if (charResult.character.isHidden) return state;
+
+    // Check hide immunity from enemy effects (Ichibi 076/130, Kyubi 129)
+    if (charResult.player !== sourcePlayer && EffectEngine.isImmuneToEnemyHide(charResult.character)) {
+      return state; // Immune — hide blocked
+    }
 
     let newState = EffectEngine.hideCharacter(state, targetInstanceId);
     const targetName = charResult.character.card.name_fr;
@@ -4247,6 +4617,25 @@ export class EffectEngine {
         { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
       );
     } else {
+      // Safety check: ensure no same-name visible character exists (name uniqueness)
+      const hasNameConflict = mission[friendlySide].some((c: CharacterInPlay) => {
+        if (c.isHidden) return false;
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      });
+      if (hasNameConflict) {
+        // Can't place — discard instead of creating a duplicate
+        ps.discardPile.push(card);
+        state.log = logAction(
+          state.log, state.turn, 'action', player,
+          'EFFECT_BLOCKED',
+          `${cardName} (${cardId}): Cannot play ${card.name_fr} on mission ${missionIndex + 1} — same name already present.`,
+          'game.log.effect.nameConflictBlocked',
+          { card: cardName, id: cardId, target: card.name_fr },
+        );
+        return state;
+      }
+
       const charInPlay: CharacterInPlay = {
         instanceId: generateInstanceId(),
         card: card as any,
@@ -4719,6 +5108,24 @@ export class EffectEngine {
         { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
       );
     } else {
+      // Safety check: name uniqueness
+      const hasNameConflict_k053 = mission[friendlySide].some((c: CharacterInPlay) => {
+        if (c.isHidden) return false;
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      });
+      if (hasNameConflict_k053) {
+        ps.discardPile.push(card);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, player,
+          'EFFECT_BLOCKED',
+          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} — same name already present.`,
+          'game.log.effect.nameConflictBlocked',
+          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr },
+        );
+        return newState;
+      }
+
       const charInPlay: CharacterInPlay = {
         instanceId: generateInstanceId(),
         card,
@@ -4765,6 +5172,18 @@ export class EffectEngine {
     const card = ps.hand[cardIndex];
     const reducedCost = Math.max(0, card.chakra - 1);
     if (ps.chakra < reducedCost) return state;
+
+    // Safety check: name uniqueness at destination
+    const friendlySide_h002: 'player1Characters' | 'player2Characters' =
+      player === 'player1' ? 'player1Characters' : 'player2Characters';
+    const hasNameConflict_h002 = newState.activeMissions[missionIndex][friendlySide_h002].some((c: CharacterInPlay) => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+    });
+    if (hasNameConflict_h002) {
+      return state; // Cannot place — return original state
+    }
 
     // Pay reduced cost
     ps.chakra -= reducedCost;
@@ -6286,7 +6705,7 @@ export class EffectEngine {
     targetPlayer: PlayerID,
     missionIndex: number,
     isEnemyEffect: boolean,
-  ): { replaced: boolean; replacement: 'hide' | 'sacrifice'; sacrificeInstanceId?: string } {
+  ): { replaced: boolean; replacement: 'hide' | 'sacrifice' | 'immune'; sacrificeInstanceId?: string } {
     if (targetChar.isHidden) {
       return { replaced: false, replacement: 'hide' };
     }
@@ -6313,14 +6732,14 @@ export class EffectEngine {
       }
     }
 
-    // Ichibi 130 (R): Can't be hidden or defeated by enemy effects
-    if (topCard.number === 130 && isEnemyEffect) {
+    // Ichibi 076 (UC), Kyubi 129 (R), Ichibi 130 (R): Can't be hidden or defeated by enemy effects
+    if ((topCard.number === 76 || topCard.number === 129 || topCard.number === 130) && isEnemyEffect) {
       const hasProtection = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
       );
       if (hasProtection) {
-        // Ichibi is immune — defeat is simply blocked (not replaced by hide)
-        return { replaced: true, replacement: 'hide' };
+        // Character is immune — defeat is blocked entirely
+        return { replaced: true, replacement: 'immune' };
       }
     }
 

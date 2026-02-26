@@ -335,7 +335,8 @@
         "kidomaru060DefeatLowPower": "Select an enemy character with Power 1 or less in play to defeat.",
         "kimimaro056DiscardAndHide": "Choose a card to discard, then hide a character with cost 4 or less.",
         "kimimaro056ChooseHide": "Choose a character to hide (cost 4 or less).",
-        "kin073DiscardAndHide": "Discard a card, then select a non-hidden enemy with Power 4 or less to hide.",
+        "kin073ChooseEnemy": "Choose an enemy character with Power 4 or less to hide.",
+        "kin073ChooseDiscard": "Choose a card from your hand to discard.",
         "kisame093StealTokens": "Select an enemy character in play to steal up to 2 Power tokens from.",
         "kisame093StealAllTokens": "Select an enemy character in play to steal ALL Power tokens from.",
         "kurenai035DefeatLowPower": "Select an enemy character with Power 1 or less in this mission to defeat.",
@@ -433,7 +434,8 @@
         "mss07ChooseDestination": "Choose a mission to move the hidden character to.",
         "mss07MoveHidden": "Choose a hidden friendly character to move.",
         "mss08ChooseCard": "Choose a card from your hand to place as a hidden character.",
-        "rockLeeEndMove": "Rock Lee: Choose a mission to move to (end of round)."
+        "rockLeeEndMove": "Rock Lee: Choose a mission to move to (end of round).",
+        "sasuke107ChooseDestination": "Sasuke (107): Choose a mission to move {target} to."
       }
     },
     "anim": {

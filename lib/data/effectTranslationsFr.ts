@@ -600,7 +600,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 089/130 - HAKU (UC) - "Miroirs de Glace"
   'KS-089-UC': [
-    'Defaussez les X cartes du dessus du deck de l\'adversaire, ou X est le nombre de personnages allies dans cette mission. POWERUP X.',
+    'Defaussez la carte du dessus du deck de votre adversaire. PUISSANCE X ou X est le cout de la carte defaussee.',
     'effet MAIN : A la place, defaussez depuis votre propre deck.',
   ],
 
@@ -618,7 +618,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 102/130 - MANDA (UC) - "Roi des Serpents"
   'KS-102-UC': [
-    'Vainquez un personnage Invocation en jeu.',
+    'EMBUSCADE [↯] Vaincre un personnage Invocateur ennemi dans cette mission.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 

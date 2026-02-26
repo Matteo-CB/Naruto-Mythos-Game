@@ -1,5 +1,5 @@
 # DONNEES MANQUANTES - CARTES SANS VISUEL
-# Mis a jour: 2026-02-25
+# Mis a jour: 2026-02-26
 #
 # Ce fichier ne liste QUE les cartes sans image qui ont des donnees manquantes.
 # Les cartes sans image mais avec toutes leurs donnees ne sont PAS listees ici
@@ -19,10 +19,7 @@
 # ============================================================
 # CARTES COMPLETES (SEULEMENT BESOIN D'IMAGE) - pour reference
 # ============================================================
-# KS-004-UC  TSUNADE - La Creation et le Renouveau (C4/P4)
 # KS-045-UC  ANKO MITARASHI - La Poigne du Serpent Spectral (C3/P4)
-# KS-073-UC  KIN TSUCHI - Clone du son de cloche (C4/P4)
-# KS-076-UC  ICHIBI - Metamorphose Partielle (C6/P9)
 # KS-108-R   NARUTO UZUMAKI - Believe it! (C5/P5)
 # KS-112-R   CHOJI AKIMICHI - C'est qui que tu traites de gros ? (C5/P4)
 # KS-116-RA  NEJI HYUGA - Hakke Soixante-Quatre Paumes (C6/P5)
@@ -32,6 +29,11 @@
 # KS-128-R   ITACHI UCHIWA - Je les controle tous. (C6/P6)
 # KS-129-R   KYUBI - Manteau du Demon Renard (C7/P10)
 # KS-130-R   ICHIBI - J'espere que tu es pret a mourir ! (C7/P10) [GROUP manquant]
+#
+# AJOUTEES AVEC VISUEL (2026-02-26):
+# KS-004-UC  TSUNADE - Mitotic Regeneration (C4/P4) — DONE
+# KS-073-UC  KIN TSUCHI - Bell Sound Clone (C4/P4) — DONE
+# KS-076-UC  ICHIBI - Partial Transformation (C6/P9) — DONE
 # ============================================================
 
 
@@ -229,8 +231,8 @@ effects =
 # RESUME
 ################################################################
 #
-# TOTAL CARTES SANS VISUEL: 27
-#   - 13 avec donnees completes (besoin image seulement)
+# TOTAL CARTES SANS VISUEL: 24 (3 ajoutees avec visuel le 26/02)
+#   - 10 avec donnees completes (besoin image seulement)
 #   - 14 avec donnees manquantes:
 #       2 Rare (R):   KS-115-R Shino, KS-127-R Sakon — TOUT manque
 #       5 Rare Art:   KS-115-RA, KS-122-RA, KS-124-RA, KS-127-RA, KS-129-RA
