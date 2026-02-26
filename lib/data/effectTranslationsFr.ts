@@ -1063,6 +1063,10 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
     'effet : À la place, éliminez-les tous les deux.',
   ],
+  'KS-133-MV': [
+    'Cachez un personnage ennemi ayant une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi ayant une Puissance de 2 ou moins en jeu.',
+    'effet MAIN : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
+  ],
   'KS-136-SV': [
     '[⧗] Quand un personnage est éliminé, gagnez 1 Chakra.',
     'Vous devez choisir un personnage ami non caché et un personnage ennemi dans cette mission et les éliminer, si possible.',
