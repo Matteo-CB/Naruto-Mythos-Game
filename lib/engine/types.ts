@@ -35,6 +35,7 @@ export interface CardData {
   effects: CardEffect[];
   image_file?: string;
   is_rare_art?: boolean;
+  data_complete?: boolean;
 }
 
 export interface CharacterCard extends CardData {

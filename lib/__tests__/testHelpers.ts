@@ -31,6 +31,7 @@ export function mockCharacter(overrides: Partial<CharacterCard> = {}): Character
     group: overrides.group ?? 'Leaf Village',
     effects: overrides.effects ?? [],
     image_file: overrides.image_file,
+    data_complete: overrides.data_complete,
   };
 }
 
