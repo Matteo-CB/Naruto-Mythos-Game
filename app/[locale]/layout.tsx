@@ -7,7 +7,6 @@ import { SessionProvider } from 'next-auth/react';
 import { NotificationContainer } from '@/components/social/NotificationContainer';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
-import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import type { Metadata } from 'next';
 
 const SITE_URL = 'https://narutomythosgame.com';
@@ -156,7 +155,6 @@ export default async function LocaleLayout({ children, params }: Props) {
           <BreadcrumbJsonLd />
         </Suspense>
         {children}
-        <LandscapeBlocker />
         <NotificationContainer />
       </NextIntlClientProvider>
     </SessionProvider>

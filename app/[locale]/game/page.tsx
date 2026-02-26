@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
+import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion
 const GameBoard = dynamic(
@@ -110,6 +111,7 @@ export default function GamePage() {
   return (
     <>
       <GameBoard />
+      <LandscapeBlocker />
       {showConnectionLost && (
         <div
           className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium"
