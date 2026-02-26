@@ -5719,7 +5719,7 @@
       "rarity_display": "",
       "image_file": "",
       "is_rare_art": true,
-      "data_complete": true,
+      "data_complete": false,
       "old_id": "115/130 A"
     },
     "KS-116-RA": {
@@ -5950,11 +5950,14 @@
       "title_fr": "Poing d'Arhat",
       "title_en": "Arhat Fist",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Sound Four", "Taijutsu"],
+      "group": "Sound Village",
+      "effects": [
+        { "type": "MAIN", "description": "POWERUP X where X is the number of characters in this mission.", "description_fr": "POWERUP X ou X est le nombre de personnages dans cette mission." },
+        { "type": "UPGRADE", "description": "Defeat an enemy character with Power 1 or less in this mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 1 ou moins dans cette mission." }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
@@ -6009,11 +6012,14 @@
       "title_fr": "Arc d'Araignée : Déchirure Féroce",
       "title_en": "Spider Bow: Fierce Rip",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        { "type": "AMBUSH", "description": "Defeat an enemy character with Power 3 or less in another mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission." },
+        { "type": "UPGRADE", "description": "AMBUSH effect: Instead, the Power limit is 5 or less.", "description_fr": "Effet EMBUSCADE : La limite de Puissance est désormais 5 ou moins." }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
@@ -6114,7 +6120,7 @@
       "rarity_display": "",
       "image_file": "",
       "is_rare_art": true,
-      "data_complete": true,
+      "data_complete": false,
       "old_id": "127/130 A"
     },
     "KS-128-RA": {
@@ -6164,11 +6170,14 @@
       "title_fr": "Manteau du Démon Renard",
       "title_en": "Demon Fox Cloak",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 7,
+      "power": 10,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        { "type": "MAIN", "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.", "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur Naruto Uzumaki." },
+        { "type": "MAIN", "description": "[⧗] Can't be hidden or defeated by enemy effects.", "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis." }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
