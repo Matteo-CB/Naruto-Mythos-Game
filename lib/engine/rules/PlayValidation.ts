@@ -269,6 +269,16 @@ function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard)
     }
   }
 
+  // Kyubi 129 (R): Can upgrade over Naruto Uzumaki
+  if (newCard.number === 129) {
+    const hasFlexible = (newCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Naruto Uzumaki'),
+    );
+    if (hasFlexible) {
+      return targetCard.name_fr.toUpperCase().includes('NARUTO');
+    }
+  }
+
   // Ukon 063 (UC) / 124b (R): Can upgrade over any Sound Village character
   if (newCard.number === 63 || newCard.number === 124) {
     const hasFlexible = (newCard.effects ?? []).some(

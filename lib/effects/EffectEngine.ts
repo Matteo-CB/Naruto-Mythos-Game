@@ -1005,6 +1005,8 @@ export class EffectEngine {
       // DEFEAT types
       // =============================================
       case 'NEJI116_DEFEAT_TARGET':
+      case 'NEJI116_DEFEAT_POWER4':
+      case 'NEJI116_DEFEAT_POWER6':
       case 'KURENAI116B_DEFEAT_TARGET':
       case 'KIBA113_DEFEAT_TARGET':
       case 'KANKURO119_DEFEAT_TARGET':
