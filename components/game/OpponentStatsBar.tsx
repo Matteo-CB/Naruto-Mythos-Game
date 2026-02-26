@@ -4,9 +4,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useGameScale } from './GameScaleContext';
 
 export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
   const t = useTranslations();
+  const dims = useGameScale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
 
@@ -72,6 +74,14 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 
       {/* Spacer */}
       <div className="flex-1" />
+
+      {/* Deck + Discard on mobile (side piles hidden) */}
+      {dims.isMobile && (
+        <>
+          <StatPill label={t('game.deck')} value={opponentState.deckSize} color="#888888" />
+          <StatPill label={t('game.discard')} value={opponentState.discardPileSize} color="#888888" />
+        </>
+      )}
 
       {/* Chakra */}
       <StatPill label={t('game.chakra')} value={opponentState.chakra} color="#b33e3e" />

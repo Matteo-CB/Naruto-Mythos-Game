@@ -15,7 +15,9 @@
     "createdBy": "Cr\u00e9\u00e9 par",
     "previous": "Pr\u00e9c\u00e9dent",
     "next": "Suivant",
-    "page": "Page"
+    "page": "Page",
+    "rotateDevice": "Tournez votre appareil en mode paysage pour jouer",
+    "fullscreen": "Plein \u00e9cran"
   },
   "home": {
     "title": "NARUTO MYTHOS",
