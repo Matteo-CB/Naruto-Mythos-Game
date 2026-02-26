@@ -3,7 +3,7 @@ import { HIDDEN_PLAY_COST } from '../types';
 import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
 import { logAction } from '../utils/gameLog';
-import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '../rules/PlayValidation';
+import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
 import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 
@@ -68,8 +68,9 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
   }
 
   // If both haven't passed, alternate active player (unless one has passed)
+  // Don't switch if there are pending effects/actions — the current player must resolve them first
   if (!newState.player1.hasPassed && !newState.player2.hasPassed) {
-    if (action.type !== 'PASS') {
+    if (action.type !== 'PASS' && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
       newState.activePlayer = otherPlayer;
     }
   }
@@ -261,13 +262,16 @@ function handleRevealCharacter(
 
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Check if this reveal is an upgrade over an existing same-name character
+  // Check if this reveal is an upgrade over an existing character (same-name or flexible)
   const upgradeTarget = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (c.isHidden) return false;
     const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase()
-      && charTopCard.chakra > cTop.chakra;
+    if (charTopCard.chakra <= cTop.chakra) return false;
+    // Same-name upgrade
+    if (cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase()) return true;
+    // Flexible upgrade (Orochimaru 138, Akamaru 029, etc.)
+    return checkFlexibleUpgrade(charTopCard, cTop);
   });
 
   let effectiveCost: number;

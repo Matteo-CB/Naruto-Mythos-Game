@@ -5,7 +5,7 @@ import { deepClone } from '../engine/utils/deepClone';
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
-import { checkNinjaHoundsTrigger } from './moveTriggers';
+import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 
 /**
  * Central effect resolver.
@@ -514,7 +514,8 @@ export class EffectEngine {
       tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
-      tst === 'SASUKE014_CHOOSE_HAND_CARD'
+      tst === 'SASUKE014_CHOOSE_HAND_CARD' ||
+      tst === 'TSUNADE104_CHOOSE_CHAKRA'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
     }
@@ -1082,9 +1083,81 @@ export class EffectEngine {
       case 'JIROBO122_DEFEAT_TARGET':
       case 'KIDOMARU124_DEFEAT_TARGET':
       case 'OROCHIMARU126_DEFEAT_WEAKEST':
-      case 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION':
       case 'KIBA149_CHOOSE_DEFEAT_TARGET':
       case 'SASUKE136_CHOOSE_ENEMY':
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        break;
+
+      // --- Tenten 118 (R/RA): Defeat hidden in mission, then if Power <= 3, defeat hidden in play ---
+      case 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION': {
+        // Check the defeated character's printed power BEFORE defeating
+        const tenten118Char = EffectEngine.findCharByInstanceId(newState, targetId);
+        let tenten118PrintedPower = 99;
+        if (tenten118Char) {
+          const tTop = tenten118Char.character.stack.length > 0
+            ? tenten118Char.character.stack[tenten118Char.character.stack.length - 1]
+            : tenten118Char.character.card;
+          tenten118PrintedPower = tTop.power ?? 0;
+        }
+
+        // Defeat the first target
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+
+        // If defeated character had printed Power <= 3, defeat another hidden character in play
+        if (tenten118PrintedPower <= 3) {
+          const hiddenTargets: string[] = [];
+          for (const mission of newState.activeMissions) {
+            for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
+              if (c.isHidden) {
+                hiddenTargets.push(c.instanceId);
+              }
+            }
+          }
+          if (hiddenTargets.length === 1) {
+            newState = EffectEngine.defeatCharacter(newState, hiddenTargets[0], pendingEffect.sourcePlayer);
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT', `Tenten (118): Defeated character had Power ${tenten118PrintedPower} (<=3), defeated another hidden character.`,
+              'game.log.effect.tenten118SecondDefeat', { card: 'TENTEN', id: 'KS-118-R' });
+          } else if (hiddenTargets.length > 1) {
+            const tt118EffId = generateInstanceId();
+            const tt118ActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: tt118EffId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: '',
+              targetSelectionType: 'TENTEN_118_DEFEAT_HIDDEN_IN_PLAY',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: hiddenTargets,
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: false,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: tt118ActId,
+              type: 'SELECT_TARGET' as PendingAction['type'],
+              player: pendingEffect.sourcePlayer,
+              description: `Tenten (118): Defeated character had Power ${tenten118PrintedPower} (<=3). Choose a hidden character in play to defeat.`,
+              descriptionKey: 'game.effect.desc.tenten118DefeatHiddenInPlay',
+              options: hiddenTargets,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: tt118EffId,
+            }];
+          } else {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_NO_TARGET', `Tenten (118): Defeated character had Power ${tenten118PrintedPower} (<=3) but no other hidden characters in play.`,
+              'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-118-R' });
+          }
+        }
+        break;
+      }
+
+      case 'TENTEN_118_DEFEAT_HIDDEN_IN_PLAY':
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
@@ -2717,12 +2790,7 @@ export class EffectEngine {
           for (let i = 0; i < newState.activeMissions.length; i++) {
             if (i !== moveChar.missionIndex) validDests_mv.push(String(i));
           }
-          if (validDests_mv.length === 1) {
-            newState = EffectEngine.moveCharToMissionDirectPublic(
-              newState, targetId, parseInt(validDests_mv[0], 10),
-              moveChar.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
-            );
-          } else if (validDests_mv.length > 1) {
+          if (validDests_mv.length >= 1) {
             const tst2 = pendingEffect.targetSelectionType === 'MOVE_CHARACTER_POWER_4_OR_LESS'
               ? 'KANKURO078_MOVE_DESTINATION'
               : pendingEffect.targetSelectionType === 'MOVE_FRIENDLY_SAND_VILLAGE'
@@ -3393,6 +3461,50 @@ export class EffectEngine {
               { card: 'GAARA', id: 'KS-120-R', amount: defeatedCount_g },
             );
           }
+        }
+        break;
+      }
+
+      // Tsunade 104 (R): Player chose how much extra chakra to spend for POWERUP
+      case 'TSUNADE104_CHOOSE_CHAKRA': {
+        const chakraAmount = parseInt(targetId, 10);
+        if (!isNaN(chakraAmount) && chakraAmount > 0) {
+          // Deduct chakra
+          const ps104 = { ...newState[pendingEffect.sourcePlayer] };
+          ps104.chakra -= chakraAmount;
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps104 };
+
+          // POWERUP on self
+          const charResult104 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          if (charResult104) {
+            const missions104 = [...newState.activeMissions];
+            const mission104 = { ...missions104[charResult104.missionIndex] };
+            const side104: 'player1Characters' | 'player2Characters' =
+              charResult104.player === 'player1' ? 'player1Characters' : 'player2Characters';
+            mission104[side104] = mission104[side104].map((c: CharacterInPlay) =>
+              c.instanceId === pendingEffect.sourceInstanceId
+                ? { ...c, powerTokens: c.powerTokens + chakraAmount }
+                : c,
+            );
+            missions104[charResult104.missionIndex] = mission104;
+            newState.activeMissions = missions104;
+          }
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP',
+            `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount}.`,
+            'game.log.effect.powerupSelf',
+            { card: 'TSUNADE', id: 'KS-104-R', amount: chakraAmount },
+          );
+        } else {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            'Tsunade (104): Chose not to spend extra chakra.',
+            'game.log.effect.tsunade104Decline',
+            { card: 'TSUNADE', id: 'KS-104-R' },
+          );
         }
         break;
       }
@@ -6729,6 +6841,9 @@ export class EffectEngine {
 
     // Check Ninja Hounds 100 trigger
     state = checkNinjaHoundsTrigger(state, movedChar, destMissionIndex, charOwner);
+
+    // Check Choji 018 post-move hide trigger (only on friendly moves)
+    state = checkChoji018PostMoveTrigger(state, movedChar, destMissionIndex, charOwner, charResult.player);
 
     return state;
   }

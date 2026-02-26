@@ -343,7 +343,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
         const tst = pendingEffect?.targetSelectionType ?? '';
-        if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD') {
+        if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
           const playerDiscard = visibleState.myState.discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
@@ -715,7 +715,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const tst = pendingEffect?.targetSelectionType ?? '';
         // Sakura 109: indices are into the discard pile
         // Sakura 135: indices are into drawn cards stored at end of discard pile (use JSON description)
-        if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
+        if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            return {
+              index: amount,
+              card: {
+                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                chakra: amount,
+                power: amount,
+              },
+            };
+          });
+        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
           const playerDiscard = newState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
@@ -1114,7 +1126,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
         const tst = pendingEffect?.targetSelectionType ?? '';
-        if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
+        if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            return {
+              index: amount,
+              card: {
+                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                chakra: amount,
+                power: amount,
+              },
+            };
+          });
+        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
           const playerDiscard = currentState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);

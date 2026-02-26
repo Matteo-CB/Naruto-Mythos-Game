@@ -1042,8 +1042,8 @@
       "group": "Leaf Village",
       "effects": [
         {
-          "type": "AMBUSH",
-          "description": "[↯] Play this character paying 4 less if there's an enemy Jutsu character in this mission.",
+          "type": "MAIN",
+          "description": "All characters played by the opponent cost 1 more this turn.",
           "description_fr": ""
         },
         {
@@ -1095,7 +1095,7 @@
       "set": "KS",
       "card_type": "character",
       "name_en": "KURENAI YUHI",
-      "name_fr": "YUHI KURENAI",
+      "name_fr": "KURENAI YUHI",
       "title_fr": "Lien de l'Arbre : Mort",
       "title_en": "Sawarabi no Mai: Bracken Dance",
       "has_visual": true,
