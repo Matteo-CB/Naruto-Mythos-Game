@@ -335,7 +335,8 @@
         "kidomaru060DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins en jeu a vaincre.",
         "kimimaro056DiscardAndHide": "Choisissez une carte a defausser, puis cachez un personnage avec cout 4 ou moins.",
         "kimimaro056ChooseHide": "Choisissez un personnage a cacher (cout 4 ou moins).",
-        "kin073DiscardAndHide": "Defaussez une carte, puis selectionnez un ennemi non-cache avec Puissance 4 ou moins a cacher.",
+        "kin073ChooseEnemy": "Choisissez un personnage ennemi avec Puissance 4 ou moins \u00e0 cacher.",
+        "kin073ChooseDiscard": "Choisissez une carte de votre main \u00e0 d\u00e9fausser.",
         "kisame093StealTokens": "Selectionnez un personnage ennemi en jeu pour voler jusqu'a 2 jetons de Puissance.",
         "kisame093StealAllTokens": "Selectionnez un personnage ennemi en jeu pour voler TOUS les jetons de Puissance.",
         "kurenai035DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins dans cette mission a vaincre.",
@@ -433,7 +434,8 @@
         "mss07ChooseDestination": "Choisissez une mission pour y deplacer le personnage cache.",
         "mss07MoveHidden": "Choisissez un personnage cache allie a deplacer.",
         "mss08ChooseCard": "Choisissez une carte de votre main a placer comme personnage cache.",
-        "rockLeeEndMove": "Rock Lee : Choisissez une mission ou le deplacer (fin de round)."
+        "rockLeeEndMove": "Rock Lee : Choisissez une mission ou le deplacer (fin de round).",
+        "sasuke107ChooseDestination": "Sasuke (107) : Choisissez une mission pour y deplacer {target}."
       }
     },
     "anim": {

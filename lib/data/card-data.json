@@ -104,8 +104,8 @@
       "name_en": "TSUNADE",
       "name_fr": "TSUNADE",
       "title_fr": "La Création et le Renouveau",
-      "title_en": "Creation Rebirth",
-      "has_visual": false,
+      "title_en": "Mitotic Regeneration",
+      "has_visual": true,
       "chakra": 4,
       "power": 4,
       "keywords": ["Sannin", "Jutsu"],
@@ -114,17 +114,17 @@
         {
           "type": "MAIN",
           "description": "[⧗] Defeated friendly characters go into your hand instead of your discard pile.",
-          "description_fr": ""
+          "description_fr": "[⧗] Les personnages amis vaincus vont dans votre main au lieu de votre pile de défausse."
         },
         {
           "type": "UPGRADE",
           "description": "Choose one character in your discard pile and put them into your hand.",
-          "description_fr": ""
+          "description_fr": "Choisissez un personnage dans votre défausse et ajoutez-le à votre main."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/uncommon/KS-004-UC.webp",
       "rarity_display": "Uncommon",
-      "image_file": "",
+      "image_file": "images/cards/KS/uncommon/KS-004-UC.webp",
       "data_complete": true,
       "old_id": "004/130"
     },
@@ -2328,27 +2328,27 @@
       "name_en": "KIN TSUCHI",
       "name_fr": "KIN TSUCHI",
       "title_fr": "Clone du son de cloche",
-      "title_en": "Bell Clone",
-      "has_visual": false,
+      "title_en": "Bell Sound Clone",
+      "has_visual": true,
       "chakra": 4,
       "power": 4,
-      "keywords": ["Team Dosu", "Jutsu"],
+      "keywords": ["Sound Ninja", "Jutsu"],
       "group": "Sound Village",
       "effects": [
         {
           "type": "MAIN",
           "description": "Discard a card to hide an enemy character with Power 4 or less.",
-          "description_fr": ""
+          "description_fr": "Défaussez une carte pour cacher un personnage ennemi avec une Puissance de 4 ou moins."
         },
         {
           "type": "UPGRADE",
           "description": "Put the top card of your deck as a hidden character in this mission.",
-          "description_fr": ""
+          "description_fr": "Placez la carte du dessus de votre deck comme personnage caché dans cette mission."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/uncommon/KS-073-UC.webp",
       "rarity_display": "Uncommon",
-      "image_file": "",
+      "image_file": "images/cards/KS/uncommon/KS-073-UC.webp",
       "data_complete": true,
       "old_id": "073/130"
     },
@@ -2428,7 +2428,7 @@
       "name_fr": "ICHIBI",
       "title_fr": "Métamorphose Partielle",
       "title_en": "Partial Transformation",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 9,
       "keywords": ["Tailed Beast"],
@@ -2437,17 +2437,17 @@
         {
           "type": "MAIN",
           "description": "[⧗] You can play this character as an upgrade over Gaara.",
-          "description_fr": ""
+          "description_fr": "[⧗] Vous pouvez jouer ce personnage comme une amélioration par-dessus Gaara."
         },
         {
           "type": "MAIN",
           "description": "[⧗] Can't be hidden or defeated by enemy effects.",
-          "description_fr": ""
+          "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/uncommon/KS-076-UC.webp",
       "rarity_display": "Uncommon",
-      "image_file": "",
+      "image_file": "images/cards/KS/uncommon/KS-076-UC.webp",
       "data_complete": true,
       "old_id": "076/130"
     },
@@ -2556,7 +2556,7 @@
       "name_en": "TEMARI",
       "name_fr": "TEMARI",
       "title_fr": "La Grande Lame du Vent",
-      "title_en": "Wind Scythe Jutsu",
+      "title_en": "Cyclone Scythe Jutsu",
       "has_visual": true,
       "chakra": 4,
       "power": 4,

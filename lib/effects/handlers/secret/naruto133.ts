@@ -27,10 +27,10 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Target 1: enemy with Power <= 5 in THIS mission
+  // Target 1: enemy with Power <= 5 in THIS mission (hidden chars have 0 power → valid)
   const thisMission = state.activeMissions[ctx.sourceMissionIndex];
   const validTarget1 = thisMission[enemySideKey]
-    .filter((c) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 5)
+    .filter((c) => getEffectivePower(state, c, opponentPlayer) <= 5)
     .map((c) => c.instanceId);
 
   if (validTarget1.length === 0) {
@@ -73,7 +73,7 @@ function checkTarget2Only(ctx: EffectContext, state: EffectContext['state'], use
   const validTarget2: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][enemySideKey]) {
-      if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 2) {
+      if (getEffectivePower(state, char, opponentPlayer) <= 2) {
         validTarget2.push(char.instanceId);
       }
     }

@@ -27,18 +27,26 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
+  // Track the pre-action state to detect if the action actually succeeded.
+  // Handlers return the SAME object reference on validation failure.
+  const beforeAction = newState;
+
   switch (action.type) {
     case 'PLAY_CHARACTER':
       newState = handlePlayCharacter(newState, player, action.cardIndex, action.missionIndex);
+      if (newState === beforeAction) return state; // Failed — don't skip turn
       break;
     case 'PLAY_HIDDEN':
       newState = handlePlayHidden(newState, player, action.cardIndex, action.missionIndex);
+      if (newState === beforeAction) return state;
       break;
     case 'REVEAL_CHARACTER':
       newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId);
+      if (newState === beforeAction) return state;
       break;
     case 'UPGRADE_CHARACTER':
       newState = handleUpgradeCharacter(newState, player, action.cardIndex, action.missionIndex, action.targetInstanceId);
+      if (newState === beforeAction) return state;
       break;
     case 'PASS':
       newState = handlePass(newState, player);
