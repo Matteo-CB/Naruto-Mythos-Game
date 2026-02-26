@@ -2795,7 +2795,7 @@ export class EffectEngine {
         newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
         const destMIdx018 = parseInt(targetId, 10);
         if (!isNaN(destMIdx018)) {
-          const { postMoveHide } = require('./handlers/uncommon/choji018');
+          const { postMoveHide } = require('./handlers/KS/uncommon/choji018');
           const hideResult = postMoveHide(newState, pendingEffect.sourceInstanceId, destMIdx018, pendingEffect.sourcePlayer);
           if (hideResult.requiresTargetSelection && hideResult.validTargets && hideResult.validTargets.length > 0) {
             return EffectEngine.createPendingTargetSelection(
