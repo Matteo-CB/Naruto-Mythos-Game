@@ -103,22 +103,23 @@ p, li, blockquote, figcaption, .font-body {
   letter-spacing: 0.05em;
 }
 
-/* Phone rotation animation — rotates from portrait (0deg) to landscape (90deg) */
+/* Phone rotation animation — phone tips from upright to landscape */
 .phone-rotate-animation {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: rotate-phone 2.5s ease-in-out infinite;
 }
 
 .phone-outline {
   position: relative;
   width: 36px;
-  height: 60px;
+  height: 62px;
   border: 2.5px solid var(--accent);
   border-radius: 8px;
+  animation: rotate-phone 3s ease-in-out infinite;
+  transform-origin: center center;
 }
 
 .phone-screen {
@@ -141,17 +142,14 @@ p, li, blockquote, figcaption, .font-body {
 }
 
 @keyframes rotate-phone {
-  0%, 20% {
+  0%, 15% {
     transform: rotate(0deg);
-    opacity: 1;
   }
-  40%, 70% {
-    transform: rotate(90deg);
-    opacity: 0.6;
+  35%, 65% {
+    transform: rotate(-90deg);
   }
   85%, 100% {
     transform: rotate(0deg);
-    opacity: 1;
   }
 }
 

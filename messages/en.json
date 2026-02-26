@@ -17,7 +17,8 @@
     "next": "Next",
     "page": "Page",
     "rotateDevice": "Rotate your device to landscape mode to play",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "play": "Play"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -542,6 +543,12 @@
     "importError": "Invalid import code",
     "importNotFound": "{count} card(s) not found: {ids}",
     "orBuildManually": "Or build your deck manually",
+    "editDeck": "Edit",
+    "deleteDeck": "Delete",
+    "confirmDelete": "Delete {name}?",
+    "currentlyEditing": "Currently editing",
+    "newDeck": "New Deck",
+    "myDecks": "My Decks",
     "error": {
       "maxCopies": "Max {max} copies of {name}",
       "maxMissions": "Max {max} missions",

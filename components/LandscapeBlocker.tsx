@@ -47,7 +47,7 @@ export function LandscapeBlocker() {
           <p className="portrait-blocker-text">{t('rotateDevice')}</p>
           <button className="fullscreen-btn" onClick={handleFullscreen} type="button">
             <span className="fullscreen-icon"><span className="fullscreen-icon-inner" /></span>
-            {t('fullscreen')}
+            {t('play')}
           </button>
         </div>
       </div>

@@ -523,6 +523,301 @@ function FullscreenCardDetail() {
     unpinCard();
   };
 
+  // Shared card info content
+  const cardInfoContent = (
+    <>
+      {/* Type badge + Rarity */}
+      <div className="flex items-center justify-between">
+        <span
+          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} rounded font-bold uppercase tracking-wider`}
+          style={{
+            backgroundColor: isMission
+              ? "rgba(196, 163, 90, 0.12)"
+              : "rgba(255, 255, 255, 0.04)",
+            color: isMission ? "#c4a35a" : "#888888",
+            border: `1px solid ${isMission ? "rgba(196, 163, 90, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
+          }}
+        >
+          {isMission ? t("card.mission") : t("card.character")}
+        </span>
+        <span
+          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} rounded shrink-0 font-bold`}
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.04)",
+            border: `1px solid ${rarityColor}`,
+            color: rarityColor,
+          }}
+        >
+          {card.rarity}
+        </span>
+      </div>
+
+      {/* Name */}
+      <div className="flex flex-col gap-0.5">
+        <span
+          className={`${dims.isMobile ? 'text-sm' : 'text-lg'} font-bold leading-tight`}
+          style={{ color: "#e0e0e0" }}
+        >
+          {getCardName(card, locale as 'en' | 'fr')}
+        </span>
+        {(card.title_fr || card.title_en) && (
+          <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#999999" }}>
+            {getCardTitle(card, locale as 'en' | 'fr')}
+          </span>
+        )}
+      </div>
+
+      {/* Chakra + Power (character cards) */}
+      {isCharacter && (
+        <div
+          className={`flex items-center ${dims.isMobile ? 'gap-3 p-1.5' : 'gap-6 p-3'} rounded-lg`}
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.03)",
+            border: "1px solid rgba(255, 255, 255, 0.05)",
+          }}
+        >
+          <div className="flex flex-col items-center gap-0.5">
+            <span
+              className={`${dims.isMobile ? 'text-[8px]' : 'text-xs'} uppercase tracking-wider`}
+              style={{ color: "#888888" }}
+            >
+              {t("collection.details.cost")}
+            </span>
+            <span
+              className={`${dims.isMobile ? 'text-base' : 'text-xl'} font-bold`}
+              style={{ color: "#c4a35a" }}
+            >
+              {(card as CharacterCard).chakra}
+            </span>
+          </div>
+          <div
+            className="w-px h-6 shrink-0"
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+          />
+          <div className="flex flex-col items-center gap-0.5">
+            <span
+              className={`${dims.isMobile ? 'text-[8px]' : 'text-xs'} uppercase tracking-wider`}
+              style={{ color: "#888888" }}
+            >
+              {t("collection.details.power")}
+            </span>
+            <span
+              className={`${dims.isMobile ? 'text-base' : 'text-xl'} font-bold`}
+              style={{ color: "#e0e0e0" }}
+            >
+              {(card as CharacterCard).power}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Mission rank + points (compact on mobile) */}
+      {isMission && missionContext && (
+        <div
+          className={`flex flex-col gap-1 ${dims.isMobile ? 'p-1.5' : 'p-3'} rounded-lg`}
+          style={{
+            backgroundColor: "rgba(255, 255, 255, 0.03)",
+            border: `1px solid ${rankColorMap[missionContext.rank] ?? "#555"}40`,
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#aaaaaa" }}>
+              {t("card.rank")}
+            </span>
+            <span
+              className={`${dims.isMobile ? 'text-xs px-2 py-0.5' : 'text-base px-3 py-1'} font-bold rounded`}
+              style={{
+                color: rankColorMap[missionContext.rank] ?? "#888",
+                backgroundColor: `${rankColorMap[missionContext.rank] ?? "#888"}15`,
+              }}
+            >
+              {missionContext.rank}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'} font-bold`} style={{ color: "#c4a35a" }}>
+              {t("card.totalPoints")}
+            </span>
+            <span className={`${dims.isMobile ? 'text-xs' : 'text-base'} font-bold tabular-nums`} style={{ color: "#c4a35a" }}>
+              {missionContext.basePoints + missionContext.rankBonus} {t("game.board.pts")}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Base points fallback */}
+      {isMission && !missionContext && "basePoints" in card && (
+        <span className="text-xs" style={{ color: "#c4a35a" }}>
+          {t("game.board.base")}: {(card as MissionCard).basePoints} {t("game.board.pts")}
+        </span>
+      )}
+
+      {/* Keywords */}
+      {card.keywords && card.keywords.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {card.keywords.map((kw) => (
+            <span
+              key={kw}
+              className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-0.5'} rounded`}
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                color: "#999999",
+                border: "1px solid rgba(255, 255, 255, 0.04)",
+              }}
+            >
+              {getCardKeyword(kw, locale as 'en' | 'fr')}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Group */}
+      {card.group && (
+        <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#999999" }}>
+          {getCardGroup(card.group, locale as 'en' | 'fr')}
+        </span>
+      )}
+
+      {/* Effects section */}
+      <div
+        className={`flex flex-col ${dims.isMobile ? 'gap-1.5 pt-1.5' : 'gap-2.5 pt-3'}`}
+        style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
+      >
+        <span
+          className={`${dims.isMobile ? 'text-[9px]' : 'text-xs'} font-bold uppercase tracking-wider`}
+          style={{ color: "#888888" }}
+        >
+          {t("card.effects")}
+        </span>
+
+        {card.effects && card.effects.length > 0 ? (
+          card.effects.map((effect, i) => {
+            const raFallbackId2 = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
+            const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId2 ? effectDescriptionsFr[raFallbackId2] : undefined);
+            const enDescriptions2 = effectDescriptionsEn[card.id] ?? (raFallbackId2 ? effectDescriptionsEn[raFallbackId2] : undefined);
+            const description =
+              locale === "fr"
+                ? (frDescriptions?.[i] ?? enDescriptions2?.[i] ?? effect.description)
+                : (enDescriptions2?.[i] ?? effect.description);
+
+            return (
+              <div
+                key={i}
+                className={`flex flex-col gap-0.5 ${dims.isMobile ? 'p-1.5' : 'p-3'} rounded-lg`}
+                style={{
+                  backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
+                  border: `1px solid ${effectTypeColorMap[effect.type] ?? "#888888"}15`,
+                }}
+              >
+                <span
+                  className={`${dims.isMobile ? 'text-[9px]' : 'text-xs'} font-bold uppercase`}
+                  style={{
+                    color: effectTypeColorMap[effect.type] ?? "#888888",
+                  }}
+                >
+                  {t(
+                    `card.effectTypes.${effect.type}` as
+                      | "card.effectTypes.MAIN"
+                      | "card.effectTypes.UPGRADE"
+                      | "card.effectTypes.AMBUSH"
+                      | "card.effectTypes.SCORE",
+                  )}
+                </span>
+                <span
+                  className={`font-body ${dims.isMobile ? 'text-[10px] leading-snug' : 'text-sm leading-relaxed'}`}
+                  style={{ color: "#bbbbbb" }}
+                >
+                  {description}
+                </span>
+              </div>
+            );
+          })
+        ) : (
+          <span className="text-[10px]" style={{ color: "#555555" }}>
+            {t("card.noEffects")}
+          </span>
+        )}
+      </div>
+    </>
+  );
+
+  // Mobile: left-side panel (landscape) — can play while viewing
+  if (dims.isMobile) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          key="mobile-card-panel-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-300"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
+          onClick={handleClose}
+        >
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute top-0 left-0 bottom-0 flex flex-col overflow-hidden"
+            style={{
+              width: "42vw",
+              backgroundColor: "rgba(10, 10, 14, 0.97)",
+              borderRight: "1px solid rgba(255, 255, 255, 0.1)",
+              boxShadow: "4px 0 20px rgba(0, 0, 0, 0.6)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={handleClose}
+              className="absolute top-1 right-1 z-10 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer"
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+                color: "#888888",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              X
+            </button>
+
+            {/* Card image (compact) */}
+            {imagePath ? (
+              <div
+                className="w-full shrink-0 flex items-center justify-center"
+                style={{ backgroundColor: "#0a0a0c", height: "120px" }}
+              >
+                <img
+                  src={imagePath}
+                  alt={getCardName(card, locale as 'en' | 'fr')}
+                  draggable={false}
+                  className="w-full h-full"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+            ) : (
+              <div
+                className="w-full shrink-0 flex items-center justify-center"
+                style={{ backgroundColor: "#1a1a1a", height: "60px" }}
+              >
+                <span className="text-[10px]" style={{ color: "#555555" }}>
+                  {t("card.noImage")}
+                </span>
+              </div>
+            )}
+
+            {/* Scrollable card info */}
+            <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
+              {cardInfoContent}
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  // Desktop: centered fullscreen modal (unchanged)
   return (
     <AnimatePresence>
       <motion.div
@@ -600,293 +895,7 @@ function FullscreenCardDetail() {
             className="p-5 flex flex-col gap-3 overflow-y-auto"
             style={{ maxHeight: "calc(90vh - 340px)" }}
           >
-            {/* Type badge + Rarity */}
-            <div className="flex items-center justify-between">
-              <span
-                className="text-xs rounded px-2 py-1 font-bold uppercase tracking-wider"
-                style={{
-                  backgroundColor: isMission
-                    ? "rgba(196, 163, 90, 0.12)"
-                    : "rgba(255, 255, 255, 0.04)",
-                  color: isMission ? "#c4a35a" : "#888888",
-                  border: `1px solid ${isMission ? "rgba(196, 163, 90, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
-                }}
-              >
-                {isMission ? t("card.mission") : t("card.character")}
-              </span>
-              <span
-                className="text-xs rounded px-2 py-1 shrink-0 font-bold"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.04)",
-                  border: `1px solid ${rarityColor}`,
-                  color: rarityColor,
-                }}
-              >
-                {card.rarity}
-              </span>
-            </div>
-
-            {/* Name */}
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
-                {t("card.name")}
-              </span>
-              <span
-                className="text-lg font-bold leading-tight"
-                style={{ color: "#e0e0e0" }}
-              >
-                {getCardName(card, locale as 'en' | 'fr')}
-              </span>
-            </div>
-
-            {/* English name for missions */}
-            {isMission && card.name_en && locale !== 'en' && (
-              <span className="text-sm -mt-1" style={{ color: "#666666" }}>
-                {card.name_en}
-              </span>
-            )}
-
-            {/* Title */}
-            {(card.title_fr || card.title_en) && (
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
-                  {t("card.title")}
-                </span>
-                <span className="text-sm" style={{ color: "#999999" }}>
-                  {getCardTitle(card, locale as 'en' | 'fr')}
-                </span>
-              </div>
-            )}
-
-            {/* Mission rank + points info */}
-            {isMission && missionContext && (
-              <div
-                className="flex flex-col gap-2 p-3 rounded-lg"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: `1px solid ${rankColorMap[missionContext.rank] ?? "#555"}40`,
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: "#aaaaaa" }}
-                  >
-                    {t("card.rank")}
-                  </span>
-                  <span
-                    className="text-base font-bold px-3 py-1 rounded"
-                    style={{
-                      color: rankColorMap[missionContext.rank] ?? "#888",
-                      backgroundColor: `${rankColorMap[missionContext.rank] ?? "#888"}15`,
-                    }}
-                  >
-                    {missionContext.rank}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: "#888888" }}>
-                    {t("game.board.base")}
-                  </span>
-                  <span
-                    className="text-sm tabular-nums"
-                    style={{ color: "#aaaaaa" }}
-                  >
-                    {missionContext.basePoints} {t("game.board.pts")}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm" style={{ color: "#888888" }}>
-                    {t("card.rankBonus")}
-                  </span>
-                  <span
-                    className="text-sm tabular-nums"
-                    style={{ color: "#aaaaaa" }}
-                  >
-                    +{missionContext.rankBonus} {t("game.board.pts")}
-                  </span>
-                </div>
-                <div
-                  className="flex items-center justify-between pt-2 mt-1"
-                  style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
-                >
-                  <span
-                    className="text-sm font-bold"
-                    style={{ color: "#c4a35a" }}
-                  >
-                    {t("card.totalPoints")}
-                  </span>
-                  <span
-                    className="text-base font-bold tabular-nums"
-                    style={{ color: "#c4a35a" }}
-                  >
-                    {missionContext.basePoints + missionContext.rankBonus}{" "}
-                    {t("game.board.pts")}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Base points fallback */}
-            {isMission && !missionContext && "basePoints" in card && (
-              <div className="flex items-center gap-3">
-                <span className="text-sm" style={{ color: "#c4a35a" }}>
-                  {t("game.board.base")}: {(card as MissionCard).basePoints}{" "}
-                  {t("game.board.pts")}
-                </span>
-              </div>
-            )}
-
-            {/* Chakra + Power (character cards) */}
-            {isCharacter && (
-              <div
-                className="flex items-center gap-6 p-3 rounded-lg"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                }}
-              >
-                <div className="flex flex-col items-center gap-1">
-                  <span
-                    className="text-xs uppercase tracking-wider"
-                    style={{ color: "#888888" }}
-                  >
-                    {t("collection.details.cost")}
-                  </span>
-                  <span
-                    className="text-xl font-bold"
-                    style={{ color: "#c4a35a" }}
-                  >
-                    {(card as CharacterCard).chakra}
-                  </span>
-                </div>
-                <div
-                  className="w-px h-8 shrink-0"
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }}
-                />
-                <div className="flex flex-col items-center gap-1">
-                  <span
-                    className="text-xs uppercase tracking-wider"
-                    style={{ color: "#888888" }}
-                  >
-                    {t("collection.details.power")}
-                  </span>
-                  <span
-                    className="text-xl font-bold"
-                    style={{ color: "#e0e0e0" }}
-                  >
-                    {(card as CharacterCard).power}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Keywords */}
-            {card.keywords && card.keywords.length > 0 && (
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
-                  {t("collection.details.keywords")}
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {card.keywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="text-xs rounded px-2 py-0.5"
-                      style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
-                        color: "#999999",
-                        border: "1px solid rgba(255, 255, 255, 0.04)",
-                      }}
-                    >
-                      {getCardKeyword(kw, locale as 'en' | 'fr')}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Group */}
-            {card.group && (
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
-                  {t("collection.details.group")}
-                </span>
-                <span className="text-sm" style={{ color: "#999999" }}>
-                  {getCardGroup(card.group, locale as 'en' | 'fr')}
-                </span>
-              </div>
-            )}
-
-            {/* Card ID */}
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] uppercase tracking-wider" style={{ color: "#666666" }}>
-                {t("card.cardId")}
-              </span>
-              <span className="text-xs" style={{ color: "#555555" }}>
-                {card.id}
-              </span>
-            </div>
-
-            {/* Effects section */}
-            <div
-              className="flex flex-col gap-2.5 pt-3"
-              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
-            >
-              <span
-                className="text-xs font-bold uppercase tracking-wider"
-                style={{ color: "#888888" }}
-              >
-                {t("card.effects")}
-              </span>
-
-              {card.effects && card.effects.length > 0 ? (
-                card.effects.map((effect, i) => {
-                  const raFallbackId2 = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
-                  const frDescriptions = effectDescriptionsFr[card.id] ?? (raFallbackId2 ? effectDescriptionsFr[raFallbackId2] : undefined);
-                  const enDescriptions2 = effectDescriptionsEn[card.id] ?? (raFallbackId2 ? effectDescriptionsEn[raFallbackId2] : undefined);
-                  const description =
-                    locale === "fr"
-                      ? (frDescriptions?.[i] ?? enDescriptions2?.[i] ?? effect.description)
-                      : (enDescriptions2?.[i] ?? effect.description);
-
-                  return (
-                    <div
-                      key={i}
-                      className="flex flex-col gap-1 p-3 rounded-lg"
-                      style={{
-                        backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
-                        border: `1px solid ${effectTypeColorMap[effect.type] ?? "#888888"}15`,
-                      }}
-                    >
-                      <span
-                        className="text-xs font-bold uppercase"
-                        style={{
-                          color: effectTypeColorMap[effect.type] ?? "#888888",
-                        }}
-                      >
-                        {t(
-                          `card.effectTypes.${effect.type}` as
-                            | "card.effectTypes.MAIN"
-                            | "card.effectTypes.UPGRADE"
-                            | "card.effectTypes.AMBUSH"
-                            | "card.effectTypes.SCORE",
-                        )}
-                      </span>
-                      <span
-                        className="font-body text-sm leading-relaxed"
-                        style={{ color: "#bbbbbb" }}
-                      >
-                        {description}
-                      </span>
-                    </div>
-                  );
-                })
-              ) : (
-                <span className="text-xs" style={{ color: "#555555" }}>
-                  {t("card.noEffects")}
-                </span>
-              )}
-            </div>
+            {cardInfoContent}
           </div>
         </motion.div>
       </motion.div>
