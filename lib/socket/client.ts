@@ -28,6 +28,8 @@ interface SocketStore {
     isRanked?: boolean;
     eloDelta?: number | null;
     winReason?: 'score' | 'forfeit' | 'timeout';
+    gameId?: string;
+    replayData?: unknown;
   } | null;
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
@@ -213,8 +215,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           isRanked?: boolean;
           eloDelta?: number | null;
           winReason?: 'score' | 'forfeit' | 'timeout';
+          gameId?: string;
+          replayData?: unknown;
         }) => {
-          console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason);
+          console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId);
           set({ gameEnded: true, gameResult: data, actionDeadline: null });
         },
       );

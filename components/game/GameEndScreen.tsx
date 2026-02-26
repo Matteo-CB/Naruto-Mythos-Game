@@ -1,18 +1,99 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
+import { Link } from '@/lib/i18n/navigation';
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export function GameEndScreen() {
   const t = useTranslations();
+  const { data: session } = useSession();
   const gameOver = useGameStore((s) => s.gameOver);
   const winner = useGameStore((s) => s.winner);
   const visibleState = useGameStore((s) => s.visibleState);
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
+  const isAIGame = useGameStore((s) => s.isAIGame);
+  const gameState = useGameStore((s) => s.gameState);
+  const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const resetGame = useGameStore((s) => s.resetGame);
   const gameResult = useSocketStore((s) => s.gameResult);
+
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [savedGameId, setSavedGameId] = useState<string | null>(null);
+
+  const handleSaveReplay = useCallback(async () => {
+    if (saveState === 'saving' || saveState === 'saved') return;
+    setSaveState('saving');
+
+    try {
+      if (isAIGame && gameState) {
+        // AI game: create game record + save replay data
+        const replayData = {
+          log: gameState.log,
+          playerNames: playerDisplayNames,
+          finalMissions: gameState.activeMissions.map(m => ({
+            name_fr: m.card.name_fr,
+            rank: m.rank,
+            basePoints: m.basePoints,
+            rankBonus: m.rankBonus,
+            wonBy: m.wonBy ?? null,
+          })),
+        };
+
+        const aiDifficulty = gameState.player2.isAI
+          ? gameState.player2.aiDifficulty
+          : gameState.player1.aiDifficulty;
+
+        // Step 1: Create game record
+        const createRes = await fetch('/api/game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isAiGame: true, aiDifficulty: aiDifficulty ?? 'medium' }),
+        });
+        if (!createRes.ok) throw new Error('Failed to create game');
+        const game = await createRes.json();
+
+        // Step 2: Complete with replay data
+        const completeRes = await fetch('/api/game', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameId: game.id,
+            winnerId: winner === 'player1' ? session?.user?.id : null,
+            player1Score: gameState.player1.missionPoints,
+            player2Score: gameState.player2.missionPoints,
+            gameLog: replayData,
+          }),
+        });
+        if (!completeRes.ok) throw new Error('Failed to save replay');
+
+        setSavedGameId(game.id);
+        setSaveState('saved');
+      } else if (isOnlineGame && gameResult?.gameId && gameResult?.replayData) {
+        // Online game: PATCH existing game record with replay data
+        const res = await fetch(`/api/game/${gameResult.gameId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gameState: gameResult.replayData }),
+        });
+        if (!res.ok) throw new Error('Failed to save replay');
+
+        setSavedGameId(gameResult.gameId);
+        setSaveState('saved');
+      } else {
+        throw new Error('No replay data available');
+      }
+    } catch {
+      setSaveState('error');
+      // Allow retry after error
+      setTimeout(() => setSaveState('idle'), 2000);
+    }
+  }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id]);
 
   if (!gameOver || !visibleState) return null;
 
@@ -30,6 +111,13 @@ export function GameEndScreen() {
 
   // Check if the forfeit was by the viewing player or the opponent
   const forfeitedByMe = isForfeit && visibleState.forfeitedBy === myPlayer;
+
+  // Can save replay?
+  const isLoggedIn = !!session?.user?.id;
+  const hasReplayData = isAIGame
+    ? !!gameState?.log?.length
+    : !!(gameResult?.gameId && gameResult?.replayData);
+  const canSave = isLoggedIn && hasReplayData && saveState !== 'saved';
 
   let headingText: string;
   let headingColor: string;
@@ -199,24 +287,72 @@ export function GameEndScreen() {
             </motion.div>
           )}
 
-          {/* Play Again button */}
-          <motion.button
+          {/* Action buttons */}
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={resetGame}
-            className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-            style={{
-              backgroundColor: '#c4a35a',
-              color: '#0a0a0a',
-              border: '1px solid #c4a35a',
-              boxShadow: '0 4px 16px rgba(196, 163, 90, 0.3)',
-            }}
+            className="flex flex-col items-center gap-3"
           >
-            {t('game.end.playAgain')}
-          </motion.button>
+            {/* Save Replay button */}
+            {canSave && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSaveReplay}
+                disabled={saveState === 'saving'}
+                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                style={{
+                  backgroundColor: saveState === 'error' ? '#b33e3e' : '#1a1a2e',
+                  color: saveState === 'error' ? '#ffffff' : '#c4a35a',
+                  border: `1px solid ${saveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
+                  opacity: saveState === 'saving' ? 0.6 : 1,
+                }}
+              >
+                {saveState === 'saving' ? t('game.end.savingReplay')
+                  : saveState === 'error' ? t('game.end.saveError')
+                  : t('game.end.saveReplay')}
+              </motion.button>
+            )}
+
+            {/* Watch Replay button (after save) */}
+            {saveState === 'saved' && savedGameId && (
+              <Link
+                href={`/replay/${savedGameId}`}
+                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider text-center"
+                style={{
+                  backgroundColor: '#1a1a2e',
+                  color: '#4a9e4a',
+                  border: '1px solid #4a9e4a',
+                }}
+              >
+                {t('game.end.watchReplay')}
+              </Link>
+            )}
+
+            {/* Replay saved confirmation */}
+            {saveState === 'saved' && (
+              <span className="text-xs" style={{ color: '#4a9e4a' }}>
+                {t('game.end.replaySaved')}
+              </span>
+            )}
+
+            {/* Play Again button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={resetGame}
+              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+              style={{
+                backgroundColor: '#c4a35a',
+                color: '#0a0a0a',
+                border: '1px solid #c4a35a',
+                boxShadow: '0 4px 16px rgba(196, 163, 90, 0.3)',
+              }}
+            >
+              {t('game.end.playAgain')}
+            </motion.button>
+          </motion.div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

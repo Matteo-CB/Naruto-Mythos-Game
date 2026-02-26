@@ -24,7 +24,8 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT'; // type of selection
+  effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean }>; // for multi-card reveal (Tayuya 065)
@@ -335,9 +336,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingEffect = visibleState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
       // Determine selection type for UI
+      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
       const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
         pendingAction.type === 'DISCARD_CARD' ||
         pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      // Build effect choices for copy-effect UI
+      let effectChoices: PendingTargetSelection['effectChoices'];
+      if (isEffectChoice) {
+        effectChoices = pendingAction.options.map((opt) => {
+          const sepIdx = opt.indexOf('::');
+          return {
+            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
+            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
+          };
+        });
+      }
 
       // Build hand card info for hand selection UI
       let handCards: PendingTargetSelection['handCards'];
@@ -494,7 +508,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          effectChoices,
           handCards,
           revealedCard,
           revealedCards,
@@ -714,9 +729,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
       // Determine selection type for UI
+      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
       const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
         pendingAction.type === 'DISCARD_CARD' ||
         pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      // Build effect choices for copy-effect UI
+      let effectChoices: PendingTargetSelection['effectChoices'];
+      if (isEffectChoice) {
+        effectChoices = pendingAction.options.map((opt) => {
+          const sepIdx = opt.indexOf('::');
+          return {
+            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
+            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
+          };
+        });
+      }
 
       // Build hand card info for hand selection UI
       let handCards: PendingTargetSelection['handCards'];
@@ -902,7 +930,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          effectChoices,
           handCards,
           revealedCard,
           revealedCards,
@@ -1136,9 +1165,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingAction = humanPendingAfterAI[0];
       const pendingEffect = currentState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
+      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
       const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
         pendingAction.type === 'DISCARD_CARD' ||
         pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+      let effectChoices: PendingTargetSelection['effectChoices'];
+      if (isEffectChoice) {
+        effectChoices = pendingAction.options.map((opt) => {
+          const sepIdx = opt.indexOf('::');
+          return {
+            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
+            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
+          };
+        });
+      }
 
       let handCards: PendingTargetSelection['handCards'];
       if (isHandSelection) {
@@ -1284,7 +1325,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          effectChoices,
           handCards,
           revealedCard: revealedCardAI,
           revealedCards: revealedCardsAI,

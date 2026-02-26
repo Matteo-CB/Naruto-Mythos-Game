@@ -213,7 +213,12 @@
       "opponentAbandoned": "Opponent Abandoned",
       "youAbandoned": "You Abandoned",
       "opponentTimedOut": "Opponent Timed Out",
-      "youTimedOut": "You Timed Out"
+      "youTimedOut": "You Timed Out",
+      "saveReplay": "Save Replay",
+      "savingReplay": "Saving...",
+      "replaySaved": "Replay Saved",
+      "watchReplay": "Watch Replay",
+      "saveError": "Failed to save replay"
     },
     "timer": {
       "autoPassed": "Time expired — auto-passed"
@@ -228,6 +233,7 @@
     "mustChoose": "{player} must choose",
     "mustChooseTarget": "{player} must choose a target",
     "mustChooseCard": "{player} must choose a card from hand",
+    "mustChooseEffect": "{player} must choose an effect to copy",
     "waitingForChoice": "Waiting for {player} to choose...",
     "chooseCardToReturn": "Choose a card to put back on top of your deck",
     "chooseCardToDiscard": "Choose a card to discard",
@@ -426,6 +432,7 @@
         "itachi143MoveEnemy": "Choose an enemy character to move to this mission.",
         "itachi152MoveFriendly": "Choose a friendly character to move to another mission.",
         "kakashi148CopyEffect": "Choose a friendly Team 7 character whose effect to copy.",
+        "chooseEffectToCopy": "Choose which effect of {target} to copy.",
         "kiba149Hide": "Choose another character in this mission to hide.",
         "kiba149Defeat": "Choose another character in this mission to defeat.",
         "naruto141Discard": "Choose a card from your hand to discard.",
@@ -620,7 +627,45 @@
     "stats": "Statistics",
     "recentGames": "Recent Games",
     "decks": "Decks",
-    "noGames": "No games played yet"
+    "noGames": "No games played yet",
+    "replay": "Replay",
+    "loadMore": "Load more",
+    "discordLinked": "Discord",
+    "rank": "Rank",
+    "rankNames": {
+      "academyStudent": "Academy Student",
+      "genin": "Genin",
+      "chunin": "Chunin",
+      "specialJonin": "Special Jonin",
+      "eliteJonin": "Elite Jonin",
+      "legendarySannin": "Legendary Sannin",
+      "kage": "Kage",
+      "sageOfSixPaths": "Sage of Six Paths"
+    }
+  },
+  "replay": {
+    "title": "Match Recap",
+    "loading": "Loading replay...",
+    "notFound": "Game not found",
+    "noLog": "No replay data available for this game",
+    "vsLabel": "vs",
+    "missionSummary": "Mission Results",
+    "eventTimeline": "Event Timeline",
+    "turnLabel": "Turn {turn}",
+    "allTurns": "All Turns",
+    "autoPlay": "Auto-play",
+    "pause": "Pause",
+    "speed": "Speed",
+    "slow": "Slow",
+    "normal": "Normal",
+    "fast": "Fast",
+    "points": "{points} pts",
+    "rank": "Rank {rank}",
+    "missionWon": "Won",
+    "missionLost": "Lost",
+    "aiGame": "vs AI ({difficulty})",
+    "onlineGame": "Online Match",
+    "back": "Back"
   },
   "auth": {
     "signIn": "Sign In",
@@ -654,7 +699,10 @@
     "resetSuccess": "Password updated successfully.",
     "resetSuccessLogin": "You can now sign in with your new password.",
     "invalidResetLink": "This reset link is invalid or has expired.",
-    "goToLogin": "Back to Login"
+    "goToLogin": "Back to Login",
+    "signInWithDiscord": "Sign in with Discord",
+    "signUpWithDiscord": "Sign up with Discord",
+    "orSeparator": "or"
   },
   "card": {
     "effectTypes": {

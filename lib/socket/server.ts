@@ -4,6 +4,7 @@ import type { GameState, GameAction, CharacterCard, MissionCard, PlayerConfig, G
 import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
+import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 
@@ -19,6 +20,8 @@ interface RoomData {
   isPrivate: boolean;
   isRanked: boolean;
   createdAt: number;
+  hostName?: string;
+  guestName?: string;
   // Timer fields
   actionTimer: ReturnType<typeof setTimeout> | null;
   timerDeadline: number | null;
@@ -120,7 +123,10 @@ async function finalizeGameEnd(
   const p2Score = room.gameState.player2.missionPoints;
 
   let eloData: { player1Delta: number; player2Delta: number } | null = null;
+  let gameRecordId: string | null = null;
+
   try {
+    // Apply ELO changes for ranked games
     if (room.isRanked && room.hostId && room.guestId) {
       const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
       const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
@@ -142,25 +148,50 @@ async function finalizeGameEnd(
             where: { id: room.guestId! },
             data: { elo: changes.player2NewElo, ...p2Stats },
           }),
-          prisma.game.create({
-            data: {
-              player1Id: room.hostId,
-              player2Id: room.guestId!,
-              isAiGame: false,
-              status: 'completed',
-              winnerId: winner === 'player1' ? room.hostId : room.guestId!,
-              player1Score: p1Score,
-              player2Score: p2Score,
-              eloChange: changes.player1Delta,
-              completedAt: new Date(),
-            },
-          }),
         ]);
+
+        // Sync Discord roles (fire-and-forget)
+        syncDiscordRole(room.hostId).catch(() => {});
+        syncDiscordRole(room.guestId!).catch(() => {});
       }
+    }
+
+    // Always persist game record (for stats — replay data saved on user request)
+    if (room.hostId && room.guestId) {
+      const gameRecord = await prisma.game.create({
+        data: {
+          player1Id: room.hostId,
+          player2Id: room.guestId,
+          isAiGame: false,
+          status: 'completed',
+          winnerId: winner === 'player1' ? room.hostId : room.guestId,
+          player1Score: p1Score,
+          player2Score: p2Score,
+          eloChange: eloData?.player1Delta ?? 0,
+          completedAt: new Date(),
+        },
+      });
+      gameRecordId = gameRecord.id;
     }
   } catch (eloErr) {
     console.error('[Socket] Error persisting game result:', eloErr);
   }
+
+  // Build replay data for client-side save
+  const replayData = room.gameState ? {
+    log: room.gameState.log,
+    playerNames: {
+      player1: room.hostName ?? 'Player 1',
+      player2: room.guestName ?? 'Player 2',
+    },
+    finalMissions: room.gameState.activeMissions.map(m => ({
+      name_fr: m.card.name_fr,
+      rank: m.rank,
+      basePoints: m.basePoints,
+      rankBonus: m.rankBonus,
+      wonBy: m.wonBy ?? null,
+    })),
+  } : null;
 
   if (room.hostSocket) {
     io.to(room.hostSocket).emit('game:ended', {
@@ -170,6 +201,8 @@ async function finalizeGameEnd(
       isRanked: room.isRanked,
       eloDelta: eloData?.player1Delta ?? null,
       winReason,
+      gameId: gameRecordId,
+      replayData,
     });
   }
   if (room.guestSocket) {
@@ -180,6 +213,8 @@ async function finalizeGameEnd(
       isRanked: room.isRanked,
       eloDelta: eloData?.player2Delta ?? null,
       winReason,
+      gameId: gameRecordId,
+      replayData,
     });
   }
 }
@@ -434,6 +469,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         } catch {
           // If DB lookup fails, fall back to default names
         }
+        room.hostName = hostName;
+        room.guestName = guestName;
 
         // Send filtered visible state to each player
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');

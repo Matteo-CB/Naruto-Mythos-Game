@@ -519,6 +519,8 @@ export class EffectEngine {
       tst === 'TSUNADE104_CHOOSE_CHAKRA'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
+    } else if (tst === 'COPY_EFFECT_CHOSEN') {
+      actionType = 'CHOOSE_EFFECT';
     }
 
     // Extract human-readable description (some handlers store JSON with a .text field)
@@ -2222,48 +2224,67 @@ export class EffectEngine {
       }
 
       case 'KAKASHI148_COPY_EFFECT': {
-        // Kakashi 148 AMBUSH: copy a Team 7 character's instant effect
-        // Find the target character and execute their MAIN effect handler
-        const copyCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (copyCharResult) {
-          const copyTopCard = copyCharResult.character.stack.length > 0
-            ? copyCharResult.character.stack[copyCharResult.character.stack.length - 1]
-            : copyCharResult.character.card;
-          // Try to execute the target's MAIN effect
-          const copyHandler = getEffectHandler(copyTopCard.id, 'MAIN');
-          if (copyHandler) {
-            const sourceCharResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-            if (sourceCharResult) {
-              const copyCtx: EffectContext = {
-                state: newState,
-                sourcePlayer: pendingEffect.sourcePlayer,
-                sourceCard: sourceCharResult.character,
-                sourceMissionIndex: sourceCharResult.missionIndex,
-                triggerType: 'MAIN',
-                isUpgrade: false,
-              };
-              try {
-                const copyResult = copyHandler(copyCtx);
-                if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
-                  newState = EffectEngine.createPendingTargetSelection(
-                    copyResult.state, pendingEffect.sourcePlayer, sourceCharResult.character,
-                    sourceCharResult.missionIndex, 'MAIN', false, copyResult, [],
-                  );
-                } else {
-                  newState = copyResult.state;
-                }
-              } catch (err) {
-                console.error(`[EffectEngine] Kakashi 148 copy error for ${copyTopCard.id}:`, err);
-              }
-            }
-          }
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT',
-            `Kakashi Hatake (148): Copied the effect of ${copyTopCard.name_fr}.`,
-            'game.log.effect.copyEffect',
-            { card: 'KAKASHI HATAKE', id: 'KS-148-M', target: copyTopCard.name_fr },
+        // Kakashi 148 AMBUSH: copy a Team 7 character's instant effect (MAIN, AMBUSH, or UPGRADE)
+        const k148Target = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!k148Target) break;
+
+        const k148TopCard = k148Target.character.stack.length > 0
+          ? k148Target.character.stack[k148Target.character.stack.length - 1]
+          : k148Target.character.card;
+
+        // Kakashi 148 can copy MAIN, AMBUSH, and UPGRADE (not continuous, not SCORE)
+        const k148Copyable = (k148TopCard.effects ?? []).filter((eff) => {
+          if (eff.type === 'SCORE') return false;
+          if (eff.description.includes('[⧗]')) return false;
+          if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+          return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
+        });
+
+        if (k148Copyable.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', `Kakashi Hatake (148): ${k148TopCard.name_fr} has no copyable instant effect.`,
+            'game.log.effect.copyFailed', { card: 'KAKASHI HATAKE', id: 'KS-148-M' });
+          break;
+        }
+
+        if (k148Copyable.length === 1) {
+          // Single copyable effect — execute directly
+          newState = EffectEngine.executeCopiedEffect(
+            newState, pendingEffect, k148TopCard, k148Copyable[0].type as EffectType,
           );
+        } else {
+          // Multiple copyable effects — Stage 2: let the player choose which effect
+          const choiceEffectId = generateInstanceId();
+          const choiceActionId = generateInstanceId();
+          const effectOptions = k148Copyable.map((eff) => `${eff.type}::${eff.description}`);
+          newState.pendingEffects.push({
+            id: choiceEffectId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ charInstanceId: targetId, cardId: k148TopCard.id }),
+            targetSelectionType: 'COPY_EFFECT_CHOSEN',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: effectOptions,
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: choiceActionId,
+            type: 'CHOOSE_EFFECT',
+            player: pendingEffect.sourcePlayer,
+            description: `Choose which effect of ${k148TopCard.name_fr} to copy.`,
+            descriptionKey: 'game.effect.desc.chooseEffectToCopy',
+            descriptionParams: { target: k148TopCard.name_fr },
+            options: effectOptions,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: choiceEffectId,
+          });
         }
         break;
       }
@@ -3075,119 +3096,108 @@ export class EffectEngine {
 
       // =============================================
       // KAKASHI_COPY_EFFECT / SAKON062_COPY_EFFECT: copy another character's effect
-      // Finds the target's first copyable instant effect, looks up its handler,
-      // and executes it with the copier (Kakashi/Sakon) as the source context.
+      // Kakashi 016: copies MAIN/AMBUSH (non-UPGRADE) instant effects from enemy
+      // Sakon 062: copies MAIN/AMBUSH (non-UPGRADE) instant effects from friendly Sound Four
+      // If the target has multiple copyable effects, the player chooses (Stage 2).
       // =============================================
       case 'KAKASHI_COPY_EFFECT':
       case 'SAKON062_COPY_EFFECT': {
-        // Find the target character whose effect we're copying
         const copyTargetResult = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!copyTargetResult) {
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT',
-            `Effect copy: target character no longer in play.`,
-            'game.log.effect.copyFailed',
-            { card: pendingEffect.sourceCardId },
-          );
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', `Effect copy: target character no longer in play.`,
+            'game.log.effect.copyFailed', { card: pendingEffect.sourceCardId });
           break;
         }
 
-        const copyTargetChar = copyTargetResult.character;
-        const copyTargetTopCard = copyTargetChar.stack.length > 0
-          ? copyTargetChar.stack[copyTargetChar.stack.length - 1]
-          : copyTargetChar.card;
+        const copyTargetTopCard = copyTargetResult.character.stack.length > 0
+          ? copyTargetResult.character.stack[copyTargetResult.character.stack.length - 1]
+          : copyTargetResult.character.card;
 
-        // Find copyable instant effects on the target (non-UPGRADE, non-SCORE, non-continuous)
+        // Kakashi 016 / Sakon 062: non-UPGRADE, non-SCORE, non-continuous
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'UPGRADE' || eff.type === 'SCORE') return false;
           if (eff.description.includes('[⧗]')) return false;
-          // Skip "effect:" modifier lines
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
           return true;
         });
 
         if (copyableEffects.length === 0) {
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT',
-            `Effect copy: ${copyTargetTopCard.name_fr} has no copyable instant effect.`,
-            'game.log.effect.copyFailed',
-            { card: pendingEffect.sourceCardId },
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', `Effect copy: ${copyTargetTopCard.name_fr} has no copyable instant effect.`,
+            'game.log.effect.copyFailed', { card: pendingEffect.sourceCardId });
+          break;
+        }
+
+        if (copyableEffects.length === 1) {
+          // Single copyable effect — execute directly
+          newState = EffectEngine.executeCopiedEffect(
+            newState, pendingEffect, copyTargetTopCard, copyableEffects[0].type as EffectType,
           );
-          break;
+        } else {
+          // Multiple copyable effects — Stage 2: let the player choose
+          const choiceEffId = generateInstanceId();
+          const choiceActId = generateInstanceId();
+          const effectOpts = copyableEffects.map((eff) => `${eff.type}::${eff.description}`);
+          newState.pendingEffects.push({
+            id: choiceEffId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ charInstanceId: targetId, cardId: copyTargetTopCard.id }),
+            targetSelectionType: 'COPY_EFFECT_CHOSEN',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: effectOpts,
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: choiceActId,
+            type: 'CHOOSE_EFFECT',
+            player: pendingEffect.sourcePlayer,
+            description: `Choose which effect of ${copyTargetTopCard.name_fr} to copy.`,
+            descriptionKey: 'game.effect.desc.chooseEffectToCopy',
+            descriptionParams: { target: copyTargetTopCard.name_fr },
+            options: effectOpts,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: choiceEffId,
+          });
         }
+        break;
+      }
 
-        // Use the first copyable effect (MAIN takes priority, then AMBUSH)
-        const effectToCopy = copyableEffects[0];
-        const copiedEffectType = effectToCopy.type as EffectType;
+      // =============================================
+      // COPY_EFFECT_CHOSEN: Stage 2 — the player chose which specific effect to copy
+      // Used by Kakashi 016, Kakashi 148, and Sakon 062 when multiple effects exist.
+      // targetId format: "EFFECT_TYPE::description"
+      // effectDescription stores JSON: { charInstanceId, cardId }
+      // =============================================
+      case 'COPY_EFFECT_CHOSEN': {
+        let parsedCopy: { charInstanceId?: string; cardId?: string } = {};
+        try { parsedCopy = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const chosenEffectType = targetId.split('::')[0] as EffectType;
 
-        // Look up the registered handler for the target card's effect
-        const copiedHandler = getEffectHandler(copyTargetTopCard.id, copiedEffectType);
-        if (!copiedHandler) {
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT',
-            `Effect copy: no handler for ${copyTargetTopCard.name_fr} (${copiedEffectType}).`,
-            'game.log.effect.copyFailed',
-            { card: pendingEffect.sourceCardId },
-          );
-          break;
-        }
+        if (!parsedCopy.cardId || !chosenEffectType) break;
 
-        // Find the copier character (Kakashi/Sakon) in current state
-        const copierResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-        if (!copierResult) {
-          // Copier was removed from play
-          break;
-        }
+        // Find the target character to get the card info for logging
+        const chosenTarget = parsedCopy.charInstanceId
+          ? EffectEngine.findCharByInstanceId(newState, parsedCopy.charInstanceId)
+          : null;
+        const chosenTopCard = chosenTarget
+          ? (chosenTarget.character.stack.length > 0
+              ? chosenTarget.character.stack[chosenTarget.character.stack.length - 1]
+              : chosenTarget.character.card)
+          : null;
 
-        const copierTopCard = copierResult.character.stack.length > 0
-          ? copierResult.character.stack[copierResult.character.stack.length - 1]
-          : copierResult.character.card;
-
-        // Log the copy
-        newState.log = logAction(
-          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT',
-          `${copierTopCard.name_fr} copies ${copyTargetTopCard.name_fr}'s ${copiedEffectType} effect!`,
-          'game.log.effect.copySuccess',
-          { card: copierTopCard.name_fr, target: copyTargetTopCard.name_fr, effectType: copiedEffectType },
+        newState = EffectEngine.executeCopiedEffect(
+          newState, pendingEffect, chosenTopCard ?? { id: parsedCopy.cardId, name_fr: '?', effects: [] } as never,
+          chosenEffectType,
         );
-
-        // Execute the copied handler with the copier as source
-        const copyCtx: EffectContext = {
-          state: newState,
-          sourcePlayer: pendingEffect.sourcePlayer,
-          sourceCard: copierResult.character,
-          sourceMissionIndex: copierResult.missionIndex,
-          triggerType: copiedEffectType,
-          isUpgrade: false, // Copy never counts as upgrade
-        };
-
-        try {
-          const copyResult = copiedHandler(copyCtx);
-
-          if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
-            // The copied effect needs target selection — create a new pending effect
-            // Use copyResult.state as base (handler may have modified state)
-            newState = EffectEngine.createPendingTargetSelection(
-              copyResult.state,
-              pendingEffect.sourcePlayer,
-              copierResult.character,
-              copierResult.missionIndex,
-              copiedEffectType,
-              false,
-              copyResult,
-              [],
-            );
-          } else {
-            // The copied effect resolved immediately (or fizzled with no targets)
-            newState = copyResult.state;
-          }
-        } catch (err) {
-          console.error(`[EffectEngine] Error executing copied effect from ${copyTargetTopCard.id}:`, err);
-        }
         break;
       }
 
@@ -6875,6 +6885,64 @@ export class EffectEngine {
   // =====================================
   // Utility Methods
   // =====================================
+
+  /**
+   * Execute a copied effect from one character's card on the copier character.
+   * Used by Kakashi 016, Kakashi 148, and Sakon 062 copy-effect mechanics.
+   */
+  static executeCopiedEffect(
+    state: GameState,
+    pendingEffect: PendingEffect,
+    targetCard: { id: string; name_fr: string; effects: Array<{ type: string; description: string }> },
+    effectType: EffectType,
+  ): GameState {
+    let newState = { ...state };
+
+    const copiedHandler = getEffectHandler(targetCard.id, effectType);
+    if (!copiedHandler) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+        'EFFECT', `Effect copy: no handler for ${targetCard.name_fr} (${effectType}).`,
+        'game.log.effect.copyFailed', { card: pendingEffect.sourceCardId });
+      return newState;
+    }
+
+    const copierResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+    if (!copierResult) return newState;
+
+    const copierTopCard = copierResult.character.stack.length > 0
+      ? copierResult.character.stack[copierResult.character.stack.length - 1]
+      : copierResult.character.card;
+
+    newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+      'EFFECT', `${copierTopCard.name_fr} copies ${targetCard.name_fr}'s ${effectType} effect!`,
+      'game.log.effect.copySuccess',
+      { card: copierTopCard.name_fr, target: targetCard.name_fr, effectType });
+
+    const copyCtx: EffectContext = {
+      state: newState,
+      sourcePlayer: pendingEffect.sourcePlayer,
+      sourceCard: copierResult.character,
+      sourceMissionIndex: copierResult.missionIndex,
+      triggerType: effectType,
+      isUpgrade: false,
+    };
+
+    try {
+      const copyResult = copiedHandler(copyCtx);
+      if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
+        newState = EffectEngine.createPendingTargetSelection(
+          copyResult.state, pendingEffect.sourcePlayer, copierResult.character,
+          copierResult.missionIndex, effectType, false, copyResult, [],
+        );
+      } else {
+        newState = copyResult.state;
+      }
+    } catch (err) {
+      console.error(`[EffectEngine] Error executing copied effect from ${targetCard.id}:`, err);
+    }
+
+    return newState;
+  }
 
   /** Find a character across all missions by instanceId */
   static findCharByInstanceId(
