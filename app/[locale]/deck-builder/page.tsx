@@ -28,6 +28,7 @@ export default function DeckBuilderPage() {
   const CHARS_PER_PAGE = 40;
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showSavedDecks, setShowSavedDecks] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [importCode, setImportCode] = useState("");
   const [importMessage, setImportMessage] = useState<{
     type: "success" | "error";
@@ -322,7 +323,7 @@ export default function DeckBuilderPage() {
             disabled={isSaving || !validation.valid}
             className="px-3 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {isSaving ? t("common.loading") : t("deckBuilder.saveDeck")}
+            {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
           </button>
           <button
             onClick={clearDeck}
@@ -370,7 +371,19 @@ export default function DeckBuilderPage() {
 
         {/* Saved decks panel (collapsible) */}
         {showSavedDecks && (
-          <div className="px-4 py-2 border-b border-[#262626] bg-[#0e0e0e]">
+          <div className="px-4 py-3 border-b border-[#262626] bg-[#0e0e0e]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#888]">
+                {t("deckBuilder.myDecks")}
+              </span>
+              <button
+                onClick={() => { clearDeck(); setShowSavedDecks(false); }}
+                className="px-3 py-1 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-[10px] hover:bg-[#1f3a1f] transition-colors"
+              >
+                + {t("deckBuilder.newDeck")}
+              </button>
+            </div>
+
             {isLoading && (
               <p className="text-xs text-[#555] italic">
                 {t("common.loading")}
@@ -381,30 +394,81 @@ export default function DeckBuilderPage() {
                 {t("deckBuilder.noSavedDecks")}
               </p>
             )}
-            <div className="flex gap-2 flex-wrap">
-              {savedDecks.map((deck) => (
-                <div
-                  key={deck.id}
-                  className={`flex items-center gap-2 px-3 py-1.5 bg-[#141414] border text-xs ${
-                    loadedDeckId === deck.id
-                      ? "border-[#3e8b3e]/50"
-                      : "border-[#262626]"
-                  }`}
-                >
-                  <button
-                    onClick={() => handleLoadDeck(deck.id)}
-                    className="text-[#e0e0e0] hover:text-white"
+            <div className="flex flex-col gap-1.5">
+              {savedDecks.map((deck) => {
+                const isActive = loadedDeckId === deck.id;
+                const isConfirming = confirmDeleteId === deck.id;
+                return (
+                  <div
+                    key={deck.id}
+                    className={`flex items-center gap-3 px-3 py-2 bg-[#141414] border transition-colors ${
+                      isActive
+                        ? "border-[#3e8b3e]/50"
+                        : "border-[#262626]"
+                    }`}
                   >
-                    {deck.name} ({deck.cardIds.length}+{deck.missionIds.length})
-                  </button>
-                  <button
-                    onClick={() => handleDeleteDeck(deck.id)}
-                    className="text-[#b33e3e] hover:text-[#d44]"
-                  >
-                    X
-                  </button>
-                </div>
-              ))}
+                    {/* Deck info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-[#e0e0e0] font-medium truncate">
+                          {deck.name}
+                        </span>
+                        {isActive && (
+                          <span className="text-[9px] px-1.5 py-0.5 bg-[#3e8b3e]/15 text-[#3e8b3e] border border-[#3e8b3e]/25 shrink-0">
+                            {t("deckBuilder.currentlyEditing")}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-[#555]">
+                        {t("deckBuilder.savedDeckInfo", {
+                          cards: deck.cardIds.length,
+                          missions: deck.missionIds.length,
+                        })}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    {isConfirming ? (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px] text-[#b33e3e]">
+                          {t("deckBuilder.confirmDelete", { name: deck.name })}
+                        </span>
+                        <button
+                          onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}
+                          className="px-2 py-0.5 bg-[#2a1a1a] border border-[#b33e3e]/40 text-[#b33e3e] text-[10px] hover:bg-[#3a1a1a] transition-colors"
+                        >
+                          {t("common.confirm")}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDeleteId(null)}
+                          className="px-2 py-0.5 bg-[#141414] border border-[#262626] text-[#888] text-[10px] hover:bg-[#1a1a1a] transition-colors"
+                        >
+                          {t("common.cancel")}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => handleLoadDeck(deck.id)}
+                          className={`px-2.5 py-1 border text-[10px] transition-colors ${
+                            isActive
+                              ? "bg-[#1a2a1a] border-[#3e8b3e]/30 text-[#3e8b3e]"
+                              : "bg-[#141414] border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444]"
+                          }`}
+                        >
+                          {t("deckBuilder.editDeck")}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDeleteId(deck.id)}
+                          className="px-2.5 py-1 bg-[#141414] border border-[#262626] text-[#b33e3e] text-[10px] hover:bg-[#1a1414] hover:border-[#b33e3e]/30 transition-colors"
+                        >
+                          {t("deckBuilder.deleteDeck")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
