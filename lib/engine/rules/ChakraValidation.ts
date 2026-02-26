@@ -128,7 +128,19 @@ export function calculateEffectiveCost(
     }
   }
 
-  // Turn-wide cost increases (e.g., Shino 033 MAIN)
+  // Shino 033 AMBUSH: Pay 4 less when revealing if there's an enemy Jutsu character in this mission
+  if (isReveal && card.number === 33) {
+    const hasEnemyJutsu = enemyChars?.some((c: any) => {
+      if (c.isHidden) return false;
+      const cTop = getTopCard(c);
+      return cTop?.keywords?.includes('Jutsu');
+    });
+    if (hasEnemyJutsu) {
+      cost = Math.max(0, cost - 4);
+    }
+  }
+
+  // Turn-wide cost increases
   if (state.playCostIncrease) {
     cost += state.playCostIncrease[player] ?? 0;
   }

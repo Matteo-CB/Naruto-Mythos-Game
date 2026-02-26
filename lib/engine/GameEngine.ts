@@ -25,7 +25,7 @@ import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
-import { executeEndPhase, handleRockLee117Move } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 
@@ -147,6 +147,16 @@ export class GameEngine {
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           // Handle pending effect target selections during action phase
           newState = GameEngine.handlePendingAction(newState, player, action);
+          // After resolving a pending effect, switch active player (same logic as executeAction)
+          // but only when all pending effects/actions are resolved
+          if (newState.phase === 'action' &&
+              newState.pendingEffects.length === 0 &&
+              newState.pendingActions.length === 0 &&
+              !newState.player1.hasPassed &&
+              !newState.player2.hasPassed) {
+            const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
+            newState.activePlayer = otherPlayer;
+          }
         } else {
           newState = executeAction(newState, player, action);
         }
@@ -182,17 +192,22 @@ export class GameEngine {
         break;
 
       case 'end':
-        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move)
+        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move, Akamaru 028 return)
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
-          // After resolving, check if more Rock Lee moves need processing
+          // After resolving, check if more end-phase effects need processing
           if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
-            // Continue processing remaining Rock Lee moves, then finish end phase
+            // Continue processing remaining Rock Lee moves
             newState = handleRockLee117Move(newState);
+            if (newState.pendingActions.length > 0) break; // More choices needed
+
+            // Continue processing Akamaru 028 optional returns
+            newState = handleAkamaru028Return(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
             // All end-of-round effects resolved — finish end phase transition
             newState.endPhaseMovedIds = undefined;
+            newState.endPhaseAkamaru028Ids = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -312,8 +327,15 @@ export class GameEngine {
       return newState;
     }
 
+    // Process Akamaru 028 optional returns
+    newState = handleAkamaru028Return(newState);
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
+
     // Clean up end phase tracking
     newState.endPhaseMovedIds = undefined;
+    newState.endPhaseAkamaru028Ids = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
@@ -531,12 +553,14 @@ export class GameEngine {
       const makeVisible = (chars: CharacterInPlay[], side: PlayerID): VisibleCharacter[] =>
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
-          const canSee = isOwn || !c.isHidden;
+          // Can see if: own card, OR not hidden, OR was previously revealed (public knowledge)
+          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
           const power = calculateCharacterPower(state, c, side);
           const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
           return {
             instanceId: c.instanceId,
             isHidden: c.isHidden,
+            wasRevealedAtLeastOnce: c.wasRevealedAtLeastOnce,
             isOwn,
             card: canSee ? c.card : undefined,
             topCard: canSee ? topCard : undefined,

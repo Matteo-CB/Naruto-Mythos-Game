@@ -1,0 +1,56 @@
+import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { registerEffect } from '@/lib/effects/EffectRegistry';
+import { logAction } from '@/lib/engine/utils/gameLog';
+
+/**
+ * Card 095/130 - GAMAHIRO (Common)
+ * Chakra: 4 | Power: 6
+ * Group: Independent | Keywords: Summon
+ * MAIN (1): If there's a friendly character in this mission, draw a card.
+ * MAIN (2) [continuous]: At the end of the round, you must return this character to your hand.
+ *
+ * The first MAIN effect triggers on play: draw a card if there's already a friendly character
+ * in this mission. The second MAIN is continuous and handled in EndPhase.ts.
+ */
+function handleGamahiro095Main(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const mission = state.activeMissions[sourceMissionIndex];
+  const friendlyChars =
+    sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+
+  // Check for any friendly character in this mission (not self)
+  const hasFriendly = friendlyChars.some(
+    (char) => char.instanceId !== sourceCard.instanceId,
+  );
+
+  if (!hasFriendly) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Gamahiro (095): No other friendly character in this mission.',
+      'game.log.effect.noTarget', { card: 'GAMAHIRO', id: 'KS-095-C' }) } };
+  }
+
+  // Draw a card
+  const newState = { ...state };
+  const playerState = { ...newState[sourcePlayer] };
+  if (playerState.deck.length > 0) {
+    const newDeck = [...playerState.deck];
+    const drawnCard = newDeck.shift()!;
+    playerState.deck = newDeck;
+    playerState.hand = [...playerState.hand, drawnCard];
+  }
+  newState[sourcePlayer] = playerState;
+
+  newState.log = logAction(
+    state.log, state.turn, state.phase, sourcePlayer,
+    'EFFECT_DRAW',
+    `Gamahiro (095): Drew 1 card (friendly in mission).`,
+    'game.log.effect.draw',
+    { card: 'Gamahiro', id: 'KS-095-C', count: 1 },
+  );
+
+  return { state: newState };
+}
+
+export function registerHandler(): void {
+  registerEffect('KS-095-C', 'MAIN', handleGamahiro095Main);
+}

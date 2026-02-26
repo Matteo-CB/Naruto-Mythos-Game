@@ -6,6 +6,7 @@ import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
+import { returnCharacterToHand } from '../engine/phases/EndPhase';
 
 /**
  * Central effect resolver.
@@ -1332,6 +1333,19 @@ export class EffectEngine {
         newState = EffectEngine.moveSelfToMission(newState, pendingEffect, targetId);
         break;
 
+      // --- Akamaru 028 optional end-of-round return to hand ---
+      case 'AKAMARU028_RETURN_TO_HAND': {
+        newState = returnCharacterToHand(newState, targetId, pendingEffect.sourcePlayer);
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'END_RETURN',
+          'Akamaru (028): Returned to hand at end of round.',
+          'game.log.effect.akamaru028Return',
+          { card: 'AKAMARU', id: 'KS-028-UC' },
+        );
+        break;
+      }
+
       // --- MOVE types (destination selection — use moveSelfToMission) ---
       case 'KURENAI116B_MOVE_SELF':
       case 'KAKASHI137_MOVE_SELF':
@@ -2270,6 +2284,7 @@ export class EffectEngine {
               instanceId: generateInstanceId(),
               card: stolenCard,
               isHidden: true,
+              wasRevealedAtLeastOnce: false,
               powerTokens: 0,
               stack: [stolenCard],
               controlledBy: player_kb,
@@ -2764,7 +2779,7 @@ export class EffectEngine {
           if (hideResult.requiresTargetSelection && hideResult.validTargets && hideResult.validTargets.length > 0) {
             return EffectEngine.createPendingTargetSelection(
               hideResult.state, pendingEffect.sourcePlayer,
-              EffectEngine.findCharByInstanceId(hideResult.state, pendingEffect.sourceInstanceId)?.character ?? { instanceId: pendingEffect.sourceInstanceId, card: { id: pendingEffect.sourceCardId } as any, isHidden: false, powerTokens: 0, stack: [], controlledBy: pendingEffect.sourcePlayer, originalOwner: pendingEffect.sourcePlayer, missionIndex: destMIdx018 },
+              EffectEngine.findCharByInstanceId(hideResult.state, pendingEffect.sourceInstanceId)?.character ?? { instanceId: pendingEffect.sourceInstanceId, card: { id: pendingEffect.sourceCardId } as any, isHidden: false, wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [], controlledBy: pendingEffect.sourcePlayer, originalOwner: pendingEffect.sourcePlayer, missionIndex: destMIdx018 },
               destMIdx018, 'UPGRADE', false, hideResult, [],
             );
           }
@@ -2874,6 +2889,7 @@ export class EffectEngine {
               instanceId: generateInstanceId(),
               card: card_ph,
               isHidden: true,
+              wasRevealedAtLeastOnce: false,
               powerTokens: 0,
               stack: [card_ph],
               controlledBy: pendingEffect.sourcePlayer,
@@ -2935,6 +2951,7 @@ export class EffectEngine {
               instanceId: generateInstanceId(),
               card: card_kh,
               isHidden: true,
+              wasRevealedAtLeastOnce: false,
               powerTokens: 0,
               stack: [card_kh],
               controlledBy: pendingEffect.sourcePlayer,
@@ -4824,6 +4841,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(),
         card: card as any,
         isHidden: false,
+        wasRevealedAtLeastOnce: true,
         powerTokens: 0,
         stack: [card as any],
         controlledBy: player,
@@ -5130,6 +5148,7 @@ export class EffectEngine {
       instanceId: generateInstanceId(),
       card: chosenCard as any,
       isHidden: true,
+      wasRevealedAtLeastOnce: false,
       powerTokens: 0,
       stack: [chosenCard as any],
       controlledBy: player,
@@ -5314,6 +5333,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(),
         card,
         isHidden: false,
+        wasRevealedAtLeastOnce: true,
         powerTokens: 0,
         stack: [card],
         controlledBy: player,
@@ -5378,6 +5398,7 @@ export class EffectEngine {
       instanceId: generateInstanceId(),
       card,
       isHidden: false,
+      wasRevealedAtLeastOnce: true,
       powerTokens: isUpgrade ? 2 : 0, // UPGRADE: POWERUP 2 on the played character
       stack: [card],
       controlledBy: player,
@@ -5748,6 +5769,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(),
         card: card as any,
         isHidden: false,
+        wasRevealedAtLeastOnce: true,
         powerTokens: 0,
         stack: [card as any],
         controlledBy: player,
@@ -6248,6 +6270,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(),
         card: card as any,
         isHidden: false,
+        wasRevealedAtLeastOnce: true,
         powerTokens: 0,
         stack: [card as any],
         controlledBy: player,
@@ -6473,6 +6496,7 @@ export class EffectEngine {
         instanceId: generateInstanceId(),
         card: card as any,
         isHidden: false,
+        wasRevealedAtLeastOnce: true,
         powerTokens: 0,
         stack: [card as any],
         controlledBy: player,

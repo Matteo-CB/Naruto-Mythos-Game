@@ -1,11 +1,8 @@
 import type { CardData, CharacterCard, MissionCard, Rarity } from '../engine/types';
-import rawData from './card-data.json';
+import { allCardData as rawData } from './sets';
 
-// card-data.json is the single source of truth.
-// All corrections (effects, keywords, names, stats, basePoints) are baked into the JSON.
-// No more correction tables needed.
-
-const CURRENT_SET = 'KS';
+// Card data is loaded from per-set files in lib/data/sets/.
+// The sets/index.ts aggregator merges all sets into a single dataset.
 
 // Raw card shape from the JSON (values may be "" for incomplete cards)
 interface RawJsonCard {
@@ -43,7 +40,7 @@ function normalizeCard(raw: RawJsonCard): CardData {
   return {
     id: raw.id,
     cardId: raw.id,
-    set: raw.set || CURRENT_SET,
+    set: raw.set || 'KS',
     number: parseInt(raw.number, 10) || 0,
     name_fr: raw.name_fr,
     title_fr: raw.title_fr || '',

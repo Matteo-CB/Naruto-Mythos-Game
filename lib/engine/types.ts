@@ -56,6 +56,7 @@ export interface CharacterInPlay {
   instanceId: string;
   card: CharacterCard;
   isHidden: boolean;
+  wasRevealedAtLeastOnce: boolean; // true if card was ever face-visible (stays true even if re-hidden)
   powerTokens: number;
   stack: CharacterCard[]; // Evolution stack, bottom to top. Last element = active card
   controlledBy: PlayerID;
@@ -130,6 +131,8 @@ export interface GameState {
   missionScoringProgress?: MissionScoringProgress;
   /** Instance IDs of Rock Lee characters already moved during this End Phase */
   endPhaseMovedIds?: string[];
+  /** Instance IDs of Akamaru 028 characters already processed for optional return during this End Phase */
+  endPhaseAkamaru028Ids?: string[];
   /** Set when all mission scoring is complete but End Phase hasn't run yet.
    * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
   missionScoringComplete?: boolean;
@@ -295,6 +298,7 @@ export interface VisibleMission extends Omit<ActiveMission, 'player1Characters' 
 export interface VisibleCharacter {
   instanceId: string;
   isHidden: boolean;
+  wasRevealedAtLeastOnce: boolean; // true if card was ever face-visible (re-hidden cards show greyed out)
   isOwn: boolean; // Can the viewing player see this card?
   card?: CharacterCard; // Only present if visible to the viewer
   topCard?: CharacterCard; // Top of the evolution stack (differs from card when upgraded)

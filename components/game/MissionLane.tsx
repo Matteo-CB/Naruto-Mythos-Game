@@ -45,20 +45,24 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
 
   const isSelected = selectedTargetId === character.instanceId;
   const isHidden = character.isHidden;
-  // card data is present for own cards (hidden or not) AND for opponent's visible cards
+  // card data is present for own cards (hidden or not), opponent visible cards,
+  // AND re-hidden enemy cards (wasRevealedAtLeastOnce = public knowledge)
   const hasCardData = !!character.card;
 
   // Determine if this is a revealable character (own hidden character)
   const isRevealable = isOwn && isHidden && isMyTurn && hasCardData;
 
-  // Hover preview: show for own hidden cards and any visible card with data
-  const isHiddenEnemy = character.isHidden && !isOwn;
+  // A re-hidden card: was revealed at least once, now face-down again
+  const isReHidden = isHidden && character.wasRevealedAtLeastOnce;
+  // True hidden enemy: never revealed, not our card
+  const isUnknownHiddenEnemy = isHidden && !isOwn && !character.wasRevealedAtLeastOnce;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isMyTurn) {
-      // When not your turn, just pin for preview (if data available)
-      if (!isHiddenEnemy && character.card) {
+      // When not your turn, pin for preview if card data available
+      // This includes own hidden cards and re-hidden enemy cards
+      if (!isUnknownHiddenEnemy && character.card) {
         pinCard(character.card);
       }
       return;
@@ -68,13 +72,13 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       selectTarget(character.instanceId);
       return;
     }
-    // For non-revealable own cards or opponent visible cards, pin for preview
-    if (!isHiddenEnemy && character.card) {
+    // For own hidden cards, re-hidden cards, or opponent visible cards, pin for preview
+    if (!isUnknownHiddenEnemy && character.card) {
       pinCard(character.card);
     }
   };
 
-  // Image path: show for ANY card that has card data + image_file (own or opponent visible)
+  // Image path: show for ANY card that has card data + image_file (own, opponent visible, or re-hidden)
   // Banned cards always show card back (no image)
   const isBanned = hasCardData && character.card ? bannedIds.has(character.card.id) : false;
   const imagePath = !isBanned && hasCardData
@@ -85,7 +89,8 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
   const totalPower = character.effectivePower;
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    if (isHiddenEnemy || !character.card) return;
+    // Block preview only for unknown hidden enemy cards (never revealed)
+    if (isUnknownHiddenEnemy || !character.card) return;
     showPreview(character.card, { x: e.clientX, y: e.clientY });
   };
 
@@ -112,7 +117,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',
         borderRadius: '5px',
-        cursor: isRevealable ? 'pointer' : (!isHiddenEnemy && character.card ? 'pointer' : 'default'),
+        cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
           ? '2px solid #c4a35a'
           : isRevealable
@@ -124,14 +129,40 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
           : '0 2px 8px rgba(0, 0, 0, 0.4)',
       }}
     >
-      {isHidden ? (
+      {isHidden && !isReHidden ? (
+        /* Never-revealed hidden card: show card back */
         <img
           src="/images/card-back.webp"
           alt=""
           draggable={false}
           className="w-full h-full object-cover"
         />
+      ) : isReHidden ? (
+        /* Re-hidden card (was revealed, now face-down): show greyed-out card face */
+        <>
+          {imagePath ? (
+            <div
+              className="w-full h-full bg-cover bg-center"
+              style={{
+                backgroundImage: `url('${imagePath}')`,
+                imageRendering: 'crisp-edges',
+                filter: 'grayscale(100%) brightness(0.5)',
+                opacity: 0.6,
+              }}
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ backgroundColor: '#1a1a1a', filter: 'grayscale(100%) brightness(0.5)', opacity: 0.6 }}
+            >
+              <span className="text-[8px] text-center px-0.5" style={{ color: '#888888' }}>
+                {character.card ? getCardName(character.card, locale as 'en' | 'fr') : '???'}
+              </span>
+            </div>
+          )}
+        </>
       ) : (
+        /* Visible card: normal rendering */
         <>
           {imagePath ? (
             <div

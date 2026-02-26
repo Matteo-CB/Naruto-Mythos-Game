@@ -1,0 +1,19 @@
+import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { registerEffect } from '@/lib/effects/EffectRegistry';
+
+/**
+ * Card 025/130 - KIBA INUZUKA (Common)
+ * Chakra: 2 | Power: 2
+ * MAIN [continuous]: If Akamaru is in the same mission, CHAKRA +1.
+ *
+ * This is a continuous chakra bonus handled in StartPhase.ts.
+ * The handler here is a no-op that registers the card so the system knows it has an effect.
+ */
+function handleKiba025Main(ctx: EffectContext): EffectResult {
+  // Continuous chakra bonus - actual calculation happens in StartPhase.ts
+  return { state: ctx.state };
+}
+
+export function registerHandler(): void {
+  registerEffect('KS-025-C', 'MAIN', handleKiba025Main);
+}
