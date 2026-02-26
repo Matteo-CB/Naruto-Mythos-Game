@@ -10,16 +10,12 @@
 # ============================================================
 #
 #   21 cartes sans image au total:
-#     13 JOUABLES  (data_complete, besoin image seulement)
-#      8 BLOQUEES  (donnees manquantes, non jouables)
+#     20 JOUABLES  (data_complete, besoin image seulement)
+#      4 BLOQUEES  (donnees manquantes, non jouables)
 #
-#   Bloquees par rarete:
+#   Bloquees:
 #     2 Rare      — KS-115-R, KS-127-R (TOUT manque)
 #     2 Rare Art  — KS-115-RA, KS-127-RA (attendent leur version R)
-#     1 Secret    — KS-134-S
-#     6 Mythos    — KS-145-M, KS-149-M, KS-150-M, KS-151-M, KS-152-M, KS-153-M
-#
-#   Note: KS-130-R ICHIBI group="Independent", devrait etre "Sand Village"
 #
 # ============================================================
 
@@ -51,68 +47,6 @@ KS-115-RA  SHINO ABURAME  -> copier KS-115-R quand rempli
 KS-127-RA  SAKON          -> copier KS-127-R quand rempli
 
 ################################################################
-# SECRET — STATS ET EFFETS MANQUANTS
-################################################################
-
-KS-134-S  KYUBI (Destruction)
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = ???
-  effects   = ???
-
-################################################################
-# MYTHOS — STATS, EFFETS, TITRES MANQUANTS
-################################################################
-
-KS-145-M  NARUTO UZUMAKI (Equipe 7 originelle)
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = ???
-  effects   = ???
-
-KS-149-M  KIBA INUZUKA
-  titre     = ???
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = Leaf Village (connu)
-  effects   = ???
-
-KS-150-M  SHIKAMARU NARA
-  titre     = ???
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = Leaf Village (connu)
-  effects   = ???
-
-KS-151-M  ROCK LEE
-  titre     = ???
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = Leaf Village (connu)
-  effects   = ???
-
-KS-152-M  ITACHI UCHIWA
-  titre     = ???
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = Akatsuki (connu)
-  effects   = ???
-
-KS-153-M  GAARA
-  titre     = ???
-  chakra    = ???
-  power     = ???
-  keywords  = ???
-  group     = Sand Village (connu)
-  effects   = ???
-
-################################################################
 # CARTES JOUABLES SANS IMAGE (data_complete=true)
 ################################################################
 #
@@ -129,3 +63,11 @@ KS-153-M  GAARA
 # KS-129-R   KYUBI                       C7/P10
 # KS-129-RA  KYUBI (RA)                  C7/P10 <- rempli depuis R
 # KS-130-R   ICHIBI                      C7/P10
+# KS-134-S   KYUBI (Destruction)         C8/P12
+# KS-145-M   NARUTO UZUMAKI (Equipe 7)   C5/P5
+# KS-149-M   KIBA INUZUKA (Fang/Fang)    C6/P6
+# KS-151-M   ROCK LEE (Loopy Fist)       C5/P5
+# KS-152-M   ITACHI UCHIWA (Amaterasu)   C6/P6
+# KS-153-M   GAARA (Sand Burial)         C5/P4
+#
+# + KS-150-M SHIKAMARU NARA (Shadow Strangle) C6/P5  <- AVEC IMAGE

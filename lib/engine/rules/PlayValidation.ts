@@ -88,7 +88,7 @@ export function validatePlayHidden(
   for (const c of opponentChars) {
     if (c.isHidden) continue;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    if (topCard.number === 111) {
+    if (topCard.number === 111 || topCard.number === 150) {
       const hasRestriction = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
       );

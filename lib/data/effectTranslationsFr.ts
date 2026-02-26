@@ -909,8 +909,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 153/130 - GAARA (M) - "Cercueil de Sable"
   'KS-153-M': [
-    'Vainquez jusqu\'a 1 personnage ennemi avec une Puissance de 1 ou moins dans chaque mission.',
-    'POWERUP X, ou X est le nombre de personnages vaincus par l\'effet MAIN.',
+    'Vainquez un personnage ennemi avec un cout inferieur au nombre de personnages allies caches en jeu.',
+    'effet MAIN : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
   ],
 
   // =====================

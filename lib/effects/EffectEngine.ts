@@ -913,6 +913,75 @@ export class EffectEngine {
         newState = EffectEngine.itachi143MoveEnemy(newState, pendingEffect, targetId);
         break;
 
+      // --- Gaara 153 (M) — same logic as 139 (S) ---
+      case 'GAARA153_DEFEAT_BY_COST': {
+        const gaara153Info = EffectEngine.findCharByInstanceId(newState, targetId);
+        const gaara153DefeatedName = gaara153Info ? gaara153Info.character.card.name_fr : '';
+        const gaara153DefeatedCost = gaara153Info
+          ? (gaara153Info.character.stack.length > 0
+              ? gaara153Info.character.stack[gaara153Info.character.stack.length - 1]
+              : gaara153Info.character.card
+            ).chakra
+          : 0;
+
+        newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+
+        if (pendingEffect.isUpgrade && gaara153DefeatedName) {
+          const opponentPlayer153 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const gaara153EnemySide: 'player1Characters' | 'player2Characters' =
+            opponentPlayer153 === 'player1' ? 'player1Characters' : 'player2Characters';
+
+          const hideTargets153: string[] = [];
+          for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+            for (const ch of newState.activeMissions[mi][gaara153EnemySide]) {
+              if (ch.isHidden) continue;
+              if (ch.instanceId === targetId) continue;
+              const tc = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              if (tc.name_fr === gaara153DefeatedName && tc.chakra < gaara153DefeatedCost) {
+                hideTargets153.push(ch.instanceId);
+              }
+            }
+          }
+
+          if (hideTargets153.length > 0) {
+            const charResult153 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+            if (charResult153) {
+              const hideEffectId153 = generateInstanceId();
+              const hideActionId153 = generateInstanceId();
+              newState.pendingEffects = [...newState.pendingEffects, {
+                id: hideEffectId153,
+                sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: charResult153.missionIndex,
+                effectType: 'UPGRADE' as const,
+                effectDescription: `Gaara (153) UPGRADE: Hide an enemy ${gaara153DefeatedName} with cost less than ${gaara153DefeatedCost}.`,
+                targetSelectionType: 'GAARA153_HIDE_SAME_NAME',
+                sourcePlayer: pendingEffect.sourcePlayer,
+                requiresTargetSelection: true,
+                validTargets: hideTargets153,
+                isOptional: true,
+                isMandatory: false,
+                resolved: false,
+                isUpgrade: true,
+              }];
+              newState.pendingActions = [...newState.pendingActions, {
+                id: hideActionId153,
+                type: 'SELECT_TARGET' as const,
+                player: pendingEffect.sourcePlayer,
+                description: `Gaara (153) UPGRADE: Hide an enemy ${gaara153DefeatedName} with cost less than ${gaara153DefeatedCost}.`,
+                descriptionKey: 'game.effect.desc.gaara153HideSameName',
+                descriptionParams: { target: gaara153DefeatedName, cost: String(gaara153DefeatedCost) },
+                options: hideTargets153,
+                minSelections: 1,
+                maxSelections: 1,
+                sourceEffectId: hideEffectId153,
+              }];
+            }
+          }
+        }
+        break;
+      }
+
       // --- Gaara 139 (S) ---
       case 'DEFEAT_ENEMY_BY_COST':
       case 'GAARA139_DEFEAT_BY_COST': {
@@ -1038,6 +1107,7 @@ export class EffectEngine {
       case 'JIRAIYA_HIDE_ENEMY_COST_3':
       case 'CHOJI018_HIDE_ENEMY':
       case 'GAARA139_HIDE_SAME_NAME':
+      case 'GAARA153_HIDE_SAME_NAME':
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
 

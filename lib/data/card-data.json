@@ -4345,20 +4345,29 @@
       "number": "134",
       "set": "KS",
       "card_type": "character",
-      "name_en": "NINE-TAILS",
+      "name_en": "NINE-TAILED FOX",
       "name_fr": "KYÛBI",
       "title_fr": "Destruction",
-      "title_en": "Destruction",
+      "title_en": "The Beast Awakens",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 8,
+      "power": 12,
+      "keywords": ["Tailed Beast"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide any number of non-hidden characters in play with total Power of 6 or less."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "134/130"
     },
     "KS-135-S": {
@@ -4712,15 +4721,20 @@
       "title_fr": "Équipe 7 originelle",
       "title_en": "Original Team 7",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Team 7"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] If you have the Edge, your hidden characters in this mission have +1 Power."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "145/130"
     },
     "KS-146-M": {
@@ -5152,18 +5166,27 @@
       "card_type": "character",
       "name_en": "KIBA INUZUKA",
       "name_fr": "KIBA INUZUKA",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Crocs sur crocs",
+      "title_en": "Fang Over Fang",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Team 8"],
       "group": "Leaf Village",
-      "effects": [],
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them."
+        }
+      ],
       "image_url": "",
       "rarity_display": "Mythos",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "149/130",
       "is_rare_art": false
     },
@@ -5175,18 +5198,27 @@
       "card_type": "character",
       "name_en": "SHIKAMARU NARA",
       "name_fr": "SHIKAMARU NARA",
-      "title_fr": "",
-      "title_en": "",
-      "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
+      "title_fr": "Étranglement de l'ombre",
+      "title_en": "Shadow Strangle Jutsu",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 5,
+      "keywords": ["Team 10", "Jutsu"],
       "group": "Leaf Village",
-      "effects": [],
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent cannot play characters while hidden in this mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Hide an enemy character with Power 3 or less in this mission."
+        }
+      ],
       "image_url": "",
       "rarity_display": "Mythos",
-      "image_file": "",
-      "data_complete": false,
+      "image_file": "images/cards/KS/mythos/KS-150-M.webp",
+      "data_complete": true,
       "old_id": "150/130",
       "is_rare_art": false
     },
@@ -5198,18 +5230,27 @@
       "card_type": "character",
       "name_en": "ROCK LEE",
       "name_fr": "ROCK LEE",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Poing de l'ivresse",
+      "title_en": "Loopy Fist",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Team Guy", "Taijutsu"],
       "group": "Leaf Village",
-      "effects": [],
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the end of the round, you must move this character to another mission, if able."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
+        }
+      ],
       "image_url": "",
       "rarity_display": "Mythos",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "151/130",
       "is_rare_art": false
     },
@@ -5221,18 +5262,27 @@
       "card_type": "character",
       "name_en": "ITACHI UCHIHA",
       "name_fr": "ITACHI UCHIWA",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Amaterasu",
+      "title_en": "Amaterasu",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
+      "chakra": 6,
+      "power": 6,
+      "keywords": ["Rogue Ninja", "Jutsu"],
       "group": "Akatsuki",
-      "effects": [],
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Every enemy character in this mission has -1 Power."
+        }
+      ],
       "image_url": "",
       "rarity_display": "Mythos",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "152/130",
       "is_rare_art": false
     },
@@ -5244,18 +5294,27 @@
       "card_type": "character",
       "name_en": "GAARA",
       "name_fr": "GAARA",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Cercueil de Sable",
+      "title_en": "Sand Burial",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
+      "chakra": 5,
+      "power": 4,
+      "keywords": ["Team Baki", "Jutsu"],
       "group": "Sand Village",
-      "effects": [],
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character."
+        }
+      ],
       "image_url": "",
       "rarity_display": "Mythos",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "153/130",
       "is_rare_art": false
     },
