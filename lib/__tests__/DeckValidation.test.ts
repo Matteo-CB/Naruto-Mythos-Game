@@ -85,7 +85,7 @@ describe('Deck Validation', () => {
     expect(result.valid).toBe(true); // 2 of each version = OK
   });
 
-  it('should reject cards without visuals', () => {
+  it('should reject cards without visuals and without complete data', () => {
     const deck = createTestDeck(29);
     const noVisual = mockCharacter({
       id: 'KS-999-C',
@@ -99,6 +99,22 @@ describe('Deck Validation', () => {
     const result = validateDeck(deck, missions);
     expect(result.valid).toBe(false);
     expect(result.errors.some((e) => e.includes('not playable'))).toBe(true);
+  });
+
+  it('should accept cards without visuals if data_complete is true', () => {
+    const deck = createTestDeck(29);
+    const noVisualComplete = mockCharacter({
+      id: 'KS-999-C',
+      name_fr: 'No Visual Complete',
+      has_visual: false,
+      data_complete: true,
+    });
+    deck.push(noVisualComplete);
+
+    const missions = [mockMission(), mockMission({ id: 'KS-002-MMS' }), mockMission({ id: 'KS-003-MMS' })];
+
+    const result = validateDeck(deck, missions);
+    expect(result.valid).toBe(true);
   });
 
   it('should accept larger decks (no max)', () => {

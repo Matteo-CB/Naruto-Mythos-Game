@@ -7,7 +7,7 @@ import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
-import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 
 // ---------------------
 // Rarity bar color mapping (no gradients, solid colors only)
@@ -74,41 +74,113 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}
         />
       ) : (
-        /* Silhouette treatment for cards without images */
+        /* Text-based card face for cards without images */
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: '#1a1a1a',
+            backgroundColor: '#111111',
+            border: `2px solid ${rarityColor}40`,
+            borderRadius: '8px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            flexDirection: 'column',
+            padding: '8%',
           }}
         >
-          <div
-            style={{
-              width: '60%',
-              height: '60%',
-              backgroundColor: '#222222',
-              borderRadius: '50%',
-              opacity: 0.5,
-            }}
-          />
+          {/* Rarity accent line at top */}
+          <div style={{
+            width: '40%',
+            height: '2px',
+            backgroundColor: rarityColor,
+            marginBottom: '6%',
+            opacity: 0.6,
+          }} />
+          {/* Character name */}
+          <div style={{
+            color: '#d0d0d0',
+            fontSize: '0.65em',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+            lineHeight: 1.2,
+            marginBottom: '2%',
+          }}>
+            {getCardName(card, locale as 'en' | 'fr')}
+          </div>
+          {/* Title */}
+          {getCardTitle(card, locale as 'en' | 'fr') && (
+            <div style={{
+              color: '#777777',
+              fontSize: '0.45em',
+              lineHeight: 1.3,
+              marginBottom: '4%',
+              fontStyle: 'italic',
+            }}>
+              {getCardTitle(card, locale as 'en' | 'fr')}
+            </div>
+          )}
+          {/* Group */}
+          {card.group && (
+            <div style={{
+              color: '#666666',
+              fontSize: '0.4em',
+              marginBottom: '3%',
+            }}>
+              {getCardGroup(card.group, locale as 'en' | 'fr')}
+            </div>
+          )}
+          {/* Keywords */}
+          {card.keywords && card.keywords.length > 0 && (
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '2px',
+              marginBottom: '3%',
+            }}>
+              {card.keywords.map((kw) => (
+                <span
+                  key={kw}
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    color: '#888888',
+                    fontSize: '0.35em',
+                    padding: '1px 4px',
+                    borderRadius: '2px',
+                    border: '1px solid #2a2a2a',
+                  }}
+                >
+                  {getCardKeyword(kw, locale as 'en' | 'fr')}
+                </span>
+              ))}
+            </div>
+          )}
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+          {/* Card ID at bottom */}
+          <div style={{
+            color: '#3a3a3a',
+            fontSize: '0.35em',
+            textAlign: 'right',
+          }}>
+            {card.id}
+          </div>
         </div>
       )}
 
-      {/* Dark overlay for text readability at bottom */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '40%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Dark overlay for text readability at bottom (only for cards with images) */}
+      {hasImage && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '40%',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {/* Chakra cost badge (top-left) - character cards only */}
       {card.card_type === 'character' && card.chakra !== undefined && (
@@ -211,69 +283,46 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Name and title (bottom-left) */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '8%',
-          left: '6%',
-          right: card.card_type === 'character' ? '26%' : '6%',
-        }}
-      >
+      {/* Name and title (bottom-left) — only for cards with images */}
+      {hasImage && (
         <div
           style={{
-            color: '#e0e0e0',
-            fontWeight: 700,
-            fontSize: '0.65em',
-            lineHeight: 1.2,
-            textShadow: '0 1px 3px rgba(0,0,0,0.9)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            position: 'absolute',
+            bottom: '8%',
+            left: '6%',
+            right: card.card_type === 'character' ? '26%' : '6%',
           }}
         >
-          {getCardName(card, locale as 'en' | 'fr')}
-        </div>
-        {getCardTitle(card, locale as 'en' | 'fr') && (
           <div
             style={{
-              color: '#888888',
-              fontSize: '0.5em',
+              color: '#e0e0e0',
+              fontWeight: 700,
+              fontSize: '0.65em',
               lineHeight: 1.2,
-              marginTop: '2px',
               textShadow: '0 1px 3px rgba(0,0,0,0.9)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
           >
-            {getCardTitle(card, locale as 'en' | 'fr')}
-          </div>
-        )}
-      </div>
-
-      {/* Silhouette name overlay (centered, only for cards without images) */}
-      {!hasImage && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '40%',
-            left: '10%',
-            right: '10%',
-            textAlign: 'center',
-          }}
-        >
-          <span
-            style={{
-              color: '#555555',
-              fontSize: '0.6em',
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
             {getCardName(card, locale as 'en' | 'fr')}
-          </span>
+          </div>
+          {getCardTitle(card, locale as 'en' | 'fr') && (
+            <div
+              style={{
+                color: '#888888',
+                fontSize: '0.5em',
+                lineHeight: 1.2,
+                marginTop: '2px',
+                textShadow: '0 1px 3px rgba(0,0,0,0.9)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {getCardTitle(card, locale as 'en' | 'fr')}
+            </div>
+          )}
         </div>
       )}
 

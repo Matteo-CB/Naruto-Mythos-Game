@@ -44,16 +44,16 @@ export function validateDeck(
     }
   }
 
-  // Check all character cards are playable (have visuals)
+  // Check all character cards are playable (have visuals or complete data)
   for (const card of characterCards) {
-    if (!card.has_visual) {
+    if (!card.has_visual && !card.data_complete) {
       errors.push(`Card ${card.id} (${card.name_fr}) is not playable (no visual).`);
     }
   }
 
   // Check all mission cards are playable
   for (const card of missionCards) {
-    if (!card.has_visual) {
+    if (!card.has_visual && !card.data_complete) {
       errors.push(`Mission ${card.id} (${card.name_fr}) is not playable (no visual).`);
     }
   }

@@ -23,5 +23,5 @@ export function hasImage(card: CardData): boolean {
 }
 
 export function isPlayable(card: CardData): boolean {
-  return card.has_visual;
+  return card.has_visual || !!card.data_complete;
 }

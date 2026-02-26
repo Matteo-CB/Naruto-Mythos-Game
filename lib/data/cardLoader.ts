@@ -62,6 +62,7 @@ function normalizeCard(raw: RawJsonCard): CardData {
     })),
     image_file: normalizeImagePath(raw.image_file) || undefined,
     is_rare_art: raw.is_rare_art ?? false,
+    data_complete: raw.data_complete ?? false,
   };
 }
 
@@ -143,14 +144,14 @@ export function getAllMissions(): MissionCard[] {
 
 export function getPlayableCharacters(): CharacterCard[] {
   if (!_playableCharacters) {
-    _playableCharacters = getAllCharacters().filter((c) => c.has_visual);
+    _playableCharacters = getAllCharacters().filter((c) => c.has_visual || c.data_complete);
   }
   return _playableCharacters;
 }
 
 export function getPlayableMissions(): MissionCard[] {
   if (!_playableMissions) {
-    _playableMissions = getAllMissions().filter((c) => c.has_visual);
+    _playableMissions = getAllMissions().filter((c) => c.has_visual || c.data_complete);
   }
   return _playableMissions;
 }
