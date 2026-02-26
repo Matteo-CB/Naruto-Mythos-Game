@@ -484,6 +484,7 @@ function CardPreview() {
 function FullscreenCardDetail() {
   const t = useTranslations();
   const locale = useLocale();
+  const dims = useGameScale();
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const pinnedMissionContext = useUIStore((s) => s.pinnedMissionContext);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
@@ -491,6 +492,20 @@ function FullscreenCardDetail() {
   const unpinCard = useUIStore((s) => s.unpinCard);
 
   const { bannedIds } = useBannedCards();
+
+  // On mobile, auto-open fullscreen detail when a card is pinned (tapped)
+  const prevPinnedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (dims.isMobile && pinnedCard) {
+      const cardId = pinnedCard.id;
+      if (prevPinnedRef.current !== cardId && !showFullscreenCard) {
+        toggleFullscreenCard();
+      }
+      prevPinnedRef.current = cardId;
+    } else {
+      prevPinnedRef.current = null;
+    }
+  }, [dims.isMobile, pinnedCard, showFullscreenCard, toggleFullscreenCard]);
 
   if (!showFullscreenCard || !pinnedCard) return null;
 

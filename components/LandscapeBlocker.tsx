@@ -3,12 +3,26 @@
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
-function requestFullscreen() {
+async function requestFullscreenAndLandscape() {
   const el = document.documentElement;
-  if (el.requestFullscreen) {
-    el.requestFullscreen().catch(() => {});
-  } else if ((el as any).webkitRequestFullscreen) {
-    (el as any).webkitRequestFullscreen();
+  try {
+    if (el.requestFullscreen) {
+      await el.requestFullscreen();
+    } else if ((el as any).webkitRequestFullscreen) {
+      (el as any).webkitRequestFullscreen();
+    }
+  } catch {
+    // Fullscreen denied — continue anyway
+  }
+
+  // Try to lock orientation to landscape (Screen Orientation API)
+  try {
+    const orientation = screen.orientation as any;
+    if (orientation && typeof orientation.lock === 'function') {
+      await orientation.lock('landscape');
+    }
+  } catch {
+    // Orientation lock not supported or denied — that's fine
   }
 }
 
@@ -16,7 +30,7 @@ export function LandscapeBlocker() {
   const t = useTranslations('common');
 
   const handleFullscreen = useCallback(() => {
-    requestFullscreen();
+    requestFullscreenAndLandscape();
   }, []);
 
   return (
