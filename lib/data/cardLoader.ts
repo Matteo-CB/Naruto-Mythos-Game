@@ -23,7 +23,7 @@ interface RawJsonCard {
   power: number | '';
   keywords: string[];
   group: string;
-  effects: { type: string; description: string; description_fr: string }[];
+  effects: { type: string; description: string; description_fr?: string }[];
   image_url: string;
   rarity_display: string;
   image_file: string;

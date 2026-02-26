@@ -5,8 +5,8 @@ import { getEffectivePower } from '../../powerUtils';
 
 /**
  * Card 150/130 - SHIKAMARU NARA (M)
- * Chakra: 4, Power: 3
- * Group: Leaf Village, Keywords: Team 10
+ * Chakra: 6, Power: 5
+ * Group: Leaf Village, Keywords: Team 10, Jutsu
  *
  * MAIN [continuous]: Opponent cannot play characters hidden in this mission.
  *   - Continuous no-op. The play restriction is enforced by the engine's

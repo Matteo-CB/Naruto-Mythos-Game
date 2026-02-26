@@ -1,114 +1,100 @@
 import type { EffectContext, EffectResult } from '../../EffectTypes';
 import { registerEffect } from '../../EffectRegistry';
 import { logAction } from '../../../engine/utils/gameLog';
-import { defeatEnemyCharacter } from '../../defeatUtils';
-import { getEffectivePower } from '../../powerUtils';
 
 /**
- * Card 153/130 - GAARA (M)
- * Chakra: 5, Power: 5
- * Group: Sand Village, Keywords: Team Baki
+ * Card 153/130 - GAARA "Cercueil de Sable" (M)
+ * Chakra: 5, Power: 4
+ * Group: Sand Village, Keywords: Team Baki, Jutsu
  *
- * MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.
- *   - Same logic as Gaara 120/130: iterate all missions, find the weakest
- *     non-hidden enemy with effective power <= 1, defeat one per mission.
+ * MAIN: Defeat an enemy character with a cost less than the number of
+ *       friendly hidden characters in play.
+ *   - Count ALL friendly hidden characters across ALL missions.
+ *   - Find non-hidden enemy characters with cost STRICTLY LESS than that count.
+ *   - If multiple valid targets, return requiresTargetSelection.
+ *   - If exactly 1, auto-apply defeat.
+ *   - If zero hidden chars or no valid targets, fizzle.
  *
- * UPGRADE: POWERUP X where X = number of characters defeated by the MAIN effect.
- *   - When isUpgrade: after defeating, count defeated characters and apply
- *     POWERUP on self with that count.
+ * UPGRADE: In addition, hide one other enemy character with the same name
+ *          as the defeated character AND cost strictly less than the defeated
+ *          character's cost.
+ *   - Only triggers when ctx.isUpgrade is true AND a character was defeated.
+ *   - Handled by EffectEngine after target selection.
  */
 
 function gaara153MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
-  let defeatedCount = 0;
 
-  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    const enemyChars = mission[enemySide];
-
-    // Find the weakest enemy with power <= 1 (hidden chars have power 0, valid targets)
-    let target: typeof enemyChars[number] | undefined;
-    let targetPower = Infinity;
-
-    for (const char of enemyChars) {
-      const power = getEffectivePower(state, char, opponentPlayer);
-      if (power <= 1 && power < targetPower) {
-        target = char;
-        targetPower = power;
+  // Count all friendly hidden characters across all missions
+  let hiddenCount = 0;
+  for (const mission of state.activeMissions) {
+    for (const char of mission[friendlySide]) {
+      if (char.isHidden) {
+        hiddenCount++;
       }
     }
+  }
 
-    if (target) {
-      state = defeatEnemyCharacter(state, i, target.instanceId, ctx.sourcePlayer);
-      defeatedCount++;
+  if (hiddenCount === 0) {
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      ctx.sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Gaara (153): No friendly hidden characters in play, effect fizzles.',
+      'game.log.effect.noTarget',
+      { card: 'GAARA', id: 'KS-153-M' },
+    );
+    return { state: { ...state, log } };
+  }
 
-      state = {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, ctx.sourcePlayer,
-          'EFFECT_DEFEAT',
-          `Gaara (153): Defeated enemy ${target.card.name_fr} (Power ${targetPower}) in mission ${i}.`,
-          'game.log.effect.defeat',
-          { card: 'GAARA', id: 'KS-153-M', target: target.card.name_fr },
-        ),
-      };
+  // Find all non-hidden enemy characters with cost strictly less than hiddenCount
+  const validTargets: { char: import('../../../engine/types').CharacterInPlay; missionIndex: number }[] = [];
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    for (const char of state.activeMissions[i][enemySide]) {
+      if (char.isHidden) continue;
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (topCard.chakra < hiddenCount) {
+        validTargets.push({ char, missionIndex: i });
+      }
     }
   }
 
-  if (defeatedCount === 0) {
-    state = {
-      ...state,
-      log: logAction(
-        state.log, state.turn, state.phase, ctx.sourcePlayer,
-        'EFFECT_NO_TARGET',
-        'Gaara (153): No enemy characters with Power 1 or less found in any mission.',
-        'game.log.effect.noTarget',
-        { card: 'GAARA', id: 'KS-153-M' },
-      ),
-    };
+  if (validTargets.length === 0) {
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      ctx.sourcePlayer,
+      'EFFECT_NO_TARGET',
+      `Gaara (153): No enemy character with cost less than ${hiddenCount} (hidden count).`,
+      'game.log.effect.noTarget',
+      { card: 'GAARA', id: 'KS-153-M' },
+    );
+    return { state: { ...state, log } };
   }
 
-  // UPGRADE: POWERUP X on self where X = number defeated
-  if (ctx.isUpgrade && defeatedCount > 0) {
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[ctx.sourceMissionIndex] };
-    const friendlyChars = [...mission[friendlySide]];
-    const selfIdx = friendlyChars.findIndex((c) => c.instanceId === ctx.sourceCard.instanceId);
-
-    if (selfIdx !== -1) {
-      friendlyChars[selfIdx] = {
-        ...friendlyChars[selfIdx],
-        powerTokens: friendlyChars[selfIdx].powerTokens + defeatedCount,
-      };
-      mission[friendlySide] = friendlyChars;
-      missions[ctx.sourceMissionIndex] = mission;
-
-      state = {
-        ...state,
-        activeMissions: missions,
-        log: logAction(
-          state.log, state.turn, state.phase, ctx.sourcePlayer,
-          'EFFECT_POWERUP',
-          `Gaara (153): POWERUP ${defeatedCount} (upgrade, X = characters defeated by MAIN).`,
-          'game.log.effect.powerupSelf',
-          { card: 'GAARA', id: 'KS-153-M', amount: defeatedCount },
-        ),
-      };
-    }
-  }
-
-  return { state };
+  // Always let player choose (optional effect)
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'GAARA153_DEFEAT_BY_COST',
+    validTargets: validTargets.map((t) => t.char.instanceId),
+    description: `Gaara (153): Select an enemy character with cost less than ${hiddenCount} to defeat.`,
+    descriptionKey: 'game.effect.desc.gaara153Defeat',
+    descriptionParams: { hiddenCount },
+  };
 }
 
 function gaara153UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  // UPGRADE logic is handled by EffectEngine after MAIN target selection
+  // (chains a hide effect for same-name enemy with lower cost).
   return { state: ctx.state };
 }
 

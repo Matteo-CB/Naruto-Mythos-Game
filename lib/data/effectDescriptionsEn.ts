@@ -897,10 +897,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     '[⧗] Every enemy character in this mission has -1 Power.',
   ],
 
-  // 153/130 - GAARA (M) - "Sand Coffin"
+  // 153/130 - GAARA (M) - "Sand Burial"
   'KS-153-M': [
-    'Defeat up to 1 enemy character with Power 1 or less in every mission.',
-    'POWERUP X, where X is the number of characters defeated by the MAIN effect.',
+    'Defeat an enemy character with a cost less than the number of friendly hidden characters in play.',
+    'MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.',
   ],
 
   // =====================

@@ -175,6 +175,14 @@ export function calculateContinuousPowerModifier(
         );
         if (hasEffect) hiddenBonus += 2;
       }
+
+      // Naruto 145 (M): If Edge holder, hidden friendlies in this mission have +1 Power
+      if (fTop.number === 145) {
+        const hasEffect = (fTop.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+1 Power'),
+        );
+        if (hasEffect && state.edgeHolder === player) hiddenBonus += 1;
+      }
     }
     return hiddenBonus;
   }
@@ -223,8 +231,8 @@ export function calculateContinuousPowerModifier(
     for (const effect of enemyTopCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Itachi 128 (R): Every enemy in this mission has -1 Power
-      if (enemyTopCard.number === 128) {
+      // Itachi 128 (R) / 152 (M): Every enemy in this mission has -1 Power
+      if (enemyTopCard.number === 128 || enemyTopCard.number === 152) {
         modifier -= 1;
       }
 
