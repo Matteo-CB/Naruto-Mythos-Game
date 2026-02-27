@@ -58,6 +58,7 @@ model Deck {
   user       User     @relation(fields: [userId], references: [id])
   cardIds    String[]
   missionIds String[]
+  sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

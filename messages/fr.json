@@ -565,6 +565,16 @@
       "alreadyInDeck": "{name} deja dans le deck"
     }
   },
+  "deckManager": {
+    "title": "Gerer les Decks",
+    "manageButton": "Gerer les Decks",
+    "backToBuilder": "Constructeur de Deck",
+    "description": "Reordonnez vos decks en les glissant ou avec les fleches. L'ordre ici determine l'ordre d'apparition quand vous lancez une partie.",
+    "rename": "Renommer",
+    "cards": "cartes",
+    "saving": "Sauvegarde de l'ordre...",
+    "createFirst": "Creer un Deck"
+  },
   "playAI": {
     "title": "Jouer contre l'IA",
     "selectDifficulty": "Choisir la Difficulte",
@@ -1203,6 +1213,41 @@
         "wontfix": "Non corrige"
       }
     }
+  },
+  "adminSettings": {
+    "title": "Panneau Admin",
+    "home": "Accueil",
+    "tabSettings": "Parametres",
+    "tabCards": "Cartes",
+    "tabBugs": "Rapports de Bugs",
+    "unauthorized": "Acces refuse",
+    "leagues": {
+      "title": "Ligues & Badges",
+      "description": "Activer ou desactiver le systeme de ligues ELO. Quand desactive, les badges de rang sont masques sur le site et la synchronisation des roles Discord est suspendue.",
+      "loading": "Chargement...",
+      "toggling": "Changement...",
+      "enabled": "ACTIVE",
+      "disabled": "DESACTIVE",
+      "enabledDesc": "Badges de rang visibles, roles Discord synchronises",
+      "disabledDesc": "Badges de rang masques, roles Discord suspendus"
+    },
+    "elo": {
+      "title": "Gestion ELO",
+      "description": "Reinitialiser tous les joueurs a ELO 500 et effacer les victoires/defaites/nuls. Cette action est irreversible.",
+      "confirmReset": "Etes-vous sur de vouloir reinitialiser TOUS les joueurs a ELO 500 et effacer toutes les statistiques V/D/N ? Cette action est irreversible.",
+      "resetting": "Reinitialisation...",
+      "resetAll": "Reinitialiser les ELO"
+    },
+    "discord": {
+      "title": "Roles Discord",
+      "description": "Remplacer les anciens roles de rang (Genin/Chunin/Kage) par le nouveau systeme ELO a 8 niveaux sur Discord. Les permissions des salons sont migrees automatiquement.",
+      "confirmCreate": "Cela va supprimer les anciens roles Genin/Chunin/Kage et creer 8 nouveaux roles ELO sur le serveur Discord. Continuer ?",
+      "creating": "Creation...",
+      "createRoles": "Creer les Roles ELO",
+      "syncing": "Synchronisation...",
+      "syncAll": "Synchroniser les Utilisateurs"
+    },
+    "actionLog": "Journal d'Actions"
   },
   "adminCards": {
     "title": "Gestion des Cartes",
