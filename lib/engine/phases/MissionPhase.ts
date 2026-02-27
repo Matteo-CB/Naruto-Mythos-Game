@@ -107,19 +107,12 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   // Determine winner
   let winner: PlayerID | null = null;
 
-  if (p1Power === 0 && p2Power === 0) {
-    // Both have 0 power - no winner
-    log = logSystem(log, state.turn, 'mission', 'NO_WINNER',
-      `Neither player has power on mission ${missionIndex + 1}. No winner.`,
-      'game.log.noWinner',
-      { index: missionIndex + 1 },
-    );
-  } else if (p1Power > p2Power) {
+  if (p1Power > p2Power) {
     winner = 'player1';
   } else if (p2Power > p1Power) {
     winner = 'player2';
   } else {
-    // Tie - edge holder wins
+    // Tie (including 0-0) - edge holder wins
     winner = state.edgeHolder;
     log = logSystem(log, state.turn, 'mission', 'TIE_BREAK',
       `Tie on mission ${missionIndex + 1}. Edge holder (${state.edgeHolder}) wins.`,
@@ -127,10 +120,6 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
       { index: missionIndex + 1 },
     );
   }
-
-  // Check minimum 1 power requirement
-  if (winner === 'player1' && p1Power === 0) winner = null;
-  if (winner === 'player2' && p2Power === 0) winner = null;
 
   const missions = [...state.activeMissions];
   const updatedMission = { ...missions[missionIndex], wonBy: winner };

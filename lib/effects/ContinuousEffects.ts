@@ -320,24 +320,22 @@ export function calculateContinuousPowerModifier(
   // -------------------------------------------------------
   // Mission SCORE [⧗] effects that modify power continuously
   // -------------------------------------------------------
-  // These only apply during the mission scoring phase, not during action phase.
-  if (state.phase === 'mission') {
-    for (const mEffect of mission.card.effects ?? []) {
-      if (mEffect.type !== 'SCORE' || !mEffect.description.includes('[⧗]')) continue;
+  // [⧗] = continuous: always active while the mission is in play (all phases).
+  for (const mEffect of mission.card.effects ?? []) {
+    if (mEffect.type !== 'SCORE' || !mEffect.description.includes('[⧗]')) continue;
 
-      // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
-      if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
+    // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
+    if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
+      modifier += 1;
+    }
+
+    // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
+    // Must use effective power (base + tokens + all prior continuous modifiers) for the threshold check
+    if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
+      const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const effectivePower = (selfTop.power ?? 0) + char.powerTokens + modifier;
+      if (effectivePower >= 4) {
         modifier += 1;
-      }
-
-      // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
-      // Must use effective power (base + tokens + all prior continuous modifiers) for the threshold check
-      if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
-        const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        const effectivePower = (selfTop.power ?? 0) + char.powerTokens + modifier;
-        if (effectivePower >= 4) {
-          modifier += 1;
-        }
       }
     }
   }
