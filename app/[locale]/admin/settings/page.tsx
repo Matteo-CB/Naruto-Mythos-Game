@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
@@ -14,6 +15,7 @@ interface ActionResult {
 }
 
 export default function AdminSettingsPage() {
+  const t = useTranslations('adminSettings');
   const { data: session } = useSession();
   const [resetEloLoading, setResetEloLoading] = useState(false);
   const [discordRolesLoading, setDiscordRolesLoading] = useState(false);
@@ -40,7 +42,7 @@ export default function AdminSettingsPage() {
   if (!isAdmin) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>Unauthorized</p>
+        <p style={{ color: '#b33e3e' }}>{t('unauthorized')}</p>
       </main>
     );
   }
@@ -76,7 +78,7 @@ export default function AdminSettingsPage() {
   };
 
   const handleResetElo = async () => {
-    if (!confirm('Are you sure you want to reset ALL users to ELO 500 and clear all W/L/D stats? This cannot be undone.')) {
+    if (!confirm(t('elo.confirmReset'))) {
       return;
     }
     setResetEloLoading(true);
@@ -96,7 +98,7 @@ export default function AdminSettingsPage() {
   };
 
   const handleCreateDiscordRoles = async () => {
-    if (!confirm('This will delete old Genin/Chunin/Kage roles and create 8 new ELO roles on the Discord server. Continue?')) {
+    if (!confirm(t('discord.confirmCreate'))) {
       return;
     }
     setDiscordRolesLoading(true);
@@ -108,6 +110,8 @@ export default function AdminSettingsPage() {
           success: true,
           message: `Discord Roles: Created ${data.created}, deleted ${data.deleted}, migrated ${data.migratedChannels} channels`,
         });
+        // Auto-sync all users after roles are created
+        await handleSyncDiscordRoles();
       } else {
         addResult({ success: false, message: `Discord Roles failed: ${data.error}` });
       }
@@ -145,14 +149,14 @@ export default function AdminSettingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
-            Admin Panel
+            {t('title')}
           </h1>
           <Link
             href="/"
             className="px-4 py-2 text-sm rounded"
             style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
           >
-            Home
+            {t('home')}
           </Link>
         </div>
 
@@ -163,21 +167,21 @@ export default function AdminSettingsPage() {
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
             style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
           >
-            Settings
+            {t('tabSettings')}
           </Link>
           <Link
             href="/admin/cards"
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
             style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
           >
-            Cards
+            {t('tabCards')}
           </Link>
           <Link
             href="/admin/bugs"
             className="px-4 py-2 text-xs font-bold uppercase tracking-wider rounded"
             style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
           >
-            Bug Reports
+            {t('tabBugs')}
           </Link>
         </div>
 
@@ -187,11 +191,10 @@ export default function AdminSettingsPage() {
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
         >
           <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-            Leagues & Badges
+            {t('leagues.title')}
           </h2>
           <p className="text-xs mb-4" style={{ color: '#555555' }}>
-            Enable or disable the ELO league system. When disabled, rank badges are hidden on the
-            website and Discord role sync is paused.
+            {t('leagues.description')}
           </p>
           <div className="flex items-center gap-4">
             <button
@@ -206,17 +209,17 @@ export default function AdminSettingsPage() {
               }}
             >
               {leaguesLoading
-                ? 'Loading...'
+                ? t('leagues.loading')
                 : leaguesToggling
-                  ? 'Toggling...'
+                  ? t('leagues.toggling')
                   : leaguesEnabled
-                    ? 'ENABLED'
-                    : 'DISABLED'}
+                    ? t('leagues.enabled')
+                    : t('leagues.disabled')}
             </button>
             <span className="text-xs" style={{ color: leaguesEnabled ? '#3e8b3e' : '#b33e3e' }}>
               {leaguesEnabled
-                ? 'Rank badges visible, Discord roles synced'
-                : 'Rank badges hidden, Discord roles paused'}
+                ? t('leagues.enabledDesc')
+                : t('leagues.disabledDesc')}
             </span>
           </div>
         </div>
@@ -227,10 +230,10 @@ export default function AdminSettingsPage() {
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
         >
           <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-            ELO Management
+            {t('elo.title')}
           </h2>
           <p className="text-xs mb-4" style={{ color: '#555555' }}>
-            Reset all players to ELO 500 and clear wins/losses/draws. This is irreversible.
+            {t('elo.description')}
           </p>
           <button
             onClick={handleResetElo}
@@ -243,7 +246,7 @@ export default function AdminSettingsPage() {
               opacity: resetEloLoading ? 0.6 : 1,
             }}
           >
-            {resetEloLoading ? 'Resetting...' : 'Reset All ELO'}
+            {resetEloLoading ? t('elo.resetting') : t('elo.resetAll')}
           </button>
         </div>
 
@@ -253,11 +256,10 @@ export default function AdminSettingsPage() {
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
         >
           <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-            Discord Roles
+            {t('discord.title')}
           </h2>
           <p className="text-xs mb-4" style={{ color: '#555555' }}>
-            Replace old rank roles (Genin/Chunin/Kage) with the new 8-tier ELO system on Discord.
-            Migrates channel permissions automatically.
+            {t('discord.description')}
           </p>
           <div className="flex gap-3 flex-wrap">
             <button
@@ -271,7 +273,7 @@ export default function AdminSettingsPage() {
                 opacity: discordRolesLoading ? 0.6 : 1,
               }}
             >
-              {discordRolesLoading ? 'Creating...' : 'Create ELO Roles'}
+              {discordRolesLoading ? t('discord.creating') : t('discord.createRoles')}
             </button>
             <button
               onClick={handleSyncDiscordRoles}
@@ -284,7 +286,7 @@ export default function AdminSettingsPage() {
                 opacity: discordSyncLoading ? 0.6 : 1,
               }}
             >
-              {discordSyncLoading ? 'Syncing...' : 'Sync All Users'}
+              {discordSyncLoading ? t('discord.syncing') : t('discord.syncAll')}
             </button>
           </div>
         </div>
@@ -296,7 +298,7 @@ export default function AdminSettingsPage() {
             style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
           >
             <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-              Action Log
+              {t('actionLog')}
             </h2>
             <div className="flex flex-col gap-2">
               {results.map((result, i) => (

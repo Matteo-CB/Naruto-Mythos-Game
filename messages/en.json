@@ -565,6 +565,16 @@
       "alreadyInDeck": "{name} already in deck"
     }
   },
+  "deckManager": {
+    "title": "Manage Decks",
+    "manageButton": "Manage Decks",
+    "backToBuilder": "Deck Builder",
+    "description": "Reorder your decks by dragging them or using the arrows. The order here determines the order they appear when you start a game.",
+    "rename": "Rename",
+    "cards": "cards",
+    "saving": "Saving order...",
+    "createFirst": "Create a Deck"
+  },
   "playAI": {
     "title": "Play vs AI",
     "selectDifficulty": "Select Difficulty",
@@ -1519,6 +1529,41 @@
         "wontfix": "Won't Fix"
       }
     }
+  },
+  "adminSettings": {
+    "title": "Admin Panel",
+    "home": "Home",
+    "tabSettings": "Settings",
+    "tabCards": "Cards",
+    "tabBugs": "Bug Reports",
+    "unauthorized": "Unauthorized",
+    "leagues": {
+      "title": "Leagues & Badges",
+      "description": "Enable or disable the ELO league system. When disabled, rank badges are hidden on the website and Discord role sync is paused.",
+      "loading": "Loading...",
+      "toggling": "Toggling...",
+      "enabled": "ENABLED",
+      "disabled": "DISABLED",
+      "enabledDesc": "Rank badges visible, Discord roles synced",
+      "disabledDesc": "Rank badges hidden, Discord roles paused"
+    },
+    "elo": {
+      "title": "ELO Management",
+      "description": "Reset all players to ELO 500 and clear wins/losses/draws. This is irreversible.",
+      "confirmReset": "Are you sure you want to reset ALL users to ELO 500 and clear all W/L/D stats? This cannot be undone.",
+      "resetting": "Resetting...",
+      "resetAll": "Reset All ELO"
+    },
+    "discord": {
+      "title": "Discord Roles",
+      "description": "Replace old rank roles (Genin/Chunin/Kage) with the new 8-tier ELO system on Discord. Migrates channel permissions automatically.",
+      "confirmCreate": "This will delete old Genin/Chunin/Kage roles and create 8 new ELO roles on the Discord server. Continue?",
+      "creating": "Creating...",
+      "createRoles": "Create ELO Roles",
+      "syncing": "Syncing...",
+      "syncAll": "Sync All Users"
+    },
+    "actionLog": "Action Log"
   },
   "adminCards": {
     "title": "Card Management",

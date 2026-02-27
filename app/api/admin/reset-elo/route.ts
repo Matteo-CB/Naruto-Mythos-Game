@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { syncDiscordRole } from '@/lib/discord/roleSync';
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
 
@@ -20,6 +21,15 @@ export async function POST() {
         discordHighestElo: 0,
       },
     });
+
+    // Auto-sync Discord roles for all users with linked accounts
+    const discordUsers = await prisma.user.findMany({
+      where: { discordId: { not: null } },
+      select: { id: true },
+    });
+    for (const user of discordUsers) {
+      syncDiscordRole(user.id).catch(() => {});
+    }
 
     return NextResponse.json({
       message: `Reset ${result.count} users to ELO 500, W/L/D = 0`,

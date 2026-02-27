@@ -280,41 +280,47 @@ export default function Home() {
               ))}
             </motion.nav>
 
-            {/* Admin link (only visible to admin) */}
+            {/* Admin links (only visible to admin) */}
             {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
               <motion.div
-                className="mt-2"
+                className="mt-2 flex gap-2"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 1.35, ease: 'easeOut' }}
               >
-                <Link
-                  href="/admin/settings"
-                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                  style={{
-                    backgroundColor: '#141414',
-                    border: '1px solid #ef4444',
-                    color: '#ef4444',
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1.03)';
-                    target.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.15)';
-                    target.style.backgroundColor = '#1a1a1a';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1)';
-                    target.style.boxShadow = 'none';
-                    target.style.backgroundColor = '#141414';
-                  }}
-                >
-                  <span
-                    className="absolute left-0 top-0 h-full w-1 transition-all"
-                    style={{ backgroundColor: '#ef4444' }}
-                  />
-                  {t('admin')}
-                </Link>
+                {[
+                  { href: '/admin/settings', label: t('admin') },
+                  { href: '/admin/cards', label: t('adminCards') },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="group relative flex h-10 flex-1 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                    style={{
+                      backgroundColor: '#141414',
+                      border: '1px solid #ef4444',
+                      color: '#ef4444',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1.03)';
+                      target.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.15)';
+                      target.style.backgroundColor = '#1a1a1a';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1)';
+                      target.style.boxShadow = 'none';
+                      target.style.backgroundColor = '#141414';
+                    }}
+                  >
+                    <span
+                      className="absolute left-0 top-0 h-full w-1 transition-all"
+                      style={{ backgroundColor: '#ef4444' }}
+                    />
+                    {link.label}
+                  </Link>
+                ))}
               </motion.div>
             )}
 

@@ -337,6 +337,12 @@ export default function DeckBuilderPage() {
           >
             {t("deckBuilder.loadDeck")}
           </button>
+          <Link
+            href="/deck-builder/manage"
+            className="px-3 py-1.5 bg-[#141414] border border-[#c4a35a]/30 text-[#c4a35a] text-xs hover:bg-[#1a1a1a] transition-colors"
+          >
+            {t("deckManager.manageButton")}
+          </Link>
         </div>
 
         {/* Rules panel */}
