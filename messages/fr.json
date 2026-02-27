@@ -565,6 +565,13 @@
       "alreadyInDeck": "{name} deja dans le deck"
     }
   },
+  "discord": {
+    "linkDiscord": "Lier Discord",
+    "unlinkDiscord": "Delier",
+    "linked": "Discord lie avec succes !",
+    "linkError": "Erreur de liaison Discord",
+    "usedByAnother": "Ce compte Discord est deja lie a un autre utilisateur"
+  },
   "deckManager": {
     "title": "Gerer les Decks",
     "manageButton": "Gerer les Decks",
