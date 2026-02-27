@@ -3224,17 +3224,24 @@ export class EffectEngine {
         const reducedCost = Math.max(0, card.chakra - 1);
         if (ps.chakra < reducedCost) break;
 
-        // Find valid missions for this card (no same-name character present)
+        // Find valid missions for this card (fresh play OR upgrade over same-name with lower cost)
         const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
         const validMissions: string[] = [];
         for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
           const mission = newState.activeMissions[mIdx];
-          const hasSameName = mission[friendlySide].some((c: CharacterInPlay) => {
+          const sameNameChar = mission[friendlySide].find((c: CharacterInPlay) => {
             if (c.isHidden) return false;
             const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
             return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
           });
-          if (!hasSameName) validMissions.push(String(mIdx));
+          if (!sameNameChar) {
+            validMissions.push(String(mIdx));
+          } else {
+            const existingTop = sameNameChar.stack.length > 0 ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+            if ((card.chakra ?? 0) > (existingTop.chakra ?? 0)) {
+              validMissions.push(String(mIdx));
+            }
+          }
         }
 
         if (validMissions.length === 0) break;
@@ -5388,64 +5395,95 @@ export class EffectEngine {
     const reducedCost = Math.max(0, card.chakra - 1);
     if (ps.chakra < reducedCost) return state;
 
-    // Safety check: name uniqueness at destination
     const friendlySide_h002: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
-    const hasNameConflict_h002 = newState.activeMissions[missionIndex][friendlySide_h002].some((c: CharacterInPlay) => {
+
+    const missions = [...newState.activeMissions];
+    const mission = { ...missions[missionIndex] };
+
+    // Check if there's a same-name character to upgrade
+    const existingIdx = mission[friendlySide_h002].findIndex((c: CharacterInPlay) => {
       if (c.isHidden) return false;
       const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
+        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
     });
-    if (hasNameConflict_h002) {
-      return state; // Cannot place — return original state
+
+    // Safety check: name conflict without upgrade possibility
+    if (existingIdx < 0) {
+      const hasNameConflict = mission[friendlySide_h002].some((c: CharacterInPlay) => {
+        if (c.isHidden) return false;
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      });
+      if (hasNameConflict) return state;
     }
 
     // Pay reduced cost
     ps.chakra -= reducedCost;
     ps.hand.splice(cardIndex, 1);
 
-    const isUpgrade = pending.isUpgrade;
-    const charInPlay: CharacterInPlay = {
-      instanceId: generateInstanceId(),
-      card,
-      isHidden: false,
-      wasRevealedAtLeastOnce: true,
-      powerTokens: isUpgrade ? 2 : 0, // UPGRADE: POWERUP 2 on the played character
-      stack: [card],
-      controlledBy: player,
-      originalOwner: player,
-      missionIndex,
-    };
+    const isHiruzenUpgrade = pending.isUpgrade;
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
 
-    const mission = { ...newState.activeMissions[missionIndex] };
-    if (player === 'player1') {
-      mission.player1Characters = [...mission.player1Characters, charInPlay];
+    if (existingIdx >= 0) {
+      // Upgrade the existing character (stack new card on top)
+      const existing = mission[friendlySide_h002][existingIdx];
+      const updatedChars = [...mission[friendlySide_h002]];
+      updatedChars[existingIdx] = {
+        ...existing,
+        card,
+        stack: [...existing.stack, card],
+        powerTokens: existing.powerTokens + (isHiruzenUpgrade ? 2 : 0),
+      };
+      mission[friendlySide_h002] = updatedChars;
+      missions[missionIndex] = mission;
+      newState.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
+
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', player,
+        'EFFECT_UPGRADE',
+        `Hiruzen Sarutobi (002): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${isHiruzenUpgrade ? ' with POWERUP 2' : ''}.`,
+        'game.log.effect.upgradeLeafReduced',
+        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
+      );
     } else {
-      mission.player2Characters = [...mission.player2Characters, charInPlay];
+      // Fresh play
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(),
+        card,
+        isHidden: false,
+        wasRevealedAtLeastOnce: true,
+        powerTokens: isHiruzenUpgrade ? 2 : 0,
+        stack: [card],
+        controlledBy: player,
+        originalOwner: player,
+        missionIndex,
+      };
+
+      mission[friendlySide_h002] = [...mission[friendlySide_h002], charInPlay];
+      missions[missionIndex] = mission;
+      newState.activeMissions = missions;
+      placedChar = charInPlay;
+
+      // Update character count
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
+
+      const upgradeNote = isHiruzenUpgrade ? ' with POWERUP 2 (upgrade)' : '';
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', player,
+        'EFFECT',
+        `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${upgradeNote}.`,
+        'game.log.effect.playLeafReduced',
+        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
+      );
     }
-    newState.activeMissions = [...newState.activeMissions];
-    newState.activeMissions[missionIndex] = mission;
 
-    // Update character count
-    let charCount = 0;
-    for (const m of newState.activeMissions) {
-      charCount += (player === 'player1' ? m.player1Characters : m.player2Characters).length;
-    }
-    ps.charactersInPlay = charCount;
-
-    const upgradeNote = isUpgrade ? ' with POWERUP 2 (upgrade)' : '';
-    newState.log = logAction(
-      newState.log, newState.turn, 'action', player,
-      'EFFECT',
-      `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${upgradeNote}.`,
-      'game.log.effect.playLeafReduced',
-      { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
-    );
-
-    // Resolve the played card's MAIN effects (e.g., Secret Sakura 135 draws cards)
-    const withEffects = EffectEngine.resolvePlayEffects(newState, player, charInPlay, missionIndex, false);
-
-    return withEffects;
+    // Resolve the played card's MAIN effects (and UPGRADE if it was a card-level upgrade)
+    return EffectEngine.resolvePlayEffects(newState, player, placedChar, missionIndex, isCardUpgrade);
   }
 
   // =====================================

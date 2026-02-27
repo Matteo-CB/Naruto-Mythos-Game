@@ -28,18 +28,25 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     const reducedCost = Math.max(0, card.chakra - 1);
     if (playerState.chakra < reducedCost) continue;
 
-    // Check if this card can be legally placed on at least one mission
+    // Check if this card can be legally placed on at least one mission (fresh play OR upgrade)
     const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
     let canPlace = false;
     for (const mission of state.activeMissions) {
-      const hasSameName = mission[friendlySide].some((c) => {
+      const sameNameChar = mission[friendlySide].find((c) => {
         if (c.isHidden) return false;
         const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       });
-      if (!hasSameName) {
+      if (!sameNameChar) {
         canPlace = true;
         break;
+      } else {
+        // Allow if upgrade is possible (new card has strictly higher cost)
+        const existingTop = sameNameChar.stack.length > 0 ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
+        if ((card.chakra ?? 0) > (existingTop.chakra ?? 0)) {
+          canPlace = true;
+          break;
+        }
       }
     }
     if (canPlace) {

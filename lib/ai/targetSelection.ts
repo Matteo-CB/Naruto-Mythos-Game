@@ -50,6 +50,11 @@ export function aiSelectTarget(
     return selectPowerupTarget(options, state, aiPlayer, difficulty);
   }
 
+  // SACRIFICE OWN CHARACTER (e.g., Jiraiya 132 UPGRADE — opponent chooses own chars to defeat)
+  if (desc.includes('choose one of your characters to defeat') || desc.includes('choisissez un de vos personnages')) {
+    return selectSacrificeTarget(options, state, aiPlayer, difficulty);
+  }
+
   // DEFEAT / DESTROY: remove the strongest enemy
   if (desc.includes('defeat') || desc.includes('destroy') || desc.includes('eliminate')) {
     return selectDefeatTarget(options, state, aiPlayer, difficulty);
@@ -262,6 +267,56 @@ function selectDefeatTarget(
     }
 
     if (score > bestScore) {
+      bestScore = score;
+      bestOption = opt;
+    }
+  }
+
+  return bestOption;
+}
+
+// ---------------------------------------------------------------------------
+// Strategy: SACRIFICE own character (forced defeat of own chars)
+// ---------------------------------------------------------------------------
+
+/**
+ * When forced to sacrifice own characters (e.g., Jiraiya 132 UPGRADE):
+ * pick the weakest character — lowest power, lowest cost, on the
+ * least valuable mission.
+ */
+function selectSacrificeTarget(
+  options: string[],
+  state: GameState,
+  aiPlayer: PlayerID,
+  difficulty: AIDifficulty,
+): string {
+  let bestOption = options[0];
+  let bestScore = Infinity; // lower is "better" (weakest to sacrifice)
+
+  for (const opt of options) {
+    const found = findCharacterInState(state, opt);
+    if (!found) continue;
+
+    const charPower = getCharEffectivePower(found.char);
+    const charCost = getCharCost(found.char);
+    const missionValue = getMissionValue(state, found.missionIndex);
+
+    let score: number;
+    if (difficulty === 'medium') {
+      // Medium: sacrifice lowest power character
+      score = charPower * 10 + charCost;
+    } else {
+      // Hard/Expert: factor in mission value — prefer sacrificing from missions
+      // we're already dominating (high gap) or low-value missions
+      const powerGap = getMissionPowerGap(state, found.missionIndex, aiPlayer);
+      score = charPower * 3 + missionValue + charCost;
+      // Prefer sacrificing from missions where we have a big lead
+      if (powerGap > charPower) {
+        score -= 5; // Safe to lose this character
+      }
+    }
+
+    if (score < bestScore) {
       bestScore = score;
       bestOption = opt;
     }
