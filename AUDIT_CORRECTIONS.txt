@@ -1,0 +1,698 @@
+# AUDIT COMPLET DES DONNEES DE CARTES - NARUTO MYTHOS TCG
+# =======================================================
+#
+# CONSIGNES POUR CHAQUE CONVERSATION (a lire avant de commencer):
+#
+# 1. PROCEDURE: Lire UNE image de carte -> comparer au JSON -> noter dans ce fichier -> corriger le JSON si erreur -> passer a la suivante
+# 2. JAMAIS lire plusieurs images en meme temps (risque de crash)
+# 3. SYMBOLES SUR LES CARTES:
+#    - [↯] = effet INSTANTANE (se declenche a la pose, une seule fois)
+#    - [⧗] = effet CONTINU (reste actif tant que le personnage est face visible)
+#    - Ces symboles peuvent apparaitre dans TOUT type d'effet (MAIN, AMBUSH, UPGRADE, SCORE)
+#    - NE PAS retirer ces symboles des descriptions, ils sont corrects et importants
+#
+# 4. CE QU'IL FAUT VERIFIER SUR CHAQUE CARTE (dans l'image):
+#    a) Nom du personnage (name_fr / name_en)
+#    b) Titre de la carte (title_fr)
+#    c) Cout en chakra (nombre en haut a gauche)
+#    d) Puissance (nombre en bas a droite)
+#    e) Keywords (badges en bas a gauche de la carte, ex: "Team 7", "Sannin", "Sound Ninja")
+#       ATTENTION: le titre n'est PAS un keyword! Les keywords sont dans des badges specifiques
+#    f) Group/Village (icone en haut a droite: Leaf Village, Sand Village, Sound Village, Akatsuki, Independent)
+#    g) Type et texte des effets (MAIN, AMBUSH, UPGRADE, SCORE)
+#    h) Rarete (bordure/couleur de la carte)
+#
+# 5. ERREURS CONNUES FREQUENTES DANS LE JSON:
+#    - "Pouvoir" comme keyword -> c'est FAUX, verifier sur l'image
+#    - "Team Dosu" comme keyword -> c'est FAUX, sur les cartes c'est "Sound Ninja"
+#    - "Academy" comme keyword -> c'est FAUX, c'est souvent le titre pas un keyword
+#    - Group "Independent" sur des cartes Leaf Village UC -> verifier sur l'image
+#
+# 6. FORMAT DES CORRECTIONS:
+#    [ID] NOM - OK (si tout est correct)
+#    [ID] NOM - ERREUR
+#      champ: VALEUR_JSON -> VALEUR_CORRECTE
+#
+# 7. FICHIER JSON A MODIFIER: lib/data/card-data.json
+#
+# 8. POUR REPRENDRE: chercher "--- AUDIT EN COURS" en bas du fichier pour savoir ou on en est
+#
+# =======================================================
+
+=== COMMON CARDS ===
+
+[KS-001-C] HIRUZEN SARUTOBI - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Hokage] | G:Leaf Village | MAIN [↯] POWERUP 2 another friendly Leaf Village character.
+  effect description: manquait [↯] -> ajoute "[↯] POWERUP 2 another friendly Leaf Village character."
+
+[KS-003-C] TSUNADE - OK
+  Image: C3/P3 | KW:[Sannin] | G:Leaf Village | MAIN [⧗] When any friendly character is defeated, gain 2 Chakra.
+
+[KS-005-C] SHIZUNE - OK
+  Image: C2/P1 | KW:[] | G:Leaf Village | MAIN [⧗] Chakra +1.
+
+[KS-007-C] JIRAIYA - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sannin] | G:Leaf Village | MAIN [↯] Play a Summon character anywhere, paying 1 less.
+  effect description: manquait [↯] -> ajoute "[↯] Play a Summon character anywhere, paying 1 less."
+
+[KS-009-C] NARUTO UZUMAKI - OK
+  Image: C2/P3 | KW:[Team 7] | G:Leaf Village | Vanilla (pas d'effet)
+
+[KS-011-C] SAKURA HARUNO - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Team 7] | G:Leaf Village | MAIN [↯] If there's another Team 7 character in this mission, draw a card.
+  effect description: manquait [↯] -> ajoute
+
+[KS-013-C] SASUKE UCHIHA - OK
+  Image: C2/P4 | KW:[Team 7] | G:Leaf Village | MAIN [⧗] -1 Power per other non-hidden friendly in mission.
+
+[KS-015-C] KAKASHI HATAKE - OK
+  Image: C3/P3 | KW:[Team 7] | G:Leaf Village | MAIN [⧗] Other Team 7 characters +1 Power.
+
+[KS-017-C] CHOJI AKIMICHI - OK
+  Image: C2/P1 | KW:[Team 10, Jutsu] | G:Leaf Village | MAIN [↯] Powerup 3.
+
+[KS-019-C] INO YAMANAKA - ERREUR CORRIGEE
+  Image: C1/P1 | KW:[Team 10] | G:Leaf Village | MAIN [↯] If there's another Team 10 character in this mission, POWERUP 1.
+  effect description: manquait [↯] -> ajoute
+
+[KS-021-C] SHIKAMARU NARA - ERREUR CORRIGEE
+  Image: C1/P0 | KW:[Team 10] | G:Leaf Village | MAIN [↯] If you have the Edge, draw a card.
+  effect description: manquait [↯] -> ajoute
+
+[KS-023-C] ASUMA SARUTOBI - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Team 10] | G:Leaf Village | MAIN [↯] Move another Team 10 character from this mission.
+  effect description: manquait [↯] -> ajoute
+
+[KS-025-C] KIBA INUZUKA - OK
+  Image: C2/P2 | KW:[Team 8] | G:Leaf Village | MAIN [⧗] If Akamaru in same mission, CHAKRA +1.
+
+[KS-027-C] AKAMARU - OK
+  Image: C1/P2 | KW:[Team 8] | G:Leaf Village | MAIN [⧗] Return to hand if no Kiba at end of round.
+
+[KS-030-C] HINATA HYUGA - OK
+  Image: C2/P2 | KW:[Team 8, Taijutsu] | G:Leaf Village | MAIN [↯] Remove up to 2 Power tokens from an enemy character in play.
+
+[KS-032-C] SHINO ABURAME - OK
+  Image: C2/P3 | KW:[Team 8] | G:Leaf Village | MAIN [↯] Each player draws a card.
+
+[KS-034-C] KURENAI YUHI - OK
+  Image: C3/P3 | KW:[Team 8] | G:Leaf Village | MAIN [⧗] Other Team 8 cost 1 less (min.1).
+
+[KS-036-C] NEJI HYUGA - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Team Guy, Taijutsu] | G:Leaf Village | MAIN [↯] Remove up to 2 Power tokens from an enemy character in play.
+  effect description: manquait [↯] -> ajoute
+
+[KS-038-C] ROCK LEE - OK
+  Image: C2/P3 | KW:[Team Guy] | G:Leaf Village | AMBUSH [↯] Powerup 1.
+
+[KS-040-C] TENTEN - OK
+  Image: C1/P2 | KW:[Team Guy] | G:Leaf Village | MAIN [⧗] Play only in mission where winning.
+
+[KS-042-C] MIGHT GUY - OK
+  Image: C3/P3 | KW:[Team Guy] | G:Leaf Village | MAIN [⧗] Other Team Guy +1 Power.
+
+[KS-044-C] ANKO MITARASHI - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Special Jonin] | G:Leaf Village | MAIN [⧗] If friendly Leaf Village in mission, CHAKRA +1.
+  keywords: [Academy] -> [Special Jonin]
+
+[KS-046-C] EBISU - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Special Jonin] | G:Leaf Village | MAIN [↯] If friendly non-hidden with less Power, draw a card.
+  keywords: [Pouvoir] -> [Special Jonin]
+  effect description: manquait [↯] -> ajoute
+
+[KS-047-C] IRUKA UMINO - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[] | G:Leaf Village | MAIN [↯] Move a Naruto Uzumaki character in play.
+  keywords: [Academy] -> [] (pas de badge keyword sur la carte)
+  effect description: manquait [↯] -> ajoute
+
+[KS-048-C] HAYATE GEKKO - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Special Jonin] | G:Leaf Village | MAIN [⧗] If defeated, hide instead.
+  keywords: [Pouvoir] -> [Special Jonin]
+
+[KS-049-C] GENMA SHIRANUI - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Special Jonin] | G:Leaf Village | MAIN [⧗] Sacrifice to protect Leaf Village ally.
+  keywords: [Pouvoir] -> [Special Jonin]
+
+[KS-050-C] OROCHIMARU - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sannin, Sound Ninja] | G:Sound Village | AMBUSH [↯] Look at hidden, take control if cost 3 or less.
+  keywords: [Sannin, Team Dosu] -> [Sannin, Sound Ninja]
+  effect description: manquait [↯] -> ajoute
+
+[KS-055-C] KIMIMARO - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Weapon] | G:Sound Village | AMBUSH [↯] Discard a card to hide a character cost 3 or less.
+  effect description: manquait [↯] -> ajoute
+
+[KS-057-C] JIROBO - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Sound Four] | G:Sound Village | MAIN [↯] POWERUP X (Sound Four count).
+  effect description: manquait [↯] -> ajoute
+
+[KS-059-C] KIDOMARU - ERREUR CORRIGEE
+  Image: C3/P2 | KW:[Sound Four] | G:Sound Village | MAIN [↯] Move X friendly characters (Sound Four count).
+  effect description: manquait [↯] -> ajoute
+
+[KS-061-C] SAKON - ERREUR CORRIGEE
+  Image: C3/P2 | KW:[Sound Four] | G:Sound Village | MAIN [↯] Draw X card(s) (Sound Four count).
+  effect description: manquait [↯] -> ajoute
+
+[KS-064-C] TAYUYA - OK
+  Image: C2/P1 | KW:[Sound Four] | G:Sound Village | MAIN [⧗] CHAKRA +X (Sound Four count).
+
+[KS-068-C] DOSU KINUTA - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Sound Ninja] | G:Sound Village | MAIN [↯] Look at hidden. AMBUSH [↯] Defeat hidden.
+  keywords: [Team Dosu] -> [Sound Ninja]
+  MAIN effect: manquait [↯] -> ajoute
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-070-C] ZAKU ABUMI - ERREUR CORRIGEE
+  Image: C2/P4 | KW:[Sound Ninja] | G:Sound Village | MAIN [↯] Opponent gains 1 Chakra.
+  keywords: [Team Dosu] -> [Sound Ninja]
+  effect description: manquait [↯] -> ajoute
+
+[KS-072-C] KIN TSUCHI - ERREUR CORRIGEE
+  Image: C1/P3 | KW:[Sound Ninja] | G:Sound Village | MAIN [↯] Opponent draws a card.
+  keywords: [Team Dosu] -> [Sound Ninja]
+  effect description: manquait [↯] -> ajoute
+
+[KS-074-C] GAARA - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Team Baki] | G:Sand Village | MAIN [↯] POWERUP X (hidden chars count).
+  effect description: manquait [↯] -> ajoute
+
+[KS-075-C] GAARA - OK
+  Image: C3/P3 | KW:[Team Baki, Jutsu] | G:Sand Village | 2x MAIN [⧗].
+
+[KS-077-C] KANKURO - OK
+  Image: C3/P3 | KW:[Team Baki] | G:Sand Village | MAIN [⧗] If non-hidden enemy, CHAKRA +1.
+
+[KS-079-C] TEMARI - OK
+  Image: C2/P2 | KW:[Team Baki] | G:Sand Village | MAIN [⧗] +2 Power if Edge.
+
+[KS-081-C] BAKI - OK
+  Image: C3/P2 | KW:[Team Baki] | G:Sand Village | SCORE [↯] Draw a card.
+
+[KS-084-C] YASHAMARU - ERREUR CORRIGEE
+  Image: C1/P1 | KW:[] | G:Sand Village | MAIN [⧗] +2 Power if friendly Gaara in mission.
+  keywords: [Pouvoir] -> [] (pas de badge keyword sur la carte)
+
+[KS-086-C] ZABUZA MOMOCHI - OK
+  Image: C3/P5 | KW:[Rogue Ninja] | G:Independent | Vanilla.
+
+[KS-088-C] HAKU - ERREUR CORRIGEE
+  Image: C2/P2 | KW:[Rogue Ninja] | G:Independent | MAIN [↯] Draw 1, put 1 back on top.
+  effect description: manquait [↯] -> ajoute
+
+[KS-092-C] KISAME HOSHIGAKI - ERREUR CORRIGEE
+  Image: C3/P4 | KW:[Rogue Ninja] | G:Akatsuki | AMBUSH [↯] Remove 2 tokens, put on this.
+  effect description: manquait [↯] -> ajoute
+
+[KS-094-C] GAMA BUNTA - OK
+  Image: C3/P6 | KW:[Summon] | G:Independent | MAIN [⧗] At end of round, must return to hand.
+
+[KS-095-C] GAMAHIRO - ERREUR CORRIGEE
+  Image: C4/P6 | KW:[Summon] | G:Independent | MAIN [↯] draw if friendly in mission + MAIN [⧗] return to hand end of round.
+  1st MAIN effect: manquait [↯] -> ajoute
+
+[KS-096-C] GAMAKICHI - OK
+  Image: C2/P3 | KW:[Summon] | G:Independent | 2x MAIN [⧗].
+
+[KS-097-C] GAMATATSU - OK
+  Image: C1/P2 | KW:[Summon] | G:Independent | MAIN [⧗] return to hand end of round.
+
+[KS-098-C] KATSUYU - ERREUR CORRIGEE
+  Image: C3/P5 | KW:[Summon] | G:Independent | MAIN [↯] if friendly Tsunade, POWERUP 2 + MAIN [⧗] return to hand.
+  1st MAIN effect: manquait [↯] -> ajoute
+
+[KS-099-C] PAKKUN - OK
+  Image: C1/P1 | KW:[Ninja Hound] | G:Independent | SCORE [↯] Move this character.
+
+[KS-100-C] NINJA HOUND CORPS - OK
+  Image: C1/P1 | KW:[Ninja Hound] | G:Independent | MAIN [⧗] When moves, look at hidden in that mission.
+
+[KS-101-C] TONTON - OK
+  Image: C0/P0 | KW:[Ninja Pig] | G:Independent | MAIN [⧗] +1 Power if friendly Tsunade or Shizune in mission.
+
+=== FIN COMMON CARDS ===
+
+=== UNCOMMON CARDS ===
+
+[KS-002-UC] HIRUZEN SARUTOBI - ERREUR CORRIGEE
+  Image: C5/P4 | KW:[Hokage] | G:Leaf Village | MAIN [↯] Play Leaf Village paying 1 less + UPGRADE [↯] POWERUP 2 that character.
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-006-UC] SHIZUNE - ERREUR CORRIGEE
+  Image: C3/P2 | KW:[Weapon] | G:Leaf Village | MAIN [↯] Move enemy P3 or less + UPGRADE [↯] Gain 2 Chakra.
+  group: Independent -> Leaf Village
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-008-UC] JIRAIYA - ERREUR CORRIGEE
+  Image: C5/P5 | KW:[Sannin, Jutsu] | G:Leaf Village | MAIN [↯] Play Summon paying 2 less + UPGRADE [↯] Hide enemy cost 3 or less.
+  group: Independent -> Leaf Village
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-012-UC] SAKURA HARUNO - ERREUR CORRIGEE
+  Image: C3/P2 | KW:[Team 7] | G:Leaf Village | MAIN [⧗] CHAKRA +1 + UPGRADE [↯] Draw 1, discard 1.
+  group: Independent -> Leaf Village
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-014-UC] SASUKE UCHIHA - ERREUR CORRIGEE
+  Image: C3/P4 | KW:[Team 7, Kekkei Genkai] | G:Leaf Village | AMBUSH [↯] Look at opponent's hand + UPGRADE AMBUSH effect: discard 1 to discard 1 from opponent's hand.
+  group: Independent -> Leaf Village
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-016-UC] KAKASHI HATAKE - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 7] | G:Leaf Village | MAIN [↯] Copy non-upgrade instant effect of enemy cost 4 or less + UPGRADE: no cost limit.
+  group: Independent -> Leaf Village
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-018-UC] CHOJI AKIMICHI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 10, Jutsu] | G:Leaf Village | MAIN [⧗] After move, hide enemy with less Power + UPGRADE [↯] Move this character.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-020-UC] INO YAMANAKA - ERREUR CORRIGEE
+  Image: C3/P0 | KW:[Team 10, Jutsu] | G:Leaf Village | MAIN [↯] Take control enemy cost 2 or less + UPGRADE: cost limit 3 or less.
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-022-UC] SHIKAMARU NARA - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Team 10, Jutsu] | G:Leaf Village | AMBUSH [↯] Move enemy played during opponent's previous turn.
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-024-UC] ASUMA SARUTOBI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 10] | G:Leaf Village | AMBUSH [↯] Draw a card, discard a card to POWERUP 3.
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-026-UC] KIBA INUZUKA - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Team 8, Jutsu] | G:Leaf Village | MAIN [↯] Hide lowest cost enemy + UPGRADE [↯] Look top 3, draw Akamaru.
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-028-UC] AKAMARU - ERREUR CORRIGEE
+  Image: C2/P3 | KW:[Team 8, Jutsu] | G:Leaf Village | MAIN [⧗] return to hand end of round + AMBUSH [↯] POWERUP 2 friendly Kiba.
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-029-UC] AKAMARU - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 8, Jutsu] | G:Leaf Village | MAIN [⧗] Can upgrade over Kiba + UPGRADE [↯] Hide lowest cost enemy.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-031-UC] HINATA HYUGA - OK
+  Image: C3/P2 | KW:[Team 8, Kekkei Genkai] | G:Leaf Village | MAIN [⧗] Gain 1 Chakra when non-hidden enemy played here.
+
+[KS-033-UC] SHINO ABURAME - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 8, Jutsu] | G:Leaf Village | AMBUSH [↯] Pay 4 less if enemy Jutsu + UPGRADE [↯] Move this character.
+  AMBUSH effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-035-UC] KURENAI YUHI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team 8, Jutsu] | G:Leaf Village | MAIN [⧗] Enemy can't move + UPGRADE [↯] Defeat enemy P1 or less.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-037-UC] NEJI HYUGA - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Guy, Jutsu] | G:Leaf Village | MAIN [⧗] POWERUP 1 when enemy played + UPGRADE [↯] Remove all Power tokens from enemy.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-039-UC] ROCK LEE - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Guy, Jutsu] | G:Leaf Village | MAIN [⧗] Keeps Power tokens + UPGRADE [↯] POWERUP 2.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-041-UC] TENTEN - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[Team Guy] | G:Leaf Village | MAIN [↯] Defeat hidden + UPGRADE [↯] POWERUP 1 another Leaf Village.
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-043-UC] MIGHT GUY - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Guy, Taijutsu] | G:Leaf Village | MAIN [⧗] Keeps Power tokens + UPGRADE [↯] POWERUP 3.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-051-UC] OROCHIMARU - ERREUR CORRIGEE
+  Image: C5/P5 | KW:[Sannin] | G:Sound Village | MAIN [⧗] Move if lost mission + UPGRADE [↯] Defeat hidden enemy in play.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-053-UC] KABUTO YAKUSHI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Jutsu] | G:Sound Village | UPGRADE [↯] Discard a card + MAIN [↯] Play top of discard paying 3 less.
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-054-UC] KABUTO YAKUSHI - ERREUR CORRIGEE
+  Image: C5/P5 | KW:[Jutsu] | G:Sound Village | UPGRADE [↯] POWERUP 1 + MAIN [↯] Hide all with less Power.
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-056-UC] KIMIMARO - ERREUR CORRIGEE
+  Image: C4/P6 | KW:[Kekkei Genkai] | G:Sound Village | MAIN [⧗] Opponent pays 1 Chakra on enemy effect + UPGRADE [↯] Discard to hide cost 4 or less.
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-058-UC] JIROBO - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sound Four, Jutsu] | G:Sound Village | MAIN [↯] POWERUP 1 other Sound Four + UPGRADE [↯] Also in other missions.
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-060-UC] KIDOMARU - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sound Four, Jutsu] | G:Sound Village | MAIN [↯] Move a character + AMBUSH [↯] Defeat enemy P1 or less.
+  MAIN effect: manquait [↯] -> ajoute
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-062-UC] SAKON - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sound Four, Jutsu] | G:Sound Village | AMBUSH [↯] Copy instant effect of friendly Sound Four.
+  AMBUSH effect: manquait [↯] -> ajoute
+
+[KS-063-UC] UKON - OK
+  Image: C5/P6 | KW:[Sound Four, Kekkei Genkai] | G:Sound Village | MAIN [⧗] Can upgrade over any Sound Village character.
+
+[KS-065-UC] TAYUYA - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Sound Four, Jutsu] | G:Sound Village | AMBUSH [↯] POWERUP 2 friendly Sound Village + UPGRADE [↯] Look top 3, draw Summon.
+  AMBUSH effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-066-UC] DOKI (RAGE OGRES) - ERREUR CORRIGEE
+  Image: C4/P5 | KW:[Summon] | G:Sound Village | MAIN [↯] Steal 1 Chakra if Sound Four here + MAIN [⧗] Return to hand end of round.
+  1st MAIN effect: manquait [↯] -> ajoute
+
+[KS-067-UC] RASHOMON (REMPART) - OK
+  Image: C4/P0 | KW:[Summon] | G:Independent | 2x MAIN [⧗].
+
+[KS-069-UC] DOSU KINUTA - ERREUR CORRIGEE
+  Image: C4/P5 | KW:[Sound Ninja, Weapon] | G:Sound Village | UPGRADE [↯] Look at hidden + MAIN [↯] Force opponent to reveal or defeat hidden.
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-071-UC] ZAKU ABUMI - ERREUR CORRIGEE
+  Image: C4/P5 | KW:[Sound Ninja] | G:Sound Village | MAIN [↯] Move enemy if less non-hidden + UPGRADE [↯] POWERUP 2.
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-078-UC] KANKURO - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Baki, Jutsu] | G:Sand Village | AMBUSH [↯] Move char P4 or less + UPGRADE [↯] Play hidden paying 1 less.
+  AMBUSH effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-080-UC] TEMARI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Baki, Jutsu] | G:Sand Village | MAIN [↯] Move friendly Sand Village + UPGRADE [↯] Move this character.
+  keywords: [Team Baki] -> [Team Baki, Jutsu]
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-082-UC] BAKI - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Team Baki] | G:Sand Village | SCORE [↯] Defeat hidden in play + UPGRADE [↯] Defeat enemy P1 or less.
+  SCORE effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+[KS-083-UC] RASA - ERREUR CORRIGEE
+  Image: C3/P3 | KW:[] | G:Sand Village | SCORE [↯] Gain 1 MP if friendly Sand Village here.
+  SCORE effect: manquait [↯] -> ajoute
+
+[KS-085-UC] YASHAMARU - ERREUR CORRIGEE
+  Image: C4/P4 | KW:[Jutsu] | G:Sand Village | SCORE [↯] Defeat self to defeat another character.
+  SCORE effect: manquait [↯] -> ajoute
+
+[KS-087-UC] ZABUZA MOMOCHI - ERREUR CORRIGEE
+  Image: C5/P5 | KW:[Rogue Ninja, Jutsu] | G:Independent | MAIN [↯] Hide lone enemy + UPGRADE: defeat instead.
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-089-UC] HAKU - ERREUR CORRIGEE
+  Image: C4/P2 | KW:[Rogue Ninja, Jutsu] | G:Independent | MAIN [↯] Discard top of opponent deck, POWERUP X + UPGRADE: from your deck instead.
+  MAIN effect: manquait [↯] -> ajoute
+
+[KS-091-UC] ITACHI UCHIHA - ERREUR CORRIGEE
+  Image: C5/P5 | KW:[Rogue Ninja, Kekkei Genkai] | G:Akatsuki | MAIN [↯] Look at opponent's hand + UPGRADE: also discard 1 from hand.
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-093-UC | KISAME HOSHIGAKI | C6/P6 | KW:[Rogue Ninja, Weapon] | G:Akatsuki | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-102-UC | MANDA | C3/P5 | KW:[Summon] | G:Independent | ERREUR
+  AMBUSH effect: manquait [↯] -> ajoute
+
+KS-103-UC | KYODAIGUMO (GIANT SPIDER) | C4/P4 | KW:[Summon] | G:Independent | OK
+
+=== FIN UNCOMMON (UC) ===
+
+=== DEBUT RARE (R) ===
+
+KS-104-R | TSUNADE | C5/P6 | KW:[Sannin] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-105-R | JIRAYA | C6/P6 | KW:[Sannin, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-106-R | KAKASHI HATAKE | C5/P5 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait ([↯]) reference dans description -> ajoute
+
+KS-107-R | SASUKE UCHIWA | C5/P6 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute, "characters"->"the characters"
+
+KS-109-R | SAKURA HARUNO | C4/P3 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-110-R | INO YAMANAKA | C5/P4 | KW:[Team 10, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-111-R | SHIKAMARU NARA | C6/P5 | KW:[Team 10, Jutsu] | G:Leaf Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-113-R | KIBA INUZUKA | C6/P6 | KW:[Team 8, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-114-R | HINATA HYUGA | C5/P5 | KW:[Team 8, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-116-R | NEJI HYUGA | C6/P5 | KW:[Team Guy, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-117-R | ROCK LEE | C5/P5 | KW:[Team Guy, Taijutsu] | G:Leaf Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute, "deck." -> "deck:"
+
+KS-118-R | TENTEN | C4/P4 | KW:[Team Guy, Jutsu] | G:Leaf Village | ERREUR
+  AMBUSH effect: manquait [↯] -> ajoute
+
+KS-119-R | KANKURO | C5/P5 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-120-R | GAARA | C4/P4 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-121-R | TEMARI | C5/P5 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-123-R | KIMIMARO | C6/P8 | KW:[Jutsu] | G:Sound Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-125-R | TAYUYA | C5/P5 | KW:[Sound Four, Jutsu] | G:Sound Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+=== FIN RARE (R) ===
+
+=== DEBUT RARE ART (RA) ===
+
+KS-104-RART | TSUNADE | C5/P6 | KW:[Sannin] | G:Leaf Village | ERREUR
+  title_fr: "Sannin Légendaire" -> titre RA different sur la carte
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-105-RART | JIRAYA | C6/P6 | KW:[Sannin, Jutsu] | G:Leaf Village | ERREUR
+  title: "Jutsu d'Invocation" -> "Ermite du Mont Myoboku" (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-106-RART | KAKASHI HATAKE | C5/P5 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  title: "Scellement du Maléfice" -> "Le Ninja Copieur" (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait ([↯]) reference -> ajoute
+
+KS-107-RART | SASUKE UCHIWA | C5/P6 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  title: "Chidori" -> "Le dernier Uchiwa" (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute, "characters"->"the characters"
+
+KS-108-RART | NARUTO UZUMAKI | C5/P5 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: "Powerup" -> "POWERUP"
+
+KS-109-RART | SAKURA HARUNO | C4/P3 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-110-RART | INO YAMANAKA | C5/P4 | KW:[Team 10, Jutsu] | G:Leaf Village | ERREUR
+  title: "Jutsu de Destruction Mentale" -> "Jutsu de Transfert d'Esprit" (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-111-RART | SHIKAMARU NARA | C6/P5 | KW:[Team 10, Jutsu] | G:Leaf Village | ERREUR
+  title: -> "Quelle galère..." (titre RA different)
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-112-RART | CHOJI AKIMICHI | C5/P4 | KW:[Team 10] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-113-RART | KIBA INUZUKA | C6/P6 | KW:[Team 8, Jutsu] | G:Leaf Village | ERREUR
+  title: "Croc sur Croc" -> "Reste avec moi Akamaru." (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-114-RART | HINATA HYUGA | C5/P5 | KW:[Team 8, Jutsu] | G:Leaf Village | ERREUR
+  title: -> "No more hiding!" (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-117-RART | ROCK LEE | C5/P5 | KW:[Team Guy, Taijutsu] | G:Leaf Village | ERREUR
+  title: "Poing Ivre" -> titre RA different
+  UPGRADE effect: manquait [↯] -> ajoute, "deck." -> "deck:"
+
+KS-118-RART | TENTEN | C4/P4 | KW:[Team Guy, Jutsu] | G:Leaf Village | ERREUR
+  AMBUSH effect: manquait [↯] -> ajoute
+
+KS-119-RART | KANKURO | C5/P5 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  title: -> titre RA different "We'll have a Puppet Show!"
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-120-RART | GAARA | C4/P4 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-121-RART | TEMARI | C5/P5 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  title: -> "C'est fini." (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-123-RART | KIMIMARO | C6/P8 | KW:[Jutsu] | G:Sound Village | ERREUR
+  title: -> "It's over." (titre RA different)
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-125-RART | TAYUYA | C5/P5 | KW:[Sound Four, Jutsu] | G:Sound Village | ERREUR
+  title: -> "This flute is my only weapon!" (titre RA different)
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-126-RART | OROCHIMARU | C7/P7 | KW:[Sannin] | G:Sound Village | ERREUR
+  SCORE effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-128-RART | ITACHI UCHIWA | C6/P6 | KW:[Rogue Ninja] | G:Akatsuki | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-130-RART | ICHIBI (ONE-TAIL) | C7/P10 | KW:[Tailed Beast, Jutsu] | G:Independent | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+=== FIN RARE ART (RART) ===
+
+=== DEBUT SECRET (S) ===
+
+KS-131-S | TSUNADE | C7/P6 | KW:[Sannin, Hokage] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-132-S | JIRAYA | C8/P8 | KW:[Sannin, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-133-S | NARUTO UZUMAKI | C6/P6 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-135-S | SAKURA HARUNO | C5/P4 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-136-S | SASUKE UCHIWA | C7/P8 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-137-S | KAKASHI HATAKE | C7/P7 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-138-S | OROCHIMARU | C6/P8 | KW:[Sannin, Jutsu] | G:Sound Village | ERREUR
+  UPGRADE effect: manquait [↯] -> ajoute
+
+KS-139-S | GAARA | C5/P4 | KW:[Team Baki, Jutsu] | G:Sand Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-140-S | ITACHI UCHIWA | C7/P7 | KW:[Rogue Ninja, Jutsu] | G:Akatsuki | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  UPGRADE effect: manquait [↯] -> ajoute
+
+=== SECRET TERMINE (KS-131-S a KS-140-S) ===
+
+--- MYTHOS ---
+
+KS-141-M | NARUTO UZUMAKI | C5/P4 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-142-M | SASUKE UCHIWA | C5/P4 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-143-M | ITACHI UCHIWA | C5/P5 | KW:[Rogue Ninja] | G:Akatsuki | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  AMBUSH effect: manquait [↯] -> ajoute
+
+KS-144-M | KISAME HOSHIGAKI | C6/P6 | KW:[Rogue Ninja] | G:Akatsuki | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-145-M | PAS D'IMAGE - SKIP
+
+KS-146-M | SASUKE UCHIWA | C3/P3 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+KS-147-M | SAKURA HARUNO | C3/P3 | KW:[Team 7] | G:Leaf Village | OK
+
+KS-148-M | KAKASHI HATAKE | C4/P5 | KW:[Team 7] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+  AMBUSH effect: manquait [↯] -> ajoute, manquait ([↯]) dans le texte -> ajoute
+
+=== MYTHOS TERMINE (KS-141-M a KS-148-M) ===
+
+--- LEGENDARY ---
+
+KS-000-L | NARUTO UZUMAKI | C6/P6 | KW:[Team 7, Jutsu] | G:Leaf Village | ERREUR
+  MAIN effect: manquait [↯] -> ajoute
+
+=== LEGENDARY TERMINE (KS-000-L) ===
+
+--- MISSION ---
+
+KS-001-MMS | CALL FOR SUPPORT | basePoints:1 | OK
+KS-002-MMS | CHUNIN EXAM | basePoints:2 | OK
+KS-003-MMS | FIND THE TRAITOR | basePoints:1 | OK
+
+KS-004-MMS | ASSASSINATION | basePoints:1 | ERREUR
+  SCORE effect: manquait "in play" a la fin -> "Defeat an enemy hidden character in play."
+
+KS-005-MMS | BRING IT BACK | basePoints:3 | ERREUR
+  basePoints: etait 1, corrige a 3 (comme sur l'image)
+
+KS-006-MMS | RESCUE A FRIEND | basePoints:1 | OK
+
+KS-007-MMS | I HAVE TO GO | basePoints:2 | ERREUR
+  basePoints: etait 1, corrige a 2 (comme sur l'image)
+
+KS-008-MMS | SET A TRAP | basePoints:2 | ERREUR
+  SCORE effect: "Put" -> "Place" (comme sur l'image)
+  basePoints: etait 1, corrige a 2 (comme sur l'image)
+
+KS-009-MMS | PROTECT THE LEADER | basePoints:2 | OK
+KS-010-MMS | CHAKRA TRAINING | basePoints:2 | OK
+
+=== MISSION TERMINE (KS-001-MMS a KS-010-MMS) ===
+
+=== AUDIT COMPLET TERMINE ===
+Sections auditees:
+- Common (KS-001-C a KS-101-C): 48 cartes
+- Uncommon (KS-002-UC a KS-103-UC): 54 cartes
+- Rare (KS-104-R a KS-125-R): 17 cartes
+- Rare Art (KS-104-RART a KS-130-RART): 21 cartes
+- Secret (KS-131-S a KS-140-S): 9 cartes
+- Mythos (KS-141-M a KS-148-M): 7 cartes
+- Legendary (KS-000-L): 1 carte
+- Mission (KS-001-MMS a KS-010-MMS): 10 cartes
+
+Erreurs les plus frequentes:
+1. Symbole [↯] manquant sur les effets MAIN, AMBUSH, UPGRADE, SCORE
+2. Symbole ([↯]) manquant dans le texte des effets AMBUSH de copie
+3. Titres differents pour les cartes Rare Art vs Rare
+4. basePoints incorrects sur certaines missions
+5. Texte d'effet mineur (mots manquants, "Put"->"Place", etc.)
