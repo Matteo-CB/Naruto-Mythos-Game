@@ -289,7 +289,7 @@ export default function ProfilePage({
                 return (
                   <div
                     key={game.id}
-                    className="rounded px-4 py-3 flex items-center justify-between"
+                    className="rounded px-4 py-3 flex flex-wrap items-center justify-between gap-2"
                     style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
                   >
                     <div className="flex items-center gap-3">
@@ -307,7 +307,7 @@ export default function ProfilePage({
                         vs {opponent}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                       <span className="text-sm" style={{ color: '#888888' }}>
                         {myScore} - {oppScore}
                       </span>

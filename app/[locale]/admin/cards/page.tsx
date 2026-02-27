@@ -146,7 +146,7 @@ export default function AdminCardsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t('adminCards.search')}
-              className="flex-1 min-w-[200px] px-3 py-2 text-sm rounded"
+              className="flex-1 min-w-[140px] px-3 py-2 text-sm rounded"
               style={{
                 backgroundColor: '#141414',
                 border: '1px solid #262626',
@@ -157,7 +157,7 @@ export default function AdminCardsPage() {
           </div>
 
           {/* Filter tabs */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(['all', 'banned', 'authorized'] as FilterMode[]).map((f) => (
               <button
                 key={f}

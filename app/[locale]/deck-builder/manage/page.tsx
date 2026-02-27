@@ -143,19 +143,17 @@ export default function ManageDecksPage() {
       <CloudBackground />
       <div className="max-w-xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#c4a35a' }}>
             {t('deckManager.title')}
           </h1>
-          <div className="flex gap-2">
-            <Link
-              href="/deck-builder"
-              className="px-4 py-2 text-sm rounded"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
-            >
-              {t('deckManager.backToBuilder')}
-            </Link>
-          </div>
+          <Link
+            href="/deck-builder"
+            className="px-4 py-2 text-sm rounded text-center"
+            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+          >
+            {t('deckManager.backToBuilder')}
+          </Link>
         </div>
 
         <p className="text-xs mb-4" style={{ color: '#555555' }}>
@@ -202,9 +200,9 @@ export default function ManageDecksPage() {
                     opacity: dragIndex === index ? 0.8 : 1,
                   }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     {/* Order indicator + drag handle */}
-                    <div className="flex flex-col items-center gap-0.5 shrink-0">
+                    <div className="flex sm:flex-col items-center gap-1 sm:gap-0.5 shrink-0">
                       <button
                         onClick={() => moveUp(index)}
                         disabled={index === 0 || saving}
@@ -273,7 +271,7 @@ export default function ManageDecksPage() {
 
                     {/* Actions */}
                     {!isRenaming && (
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         {isConfirming ? (
                           <>
                             <span className="text-[10px]" style={{ color: '#b33e3e' }}>
