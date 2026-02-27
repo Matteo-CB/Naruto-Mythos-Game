@@ -113,7 +113,7 @@ export function PlaybackControls({
       </div>
 
       {/* Controls row */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-between">
         {/* Turn jump buttons */}
         <div className="flex items-center gap-1">
           {turnStarts.map(({ turn, step }) => (

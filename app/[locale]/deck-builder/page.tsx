@@ -304,7 +304,7 @@ export default function DeckBuilderPage() {
 
       <div className="flex-1 flex flex-col relative z-10">
         {/* Top bar: back + name + save/clear */}
-        <div className="flex items-center gap-3 px-4 pt-3 pb-2 border-b border-[#262626]">
+        <div className="flex flex-wrap items-center gap-2 px-4 pt-3 pb-2 border-b border-[#262626]">
           <Link
             href="/"
             className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
@@ -316,7 +316,7 @@ export default function DeckBuilderPage() {
             placeholder={t("deckBuilder.deckName")}
             value={deckName}
             onChange={(e) => setDeckName(e.target.value)}
-            className="flex-1 max-w-xs px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
+            className="flex-1 min-w-[120px] max-w-xs px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
           />
           <button
             onClick={handleSave}

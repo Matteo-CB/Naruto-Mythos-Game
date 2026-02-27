@@ -156,7 +156,7 @@ export default function AdminBugsPage() {
           </div>
 
           {/* Filter tabs */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(['all', 'open', 'fixed', 'wontfix'] as FilterStatus[]).map((s) => (
               <button
                 key={s}
@@ -187,8 +187,8 @@ export default function AdminBugsPage() {
                   style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
                 >
                   {/* Header row */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                       <span
                         className="px-2 py-0.5 text-xs font-bold uppercase rounded"
                         style={{
@@ -225,7 +225,7 @@ export default function AdminBugsPage() {
                   )}
 
                   {/* Actions */}
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 pt-1">
                     {report.status !== 'fixed' && (
                       <button
                         onClick={() => updateStatus(report.id, 'fixed')}

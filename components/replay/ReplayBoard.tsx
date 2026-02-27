@@ -301,7 +301,7 @@ function ReplayMissionLane({
       className="flex flex-col items-center rounded-lg overflow-hidden"
       style={{
         flex: '1 1 0',
-        minWidth: '100px',
+        minWidth: '80px',
         maxWidth: '180px',
         backgroundColor: 'rgba(10, 10, 14, 0.6)',
         border: `1px solid ${mission.wonBy ? (mission.wonBy === 'player1' ? 'rgba(196, 163, 90, 0.4)' : 'rgba(179, 62, 62, 0.4)') : 'rgba(255, 255, 255, 0.06)'}`,
@@ -382,7 +382,7 @@ function ReplayStatsBar({
 
   return (
     <div
-      className="flex items-center justify-between px-3 py-1.5"
+      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-1.5"
       style={{
         backgroundColor: isActive ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
         borderBottom: isTop ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
@@ -502,7 +502,7 @@ export function ReplayBoard({ state, playerNames, locale }: ReplayBoardProps) {
       </div>
 
       {/* Mission area */}
-      <div className="flex items-stretch justify-center gap-1.5 px-2 py-2 min-h-[200px]">
+      <div className="flex items-stretch justify-center gap-1.5 px-2 py-2 min-h-[160px] sm:min-h-[200px] overflow-x-auto">
         {state.activeMissions.map((mission, index) => (
           <ReplayMissionLane
             key={`mission-${index}`}
@@ -519,7 +519,7 @@ export function ReplayBoard({ state, playerNames, locale }: ReplayBoardProps) {
             className="flex items-center justify-center rounded-lg"
             style={{
               flex: '1 1 0',
-              minWidth: '100px',
+              minWidth: '80px',
               maxWidth: '180px',
               backgroundColor: 'rgba(10, 10, 14, 0.3)',
               border: '1px dashed rgba(255, 255, 255, 0.06)',
