@@ -2,14 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 
+function getLocale(request: NextRequest): string {
+  // Check NEXT_LOCALE cookie first (set by next-intl)
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  if (cookieLocale === 'en' || cookieLocale === 'fr') return cookieLocale;
+  // Fallback: check Accept-Language header
+  const acceptLang = request.headers.get('accept-language') || '';
+  if (acceptLang.startsWith('fr')) return 'fr';
+  return 'en';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const locale = getLocale(request);
     const code = searchParams.get('code');
     const state = searchParams.get('state');
 
     if (!code || !state) {
-      return redirectWithError('Missing code or state');
+      return redirectWithError(request, 'Missing code or state');
     }
 
     // Decode state to get userId
@@ -19,10 +30,10 @@ export async function GET(request: NextRequest) {
       userId = decoded.userId;
       // Reject states older than 10 minutes
       if (Date.now() - decoded.ts > 10 * 60 * 1000) {
-        return redirectWithError('Link expired');
+        return redirectWithError(request, 'Link expired');
       }
     } catch {
-      return redirectWithError('Invalid state');
+      return redirectWithError(request, 'Invalid state');
     }
 
     // Verify user exists
@@ -32,11 +43,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return redirectWithError('User not found');
+      return redirectWithError(request, 'User not found');
     }
 
     if (user.discordId) {
-      return redirectWithError('Discord already linked');
+      return redirectWithError(request, 'Discord already linked');
     }
 
     // Exchange code for access token
@@ -56,7 +67,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenRes.ok) {
-      return redirectWithError('Discord token exchange failed');
+      return redirectWithError(request, 'Discord token exchange failed');
     }
 
     const tokenData = await tokenRes.json();
@@ -68,7 +79,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!profileRes.ok) {
-      return redirectWithError('Failed to fetch Discord profile');
+      return redirectWithError(request, 'Failed to fetch Discord profile');
     }
 
     const discordProfile = await profileRes.json();
@@ -81,7 +92,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (existingLink) {
-      return redirectWithError('Discord account already linked to another user');
+      return redirectWithError(request, 'Discord account already linked to another user');
     }
 
     // Link Discord to user
@@ -121,14 +132,16 @@ export async function GET(request: NextRequest) {
     // Sync ELO role
     syncDiscordRole(userId).catch(() => {});
 
-    // Redirect to profile with success
-    return NextResponse.redirect(`${baseUrl}/profile/${user.username}?discord=linked`);
+    // Redirect to profile with success (include locale prefix)
+    return NextResponse.redirect(`${baseUrl}/${locale}/profile/${user.username}?discord=linked`);
   } catch {
-    return redirectWithError('Internal server error');
+    return redirectWithError(request, 'Internal server error');
   }
 }
 
-function redirectWithError(error: string) {
+function redirectWithError(request: NextRequest, error: string) {
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  return NextResponse.redirect(`${baseUrl}/?discord_error=${encodeURIComponent(error)}`);
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+  const locale = (cookieLocale === 'en' || cookieLocale === 'fr') ? cookieLocale : 'en';
+  return NextResponse.redirect(`${baseUrl}/${locale}?discord_error=${encodeURIComponent(error)}`);
 }
