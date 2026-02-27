@@ -28,8 +28,10 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Pick a random card from opponent's hand
-  const randomIndex = Math.floor(Math.random() * opponentHand.length);
+  // Pick a deterministic "random" card from opponent's hand
+  // Use actionHistory length as a seed so replays produce the same result
+  const seed = (state.actionHistory?.length ?? 0) + opponentHand.length + state.turn;
+  const randomIndex = seed % opponentHand.length;
   const revealedCard = opponentHand[randomIndex];
 
   let newState = { ...state };

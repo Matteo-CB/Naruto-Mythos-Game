@@ -554,10 +554,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
     const ai = new AIPlayer(difficulty, aiPlayerSide);
 
-    // Save initial state for replay (before any mulligans)
-    const replayInitialState = deepClone(state);
-    delete replayInitialState.actionHistory; // Empty at this point, save space
-
+    // replayInitialState will be captured AFTER mulligans complete (deterministic point)
     const visible = GameEngine.getVisibleState(state, humanPlayer);
 
     // Build display names
@@ -580,7 +577,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameOver: false,
       winner: null,
       playerDisplayNames,
-      replayInitialState,
+      replayInitialState: null,
       animationQueue: [],
       pendingTargetSelection: null,
     });
@@ -683,6 +680,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }, 4000);
         return;
       }
+    }
+
+    // Capture replay initial state when mulligans complete (deterministic snapshot)
+    // Mulligans use shuffle() which is non-deterministic, so we must capture AFTER.
+    if (gameState.phase === 'mulligan' && newState.phase !== 'mulligan' && !get().replayInitialState) {
+      const snapshot = deepClone(newState);
+      snapshot.actionHistory = []; // Clear — replay starts from this point
+      set({ replayInitialState: snapshot });
+      // Reset actionHistory so only post-mulligan actions are recorded
+      newState.actionHistory = [];
     }
 
     // Clear any previous error on successful action
