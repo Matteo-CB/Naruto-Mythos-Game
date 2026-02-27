@@ -250,6 +250,32 @@ function VisualReplay({
         break;
       }
     }
+
+    // Recovery: auto-advance stuck states until game reaches gameOver or stops changing
+    let recovery = 0;
+    while (current.phase !== 'gameOver' && recovery < 20) {
+      let advanced: GameState | null = null;
+      try {
+        if (current.phase === 'mission' && current.missionScoringComplete) {
+          // Stuck after mission scoring — inject ADVANCE_PHASE
+          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+        } else if (current.phase === 'end' && current.pendingActions.length === 0 && current.pendingEffects.length === 0) {
+          // Stuck in end phase with nothing pending — inject a dummy to trigger advance
+          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+        } else {
+          break; // Not stuck in a recoverable way
+        }
+      } catch {
+        break;
+      }
+      if (!advanced || advanced === current || advanced.phase === current.phase && advanced.turn === current.turn) {
+        break; // No progress made
+      }
+      current = advanced;
+      result.push(current);
+      recovery++;
+    }
+
     return result;
   }, [initialState, actionHistory]);
 

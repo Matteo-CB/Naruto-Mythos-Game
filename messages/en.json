@@ -1570,7 +1570,27 @@
       "syncing": "Syncing...",
       "syncAll": "Sync All Users"
     },
+    "testers": {
+      "title": "Testers",
+      "description": "Manage tester accounts. Testers get a special badge visible everywhere.",
+      "search": "Search by username...",
+      "add": "Add tester",
+      "remove": "Remove",
+      "noTesters": "No testers yet.",
+      "added": "Tester added",
+      "removed": "Tester removed",
+      "notFound": "User not found"
+    },
     "actionLog": "Action Log"
+  },
+  "badges": {
+    "admin": "ADMIN",
+    "tester": "TESTER",
+    "showAdmin": "Show Admin badge",
+    "showTester": "Show Tester badge",
+    "showLeague": "Show League badge",
+    "badgePrefs": "Badge Preferences",
+    "badgePrefsDesc": "Choose which badges to display next to your name."
   },
   "adminCards": {
     "title": "Card Management",

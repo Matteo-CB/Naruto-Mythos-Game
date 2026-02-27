@@ -11,6 +11,7 @@ import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { EloBadgeLarge } from '@/components/EloBadge';
+import { UserBadges } from '@/components/badges/UserBadges';
 
 interface ProfileData {
   id: string;
@@ -19,6 +20,8 @@ interface ProfileData {
   wins: number;
   losses: number;
   draws: number;
+  role?: string;
+  badgePrefs?: string[];
   discordUsername: string | null;
   createdAt: string;
   decks: Array<{ id: string; name: string; createdAt: string }>;
@@ -57,6 +60,8 @@ export default function ProfilePage({
   const [currentPage, setCurrentPage] = useState(1);
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const [unlinking, setUnlinking] = useState(false);
+  const [badgePrefsLocal, setBadgePrefsLocal] = useState<string[]>([]);
+  const tb = useTranslations('badges');
 
   useEffect(() => {
     fetch('/api/settings')
@@ -81,6 +86,7 @@ export default function ProfilePage({
         });
       } else {
         setProfile(data);
+        setBadgePrefsLocal(data.badgePrefs ?? []);
       }
       setCurrentPage(page);
     } catch {
@@ -137,9 +143,18 @@ export default function ProfilePage({
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#e0e0e0' }}>
-              {profile.username}
-            </h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-bold" style={{ color: '#e0e0e0' }}>
+                {profile.username}
+              </h1>
+              <UserBadges
+                role={profile.role}
+                elo={profile.elo}
+                badgePrefs={profile.badgePrefs}
+                leaguesEnabled={leaguesEnabled}
+                size="md"
+              />
+            </div>
             <p className="text-xs mt-1" style={{ color: '#555555' }}>
               {t('memberSince', {
                 date: new Date(profile.createdAt).toLocaleDateString(),
@@ -218,6 +233,89 @@ export default function ProfilePage({
             </svg>
             <span className="text-xs font-medium">{td('linkDiscord')}</span>
           </a>
+        )}
+
+        {/* Badge Preferences (own profile only) */}
+        {session?.user?.id === profile.id && (profile.role === 'admin' || profile.role === 'tester' || leaguesEnabled) && (
+          <div
+            className="rounded-lg p-4 mb-4"
+            style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          >
+            <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888888' }}>
+              {tb('badgePrefs')}
+            </p>
+            <p className="text-[10px] mb-3" style={{ color: '#555555' }}>
+              {tb('badgePrefsDesc')}
+            </p>
+            <div className="flex flex-col gap-2">
+              {profile.role === 'admin' && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!badgePrefsLocal.includes('admin')}
+                    onChange={async (e) => {
+                      const newPrefs = e.target.checked
+                        ? badgePrefsLocal.filter((b) => b !== 'admin')
+                        : [...badgePrefsLocal, 'admin'];
+                      setBadgePrefsLocal(newPrefs);
+                      setProfile((prev) => prev ? { ...prev, badgePrefs: newPrefs } : prev);
+                      await fetch('/api/user/badge-prefs', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ badgePrefs: newPrefs }),
+                      });
+                    }}
+                    className="accent-amber-500"
+                  />
+                  <span className="text-xs" style={{ color: '#e0e0e0' }}>{tb('showAdmin')}</span>
+                </label>
+              )}
+              {profile.role === 'tester' && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!badgePrefsLocal.includes('tester')}
+                    onChange={async (e) => {
+                      const newPrefs = e.target.checked
+                        ? badgePrefsLocal.filter((b) => b !== 'tester')
+                        : [...badgePrefsLocal, 'tester'];
+                      setBadgePrefsLocal(newPrefs);
+                      setProfile((prev) => prev ? { ...prev, badgePrefs: newPrefs } : prev);
+                      await fetch('/api/user/badge-prefs', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ badgePrefs: newPrefs }),
+                      });
+                    }}
+                    className="accent-cyan-500"
+                  />
+                  <span className="text-xs" style={{ color: '#e0e0e0' }}>{tb('showTester')}</span>
+                </label>
+              )}
+              {leaguesEnabled && (
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!badgePrefsLocal.includes('league')}
+                    onChange={async (e) => {
+                      const newPrefs = e.target.checked
+                        ? badgePrefsLocal.filter((b) => b !== 'league')
+                        : [...badgePrefsLocal, 'league'];
+                      setBadgePrefsLocal(newPrefs);
+                      setProfile((prev) => prev ? { ...prev, badgePrefs: newPrefs } : prev);
+                      await fetch('/api/user/badge-prefs', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ badgePrefs: newPrefs }),
+                      });
+                    }}
+                    className="accent-green-500"
+                  />
+                  <span className="text-xs" style={{ color: '#e0e0e0' }}>{tb('showLeague')}</span>
+                </label>
+              )}
+            </div>
+          </div>
         )}
 
         {/* ELO Badge and Stats */}

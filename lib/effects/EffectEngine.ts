@@ -1184,6 +1184,7 @@ export class EffectEngine {
       case 'CHOJI018_HIDE_ENEMY':
       case 'GAARA139_HIDE_SAME_NAME':
       case 'GAARA153_HIDE_SAME_NAME':
+      case 'KIBA026_OPPONENT_CHOOSE_HIDE':
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
