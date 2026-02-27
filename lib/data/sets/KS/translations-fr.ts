@@ -592,9 +592,9 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     '[↯] Vainquez ce personnage et un autre personnage dans cette mission.',
   ],
 
-  // 087/130 - ZABUZA MOMOCHI (UC) - "Demon du Brouillard"
+  // 087/130 - ZABUZA MOMOCHI (UC) - "Prison Aqueuse"
   'KS-087-UC': [
-    'S\'il n\'y a qu\'un seul personnage ennemi dans cette mission, cachez-le.',
+    'S\'il n\'y a qu\'un seul personnage ennemi non cache dans cette mission, cachez-le.',
     'effet MAIN : A la place, vainquez-le.',
   ],
 
