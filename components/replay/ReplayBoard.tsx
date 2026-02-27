@@ -295,14 +295,12 @@ function ReplayMissionLane({
   const missionName = getCardName(mission.card, locale);
   const rankColor = rankColorMap[mission.rank] ?? '#888';
   const totalPoints = mission.basePoints + mission.rankBonus;
+  const missionImage = mission.card.image_file ? normalizeImagePath(mission.card.image_file) : null;
 
   return (
     <div
       className="flex flex-col items-center rounded-lg overflow-hidden"
       style={{
-        flex: '1 1 0',
-        minWidth: '80px',
-        maxWidth: '180px',
         backgroundColor: 'rgba(10, 10, 14, 0.6)',
         border: `1px solid ${mission.wonBy ? (mission.wonBy === 'player1' ? 'rgba(196, 163, 90, 0.4)' : 'rgba(179, 62, 62, 0.4)') : 'rgba(255, 255, 255, 0.06)'}`,
       }}
@@ -316,38 +314,53 @@ function ReplayMissionLane({
         </AnimatePresence>
       </div>
 
-      {/* Mission card */}
+      {/* Mission card with image */}
       <div
-        className="w-full px-2 py-1.5 text-center"
+        className="relative w-full px-2 py-1.5 text-center overflow-hidden"
         style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           borderTop: `1px solid ${rankColor}40`,
           borderBottom: `1px solid ${rankColor}40`,
+          minHeight: '48px',
         }}
       >
-        <div className="flex items-center justify-center gap-1.5">
-          <span
-            className="text-[9px] font-bold uppercase px-1 rounded"
-            style={{ backgroundColor: `${rankColor}30`, color: rankColor }}
-          >
-            {mission.rank}
-          </span>
-          <span className="text-[9px] truncate" style={{ color: '#e0e0e0' }}>
-            {missionName}
-          </span>
-        </div>
-        <div className="flex items-center justify-center gap-1 mt-0.5">
-          <span className="text-[8px]" style={{ color: '#888' }}>
-            {totalPoints} pts
-          </span>
-          {mission.wonBy && (
+        {/* Mission card image background */}
+        {missionImage && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${missionImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: 0.25,
+            }}
+          />
+        )}
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.55)' }} />
+        <div className="relative z-10">
+          <div className="flex items-center justify-center gap-1.5">
             <span
-              className="text-[7px] font-bold uppercase"
-              style={{ color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e' }}
+              className="text-[9px] font-bold uppercase px-1 rounded"
+              style={{ backgroundColor: `${rankColor}30`, color: rankColor }}
             >
-              {mission.wonBy === 'player1' ? 'P1' : 'P2'}
+              {mission.rank}
             </span>
-          )}
+            <span className="text-[9px] truncate font-medium" style={{ color: '#e0e0e0' }}>
+              {missionName}
+            </span>
+          </div>
+          <div className="flex items-center justify-center gap-1 mt-0.5">
+            <span className="text-[8px] font-semibold" style={{ color: rankColor }}>
+              {totalPoints} pts
+            </span>
+            {mission.wonBy && (
+              <span
+                className="text-[7px] font-bold uppercase"
+                style={{ color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e' }}
+              >
+                {mission.wonBy === 'player1' ? 'P1' : 'P2'}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -501,35 +514,35 @@ export function ReplayBoard({ state, playerNames, locale }: ReplayBoardProps) {
         )}
       </div>
 
-      {/* Mission area */}
-      <div className="flex items-stretch justify-center gap-1.5 px-2 py-2 min-h-[160px] sm:min-h-[200px] overflow-x-auto">
-        {state.activeMissions.map((mission, index) => (
-          <ReplayMissionLane
-            key={`mission-${index}`}
-            mission={mission}
-            state={state}
-            locale={locale}
-          />
-        ))}
-
-        {/* Empty mission slots */}
-        {Array.from({ length: Math.max(0, 4 - state.activeMissions.length) }).map((_, i) => (
-          <div
-            key={`empty-${i}`}
-            className="flex items-center justify-center rounded-lg"
-            style={{
-              flex: '1 1 0',
-              minWidth: '80px',
-              maxWidth: '180px',
-              backgroundColor: 'rgba(10, 10, 14, 0.3)',
-              border: '1px dashed rgba(255, 255, 255, 0.06)',
-            }}
-          >
-            <span className="text-[9px]" style={{ color: 'rgba(255, 255, 255, 0.12)' }}>
-              {t('game.turn', { turn: state.activeMissions.length + i + 1 })}
-            </span>
-          </div>
-        ))}
+      {/* Mission area — fixed 4-column grid so layout doesn't shift */}
+      <div className="grid grid-cols-4 gap-1.5 px-2 py-2 min-h-[160px] sm:min-h-[200px]">
+        {Array.from({ length: 4 }).map((_, slotIdx) => {
+          const mission = state.activeMissions[slotIdx];
+          if (mission) {
+            return (
+              <ReplayMissionLane
+                key={`mission-${slotIdx}`}
+                mission={mission}
+                state={state}
+                locale={locale}
+              />
+            );
+          }
+          return (
+            <div
+              key={`empty-${slotIdx}`}
+              className="flex items-center justify-center rounded-lg"
+              style={{
+                backgroundColor: 'rgba(10, 10, 14, 0.3)',
+                border: '1px dashed rgba(255, 255, 255, 0.06)',
+              }}
+            >
+              <span className="text-[9px]" style={{ color: 'rgba(255, 255, 255, 0.12)' }}>
+                {t('game.turn', { turn: slotIdx + 1 })}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {/* Player 1 hand */}

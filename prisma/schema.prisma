@@ -19,6 +19,8 @@ model User {
   discordId         String?
   discordUsername   String?
   discordHighestElo Int          @default(0)
+  role              String       @default("user")
+  badgePrefs        String[]     @default([])
   resetToken        String?
   resetTokenExpiry  DateTime?
   createdAt         DateTime     @default(now())

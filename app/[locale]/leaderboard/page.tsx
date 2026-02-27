@@ -9,6 +9,7 @@ import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
 import { EloBadge } from '@/components/EloBadge';
+import { UserBadges } from '@/components/badges/UserBadges';
 
 interface LeaderboardUser {
   id: string;
@@ -17,6 +18,8 @@ interface LeaderboardUser {
   wins: number;
   losses: number;
   draws: number;
+  role?: string;
+  badgePrefs?: string[];
 }
 
 export default function LeaderboardPage() {
@@ -118,13 +121,22 @@ export default function LeaderboardPage() {
                   <span style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}>
                     {globalRank}
                   </span>
-                  <Link
-                    href={`/profile/${user.username}` as '/'}
-                    className="underline truncate"
-                    style={{ color: '#e0e0e0' }}
-                  >
-                    {user.username}
-                  </Link>
+                  <span className="flex items-center gap-1 truncate">
+                    <Link
+                      href={`/profile/${user.username}` as '/'}
+                      className="underline truncate"
+                      style={{ color: '#e0e0e0' }}
+                    >
+                      {user.username}
+                    </Link>
+                    <UserBadges
+                      role={user.role}
+                      elo={user.elo}
+                      badgePrefs={user.badgePrefs}
+                      leaguesEnabled={leaguesEnabled}
+                      size="sm"
+                    />
+                  </span>
                   <span className="flex items-center gap-2">
                     {leaguesEnabled && <EloBadge elo={user.elo} size="sm" showElo={false} />}
                     <span style={{ color: '#e0e0e0' }}>{user.elo}</span>

@@ -1254,7 +1254,27 @@
       "syncing": "Synchronisation...",
       "syncAll": "Synchroniser les Utilisateurs"
     },
+    "testers": {
+      "title": "Testeurs",
+      "description": "Gerer les comptes testeurs. Les testeurs obtiennent un badge special visible partout.",
+      "search": "Rechercher par pseudo...",
+      "add": "Ajouter testeur",
+      "remove": "Retirer",
+      "noTesters": "Aucun testeur pour le moment.",
+      "added": "Testeur ajoute",
+      "removed": "Testeur retire",
+      "notFound": "Utilisateur introuvable"
+    },
     "actionLog": "Journal d'Actions"
+  },
+  "badges": {
+    "admin": "ADMIN",
+    "tester": "TESTEUR",
+    "showAdmin": "Afficher badge Admin",
+    "showTester": "Afficher badge Testeur",
+    "showLeague": "Afficher badge Ligue",
+    "badgePrefs": "Preferences de badges",
+    "badgePrefsDesc": "Choisissez quels badges afficher a cote de votre nom."
   },
   "adminCards": {
     "title": "Gestion des Cartes",

@@ -15,6 +15,8 @@ export async function GET(request: NextRequest) {
         wins: true,
         losses: true,
         draws: true,
+        role: true,
+        badgePrefs: true,
       },
       orderBy: { elo: 'desc' },
       take: limit,

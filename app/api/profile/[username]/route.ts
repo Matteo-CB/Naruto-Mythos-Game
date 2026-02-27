@@ -20,6 +20,8 @@ export async function GET(
         wins: true,
         losses: true,
         draws: true,
+        role: true,
+        badgePrefs: true,
         discordUsername: true,
         createdAt: true,
         decks: {
