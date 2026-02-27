@@ -460,9 +460,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
 
         room.gameState = GameEngine.createGame(config);
-        // Save initial state for replay (before any mulligans)
-        room.replayInitialState = deepClone(room.gameState);
-        delete room.replayInitialState.actionHistory;
+        // replayInitialState will be captured AFTER mulligans complete (deterministic point)
+        room.replayInitialState = null;
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
 
@@ -557,11 +556,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const prevState = room.gameState;
 
         // Apply action server-side (authoritative)
+        const prevPhase = room.gameState.phase;
         room.gameState = GameEngine.applyAction(
           room.gameState,
           player,
           data.action,
         );
+
+        // Capture replay initial state when mulligans complete (deterministic snapshot)
+        if (prevPhase === 'mulligan' && room.gameState.phase !== 'mulligan' && !room.replayInitialState) {
+          room.replayInitialState = deepClone(room.gameState);
+          room.replayInitialState.actionHistory = [];
+          room.gameState.actionHistory = [];
+        }
 
         // Detect silently rejected play actions (validation failed, state unchanged)
         const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);

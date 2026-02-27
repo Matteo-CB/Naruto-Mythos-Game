@@ -64,9 +64,15 @@ export default function PlayAIPage() {
 
     // AI always gets a random deck (excludes banned cards)
     const shuffled = [...availableChars].sort(() => Math.random() - 0.5);
-    const aiMissions = [...availableMissions].sort(() => Math.random() - 0.5);
     const player2Deck = shuffled.slice(0, 30);
-    const player2Missions = aiMissions.slice(0, 3);
+
+    // AI missions: exclude player's missions to ensure no overlap (2 unique per player in mission deck)
+    const playerMissionIds = new Set(player1Missions.map((m) => m.id));
+    const aiMissionPool = availableMissions.filter((m) => !playerMissionIds.has(m.id));
+    const aiMissions = [...aiMissionPool].sort(() => Math.random() - 0.5);
+    const player2Missions = aiMissions.length >= 3
+      ? aiMissions.slice(0, 3)
+      : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
     const config: GameConfig = {
       player1: {
