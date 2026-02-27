@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -560,13 +561,15 @@ function AbandonConfirmDialog({
   onCancel: () => void;
   t: ReturnType<typeof useTranslations>;
 }) {
-  return (
+  // Use portal to render at document body level, escaping any stacking context
+  // that could trap the dialog (e.g. parent with backdropFilter or transform)
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+      className="fixed inset-0 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 9999 }}
       onClick={onCancel}
     >
       <motion.div
@@ -574,19 +577,20 @@ function AbandonConfirmDialog({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col items-center gap-4 rounded-xl p-8"
+        className="flex flex-col items-center gap-4 rounded-xl p-8 mx-4"
         style={{
-          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          backgroundColor: 'rgba(8, 8, 12, 0.97)',
           border: '1px solid rgba(179, 62, 62, 0.3)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7)',
-          minWidth: '320px',
+          minWidth: '280px',
+          maxWidth: '400px',
         }}
       >
-        <span className="text-lg font-bold" style={{ color: '#e0e0e0' }}>
+        <span className="text-lg font-bold text-center" style={{ color: '#e0e0e0' }}>
           {t('game.actions.abandonConfirmTitle')}
         </span>
-        <span className="text-sm" style={{ color: '#888888' }}>
+        <span className="text-sm text-center" style={{ color: '#888888' }}>
           {t('game.actions.abandonConfirmMessage')}
         </span>
         <div className="flex gap-3 mt-2">
@@ -618,6 +622,7 @@ function AbandonConfirmDialog({
           </motion.button>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   );
 }

@@ -1009,7 +1009,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const pendingEffectForOpt = currentState.pendingEffects.find(
               (e) => e.id === pendingAction.sourceEffectId,
             );
-            if (pendingEffectForOpt?.isOptional && aiPlayer.difficulty === 'easy') {
+
+            // Special handling for DOSU069_OPPONENT_CHOICE: AI decides whether to pay or let character be defeated
+            if (pendingEffectForOpt?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE' && pendingEffectForOpt.isOptional) {
+              let shouldDecline = false;
+              try {
+                const parsed = JSON.parse(pendingEffectForOpt.effectDescription);
+                const revealCost = parsed.revealCost ?? 0;
+                const aiChakra = currentState[aiPlayer.player].chakra;
+                // Easy: always decline, Medium: decline if cost > 60% chakra, Hard/Expert: decline if cost > 80% chakra
+                if (aiPlayer.difficulty === 'easy') {
+                  shouldDecline = true;
+                } else if (aiPlayer.difficulty === 'medium') {
+                  shouldDecline = revealCost > aiChakra * 0.6 || revealCost >= aiChakra;
+                } else {
+                  // Hard/Expert: decline if paying would leave very little chakra
+                  shouldDecline = revealCost >= aiChakra || (aiChakra - revealCost) < 2;
+                }
+              } catch { shouldDecline = Math.random() < 0.5; }
+              if (shouldDecline) {
+                currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+                  type: 'DECLINE_OPTIONAL_EFFECT',
+                  pendingEffectId: pendingEffectForOpt.id,
+                });
+                iterations++;
+                continue;
+              }
+            } else if (pendingEffectForOpt?.isOptional && aiPlayer.difficulty === 'easy') {
               // Easy AI: 50% chance to decline optional effects
               if (Math.random() < 0.5) {
                 currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
