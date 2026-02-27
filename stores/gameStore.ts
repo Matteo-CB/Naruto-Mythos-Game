@@ -8,6 +8,7 @@ import { aiSelectTarget } from '@/lib/ai/targetSelection';
 import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { deepClone } from '@/lib/engine/utils/deepClone';
 
 interface AnimationEvent {
   id: string;
@@ -45,6 +46,9 @@ interface GameStore {
   gameOver: boolean;
   winner: PlayerID | null;
   playerDisplayNames: { player1: string; player2: string };
+
+  // Replay
+  replayInitialState: GameState | null;
 
   // Animation queue
   animationQueue: AnimationEvent[];
@@ -297,6 +301,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   gameOver: false,
   winner: null,
   playerDisplayNames: { player1: 'Player 1', player2: 'Player 2' },
+  replayInitialState: null,
   animationQueue: [],
   isAnimating: false,
   pendingTargetSelection: null,
@@ -549,6 +554,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
     const ai = new AIPlayer(difficulty, aiPlayerSide);
 
+    // Save initial state for replay (before any mulligans)
+    const replayInitialState = deepClone(state);
+    delete replayInitialState.actionHistory; // Empty at this point, save space
+
     const visible = GameEngine.getVisibleState(state, humanPlayer);
 
     // Build display names
@@ -571,6 +580,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameOver: false,
       winner: null,
       playerDisplayNames,
+      replayInitialState,
       animationQueue: [],
       pendingTargetSelection: null,
     });
@@ -1452,6 +1462,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameOver: false,
       winner: null,
       playerDisplayNames: { player1: 'Player 1', player2: 'Player 2' },
+      replayInitialState: null,
       animationQueue: [],
       isAnimating: false,
       pendingTargetSelection: null,

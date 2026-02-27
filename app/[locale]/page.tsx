@@ -289,7 +289,7 @@ export default function Home() {
                 transition={{ duration: 0.3, delay: 1.35, ease: 'easeOut' }}
               >
                 <Link
-                  href="/admin/cards"
+                  href="/admin/settings"
                   className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                   style={{
                     backgroundColor: '#141414',
@@ -313,7 +313,7 @@ export default function Home() {
                     className="absolute left-0 top-0 h-full w-1 transition-all"
                     style={{ backgroundColor: '#ef4444' }}
                   />
-                  {t('adminCards')}
+                  {t('admin')}
                 </Link>
               </motion.div>
             )}

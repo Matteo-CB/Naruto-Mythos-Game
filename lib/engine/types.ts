@@ -143,6 +143,8 @@ export interface GameState {
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).
    *  Key = player who pays MORE. Reset at start of each turn. */
   playCostIncrease?: { player1: number; player2: number };
+  /** Ordered history of all actions applied during the game (for replay). */
+  actionHistory?: Array<{ player: PlayerID; action: GameAction }>;
 }
 
 export interface GameLogEntry {

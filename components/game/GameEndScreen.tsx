@@ -21,6 +21,7 @@ export function GameEndScreen() {
   const gameState = useGameStore((s) => s.gameState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const resetGame = useGameStore((s) => s.resetGame);
+  const replayInitialState = useGameStore((s) => s.replayInitialState);
   const gameResult = useSocketStore((s) => s.gameResult);
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
@@ -43,6 +44,9 @@ export function GameEndScreen() {
             rankBonus: m.rankBonus,
             wonBy: m.wonBy ?? null,
           })),
+          // Visual replay data
+          initialState: replayInitialState,
+          actionHistory: gameState.actionHistory ?? [],
         };
 
         const aiDifficulty = gameState.player2.isAI
@@ -93,7 +97,7 @@ export function GameEndScreen() {
       // Allow retry after error
       setTimeout(() => setSaveState('idle'), 2000);
     }
-  }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id]);
+  }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id, replayInitialState]);
 
   if (!gameOver || !visibleState) return null;
 
