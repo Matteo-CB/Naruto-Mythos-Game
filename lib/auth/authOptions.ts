@@ -219,7 +219,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -231,12 +231,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.name = user.name;
       }
 
+      // Refresh discordId from DB on sign-in or session update
+      if (token.id && (trigger === 'signIn' || trigger === 'update' || !('discordId' in token))) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { discordId: true },
+          });
+          token.discordId = dbUser?.discordId ?? null;
+        } catch {
+          // Keep existing value on error
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.name = token.name as string;
+        (session.user as unknown as Record<string, unknown>).discordId = token.discordId as string | null;
       }
       return session;
     },

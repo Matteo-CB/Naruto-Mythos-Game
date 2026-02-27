@@ -48,13 +48,15 @@ export default function ProfilePage({
   const { username } = use(params);
   const t = useTranslations('profile');
   const tc = useTranslations('common');
-  const { data: session } = useSession();
+  const td = useTranslations('discord');
+  const { data: session, update: updateSession } = useSession();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
+  const [unlinking, setUnlinking] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -164,7 +166,7 @@ export default function ProfilePage({
         </div>
 
         {/* Discord indicator */}
-        {profile.discordUsername && (
+        {profile.discordUsername ? (
           <div
             className="flex items-center gap-2 mb-4 px-3 py-2 rounded"
             style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -175,7 +177,47 @@ export default function ProfilePage({
             <span className="text-xs" style={{ color: '#5865F2' }}>
               {profile.discordUsername}
             </span>
+            {session?.user?.id === profile.id && (
+              <button
+                onClick={async () => {
+                  setUnlinking(true);
+                  try {
+                    const res = await fetch('/api/user/unlink-discord', { method: 'POST' });
+                    if (res.ok) {
+                      setProfile((prev) => prev ? { ...prev, discordUsername: null } : prev);
+                      updateSession();
+                    }
+                  } catch { /* ignore */ }
+                  setUnlinking(false);
+                }}
+                disabled={unlinking}
+                className="ml-auto text-[10px] px-2 py-0.5 rounded transition-colors"
+                style={{
+                  backgroundColor: '#1a1a1a',
+                  border: '1px solid #333',
+                  color: '#888',
+                  opacity: unlinking ? 0.5 : 1,
+                }}
+              >
+                {td('unlinkDiscord')}
+              </button>
+            )}
           </div>
+        ) : session?.user?.id === profile.id && (
+          <a
+            href="/api/user/link-discord"
+            className="flex items-center justify-center gap-2 mb-4 px-3 py-2 rounded transition-colors"
+            style={{
+              backgroundColor: '#141414',
+              border: '1px solid #5865F2',
+              color: '#5865F2',
+            }}
+          >
+            <svg width="16" height="12" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60.1 4.9A58.5 58.5 0 0045.4.2a.2.2 0 00-.2.1 40.8 40.8 0 00-1.8 3.7 54 54 0 00-16.2 0A37.3 37.3 0 0025.4.3a.2.2 0 00-.2-.1 58.4 58.4 0 00-14.7 4.6.2.2 0 00-.1.1C1.5 18.7-.9 32.2.3 45.5v.1a58.8 58.8 0 0017.9 9.1.2.2 0 00.3-.1 42 42 0 003.6-5.9.2.2 0 00-.1-.3 38.8 38.8 0 01-5.5-2.7.2.2 0 01 0-.4l1.1-.9a.2.2 0 01.2 0 42 42 0 0035.8 0 .2.2 0 01.2 0l1.1.9a.2.2 0 010 .4 36.4 36.4 0 01-5.5 2.7.2.2 0 00-.1.3 47.2 47.2 0 003.6 5.9.2.2 0 00.3.1A58.6 58.6 0 0070.7 45.6v-.1c1.4-15-2.3-28-9.8-39.5a.2.2 0 00-.1-.1zM23.7 37.3c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7zm22.9 0c-3.4 0-6.2-3.1-6.2-7s2.7-7 6.2-7 6.3 3.2 6.2 7-2.8 7-6.2 7z" fill="#5865F2"/>
+            </svg>
+            <span className="text-xs font-medium">{td('linkDiscord')}</span>
+          </a>
         )}
 
         {/* ELO Badge and Stats */}
