@@ -36,6 +36,7 @@
     "friends": "Friends",
     "betaBanner": "We are in testing phase. Some cards may be missing and some effects may not work! You can help us by joining our Discord and reporting bugs in the dedicated channel.",
     "adminCards": "Card Management",
+    "admin": "Administration",
     "signOut": "Sign Out"
   },
   "game": {
@@ -665,7 +666,15 @@
     "missionLost": "Lost",
     "aiGame": "vs AI ({difficulty})",
     "onlineGame": "Online Match",
-    "back": "Back"
+    "back": "Back",
+    "start": "Start",
+    "end": "End",
+    "stepBack": "Step Back",
+    "stepForward": "Step Forward",
+    "step": "Step {current} / {total}",
+    "noVisualData": "Visual replay not available for this game",
+    "visualReplay": "Visual Replay",
+    "textLog": "Text Log"
   },
   "auth": {
     "signIn": "Sign In",

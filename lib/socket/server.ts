@@ -7,6 +7,7 @@ import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { deepClone } from '@/lib/engine/utils/deepClone';
 
 interface RoomData {
   code: string;
@@ -26,6 +27,8 @@ interface RoomData {
   actionTimer: ReturnType<typeof setTimeout> | null;
   timerDeadline: number | null;
   disconnectTimer: ReturnType<typeof setTimeout> | null;
+  // Replay
+  replayInitialState: GameState | null;
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -191,6 +194,9 @@ async function finalizeGameEnd(
       rankBonus: m.rankBonus,
       wonBy: m.wonBy ?? null,
     })),
+    // Visual replay data
+    initialState: room.replayInitialState,
+    actionHistory: room.gameState.actionHistory ?? [],
   } : null;
 
   if (room.hostSocket) {
@@ -363,6 +369,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         actionTimer: null,
         timerDeadline: null,
         disconnectTimer: null,
+        replayInitialState: null,
       };
 
       rooms.set(code, room);
@@ -453,6 +460,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
 
         room.gameState = GameEngine.createGame(config);
+        // Save initial state for replay (before any mulligans)
+        room.replayInitialState = deepClone(room.gameState);
+        delete room.replayInitialState.actionHistory;
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
 
@@ -740,6 +750,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           actionTimer: null,
           timerDeadline: null,
           disconnectTimer: null,
+          replayInitialState: null,
         };
 
         rooms.set(code, room);

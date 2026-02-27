@@ -36,6 +36,7 @@
     "friends": "Amis",
     "betaBanner": "Nous sommes en phase de test. Des cartes peuvent manquer et des effets peuvent ne pas \u00eatre fonctionnels ! Vous pouvez nous aider en rejoignant le Discord et en communiquant les bugs dans le salon d\u00e9di\u00e9.",
     "adminCards": "Gestion des Cartes",
+    "admin": "Administration",
     "signOut": "Se deconnecter"
   },
   "game": {
@@ -665,7 +666,15 @@
     "missionLost": "Perdue",
     "aiGame": "vs IA ({difficulty})",
     "onlineGame": "Match en Ligne",
-    "back": "Retour"
+    "back": "Retour",
+    "start": "Debut",
+    "end": "Fin",
+    "stepBack": "Reculer",
+    "stepForward": "Avancer",
+    "step": "Etape {current} / {total}",
+    "noVisualData": "Replay visuel non disponible pour cette partie",
+    "visualReplay": "Replay Visuel",
+    "textLog": "Journal Texte"
   },
   "auth": {
     "signIn": "Se Connecter",

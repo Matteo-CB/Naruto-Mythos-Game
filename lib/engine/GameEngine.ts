@@ -110,6 +110,7 @@ export class GameEngine {
       turnMissionRevealed: false,
       missionScoredThisTurn: false,
       consecutiveTimeouts: { player1: 0, player2: 0 },
+      actionHistory: [],
     };
 
     return {
@@ -125,6 +126,10 @@ export class GameEngine {
    */
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
     let newState = deepClone(state);
+
+    // Track action for replay
+    if (!newState.actionHistory) newState.actionHistory = [];
+    newState.actionHistory.push({ player, action });
 
     // FORFEIT can happen in any phase — handle before the phase switch
     if (action.type === 'FORFEIT') {

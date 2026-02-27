@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, use } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, use } from 'react';
 import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import type { GamePhase } from '@/lib/engine/types';
+import { ReplayBoard } from '@/components/replay/ReplayBoard';
+import { PlaybackControls } from '@/components/replay/PlaybackControls';
+import { GameEngine } from '@/lib/engine/GameEngine';
+import type { GameState, GamePhase, GameAction, PlayerID } from '@/lib/engine/types';
 
 interface ReplayLogEntry {
   turn: number;
@@ -44,6 +48,9 @@ interface GameData {
     log: ReplayLogEntry[];
     playerNames: { player1: string; player2: string };
     finalMissions?: MissionResult[];
+    // Visual replay data (new games only)
+    initialState?: GameState;
+    actionHistory?: Array<{ player: PlayerID; action: GameAction }>;
   } | null;
 }
 
@@ -57,14 +64,280 @@ const phaseTranslationKeys: Record<string, string> = {
   gameOver: 'game.phase.gameOver',
 };
 
-const SPEEDS = { slow: 1500, normal: 800, fast: 300 };
-
 function formatTimestamp(ts: number): string {
   const date = new Date(ts);
   const mins = date.getMinutes().toString().padStart(2, '0');
   const secs = date.getSeconds().toString().padStart(2, '0');
   return `${mins}:${secs}`;
 }
+
+// ----- Text Timeline Component (fallback for old games) -----
+
+function TextTimeline({
+  log,
+  playerNames,
+}: {
+  log: ReplayLogEntry[];
+  playerNames: { player1: string; player2: string };
+}) {
+  const t = useTranslations();
+  const tr = useTranslations('replay');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [selectedTurn, setSelectedTurn] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
+  const [visibleCount, setVisibleCount] = useState(log.length);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const SPEEDS = { slow: 1500, normal: 800, fast: 300 };
+
+  const filteredLog = selectedTurn === null ? log : log.filter((e) => e.turn === selectedTurn);
+  const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
+
+  const stopAutoPlay = useCallback(() => {
+    setIsPlaying(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setVisibleCount((prev) => {
+          if (prev >= filteredLog.length) { stopAutoPlay(); return filteredLog.length; }
+          return prev + 1;
+        });
+      }, SPEEDS[speed]);
+    }
+    return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
+  }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
+
+  useEffect(() => {
+    if (scrollRef.current && isPlaying) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [visibleCount, isPlaying]);
+
+  useEffect(() => { setVisibleCount(filteredLog.length); stopAutoPlay(); }, [selectedTurn, filteredLog.length, stopAutoPlay]);
+
+  const formatPhase = (phase: GamePhase): string => {
+    const key = phaseTranslationKeys[phase];
+    return key ? t(key) : phase;
+  };
+
+  const displayEntries = filteredLog.slice(0, visibleCount);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
+          {tr('eventTimeline')}
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
+            className="px-3 py-1 text-xs rounded cursor-pointer"
+            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: isPlaying ? '#b33e3e' : '#4a9e4a' }}
+          >
+            {isPlaying ? tr('pause') : tr('autoPlay')}
+          </button>
+          <select
+            value={speed}
+            onChange={(e) => setSpeed(e.target.value as 'slow' | 'normal' | 'fast')}
+            className="text-xs rounded px-2 py-1 cursor-pointer"
+            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888888' }}
+          >
+            <option value="slow">{tr('slow')}</option>
+            <option value="normal">{tr('normal')}</option>
+            <option value="fast">{tr('fast')}</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex gap-1 mb-3 flex-wrap">
+        <button
+          onClick={() => setSelectedTurn(null)}
+          className="px-3 py-1 text-xs rounded cursor-pointer"
+          style={{
+            backgroundColor: selectedTurn === null ? '#c4a35a' : '#1a1a2e',
+            color: selectedTurn === null ? '#0a0a0a' : '#888888',
+            border: `1px solid ${selectedTurn === null ? '#c4a35a' : '#333'}`,
+          }}
+        >
+          {tr('allTurns')}
+        </button>
+        {turns.map((turn) => (
+          <button
+            key={turn}
+            onClick={() => setSelectedTurn(turn)}
+            className="px-3 py-1 text-xs rounded cursor-pointer"
+            style={{
+              backgroundColor: selectedTurn === turn ? '#c4a35a' : '#1a1a2e',
+              color: selectedTurn === turn ? '#0a0a0a' : '#888888',
+              border: `1px solid ${selectedTurn === turn ? '#c4a35a' : '#333'}`,
+            }}
+          >
+            {tr('turnLabel', { turn })}
+          </button>
+        ))}
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="rounded-lg overflow-y-auto"
+        style={{ backgroundColor: '#0e0e12', border: '1px solid #262626', maxHeight: '500px' }}
+      >
+        {displayEntries.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <span className="text-sm" style={{ color: '#555555' }}>{tr('noLog')}</span>
+          </div>
+        ) : (
+          displayEntries.map((entry, i) => {
+            const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
+            const displayName = entry.player ? playerNames[entry.player] : null;
+            return (
+              <div
+                key={`${entry.timestamp}-${i}`}
+                className="flex items-start gap-2 px-3 py-1.5 text-xs"
+                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
+              >
+                <span className="shrink-0 tabular-nums" style={{ color: '#555555' }}>{formatTimestamp(entry.timestamp)}</span>
+                <span className="shrink-0 rounded px-1 py-0.5 text-[10px] uppercase font-medium" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#777777' }}>
+                  T{entry.turn} {formatPhase(entry.phase)}
+                </span>
+                {entry.player && <span className="shrink-0 font-medium" style={{ color: playerColor }}>{displayName}</span>}
+                <span style={{ color: '#e0e0e0' }}>
+                  {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
+                </span>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ----- Visual Replay Component -----
+
+function VisualReplay({
+  initialState,
+  actionHistory,
+  log,
+  playerNames,
+}: {
+  initialState: GameState;
+  actionHistory: Array<{ player: PlayerID; action: GameAction }>;
+  log: ReplayLogEntry[];
+  playerNames: { player1: string; player2: string };
+}) {
+  const tr = useTranslations('replay');
+  const t = useTranslations();
+  const locale = useLocale() as 'en' | 'fr';
+  const [currentStep, setCurrentStep] = useState(0);
+  const [showLog, setShowLog] = useState(false);
+
+  // Pre-compute all game states from initial state + action history
+  const states = useMemo(() => {
+    const result: GameState[] = [initialState];
+    let current = initialState;
+    for (const { player, action } of actionHistory) {
+      try {
+        current = GameEngine.applyAction(current, player, action);
+        result.push(current);
+      } catch (err) {
+        console.error('[Replay] Error applying action:', err);
+        break;
+      }
+    }
+    return result;
+  }, [initialState, actionHistory]);
+
+  // Compute turn start indices for quick navigation
+  const turnStarts = useMemo(() => {
+    const starts: Array<{ turn: number; step: number }> = [];
+    const seenTurns = new Set<number>();
+    for (let i = 0; i < states.length; i++) {
+      const turn = states[i].turn;
+      if (!seenTurns.has(turn)) {
+        seenTurns.add(turn);
+        starts.push({ turn, step: i });
+      }
+    }
+    return starts;
+  }, [states]);
+
+  // Build action label from the log entry closest to this step
+  const actionLabel = useMemo(() => {
+    const state = states[currentStep];
+    if (!state) return '';
+    // Find the log entry that was added at this step
+    // The log grows as actions are applied; compare log lengths
+    if (currentStep === 0) return tr('start');
+    const prevLogLen = states[currentStep - 1]?.log?.length ?? 0;
+    const curLogLen = state.log?.length ?? 0;
+    if (curLogLen > prevLogLen) {
+      const newEntry = state.log[prevLogLen];
+      if (newEntry) {
+        if (newEntry.messageKey) {
+          try { return t(newEntry.messageKey, newEntry.messageParams ?? {}); } catch { /* fallback */ }
+        }
+        return newEntry.details || newEntry.action;
+      }
+    }
+    return '';
+  }, [currentStep, states, t, tr]);
+
+  const handleStepChange = useCallback((step: number) => {
+    if (step === -1) {
+      // Advance by one (used by auto-play)
+      setCurrentStep((prev) => Math.min(states.length - 1, prev + 1));
+    } else {
+      setCurrentStep(Math.max(0, Math.min(states.length - 1, step)));
+    }
+  }, [states.length]);
+
+  const currentState = states[currentStep];
+  if (!currentState) return null;
+
+  return (
+    <div>
+      {/* Visual board */}
+      <div className="mb-4">
+        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} />
+      </div>
+
+      {/* Playback controls */}
+      <div className="mb-4">
+        <PlaybackControls
+          currentStep={currentStep}
+          totalSteps={states.length}
+          onStepChange={handleStepChange}
+          turnStarts={turnStarts}
+          actionLabel={actionLabel}
+        />
+      </div>
+
+      {/* Toggle log */}
+      <div>
+        <button
+          onClick={() => setShowLog(!showLog)}
+          className="px-3 py-1.5 text-xs rounded cursor-pointer mb-3"
+          style={{
+            backgroundColor: showLog ? '#c4a35a' : '#1a1a2e',
+            color: showLog ? '#0a0a0a' : '#888',
+            border: `1px solid ${showLog ? '#c4a35a' : '#333'}`,
+          }}
+        >
+          {tr('eventTimeline')}
+        </button>
+        {showLog && <TextTimeline log={log} playerNames={playerNames} />}
+      </div>
+    </div>
+  );
+}
+
+// ----- Main Page -----
 
 export default function ReplayPage({
   params,
@@ -79,14 +352,6 @@ export default function ReplayPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [selectedTurn, setSelectedTurn] = useState<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
-  const [visibleCount, setVisibleCount] = useState(0);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
   useEffect(() => {
     fetch(`/api/game/${id}`)
       .then((res) => {
@@ -96,81 +361,12 @@ export default function ReplayPage({
       .then((data: GameData) => {
         setGame(data);
         setLoading(false);
-        // Show all entries initially
-        if (data.gameState?.log) {
-          setVisibleCount(data.gameState.log.length);
-        }
       })
       .catch(() => {
         setError(tr('notFound'));
         setLoading(false);
       });
   }, [id, tr]);
-
-  const log = game?.gameState?.log ?? [];
-  const playerNames = game?.gameState?.playerNames ?? { player1: 'Player 1', player2: 'Player 2' };
-  const missions = game?.gameState?.finalMissions ?? [];
-
-  // Filter log by turn
-  const filteredLog = selectedTurn === null
-    ? log
-    : log.filter((e) => e.turn === selectedTurn);
-
-  // Get unique turns
-  const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
-
-  // Auto-play logic
-  const startAutoPlay = useCallback(() => {
-    setVisibleCount(0);
-    setIsPlaying(true);
-  }, []);
-
-  const stopAutoPlay = useCallback(() => {
-    setIsPlaying(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setVisibleCount((prev) => {
-          const max = filteredLog.length;
-          if (prev >= max) {
-            stopAutoPlay();
-            return max;
-          }
-          return prev + 1;
-        });
-      }, SPEEDS[speed]);
-    }
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
-
-  // Auto-scroll during playback
-  useEffect(() => {
-    if (scrollRef.current && isPlaying) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [visibleCount, isPlaying]);
-
-  // Reset visible count when filter changes
-  useEffect(() => {
-    setVisibleCount(filteredLog.length);
-    stopAutoPlay();
-  }, [selectedTurn, filteredLog.length, stopAutoPlay]);
-
-  const formatPhase = (phase: GamePhase): string => {
-    const key = phaseTranslationKeys[phase];
-    return key ? t(key) : phase;
-  };
 
   if (loading) {
     return (
@@ -198,18 +394,22 @@ export default function ReplayPage({
     );
   }
 
+  const playerNames = game.gameState.playerNames ?? { player1: 'Player 1', player2: 'Player 2' };
   const p1Name = playerNames.player1;
   const p2Name = playerNames.player2;
   const p1Won = game.winnerId === game.player1Id;
+  const missions = game.gameState.finalMissions ?? [];
+  const log = game.gameState.log ?? [];
 
-  const displayEntries = filteredLog.slice(0, visibleCount);
+  // Determine if visual replay is available
+  const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
   return (
     <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <DecorativeIcons />
 
-      <div className="max-w-3xl mx-auto relative z-10 flex-1 px-4 py-6 w-full">
+      <div className="max-w-4xl mx-auto relative z-10 flex-1 px-4 py-6 w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -227,62 +427,40 @@ export default function ReplayPage({
             <Link
               href="/"
               className="px-4 py-2 text-sm"
-              style={{
-                backgroundColor: '#141414',
-                border: '1px solid #262626',
-                color: '#888888',
-              }}
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
             >
               {tr('back')}
             </Link>
           </div>
         </div>
 
-        {/* Match Summary Card */}
+        {/* Match Summary */}
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
         >
-          {/* Players + Score */}
           <div className="flex items-center justify-center gap-6 mb-4">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-sm font-medium" style={{ color: p1Won ? '#c4a35a' : '#e0e0e0' }}>
-                {p1Name}
-              </span>
-              <span className="text-3xl font-bold tabular-nums" style={{ color: '#c4a35a' }}>
-                {game.player1Score}
-              </span>
+              <span className="text-sm font-medium" style={{ color: p1Won ? '#c4a35a' : '#e0e0e0' }}>{p1Name}</span>
+              <span className="text-3xl font-bold tabular-nums" style={{ color: '#c4a35a' }}>{game.player1Score}</span>
             </div>
-            <span className="text-lg font-bold" style={{ color: '#333333' }}>
-              {tr('vsLabel')}
-            </span>
+            <span className="text-lg font-bold" style={{ color: '#333333' }}>{tr('vsLabel')}</span>
             <div className="flex flex-col items-center gap-1">
-              <span className="text-sm font-medium" style={{ color: !p1Won ? '#c4a35a' : '#e0e0e0' }}>
-                {p2Name}
-              </span>
-              <span className="text-3xl font-bold tabular-nums" style={{ color: '#b33e3e' }}>
-                {game.player2Score}
-              </span>
+              <span className="text-sm font-medium" style={{ color: !p1Won ? '#c4a35a' : '#e0e0e0' }}>{p2Name}</span>
+              <span className="text-3xl font-bold tabular-nums" style={{ color: '#b33e3e' }}>{game.player2Score}</span>
             </div>
           </div>
-
-          {/* Game type */}
           <div className="flex justify-center">
             <span className="text-xs" style={{ color: '#555555' }}>
-              {game.isAiGame
-                ? tr('aiGame', { difficulty: game.aiDifficulty ?? 'medium' })
-                : tr('onlineGame')}
+              {game.isAiGame ? tr('aiGame', { difficulty: game.aiDifficulty ?? 'medium' }) : tr('onlineGame')}
             </span>
           </div>
         </div>
 
-        {/* Mission Results */}
+        {/* Mission Results (for all games) */}
         {missions.length > 0 && (
           <div className="mb-6">
-            <h2
-              className="text-sm font-bold uppercase tracking-wider mb-3"
-              style={{ color: '#888888' }}
-            >
+            <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#888888' }}>
               {tr('missionSummary')}
             </h2>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -295,17 +473,12 @@ export default function ReplayPage({
                     border: `1px solid ${mission.wonBy ? (mission.wonBy === 'player1' ? '#c4a35a30' : '#b33e3e30') : '#262626'}`,
                   }}
                 >
-                  <p className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>
-                    {mission.name_fr}
-                  </p>
+                  <p className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>{mission.name_fr}</p>
                   <p className="text-[10px] mt-1" style={{ color: '#555555' }}>
                     {tr('rank', { rank: mission.rank })} - {tr('points', { points: mission.basePoints + mission.rankBonus })}
                   </p>
                   {mission.wonBy && (
-                    <p
-                      className="text-[10px] font-medium mt-1"
-                      style={{ color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e' }}
-                    >
+                    <p className="text-[10px] font-medium mt-1" style={{ color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e' }}>
                       {playerNames[mission.wonBy]}
                     </p>
                   )}
@@ -315,130 +488,17 @@ export default function ReplayPage({
           </div>
         )}
 
-        {/* Event Timeline */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2
-              className="text-sm font-bold uppercase tracking-wider"
-              style={{ color: '#888888' }}
-            >
-              {tr('eventTimeline')}
-            </h2>
-
-            {/* Auto-play controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={isPlaying ? stopAutoPlay : startAutoPlay}
-                className="px-3 py-1 text-xs rounded cursor-pointer"
-                style={{
-                  backgroundColor: '#1a1a2e',
-                  border: '1px solid #333',
-                  color: isPlaying ? '#b33e3e' : '#4a9e4a',
-                }}
-              >
-                {isPlaying ? tr('pause') : tr('autoPlay')}
-              </button>
-              <select
-                value={speed}
-                onChange={(e) => setSpeed(e.target.value as 'slow' | 'normal' | 'fast')}
-                className="text-xs rounded px-2 py-1 cursor-pointer"
-                style={{
-                  backgroundColor: '#1a1a2e',
-                  border: '1px solid #333',
-                  color: '#888888',
-                }}
-              >
-                <option value="slow">{tr('slow')}</option>
-                <option value="normal">{tr('normal')}</option>
-                <option value="fast">{tr('fast')}</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Turn filter tabs */}
-          <div className="flex gap-1 mb-3 flex-wrap">
-            <button
-              onClick={() => setSelectedTurn(null)}
-              className="px-3 py-1 text-xs rounded cursor-pointer"
-              style={{
-                backgroundColor: selectedTurn === null ? '#c4a35a' : '#1a1a2e',
-                color: selectedTurn === null ? '#0a0a0a' : '#888888',
-                border: `1px solid ${selectedTurn === null ? '#c4a35a' : '#333'}`,
-              }}
-            >
-              {tr('allTurns')}
-            </button>
-            {turns.map((turn) => (
-              <button
-                key={turn}
-                onClick={() => setSelectedTurn(turn)}
-                className="px-3 py-1 text-xs rounded cursor-pointer"
-                style={{
-                  backgroundColor: selectedTurn === turn ? '#c4a35a' : '#1a1a2e',
-                  color: selectedTurn === turn ? '#0a0a0a' : '#888888',
-                  border: `1px solid ${selectedTurn === turn ? '#c4a35a' : '#333'}`,
-                }}
-              >
-                {tr('turnLabel', { turn })}
-              </button>
-            ))}
-          </div>
-
-          {/* Log entries */}
-          <div
-            ref={scrollRef}
-            className="rounded-lg overflow-y-auto"
-            style={{
-              backgroundColor: '#0e0e12',
-              border: '1px solid #262626',
-              maxHeight: '500px',
-            }}
-          >
-            {displayEntries.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <span className="text-sm" style={{ color: '#555555' }}>
-                  {tr('noLog')}
-                </span>
-              </div>
-            ) : (
-              displayEntries.map((entry, i) => {
-                const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
-                const displayName = entry.player ? playerNames[entry.player] : null;
-
-                return (
-                  <div
-                    key={`${entry.timestamp}-${i}`}
-                    className="flex items-start gap-2 px-3 py-1.5 text-xs"
-                    style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
-                  >
-                    <span className="shrink-0 tabular-nums" style={{ color: '#555555' }}>
-                      {formatTimestamp(entry.timestamp)}
-                    </span>
-                    <span
-                      className="shrink-0 rounded px-1 py-0.5 text-[10px] uppercase font-medium"
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                        color: '#777777',
-                      }}
-                    >
-                      T{entry.turn} {formatPhase(entry.phase)}
-                    </span>
-                    {entry.player && (
-                      <span className="shrink-0 font-medium" style={{ color: playerColor }}>
-                        {displayName}
-                      </span>
-                    )}
-                    <span style={{ color: '#e0e0e0' }}>
-                      {entry.messageKey
-                        ? t(entry.messageKey, entry.messageParams ?? {})
-                        : (entry.details || entry.action)}
-                    </span>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
+        {/* Visual Replay or Text-only fallback */}
+        {hasVisualReplay ? (
+          <VisualReplay
+            initialState={game.gameState.initialState!}
+            actionHistory={game.gameState.actionHistory!}
+            log={log}
+            playerNames={playerNames}
+          />
+        ) : (
+          <TextTimeline log={log} playerNames={playerNames} />
+        )}
       </div>
     </main>
   );
