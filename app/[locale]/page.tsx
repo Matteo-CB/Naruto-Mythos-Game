@@ -83,6 +83,7 @@ export default function Home() {
   const td = useTranslations('discord');
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
+  const [canAccessDraft, setCanAccessDraft] = useState(false);
   const [featuredCard] = useState(() =>
     FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
   );
@@ -90,6 +91,16 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Check draft access
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/draft/access')
+        .then((res) => res.json())
+        .then((data) => setCanAccessDraft(data.canAccess === true))
+        .catch(() => setCanAccessDraft(false));
+    }
+  }, [session?.user]);
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
@@ -279,6 +290,44 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ))}
+              {/* Draft button (only visible if user has access) */}
+              {canAccessDraft && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 1.3, ease: 'easeOut' }}
+                >
+                  <Link
+                    href="/play/draft"
+                    className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                    style={{
+                      backgroundColor: '#141414',
+                      border: '1px solid #c4a35a',
+                      color: '#c4a35a',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1.03)';
+                      target.style.borderColor = '#c4a35a';
+                      target.style.boxShadow = '0 0 20px rgba(196, 163, 90, 0.15)';
+                      target.style.backgroundColor = '#1a1a1a';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1)';
+                      target.style.borderColor = '#c4a35a';
+                      target.style.boxShadow = 'none';
+                      target.style.backgroundColor = '#141414';
+                    }}
+                  >
+                    <span
+                      className="absolute left-0 top-0 h-full w-1"
+                      style={{ backgroundColor: '#c4a35a' }}
+                    />
+                    {t('draft')}
+                  </Link>
+                </motion.div>
+              )}
             </motion.nav>
 
             {/* Admin links (only visible to admin) */}

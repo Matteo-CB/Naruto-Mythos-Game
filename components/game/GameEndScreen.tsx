@@ -22,10 +22,14 @@ export function GameEndScreen() {
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const resetGame = useGameStore((s) => s.resetGame);
   const replayInitialState = useGameStore((s) => s.replayInitialState);
+  const draftDeckCardIds = useGameStore((s) => s.draftDeckCardIds);
+  const draftDeckMissionIds = useGameStore((s) => s.draftDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
+  const [draftDeckName, setDraftDeckName] = useState('');
+  const [draftSaveState, setDraftSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const handleSaveReplay = useCallback(async () => {
     if (saveState === 'saving' || saveState === 'saved') return;
@@ -98,6 +102,34 @@ export function GameEndScreen() {
       setTimeout(() => setSaveState('idle'), 2000);
     }
   }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id, replayInitialState]);
+
+  const handleSaveDraftDeck = useCallback(async () => {
+    if (draftSaveState === 'saving' || draftSaveState === 'saved') return;
+    if (!draftDeckCardIds || !draftDeckMissionIds) return;
+
+    setDraftSaveState('saving');
+    try {
+      const name = draftDeckName.trim() || 'Draft Deck';
+      const res = await fetch('/api/decks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          cardIds: draftDeckCardIds,
+          missionIds: draftDeckMissionIds,
+        }),
+      });
+      if (res.ok) {
+        setDraftSaveState('saved');
+      } else {
+        setDraftSaveState('error');
+        setTimeout(() => setDraftSaveState('idle'), 2000);
+      }
+    } catch {
+      setDraftSaveState('error');
+      setTimeout(() => setDraftSaveState('idle'), 2000);
+    }
+  }, [draftSaveState, draftDeckCardIds, draftDeckMissionIds, draftDeckName]);
 
   if (!gameOver || !visibleState) return null;
 
@@ -341,7 +373,58 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* Play Again button */}
+            {/* Save Draft Deck */}
+            {isLoggedIn && draftDeckCardIds && draftDeckMissionIds && draftSaveState !== 'saved' && (
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                  {t('draft.saveDeck')}
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={draftDeckName}
+                    onChange={(e) => setDraftDeckName(e.target.value)}
+                    placeholder={t('draft.saveDeckPlaceholder')}
+                    className="px-3 py-2 text-sm rounded"
+                    style={{
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #333',
+                      color: '#e0e0e0',
+                      outline: 'none',
+                      width: '200px',
+                    }}
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleSaveDraftDeck}
+                    disabled={draftSaveState === 'saving'}
+                    className="px-4 py-2 rounded text-sm font-medium uppercase tracking-wider cursor-pointer"
+                    style={{
+                      backgroundColor: draftSaveState === 'error' ? '#b33e3e' : '#1a1a2e',
+                      color: draftSaveState === 'error' ? '#ffffff' : '#c4a35a',
+                      border: `1px solid ${draftSaveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
+                      opacity: draftSaveState === 'saving' ? 0.6 : 1,
+                    }}
+                  >
+                    {draftSaveState === 'saving'
+                      ? t('common.loading')
+                      : draftSaveState === 'error'
+                        ? t('draft.deckSaveError')
+                        : t('common.save')}
+                  </motion.button>
+                </div>
+              </div>
+            )}
+
+            {/* Draft deck saved confirmation */}
+            {draftSaveState === 'saved' && (
+              <span className="text-xs" style={{ color: '#4a9e4a' }}>
+                {t('draft.deckSaved')}
+              </span>
+            )}
+
+            {/* Back to Menu button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -354,7 +437,7 @@ export function GameEndScreen() {
                 boxShadow: '0 4px 16px rgba(196, 163, 90, 0.3)',
               }}
             >
-              {t('game.end.playAgain')}
+              {t('game.end.backToMenu')}
             </motion.button>
           </motion.div>
         </motion.div>

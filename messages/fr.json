@@ -37,7 +37,8 @@
     "betaBanner": "Nous sommes en phase de test. Des cartes peuvent manquer et des effets peuvent ne pas \u00eatre fonctionnels ! Vous pouvez nous aider en rejoignant le Discord et en communiquant les bugs dans le salon d\u00e9di\u00e9.",
     "adminCards": "Gestion des Cartes",
     "admin": "Administration",
-    "signOut": "Se deconnecter"
+    "signOut": "Se deconnecter",
+    "draft": "Draft"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -608,6 +609,8 @@
     "title": "Jouer en Ligne",
     "signInRequired": "Vous devez etre connecte pour jouer en ligne.",
     "createRoom": "Creer un Salon",
+    "createRoomDesc": "Creez un salon prive et partagez le code",
+    "connecting": "Connexion...",
     "joinRoom": "Rejoindre un Salon",
     "findMatch": "Trouver un Match",
     "roomCode": "Code du Salon",
@@ -1265,7 +1268,17 @@
       "removed": "Testeur retire",
       "notFound": "Utilisateur introuvable"
     },
-    "actionLog": "Journal d'Actions"
+    "actionLog": "Journal d'Actions",
+    "draft": {
+      "title": "Mode Draft",
+      "description": "Activer ou desactiver le mode Draft pour tous les utilisateurs. Quand desactive, seuls les testeurs et admins peuvent acceder au Draft.",
+      "loading": "Chargement...",
+      "toggling": "Changement...",
+      "enabled": "ACTIVE",
+      "disabled": "DESACTIVE",
+      "enabledDesc": "Tous les utilisateurs peuvent acceder au Draft",
+      "disabledDesc": "Seuls les testeurs et admins peuvent acceder au Draft"
+    }
   },
   "badges": {
     "admin": "ADMIN",
@@ -1331,5 +1344,47 @@
       "Ninja Pig": "Cochon Ninja",
       "Special Jonin": "Jônin Spécial"
     }
+  },
+  "draft": {
+    "title": "Mode Draft",
+    "description": "Ouvrez 6 boosters, construisez un deck avec les cartes obtenues, puis combattez !",
+    "vsAI": "Draft vs IA",
+    "vsAIDesc": "Ouvrez des boosters et construisez un deck pour affronter l'IA",
+    "online": "Draft en Ligne",
+    "onlineDesc": "Draft contre un autre joueur en ligne (non classe)",
+    "waitingBoosters": "Generation des boosters...",
+    "waitingOpponent": "En attente de l'adversaire...",
+    "openBooster": "Appuyez pour ouvrir",
+    "boosterCount": "Booster {current}/{total}",
+    "cardsCollected": "Cartes Collectees",
+    "cards": "cartes",
+    "buildDeck": "Construisez votre Deck",
+    "yourDeck": "Votre Deck",
+    "characters": "Personnages",
+    "missionsLabel": "Missions",
+    "searchCards": "Rechercher...",
+    "filterAll": "Tout",
+    "allGroups": "Tous les Groupes",
+    "selectAllBtn": "Tout Selectionner",
+    "clearAllBtn": "Effacer",
+    "deckReady": "Deck Pret !",
+    "startGame": "Lancer la Partie",
+    "submitted": "Soumis",
+    "restricted": "Le mode Draft est en phase de test",
+    "timeRemaining": "{minutes}:{seconds}",
+    "timeWarning": "5 min restantes !",
+    "timeCritical": "1 min restante !",
+    "timeExpired": "Temps ecoule !",
+    "autoSubmitted": "Deck soumis automatiquement",
+    "validation": {
+      "minChars": "{count}/{min} personnages (minimum {min})",
+      "missions": "{count}/{required} missions (besoin de {required})",
+      "maxCopies": "Trop de copies de {version} : {count}/{max}"
+    },
+    "saveDeck": "Sauvegarder le Deck Draft",
+    "saveDeckName": "Nom du deck",
+    "saveDeckPlaceholder": "Mon Deck Draft",
+    "deckSaved": "Deck sauvegarde !",
+    "deckSaveError": "Erreur lors de la sauvegarde"
   }
 }
