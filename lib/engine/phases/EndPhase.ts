@@ -96,8 +96,13 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
 
           // Summon return: "At the end of the round, you must return this character to your hand"
           // Also matches "take back this character in hand" (Doki 066 variant)
+          // Exclude CONDITIONAL returns like Akamaru 027 ("If there isn't a Kiba Inuzuka...")
           const descLower = effect.description.toLowerCase();
-          if (descLower.includes('end of the round') && (descLower.includes('return this character') || descLower.includes('take back this character'))) {
+          if (
+            descLower.includes('end of the round') &&
+            (descLower.includes('return this character') || descLower.includes('take back this character')) &&
+            !descLower.includes('if there')
+          ) {
             charsToReturn.push({
               instanceId: char.instanceId,
               player: char.controlledBy,

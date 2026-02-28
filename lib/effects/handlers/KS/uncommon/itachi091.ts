@@ -7,9 +7,9 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 5 | Power: 5
  * Group: Akatsuki | Keywords: Rogue Ninja, Kekkei Genkai
  *
- * MAIN: Look at a random card in the opponent's hand.
+ * MAIN: Look at all cards in the opponent's hand. (Mandatory)
  *
- * UPGRADE: MAIN effect: In addition, the opponent discards that card and draws a card.
+ * UPGRADE: MAIN effect: In addition, the opponent discards a random card and draws a card.
  */
 
 function handleItachi091Main(ctx: EffectContext): EffectResult {
@@ -28,6 +28,16 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Capture ALL hand cards BEFORE any mutation (for the full-hand reveal)
+  const allCardsBefore = opponentHand.map((c, i) => ({
+    name_fr: c.name_fr,
+    chakra: c.chakra ?? 0,
+    power: c.power ?? 0,
+    image_file: c.image_file,
+    isDiscarded: false,
+    originalIndex: i,
+  }));
+
   // Pick a deterministic "random" card from opponent's hand
   // Use actionHistory length as a seed so replays produce the same result
   const seed = (state.actionHistory?.length ?? 0) + opponentHand.length + state.turn;
@@ -36,7 +46,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
 
   let newState = { ...state };
 
-  // If UPGRADE: discard the revealed card and draw a replacement
+  // If UPGRADE: discard the revealed card and draw a replacement (before showing the reveal)
   if (isUpgrade) {
     const oppState = { ...newState[opponentPlayer] };
     const hand = [...oppState.hand];
@@ -58,25 +68,28 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
       log: logAction(
         newState.log, newState.turn, newState.phase, sourcePlayer,
         'EFFECT_LOOK_HAND',
-        `Itachi Uchiwa (091): Revealed ${revealedCard.name_fr} from opponent's hand. Discarded and opponent draws 1 (upgrade).`,
+        `Itachi Uchiwa (091): Revealed opponent's hand. Discarded ${revealedCard.name_fr} (upgrade).`,
         'game.log.effect.itachi091RevealUpgrade',
         { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: revealedCard.name_fr },
       ),
     };
+
+    // Mark the discarded card in the allCards list
+    allCardsBefore[randomIndex].isDiscarded = true;
   } else {
     newState = {
       ...newState,
       log: logAction(
         newState.log, newState.turn, newState.phase, sourcePlayer,
         'EFFECT_LOOK_HAND',
-        `Itachi Uchiwa (091): Revealed ${revealedCard.name_fr} from opponent's hand.`,
+        'Itachi Uchiwa (091): Revealed all cards in opponent\'s hand.',
         'game.log.effect.itachi091Reveal',
-        { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: revealedCard.name_fr },
+        { card: 'ITACHI UCHIWA', id: 'KS-091-UC' },
       ),
     };
   }
 
-  // Show the revealed card to the player via INFO_REVEAL
+  // Show all opponent hand cards (with discarded one marked for UPGRADE)
   return {
     state: newState,
     requiresTargetSelection: true,
@@ -84,12 +97,9 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     validTargets: ['confirm'],
     description: JSON.stringify({
       text: isUpgrade
-        ? `Itachi (091): Revealed ${revealedCard.name_fr}. This card has been discarded.`
-        : `Itachi (091): Revealed ${revealedCard.name_fr} from opponent's hand.`,
-      cardName: revealedCard.name_fr,
-      cardCost: revealedCard.chakra,
-      cardPower: revealedCard.power,
-      cardImageFile: revealedCard.image_file,
+        ? `Itachi (091): Opponent's hand revealed. ${revealedCard.name_fr} was discarded (upgrade).`
+        : 'Itachi (091): Opponent\'s hand revealed.',
+      cards: allCardsBefore,
       isUpgrade,
     }),
     descriptionKey: isUpgrade

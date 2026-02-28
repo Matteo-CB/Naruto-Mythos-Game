@@ -277,6 +277,7 @@
       "tayuya065UpgradeRevealNone": "No Summon cards found. Cards put back on top.",
       "tayuya065Summon": "DRAWN (Summon)",
       "tayuya065PutBack": "Put back on top",
+      "cardDiscarded": "DISCARDED",
       "desc": {
         "chooseMissionMove": "Choose a mission to move the character to.",
         "chooseMissionPlaceHidden": "Choose a mission to place the hidden character on.",
@@ -484,6 +485,7 @@
       "invalidMission": "Invalid mission index.",
       "targetNotFound": "Target character not found.",
       "cannotUpgradeOpponent": "Cannot upgrade opponent's character.",
+      "cannotUpgradeHidden": "Cannot upgrade a hidden character.",
       "upgradeSameName": "Upgrade must be same character name.",
       "upgradeHigherCost": "Upgrade must have strictly higher chakra cost. New: {newCost}, Current: {currentCost}.",
       "notEnoughChakraUpgrade": "Not enough chakra. Need {need} (difference), have {have}.",

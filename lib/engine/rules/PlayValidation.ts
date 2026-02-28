@@ -208,6 +208,11 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
+  // Cannot upgrade a hidden character — [⧗] effects require the character to be face-visible
+  if (target.isHidden) {
+    return { valid: false, reason: 'Cannot upgrade a hidden character.', reasonKey: 'game.error.cannotUpgradeHidden' };
+  }
+
   const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
 
   // Check special upgrade rules

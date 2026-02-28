@@ -195,107 +195,58 @@ export class EffectEngine {
     let newState = deepClone(state);
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
 
-    // Resolve MAIN effects
-    const hasMainEffect = (topCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
-    );
-    if (hasMainEffect) {
-      const handler = getEffectHandler(topCard.id, 'MAIN');
-      if (handler) {
-        try {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'MAIN',
-            isUpgrade: true,
-          };
-          const result = handler(ctx);
-
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            // Queue remaining: UPGRADE then AMBUSH
-            const remainingEffectTypes: EffectType[] = [];
-            const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-            if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
-            const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
-            if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
-
-            newState = EffectEngine.createPendingTargetSelection(
-              result.state, player, character, missionIndex, 'MAIN', true,
-              result, remainingEffectTypes,
-            );
-            return newState;
-          }
-          newState = result.state;
-        } catch (err) {
-          console.error(`[EffectEngine] MAIN handler error for ${topCard.id} (reveal-upgrade):`, err);
-        }
+    // Build the ordered list of effect types from the card definition (top-to-bottom).
+    // When revealed as an upgrade, MAIN, AMBUSH, and UPGRADE all trigger — in card order.
+    const relevantTypes = new Set<string>(['MAIN', 'UPGRADE', 'AMBUSH']);
+    const orderedTypes: EffectType[] = [];
+    for (const effect of (topCard.effects ?? [])) {
+      if (relevantTypes.has(effect.type) && !orderedTypes.includes(effect.type as EffectType)) {
+        orderedTypes.push(effect.type as EffectType);
       }
     }
 
-    // Resolve UPGRADE effects
-    const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-    if (hasUpgradeEffect) {
-      const handler = getEffectHandler(topCard.id, 'UPGRADE');
-      if (handler) {
-        try {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'UPGRADE',
-            isUpgrade: true,
-          };
-          const result = handler(ctx);
+    for (let i = 0; i < orderedTypes.length; i++) {
+      const effectType = orderedTypes[i];
 
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            // Queue remaining: AMBUSH
-            const remainingEffectTypes: EffectType[] = [];
-            const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
-            if (hasAmbushEffect) remainingEffectTypes.push('AMBUSH');
-
-            newState = EffectEngine.createPendingTargetSelection(
-              result.state, player, character, missionIndex, 'UPGRADE', true,
-              result, remainingEffectTypes,
-            );
-            return newState;
-          }
-          newState = result.state;
-        } catch (err) {
-          console.error(`[EffectEngine] UPGRADE handler error for ${topCard.id} (reveal-upgrade):`, err);
+      // Check if this effect type is actually present (MAIN has an extra filter for 'effect:' modifiers)
+      const hasEffect = (topCard.effects ?? []).some((e) => {
+        if (e.type !== effectType) return false;
+        if (effectType === 'MAIN') {
+          return !e.description.startsWith('effect:') && !e.description.startsWith('effect.');
         }
-      }
-    }
+        return true;
+      });
+      if (!hasEffect) continue;
 
-    // Resolve AMBUSH effects
-    const hasAmbushEffect = (topCard.effects ?? []).some((e) => e.type === 'AMBUSH');
-    if (hasAmbushEffect) {
-      const handler = getEffectHandler(topCard.id, 'AMBUSH');
-      if (handler) {
-        try {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'AMBUSH',
-            isUpgrade: true,
-          };
-          const result = handler(ctx);
+      const handler = getEffectHandler(topCard.id, effectType);
+      if (!handler) continue;
 
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            newState = EffectEngine.createPendingTargetSelection(
-              result.state, player, character, missionIndex, 'AMBUSH', true,
-              result, [],
-            );
-            return newState;
-          }
-          newState = result.state;
-        } catch (err) {
-          console.error(`[EffectEngine] AMBUSH handler error for ${topCard.id} (reveal-upgrade):`, err);
+      try {
+        const ctx: EffectContext = {
+          state: newState,
+          sourcePlayer: player,
+          sourceCard: character,
+          sourceMissionIndex: missionIndex,
+          triggerType: effectType,
+          isUpgrade: true,
+        };
+        const result = handler(ctx);
+
+        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+          // Queue remaining effect types (those after current position, in card order)
+          const remainingEffectTypes = orderedTypes.slice(i + 1).filter((t) =>
+            (topCard.effects ?? []).some((e) => e.type === t)
+          );
+
+          newState = EffectEngine.createPendingTargetSelection(
+            result.state, player, character, missionIndex, effectType, true,
+            result, remainingEffectTypes,
+          );
+          return newState;
         }
+        newState = result.state;
+      } catch (err) {
+        console.error(`[EffectEngine] ${effectType} handler error for ${topCard.id} (reveal-upgrade):`, err);
       }
     }
 
@@ -3438,12 +3389,12 @@ export class EffectEngine {
         if (cardIndex < 0 || cardIndex >= ps.hand.length) break;
 
         const card = ps.hand[cardIndex];
-        const reducedCost = Math.max(0, card.chakra - 1);
-        if (ps.chakra < reducedCost) break;
 
-        // Find valid missions for this card (fresh play OR upgrade over same-name with lower cost)
+        // Find valid missions for this card (fresh play OR upgrade over same-name with lower cost).
+        // Filter by affordability: upgrade missions cost (diff - 1), fresh play costs (card.chakra - 1).
         const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
         const validMissions: string[] = [];
+        let minCost = Math.max(0, card.chakra - 1); // fresh play baseline
         for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
           const mission = newState.activeMissions[mIdx];
           const sameNameChar = mission[friendlySide].find((c: CharacterInPlay) => {
@@ -3452,14 +3403,25 @@ export class EffectEngine {
             return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
           });
           if (!sameNameChar) {
-            validMissions.push(String(mIdx));
+            // Fresh play — cost is card.chakra - 1
+            const freshCost = Math.max(0, card.chakra - 1);
+            if (ps.chakra >= freshCost) {
+              validMissions.push(String(mIdx));
+              minCost = Math.min(minCost, freshCost);
+            }
           } else {
             const existingTop = sameNameChar.stack.length > 0 ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
             if ((card.chakra ?? 0) > (existingTop.chakra ?? 0)) {
-              validMissions.push(String(mIdx));
+              // Upgrade — cost is (diff - 1)
+              const upgradeCost = Math.max(0, (card.chakra - existingTop.chakra) - 1);
+              if (ps.chakra >= upgradeCost) {
+                validMissions.push(String(mIdx));
+                minCost = Math.min(minCost, upgradeCost);
+              }
             }
           }
         }
+        const reducedCost = minCost; // used in description below
 
         if (validMissions.length === 0) break;
 

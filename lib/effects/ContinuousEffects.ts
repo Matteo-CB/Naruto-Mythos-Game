@@ -356,11 +356,15 @@ export function calculateContinuousPowerModifier(
  * Determine whether a character should retain its power tokens at end of round.
  *
  * Rock Lee 039 and Gai Maito 043 both have continuous effects that prevent power token removal.
+ * Hidden characters do NOT have their [⧗] effects active, so they always lose tokens.
  */
 export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
+  // [⧗] effects are only active when face-visible
+  if (char.isHidden) return false;
+
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens (even when hidden)
+  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens (only when face-visible)
   if (topCard.number === 39 || topCard.number === 43) {
     const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),

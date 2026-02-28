@@ -30,7 +30,7 @@ interface PendingTargetSelection {
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
-  revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean }>; // for multi-card reveal (Tayuya 065)
+  revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Sasuke 014, Itachi 091)
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
 }
@@ -471,16 +471,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isItachi091Reveal) {
             revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
+              name_fr: '',
+              chakra: 0,
+              power: 0,
               canSteal: false,
               revealTitleKey: 'game.effect.itachi091RevealTitle',
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.itachi091DiscardResult'
                 : 'game.effect.itachi091RevealResult',
             };
+            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isDiscarded: c.isDiscarded ?? false,
+            }));
           } else if (isDosuLookReveal) {
             revealedCard = {
               name_fr: rd.cardName,
@@ -493,16 +499,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isSasuke014Reveal) {
             revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
+              name_fr: '',
+              chakra: 0,
+              power: 0,
               canSteal: false,
               revealTitleKey: 'game.effect.sasuke014RevealTitle',
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.sasuke014DiscardResult'
                 : 'game.effect.sasuke014RevealResult',
             };
+            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+            }));
           } else if (isTayuya065Reveal) {
             revealedCard = {
               name_fr: 'Tayuya',
@@ -909,16 +920,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isItachi091Reveal) {
             revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
+              name_fr: '',
+              chakra: 0,
+              power: 0,
               canSteal: false,
               revealTitleKey: 'game.effect.itachi091RevealTitle',
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.itachi091DiscardResult'
                 : 'game.effect.itachi091RevealResult',
             };
+            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isDiscarded: c.isDiscarded ?? false,
+            }));
           } else if (isDosuLookReveal) {
             revealedCard = {
               name_fr: rd.cardName,
@@ -931,16 +948,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isSasuke014Reveal) {
             revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
+              name_fr: '',
+              chakra: 0,
+              power: 0,
               canSteal: false,
               revealTitleKey: 'game.effect.sasuke014RevealTitle',
               revealResultKey: rd.isUpgrade
                 ? 'game.effect.sasuke014DiscardResult'
                 : 'game.effect.sasuke014RevealResult',
             };
+            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+            }));
           } else if (isTayuya065Reveal) {
             revealedCard = {
               name_fr: 'Tayuya',
@@ -1349,11 +1371,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isItachi091RevealAI) {
             revealedCardAI = {
-              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
-              image_file: rd.cardImageFile, canSteal: false,
+              name_fr: '', chakra: 0, power: 0, canSteal: false,
               revealTitleKey: 'game.effect.itachi091RevealTitle',
               revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
             };
+            revealedCardsAI = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
+              name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isDiscarded: c.isDiscarded ?? false,
+            }));
           } else if (isDosuLookRevealAI) {
             revealedCardAI = {
               name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
@@ -1363,11 +1387,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           } else if (isSasuke014RevealAI) {
             revealedCardAI = {
-              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
-              image_file: rd.cardImageFile, canSteal: false,
+              name_fr: '', chakra: 0, power: 0, canSteal: false,
               revealTitleKey: 'game.effect.sasuke014RevealTitle',
               revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
             };
+            revealedCardsAI = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
+              name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file,
+            }));
           } else if (isTayuya065RevealAI) {
             revealedCardAI = {
               name_fr: 'Tayuya', chakra: 0, power: 0,

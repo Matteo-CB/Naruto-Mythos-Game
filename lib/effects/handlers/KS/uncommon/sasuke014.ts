@@ -7,7 +7,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 3 | Power: 4
  * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
  *
- * AMBUSH: Look at a card in the opponent's hand (player picks face-down).
+ * AMBUSH: Look at all cards in the opponent's hand. (Mandatory)
  *
  * UPGRADE: AMBUSH effect: In addition, discard 1 card from your hand.
  *   If you do so, choose 1 card in the opponent's hand and discard it.
@@ -29,19 +29,45 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Player chooses which face-down card to look at
-  const validTargets = opponentHand.map((_c, i) => String(i));
+  // Capture all opponent hand cards for the reveal
+  const allCards = opponentHand.map(c => ({
+    name_fr: c.name_fr,
+    chakra: c.chakra ?? 0,
+    power: c.power ?? 0,
+    image_file: c.image_file,
+  }));
 
+  const logMsg = isUpgrade
+    ? 'Sasuke Uchiwa (014): Looked at all cards in opponent\'s hand (upgrade: may discard one).'
+    : 'Sasuke Uchiwa (014): Looked at all cards in opponent\'s hand.';
+  const newState = {
+    ...state,
+    log: logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_LOOK_HAND',
+      logMsg,
+      'game.log.effect.sasuke014Reveal',
+      { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
+    ),
+  };
+
+  // Show all opponent hand cards — go directly to SASUKE014_HAND_REVEAL (no choose-one step)
   return {
-    state,
+    state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE014_CHOOSE_HAND_CARD',
-    validTargets,
+    targetSelectionType: 'SASUKE014_HAND_REVEAL',
+    validTargets: ['confirm'],
     description: JSON.stringify({
-      text: 'Sasuke Uchiwa (014): Choose a card from the opponent\'s hand to look at.',
+      text: isUpgrade
+        ? 'Sasuke (014): Opponent\'s hand revealed. You may discard a card to discard one from their hand.'
+        : 'Sasuke (014): Opponent\'s hand revealed.',
+      cards: allCards,
       isUpgrade,
     }),
-    descriptionKey: 'game.effect.desc.sasuke014ChooseHandCard',
+    descriptionKey: isUpgrade
+      ? 'game.effect.desc.sasuke014RevealUpgrade'
+      : 'game.effect.desc.sasuke014Reveal',
+    isMandatory: true,
   };
 }
 
