@@ -57,6 +57,10 @@ interface GameStore {
   // Target selection
   pendingTargetSelection: PendingTargetSelection | null;
 
+  // Draft deck data (for saving after game)
+  draftDeckCardIds: string[] | null;
+  draftDeckMissionIds: string[] | null;
+
   // Action error feedback (e.g., name uniqueness violation)
   actionError: string | null;
   actionErrorKey: string | null;
@@ -76,6 +80,7 @@ interface GameStore {
   selectTarget: (targetId: string) => void;
   declineTarget: () => void;
   clearActionError: () => void;
+  setDraftDeck: (cardIds: string[], missionIds: string[]) => void;
   resetGame: () => void;
   endAIGameAsForfeit: () => void;
 }
@@ -308,6 +313,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actionError: null,
   actionErrorKey: null,
   actionErrorParams: null,
+  draftDeckCardIds: null,
+  draftDeckMissionIds: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
     const humanName = playerName || 'Player';
@@ -1492,6 +1499,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ actionError: null });
   },
 
+  setDraftDeck: (cardIds: string[], missionIds: string[]) => {
+    set({ draftDeckCardIds: cardIds, draftDeckMissionIds: missionIds });
+  },
+
   resetGame: () => {
     // Disconnect socket if leaving an online game
     if (get().isOnlineGame) {
@@ -1512,6 +1523,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isAnimating: false,
       pendingTargetSelection: null,
       actionError: null,
+      draftDeckCardIds: null,
+      draftDeckMissionIds: null,
     });
   },
 

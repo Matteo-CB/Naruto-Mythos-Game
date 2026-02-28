@@ -152,4 +152,5 @@ model SiteSettings {
   id             String  @id @default(auto()) @map("_id") @db.ObjectId
   key            String  @unique
   leaguesEnabled Boolean @default(false)
+  draftEnabled   Boolean @default(false)
 }

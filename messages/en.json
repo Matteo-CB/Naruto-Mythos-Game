@@ -37,7 +37,8 @@
     "betaBanner": "We are in testing phase. Some cards may be missing and some effects may not work! You can help us by joining our Discord and reporting bugs in the dedicated channel.",
     "adminCards": "Card Management",
     "admin": "Administration",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "draft": "Draft"
   },
   "game": {
     "turn": "Turn {turn}",
@@ -608,6 +609,8 @@
     "title": "Play Online",
     "signInRequired": "You must be signed in to play online.",
     "createRoom": "Create Room",
+    "createRoomDesc": "Create a private room and share the code",
+    "connecting": "Connecting...",
     "joinRoom": "Join Room",
     "findMatch": "Find Match",
     "roomCode": "Room Code",
@@ -1581,7 +1584,17 @@
       "removed": "Tester removed",
       "notFound": "User not found"
     },
-    "actionLog": "Action Log"
+    "actionLog": "Action Log",
+    "draft": {
+      "title": "Draft Mode",
+      "description": "Enable or disable Draft mode for all users. When disabled, only testers and admins can access Draft.",
+      "loading": "Loading...",
+      "toggling": "Toggling...",
+      "enabled": "ENABLED",
+      "disabled": "DISABLED",
+      "enabledDesc": "All users can access Draft mode",
+      "disabledDesc": "Only testers and admins can access Draft"
+    }
   },
   "badges": {
     "admin": "ADMIN",
@@ -1647,5 +1660,47 @@
       "Ninja Pig": "Ninja Pig",
       "Special Jonin": "Special Jonin"
     }
+  },
+  "draft": {
+    "title": "Draft Mode",
+    "description": "Open 6 boosters, build a deck from the cards you pull, then battle!",
+    "vsAI": "Draft vs AI",
+    "vsAIDesc": "Open boosters and build a deck to fight the AI",
+    "online": "Draft Online",
+    "onlineDesc": "Draft against another player online (unranked)",
+    "waitingBoosters": "Generating boosters...",
+    "waitingOpponent": "Waiting for opponent...",
+    "openBooster": "Tap to open",
+    "boosterCount": "Booster {current}/{total}",
+    "cardsCollected": "Cards Collected",
+    "cards": "cards",
+    "buildDeck": "Build Your Deck",
+    "yourDeck": "Your Deck",
+    "characters": "Characters",
+    "missionsLabel": "Missions",
+    "searchCards": "Search cards...",
+    "filterAll": "All",
+    "allGroups": "All Groups",
+    "selectAllBtn": "Select All",
+    "clearAllBtn": "Clear",
+    "deckReady": "Deck Ready!",
+    "startGame": "Start Game",
+    "submitted": "Submitted",
+    "restricted": "Draft mode is currently in testing phase",
+    "timeRemaining": "{minutes}:{seconds}",
+    "timeWarning": "5 min left!",
+    "timeCritical": "1 min left!",
+    "timeExpired": "Time's up!",
+    "autoSubmitted": "Deck auto-submitted",
+    "validation": {
+      "minChars": "{count}/{min} characters (minimum {min})",
+      "missions": "{count}/{required} missions (need {required})",
+      "maxCopies": "Too many copies of {version}: {count}/{max}"
+    },
+    "saveDeck": "Save Draft Deck",
+    "saveDeckName": "Deck name",
+    "saveDeckPlaceholder": "My Draft Deck",
+    "deckSaved": "Deck saved!",
+    "deckSaveError": "Failed to save deck"
   }
 }

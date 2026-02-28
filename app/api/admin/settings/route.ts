@@ -12,9 +12,10 @@ export async function GET() {
 
     return NextResponse.json({
       leaguesEnabled: settings?.leaguesEnabled ?? false,
+      draftEnabled: settings?.draftEnabled ?? false,
     });
   } catch {
-    return NextResponse.json({ leaguesEnabled: false });
+    return NextResponse.json({ leaguesEnabled: false, draftEnabled: false });
   }
 }
 
@@ -26,20 +27,28 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { leaguesEnabled } = body;
+    const updateData: Record<string, boolean> = {};
 
-    if (typeof leaguesEnabled !== 'boolean') {
+    if (typeof body.leaguesEnabled === 'boolean') {
+      updateData.leaguesEnabled = body.leaguesEnabled;
+    }
+    if (typeof body.draftEnabled === 'boolean') {
+      updateData.draftEnabled = body.draftEnabled;
+    }
+
+    if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }
 
     const settings = await prisma.siteSettings.upsert({
       where: { key: 'global' },
-      update: { leaguesEnabled },
-      create: { key: 'global', leaguesEnabled },
+      update: updateData,
+      create: { key: 'global', ...updateData },
     });
 
     return NextResponse.json({
       leaguesEnabled: settings.leaguesEnabled,
+      draftEnabled: settings.draftEnabled,
     });
   } catch {
     return NextResponse.json(

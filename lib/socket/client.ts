@@ -34,9 +34,17 @@ interface SocketStore {
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
 
+  // Draft state
+  isDraftRoom: boolean;
+  draftBoosters: unknown[] | null;
+  draftAllCards: unknown[] | null;
+  draftDeckSubmitted: boolean;
+  draftOpponentReady: boolean;
+  draftDeadline: number | null;
+
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isDraft?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[]) => void;
   performAction: (action: GameAction) => void;
@@ -63,6 +71,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   playerNames: null,
   gameResult: null,
   actionDeadline: null,
+  isDraftRoom: false,
+  draftBoosters: null,
+  draftAllCards: null,
+  draftDeckSubmitted: false,
+  draftOpponentReady: false,
+  draftDeadline: null,
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -172,6 +186,31 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('room:deck-accepted', () => {
         console.log('[Socket] Deck accepted, waiting for opponent');
+        if (get().isDraftRoom) {
+          set({ draftDeckSubmitted: true });
+        }
+      });
+
+      // --- Draft events ---
+
+      socket.on('draft:boosters', (data: { boosters: unknown[]; allCards: unknown[] }) => {
+        console.log('[Socket] Draft boosters received:', data.boosters?.length, 'boosters');
+        set({ draftBoosters: data.boosters, draftAllCards: data.allCards });
+      });
+
+      socket.on('draft:timer-start', (data: { deadline: number; durationMs: number }) => {
+        console.log('[Socket] Draft timer started, deadline:', data.deadline);
+        set({ draftDeadline: data.deadline });
+      });
+
+      socket.on('draft:opponent-ready', () => {
+        console.log('[Socket] Draft opponent ready');
+        set({ draftOpponentReady: true });
+      });
+
+      socket.on('draft:time-expired', () => {
+        console.log('[Socket] Draft time expired');
+        set({ draftDeadline: 0 });
       });
 
       // --- Game events ---
@@ -304,15 +343,22 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameEnded: false,
         gameResult: null,
         actionDeadline: null,
+        isDraftRoom: false,
+        draftBoosters: null,
+        draftAllCards: null,
+        draftDeckSubmitted: false,
+        draftOpponentReady: false,
+        draftDeadline: null,
       });
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isDraft = false) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log('[Socket] Emitting room:create');
-      socket.emit('room:create', { userId, isPrivate, isRanked });
+      console.log(`[Socket] Emitting room:create${isDraft ? ' (draft)' : ''}`);
+      set({ isDraftRoom: isDraft });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isDraft });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
