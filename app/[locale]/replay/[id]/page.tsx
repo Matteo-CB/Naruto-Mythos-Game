@@ -270,16 +270,35 @@ function VisualReplay({
       result.push(current);
     }
 
-    // Recovery: auto-advance stuck states until game reaches gameOver or stops changing
+    // Recovery: auto-advance stuck states until game reaches gameOver or stops changing.
+    // The actionHistory may not contain all phase transitions (e.g. ADVANCE_PHASE
+    // fired from a setTimeout in gameStore). We simulate them here.
     let recovery = 0;
     while (current.phase !== 'gameOver' && recovery < 50) {
       let advanced: GameState | null = null;
       try {
         if (current.phase === 'action' && current.player1.hasPassed && current.player2.hasPassed) {
-          // Both players passed — advance to mission phase
-          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-        } else if (current.phase === 'mission') {
-          // Mission phase — try to advance (scoring or post-scoring)
+          // Both players passed but mission phase transition didn't happen yet.
+          // Send a PASS to trigger the phase='mission' → transitionToMissionPhase chain.
+          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'PASS' });
+        } else if (current.phase === 'mission' && current.pendingActions.length > 0) {
+          // Mission phase with pending SCORE effects — auto-select first valid target
+          // or decline if optional (minSelections === 0) to advance past them
+          const pending = current.pendingActions[0];
+          if (pending.minSelections === 0 || pending.options.length === 0) {
+            advanced = GameEngine.applyAction(current, pending.player, {
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pending.id,
+            });
+          } else if (pending.options.length > 0) {
+            advanced = GameEngine.applyAction(current, pending.player, {
+              type: 'SELECT_TARGET',
+              pendingActionId: pending.id,
+              selectedTargets: [pending.options[0]],
+            });
+          }
+        } else if (current.phase === 'mission' && current.missionScoringComplete) {
+          // Scoring done, no pending actions — advance to End Phase
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
         } else if (current.phase === 'end' && current.pendingActions.length === 0 && current.pendingEffects.length === 0) {
           // Stuck in end phase with nothing pending — advance to next turn
@@ -290,7 +309,7 @@ function VisualReplay({
       } catch {
         break;
       }
-      if (!advanced || advanced === current || (advanced.phase === current.phase && advanced.turn === current.turn)) {
+      if (!advanced || advanced === current || (advanced.phase === current.phase && advanced.turn === current.turn && advanced.pendingActions.length === current.pendingActions.length)) {
         break; // No progress made
       }
 
