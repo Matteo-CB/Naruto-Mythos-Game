@@ -20,6 +20,7 @@ interface DraftDeckBuilderProps {
 
 type FilterRarity = 'all' | 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'MMS';
 
+/** Normalize card ID for version comparison (RA variants = same version) */
 function getVersionKey(card: BoosterCard): string {
   return card.id.replace(/\s*A$/, '').trim();
 }
@@ -32,40 +33,79 @@ export function DraftDeckBuilder({
   onTimeUp,
 }: DraftDeckBuilderProps) {
   const t = useTranslations('draft');
-  const [selectedCharIds, setSelectedCharIds] = useState<Set<string>>(new Set());
-  const [selectedMissionIds, setSelectedMissionIds] = useState<Set<string>>(new Set());
+
+  // Deck state — arrays, like the site's deck builder
+  const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
+  const [deckMissions, setDeckMissions] = useState<BoosterCard[]>([]);
+
+  // UI state
   const [filterRarity, setFilterRarity] = useState<FilterRarity>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchText, setSearchText] = useState('');
   const [previewCard, setPreviewCard] = useState<BoosterCard | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  // Separate characters and missions
+  // Separate pool into characters and missions
   const { characters, missions } = useMemo(() => {
     const chars: BoosterCard[] = [];
     const miss: BoosterCard[] = [];
     for (const card of pool) {
-      if (card.card_type === 'mission') {
-        miss.push(card);
-      } else {
-        chars.push(card);
-      }
+      if (card.card_type === 'mission') miss.push(card);
+      else chars.push(card);
     }
     return { characters: chars, missions: miss };
   }, [pool]);
 
-  // Groups available in pool
+  // Pool availability: how many copies of each version are available
+  const poolAvailability = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of characters) {
+      const key = getVersionKey(c);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    return counts;
+  }, [characters]);
+
+  // Deduplicated catalog: one representative card per version
+  const catalogChars = useMemo(() => {
+    const seen = new Map<string, BoosterCard>();
+    for (const c of characters) {
+      const key = getVersionKey(c);
+      if (!seen.has(key)) seen.set(key, c);
+    }
+    return Array.from(seen.values());
+  }, [characters]);
+
+  // Mission availability: how many of each mission in pool
+  const missionAvailability = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const m of missions) {
+      counts.set(m.id, (counts.get(m.id) ?? 0) + 1);
+    }
+    return counts;
+  }, [missions]);
+
+  // Deduplicated missions catalog
+  const catalogMissions = useMemo(() => {
+    const seen = new Map<string, BoosterCard>();
+    for (const m of missions) {
+      if (!seen.has(m.id)) seen.set(m.id, m);
+    }
+    return Array.from(seen.values());
+  }, [missions]);
+
+  // Groups from pool
   const availableGroups = useMemo(() => {
     const groups = new Set<string>();
-    for (const c of characters) {
+    for (const c of catalogChars) {
       if (c.group) groups.add(c.group);
     }
     return Array.from(groups).sort();
-  }, [characters]);
+  }, [catalogChars]);
 
-  // Filter characters
-  const filteredChars = useMemo(() => {
-    return characters.filter((c) => {
+  // Filter catalog characters
+  const filteredCatalog = useMemo(() => {
+    return catalogChars.filter((c) => {
       if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
       if (filterGroup !== 'all' && c.group !== filterGroup) return false;
       if (searchText) {
@@ -80,128 +120,150 @@ export function DraftDeckBuilder({
       }
       return true;
     });
-  }, [characters, filterRarity, filterGroup, searchText]);
+  }, [catalogChars, filterRarity, filterGroup, searchText]);
 
-  // Validation
-  const selectedChars = useMemo(
-    () => characters.filter((c) => selectedCharIds.has(c.draftInstanceId)),
-    [characters, selectedCharIds],
-  );
-  const selectedMissions = useMemo(
-    () => missions.filter((m) => selectedMissionIds.has(m.draftInstanceId)),
-    [missions, selectedMissionIds],
-  );
-
-  // Check version limits
-  const versionCounts = useMemo(() => {
+  // Count characters in deck by version key
+  const deckVersionCounts = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const c of selectedChars) {
+    for (const c of deckChars) {
       const key = getVersionKey(c);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     return counts;
-  }, [selectedChars]);
+  }, [deckChars]);
 
+  // Count missions in deck by ID
+  const deckMissionIds = useMemo(() => {
+    return new Set(deckMissions.map((m) => m.id));
+  }, [deckMissions]);
+
+  // Validation
   const errors = useMemo(() => {
     const errs: string[] = [];
-    if (selectedChars.length < MIN_DECK_SIZE) {
-      errs.push(t('validation.minChars', { count: selectedChars.length, min: MIN_DECK_SIZE }));
+    if (deckChars.length < MIN_DECK_SIZE) {
+      errs.push(t('validation.minChars', { count: deckChars.length, min: MIN_DECK_SIZE }));
     }
-    if (selectedMissions.length !== MISSION_CARDS_PER_PLAYER) {
-      errs.push(t('validation.missions', { count: selectedMissions.length, required: MISSION_CARDS_PER_PLAYER }));
+    if (deckMissions.length !== MISSION_CARDS_PER_PLAYER) {
+      errs.push(t('validation.missions', { count: deckMissions.length, required: MISSION_CARDS_PER_PLAYER }));
     }
-    for (const [version, count] of versionCounts) {
+    for (const [version, count] of deckVersionCounts) {
       if (count > MAX_COPIES_PER_VERSION) {
         errs.push(t('validation.maxCopies', { version, count, max: MAX_COPIES_PER_VERSION }));
       }
     }
     return errs;
-  }, [selectedChars, selectedMissions, versionCounts, t]);
+  }, [deckChars, deckMissions, deckVersionCounts, t]);
 
-  const isValid = errors.length === 0 && selectedChars.length >= MIN_DECK_SIZE && selectedMissions.length === MISSION_CARDS_PER_PLAYER;
+  const isValid = errors.length === 0 && deckChars.length >= MIN_DECK_SIZE && deckMissions.length === MISSION_CARDS_PER_PLAYER;
 
-  // Can this character still be added?
+  // Can add this character to the deck?
   const canAddChar = useCallback(
     (card: BoosterCard) => {
-      if (selectedCharIds.has(card.draftInstanceId)) return false;
       const key = getVersionKey(card);
-      const count = versionCounts.get(key) ?? 0;
-      return count < MAX_COPIES_PER_VERSION;
+      const inDeck = deckVersionCounts.get(key) ?? 0;
+      const inPool = poolAvailability.get(key) ?? 0;
+      return inDeck < MAX_COPIES_PER_VERSION && inDeck < inPool;
     },
-    [selectedCharIds, versionCounts],
+    [deckVersionCounts, poolAvailability],
   );
 
-  const toggleChar = useCallback((card: BoosterCard) => {
-    setSelectedCharIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(card.draftInstanceId)) {
-        next.delete(card.draftInstanceId);
-      } else {
-        next.add(card.draftInstanceId);
-      }
+  // Can add this mission to the deck?
+  const canAddMission = useCallback(
+    (card: BoosterCard) => {
+      if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) return false;
+      return !deckMissionIds.has(card.id);
+    },
+    [deckMissions.length, deckMissionIds],
+  );
+
+  // Add character to deck
+  const addChar = useCallback(
+    (card: BoosterCard) => {
+      if (!canAddChar(card)) return;
+      setDeckChars((prev) => [...prev, card]);
+    },
+    [canAddChar],
+  );
+
+  // Remove character from deck by index
+  const removeChar = useCallback((index: number) => {
+    setDeckChars((prev) => {
+      const next = [...prev];
+      next.splice(index, 1);
       return next;
     });
   }, []);
 
-  const toggleMission = useCallback((card: BoosterCard) => {
-    setSelectedMissionIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(card.draftInstanceId)) {
-        next.delete(card.draftInstanceId);
-      } else if (next.size < MISSION_CARDS_PER_PLAYER) {
-        next.add(card.draftInstanceId);
-      }
+  // Add mission to deck
+  const addMission = useCallback(
+    (card: BoosterCard) => {
+      if (!canAddMission(card)) return;
+      setDeckMissions((prev) => [...prev, card]);
+    },
+    [canAddMission],
+  );
+
+  // Remove mission from deck by index
+  const removeMission = useCallback((index: number) => {
+    setDeckMissions((prev) => {
+      const next = [...prev];
+      next.splice(index, 1);
       return next;
     });
   }, []);
 
+  // Select all (respecting limits)
   const selectAll = useCallback(() => {
-    const allIds = new Set<string>();
+    const chars: BoosterCard[] = [];
     const counts = new Map<string, number>();
-    // Add by priority (keep version limit)
     for (const c of characters) {
       const key = getVersionKey(c);
       const count = counts.get(key) ?? 0;
       if (count < MAX_COPIES_PER_VERSION) {
-        allIds.add(c.draftInstanceId);
+        chars.push(c);
         counts.set(key, count + 1);
       }
     }
-    setSelectedCharIds(allIds);
-    // Select first 3 missions
+    setDeckChars(chars);
+
+    // Select first 3 unique missions
+    const miss: BoosterCard[] = [];
     const mIds = new Set<string>();
     for (const m of missions) {
-      if (mIds.size >= MISSION_CARDS_PER_PLAYER) break;
-      mIds.add(m.draftInstanceId);
+      if (miss.length >= MISSION_CARDS_PER_PLAYER) break;
+      if (!mIds.has(m.id)) {
+        miss.push(m);
+        mIds.add(m.id);
+      }
     }
-    setSelectedMissionIds(mIds);
+    setDeckMissions(miss);
   }, [characters, missions]);
 
   const clearAll = useCallback(() => {
-    setSelectedCharIds(new Set());
-    setSelectedMissionIds(new Set());
+    setDeckChars([]);
+    setDeckMissions([]);
   }, []);
 
   const handleSubmit = useCallback(() => {
     if (!isValid || submitted) return;
     setSubmitted(true);
     onDeckReady(
-      selectedChars as unknown as CharacterCard[],
-      selectedMissions as unknown as MissionCard[],
+      deckChars as unknown as CharacterCard[],
+      deckMissions as unknown as MissionCard[],
     );
-  }, [isValid, submitted, selectedChars, selectedMissions, onDeckReady]);
+  }, [isValid, submitted, deckChars, deckMissions, onDeckReady]);
 
   const handleTimeUp = useCallback(() => {
     if (isValid && !submitted) {
       setSubmitted(true);
       onDeckReady(
-        selectedChars as unknown as CharacterCard[],
-        selectedMissions as unknown as MissionCard[],
+        deckChars as unknown as CharacterCard[],
+        deckMissions as unknown as MissionCard[],
       );
     } else {
       onTimeUp?.();
     }
-  }, [isValid, submitted, selectedChars, selectedMissions, onDeckReady, onTimeUp]);
+  }, [isValid, submitted, deckChars, deckMissions, onDeckReady, onTimeUp]);
 
   const rarityFilters: FilterRarity[] = ['all', 'C', 'UC', 'R', 'RA', 'S', 'M', 'MMS'];
 
@@ -230,12 +292,12 @@ export function DraftDeckBuilder({
             {t('buildDeck')}
           </h2>
           <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-[10px] sm:text-xs" style={{ color: selectedChars.length >= MIN_DECK_SIZE ? '#3e8b3e' : '#b33e3e' }}>
-              {selectedChars.length}/{MIN_DECK_SIZE}+
+            <span className="text-[10px] sm:text-xs" style={{ color: deckChars.length >= MIN_DECK_SIZE ? '#3e8b3e' : '#b33e3e' }}>
+              {deckChars.length}/{MIN_DECK_SIZE}+
             </span>
             <span className="text-[10px] sm:text-xs" style={{ color: '#555' }}>|</span>
-            <span className="text-[10px] sm:text-xs" style={{ color: selectedMissions.length === MISSION_CARDS_PER_PLAYER ? '#3e8b3e' : '#b33e3e' }}>
-              {selectedMissions.length}/{MISSION_CARDS_PER_PLAYER} M
+            <span className="text-[10px] sm:text-xs" style={{ color: deckMissions.length === MISSION_CARDS_PER_PLAYER ? '#3e8b3e' : '#b33e3e' }}>
+              {deckMissions.length}/{MISSION_CARDS_PER_PLAYER} M
             </span>
           </div>
         </div>
@@ -263,7 +325,7 @@ export function DraftDeckBuilder({
 
       {/* Main content */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-        {/* Left: Available cards — single scroll area */}
+        {/* Left: Pool catalog — single scroll area */}
         <div className="flex-1 overflow-y-auto" style={{ borderRight: '1px solid #262626', minHeight: 0 }}>
           {/* Filters */}
           <div className="px-3 py-2 flex flex-wrap items-center gap-2 sticky top-0 z-10" style={{ borderBottom: '1px solid #1a1a1a', backgroundColor: '#0a0a0a' }}>
@@ -325,25 +387,26 @@ export function DraftDeckBuilder({
           {/* Missions section */}
           <div className="px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#e67e22' }}>
-              {t('missionsLabel')} ({selectedMissions.length}/{MISSION_CARDS_PER_PLAYER})
+              {t('missionsLabel')} ({deckMissions.length}/{MISSION_CARDS_PER_PLAYER})
             </h3>
             <div className="flex gap-2 flex-wrap">
-              {missions.map((m) => {
-                const selected = selectedMissionIds.has(m.draftInstanceId);
+              {catalogMissions.map((m) => {
+                const inDeck = deckMissionIds.has(m.id);
+                const canAdd = canAddMission(m);
                 const imgPath = normalizeImagePath(m.image_file);
                 return (
                   <motion.div
-                    key={m.draftInstanceId}
+                    key={m.id}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => toggleMission(m)}
+                    onClick={() => { if (canAdd) addMission(m); }}
                     onContextMenu={(e) => { e.preventDefault(); setPreviewCard(m); }}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
-                      width: '80px',
-                      height: '112px',
-                      border: `2px solid ${selected ? '#e67e22' : '#333'}`,
-                      opacity: !selected && selectedMissionIds.size >= MISSION_CARDS_PER_PLAYER ? 0.4 : 1,
+                      width: '140px',
+                      aspectRatio: '3.5/2.5',
+                      border: `2px solid ${inDeck ? '#e67e22' : '#333'}`,
+                      opacity: !canAdd && !inDeck ? 0.4 : 1,
                     }}
                   >
                     {imgPath ? (
@@ -353,7 +416,10 @@ export function DraftDeckBuilder({
                         <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{m.name_fr}</span>
                       </div>
                     )}
-                    {selected && (
+                    <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                      <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{m.name_fr}</span>
+                    </div>
+                    {inDeck && (
                       <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#e67e22' }}>
                         <span className="text-[10px] font-bold" style={{ color: '#0a0a0a' }}>+</span>
                       </div>
@@ -364,32 +430,32 @@ export function DraftDeckBuilder({
             </div>
           </div>
 
-          {/* Character cards grid */}
+          {/* Character cards grid (deduplicated catalog) */}
           <div className="px-3 py-2">
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888' }}>
-              {t('characters')} ({filteredChars.length})
+              {t('characters')} ({filteredCatalog.length})
             </h3>
             <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
-              {filteredChars.map((card) => {
-                const selected = selectedCharIds.has(card.draftInstanceId);
+              {filteredCatalog.map((card) => {
+                const key = getVersionKey(card);
+                const inDeck = deckVersionCounts.get(key) ?? 0;
+                const inPool = poolAvailability.get(key) ?? 0;
                 const canAdd = canAddChar(card);
                 const imgPath = normalizeImagePath(card.image_file);
                 const rarityColor = rarityColors[card.rarity] ?? '#888';
 
                 return (
                   <motion.div
-                    key={card.draftInstanceId}
+                    key={key}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      if (selected || canAdd) toggleChar(card);
-                    }}
+                    onClick={() => addChar(card)}
                     onContextMenu={(e) => { e.preventDefault(); setPreviewCard(card); }}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
                       aspectRatio: '5/7',
-                      border: `2px solid ${selected ? rarityColor : '#262626'}`,
-                      opacity: !selected && !canAdd ? 0.3 : 1,
+                      border: `2px solid ${inDeck > 0 ? rarityColor : '#262626'}`,
+                      opacity: !canAdd ? 0.3 : 1,
                     }}
                   >
                     {imgPath ? (
@@ -400,7 +466,7 @@ export function DraftDeckBuilder({
                       </div>
                     )}
 
-                    {/* Overlay info */}
+                    {/* Card info overlay */}
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                       <div className="flex items-center justify-between">
                         <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{card.name_fr}</span>
@@ -412,12 +478,12 @@ export function DraftDeckBuilder({
                       </div>
                     </div>
 
-                    {/* Selected indicator */}
-                    {selected && (
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: rarityColor }}>
-                        <span className="text-[10px] font-bold" style={{ color: '#0a0a0a' }}>+</span>
-                      </div>
-                    )}
+                    {/* Count badge: inDeck / available */}
+                    <div className="absolute top-1 right-1 px-1 py-0.5 rounded" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+                      <span className="text-[9px] font-bold" style={{ color: inDeck > 0 ? rarityColor : '#666' }}>
+                        {inDeck}/{inPool}
+                      </span>
+                    </div>
 
                     {/* Holo badge */}
                     {card.isHolo && (
@@ -434,7 +500,7 @@ export function DraftDeckBuilder({
           </div>
         </div>
 
-        {/* Right: Selected deck summary */}
+        {/* Right: Deck summary */}
         <div className="w-full lg:w-64 flex flex-col overflow-hidden shrink-0 max-h-48 lg:max-h-none" style={{ backgroundColor: '#0d0d0d', borderTop: '1px solid #262626' }}>
           <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
             <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
@@ -458,14 +524,14 @@ export function DraftDeckBuilder({
           </div>
 
           {/* Selected missions */}
-          {selectedMissions.length > 0 && (
+          {deckMissions.length > 0 && (
             <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
               <h4 className="text-[10px] font-bold uppercase mb-1" style={{ color: '#e67e22' }}>{t('missionsLabel')}</h4>
-              {selectedMissions.map((m) => (
+              {deckMissions.map((m, i) => (
                 <div
-                  key={m.draftInstanceId}
+                  key={`${m.id}-${i}`}
                   className="flex items-center justify-between py-0.5 cursor-pointer"
-                  onClick={() => toggleMission(m)}
+                  onClick={() => removeMission(i)}
                 >
                   <span className="text-[10px] truncate" style={{ color: '#e0e0e0' }}>{m.name_fr}</span>
                   <span className="text-[10px]" style={{ color: '#b33e3e' }}>x</span>
@@ -477,26 +543,30 @@ export function DraftDeckBuilder({
           {/* Selected characters list */}
           <div className="flex-1 overflow-y-auto px-3 py-2">
             <h4 className="text-[10px] font-bold uppercase mb-1" style={{ color: '#888' }}>
-              {t('characters')} ({selectedChars.length})
+              {t('characters')} ({deckChars.length})
             </h4>
-            {selectedChars
+            {[...deckChars]
               .sort((a, b) => a.chakra - b.chakra)
-              .map((c) => (
-                <div
-                  key={c.draftInstanceId}
-                  className="flex items-center justify-between py-0.5 cursor-pointer"
-                  onClick={() => toggleChar(c)}
-                >
-                  <div className="flex items-center gap-1 min-w-0">
-                    <span className="text-[10px] shrink-0" style={{ color: '#5865F2' }}>{c.chakra}</span>
-                    <span className="text-[10px] truncate" style={{ color: '#e0e0e0' }}>{c.name_fr}</span>
+              .map((c, i) => {
+                // Find the original index in unsorted deckChars
+                const originalIndex = deckChars.indexOf(c);
+                return (
+                  <div
+                    key={`${c.id}-${i}`}
+                    className="flex items-center justify-between py-0.5 cursor-pointer"
+                    onClick={() => removeChar(originalIndex)}
+                  >
+                    <div className="flex items-center gap-1 min-w-0">
+                      <span className="text-[10px] shrink-0" style={{ color: '#5865F2' }}>{c.chakra}</span>
+                      <span className="text-[10px] truncate" style={{ color: '#e0e0e0' }}>{c.name_fr}</span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className="text-[10px]" style={{ color: rarityColors[c.rarity] ?? '#888' }}>{c.rarity}</span>
+                      <span className="text-[10px]" style={{ color: '#b33e3e' }}>x</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <span className="text-[10px]" style={{ color: rarityColors[c.rarity] ?? '#888' }}>{c.rarity}</span>
-                    <span className="text-[10px]" style={{ color: '#b33e3e' }}>x</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
           </div>
         </div>
       </div>
@@ -517,7 +587,10 @@ export function DraftDeckBuilder({
               animate={{ scale: 1 }}
               exit={{ scale: 0.5 }}
               className="relative rounded-lg overflow-hidden"
-              style={{ width: '280px', height: '392px' }}
+              style={{
+                width: previewCard.card_type === 'mission' ? '392px' : '280px',
+                height: previewCard.card_type === 'mission' ? '280px' : '392px',
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               {normalizeImagePath(previewCard.image_file) ? (
@@ -535,13 +608,17 @@ export function DraftDeckBuilder({
                 <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{previewCard.name_fr}</div>
                 <div className="text-xs" style={{ color: '#888' }}>{previewCard.title_fr}</div>
                 <div className="flex gap-2 mt-1">
-                  <span className="text-xs" style={{ color: '#5865F2' }}>Chakra: {previewCard.chakra}</span>
-                  <span className="text-xs" style={{ color: '#b33e3e' }}>Power: {previewCard.power}</span>
+                  {previewCard.card_type !== 'mission' && (
+                    <>
+                      <span className="text-xs" style={{ color: '#5865F2' }}>Chakra: {previewCard.chakra}</span>
+                      <span className="text-xs" style={{ color: '#b33e3e' }}>Power: {previewCard.power}</span>
+                    </>
+                  )}
                   <span className="text-xs" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>{previewCard.rarity}</span>
                 </div>
                 {previewCard.effects?.length > 0 && (
                   <div className="mt-2 flex flex-col gap-1">
-                    {previewCard.effects.map((eff, i) => (
+                    {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
                       <div key={i} className="text-[10px]" style={{ color: '#ccc' }}>
                         <span className="font-bold" style={{ color: '#c4a35a' }}>{eff.type}: </span>
                         {eff.description}
