@@ -109,7 +109,11 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           <img
             src="/images/card-back.webp"
             alt="Card back"
-            style={{ width: '100%', height: '100%', objectFit: isMission ? 'contain' : 'cover' }}
+            style={{
+              ...(isMission
+                ? { width: cardHeight, height: cardWidth, objectFit: 'cover' as const, transform: 'rotate(90deg)', transformOrigin: 'center center', position: 'absolute' as const, top: '50%', left: '50%', marginTop: `calc(-${cardWidth} / 2)`, marginLeft: `calc(-${cardHeight} / 2)` }
+                : { width: '100%', height: '100%', objectFit: 'cover' as const }),
+            }}
           />
           {/* Tap hint shimmer */}
           {!isFlipped && !hasFlippedRef.current && (
