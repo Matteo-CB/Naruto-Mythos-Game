@@ -145,6 +145,10 @@ export interface GameState {
   playCostIncrease?: { player1: number; player2: number };
   /** Ordered history of all actions applied during the game (for replay). */
   actionHistory?: Array<{ player: PlayerID; action: GameAction }>;
+  /** When a forced-choice pending (e.g. Dosu069) is created for a player,
+   *  this records which player should receive the turn once all pendings clear.
+   *  Cleared by GameEngine when the turn switch fires. */
+  pendingForcedResolver?: PlayerID;
 }
 
 export interface GameLogEntry {

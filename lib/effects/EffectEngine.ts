@@ -3153,6 +3153,8 @@ export class EffectEngine {
           maxSelections: 1,
           sourceEffectId: effectId_dosu,
         }];
+        // Track that the opponent is the forced resolver — they get the turn after resolution
+        newState.pendingForcedResolver = opponentPlayer_dosu;
         break;
       }
 

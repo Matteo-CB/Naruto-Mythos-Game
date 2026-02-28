@@ -328,7 +328,7 @@ export function TargetSelector() {
   // Hand selection is handled by HandCardSelector
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
-  const { validTargets, description, descriptionKey, descriptionParams, onDecline, playerName, revealedCard } = pendingTargetSelection;
+  const { validTargets, description, descriptionKey, descriptionParams, onDecline, declineLabelKey, playerName, revealedCard } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
@@ -714,7 +714,7 @@ export function TargetSelector() {
               border: '1px solid #333333',
             }}
           >
-            {t('game.board.skip')}
+            {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
           </motion.button>
         )}
       </motion.div>

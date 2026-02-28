@@ -208,11 +208,6 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
-  // Cannot upgrade a hidden character — [⧗] effects require the character to be face-visible
-  if (target.isHidden) {
-    return { valid: false, reason: 'Cannot upgrade a hidden character.', reasonKey: 'game.error.cannotUpgradeHidden' };
-  }
-
   const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
 
   // Check special upgrade rules
@@ -230,9 +225,18 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.`, reasonKey: 'game.error.upgradeHigherCost', reasonParams: { newCost: newCard.chakra, currentCost: topCard.chakra } };
   }
 
-  // Pay only the difference
-  const costDiff = newCard.chakra - topCard.chakra;
+  // When upgrading over a hidden character, cost = full cost of newCard
+  // (combines the reveal cost + upgrade diff in one action)
   const ps = state[player];
+  if (target.isHidden) {
+    if (ps.chakra < newCard.chakra) {
+      return { valid: false, reason: `Not enough chakra. Need ${newCard.chakra} (reveal + upgrade), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: newCard.chakra, have: ps.chakra } };
+    }
+    return { valid: true };
+  }
+
+  // Pay only the difference for visible characters
+  const costDiff = newCard.chakra - topCard.chakra;
   if (ps.chakra < costDiff) {
     return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakraUpgrade', reasonParams: { need: costDiff, have: ps.chakra } };
   }
@@ -247,7 +251,7 @@ export function validateUpgradeCharacter(
  * - Orochimaru 051 (UC) / 138 (S): Can upgrade any non-Summon, non-Orochimaru
  * - Akamaru 029 (UC): Can upgrade over Kiba Inuzuka
  * - Ichibi 076 (UC): Can upgrade any Gaara
- * - Ukon 063 (UC) / 124b (R): Can upgrade any Sound Village character
+ * - Ukon 063 (UC) / 124b (R): Can upgrade any character with printed cost 0–4
  */
 export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
   // Already same name — standard upgrade, no special rule needed
@@ -295,13 +299,13 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  // Ukon 063 (UC) / 124b (R): Can upgrade over any Sound Village character
+  // Ukon 063 (UC) / 124b (R): Can upgrade over any character with printed cost 0–4
   if (newCard.number === 63 || newCard.number === 124) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
     );
     if (hasFlexible) {
-      return (targetCard.group ?? '') === 'Sound Village';
+      return (targetCard.chakra ?? 0) <= 4;
     }
   }
 

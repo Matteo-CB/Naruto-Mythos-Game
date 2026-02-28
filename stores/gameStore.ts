@@ -33,6 +33,7 @@ interface PendingTargetSelection {
   revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Sasuke 014, Itachi 091)
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
+  declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
 }
 
 interface GameStore {
@@ -565,6 +566,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               });
             }
           } : undefined,
+          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
+            ? 'game.effect.dosu069Defeat'
+            : undefined,
         },
       });
     } else {
@@ -1013,6 +1017,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               });
             }
           } : undefined,
+          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
+            ? 'game.effect.dosu069Defeat'
+            : undefined,
         },
       });
       return;
@@ -1438,6 +1445,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               });
             }
           } : undefined,
+          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
+            ? 'game.effect.dosu069Defeat'
+            : undefined,
         },
       });
       return;

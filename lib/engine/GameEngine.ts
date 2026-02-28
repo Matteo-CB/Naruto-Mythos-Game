@@ -153,15 +153,6 @@ export class GameEngine {
 
       case 'action':
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
-          // Capture the originPlayer of the pending action BEFORE it is removed by handlePendingAction.
-          // This lets us detect forced-choice resolutions (e.g., Dosu069 opponent choice) where
-          // the resolver should keep their turn instead of handing it back to the source player.
-          let resolvedPendingOriginPlayer: PlayerID | undefined;
-          if ('pendingActionId' in action && action.pendingActionId) {
-            const pa = newState.pendingActions.find((p) => p.id === action.pendingActionId);
-            resolvedPendingOriginPlayer = pa?.originPlayer;
-          }
-
           // Handle pending effect target selections during action phase
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving a pending effect, switch active player (same logic as executeAction)
@@ -171,16 +162,13 @@ export class GameEngine {
               newState.pendingActions.length === 0 &&
               !newState.player1.hasPassed &&
               !newState.player2.hasPassed) {
-            // If the resolved action was a forced choice initiated by the opponent
-            // (originPlayer !== player), the resolver keeps their turn.
-            // We must explicitly set activePlayer rather than "don't switch", because
-            // activePlayer may still be the initiating player (e.g. Dosu's player) if
-            // the pending was created before the normal turn-switch could fire.
-            const wasOpponentForced = resolvedPendingOriginPlayer !== undefined
-              && resolvedPendingOriginPlayer !== player;
-            if (wasOpponentForced) {
-              // Forced choice (e.g. Dosu069): resolver keeps their own turn
-              newState.activePlayer = player;
+            // If a forced-choice sequence was tracked (e.g. Dosu069 → opponent choice),
+            // give the turn to the recorded resolver player (the opponent of the Dosu player).
+            // This correctly handles chains: even if the reveal triggers MAIN/AMBUSH pending
+            // effects that are then resolved, the turn still goes to the right player.
+            if (newState.pendingForcedResolver) {
+              newState.activePlayer = newState.pendingForcedResolver;
+              newState.pendingForcedResolver = undefined;
             } else {
               const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
               newState.activePlayer = otherPlayer;

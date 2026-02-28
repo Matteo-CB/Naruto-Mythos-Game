@@ -84,8 +84,6 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
-      // Cannot upgrade a hidden character ([⧗] effects require face-visible status)
-      if (c.isHidden) return false;
       // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
@@ -103,10 +101,10 @@ export function ActionBar() {
       const isIchibiUpgrade = selectedCard.number === 76
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
         && charCard.name_fr.toUpperCase() === 'GAARA';
-      // Ukon 063/124 can upgrade any Sound Village character
+      // Ukon 063/124 can upgrade any character with printed cost 0–4
       const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
         && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
-        && (charCard.group ?? '') === 'Sound Village';
+        && (charCard.chakra ?? 0) <= 4;
 
       const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade;
       return nameOk && charCard.chakra < selectedCard.chakra;
@@ -342,13 +340,20 @@ export function ActionBar() {
           {/* Upgrade button(s) — shown first when available */}
           {cardAndMissionReady && upgradeTargets.map((target) => {
             const charCard = target.topCard ?? target.card;
-            const upgradeCost = (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
+            const isHiddenTarget = target.isHidden;
+            // For hidden targets: pay full cost (reveal + upgrade). For visible: pay diff.
+            const upgradeCost = isHiddenTarget
+              ? (selectedCard?.chakra ?? 0)
+              : (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
             const canAffordUpgrade = myState.chakra >= upgradeCost;
             const targetName = charCard?.name_fr ?? '';
+            const upgradeLabel = isHiddenTarget
+              ? `${t('game.reveal')} + ${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`
+              : `${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`;
             return (
               <ActionButton
                 key={target.instanceId}
-                label={`${t('game.actions.upgrade')} ${targetName} (${upgradeCost} ${t('game.chakra').toLowerCase()})`}
+                label={upgradeLabel}
                 onClick={() => handleUpgrade(target.instanceId)}
                 disabled={!canAffordUpgrade}
                 variant="primary"

@@ -278,6 +278,7 @@
       "tayuya065Summon": "DRAWN (Summon)",
       "tayuya065PutBack": "Put back on top",
       "cardDiscarded": "DISCARDED",
+      "dosu069Defeat": "Defeat the character",
       "desc": {
         "chooseMissionMove": "Choose a mission to move the character to.",
         "chooseMissionPlaceHidden": "Choose a mission to place the hidden character on.",
