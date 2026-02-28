@@ -1010,7 +1010,7 @@ describe('086/130 - Zabuza Momochi', () => {
 // 088/130 - HAKU: Draw 1, then put 1 card on top of deck
 // ===================================================================
 describe('088/130 - Haku', () => {
-  it('should draw 1 card and require hand selection to choose which to put back', () => {
+  it('should offer optional draw choice (not auto-draw) requiring target selection type HAKU088_CONFIRM_DRAW', () => {
     const haku = mockCharInPlay({ instanceId: 'haku-1' }, {
       id: 'KS-088-C', number: 88, name_fr: 'Haku',
     });
@@ -1028,12 +1028,13 @@ describe('088/130 - Haku', () => {
 
     const handler = getEffectHandler('KS-088-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', haku, 0));
-    // Draws the card, then asks which to put back
-    expect(result.state.player1.hand.length).toBe(2); // InHand + HakuDraw
-    expect(result.state.player1.deck.length).toBe(0); // deck empty after draw
+    // Draw is optional — should NOT auto-draw; instead prompt for confirmation
+    expect(result.state.player1.hand.length).toBe(1); // unchanged (no auto-draw)
+    expect(result.state.player1.deck.length).toBe(1); // deck unchanged
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('PUT_CARD_ON_DECK');
-    expect(result.validTargets).toEqual(['0', '1']); // both hand indices
+    expect(result.targetSelectionType).toBe('HAKU088_CONFIRM_DRAW');
+    expect(result.isOptional).toBe(true);
+    expect(result.validTargets).toEqual(['draw']);
   });
 
   it('should do nothing when deck is empty', () => {
