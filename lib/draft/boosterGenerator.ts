@@ -48,7 +48,6 @@ export function generateBooster(boosterIndex: number): BoosterPack {
   const rares = allChars.filter(c => c.rarity === 'R');
   const rareArts = allChars.filter(c => c.rarity === 'RA');
   const secrets = allChars.filter(c => c.rarity === 'S');
-  const mythos = allChars.filter(c => c.rarity === 'M');
   const legendaries = allChars.filter(c => c.rarity === 'L');
 
   const cards: BoosterCard[] = [];
@@ -75,14 +74,11 @@ export function generateBooster(boosterIndex: number): BoosterPack {
   }
 
   // Special pull: replace the holo slot card with a special rarity
-  // Secret: 10% chance, Mythos: 2% chance, Legendary: 0.125% chance
+  // Secret: 10% chance, Legendary: 0.125% chance (Mythos excluded from draft)
   const specialRoll = Math.random();
   if (specialRoll < 0.00125 && legendaries.length > 0) {
     // Legendary — replace last card
     cards[cards.length - 1] = toBoosterCard(pickRandom(legendaries), true);
-  } else if (specialRoll < 0.02 && mythos.length > 0) {
-    // Mythos — replace last card
-    cards[cards.length - 1] = toBoosterCard(pickRandom(mythos), true);
   } else if (specialRoll < 0.10 && secrets.length > 0) {
     // Secret — replace last card
     cards[cards.length - 1] = toBoosterCard(pickRandom(secrets), true);
