@@ -24,11 +24,11 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 function handleKin073Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const playerState = state[sourcePlayer];
 
-  // Check if player has cards in hand to discard
+  // Check if player has cards in hand to discard (cost)
   if (playerState.hand.length === 0) {
     const log = logAction(
       state.log, state.turn, state.phase, sourcePlayer,
@@ -40,39 +40,35 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Find valid enemy targets (non-hidden with effective power <= 4)
-  const validEnemyTargets: string[] = [];
-  for (const mission of state.activeMissions) {
-    const enemyChars =
-      opponentPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-    for (const char of enemyChars) {
-      if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 4) {
-        validEnemyTargets.push(char.instanceId);
-      }
-    }
-  }
+  // Check that there is at least one valid enemy target IN THIS MISSION ONLY
+  const thisMission = state.activeMissions[sourceMissionIndex];
+  const enemyCharsHere = opponentPlayer === 'player1'
+    ? thisMission.player1Characters
+    : thisMission.player2Characters;
+  const hasValidTarget = enemyCharsHere.some(
+    (char) => !char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 4,
+  );
 
-  if (validEnemyTargets.length === 0) {
+  if (!hasValidTarget) {
     const log = logAction(
       state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Kin Tsuchi (073): No non-hidden enemy character with Power 4 or less in play.',
+      'Kin Tsuchi (073): No non-hidden enemy with Power 4 or less in this mission.',
       'game.log.effect.noTarget',
       { card: 'KIN TSUCHI', id: 'KS-073-UC' },
     );
     return { state: { ...state, log } };
   }
 
-  // Step 1: Player chooses enemy to hide
+  // Step 1: Player chooses a card from hand to discard (cost)
+  const handIndices = playerState.hand.map((_, i) => String(i));
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIN073_CHOOSE_ENEMY',
-    validTargets: validEnemyTargets,
-    description: JSON.stringify({
-      text: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
-    }),
-    descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
+    targetSelectionType: 'KIN073_CHOOSE_DISCARD',
+    validTargets: handIndices,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kin073ChooseDiscard',
   };
 }
 

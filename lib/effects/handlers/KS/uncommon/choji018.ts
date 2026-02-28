@@ -1,6 +1,8 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
+import type { PlayerID } from '@/lib/engine/types';
 
 /**
  * Card 018/130 - CHOJI AKIMICHI "Le Boulet Humain" (UC)
@@ -66,14 +68,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // If exactly one valid destination, auto-move then trigger post-move hide
-  if (validTargets.length === 1) {
-    const destMissionIdx = parseInt(validTargets[0], 10);
-    const newState = moveCharacterToMission(state, sourceCard.instanceId, sourceMissionIndex, destMissionIdx, sourcePlayer);
-    return postMoveHide(newState, sourceCard.instanceId, destMissionIdx, sourcePlayer);
-  }
-
-  // Multiple valid destinations: requires target selection
+  // Always require target selection so the player can skip (effect is optional per the rules)
   // Post-move hide will be handled in EffectEngine's CHOJI_018_MOVE_SELF case
   return {
     state,
@@ -104,17 +99,15 @@ export function postMoveHide(
   const chojiChar = mission[friendlySide].find(c => c.instanceId === chojiInstanceId);
   if (!chojiChar) return { state };
 
-  const chojiPower = (chojiChar.stack.length > 0
-    ? chojiChar.stack[chojiChar.stack.length - 1].power
-    : chojiChar.card.power) + chojiChar.powerTokens;
+  const enemyPlayer: PlayerID = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  // Use effective power (includes continuous effects like MSS02 +1, Sasuke -1/ally, etc.)
+  const chojiPower = calculateCharacterPower(state, chojiChar, sourcePlayer);
 
-  // Find non-hidden enemies with less power
+  // Find non-hidden enemies with less effective power
   const hideTargets: string[] = [];
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
-    const enemyPower = (enemy.stack.length > 0
-      ? enemy.stack[enemy.stack.length - 1].power
-      : enemy.card.power) + enemy.powerTokens;
+    const enemyPower = calculateCharacterPower(state, enemy, enemyPlayer);
     if (enemyPower < chojiPower) {
       hideTargets.push(enemy.instanceId);
     }
