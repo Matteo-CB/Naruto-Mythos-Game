@@ -9,6 +9,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
+import { resetIdCounter } from '@/lib/engine/utils/id';
 
 interface AnimationEvent {
   id: string;
@@ -703,7 +704,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Capture replay initial state when mulligans complete (deterministic snapshot)
     // Mulligans use shuffle() which is non-deterministic, so we must capture AFTER.
+    // Also reset the instance ID counter so all post-mulligan IDs are deterministic
+    // from a known starting point, ensuring replay reconstruction matches.
     if (gameState.phase === 'mulligan' && newState.phase !== 'mulligan' && !get().replayInitialState) {
+      resetIdCounter();
       const snapshot = deepClone(newState);
       snapshot.actionHistory = []; // Clear — replay starts from this point
       set({ replayInitialState: snapshot });

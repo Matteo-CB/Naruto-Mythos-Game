@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
@@ -30,6 +30,7 @@ export function GameEndScreen() {
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
   const [draftDeckName, setDraftDeckName] = useState('');
   const [draftSaveState, setDraftSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const autoSaveAttempted = useRef(false);
 
   const handleSaveReplay = useCallback(async () => {
     if (saveState === 'saving' || saveState === 'saved') return;
@@ -98,10 +99,21 @@ export function GameEndScreen() {
       }
     } catch {
       setSaveState('error');
-      // Allow retry after error
-      setTimeout(() => setSaveState('idle'), 2000);
     }
   }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id, replayInitialState]);
+
+  // Auto-save when the end screen appears (if logged in and has replay data)
+  useEffect(() => {
+    if (!gameOver || autoSaveAttempted.current) return;
+    const isLoggedIn = !!session?.user?.id;
+    const hasReplayData = isAIGame
+      ? !!gameState?.log?.length
+      : !!(gameResult?.gameId && gameResult?.replayData);
+    if (isLoggedIn && hasReplayData) {
+      autoSaveAttempted.current = true;
+      handleSaveReplay();
+    }
+  }, [gameOver, session?.user?.id, isAIGame, gameState, gameResult, handleSaveReplay]);
 
   const handleSaveDraftDeck = useCallback(async () => {
     if (draftSaveState === 'saving' || draftSaveState === 'saved') return;
@@ -147,13 +159,6 @@ export function GameEndScreen() {
 
   // Check if the forfeit was by the viewing player or the opponent
   const forfeitedByMe = isForfeit && visibleState.forfeitedBy === myPlayer;
-
-  // Can save replay?
-  const isLoggedIn = !!session?.user?.id;
-  const hasReplayData = isAIGame
-    ? !!gameState?.log?.length
-    : !!(gameResult?.gameId && gameResult?.replayData);
-  const canSave = isLoggedIn && hasReplayData && saveState !== 'saved';
 
   let headingText: string;
   let headingColor: string;
@@ -330,51 +335,40 @@ export function GameEndScreen() {
             transition={{ delay: 1.6 }}
             className="flex flex-col items-center gap-3"
           >
-            {/* Save Replay button */}
-            {canSave && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleSaveReplay}
-                disabled={saveState === 'saving'}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                style={{
-                  backgroundColor: saveState === 'error' ? '#b33e3e' : '#1a1a2e',
-                  color: saveState === 'error' ? '#ffffff' : '#c4a35a',
-                  border: `1px solid ${saveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
-                  opacity: saveState === 'saving' ? 0.6 : 1,
-                }}
-              >
-                {saveState === 'saving' ? t('game.end.savingReplay')
-                  : saveState === 'error' ? t('game.end.saveError')
-                  : t('game.end.saveReplay')}
-              </motion.button>
+            {/* Auto-save status */}
+            {saveState === 'saving' && (
+              <span className="text-xs" style={{ color: '#888888' }}>
+                {t('game.end.savingReplay')}
+              </span>
             )}
-
-            {/* Watch Replay button (after save) */}
-            {saveState === 'saved' && savedGameId && (
-              <Link
-                href={`/replay/${savedGameId}`}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider text-center"
-                style={{
-                  backgroundColor: '#1a1a2e',
-                  color: '#4a9e4a',
-                  border: '1px solid #4a9e4a',
-                }}
-              >
-                {t('game.end.watchReplay')}
-              </Link>
-            )}
-
-            {/* Replay saved confirmation */}
-            {saveState === 'saved' && (
-              <span className="text-xs" style={{ color: '#4a9e4a' }}>
-                {t('game.end.replaySaved')}
+            {saveState === 'error' && (
+              <span className="text-xs" style={{ color: '#b33e3e' }}>
+                {t('game.end.saveError')}
               </span>
             )}
 
+            {/* Watch Replay button (after auto-save) */}
+            {saveState === 'saved' && savedGameId && (
+              <>
+                <span className="text-xs" style={{ color: '#4a9e4a' }}>
+                  {t('game.end.replaySaved')}
+                </span>
+                <Link
+                  href={`/replay/${savedGameId}`}
+                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider text-center"
+                  style={{
+                    backgroundColor: '#1a1a2e',
+                    color: '#4a9e4a',
+                    border: '1px solid #4a9e4a',
+                  }}
+                >
+                  {t('game.end.watchReplay')}
+                </Link>
+              </>
+            )}
+
             {/* Save Draft Deck */}
-            {isLoggedIn && draftDeckCardIds && draftDeckMissionIds && draftSaveState !== 'saved' && (
+            {!!session?.user?.id && draftDeckCardIds && draftDeckMissionIds && draftSaveState !== 'saved' && (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                   {t('draft.saveDeck')}
