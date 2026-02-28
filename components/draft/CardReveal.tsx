@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import type { BoosterCard } from '@/lib/draft/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
@@ -43,28 +42,34 @@ function isHighRarity(rarity: string): boolean {
 
 export function CardReveal({ card, index, onRevealed, autoReveal = false, delay = 0 }: CardRevealProps) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [hasFlipped, setHasFlipped] = useState(false);
+  const hasFlippedRef = useRef(false);
+  const hasCalledRevealedRef = useRef(false);
   const imagePath = normalizeImagePath(card.image_file);
   const rarityInfo = getRarityGlow(card.rarity);
   const highRarity = isHighRarity(card.rarity);
 
-  const handleFlip = () => {
-    if (hasFlipped) return;
+  const handleFlip = useCallback(() => {
+    if (hasFlippedRef.current) return;
+    hasFlippedRef.current = true;
     setIsFlipped(true);
-    setHasFlipped(true);
 
     const flipDuration = highRarity ? 800 : 500;
     setTimeout(() => {
-      onRevealed();
+      if (!hasCalledRevealedRef.current) {
+        hasCalledRevealedRef.current = true;
+        onRevealed();
+      }
     }, flipDuration);
-  };
+  }, [highRarity, onRevealed]);
 
-  // Auto-reveal with staggered delay
-  if (autoReveal && !hasFlipped) {
-    setTimeout(() => {
+  // Auto-reveal with staggered delay — useEffect ensures it runs only once
+  useEffect(() => {
+    if (!autoReveal || hasFlippedRef.current) return;
+    const timer = setTimeout(() => {
       handleFlip();
     }, delay);
-  }
+    return () => clearTimeout(timer);
+  }, [autoReveal, delay, handleFlip]);
 
   return (
     <motion.div
@@ -97,15 +102,13 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             overflow: 'hidden',
           }}
         >
-          <Image
+          <img
             src="/images/card-back.webp"
             alt="Card back"
-            fill
-            className="object-cover"
-            sizes="120px"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           {/* Tap hint shimmer */}
-          {!hasFlipped && (
+          {!isFlipped && !hasFlippedRef.current && (
             <motion.div
               className="absolute inset-0"
               animate={{ opacity: [0.05, 0.15, 0.05] }}
@@ -128,12 +131,10 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           }}
         >
           {imagePath ? (
-            <Image
+            <img
               src={imagePath}
               alt={card.name_fr}
-              fill
-              className="object-cover"
-              sizes="120px"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
             <div
@@ -146,18 +147,16 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          {/* Holo shimmer */}
+          {/* Holo shimmer overlay */}
           {card.isHolo && (
             <motion.div
-              className="absolute inset-0"
-              animate={{
-                background: [
-                  'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
-                  'linear-gradient(135deg, transparent 100%, rgba(255,255,255,0.15) 150%, transparent 200%)',
-                ],
-              }}
+              className="absolute inset-0 pointer-events-none"
+              animate={{ opacity: [0.05, 0.2, 0.05] }}
               transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-              style={{ borderRadius: '8px' }}
+              style={{
+                borderRadius: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              }}
             />
           )}
         </div>
