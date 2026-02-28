@@ -238,19 +238,36 @@ function VisualReplay({
   const [showLog, setShowLog] = useState(false);
 
   // Pre-compute all game states from initial state + action history
+  // transitionToStartPhase() bundles the entire Start Phase (reveal mission, grant
+  // chakra, draw cards) + transition to action phase in one atomic call, so those
+  // transitions never appear as separate states in the action history. We inject
+  // synthetic "start" phase snapshots whenever a turn boundary is crossed so the
+  // replay UI shows each turn's Start Phase properly.
   const states = useMemo(() => {
-    const result: GameState[] = [initialState];
+    // The initial state is already in action phase (Start Phase for Turn 1 was
+    // consumed during the mulligan→start transition). Insert a synthetic Turn 1
+    // "start" state so the replay begins with "Turn 1 — Start Phase".
+    const turn1Start: GameState = { ...initialState, phase: 'start' as GamePhase };
+    const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
+
     for (const { player, action } of actionHistory) {
+      const prevTurn = current.turn;
       try {
         current = GameEngine.applyAction(current, player, action);
-        result.push(current);
       } catch (err) {
         console.error('[Replay] Error applying action:', err, { player, action });
-        // Push the current good state and skip this broken action
-        result.push(current);
         continue;
       }
+
+      // If turn changed, inject a synthetic start-phase snapshot so the UI
+      // displays "Turn X — Start Phase" with the newly revealed mission.
+      if (current.turn !== prevTurn && current.phase === 'action') {
+        const startSnapshot: GameState = { ...current, phase: 'start' as GamePhase };
+        result.push(startSnapshot);
+      }
+
+      result.push(current);
     }
 
     // Recovery: auto-advance stuck states until game reaches gameOver or stops changing
@@ -276,6 +293,13 @@ function VisualReplay({
       if (!advanced || advanced === current || (advanced.phase === current.phase && advanced.turn === current.turn)) {
         break; // No progress made
       }
+
+      // Inject start-phase snapshot for recovery-driven turn changes too
+      if (advanced.turn !== current.turn && advanced.phase === 'action') {
+        const startSnapshot: GameState = { ...advanced, phase: 'start' as GamePhase };
+        result.push(startSnapshot);
+      }
+
       current = advanced;
       result.push(current);
       recovery++;
