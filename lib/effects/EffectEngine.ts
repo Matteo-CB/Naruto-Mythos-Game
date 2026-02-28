@@ -8,6 +8,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { isProtectedFromEnemyHide } from './ContinuousEffects';
+import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 
 /**
  * Central effect resolver.
@@ -2263,6 +2264,70 @@ export class EffectEngine {
       }
 
       // =============================================
+      // OPTIONAL CONFIRM types (player accepts or skips via popup)
+      // =============================================
+
+      case 'SASUKE146_GIVE_EDGE': {
+        // Player confirmed: give Edge to opponent and POWERUP 3 on self
+        const opponentId146: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        newState = { ...newState, edgeHolder: opponentId146 };
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_EDGE',
+          'Sasuke Uchiwa (146): Gave the Edge token to opponent.',
+          'game.log.effect.giveEdge',
+          { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
+        );
+        // POWERUP 3 on Sasuke 146
+        let parsedSasuke146: { sourceMissionIndex?: number } = {};
+        try { parsedSasuke146 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const mIdx146 = parsedSasuke146.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
+        const friendlySide146: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const missions146 = [...newState.activeMissions];
+        const mission146 = { ...missions146[mIdx146] };
+        const chars146 = [...mission146[friendlySide146]];
+        const selfIdx146 = chars146.findIndex((c) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (selfIdx146 !== -1) {
+          chars146[selfIdx146] = { ...chars146[selfIdx146], powerTokens: chars146[selfIdx146].powerTokens + 3 };
+          mission146[friendlySide146] = chars146;
+          missions146[mIdx146] = mission146;
+          newState = {
+            ...newState,
+            activeMissions: missions146,
+            log: logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_POWERUP',
+              'Sasuke Uchiwa (146): POWERUP 3 on self.',
+              'game.log.effect.powerupSelf',
+              { card: 'SASUKE UCHIWA', id: 'KS-146-M', amount: 3 },
+            ),
+          };
+        }
+        break;
+      }
+
+      case 'SAKURA011_DRAW': {
+        // Player confirmed: draw 1 card
+        const ps011 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps011.deck.length > 0) {
+          const deck011 = [...ps011.deck];
+          const drawn011 = deck011.shift()!;
+          ps011.deck = deck011;
+          ps011.hand = [...ps011.hand, drawn011];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps011 };
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DRAW',
+          'Sakura Haruno (011): Drew 1 card (Team 7 synergy).',
+          'game.log.effect.draw',
+          { card: 'SAKURA HARUNO', id: 'KS-011-C', count: '1' },
+        );
+        break;
+      }
+
+      // =============================================
       // PLAY SUMMON types
       // =============================================
       case 'JIRAIYA008_CHOOSE_SUMMON':
@@ -2746,59 +2811,13 @@ export class EffectEngine {
         );
         break;
       }
-      case 'KIN073_CHOOSE_ENEMY': {
-        // Step 1: Player chose an enemy to hide. Now prompt for discard from hand.
-        const enemyInstanceId_k73 = targetId;
-        const ps_k73 = newState[pendingEffect.sourcePlayer];
-        if (ps_k73.hand.length === 1) {
-          // Auto-discard the only card in hand, then hide the enemy
-          const hand_k73 = [...ps_k73.hand];
-          const discarded_k73 = hand_k73.splice(0, 1)[0];
-          newState = {
-            ...newState,
-            [pendingEffect.sourcePlayer]: {
-              ...ps_k73,
-              hand: hand_k73,
-              discardPile: [...ps_k73.discardPile, discarded_k73],
-            },
-          };
-          newState = EffectEngine.hideCharacterWithLog(newState, enemyInstanceId_k73, pendingEffect.sourcePlayer);
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${discarded_k73.name_fr} to hide enemy.`,
-            'game.log.effect.kin073Discard',
-            { card: 'KIN TSUCHI', id: 'KS-073-UC', target: discarded_k73.name_fr },
-          );
-        } else {
-          // Multiple cards in hand — prompt for discard (Step 2)
-          const handIndices_k73 = ps_k73.hand.map((_: unknown, i: number) => String(i));
-          const charResult_k73 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-          const step2Result: EffectResult = {
-            state: newState,
-            requiresTargetSelection: true,
-            targetSelectionType: 'KIN073_CHOOSE_DISCARD',
-            validTargets: handIndices_k73,
-            description: JSON.stringify({ enemyInstanceId: enemyInstanceId_k73, text: 'Kin Tsuchi (073): Choose a card from your hand to discard.' }),
-            descriptionKey: 'game.effect.desc.kin073ChooseDiscard',
-          };
-          return EffectEngine.createPendingTargetSelection(
-            newState,
-            pendingEffect.sourcePlayer,
-            charResult_k73?.character ?? null,
-            pendingEffect.sourceMissionIndex,
-            'MAIN',
-            false,
-            step2Result,
-            [],
-          );
-        }
-        break;
-      }
       case 'KIN073_CHOOSE_DISCARD': {
-        // Step 2: Player chose a card to discard. Now apply the hide.
-        let parsed_k73d: { enemyInstanceId?: string } = {};
+        // Step 1: Player chose a card to discard (cost). Now find enemies in Kin's mission to hide.
+        let parsed_k73d: { missionIndex?: number } = {};
         try { parsed_k73d = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const enemyId_k73d = parsed_k73d.enemyInstanceId;
+        const k73MissionIdx = typeof parsed_k73d.missionIndex === 'number'
+          ? parsed_k73d.missionIndex
+          : pendingEffect.sourceMissionIndex;
         const idx_k73d = parseInt(targetId, 10);
         const ps_k73d = { ...newState[pendingEffect.sourcePlayer] };
         if (idx_k73d >= 0 && idx_k73d < ps_k73d.hand.length) {
@@ -2809,14 +2828,62 @@ export class EffectEngine {
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps_k73d };
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${discarded_k73d.name_fr} to hide enemy.`,
+            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${discarded_k73d.name_fr} as cost.`,
             'game.log.effect.kin073Discard',
             { card: 'KIN TSUCHI', id: 'KS-073-UC', target: discarded_k73d.name_fr },
           );
         }
-        if (enemyId_k73d) {
-          newState = EffectEngine.hideCharacterWithLog(newState, enemyId_k73d, pendingEffect.sourcePlayer);
+        // Now find non-hidden enemies in Kin's mission with effective power <= 4
+        const enemyPlayer_k73d: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const enemySide_k73d: 'player1Characters' | 'player2Characters' =
+          enemyPlayer_k73d === 'player1' ? 'player1Characters' : 'player2Characters';
+        const k73Mission = newState.activeMissions[k73MissionIdx];
+        const k73HideTargets: string[] = [];
+        if (k73Mission) {
+          for (const enemy of k73Mission[enemySide_k73d]) {
+            if (enemy.isHidden) continue;
+            const enemyPower_k73 = calculateCharacterPower(newState, enemy, enemyPlayer_k73d);
+            if (enemyPower_k73 <= 4) {
+              k73HideTargets.push(enemy.instanceId);
+            }
+          }
         }
+        if (k73HideTargets.length === 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No valid enemy to hide after discard.',
+            'game.log.effect.noTarget',
+            { card: 'KIN TSUCHI', id: 'KS-073-UC' },
+          );
+        } else if (k73HideTargets.length === 1) {
+          newState = EffectEngine.hideCharacterWithLog(newState, k73HideTargets[0], pendingEffect.sourcePlayer);
+        } else {
+          // Multiple targets — let player choose
+          const charResult_k73d = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          const step2Result_k73d: EffectResult = {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'KIN073_CHOOSE_ENEMY',
+            validTargets: k73HideTargets,
+            description: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
+            descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
+          };
+          return EffectEngine.createPendingTargetSelection(
+            newState,
+            pendingEffect.sourcePlayer,
+            charResult_k73d?.character ?? null,
+            pendingEffect.sourceMissionIndex,
+            'MAIN',
+            false,
+            step2Result_k73d,
+            [],
+          );
+        }
+        break;
+      }
+      case 'KIN073_CHOOSE_ENEMY': {
+        // Step 2: Player chose an enemy to hide (after discarding cost).
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
       case 'DISCARD_FROM_OPPONENT_HAND': {
@@ -4475,13 +4542,13 @@ export class EffectEngine {
     // Now find valid targets for Stage 2: enemy Power ≤ 2 in ANY mission
     const enemySideKey: 'player1Characters' | 'player2Characters' =
       pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const enemyPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
 
     const validTarget2: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][enemySideKey]) {
-        // Hidden chars have 0 power → valid targets for Power ≤ 2
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        const power = char.isHidden ? 0 : topCard.power + char.powerTokens;
+        // Use effective power (includes continuous effects like MSS02 +1) — not just base+tokens
+        const power = calculateCharacterPower(newState, char, enemyPlayer);
         if (power <= 2) {
           validTarget2.push(char.instanceId);
         }

@@ -31,26 +31,16 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-011-C' }) } };
   }
 
-  // Draw a card
-  const newState = { ...state };
-  const playerState = { ...newState[sourcePlayer] };
-  if (playerState.deck.length > 0) {
-    const newDeck = [...playerState.deck];
-    const drawnCard = newDeck.shift()!;
-    playerState.deck = newDeck;
-    playerState.hand = [...playerState.hand, drawnCard];
-  }
-  newState[sourcePlayer] = playerState;
-
-  newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_DRAW',
-    `Sakura Haruno (011): Drew 1 card (Team 7 synergy).`,
-    'game.log.effect.draw',
-    { card: 'Sakura Haruno', id: 'KS-011-C', count: 1 },
-  );
-
-  return { state: newState };
+  // Effect is optional — route through pending action so player can skip.
+  // The "target" is Sakura herself (confirms the player wants to draw).
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SAKURA011_DRAW',
+    validTargets: [sourceCard.instanceId],
+    description: 'Sakura Haruno (011): Draw a card (Team 7 synergy)?',
+    descriptionKey: 'game.effect.desc.sakura011Draw',
+  };
 }
 
 export function registerHandler(): void {

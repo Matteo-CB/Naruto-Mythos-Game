@@ -197,8 +197,11 @@ describe('011/130 - Sakura Haruno', () => {
 
     const handler = getEffectHandler('KS-011-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
-    expect(result.state.player1.hand.length).toBe(1);
-    expect(result.state.player1.hand[0].name_fr).toBe('DeckCard');
+    // Effect is now optional — returns requiresTargetSelection so player can skip
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SAKURA011_DRAW');
+    // State is unchanged (draw happens in EffectEngine when player confirms)
+    expect(result.state.player1.hand.length).toBe(0);
   });
 
   it('should not draw when no other Team 7 character exists', () => {
