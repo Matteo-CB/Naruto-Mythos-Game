@@ -323,6 +323,61 @@ export function DraftDeckBuilder({
         </div>
       </div>
 
+      {/* Deck selection bar — always visible above the pool */}
+      <div
+        className="shrink-0 px-3 py-1.5 flex items-center gap-3 overflow-x-auto"
+        style={{ backgroundColor: '#111', borderBottom: '1px solid #262626', minHeight: '36px' }}
+      >
+        {/* Validation */}
+        {errors.length > 0 ? (
+          <span className="text-[10px] shrink-0" style={{ color: '#b33e3e' }}>
+            {errors[0]}
+          </span>
+        ) : (
+          <span className="text-[10px] font-bold shrink-0" style={{ color: '#3e8b3e' }}>
+            {t('deckReady')}
+          </span>
+        )}
+
+        <div className="w-px h-5 shrink-0" style={{ backgroundColor: '#333' }} />
+
+        {/* Mission chips */}
+        <span className="text-[9px] font-bold uppercase shrink-0" style={{ color: '#e67e22' }}>M:</span>
+        {deckMissions.map((m, i) => (
+          <span
+            key={`deck-m-${m.id}-${i}`}
+            className="flex items-center gap-1 px-2 py-0.5 rounded shrink-0 cursor-pointer"
+            style={{ backgroundColor: '#1a1a1a', border: '1px solid #e67e2240' }}
+          >
+            <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(m)}>{m.name_fr}</span>
+            <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeMission(i)}>x</span>
+          </span>
+        ))}
+
+        <div className="w-px h-5 shrink-0" style={{ backgroundColor: '#333' }} />
+
+        {/* Character chips */}
+        <span className="text-[9px] font-bold uppercase shrink-0" style={{ color: '#888' }}>
+          {t('characters')}: {deckChars.length}
+        </span>
+        {[...deckChars]
+          .sort((a, b) => a.chakra - b.chakra)
+          .map((c, i) => {
+            const originalIndex = deckChars.indexOf(c);
+            return (
+              <span
+                key={`deck-c-${c.id}-${i}`}
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded shrink-0 cursor-pointer"
+                style={{ backgroundColor: '#1a1a1a', border: `1px solid ${(rarityColors[c.rarity] ?? '#888')}30` }}
+              >
+                <span className="text-[9px]" style={{ color: '#5865F2' }}>{c.chakra}</span>
+                <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(c)}>{c.name_fr}</span>
+                <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeChar(originalIndex)}>x</span>
+              </span>
+            );
+          })}
+      </div>
+
       {/* Main content */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left: Pool catalog — single scroll area */}
@@ -400,7 +455,6 @@ export function DraftDeckBuilder({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => { if (canAdd) addMission(m); }}
-                    onContextMenu={(e) => { e.preventDefault(); setPreviewCard(m); }}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
                       width: '140px',
@@ -424,14 +478,14 @@ export function DraftDeckBuilder({
                         <span className="text-[10px] font-bold" style={{ color: '#0a0a0a' }}>+</span>
                       </div>
                     )}
-                    {/* Info button */}
-                    <div
-                      className="absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.7)', border: '1px solid #555' }}
+                    {/* Detail button */}
+                    <button
+                      className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
                       onClick={(e) => { e.stopPropagation(); setPreviewCard(m); }}
                     >
-                      <span className="text-[8px] font-bold" style={{ color: '#e0e0e0' }}>i</span>
-                    </div>
+                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>Detail</span>
+                    </button>
                   </motion.div>
                 );
               })}
@@ -458,7 +512,6 @@ export function DraftDeckBuilder({
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => addChar(card)}
-                    onContextMenu={(e) => { e.preventDefault(); setPreviewCard(card); }}
                     className="relative cursor-pointer rounded overflow-hidden"
                     style={{
                       aspectRatio: '5/7',
@@ -501,14 +554,14 @@ export function DraftDeckBuilder({
                         </span>
                       </div>
                     )}
-                    {/* Info button */}
-                    <div
-                      className="absolute bottom-[28px] right-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.7)', border: '1px solid #555' }}
+                    {/* Detail button */}
+                    <button
+                      className="absolute bottom-[28px] right-0.5 px-1.5 py-0.5 rounded cursor-pointer"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
                       onClick={(e) => { e.stopPropagation(); setPreviewCard(card); }}
                     >
-                      <span className="text-[8px] font-bold" style={{ color: '#e0e0e0' }}>i</span>
-                    </div>
+                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>Detail</span>
+                    </button>
                   </motion.div>
                 );
               })}
@@ -516,65 +569,195 @@ export function DraftDeckBuilder({
           </div>
         </div>
 
-        {/* Right: Deck summary + Card detail */}
-        <div
-          className={`w-full flex flex-col overflow-hidden shrink-0 max-h-48 lg:max-h-none ${previewCard ? 'lg:w-80' : 'lg:w-64'}`}
-          style={{ backgroundColor: '#0d0d0d', borderTop: '1px solid #262626', transition: 'width 0.2s ease' }}
-        >
-          {/* Card detail panel (inline, non-blocking) */}
-          <AnimatePresence>
-            {previewCard && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="shrink-0 overflow-hidden"
-                style={{ borderBottom: '1px solid #262626' }}
-              >
-                <div className="px-3 py-2">
-                  {/* Header with close button */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-                      {t('cardDetail')}
-                    </span>
-                    <button
-                      onClick={() => setPreviewCard(null)}
-                      className="w-5 h-5 flex items-center justify-center rounded cursor-pointer"
-                      style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                    >
-                      <span className="text-[10px] font-bold" style={{ color: '#888' }}>x</span>
-                    </button>
-                  </div>
+        {/* Right: Card detail panel only */}
+        <AnimatePresence>
+          {previewCard && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 320, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="hidden lg:flex flex-col overflow-hidden shrink-0"
+              style={{ backgroundColor: '#0d0d0d', borderLeft: '1px solid #262626' }}
+            >
+              <div className="flex-1 overflow-y-auto px-3 py-3">
+                {/* Header with close button */}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                    {t('cardDetail')}
+                  </span>
+                  <button
+                    onClick={() => setPreviewCard(null)}
+                    className="w-5 h-5 flex items-center justify-center rounded cursor-pointer"
+                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                  >
+                    <span className="text-[10px] font-bold" style={{ color: '#888' }}>x</span>
+                  </button>
+                </div>
 
-                  {/* Card image */}
-                  <div
-                    className="relative rounded overflow-hidden mb-2 mx-auto"
+                {/* Card image */}
+                <div
+                  className="relative rounded overflow-hidden mb-3 mx-auto"
+                  style={{
+                    width: previewCard.card_type === 'mission' ? '100%' : '140px',
+                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                  }}
+                >
+                  {normalizeImagePath(previewCard.image_file) ? (
+                    <img
+                      src={normalizeImagePath(previewCard.image_file)!}
+                      alt={previewCard.name_fr}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                      <span className="text-xs" style={{ color: '#888' }}>{previewCard.name_fr}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card info */}
+                <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{previewCard.name_fr}</div>
+                {previewCard.title_fr && (
+                  <div className="text-[11px]" style={{ color: '#888' }}>{previewCard.title_fr}</div>
+                )}
+
+                {/* Stats row */}
+                <div className="flex gap-2 mt-1 flex-wrap">
+                  {previewCard.card_type !== 'mission' && (
+                    <>
+                      <span className="text-[11px]" style={{ color: '#5865F2' }}>Chakra: {previewCard.chakra}</span>
+                      <span className="text-[11px]" style={{ color: '#b33e3e' }}>Power: {previewCard.power}</span>
+                    </>
+                  )}
+                  <span className="text-[11px] font-bold" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>
+                    {previewCard.rarity}
+                  </span>
+                  {previewCard.group && (
+                    <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{previewCard.group}</span>
+                  )}
+                </div>
+
+                {/* Keywords */}
+                {previewCard.keywords && previewCard.keywords.length > 0 && (
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {previewCard.keywords.map((kw: string, i: number) => (
+                      <span
+                        key={i}
+                        className="text-[9px] px-1.5 py-0.5 rounded"
+                        style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
+                      >
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Effects */}
+                {previewCard.effects?.length > 0 && (
+                  <div className="mt-2 flex flex-col gap-1.5">
+                    {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
+                      <div key={i}>
+                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{eff.description}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add/Remove button */}
+                {previewCard.card_type === 'mission' ? (
+                  <button
+                    onClick={() => {
+                      if (deckMissionIds.has(previewCard.id)) {
+                        const idx = deckMissions.findIndex((m) => m.id === previewCard.id);
+                        if (idx >= 0) removeMission(idx);
+                      } else {
+                        addMission(previewCard);
+                      }
+                    }}
+                    className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
                     style={{
-                      width: previewCard.card_type === 'mission' ? '100%' : '120px',
-                      aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                      backgroundColor: deckMissionIds.has(previewCard.id) ? '#2a1a1a' : '#1a2a1a',
+                      color: deckMissionIds.has(previewCard.id) ? '#b33e3e' : '#3e8b3e',
+                      border: `1px solid ${deckMissionIds.has(previewCard.id) ? '#4a2a2a' : '#2a4a2a'}`,
                     }}
                   >
-                    {normalizeImagePath(previewCard.image_file) ? (
-                      <img
-                        src={normalizeImagePath(previewCard.image_file)!}
-                        alt={previewCard.name_fr}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-xs" style={{ color: '#888' }}>{previewCard.name_fr}</span>
-                      </div>
-                    )}
-                  </div>
+                    {deckMissionIds.has(previewCard.id) ? t('removeFromDeck') : t('addToDeck')}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => addChar(previewCard)}
+                    disabled={!canAddChar(previewCard)}
+                    className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                    style={{
+                      backgroundColor: canAddChar(previewCard) ? '#1a2a1a' : '#1a1a1a',
+                      color: canAddChar(previewCard) ? '#3e8b3e' : '#555',
+                      border: `1px solid ${canAddChar(previewCard) ? '#2a4a2a' : '#333'}`,
+                    }}
+                  >
+                    {t('addToDeck')}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-                  {/* Card info */}
+      {/* Mobile detail drawer */}
+      <AnimatePresence>
+        {previewCard && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 overflow-y-auto"
+            style={{ backgroundColor: '#0d0d0d', borderTop: '2px solid #c4a35a', maxHeight: '60vh' }}
+          >
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                  {t('cardDetail')}
+                </span>
+                <button
+                  onClick={() => setPreviewCard(null)}
+                  className="px-3 py-1 rounded cursor-pointer"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                >
+                  <span className="text-xs font-bold" style={{ color: '#888' }}>x</span>
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                {/* Image */}
+                <div
+                  className="relative rounded overflow-hidden shrink-0"
+                  style={{
+                    width: previewCard.card_type === 'mission' ? '140px' : '90px',
+                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                  }}
+                >
+                  {normalizeImagePath(previewCard.image_file) ? (
+                    <img
+                      src={normalizeImagePath(previewCard.image_file)!}
+                      alt={previewCard.name_fr}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                      <span className="text-xs" style={{ color: '#888' }}>{previewCard.name_fr}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
                   <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{previewCard.name_fr}</div>
                   {previewCard.title_fr && (
                     <div className="text-[11px]" style={{ color: '#888' }}>{previewCard.title_fr}</div>
                   )}
-
-                  {/* Stats row */}
                   <div className="flex gap-2 mt-1 flex-wrap">
                     {previewCard.card_type !== 'mission' && (
                       <>
@@ -589,161 +772,68 @@ export function DraftDeckBuilder({
                       <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{previewCard.group}</span>
                     )}
                   </div>
-
-                  {/* Keywords */}
                   {previewCard.keywords && previewCard.keywords.length > 0 && (
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {previewCard.keywords.map((kw: string, i: number) => (
-                        <span
-                          key={i}
-                          className="text-[9px] px-1.5 py-0.5 rounded"
-                          style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
-                        >
+                        <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}>
                           {kw}
                         </span>
                       ))}
                     </div>
                   )}
-
-                  {/* Effects */}
-                  {previewCard.effects?.length > 0 && (
-                    <div className="mt-2 flex flex-col gap-1.5">
-                      {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
-                        <div key={i}>
-                          <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
-                          <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{eff.description}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add/Remove button */}
-                  {previewCard.card_type === 'mission' ? (
-                    <button
-                      onClick={() => {
-                        if (deckMissionIds.has(previewCard.id)) {
-                          const idx = deckMissions.findIndex((m) => m.id === previewCard.id);
-                          if (idx >= 0) removeMission(idx);
-                        } else {
-                          addMission(previewCard);
-                        }
-                      }}
-                      className="mt-2 w-full py-1 text-[10px] font-bold uppercase rounded cursor-pointer"
-                      style={{
-                        backgroundColor: deckMissionIds.has(previewCard.id) ? '#2a1a1a' : '#1a2a1a',
-                        color: deckMissionIds.has(previewCard.id) ? '#b33e3e' : '#3e8b3e',
-                        border: `1px solid ${deckMissionIds.has(previewCard.id) ? '#4a2a2a' : '#2a4a2a'}`,
-                      }}
-                    >
-                      {deckMissionIds.has(previewCard.id) ? t('removeFromDeck') : t('addToDeck')}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => addChar(previewCard)}
-                      disabled={!canAddChar(previewCard)}
-                      className="mt-2 w-full py-1 text-[10px] font-bold uppercase rounded cursor-pointer"
-                      style={{
-                        backgroundColor: canAddChar(previewCard) ? '#1a2a1a' : '#1a1a1a',
-                        color: canAddChar(previewCard) ? '#3e8b3e' : '#555',
-                        border: `1px solid ${canAddChar(previewCard) ? '#2a4a2a' : '#333'}`,
-                      }}
-                    >
-                      {t('addToDeck')}
-                    </button>
-                  )}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Deck header */}
-          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-            <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-              {t('yourDeck')}
-            </h3>
-          </div>
-
-          {/* Validation status */}
-          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-            {errors.length > 0 ? (
-              <div className="flex flex-col gap-1">
-                {errors.map((err, i) => (
-                  <span key={i} className="text-[10px]" style={{ color: '#b33e3e' }}>{err}</span>
-                ))}
               </div>
-            ) : (
-              <span className="text-xs font-bold" style={{ color: '#3e8b3e' }}>
-                {t('deckReady')}
-              </span>
-            )}
-          </div>
 
-          {/* Selected missions */}
-          {deckMissions.length > 0 && (
-            <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-              <h4 className="text-[10px] font-bold uppercase mb-1" style={{ color: '#e67e22' }}>{t('missionsLabel')}</h4>
-              {deckMissions.map((m, i) => (
-                <div
-                  key={`${m.id}-${i}`}
-                  className="flex items-center justify-between py-0.5"
-                >
-                  <span
-                    className="text-[10px] truncate cursor-pointer"
-                    style={{ color: '#e0e0e0' }}
-                    onClick={() => setPreviewCard(m)}
-                  >
-                    {m.name_fr}
-                  </span>
-                  <span
-                    className="text-[10px] cursor-pointer"
-                    style={{ color: '#b33e3e' }}
-                    onClick={() => removeMission(i)}
-                  >
-                    x
-                  </span>
+              {/* Effects */}
+              {previewCard.effects?.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1.5">
+                  {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
+                    <div key={i}>
+                      <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                      <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{eff.description}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {/* Selected characters list */}
-          <div className="flex-1 overflow-y-auto px-3 py-2">
-            <h4 className="text-[10px] font-bold uppercase mb-1" style={{ color: '#888' }}>
-              {t('characters')} ({deckChars.length})
-            </h4>
-            {[...deckChars]
-              .sort((a, b) => a.chakra - b.chakra)
-              .map((c, i) => {
-                // Find the original index in unsorted deckChars
-                const originalIndex = deckChars.indexOf(c);
-                return (
-                  <div
-                    key={`${c.id}-${i}`}
-                    className="flex items-center justify-between py-0.5"
-                  >
-                    <div
-                      className="flex items-center gap-1 min-w-0 cursor-pointer"
-                      onClick={() => setPreviewCard(c)}
-                    >
-                      <span className="text-[10px] shrink-0" style={{ color: '#5865F2' }}>{c.chakra}</span>
-                      <span className="text-[10px] truncate" style={{ color: '#e0e0e0' }}>{c.name_fr}</span>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className="text-[10px]" style={{ color: rarityColors[c.rarity] ?? '#888' }}>{c.rarity}</span>
-                      <span
-                        className="text-[10px] cursor-pointer"
-                        style={{ color: '#b33e3e' }}
-                        onClick={() => removeChar(originalIndex)}
-                      >
-                        x
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      </div>
+              {/* Add/Remove */}
+              {previewCard.card_type === 'mission' ? (
+                <button
+                  onClick={() => {
+                    if (deckMissionIds.has(previewCard.id)) {
+                      const idx = deckMissions.findIndex((m) => m.id === previewCard.id);
+                      if (idx >= 0) removeMission(idx);
+                    } else {
+                      addMission(previewCard);
+                    }
+                  }}
+                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: deckMissionIds.has(previewCard.id) ? '#2a1a1a' : '#1a2a1a',
+                    color: deckMissionIds.has(previewCard.id) ? '#b33e3e' : '#3e8b3e',
+                    border: `1px solid ${deckMissionIds.has(previewCard.id) ? '#4a2a2a' : '#2a4a2a'}`,
+                  }}
+                >
+                  {deckMissionIds.has(previewCard.id) ? t('removeFromDeck') : t('addToDeck')}
+                </button>
+              ) : (
+                <button
+                  onClick={() => addChar(previewCard)}
+                  disabled={!canAddChar(previewCard)}
+                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: canAddChar(previewCard) ? '#1a2a1a' : '#1a1a1a',
+                    color: canAddChar(previewCard) ? '#3e8b3e' : '#555',
+                    border: `1px solid ${canAddChar(previewCard) ? '#2a4a2a' : '#333'}`,
+                  }}
+                >
+                  {t('addToDeck')}
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <LandscapeBlocker />
     </div>
