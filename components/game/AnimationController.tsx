@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 
 // ----- Duration mapping -----
@@ -935,6 +936,7 @@ export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
   const completeAnimation = useGameStore((s) => s.completeAnimation);
   const setAnimating = useGameStore((s) => s.setAnimating);
+  const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
 
   // Sync isAnimating state
   useEffect(() => {
@@ -948,15 +950,15 @@ export function AnimationController() {
   // Process one animation at a time
   const currentAnim = animationQueue[0] as AnimationEvent | undefined;
 
-  // Auto-complete after animation duration
+  // Auto-complete after animation duration (instant when animations disabled)
   useEffect(() => {
     if (!currentAnim) return;
-    const duration = getAnimationDuration(currentAnim.type as AnimationType);
+    const duration = animationsEnabled ? getAnimationDuration(currentAnim.type as AnimationType) : 0;
     const timer = setTimeout(() => {
       completeAnimation(currentAnim.id);
     }, duration);
     return () => clearTimeout(timer);
-  }, [currentAnim, completeAnimation]);
+  }, [currentAnim, completeAnimation, animationsEnabled]);
 
   if (!currentAnim) return null;
 

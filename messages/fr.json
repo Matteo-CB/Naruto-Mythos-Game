@@ -38,7 +38,15 @@
     "adminCards": "Gestion des Cartes",
     "admin": "Administration",
     "signOut": "Se deconnecter",
-    "draft": "Draft"
+    "draft": "Draft",
+    "settings": "Parametres"
+  },
+  "settings": {
+    "title": "Parametres",
+    "animations": "Activer les animations",
+    "animationsOn": "Les animations sont activees",
+    "animationsOff": "Les animations sont desactivees",
+    "back": "Retour au menu"
   },
   "game": {
     "turn": "Tour {turn}",

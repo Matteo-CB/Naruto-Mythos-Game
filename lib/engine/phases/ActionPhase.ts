@@ -276,16 +276,9 @@ function handleRevealCharacter(
     return checkFlexibleUpgrade(charTopCard, cTop);
   });
 
-  let effectiveCost: number;
-  if (upgradeTarget) {
-    // Reveal-for-upgrade: pay only the difference in cost
-    const existingTopCard = upgradeTarget.stack.length > 0
-      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
-      : upgradeTarget.card;
-    effectiveCost = charTopCard.chakra - existingTopCard.chakra;
-  } else {
-    effectiveCost = calculateEffectiveCost(state, player, char.card, missionIndex, true);
-  }
+  // Reveal cost is always the full printed cost of the hidden card (with modifiers),
+  // whether or not it resolves as an upgrade. Hidden-to-upgrade is NOT discounted.
+  const effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
 
   // Pay cost
   const ps = { ...state[player] };

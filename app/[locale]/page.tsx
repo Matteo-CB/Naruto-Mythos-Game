@@ -396,6 +396,29 @@ export default function Home() {
                   >
                     {t('profile')}
                   </Link>
+                  <Link
+                    href="/settings"
+                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '1px solid #333333',
+                      color: '#888888',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.borderColor = '#c4a35a';
+                      target.style.color = '#c4a35a';
+                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.borderColor = '#333333';
+                      target.style.color = '#888888';
+                      target.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    {t('settings')}
+                  </Link>
                   {!(session.user as Record<string, unknown>)?.discordId && (
                     <a
                       href="/api/user/link-discord"

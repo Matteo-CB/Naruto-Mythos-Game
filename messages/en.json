@@ -38,7 +38,15 @@
     "adminCards": "Card Management",
     "admin": "Administration",
     "signOut": "Sign Out",
-    "draft": "Draft"
+    "draft": "Draft",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "animations": "Enable animations",
+    "animationsOn": "Animations are enabled",
+    "animationsOff": "Animations are disabled",
+    "back": "Back to menu"
   },
   "game": {
     "turn": "Turn {turn}",
