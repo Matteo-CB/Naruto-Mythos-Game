@@ -322,7 +322,7 @@ export default function Home() {
             {/* Admin link (only visible to admin) */}
             {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
               <motion.div
-                className="mt-2"
+                className="mt-2 w-full"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 1.35, ease: 'easeOut' }}

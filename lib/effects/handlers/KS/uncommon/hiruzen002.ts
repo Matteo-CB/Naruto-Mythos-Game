@@ -22,14 +22,13 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
 
   // Find all affordable Leaf Village characters in hand
   const affordableLeafIndices: string[] = [];
+  const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   for (let i = 0; i < playerState.hand.length; i++) {
     const card = playerState.hand[i];
     if (card.group !== 'Leaf Village') continue;
-    const reducedCost = Math.max(0, card.chakra - 1);
-    if (playerState.chakra < reducedCost) continue;
 
     // Check if this card can be legally placed on at least one mission (fresh play OR upgrade)
-    const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+    // and is affordable at that placement's correct cost.
     let canPlace = false;
     for (const mission of state.activeMissions) {
       const sameNameChar = mission[friendlySide].find((c) => {
@@ -38,14 +37,24 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
         return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       });
       if (!sameNameChar) {
-        canPlace = true;
-        break;
-      } else {
-        // Allow if upgrade is possible (new card has strictly higher cost)
-        const existingTop = sameNameChar.stack.length > 0 ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
-        if ((card.chakra ?? 0) > (existingTop.chakra ?? 0)) {
+        // Fresh play — cost is card.chakra - 1
+        const freshCost = Math.max(0, card.chakra - 1);
+        if (playerState.chakra >= freshCost) {
           canPlace = true;
           break;
+        }
+      } else {
+        // Allow if upgrade is possible (new card has strictly higher cost)
+        const existingTop = sameNameChar.stack.length > 0
+          ? sameNameChar.stack[sameNameChar.stack.length - 1]
+          : sameNameChar.card;
+        if ((card.chakra ?? 0) > (existingTop.chakra ?? 0)) {
+          // Upgrade cost is (diff - 1), which can be lower than fresh-play cost
+          const upgradeCost = Math.max(0, (card.chakra - existingTop.chakra) - 1);
+          if (playerState.chakra >= upgradeCost) {
+            canPlace = true;
+            break;
+          }
         }
       }
     }

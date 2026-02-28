@@ -403,6 +403,7 @@
         "kakashi106DevolveUpgrade": "Choisissez un personnage ennemi ameliore pour le de-evoluer (copier l'effet de la carte defaussee).",
         "kankuro119Defeat": "Choisissez un personnage ennemi avec Puissance 3 ou moins a vaincre.",
         "kankuro119MoveCharacter": "Choisissez un personnage en jeu a deplacer vers une autre mission.",
+        "kiba026OpponentChoose": "Choisissez un de vos personnages (cout {cost}) a cacher.",
         "kiba113Hide": "Choisissez un personnage dans cette mission a cacher.",
         "kiba113Defeat": "Choisissez un personnage dans cette mission a vaincre.",
         "kidomaru124Defeat": "Choisissez un ennemi avec Puissance 3 ou moins dans une autre mission a vaincre.",
@@ -419,6 +420,8 @@
         "tayuya125PlaySound": "Choisissez un personnage Village du Son de votre main a jouer (2 de moins).",
         "temari121MoveFriendly": "Choisissez un personnage allie a deplacer vers une autre mission.",
         "temari121MoveAny": "Choisissez un personnage en jeu a deplacer vers une autre mission.",
+        "shino115MoveFriendly": "Shino Aburame (115) EMBUSCADE : Choisissez un personnage allie dans cette mission a deplacer.",
+        "sakon127MoveFriendly": "Sakon (127) AMELIORATION : Choisissez un personnage allie en jeu a deplacer.",
         "tenten118DefeatHidden": "Selectionnez un personnage cache dans cette mission a vaincre.",
         "ukon124bHide": "Choisissez un personnage ennemi avec Puissance 5 ou moins a cacher.",
         "gaara139Defeat": "Selectionnez un personnage ennemi avec cout inferieur a {hiddenCount} a vaincre.",
@@ -625,6 +628,7 @@
     "createPrivateRoom": "Creer un Salon Prive",
     "findMatchDesc": "Trouver un adversaire aleatoire pres de votre niveau",
     "cancel": "Annuler",
+    "join": "Rejoindre",
     "casual": "Casual",
     "ranked": "Classe",
     "casualDesc": "Match non classe — jouez pour le plaisir, pas de changement ELO",
@@ -1391,6 +1395,9 @@
     "saveDeckName": "Nom du deck",
     "saveDeckPlaceholder": "Mon Deck Draft",
     "deckSaved": "Deck sauvegarde !",
-    "deckSaveError": "Erreur lors de la sauvegarde"
+    "deckSaveError": "Erreur lors de la sauvegarde",
+    "holo": "HOLO",
+    "cardBack": "Dos de carte",
+    "boosterPack": "Paquet Booster"
   }
 }

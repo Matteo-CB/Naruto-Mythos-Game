@@ -1042,6 +1042,26 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     '[⧗] CHAKRA +1 for both players.',
   ],
 
+  // 115 - Shino Aburame (R/RA)
+  'KS-115-R': [
+    '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
+    'AMBUSH: Move a friendly character in this mission to another mission.',
+  ],
+  'KS-115-RA': [
+    '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
+    'AMBUSH: Move a friendly character in this mission to another mission.',
+  ],
+
+  // 127 - Sakon (R/RA)
+  'KS-127-R': [
+    '[⧗] Each enemy character in this mission has -1 Power.',
+    'UPGRADE: Move a friendly character in play to another mission.',
+  ],
+  'KS-127-RA': [
+    '[⧗] Each enemy character in this mission has -1 Power.',
+    'UPGRADE: Move a friendly character in play to another mission.',
+  ],
+
   // =====================
   // SECRET V (SV) — Gold variants of Secret cards
   // =====================

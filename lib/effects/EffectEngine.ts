@@ -7,6 +7,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
+import { isProtectedFromEnemyHide } from './ContinuousEffects';
 
 /**
  * Central effect resolver.
@@ -28,6 +29,82 @@ export class EffectEngine {
   ): GameState {
     let newState = deepClone(state);
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+
+    // Cards where UPGRADE fires before MAIN when played as an upgrade.
+    // KS-137-S (Kakashi 137): UPGRADE = move self, MAIN = hide upgraded char in (new) mission.
+    // processRemainingEffects uses findCharByInstanceId so it picks up the new mission after the move.
+    const UPGRADE_BEFORE_MAIN = new Set(['KS-137-S']);
+    if (isUpgrade && UPGRADE_BEFORE_MAIN.has(topCard.id)) {
+      const hasUpgradeFirst = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
+      if (hasUpgradeFirst) {
+        const upgradeHandler = getEffectHandler(topCard.id, 'UPGRADE');
+        if (upgradeHandler) {
+          try {
+            const ctx: EffectContext = {
+              state: newState,
+              sourcePlayer: player,
+              sourceCard: character,
+              sourceMissionIndex: missionIndex,
+              triggerType: 'UPGRADE',
+              isUpgrade: true,
+            };
+            const result = upgradeHandler(ctx);
+            const hasMainEffect2 = (topCard.effects ?? []).some(
+              (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
+            );
+            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+              // Queue MAIN to run after UPGRADE resolves
+              const remainingAfterUpgrade: EffectType[] = hasMainEffect2 ? ['MAIN'] : [];
+              newState = EffectEngine.createPendingTargetSelection(
+                result.state, player, character, missionIndex, 'UPGRADE', true,
+                result, remainingAfterUpgrade,
+              );
+              return newState;
+            }
+            newState = result.state;
+            // UPGRADE resolved immediately — fall through to MAIN below
+          } catch (err) {
+            console.error(`[EffectEngine] UPGRADE-first handler error for ${topCard.id}:`, err);
+          }
+        }
+      }
+      // MAIN fires after UPGRADE (using findCharByInstanceId in processRemainingEffects
+      // if UPGRADE created a pending; or here directly if UPGRADE resolved immediately).
+      const hasMain137 = (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
+      );
+      if (hasMain137) {
+        const mainHandler = getEffectHandler(topCard.id, 'MAIN');
+        if (mainHandler) {
+          try {
+            // Re-find the character in case UPGRADE moved it
+            const charResult = EffectEngine.findCharByInstanceId(newState, character.instanceId);
+            const updatedChar = charResult?.character ?? character;
+            const updatedMissionIndex = charResult?.missionIndex ?? missionIndex;
+            const ctx: EffectContext = {
+              state: newState,
+              sourcePlayer: player,
+              sourceCard: updatedChar,
+              sourceMissionIndex: updatedMissionIndex,
+              triggerType: 'MAIN',
+              isUpgrade: true,
+            };
+            const result = mainHandler(ctx);
+            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+              newState = EffectEngine.createPendingTargetSelection(
+                result.state, player, updatedChar, updatedMissionIndex, 'MAIN', true,
+                result, [],
+              );
+              return newState;
+            }
+            newState = result.state;
+          } catch (err) {
+            console.error(`[EffectEngine] MAIN (after UPGRADE-first) handler error for ${topCard.id}:`, err);
+          }
+        }
+      }
+      return newState;
+    }
 
     // Resolve MAIN effects
     const hasMainEffect = (topCard.effects ?? []).some(
@@ -536,6 +613,9 @@ export class EffectEngine {
       id: actionId,
       type: actionType,
       player: result.selectingPlayer ?? player,
+      // Track who originally triggered this pending action so GameEngine can correctly
+      // preserve the initiating player's turn when the opponent resolves a forced choice.
+      originPlayer: player,
       description: actionDescription,
       descriptionKey: result.descriptionKey,
       descriptionParams: result.descriptionParams,
@@ -1243,7 +1323,9 @@ export class EffectEngine {
       case 'KANKURO119_MOVE_CHARACTER':
       case 'TEMARI121_MOVE_FRIENDLY':
       case 'TEMARI121_MOVE_ANY':
-      case 'ITACHI152_CHOOSE_MOVE': {
+      case 'ITACHI152_CHOOSE_MOVE':
+      case 'SHINO115_MOVE_FRIENDLY':
+      case 'SAKON127_MOVE_FRIENDLY': {
         // Stage 1: player chose which character to move. Now prompt for destination mission.
         const moveCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
         if (moveCharResult) {
@@ -1313,7 +1395,9 @@ export class EffectEngine {
       case 'KANKURO119_MOVE_CHARACTER_DESTINATION':
       case 'TEMARI121_MOVE_FRIENDLY_DESTINATION':
       case 'TEMARI121_MOVE_ANY_DESTINATION':
-      case 'ITACHI152_CHOOSE_MOVE_DESTINATION': {
+      case 'ITACHI152_CHOOSE_MOVE_DESTINATION':
+      case 'SHINO115_MOVE_FRIENDLY_DESTINATION':
+      case 'SAKON127_MOVE_FRIENDLY_DESTINATION': {
         const destMissionIdx = parseInt(targetId, 10);
         if (!isNaN(destMissionIdx)) {
           let moveCharId = '';
@@ -3042,6 +3126,7 @@ export class EffectEngine {
           id: actionId_dosu,
           type: 'SELECT_TARGET' as PendingAction['type'],
           player: opponentPlayer_dosu,
+          originPlayer: pendingEffect.sourcePlayer, // Dosu's player initiated this forced choice
           description: `Dosu Kinuta (069): Your hidden character was targeted. Click to reveal (pay ${revealCost_dosu} chakra) or skip to let it be defeated.`,
           descriptionKey: 'game.effect.desc.dosu069OpponentChoice',
           descriptionParams: { cost: String(revealCost_dosu) },
@@ -3865,10 +3950,13 @@ export class EffectEngine {
               };
               const copyResult = handler(ctx);
               if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
-                // Chain the target selection for the copied effect
+                // Chain the target selection for the copied effect.
+                // Override selectingPlayer: when Kakashi copies an effect, Kakashi's player
+                // makes all target choices (even if the original card gives the opponent a choice).
+                const adjustedCopyResult = { ...copyResult, selectingPlayer: undefined };
                 return EffectEngine.createPendingTargetSelection(
                   copyResult.state, pending.sourcePlayer, kakashiResult.character,
-                  kakashiResult.missionIndex, 'MAIN', false, copyResult, [],
+                  kakashiResult.missionIndex, 'MAIN', false, adjustedCopyResult, [],
                 );
               }
               return copyResult.state;
@@ -4627,6 +4715,11 @@ export class EffectEngine {
     // Check hide immunity from enemy effects (Ichibi 076/130, Kyubi 129)
     if (charResult.player !== sourcePlayer && EffectEngine.isImmuneToEnemyHide(charResult.character)) {
       return state; // Immune — hide blocked
+    }
+
+    // Check Shino 115 mission-level protection: friendly allies cannot be hidden by enemy effects
+    if (charResult.player !== sourcePlayer && isProtectedFromEnemyHide(state, charResult.character, charResult.player)) {
+      return state; // Protected by Shino 115 — hide blocked
     }
 
     let newState = EffectEngine.hideCharacter(state, targetInstanceId);
@@ -5457,8 +5550,6 @@ export class EffectEngine {
     if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) return state;
 
     const card = ps.hand[cardIndex];
-    const reducedCost = Math.max(0, card.chakra - 1);
-    if (ps.chakra < reducedCost) return state;
 
     const friendlySide_h002: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -5484,8 +5575,21 @@ export class EffectEngine {
       if (hasNameConflict) return state;
     }
 
-    // Pay reduced cost
-    ps.chakra -= reducedCost;
+    // Compute actual cost: for upgrades pay (diff - 1), for fresh play pay (cost - 1)
+    let actualCost: number;
+    if (existingIdx >= 0) {
+      const existing_h002 = mission[friendlySide_h002][existingIdx];
+      const existingTop_h002 = existing_h002.stack.length > 0
+        ? existing_h002.stack[existing_h002.stack.length - 1]
+        : existing_h002.card;
+      actualCost = Math.max(0, (card.chakra - existingTop_h002.chakra) - 1);
+    } else {
+      actualCost = Math.max(0, card.chakra - 1);
+    }
+    if (ps.chakra < actualCost) return state;
+
+    // Pay cost
+    ps.chakra -= actualCost;
     ps.hand.splice(cardIndex, 1);
 
     const isHiruzenUpgrade = pending.isUpgrade;
@@ -5511,9 +5615,9 @@ export class EffectEngine {
       newState.log = logAction(
         newState.log, newState.turn, 'action', player,
         'EFFECT_UPGRADE',
-        `Hiruzen Sarutobi (002): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${isHiruzenUpgrade ? ' with POWERUP 2' : ''}.`,
+        `Hiruzen Sarutobi (002): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (diff-1)${isHiruzenUpgrade ? ' with POWERUP 2' : ''}.`,
         'game.log.effect.upgradeLeafReduced',
-        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
+        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
     } else {
       // Fresh play
@@ -5541,9 +5645,9 @@ export class EffectEngine {
       newState.log = logAction(
         newState.log, newState.turn, 'action', player,
         'EFFECT',
-        `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${reducedCost} chakra (1 less)${upgradeNote}.`,
+        `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (1 less)${upgradeNote}.`,
         'game.log.effect.playLeafReduced',
-        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(reducedCost) },
+        { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
     }
 
@@ -7034,9 +7138,12 @@ export class EffectEngine {
     try {
       const copyResult = copiedHandler(copyCtx);
       if (copyResult.requiresTargetSelection && copyResult.validTargets && copyResult.validTargets.length > 0) {
+        // Override selectingPlayer: when an effect is copied, the copier's player makes all
+        // target choices regardless of what the original handler specifies.
+        const adjustedCopyResult = { ...copyResult, selectingPlayer: undefined };
         newState = EffectEngine.createPendingTargetSelection(
           copyResult.state, pendingEffect.sourcePlayer, copierResult.character,
-          copierResult.missionIndex, effectType, false, copyResult, [],
+          copierResult.missionIndex, effectType, false, adjustedCopyResult, [],
         );
       } else {
         newState = copyResult.state;
