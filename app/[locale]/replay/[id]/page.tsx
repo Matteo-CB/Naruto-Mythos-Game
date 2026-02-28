@@ -10,7 +10,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ReplayBoard } from '@/components/replay/ReplayBoard';
 import { PlaybackControls } from '@/components/replay/PlaybackControls';
 import { GameEngine } from '@/lib/engine/GameEngine';
-import { resetIdCounter } from '@/lib/engine/utils/id';
+import { resetIdCounter, getIdCounter, setIdCounter } from '@/lib/engine/utils/id';
 import type { GameState, GamePhase, GameAction, PlayerID } from '@/lib/engine/types';
 
 interface ReplayLogEntry {
@@ -246,8 +246,6 @@ function VisualReplay({
   // replay UI shows each turn's Start Phase properly.
   const states = useMemo(() => {
     // Reset the instance ID counter so deterministic IDs match the original game.
-    // For older saved games with non-deterministic IDs, the recovery loop below
-    // handles stuck states caused by ID mismatches.
     resetIdCounter();
 
     // The initial state is already in action phase (Start Phase for Turn 1 was
@@ -257,54 +255,44 @@ function VisualReplay({
     const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
 
+    // ---- Main loop: apply each recorded action ----
     for (const { player, action } of actionHistory) {
       const prevTurn = current.turn;
+      const counterBefore = getIdCounter();
       try {
         const next = GameEngine.applyAction(current, player, action);
-        // Check the action actually did something meaningful
-        if (next.phase === current.phase && next.turn === current.turn &&
-            next.pendingActions.length === current.pendingActions.length &&
-            next.player1.chakra === current.player1.chakra &&
-            next.player2.chakra === current.player2.chakra &&
-            next.player1.hasPassed === current.player1.hasPassed &&
-            next.player2.hasPassed === current.player2.hasPassed) {
-          // Action had no effect (likely ID mismatch from old replay) — skip it
-          continue;
-        }
+        // Always use the result — even if the action had "no visible effect",
+        // the ID counter has advanced and we must stay in sync.
         current = next;
-      } catch (err) {
-        console.warn('[Replay] Error applying action, skipping:', { player, actionType: action.type, turn: current.turn, phase: current.phase }, err);
+      } catch {
+        // Action threw — restore counter to prevent desync, keep current state
+        setIdCounter(counterBefore);
         continue;
       }
 
-      // If turn changed, inject a synthetic start-phase snapshot so the UI
-      // displays "Turn X — Start Phase" with the newly revealed mission.
+      // If turn changed, inject a synthetic start-phase snapshot
       if (current.turn !== prevTurn && current.phase === 'action') {
-        const startSnapshot: GameState = { ...current, phase: 'start' as GamePhase };
-        result.push(startSnapshot);
+        result.push({ ...current, phase: 'start' as GamePhase });
       }
-
       result.push(current);
     }
 
-    // Recovery: auto-advance stuck states until game reaches gameOver or stops
-    // changing. The actionHistory may not contain all phase transitions (e.g.
-    // ADVANCE_PHASE fired from a setTimeout in gameStore, or pending target
-    // selections that used non-deterministic IDs in old replays).
+    // ---- Recovery loop: advance stuck states after actionHistory is exhausted ----
+    // Handles: auto-resolve pending effects, force phase transitions,
+    // clean up stale state, and advance through remaining turns.
     let recovery = 0;
-    while (current.phase !== 'gameOver' && recovery < 80) {
+    while (current.phase !== 'gameOver' && recovery < 120) {
       let advanced: GameState | null = null;
       try {
+        // --- Clean up stale pendingEffects without matching pendingActions ---
+        if (current.pendingEffects.length > 0 && current.pendingActions.length === 0) {
+          current = { ...current, pendingEffects: [] };
+        }
+
         if (current.phase === 'action') {
           if (current.player1.hasPassed && current.player2.hasPassed) {
-            // Both passed — force mission phase transition by setting phase
-            // directly and calling transitionToMissionPhase via ADVANCE_PHASE won't
-            // work, so we use a PASS which the engine handles gracefully.
-            const target = current.edgeHolder;
-            // The edge holder already passed, so try the other player
-            const other: PlayerID = target === 'player1' ? 'player2' : 'player1';
-            // Try both — one might not have technically passed yet in the state
-            for (const p of [target, other]) {
+            // Both passed — try PASS to trigger mission phase transition
+            for (const p of ['player1', 'player2'] as PlayerID[]) {
               try {
                 const attempt = GameEngine.applyAction(current, p, { type: 'PASS' });
                 if (attempt.phase !== current.phase || attempt.turn !== current.turn) {
@@ -313,22 +301,23 @@ function VisualReplay({
                 }
               } catch { /* try next */ }
             }
-            // If PASS didn't advance, force the transition by directly calling the engine
+            // If PASS didn't advance, force mission phase + ADVANCE_PHASE
             if (!advanced) {
               try {
-                // Manually set phase to mission and run scoring
-                const forced = { ...current, phase: 'mission' as GamePhase };
+                const forced: GameState = { ...current, phase: 'mission' as GamePhase, missionScoredThisTurn: false };
                 advanced = GameEngine.applyAction(forced, current.edgeHolder, { type: 'ADVANCE_PHASE' });
               } catch { /* fallthrough */ }
             }
           }
-          // Single player hasn't passed — stuck; break out
+          // Not both passed — can't simulate player decisions; break
           if (!advanced) break;
-        } else if (current.phase === 'mission' && current.pendingActions.length > 0) {
-          // Mission phase with pending SCORE effects — auto-resolve them
+
+        } else if ((current.phase === 'mission' || current.phase === 'end') && current.pendingActions.length > 0) {
+          // Resolve pending actions (SCORE effects, Rock Lee moves, Akamaru returns)
           const pending = current.pendingActions[0];
           const effect = current.pendingEffects.find((e) => e.id === pending.sourceEffectId);
-          const isOptional = (effect?.isOptional) || pending.minSelections === 0 || pending.options.length === 0;
+          const isOptional = effect?.isOptional || pending.minSelections === 0 || pending.options.length === 0;
+
           if (isOptional) {
             advanced = GameEngine.applyAction(current, pending.player, {
               type: 'DECLINE_OPTIONAL_EFFECT',
@@ -341,60 +330,92 @@ function VisualReplay({
               selectedTargets: [pending.options[0]],
             });
           }
+
+          // If the action didn't resolve the pending, force-remove it
+          if (!advanced || advanced.pendingActions.length === current.pendingActions.length) {
+            const cleaned = advanced ?? current;
+            advanced = {
+              ...cleaned,
+              pendingActions: cleaned.pendingActions.filter((p) => p.id !== pending.id),
+              pendingEffects: pending.sourceEffectId
+                ? cleaned.pendingEffects.filter((e) => e.id !== pending.sourceEffectId)
+                : cleaned.pendingEffects,
+            };
+          }
+
         } else if (current.phase === 'mission' && current.pendingActions.length === 0) {
-          // Mission phase with no pending actions — advance regardless of
-          // missionScoringComplete flag (it may not have been set if scoring
-          // ran without creating any SCORE-effect pendings).
+          // Mission phase done — advance to end phase
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-        } else if (current.phase === 'end' && current.pendingActions.length > 0) {
-          // End phase with pending actions (e.g., Rock Lee 117 move, Akamaru 028 return)
-          const pending = current.pendingActions[0];
-          const effect = current.pendingEffects.find((e) => e.id === pending.sourceEffectId);
-          const isOptional = (effect?.isOptional) || pending.minSelections === 0;
-          if (isOptional) {
-            advanced = GameEngine.applyAction(current, pending.player, {
-              type: 'DECLINE_OPTIONAL_EFFECT',
-              pendingEffectId: pending.sourceEffectId ?? pending.id,
-            });
-          } else if (pending.options.length > 0) {
-            advanced = GameEngine.applyAction(current, pending.player, {
-              type: 'SELECT_TARGET',
-              pendingActionId: pending.id,
-              selectedTargets: [pending.options[0]],
-            });
-          }
-        } else if (current.phase === 'end' && current.pendingActions.length === 0 && current.pendingEffects.length === 0) {
-          // End phase with nothing pending — advance to next turn
+
+        } else if (current.phase === 'end' && current.pendingActions.length === 0) {
+          // End phase done — advance to next turn or game over
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+
         } else {
-          break; // Not stuck in a recoverable way
+          break;
         }
       } catch {
-        // If the recovery action threw, try forcing ADVANCE_PHASE as last resort
+        // Last resort: force ADVANCE_PHASE
         try {
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
         } catch {
-          break;
+          // If even that fails, try forcing the phase transition directly
+          if (current.phase === 'mission') {
+            advanced = {
+              ...current,
+              phase: 'end' as GamePhase,
+              pendingActions: [],
+              pendingEffects: [],
+              missionScoringComplete: undefined,
+            };
+          } else if (current.phase === 'end') {
+            if (current.turn >= 4) {
+              advanced = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
+            } else {
+              // Force next turn — we lose the start phase details but at least the replay continues
+              advanced = {
+                ...current,
+                phase: 'action' as GamePhase,
+                turn: (current.turn + 1) as 1 | 2 | 3 | 4,
+                pendingActions: [],
+                pendingEffects: [],
+                player1: { ...current.player1, hasPassed: false },
+                player2: { ...current.player2, hasPassed: false },
+              };
+            }
+          } else {
+            break;
+          }
         }
       }
+
       if (!advanced) break;
 
-      // Detect progress — must change phase, turn, or pending count
+      // Detect progress — must change phase, turn, pending count, or missionScoringComplete
       const madeProgress = advanced.phase !== current.phase ||
         advanced.turn !== current.turn ||
         advanced.pendingActions.length !== current.pendingActions.length ||
         advanced.pendingEffects.length !== current.pendingEffects.length;
       if (!madeProgress) break;
 
-      // Inject start-phase snapshot for recovery-driven turn changes too
+      // Inject start-phase snapshot for turn changes
       if (advanced.turn !== current.turn && advanced.phase === 'action') {
-        const startSnapshot: GameState = { ...advanced, phase: 'start' as GamePhase };
-        result.push(startSnapshot);
+        result.push({ ...advanced, phase: 'start' as GamePhase });
       }
 
       current = advanced;
       result.push(current);
       recovery++;
+    }
+
+    if (current.phase !== 'gameOver') {
+      console.warn('[Replay] Could not reach gameOver. Final state:', {
+        turn: current.turn, phase: current.phase,
+        pendingActions: current.pendingActions.length,
+        pendingEffects: current.pendingEffects.length,
+        p1Passed: current.player1.hasPassed,
+        p2Passed: current.player2.hasPassed,
+      });
     }
 
     return result;

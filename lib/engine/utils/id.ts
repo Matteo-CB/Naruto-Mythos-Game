@@ -16,3 +16,11 @@ export function generateGameId(): string {
 export function resetIdCounter(): void {
   _counter = 0;
 }
+
+export function getIdCounter(): number {
+  return _counter;
+}
+
+export function setIdCounter(value: number): void {
+  _counter = value;
+}

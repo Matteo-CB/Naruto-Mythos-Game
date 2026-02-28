@@ -223,8 +223,10 @@ export class GameEngine {
               newState = GameEngine.transitionToStartPhase(newState);
             }
           }
-        } else if (action.type === 'ADVANCE_PHASE' && newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
+        } else if (action.type === 'ADVANCE_PHASE' && newState.pendingActions.length === 0) {
           // Fallback: force advance when stuck in end phase with no pending actions (e.g., during replay)
+          // Clear any stale pending effects that don't have matching actions
+          newState.pendingEffects = [];
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
           if (newState.turn >= TOTAL_TURNS) {
