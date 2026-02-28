@@ -362,16 +362,16 @@ export function TargetSelector() {
           </motion.span>
 
           {/* Cards grid */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-wrap gap-3 mb-6 justify-center" style={{ maxWidth: '720px' }}>
             {cards.map((card, idx) => {
               const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
-              const borderColor = card.isSummon ? '#4aff6b' : '#555555';
+              const borderColor = card.isSummon ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#555555';
               return (
                 <motion.div
                   key={idx}
                   initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
                   animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.15 }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
                   className="relative"
                   style={{
                     width: dims.previewMed.w + 'px',
@@ -381,7 +381,10 @@ export function TargetSelector() {
                     border: `2px solid ${borderColor}`,
                     boxShadow: card.isSummon
                       ? `0 0 20px ${borderColor}40, 0 4px 16px rgba(0, 0, 0, 0.6)`
-                      : '0 4px 16px rgba(0, 0, 0, 0.6)',
+                      : card.isDiscarded
+                        ? `0 0 16px rgba(179, 62, 62, 0.4), 0 4px 16px rgba(0, 0, 0, 0.6)`
+                        : '0 4px 16px rgba(0, 0, 0, 0.6)',
+                    opacity: card.isDiscarded ? 0.6 : 1,
                   }}
                 >
                   {imgPath ? (
@@ -408,9 +411,11 @@ export function TargetSelector() {
                     <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
                       {card.name_fr}
                     </div>
-                    <div className="text-[9px] mt-0.5" style={{ color: card.isSummon ? '#4aff6b' : '#888888' }}>
-                      {card.isSummon ? t('game.effect.tayuya065Summon') : t('game.effect.tayuya065PutBack')}
-                    </div>
+                    {(card.isSummon || card.isDiscarded) && (
+                      <div className="text-[9px] mt-0.5" style={{ color: card.isSummon ? '#4aff6b' : '#b33e3e' }}>
+                        {card.isSummon ? t('game.effect.tayuya065Summon') : t('game.effect.cardDiscarded')}
+                      </div>
+                    )}
                   </div>
 
                   {/* Chakra badge */}

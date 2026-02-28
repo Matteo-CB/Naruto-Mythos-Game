@@ -57,14 +57,13 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
 
-      // Check if this character has any non-continuous, non-SCORE effects
+      // Check if this character has any non-continuous, non-SCORE, non-UPGRADE instant effects
       const hasCopyableEffect = topCard.effects.some((effect) => {
-        // Skip SCORE effects
-        if (effect.type === 'SCORE') return false;
-        // Skip continuous effects (marked with [hourglass] symbol)
-        if (effect.description.includes('[hourglass]') || effect.description.includes('[\\u29D7]')) return false;
-        // Accept MAIN and UPGRADE instant effects
-        return effect.type === 'MAIN' || effect.type === 'UPGRADE' || effect.type === 'AMBUSH';
+        // Only copy MAIN or AMBUSH instant effects (not UPGRADE, not SCORE)
+        if (effect.type !== 'MAIN' && effect.type !== 'AMBUSH') return false;
+        // Skip continuous effects (marked with [⧗] symbol)
+        if (effect.description.includes('[⧗]')) return false;
+        return true;
       });
 
       if (hasCopyableEffect) {

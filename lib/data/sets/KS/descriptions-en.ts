@@ -319,7 +319,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 016/130 - KAKASHI HATAKE (UC) - "Copy Ninja"
   'KS-016-UC': [
-    'Copy the instant effect of an enemy character with cost 4 or less in this mission.',
+    'Copy a non-upgrade instant effect of an enemy character with cost 4 or less in play.',
     'MAIN effect: Instead, there is no cost limit.',
   ],
 
@@ -418,7 +418,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 053/130 - KABUTO YAKUSHI (UC) - "Dead Soul Jutsu"
   'KS-053-UC': [
     'Draw a card.',
-    'Play a character from your discard pile anywhere, paying its cost minus 3.',
+    'Play the top character of your discard pile anywhere, paying its cost minus 3.',
   ],
 
   // 054/130 - KABUTO YAKUSHI (UC) - "Chakra Scalpel"
@@ -870,7 +870,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 148/130 - KAKASHI HATAKE (M) - "Original Team 7"
   'KS-148-M': [
     'Gain the Edge.',
-    'Copy an instant effect of another friendly Team 7 character in play.',
+    'Copy a non-upgrade instant effect of another friendly Team 7 character in play.',
   ],
 
   // 149/130 - KIBA INUZUKA (M) - "Fang Over Fang"

@@ -329,7 +329,7 @@ export default function Home() {
               >
                 <Link
                   href="/admin"
-                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                  className="group relative flex w-full h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                   style={{
                     backgroundColor: '#141414',
                     border: '1px solid #ef4444',

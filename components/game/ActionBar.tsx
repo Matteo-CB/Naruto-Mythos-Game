@@ -84,6 +84,8 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
+      // Cannot upgrade a hidden character ([⧗] effects require face-visible status)
+      if (c.isHidden) return false;
       // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;

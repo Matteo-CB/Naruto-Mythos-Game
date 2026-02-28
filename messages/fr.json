@@ -277,6 +277,7 @@
       "tayuya065UpgradeRevealNone": "Aucune carte Invocation trouvee. Cartes remises sur le dessus.",
       "tayuya065Summon": "PIOCHEE (Invocation)",
       "tayuya065PutBack": "Remise sur le dessus",
+      "cardDiscarded": "DEFAUSSEE",
       "desc": {
         "chooseMissionMove": "Choisissez une mission pour y deplacer le personnage.",
         "chooseMissionPlaceHidden": "Choisissez une mission pour y placer le personnage cache.",
@@ -484,6 +485,7 @@
       "invalidMission": "Index de mission invalide.",
       "targetNotFound": "Personnage cible introuvable.",
       "cannotUpgradeOpponent": "Impossible d'ameliorer le personnage adverse.",
+      "cannotUpgradeHidden": "Impossible d'ameliorer un personnage cache.",
       "upgradeSameName": "L'amelioration doit porter le meme nom de personnage.",
       "upgradeHigherCost": "L'amelioration doit avoir un cout strictement superieur. Nouveau : {newCost}, Actuel : {currentCost}.",
       "notEnoughChakraUpgrade": "Pas assez de chakra. Besoin de {need} (difference), vous avez {have}.",

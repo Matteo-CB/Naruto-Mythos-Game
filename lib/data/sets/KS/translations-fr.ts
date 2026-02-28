@@ -367,8 +367,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 016/130 - KAKASHI HATAKE (UC) - "Ninja Copieur"
   'KS-016-UC': [
-    'Copiez l\'effet instantane d\'un personnage ennemi avec un cout de 4 ou moins dans cette mission.',
-    'effet MAIN : A la place, il n\'y a pas de limite de cout.',
+    'Copiez un effet instantané non-amélioration d\'un personnage ennemi avec un coût de 4 ou moins en jeu.',
+    'effet MAIN : A la place, il n\'y a pas de limite de coût.',
   ],
 
   // 017/130 - CHOJI AKIMICHI (C) - "Decuplement"
@@ -880,7 +880,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 148/130 - KAKASHI HATAKE (M) - "Equipe 7 Originelle"
   'KS-148-M': [
     'Gagnez l\'Initiative.',
-    'Copiez un effet instantane d\'un autre personnage Equipe 7 allie en jeu.',
+    'Copiez un effet instantané non-amélioration d\'un autre personnage Equipe 7 allié en jeu.',
   ],
 
   // 149/130 - KIBA INUZUKA (M) - "Crocs Lacerateurs"
