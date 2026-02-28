@@ -32,6 +32,8 @@ import { registerOrochimaru126Handlers } from './orochimaru126';
 import { registerItachi128Handlers } from './itachi128';
 import { registerKyubi129Handlers } from './kyubi129';
 import { registerIchibi130Handlers } from './ichibi130';
+import { registerShino115Handlers } from './shino115';
+import { registerSakon127Handlers } from './sakon127';
 
 export function registerAllRareHandlers(): void {
   // Existing handlers
@@ -66,4 +68,6 @@ export function registerAllRareHandlers(): void {
   registerItachi128Handlers();    // 128/130 - ITACHI: UPGRADE move friendly / [continuous] enemy -1 Power
   registerKyubi129Handlers();     // 129/130 - KYUBI: [continuous] upgrade over Naruto / immune
   registerIchibi130Handlers();    // 130/130 - ICHIBI: [continuous] immune / UPGRADE defeat all hidden in mission
+  registerShino115Handlers();    // 115/130 - SHINO ABURAME: [continuous] ally hide protection / AMBUSH move friendly
+  registerSakon127Handlers();    // 127/130 - SAKON: [continuous] enemy -1 Power / UPGRADE move friendly
 }

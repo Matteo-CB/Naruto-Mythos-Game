@@ -403,6 +403,7 @@
         "kakashi106DevolveUpgrade": "Choose an upgraded enemy character to de-evolve (copy discarded card's effect).",
         "kankuro119Defeat": "Choose an enemy character with Power 3 or less to defeat.",
         "kankuro119MoveCharacter": "Choose a character in play to move to another mission.",
+        "kiba026OpponentChoose": "Choose one of your characters (cost {cost}) to hide.",
         "kiba113Hide": "Choose a character in this mission to hide.",
         "kiba113Defeat": "Choose a character in this mission to defeat.",
         "kidomaru124Defeat": "Choose an enemy with Power 3 or less in another mission to defeat.",
@@ -419,6 +420,8 @@
         "tayuya125PlaySound": "Choose a Sound Village character from your hand to play (paying 2 less).",
         "temari121MoveFriendly": "Choose a friendly character to move to another mission.",
         "temari121MoveAny": "Choose any character in play to move to another mission.",
+        "shino115MoveFriendly": "Shino Aburame (115) AMBUSH: Choose a friendly character in this mission to move to another mission.",
+        "sakon127MoveFriendly": "Sakon (127) UPGRADE: Choose a friendly character in play to move to another mission.",
         "tenten118DefeatHidden": "Select a hidden character in this mission to defeat.",
         "ukon124bHide": "Choose an enemy character with Power 5 or less to hide.",
         "gaara139Defeat": "Select an enemy character with cost less than {hiddenCount} to defeat.",
@@ -625,6 +628,7 @@
     "createPrivateRoom": "Create Private Room",
     "findMatchDesc": "Find a random opponent near your skill level",
     "cancel": "Cancel",
+    "join": "Join",
     "casual": "Casual",
     "ranked": "Ranked",
     "casualDesc": "Unranked match — play for fun, no ELO changes",
@@ -1707,6 +1711,9 @@
     "saveDeckName": "Deck name",
     "saveDeckPlaceholder": "My Draft Deck",
     "deckSaved": "Deck saved!",
-    "deckSaveError": "Failed to save deck"
+    "deckSaveError": "Failed to save deck",
+    "holo": "HOLO",
+    "cardBack": "Card back",
+    "boosterPack": "Booster Pack"
   }
 }

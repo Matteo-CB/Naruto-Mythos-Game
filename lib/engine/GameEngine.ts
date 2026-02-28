@@ -153,6 +153,15 @@ export class GameEngine {
 
       case 'action':
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
+          // Capture the originPlayer of the pending action BEFORE it is removed by handlePendingAction.
+          // This lets us detect forced-choice resolutions (e.g., Dosu069 opponent choice) where
+          // the resolver should keep their turn instead of handing it back to the source player.
+          let resolvedPendingOriginPlayer: PlayerID | undefined;
+          if ('pendingActionId' in action && action.pendingActionId) {
+            const pa = newState.pendingActions.find((p) => p.id === action.pendingActionId);
+            resolvedPendingOriginPlayer = pa?.originPlayer;
+          }
+
           // Handle pending effect target selections during action phase
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving a pending effect, switch active player (same logic as executeAction)
@@ -162,8 +171,14 @@ export class GameEngine {
               newState.pendingActions.length === 0 &&
               !newState.player1.hasPassed &&
               !newState.player2.hasPassed) {
-            const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
-            newState.activePlayer = otherPlayer;
+            // If the resolved action was a forced choice initiated by the opponent
+            // (originPlayer !== player), the resolver keeps their turn.
+            const wasOpponentForced = resolvedPendingOriginPlayer !== undefined
+              && resolvedPendingOriginPlayer !== player;
+            if (!wasOpponentForced) {
+              const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
+              newState.activePlayer = otherPlayer;
+            }
           }
         } else {
           newState = executeAction(newState, player, action);

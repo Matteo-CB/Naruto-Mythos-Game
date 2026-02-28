@@ -150,7 +150,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             {/* Booster image — displayed naturally, no cropping */}
             <img
               src="/images/booster.webp"
-              alt="Booster Pack"
+              alt={t('boosterPack')}
               style={{
                 width: '240px',
                 height: 'auto',

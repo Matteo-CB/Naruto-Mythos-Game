@@ -554,7 +554,7 @@ export function DraftDeckBuilder({
                     {card.isHolo && (
                       <div className="absolute top-1 left-1">
                         <span className="text-[7px] px-1 rounded font-bold" style={{ backgroundColor: 'rgba(196,163,90,0.8)', color: '#0a0a0a' }}>
-                          HOLO
+                          {t('holo')}
                         </span>
                       </div>
                     )}

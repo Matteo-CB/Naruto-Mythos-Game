@@ -3711,20 +3711,31 @@
       "number": "115",
       "set": "KS",
       "card_type": "character",
-      "name_en": "SHINO ABURAME",
+      "name_en": "Shino Aburame",
       "name_fr": "SHINO ABURAME",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Technique du Mur d'Insectes",
+      "title_en": "Insect Wall Technique",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Équipe 8", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Friendly characters in this mission cannot be hidden by enemy effects.",
+          "description_fr": "[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "Move a friendly character in this mission to another mission.",
+          "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "115/130"
     },
     "KS-116-R": {
@@ -4116,20 +4127,31 @@
       "number": "127",
       "set": "KS",
       "card_type": "character",
-      "name_en": "SAKON",
+      "name_en": "Sakon",
       "name_fr": "SAKON",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Le Poing de Pierre",
+      "title_en": "Stone Fist",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Each enemy character in this mission has -1 Power.",
+          "description_fr": "[⧗] Chaque personnage ennemi dans cette mission a -1 Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play to another mission.",
+          "description_fr": "Déplacez un personnage allié en jeu vers une autre mission."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "127/130"
     },
     "KS-128-R": {
@@ -4878,9 +4900,9 @@
       "group": "",
       "effects": [
         {
-          "type": "SCORE",
+          "type": "MAIN",
           "description": "[⧗] All non-hidden characters in this mission have +1 Power.",
-          "description_fr": ""
+          "description_fr": "[⧗] Tous les personnages non-cachés dans cette mission ont +1 Puissance."
         }
       ],
       "image_url": "/images/cards/KS/mission/KS-002-MMS.webp",
@@ -5081,9 +5103,9 @@
       "group": "",
       "effects": [
         {
-          "type": "SCORE",
+          "type": "MAIN",
           "description": "[⧗] Characters with 4 Power or more in this mission have +1 Power.",
-          "description_fr": ""
+          "description_fr": "[⧗] Les personnages avec 4 Puissance ou plus dans cette mission ont +1 Puissance."
         }
       ],
       "image_url": "/images/cards/KS/mission/KS-009-MMS.webp",
@@ -5110,9 +5132,9 @@
       "group": "",
       "effects": [
         {
-          "type": "SCORE",
+          "type": "MAIN",
           "description": "[⧗] CHAKRA +1 for both players.",
-          "description_fr": ""
+          "description_fr": "[⧗] CHAKRA +1 pour les deux joueurs."
         }
       ],
       "image_url": "/images/cards/KS/mission/KS-010-MMS.webp",
@@ -5764,21 +5786,32 @@
       "number": "115",
       "set": "KS",
       "card_type": "character",
-      "name_en": "SHINO ABURAME",
+      "name_en": "Shino Aburame",
       "name_fr": "SHINO ABURAME",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Technique du Mur d'Insectes",
+      "title_en": "Insect Wall Technique",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 6,
+      "keywords": ["Équipe 8", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Friendly characters in this mission cannot be hidden by enemy effects.",
+          "description_fr": "[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis."
+        },
+        {
+          "type": "AMBUSH",
+          "description": "Move a friendly character in this mission to another mission.",
+          "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
       "is_rare_art": true,
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "115/130 A"
     },
     "KS-116-RA": {
@@ -6165,21 +6198,32 @@
       "number": "127",
       "set": "KS",
       "card_type": "character",
-      "name_en": "SAKON",
+      "name_en": "Sakon",
       "name_fr": "SAKON",
-      "title_fr": "",
-      "title_en": "",
+      "title_fr": "Le Poing de Pierre",
+      "title_en": "Stone Fist",
       "has_visual": false,
-      "chakra": 0,
-      "power": 0,
-      "keywords": [],
-      "group": "Independent",
-      "effects": [],
+      "chakra": 5,
+      "power": 5,
+      "keywords": ["Sound Four", "Jutsu"],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Each enemy character in this mission has -1 Power.",
+          "description_fr": "[⧗] Chaque personnage ennemi dans cette mission a -1 Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play to another mission.",
+          "description_fr": "Déplacez un personnage allié en jeu vers une autre mission."
+        }
+      ],
       "image_url": "",
       "rarity_display": "",
       "image_file": "",
       "is_rare_art": true,
-      "data_complete": false,
+      "data_complete": true,
       "old_id": "127/130 A"
     },
     "KS-128-RA": {

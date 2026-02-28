@@ -187,6 +187,8 @@ export interface PendingAction {
   id: string;
   type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK' | 'INFO_REVEAL' | 'CHOOSE_EFFECT';
   player: PlayerID;
+  /** The player whose action originally created this pending (may differ from player who resolves it). */
+  originPlayer?: PlayerID;
   description: string;
   descriptionKey?: string;
   descriptionParams?: Record<string, string | number>;

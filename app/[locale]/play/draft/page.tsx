@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
@@ -32,11 +32,12 @@ export default function DraftPage() {
   const t = useTranslations('draft');
   const tc = useTranslations('common');
   const tAI = useTranslations('playAI');
-  const tOnline = useTranslations('playOnline');
+  const tOnline = useTranslations('online');
   const router = useRouter();
   const { data: session } = useSession();
   const startAIGame = useGameStore((s) => s.startAIGame);
   const setDraftDeck = useGameStore((s) => s.setDraftDeck);
+  const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
   // Socket store for online draft
   const socketConnect = useSocketStore((s) => s.connect);
@@ -47,6 +48,9 @@ export default function DraftPage() {
   const socketRoomCode = useSocketStore((s) => s.roomCode);
   const socketOpponentJoined = useSocketStore((s) => s.opponentJoined);
   const socketGameStarted = useSocketStore((s) => s.gameStarted);
+  const socketVisibleState = useSocketStore((s) => s.visibleState);
+  const socketPlayerRole = useSocketStore((s) => s.playerRole);
+  const socketPlayerNames = useSocketStore((s) => s.playerNames);
   const socketError = useSocketStore((s) => s.error);
   const draftBoosters = useSocketStore((s) => s.draftBoosters);
   const draftAllCards = useSocketStore((s) => s.draftAllCards);
@@ -84,12 +88,25 @@ export default function DraftPage() {
     }
   }, [mode, draftBoosters, draftAllCards, step]);
 
-  // When online game starts, redirect to game page
+  // When online game starts: initialize gameStore with online state then navigate to /game
+  const gameInitRef = useRef(false);
   useEffect(() => {
-    if (mode === 'online' && socketGameStarted) {
+    if (
+      mode === 'online' &&
+      socketGameStarted &&
+      socketVisibleState &&
+      socketPlayerRole &&
+      !gameInitRef.current
+    ) {
+      gameInitRef.current = true;
+      const myName = session?.user?.name ?? undefined;
+      const oppName = socketPlayerNames
+        ? (socketPlayerRole === 'player1' ? socketPlayerNames.player2 : socketPlayerNames.player1)
+        : undefined;
+      startOnlineGame(socketVisibleState, socketPlayerRole, myName, oppName);
       router.push('/game');
     }
-  }, [mode, socketGameStarted, router]);
+  }, [mode, socketGameStarted, socketVisibleState, socketPlayerRole, startOnlineGame, router, session, socketPlayerNames]);
 
   const handleModeSelect = useCallback((selectedMode: 'ai' | 'online') => {
     setMode(selectedMode);

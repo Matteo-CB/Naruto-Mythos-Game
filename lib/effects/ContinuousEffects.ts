@@ -100,22 +100,22 @@ export function calculateContinuousChakraBonus(
 }
 
 /**
- * Calculate CHAKRA bonus from mission SCORE [⧗] effects.
+ * Calculate CHAKRA bonus from mission continuous [⧗] effects.
  * Called once per player per Start Phase (not per character).
  *
- * MSS-10 "Chakra Training": After won, both players get CHAKRA +1.
+ * MSS-10 "Chakra Training": CHAKRA +1 for both players, active as soon as the mission is revealed.
  */
 export function calculateMissionChakraBonus(state: GameState, player: PlayerID): number {
   let bonus = 0;
 
   for (const mission of state.activeMissions) {
-    if (!mission.wonBy) continue;
-
     for (const effect of mission.card.effects ?? []) {
-      if (effect.type !== 'SCORE' || !effect.description.includes('[⧗]')) continue;
+      if (!effect.description.includes('[⧗]')) continue;
 
-      // MSS-10: CHAKRA +1 for both players
-      if (effect.description.includes('CHAKRA +1') && effect.description.includes('both players')) {
+      // MSS-10: CHAKRA +1 for both players — applies immediately when mission is in play (MAIN type)
+      if (effect.type === 'MAIN'
+          && effect.description.includes('CHAKRA +1')
+          && effect.description.includes('both players')) {
         bonus += 1;
       }
     }
@@ -236,6 +236,11 @@ export function calculateContinuousPowerModifier(
         modifier -= 1;
       }
 
+      // Sakon 127 (R/RA): Each enemy character in this mission has -1 Power
+      if (enemyTopCard.number === 127 && effect.description.includes('-1 Power')) {
+        modifier -= 1;
+      }
+
       // Rempart 067 (UC): The strongest non-hidden enemy character has Power = 0
       // We handle this below as a special case since it only affects the strongest
     }
@@ -318,11 +323,11 @@ export function calculateContinuousPowerModifier(
   }
 
   // -------------------------------------------------------
-  // Mission SCORE [⧗] effects that modify power continuously
+  // Mission [⧗] effects that modify power continuously (MAIN type).
+  // Active as soon as the mission is in play — no wonBy guard.
   // -------------------------------------------------------
-  // [⧗] = continuous: always active while the mission is in play (all phases).
   for (const mEffect of mission.card.effects ?? []) {
-    if (mEffect.type !== 'SCORE' || !mEffect.description.includes('[⧗]')) continue;
+    if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;
 
     // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
     if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
@@ -362,6 +367,46 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
     );
     if (hasRetention) {
       return true;
+    }
+  }
+
+  return false;
+}
+
+// ---------------------
+// Hide Protection
+// ---------------------
+
+/**
+ * Returns true if a friendly character in the target's mission prevents hiding by enemy effects.
+ *
+ * Shino Aburame 115 (R/RA): [⧗] Friendly characters in this mission cannot be hidden by enemy effects.
+ *
+ * @param state       Current game state
+ * @param targetChar  The character that an enemy effect is trying to hide
+ * @param owner       The player who owns the targetChar
+ */
+export function isProtectedFromEnemyHide(
+  state: GameState,
+  targetChar: CharacterInPlay,
+  owner: PlayerID,
+): boolean {
+  const mission = state.activeMissions[targetChar.missionIndex];
+  if (!mission) return false;
+
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    owner === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  for (const char of mission[friendlySide]) {
+    if (char.isHidden) continue;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
+    // Shino 115 (R/RA): protects all allies in this mission from being hidden by enemy effects
+    if (topCard.number === 115) {
+      const hasProtection = (topCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot be hidden by enemy effects'),
+      );
+      if (hasProtection) return true;
     }
   }
 

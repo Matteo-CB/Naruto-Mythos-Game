@@ -1052,6 +1052,26 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     '[⧗] CHAKRA +1 pour les deux joueurs.',
   ],
 
+  // 115 - Shino Aburame (R/RA)
+  'KS-115-R': [
+    '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
+    'EMBUSCADE : Déplacez un personnage allié dans cette mission vers une autre mission.',
+  ],
+  'KS-115-RA': [
+    '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
+    'EMBUSCADE : Déplacez un personnage allié dans cette mission vers une autre mission.',
+  ],
+
+  // 127 - Sakon (R/RA)
+  'KS-127-R': [
+    '[⧗] Chaque personnage ennemi dans cette mission a -1 Power.',
+    'AMÉLIORATION : Déplacez un personnage allié en jeu vers une autre mission.',
+  ],
+  'KS-127-RA': [
+    '[⧗] Chaque personnage ennemi dans cette mission a -1 Power.',
+    'AMÉLIORATION : Déplacez un personnage allié en jeu vers une autre mission.',
+  ],
+
   // =====================
   // SECRET V (SV) — Variantes dorées des cartes Secret
   // =====================
