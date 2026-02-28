@@ -1,10 +1,10 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export async function sendResetEmail(email: string, token: string, locale: string = 'en') {
+  // Lazy-initialize Resend so module evaluation during build doesn't fail
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const resetUrl = `${APP_URL}/${locale}/reset-password?token=${token}`;
 
   const isEn = locale === 'en';

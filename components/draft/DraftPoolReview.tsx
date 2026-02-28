@@ -130,6 +130,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
 }
 
 function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; locale: 'en' | 'fr' }) {
+  const t = useTranslations('draft');
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';
   const isMission = card.card_type === 'mission';

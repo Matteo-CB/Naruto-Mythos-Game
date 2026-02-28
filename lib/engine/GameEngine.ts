@@ -437,7 +437,7 @@ export class GameEngine {
     }
 
     if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
-      const newState = deepClone(state);
+      let newState = deepClone(state);
       const effectIdx = newState.pendingEffects.findIndex((p) => p.id === action.pendingEffectId);
       if (effectIdx === -1) return state;
 
@@ -491,7 +491,7 @@ export class GameEngine {
           }];
           newState.pendingActions = [...newState.pendingActions, {
             id: actId,
-            type: 'SELECT_TARGET' as import('./types').GameAction['type'],
+            type: 'SELECT_TARGET' as const,
             player: effect.sourcePlayer,
             description: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${mi + 1}.`,
             descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
