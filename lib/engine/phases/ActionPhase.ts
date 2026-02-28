@@ -421,14 +421,23 @@ function handleUpgradeCharacter(
     ? existingChar.stack[existingChar.stack.length - 1]
     : existingChar.card;
 
-  // Cost difference
-  const costDiff = newCard.chakra - existingTopCard.chakra;
+  // When upgrading over a hidden character, pay the full cost of the new card
+  // (this combines the hidden reveal cost + upgrade diff in one action).
+  // When upgrading over a visible character, pay only the chakra diff.
+  const isHiddenUpgrade = existingChar.isHidden;
+  const costDiff = isHiddenUpgrade ? newCard.chakra : newCard.chakra - existingTopCard.chakra;
   if (costDiff <= 0) return state;
 
-  // Pay difference
+  // Pay cost
   const ps = { ...playerState };
   if (ps.chakra < costDiff) return state;
   ps.chakra -= costDiff;
+
+  // If target was hidden, reveal it now (combined reveal + upgrade)
+  if (isHiddenUpgrade) {
+    existingChar.isHidden = false;
+    existingChar.wasRevealedAtLeastOnce = true;
+  }
 
   // Remove card from hand
   const hand = [...ps.hand];
