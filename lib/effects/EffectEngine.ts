@@ -541,7 +541,6 @@ export class EffectEngine {
       tst === 'SAKURA109_CHOOSE_DISCARD' ||
       tst === 'SAKURA135_CHOOSE_CARD' ||
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
-      tst === 'PLAY_HIDDEN_FROM_HAND_FREE' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
       tst === 'SASUKE014_CHOOSE_HAND_CARD' ||
@@ -1200,6 +1199,93 @@ export class EffectEngine {
       case 'SASUKE136_CHOOSE_FRIENDLY': {
         // Stage 1: defeat the chosen friendly character
         newState = EffectEngine.defeatFriendlyForSasuke136(newState, pendingEffect, targetId);
+        break;
+      }
+
+      // =============================================
+      // KIBA113: Confirm hide/defeat Akamaru, then prompt for second target
+      // =============================================
+      case 'KIBA113_CONFIRM_HIDE_AKAMARU':
+      case 'KIBA113_CONFIRM_DEFEAT_AKAMARU': {
+        const isDefeatMode = pendingEffect.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+        let k113Data: { akamaruInstanceId: string; akamaruMissionIdx: number; sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
+        try {
+          k113Data = JSON.parse(pendingEffect.effectDescription);
+        } catch { /* ignore */ }
+        if (!k113Data) break;
+
+        const { akamaruInstanceId, akamaruMissionIdx, sourceMissionIndex: srcMI } = k113Data;
+        const friendlySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const enemySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        // Apply action to Akamaru
+        if (isDefeatMode) {
+          newState = EffectEngine.defeatCharacter(newState, akamaruInstanceId, pendingEffect.sourcePlayer);
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DEFEAT', `Kiba Inuzuka (113) UPGRADE: Defeated friendly Akamaru (mission ${akamaruMissionIdx}).`,
+            'game.log.effect.defeat',
+            { card: 'KIBA INUZUKA', id: 'KS-113-R', target: 'Akamaru' },
+          );
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, akamaruInstanceId, pendingEffect.sourcePlayer);
+        }
+
+        // Gather valid targets for step 2 in source mission: enemy characters only (non-hidden)
+        const srcMission = newState.activeMissions[srcMI];
+        if (!srcMission) break;
+        const step2Targets: string[] = [];
+        for (const char of srcMission[enemySide_k113]) {
+          if (!char.isHidden) {
+            step2Targets.push(char.instanceId);
+          }
+        }
+
+        if (step2Targets.length === 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No other character in this mission to target.',
+            'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-113-R' },
+          );
+          break;
+        }
+
+        // Always show selection — even for single target (never auto-resolve)
+        const step2Type = isDefeatMode ? 'KIBA113_DEFEAT_TARGET' : 'KIBA113_HIDE_TARGET';
+        const step2DescKey = isDefeatMode ? 'game.effect.desc.kiba113Defeat' : 'game.effect.desc.kiba113Hide';
+        const step2Desc = isDefeatMode
+          ? 'Kiba Inuzuka (113) UPGRADE: Choose an enemy character in this mission to defeat.'
+          : 'Kiba Inuzuka (113): Choose an enemy character in this mission to hide.';
+
+        const step2EffId = generateInstanceId();
+        const step2ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: step2EffId,
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: srcMI,
+          effectType: pendingEffect.effectType,
+          effectDescription: '',
+          targetSelectionType: step2Type,
+          sourcePlayer: pendingEffect.sourcePlayer,
+          requiresTargetSelection: true,
+          validTargets: step2Targets,
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: isDefeatMode,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: step2ActId,
+          type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: step2Desc,
+          descriptionKey: step2DescKey,
+          options: step2Targets,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: step2EffId,
+        }];
         break;
       }
 
@@ -2259,7 +2345,7 @@ export class EffectEngine {
       }
 
       case 'SAKURA011_DRAW': {
-        // Player confirmed: draw 1 card
+        // Player confirmed (targetId = 'confirm' from new DRAW_CARD UI, or sourceCard.instanceId from old path)
         const ps011 = { ...newState[pendingEffect.sourcePlayer] };
         if (ps011.deck.length > 0) {
           const deck011 = [...ps011.deck];
@@ -2989,8 +3075,59 @@ export class EffectEngine {
       }
 
       // =============================================
-      // PLAY_HIDDEN_FROM_HAND_FREE (Kankuro 078 UPGRADE)
-      // Stage 1: pick card from hand, Stage 2: pick mission
+      // KANKURO078_REVEAL_HIDDEN_REDUCED (Kankuro 078 UPGRADE — correct implementation)
+      // Reveal a hidden friendly character paying 1 less than its reveal cost.
+      // =============================================
+      case 'KANKURO078_REVEAL_HIDDEN_REDUCED': {
+        const charResult_k78 = EffectEngine.findCharByInstanceId(newState, targetId);
+        if (!charResult_k78) break;
+
+        const { missionIndex: mIdx_k78, player: charPlayer_k78, character: hiddenChar_k78 } = charResult_k78;
+        const side_k78 = charPlayer_k78 === 'player1' ? 'player1Characters' : 'player2Characters';
+        if (!hiddenChar_k78.isHidden) break; // sanity check
+
+        const topCard_k78 = hiddenChar_k78.stack.length > 0
+          ? hiddenChar_k78.stack[hiddenChar_k78.stack.length - 1]
+          : hiddenChar_k78.card;
+
+        // Cost = max(0, card.chakra - 1)
+        const revealCost_k78 = Math.max(0, (topCard_k78.chakra ?? 0) - 1);
+        const ps_k78 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps_k78.chakra < revealCost_k78) break; // can't afford
+        ps_k78.chakra -= revealCost_k78;
+        newState = { ...newState, [pendingEffect.sourcePlayer]: ps_k78 };
+
+        // Reveal the character
+        const missions_k78 = [...newState.activeMissions];
+        const m_k78 = { ...missions_k78[mIdx_k78] };
+        const chars_k78 = [...m_k78[side_k78]];
+        const cidx_k78 = chars_k78.findIndex(c => c.instanceId === targetId);
+        if (cidx_k78 !== -1) {
+          chars_k78[cidx_k78] = { ...chars_k78[cidx_k78], isHidden: false, wasRevealedAtLeastOnce: true };
+          m_k78[side_k78] = chars_k78;
+          missions_k78[mIdx_k78] = m_k78;
+          newState = { ...newState, activeMissions: missions_k78 };
+
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            `Kankuro (078) UPGRADE: Revealed ${topCard_k78.name_fr}, paying ${revealCost_k78} chakra.`,
+            'game.log.effect.kankuro078RevealHidden',
+            { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78.name_fr, cost: String(revealCost_k78) },
+          );
+
+          const revealedChar_k78 = newState.activeMissions[mIdx_k78][side_k78].find(
+            c => c.instanceId === targetId,
+          );
+          if (revealedChar_k78) {
+            newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, revealedChar_k78, mIdx_k78);
+          }
+        }
+        break;
+      }
+
+      // =============================================
+      // PLAY_HIDDEN_FROM_HAND_FREE (Kankuro 078 UPGRADE — deprecated, replaced by KANKURO078_REVEAL_HIDDEN_REDUCED)
       // =============================================
       case 'PLAY_HIDDEN_FROM_HAND_FREE': {
         // Stage 1: card chosen from hand. Store index and prompt for mission.
@@ -3598,22 +3735,7 @@ export class EffectEngine {
 
           if (validTargets_g.length === 0) continue;
 
-          if (validTargets_g.length === 1) {
-            // Auto-defeat
-            newState = EffectEngine.defeatCharacter(newState, validTargets_g[0].instanceId, pendingEffect.sourcePlayer);
-            defeatedCount_g++;
-            const autoName = validTargets_g[0].card.name_fr;
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_DEFEAT',
-              `Gaara (120): Defeated enemy ${autoName} in mission ${mi + 1}.`,
-              'game.log.effect.defeat',
-              { card: 'GAARA', id: 'KS-120-R', target: autoName },
-            );
-            continue;
-          }
-
-          // Multiple targets — chain another selection
+          // Always prompt for remaining missions too — player can skip (optional "up to 1")
           const chainData_g = JSON.stringify({
             defeatedCount: defeatedCount_g,
             nextMissionIndex: mi + 1,
@@ -4729,7 +4851,11 @@ export class EffectEngine {
   static isImmuneToEnemyHide(char: CharacterInPlay): boolean {
     if (char.isHidden) return false;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    if (topCard.number === 76 || topCard.number === 129 || topCard.number === 130) {
+    // Note: card 076 has no effects in JSON data — match all three by number directly.
+    if (topCard.number === 76 || topCard.number === 130) {
+      return true;
+    }
+    if (topCard.number === 129) {
       return (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
       );
@@ -7254,14 +7380,10 @@ export class EffectEngine {
     }
 
     // Ichibi 076 (UC), Kyubi 129 (R), Ichibi 130 (R): Can't be hidden or defeated by enemy effects
+    // Note: card 076 has no effects in JSON data, so immunity is matched by card number directly.
     if ((topCard.number === 76 || topCard.number === 129 || topCard.number === 130) && isEnemyEffect) {
-      const hasProtection = (topCard.effects ?? []).some(
-        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
-      );
-      if (hasProtection) {
-        // Character is immune — defeat is blocked entirely
-        return { replaced: true, replacement: 'immune' };
-      }
+      // Always immune — no effect-text guard needed (076 lacks effect data in JSON)
+      return { replaced: true, replacement: 'immune' };
     }
 
     // Gemma 049: If friendly Leaf Village in this mission would be hidden/defeated by enemy effects,

@@ -138,7 +138,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 // 120/130 - GAARA (R): Defeat Power<=1 in every mission + UPGRADE POWERUP X
 // ===================================================================
 describe('120/130 - Gaara (R)', () => {
-  it('should defeat enemies with Power 1 or less across all missions', () => {
+  it('should prompt player to defeat enemies with Power 1 or less (optional — always shows UI)', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r', powerTokens: 0 }, {
       id: 'KS-120-R', number: 120, name_fr: 'Gaara', power: 4,
     });
@@ -163,14 +163,16 @@ describe('120/130 - Gaara (R)', () => {
 
     const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
-    // weakE1 should be defeated (removed from mission 0)
-    expect(result.state.activeMissions[0].player2Characters.length).toBe(0);
-    // weakE2 should be defeated (removed from mission 1), strongE remains
-    expect(result.state.activeMissions[1].player2Characters.length).toBe(1);
-    expect(result.state.activeMissions[1].player2Characters[0].instanceId).toBe('se1');
+    // Effect is optional ("up to 1") — always prompts player, never auto-defeats
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.isOptional).toBe(true);
+    expect(result.targetSelectionType).toBe('GAARA120_CHOOSE_DEFEAT');
+    expect(result.validTargets).toContain('we1');
+    // Enemies NOT defeated yet (pending selection)
+    expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
 
-  it('should POWERUP X on upgrade where X = defeated count', () => {
+  it('should encode defeatedCount and nextMissionIndex in description for upgrade chain', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r', powerTokens: 0 }, {
       id: 'KS-120-R', number: 120, name_fr: 'Gaara', power: 4,
     });
@@ -192,8 +194,13 @@ describe('120/130 - Gaara (R)', () => {
 
     const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0, 'MAIN', true));
-    const updatedGaara = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'gaara-r');
-    expect(updatedGaara?.powerTokens).toBe(2); // 2 defeated
+    // Should prompt for first mission (mission 0 has weakE1)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.isOptional).toBe(true);
+    const desc = JSON.parse(result.description ?? '{}');
+    expect(desc.defeatedCount).toBe(0); // nothing defeated yet
+    expect(desc.nextMissionIndex).toBe(1); // next to check is mission 1
+    expect(desc.isUpgrade).toBe(true);
   });
 
   it('should not defeat characters with Power > 1', () => {

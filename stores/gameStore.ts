@@ -26,11 +26,14 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Sasuke 014, Itachi 091)
+  // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
+  deckSize?: number; // for DRAW_CARD: shows deck size
+  confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
@@ -450,6 +453,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
+      // Detect dedicated confirm UIs
+      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Tayuya 065, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
@@ -537,6 +544,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } catch { /* ignore */ }
       }
 
+      // Build dedicated confirm UI data
+      let deckSize: number | undefined;
+      let confirmCardData: PendingTargetSelection['confirmCardData'];
+      if (isSakura011Draw) {
+        deckSize = visibleState.myState.deck?.length ?? 0;
+      }
+      if (isKiba113ConfirmHide && pendingEffect) {
+        try {
+          const cd = JSON.parse(pendingEffect.effectDescription);
+          confirmCardData = {
+            name_fr: cd.name_fr ?? '',
+            name_en: cd.name_en,
+            image_file: cd.image_file,
+            chakra: cd.chakra,
+            power: cd.power,
+          };
+        } catch { /* ignore */ }
+      }
+
       set({
         visibleState,
         isProcessing: false,
@@ -545,11 +571,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011Draw ? 'DRAW_CARD' : isKiba113ConfirmHide ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
           effectChoices,
           handCards,
           revealedCard,
           revealedCards,
+          deckSize,
+          confirmCardData,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -902,6 +930,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
+      // Detect dedicated confirm UIs
+      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
@@ -989,6 +1021,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } catch { /* ignore */ }
       }
 
+      // Build dedicated confirm UI data
+      let deckSize: number | undefined;
+      let confirmCardData: PendingTargetSelection['confirmCardData'];
+      if (isSakura011Draw) {
+        deckSize = newState[humanPlayer].deck?.length ?? 0;
+      }
+      if (isKiba113ConfirmHide && pendingEffect) {
+        try {
+          const cd = JSON.parse(pendingEffect.effectDescription);
+          confirmCardData = {
+            name_fr: cd.name_fr ?? '',
+            name_en: cd.name_en,
+            image_file: cd.image_file,
+            chakra: cd.chakra,
+            power: cd.power,
+          };
+        } catch { /* ignore */ }
+      }
+
       set({
         isProcessing: false,
         pendingTargetSelection: {
@@ -996,11 +1047,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011Draw ? 'DRAW_CARD' : isKiba113ConfirmHide ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
           effectChoices,
           handCards,
           revealedCard,
           revealedCards,
+          deckSize,
+          confirmCardData,
           playerName: get().playerDisplayNames[get().humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({
@@ -1359,6 +1412,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
 
+      // Detect dedicated confirm UIs
+      const isSakura011DrawAI = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isKiba113ConfirmHideAI = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
       const isOroRevealAI = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091RevealAI = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
@@ -1415,6 +1472,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } catch { /* ignore */ }
       }
 
+      // Build dedicated confirm UI data
+      let deckSizeAI: number | undefined;
+      let confirmCardDataAI: PendingTargetSelection['confirmCardData'];
+      if (isSakura011DrawAI) {
+        deckSizeAI = currentState[humanPlayer].deck?.length ?? 0;
+      }
+      if (isKiba113ConfirmHideAI && pendingEffect) {
+        try {
+          const cd = JSON.parse(pendingEffect.effectDescription);
+          confirmCardDataAI = {
+            name_fr: cd.name_fr ?? '',
+            name_en: cd.name_en,
+            image_file: cd.image_file,
+            chakra: cd.chakra,
+            power: cd.power,
+          };
+        } catch { /* ignore */ }
+      }
+
       set({
         gameState: currentState,
         visibleState: visible,
@@ -1424,11 +1500,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           description: pendingAction.description,
           descriptionKey: pendingAction.descriptionKey,
           descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011DrawAI ? 'DRAW_CARD' : isKiba113ConfirmHideAI ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
           effectChoices,
           handCards,
           revealedCard: revealedCardAI,
           revealedCards: revealedCardsAI,
+          deckSize: deckSizeAI,
+          confirmCardData: confirmCardDataAI,
           playerName: get().playerDisplayNames[humanPlayer],
           onSelect: (targetId: string) => {
             get().performAction({

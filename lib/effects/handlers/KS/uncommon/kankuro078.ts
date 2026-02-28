@@ -15,10 +15,10 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  *   - Requires target selection: which character to move, then which mission to move them to.
  *   - Triggered only when Kankuro is revealed from hidden (AMBUSH).
  *
- * UPGRADE: Play a friendly character from hand while hidden, paying 1 less.
- *   - When played as upgrade, select a character from hand to play hidden on any mission.
- *   - Normal hidden cost is 1 chakra; paying 1 less means it's free (0 cost).
- *   - Requires target selection for which card to play and which mission to place it on.
+ * UPGRADE: Reveal a friendly hidden character paying 1 less than its reveal cost.
+ *   - When played as upgrade, scan all missions for hidden friendly characters.
+ *   - Player selects which hidden character to reveal.
+ *   - Cost = max(0, card.chakra - 1). The MAIN + AMBUSH effects of the revealed card fire.
  */
 
 function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
@@ -62,33 +62,40 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
 
 function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
-  const playerState = state[sourcePlayer];
+  const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find characters in hand that could be played hidden
-  if (playerState.hand.length === 0) {
+  // Find all hidden friendly characters across all missions
+  const validTargets: string[] = [];
+  for (const mission of state.activeMissions) {
+    for (const char of mission[friendlySide]) {
+      if (char.isHidden) {
+        validTargets.push(char.instanceId);
+      }
+    }
+  }
+
+  if (validTargets.length === 0) {
     const log = logAction(
       state.log,
       state.turn,
       state.phase,
       sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Kankuro (078): No characters in hand to play hidden.',
+      'Kankuro (078) UPGRADE: No hidden friendly characters in play to reveal.',
       'game.log.effect.noTarget',
       { card: 'KANKURO', id: 'KS-078-UC' },
     );
     return { state: { ...state, log } };
   }
 
-  // All hand cards are valid targets for hidden play (paying 1 less = free)
-  const validTargets = playerState.hand.map((_, i) => String(i));
-
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'PLAY_HIDDEN_FROM_HAND_FREE',
+    targetSelectionType: 'KANKURO078_REVEAL_HIDDEN_REDUCED',
     validTargets,
-    description: 'Kankuro (078) UPGRADE: Select a character from your hand to play hidden on any mission (free, 1 less than normal hidden cost).',
-    descriptionKey: 'game.effect.desc.kankuro078PlayHiddenFree',
+    description: 'Kankuro (078) UPGRADE: Select a hidden friendly character to reveal, paying 1 less than its reveal cost.',
+    descriptionKey: 'game.effect.desc.kankuro078RevealHidden',
+    isOptional: true,
   };
 }
 

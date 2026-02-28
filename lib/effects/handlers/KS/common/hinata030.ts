@@ -36,19 +36,13 @@ function handleHinata030Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-030-C' }) } };
   }
 
-  // If exactly one valid target, auto-apply
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const newState = removePowerTokens(state, targetId, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple valid targets: requires target selection
+  // Always require target selection (effect is optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'REMOVE_POWER_TOKENS_ENEMY',
     validTargets,
+    isOptional: true,
     description: 'Select an enemy character to remove up to 2 Power tokens from.',
     descriptionKey: 'game.effect.desc.hinata030RemoveTokens',
   };

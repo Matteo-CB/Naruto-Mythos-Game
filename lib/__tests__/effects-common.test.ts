@@ -29,7 +29,7 @@ function makeCtx(
 // 001/130 - HIRUZEN SARUTOBI: POWERUP 2 another friendly Leaf Village character
 // ===================================================================
 describe('001/130 - Hiruzen Sarutobi', () => {
-  it('should POWERUP 2 a single valid Leaf Village target automatically', () => {
+  it('should require target selection for a single valid Leaf Village target (optional effect)', () => {
     const hiruzen = mockCharInPlay({ instanceId: 'hiruzen-1' }, {
       id: 'KS-001-C', number: 1, name_fr: 'Hiruzen Sarutobi', group: 'Leaf Village', power: 3, chakra: 3,
     });
@@ -47,8 +47,13 @@ describe('001/130 - Hiruzen Sarutobi', () => {
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
+    // Effect is optional — always routes to target selection even with 1 target
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.isOptional).toBe(true);
+    expect(result.validTargets).toContain('ally-1');
+    // Token NOT applied yet (pending selection)
     const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
-    expect(ally?.powerTokens).toBe(2);
+    expect(ally?.powerTokens).toBe(0);
   });
 
   it('should fizzle when no other Leaf Village character exists', () => {

@@ -39,19 +39,13 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' }) } };
   }
 
-  // If exactly one valid target, apply automatically
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const newState = applyPowerup(state, targetId, 2, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple valid targets: requires target selection
+  // Always require target selection (effect is optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'POWERUP_2_LEAF_VILLAGE',
     validTargets,
+    isOptional: true,
     description: 'Select a friendly Leaf Village character to give POWERUP 2.',
     descriptionKey: 'game.effect.desc.hiruzen001Powerup',
   };
