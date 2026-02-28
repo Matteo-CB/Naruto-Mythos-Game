@@ -47,6 +47,9 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
   const imagePath = normalizeImagePath(card.image_file);
   const rarityInfo = getRarityGlow(card.rarity);
   const highRarity = isHighRarity(card.rarity);
+  const isMission = card.card_type === 'mission';
+  const cardWidth = isMission ? '168px' : '120px';
+  const cardHeight = isMission ? '120px' : '168px';
 
   const handleFlip = useCallback(() => {
     if (hasFlippedRef.current) return;
@@ -77,7 +80,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: index * 0.08, duration: 0.3, type: 'spring', stiffness: 200 }}
       className="relative cursor-pointer"
-      style={{ perspective: '1000px', width: '120px', height: '168px' }}
+      style={{ perspective: '1000px', width: cardWidth, height: cardHeight }}
       onClick={handleFlip}
     >
       {/* 3D flip container */}
@@ -100,12 +103,13 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             backfaceVisibility: 'hidden',
             borderRadius: '8px',
             overflow: 'hidden',
+            backgroundColor: '#111',
           }}
         >
           <img
             src="/images/card-back.webp"
             alt="Card back"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: isMission ? 'contain' : 'cover' }}
           />
           {/* Tap hint shimmer */}
           {!isFlipped && !hasFlippedRef.current && (
