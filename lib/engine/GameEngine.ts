@@ -173,9 +173,15 @@ export class GameEngine {
               !newState.player2.hasPassed) {
             // If the resolved action was a forced choice initiated by the opponent
             // (originPlayer !== player), the resolver keeps their turn.
+            // We must explicitly set activePlayer rather than "don't switch", because
+            // activePlayer may still be the initiating player (e.g. Dosu's player) if
+            // the pending was created before the normal turn-switch could fire.
             const wasOpponentForced = resolvedPendingOriginPlayer !== undefined
               && resolvedPendingOriginPlayer !== player;
-            if (!wasOpponentForced) {
+            if (wasOpponentForced) {
+              // Forced choice (e.g. Dosu069): resolver keeps their own turn
+              newState.activePlayer = player;
+            } else {
               const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
               newState.activePlayer = otherPlayer;
             }
