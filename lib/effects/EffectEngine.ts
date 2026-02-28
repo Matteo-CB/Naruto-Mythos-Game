@@ -1719,7 +1719,7 @@ export class EffectEngine {
         if (shizChar) {
           const validMissions_sh: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (i !== shizChar.missionIndex) validMissions_sh.push(String(i));
+            if (i !== shizChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, shizChar.character, i, shizChar.player)) validMissions_sh.push(String(i));
           }
           if (validMissions_sh.length === 1) {
             newState = EffectEngine.moveCharToMissionDirectPublic(
@@ -1785,7 +1785,7 @@ export class EffectEngine {
         if (zakuChar) {
           const validMissions_z: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (i !== zakuChar.missionIndex) validMissions_z.push(String(i));
+            if (i !== zakuChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, zakuChar.character, i, zakuChar.player)) validMissions_z.push(String(i));
           }
           if (validMissions_z.length === 1) {
             newState = EffectEngine.moveCharToMissionDirectPublic(
@@ -2825,7 +2825,7 @@ export class EffectEngine {
         if (moveChar) {
           const validDests_mv: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (i !== moveChar.missionIndex) validDests_mv.push(String(i));
+            if (i !== moveChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, moveChar.character, i, moveChar.player)) validDests_mv.push(String(i));
           }
           if (validDests_mv.length >= 1) {
             const tst2 = pendingEffect.targetSelectionType === 'MOVE_CHARACTER_POWER_4_OR_LESS'
@@ -3054,34 +3054,99 @@ export class EffectEngine {
       }
 
       case 'DOSU069_OPPONENT_CHOICE': {
-        // Opponent clicked the character = reveal and pay
+        // Opponent clicked the character = reveal and pay (triggers MAIN + AMBUSH effects)
         let parsed_dosu69: { targetInstanceId?: string; revealCost?: number; sourcePlayer?: string } = {};
         try { parsed_dosu69 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const targetInst_dosu69 = parsed_dosu69.targetInstanceId ?? targetId;
         const revCost_dosu69 = parsed_dosu69.revealCost ?? 0;
         const opponent_dosu69 = pendingEffect.selectingPlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
 
-        // Reveal and pay
+        // Pay reveal cost
         const ps_dosu69 = { ...newState[opponent_dosu69] };
         ps_dosu69.chakra -= revCost_dosu69;
         newState = { ...newState, [opponent_dosu69]: ps_dosu69 };
 
-        // Reveal the character
-        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
-          const mission = { ...newState.activeMissions[mi] };
-          const side_dosu69 = opponent_dosu69 === 'player1' ? 'player1Characters' : 'player2Characters';
-          const chars_dosu69 = [...mission[side_dosu69]];
+        // Find the character and its mission
+        const charResult_dosu69 = EffectEngine.findCharByInstanceId(newState, targetInst_dosu69);
+        if (!charResult_dosu69) break;
+        const mIdx_dosu69 = charResult_dosu69.missionIndex;
+        const side_dosu69: 'player1Characters' | 'player2Characters' =
+          opponent_dosu69 === 'player1' ? 'player1Characters' : 'player2Characters';
+        const charTopCard_dosu69 = charResult_dosu69.character.stack.length > 0
+          ? charResult_dosu69.character.stack[charResult_dosu69.character.stack.length - 1]
+          : charResult_dosu69.character.card;
+
+        // Check for upgrade target at same mission (same name, non-hidden, lower cost)
+        const friendlyChars_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69];
+        const upgradeTarget_dosu69 = friendlyChars_dosu69.find((c) => {
+          if (c.instanceId === targetInst_dosu69 || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          if ((charTopCard_dosu69.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
+          return cTop.name_fr.toUpperCase() === charTopCard_dosu69.name_fr.toUpperCase();
+        });
+
+        if (upgradeTarget_dosu69) {
+          // Reveal-for-upgrade: merge stacks
+          const missions_dosu69 = [...newState.activeMissions];
+          const m_dosu69 = { ...missions_dosu69[mIdx_dosu69] };
+          const chars_dosu69 = [...m_dosu69[side_dosu69]];
+          const hiddenChar_dosu69 = chars_dosu69.find(c => c.instanceId === targetInst_dosu69);
+          const upgradeIdx_dosu69 = chars_dosu69.findIndex(c => c.instanceId === upgradeTarget_dosu69.instanceId);
+
+          if (hiddenChar_dosu69 && upgradeIdx_dosu69 !== -1) {
+            const upgraded = { ...chars_dosu69[upgradeIdx_dosu69] };
+            upgraded.stack = [...upgraded.stack, ...hiddenChar_dosu69.stack];
+            upgraded.card = charTopCard_dosu69;
+            upgraded.powerTokens += hiddenChar_dosu69.powerTokens;
+            upgraded.isHidden = false;
+            upgraded.wasRevealedAtLeastOnce = true;
+
+            const updatedChars = chars_dosu69.filter(c => c.instanceId !== targetInst_dosu69);
+            const mergedIdx = updatedChars.findIndex(c => c.instanceId === upgradeTarget_dosu69.instanceId);
+            if (mergedIdx !== -1) updatedChars[mergedIdx] = upgraded;
+
+            m_dosu69[side_dosu69] = updatedChars;
+            missions_dosu69[mIdx_dosu69] = m_dosu69;
+            newState = { ...newState, activeMissions: missions_dosu69 };
+
+            newState.log = logAction(newState.log, newState.turn, newState.phase, opponent_dosu69,
+              'REVEAL_UPGRADE',
+              `Dosu Kinuta (069): ${charTopCard_dosu69.name_fr} revealed as upgrade, paying ${revCost_dosu69} chakra.`,
+              'game.log.effect.dosu069RevealUpgrade',
+              { card: 'DOSU KINUTA', id: 'KS-069-UC', target: charTopCard_dosu69.name_fr, cost: String(revCost_dosu69) });
+
+            // Trigger MAIN + UPGRADE + AMBUSH effects
+            const upgradedChar_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69].find(
+              c => c.instanceId === upgradeTarget_dosu69.instanceId
+            );
+            if (upgradedChar_dosu69) {
+              newState = EffectEngine.resolveRevealUpgradeEffects(newState, opponent_dosu69, upgradedChar_dosu69, mIdx_dosu69);
+            }
+          }
+        } else {
+          // Normal reveal (no upgrade) — reveal and trigger MAIN + AMBUSH
+          const missions_dosu69 = [...newState.activeMissions];
+          const m_dosu69 = { ...missions_dosu69[mIdx_dosu69] };
+          const chars_dosu69 = [...m_dosu69[side_dosu69]];
           const cidx_dosu69 = chars_dosu69.findIndex(c => c.instanceId === targetInst_dosu69);
+
           if (cidx_dosu69 !== -1) {
-            chars_dosu69[cidx_dosu69] = { ...chars_dosu69[cidx_dosu69], isHidden: false };
-            mission[side_dosu69] = chars_dosu69;
-            newState.activeMissions = [...newState.activeMissions];
-            newState.activeMissions[mi] = mission;
+            chars_dosu69[cidx_dosu69] = { ...chars_dosu69[cidx_dosu69], isHidden: false, wasRevealedAtLeastOnce: true };
+            m_dosu69[side_dosu69] = chars_dosu69;
+            missions_dosu69[mIdx_dosu69] = m_dosu69;
+            newState = { ...newState, activeMissions: missions_dosu69 };
 
             newState.log = logAction(newState.log, newState.turn, newState.phase, opponent_dosu69,
               'EFFECT', `Dosu Kinuta (069): ${chars_dosu69[cidx_dosu69].card.name_fr} was revealed, paying ${revCost_dosu69} chakra.`,
               'game.log.effect.dosu069Reveal', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: chars_dosu69[cidx_dosu69].card.name_fr, cost: String(revCost_dosu69) });
-            break;
+
+            // Trigger MAIN + AMBUSH effects of the revealed character
+            const revealedChar_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69].find(
+              c => c.instanceId === targetInst_dosu69
+            );
+            if (revealedChar_dosu69) {
+              newState = EffectEngine.resolveRevealEffects(newState, opponent_dosu69, revealedChar_dosu69, mIdx_dosu69);
+            }
           }
         }
         break;

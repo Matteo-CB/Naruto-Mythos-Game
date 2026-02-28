@@ -64,15 +64,10 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find enemy characters in this mission that can be moved
-  const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden)
-    .map((c: CharacterInPlay) => c.instanceId);
+  // Find enemy characters in this mission that can be moved (hidden chars included)
+  const validTargets: string[] = enemyChars.map((c: CharacterInPlay) => c.instanceId);
 
-  // Also include hidden enemies (they can be moved too)
-  const allValidTargets: string[] = enemyChars.map((c: CharacterInPlay) => c.instanceId);
-
-  if (allValidTargets.length === 0) {
+  if (validTargets.length === 0) {
     return {
       state: {
         ...state,
@@ -91,7 +86,7 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'JIRAIYA105_MOVE_ENEMY',
-    validTargets: allValidTargets,
+    validTargets: validTargets,
     description: 'Jiraiya (105) UPGRADE: Choose an enemy character in this mission to move to another mission.',
     descriptionKey: 'game.effect.desc.jiraiya105MoveEnemy',
   };
