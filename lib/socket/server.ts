@@ -165,8 +165,25 @@ async function finalizeGameEnd(
       }
     }
 
-    // Always persist game record (for stats — replay data saved on user request)
+    // Persist game record with replay data included
     if (room.hostId && room.guestId) {
+      const replayForDb = room.gameState ? {
+        log: room.gameState.log,
+        playerNames: {
+          player1: room.hostName ?? 'Player 1',
+          player2: room.guestName ?? 'Player 2',
+        },
+        finalMissions: room.gameState.activeMissions.map(m => ({
+          name_fr: m.card.name_fr,
+          rank: m.rank,
+          basePoints: m.basePoints,
+          rankBonus: m.rankBonus,
+          wonBy: m.wonBy ?? null,
+        })),
+        initialState: room.replayInitialState,
+        actionHistory: room.gameState.actionHistory ?? [],
+      } : null;
+
       const gameRecord = await prisma.game.create({
         data: {
           player1Id: room.hostId,
@@ -178,6 +195,7 @@ async function finalizeGameEnd(
           player2Score: p2Score,
           eloChange: eloData?.player1Delta ?? 0,
           completedAt: new Date(),
+          gameState: replayForDb ? JSON.parse(JSON.stringify(replayForDb)) : undefined,
         },
       });
       gameRecordId = gameRecord.id;

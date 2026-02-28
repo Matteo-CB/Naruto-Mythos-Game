@@ -246,21 +246,26 @@ function VisualReplay({
         current = GameEngine.applyAction(current, player, action);
         result.push(current);
       } catch (err) {
-        console.error('[Replay] Error applying action:', err);
-        break;
+        console.error('[Replay] Error applying action:', err, { player, action });
+        // Push the current good state and skip this broken action
+        result.push(current);
+        continue;
       }
     }
 
     // Recovery: auto-advance stuck states until game reaches gameOver or stops changing
     let recovery = 0;
-    while (current.phase !== 'gameOver' && recovery < 20) {
+    while (current.phase !== 'gameOver' && recovery < 50) {
       let advanced: GameState | null = null;
       try {
-        if (current.phase === 'mission' && current.missionScoringComplete) {
-          // Stuck after mission scoring — inject ADVANCE_PHASE
+        if (current.phase === 'action' && current.player1.hasPassed && current.player2.hasPassed) {
+          // Both players passed — advance to mission phase
+          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+        } else if (current.phase === 'mission') {
+          // Mission phase — try to advance (scoring or post-scoring)
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
         } else if (current.phase === 'end' && current.pendingActions.length === 0 && current.pendingEffects.length === 0) {
-          // Stuck in end phase with nothing pending — inject a dummy to trigger advance
+          // Stuck in end phase with nothing pending — advance to next turn
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
         } else {
           break; // Not stuck in a recoverable way
@@ -268,7 +273,7 @@ function VisualReplay({
       } catch {
         break;
       }
-      if (!advanced || advanced === current || advanced.phase === current.phase && advanced.turn === current.turn) {
+      if (!advanced || advanced === current || (advanced.phase === current.phase && advanced.turn === current.turn)) {
         break; // No progress made
       }
       current = advanced;

@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { BoosterCard } from '@/lib/draft/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
@@ -348,7 +347,7 @@ export function DraftDeckBuilder({
                     }}
                   >
                     {imgPath ? (
-                      <Image src={imgPath} alt={m.name_fr} fill className="object-cover" sizes="80px" />
+                      <img src={imgPath} alt={m.name_fr} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
                         <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{m.name_fr}</span>
@@ -394,7 +393,7 @@ export function DraftDeckBuilder({
                     }}
                   >
                     {imgPath ? (
-                      <Image src={imgPath} alt={card.name_fr} fill className="object-cover" sizes="100px" />
+                      <img src={imgPath} alt={card.name_fr} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
                         <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{card.name_fr}</span>
@@ -522,12 +521,10 @@ export function DraftDeckBuilder({
               onClick={(e) => e.stopPropagation()}
             >
               {normalizeImagePath(previewCard.image_file) ? (
-                <Image
+                <img
                   src={normalizeImagePath(previewCard.image_file)!}
                   alt={previewCard.name_fr}
-                  fill
-                  className="object-cover"
-                  sizes="280px"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>

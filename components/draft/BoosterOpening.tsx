@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { BoosterPack, BoosterCard } from '@/lib/draft/boosterGenerator';
 import { CardReveal } from './CardReveal';
@@ -18,8 +17,12 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const t = useTranslations('draft');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stage, setStage] = useState<Stage>('ready');
-  const [revealedCount, setRevealedCount] = useState(0);
   const [collectedCards, setCollectedCards] = useState<BoosterCard[]>([]);
+
+  // Track how many cards have been revealed for the current booster
+  const revealedCountRef = useRef(0);
+  const isTransitioningRef = useRef(false);
+  const collectedCardsRef = useRef<BoosterCard[]>([]);
 
   const currentBooster = boosters[currentIndex];
   const totalBoosters = boosters.length;
@@ -41,37 +44,44 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
       setStage('opening');
       // Opening animation lasts 800ms
       setTimeout(() => {
+        revealedCountRef.current = 0;
+        isTransitioningRef.current = false;
         setStage('revealing');
-        setRevealedCount(0);
       }, 800);
     }, 600);
   }, [stage]);
 
   const handleCardRevealed = useCallback(() => {
-    setRevealedCount((prev) => {
-      const next = prev + 1;
-      if (next >= sortedCards.length) {
-        // All cards revealed, wait a moment then collect
-        setTimeout(() => {
-          setCollectedCards((prev) => [...prev, ...sortedCards]);
-          setStage('collected');
+    // Prevent duplicate calls during transition
+    if (isTransitioningRef.current) return;
 
-          // Move to next booster or finish
-          setTimeout(() => {
-            if (currentIndex + 1 < totalBoosters) {
-              setCurrentIndex((prev) => prev + 1);
-              setStage('ready');
-              setRevealedCount(0);
-            } else {
-              // All boosters opened
-              onComplete([...collectedCards, ...sortedCards]);
-            }
-          }, 600);
-        }, 400);
-      }
-      return next;
-    });
-  }, [sortedCards, currentIndex, totalBoosters, collectedCards, onComplete]);
+    revealedCountRef.current += 1;
+
+    if (revealedCountRef.current >= sortedCards.length) {
+      // All cards revealed — lock to prevent more calls
+      isTransitioningRef.current = true;
+
+      setTimeout(() => {
+        const newCollected = [...collectedCardsRef.current, ...sortedCards];
+        collectedCardsRef.current = newCollected;
+        setCollectedCards(newCollected);
+        setStage('collected');
+
+        // Move to next booster or finish
+        setTimeout(() => {
+          if (currentIndex + 1 < totalBoosters) {
+            setCurrentIndex((prev) => prev + 1);
+            revealedCountRef.current = 0;
+            isTransitioningRef.current = false;
+            setStage('ready');
+          } else {
+            // All boosters opened
+            onComplete(newCollected);
+          }
+        }, 600);
+      }, 400);
+    }
+  }, [sortedCards, currentIndex, totalBoosters, onComplete]);
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -117,7 +127,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         {(stage === 'ready' || stage === 'shaking') && (
           <motion.div
             key={`booster-${currentIndex}`}
-            className="relative cursor-pointer"
+            className="relative cursor-pointer flex items-center justify-center"
             initial={{ y: 200, opacity: 0, rotate: -5 }}
             animate={{
               y: 0,
@@ -131,40 +141,69 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
               rotate: {
                 duration: stage === 'shaking' ? 0.6 : 3,
                 repeat: stage === 'shaking' ? 0 : Infinity,
-                ease: stage === 'shaking' ? 'easeInOut' : 'easeInOut',
+                ease: 'easeInOut',
               },
               scale: { duration: stage === 'shaking' ? 0.6 : 1 },
             }}
             onClick={handleBoosterTap}
-            style={{ width: '220px', height: '310px' }}
           >
-            <Image
-              src="/images/booster.webp"
-              alt="Booster Pack"
-              fill
-              className="object-contain"
-              sizes="220px"
-              priority
-            />
-
-            {/* Pulsing aura */}
+            {/* Outer glow layer */}
             <motion.div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute"
+              style={{
+                width: '260px',
+                height: '370px',
+                borderRadius: '16px',
+                boxShadow: '0 0 40px rgba(196, 163, 90, 0.25), 0 0 80px rgba(196, 163, 90, 0.1)',
+              }}
               animate={{
                 boxShadow: [
-                  '0 0 20px rgba(196, 163, 90, 0.2)',
-                  '0 0 40px rgba(196, 163, 90, 0.4)',
-                  '0 0 20px rgba(196, 163, 90, 0.2)',
+                  '0 0 40px rgba(196, 163, 90, 0.2), 0 0 80px rgba(196, 163, 90, 0.08)',
+                  '0 0 60px rgba(196, 163, 90, 0.35), 0 0 100px rgba(196, 163, 90, 0.15)',
+                  '0 0 40px rgba(196, 163, 90, 0.2), 0 0 80px rgba(196, 163, 90, 0.08)',
                 ],
               }}
               transition={{ duration: 2, repeat: Infinity }}
-              style={{ borderRadius: '12px' }}
             />
+
+            {/* Booster container with subtle border frame */}
+            <div
+              className="relative overflow-hidden"
+              style={{
+                width: '220px',
+                height: '310px',
+                borderRadius: '12px',
+                border: '2px solid rgba(196, 163, 90, 0.4)',
+                boxShadow: 'inset 0 0 30px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.6)',
+              }}
+            >
+              <img
+                src="/images/booster.webp"
+                alt="Booster Pack"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+
+              {/* Subtle shine overlay */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                animate={{ opacity: [0, 0.08, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
+                }}
+              />
+            </div>
 
             {/* Tap hint */}
             {stage === 'ready' && (
               <motion.div
-                className="absolute -bottom-10 left-0 right-0 text-center"
+                className="absolute -bottom-12 left-0 right-0 text-center"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
@@ -199,7 +238,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           >
             {sortedCards.map((card, i) => (
               <CardReveal
-                key={card.draftInstanceId}
+                key={`${currentIndex}-${card.draftInstanceId}`}
                 card={card}
                 index={i}
                 onRevealed={handleCardRevealed}
