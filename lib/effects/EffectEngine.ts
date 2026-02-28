@@ -839,6 +839,11 @@ export class EffectEngine {
         newState = EffectEngine.putCardOnDeck(newState, pendingEffect, targetId);
         break;
 
+      // --- Haku 088: player confirmed optional draw ---
+      case 'HAKU088_CONFIRM_DRAW':
+        newState = EffectEngine.haku088ConfirmDraw(newState, pendingEffect);
+        break;
+
       // --- MSS 08: Set a Trap ---
       case 'MSS08_CHOOSE_CARD':
         newState = EffectEngine.mss08ChooseCard(newState, pendingEffect, targetId);
@@ -5392,6 +5397,69 @@ export class EffectEngine {
       'game.log.effect.putOnDeck',
       { card: card.name_fr, id: pending.sourceCardId },
     );
+
+    return newState;
+  }
+
+  // =====================================
+  // Haku 088 — Draw 1, put 1 back (two-step)
+  // =====================================
+
+  /**
+   * Haku 088: Player confirmed the optional draw.
+   * Draw 1 card from the deck, then create a mandatory PUT_CARD_ON_DECK pending.
+   */
+  static haku088ConfirmDraw(state: GameState, pending: PendingEffect): GameState {
+    const newState = deepClone(state);
+    const player = pending.sourcePlayer;
+    const ps = newState[player];
+
+    if (ps.deck.length === 0) return newState; // Should not happen (handler checks), but guard
+
+    const drawnCard = ps.deck.shift()!;
+    ps.hand.push(drawnCard);
+
+    newState.log = logAction(
+      newState.log, newState.turn, newState.phase, player,
+      'EFFECT_DRAW',
+      `Haku (088): Drew 1 card. Must put 1 card back on top of deck.`,
+      'game.log.effect.draw',
+      { card: 'HAKU', id: 'KS-088-C', count: 1 },
+    );
+
+    // Mandatory put-back
+    const handIndices = ps.hand.map((_: unknown, i: number) => String(i));
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+
+    newState.pendingEffects.push({
+      id: effectId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: '',
+      targetSelectionType: 'PUT_CARD_ON_DECK',
+      sourcePlayer: player,
+      requiresTargetSelection: true,
+      validTargets: handIndices,
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: pending.isUpgrade,
+    });
+
+    newState.pendingActions.push({
+      id: actionId,
+      type: 'PUT_CARD_ON_DECK' as const,
+      player,
+      description: 'Haku (088): Choose a card from your hand to put on top of your deck.',
+      descriptionKey: 'game.effect.desc.haku088PutBack',
+      options: handIndices,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    });
 
     return newState;
   }

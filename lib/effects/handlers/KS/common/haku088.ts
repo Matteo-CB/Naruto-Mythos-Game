@@ -8,9 +8,14 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Independent | Keywords: Rogue Ninja
  * MAIN: Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.
  *
- * Draws 1 card, then asks the player to choose which card to put back on top
- * of their deck. The put-back is mandatory per card text ("you must").
- * If the deck is empty (no card drawn), the effect fizzles entirely.
+ * The draw is OPTIONAL ("if you do" implies player choice — no "must" on the draw).
+ * If the player chooses to draw, they MUST put 1 card from hand back on top of deck.
+ * If the deck is empty, the effect fizzles entirely.
+ *
+ * Flow:
+ * 1. Handler offers optional HAKU088_CONFIRM_DRAW (isOptional: true, skip = do nothing)
+ * 2. If player accepts (SELECT_TARGET → EffectEngine HAKU088_CONFIRM_DRAW):
+ *    draw 1 card, then push mandatory PUT_CARD_ON_DECK pending (isMandatory: true)
  */
 function handleHaku088Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -18,49 +23,25 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
 
   // If deck is empty, nothing happens
   if (playerState.deck.length === 0) {
-    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Haku (088): Deck is empty, cannot draw.',
-      'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-088-C' }) } };
+    return {
+      state: {
+        ...state,
+        log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+          'Haku (088): Deck is empty, cannot draw.',
+          'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-088-C' }),
+      },
+    };
   }
 
-  // Draw 1 card
-  const newDeck = [...playerState.deck];
-  const drawnCard = newDeck.shift()!;
-  const newHand = [...playerState.hand, drawnCard];
-
-  const newPlayerState = {
-    ...playerState,
-    deck: newDeck,
-    hand: newHand,
-  };
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'EFFECT_DRAW',
-    `Haku (088): Drew 1 card. Must put 1 card back on top of deck.`,
-    'game.log.effect.draw',
-    { card: 'HAKU', id: 'KS-088-C', count: 1 },
-  );
-
-  const newState = {
-    ...state,
-    [sourcePlayer]: newPlayerState,
-    log,
-  };
-
-  // Create hand indices as valid targets for the put-back selection
-  const handIndices = newHand.map((_, i) => String(i));
-
+  // Offer optional draw — if accepted, EffectEngine draws and chains mandatory put-back
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'PUT_CARD_ON_DECK',
-    validTargets: handIndices,
-    description: `Haku (088): Choose a card from your hand to put on top of your deck.`,
-    descriptionKey: 'game.effect.desc.haku088PutBack',
+    targetSelectionType: 'HAKU088_CONFIRM_DRAW',
+    validTargets: ['draw'],
+    isOptional: true,
+    description: 'Haku (088): Draw 1 card, then put 1 card from your hand on top of your deck.',
+    descriptionKey: 'game.effect.desc.haku088Draw',
   };
 }
 
