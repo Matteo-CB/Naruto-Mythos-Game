@@ -147,58 +147,16 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             }}
             onClick={handleBoosterTap}
           >
-            {/* Outer glow layer */}
-            <motion.div
-              className="absolute"
+            {/* Booster image — displayed naturally, no cropping */}
+            <img
+              src="/images/booster.webp"
+              alt="Booster Pack"
               style={{
-                width: '260px',
-                height: '370px',
-                borderRadius: '16px',
-                boxShadow: '0 0 40px rgba(196, 163, 90, 0.25), 0 0 80px rgba(196, 163, 90, 0.1)',
+                width: '240px',
+                height: 'auto',
+                display: 'block',
               }}
-              animate={{
-                boxShadow: [
-                  '0 0 40px rgba(196, 163, 90, 0.2), 0 0 80px rgba(196, 163, 90, 0.08)',
-                  '0 0 60px rgba(196, 163, 90, 0.35), 0 0 100px rgba(196, 163, 90, 0.15)',
-                  '0 0 40px rgba(196, 163, 90, 0.2), 0 0 80px rgba(196, 163, 90, 0.08)',
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
             />
-
-            {/* Booster container with subtle border frame */}
-            <div
-              className="relative overflow-hidden"
-              style={{
-                width: '220px',
-                height: '310px',
-                borderRadius: '12px',
-                border: '2px solid rgba(196, 163, 90, 0.4)',
-                boxShadow: 'inset 0 0 30px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.6)',
-              }}
-            >
-              <img
-                src="/images/booster.webp"
-                alt="Booster Pack"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
-
-              {/* Subtle shine overlay */}
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                animate={{ opacity: [0, 0.08, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: '12px',
-                }}
-              />
-            </div>
 
             {/* Tap hint */}
             {stage === 'ready' && (

@@ -130,6 +130,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
 function PoolCard({ card, index }: { card: BoosterCard; index: number }) {
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';
+  const isMission = card.card_type === 'mission';
 
   return (
     <motion.div
@@ -138,7 +139,7 @@ function PoolCard({ card, index }: { card: BoosterCard; index: number }) {
       transition={{ delay: index * 0.02, duration: 0.2 }}
       className="relative rounded overflow-hidden"
       style={{
-        aspectRatio: '5/7',
+        aspectRatio: isMission ? '3.5/2.5' : '5/7',
         border: `1px solid ${rarityColor}40`,
       }}
     >
