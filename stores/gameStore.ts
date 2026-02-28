@@ -402,6 +402,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            return {
+              index: amount,
+              card: {
+                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                chakra: amount,
+                power: amount,
+              },
+            };
+          });
         } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
           // Opponent's hand cards shown as face-down (card backs)
           handCards = pendingAction.options.map((indexStr) => {

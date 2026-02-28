@@ -45,7 +45,7 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const mission of newState.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (!char.isHidden && getEffectivePower(newState, char, opponentPlayer) <= 3) {
+      if (getEffectivePower(newState, char, opponentPlayer) <= 3) {
         validTargets.push(char.instanceId);
       }
     }

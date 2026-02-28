@@ -69,9 +69,9 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 1
+  // Find enemies with effective power <= 1 (hidden chars have power 0, valid targets)
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 1)
+    .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 1)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {
