@@ -20,7 +20,7 @@ import {
 } from './types';
 import { deepClone } from './utils/deepClone';
 import { shuffle } from './utils/shuffle';
-import { generateGameId } from './utils/id';
+import { generateGameId, resetIdCounter } from './utils/id';
 import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
@@ -35,6 +35,9 @@ export class GameEngine {
    * Handles: random starting player, mission deck construction, initial draw, mulligan setup.
    */
   static createGame(config: GameConfig): GameState {
+    // Reset instance ID counter so IDs are deterministic from game start.
+    // This ensures replay reconstruction generates the same IDs.
+    resetIdCounter();
     const gameId = generateGameId();
 
     // Randomly determine starting player (Edge token holder)

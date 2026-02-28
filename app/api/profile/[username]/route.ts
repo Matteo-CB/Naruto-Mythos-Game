@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
+import { cleanupOldGames } from '@/lib/db/gameCleanup';
 
 export async function GET(
   request: NextRequest,
@@ -10,6 +11,9 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
     const perPage = 20;
+
+    // Fire-and-forget: clean up games older than 7 days
+    cleanupOldGames().catch(() => {});
 
     const user = await prisma.user.findUnique({
       where: { username },

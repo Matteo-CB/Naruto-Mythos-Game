@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { cleanupOldGames } from '@/lib/db/gameCleanup';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    cleanupOldGames().catch(() => {});
+
     const { id } = await params;
 
     const game = await prisma.game.findUnique({
