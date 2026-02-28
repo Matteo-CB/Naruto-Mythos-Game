@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/draft/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getRarityLabel } from '@/lib/utils/cardLocale';
 
 interface CardRevealProps {
   card: BoosterCard;
@@ -13,26 +15,26 @@ interface CardRevealProps {
   delay?: number;
 }
 
-function getRarityGlow(rarity: string): { color: string; intensity: string; label: string } {
+function getRarityGlow(rarity: string): { color: string; intensity: string } {
   switch (rarity) {
     case 'L':
-      return { color: '#ffd700', intensity: '0 0 30px #ffd700, 0 0 60px #ffd700, 0 0 90px #ffd700', label: 'LEGENDARY' };
+      return { color: '#ffd700', intensity: '0 0 30px #ffd700, 0 0 60px #ffd700, 0 0 90px #ffd700' };
     case 'M':
     case 'MV':
-      return { color: '#ff4444', intensity: '0 0 20px #ff4444, 0 0 40px #ff4444', label: 'MYTHOS' };
+      return { color: '#ff4444', intensity: '0 0 20px #ff4444, 0 0 40px #ff4444' };
     case 'S':
     case 'SV':
-      return { color: '#c4a35a', intensity: '0 0 20px #c4a35a, 0 0 40px #c4a35a', label: 'SECRET' };
+      return { color: '#c4a35a', intensity: '0 0 20px #c4a35a, 0 0 40px #c4a35a' };
     case 'RA':
-      return { color: '#9b59b6', intensity: '0 0 15px #9b59b6, 0 0 30px #9b59b6', label: 'RARE ART' };
+      return { color: '#9b59b6', intensity: '0 0 15px #9b59b6, 0 0 30px #9b59b6' };
     case 'R':
-      return { color: '#3498db', intensity: '0 0 12px #3498db, 0 0 25px #3498db', label: 'RARE' };
+      return { color: '#3498db', intensity: '0 0 12px #3498db, 0 0 25px #3498db' };
     case 'UC':
-      return { color: '#2ecc71', intensity: '0 0 8px #2ecc71', label: 'UNCOMMON' };
+      return { color: '#2ecc71', intensity: '0 0 8px #2ecc71' };
     case 'MMS':
-      return { color: '#e67e22', intensity: '0 0 10px #e67e22, 0 0 20px #e67e22', label: 'MISSION' };
+      return { color: '#e67e22', intensity: '0 0 10px #e67e22, 0 0 20px #e67e22' };
     default:
-      return { color: '#888888', intensity: '0 0 5px #88888840', label: 'COMMON' };
+      return { color: '#888888', intensity: '0 0 5px #88888840' };
   }
 }
 
@@ -41,6 +43,7 @@ function isHighRarity(rarity: string): boolean {
 }
 
 export function CardReveal({ card, index, onRevealed, autoReveal = false, delay = 0 }: CardRevealProps) {
+  const locale = useLocale() as 'en' | 'fr';
   const [isFlipped, setIsFlipped] = useState(false);
   const hasFlippedRef = useRef(false);
   const hasCalledRevealedRef = useRef(false);
@@ -210,7 +213,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             className="text-[9px] font-bold uppercase tracking-wider"
             style={{ color: rarityInfo.color }}
           >
-            {rarityInfo.label}
+            {getRarityLabel(card.rarity, locale)}
           </span>
         </motion.div>
       )}

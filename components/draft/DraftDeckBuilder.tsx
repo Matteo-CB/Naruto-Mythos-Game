@@ -2,11 +2,14 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/draft/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MIN_DECK_SIZE, MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
+import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { DraftTimer } from './DraftTimer';
 
@@ -33,6 +36,7 @@ export function DraftDeckBuilder({
   onTimeUp,
 }: DraftDeckBuilderProps) {
   const t = useTranslations('draft');
+  const locale = useLocale() as 'en' | 'fr';
 
   // Deck state — arrays, like the site's deck builder
   const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
@@ -111,7 +115,7 @@ export function DraftDeckBuilder({
       if (searchText) {
         const search = searchText.toLowerCase();
         if (
-          !c.name_fr.toLowerCase().includes(search) &&
+          !getCardName(c, locale).toLowerCase().includes(search) &&
           !(c.name_en ?? '').toLowerCase().includes(search) &&
           !c.id.toLowerCase().includes(search)
         ) {
@@ -349,7 +353,7 @@ export function DraftDeckBuilder({
             className="flex items-center gap-1 px-2 py-0.5 rounded shrink-0 cursor-pointer"
             style={{ backgroundColor: '#1a1a1a', border: '1px solid #e67e2240' }}
           >
-            <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(m)}>{m.name_fr}</span>
+            <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(m)}>{getCardName(m, locale)}</span>
             <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeMission(i)}>x</span>
           </span>
         ))}
@@ -371,7 +375,7 @@ export function DraftDeckBuilder({
                 style={{ backgroundColor: '#1a1a1a', border: `1px solid ${(rarityColors[c.rarity] ?? '#888')}30` }}
               >
                 <span className="text-[9px]" style={{ color: '#5865F2' }}>{c.chakra}</span>
-                <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(c)}>{c.name_fr}</span>
+                <span className="text-[9px]" style={{ color: '#e0e0e0' }} onClick={() => setPreviewCard(c)}>{getCardName(c, locale)}</span>
                 <span className="text-[9px]" style={{ color: '#b33e3e' }} onClick={() => removeChar(originalIndex)}>x</span>
               </span>
             );
@@ -417,7 +421,7 @@ export function DraftDeckBuilder({
               >
                 <option value="all">{t('allGroups')}</option>
                 {availableGroups.map((g) => (
-                  <option key={g} value={g}>{g}</option>
+                  <option key={g} value={g}>{getCardGroup(g, locale)}</option>
                 ))}
               </select>
             )}
@@ -464,14 +468,14 @@ export function DraftDeckBuilder({
                     }}
                   >
                     {imgPath ? (
-                      <img src={imgPath} alt={m.name_fr} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+                      <img src={imgPath} alt={getCardName(m, locale)} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{m.name_fr}</span>
+                        <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{getCardName(m, locale)}</span>
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
-                      <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{m.name_fr}</span>
+                      <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{getCardName(m, locale)}</span>
                     </div>
                     {inDeck && (
                       <div className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#e67e22' }}>
@@ -484,7 +488,7 @@ export function DraftDeckBuilder({
                       style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
                       onClick={(e) => { e.stopPropagation(); setPreviewCard(m); }}
                     >
-                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>Detail</span>
+                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t('detailBtn')}</span>
                     </button>
                   </motion.div>
                 );
@@ -520,17 +524,17 @@ export function DraftDeckBuilder({
                     }}
                   >
                     {imgPath ? (
-                      <img src={imgPath} alt={card.name_fr} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+                      <img src={imgPath} alt={getCardName(card, locale)} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                        <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{card.name_fr}</span>
+                        <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{getCardName(card, locale)}</span>
                       </div>
                     )}
 
                     {/* Card info overlay */}
                     <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
                       <div className="flex items-center justify-between">
-                        <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{card.name_fr}</span>
+                        <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{getCardName(card, locale)}</span>
                         <span className="text-[8px] font-bold" style={{ color: rarityColor }}>{card.rarity}</span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -560,7 +564,7 @@ export function DraftDeckBuilder({
                       style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
                       onClick={(e) => { e.stopPropagation(); setPreviewCard(card); }}
                     >
-                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>Detail</span>
+                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t('detailBtn')}</span>
                     </button>
                   </motion.div>
                 );
@@ -606,35 +610,35 @@ export function DraftDeckBuilder({
                   {normalizeImagePath(previewCard.image_file) ? (
                     <img
                       src={normalizeImagePath(previewCard.image_file)!}
-                      alt={previewCard.name_fr}
+                      alt={getCardName(previewCard, locale)}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                      <span className="text-xs" style={{ color: '#888' }}>{previewCard.name_fr}</span>
+                      <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale)}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Card info */}
-                <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{previewCard.name_fr}</div>
-                {previewCard.title_fr && (
-                  <div className="text-[11px]" style={{ color: '#888' }}>{previewCard.title_fr}</div>
+                <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale)}</div>
+                {(previewCard.title_fr || previewCard.title_en) && (
+                  <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard, locale)}</div>
                 )}
 
                 {/* Stats row */}
                 <div className="flex gap-2 mt-1 flex-wrap">
                   {previewCard.card_type !== 'mission' && (
                     <>
-                      <span className="text-[11px]" style={{ color: '#5865F2' }}>Chakra: {previewCard.chakra}</span>
-                      <span className="text-[11px]" style={{ color: '#b33e3e' }}>Power: {previewCard.power}</span>
+                      <span className="text-[11px]" style={{ color: '#5865F2' }}>{t('chakra')}: {previewCard.chakra}</span>
+                      <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t('power')}: {previewCard.power}</span>
                     </>
                   )}
                   <span className="text-[11px] font-bold" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>
-                    {previewCard.rarity}
+                    {getRarityLabel(previewCard.rarity, locale)}
                   </span>
                   {previewCard.group && (
-                    <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{previewCard.group}</span>
+                    <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, locale)}</span>
                   )}
                 </div>
 
@@ -647,7 +651,7 @@ export function DraftDeckBuilder({
                         className="text-[9px] px-1.5 py-0.5 rounded"
                         style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
                       >
-                        {kw}
+                        {getCardKeyword(kw, locale)}
                       </span>
                     ))}
                   </div>
@@ -656,12 +660,20 @@ export function DraftDeckBuilder({
                 {/* Effects */}
                 {previewCard.effects?.length > 0 && (
                   <div className="mt-2 flex flex-col gap-1.5">
-                    {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
-                      <div key={i}>
-                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
-                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{eff.description}</div>
-                      </div>
-                    ))}
+                    {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
+                      const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
+                      const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+                      const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
+                      const description = locale === 'fr'
+                        ? (frDescs?.[i] ?? eff.description)
+                        : (enDescs?.[i] ?? eff.description);
+                      return (
+                        <div key={i}>
+                          <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                          <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -742,41 +754,41 @@ export function DraftDeckBuilder({
                   {normalizeImagePath(previewCard.image_file) ? (
                     <img
                       src={normalizeImagePath(previewCard.image_file)!}
-                      alt={previewCard.name_fr}
+                      alt={getCardName(previewCard, locale)}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                      <span className="text-xs" style={{ color: '#888' }}>{previewCard.name_fr}</span>
+                      <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale)}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{previewCard.name_fr}</div>
-                  {previewCard.title_fr && (
-                    <div className="text-[11px]" style={{ color: '#888' }}>{previewCard.title_fr}</div>
+                  <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale)}</div>
+                  {(previewCard.title_fr || previewCard.title_en) && (
+                    <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard, locale)}</div>
                   )}
                   <div className="flex gap-2 mt-1 flex-wrap">
                     {previewCard.card_type !== 'mission' && (
                       <>
-                        <span className="text-[11px]" style={{ color: '#5865F2' }}>Chakra: {previewCard.chakra}</span>
-                        <span className="text-[11px]" style={{ color: '#b33e3e' }}>Power: {previewCard.power}</span>
+                        <span className="text-[11px]" style={{ color: '#5865F2' }}>{t('chakra')}: {previewCard.chakra}</span>
+                        <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t('power')}: {previewCard.power}</span>
                       </>
                     )}
                     <span className="text-[11px] font-bold" style={{ color: rarityColors[previewCard.rarity] ?? '#888' }}>
-                      {previewCard.rarity}
+                      {getRarityLabel(previewCard.rarity, locale)}
                     </span>
                     {previewCard.group && (
-                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{previewCard.group}</span>
+                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup(previewCard.group, locale)}</span>
                     )}
                   </div>
                   {previewCard.keywords && previewCard.keywords.length > 0 && (
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {previewCard.keywords.map((kw: string, i: number) => (
                         <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}>
-                          {kw}
+                          {getCardKeyword(kw, locale)}
                         </span>
                       ))}
                     </div>
@@ -787,12 +799,20 @@ export function DraftDeckBuilder({
               {/* Effects */}
               {previewCard.effects?.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
-                  {previewCard.effects.map((eff: { type: string; description: string }, i: number) => (
-                    <div key={i}>
-                      <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
-                      <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{eff.description}</div>
-                    </div>
-                  ))}
+                  {previewCard.effects.map((eff: { type: string; description: string }, i: number) => {
+                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
+                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
+                    const description = locale === 'fr'
+                      ? (frDescs?.[i] ?? eff.description)
+                      : (enDescs?.[i] ?? eff.description);
+                    return (
+                      <div key={i}>
+                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
