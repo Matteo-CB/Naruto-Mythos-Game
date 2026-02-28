@@ -2,9 +2,10 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/draft/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
 
 interface DraftPoolReviewProps {
   cards: BoosterCard[];
@@ -39,6 +40,7 @@ const RARITY_COLORS: Record<string, string> = {
 
 export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
   const t = useTranslations('draft');
+  const locale = useLocale() as 'en' | 'fr';
 
   const sortedCards = useMemo(
     () =>
@@ -92,7 +94,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
           .sort(([a], [b]) => (RARITY_ORDER[a] ?? 99) - (RARITY_ORDER[b] ?? 99))
           .map(([rarity, count]) => (
             <span key={rarity} className="text-xs font-bold" style={{ color: RARITY_COLORS[rarity] ?? '#888' }}>
-              {rarity}: {count}
+              {getRarityLabel(rarity, locale)}: {count}
             </span>
           ))}
       </div>
@@ -103,11 +105,11 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
         {missions.length > 0 && (
           <div className="mb-4">
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#e67e22' }}>
-              Missions ({missions.length})
+              {t('missionsLabel')} ({missions.length})
             </h3>
             <div className="flex gap-2 flex-wrap">
               {missions.map((card, i) => (
-                <PoolCard key={card.draftInstanceId} card={card} index={i} />
+                <PoolCard key={card.draftInstanceId} card={card} index={i} locale={locale} />
               ))}
             </div>
           </div>
@@ -119,7 +121,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
         </h3>
         <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
           {characters.map((card, i) => (
-            <PoolCard key={card.draftInstanceId} card={card} index={i} />
+            <PoolCard key={card.draftInstanceId} card={card} index={i} locale={locale} />
           ))}
         </div>
       </div>
@@ -127,10 +129,11 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
   );
 }
 
-function PoolCard({ card, index }: { card: BoosterCard; index: number }) {
+function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; locale: 'en' | 'fr' }) {
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';
   const isMission = card.card_type === 'mission';
+  const cardName = getCardName(card, locale);
 
   return (
     <motion.div
@@ -144,15 +147,15 @@ function PoolCard({ card, index }: { card: BoosterCard; index: number }) {
       }}
     >
       {imgPath ? (
-        <img src={imgPath} alt={card.name_fr} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
+        <img src={imgPath} alt={cardName} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
       ) : (
         <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-          <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{card.name_fr}</span>
+          <span className="text-[9px] text-center px-1" style={{ color: '#888' }}>{cardName}</span>
         </div>
       )}
       <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
         <div className="flex items-center justify-between">
-          <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{card.name_fr}</span>
+          <span className="text-[8px] truncate" style={{ color: '#e0e0e0' }}>{cardName}</span>
           <span className="text-[8px] font-bold" style={{ color: rarityColor }}>{card.rarity}</span>
         </div>
       </div>

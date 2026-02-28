@@ -83,7 +83,6 @@ export default function Home() {
   const td = useTranslations('discord');
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
-  const [canAccessDraft, setCanAccessDraft] = useState(false);
   const [featuredCard] = useState(() =>
     FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
   );
@@ -91,16 +90,6 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  // Check draft access
-  useEffect(() => {
-    if (session?.user) {
-      fetch('/api/draft/access')
-        .then((res) => res.json())
-        .then((data) => setCanAccessDraft(data.canAccess === true))
-        .catch(() => setCanAccessDraft(false));
-    }
-  }, [session?.user]);
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
@@ -290,8 +279,8 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ))}
-              {/* Draft button (only visible if user has access) */}
-              {canAccessDraft && (
+              {/* Draft button */}
+              {(
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

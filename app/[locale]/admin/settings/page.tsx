@@ -23,8 +23,6 @@ export default function AdminSettingsPage() {
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const [leaguesLoading, setLeaguesLoading] = useState(true);
   const [leaguesToggling, setLeaguesToggling] = useState(false);
-  const [draftEnabled, setDraftEnabled] = useState(false);
-  const [draftToggling, setDraftToggling] = useState(false);
   const [results, setResults] = useState<ActionResult[]>([]);
   const [testers, setTesters] = useState<Array<{ id: string; username: string; elo: number }>>([]);
   const [testerSearch, setTesterSearch] = useState('');
@@ -45,7 +43,6 @@ export default function AdminSettingsPage() {
         .then((res) => res.json())
         .then((data) => {
           setLeaguesEnabled(data.leaguesEnabled ?? false);
-          setDraftEnabled(data.draftEnabled ?? false);
           setLeaguesLoading(false);
         })
         .catch(() => setLeaguesLoading(false));
@@ -88,32 +85,6 @@ export default function AdminSettingsPage() {
       addResult({ success: false, message: `Toggle error: ${err}` });
     } finally {
       setLeaguesToggling(false);
-    }
-  };
-
-  const handleToggleDraft = async () => {
-    setDraftToggling(true);
-    try {
-      const newValue = !draftEnabled;
-      const res = await fetch('/api/admin/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ draftEnabled: newValue }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setDraftEnabled(data.draftEnabled);
-        addResult({
-          success: true,
-          message: `Draft ${data.draftEnabled ? 'ENABLED' : 'DISABLED'}`,
-        });
-      } else {
-        addResult({ success: false, message: `Toggle failed: ${data.error}` });
-      }
-    } catch (err) {
-      addResult({ success: false, message: `Toggle error: ${err}` });
-    } finally {
-      setDraftToggling(false);
     }
   };
 
@@ -300,45 +271,6 @@ export default function AdminSettingsPage() {
               {leaguesEnabled
                 ? t('leagues.enabledDesc')
                 : t('leagues.disabledDesc')}
-            </span>
-          </div>
-        </div>
-
-        {/* Draft Mode Toggle */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-        >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-            {t('draft.title')}
-          </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
-            {t('draft.description')}
-          </p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleToggleDraft}
-              disabled={leaguesLoading || draftToggling}
-              className="px-6 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-              style={{
-                backgroundColor: draftEnabled ? '#3e8b3e' : '#1a1a2e',
-                color: draftEnabled ? '#ffffff' : '#888888',
-                border: `1px solid ${draftEnabled ? '#3e8b3e' : '#333333'}`,
-                opacity: draftToggling ? 0.6 : 1,
-              }}
-            >
-              {leaguesLoading
-                ? t('draft.loading')
-                : draftToggling
-                  ? t('draft.toggling')
-                  : draftEnabled
-                    ? t('draft.enabled')
-                    : t('draft.disabled')}
-            </button>
-            <span className="text-xs" style={{ color: draftEnabled ? '#3e8b3e' : '#b33e3e' }}>
-              {draftEnabled
-                ? t('draft.enabledDesc')
-                : t('draft.disabledDesc')}
             </span>
           </div>
         </div>

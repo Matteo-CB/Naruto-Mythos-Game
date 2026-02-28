@@ -32,10 +32,6 @@ export async function PUT(request: NextRequest) {
     if (typeof body.leaguesEnabled === 'boolean') {
       updateData.leaguesEnabled = body.leaguesEnabled;
     }
-    if (typeof body.draftEnabled === 'boolean') {
-      updateData.draftEnabled = body.draftEnabled;
-    }
-
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
     }

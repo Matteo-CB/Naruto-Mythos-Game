@@ -52,6 +52,7 @@ export default function DraftPage() {
   const draftAllCards = useSocketStore((s) => s.draftAllCards);
   const draftDeadline = useSocketStore((s) => s.draftDeadline);
 
+  const { status } = useSession();
   const [step, setStep] = useState<DraftStep>('loading');
   const [mode, setMode] = useState<'ai' | 'online' | null>(null);
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
@@ -59,19 +60,17 @@ export default function DraftPage() {
   const [allOpenedCards, setAllOpenedCards] = useState<BoosterCard[]>([]);
   const [joinCode, setJoinCode] = useState('');
 
-  // Check access on load
+  // Auth check — redirect to login if not authenticated
   useEffect(() => {
-    fetch('/api/draft/access')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.canAccess) {
-          setStep('mode-select');
-        } else {
-          setStep('denied');
-        }
-      })
-      .catch(() => setStep('denied'));
-  }, []);
+    if (status === 'loading') return;
+    if (status === 'unauthenticated') {
+      router.push('/login');
+      return;
+    }
+    if (step === 'loading') {
+      setStep('mode-select');
+    }
+  }, [status, step, router]);
 
   // When online boosters arrive, transition to opening
   useEffect(() => {
