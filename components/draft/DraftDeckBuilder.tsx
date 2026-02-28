@@ -263,10 +263,10 @@ export function DraftDeckBuilder({
 
       {/* Main content */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-        {/* Left: Available cards */}
-        <div className="flex-1 flex flex-col overflow-hidden" style={{ borderRight: '1px solid #262626', minHeight: 0 }}>
+        {/* Left: Available cards — single scroll area */}
+        <div className="flex-1 overflow-y-auto" style={{ borderRight: '1px solid #262626', minHeight: 0 }}>
           {/* Filters */}
-          <div className="px-3 py-2 flex flex-wrap items-center gap-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+          <div className="px-3 py-2 flex flex-wrap items-center gap-2 sticky top-0 z-10" style={{ borderBottom: '1px solid #1a1a1a', backgroundColor: '#0a0a0a' }}>
             <input
               type="text"
               value={searchText}
@@ -323,7 +323,7 @@ export function DraftDeckBuilder({
           </div>
 
           {/* Missions section */}
-          <div className="px-3 py-2 shrink-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+          <div className="px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#e67e22' }}>
               {t('missionsLabel')} ({selectedMissions.length}/{MISSION_CARDS_PER_PLAYER})
             </h3>
@@ -365,7 +365,7 @@ export function DraftDeckBuilder({
           </div>
 
           {/* Character cards grid */}
-          <div className="flex-1 overflow-y-auto px-3 py-2">
+          <div className="px-3 py-2">
             <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: '#888' }}>
               {t('characters')} ({filteredChars.length})
             </h3>
