@@ -162,10 +162,10 @@ export function validateRevealCharacter(
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      // Reveal-for-upgrade: apply all cost modifiers first (e.g. Gaara 075 -2 discount),
-      // then subtract existing card cost. Never below 0.
-      const discountedFull = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
-      effectiveCost = Math.max(0, discountedFull - existingTopCard.chakra);
+      // Reveal-for-upgrade: pay the full printed cost of the hidden card (with modifiers).
+      // The hidden card was placed at cost 1; revealing it as an upgrade costs the full
+      // chakra value — not the upgrade difference.
+      effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {

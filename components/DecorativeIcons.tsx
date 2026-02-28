@@ -14,9 +14,10 @@ const DECORATIVE_PLACEMENTS = [
 
 interface DecorativeIconsProps {
   className?: string;
+  animated?: boolean;
 }
 
-export const DecorativeIcons = memo(function DecorativeIcons({ className = '' }: DecorativeIconsProps) {
+export const DecorativeIcons = memo(function DecorativeIcons({ className = '', animated = true }: DecorativeIconsProps) {
   return (
     <div
       className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
@@ -29,17 +30,42 @@ export const DecorativeIcons = memo(function DecorativeIcons({ className = '' }:
         const floatDuration = 20 + (i % 3) * 5;
         const floatRange = 6 + (i % 3) * 3;
 
+        const sharedStyle = {
+          left: item.x,
+          top: item.y,
+          width: item.size,
+          height: item.size,
+          opacity: item.opacity,
+        };
+
+        const image = (
+          <Image
+            src={item.src}
+            alt=""
+            width={item.size}
+            height={item.size}
+            loading="lazy"
+            style={{ objectFit: 'contain' }}
+          />
+        );
+
+        if (!animated) {
+          return (
+            <div
+              key={i}
+              className="absolute select-none"
+              style={{ ...sharedStyle, transform: `rotate(${item.rotation}deg)` }}
+            >
+              {image}
+            </div>
+          );
+        }
+
         return (
           <motion.div
             key={i}
             className="absolute select-none"
-            style={{
-              left: item.x,
-              top: item.y,
-              width: item.size,
-              height: item.size,
-              opacity: item.opacity,
-            }}
+            style={sharedStyle}
             animate={{
               y: [0, -floatRange, 0, floatRange * 0.6, 0],
               rotate: isShuriken
@@ -58,14 +84,7 @@ export const DecorativeIcons = memo(function DecorativeIcons({ className = '' }:
                 : { duration: 8, repeat: Infinity, ease: 'easeInOut', delay: item.floatDelay },
             }}
           >
-            <Image
-              src={item.src}
-              alt=""
-              width={item.size}
-              height={item.size}
-              loading="lazy"
-              style={{ objectFit: 'contain' }}
-            />
+            {image}
           </motion.div>
         );
       })}
