@@ -49,16 +49,13 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    return applyDevolve(state, validTargets[0], sourcePlayer, enemySide, ctx.isUpgrade);
-  }
-
+  // Always require target selection (effect is optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
     validTargets,
+    isOptional: true,
     description: ctx.isUpgrade
       ? 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (the discarded card\'s non-Upgrade effect will be copied).'
       : 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (discard top card of stack).',

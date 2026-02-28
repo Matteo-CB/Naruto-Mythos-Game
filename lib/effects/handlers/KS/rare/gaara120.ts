@@ -26,7 +26,8 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Process missions sequentially. Auto-defeat when 1 target, ask when >1.
+  // Process missions sequentially. For each mission with valid targets, always prompt the player
+  // (effect is optional — "up to 1" means the player can skip defeating in any mission).
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
@@ -36,31 +37,13 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
       continue;
     }
 
-    if (validTargets.length === 1) {
-      // Auto-defeat the single target
-      state = defeatEnemyCharacter(state, i, validTargets[0].instanceId, ctx.sourcePlayer);
-      defeatedCount++;
-
-      state = {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, ctx.sourcePlayer,
-          'EFFECT_DEFEAT',
-          `Gaara (120): Defeated enemy ${validTargets[0].card.name_fr} (Power ${getEffectivePower(state, validTargets[0], opponentPlayer)}) in mission ${i}.`,
-          'game.log.effect.defeat',
-          { card: 'GAARA', id: 'KS-120-R', target: validTargets[0].card.name_fr },
-        ),
-      };
-      continue;
-    }
-
-    // Multiple targets in this mission — need player selection
-    // Store context for the multi-stage chain in the description field as JSON
+    // Always show selection UI — player can skip this mission (optional "up to 1")
     return {
       state,
       requiresTargetSelection: true,
       targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
       validTargets: validTargets.map((c) => c.instanceId),
+      isOptional: true,
       description: JSON.stringify({
         defeatedCount,
         nextMissionIndex: i + 1,

@@ -20,7 +20,7 @@ import {
 } from './types';
 import { deepClone } from './utils/deepClone';
 import { shuffle } from './utils/shuffle';
-import { generateGameId, resetIdCounter } from './utils/id';
+import { generateGameId, generateInstanceId, resetIdCounter } from './utils/id';
 import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
@@ -443,6 +443,92 @@ export class GameEngine {
 
       const effect = newState.pendingEffects[effectIdx];
       if (!effect.isOptional) return state;
+
+      // Special case: Gaara 120 — declining means "skip this mission, continue to remaining missions"
+      if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {
+        let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
+        try { gDesc = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const { defeatedCount = 0, nextMissionIndex = 0, isUpgrade = false, sourceInstanceId, sourceMissionIndex } = gDesc;
+
+        // Remove the declined effect and action
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const enemySide_g: 'player1Characters' | 'player2Characters' =
+          effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        // Continue checking remaining missions from nextMissionIndex
+        let chainedToNext = false;
+        for (let mi = nextMissionIndex; mi < newState.activeMissions.length; mi++) {
+          const mission_g = newState.activeMissions[mi];
+          const validTargets_g: string[] = [];
+          for (const c of mission_g[enemySide_g]) {
+            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const power = (topCard.power ?? 0) + c.powerTokens;
+            if (power <= 1) validTargets_g.push(c.instanceId);
+          }
+          if (validTargets_g.length === 0) continue;
+
+          // Prompt for this mission (isOptional: true — player can skip)
+          const chainData = JSON.stringify({ defeatedCount, nextMissionIndex: mi + 1, isUpgrade, sourceInstanceId, sourceMissionIndex, missionIndex: mi });
+          const effId = generateInstanceId();
+          const actId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: effId,
+            sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: effect.effectType,
+            effectDescription: chainData,
+            targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
+            sourcePlayer: effect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: validTargets_g,
+            isOptional: true,
+            isMandatory: false,
+            resolved: false,
+            isUpgrade: effect.isUpgrade,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: actId,
+            type: 'SELECT_TARGET' as import('./types').GameAction['type'],
+            player: effect.sourcePlayer,
+            description: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${mi + 1}.`,
+            descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
+            descriptionParams: { mission: String(mi + 1) },
+            options: validTargets_g,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effId,
+          }];
+          chainedToNext = true;
+          break;
+        }
+
+        // If no remaining missions need prompting, apply UPGRADE powerup if applicable
+        if (!chainedToNext && isUpgrade && defeatedCount > 0 && sourceInstanceId && sourceMissionIndex != null) {
+          const friendlySide_g: 'player1Characters' | 'player2Characters' =
+            effect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+          const upgMissions = [...newState.activeMissions];
+          const upgMission = { ...upgMissions[sourceMissionIndex] };
+          const upgChars = [...upgMission[friendlySide_g]];
+          const selfIdx = upgChars.findIndex((c: CharacterInPlay) => c.instanceId === sourceInstanceId);
+          if (selfIdx !== -1) {
+            upgChars[selfIdx] = { ...upgChars[selfIdx], powerTokens: upgChars[selfIdx].powerTokens + defeatedCount };
+            upgMission[friendlySide_g] = upgChars;
+            upgMissions[sourceMissionIndex] = upgMission;
+            newState = { ...newState, activeMissions: upgMissions };
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, effect.sourcePlayer,
+              'EFFECT_POWERUP',
+              `Gaara (120): POWERUP ${defeatedCount} (upgrade, from missions skipped then completed).`,
+              'game.log.effect.powerupSelf',
+              { card: 'GAARA', id: 'KS-120-R', amount: defeatedCount },
+            );
+          }
+        }
+        return newState;
+      }
 
       // Special case: Dosu 069 — declining means the opponent lets the character be defeated
       if (effect.targetSelectionType === 'DOSU069_OPPONENT_CHOICE') {

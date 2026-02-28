@@ -18,7 +18,7 @@ function findCard(id: string) {
 }
 
 describe('POWERUP end-to-end', () => {
-  it('Hiruzen 001 should POWERUP 2 on a single friendly Leaf Village target', () => {
+  it('Hiruzen 001 should prompt to POWERUP 2 on a single friendly Leaf Village target (optional)', () => {
     const hiruzen = findCard('KS-001-C')!;
     expect(hiruzen).toBeDefined();
     expect(hiruzen.effects?.some(e => e.type === 'MAIN')).toBe(true);
@@ -58,10 +58,15 @@ describe('POWERUP end-to-end', () => {
     const p1Chars = newState.activeMissions[0].player1Characters;
     expect(p1Chars.length).toBe(2);
 
-    // The ally should have 2 power tokens from Hiruzen's POWERUP 2
+    // Effect is optional — pending target selection should be waiting
+    expect(newState.pendingEffects.length).toBeGreaterThan(0);
+    const pendingEff = newState.pendingEffects.find(e => e.targetSelectionType === 'POWERUP_2_LEAF_VILLAGE');
+    expect(pendingEff).toBeDefined();
+    expect(pendingEff!.isOptional).toBe(true);
+    expect(pendingEff!.validTargets).toContain('ally-leaf');
+    // Token NOT yet applied (awaiting player confirmation)
     const updatedAlly = p1Chars.find(c => c.instanceId === 'ally-leaf');
-    expect(updatedAlly).toBeDefined();
-    expect(updatedAlly!.powerTokens).toBe(2);
+    expect(updatedAlly!.powerTokens).toBe(0);
   });
 
   it('Hiruzen 001 should fizzle if no Leaf Village target', () => {
@@ -227,7 +232,7 @@ describe('UPGRADE end-to-end', () => {
     expect(finalUpgraded!.powerTokens).toBe(3);
   });
 
-  it('Upgrading Gaara 074 to Gaara 120 should defeat weak enemies and POWERUP X', () => {
+  it('Upgrading Gaara 074 to Gaara 120 should prompt to defeat weak enemies (optional per-mission)', () => {
     const gaara074 = findCard('KS-074-C')!;
     const gaara120 = findCard('KS-120-R')!;
     expect(gaara074).toBeDefined();
@@ -292,15 +297,14 @@ describe('UPGRADE end-to-end', () => {
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-120-R');
 
-    // MAIN effect: weak enemies should be defeated
+    // MAIN effect is optional ("up to 1" per mission) — should create pending selection
+    const gaara120Pending = newState.pendingEffects.find(e => e.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT');
+    expect(gaara120Pending).toBeDefined();
+    expect(gaara120Pending!.isOptional).toBe(true);
+    expect(gaara120Pending!.validTargets).toContain('weak1');
+    // Enemies NOT yet defeated (awaiting player choice)
     const m0Enemies = newState.activeMissions[0].player2Characters;
-    const m1Enemies = newState.activeMissions[1].player2Characters;
-    // Weak enemies with power <= 1 should be defeated (removed)
-    expect(m0Enemies.find(c => c.instanceId === 'weak1')).toBeUndefined();
-    expect(m1Enemies.find(c => c.instanceId === 'weak2')).toBeUndefined();
-
-    // UPGRADE effect: POWERUP X where X = number of defeated (2)
-    expect(upgraded!.powerTokens).toBe(2);
+    expect(m0Enemies.find(c => c.instanceId === 'weak1')).toBeDefined();
   });
 
   it('Rock Lee 039 UPGRADE should POWERUP 2', () => {

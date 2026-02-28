@@ -32,13 +32,14 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
   }
 
   // Effect is optional — route through pending action so player can skip.
-  // The "target" is Sakura herself (confirms the player wants to draw).
+  // Uses dedicated DRAW_CARD UI (shows deck + Draw/Skip buttons).
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SAKURA011_DRAW',
-    validTargets: [sourceCard.instanceId],
-    description: 'Sakura Haruno (011): Draw a card (Team 7 synergy)?',
+    validTargets: ['confirm'],
+    isOptional: true,
+    description: 'Sakura Haruno (011): Draw a card? (Team 7 synergy active)',
     descriptionKey: 'game.effect.desc.sakura011Draw',
   };
 }

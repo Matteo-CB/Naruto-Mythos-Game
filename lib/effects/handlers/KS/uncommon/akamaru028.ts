@@ -48,19 +48,13 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' }) } };
   }
 
-  // If exactly one target, auto-apply
-  if (kibaTargets.length === 1) {
-    const targetId = kibaTargets[0];
-    const newState = applyPowerupToTarget(state, targetId, 2, sourceMissionIndex, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets (unlikely but handle it): requires target selection
+  // Always require target selection (effect is optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'AKAMARU_028_POWERUP_KIBA',
     validTargets: kibaTargets,
+    isOptional: true,
     description: 'Select a friendly Kiba Inuzuka in this mission to give POWERUP 2.',
     descriptionKey: 'game.effect.desc.akamaru028PowerupKiba',
   };

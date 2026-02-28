@@ -52,16 +52,13 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    return applyHide(state, validTargets[0], sourcePlayer, enemySide, sourceMissionIndex);
-  }
-
+  // Always require target selection (effect is optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SHIKAMARU111_HIDE_ENEMY',
     validTargets,
+    isOptional: true,
     description: 'Shikamaru Nara (111) UPGRADE: Choose an enemy character with Power 3 or less to hide.',
     descriptionKey: 'game.effect.desc.shikamaru111HideEnemy',
   };

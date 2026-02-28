@@ -162,8 +162,10 @@ export function validateRevealCharacter(
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      // Reveal-for-upgrade: cost is the difference
-      effectiveCost = charTopCard.chakra - existingTopCard.chakra;
+      // Reveal-for-upgrade: apply all cost modifiers first (e.g. Gaara 075 -2 discount),
+      // then subtract existing card cost. Never below 0.
+      const discountedFull = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+      effectiveCost = Math.max(0, discountedFull - existingTopCard.chakra);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {
@@ -280,13 +282,9 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
   }
 
   // Ichibi 076 (UC): Can upgrade any Gaara
+  // Note: card 076 has no effects in JSON data, so we match by number directly.
   if (newCard.number === 76) {
-    const hasFlexible = (newCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
-    );
-    if (hasFlexible) {
-      return targetCard.name_fr.toUpperCase() === 'GAARA';
-    }
+    return targetCard.name_fr.toUpperCase() === 'GAARA';
   }
 
   // Kyubi 129 (R): Can upgrade over Naruto Uzumaki
