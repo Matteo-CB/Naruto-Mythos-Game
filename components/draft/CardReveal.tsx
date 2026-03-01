@@ -188,20 +188,6 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
         />
       )}
 
-      {/* High rarity flash */}
-      {isFlipped && highRarity && (
-        <motion.div
-          initial={{ opacity: 0.8, scale: 1 }}
-          animate={{ opacity: 0, scale: 2 }}
-          transition={{ duration: 0.6 }}
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            borderRadius: '8px',
-            backgroundColor: rarityInfo.color,
-          }}
-        />
-      )}
-
       {/* Rarity label */}
       {isFlipped && (
         <motion.div

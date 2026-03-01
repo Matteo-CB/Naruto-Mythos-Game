@@ -74,7 +74,7 @@ export default function SettingsPage() {
               aria-checked={animationsEnabled}
               disabled={!isLoaded}
               onClick={() => setAnimationsEnabled(!animationsEnabled)}
-              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
+              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors overflow-hidden"
               style={{
                 backgroundColor: animationsEnabled ? '#c4a35a' : '#333333',
                 cursor: isLoaded ? 'pointer' : 'default',
@@ -82,10 +82,11 @@ export default function SettingsPage() {
               }}
             >
               <span
-                className="absolute top-0.5 h-5 w-5 rounded-full transition-transform"
+                className="absolute top-0.5 h-5 w-5 rounded-full"
                 style={{
                   backgroundColor: '#0a0a0a',
-                  transform: animationsEnabled ? 'translateX(20px)' : 'translateX(2px)',
+                  left: animationsEnabled ? '22px' : '2px',
+                  transition: 'left 150ms ease',
                 }}
               />
             </button>
