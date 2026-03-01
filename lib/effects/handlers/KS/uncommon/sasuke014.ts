@@ -7,10 +7,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 3 | Power: 4
  * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
  *
- * AMBUSH: Look at all cards in the opponent's hand. (Mandatory)
+ * AMBUSH: Choose 1 card in the opponent's hand (face-down) and look at it. (Mandatory)
  *
  * UPGRADE: AMBUSH effect: In addition, discard 1 card from your hand.
- *   If you do so, choose 1 card in the opponent's hand and discard it.
+ *   If you do so, the chosen opponent card is also discarded.
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
@@ -29,44 +29,31 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Capture all opponent hand cards for the reveal
-  const allCards = opponentHand.map(c => ({
-    name_fr: c.name_fr,
-    chakra: c.chakra ?? 0,
-    power: c.power ?? 0,
-    image_file: c.image_file,
-  }));
-
-  const logMsg = isUpgrade
-    ? 'Sasuke Uchiwa (014): Looked at all cards in opponent\'s hand (upgrade: may discard one).'
-    : 'Sasuke Uchiwa (014): Looked at all cards in opponent\'s hand.';
   const newState = {
     ...state,
     log: logAction(
       state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_LOOK_HAND',
-      logMsg,
-      'game.log.effect.sasuke014Reveal',
+      'Sasuke Uchiwa (014): Choose a card from opponent\'s hand to look at.',
+      'game.log.effect.sasuke014Choose',
       { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
     ),
   };
 
-  // Show all opponent hand cards — go directly to SASUKE014_HAND_REVEAL (no choose-one step)
+  // Show opponent's hand as face-down cards — player picks one to reveal
+  const validTargets = opponentHand.map((_: unknown, i: number) => String(i));
+
   return {
     state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE014_HAND_REVEAL',
-    validTargets: ['confirm'],
+    targetSelectionType: 'SASUKE014_CHOOSE_HAND_CARD',
+    validTargets,
     description: JSON.stringify({
-      text: isUpgrade
-        ? 'Sasuke (014): Opponent\'s hand revealed. You may discard a card to discard one from their hand.'
-        : 'Sasuke (014): Opponent\'s hand revealed.',
-      cards: allCards,
+      text: 'Choose a card from the opponent\'s hand to look at.',
+      cardCount: opponentHand.length,
       isUpgrade,
     }),
-    descriptionKey: isUpgrade
-      ? 'game.effect.desc.sasuke014RevealUpgrade'
-      : 'game.effect.desc.sasuke014Reveal',
+    descriptionKey: 'game.effect.desc.sasuke014ChooseCard',
     isMandatory: true,
   };
 }
