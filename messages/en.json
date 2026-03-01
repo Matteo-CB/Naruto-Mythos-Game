@@ -432,6 +432,7 @@
         "kankuro119Defeat": "Choose an enemy character with Power 3 or less to defeat.",
         "kankuro119MoveCharacter": "Choose a character in play to move to another mission.",
         "kiba026OpponentChoose": "Choose one of your characters (cost {cost}) to hide.",
+        "kiba026PlayerChoose": "Choose which enemy character (cost {cost}) to hide.",
         "kiba113Hide": "Choose an enemy character in this mission to hide.",
         "kiba113Defeat": "Choose an enemy character in this mission to defeat.",
         "kidomaru124Defeat": "Choose an enemy with Power 3 or less in another mission to defeat.",

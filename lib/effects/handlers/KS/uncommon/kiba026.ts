@@ -8,7 +8,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Leaf Village | Keywords: Team 8, Jutsu
  *
  * MAIN: Hide the non-hidden enemy character with the lowest cost in this mission.
- *   - If multiple enemies are tied for the lowest cost, the OPPONENT chooses which to hide.
+ *   - If multiple enemies are tied for the lowest cost, the KIBA PLAYER chooses which to hide.
  *
  * UPGRADE: Look at the 3 top cards of your deck, reveal and draw any Akamaru characters,
  *   then put back the other cards on top of the deck.
@@ -75,17 +75,16 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
     return { state: newState };
   }
 
-  // Multiple enemies tied for lowest cost: the OPPONENT chooses which to hide
-  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  // Multiple enemies tied for lowest cost: the KIBA PLAYER chooses which enemy to hide
   const validTargets = tiedChars.map(c => c.instanceId);
   return {
     state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIBA026_OPPONENT_CHOOSE_HIDE',
+    targetSelectionType: 'KIBA026_PLAYER_CHOOSE_HIDE',
     validTargets,
-    selectingPlayer: opponentPlayer,
-    description: `Kiba Inuzuka (026): Choose which of your characters (cost ${lowestCost}) to hide.`,
-    descriptionKey: 'game.effect.desc.kiba026OpponentChoose',
+    selectingPlayer: sourcePlayer,
+    description: `Kiba Inuzuka (026): Choose which enemy character (cost ${lowestCost}) to hide.`,
+    descriptionKey: 'game.effect.desc.kiba026PlayerChoose',
     descriptionParams: { cost: String(lowestCost) },
     isMandatory: true,
   };

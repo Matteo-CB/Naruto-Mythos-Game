@@ -369,7 +369,7 @@ function VisualReplay({
               missionScoringComplete: undefined,
             };
           } else if (current.phase === 'end') {
-            if (current.turn >= 4) {
+            if (current.turn > 4) {
               advanced = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
             } else {
               // Force next turn — we lose the start phase details but at least the replay continues
@@ -395,7 +395,8 @@ function VisualReplay({
       const madeProgress = advanced.phase !== current.phase ||
         advanced.turn !== current.turn ||
         advanced.pendingActions.length !== current.pendingActions.length ||
-        advanced.pendingEffects.length !== current.pendingEffects.length;
+        advanced.pendingEffects.length !== current.pendingEffects.length ||
+        Boolean(advanced.missionScoringComplete) !== Boolean(current.missionScoringComplete);
       if (!madeProgress) break;
 
       // Inject start-phase snapshot for turn changes
