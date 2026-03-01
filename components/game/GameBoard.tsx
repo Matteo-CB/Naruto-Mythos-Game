@@ -749,79 +749,75 @@ function FullscreenCardDetail() {
     </>
   );
 
-  // Mobile: left-side panel (landscape) — can play while viewing
+  // Mobile: bottom sheet — slides up from bottom, no backdrop click (avoids ghost-click bug)
   if (dims.isMobile) {
     return (
-      <AnimatePresence>
+      <>
+        {/* Backdrop — pointer-events-none to prevent ghost clicks from the Details tap */}
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", zIndex: 299 }}
+        />
+        {/* Bottom sheet */}
         <motion.div
-          key="mobile-card-panel-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-300"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
-          onClick={handleClose}
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 320, damping: 32 }}
+          className="fixed bottom-0 left-0 right-0 flex flex-col overflow-hidden"
+          style={{
+            zIndex: 300,
+            maxHeight: "80vh",
+            backgroundColor: "rgba(10, 10, 14, 0.98)",
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            borderTopLeftRadius: "12px",
+            borderTopRightRadius: "12px",
+            boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.7)",
+          }}
         >
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute top-0 left-0 bottom-0 flex flex-col overflow-hidden"
+          {/* Close button — only toggles fullscreen, keeps card pinned so Details btn reappears */}
+          <button
+            onClick={() => toggleFullscreenCard()}
+            className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold cursor-pointer"
             style={{
-              width: "42vw",
-              backgroundColor: "rgba(10, 10, 14, 0.97)",
-              borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-              boxShadow: "4px 0 20px rgba(0, 0, 0, 0.6)",
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              color: "#888888",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
-            <button
-              onClick={handleClose}
-              className="absolute top-1 right-1 z-10 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer"
-              style={{
-                backgroundColor: "rgba(0, 0, 0, 0.7)",
-                color: "#888888",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-              }}
+            X
+          </button>
+
+          {/* Card image — sized to fill a good portion of the sheet */}
+          {imagePath ? (
+            <div
+              className="w-full shrink-0 flex items-center justify-center"
+              style={{ height: "min(45vw, 36vh)", backgroundColor: "#0a0a0c" }}
             >
-              X
-            </button>
-
-            {/* Card image (compact) */}
-            {imagePath ? (
-              <div
-                className="w-full shrink-0 flex items-center justify-center"
-                style={{ backgroundColor: "#0a0a0c", height: "120px" }}
-              >
-                <img
-                  src={imagePath}
-                  alt={getCardName(card, locale as 'en' | 'fr')}
-                  draggable={false}
-                  className="w-full h-full"
-                  style={{ objectFit: "contain" }}
-                />
-              </div>
-            ) : (
-              <div
-                className="w-full shrink-0 flex items-center justify-center"
-                style={{ backgroundColor: "#1a1a1a", height: "60px" }}
-              >
-                <span className="text-[10px]" style={{ color: "#555555" }}>
-                  {t("card.noImage")}
-                </span>
-              </div>
-            )}
-
-            {/* Scrollable card info */}
-            <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
-              {cardInfoContent}
+              <img
+                src={imagePath}
+                alt={getCardName(card, locale as "en" | "fr")}
+                draggable={false}
+                className="h-full w-auto"
+                style={{ objectFit: "contain" }}
+              />
             </div>
-          </motion.div>
+          ) : (
+            <div
+              className="w-full shrink-0 flex items-center justify-center"
+              style={{ height: "48px", backgroundColor: "#1a1a1a" }}
+            >
+              <span className="text-[10px]" style={{ color: "#555555" }}>
+                {t("card.noImage")}
+              </span>
+            </div>
+          )}
+
+          {/* Scrollable card info */}
+          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
+            {cardInfoContent}
+          </div>
         </motion.div>
-      </AnimatePresence>
+      </>
     );
   }
 
@@ -982,6 +978,7 @@ function GameBoardInner() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
+        overscrollBehavior: "none",
       }}
       onClick={handleBoardClick}
     >
