@@ -1,7 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import type { CharacterInPlay } from '@/lib/engine/types';
 
 /**
  * Card 113/130 - KIBA INUZUKA (R)
@@ -9,15 +8,13 @@ import type { CharacterInPlay } from '@/lib/engine/types';
  * Group: Leaf Village, Keywords: Team 8
  *
  * MAIN: Hide a friendly Akamaru in play; if you do, hide an enemy character in this mission.
- *   The "skip" is only at step 1 — once Akamaru is hidden, step 2 (hide enemy) is mandatory.
- *   Pre-conditions: a non-hidden friendly Akamaru exists AND a non-hidden enemy exists in Kiba's mission.
- *   Step 1: Ask player if they want to hide Akamaru → KIBA113_CONFIRM_HIDE_AKAMARU pending
- *           (uses CONFIRM_HIDE UI with card art + Hide/Skip buttons)
- *   Step 2: If confirmed, hide Akamaru, then must choose an enemy in this mission to hide → KIBA113_HIDE_TARGET
- *           (mandatory — no Skip button)
+ *   Step 1 (optional): Choose WHICH Akamaru to hide → KIBA113_CHOOSE_AKAMARU
+ *     - Player sees all non-hidden friendly Akamarous as selectable targets
+ *     - Player may decline (isOptional: true)
+ *   Step 2 (mandatory once step 1 chosen): Choose enemy in Kiba's mission to hide → KIBA113_HIDE_TARGET
  *
  * UPGRADE: Defeat both targets instead of hiding.
- *   Step 1: KIBA113_CONFIRM_DEFEAT_AKAMARU → KIBA113_DEFEAT_TARGET (mandatory)
+ *   Step 1: KIBA113_CHOOSE_AKAMARU_DEFEAT (optional) → KIBA113_DEFEAT_TARGET (mandatory)
  */
 
 function kiba113MainHandler(ctx: EffectContext): EffectResult {
@@ -27,27 +24,21 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-condition 1: Find a friendly Akamaru in play (any mission, non-hidden)
-  let akamaruChar: CharacterInPlay | null = null;
-  let akamaruMissionIdx = -1;
-
+  // Pre-condition 1: Collect ALL non-hidden friendly Akamarous in any mission
+  const akamaruTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
-    const friendlyChars = mission[friendlySide];
-    for (const char of friendlyChars) {
+    for (const char of mission[friendlySide]) {
       if (!char.isHidden) {
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if (topCard.name_fr.toLowerCase().includes('akamaru')) {
-          akamaruChar = char;
-          akamaruMissionIdx = i;
-          break;
+          akamaruTargets.push(char.instanceId);
         }
       }
     }
-    if (akamaruChar) break;
   }
 
-  if (!akamaruChar) {
+  if (akamaruTargets.length === 0) {
     return {
       state: {
         ...state,
@@ -62,7 +53,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Pre-condition 2: There must be at least one non-hidden enemy in Kiba's mission (step 2 target)
+  // Pre-condition 2: There must be at least one non-hidden enemy in Kiba's mission
   const kibaMission = state.activeMissions[sourceMissionIndex];
   const hasEnemy = kibaMission && kibaMission[enemySide].some(c => !c.isHidden);
   if (!hasEnemy) {
@@ -80,41 +71,31 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  const akamaruTopCard = akamaruChar.stack.length > 0
-    ? akamaruChar.stack[akamaruChar.stack.length - 1]
-    : akamaruChar.card;
-
-  // Encode Akamaru data + context into description (stored as effectDescription in PendingEffect)
-  // The EffectEngine and gameStore will JSON.parse this.
+  // Encode source context into effectDescription
   const extraData = JSON.stringify({
-    akamaruInstanceId: akamaruChar.instanceId,
-    akamaruMissionIdx,
     sourceMissionIndex,
     sourceCardInstanceId: sourceCard.instanceId,
     isUpgrade: isUpgrade ? 'true' : 'false',
-    name_fr: akamaruTopCard.name_fr,
-    image_file: akamaruTopCard.image_file,
-    chakra: akamaruTopCard.chakra,
-    power: akamaruTopCard.power,
   });
 
-  const confirmSelectionType = isUpgrade ? 'KIBA113_CONFIRM_DEFEAT_AKAMARU' : 'KIBA113_CONFIRM_HIDE_AKAMARU';
-  const descKey = isUpgrade ? 'game.effect.desc.kiba113DefeatAkamaru' : 'game.effect.desc.kiba113HideAkamaru';
+  const selectionType = isUpgrade ? 'KIBA113_CHOOSE_AKAMARU_DEFEAT' : 'KIBA113_CHOOSE_AKAMARU';
+  const descKey = isUpgrade
+    ? 'game.effect.desc.kiba113ChooseAkamaruDefeat'
+    : 'game.effect.desc.kiba113ChooseAkamaru';
 
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: confirmSelectionType,
-    validTargets: ['confirm'],
+    targetSelectionType: selectionType,
+    validTargets: akamaruTargets,
     isOptional: true,
-    // description is stored as effectDescription in PendingEffect — encode extra data here
     description: extraData,
     descriptionKey: descKey,
   };
 }
 
 function kiba113UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
+  // UPGRADE logic integrated into MAIN handler via isUpgrade flag.
   return { state: ctx.state };
 }
 

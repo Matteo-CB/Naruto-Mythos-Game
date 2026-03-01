@@ -1208,39 +1208,38 @@ export class EffectEngine {
       }
 
       // =============================================
-      // KIBA113: Confirm hide/defeat Akamaru, then prompt for second target
+      // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for enemy target
       // =============================================
-      case 'KIBA113_CONFIRM_HIDE_AKAMARU':
-      case 'KIBA113_CONFIRM_DEFEAT_AKAMARU': {
-        const isDefeatMode = pendingEffect.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
-        let k113Data: { akamaruInstanceId: string; akamaruMissionIdx: number; sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
+      case 'KIBA113_CHOOSE_AKAMARU':
+      case 'KIBA113_CHOOSE_AKAMARU_DEFEAT': {
+        const isDefeatMode = pendingEffect.targetSelectionType === 'KIBA113_CHOOSE_AKAMARU_DEFEAT';
+        let k113Data: { sourceMissionIndex: number } | null = null;
         try {
           k113Data = JSON.parse(pendingEffect.effectDescription);
         } catch { /* ignore */ }
         if (!k113Data) break;
 
-        const { akamaruInstanceId, akamaruMissionIdx, sourceMissionIndex: srcMI } = k113Data;
-        const friendlySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const srcMI = k113Data.sourceMissionIndex;
         const enemySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-        // Apply action to Akamaru
+        // Apply action to the chosen Akamaru (targetId)
         if (isDefeatMode) {
-          newState = EffectEngine.defeatCharacter(newState, akamaruInstanceId, pendingEffect.sourcePlayer);
+          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DEFEAT', `Kiba Inuzuka (113) UPGRADE: Defeated friendly Akamaru (mission ${akamaruMissionIdx}).`,
+            'EFFECT_DEFEAT', 'Kiba Inuzuka (113) UPGRADE: Defeated friendly Akamaru.',
             'game.log.effect.defeat',
             { card: 'KIBA INUZUKA', id: 'KS-113-R', target: 'Akamaru' },
           );
         } else {
-          newState = EffectEngine.hideCharacterWithLog(newState, akamaruInstanceId, pendingEffect.sourcePlayer);
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         }
 
-        // Gather valid targets for step 2 in source mission: enemy characters only (non-hidden)
-        const srcMission = newState.activeMissions[srcMI];
-        if (!srcMission) break;
+        // Gather valid targets for step 2 in source mission: non-hidden enemies
+        const srcMission_k113 = newState.activeMissions[srcMI];
+        if (!srcMission_k113) break;
         const step2Targets: string[] = [];
-        for (const char of srcMission[enemySide_k113]) {
+        for (const char of srcMission_k113[enemySide_k113]) {
           if (!char.isHidden) {
             step2Targets.push(char.instanceId);
           }
@@ -1249,13 +1248,12 @@ export class EffectEngine {
         if (step2Targets.length === 0) {
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No other character in this mission to target.',
+            'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No non-hidden enemy in this mission to target.',
             'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-113-R' },
           );
           break;
         }
 
-        // Always show selection — even for single target (never auto-resolve)
         const step2Type = isDefeatMode ? 'KIBA113_DEFEAT_TARGET' : 'KIBA113_HIDE_TARGET';
         const step2DescKey = isDefeatMode ? 'game.effect.desc.kiba113Defeat' : 'game.effect.desc.kiba113Hide';
         const step2Desc = isDefeatMode
@@ -1473,6 +1471,26 @@ export class EffectEngine {
           'game.log.effect.akamaru028Return',
           { card: 'AKAMARU', id: 'KS-028-UC' },
         );
+        break;
+      }
+
+      // --- Kidômaru 060 optional end-of-round: hide a character, then must return to hand ---
+      case 'KIDOMARU060_CHOOSE_HIDE_TARGET': {
+        // Hide the selected character
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        // Kidômaru must return to hand
+        let k060Data: { kidomaruInstanceId?: string } = {};
+        try { k060Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (k060Data.kidomaruInstanceId) {
+          newState = returnCharacterToHand(newState, k060Data.kidomaruInstanceId, pendingEffect.sourcePlayer);
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'END_RETURN',
+            'Kidômaru (060): Must return to hand after using end-of-round effect.',
+            'game.log.effect.kidomaru060Return',
+            { card: 'KIDÔMARU', id: 'KS-060-UC' },
+          );
+        }
         break;
       }
 

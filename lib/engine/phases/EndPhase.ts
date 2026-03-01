@@ -344,6 +344,89 @@ export function handleAkamaru028Return(state: GameState): GameState {
 }
 
 /**
+ * Kidômaru 060 (UC): At end of round, player may optionally hide a character with Power ≤ Kidômaru's power.
+ * If they do, Kidômaru must return to hand (handled in EffectEngine KIDOMARU060_CHOOSE_HIDE_TARGET case).
+ * Uses state.endPhaseKidomaru060Ids to avoid processing the same card twice across resumptions.
+ */
+export function handleKidomaru060EndOfRound(state: GameState): GameState {
+  let newState = { ...state };
+  const alreadyProcessed = new Set<string>(newState.endPhaseKidomaru060Ids ?? []);
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const mission = newState.activeMissions[mIdx];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      const chars = mission[side];
+
+      for (const char of chars) {
+        if (alreadyProcessed.has(char.instanceId)) continue;
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.number !== 60) continue;
+
+        // Power tokens are already removed at this point — compare against printed power
+        const powerThreshold = topCard.power ?? 3;
+
+        // Find all non-hidden, non-self characters with printed power ≤ threshold
+        const validTargets: string[] = [];
+        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+          const m = newState.activeMissions[mi];
+          for (const s of ['player1Characters', 'player2Characters'] as const) {
+            for (const c of m[s]) {
+              if (c.isHidden) continue;
+              if (c.instanceId === char.instanceId) continue;
+              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              if ((cTop.power ?? 0) <= powerThreshold) {
+                validTargets.push(c.instanceId);
+              }
+            }
+          }
+        }
+
+        alreadyProcessed.add(char.instanceId);
+        newState.endPhaseKidomaru060Ids = [...alreadyProcessed];
+
+        if (validTargets.length === 0) continue;
+
+        const effectId = `kidomaru060-hide-${char.instanceId}`;
+        const actionId = `kidomaru060-hide-action-${char.instanceId}`;
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId,
+          sourceCardId: topCard.id,
+          sourceInstanceId: char.instanceId,
+          sourceMissionIndex: mIdx,
+          effectType: 'MAIN' as const,
+          effectDescription: JSON.stringify({ kidomaruInstanceId: char.instanceId }),
+          targetSelectionType: 'KIDOMARU060_CHOOSE_HIDE_TARGET',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets,
+          isOptional: true,
+          isMandatory: false,
+          resolved: false,
+          isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: actionId,
+          type: 'SELECT_TARGET' as const,
+          player,
+          description: `Kidômaru (060): You may hide a character with Power ≤ ${powerThreshold}. If you do, Kidômaru must return to your hand.`,
+          descriptionKey: 'game.effect.desc.kidomaru060EndHide',
+          options: validTargets,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId,
+        }];
+        // Return immediately — wait for player to choose (or decline)
+        return newState;
+      }
+    }
+  }
+
+  return newState;
+}
+
+/**
  * Remove a character from play and return to owner's hand.
  */
 export function returnCharacterToHand(state: GameState, instanceId: string, player: PlayerID): GameState {

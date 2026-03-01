@@ -297,13 +297,13 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  // Ukon 063 (UC) / 124b (R): Can upgrade over any character with printed cost 0–4
+  // Ukon 063 (UC) / 124 (R): Can upgrade over any Sound Village character
   if (newCard.number === 63 || newCard.number === 124) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
     );
     if (hasFlexible) {
-      return (targetCard.chakra ?? 0) <= 4;
+      return (targetCard.group ?? '').toLowerCase().includes('sound');
     }
   }
 
