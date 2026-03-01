@@ -449,7 +449,7 @@ function MobileDetailsButton() {
   if (!dims.isMobile || !pinnedCard || showFullscreenCard) return null;
   return (
     <button
-      onClick={toggleFullscreenCard}
+      onClick={(e) => { e.stopPropagation(); toggleFullscreenCard(); }}
       className="fullscreen-btn"
       style={{ position: 'fixed', bottom: '50px', right: '8px', zIndex: 9997, margin: 0 }}
     >
@@ -926,6 +926,7 @@ function GameBoardInner() {
   const addAnimation = useGameStore((s) => s.addAnimation);
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
+  const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
 
   const prevTurnRef = useRef<number | null>(null);
 
@@ -942,12 +943,14 @@ function GameBoardInner() {
     }
   }, [visibleState?.turn, addAnimation, visibleState]);
 
-  // Clicking the board background unpins
+  // Clicking the board background unpins — but not when the fullscreen sheet is open
+  // (mobile ghost-tap: when Details button disappears after tap, a synthetic click fires at
+  //  the same coordinates and passes through the pointer-events-none backdrop to the board div)
   const handleBoardClick = useCallback(() => {
-    if (pinnedCard) {
+    if (pinnedCard && !showFullscreenCard) {
       unpinCard();
     }
-  }, [pinnedCard, unpinCard]);
+  }, [pinnedCard, showFullscreenCard, unpinCard]);
 
   if (!visibleState) {
     return (
