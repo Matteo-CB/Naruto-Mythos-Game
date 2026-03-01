@@ -12,13 +12,21 @@ export default function SettingsPage() {
   const { status } = useSession();
   const router = useRouter();
   const t = useTranslations('settings');
-  const { animationsEnabled, setAnimationsEnabled } = useSettingsStore();
+  const { animationsEnabled, isLoaded, fetchFromServer, setAnimationsEnabled } = useSettingsStore();
 
+  // Redirect unauthenticated users
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login');
     }
   }, [status, router]);
+
+  // Load preferences from server once authenticated
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchFromServer();
+    }
+  }, [status, fetchFromServer]);
 
   if (status === 'loading' || status === 'unauthenticated') {
     return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }} />;
@@ -56,7 +64,7 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between gap-4">
             <span
               className="text-sm font-medium tracking-wide"
-              style={{ color: '#e0e0e0' }}
+              style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}
             >
               {t('animations')}
             </span>
@@ -64,10 +72,13 @@ export default function SettingsPage() {
               type="button"
               role="switch"
               aria-checked={animationsEnabled}
+              disabled={!isLoaded}
               onClick={() => setAnimationsEnabled(!animationsEnabled)}
-              className="relative h-6 w-11 flex-shrink-0 cursor-pointer rounded-full transition-colors"
+              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors"
               style={{
                 backgroundColor: animationsEnabled ? '#c4a35a' : '#333333',
+                cursor: isLoaded ? 'pointer' : 'default',
+                opacity: isLoaded ? 1 : 0.5,
               }}
             >
               <span
@@ -88,7 +99,7 @@ export default function SettingsPage() {
             className="text-xs tracking-wide"
             style={{ color: '#555555' }}
           >
-            {animationsEnabled ? t('animationsOn') : t('animationsOff')}
+            {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
           </p>
         </div>
 
