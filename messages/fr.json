@@ -593,6 +593,11 @@
     "currentlyEditing": "En cours de modification",
     "newDeck": "Nouveau Deck",
     "myDecks": "Mes Decks",
+    "detailBtn": "Detail",
+    "chakra": "Chakra",
+    "power": "Puissance",
+    "addToDeck": "Ajouter au deck",
+    "maxCopiesRule": "Max 2 copies de la meme version",
     "error": {
       "maxCopies": "Max {max} copies de {name}",
       "maxMissions": "Max {max} missions",

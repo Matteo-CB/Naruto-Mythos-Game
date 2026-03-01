@@ -593,6 +593,11 @@
     "currentlyEditing": "Currently editing",
     "newDeck": "New Deck",
     "myDecks": "My Decks",
+    "detailBtn": "Detail",
+    "chakra": "Chakra",
+    "power": "Power",
+    "addToDeck": "Add to Deck",
+    "maxCopiesRule": "Max 2 copies of the same version",
     "error": {
       "maxCopies": "Max {max} copies of {name}",
       "maxMissions": "Max {max} missions",
