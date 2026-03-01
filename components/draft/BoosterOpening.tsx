@@ -173,18 +173,6 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        {/* Opening flash */}
-        {stage === 'opening' && (
-          <motion.div
-            key="opening-flash"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 0.8, times: [0, 0.2, 0.6, 1] }}
-            className="fixed inset-0 z-50 pointer-events-none"
-            style={{ backgroundColor: '#c4a35a' }}
-          />
-        )}
-
         {/* Card reveal grid */}
         {stage === 'revealing' && (
           <motion.div

@@ -114,8 +114,9 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
               src={cardImage}
               alt={cardName}
               className="w-full h-full"
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'cover', opacity: 0, transition: 'opacity 0.12s ease' }}
               draggable={false}
+              onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '1'; }}
             />
           ) : (
             <div
@@ -209,8 +210,9 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
                 src={cardImage}
                 alt={cardName}
                 className="w-full h-full"
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'cover', opacity: 0, transition: 'opacity 0.12s ease' }}
                 draggable={false}
+                onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '1'; }}
               />
             ) : (
               <img
@@ -481,8 +483,9 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
               src={cardImage}
               alt={cardName}
               className="w-full h-full"
-              style={{ objectFit: 'cover' }}
+              style={{ objectFit: 'cover', opacity: 0, transition: 'opacity 0.12s ease' }}
               draggable={false}
+              onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '1'; }}
             />
           ) : (
             <img
