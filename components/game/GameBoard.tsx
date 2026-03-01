@@ -930,6 +930,19 @@ function GameBoardInner() {
 
   const prevTurnRef = useRef<number | null>(null);
 
+  // Lock body scroll while game board is mounted — prevents mobile browser chrome from
+  // creating a scrollable document that would let the game board scroll off-screen.
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    const prevMinHeight = document.body.style.minHeight;
+    document.body.style.overflow = 'hidden';
+    document.body.style.minHeight = 'unset';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.minHeight = prevMinHeight;
+    };
+  }, []);
+
   useEffect(() => {
     if (visibleState) {
       const currentTurn = visibleState.turn;
@@ -974,8 +987,9 @@ function GameBoardInner() {
 
   return (
     <div
-      className="w-screen h-screen flex overflow-hidden no-select"
+      className="w-screen flex overflow-hidden no-select"
       style={{
+        height: '100dvh',
         backgroundColor: "#0a0a0a",
         backgroundImage: "url(/images/bg-game.jpg)",
         backgroundSize: "cover",
