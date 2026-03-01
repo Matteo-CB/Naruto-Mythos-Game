@@ -9,6 +9,7 @@ interface OpponentHandProps {
 }
 
 function CardBack({ index, total }: { index: number; total: number }) {
+  const t = useTranslations();
   const dims = useGameScale();
   // Fan effect: spread cards with rotation around a central arc
   const midpoint = (total - 1) / 2;
@@ -46,7 +47,7 @@ function CardBack({ index, total }: { index: number; total: number }) {
     >
       <img
         src="/images/card-back.webp"
-        alt=""
+        alt={t('card.back')}
         draggable={false}
         className="w-full h-full object-cover"
       />

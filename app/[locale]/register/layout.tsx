@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       title,
       description,
       url: `${SITE_URL}/${locale}/register`,
+      images: [{ url: `${SITE_URL}/images/design/naruto.png`, width: 1200, height: 630, alt: 'Naruto Mythos TCG' }],
     },
   };
 }

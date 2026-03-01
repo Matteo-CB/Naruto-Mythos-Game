@@ -787,7 +787,8 @@
     "name": "Nom",
     "title": "Titre",
     "cardId": "ID de carte",
-    "clickToPin": "Cliquez pour epingler"
+    "clickToPin": "Cliquez pour epingler",
+    "back": "Dos de carte (cache)"
   },
   "learn": {
     "title": "Apprendre le jeu",
