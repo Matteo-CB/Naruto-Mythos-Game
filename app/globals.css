@@ -263,6 +263,18 @@ p, li, blockquote, figcaption, .font-body {
   display: none !important;
 }
 
+/* Power token glow — CSS alternative to Framer Motion repeat:Infinity */
+@keyframes powerGlow {
+  0%, 100% { box-shadow: 0 0 4px rgba(196, 163, 90, 0.2); }
+  50%       { box-shadow: 0 0 10px rgba(196, 163, 90, 0.6); }
+}
+@keyframes stackPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(74, 222, 128, 0.2); }
+  50%       { box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
+}
+.power-glow  { animation: powerGlow  1.8s ease-in-out infinite; }
+.stack-pulse { animation: stackPulse 2.5s ease-in-out infinite; }
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

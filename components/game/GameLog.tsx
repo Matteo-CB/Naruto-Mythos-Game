@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useEffect } from 'react';
@@ -24,7 +25,7 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-function LogEntry({ entry, formatPhase, playerDisplayNames }: {
+const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames }: {
   entry: GameLogEntry;
   formatPhase: (phase: GamePhase) => string;
   playerDisplayNames: { player1: string; player2: string };
@@ -63,7 +64,7 @@ function LogEntry({ entry, formatPhase, playerDisplayNames }: {
       </span>
     </motion.div>
   );
-}
+});
 
 export function GameLog() {
   const t = useTranslations();
