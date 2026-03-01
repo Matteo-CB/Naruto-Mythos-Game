@@ -92,6 +92,26 @@ function handlePlayCharacter(
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) return state;
 
   const card = playerState.hand[cardIndex];
+
+  // Auto-detect upgrade: if a same-name (or flexible-upgrade) visible character
+  // with strictly lower cost exists on this mission, redirect to upgrade logic
+  // so the player pays only the difference (per game rules).
+  const missionForUpgradeCheck = state.activeMissions[missionIndex];
+  const chars = player === 'player1' ? missionForUpgradeCheck.player1Characters : missionForUpgradeCheck.player2Characters;
+  const autoUpgradeTarget = chars.find((c) => {
+    if (c.isHidden || c.controlledBy !== player) return false;
+    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    if (card.chakra <= topCard.chakra) return false;
+    // Same name
+    if (topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()) return true;
+    // Flexible upgrade (Orochimaru 051/138, Akamaru 029, etc.)
+    return checkFlexibleUpgrade(card, topCard);
+  });
+
+  if (autoUpgradeTarget) {
+    return handleUpgradeCharacter(state, player, cardIndex, missionIndex, autoUpgradeTarget.instanceId);
+  }
+
   const effectiveCost = calculateEffectiveCost(state, player, card, missionIndex, false);
 
   const validation = validatePlayCharacter(state, player, card, missionIndex, effectiveCost);
