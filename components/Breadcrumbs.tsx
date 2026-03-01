@@ -14,7 +14,6 @@ const PAGE_NAMES: Record<string, Record<string, string>> = {
   register: { en: 'Create Account', fr: 'Creer un Compte' },
   legal: { en: 'Legal Notice', fr: 'Mentions Legales' },
   friends: { en: 'Friends', fr: 'Amis' },
-  'bug-report': { en: 'Report a Bug', fr: 'Signaler un Bug' },
 };
 
 const PLAY_NAMES: Record<string, Record<string, string>> = {
