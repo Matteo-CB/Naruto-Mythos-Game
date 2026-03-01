@@ -12,8 +12,22 @@ import { Footer } from "@/components/Footer";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
+import { AnimatePresence, motion } from "framer-motion";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
-import { getCardName, getCardTitle } from "@/lib/utils/cardLocale";
+import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from "@/lib/utils/cardLocale";
+import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
+import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
+
+const RARITY_COLORS: Record<string, string> = {
+  C: '#888888',
+  UC: '#3e8b3e',
+  R: '#4a7ab5',
+  RA: '#4a7ab5',
+  S: '#9b59b6',
+  M: '#c4a35a',
+  Legendary: '#c4a35a',
+  Mission: '#888888',
+};
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
@@ -34,6 +48,7 @@ export default function DeckBuilderPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
 
   // Zustand store
   const deckName = useDeckBuilderStore((s) => s.deckName);
@@ -675,6 +690,14 @@ export default function DeckBuilderPage() {
                         </span>
                       </div>
                     )}
+                    {/* Detail button */}
+                    <button
+                      className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer z-10"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
+                      onClick={(e) => { e.stopPropagation(); setPreviewCard(m); }}
+                    >
+                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t("deckBuilder.detailBtn")}</span>
+                    </button>
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       {check.allowed ? (
@@ -730,6 +753,14 @@ export default function DeckBuilderPage() {
                       </span>
                     </div>
                   )}
+                  {/* Detail button */}
+                  <button
+                    className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer z-10"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
+                    onClick={(e) => { e.stopPropagation(); setPreviewCard(card); }}
+                  >
+                    <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t("deckBuilder.detailBtn")}</span>
+                  </button>
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
                     {check.allowed ? (
@@ -780,6 +811,274 @@ export default function DeckBuilderPage() {
 
         <Footer />
       </div>
+
+      {/* Desktop card detail panel (fixed right sidebar) */}
+      <AnimatePresence>
+        {previewCard && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 320, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="hidden lg:flex flex-col overflow-hidden shrink-0 fixed top-0 right-0 h-full z-30"
+            style={{ backgroundColor: '#0d0d0d', borderLeft: '1px solid #262626' }}
+          >
+            <div className="flex-1 overflow-y-auto px-3 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                  {t("deckBuilder.detailBtn")}
+                </span>
+                <button
+                  onClick={() => setPreviewCard(null)}
+                  className="w-5 h-5 flex items-center justify-center rounded cursor-pointer"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                >
+                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>x</span>
+                </button>
+              </div>
+
+              {/* Card image */}
+              <div
+                className="relative rounded overflow-hidden mb-3 mx-auto"
+                style={{
+                  width: previewCard.card_type === 'mission' ? '100%' : '140px',
+                  aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                }}
+              >
+                {normalizeImagePath(previewCard.image_file) ? (
+                  <img
+                    src={normalizeImagePath(previewCard.image_file)!}
+                    alt={getCardName(previewCard, locale as "en" | "fr")}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                    <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale as "en" | "fr")}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Card info */}
+              <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale as "en" | "fr")}</div>
+              {(previewCard.card_type !== 'mission') && (
+                <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard as CharacterCard, locale as "en" | "fr")}</div>
+              )}
+
+              {/* Stats row */}
+              <div className="flex gap-2 mt-1 flex-wrap">
+                {previewCard.card_type !== 'mission' && (
+                  <>
+                    <span className="text-[11px]" style={{ color: '#5865F2' }}>{t("deckBuilder.chakra")}: {(previewCard as CharacterCard).chakra}</span>
+                    <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.power")}: {(previewCard as CharacterCard).power}</span>
+                  </>
+                )}
+                <span className="text-[11px] font-bold" style={{ color: RARITY_COLORS[previewCard.rarity] ?? '#888' }}>
+                  {getRarityLabel(previewCard.rarity, locale as "en" | "fr")}
+                </span>
+                {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).group && (
+                  <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup((previewCard as CharacterCard).group!, locale as "en" | "fr")}</span>
+                )}
+              </div>
+
+              {/* Keywords */}
+              {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).keywords && (previewCard as CharacterCard).keywords!.length > 0 && (
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {(previewCard as CharacterCard).keywords!.map((kw, i) => (
+                    <span
+                      key={i}
+                      className="text-[9px] px-1.5 py-0.5 rounded"
+                      style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
+                    >
+                      {getCardKeyword(kw, locale as "en" | "fr")}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Effects */}
+              {previewCard.effects && previewCard.effects.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1.5">
+                  {previewCard.effects.map((eff, i) => {
+                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
+                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
+                    const description = locale === 'fr'
+                      ? (frDescs?.[i] ?? eff.description)
+                      : (enDescs?.[i] ?? eff.description);
+                    return (
+                      <div key={i}>
+                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Add button */}
+              {previewCard.card_type === 'mission' ? (
+                <button
+                  onClick={() => addMission(previewCard as MissionCard)}
+                  disabled={!canAddMission(previewCard as MissionCard).allowed}
+                  className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: canAddMission(previewCard as MissionCard).allowed ? '#1a2a1a' : '#1a1a1a',
+                    color: canAddMission(previewCard as MissionCard).allowed ? '#3e8b3e' : '#555',
+                    border: `1px solid ${canAddMission(previewCard as MissionCard).allowed ? '#2a4a2a' : '#333'}`,
+                  }}
+                >
+                  {t("deckBuilder.addToDeck")}
+                </button>
+              ) : (
+                <button
+                  onClick={() => addChar(previewCard as CharacterCard)}
+                  disabled={!canAddChar(previewCard as CharacterCard).allowed}
+                  className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: canAddChar(previewCard as CharacterCard).allowed ? '#1a2a1a' : '#1a1a1a',
+                    color: canAddChar(previewCard as CharacterCard).allowed ? '#3e8b3e' : '#555',
+                    border: `1px solid ${canAddChar(previewCard as CharacterCard).allowed ? '#2a4a2a' : '#333'}`,
+                  }}
+                >
+                  {t("deckBuilder.addToDeck")}
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile card detail drawer */}
+      <AnimatePresence>
+        {previewCard && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 overflow-y-auto"
+            style={{ backgroundColor: '#0d0d0d', borderTop: '2px solid #c4a35a', maxHeight: '60vh' }}
+          >
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                  {t("deckBuilder.detailBtn")}
+                </span>
+                <button
+                  onClick={() => setPreviewCard(null)}
+                  className="px-3 py-1 rounded cursor-pointer"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
+                >
+                  <span className="text-xs font-bold" style={{ color: '#888' }}>x</span>
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                {/* Image */}
+                <div
+                  className="relative rounded overflow-hidden shrink-0"
+                  style={{
+                    width: previewCard.card_type === 'mission' ? '140px' : '90px',
+                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
+                  }}
+                >
+                  {normalizeImagePath(previewCard.image_file) ? (
+                    <img
+                      src={normalizeImagePath(previewCard.image_file)!}
+                      alt={getCardName(previewCard, locale as "en" | "fr")}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                      <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale as "en" | "fr")}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale as "en" | "fr")}</div>
+                  {previewCard.card_type !== 'mission' && (
+                    <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard as CharacterCard, locale as "en" | "fr")}</div>
+                  )}
+                  <div className="flex gap-2 mt-1 flex-wrap">
+                    {previewCard.card_type !== 'mission' && (
+                      <>
+                        <span className="text-[11px]" style={{ color: '#5865F2' }}>{t("deckBuilder.chakra")}: {(previewCard as CharacterCard).chakra}</span>
+                        <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.power")}: {(previewCard as CharacterCard).power}</span>
+                      </>
+                    )}
+                    <span className="text-[11px] font-bold" style={{ color: RARITY_COLORS[previewCard.rarity] ?? '#888' }}>
+                      {getRarityLabel(previewCard.rarity, locale as "en" | "fr")}
+                    </span>
+                    {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).group && (
+                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup((previewCard as CharacterCard).group!, locale as "en" | "fr")}</span>
+                    )}
+                  </div>
+                  {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).keywords && (previewCard as CharacterCard).keywords!.length > 0 && (
+                    <div className="flex gap-1 mt-1 flex-wrap">
+                      {(previewCard as CharacterCard).keywords!.map((kw, i) => (
+                        <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}>
+                          {getCardKeyword(kw, locale as "en" | "fr")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Effects */}
+              {previewCard.effects && previewCard.effects.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1.5">
+                  {previewCard.effects.map((eff, i) => {
+                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
+                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
+                    const description = locale === 'fr'
+                      ? (frDescs?.[i] ?? eff.description)
+                      : (enDescs?.[i] ?? eff.description);
+                    return (
+                      <div key={i}>
+                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
+                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Add button */}
+              {previewCard.card_type === 'mission' ? (
+                <button
+                  onClick={() => addMission(previewCard as MissionCard)}
+                  disabled={!canAddMission(previewCard as MissionCard).allowed}
+                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: canAddMission(previewCard as MissionCard).allowed ? '#1a2a1a' : '#1a1a1a',
+                    color: canAddMission(previewCard as MissionCard).allowed ? '#3e8b3e' : '#555',
+                    border: `1px solid ${canAddMission(previewCard as MissionCard).allowed ? '#2a4a2a' : '#333'}`,
+                  }}
+                >
+                  {t("deckBuilder.addToDeck")}
+                </button>
+              ) : (
+                <button
+                  onClick={() => addChar(previewCard as CharacterCard)}
+                  disabled={!canAddChar(previewCard as CharacterCard).allowed}
+                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
+                  style={{
+                    backgroundColor: canAddChar(previewCard as CharacterCard).allowed ? '#1a2a1a' : '#1a1a1a',
+                    color: canAddChar(previewCard as CharacterCard).allowed ? '#3e8b3e' : '#555',
+                    border: `1px solid ${canAddChar(previewCard as CharacterCard).allowed ? '#2a4a2a' : '#333'}`,
+                  }}
+                >
+                  {t("deckBuilder.addToDeck")}
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
