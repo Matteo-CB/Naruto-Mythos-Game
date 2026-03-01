@@ -81,7 +81,7 @@ const accountButtons = [
 export default function Home() {
   const t = useTranslations('home');
   const td = useTranslations('discord');
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [mounted, setMounted] = useState(false);
   const [featuredCard] = useState(() =>
     FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
@@ -89,6 +89,11 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    // Refresh session to pick up discordId changes (e.g. after linking Discord)
+    if (session) {
+      updateSession();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const titleText = t('title');

@@ -68,6 +68,11 @@ export default function ProfilePage({
       .then((res) => res.json())
       .then((data) => setLeaguesEnabled(data.leaguesEnabled ?? false))
       .catch(() => {});
+    // Refresh session after Discord linking redirect (?discord=linked)
+    if (typeof window !== 'undefined' && window.location.search.includes('discord=linked')) {
+      updateSession();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = useCallback(async (page: number, append = false) => {
