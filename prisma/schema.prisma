@@ -133,15 +133,6 @@ model MatchInvite {
   expiresAt  DateTime
 }
 
-model BugReport {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String?  @db.ObjectId
-  username    String?
-  description String
-  imageData   String?
-  status      String   @default("open")
-  createdAt   DateTime @default(now())
-}
 
 model BannedCard {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
