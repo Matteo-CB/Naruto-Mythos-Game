@@ -269,7 +269,8 @@
       "skip": "Passer",
       "base": "Base",
       "up": "AME",
-      "confirm": "OK"
+      "confirm": "OK",
+      "details": "Détails"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru — Infiltration",

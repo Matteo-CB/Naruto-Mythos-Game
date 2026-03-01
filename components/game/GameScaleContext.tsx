@@ -83,9 +83,13 @@ export interface GameDimensions {
 // ── Scale computation ──────────────────────────────────────────────
 
 function computeScale(vw: number, vh: number): number {
-  const raw = Math.min(vw / 1400, vh / 900);
-  // On phones (vh < 500), allow scaling down to 0.38 for a better fit
-  const minScale = vh < 500 ? 0.38 : 0.55;
+  const isMobile = vh < 500;
+  // On phones (landscape, vh < 500), use a tighter reference viewport so cards
+  // appear ~20% larger without changing the overall layout proportions.
+  const refW = isMobile ? 1200 : 1400;
+  const refH = isMobile ? 750 : 900;
+  const raw = Math.min(vw / refW, vh / refH);
+  const minScale = isMobile ? 0.38 : 0.55;
   return Math.max(minScale, Math.min(raw, 1.0));
 }
 

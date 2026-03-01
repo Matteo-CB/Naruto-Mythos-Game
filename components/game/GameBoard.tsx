@@ -437,6 +437,27 @@ function CardPreviewContent({
   );
 }
 
+// ----- Mobile Details Button (floating, appears when a card is pinned on mobile) -----
+
+function MobileDetailsButton() {
+  const t = useTranslations();
+  const dims = useGameScale();
+  const pinnedCard = useUIStore((s) => s.pinnedCard);
+  const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
+  const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
+  // Only show on touch devices when a card is pinned and fullscreen isn't already open
+  if (!dims.isMobile || !pinnedCard || showFullscreenCard) return null;
+  return (
+    <button
+      onClick={toggleFullscreenCard}
+      className="fullscreen-btn"
+      style={{ position: 'fixed', bottom: '50px', right: '8px', zIndex: 9997, margin: 0 }}
+    >
+      {t('game.board.details')}
+    </button>
+  );
+}
+
 // ----- Card Preview Panel (fixed right-side) -----
 
 function CardPreview() {
@@ -493,20 +514,6 @@ function FullscreenCardDetail() {
   const unpinCard = useUIStore((s) => s.unpinCard);
 
   const { bannedIds } = useBannedCards();
-
-  // On mobile, auto-open fullscreen detail when a card is pinned (tapped)
-  const prevPinnedRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (dims.isMobile && pinnedCard) {
-      const cardId = pinnedCard.id;
-      if (prevPinnedRef.current !== cardId && !showFullscreenCard) {
-        toggleFullscreenCard();
-      }
-      prevPinnedRef.current = cardId;
-    } else {
-      prevPinnedRef.current = null;
-    }
-  }, [dims.isMobile, pinnedCard, showFullscreenCard, toggleFullscreenCard]);
 
   if (!showFullscreenCard || !pinnedCard) return null;
 
@@ -1078,6 +1085,7 @@ function GameBoardInner() {
 
       <CardPreview />
       <FullscreenCardDetail />
+      <MobileDetailsButton />
 
       <MulliganDialog />
       <GameLog />

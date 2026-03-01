@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -25,7 +25,7 @@ interface CharacterSlotProps {
   myPlayer: PlayerID;
 }
 
-function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSlotProps) {
+const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSlotProps) {
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
@@ -34,14 +34,14 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
-  const visibleState = useGameStore((s) => s.visibleState);
   const { bannedIds } = useBannedCards();
-  const isProcessing = useGameStore((s) => s.isProcessing);
 
-  const isMyTurn =
-    visibleState?.activePlayer === visibleState?.myPlayer &&
-    visibleState?.phase === 'action' &&
-    !isProcessing;
+  // Granular selector — only re-renders when turn ownership actually changes
+  const isMyTurn = useGameStore((s) =>
+    !s.isProcessing &&
+    s.visibleState?.phase === 'action' &&
+    s.visibleState?.activePlayer === s.visibleState?.myPlayer,
+  );
 
   const isSelected = selectedTargetId === character.instanceId;
   const isHidden = character.isHidden;
@@ -127,6 +127,7 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
         boxShadow: isSelected
           ? '0 0 16px rgba(196, 163, 90, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)'
           : '0 2px 8px rgba(0, 0, 0, 0.4)',
+        contain: 'layout style',
       }}
     >
       {isHidden && !isReHidden ? (
@@ -182,10 +183,10 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
         </>
       )}
 
-      {/* Power display (bottom-right) for visible cards */}
+      {/* Power display (bottom-right) — CSS animation replaces Framer Motion repeat:Infinity */}
       {!isHidden && (
-        <motion.div
-          className="absolute bottom-0.5 right-0.5 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums"
+        <div
+          className={`absolute bottom-0.5 right-0.5 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
           style={{
             minWidth: '22px',
             height: '18px',
@@ -195,17 +196,9 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
             border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
             textShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
           }}
-          animate={character.powerTokens > 0 ? {
-            boxShadow: [
-              '0 0 4px rgba(196, 163, 90, 0.2)',
-              `0 0 ${6 + character.powerTokens * 2}px rgba(196, 163, 90, ${Math.min(0.6, 0.3 + character.powerTokens * 0.05)})`,
-              '0 0 4px rgba(196, 163, 90, 0.2)',
-            ],
-          } : {}}
-          transition={character.powerTokens > 0 ? { repeat: Infinity, duration: 1.8 } : {}}
         >
           {totalPower}
-        </motion.div>
+        </div>
       )}
 
       {/* Physical Power tokens */}
@@ -263,23 +256,13 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
         </div>
       )}
 
-      {/* Stack/upgrade indicator */}
+      {/* Stack/upgrade indicator — CSS animation replaces Framer Motion repeat:Infinity */}
       {character.stackSize > 1 && (
         <motion.div
           initial={{ scale: 0 }}
-          animate={{
-            scale: 1,
-            boxShadow: [
-              '0 0 3px rgba(62, 139, 62, 0.2)',
-              '0 0 8px rgba(62, 139, 62, 0.5)',
-              '0 0 3px rgba(62, 139, 62, 0.2)',
-            ],
-          }}
-          transition={{
-            scale: { type: 'spring', stiffness: 400, damping: 20 },
-            boxShadow: { repeat: Infinity, duration: 2.5 },
-          }}
-          className="absolute bottom-0.5 left-0.5 rounded-md px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5"
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          className="absolute bottom-0.5 left-0.5 rounded-md px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
           style={{
             backgroundColor: 'rgba(62, 139, 62, 0.25)',
             color: '#5cb85c',
@@ -293,7 +276,17 @@ function CharacterSlot({ character, isOwn, missionIndex, myPlayer }: CharacterSl
       )}
     </motion.div>
   );
-}
+},
+  (prev, next) =>
+    prev.character.instanceId === next.character.instanceId &&
+    prev.character.powerTokens === next.character.powerTokens &&
+    prev.character.isHidden === next.character.isHidden &&
+    prev.character.wasRevealedAtLeastOnce === next.character.wasRevealedAtLeastOnce &&
+    prev.character.effectivePower === next.character.effectivePower &&
+    prev.character.stackSize === next.character.stackSize &&
+    prev.character.card?.id === next.character.card?.id &&
+    prev.isOwn === next.isOwn,
+);
 
 // ----- Mission Card Component -----
 
@@ -583,4 +576,11 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       </div>
     </motion.div>
   );
-});
+},
+  (prev, next) =>
+    prev.missionIndex === next.missionIndex &&
+    prev.mission.player1Characters === next.mission.player1Characters &&
+    prev.mission.player2Characters === next.mission.player2Characters &&
+    prev.mission.card?.id === next.mission.card?.id &&
+    prev.mission.wonBy === next.mission.wonBy,
+);

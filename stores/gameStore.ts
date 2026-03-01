@@ -758,6 +758,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newState.actionHistory = [];
     }
 
+    // Cap log at 500 entries to prevent unbounded growth
+    if (newState.log.length > 500) {
+      newState = { ...newState, log: newState.log.slice(-500) };
+    }
+
     // Clear any previous error on successful action
     const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
 
