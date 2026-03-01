@@ -134,7 +134,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         /* Never-revealed hidden card: show card back */
         <img
           src="/images/card-back.webp"
-          alt=""
+          alt={t('card.back')}
           draggable={false}
           className="w-full h-full object-cover"
         />

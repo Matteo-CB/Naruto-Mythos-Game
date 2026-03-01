@@ -787,7 +787,8 @@
     "name": "Name",
     "title": "Title",
     "cardId": "Card ID",
-    "clickToPin": "Click to pin preview"
+    "clickToPin": "Click to pin preview",
+    "back": "Card back (hidden)"
   },
   "learn": {
     "title": "Learn the Game",

@@ -81,7 +81,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       {isHidden && !canSeeCard ? (
         <img
           src="/images/card-back.webp"
-          alt=""
+          alt={t('card.back')}
           draggable={false}
           className="w-full h-full object-cover"
         />
@@ -380,7 +380,7 @@ export function TargetSelector() {
                   boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
                 }}
               >
-                <img src="/images/card-back.webp" alt="" draggable={false} className="w-full h-full object-cover" style={{ opacity: 0.5 - offset * 0.1 }} />
+                <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" style={{ opacity: 0.5 - offset * 0.1 }} />
               </div>
             ))}
             {/* Top card */}
@@ -392,7 +392,7 @@ export function TargetSelector() {
                 boxShadow: '0 0 18px rgba(196, 163, 90, 0.5)',
               }}
             >
-              <img src="/images/card-back.webp" alt="" draggable={false} className="w-full h-full object-cover" />
+              <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
             </div>
             {/* Card count badge */}
             <div
