@@ -9,8 +9,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * AMBUSH: Choose 1 card in the opponent's hand (face-down) and look at it. (Mandatory)
  *
- * UPGRADE: AMBUSH effect: In addition, discard 1 card from your hand.
- *   If you do so, the chosen opponent card is also discarded.
+ * UPGRADE: The revealed card is discarded from the opponent's hand,
+ *   then the opponent draws 1 card.
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {

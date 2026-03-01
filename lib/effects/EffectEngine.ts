@@ -4390,7 +4390,7 @@ export class EffectEngine {
   /**
    * Sasuke 014 "Sharingan": Resolve the hand reveal.
    * After the player acknowledges the revealed card:
-   * - If isUpgrade: create pending for SASUKE_014_DISCARD_OWN (player discards own card, then chains to opponent discard)
+   * - If isUpgrade: auto-discard the revealed opponent card, then opponent draws 1
    * - If not upgrade: nothing more to do.
    */
   static sasuke014ResolveReveal(state: GameState, pending: PendingEffect): GameState {
@@ -4402,54 +4402,42 @@ export class EffectEngine {
       return state;
     }
 
-    // UPGRADE: chain to SASUKE_014_DISCARD_OWN (player must discard 1 from own hand)
-    // Then the opponent card at chosenIndex is auto-discarded
+    // UPGRADE: discard the revealed opponent card, then opponent draws 1
     const newState = deepClone(state);
-    const ps = newState[pending.sourcePlayer];
+    const opponentPlayer = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const oppPs = newState[opponentPlayer];
+    const chosenIdx = parsed.chosenIndex ?? 0;
 
-    if (ps.hand.length === 0) {
-      // No cards to discard from own hand — upgrade portion fizzles
+    if (chosenIdx >= 0 && chosenIdx < oppPs.hand.length) {
+      const hand = [...oppPs.hand];
+      const discarded = hand.splice(chosenIdx, 1)[0];
+      oppPs.hand = hand;
+      oppPs.discardPile = [...oppPs.discardPile, discarded];
+
       newState.log = logAction(
         newState.log, newState.turn, 'action', pending.sourcePlayer,
-        'EFFECT_NO_TARGET',
-        'Sasuke Uchiwa (014) UPGRADE: No cards in hand to discard, upgrade effect fizzles.',
-        'game.log.effect.noTarget',
-        { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
+        'EFFECT_DISCARD_FROM_HAND',
+        `Sasuke Uchiwa (014) UPGRADE: Discarded ${discarded.name_fr} from opponent's hand.`,
+        'game.log.effect.sasuke014DiscardOpponent',
+        { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discarded.name_fr },
       );
-      return newState;
-    }
 
-    const validTargets = ps.hand.map((_: unknown, idx: number) => String(idx));
-    const effectId = generateInstanceId();
-    const actionId = generateInstanceId();
-    // Pass chosenIndex so DISCARD_OWN handler can auto-discard the opponent card
-    newState.pendingEffects.push({
-      id: effectId,
-      sourceCardId: pending.sourceCardId,
-      sourceInstanceId: pending.sourceInstanceId,
-      sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: pending.effectType,
-      effectDescription: JSON.stringify({ chosenIndex: parsed.chosenIndex ?? 0 }),
-      targetSelectionType: 'SASUKE_014_DISCARD_OWN',
-      sourcePlayer: pending.sourcePlayer,
-      requiresTargetSelection: true,
-      validTargets,
-      isOptional: true,
-      isMandatory: false,
-      resolved: false,
-      isUpgrade: true,
-    });
-    newState.pendingActions.push({
-      id: actionId,
-      type: 'DISCARD_CARD',
-      player: pending.sourcePlayer,
-      description: 'Discard 1 card from your hand to discard the revealed opponent card.',
-      descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
-      options: validTargets,
-      minSelections: 1,
-      maxSelections: 1,
-      sourceEffectId: effectId,
-    });
+      // Opponent draws 1 card
+      if (oppPs.deck.length > 0) {
+        const deck = [...oppPs.deck];
+        const drawn = deck.pop()!;
+        oppPs.deck = deck;
+        oppPs.hand = [...oppPs.hand, drawn];
+
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', opponentPlayer,
+          'DRAW',
+          `${opponentPlayer} draws 1 card (Sasuke 014 UPGRADE).`,
+          'game.log.effect.draw',
+          { card: 'SASUKE UCHIWA', id: 'KS-014-UC', count: '1' },
+        );
+      }
+    }
 
     return newState;
   }
