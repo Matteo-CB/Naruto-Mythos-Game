@@ -373,7 +373,7 @@ export default function DeckBuilderPage() {
             {t("deckBuilder.missions", { count: deckMissions.length })} / 3
           </span>
           <span className="text-xs text-[#555]">
-            {t("deckBuilder.maxCopies")}
+            {t("deckBuilder.maxCopiesRule")}
           </span>
           {saveError && (
             <span className="text-xs text-[#b33e3e]">{saveError}</span>
