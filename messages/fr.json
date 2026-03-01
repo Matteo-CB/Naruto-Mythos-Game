@@ -46,6 +46,7 @@
     "animations": "Activer les animations",
     "animationsOn": "Les animations sont activees",
     "animationsOff": "Les animations sont desactivees",
+    "loading": "Chargement...",
     "back": "Retour au menu"
   },
   "game": {

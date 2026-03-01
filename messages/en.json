@@ -46,6 +46,7 @@
     "animations": "Enable animations",
     "animationsOn": "Animations are enabled",
     "animationsOff": "Animations are disabled",
+    "loading": "Loading...",
     "back": "Back to menu"
   },
   "game": {

@@ -21,6 +21,7 @@ model User {
   discordHighestElo Int          @default(0)
   role              String       @default("user")
   badgePrefs        String[]     @default([])
+  animationsEnabled Boolean      @default(true)
   resetToken        String?
   resetTokenExpiry  DateTime?
   createdAt         DateTime     @default(now())
