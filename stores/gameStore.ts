@@ -421,6 +421,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: amount,
               card: {
                 name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
                 chakra: amount,
                 power: amount,
               },
@@ -865,6 +866,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: amount,
               card: {
                 name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
                 chakra: amount,
                 power: amount,
               },
@@ -1363,6 +1365,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: amount,
               card: {
                 name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
                 chakra: amount,
                 power: amount,
               },
