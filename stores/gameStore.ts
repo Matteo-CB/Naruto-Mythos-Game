@@ -426,6 +426,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
+        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
+          // Source player selects from opponent's hand — card info stored in effectDescription
+          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = oppCards[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                name_en: card.name_en,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
         } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
           // Opponent's hand cards shown as face-down (card backs)
           handCards = pendingAction.options.map((indexStr) => {
@@ -893,16 +911,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           });
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
-          // Source player selects from opponent's hand
-          const opponentPlayer = humanPlayer === 'player1' ? 'player2' : 'player1';
-          const opponentHand = newState[opponentPlayer].hand;
+          // Source player selects from opponent's hand — card info stored in effectDescription
+          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
-            const card = opponentHand[idx];
+            const card = oppCards[idx];
             return {
               index: idx,
               card: card ? {
                 name_fr: card.name_fr,
+                name_en: card.name_en,
                 chakra: card.chakra,
                 power: card.power,
                 image_file: card.image_file,
@@ -1381,16 +1400,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             };
           });
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
-          // Source player selects from opponent's hand
-          const opponentPlayer = humanPlayer === 'player1' ? 'player2' : 'player1';
-          const opponentHand = currentState[opponentPlayer].hand;
+          // Source player selects from opponent's hand — card info stored in effectDescription
+          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
-            const card = opponentHand[idx];
+            const card = oppCards[idx];
             return {
               index: idx,
               card: card ? {
-                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+                name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
               } : { name_fr: '???' },
             };
           });
