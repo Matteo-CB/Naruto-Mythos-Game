@@ -25,7 +25,7 @@ import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
-import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleKidomaru060EndOfRound } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 
@@ -209,7 +209,7 @@ export class GameEngine {
         break;
 
       case 'end':
-        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move, Akamaru 028 return)
+        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move, Akamaru 028 return, Kidômaru 060)
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving, check if more end-phase effects need processing
@@ -222,9 +222,14 @@ export class GameEngine {
             newState = handleAkamaru028Return(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
+            // Continue processing Kidômaru 060 optional end-of-round hides
+            newState = handleKidomaru060EndOfRound(newState);
+            if (newState.pendingActions.length > 0) break; // More choices needed
+
             // All end-of-round effects resolved — finish end phase transition
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
+            newState.endPhaseKidomaru060Ids = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -238,6 +243,7 @@ export class GameEngine {
           newState.pendingEffects = [];
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
+          newState.endPhaseKidomaru060Ids = undefined;
           if (newState.turn >= TOTAL_TURNS) {
             newState = GameEngine.endGame(newState);
           } else {
@@ -362,9 +368,16 @@ export class GameEngine {
       return newState;
     }
 
+    // Process Kidômaru 060 optional end-of-round hides
+    newState = handleKidomaru060EndOfRound(newState);
+    if (newState.pendingActions.length > 0) {
+      return newState;
+    }
+
     // Clean up end phase tracking
     newState.endPhaseMovedIds = undefined;
     newState.endPhaseAkamaru028Ids = undefined;
+    newState.endPhaseKidomaru060Ids = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
