@@ -2713,13 +2713,21 @@ export class EffectEngine {
             const validOppTargets = oppHand_ss.map((_: unknown, i: number) => String(i));
             const effectId_ss = generateInstanceId();
             const actionId_ss = generateInstanceId();
+            // Store opponent hand card info so UI can display them (needed for online mode)
+            const oppHandInfo = oppHand_ss.map((c) => ({
+              name_fr: c.name_fr,
+              name_en: c.name_en,
+              chakra: c.chakra ?? 0,
+              power: c.power ?? 0,
+              image_file: c.image_file,
+            }));
             newState.pendingEffects.push({
               id: effectId_ss,
               sourceCardId: pendingEffect.sourceCardId,
               sourceInstanceId: pendingEffect.sourceInstanceId,
               sourceMissionIndex: pendingEffect.sourceMissionIndex,
               effectType: pendingEffect.effectType,
-              effectDescription: '',
+              effectDescription: JSON.stringify({ opponentCards: oppHandInfo }),
               targetSelectionType: 'SASUKE_014_DISCARD_OPPONENT',
               sourcePlayer: pendingEffect.sourcePlayer,
               requiresTargetSelection: true,
