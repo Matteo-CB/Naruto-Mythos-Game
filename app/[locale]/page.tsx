@@ -97,11 +97,11 @@ export default function Home() {
   return (
     <main
       id="main-content"
-      className="relative min-h-screen w-full overflow-y-auto flex flex-col"
+      className="relative min-h-screen w-full overflow-x-hidden overflow-y-auto flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
       {/* === BACKGROUND CLOUD PATTERN === */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         {cloudPositions.map((cloud, i) => (
           <div
             key={`cloud-${i}`}
@@ -129,7 +129,7 @@ export default function Home() {
       </div>
 
       {/* === FLOATING WEAPON DECORATIONS === */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         {mounted && floatingElements.map((el, i) => (
           <motion.div
             key={`float-${i}`}
