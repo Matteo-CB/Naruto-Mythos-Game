@@ -87,14 +87,19 @@ export default function Home() {
     FEATURED_CARDS[Math.floor(Math.random() * FEATURED_CARDS.length)]
   );
 
+  const [sessionRefreshed, setSessionRefreshed] = useState(false);
+
   useEffect(() => {
     setMounted(true);
-    // Refresh session to pick up discordId changes (e.g. after linking Discord)
-    if (session) {
+  }, []);
+
+  // Refresh session once to pick up discordId/role changes from DB
+  useEffect(() => {
+    if (session && !sessionRefreshed) {
+      setSessionRefreshed(true);
       updateSession();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [session, sessionRefreshed, updateSession]);
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
