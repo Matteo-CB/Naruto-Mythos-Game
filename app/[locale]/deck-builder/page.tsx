@@ -513,16 +513,17 @@ export default function DeckBuilderPage() {
                           <img
                             src={mImg}
                             alt={getCardName(m, locale as "en" | "fr")}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover cursor-pointer"
+                            onClick={() => setPreviewCard(m)}
                           />
                         )}
                         <button
                           onClick={() => removeMission(i)}
-                          className="absolute top-0 right-0 w-4 h-4 bg-black/70 text-[#b33e3e] text-[8px] flex items-center justify-center hover:bg-black"
+                          className="absolute top-0 right-0 w-4 h-4 bg-black/70 text-[#b33e3e] text-[8px] flex items-center justify-center hover:bg-black z-10"
                         >
                           X
                         </button>
-                        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-0.5">
+                        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-0.5 cursor-pointer" onClick={() => setPreviewCard(m)}>
                           <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">
                             {getCardName(m, locale as "en" | "fr")}
                           </span>
@@ -547,7 +548,8 @@ export default function DeckBuilderPage() {
                 return (
                   <div
                     key={`${card.id}-${i}`}
-                    className="w-10 h-14 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0 group"
+                    className="w-10 h-14 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0 group cursor-pointer"
+                    onClick={() => setPreviewCard(card)}
                   >
                     {img ? (
                       <img
@@ -563,7 +565,7 @@ export default function DeckBuilderPage() {
                       </div>
                     )}
                     <button
-                      onClick={() => removeChar(i)}
+                      onClick={(e) => { e.stopPropagation(); removeChar(i); }}
                       className="absolute inset-0 bg-black/60 text-[#b33e3e] text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       X
