@@ -54,7 +54,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Kiba Inuzuka (149): No friendly non-hidden Akamaru in play, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'KIBA INUZUKA', id: 'KS-149-M' },
+      { card: 'KIBA INUZUKA', id: 'KS-149-MV' },
     );
     return { state: { ...state, log } };
   }
@@ -69,7 +69,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_DEFEAT',
         `Kiba Inuzuka (149): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: 'KS-149-M', target: akamaru.card.name_fr },
+        { card: 'KIBA INUZUKA', id: 'KS-149-MV', target: akamaru.card.name_fr },
       ),
     };
   } else {
@@ -90,7 +90,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
           'EFFECT_HIDE',
           `Kiba Inuzuka (149): Hid friendly ${akamaru.card.name_fr}.`,
           'game.log.effect.hide',
-          { card: 'KIBA INUZUKA', id: 'KS-149-M', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
+          { card: 'KIBA INUZUKA', id: 'KS-149-MV', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
         ),
       };
     }
@@ -125,7 +125,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         'EFFECT_NO_TARGET',
         'Kiba Inuzuka (149): No other non-hidden character in this mission to target.',
         'game.log.effect.noTarget',
-        { card: 'KIBA INUZUKA', id: 'KS-149-M' },
+        { card: 'KIBA INUZUKA', id: 'KS-149-MV' },
       ),
     };
     return { state };
@@ -151,6 +151,6 @@ function kiba149UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKiba149Handlers(): void {
-  registerEffect('KS-149-M', 'MAIN', kiba149MainHandler);
-  registerEffect('KS-149-M', 'UPGRADE', kiba149UpgradeHandler);
+  registerEffect('KS-149-MV', 'MAIN', kiba149MainHandler);
+  registerEffect('KS-149-MV', 'UPGRADE', kiba149UpgradeHandler);
 }

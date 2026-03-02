@@ -15,9 +15,12 @@ KS-129-R — Kyubi
 KS-129-RA — Kyubi
 KS-130-R — One-Tail
 KS-134-S — Kyubi
-KS-149-M — Kiba
-KS-151-M — RockLee
-KS-152-M — Itachi
-KS-153-M — Gaara
+KS-135-MV — Sakura (Mythos V)
+KS-136-MV — Sasuke (Mythos V)
+KS-149-MV — Kiba (Mythos V)
+KS-150-MV — Shikamaru (Mythos V)
+KS-151-MV — RockLee (Mythos V)
+KS-152-MV — Itachi (Mythos V)
+KS-153-MV — Gaara (Mythos V)
 
-19 cards remaining.
+21 cards remaining.

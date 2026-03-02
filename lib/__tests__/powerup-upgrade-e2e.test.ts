@@ -367,7 +367,7 @@ describe('Card data integrity for effects', () => {
   it('effect handlers should be registered for key cards', () => {
     const cardsWithHandlers = [
       'KS-001-C', 'KS-003-C', 'KS-007-C', 'KS-009-C', 'KS-011-C', 'KS-013-C', 'KS-015-C',
-      'KS-039-UC', 'KS-074-C', 'KS-108-R', 'KS-120-R', 'KS-133-S', 'KS-135-S', 'KS-136-S', 'KS-137-S',
+      'KS-039-UC', 'KS-074-C', 'KS-108-R', 'KS-120-R', 'KS-133-S', 'KS-135-S', 'KS-135-MV', 'KS-136-S', 'KS-136-MV', 'KS-137-S',
     ];
     for (const id of cardsWithHandlers) {
       const handler = getEffectHandler(id, 'MAIN');

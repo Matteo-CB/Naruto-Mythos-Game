@@ -49,7 +49,7 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       'Gaara (153): No friendly hidden characters in play, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'GAARA', id: 'KS-153-M' },
+      { card: 'GAARA', id: 'KS-153-MV' },
     );
     return { state: { ...state, log } };
   }
@@ -75,7 +75,7 @@ function gaara153MainHandler(ctx: EffectContext): EffectResult {
       'EFFECT_NO_TARGET',
       `Gaara (153): No enemy character with cost less than ${hiddenCount} (hidden count).`,
       'game.log.effect.noTarget',
-      { card: 'GAARA', id: 'KS-153-M' },
+      { card: 'GAARA', id: 'KS-153-MV' },
     );
     return { state: { ...state, log } };
   }
@@ -99,6 +99,6 @@ function gaara153UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerGaara153Handlers(): void {
-  registerEffect('KS-153-M', 'MAIN', gaara153MainHandler);
-  registerEffect('KS-153-M', 'UPGRADE', gaara153UpgradeHandler);
+  registerEffect('KS-153-MV', 'MAIN', gaara153MainHandler);
+  registerEffect('KS-153-MV', 'UPGRADE', gaara153UpgradeHandler);
 }

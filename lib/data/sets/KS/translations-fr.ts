@@ -297,6 +297,18 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Vous devez choisir un personnage allie non cache et un personnage ennemi dans cette mission et les vaincre, si possible.',
   ],
 
+  // 135/130 - SAKURA HARUNO (MV) - "Sasuke est en train de me regarder !"
+  'KS-135-MV': [
+    'Regardez les 3 cartes du dessus de votre deck. Jouez un personnage n\'importe ou et defaussez les autres cartes.',
+    'effet : A la place, jouez la carte en payant 4 de moins.',
+  ],
+
+  // 136/130 - SASUKE UCHIWA (MV) - "Tu m'enerves"
+  'KS-136-MV': [
+    '[⧗] Quand un personnage est vaincu, gagnez 1 Chakra.',
+    'Vous devez choisir un personnage allie non cache et un personnage ennemi dans cette mission et les vaincre, si possible.',
+  ],
+
   // 137/130 - KAKASHI HATAKE (S) - "L'Eclair Pourfendeur"
   // Corrected: MAIN targets upgraded characters (friend or foe), not just enemies
   'KS-137-S': [
@@ -883,32 +895,32 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Copiez un effet instantané non-amélioration d\'un autre personnage Equipe 7 allié en jeu.',
   ],
 
-  // 149/130 - KIBA INUZUKA (M) - "Crocs Lacerateurs"
-  'KS-149-M': [
+  // 149/130 - KIBA INUZUKA (MV) - "Crocs Lacerateurs"
+  'KS-149-MV': [
     'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
     'effet MAIN : A la place, vainquez-les tous les deux.',
   ],
 
-  // 150/130 - SHIKAMARU NARA (M) - "Etranglement des Ombres"
-  'KS-150-M': [
+  // 150/130 - SHIKAMARU NARA (MV) - "Etranglement des Ombres"
+  'KS-150-MV': [
     '[⧗] L\'adversaire ne peut pas jouer de personnages en cache dans cette mission.',
     'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
   ],
 
-  // 151/130 - ROCK LEE (M) - "Poing Loufoque"
-  'KS-151-M': [
+  // 151/130 - ROCK LEE (MV) - "Poing Loufoque"
+  'KS-151-MV': [
     '[⧗] A la fin du tour, vous devez deplacer ce personnage vers une autre mission, si possible.',
     'Revelez et defaussez la carte du dessus de votre deck : POWERUP X ou X est le cout de la carte defaussee.',
   ],
 
-  // 152/130 - ITACHI UCHIHA (M) - "Amaterasu"
-  'KS-152-M': [
+  // 152/130 - ITACHI UCHIHA (MV) - "Amaterasu"
+  'KS-152-MV': [
     'Deplacez un personnage allie en jeu.',
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
   ],
 
-  // 153/130 - GAARA (M) - "Cercueil de Sable"
-  'KS-153-M': [
+  // 153/130 - GAARA (MV) - "Cercueil de Sable"
+  'KS-153-MV': [
     'Vainquez un personnage ennemi avec un cout inferieur au nombre de personnages allies caches en jeu.',
     'effet MAIN : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
   ],

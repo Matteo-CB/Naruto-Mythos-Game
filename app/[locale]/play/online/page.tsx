@@ -33,6 +33,7 @@ export default function PlayOnlinePage() {
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [deckSelected, setDeckSelected] = useState(false);
   const [showJoinInput, setShowJoinInput] = useState(false);
+  const [isPrivateRoom, setIsPrivateRoom] = useState(false);
 
   const {
     connected,
@@ -183,6 +184,7 @@ export default function PlayOnlinePage() {
         await connect(session.user.id);
       }
       createRoom(session.user.id, false, selectedMode === 'ranked', false, selectedMode, session.user.name ?? undefined);
+      setIsPrivateRoom(false);
     } catch {
       // Error set in socket store
     }
@@ -194,6 +196,7 @@ export default function PlayOnlinePage() {
         await connect(session.user.id);
       }
       createRoom(session.user.id, true, false, false, 'casual', session.user.name ?? undefined);
+      setIsPrivateRoom(true);
     } catch {
       // Error set in socket store
     }
@@ -388,16 +391,7 @@ export default function PlayOnlinePage() {
                 style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
               >
                 <div className="flex flex-col gap-4 items-center">
-                  <p className="text-xs" style={{ color: '#888888' }}>
-                    {t('online.roomCreated')}
-                  </p>
-                  <p
-                    className="text-3xl font-bold tracking-[0.3em]"
-                    style={{ color: '#c4a35a' }}
-                  >
-                    {roomCode}
-                  </p>
-                  <p className="text-xs" style={{ color: '#555555' }}>
+                  <p className="text-sm font-bold" style={{ color: '#c4a35a' }}>
                     {opponentJoined
                       ? t('online.opponentJoined')
                       : t('online.waitingForOpponent')}
