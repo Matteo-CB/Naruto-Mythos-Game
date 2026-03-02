@@ -42,15 +42,25 @@ html, body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'NJNaruto', Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeSpeed;
 }
 
-/* Inter for body/description text — NJNaruto stays for headings, nav, buttons, card names */
-p, li, blockquote, figcaption, .font-body {
-  font-family: var(--font-body), 'Inter', sans-serif;
+/* NJNaruto for all short UI text: headings, buttons, labels, links, spans, badges, stats */
+h1, h2, h3, h4, h5, h6,
+button, label, a, nav,
+span, small,
+select, option,
+th, td,
+.font-display {
+  font-family: 'NJNaruto', Arial, sans-serif;
+}
+
+/* Inter for long-form text: paragraphs, descriptions, effect text */
+p, .font-body {
+  font-family: var(--font-inter), 'Inter', sans-serif;
 }
 
 * {

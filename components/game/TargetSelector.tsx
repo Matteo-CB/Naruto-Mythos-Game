@@ -914,7 +914,7 @@ export function TargetSelector() {
           }}
         >
           <span
-            className="text-xs text-center leading-relaxed"
+            className="font-body text-xs text-center leading-relaxed"
             style={{ color: '#e0e0e0' }}
           >
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}

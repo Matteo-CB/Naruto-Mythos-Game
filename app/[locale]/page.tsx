@@ -204,7 +204,7 @@ export default function Home() {
                 {titleLetters.map((letter, i) => (
                   <motion.span
                     key={`letter-${i}`}
-                    className="inline-block text-3xl font-black tracking-wider sm:text-4xl lg:text-5xl"
+                    className="font-display inline-block text-3xl font-black tracking-wider sm:text-4xl lg:text-5xl"
                     style={{
                       color: '#c4a35a',
                       textShadow: '0 0 40px rgba(196, 163, 90, 0.3), 0 0 80px rgba(196, 163, 90, 0.1)',
@@ -225,7 +225,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <motion.p
-              className="mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
+              className="font-display mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
               style={{ color: '#888888' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

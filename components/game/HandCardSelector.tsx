@@ -213,7 +213,7 @@ export function HandCardSelector() {
             maxWidth: '500px',
           }}
         >
-          <span className="text-xs text-center leading-relaxed" style={{ color: '#e0e0e0' }}>
+          <span className="font-body text-xs text-center leading-relaxed" style={{ color: '#e0e0e0' }}>
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </span>
         </motion.div>
