@@ -162,16 +162,15 @@ export function validateRevealCharacter(
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      // Reveal-for-upgrade: pay difference minus 1 already paid for hidden placement
-      effectiveCost = Math.max(0, charTopCard.chakra - existingTopCard.chakra - 1);
+      // Reveal-for-upgrade: pay only the DIFFERENCE (new cost - existing cost)
+      effectiveCost = Math.max(0, charTopCard.chakra - existingTopCard.chakra);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {
       effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
     }
   } else {
-    // Normal reveal: subtract the 1 chakra already paid to play face-down
-    effectiveCost = Math.max(0, calculateEffectiveCost(state, player, charTopCard, missionIndex, true) - 1);
+    effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   }
 
   // Check chakra cost (uses upgrade difference if applicable)
