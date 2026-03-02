@@ -181,14 +181,14 @@ describe('Action Phase', () => {
       // Player 2 passes
       newState = GameEngine.applyAction(newState, 'player2', { type: 'PASS' });
 
-      // Reveal (should cost 3, the printed cost)
+      // Reveal (should cost printed cost - 1 already paid for hidden = 3 - 1 = 2)
       newState = GameEngine.applyAction(newState, 'player1', {
         type: 'REVEAL_CHARACTER',
         missionIndex: 0,
         characterInstanceId: hiddenChar.instanceId,
       });
 
-      expect(newState.player1.chakra).toBe(afterHiddenChakra - 3); // 9 - 3 = 6
+      expect(newState.player1.chakra).toBe(afterHiddenChakra - 2); // 9 - 2 = 7
     });
   });
 

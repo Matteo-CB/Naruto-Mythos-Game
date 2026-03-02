@@ -193,7 +193,7 @@ For each mission:
 - Hidden characters have **cost 0 and power 0** when targeted by opponent effects
 
 #### Revealing a Hidden Character
-- Pay the card's **printed chakra cost**
+- Pay the card's **printed chakra cost minus 1** (since 1 chakra was already paid to play face-down)
 - This is treated as **playing a character** — all rules that apply when playing a character apply here
 - Activate MAIN and AMBUSH effects
 - The character is now face-visible
