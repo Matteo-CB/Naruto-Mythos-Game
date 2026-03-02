@@ -162,10 +162,8 @@ export function validateRevealCharacter(
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      // Reveal-for-upgrade: pay the full printed cost of the hidden card (with modifiers).
-      // The hidden card was placed at cost 1; revealing it as an upgrade costs the full
-      // chakra value — not the upgrade difference.
-      effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+      // Reveal-for-upgrade: pay only the DIFFERENCE (new cost - existing cost)
+      effectiveCost = Math.max(0, charTopCard.chakra - existingTopCard.chakra);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {

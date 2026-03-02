@@ -296,14 +296,21 @@ function handleRevealCharacter(
     return checkFlexibleUpgrade(charTopCard, cTop);
   });
 
-  // Reveal cost is always the full printed cost of the hidden card (with modifiers),
-  // whether or not it resolves as an upgrade. Hidden-to-upgrade is NOT discounted.
-  const effectiveCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE
+  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  let costToPay = fullCost;
+
+  if (upgradeTarget) {
+    const existingTopCard = upgradeTarget.stack.length > 0
+      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+      : upgradeTarget.card;
+    costToPay = Math.max(0, charTopCard.chakra - existingTopCard.chakra);
+  }
 
   // Pay cost
   const ps = { ...state[player] };
-  if (ps.chakra < effectiveCost) return state;
-  ps.chakra -= effectiveCost;
+  if (ps.chakra < costToPay) return state;
+  ps.chakra -= costToPay;
 
   if (upgradeTarget) {
     // Reveal-for-upgrade: merge stacks — put the revealed card's stack on top of the existing one
@@ -331,9 +338,9 @@ function handleRevealCharacter(
     const log = logAction(
       state.log, state.turn, 'action', player,
       'REVEAL_UPGRADE',
-      `${player} reveals ${charTopCard.name_fr} (${charTopCard.title_fr}) to upgrade existing ${upgradeTarget.card.name_fr} on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
+      `${player} reveals ${charTopCard.name_fr} (${charTopCard.title_fr}) to upgrade existing ${upgradeTarget.card.name_fr} on mission ${missionIndex + 1} for ${costToPay} chakra.`,
       'game.log.revealUpgrade',
-      { card: charTopCard.name_fr, title: charTopCard.title_fr, mission: missionIndex + 1, cost: effectiveCost },
+      { card: charTopCard.name_fr, title: charTopCard.title_fr, mission: missionIndex + 1, cost: costToPay },
     );
 
     let newState: GameState = {
