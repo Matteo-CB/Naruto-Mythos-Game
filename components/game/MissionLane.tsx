@@ -68,8 +68,11 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       return;
     }
     if (isRevealable) {
-      // Don't pin when selecting for reveal — keep the ActionBar visible
       selectTarget(character.instanceId);
+      // Also pin preview so the player can scroll and read card details
+      if (character.card) {
+        pinCard(character.card);
+      }
       return;
     }
     // For own hidden cards, re-hidden cards, or opponent visible cards, pin for preview
@@ -492,7 +495,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     >
       {/* Opponent power total */}
       <div
-        className="flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
+        className="font-display flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
         style={{ backgroundColor: 'rgba(179, 62, 62, 0.1)' }}
       >
         <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666' }}>
@@ -561,7 +564,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
       {/* Player power total */}
       <div
-        className="flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
+        className="font-display flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
         style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)' }}
       >
         <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666' }}>

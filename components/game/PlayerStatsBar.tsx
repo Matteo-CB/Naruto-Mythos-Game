@@ -37,7 +37,7 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
 
   return (
     <div
-      className="flex items-center gap-2 px-3 py-1 w-full"
+      className="font-display flex items-center gap-2 px-3 py-1 w-full"
       style={{
         backgroundColor: 'rgba(8, 8, 12, 0.8)',
         backdropFilter: 'blur(8px)',

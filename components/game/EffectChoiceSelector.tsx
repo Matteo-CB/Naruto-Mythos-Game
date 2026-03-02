@@ -88,7 +88,7 @@ export function EffectChoiceSelector() {
             maxWidth: '500px',
           }}
         >
-          <span className="text-xs text-center leading-relaxed" style={{ color: '#e0e0e0' }}>
+          <span className="font-body text-xs text-center leading-relaxed" style={{ color: '#e0e0e0' }}>
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </span>
         </motion.div>
@@ -155,7 +155,7 @@ export function EffectChoiceSelector() {
 
                 {/* Effect description */}
                 <span
-                  className="text-sm leading-relaxed flex-1"
+                  className="font-body text-sm leading-relaxed flex-1"
                   style={{ color: '#e0e0e0' }}
                 >
                   {choice.description}

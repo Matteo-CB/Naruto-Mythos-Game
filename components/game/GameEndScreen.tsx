@@ -217,7 +217,7 @@ export function GameEndScreen() {
             className="flex flex-col items-center gap-2"
           >
             <motion.span
-              className="text-5xl font-bold tracking-widest uppercase"
+              className="font-display text-5xl font-bold tracking-widest uppercase"
               style={{ color: headingColor }}
               animate={{
                 textShadow: [
@@ -244,7 +244,7 @@ export function GameEndScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="flex items-center gap-8"
+            className="font-display flex items-center gap-8"
           >
             {/* Player score */}
             <div className="flex flex-col items-center gap-1">

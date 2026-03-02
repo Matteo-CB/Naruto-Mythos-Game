@@ -41,7 +41,7 @@ export function TurnOverlay() {
             className="flex flex-col items-center gap-2"
           >
             <motion.span
-              className="text-5xl font-bold tracking-widest uppercase"
+              className="font-display text-5xl font-bold tracking-widest uppercase"
               style={{ color: '#c4a35a' }}
               initial={{ letterSpacing: '0.5em', opacity: 0 }}
               animate={{ letterSpacing: '0.2em', opacity: 1 }}

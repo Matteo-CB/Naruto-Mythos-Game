@@ -5254,7 +5254,7 @@
       "name_fr": "ROCK LEE",
       "title_fr": "Poing de l'ivresse",
       "title_en": "Loopy Fist",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": ["Team Guy", "Taijutsu"],
@@ -5271,7 +5271,7 @@
       ],
       "image_url": "",
       "rarity_display": "Mythos",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos/KS-151-M.webp",
       "data_complete": true,
       "old_id": "151/130",
       "is_rare_art": false

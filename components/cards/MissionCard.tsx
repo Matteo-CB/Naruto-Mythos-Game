@@ -275,6 +275,7 @@ function MissionCardInner({
                 {effect.type}
               </span>
               <span
+                className="font-body"
                 style={{
                   color: '#aaaaaa',
                   fontSize: '0.38em',
