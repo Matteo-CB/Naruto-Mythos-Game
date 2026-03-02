@@ -22,8 +22,8 @@ export function GameEndScreen() {
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const resetGame = useGameStore((s) => s.resetGame);
   const replayInitialState = useGameStore((s) => s.replayInitialState);
-  const draftDeckCardIds = useGameStore((s) => s.draftDeckCardIds);
-  const draftDeckMissionIds = useGameStore((s) => s.draftDeckMissionIds);
+  const sealedDeckCardIds = useGameStore((s) => s.sealedDeckCardIds);
+  const sealedDeckMissionIds = useGameStore((s) => s.sealedDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
   const rematchState = useSocketStore((s) => s.rematchState);
   const offerRematch = useSocketStore((s) => s.offerRematch);
@@ -34,8 +34,8 @@ export function GameEndScreen() {
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
-  const [draftDeckName, setDraftDeckName] = useState('');
-  const [draftSaveState, setDraftSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [sealedDeckName, setSealedDeckName] = useState('');
+  const [sealedSaveState, setSealedSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autoSaveAttempted = useRef(false);
 
   const handleSaveReplay = useCallback(async () => {
@@ -121,33 +121,33 @@ export function GameEndScreen() {
     }
   }, [gameOver, session?.user?.id, isAIGame, gameState, gameResult, handleSaveReplay]);
 
-  const handleSaveDraftDeck = useCallback(async () => {
-    if (draftSaveState === 'saving' || draftSaveState === 'saved') return;
-    if (!draftDeckCardIds || !draftDeckMissionIds) return;
+  const handleSaveSealedDeck = useCallback(async () => {
+    if (sealedSaveState === 'saving' || sealedSaveState === 'saved') return;
+    if (!sealedDeckCardIds || !sealedDeckMissionIds) return;
 
-    setDraftSaveState('saving');
+    setSealedSaveState('saving');
     try {
-      const name = draftDeckName.trim() || 'Draft Deck';
+      const name = sealedDeckName.trim() || 'Sealed Deck';
       const res = await fetch('/api/decks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
-          cardIds: draftDeckCardIds,
-          missionIds: draftDeckMissionIds,
+          cardIds: sealedDeckCardIds,
+          missionIds: sealedDeckMissionIds,
         }),
       });
       if (res.ok) {
-        setDraftSaveState('saved');
+        setSealedSaveState('saved');
       } else {
-        setDraftSaveState('error');
-        setTimeout(() => setDraftSaveState('idle'), 2000);
+        setSealedSaveState('error');
+        setTimeout(() => setSealedSaveState('idle'), 2000);
       }
     } catch {
-      setDraftSaveState('error');
-      setTimeout(() => setDraftSaveState('idle'), 2000);
+      setSealedSaveState('error');
+      setTimeout(() => setSealedSaveState('idle'), 2000);
     }
-  }, [draftSaveState, draftDeckCardIds, draftDeckMissionIds, draftDeckName]);
+  }, [sealedSaveState, sealedDeckCardIds, sealedDeckMissionIds, sealedDeckName]);
 
   if (!gameOver || !visibleState) return null;
 
@@ -373,18 +373,18 @@ export function GameEndScreen() {
               </>
             )}
 
-            {/* Save Draft Deck */}
-            {!!session?.user?.id && draftDeckCardIds && draftDeckMissionIds && draftSaveState !== 'saved' && (
+            {/* Save Sealed Deck */}
+            {!!session?.user?.id && sealedDeckCardIds && sealedDeckMissionIds && sealedSaveState !== 'saved' && (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
-                  {t('draft.saveDeck')}
+                  {t('sealed.saveDeck')}
                 </span>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={draftDeckName}
-                    onChange={(e) => setDraftDeckName(e.target.value)}
-                    placeholder={t('draft.saveDeckPlaceholder')}
+                    value={sealedDeckName}
+                    onChange={(e) => setSealedDeckName(e.target.value)}
+                    placeholder={t('sealed.saveDeckPlaceholder')}
                     className="px-3 py-2 text-sm rounded"
                     style={{
                       backgroundColor: '#1a1a1a',
@@ -397,30 +397,30 @@ export function GameEndScreen() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={handleSaveDraftDeck}
-                    disabled={draftSaveState === 'saving'}
+                    onClick={handleSaveSealedDeck}
+                    disabled={sealedSaveState === 'saving'}
                     className="px-4 py-2 rounded text-sm font-medium uppercase tracking-wider cursor-pointer"
                     style={{
-                      backgroundColor: draftSaveState === 'error' ? '#b33e3e' : '#1a1a2e',
-                      color: draftSaveState === 'error' ? '#ffffff' : '#c4a35a',
-                      border: `1px solid ${draftSaveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
-                      opacity: draftSaveState === 'saving' ? 0.6 : 1,
+                      backgroundColor: sealedSaveState === 'error' ? '#b33e3e' : '#1a1a2e',
+                      color: sealedSaveState === 'error' ? '#ffffff' : '#c4a35a',
+                      border: `1px solid ${sealedSaveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
+                      opacity: sealedSaveState === 'saving' ? 0.6 : 1,
                     }}
                   >
-                    {draftSaveState === 'saving'
+                    {sealedSaveState === 'saving'
                       ? t('common.loading')
-                      : draftSaveState === 'error'
-                        ? t('draft.deckSaveError')
+                      : sealedSaveState === 'error'
+                        ? t('sealed.deckSaveError')
                         : t('common.save')}
                   </motion.button>
                 </div>
               </div>
             )}
 
-            {/* Draft deck saved confirmation */}
-            {draftSaveState === 'saved' && (
+            {/*/* Sealed deck saved confirmation */}
+            {sealedSaveState === 'saved' && (
               <span className="text-xs" style={{ color: '#4a9e4a' }}>
-                {t('draft.deckSaved')}
+                {t('sealed.deckSaved')}
               </span>
             )}
 

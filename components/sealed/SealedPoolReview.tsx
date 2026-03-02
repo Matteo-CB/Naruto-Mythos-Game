@@ -3,11 +3,11 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
-import type { BoosterCard } from '@/lib/draft/boosterGenerator';
+import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getRarityLabel } from '@/lib/utils/cardLocale';
 
-interface DraftPoolReviewProps {
+interface SealedPoolReviewProps {
   cards: BoosterCard[];
   onContinue: () => void;
 }
@@ -38,8 +38,8 @@ const RARITY_COLORS: Record<string, string> = {
   MMS: '#e67e22',
 };
 
-export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
-  const t = useTranslations('draft');
+export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
+  const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
 
   const sortedCards = useMemo(
@@ -109,7 +109,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
             </h3>
             <div className="flex gap-2 flex-wrap">
               {missions.map((card, i) => (
-                <PoolCard key={card.draftInstanceId} card={card} index={i} locale={locale} />
+                <PoolCard key={card.sealedInstanceId} card={card} index={i} locale={locale} />
               ))}
             </div>
           </div>
@@ -121,7 +121,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
         </h3>
         <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
           {characters.map((card, i) => (
-            <PoolCard key={card.draftInstanceId} card={card} index={i} locale={locale} />
+            <PoolCard key={card.sealedInstanceId} card={card} index={i} locale={locale} />
           ))}
         </div>
       </div>
@@ -130,7 +130,7 @@ export function DraftPoolReview({ cards, onContinue }: DraftPoolReviewProps) {
 }
 
 function PoolCard({ card, index, locale }: { card: BoosterCard; index: number; locale: 'en' | 'fr' }) {
-  const t = useTranslations('draft');
+  const t = useTranslations('sealed');
   const imgPath = normalizeImagePath(card.image_file);
   const rarityColor = RARITY_COLORS[card.rarity] ?? '#888';
   const isMission = card.card_type === 'mission';

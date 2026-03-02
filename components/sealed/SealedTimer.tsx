@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-interface DraftTimerProps {
+interface SealedTimerProps {
   totalSeconds: number; // 900 for 15 min
   onTimeUp: () => void;
   paused?: boolean;
@@ -54,8 +54,8 @@ function playAlertSound(level: 'info' | 'warning' | 'critical') {
   }
 }
 
-export function DraftTimer({ totalSeconds, onTimeUp, paused = false }: DraftTimerProps) {
-  const t = useTranslations('draft');
+export function SealedTimer({ totalSeconds, onTimeUp, paused = false }: SealedTimerProps) {
+  const t = useTranslations('sealed');
   const [remaining, setRemaining] = useState(totalSeconds);
   const alertedRef = useRef<Set<number>>(new Set());
   const onTimeUpRef = useRef(onTimeUp);

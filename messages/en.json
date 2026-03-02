@@ -38,7 +38,7 @@
     "adminCards": "Card Management",
     "admin": "Administration",
     "signOut": "Sign Out",
-    "draft": "Draft",
+    "sealed": "Sealed",
     "settings": "Settings"
   },
   "settings": {
@@ -694,12 +694,12 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Ranked",
-      "draft": "Draft"
+      "sealed": "Sealed"
     },
     "modeDesc": {
       "casual": "Unranked match — play for fun, no ELO changes",
       "ranked": "Ranked match — ELO rating will be updated",
-      "draft": "Draft mode — build a deck from random boosters"
+      "sealed": "Sealed mode — build a deck from random boosters"
     }
   },
   "leaderboard": {
@@ -1624,15 +1624,15 @@
       "notFound": "User not found"
     },
     "actionLog": "Action Log",
-    "draft": {
-      "title": "Draft Mode",
-      "description": "Enable or disable Draft mode for all users. When disabled, only testers and admins can access Draft.",
+    "sealed": {
+      "title": "Sealed Mode",
+      "description": "Enable or disable Sealed mode for all users. When disabled, only testers and admins can access Sealed mode.",
       "loading": "Loading...",
       "toggling": "Toggling...",
       "enabled": "ENABLED",
       "disabled": "DISABLED",
-      "enabledDesc": "All users can access Draft mode",
-      "disabledDesc": "Only testers and admins can access Draft"
+      "enabledDesc": "All users can access Sealed mode",
+      "disabledDesc": "Only testers and admins can access Sealed mode"
     }
   },
   "badges": {
@@ -1700,13 +1700,13 @@
       "Special Jonin": "Special Jonin"
     }
   },
-  "draft": {
-    "title": "Draft Mode",
+  "sealed": {
+    "title": "Sealed Mode",
     "description": "Open 6 boosters, build a deck from the cards you pull, then battle!",
-    "vsAI": "Draft vs AI",
+    "vsAI": "Sealed vs AI",
     "vsAIDesc": "Open boosters and build a deck to fight the AI",
-    "online": "Draft Online",
-    "onlineDesc": "Draft against another player online (unranked)",
+    "online": "Sealed Online",
+    "onlineDesc": "Sealed match against another player online (unranked)",
     "waitingBoosters": "Generating boosters...",
     "waitingOpponent": "Waiting for opponent...",
     "openBooster": "Tap to open",
@@ -1731,7 +1731,7 @@
     "detailBtn": "Detail",
     "chakra": "Chakra",
     "power": "Power",
-    "restricted": "Draft mode is currently in testing phase",
+    "restricted": "Sealed mode is currently in testing phase",
     "timeRemaining": "{minutes}:{seconds}",
     "timeWarning": "5 min left!",
     "timeCritical": "1 min left!",
@@ -1742,9 +1742,9 @@
       "missions": "{count}/{required} missions (need {required})",
       "maxCopies": "Too many copies of {version}: {count}/{max}"
     },
-    "saveDeck": "Save Draft Deck",
+    "saveDeck": "Save Sealed Deck",
     "saveDeckName": "Deck name",
-    "saveDeckPlaceholder": "My Draft Deck",
+    "saveDeckPlaceholder": "My Sealed Deck",
     "deckSaved": "Deck saved!",
     "deckSaveError": "Failed to save deck",
     "holo": "HOLO",

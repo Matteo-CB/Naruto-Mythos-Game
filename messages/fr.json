@@ -38,7 +38,7 @@
     "adminCards": "Gestion des Cartes",
     "admin": "Administration",
     "signOut": "Se deconnecter",
-    "draft": "Draft",
+    "sealed": "Scellé",
     "settings": "Parametres"
   },
   "settings": {
@@ -694,12 +694,12 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Classe",
-      "draft": "Draft"
+      "sealed": "Scellé"
     },
     "modeDesc": {
       "casual": "Match non classe — jouez pour le plaisir, pas de changement ELO",
       "ranked": "Match classe — votre classement ELO sera mis a jour",
-      "draft": "Mode draft — construisez un deck a partir de boosters aleatoires"
+      "sealed": "Mode scellé — construisez un deck a partir de boosters aleatoires"
     }
   },
   "leaderboard": {
@@ -1308,15 +1308,15 @@
       "notFound": "Utilisateur introuvable"
     },
     "actionLog": "Journal d'Actions",
-    "draft": {
-      "title": "Mode Draft",
-      "description": "Activer ou desactiver le mode Draft pour tous les utilisateurs. Quand desactive, seuls les testeurs et admins peuvent acceder au Draft.",
+    "sealed": {
+      "title": "Mode Scellé",
+      "description": "Activer ou desactiver le mode Scelle pour tous les utilisateurs. Quand desactive, seuls les testeurs et admins peuvent acceder au mode Scelle.",
       "loading": "Chargement...",
       "toggling": "Changement...",
       "enabled": "ACTIVE",
       "disabled": "DESACTIVE",
-      "enabledDesc": "Tous les utilisateurs peuvent acceder au Draft",
-      "disabledDesc": "Seuls les testeurs et admins peuvent acceder au Draft"
+      "enabledDesc": "Tous les utilisateurs peuvent acceder au mode Scelle",
+      "disabledDesc": "Seuls les testeurs et admins peuvent acceder au mode Scelle"
     }
   },
   "badges": {
@@ -1384,13 +1384,13 @@
       "Special Jonin": "Jônin Spécial"
     }
   },
-  "draft": {
-    "title": "Mode Draft",
+  "sealed": {
+    "title": "Mode Scellé",
     "description": "Ouvrez 6 boosters, construisez un deck avec les cartes obtenues, puis combattez !",
-    "vsAI": "Draft vs IA",
+    "vsAI": "Scelle vs IA",
     "vsAIDesc": "Ouvrez des boosters et construisez un deck pour affronter l'IA",
-    "online": "Draft en Ligne",
-    "onlineDesc": "Draft contre un autre joueur en ligne (non classe)",
+    "online": "Scelle en Ligne",
+    "onlineDesc": "Scelle contre un autre joueur en ligne (non classe)",
     "waitingBoosters": "Generation des boosters...",
     "waitingOpponent": "En attente de l'adversaire...",
     "openBooster": "Appuyez pour ouvrir",
@@ -1415,7 +1415,7 @@
     "detailBtn": "Détail",
     "chakra": "Chakra",
     "power": "Puissance",
-    "restricted": "Le mode Draft est en phase de test",
+    "restricted": "Le mode Scelle est en phase de test",
     "timeRemaining": "{minutes}:{seconds}",
     "timeWarning": "5 min restantes !",
     "timeCritical": "1 min restante !",
@@ -1426,9 +1426,9 @@
       "missions": "{count}/{required} missions (besoin de {required})",
       "maxCopies": "Trop de copies de {version} : {count}/{max}"
     },
-    "saveDeck": "Sauvegarder le Deck Draft",
+    "saveDeck": "Sauvegarder le Deck Scelle",
     "saveDeckName": "Nom du deck",
-    "saveDeckPlaceholder": "Mon Deck Draft",
+    "saveDeckPlaceholder": "Mon Deck Scelle",
     "deckSaved": "Deck sauvegarde !",
     "deckSaveError": "Erreur lors de la sauvegarde",
     "holo": "HOLO",

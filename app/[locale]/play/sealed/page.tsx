@@ -7,16 +7,16 @@ import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
-import { BoosterOpening } from '@/components/draft/BoosterOpening';
-import { DraftPoolReview } from '@/components/draft/DraftPoolReview';
-import { DraftDeckBuilder } from '@/components/draft/DraftDeckBuilder';
+import { BoosterOpening } from '@/components/sealed/BoosterOpening';
+import { SealedPoolReview } from '@/components/sealed/SealedPoolReview';
+import { SealedDeckBuilder } from '@/components/sealed/SealedDeckBuilder';
 import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
-import type { BoosterCard, BoosterPack, DraftPool } from '@/lib/draft/boosterGenerator';
+import type { BoosterCard, BoosterPack, SealedPool } from '@/lib/sealed/boosterGenerator';
 
-type DraftStep =
+type SealedStep =
   | 'loading'
   | 'denied'
   | 'mode-select'
@@ -28,18 +28,18 @@ type DraftStep =
   | 'building'
   | 'starting';
 
-export default function DraftPage() {
-  const t = useTranslations('draft');
+export default function SealedPage() {
+  const t = useTranslations('sealed');
   const tc = useTranslations('common');
   const tAI = useTranslations('playAI');
   const tOnline = useTranslations('online');
   const router = useRouter();
   const { data: session } = useSession();
   const startAIGame = useGameStore((s) => s.startAIGame);
-  const setDraftDeck = useGameStore((s) => s.setDraftDeck);
+  const setSealedDeck = useGameStore((s) => s.setSealedDeck);
   const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
-  // Socket store for online draft
+  // Socket store for online sealed
   const socketConnect = useSocketStore((s) => s.connect);
   const socketCreateRoom = useSocketStore((s) => s.createRoom);
   const socketJoinRoom = useSocketStore((s) => s.joinRoom);
@@ -55,15 +55,15 @@ export default function DraftPage() {
   const socketDisconnect = useSocketStore((s) => s.disconnect);
   const publicRooms = useSocketStore((s) => s.publicRooms);
   const requestRoomList = useSocketStore((s) => s.requestRoomList);
-  const draftBoosters = useSocketStore((s) => s.draftBoosters);
-  const draftAllCards = useSocketStore((s) => s.draftAllCards);
-  const draftDeadline = useSocketStore((s) => s.draftDeadline);
+  const sealedBoosters = useSocketStore((s) => s.sealedBoosters);
+  const sealedAllCards = useSocketStore((s) => s.sealedAllCards);
+  const sealedDeadline = useSocketStore((s) => s.sealedDeadline);
 
   const { status } = useSession();
-  const [step, setStep] = useState<DraftStep>('loading');
+  const [step, setStep] = useState<SealedStep>('loading');
   const [mode, setMode] = useState<'ai' | 'online' | null>(null);
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
-  const [draftPool, setDraftPool] = useState<DraftPool | null>(null);
+  const [sealedPool, setSealedPool] = useState<SealedPool | null>(null);
   const [allOpenedCards, setAllOpenedCards] = useState<BoosterCard[]>([]);
   const [joinCode, setJoinCode] = useState('');
   const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
@@ -82,15 +82,15 @@ export default function DraftPage() {
 
   // When online boosters arrive, transition to opening
   useEffect(() => {
-    if (mode === 'online' && draftBoosters && draftAllCards && step === 'online-waiting') {
-      const pool: DraftPool = {
-        boosters: draftBoosters as BoosterPack[],
-        allCards: draftAllCards as BoosterCard[],
+    if (mode === 'online' && sealedBoosters && sealedAllCards && step === 'online-waiting') {
+      const pool: SealedPool = {
+        boosters: sealedBoosters as BoosterPack[],
+        allCards: sealedAllCards as BoosterCard[],
       };
-      setDraftPool(pool);
+      setSealedPool(pool);
       setStep('opening');
     }
-  }, [mode, draftBoosters, draftAllCards, step]);
+  }, [mode, sealedBoosters, sealedAllCards, step]);
 
   // When online game starts: initialize gameStore with online state then navigate to /game
   const gameInitRef = useRef(false);
@@ -121,7 +121,7 @@ export default function DraftPage() {
     }
   }, []);
 
-  // Connect socket and fetch draft rooms when entering online-create
+  // Connect socket and fetch sealed rooms when entering online-create
   useEffect(() => {
     if (step === 'online-create' && session?.user?.id) {
       (async () => {
@@ -152,7 +152,7 @@ export default function DraftPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, false, false, true, 'draft', session.user.name ?? undefined);
+      socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
@@ -165,7 +165,7 @@ export default function DraftPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, true, false, true, 'draft', session.user.name ?? undefined);
+      socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
@@ -190,9 +190,9 @@ export default function DraftPage() {
     setDifficulty(diff);
 
     // Generate boosters
-    import('@/lib/draft/boosterGenerator').then((mod) => {
-      const pool = mod.generateDraftPool(6);
-      setDraftPool(pool);
+    import('@/lib/sealed/boosterGenerator').then((mod) => {
+      const pool = mod.generateSealedPool(6);
+      setSealedPool(pool);
       setStep('opening');
     });
   }, []);
@@ -212,11 +212,11 @@ export default function DraftPage() {
         setStep('starting');
 
         // Generate AI boosters and build AI deck
-        import('@/lib/draft/boosterGenerator').then((boosterMod) => {
-          import('@/lib/draft/aiDraftDeckBuilder').then((aiMod) => {
+        import('@/lib/sealed/boosterGenerator').then((boosterMod) => {
+          import('@/lib/sealed/aiSealedDeckBuilder').then((aiMod) => {
             import('@/lib/data/cardLoader').then((cardMod) => {
-              const aiPool = boosterMod.generateDraftPool(6);
-              const aiDeck = aiMod.buildAIDraftDeck(aiPool);
+              const aiPool = boosterMod.generateSealedPool(6);
+              const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
               // AI missions: try to avoid overlap with player
               const playerMissionIds = new Set(missions.map((m) => m.id));
@@ -246,7 +246,7 @@ export default function DraftPage() {
                 },
               };
 
-              setDraftDeck(
+              setSealedDeck(
                 characters.map((c) => c.id),
                 missions.map((m) => m.id),
               );
@@ -258,7 +258,7 @@ export default function DraftPage() {
         });
       } else if (mode === 'online') {
         // Submit deck via socket
-        setDraftDeck(
+        setSealedDeck(
           characters.map((c) => c.id),
           missions.map((m) => m.id),
         );
@@ -266,7 +266,7 @@ export default function DraftPage() {
         setStep('starting');
       }
     },
-    [mode, difficulty, startAIGame, setDraftDeck, session?.user?.name, router, socketSelectDeck],
+    [mode, difficulty, startAIGame, setSealedDeck, session?.user?.name, router, socketSelectDeck],
   );
 
   const handleTimeUp = useCallback(() => {
@@ -274,12 +274,12 @@ export default function DraftPage() {
   }, [router]);
 
   // Compute remaining seconds for online timer
-  const onlineTimerSeconds = draftDeadline
-    ? Math.max(0, Math.floor((draftDeadline - Date.now()) / 1000))
+  const onlineTimerSeconds = sealedDeadline
+    ? Math.max(0, Math.floor((sealedDeadline - Date.now()) / 1000))
     : 900;
 
-  // Filter public rooms to draft mode only
-  const draftPublicRooms = publicRooms.filter((r) => r.gameMode === 'draft');
+  // Filter public rooms to sealed mode only
+  const sealedPublicRooms = publicRooms.filter((r) => r.gameMode === 'sealed');
 
   const DIFFICULTIES = [
     { key: 'easy' as AIDifficulty, label: tAI('difficulties.easy'), description: tAI('difficulties.easyDesc') },
@@ -316,19 +316,19 @@ export default function DraftPage() {
   }
 
   // Booster opening
-  if (step === 'opening' && draftPool) {
-    return <BoosterOpening boosters={draftPool.boosters} onComplete={handleBoostersComplete} />;
+  if (step === 'opening' && sealedPool) {
+    return <BoosterOpening boosters={sealedPool.boosters} onComplete={handleBoostersComplete} />;
   }
 
   // Pool review
   if (step === 'review' && allOpenedCards.length > 0) {
-    return <DraftPoolReview cards={allOpenedCards} onContinue={handleContinueToBuilding} />;
+    return <SealedPoolReview cards={allOpenedCards} onContinue={handleContinueToBuilding} />;
   }
 
   // Deck building
   if (step === 'building' && allOpenedCards.length > 0) {
     return (
-      <DraftDeckBuilder
+      <SealedDeckBuilder
         pool={allOpenedCards}
         isOnline={mode === 'online'}
         timerSeconds={mode === 'online' ? onlineTimerSeconds : 900}
@@ -484,7 +484,7 @@ export default function DraftPage() {
                       className="w-full rounded-lg overflow-hidden"
                       style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
                     >
-                      {draftPublicRooms.length === 0 ? (
+                      {sealedPublicRooms.length === 0 ? (
                         <div className="p-8 text-center">
                           <p className="text-xs" style={{ color: '#555555' }}>
                             {tOnline('noRooms')}
@@ -492,7 +492,7 @@ export default function DraftPage() {
                         </div>
                       ) : (
                         <div className="max-h-64 overflow-y-auto">
-                          {draftPublicRooms.map((room) => (
+                          {sealedPublicRooms.map((room) => (
                             <div
                               key={room.code}
                               className="flex items-center justify-between px-4 py-3"

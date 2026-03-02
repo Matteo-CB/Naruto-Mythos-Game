@@ -20,7 +20,7 @@ interface RoomData {
   guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   isPrivate: boolean;
   isRanked: boolean;
-  gameMode: 'casual' | 'ranked' | 'draft';
+  gameMode: 'casual' | 'ranked' | 'sealed';
   createdAt: number;
   hostName?: string;
   guestName?: string;
@@ -30,10 +30,10 @@ interface RoomData {
   disconnectTimer: ReturnType<typeof setTimeout> | null;
   // Replay
   replayInitialState: GameState | null;
-  // Draft mode
-  isDraft: boolean;
-  draftTimer: ReturnType<typeof setTimeout> | null;
-  draftDeadline: number | null;
+  // Sealed mode
+  isSealed: boolean;
+  sealedTimer: ReturnType<typeof setTimeout> | null;
+  sealedDeadline: number | null;
   // Rematch
   rematchOffer?: 'player1' | 'player2';
 }
@@ -41,7 +41,7 @@ interface RoomData {
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
 const DISCONNECT_GRACE_MS = 30_000; // 30 seconds before disconnect = forfeit
-const DRAFT_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for draft deck building
+const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
 const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
@@ -70,7 +70,7 @@ function cleanupPlayerRoom(socket: Socket): void {
   }
   // If this socket is the host of a room with no game running, remove it
   if (existingRoom.hostSocket === socket.id && !existingRoom.gameState) {
-    if (existingRoom.draftTimer) clearTimeout(existingRoom.draftTimer);
+    if (existingRoom.sealedTimer) clearTimeout(existingRoom.sealedTimer);
     rooms.delete(existingCode);
     socket.leave(existingCode);
   }
@@ -473,7 +473,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isDraft?: boolean; gameMode?: 'casual' | 'ranked' | 'draft'; hostName?: string }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
@@ -484,7 +484,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         code = generateRoomCode();
       } while (rooms.has(code));
 
-      const gameMode = data.gameMode ?? (data.isDraft ? 'draft' : data.isRanked ? 'ranked' : 'casual');
+      const gameMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
 
       const room: RoomData = {
         code,
@@ -504,9 +504,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         timerDeadline: null,
         disconnectTimer: null,
         replayInitialState: null,
-        isDraft: gameMode === 'draft',
-        draftTimer: null,
-        draftDeadline: null,
+        isSealed: gameMode === 'sealed',
+        sealedTimer: null,
+        sealedDeadline: null,
       };
 
       rooms.set(code, room);
@@ -514,7 +514,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       socket.join(code);
 
       console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode})`);
-      socket.emit('room:created', { code, isDraft: room.isDraft });
+      socket.emit('room:created', { code, isSealed: room.isSealed });
 
       // Broadcast updated room list to all connected sockets
       if (!room.isPrivate) {
@@ -561,7 +561,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       io.to(data.code).emit('room:player-joined', {
         hostId: room.hostId,
         guestId: room.guestId,
-        isDraft: room.isDraft,
+        isSealed: room.isSealed,
       });
 
       // Room is now full — broadcast updated list (room removed from available)
@@ -569,50 +569,50 @@ export function setupSocketHandlers(io: SocketIOServer) {
         broadcastRoomList(io);
       }
 
-      // If this is a draft room and both players are here, generate boosters
-      if (room.isDraft && room.guestId) {
+      // If this is a sealed room and both players are here, generate boosters
+      if (room.isSealed && room.guestId) {
         try {
-          const { generateDraftPool } = await import('@/lib/draft/boosterGenerator');
-          const hostPool = generateDraftPool(6);
-          const guestPool = generateDraftPool(6);
+          const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
+          const hostPool = generateSealedPool(6);
+          const guestPool = generateSealedPool(6);
 
           // Send boosters to each player
           if (room.hostSocket) {
-            io.to(room.hostSocket).emit('draft:boosters', {
+            io.to(room.hostSocket).emit('sealed:boosters', {
               boosters: hostPool.boosters,
               allCards: hostPool.allCards,
             });
           }
-          io.to(socket.id).emit('draft:boosters', {
+          io.to(socket.id).emit('sealed:boosters', {
             boosters: guestPool.boosters,
             allCards: guestPool.allCards,
           });
 
-          console.log(`[Socket] Draft boosters generated for room ${data.code}`);
+          console.log(`[Socket] Sealed boosters generated for room ${data.code}`);
 
-          // Start draft timer (15 minutes)
-          const deadline = Date.now() + DRAFT_TIMEOUT_MS;
-          room.draftDeadline = deadline;
-          io.to(data.code).emit('draft:timer-start', { deadline, durationMs: DRAFT_TIMEOUT_MS });
+          // Start sealed timer (15 minutes)
+          const deadline = Date.now() + SEALED_TIMEOUT_MS;
+          room.sealedDeadline = deadline;
+          io.to(data.code).emit('sealed:timer-start', { deadline, durationMs: SEALED_TIMEOUT_MS });
 
-          room.draftTimer = setTimeout(() => {
+          room.sealedTimer = setTimeout(() => {
             // Time's up - check if both decks submitted
             if (!room.hostDeck || !room.guestDeck) {
-              console.log(`[Socket] Draft time expired for room ${data.code}`);
-              io.to(data.code).emit('draft:time-expired');
+              console.log(`[Socket] Sealed time expired for room ${data.code}`);
+              io.to(data.code).emit('sealed:time-expired');
               // Clean up room
-              if (room.draftTimer) clearTimeout(room.draftTimer);
-              room.draftTimer = null;
+              if (room.sealedTimer) clearTimeout(room.sealedTimer);
+              room.sealedTimer = null;
             }
-          }, DRAFT_TIMEOUT_MS);
+          }, SEALED_TIMEOUT_MS);
         } catch (err) {
-          console.error(`[Socket] Draft booster generation error:`, err);
-          io.to(data.code).emit('room:error', { message: 'Failed to generate draft boosters' });
+          console.error(`[Socket] Sealed booster generation error:`, err);
+          io.to(data.code).emit('room:error', { message: 'Failed to generate sealed boosters' });
         }
       }
     });
 
-    // Submit deck selection (works for both normal and draft)
+    // Submit deck selection (works for both normal and sealed)
     socket.on('room:select-deck', async (data: {
       characters: CharacterCard[];
       missions: MissionCard[];
@@ -628,22 +628,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.guestDeck = data;
       }
 
-      // Clear draft timer when a deck is submitted in draft mode
-      if (room.isDraft) {
+      // Clear sealed timer when a deck is submitted in sealed mode
+      if (room.isSealed) {
         // Notify the other player that this player is ready
         const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
-          io.to(otherSocket).emit('draft:opponent-ready');
+          io.to(otherSocket).emit('sealed:opponent-ready');
         }
       }
 
       // Check if both players have selected decks
       if (room.hostDeck && room.guestDeck) {
-        // Clear draft timer since both decks are in
-        if (room.draftTimer) {
-          clearTimeout(room.draftTimer);
-          room.draftTimer = null;
-          room.draftDeadline = null;
+        // Clear sealed timer since both decks are in
+        if (room.sealedTimer) {
+          clearTimeout(room.sealedTimer);
+          room.sealedTimer = null;
+          room.sealedDeadline = null;
         }
         console.log(`[Socket] Both decks submitted in room ${code}, creating game...`);
         console.log(`[Socket] Host deck: ${room.hostDeck.characters.length} characters, ${room.hostDeck.missions.length} missions`);
@@ -1054,9 +1054,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           timerDeadline: null,
           disconnectTimer: null,
           replayInitialState: null,
-          isDraft: false,
-          draftTimer: null,
-          draftDeadline: null,
+          isSealed: false,
+          sealedTimer: null,
+          sealedDeadline: null,
         };
 
         rooms.set(code, room);

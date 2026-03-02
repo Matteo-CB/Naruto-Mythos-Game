@@ -1,11 +1,11 @@
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import type { BoosterCard, DraftPool } from './boosterGenerator';
-import { separateDraftPool } from './boosterGenerator';
+import type { BoosterCard, SealedPool } from './boosterGenerator';
+import { separateSealedPool } from './boosterGenerator';
 import { validateDeck } from '@/lib/engine/rules/DeckValidation';
 import { MIN_DECK_SIZE, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 
 /**
- * AI builds a strategic deck from its draft pool.
+ * AI builds a strategic deck from its sealed pool.
  * Scores each card and picks the best 30+ characters and 3 missions.
  */
 
@@ -95,11 +95,11 @@ function scoreCharacter(card: BoosterCard, groupCounts: Map<string, number>): nu
   return score;
 }
 
-export function buildAIDraftDeck(pool: DraftPool): {
+export function buildAISealedDeck(pool: SealedPool): {
   characters: CharacterCard[];
   missions: MissionCard[];
 } {
-  const { characters, missions } = separateDraftPool(pool);
+  const { characters, missions } = separateSealedPool(pool);
 
   // Pick best 3 missions
   const scoredMissions = missions
@@ -152,7 +152,7 @@ export function buildAIDraftDeck(pool: DraftPool): {
   if (selectedChars.length < MIN_DECK_SIZE) {
     for (const sc of scoredChars) {
       if (selectedChars.length >= MIN_DECK_SIZE) break;
-      const alreadyIn = selectedChars.some(c => (c as unknown as BoosterCard).draftInstanceId === sc.card.draftInstanceId);
+      const alreadyIn = selectedChars.some(c => (c as unknown as BoosterCard).sealedInstanceId === sc.card.sealedInstanceId);
       if (alreadyIn) continue;
 
       const baseVersion = sc.card.id.replace(/\s*A$/, '').trim();

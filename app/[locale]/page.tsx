@@ -289,7 +289,7 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ))}
-              {/* Draft button */}
+              {/* Sealed button */}
               {(
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -297,7 +297,7 @@ export default function Home() {
                   transition={{ duration: 0.3, delay: 1.3, ease: 'easeOut' }}
                 >
                   <Link
-                    href="/play/draft"
+                    href="/play/sealed"
                     className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                     style={{
                       backgroundColor: '#141414',
@@ -323,7 +323,7 @@ export default function Home() {
                       className="absolute left-0 top-0 h-full w-1"
                       style={{ backgroundColor: '#c4a35a' }}
                     />
-                    {t('draft')}
+                    {t('sealed')}
                   </Link>
                 </motion.div>
               )}
