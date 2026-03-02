@@ -5181,9 +5181,9 @@
       "data_complete": true,
       "old_id": "Legendary"
     },
-    "KS-149-M": {
-      "id": "KS-149-M",
-      "rarity": "M",
+    "KS-149-MV": {
+      "id": "KS-149-MV",
+      "rarity": "MV",
       "number": "149",
       "set": "KS",
       "card_type": "character",
@@ -5207,15 +5207,15 @@
         }
       ],
       "image_url": "",
-      "rarity_display": "Mythos",
+      "rarity_display": "Mythos V",
       "image_file": "",
       "data_complete": true,
       "old_id": "149/130",
       "is_rare_art": false
     },
-    "KS-150-M": {
-      "id": "KS-150-M",
-      "rarity": "M",
+    "KS-150-MV": {
+      "id": "KS-150-MV",
+      "rarity": "MV",
       "number": "150",
       "set": "KS",
       "card_type": "character",
@@ -5239,15 +5239,15 @@
         }
       ],
       "image_url": "",
-      "rarity_display": "Mythos",
-      "image_file": "images/cards/KS/mythos/KS-150-M.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-150-MV.webp",
       "data_complete": true,
       "old_id": "150/130",
       "is_rare_art": false
     },
-    "KS-151-M": {
-      "id": "KS-151-M",
-      "rarity": "M",
+    "KS-151-MV": {
+      "id": "KS-151-MV",
+      "rarity": "MV",
       "number": "151",
       "set": "KS",
       "card_type": "character",
@@ -5271,15 +5271,15 @@
         }
       ],
       "image_url": "",
-      "rarity_display": "Mythos",
-      "image_file": "images/cards/KS/mythos/KS-151-M.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-151-MV.webp",
       "data_complete": true,
       "old_id": "151/130",
       "is_rare_art": false
     },
-    "KS-152-M": {
-      "id": "KS-152-M",
-      "rarity": "M",
+    "KS-152-MV": {
+      "id": "KS-152-MV",
+      "rarity": "MV",
       "number": "152",
       "set": "KS",
       "card_type": "character",
@@ -5303,15 +5303,15 @@
         }
       ],
       "image_url": "",
-      "rarity_display": "Mythos",
+      "rarity_display": "Mythos V",
       "image_file": "",
       "data_complete": true,
       "old_id": "152/130",
       "is_rare_art": false
     },
-    "KS-153-M": {
-      "id": "KS-153-M",
-      "rarity": "M",
+    "KS-153-MV": {
+      "id": "KS-153-MV",
+      "rarity": "MV",
       "number": "153",
       "set": "KS",
       "card_type": "character",
@@ -5335,7 +5335,7 @@
         }
       ],
       "image_url": "",
-      "rarity_display": "Mythos",
+      "rarity_display": "Mythos V",
       "image_file": "",
       "data_complete": true,
       "old_id": "153/130",
@@ -6484,6 +6484,72 @@
       "image_file": "images/cards/KS/secret_v/KS-137-SV.webp",
       "data_complete": true,
       "old_id": "137/130"
+    },
+    "KS-135-MV": {
+      "id": "KS-135-MV",
+      "rarity": "MV",
+      "number": "135",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SAKURA HARUNO",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Sasuke est en train de me regarder !",
+      "title_en": "He's looking... right at me!",
+      "has_visual": false,
+      "chakra": 5,
+      "power": 4,
+      "keywords": ["Team 7"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, play the card paying 4 less.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos V",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": ""
+    },
+    "KS-136-MV": {
+      "id": "KS-136-MV",
+      "rarity": "MV",
+      "number": "136",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "SASUKE UCHIHA",
+      "name_fr": "SASUKE UCHIWA",
+      "title_fr": "Tu m'énerves",
+      "title_en": "You're annoying.",
+      "has_visual": false,
+      "chakra": 7,
+      "power": 8,
+      "keywords": ["Team 7", "Jutsu"],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a character is defeated, gain 1 Chakra.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "",
+      "rarity_display": "Mythos V",
+      "image_file": "",
+      "data_complete": true,
+      "old_id": ""
     }
   }
 }

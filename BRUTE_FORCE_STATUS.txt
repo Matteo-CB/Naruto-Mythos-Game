@@ -43,10 +43,13 @@ STILL MISSING (20 cards):
   KS-129-RA  - NINE-TAILS "Demon Fox Cloak" (Rare Art)
   KS-130-R   - ONE-TAIL "I hope you're ready to die!"
   KS-134-S   - NINE-TAILED FOX "The Beast Awakens"
-  KS-149-M   - KIBA INUZUKA "Fang Over Fang"
-  KS-151-M   - ROCK LEE "Loopy Fist"
-  KS-152-M   - ITACHI UCHIHA "Amaterasu"
-  KS-153-M   - GAARA "Sand Burial"
+  KS-135-MV  - SAKURA HARUNO "He's looking... right at me!" (Mythos V)
+  KS-136-MV  - SASUKE UCHIHA "You're annoying." (Mythos V)
+  KS-149-MV  - KIBA INUZUKA "Fang Over Fang" (Mythos V)
+  KS-150-MV  - SHIKAMARU NARA "Shadow Strangle Jutsu" (Mythos V)
+  KS-151-MV  - ROCK LEE "Loopy Fist" (Mythos V)
+  KS-152-MV  - ITACHI UCHIHA "Amaterasu" (Mythos V)
+  KS-153-MV  - GAARA "Sand Burial" (Mythos V)
 
 WHAT WAS ALREADY TRIED (scripts brute-force-images.js through brute5.js):
   - ~5000+ URL combinations per card

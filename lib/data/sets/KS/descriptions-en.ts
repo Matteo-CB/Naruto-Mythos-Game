@@ -803,6 +803,18 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
   ],
 
+  // 135/130 - SAKURA HARUNO (MV) - "He's looking... right at me!"
+  'KS-135-MV': [
+    'Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.',
+    'effect: Instead, play the card paying 4 less.',
+  ],
+
+  // 136/130 - SASUKE UCHIHA (MV) - "You're annoying."
+  'KS-136-MV': [
+    '[⧗] When a character is defeated, gain 1 Chakra.',
+    'You must choose a friendly non-hidden character and any enemy character in this mission and defeat them, if able.',
+  ],
+
   // 137/130 - KAKASHI HATAKE (S) - "Lightning Blade"
   'KS-137-S': [
     'Move this character to another mission.',
@@ -873,32 +885,32 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Copy a non-upgrade instant effect of another friendly Team 7 character in play.',
   ],
 
-  // 149/130 - KIBA INUZUKA (M) - "Fang Over Fang"
-  'KS-149-M': [
+  // 149/130 - KIBA INUZUKA (MV) - "Fang Over Fang"
+  'KS-149-MV': [
     'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
     'MAIN effect: Instead, defeat both of them.',
   ],
 
-  // 150/130 - SHIKAMARU NARA (M) - "Shadow Strangle Jutsu"
-  'KS-150-M': [
+  // 150/130 - SHIKAMARU NARA (MV) - "Shadow Strangle Jutsu"
+  'KS-150-MV': [
     '[⧗] The opponent cannot play characters while hidden in this mission.',
     'Hide an enemy character with Power 3 or less in this mission.',
   ],
 
-  // 151/130 - ROCK LEE (M) - "Loopy Fist"
-  'KS-151-M': [
+  // 151/130 - ROCK LEE (MV) - "Loopy Fist"
+  'KS-151-MV': [
     '[⧗] At the end of the round, you must move this character to another mission, if able.',
     'Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.',
   ],
 
-  // 152/130 - ITACHI UCHIHA (M) - "Amaterasu"
-  'KS-152-M': [
+  // 152/130 - ITACHI UCHIHA (MV) - "Amaterasu"
+  'KS-152-MV': [
     'Move a friendly character in play.',
     '[⧗] Every enemy character in this mission has -1 Power.',
   ],
 
-  // 153/130 - GAARA (M) - "Sand Burial"
-  'KS-153-M': [
+  // 153/130 - GAARA (MV) - "Sand Burial"
+  'KS-153-MV': [
     'Defeat an enemy character with a cost less than the number of friendly hidden characters in play.',
     'MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.',
   ],

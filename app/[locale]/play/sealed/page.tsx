@@ -67,6 +67,7 @@ export default function SealedPage() {
   const [allOpenedCards, setAllOpenedCards] = useState<BoosterCard[]>([]);
   const [joinCode, setJoinCode] = useState('');
   const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
+  const [isPrivateRoom, setIsPrivateRoom] = useState(false);
 
   // Auth check — redirect to login if not authenticated
   useEffect(() => {
@@ -153,6 +154,7 @@ export default function SealedPage() {
         await socketConnect(session.user.id);
       }
       socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined);
+      setIsPrivateRoom(false);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
@@ -166,6 +168,7 @@ export default function SealedPage() {
         await socketConnect(session.user.id);
       }
       socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined);
+      setIsPrivateRoom(true);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
@@ -589,7 +592,7 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col items-center gap-4 w-full"
               >
-                {socketRoomCode && (
+                {socketRoomCode && isPrivateRoom && (
                   <div className="flex flex-col items-center gap-2">
                     <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
                       {tOnline('roomCode')}
