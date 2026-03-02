@@ -295,15 +295,16 @@ function handleRevealCharacter(
     return checkFlexibleUpgrade(charTopCard, cTop);
   });
 
-  // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE
+  // Calculate cost: subtract 1 chakra already paid to play face-down
   const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
-  let costToPay = fullCost;
+  let costToPay = Math.max(0, fullCost - 1);
 
   if (upgradeTarget) {
     const existingTopCard = upgradeTarget.stack.length > 0
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
-    costToPay = Math.max(0, charTopCard.chakra - existingTopCard.chakra);
+    // Upgrade diff, also subtract 1 already paid for hidden placement
+    costToPay = Math.max(0, charTopCard.chakra - existingTopCard.chakra - 1);
   }
 
   // Pay cost

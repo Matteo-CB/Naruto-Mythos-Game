@@ -139,15 +139,13 @@ export function ActionBar() {
         });
         if (upgradeOver) {
           const existingTop = upgradeOver.topCard ?? upgradeOver.card;
-          // Apply cost discounts first (e.g. Gaara 075 -2 when revealed hidden),
-          // then subtract existing card's cost. Never below 0.
+          // Apply cost discounts first, then subtract existing card's cost and 1 already paid for hidden. Never below 0.
           const discountedFull = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
-          revealCost = Math.max(0, discountedFull - (existingTop?.chakra ?? 0));
+          revealCost = Math.max(0, discountedFull - (existingTop?.chakra ?? 0) - 1);
           isRevealUpgrade = true;
         } else {
-          // Use calculateEffectiveCost to apply reveal cost reductions
-          // (Itachi 090: -3 with Sasuke, Gaara 075: -2 when hidden)
-          revealCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
+          // Subtract 1 chakra already paid to play face-down
+          revealCost = Math.max(0, calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true) - 1);
         }
         break;
       }
