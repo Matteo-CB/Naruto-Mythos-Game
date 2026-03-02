@@ -12,10 +12,10 @@ export async function GET() {
 
     return NextResponse.json({
       leaguesEnabled: settings?.leaguesEnabled ?? false,
-      draftEnabled: settings?.draftEnabled ?? false,
+      sealedEnabled: settings?.sealedEnabled ?? false,
     });
   } catch {
-    return NextResponse.json({ leaguesEnabled: false, draftEnabled: false });
+    return NextResponse.json({ leaguesEnabled: false, sealedEnabled: false });
   }
 }
 
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       leaguesEnabled: settings.leaguesEnabled,
-      draftEnabled: settings.draftEnabled,
+      sealedEnabled: settings.sealedEnabled,
     });
   } catch {
     return NextResponse.json(

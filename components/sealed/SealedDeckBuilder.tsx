@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
-import type { BoosterCard } from '@/lib/draft/boosterGenerator';
+import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MIN_DECK_SIZE, MAX_COPIES_PER_VERSION, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
@@ -11,9 +11,9 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
-import { DraftTimer } from './DraftTimer';
+import { SealedTimer } from './SealedTimer';
 
-interface DraftDeckBuilderProps {
+interface SealedDeckBuilderProps {
   pool: BoosterCard[];
   isOnline: boolean;
   timerSeconds?: number;
@@ -28,14 +28,14 @@ function getVersionKey(card: BoosterCard): string {
   return card.id.replace(/\s*A$/, '').trim();
 }
 
-export function DraftDeckBuilder({
+export function SealedDeckBuilder({
   pool,
   isOnline,
   timerSeconds = 900,
   onDeckReady,
   onTimeUp,
-}: DraftDeckBuilderProps) {
-  const t = useTranslations('draft');
+}: SealedDeckBuilderProps) {
+  const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
 
   // Deck state — arrays, like the site's deck builder
@@ -309,7 +309,7 @@ export function DraftDeckBuilder({
         </div>
         <div className="flex items-center gap-4">
           {isOnline && (
-            <DraftTimer
+            <SealedTimer
               totalSeconds={timerSeconds}
               onTimeUp={handleTimeUp}
             />

@@ -47,17 +47,17 @@ interface SocketStore {
   // Rematch state
   rematchState: 'none' | 'offered' | 'received' | 'accepted' | 'declined';
 
-  // Draft state
-  isDraftRoom: boolean;
-  draftBoosters: unknown[] | null;
-  draftAllCards: unknown[] | null;
-  draftDeckSubmitted: boolean;
-  draftOpponentReady: boolean;
-  draftDeadline: number | null;
+  // Sealed state
+  isSealedRoom: boolean;
+  sealedBoosters: unknown[] | null;
+  sealedAllCards: unknown[] | null;
+  sealedDeckSubmitted: boolean;
+  sealedOpponentReady: boolean;
+  sealedDeadline: number | null;
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isDraft?: boolean, gameMode?: 'casual' | 'ranked' | 'draft', hostName?: string) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[]) => void;
   performAction: (action: GameAction) => void;
@@ -88,14 +88,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   playerNames: null,
   gameResult: null,
   actionDeadline: null,
-  isDraftRoom: false,
+  isSealedRoom: false,
   publicRooms: [],
   rematchState: 'none',
-  draftBoosters: null,
-  draftAllCards: null,
-  draftDeckSubmitted: false,
-  draftOpponentReady: false,
-  draftDeadline: null,
+  sealedBoosters: null,
+  sealedAllCards: null,
+  sealedDeckSubmitted: false,
+  sealedOpponentReady: false,
+  sealedDeadline: null,
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -205,31 +205,31 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('room:deck-accepted', () => {
         console.log('[Socket] Deck accepted, waiting for opponent');
-        if (get().isDraftRoom) {
-          set({ draftDeckSubmitted: true });
+        if (get().isSealedRoom) {
+          set({ sealedDeckSubmitted: true });
         }
       });
 
-      // --- Draft events ---
+      // ---/* Sealed events ---
 
-      socket.on('draft:boosters', (data: { boosters: unknown[]; allCards: unknown[] }) => {
-        console.log('[Socket] Draft boosters received:', data.boosters?.length, 'boosters');
-        set({ draftBoosters: data.boosters, draftAllCards: data.allCards });
+      socket.on('sealed:boosters', (data: { boosters: unknown[]; allCards: unknown[] }) => {
+        console.log('[Socket] Sealed boosters received:', data.boosters?.length, 'boosters');
+        set({ sealedBoosters: data.boosters, sealedAllCards: data.allCards });
       });
 
-      socket.on('draft:timer-start', (data: { deadline: number; durationMs: number }) => {
-        console.log('[Socket] Draft timer started, deadline:', data.deadline);
-        set({ draftDeadline: data.deadline });
+      socket.on('sealed:timer-start', (data: { deadline: number; durationMs: number }) => {
+        console.log('[Socket] Sealed timer started, deadline:', data.deadline);
+        set({ sealedDeadline: data.deadline });
       });
 
-      socket.on('draft:opponent-ready', () => {
-        console.log('[Socket] Draft opponent ready');
-        set({ draftOpponentReady: true });
+      socket.on('sealed:opponent-ready', () => {
+        console.log('[Socket] Sealed opponent ready');
+        set({ sealedOpponentReady: true });
       });
 
-      socket.on('draft:time-expired', () => {
-        console.log('[Socket] Draft time expired');
-        set({ draftDeadline: 0 });
+      socket.on('sealed:time-expired', () => {
+        console.log('[Socket] Sealed time expired');
+        set({ sealedDeadline: 0 });
       });
 
       // --- Game events ---
@@ -397,22 +397,22 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         actionDeadline: null,
         publicRooms: [],
         rematchState: 'none',
-        isDraftRoom: false,
-        draftBoosters: null,
-        draftAllCards: null,
-        draftDeckSubmitted: false,
-        draftOpponentReady: false,
-        draftDeadline: null,
+        isSealedRoom: false,
+        sealedBoosters: null,
+        sealedAllCards: null,
+        sealedDeckSubmitted: false,
+        sealedOpponentReady: false,
+        sealedDeadline: null,
       });
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isDraft = false, gameMode?: 'casual' | 'ranked' | 'draft', hostName?: string) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isDraft ? ' (draft)' : ''} mode: ${gameMode ?? 'auto'}`);
-      set({ isDraftRoom: isDraft, rematchState: 'none' });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isDraft, gameMode, hostName });
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}`);
+      set({ isSealedRoom: isSealed, rematchState: 'none' });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });

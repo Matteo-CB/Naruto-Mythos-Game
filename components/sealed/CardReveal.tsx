@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
-import type { BoosterCard } from '@/lib/draft/boosterGenerator';
+import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getRarityLabel } from '@/lib/utils/cardLocale';
 
@@ -44,7 +44,7 @@ function isHighRarity(rarity: string): boolean {
 
 export function CardReveal({ card, index, onRevealed, autoReveal = false, delay = 0 }: CardRevealProps) {
   const locale = useLocale() as 'en' | 'fr';
-  const t = useTranslations('draft');
+  const t = useTranslations('sealed');
   const [isFlipped, setIsFlipped] = useState(false);
   const hasFlippedRef = useRef(false);
   const hasCalledRevealedRef = useRef(false);

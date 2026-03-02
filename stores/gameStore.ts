@@ -62,9 +62,9 @@ interface GameStore {
   // Target selection
   pendingTargetSelection: PendingTargetSelection | null;
 
-  // Draft deck data (for saving after game)
-  draftDeckCardIds: string[] | null;
-  draftDeckMissionIds: string[] | null;
+  // Sealed deck data (for saving after game)
+  sealedDeckCardIds: string[] | null;
+  sealedDeckMissionIds: string[] | null;
 
   // AI replay config
   lastAIGameConfig: { config: GameConfig; difficulty: AIDifficulty; playerName?: string } | null;
@@ -89,7 +89,7 @@ interface GameStore {
   selectTarget: (targetId: string) => void;
   declineTarget: () => void;
   clearActionError: () => void;
-  setDraftDeck: (cardIds: string[], missionIds: string[]) => void;
+  setSealedDeck: (cardIds: string[], missionIds: string[]) => void;
   resetGame: () => void;
   endAIGameAsForfeit: () => void;
 }
@@ -322,8 +322,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actionError: null,
   actionErrorKey: null,
   actionErrorParams: null,
-  draftDeckCardIds: null,
-  draftDeckMissionIds: null,
+  sealedDeckCardIds: null,
+  sealedDeckMissionIds: null,
   lastAIGameConfig: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
@@ -1669,8 +1669,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ actionError: null });
   },
 
-  setDraftDeck: (cardIds: string[], missionIds: string[]) => {
-    set({ draftDeckCardIds: cardIds, draftDeckMissionIds: missionIds });
+  setSealedDeck: (cardIds: string[], missionIds: string[]) => {
+    set({ sealedDeckCardIds: cardIds, sealedDeckMissionIds: missionIds });
   },
 
   resetGame: () => {
@@ -1693,8 +1693,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isAnimating: false,
       pendingTargetSelection: null,
       actionError: null,
-      draftDeckCardIds: null,
-      draftDeckMissionIds: null,
+      sealedDeckCardIds: null,
+      sealedDeckMissionIds: null,
     });
   },
 

@@ -3,7 +3,7 @@ import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
 
 export interface BoosterCard extends CardData {
   isHolo?: boolean;
-  draftInstanceId: string; // unique per-draft instance to allow duplicates
+  sealedInstanceId: string; // unique per-sealed instance to allow duplicates
 }
 
 export interface BoosterPack {
@@ -11,7 +11,7 @@ export interface BoosterPack {
   boosterIndex: number;
 }
 
-export interface DraftPool {
+export interface SealedPool {
   boosters: BoosterPack[];
   allCards: BoosterCard[];
 }
@@ -32,11 +32,11 @@ function pickRandomN<T>(arr: T[], n: number): T[] {
 let _instanceCounter = 0;
 function nextInstanceId(): string {
   _instanceCounter++;
-  return `draft-${Date.now()}-${_instanceCounter}`;
+  return `sealed-${Date.now()}-${_instanceCounter}`;
 }
 
 function toBoosterCard(card: CardData, isHolo = false): BoosterCard {
-  return { ...card, isHolo, draftInstanceId: nextInstanceId() };
+  return { ...card, isHolo, sealedInstanceId: nextInstanceId() };
 }
 
 export function generateBooster(boosterIndex: number): BoosterPack {
@@ -74,7 +74,7 @@ export function generateBooster(boosterIndex: number): BoosterPack {
   }
 
   // Special pull: replace the holo slot card with a special rarity
-  // Secret: 10% chance, Legendary: 0.125% chance (Mythos excluded from draft)
+  // Secret: 10% chance, Legendary: 0.125% chance (Mythos excluded from sealed)
   const specialRoll = Math.random();
   if (specialRoll < 0.00125 && legendaries.length > 0) {
     // Legendary — replace last card
@@ -90,8 +90,8 @@ export function generateBooster(boosterIndex: number): BoosterPack {
   return { cards, boosterIndex };
 }
 
-export function generateDraftPool(boosterCount: number = 6): DraftPool {
-  _instanceCounter = 0; // Reset counter for each draft
+export function generateSealedPool(boosterCount: number = 6): SealedPool {
+  _instanceCounter = 0; // Reset counter for each sealed
   const boosters: BoosterPack[] = [];
   const allCards: BoosterCard[] = [];
 
@@ -105,9 +105,9 @@ export function generateDraftPool(boosterCount: number = 6): DraftPool {
 }
 
 /**
- * Separate drafted cards into characters and missions for deck building.
+ * Separate sealed cards into characters and missions for deck building.
  */
-export function separateDraftPool(pool: DraftPool): {
+export function separateSealedPool(pool: SealedPool): {
   characters: BoosterCard[];
   missions: BoosterCard[];
 } {

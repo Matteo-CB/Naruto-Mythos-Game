@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import type { BoosterPack, BoosterCard } from '@/lib/draft/boosterGenerator';
+import type { BoosterPack, BoosterCard } from '@/lib/sealed/boosterGenerator';
 import { CardReveal } from './CardReveal';
 
 interface BoosterOpeningProps {
@@ -14,7 +14,7 @@ interface BoosterOpeningProps {
 type Stage = 'ready' | 'shaking' | 'opening' | 'revealing' | 'collected';
 
 export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
-  const t = useTranslations('draft');
+  const t = useTranslations('sealed');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stage, setStage] = useState<Stage>('ready');
   const [collectedCards, setCollectedCards] = useState<BoosterCard[]>([]);
@@ -184,7 +184,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           >
             {sortedCards.map((card, i) => (
               <CardReveal
-                key={`${currentIndex}-${card.draftInstanceId}`}
+                key={`${currentIndex}-${card.sealedInstanceId}`}
                 card={card}
                 index={i}
                 onRevealed={handleCardRevealed}
@@ -206,7 +206,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           >
             {sortedCards.map((card) => (
               <div
-                key={card.draftInstanceId}
+                key={card.sealedInstanceId}
                 style={{ width: '120px', height: '168px', backgroundColor: '#1a1a1a', borderRadius: '8px' }}
               />
             ))}
