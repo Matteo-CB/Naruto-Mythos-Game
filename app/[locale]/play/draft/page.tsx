@@ -52,6 +52,9 @@ export default function DraftPage() {
   const socketPlayerRole = useSocketStore((s) => s.playerRole);
   const socketPlayerNames = useSocketStore((s) => s.playerNames);
   const socketError = useSocketStore((s) => s.error);
+  const socketDisconnect = useSocketStore((s) => s.disconnect);
+  const publicRooms = useSocketStore((s) => s.publicRooms);
+  const requestRoomList = useSocketStore((s) => s.requestRoomList);
   const draftBoosters = useSocketStore((s) => s.draftBoosters);
   const draftAllCards = useSocketStore((s) => s.draftAllCards);
   const draftDeadline = useSocketStore((s) => s.draftDeadline);
@@ -63,6 +66,7 @@ export default function DraftPage() {
   const [draftPool, setDraftPool] = useState<DraftPool | null>(null);
   const [allOpenedCards, setAllOpenedCards] = useState<BoosterCard[]>([]);
   const [joinCode, setJoinCode] = useState('');
+  const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
 
   // Auth check — redirect to login if not authenticated
   useEffect(() => {
@@ -117,27 +121,70 @@ export default function DraftPage() {
     }
   }, []);
 
-  const handleOnlineCreate = useCallback(async () => {
+  // Connect socket and fetch draft rooms when entering online-create
+  useEffect(() => {
+    if (step === 'online-create' && session?.user?.id) {
+      (async () => {
+        try {
+          if (!socketConnected) {
+            await socketConnect(session.user.id);
+          }
+          requestRoomList();
+        } catch {
+          // Error handled via socket store
+        }
+      })();
+    }
+  }, [step, session?.user?.id, socketConnected, socketConnect, requestRoomList]);
+
+  // Cleanup socket on unmount if game not started
+  useEffect(() => {
+    return () => {
+      if (!useSocketStore.getState().gameStarted) {
+        socketDisconnect();
+      }
+    };
+  }, [socketDisconnect]);
+
+  const handleOnlineCreatePublic = useCallback(async () => {
     if (!session?.user?.id) return;
     try {
-      await socketConnect(session.user.id);
-      socketCreateRoom(session.user.id, true, false, true); // isDraft = true
+      if (!socketConnected) {
+        await socketConnect(session.user.id);
+      }
+      socketCreateRoom(session.user.id, false, false, true, 'draft', session.user.name ?? undefined);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
     }
-  }, [session?.user?.id, socketConnect, socketCreateRoom]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom]);
 
-  const handleOnlineJoin = useCallback(async () => {
-    if (!session?.user?.id || !joinCode.trim()) return;
+  const handleOnlineCreatePrivate = useCallback(async () => {
+    if (!session?.user?.id) return;
     try {
-      await socketConnect(session.user.id);
-      socketJoinRoom(joinCode.trim().toUpperCase(), session.user.id);
+      if (!socketConnected) {
+        await socketConnect(session.user.id);
+      }
+      socketCreateRoom(session.user.id, true, false, true, 'draft', session.user.name ?? undefined);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
     }
-  }, [session?.user?.id, joinCode, socketConnect, socketJoinRoom]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom]);
+
+  const handleOnlineJoin = useCallback(async (code?: string) => {
+    const codeToJoin = code || joinCode.trim().toUpperCase();
+    if (!session?.user?.id || !codeToJoin) return;
+    try {
+      if (!socketConnected) {
+        await socketConnect(session.user.id);
+      }
+      socketJoinRoom(codeToJoin, session.user.id);
+      setStep('online-waiting');
+    } catch {
+      // Error handled via socket store
+    }
+  }, [session?.user?.id, joinCode, socketConnected, socketConnect, socketJoinRoom]);
 
   const handleDifficultySelect = useCallback((diff: AIDifficulty) => {
     setDifficulty(diff);
@@ -230,6 +277,9 @@ export default function DraftPage() {
   const onlineTimerSeconds = draftDeadline
     ? Math.max(0, Math.floor((draftDeadline - Date.now()) / 1000))
     : 900;
+
+  // Filter public rooms to draft mode only
+  const draftPublicRooms = publicRooms.filter((r) => r.gameMode === 'draft');
 
   const DIFFICULTIES = [
     { key: 'easy' as AIDifficulty, label: tAI('difficulties.easy'), description: tAI('difficulties.easyDesc') },
@@ -399,50 +449,130 @@ export default function DraftPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-4 w-full"
               >
-                <button
-                  onClick={handleOnlineCreate}
-                  className="flex flex-col items-start p-4 border transition-colors text-left hover:bg-[#1a1a1a] hover:border-[#c4a35a] cursor-pointer"
-                  style={{ backgroundColor: '#141414', borderColor: '#262626' }}
+                {/* Browse / Private toggle */}
+                <div
+                  className="flex w-full rounded-lg overflow-hidden"
+                  style={{ border: '1px solid #262626' }}
                 >
-                  <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>
-                    {tOnline('createRoom')}
-                  </span>
-                  <span className="text-xs mt-0.5" style={{ color: '#666' }}>
-                    {tOnline('createRoomDesc')}
-                  </span>
-                </button>
+                  <button
+                    onClick={() => setOnlineView('browse')}
+                    className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    style={{
+                      backgroundColor: onlineView === 'browse' ? '#141414' : '#0a0a0a',
+                      borderRight: '1px solid #262626',
+                      color: onlineView === 'browse' ? '#e0e0e0' : '#555555',
+                    }}
+                  >
+                    {tOnline('publicRooms')}
+                  </button>
+                  <button
+                    onClick={() => setOnlineView('private')}
+                    className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                    style={{
+                      backgroundColor: onlineView === 'private' ? '#141414' : '#0a0a0a',
+                      color: onlineView === 'private' ? '#e0e0e0' : '#555555',
+                    }}
+                  >
+                    {tOnline('privateRoom')}
+                  </button>
+                </div>
 
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
-                    {tOnline('joinRoom')}
-                  </span>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={joinCode}
-                      onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                      onKeyDown={(e) => e.key === 'Enter' && handleOnlineJoin()}
-                      placeholder={tOnline('roomCode')}
-                      maxLength={6}
-                      className="flex-1 px-3 py-2 text-sm rounded uppercase tracking-wider text-center"
-                      style={{
-                        backgroundColor: '#1a1a1a',
-                        border: '1px solid #333',
-                        color: '#e0e0e0',
-                        outline: 'none',
-                        letterSpacing: '0.2em',
-                      }}
-                    />
+                {/* Public rooms browse */}
+                {onlineView === 'browse' && (
+                  <>
+                    <div
+                      className="w-full rounded-lg overflow-hidden"
+                      style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+                    >
+                      {draftPublicRooms.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <p className="text-xs" style={{ color: '#555555' }}>
+                            {tOnline('noRooms')}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="max-h-64 overflow-y-auto">
+                          {draftPublicRooms.map((room) => (
+                            <div
+                              key={room.code}
+                              className="flex items-center justify-between px-4 py-3"
+                              style={{ borderBottom: '1px solid #1e1e1e' }}
+                            >
+                              <div className="flex flex-col gap-0.5">
+                                <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
+                                  {room.hostName}
+                                </span>
+                                <span className="text-xs" style={{ color: '#555555' }}>
+                                  {formatTimeAgo(room.createdAt, tOnline)}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => handleOnlineJoin(room.code)}
+                                className="px-4 py-1.5 text-xs font-bold uppercase tracking-wider cursor-pointer"
+                                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                              >
+                                {tOnline('join')}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <button
-                      onClick={handleOnlineJoin}
-                      disabled={joinCode.trim().length < 6}
-                      className="px-4 py-2 text-sm font-bold uppercase rounded cursor-pointer disabled:opacity-40"
+                      onClick={handleOnlineCreatePublic}
+                      className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
                       style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
                     >
-                      {tOnline('join')}
+                      {tOnline('createPublicRoom')}
                     </button>
+                  </>
+                )}
+
+                {/* Private room */}
+                {onlineView === 'private' && (
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={handleOnlineCreatePrivate}
+                      className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                      style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                    >
+                      {tOnline('createPrivateRoom')}
+                    </button>
+
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
+                        {tOnline('joinRoom')}
+                      </span>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={joinCode}
+                          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => e.key === 'Enter' && handleOnlineJoin()}
+                          placeholder={tOnline('roomCode')}
+                          maxLength={6}
+                          className="flex-1 px-3 py-2 text-sm rounded uppercase tracking-wider text-center"
+                          style={{
+                            backgroundColor: '#1a1a1a',
+                            border: '1px solid #333',
+                            color: '#e0e0e0',
+                            outline: 'none',
+                            letterSpacing: '0.2em',
+                          }}
+                        />
+                        <button
+                          onClick={() => handleOnlineJoin()}
+                          disabled={joinCode.trim().length < 6}
+                          className="px-4 py-2 text-sm font-bold uppercase rounded cursor-pointer disabled:opacity-40"
+                          style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                        >
+                          {tOnline('join')}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {socketError && (
                   <span className="text-xs" style={{ color: '#b33e3e' }}>{socketError}</span>
@@ -519,4 +649,11 @@ export default function DraftPage() {
       <Footer />
     </main>
   );
+}
+
+function formatTimeAgo(timestamp: number, t: ReturnType<typeof useTranslations>): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return t('timeJustNow');
+  const minutes = Math.floor(seconds / 60);
+  return t('timeMinutesAgo', { minutes });
 }

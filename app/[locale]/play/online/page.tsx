@@ -14,7 +14,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
-type GameMode = 'casual' | 'ranked' | 'draft';
+type GameMode = 'casual' | 'ranked';
 type View = 'browse' | 'private';
 
 interface ResolvedDeck {
@@ -182,8 +182,7 @@ export default function PlayOnlinePage() {
       if (!connected) {
         await connect(session.user.id);
       }
-      const isDraft = selectedMode === 'draft';
-      createRoom(session.user.id, false, selectedMode === 'ranked', isDraft, selectedMode, session.user.name ?? undefined);
+      createRoom(session.user.id, false, selectedMode === 'ranked', false, selectedMode, session.user.name ?? undefined);
     } catch {
       // Error set in socket store
     }
@@ -316,7 +315,7 @@ export default function PlayOnlinePage() {
               <>
                 {/* Game mode tabs */}
                 <div className="flex w-full">
-                  {(['casual', 'ranked', 'draft'] as GameMode[]).map((mode) => (
+                  {(['casual', 'ranked'] as GameMode[]).map((mode) => (
                     <button
                       key={mode}
                       onClick={() => setSelectedMode(mode)}
