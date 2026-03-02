@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 055/130 - KIMIMARO (Common)
@@ -29,13 +30,14 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
   // Find all non-hidden characters in play with cost <= 3
   const validTargets: string[] = [];
 
-  // First pass: enemy characters
+  // First pass: enemy characters (filter out immune ones)
   const enemySide: 'player1Characters' | 'player2Characters' =
     opponent === 'player1' ? 'player1Characters' : 'player2Characters';
 
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
       if (char.isHidden) continue;
+      if (!canBeHiddenByEnemy(state, char, opponent)) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 3) {
         validTargets.push(char.instanceId);

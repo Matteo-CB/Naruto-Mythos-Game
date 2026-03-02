@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import type { PlayerID } from '@/lib/engine/types';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 018/130 - CHOJI AKIMICHI "Le Boulet Humain" (UC)
@@ -103,10 +104,11 @@ export function postMoveHide(
   // Use effective power (includes continuous effects like MSS02 +1, Sasuke -1/ally, etc.)
   const chojiPower = calculateCharacterPower(state, chojiChar, sourcePlayer);
 
-  // Find non-hidden enemies with less effective power
+  // Find non-hidden enemies with less effective power that can be hidden
   const hideTargets: string[] = [];
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
+    if (!canBeHiddenByEnemy(state, enemy, enemyPlayer)) continue;
     const enemyPower = calculateCharacterPower(state, enemy, enemyPlayer);
     if (enemyPower < chojiPower) {
       hideTargets.push(enemy.instanceId);

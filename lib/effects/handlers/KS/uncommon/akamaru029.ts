@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 029/130 - AKAMARU "Le Loup Bicephale" (UC)
@@ -42,8 +43,10 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies in this mission
-  const nonHiddenEnemies = enemyChars.filter(c => !c.isHidden);
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
+
+  // Find non-hidden enemies that can be hidden by enemy effects
+  const nonHiddenEnemies = enemyChars.filter(c => canBeHiddenByEnemy(state, c, opponentPlayer));
 
   if (nonHiddenEnemies.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',

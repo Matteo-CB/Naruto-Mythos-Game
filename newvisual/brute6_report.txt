@@ -1,0 +1,26 @@
+========================================
+  BRUTE6-ULTIMATE: Final Report
+========================================
+
+Started: 2026-03-02T10:41:09.491Z
+Finished: 2026-03-02T11:26:22.961Z
+Total URLs tested: 238922
+Total images found: 0
+
+--- Found Images ---
+
+--- Still Missing ---
+  KS-045-UC — Anko
+  KS-115-R, KS-115-RA — Shino
+  KS-116-RA — Neji
+  KS-122-R, KS-122-RA — Jirobo
+  KS-124-R, KS-124-RA — Kidomaru
+  KS-126-R — Orochimaru
+  KS-127-R, KS-127-RA — Sakon
+  KS-129-R, KS-129-RA — Kyubi
+  KS-130-R — One-Tail
+  KS-134-S — Kyubi
+  KS-149-M — Kiba
+  KS-151-M — RockLee
+  KS-152-M — Itachi
+  KS-153-M — Gaara

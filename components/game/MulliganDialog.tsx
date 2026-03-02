@@ -384,6 +384,13 @@ export function MulliganDialog() {
           ))}
         </div>
 
+        {/* Click hint */}
+        {!selectedCard && (
+          <span className="text-[11px]" style={{ color: '#555555' }}>
+            {t('game.mulligan.clickHint')}
+          </span>
+        )}
+
         {/* Inline card detail */}
         <AnimatePresence mode="wait">
           {selectedCard && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -14,7 +14,8 @@ import { useSocketStore } from '@/lib/socket/client';
 import { useGameStore } from '@/stores/gameStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
-type Tab = 'create' | 'join' | 'matchmaking';
+type GameMode = 'casual' | 'ranked' | 'draft';
+type View = 'browse' | 'private';
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -26,11 +27,12 @@ export default function PlayOnlinePage() {
   const router = useRouter();
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<Tab>('create');
+  const [view, setView] = useState<View>('browse');
+  const [selectedMode, setSelectedMode] = useState<GameMode>('casual');
   const [joinCode, setJoinCode] = useState('');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [deckSelected, setDeckSelected] = useState(false);
-  const [isRanked, setIsRanked] = useState(false);
+  const [showJoinInput, setShowJoinInput] = useState(false);
 
   const {
     connected,
@@ -39,15 +41,14 @@ export default function PlayOnlinePage() {
     opponentJoined,
     gameStarted,
     visibleState,
-    matchmakingStatus,
     error,
+    publicRooms,
     connect,
     disconnect,
     createRoom,
     joinRoom,
     selectDeck,
-    joinMatchmaking,
-    leaveMatchmaking,
+    requestRoomList,
     clearError,
   } = useSocketStore();
 
@@ -61,9 +62,27 @@ export default function PlayOnlinePage() {
     });
   }, []);
 
+  // Connect and request room list on mount
+  const connectAndFetch = useCallback(async () => {
+    if (!session?.user?.id) return;
+    try {
+      if (!connected) {
+        await connect(session.user.id);
+      }
+      requestRoomList();
+    } catch {
+      // Error set in socket store
+    }
+  }, [session?.user?.id, connected, connect, requestRoomList]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      connectAndFetch();
+    }
+  }, [session?.user?.id, connectAndFetch]);
+
   useEffect(() => {
     return () => {
-      // Only disconnect if the game hasn't started — we need the socket alive in /game
       if (!useSocketStore.getState().gameStarted) {
         disconnect();
       }
@@ -97,7 +116,8 @@ export default function PlayOnlinePage() {
     const roomParam = searchParams.get('room');
     if (roomParam && session?.user?.id && !connected) {
       connect(session.user.id);
-      setActiveTab('join');
+      setView('private');
+      setShowJoinInput(true);
       setJoinCode(roomParam);
     }
   }, [searchParams, session, connected, connect]);
@@ -157,37 +177,39 @@ export default function PlayOnlinePage() {
     );
   }
 
-  const handleCreateRoom = async () => {
+  const handleCreatePublicRoom = async () => {
     try {
       if (!connected) {
         await connect(session.user.id);
       }
-      createRoom(session.user.id, true, isRanked);
+      const isDraft = selectedMode === 'draft';
+      createRoom(session.user.id, false, selectedMode === 'ranked', isDraft, selectedMode, session.user.name ?? undefined);
     } catch {
-      // Error is already set in the socket store by connect()
+      // Error set in socket store
     }
   };
 
-  const handleJoinRoom = async () => {
-    if (!joinCode.trim()) return;
+  const handleCreatePrivateRoom = async () => {
     try {
       if (!connected) {
         await connect(session.user.id);
       }
-      joinRoom(joinCode.trim().toUpperCase(), session.user.id);
+      createRoom(session.user.id, true, false, false, 'casual', session.user.name ?? undefined);
     } catch {
-      // Error is already set in the socket store by connect()
+      // Error set in socket store
     }
   };
 
-  const handleMatchmaking = async () => {
+  const handleJoinRoom = async (code?: string) => {
+    const codeToJoin = code || joinCode.trim().toUpperCase();
+    if (!codeToJoin) return;
     try {
       if (!connected) {
         await connect(session.user.id);
       }
-      joinMatchmaking(session.user.id, isRanked);
+      joinRoom(codeToJoin, session.user.id);
     } catch {
-      // Error is already set in the socket store by connect()
+      // Error set in socket store
     }
   };
 
@@ -196,14 +218,17 @@ export default function PlayOnlinePage() {
     setDeckSelected(true);
   };
 
-  const tabStyle = (tab: Tab) => ({
-    backgroundColor: activeTab === tab ? '#1a1a1a' : '#0a0a0a',
-    borderBottom: activeTab === tab ? '2px solid #c4a35a' : '2px solid transparent',
-    color: activeTab === tab ? '#e0e0e0' : '#555555',
-  });
+  // Filter rooms by selected mode
+  const filteredRooms = publicRooms.filter((r) => r.gameMode === selectedMode);
 
   // Show deck selector once in a room and opponent has joined
   const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards;
+
+  const modeStyle = (mode: GameMode) => ({
+    backgroundColor: selectedMode === mode ? '#1a1a1a' : '#0a0a0a',
+    borderBottom: selectedMode === mode ? '2px solid #c4a35a' : '2px solid transparent',
+    color: selectedMode === mode ? '#e0e0e0' : '#555555',
+  });
 
   return (
     <main
@@ -215,7 +240,7 @@ export default function PlayOnlinePage() {
       <DecorativeIcons />
       <CardBackgroundDecor variant="playOnline" />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-      <div className="flex flex-col items-center gap-6 max-w-md w-full relative z-10">
+      <div className="flex flex-col items-center gap-6 max-w-lg w-full relative z-10">
         <h1
           className="text-2xl font-bold tracking-wider uppercase"
           style={{ color: '#c4a35a' }}
@@ -256,166 +281,215 @@ export default function PlayOnlinePage() {
           </p>
         )}
 
-        {/* Tab navigation (hide once deck selection is shown) */}
+        {/* Main UI (hide once deck selection is shown) */}
         {!showDeckSelector && !deckSelected && (
           <>
-            {/* Ranked / Unranked toggle */}
+            {/* Browse / Private toggle */}
             <div
               className="flex w-full rounded-lg overflow-hidden"
               style={{ border: '1px solid #262626' }}
             >
               <button
-                onClick={() => setIsRanked(false)}
+                onClick={() => setView('browse')}
                 className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
                 style={{
-                  backgroundColor: !isRanked ? '#141414' : '#0a0a0a',
+                  backgroundColor: view === 'browse' ? '#141414' : '#0a0a0a',
                   borderRight: '1px solid #262626',
-                  color: !isRanked ? '#e0e0e0' : '#555555',
+                  color: view === 'browse' ? '#e0e0e0' : '#555555',
                 }}
               >
-                {t('online.casual')}
+                {t('online.publicRooms')}
               </button>
               <button
-                onClick={() => setIsRanked(true)}
+                onClick={() => setView('private')}
                 className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors"
                 style={{
-                  backgroundColor: isRanked ? '#141414' : '#0a0a0a',
-                  color: isRanked ? '#c4a35a' : '#555555',
+                  backgroundColor: view === 'private' ? '#141414' : '#0a0a0a',
+                  color: view === 'private' ? '#e0e0e0' : '#555555',
                 }}
               >
-                {t('online.ranked')}
+                {t('online.privateRoom')}
               </button>
             </div>
-            <p className="text-xs" style={{ color: '#555555' }}>
-              {isRanked ? t('online.rankedDesc') : t('online.casualDesc')}
-            </p>
 
-            <div className="flex w-full">
-              {(['create', 'join', 'matchmaking'] as Tab[]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors"
-                  style={tabStyle(tab)}
-                >
-                  {tab === 'create' ? t('online.createRoom') : tab === 'join' ? t('online.joinRoom') : t('online.findMatch')}
-                </button>
-              ))}
-            </div>
-
-            {/* Tab content */}
-            <div
-              className="w-full rounded-lg p-6"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-            >
-              {activeTab === 'create' && (
-                <div className="flex flex-col gap-4 items-center">
-                  {roomCode ? (
-                    <>
-                      <p className="text-xs" style={{ color: '#888888' }}>
-                        {t('online.roomCreated')}
-                      </p>
-                      <p
-                        className="text-3xl font-bold tracking-[0.3em]"
-                        style={{ color: '#c4a35a' }}
-                      >
-                        {roomCode}
-                      </p>
-                      <p className="text-xs" style={{ color: '#555555' }}>
-                        {opponentJoined
-                          ? t('online.opponentJoined')
-                          : t('online.waitingForOpponent')}
-                      </p>
-                    </>
-                  ) : (
+            {view === 'browse' && !roomCode && (
+              <>
+                {/* Game mode tabs */}
+                <div className="flex w-full">
+                  {(['casual', 'ranked', 'draft'] as GameMode[]).map((mode) => (
                     <button
-                      onClick={handleCreateRoom}
+                      key={mode}
+                      onClick={() => setSelectedMode(mode)}
+                      className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors"
+                      style={modeStyle(mode)}
+                    >
+                      {t(`online.mode.${mode}`)}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-xs" style={{ color: '#555555' }}>
+                  {t(`online.modeDesc.${selectedMode}`)}
+                </p>
+
+                {/* Room list */}
+                <div
+                  className="w-full rounded-lg overflow-hidden"
+                  style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+                >
+                  {filteredRooms.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <p className="text-xs" style={{ color: '#555555' }}>
+                        {t('online.noRooms')}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredRooms.map((room) => (
+                        <div
+                          key={room.code}
+                          className="flex items-center justify-between px-4 py-3"
+                          style={{ borderBottom: '1px solid #1e1e1e' }}
+                        >
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
+                              {room.hostName}
+                            </span>
+                            <span className="text-xs" style={{ color: '#555555' }}>
+                              {formatTimeAgo(room.createdAt, t)}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleJoinRoom(room.code)}
+                            className="px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
+                            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                          >
+                            {t('online.join')}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Create public room button */}
+                <button
+                  onClick={handleCreatePublicRoom}
+                  className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+                  style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+                >
+                  {t('online.createPublicRoom')}
+                </button>
+              </>
+            )}
+
+            {view === 'browse' && roomCode && (
+              <div
+                className="w-full rounded-lg p-6"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+              >
+                <div className="flex flex-col gap-4 items-center">
+                  <p className="text-xs" style={{ color: '#888888' }}>
+                    {t('online.roomCreated')}
+                  </p>
+                  <p
+                    className="text-3xl font-bold tracking-[0.3em]"
+                    style={{ color: '#c4a35a' }}
+                  >
+                    {roomCode}
+                  </p>
+                  <p className="text-xs" style={{ color: '#555555' }}>
+                    {opponentJoined
+                      ? t('online.opponentJoined')
+                      : t('online.waitingForOpponent')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {view === 'private' && (
+              <div
+                className="w-full rounded-lg p-6"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+              >
+                {roomCode ? (
+                  <div className="flex flex-col gap-4 items-center">
+                    <p className="text-xs" style={{ color: '#888888' }}>
+                      {t('online.roomCreated')}
+                    </p>
+                    <p
+                      className="text-3xl font-bold tracking-[0.3em]"
+                      style={{ color: '#c4a35a' }}
+                    >
+                      {roomCode}
+                    </p>
+                    <p className="text-xs" style={{ color: '#555555' }}>
+                      {opponentJoined
+                        ? t('online.opponentJoined')
+                        : t('online.waitingForOpponent')}
+                    </p>
+                  </div>
+                ) : showJoinInput ? (
+                  <div className="flex flex-col gap-4 items-center">
+                    <p className="text-xs" style={{ color: '#888888' }}>
+                      {t('online.enterCode')}
+                    </p>
+                    <input
+                      type="text"
+                      value={joinCode}
+                      onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
+                      maxLength={6}
+                      placeholder="ABCD12"
+                      className="w-full text-center text-2xl font-bold tracking-[0.3em] rounded py-3 outline-none uppercase"
+                      style={{
+                        backgroundColor: '#0a0a0a',
+                        border: '1px solid #262626',
+                        color: '#e0e0e0',
+                      }}
+                    />
+                    <button
+                      onClick={() => handleJoinRoom()}
+                      disabled={joinCode.length < 6}
+                      className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+                      style={{
+                        backgroundColor: joinCode.length < 6 ? '#333333' : '#c4a35a',
+                        color: '#0a0a0a',
+                      }}
+                    >
+                      {t('online.joinRoom')}
+                    </button>
+                    <button
+                      onClick={() => setShowJoinInput(false)}
+                      className="text-xs underline"
+                      style={{ color: '#888888' }}
+                    >
+                      {t('common.back')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={handleCreatePrivateRoom}
                       className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
                       style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
                     >
-                      {t('online.createRoom')}
+                      {t('online.createPrivateRoom')}
                     </button>
-                  )}
-                </div>
-              )}
-
-              {activeTab === 'join' && (
-                <div className="flex flex-col gap-4 items-center">
-                  <p className="text-xs" style={{ color: '#888888' }}>
-                    {t('online.enterCode')}
-                  </p>
-                  <input
-                    type="text"
-                    value={joinCode}
-                    onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 6))}
-                    maxLength={6}
-                    placeholder="ABCD12"
-                    className="w-full text-center text-2xl font-bold tracking-[0.3em] rounded py-3 outline-none uppercase"
-                    style={{
-                      backgroundColor: '#0a0a0a',
-                      border: '1px solid #262626',
-                      color: '#e0e0e0',
-                    }}
-                  />
-                  <button
-                    onClick={handleJoinRoom}
-                    disabled={joinCode.length < 6}
-                    className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
-                    style={{
-                      backgroundColor: joinCode.length < 6 ? '#333333' : '#c4a35a',
-                      color: '#0a0a0a',
-                    }}
-                  >
-                    {t('online.joinRoom')}
-                  </button>
-                </div>
-              )}
-
-              {activeTab === 'matchmaking' && (
-                <div className="flex flex-col gap-4 items-center">
-                  {matchmakingStatus === 'idle' && (
-                    <>
-                      <p className="text-xs" style={{ color: '#888888' }}>
-                        {t('online.findMatch')}
-                      </p>
-                      <button
-                        onClick={handleMatchmaking}
-                        className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
-                        style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
-                      >
-                        {t('online.startMatchmaking')}
-                      </button>
-                    </>
-                  )}
-                  {matchmakingStatus === 'waiting' && (
-                    <>
-                      <p className="text-sm" style={{ color: '#e0e0e0' }}>
-                        {t('online.searching')}
-                      </p>
-                      <div
-                        className="w-8 h-8 rounded-full border-2 animate-spin"
-                        style={{
-                          borderColor: '#262626',
-                          borderTopColor: '#c4a35a',
-                        }}
-                      />
-                      <button
-                        onClick={leaveMatchmaking}
-                        className="text-xs underline"
-                        style={{ color: '#888888' }}
-                      >
-                        {t('common.cancel')}
-                      </button>
-                    </>
-                  )}
-                  {matchmakingStatus === 'found' && (
-                    <p className="text-sm" style={{ color: '#c4a35a' }}>
-                      {t('online.matchFound')}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+                    <button
+                      onClick={() => setShowJoinInput(true)}
+                      className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+                      style={{
+                        backgroundColor: '#141414',
+                        border: '1px solid #262626',
+                        color: '#e0e0e0',
+                      }}
+                    >
+                      {t('online.joinRoom')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
 
@@ -435,4 +509,11 @@ export default function PlayOnlinePage() {
       <Footer />
     </main>
   );
+}
+
+function formatTimeAgo(timestamp: number, t: ReturnType<typeof useTranslations>): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+  if (seconds < 60) return t('online.timeJustNow');
+  const minutes = Math.floor(seconds / 60);
+  return t('online.timeMinutesAgo', { minutes });
 }

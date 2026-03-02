@@ -133,8 +133,8 @@ export interface GameState {
   endPhaseMovedIds?: string[];
   /** Instance IDs of Akamaru 028 characters already processed for optional return during this End Phase */
   endPhaseAkamaru028Ids?: string[];
-  /** Instance IDs of Kidômaru 060 characters already processed for optional hide during this End Phase */
-  endPhaseKidomaru060Ids?: string[];
+  /** Instance IDs of Kyodaigumo 103 characters already processed for optional hide during this End Phase */
+  endPhaseKyodaigumo103Ids?: string[];
   /** Set when all mission scoring is complete but End Phase hasn't run yet.
    * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
   missionScoringComplete?: boolean;

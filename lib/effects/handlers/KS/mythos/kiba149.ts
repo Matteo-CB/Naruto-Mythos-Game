@@ -4,6 +4,7 @@ import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter, defeatFriendlyCharacter } from '@/lib/effects/defeatUtils';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 149/130 - KIBA INUZUKA (M)
@@ -107,9 +108,12 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     validTargets.push(char.instanceId);
   }
 
-  // Check enemy side
+  // Check enemy side (filter immune enemies when hiding, not defeating)
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
   for (const char of thisMission[enemySide]) {
     if (char.isHidden) continue;
+    // When hiding (not upgrade/defeat), skip immune enemies
+    if (!useDefeat && !canBeHiddenByEnemy(state, char, opponentPlayer)) continue;
     validTargets.push(char.instanceId);
   }
 

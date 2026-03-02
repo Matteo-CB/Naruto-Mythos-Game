@@ -25,7 +25,7 @@ import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
-import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleKidomaru060EndOfRound } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleKyodaigumo103EndOfRound } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 
@@ -222,14 +222,14 @@ export class GameEngine {
             newState = handleAkamaru028Return(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
-            // Continue processing Kidômaru 060 optional end-of-round hides
-            newState = handleKidomaru060EndOfRound(newState);
+            // Continue processing Kyodaigumo 103 optional end-of-round hides
+            newState = handleKyodaigumo103EndOfRound(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
             // All end-of-round effects resolved — finish end phase transition
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
-            newState.endPhaseKidomaru060Ids = undefined;
+            newState.endPhaseKyodaigumo103Ids = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -243,7 +243,7 @@ export class GameEngine {
           newState.pendingEffects = [];
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
-          newState.endPhaseKidomaru060Ids = undefined;
+          newState.endPhaseKyodaigumo103Ids = undefined;
           if (newState.turn >= TOTAL_TURNS) {
             newState = GameEngine.endGame(newState);
           } else {
@@ -368,8 +368,8 @@ export class GameEngine {
       return newState;
     }
 
-    // Process Kidômaru 060 optional end-of-round hides
-    newState = handleKidomaru060EndOfRound(newState);
+    // Process Kyodaigumo 103 optional end-of-round hides
+    newState = handleKyodaigumo103EndOfRound(newState);
     if (newState.pendingActions.length > 0) {
       return newState;
     }
@@ -377,7 +377,7 @@ export class GameEngine {
     // Clean up end phase tracking
     newState.endPhaseMovedIds = undefined;
     newState.endPhaseAkamaru028Ids = undefined;
-    newState.endPhaseKidomaru060Ids = undefined;
+    newState.endPhaseKyodaigumo103Ids = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
@@ -569,6 +569,59 @@ export class GameEngine {
         }
       }
 
+      // Special case: Gemma 049 sacrifice (defeat) — declining means the original target gets defeated
+      if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE') {
+        let parsed049: { targetInstanceId?: string; effectSource?: string } = {};
+        try { parsed049 = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const defeatTargetId049 = parsed049.targetInstanceId ?? '';
+        const effectSource049 = (parsed049.effectSource ?? (effect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as import('./types').PlayerID;
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        if (defeatTargetId049) {
+          // Use defeatCharacterDirect to avoid re-triggering Gemma check
+          newState = EffectEngine.defeatCharacterDirect(newState, defeatTargetId049);
+          const charResult049 = EffectEngine.findCharByInstanceId(state, defeatTargetId049);
+          if (charResult049) {
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, effectSource049,
+              'EFFECT_DEFEAT', `${charResult049.character.card.name_fr} was defeated (Gemma sacrifice declined).`,
+              'game.log.effect.defeat',
+              { card: '???', id: '', target: charResult049.character.card.name_fr },
+            );
+          }
+        }
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Special case: Gemma 049 sacrifice (hide) — declining means the original target gets hidden
+      if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
+        let parsed049h: { targetInstanceId?: string; effectSource?: string } = {};
+        try { parsed049h = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const hideTargetId049 = parsed049h.targetInstanceId ?? '';
+        const effectSource049h = (parsed049h.effectSource ?? (effect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as import('./types').PlayerID;
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        if (hideTargetId049) {
+          newState = EffectEngine.hideCharacter(newState, hideTargetId049);
+          const charResult049h = EffectEngine.findCharByInstanceId(state, hideTargetId049);
+          if (charResult049h) {
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, effectSource049h,
+              'EFFECT_HIDE', `${charResult049h.character.card.name_fr} was hidden (Gemma sacrifice declined).`,
+              'game.log.effect.hide',
+              { card: '???', id: '', target: charResult049h.character.card.name_fr, mission: String(charResult049h.missionIndex + 1) },
+            );
+          }
+        }
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
       // Remove the effect and its associated action
       newState.pendingEffects.splice(effectIdx, 1);
       newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
@@ -722,7 +775,7 @@ export class GameEngine {
       missionDeckSize: state.missionDeck.length,
       log: state.log,
       pendingEffects: state.pendingEffects.filter(
-        (e) => e.sourcePlayer === player || !e.requiresTargetSelection,
+        (e) => e.sourcePlayer === player || e.selectingPlayer === player || !e.requiresTargetSelection,
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
       forfeitedBy: state.forfeitedBy,

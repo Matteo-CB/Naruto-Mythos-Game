@@ -20,6 +20,7 @@ interface RoomData {
   guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   isPrivate: boolean;
   isRanked: boolean;
+  gameMode: 'casual' | 'ranked' | 'draft';
   createdAt: number;
   hostName?: string;
   guestName?: string;
@@ -33,6 +34,8 @@ interface RoomData {
   isDraft: boolean;
   draftTimer: ReturnType<typeof setTimeout> | null;
   draftDeadline: number | null;
+  // Rematch
+  rematchOffer?: 'player1' | 'player2';
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -79,6 +82,29 @@ function cleanupPlayerRoom(socket: Socket): void {
     socket.leave(existingCode);
   }
   playerRooms.delete(socket.id);
+}
+
+/**
+ * Build the list of public waiting rooms and broadcast to all connected sockets.
+ */
+function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> {
+  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> = [];
+  for (const [, room] of rooms) {
+    if (room.isPrivate) continue;
+    if (room.guestId) continue; // Already has a guest
+    if (room.gameState) continue; // Game already started
+    list.push({
+      code: room.code,
+      hostName: room.hostName ?? 'Unknown',
+      gameMode: room.gameMode,
+      createdAt: room.createdAt,
+    });
+  }
+  return list;
+}
+
+function broadcastRoomList(io: SocketIOServer): void {
+  io.emit('room:list-update', getPublicRoomList());
 }
 
 /**
@@ -331,6 +357,86 @@ function startActionTimer(
 }
 
 /**
+ * Start a timer for the forced resolver (opponent who must respond to an effect).
+ * Pauses the active player's timer and gives the forced resolver 2 minutes.
+ * On timeout: auto-decline the pending action (character gets defeated).
+ */
+function startForcedResolverTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  clearActionTimer(room);
+
+  if (!room.gameState) return;
+  const forcedPlayer = room.gameState.pendingForcedResolver;
+  if (!forcedPlayer) return;
+
+  const forcedSocket = forcedPlayer === 'player1' ? room.hostSocket : room.guestSocket;
+  const activeSocket = forcedPlayer === 'player1' ? room.guestSocket : room.hostSocket;
+
+  // Pause active player's timer
+  if (activeSocket) {
+    io.to(activeSocket).emit('game:action-deadline-pause');
+  }
+
+  // Send deadline to forced resolver
+  const deadline = Date.now() + ACTION_TIMEOUT_MS;
+  room.timerDeadline = deadline;
+  if (forcedSocket) {
+    io.to(forcedSocket).emit('game:action-deadline', { deadline });
+  }
+
+  room.actionTimer = setTimeout(async () => {
+    if (!room.gameState || !room.gameState.pendingForcedResolver) return;
+
+    const resolver = room.gameState.pendingForcedResolver;
+    console.log(`[Socket] Forced resolver timer expired for ${resolver} in room ${code}`);
+
+    // Auto-decline: find the pending effect for this player and decline it
+    const pendingEffect = room.gameState.pendingEffects.find(
+      (e: { selectingPlayer?: string; sourcePlayer: string; isOptional?: boolean }) =>
+        (e.selectingPlayer === resolver || e.sourcePlayer === resolver),
+    );
+    if (pendingEffect) {
+      room.gameState = GameEngine.applyAction(room.gameState, resolver, {
+        type: 'DECLINE_OPTIONAL_EFFECT',
+        pendingEffectId: pendingEffect.id,
+      });
+    } else {
+      // Fallback: try declining via SELECT_TARGET with empty targets
+      const pendingAction = room.gameState.pendingActions.find(
+        (a: { player: string }) => a.player === resolver,
+      );
+      if (pendingAction) {
+        room.gameState = GameEngine.applyAction(room.gameState, resolver, {
+          type: 'SELECT_TARGET',
+          pendingActionId: pendingAction.id,
+          selectedTargets: [],
+        });
+      }
+    }
+
+    // Notify the timed-out player
+    if (forcedSocket) {
+      io.to(forcedSocket).emit('game:auto-declined');
+    }
+
+    // Broadcast updated state
+    broadcastState(room, io);
+
+    // Check if game ended
+    const winner = GameEngine.getWinner(room.gameState);
+    if (winner) {
+      await finalizeGameEnd(room, code, io, 'score');
+    } else if (room.gameState.phase === 'action') {
+      // Restart timer for the original active player
+      startActionTimer(room, code, io);
+    }
+  }, ACTION_TIMEOUT_MS);
+}
+
+/**
  * Broadcast visible state to both players.
  */
 function broadcastState(room: RoomData, io: SocketIOServer): void {
@@ -367,7 +473,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isDraft?: boolean }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isDraft?: boolean; gameMode?: 'casual' | 'ranked' | 'draft'; hostName?: string }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
@@ -378,6 +484,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         code = generateRoomCode();
       } while (rooms.has(code));
 
+      const gameMode = data.gameMode ?? (data.isDraft ? 'draft' : data.isRanked ? 'ranked' : 'casual');
+
       const room: RoomData = {
         code,
         hostId: data.userId,
@@ -387,14 +495,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
         gameState: null,
         hostDeck: null,
         guestDeck: null,
-        isPrivate: data.isPrivate ?? true,
-        isRanked: data.isRanked ?? false,
+        isPrivate: data.isPrivate ?? false,
+        isRanked: gameMode === 'ranked',
+        gameMode,
         createdAt: Date.now(),
+        hostName: data.hostName,
         actionTimer: null,
         timerDeadline: null,
         disconnectTimer: null,
         replayInitialState: null,
-        isDraft: data.isDraft ?? false,
+        isDraft: gameMode === 'draft',
         draftTimer: null,
         draftDeadline: null,
       };
@@ -403,8 +513,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, code);
       socket.join(code);
 
-      console.log(`[Socket] Room ${code} created by ${data.userId}${room.isDraft ? ' (DRAFT)' : ''}`);
+      console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode})`);
       socket.emit('room:created', { code, isDraft: room.isDraft });
+
+      // Broadcast updated room list to all connected sockets
+      if (!room.isPrivate) {
+        broadcastRoomList(io);
+      }
     });
 
     // Join a room
@@ -448,6 +563,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestId: room.guestId,
         isDraft: room.isDraft,
       });
+
+      // Room is now full — broadcast updated list (room removed from available)
+      if (!room.isPrivate) {
+        broadcastRoomList(io);
+      }
 
       // If this is a draft room and both players are here, generate boosters
       if (room.isDraft && room.guestId) {
@@ -732,6 +852,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
               startActionTimer(room, code, io);
             }
           }, 1500);
+        } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
+          // Opponent must respond to a forced choice — start their timer, pause active player's
+          startForcedResolverTimer(room, code, io);
         } else if (room.gameState.phase === 'action') {
           // Restart timer for next active player
           startActionTimer(room, code, io);
@@ -763,6 +886,93 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       broadcastState(room, io);
       await finalizeGameEnd(room, code, io, data.reason === 'timeout' ? 'timeout' : 'forfeit');
+    });
+
+    // Room list request (for public room browser)
+    socket.on('room:list', () => {
+      socket.emit('room:list-update', getPublicRoomList());
+    });
+
+    // --- Rematch ---
+    socket.on('game:rematch-offer', () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room || !room.gameState || room.gameState.phase !== 'gameOver') return;
+
+      const offerer = socket.id === room.hostSocket ? 'player1' : 'player2';
+      room.rematchOffer = offerer;
+
+      // Forward to opponent
+      const opponentSocket = offerer === 'player1' ? room.guestSocket : room.hostSocket;
+      if (opponentSocket) {
+        io.to(opponentSocket).emit('game:rematch-offered');
+      }
+      console.log(`[Socket] Rematch offered by ${offerer} in room ${code}`);
+    });
+
+    socket.on('game:rematch-accept', async () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room || !room.rematchOffer) return;
+      if (!room.hostDeck || !room.guestDeck) return;
+
+      console.log(`[Socket] Rematch accepted in room ${code}, restarting game`);
+      room.rematchOffer = undefined;
+
+      // Reset game state with same decks
+      const config: GameConfig = {
+        player1: {
+          userId: room.hostId,
+          isAI: false,
+          deck: room.hostDeck.characters,
+          missionCards: room.hostDeck.missions,
+        },
+        player2: {
+          userId: room.guestId!,
+          isAI: false,
+          deck: room.guestDeck.characters,
+          missionCards: room.guestDeck.missions,
+        },
+      };
+
+      room.gameState = GameEngine.createGame(config);
+      room.replayInitialState = null;
+      clearActionTimer(room);
+
+      // Broadcast fresh state
+      const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+      const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+      const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
+
+      if (room.hostSocket) {
+        io.to(room.hostSocket).emit('game:rematch-accepted');
+        io.to(room.hostSocket).emit('game:state-update', { visibleState: p1State, playerRole: 'player1', playerNames });
+      }
+      if (room.guestSocket) {
+        io.to(room.guestSocket).emit('game:rematch-accepted');
+        io.to(room.guestSocket).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
+      }
+      io.to(code).emit('game:started');
+
+      if (room.gameState.phase === 'action') {
+        startActionTimer(room, code, io);
+      }
+    });
+
+    socket.on('game:rematch-decline', () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room) return;
+
+      room.rematchOffer = undefined;
+      const opponentSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
+      if (opponentSocket) {
+        io.to(opponentSocket).emit('game:rematch-declined');
+      }
+      console.log(`[Socket] Rematch declined in room ${code}`);
     });
 
     // Matchmaking
@@ -838,6 +1048,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestDeck: null,
           isPrivate: false,
           isRanked: wantRanked,
+          gameMode: wantRanked ? 'ranked' : 'casual',
           createdAt: Date.now(),
           actionTimer: null,
           timerDeadline: null,
@@ -864,10 +1075,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       // Only remove if waiting (no guest yet) and not a started game
       if (!room.guestId && !room.gameState) {
+        const wasPublic = !room.isPrivate;
         rooms.delete(code);
         playerRooms.delete(socket.id);
         socket.leave(code);
         console.log(`[Socket] Matchmaking: user left queue, room ${code} removed`);
+        if (wasPublic) broadcastRoomList(io);
       }
     });
 
@@ -906,7 +1119,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
             // Host disconnected before game started - remove room
             if (!room.gameState) {
               console.log(`[Socket] Host left room ${code} before game started, removing room`);
+              const wasPublic = !room.isPrivate;
               rooms.delete(code);
+              if (wasPublic) broadcastRoomList(io);
             }
           } else if (room.guestSocket === socket.id) {
             // Guest disconnected before game started - reset guest info
@@ -914,6 +1129,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             room.guestId = null;
             room.guestSocket = null;
             room.guestDeck = null;
+            if (!room.isPrivate && !room.gameState) broadcastRoomList(io);
           }
         }
         playerRooms.delete(socket.id);

@@ -242,7 +242,7 @@ describe('MSS 06 - Rescue a Friend', () => {
 // MSS 07 - I Have to Go: Move a friendly hidden character
 // ===================================================================
 describe('MSS 07 - I Have to Go', () => {
-  it('should move a hidden friendly character to another mission', () => {
+  it('should offer optional target selection to move a hidden friendly character', () => {
     const hidden = mockCharInPlay({ instanceId: 'h-1', isHidden: true }, { name_fr: 'HiddenToMove' });
     const state = createActionPhaseState({
       activeMissions: [
@@ -254,9 +254,11 @@ describe('MSS 07 - I Have to Go', () => {
     const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
-    expect(result.state.activeMissions[1].player1Characters.length).toBe(1);
-    expect(result.state.activeMissions[1].player1Characters[0].instanceId).toBe('h-1');
+    // Effect is optional — always asks the player (no auto-move)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.isOptional).toBe(true);
+    expect(result.validTargets).toBeDefined();
+    expect(result.validTargets!.length).toBeGreaterThan(0);
   });
 
   it('should fizzle when no hidden friendly exists', () => {

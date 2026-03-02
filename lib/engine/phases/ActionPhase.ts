@@ -93,19 +93,18 @@ function handlePlayCharacter(
 
   const card = playerState.hand[cardIndex];
 
-  // Auto-detect upgrade: if a same-name (or flexible-upgrade) visible character
-  // with strictly lower cost exists on this mission, redirect to upgrade logic
-  // so the player pays only the difference (per game rules).
+  // Auto-detect upgrade: if a same-name visible character with strictly lower cost
+  // exists on this mission, redirect to upgrade logic so the player pays only
+  // the difference (per game rules). Flexible upgrades (cross-name) are NOT
+  // auto-detected — player must explicitly choose to upgrade via the UI.
   const missionForUpgradeCheck = state.activeMissions[missionIndex];
   const chars = player === 'player1' ? missionForUpgradeCheck.player1Characters : missionForUpgradeCheck.player2Characters;
   const autoUpgradeTarget = chars.find((c) => {
     if (c.isHidden || c.controlledBy !== player) return false;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     if (card.chakra <= topCard.chakra) return false;
-    // Same name
-    if (topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()) return true;
-    // Flexible upgrade (Orochimaru 051/138, Akamaru 029, etc.)
-    return checkFlexibleUpgrade(card, topCard);
+    // Same name only — mandatory per rules
+    return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
   });
 
   if (autoUpgradeTarget) {
@@ -383,9 +382,9 @@ function handleRevealCharacter(
     'action',
     player,
     'REVEAL_CHARACTER',
-    `${player} reveals ${char.card.name_fr} (${char.card.title_fr}) on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
+    `${player} reveals ${char.card.name_fr} (${char.card.title_fr}) on mission ${missionIndex + 1} for ${costToPay} chakra.`,
     'game.log.revealCharacter',
-    { card: char.card.name_fr, title: char.card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
+    { card: char.card.name_fr, title: char.card.title_fr, mission: missionIndex + 1, cost: costToPay },
   );
 
   let newState: GameState = {

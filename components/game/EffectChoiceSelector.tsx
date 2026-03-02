@@ -150,7 +150,12 @@ export function EffectChoiceSelector() {
                     textAlign: 'center',
                   }}
                 >
-                  {t(`game.effectType.${choice.effectType}`)}
+                  {t(`card.effectTypes.${choice.effectType}` as
+                    | 'card.effectTypes.MAIN'
+                    | 'card.effectTypes.UPGRADE'
+                    | 'card.effectTypes.AMBUSH'
+                    | 'card.effectTypes.SCORE'
+                  )}
                 </div>
 
                 {/* Effect description */}

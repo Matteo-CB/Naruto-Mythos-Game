@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 087/130 - ZABUZA MOMOCHI "Demon of the Mist" (UC)
@@ -23,6 +24,8 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyChars = mission[enemySide];
+
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
   // Find non-hidden enemy characters in this mission
   const nonHiddenEnemies = enemyChars.filter((c) => !c.isHidden);
@@ -59,7 +62,17 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
     return { state: { ...newState, log } };
   }
 
-  // MAIN: Hide the only non-hidden enemy
+  // MAIN: Hide the only non-hidden enemy (check hide immunity first)
+  if (!canBeHiddenByEnemy(state, target, opponentPlayer)) {
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET',
+      `Zabuza Momochi (087): ${target.card.name_fr} is immune to being hidden by enemy effects.`,
+      'game.log.effect.immune', { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: target.card.name_fr },
+    );
+    return { state: { ...state, log } };
+  }
+
   const newState = { ...state };
   const missions = [...newState.activeMissions];
   const m = { ...missions[sourceMissionIndex] };

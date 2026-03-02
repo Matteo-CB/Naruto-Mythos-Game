@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 111/130 - SHIKAMARU NARA (R)
@@ -32,9 +33,9 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 3
+  // Find non-hidden enemies with effective power <= 3 that can be hidden
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 3)
+    .filter((c: CharacterInPlay) => canBeHiddenByEnemy(state, c, opponentPlayer) && getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {
