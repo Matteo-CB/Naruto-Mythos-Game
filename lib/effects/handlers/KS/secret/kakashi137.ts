@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 137/130 - KAKASHI HATAKE "L'Eclair Pourfendeur" (S)
@@ -20,10 +21,15 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[ctx.sourceMissionIndex];
 
   // Collect ALL valid targets: upgraded, non-hidden characters (not self)
+  // Exclude enemy characters that are immune to hide
   const validTargets: string[] = [];
   for (const side of ['player1Characters', 'player2Characters'] as const) {
+    const sidePlayer = side === 'player1Characters' ? 'player1' : 'player2';
+    const isEnemy = sidePlayer !== ctx.sourcePlayer;
     for (const c of mission[side]) {
       if (!c.isHidden && c.stack.length >= 2 && c.instanceId !== ctx.sourceCard.instanceId) {
+        // Skip immune enemy characters
+        if (isEnemy && !canBeHiddenByEnemy(state, c, sidePlayer)) continue;
         validTargets.push(c.instanceId);
       }
     }

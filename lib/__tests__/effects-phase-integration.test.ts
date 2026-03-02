@@ -123,8 +123,8 @@ describe('EndPhase - Summon Returns', () => {
 describe('EndPhase - Akamaru Return', () => {
   it('should return Akamaru to hand when no Kiba in same mission', () => {
     const akamaru = mockCharInPlay({ instanceId: 'aka-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: 'KS-027-C', number: 27, name_fr: 'Akamaru',
-      effects: [{ type: 'MAIN', description: '[⧗] If there is no friendly [u]Kiba Inuzuka[/u] in this mission at end of round, return to hand.' }],
+      id: 'KS-027-C', number: 27, name_fr: 'AKAMARU',
+      effects: [{ type: 'MAIN', description: '[⧗] If there isn\'t a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand.' }],
     });
     const baseState = createActionPhaseState();
     const state: GameState = {
@@ -137,13 +137,13 @@ describe('EndPhase - Akamaru Return', () => {
     const result = executeEndPhase(state);
     expect(result.activeMissions[0].player1Characters.length).toBe(0);
     expect(result.player1.hand.length).toBe(1);
-    expect(result.player1.hand[0].name_fr).toBe('Akamaru');
+    expect(result.player1.hand[0].name_fr).toBe('AKAMARU');
   });
 
   it('should keep Akamaru when Kiba is in the same mission', () => {
     const akamaru = mockCharInPlay({ instanceId: 'aka-1' }, {
-      id: 'KS-027-C', number: 27, name_fr: 'Akamaru',
-      effects: [{ type: 'MAIN', description: '[⧗] If there is no friendly [u]Kiba Inuzuka[/u] in this mission at end of round, return to hand.' }],
+      id: 'KS-027-C', number: 27, name_fr: 'AKAMARU',
+      effects: [{ type: 'MAIN', description: '[⧗] If there isn\'t a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand.' }],
     });
     const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
       id: 'KS-025-C', number: 25, name_fr: 'KIBA INUZUKA',
@@ -155,6 +155,74 @@ describe('EndPhase - Akamaru Return', () => {
 
     const result = executeEndPhase(state);
     expect(result.activeMissions[0].player1Characters.length).toBe(2);
+  });
+});
+
+// ===================================================================
+// END PHASE - Summon Keyword Return
+// ===================================================================
+describe('EndPhase - Summon Return', () => {
+  it('should return Summon keyword cards to hand at end of round', () => {
+    const gamaBunta = mockCharInPlay({ instanceId: 'gb-1', controlledBy: 'player1', originalOwner: 'player1' }, {
+      id: 'KS-094-C', number: 94, name_fr: 'GAMA BUNTA',
+      keywords: ['Summon'],
+      effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, you must return this character to your hand.' }],
+    });
+    const baseState = createActionPhaseState();
+    const state: GameState = {
+      ...baseState,
+      phase: 'end',
+      player1: { ...baseState.player1, hand: [], charactersInPlay: 1 },
+      activeMissions: [makeMission('D', [gamaBunta])],
+    };
+
+    const result = executeEndPhase(state);
+    expect(result.activeMissions[0].player1Characters.length).toBe(0);
+    expect(result.player1.hand.length).toBe(1);
+    expect(result.player1.hand[0].name_fr).toBe('GAMA BUNTA');
+  });
+
+  it('should return Rashomon (Summon) to hand at end of round', () => {
+    const rashomon = mockCharInPlay({ instanceId: 'rash-1', controlledBy: 'player1', originalOwner: 'player1' }, {
+      id: 'KS-067-UC', number: 67, name_fr: 'REMPART',
+      keywords: ['Summon'],
+      effects: [
+        { type: 'MAIN', description: '[⧗] The strongest enemy character in this mission loses all Power tokens and has its Power set to 0.' },
+        { type: 'MAIN', description: '[⧗] At the end of the round, you must return this character to your hand.' },
+      ],
+    });
+    const baseState = createActionPhaseState();
+    const state: GameState = {
+      ...baseState,
+      phase: 'end',
+      player1: { ...baseState.player1, hand: [], charactersInPlay: 1 },
+      activeMissions: [makeMission('D', [rashomon])],
+    };
+
+    const result = executeEndPhase(state);
+    expect(result.activeMissions[0].player1Characters.length).toBe(0);
+    expect(result.player1.hand.length).toBe(1);
+    expect(result.player1.hand[0].name_fr).toBe('REMPART');
+  });
+
+  it('should NOT return Kyodaigumo 103 via generic Summon return (handled separately)', () => {
+    const kyodaigumo = mockCharInPlay({ instanceId: 'kyo-1', controlledBy: 'player1', originalOwner: 'player1' }, {
+      id: 'KS-103-UC', number: 103, name_fr: 'KYODAIGUMO',
+      keywords: ['Summon'],
+      effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, hide a character with Power equal or less than this character. Then, you must return this character to your hand.' }],
+    });
+    const baseState = createActionPhaseState();
+    const state: GameState = {
+      ...baseState,
+      phase: 'end',
+      player1: { ...baseState.player1, hand: [], charactersInPlay: 1 },
+      activeMissions: [makeMission('D', [kyodaigumo])],
+    };
+
+    const result = executeEndPhase(state);
+    // Kyodaigumo should NOT be returned by generic Summon logic (it's handled by handleKyodaigumo103EndOfRound)
+    expect(result.activeMissions[0].player1Characters.length).toBe(1);
+    expect(result.player1.hand.length).toBe(0);
   });
 });
 

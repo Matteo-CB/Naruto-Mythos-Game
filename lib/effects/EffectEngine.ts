@@ -7,7 +7,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
-import { isProtectedFromEnemyHide } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 
 /**
@@ -1475,21 +1475,21 @@ export class EffectEngine {
         break;
       }
 
-      // --- Kidômaru 060 optional end-of-round: hide a character, then must return to hand ---
-      case 'KIDOMARU060_CHOOSE_HIDE_TARGET': {
+      // --- Kyodaigumo 103 optional end-of-round: hide a character, then must return to hand ---
+      case 'KYODAIGUMO103_CHOOSE_HIDE_TARGET': {
         // Hide the selected character
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
-        // Kidômaru must return to hand
-        let k060Data: { kidomaruInstanceId?: string } = {};
-        try { k060Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        if (k060Data.kidomaruInstanceId) {
-          newState = returnCharacterToHand(newState, k060Data.kidomaruInstanceId, pendingEffect.sourcePlayer);
+        // Kyodaigumo must return to hand
+        let k103Data: { kyodaigumoInstanceId?: string } = {};
+        try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (k103Data.kyodaigumoInstanceId) {
+          newState = returnCharacterToHand(newState, k103Data.kyodaigumoInstanceId, pendingEffect.sourcePlayer);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'END_RETURN',
-            'Kidômaru (060): Must return to hand after using end-of-round effect.',
-            'game.log.effect.kidomaru060Return',
-            { card: 'KIDÔMARU', id: 'KS-060-UC' },
+            'Kyodaigumo (103): Must return to hand after using end-of-round effect.',
+            'game.log.effect.kyodaigumo103Return',
+            { card: 'KYODAIGUMO', id: 'KS-103-UC' },
           );
         }
         break;
@@ -1503,29 +1503,8 @@ export class EffectEngine {
         break;
 
       case 'KAKASHI137_HIDE_UPGRADED': {
-        // Hide the selected upgraded character
-        const kakRes = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (kakRes) {
-          const kakSide: 'player1Characters' | 'player2Characters' =
-            kakRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
-          const kakMissions = [...newState.activeMissions];
-          const kakMission = { ...kakMissions[kakRes.missionIndex] };
-          const kakChars = [...kakMission[kakSide]];
-          const kakIdx = kakChars.findIndex((c) => c.instanceId === targetId);
-          if (kakIdx !== -1) {
-            kakChars[kakIdx] = { ...kakChars[kakIdx], isHidden: true };
-            kakMission[kakSide] = kakChars;
-            kakMissions[kakRes.missionIndex] = kakMission;
-            newState.activeMissions = kakMissions;
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_HIDE',
-              `Kakashi Hatake (137): Hid upgraded ${kakRes.character.card.name_fr}.`,
-              'game.log.effect.hide',
-              { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: kakRes.character.card.name_fr, mission: String(kakRes.missionIndex + 1) },
-            );
-          }
-        }
+        // Hide the selected upgraded character — use hideCharacterWithLog for proper protection checks
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
 
@@ -2581,6 +2560,48 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
+      // --- Gemma 049: Sacrifice choice (defeat protection) ---
+      case 'GEMMA049_SACRIFICE_CHOICE': {
+        // Player accepted — sacrifice Gemma to protect the original target from defeat
+        let g049Data: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
+        try { g049Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const gemmaId = g049Data.sacrificeInstanceId ?? targetId;
+        const gemmaResult = EffectEngine.findCharByInstanceId(newState, gemmaId);
+        newState = EffectEngine.defeatCharacterDirect(newState, gemmaId);
+        if (gemmaResult) {
+          newState = triggerOnDefeatEffects(newState, gemmaResult.character, gemmaResult.player);
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_SACRIFICE',
+          'Gemma Shiranui (049): Sacrificed to protect an ally from defeat.',
+          'game.log.effect.gemma049Sacrifice',
+          { card: 'GEMMA SHIRANUI', id: 'KS-049-C' },
+        );
+        break;
+      }
+
+      // --- Gemma 049: Sacrifice choice (hide protection) ---
+      case 'GEMMA049_SACRIFICE_HIDE_CHOICE': {
+        // Player accepted — sacrifice Gemma to protect the original target from being hidden
+        let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
+        try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const gemmaHideId = g049HideData.sacrificeInstanceId ?? targetId;
+        const gemmaHideResult = EffectEngine.findCharByInstanceId(newState, gemmaHideId);
+        newState = EffectEngine.defeatCharacterDirect(newState, gemmaHideId);
+        if (gemmaHideResult) {
+          newState = triggerOnDefeatEffects(newState, gemmaHideResult.character, gemmaHideResult.player);
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_SACRIFICE',
+          'Gemma Shiranui (049): Sacrificed to protect an ally from being hidden.',
+          'game.log.effect.gemma049SacrificeHide',
+          { card: 'GEMMA SHIRANUI', id: 'KS-049-C' },
+        );
+        break;
+      }
+
       // =============================================
       // SIMPLE POWERUP types (target = instanceId → add power tokens)
       // =============================================
@@ -2753,47 +2774,27 @@ export class EffectEngine {
           );
 
           // Stage 2: find valid characters to hide (cost ≤ 4, not Kimimaro itself, not already hidden)
+          // Filter out enemy chars immune to hide
           const validHideTargets_km: string[] = [];
           for (const mission_km of newState.activeMissions) {
-            for (const char_km of [...mission_km.player1Characters, ...mission_km.player2Characters]) {
-              if (char_km.isHidden) continue;
-              if (char_km.instanceId === pendingEffect.sourceInstanceId) continue;
-              const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
-              if ((topCard_km.chakra ?? 0) <= 4) {
-                validHideTargets_km.push(char_km.instanceId);
+            for (const side_km of ['player1Characters', 'player2Characters'] as const) {
+              const sideOwner_km = side_km === 'player1Characters' ? 'player1' as const : 'player2' as const;
+              const isEnemy_km = sideOwner_km !== pendingEffect.sourcePlayer;
+              for (const char_km of mission_km[side_km]) {
+                if (char_km.isHidden) continue;
+                if (char_km.instanceId === pendingEffect.sourceInstanceId) continue;
+                if (isEnemy_km && !canBeHiddenByEnemy(newState, char_km, sideOwner_km)) continue;
+                const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
+                if ((topCard_km.chakra ?? 0) <= 4) {
+                  validHideTargets_km.push(char_km.instanceId);
+                }
               }
             }
           }
 
           if (validHideTargets_km.length === 1) {
-            // Auto-hide the single target
-            const autoTarget_km = validHideTargets_km[0];
-            const missions_km = newState.activeMissions.map(m => ({
-              ...m,
-              player1Characters: m.player1Characters.map(c =>
-                c.instanceId === autoTarget_km ? { ...c, isHidden: true } : c
-              ),
-              player2Characters: m.player2Characters.map(c =>
-                c.instanceId === autoTarget_km ? { ...c, isHidden: true } : c
-              ),
-            }));
-            newState = { ...newState, activeMissions: missions_km };
-            let hiddenName_km = '';
-            for (const m of missions_km) {
-              for (const c of [...m.player1Characters, ...m.player2Characters]) {
-                if (c.instanceId === autoTarget_km) {
-                  const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                  hiddenName_km = tc.name_fr;
-                }
-              }
-            }
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_HIDE',
-              `Kimimaro (056) UPGRADE: Hid ${hiddenName_km}.`,
-              'game.log.effect.hide',
-              { card: 'KIMIMARO', id: 'KS-056-UC', target: hiddenName_km },
-            );
+            // Auto-hide the single target (use hideCharacterWithLog for protection checks)
+            newState = EffectEngine.hideCharacterWithLog(newState, validHideTargets_km[0], pendingEffect.sourcePlayer);
           } else if (validHideTargets_km.length > 1) {
             // Create stage 2 pending effect/action for choosing which character to hide
             const effectId_km = generateInstanceId();
@@ -2831,34 +2832,8 @@ export class EffectEngine {
         break;
       }
       case 'KIMIMARO056_CHOOSE_HIDE': {
-        // Stage 2: hide the selected character (cost ≤ 4)
-        const targetInstanceId_kmh = targetId;
-        const missions_kmh = newState.activeMissions.map(m => ({
-          ...m,
-          player1Characters: m.player1Characters.map(c =>
-            c.instanceId === targetInstanceId_kmh ? { ...c, isHidden: true } : c
-          ),
-          player2Characters: m.player2Characters.map(c =>
-            c.instanceId === targetInstanceId_kmh ? { ...c, isHidden: true } : c
-          ),
-        }));
-        newState = { ...newState, activeMissions: missions_kmh };
-        let hiddenName_kmh = '';
-        for (const m of missions_kmh) {
-          for (const c of [...m.player1Characters, ...m.player2Characters]) {
-            if (c.instanceId === targetInstanceId_kmh) {
-              const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              hiddenName_kmh = tc.name_fr;
-            }
-          }
-        }
-        newState.log = logAction(
-          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_HIDE',
-          `Kimimaro (056) UPGRADE: Hid ${hiddenName_kmh}.`,
-          'game.log.effect.hide',
-          { card: 'KIMIMARO', id: 'KS-056-UC', target: hiddenName_kmh },
-        );
+        // Stage 2: hide the selected character (cost ≤ 4) — use hideCharacterWithLog for protection checks
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
       case 'KIN073_CHOOSE_DISCARD': {
@@ -2892,6 +2867,7 @@ export class EffectEngine {
         if (k73Mission) {
           for (const enemy of k73Mission[enemySide_k73d]) {
             if (enemy.isHidden) continue;
+            if (!canBeHiddenByEnemy(newState, enemy, enemyPlayer_k73d)) continue;
             const enemyPower_k73 = calculateCharacterPower(newState, enemy, enemyPlayer_k73d);
             if (enemyPower_k73 <= 4) {
               k73HideTargets.push(enemy.instanceId);
@@ -4453,10 +4429,11 @@ export class EffectEngine {
     if (!charResult) return state;
 
     const effectSource = sourcePlayer ?? (charResult.player === 'player1' ? 'player2' : 'player1');
+    const isEnemyEffect = effectSource !== charResult.player;
 
     // Check for defeat replacement (Hayate, Gaara 075, Gemma)
     const replacement = EffectEngine.checkDefeatReplacement(
-      state, charResult.character, charResult.player, charResult.missionIndex, true,
+      state, charResult.character, charResult.player, charResult.missionIndex, isEnemyEffect,
     );
     if (replacement.replaced) {
       if (replacement.replacement === 'immune') {
@@ -4467,12 +4444,42 @@ export class EffectEngine {
         return EffectEngine.hideCharacter(state, targetId);
       }
       if (replacement.replacement === 'sacrifice' && replacement.sacrificeInstanceId) {
-        let newState = EffectEngine.defeatCharacterDirect(state, replacement.sacrificeInstanceId);
-        // Find the sacrificed character for on-defeat triggers
-        const sacrificeResult = EffectEngine.findCharByInstanceId(state, replacement.sacrificeInstanceId);
-        if (sacrificeResult) {
-          newState = triggerOnDefeatEffects(newState, sacrificeResult.character, sacrificeResult.player);
-        }
+        // Gemma 049: optional sacrifice — create pending choice for the owning player
+        let newState = { ...state };
+        const effectId = generateInstanceId();
+        const actionId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId,
+          sourceCardId: 'KS-049-C',
+          sourceInstanceId: replacement.sacrificeInstanceId,
+          sourceMissionIndex: charResult.missionIndex,
+          effectType: 'MAIN' as const,
+          effectDescription: JSON.stringify({
+            targetInstanceId: targetId,
+            sacrificeInstanceId: replacement.sacrificeInstanceId,
+            effectSource,
+          }),
+          targetSelectionType: 'GEMMA049_SACRIFICE_CHOICE',
+          sourcePlayer: charResult.player,
+          requiresTargetSelection: true,
+          validTargets: [replacement.sacrificeInstanceId],
+          isOptional: true,
+          isMandatory: false,
+          resolved: false,
+          isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: actionId,
+          type: 'SELECT_TARGET' as 'SELECT_TARGET',
+          player: charResult.player,
+          description: `Gemma Shiranui (049): Sacrifice Gemma to protect ${charResult.character.card.name_fr}?`,
+          descriptionKey: 'game.effect.desc.gemma049SacrificeDefeat',
+          descriptionParams: { target: charResult.character.card.name_fr },
+          options: [replacement.sacrificeInstanceId],
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId,
+        }];
         return newState;
       }
     }
@@ -4850,20 +4857,9 @@ export class EffectEngine {
     return false;
   }
 
-  /** Check if a character is immune to hide by enemy effects (Ichibi 076/130, Kyubi 129) */
+  /** Check if a character is immune to hide by enemy effects (Ichibi 076/130, Kyubi 129/134) */
   static isImmuneToEnemyHide(char: CharacterInPlay): boolean {
-    if (char.isHidden) return false;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    // Note: card 076 has no effects in JSON data — match all three by number directly.
-    if (topCard.number === 76 || topCard.number === 130) {
-      return true;
-    }
-    if (topCard.number === 129) {
-      return (topCard.effects ?? []).some(
-        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('defeated') || e.description.includes('hidden')),
-      );
-    }
-    return false;
+    return isImmuneToEnemyHideOrDefeat(char);
   }
 
   /** Hide a character and log the action */
@@ -4872,14 +4868,74 @@ export class EffectEngine {
     if (!charResult) return state;
     if (charResult.character.isHidden) return state;
 
+    const isEnemyEffect = charResult.player !== sourcePlayer;
+
     // Check hide immunity from enemy effects (Ichibi 076/130, Kyubi 129)
-    if (charResult.player !== sourcePlayer && EffectEngine.isImmuneToEnemyHide(charResult.character)) {
+    if (isEnemyEffect && EffectEngine.isImmuneToEnemyHide(charResult.character)) {
       return state; // Immune — hide blocked
     }
 
     // Check Shino 115 mission-level protection: friendly allies cannot be hidden by enemy effects
-    if (charResult.player !== sourcePlayer && isProtectedFromEnemyHide(state, charResult.character, charResult.player)) {
+    if (isEnemyEffect && isProtectedFromEnemyHide(state, charResult.character, charResult.player)) {
       return state; // Protected by Shino 115 — hide blocked
+    }
+
+    // Check Gemma 049 sacrifice: can sacrifice Gemma to protect friendly Leaf Village from enemy hide
+    if (isEnemyEffect && charResult.character.card.group === 'Leaf Village') {
+      const mission = state.activeMissions[charResult.missionIndex];
+      const friendlyChars = charResult.player === 'player1' ? mission.player1Characters : mission.player2Characters;
+      for (const friendly of friendlyChars) {
+        if (friendly.isHidden || friendly.instanceId === charResult.character.instanceId) continue;
+        const fTopCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+        if (fTopCard.number === 49) {
+          const hasSacrifice = (fTopCard.effects ?? []).some(
+            (e) =>
+              e.type === 'MAIN' &&
+              e.description.includes('[⧗]') &&
+              e.description.includes('Leaf Village') &&
+              e.description.includes('defeat this character instead'),
+          );
+          if (hasSacrifice) {
+            // Create pending choice for the owning player
+            let newState = { ...state };
+            const effectId = generateInstanceId();
+            const actionId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: effectId,
+              sourceCardId: 'KS-049-C',
+              sourceInstanceId: friendly.instanceId,
+              sourceMissionIndex: charResult.missionIndex,
+              effectType: 'MAIN' as const,
+              effectDescription: JSON.stringify({
+                targetInstanceId: targetInstanceId,
+                sacrificeInstanceId: friendly.instanceId,
+                effectSource: sourcePlayer,
+              }),
+              targetSelectionType: 'GEMMA049_SACRIFICE_HIDE_CHOICE',
+              sourcePlayer: charResult.player,
+              requiresTargetSelection: true,
+              validTargets: [friendly.instanceId],
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: false,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: actionId,
+              type: 'SELECT_TARGET' as 'SELECT_TARGET',
+              player: charResult.player,
+              description: `Gemma Shiranui (049): Sacrifice Gemma to protect ${charResult.character.card.name_fr} from being hidden?`,
+              descriptionKey: 'game.effect.desc.gemma049SacrificeHide',
+              descriptionParams: { target: charResult.character.card.name_fr },
+              options: [friendly.instanceId],
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId,
+            }];
+            return newState;
+          }
+        }
+      }
     }
 
     let newState = EffectEngine.hideCharacter(state, targetInstanceId);
@@ -5258,15 +5314,8 @@ export class EffectEngine {
       : charResult.character.card;
 
     if ((topCard.chakra ?? 0) <= 3 && !charResult.character.isHidden) {
-      const hiddenState = EffectEngine.hideCharacter(newState, targetId);
-      hiddenState.log = logAction(
-        hiddenState.log, hiddenState.turn, hiddenState.phase, player,
-        'EFFECT_HIDE',
-        `Kimimaro (055): Hid ${topCard.name_fr}.`,
-        'game.log.effect.hide',
-        { card: 'Kimimaro', id: 'KS-055-C', target: topCard.name_fr, mission: String(charResult.missionIndex + 1) },
-      );
-      return hiddenState;
+      // Use hideCharacterWithLog for proper protection checks (Ichibi, Shino 115, Gemma 049)
+      return EffectEngine.hideCharacterWithLog(newState, targetId, player);
     }
 
     return newState;
@@ -5305,13 +5354,16 @@ export class EffectEngine {
     const validHideTargets: string[] = [];
 
     for (const mission of newState.activeMissions) {
+      // Enemy chars — check immunity
       for (const char of mission[enemySide]) {
         if (char.isHidden) continue;
+        if (!canBeHiddenByEnemy(newState, char, opponent)) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if ((topCard.chakra ?? 0) <= 3) {
           validHideTargets.push(char.instanceId);
         }
       }
+      // Friendly chars — no immunity check needed
       for (const char of mission[friendlySide]) {
         if (char.isHidden) continue;
         if (char.instanceId === pending.sourceInstanceId) continue;
@@ -5327,15 +5379,8 @@ export class EffectEngine {
     }
 
     if (validHideTargets.length === 1) {
-      // Auto-hide the only valid target
-      newState.log = logAction(
-        newState.log, newState.turn, newState.phase, player,
-        'EFFECT_HIDE',
-        `Kimimaro (055): Hid a character.`,
-        'game.log.effect.hide',
-        { card: 'Kimimaro', id: 'KS-055-C', target: validHideTargets[0], mission: '' },
-      );
-      return EffectEngine.hideCharacter(newState, validHideTargets[0]);
+      // Auto-hide the only valid target (use hideCharacterWithLog for protection checks)
+      return EffectEngine.hideCharacterWithLog(newState, validHideTargets[0], player);
     }
 
     // Multiple targets — create a new pending for hide target selection
@@ -7445,10 +7490,8 @@ export class EffectEngine {
       }
     }
 
-    // Ichibi 076 (UC), Kyubi 129 (R), Ichibi 130 (R): Can't be hidden or defeated by enemy effects
-    // Note: card 076 has no effects in JSON data, so immunity is matched by card number directly.
-    if ((topCard.number === 76 || topCard.number === 129 || topCard.number === 130) && isEnemyEffect) {
-      // Always immune — no effect-text guard needed (076 lacks effect data in JSON)
+    // Ichibi 076 (UC), Kyubi 129 (R/RA), Ichibi 130 (R/RA), Kyubi 134 (S): Can't be hidden or defeated by enemy effects
+    if (isEnemyEffect && isImmuneToEnemyHideOrDefeat(targetChar)) {
       return { replaced: true, replacement: 'immune' };
     }
 

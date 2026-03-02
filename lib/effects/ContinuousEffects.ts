@@ -416,3 +416,45 @@ export function isProtectedFromEnemyHide(
 
   return false;
 }
+
+// ---------------------
+// Hide Immunity (Self)
+// ---------------------
+
+/**
+ * Returns true if a character is immune to being hidden by enemy effects.
+ *
+ * Cards with "[⧗] Can't be hidden or defeated by enemy effects":
+ * - Ichibi 076 (UC), Ichibi 130 (R/RA), Kyubi 129 (R/RA), Kyubi 134 (S)
+ *
+ * Uses text-based matching on effects for robustness.
+ */
+export function isImmuneToEnemyHideOrDefeat(char: CharacterInPlay): boolean {
+  if (char.isHidden) return false;
+  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  return (topCard.effects ?? []).some(
+    (e) =>
+      e.type === 'MAIN' &&
+      e.description.includes('[⧗]') &&
+      e.description.includes("Can't be hidden or defeated by enemy effects"),
+  );
+}
+
+/**
+ * Returns true if a character can be hidden by an enemy effect.
+ * Checks self-immunity AND mission-level protection (Shino 115).
+ *
+ * Use this in handlers to filter valid targets BEFORE presenting them
+ * to the player. Does NOT check Gemma 049 sacrifice (that creates a
+ * pending choice and cannot be pre-filtered).
+ */
+export function canBeHiddenByEnemy(
+  state: GameState,
+  char: CharacterInPlay,
+  charOwner: PlayerID,
+): boolean {
+  if (char.isHidden) return false;
+  if (isImmuneToEnemyHideOrDefeat(char)) return false;
+  if (isProtectedFromEnemyHide(state, char, charOwner)) return false;
+  return true;
+}

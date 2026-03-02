@@ -107,23 +107,25 @@ export function DraftDeckBuilder({
     return Array.from(groups).sort();
   }, [catalogChars]);
 
-  // Filter catalog characters
+  // Filter catalog characters and sort by chakra cost
   const filteredCatalog = useMemo(() => {
-    return catalogChars.filter((c) => {
-      if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
-      if (filterGroup !== 'all' && c.group !== filterGroup) return false;
-      if (searchText) {
-        const search = searchText.toLowerCase();
-        if (
-          !getCardName(c, locale).toLowerCase().includes(search) &&
-          !(c.name_en ?? '').toLowerCase().includes(search) &&
-          !c.id.toLowerCase().includes(search)
-        ) {
-          return false;
+    return catalogChars
+      .filter((c) => {
+        if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
+        if (filterGroup !== 'all' && c.group !== filterGroup) return false;
+        if (searchText) {
+          const search = searchText.toLowerCase();
+          if (
+            !getCardName(c, locale).toLowerCase().includes(search) &&
+            !(c.name_en ?? '').toLowerCase().includes(search) &&
+            !c.id.toLowerCase().includes(search)
+          ) {
+            return false;
+          }
         }
-      }
-      return true;
-    });
+        return true;
+      })
+      .sort((a, b) => (a.chakra ?? 0) - (b.chakra ?? 0));
   }, [catalogChars, filterRarity, filterGroup, searchText]);
 
   // Count characters in deck by version key

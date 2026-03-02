@@ -25,6 +25,12 @@ export function GameEndScreen() {
   const draftDeckCardIds = useGameStore((s) => s.draftDeckCardIds);
   const draftDeckMissionIds = useGameStore((s) => s.draftDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
+  const rematchState = useSocketStore((s) => s.rematchState);
+  const offerRematch = useSocketStore((s) => s.offerRematch);
+  const acceptRematch = useSocketStore((s) => s.acceptRematch);
+  const declineRematch = useSocketStore((s) => s.declineRematch);
+  const replayAIGame = useGameStore((s) => s.replayAIGame);
+  const lastAIGameConfig = useGameStore((s) => s.lastAIGameConfig);
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
@@ -415,6 +421,83 @@ export function GameEndScreen() {
             {draftSaveState === 'saved' && (
               <span className="text-xs" style={{ color: '#4a9e4a' }}>
                 {t('draft.deckSaved')}
+              </span>
+            )}
+
+            {/* AI Replay button */}
+            {isAIGame && lastAIGameConfig && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={replayAIGame}
+                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                style={{
+                  backgroundColor: '#1a1a2e',
+                  color: '#c4a35a',
+                  border: '1px solid #c4a35a',
+                }}
+              >
+                {t('game.end.replay')}
+              </motion.button>
+            )}
+
+            {/* Online Rematch button */}
+            {isOnlineGame && rematchState === 'none' && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={offerRematch}
+                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                style={{
+                  backgroundColor: '#1a1a2e',
+                  color: '#c4a35a',
+                  border: '1px solid #c4a35a',
+                }}
+              >
+                {t('game.end.rematch')}
+              </motion.button>
+            )}
+
+            {isOnlineGame && rematchState === 'offered' && (
+              <span className="text-xs" style={{ color: '#c4a35a' }}>
+                {t('game.end.rematchWaiting')}
+              </span>
+            )}
+
+            {isOnlineGame && rematchState === 'received' && (
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={acceptRematch}
+                  className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                  style={{
+                    backgroundColor: '#4a9e4a',
+                    color: '#0a0a0a',
+                    border: '1px solid #4a9e4a',
+                  }}
+                >
+                  {t('game.end.rematchAccept')}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={declineRematch}
+                  className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                  style={{
+                    backgroundColor: '#1a1a2e',
+                    color: '#b33e3e',
+                    border: '1px solid #b33e3e',
+                  }}
+                >
+                  {t('game.end.rematchDecline')}
+                </motion.button>
+              </div>
+            )}
+
+            {isOnlineGame && rematchState === 'declined' && (
+              <span className="text-xs" style={{ color: '#b33e3e' }}>
+                {t('game.end.rematchDeclined')}
               </span>
             )}
 

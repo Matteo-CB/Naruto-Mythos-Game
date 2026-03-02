@@ -1,22 +1,23 @@
-Cards NOT found on CDN (brute-force failed across 6 scripts, 50000+ URL combinations):
+Cards NOT found on CDN (brute-force across 10 scripts, 4 184 391+ URLs tested):
 
-KS-045-UC — ANKO MITARASHI "Shadow Snake Hands"
-KS-115-R — SHINO ABURAME "Insect Wall Technique"
-KS-115-RA — SHINO ABURAME "Insect Wall Technique" (Rare Art)
-KS-116-RA — NEJI HYUGA "Eight Trigrams Sixty-Four Palms"
-KS-122-R — JIROBO "Arhat Fist"
-KS-122-RA — JIROBO "Arhat Fist" (Rare Art)
-KS-124-R — KIDOMARU "Spider Bow: Fierce Rip"
-KS-124-RA — KIDOMARU "Spider Bow: Fierce Rip" (Rare Art)
-KS-126-R — OROCHIMARU "Get out of my way."
-KS-127-R — SAKON "Stone Fist"
-KS-127-RA — SAKON "Stone Fist" (Rare Art)
-KS-129-R — NINE-TAILS "Demon Fox Cloak"
-KS-129-RA — NINE-TAILS "Demon Fox Cloak" (Rare Art)
-KS-130-R — ONE-TAIL "I hope you're ready to die!"
-KS-134-S — NINE-TAILED FOX "The Beast Awakens"
-KS-149-M — KIBA INUZUKA "Fang Over Fang"
-KS-152-M — ITACHI UCHIHA "Amaterasu"
-KS-153-M — GAARA "Sand Burial"
+KS-045-UC — Anko
+KS-115-R — Shino
+KS-115-RA — Shino
+KS-116-RA — Neji
+KS-122-R — Jirobo
+KS-122-RA — Jirobo
+KS-124-R — Kidomaru
+KS-124-RA — Kidomaru
+KS-126-R — Orochimaru
+KS-127-R — Sakon
+KS-127-RA — Sakon
+KS-129-R — Kyubi
+KS-129-RA — Kyubi
+KS-130-R — One-Tail
+KS-134-S — Kyubi
+KS-149-M — Kiba
+KS-151-M — RockLee
+KS-152-M — Itachi
+KS-153-M — Gaara
 
-18 cards remaining. These are likely not yet uploaded to the CDN.
+19 cards remaining.

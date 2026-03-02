@@ -3463,9 +3463,9 @@
       "card_type": "character",
       "name_en": "NARUTO UZUMAKI",
       "name_fr": "NARUTO UZUMAKI",
-      "title_fr": "Believe it!",
-      "title_en": "Believe it!",
-      "has_visual": false,
+      "title_fr": "Fureur du Rasengan",
+      "title_en": "Fury of the Rasengan",
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -3485,9 +3485,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/rare/KS-108-R.webp",
       "rarity_display": "Rare",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-108-R.webp",
       "data_complete": true,
       "old_id": "108/130"
     },
@@ -3606,9 +3606,9 @@
       "card_type": "character",
       "name_en": "CHOJI AKIMICHI",
       "name_fr": "CHÔJI AKIMICHI",
-      "title_fr": "C'est qui que tu traites de gros ?",
-      "title_en": "Who are you calling fat?",
-      "has_visual": false,
+      "title_fr": "Pilule aux Piments",
+      "title_en": "Chili Pepper Pill",
+      "has_visual": true,
       "chakra": 5,
       "power": 4,
       "keywords": [
@@ -3627,9 +3627,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "",
-      "rarity_display": "",
-      "image_file": "",
+      "image_url": "/images/cards/KS/rare/KS-112-R.webp",
+      "rarity_display": "Rare",
+      "image_file": "images/cards/KS/rare/KS-112-R.webp",
       "data_complete": true,
       "old_id": "112/130"
     },
@@ -4162,13 +4162,14 @@
       "card_type": "character",
       "name_en": "ITACHI UCHIHA",
       "name_fr": "ITACHI UCHIWA",
-      "title_fr": "Je les contrôle tous.",
-      "title_en": "I control them all.",
-      "has_visual": false,
+      "title_fr": "Amaterasu",
+      "title_en": "Amaterasu",
+      "has_visual": true,
       "chakra": 6,
       "power": 6,
       "keywords": [
-        "Rogue Ninja"
+        "Rogue Ninja",
+        "Jutsu"
       ],
       "group": "Akatsuki",
       "effects": [
@@ -4183,9 +4184,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "",
-      "rarity_display": "",
-      "image_file": "",
+      "image_url": "/images/cards/KS/rare/KS-128-R.webp",
+      "rarity_display": "Rare",
+      "image_file": "images/cards/KS/rare/KS-128-R.webp",
       "data_complete": true,
       "old_id": "128/130"
     },
@@ -4742,7 +4743,7 @@
       "name_fr": "NARUTO UZUMAKI",
       "title_fr": "Équipe 7 originelle",
       "title_en": "Original Team 7",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": ["Team 7"],
@@ -4753,9 +4754,9 @@
           "description": "[⧗] If you have the Edge, your hidden characters in this mission have +1 Power."
         }
       ],
-      "image_url": "",
-      "rarity_display": "",
-      "image_file": "",
+      "image_url": "/images/cards/KS/mythos/KS-145-M.webp",
+      "rarity_display": "Mythos",
+      "image_file": "images/cards/KS/mythos/KS-145-M.webp",
       "data_complete": true,
       "old_id": "145/130"
     },
@@ -5531,8 +5532,8 @@
       "card_type": "character",
       "name_en": "NARUTO UZUMAKI",
       "name_fr": "NARUTO UZUMAKI",
-      "title_fr": "Believe it!",
-      "title_en": "Believe it!",
+      "title_fr": "Fureur du Rasengan",
+      "title_en": "Fury of the Rasengan",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -6234,13 +6235,14 @@
       "card_type": "character",
       "name_en": "ITACHI UCHIHA",
       "name_fr": "ITACHI UCHIWA",
-      "title_fr": "Je les contrôle tous.",
-      "title_en": "I control them all.",
+      "title_fr": "Amaterasu",
+      "title_en": "Amaterasu",
       "has_visual": true,
       "chakra": 6,
       "power": 6,
       "keywords": [
-        "Rogue Ninja"
+        "Rogue Ninja",
+        "Jutsu"
       ],
       "group": "Akatsuki",
       "effects": [

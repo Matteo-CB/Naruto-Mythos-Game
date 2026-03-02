@@ -76,7 +76,8 @@
       "title": "Mulligan",
       "description": "Vous pouvez remettre votre main dans le deck et piocher 5 nouvelles cartes. Cela ne peut etre fait qu'une seule fois.",
       "keep": "Garder la main",
-      "redraw": "Repiocher"
+      "redraw": "Repiocher",
+      "clickHint": "Cliquez sur une carte pour l'inspecter"
     },
     "actions": {
       "playCharacter": "Jouer un personnage sur une mission",
@@ -145,6 +146,8 @@
         "fizzle": "{card} ({id}) : Effet sans effet.",
         "defeatReplacement": "{card} : Cache au lieu d'etre vaincu (effet de remplacement).",
         "sacrifice": "Gemma Shiranui se sacrifie pour proteger {target}.",
+        "gemma049Sacrifice": "Gemma Shiranui (049) : Sacrifie pour proteger un allie de la defaite.",
+        "gemma049SacrificeHide": "Gemma Shiranui (049) : Sacrifie pour proteger un allie d'etre cache.",
         "dosu069AutoDefeat": "Dosu Kinuta (069) : L'adversaire ne peut pas payer (cout {cost}), le personnage est vaincu.",
         "dosu069Reveal": "Dosu Kinuta (069) : {target} a ete revele, payant {cost} chakra.",
         "onDefeatChakra": "{card} ({id}) : Gagne {amount} chakra ({defeated} a ete vaincu).",
@@ -152,6 +155,7 @@
         "akamaru": "Akamaru retourne en main (pas de Kiba dans la mission).",
         "akamaru028Return": "Akamaru (028) : Retourne en main en fin de tour.",
         "kidomaru060Return": "Kidômaru (060) : Doit retourner en main apres avoir utilise l'effet de fin de tour.",
+        "kyodaigumo103Return": "Kyodaigumo (103) : Doit retourner en main apres avoir utilise l'effet de fin de tour.",
         "deckLook": "{card} ({id}) : Regarde les {count} premieres cartes du deck.",
         "discardCards": "{card} ({id}) : Defausse {count} carte(s).",
         "putOnDeck": "Remet {card} sur le dessus du deck.",
@@ -232,7 +236,13 @@
       "savingReplay": "Enregistrement...",
       "replaySaved": "Partie enregistree",
       "watchReplay": "Voir le Replay",
-      "saveError": "Echec de l'enregistrement"
+      "saveError": "Echec de l'enregistrement",
+      "replay": "Rejouer",
+      "rematch": "Revanche",
+      "rematchWaiting": "En attente de l'adversaire...",
+      "rematchAccept": "Accepter",
+      "rematchDecline": "Refuser",
+      "rematchDeclined": "L'adversaire a refuse la revanche"
     },
     "timer": {
       "autoPassed": "Temps ecoule — passe automatique"
@@ -292,6 +302,8 @@
       "tayuya065PutBack": "Remise sur le dessus",
       "cardDiscarded": "DEFAUSSEE",
       "dosu069Defeat": "Laisser vaincre le personnage",
+      "gemma049DeclineDefeat": "Laisser le personnage etre vaincu",
+      "gemma049DeclineHide": "Laisser le personnage etre cache",
       "sakura011DrawBtn": "Piocher une carte",
       "sakura011DrawDeck": "Votre pioche ({count} cartes)",
       "confirmHideBtn": "Cacher",
@@ -376,6 +388,9 @@
         "kidomaru060MoveCharacter": "Choisissez un personnage dans cette mission a deplacer vers une autre.",
         "kidomaru060DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins en jeu a vaincre.",
         "kidomaru060EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Kidômaru doit retourner dans votre main.",
+        "kyodaigumo103EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Kyodaigumo doit retourner dans votre main.",
+        "gemma049SacrificeDefeat": "Sacrifier Gemma Shiranui pour proteger {target} de la defaite ?",
+        "gemma049SacrificeHide": "Sacrifier Gemma Shiranui pour proteger {target} d'etre cache ?",
         "kimimaro056DiscardAndHide": "Choisissez une carte a defausser, puis cachez un personnage avec cout 4 ou moins.",
         "kimimaro056ChooseHide": "Choisissez un personnage a cacher (cout 4 ou moins).",
         "kin073ChooseEnemy": "Choisissez un personnage ennemi avec Puissance 4 ou moins \u00e0 cacher.",
@@ -669,7 +684,23 @@
     "casual": "Casual",
     "ranked": "Classe",
     "casualDesc": "Match non classe — jouez pour le plaisir, pas de changement ELO",
-    "rankedDesc": "Match classe — votre classement ELO sera mis a jour"
+    "rankedDesc": "Match classe — votre classement ELO sera mis a jour",
+    "publicRooms": "Salons Publics",
+    "privateRoom": "Salon Prive",
+    "createPublicRoom": "Creer un Salon",
+    "noRooms": "Aucun salon disponible. Creez-en un !",
+    "timeJustNow": "A l'instant",
+    "timeMinutesAgo": "Il y a {minutes}m",
+    "mode": {
+      "casual": "Casual",
+      "ranked": "Classe",
+      "draft": "Draft"
+    },
+    "modeDesc": {
+      "casual": "Match non classe — jouez pour le plaisir, pas de changement ELO",
+      "ranked": "Match classe — votre classement ELO sera mis a jour",
+      "draft": "Mode draft — construisez un deck a partir de boosters aleatoires"
+    }
   },
   "leaderboard": {
     "title": "Classement",
@@ -1237,6 +1268,7 @@
     "home": "Accueil",
     "tabSettings": "Parametres",
     "tabCards": "Cartes",
+    "tabBugs": "Rapports de Bugs",
     "unauthorized": "Acces refuse",
     "leagues": {
       "title": "Ligues & Badges",

@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 113/130 - KIBA INUZUKA (R)
@@ -53,9 +54,10 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Pre-condition 2: There must be at least one non-hidden enemy in Kiba's mission
+  // Pre-condition 2: There must be at least one non-hidden enemy in Kiba's mission that can be hidden
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const kibaMission = state.activeMissions[sourceMissionIndex];
-  const hasEnemy = kibaMission && kibaMission[enemySide].some(c => !c.isHidden);
+  const hasEnemy = kibaMission && kibaMission[enemySide].some(c => canBeHiddenByEnemy(state, c, opponentPlayer));
   if (!hasEnemy) {
     return {
       state: {

@@ -80,6 +80,8 @@ function removeAllPowerTokens(state: GameState): GameState {
 function handleEndOfRoundTriggers(state: GameState): GameState {
   let newState = { ...state };
   const charsToReturn: { instanceId: string; player: PlayerID; reason: string; cardName: string; isAkamaru: boolean }[] = [];
+  // Track which instanceIds are already queued for return (avoid duplicates)
+  const returnQueued = new Set<string>();
 
   for (const mission of newState.activeMissions) {
     for (const side of ['player1Characters', 'player2Characters'] as const) {
@@ -88,21 +90,20 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
 
       for (const char of chars) {
         if (char.isHidden) continue;
+        if (returnQueued.has(char.instanceId)) continue;
 
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const isSummon = (topCard.keywords ?? []).includes('Summon');
 
-        for (const effect of topCard.effects ?? []) {
-          if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
-
-          // Summon return: "At the end of the round, you must return this character to your hand"
-          // Also matches "take back this character in hand" (Doki 066 variant)
-          // Exclude CONDITIONAL returns like Akamaru 027 ("If there isn't a Kiba Inuzuka...")
-          const descLower = effect.description.toLowerCase();
-          if (
-            descLower.includes('end of the round') &&
-            (descLower.includes('return this character') || descLower.includes('take back this character')) &&
-            !descLower.includes('if there')
-          ) {
+        // --- Summon keyword return ---
+        // All Summon cards return to hand at end of round.
+        // Exception: Kyodaigumo 103 has a "hide then return" flow handled separately.
+        if (isSummon) {
+          const isKyodaigumo103 = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+              e.description.toLowerCase().includes('hide a character'),
+          );
+          if (!isKyodaigumo103) {
             charsToReturn.push({
               instanceId: char.instanceId,
               player: char.controlledBy,
@@ -110,26 +111,37 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
               cardName: topCard.name_fr,
               isAkamaru: false,
             });
+            returnQueued.add(char.instanceId);
           }
+          continue; // Summon cards don't need further effect checking
+        }
 
-          // Akamaru 027: If no Kiba in this mission, return to hand
-          if (topCard.number === 27 && effect.description.includes('Kiba Inuzuka')) {
-            const hasKiba = chars.some(
-              (c) => {
-                if (c.instanceId === char.instanceId || c.isHidden) return false;
-                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                return cTop.name_fr.toUpperCase().includes('KIBA');
-              },
-            );
-            if (!hasKiba) {
-              charsToReturn.push({
-                instanceId: char.instanceId,
-                player: char.controlledBy,
-                reason: 'Akamaru returns to hand (no Kiba in mission).',
-                cardName: topCard.name_fr,
-                isAkamaru: true,
-              });
-            }
+        // --- Akamaru 027: Conditional return if no friendly Kiba in mission ---
+        // Match by effect text (not card number) for robustness against type mismatch.
+        const hasAkamaruReturn = (topCard.effects ?? []).some(
+          (e) => e.type === 'MAIN' &&
+            e.description.includes('[⧗]') &&
+            e.description.includes('Kiba Inuzuka') &&
+            e.description.toLowerCase().includes('end of the round') &&
+            e.description.toLowerCase().includes('return'),
+        );
+        if (hasAkamaruReturn) {
+          const hasKiba = chars.some(
+            (c) => {
+              if (c.instanceId === char.instanceId || c.isHidden) return false;
+              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return cTop.name_fr.toUpperCase().includes('KIBA');
+            },
+          );
+          if (!hasKiba) {
+            charsToReturn.push({
+              instanceId: char.instanceId,
+              player: char.controlledBy,
+              reason: 'Akamaru returns to hand (no Kiba in mission).',
+              cardName: topCard.name_fr,
+              isAkamaru: true,
+            });
+            returnQueued.add(char.instanceId);
           }
         }
       }
@@ -344,13 +356,13 @@ export function handleAkamaru028Return(state: GameState): GameState {
 }
 
 /**
- * Kidômaru 060 (UC): At end of round, player may optionally hide a character with Power ≤ Kidômaru's power.
- * If they do, Kidômaru must return to hand (handled in EffectEngine KIDOMARU060_CHOOSE_HIDE_TARGET case).
- * Uses state.endPhaseKidomaru060Ids to avoid processing the same card twice across resumptions.
+ * Kyodaigumo 103 (UC): [⧗] At end of round, player may optionally hide a character with Power ≤ Kyodaigumo's power.
+ * If they do, Kyodaigumo must return to hand (handled in EffectEngine KYODAIGUMO103_CHOOSE_HIDE_TARGET case).
+ * Uses state.endPhaseKyodaigumo103Ids to avoid processing the same card twice across resumptions.
  */
-export function handleKidomaru060EndOfRound(state: GameState): GameState {
+export function handleKyodaigumo103EndOfRound(state: GameState): GameState {
   let newState = { ...state };
-  const alreadyProcessed = new Set<string>(newState.endPhaseKidomaru060Ids ?? []);
+  const alreadyProcessed = new Set<string>(newState.endPhaseKyodaigumo103Ids ?? []);
 
   for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
     const mission = newState.activeMissions[mIdx];
@@ -362,10 +374,10 @@ export function handleKidomaru060EndOfRound(state: GameState): GameState {
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.number !== 60) continue;
+        if (topCard.number !== 103) continue;
 
         // Power tokens are already removed at this point — compare against printed power
-        const powerThreshold = topCard.power ?? 3;
+        const powerThreshold = topCard.power ?? 4;
 
         // Find all non-hidden, non-self characters with printed power ≤ threshold
         const validTargets: string[] = [];
@@ -384,20 +396,20 @@ export function handleKidomaru060EndOfRound(state: GameState): GameState {
         }
 
         alreadyProcessed.add(char.instanceId);
-        newState.endPhaseKidomaru060Ids = [...alreadyProcessed];
+        newState.endPhaseKyodaigumo103Ids = [...alreadyProcessed];
 
         if (validTargets.length === 0) continue;
 
-        const effectId = `kidomaru060-hide-${char.instanceId}`;
-        const actionId = `kidomaru060-hide-action-${char.instanceId}`;
+        const effectId = `kyodaigumo103-hide-${char.instanceId}`;
+        const actionId = `kyodaigumo103-hide-action-${char.instanceId}`;
         newState.pendingEffects = [...newState.pendingEffects, {
           id: effectId,
           sourceCardId: topCard.id,
           sourceInstanceId: char.instanceId,
           sourceMissionIndex: mIdx,
           effectType: 'MAIN' as const,
-          effectDescription: JSON.stringify({ kidomaruInstanceId: char.instanceId }),
-          targetSelectionType: 'KIDOMARU060_CHOOSE_HIDE_TARGET',
+          effectDescription: JSON.stringify({ kyodaigumoInstanceId: char.instanceId }),
+          targetSelectionType: 'KYODAIGUMO103_CHOOSE_HIDE_TARGET',
           sourcePlayer: player,
           requiresTargetSelection: true,
           validTargets,
@@ -410,8 +422,8 @@ export function handleKidomaru060EndOfRound(state: GameState): GameState {
           id: actionId,
           type: 'SELECT_TARGET' as const,
           player,
-          description: `Kidômaru (060): You may hide a character with Power ≤ ${powerThreshold}. If you do, Kidômaru must return to your hand.`,
-          descriptionKey: 'game.effect.desc.kidomaru060EndHide',
+          description: `Kyodaigumo (103): You may hide a character with Power ≤ ${powerThreshold}. If you do, Kyodaigumo must return to your hand.`,
+          descriptionKey: 'game.effect.desc.kyodaigumo103EndHide',
           options: validTargets,
           minSelections: 1,
           maxSelections: 1,

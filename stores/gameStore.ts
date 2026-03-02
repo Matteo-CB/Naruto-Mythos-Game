@@ -66,6 +66,9 @@ interface GameStore {
   draftDeckCardIds: string[] | null;
   draftDeckMissionIds: string[] | null;
 
+  // AI replay config
+  lastAIGameConfig: { config: GameConfig; difficulty: AIDifficulty; playerName?: string } | null;
+
   // Action error feedback (e.g., name uniqueness violation)
   actionError: string | null;
   actionErrorKey: string | null;
@@ -73,6 +76,7 @@ interface GameStore {
 
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
+  replayAIGame: () => void;
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => void;
   updateOnlineState: (visibleState: VisibleGameState) => void;
   endOnlineGame: (winner: string) => void;
@@ -320,6 +324,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actionErrorParams: null,
   draftDeckCardIds: null,
   draftDeckMissionIds: null,
+  lastAIGameConfig: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
     const humanName = playerName || 'Player';
@@ -615,7 +620,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } : undefined,
           declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
             ? 'game.effect.dosu069Defeat'
-            : undefined,
+            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
+              ? 'game.effect.gemma049DeclineDefeat'
+              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
+                ? 'game.effect.gemma049DeclineHide'
+                : undefined,
         },
       });
     } else {
@@ -662,6 +671,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       replayInitialState: null,
       animationQueue: [],
       pendingTargetSelection: null,
+      lastAIGameConfig: { config, difficulty, playerName },
     });
 
     // If AI goes first during mulligan, let it decide
@@ -678,6 +688,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
+  },
+
+  replayAIGame: () => {
+    const { lastAIGameConfig } = get();
+    if (!lastAIGameConfig) return;
+    resetIdCounter();
+    get().startAIGame(lastAIGameConfig.config, lastAIGameConfig.difficulty, lastAIGameConfig.playerName);
   },
 
   performAction: (action: GameAction) => {
@@ -1098,7 +1115,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } : undefined,
           declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
             ? 'game.effect.dosu069Defeat'
-            : undefined,
+            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
+              ? 'game.effect.gemma049DeclineDefeat'
+              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
+                ? 'game.effect.gemma049DeclineHide'
+                : undefined,
         },
       });
       return;
@@ -1552,7 +1573,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } : undefined,
           declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
             ? 'game.effect.dosu069Defeat'
-            : undefined,
+            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
+              ? 'game.effect.gemma049DeclineDefeat'
+              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
+                ? 'game.effect.gemma049DeclineHide'
+                : undefined,
         },
       });
       return;

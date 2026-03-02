@@ -7,6 +7,13 @@ import { useSocialStore } from '@/stores/socialStore';
 
 const CONNECT_TIMEOUT_MS = 8000;
 
+interface PublicRoom {
+  code: string;
+  hostName: string;
+  gameMode: string;
+  createdAt: number;
+}
+
 interface SocketStore {
   socket: Socket | null;
   connected: boolean;
@@ -34,6 +41,12 @@ interface SocketStore {
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
 
+  // Public room browser
+  publicRooms: PublicRoom[];
+
+  // Rematch state
+  rematchState: 'none' | 'offered' | 'received' | 'accepted' | 'declined';
+
   // Draft state
   isDraftRoom: boolean;
   draftBoosters: unknown[] | null;
@@ -44,12 +57,16 @@ interface SocketStore {
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isDraft?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isDraft?: boolean, gameMode?: 'casual' | 'ranked' | 'draft', hostName?: string) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[]) => void;
   performAction: (action: GameAction) => void;
   joinMatchmaking: (userId: string, isRanked?: boolean) => void;
   leaveMatchmaking: () => void;
+  requestRoomList: () => void;
+  offerRematch: () => void;
+  acceptRematch: () => void;
+  declineRematch: () => void;
   clearError: () => void;
   forfeit: (reason: 'abandon' | 'timeout') => void;
 }
@@ -72,6 +89,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   gameResult: null,
   actionDeadline: null,
   isDraftRoom: false,
+  publicRooms: [],
+  rematchState: 'none',
   draftBoosters: null,
   draftAllCards: null,
   draftDeckSubmitted: false,
@@ -268,9 +287,42 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ actionDeadline: data.deadline });
       });
 
+      socket.on('game:action-deadline-pause', () => {
+        console.log('[Socket] Timer paused (opponent making forced choice)');
+        set({ actionDeadline: null });
+      });
+
       socket.on('game:auto-passed', () => {
         console.log('[Socket] You were auto-passed due to timeout');
         set({ actionDeadline: null });
+      });
+
+      socket.on('game:auto-declined', () => {
+        console.log('[Socket] Your forced choice was auto-declined due to timeout');
+        set({ actionDeadline: null });
+      });
+
+      // --- Public room list ---
+
+      socket.on('room:list-update', (rooms: PublicRoom[]) => {
+        set({ publicRooms: rooms });
+      });
+
+      // --- Rematch events ---
+
+      socket.on('game:rematch-offered', () => {
+        console.log('[Socket] Opponent offered rematch');
+        set({ rematchState: 'received' });
+      });
+
+      socket.on('game:rematch-accepted', () => {
+        console.log('[Socket] Rematch accepted, restarting game');
+        set({ rematchState: 'accepted', gameEnded: false, gameResult: null, actionDeadline: null });
+      });
+
+      socket.on('game:rematch-declined', () => {
+        console.log('[Socket] Rematch declined');
+        set({ rematchState: 'declined' });
       });
 
       // --- Matchmaking events ---
@@ -343,6 +395,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameEnded: false,
         gameResult: null,
         actionDeadline: null,
+        publicRooms: [],
+        rematchState: 'none',
         isDraftRoom: false,
         draftBoosters: null,
         draftAllCards: null,
@@ -353,12 +407,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isDraft = false) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isDraft = false, gameMode?: 'casual' | 'ranked' | 'draft', hostName?: string) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isDraft ? ' (draft)' : ''}`);
-      set({ isDraftRoom: isDraft });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isDraft });
+      console.log(`[Socket] Emitting room:create${isDraft ? ' (draft)' : ''} mode: ${gameMode ?? 'auto'}`);
+      set({ isDraftRoom: isDraft, rematchState: 'none' });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isDraft, gameMode, hostName });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -429,6 +483,36 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket) {
       socket.emit('matchmaking:leave');
       set({ matchmakingStatus: 'idle' });
+    }
+  },
+
+  requestRoomList: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('room:list');
+    }
+  },
+
+  offerRematch: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      set({ rematchState: 'offered' });
+      socket.emit('game:rematch-offer');
+    }
+  },
+
+  acceptRematch: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('game:rematch-accept');
+    }
+  },
+
+  declineRematch: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      set({ rematchState: 'none' });
+      socket.emit('game:rematch-decline');
     }
   },
 

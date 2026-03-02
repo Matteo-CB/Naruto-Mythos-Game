@@ -5,38 +5,38 @@ import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 // ── Base dimensions (designed for ~1400×900 viewport) ──────────────
 
 const BASE = {
-  // Card sizes
-  handCardW: 80, handCardH: 112,
-  missionCardW: 72, missionCardH: 100,
-  sideCardW: 56, sideCardH: 78,
-  opponentCardW: 44, opponentCardH: 62,
+  // Card sizes — larger for desktop readability (TCG Arena style)
+  handCardW: 100, handCardH: 140,
+  missionCardW: 90, missionCardH: 126,
+  sideCardW: 64, sideCardH: 90,
+  opponentCardW: 50, opponentCardH: 70,
   // Section heights
-  opponentHandH: 85,
-  playerHandH: 150,
-  sidePileW: 80,
+  opponentHandH: 95,
+  playerHandH: 175,
+  sidePileW: 90,
   // Hand spacing
-  handFanSpacing: 48,
+  handFanSpacing: 58,
   handFanArc: 3,
-  handContainerH: 110,
-  handMinW: 400,
+  handContainerH: 135,
+  handMinW: 480,
   // Opponent hand spacing
-  opponentFanSpacing: 18,
-  opponentContainerH: 56,
-  opponentMinW: 250,
+  opponentFanSpacing: 20,
+  opponentContainerH: 64,
+  opponentMinW: 280,
   // Mission lane
-  missionMaxW: 140,
-  emptyLaneMinW: 230,
-  emptyLaneMaxW: 320,
+  missionMaxW: 170,
+  emptyLaneMinW: 270,
+  emptyLaneMaxW: 380,
   // Animation card sizes
-  animHandW: 120, animHandH: 168,
-  animBoardW: 130, animBoardH: 182,
-  animDeckW: 48, animDeckH: 68,
+  animHandW: 150, animHandH: 210,
+  animBoardW: 160, animBoardH: 224,
+  animDeckW: 56, animDeckH: 78,
   // Modal card sizes
-  targetCardW: 64, targetCardH: 90,
-  mulliganCardW: 115, mulliganCardH: 161,
-  handSelectorCardW: 110, handSelectorCardH: 154,
-  previewMedW: 140, previewMedH: 196,
-  previewLgW: 180, previewLgH: 252,
+  targetCardW: 72, targetCardH: 100,
+  mulliganCardW: 130, mulliganCardH: 182,
+  handSelectorCardW: 120, handSelectorCardH: 168,
+  previewMedW: 160, previewMedH: 224,
+  previewLgW: 200, previewLgH: 280,
 } as const;
 
 // ── Computed dimensions interface ──────────────────────────────────
@@ -86,11 +86,12 @@ function computeScale(vw: number, vh: number): number {
   const isMobile = vh < 500;
   // On phones (landscape, vh < 500), use a tighter reference viewport so cards
   // appear ~20% larger without changing the overall layout proportions.
-  const refW = isMobile ? 1200 : 1400;
-  const refH = isMobile ? 750 : 900;
+  // Desktop reference viewport increased to account for larger base card sizes.
+  const refW = isMobile ? 1200 : 1600;
+  const refH = isMobile ? 750 : 1000;
   const raw = Math.min(vw / refW, vh / refH);
   const minScale = isMobile ? 0.38 : 0.55;
-  return Math.max(minScale, Math.min(raw, 1.0));
+  return Math.max(minScale, Math.min(raw, 1.15));
 }
 
 function s(base: number, scale: number): number {

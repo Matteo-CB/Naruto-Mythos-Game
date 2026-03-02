@@ -53,7 +53,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
   }
 
   // If exactly one hidden friendly character, skip character selection
-  // but still let the player choose destination (or decline)
+  // but still ask for destination (player can always decline since effect is optional)
   if (validTargets.length === 1) {
     const charId = validTargets[0];
     const fromMissionIndex = charMissionMap[charId];
@@ -65,7 +65,6 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       }
     }
 
-    // Always let the player choose (with option to decline)
     return {
       state,
       requiresTargetSelection: true,
@@ -74,7 +73,6 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
       description: JSON.stringify({ text: 'MSS 07 (I Have to Go): Choose a mission to move the hidden character to.', charId, fromMissionIndex }),
       descriptionKey: 'game.effect.desc.mss07ChooseDestination',
       isOptional: true,
-      onDecline: 'skip',
     };
   }
 
@@ -87,7 +85,6 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     description: 'MSS 07 (I Have to Go): Choose a hidden friendly character to move.',
     descriptionKey: 'game.effect.desc.mss07MoveHidden',
     isOptional: true,
-    onDecline: 'skip',
   };
 }
 

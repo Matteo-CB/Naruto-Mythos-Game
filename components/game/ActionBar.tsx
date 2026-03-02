@@ -105,8 +105,11 @@ export function ActionBar() {
       const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
         && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
         && (charCard.chakra ?? 0) <= 4;
+      // Kyubi 129 can upgrade over any Naruto Uzumaki
+      const isKyubiUpgrade = selectedCard.number === 129
+        && charCard.name_fr.toUpperCase().includes('NARUTO');
 
-      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade;
+      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade || isKyubiUpgrade;
       return nameOk && charCard.chakra < selectedCard.chakra;
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);

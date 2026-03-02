@@ -76,6 +76,24 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
+  // Handle rematch restart — reset gameOver so the board shows again
+  const rematchState = useSocketStore((s) => s.rematchState);
+  const gameOver = useGameStore((s) => s.gameOver);
+  useEffect(() => {
+    if (isOnlineGame && rematchState === 'accepted' && gameOver) {
+      useGameStore.setState({
+        gameOver: false,
+        winner: null,
+        pendingTargetSelection: null,
+        animationQueue: [],
+        isAnimating: false,
+        replayInitialState: null,
+      });
+      // Reset rematchState so this doesn't re-trigger
+      useSocketStore.setState({ rematchState: 'none' });
+    }
+  }, [isOnlineGame, rematchState, gameOver]);
+
   // Bridge socket game:error to gameStore actionError for online games
   useEffect(() => {
     if (isOnlineGame && socketError) {

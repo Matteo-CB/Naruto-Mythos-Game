@@ -76,7 +76,8 @@
       "title": "Mulligan",
       "description": "You may return your hand and draw 5 new cards. This can only be done once.",
       "keep": "Keep Hand",
-      "redraw": "Redraw"
+      "redraw": "Redraw",
+      "clickHint": "Click a card to inspect it"
     },
     "actions": {
       "playCharacter": "Play character on mission",
@@ -145,6 +146,8 @@
         "fizzle": "{card} ({id}): Effect fizzled.",
         "defeatReplacement": "{card}: Hidden instead of defeated (replacement effect).",
         "sacrifice": "Gemma Shiranui sacrificed to protect {target}.",
+        "gemma049Sacrifice": "Gemma Shiranui (049): Sacrificed to protect an ally from defeat.",
+        "gemma049SacrificeHide": "Gemma Shiranui (049): Sacrificed to protect an ally from being hidden.",
         "dosu069AutoDefeat": "Dosu Kinuta (069): Opponent cannot afford to reveal (cost {cost}), character defeated.",
         "dosu069Reveal": "Dosu Kinuta (069): {target} was revealed, paying {cost} chakra.",
         "onDefeatChakra": "{card} ({id}): Gained {amount} chakra (character {defeated} was defeated).",
@@ -152,6 +155,7 @@
         "akamaru": "Akamaru returns to hand (no Kiba in mission).",
         "akamaru028Return": "Akamaru (028): Returned to hand at end of round.",
         "kidomaru060Return": "Kidômaru (060): Must return to hand after using end-of-round effect.",
+        "kyodaigumo103Return": "Kyodaigumo (103): Must return to hand after using end-of-round effect.",
         "deckLook": "{card} ({id}): Looked at top {count} cards of deck.",
         "discardCards": "{card} ({id}): Discarded {count} card(s).",
         "putOnDeck": "Put {card} back on top of deck.",
@@ -232,7 +236,13 @@
       "savingReplay": "Saving...",
       "replaySaved": "Replay Saved",
       "watchReplay": "Watch Replay",
-      "saveError": "Failed to save replay"
+      "saveError": "Failed to save replay",
+      "replay": "Replay",
+      "rematch": "Rematch",
+      "rematchWaiting": "Waiting for opponent...",
+      "rematchAccept": "Accept",
+      "rematchDecline": "Decline",
+      "rematchDeclined": "Opponent declined the rematch"
     },
     "timer": {
       "autoPassed": "Time expired — auto-passed"
@@ -292,6 +302,8 @@
       "tayuya065PutBack": "Put back on top",
       "cardDiscarded": "DISCARDED",
       "dosu069Defeat": "Defeat the character",
+      "gemma049DeclineDefeat": "Let the character be defeated",
+      "gemma049DeclineHide": "Let the character be hidden",
       "sakura011DrawBtn": "Draw a card",
       "sakura011DrawDeck": "Your deck ({count} cards)",
       "confirmHideBtn": "Hide",
@@ -376,6 +388,9 @@
         "kidomaru060MoveCharacter": "Choose a character in this mission to move to another mission.",
         "kidomaru060DefeatLowPower": "Select an enemy character with Power 1 or less in play to defeat.",
         "kidomaru060EndHide": "You may hide a character with Power equal or less. If you do, Kidômaru must return to your hand.",
+        "kyodaigumo103EndHide": "You may hide a character with Power equal or less. If you do, Kyodaigumo must return to your hand.",
+        "gemma049SacrificeDefeat": "Sacrifice Gemma Shiranui to protect {target} from being defeated?",
+        "gemma049SacrificeHide": "Sacrifice Gemma Shiranui to protect {target} from being hidden?",
         "kimimaro056DiscardAndHide": "Choose a card to discard, then hide a character with cost 4 or less.",
         "kimimaro056ChooseHide": "Choose a character to hide (cost 4 or less).",
         "kin073ChooseEnemy": "Choose an enemy character with Power 4 or less to hide.",
@@ -669,7 +684,23 @@
     "casual": "Casual",
     "ranked": "Ranked",
     "casualDesc": "Unranked match — play for fun, no ELO changes",
-    "rankedDesc": "Ranked match — ELO rating will be updated"
+    "rankedDesc": "Ranked match — ELO rating will be updated",
+    "publicRooms": "Public Rooms",
+    "privateRoom": "Private Room",
+    "createPublicRoom": "Create Room",
+    "noRooms": "No rooms available. Create one!",
+    "timeJustNow": "Just now",
+    "timeMinutesAgo": "{minutes}m ago",
+    "mode": {
+      "casual": "Casual",
+      "ranked": "Ranked",
+      "draft": "Draft"
+    },
+    "modeDesc": {
+      "casual": "Unranked match — play for fun, no ELO changes",
+      "ranked": "Ranked match — ELO rating will be updated",
+      "draft": "Draft mode — build a deck from random boosters"
+    }
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -1553,6 +1584,7 @@
     "home": "Home",
     "tabSettings": "Settings",
     "tabCards": "Cards",
+    "tabBugs": "Bug Reports",
     "unauthorized": "Unauthorized",
     "leagues": {
       "title": "Leagues & Badges",

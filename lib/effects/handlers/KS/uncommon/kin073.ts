@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 073/130 - KIN TSUCHI "Bell Sound Clone" (UC)
@@ -46,7 +47,7 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
     ? thisMission.player1Characters
     : thisMission.player2Characters;
   const hasValidTarget = enemyCharsHere.some(
-    (char) => !char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 4,
+    (char) => canBeHiddenByEnemy(state, char, opponentPlayer) && getEffectivePower(state, char, opponentPlayer) <= 4,
   );
 
   if (!hasValidTarget) {
