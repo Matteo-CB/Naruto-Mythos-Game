@@ -703,6 +703,35 @@ export class EffectEngine {
         // Acknowledgment only — AMBUSH just shows opponent's hand
         break;
 
+      case 'SASUKE014_UPGRADE_HAND_REVEAL': {
+        // UPGRADE includes AMBUSH effect — opponent's hand was shown, now chain to discard flow
+        const ps_sur = { ...newState[pendingEffect.sourcePlayer] };
+        const opp_sur = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const oppHand_sur = newState[opp_sur].hand;
+
+        if (ps_sur.hand.length > 0 && oppHand_sur.length > 0) {
+          // Chain to SASUKE_014_DISCARD_OWN (discard from own hand, optional)
+          const handIndices_sur = ps_sur.hand.map((_: unknown, i: number) => String(i));
+          const charResult_sur = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          const step_sur: EffectResult = {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'SASUKE_014_DISCARD_OWN',
+            validTargets: handIndices_sur,
+            isOptional: true,
+            description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards to discard 1 from opponent\'s hand.',
+            descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+          };
+          return EffectEngine.createPendingTargetSelection(
+            newState, pendingEffect.sourcePlayer,
+            charResult_sur?.character ?? null,
+            pendingEffect.sourceMissionIndex,
+            'UPGRADE', true, step_sur, [],
+          );
+        }
+        break;
+      }
+
       case 'ITACHI091_CHOOSE_DISCARD': {
         // UPGRADE: source player chose which opponent card to discard
         const idx091 = parseInt(targetId, 10);

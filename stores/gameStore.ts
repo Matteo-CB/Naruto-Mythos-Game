@@ -485,7 +485,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
-      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
+      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
       const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
       const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
@@ -987,7 +987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
-      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
+      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
       const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
       const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
