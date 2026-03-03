@@ -2,12 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from 'next-intl';
-import type { CharacterCard } from '@/lib/engine/types';
+import type { CardData } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 
 interface DiscardPileViewerProps {
-  cards: CharacterCard[];
+  cards: CardData[];
   onClose: () => void;
   title: string;
 }

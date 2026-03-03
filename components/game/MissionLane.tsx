@@ -612,14 +612,6 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         >
           {totalPoints}
         </span>
-        {mission.wonBy && (
-          <span
-            className="text-[9px] font-bold uppercase"
-            style={{ color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e' }}
-          >
-            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
-          </span>
-        )}
       </div>
     </motion.div>
   );

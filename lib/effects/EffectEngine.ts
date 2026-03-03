@@ -528,7 +528,8 @@ export class EffectEngine {
       tst === 'KIMIMARO056_CHOOSE_DISCARD' ||
       tst === 'NARUTO141_CHOOSE_DISCARD' ||
       tst === 'SASUKE142_CHOOSE_DISCARD' ||
-      tst === 'KIN073_CHOOSE_DISCARD'
+      tst === 'KIN073_CHOOSE_DISCARD' ||
+      tst === 'KABUTO053_CHOOSE_DISCARD'
     ) {
       actionType = 'DISCARD_CARD';
     } else if (
@@ -543,7 +544,7 @@ export class EffectEngine {
       tst === 'TAYUYA125_CHOOSE_SOUND' ||
       tst === 'RECOVER_FROM_DISCARD' ||
       tst === 'HIRUZEN002_CHOOSE_CARD' ||
-      tst === 'SASUKE014_CHOOSE_HAND_CARD' ||
+      tst === 'ITACHI091_CHOOSE_DISCARD' ||
       tst === 'TSUNADE104_CHOOSE_CHAKRA'
     ) {
       actionType = 'CHOOSE_CARD_FROM_LIST';
@@ -628,9 +629,59 @@ export class EffectEngine {
         newState = EffectEngine.orochimaruExecuteSteal(newState, pendingEffect);
         break;
 
-      case 'ITACHI091_HAND_REVEAL':
-        // Acknowledgment only — handler already applied discard+draw for upgrade
+      case 'ITACHI091_HAND_REVEAL': {
+        // After confirming hand reveal, if upgrade: chain choose-discard from opponent
+        let parsed091: { isUpgrade?: boolean } = {};
+        try { parsed091 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (parsed091.isUpgrade) {
+          const opp091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const oppHand091 = newState[opp091].hand;
+          if (oppHand091.length > 0) {
+            // Auto-discard if only 1 card
+            if (oppHand091.length === 1) {
+              const ps091 = { ...newState[opp091] };
+              const hand091 = [...ps091.hand];
+              const discarded091 = hand091.splice(0, 1)[0];
+              ps091.hand = hand091;
+              ps091.discardPile = [...ps091.discardPile, discarded091];
+              newState = { ...newState, [opp091]: ps091 };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+                'EFFECT_DISCARD_FROM_HAND',
+                `Itachi Uchiwa (091) UPGRADE: Discarded ${discarded091.name_fr} from opponent's hand.`,
+                'game.log.effect.itachi091DiscardOpponent',
+                { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: discarded091.name_fr },
+              );
+            } else {
+              // Multiple cards — source player chooses which to discard
+              const oppIndices091 = oppHand091.map((_: unknown, i: number) => String(i));
+              const oppCards091 = oppHand091.map((c, i) => ({
+                name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+                image_file: c.image_file, originalIndex: i,
+              }));
+              const charResult091 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+              const step2091: EffectResult = {
+                state: newState,
+                requiresTargetSelection: true,
+                targetSelectionType: 'ITACHI091_CHOOSE_DISCARD',
+                validTargets: oppIndices091,
+                description: JSON.stringify({
+                  text: 'Itachi (091) UPGRADE: Choose a card from opponent\'s hand to discard.',
+                  cards: oppCards091,
+                }),
+                descriptionKey: 'game.effect.desc.itachi091ChooseDiscard',
+              };
+              return EffectEngine.createPendingTargetSelection(
+                newState, pendingEffect.sourcePlayer,
+                charResult091?.character ?? null,
+                pendingEffect.sourceMissionIndex,
+                'MAIN', false, step2091, [],
+              );
+            }
+          }
+        }
         break;
+      }
 
       case 'LOOK_AT_HIDDEN_CHARACTER':
         newState = EffectEngine.dosuLookAtHidden(newState, pendingEffect, targetId);
@@ -644,79 +695,35 @@ export class EffectEngine {
         // Acknowledgment only — no additional action needed
         break;
 
-      case 'SASUKE014_CHOOSE_HAND_CARD': {
-        // Player chose a face-down card from opponent's hand — reveal it
-        const chosenIdx014 = parseInt(targetId, 10);
-        if (!isNaN(chosenIdx014)) {
-          const opponentPlayer014 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const oppHand014 = newState[opponentPlayer014].hand;
-          if (chosenIdx014 >= 0 && chosenIdx014 < oppHand014.length) {
-            const revealedCard014 = oppHand014[chosenIdx014];
-            let parsed014: { isUpgrade?: boolean } = {};
-            try { parsed014 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-            const isUpgrade014 = parsed014.isUpgrade ?? false;
+      case 'KIBA026_UPGRADE_REVEAL':
+        // Acknowledgment only — draw and deck rearrangement already applied
+        break;
 
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_LOOK_HAND',
-              `Sasuke Uchiwa (014): Revealed ${revealedCard014.name_fr} from opponent's hand.`,
-              'game.log.effect.sasuke014Reveal',
-              { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: revealedCard014.name_fr },
-            );
+      case 'SASUKE014_HAND_REVEAL':
+        // Acknowledgment only — AMBUSH just shows opponent's hand
+        break;
 
-            // Create INFO_REVEAL pending
-            const revealData014 = JSON.stringify({
-              text: isUpgrade014
-                ? `Sasuke (014): Revealed ${revealedCard014.name_fr}. You may now discard a card to discard one from the opponent's hand.`
-                : `Sasuke (014): Revealed ${revealedCard014.name_fr} from opponent's hand.`,
-              cardName: revealedCard014.name_fr,
-              cardCost: revealedCard014.chakra,
-              cardPower: revealedCard014.power,
-              cardImageFile: revealedCard014.image_file,
-              isUpgrade: isUpgrade014,
-              chosenIndex: chosenIdx014,
-            });
-
-            const effectId014 = generateInstanceId();
-            const actionId014 = generateInstanceId();
-            newState.pendingEffects.push({
-              id: effectId014,
-              sourceCardId: pendingEffect.sourceCardId,
-              sourceInstanceId: pendingEffect.sourceInstanceId,
-              sourceMissionIndex: pendingEffect.sourceMissionIndex,
-              effectType: pendingEffect.effectType,
-              effectDescription: revealData014,
-              targetSelectionType: 'SASUKE014_HAND_REVEAL',
-              sourcePlayer: pendingEffect.sourcePlayer,
-              requiresTargetSelection: true,
-              validTargets: ['confirm'],
-              isOptional: false,
-              isMandatory: true,
-              resolved: false,
-              isUpgrade: isUpgrade014,
-            });
-            newState.pendingActions.push({
-              id: actionId014,
-              type: 'INFO_REVEAL',
-              player: pendingEffect.sourcePlayer,
-              description: revealData014,
-              descriptionKey: isUpgrade014
-                ? 'game.effect.desc.sasuke014RevealUpgrade'
-                : 'game.effect.desc.sasuke014Reveal',
-              descriptionParams: { target: revealedCard014.name_fr },
-              options: ['confirm'],
-              minSelections: 1,
-              maxSelections: 1,
-              sourceEffectId: effectId014,
-            });
-          }
+      case 'ITACHI091_CHOOSE_DISCARD': {
+        // UPGRADE: source player chose which opponent card to discard
+        const idx091 = parseInt(targetId, 10);
+        const opp091d = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const ps091d = { ...newState[opp091d] };
+        if (idx091 >= 0 && idx091 < ps091d.hand.length) {
+          const hand091d = [...ps091d.hand];
+          const discarded091d = hand091d.splice(idx091, 1)[0];
+          ps091d.hand = hand091d;
+          ps091d.discardPile = [...ps091d.discardPile, discarded091d];
+          newState = { ...newState, [opp091d]: ps091d };
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD_FROM_HAND',
+            `Itachi Uchiwa (091) UPGRADE: Discarded ${discarded091d.name_fr} from opponent's hand.`,
+            'game.log.effect.itachi091DiscardOpponent',
+            { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: discarded091d.name_fr },
+          );
         }
         break;
       }
-
-      case 'SASUKE014_HAND_REVEAL':
-        newState = EffectEngine.sasuke014ResolveReveal(newState, pendingEffect);
-        break;
 
       case 'DEFEAT_HIDDEN_CHARACTER':
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
@@ -2709,8 +2716,7 @@ export class EffectEngine {
         break;
       }
       case 'SASUKE_014_DISCARD_OWN': {
-        // Stage 1: discard own card from hand
-        // Stage 2: auto-discard the opponent card that was chosen/revealed earlier
+        // Stage 1: discard own card from hand, then chain to choose opponent card
         const idx_ss = parseInt(targetId, 10);
         const ps_ss = { ...newState[pendingEffect.sourcePlayer] };
         if (idx_ss >= 0 && idx_ss < ps_ss.hand.length) {
@@ -2728,28 +2734,51 @@ export class EffectEngine {
             { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discarded_ss.name_fr },
           );
 
-          // Auto-discard the opponent card at the previously chosen index
-          let parsedDesc: { chosenIndex?: number } = {};
-          try { parsedDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-          const chosenOppIdx = parsedDesc.chosenIndex ?? 0;
-
+          // Stage 2: source player chooses which opponent card to discard
           const opponentPlayer_ss = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const oppPs_ss = { ...newState[opponentPlayer_ss] };
-          const oppHand_ss = [...oppPs_ss.hand];
-
-          if (chosenOppIdx >= 0 && chosenOppIdx < oppHand_ss.length) {
-            const discardedOpp = oppHand_ss.splice(chosenOppIdx, 1)[0];
-            oppPs_ss.hand = oppHand_ss;
-            oppPs_ss.discardPile = [...oppPs_ss.discardPile, discardedOpp];
-            newState = { ...newState, [opponentPlayer_ss]: oppPs_ss };
-
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_DISCARD_FROM_HAND',
-              `Sasuke Uchiwa (014) UPGRADE: Discarded ${discardedOpp.name_fr} from opponent's hand.`,
-              'game.log.effect.sasuke014DiscardOpponent',
-              { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discardedOpp.name_fr },
-            );
+          const oppHand_ss = newState[opponentPlayer_ss].hand;
+          if (oppHand_ss.length > 0) {
+            if (oppHand_ss.length === 1) {
+              // Auto-discard if only 1 card
+              const oppPs_ss = { ...newState[opponentPlayer_ss] };
+              const oH = [...oppPs_ss.hand];
+              const discardedOpp = oH.splice(0, 1)[0];
+              oppPs_ss.hand = oH;
+              oppPs_ss.discardPile = [...oppPs_ss.discardPile, discardedOpp];
+              newState = { ...newState, [opponentPlayer_ss]: oppPs_ss };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+                'EFFECT_DISCARD_FROM_HAND',
+                `Sasuke Uchiwa (014) UPGRADE: Discarded ${discardedOpp.name_fr} from opponent's hand.`,
+                'game.log.effect.sasuke014DiscardOpponent',
+                { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discardedOpp.name_fr },
+              );
+            } else {
+              // Multiple cards — source player chooses
+              const oppIndices_ss = oppHand_ss.map((_: unknown, i: number) => String(i));
+              const oppCards_ss = oppHand_ss.map((c, i) => ({
+                name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+                image_file: c.image_file, originalIndex: i,
+              }));
+              const charResult_ss = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+              const step2_ss: EffectResult = {
+                state: newState,
+                requiresTargetSelection: true,
+                targetSelectionType: 'SASUKE_014_DISCARD_OPPONENT',
+                validTargets: oppIndices_ss,
+                description: JSON.stringify({
+                  text: 'Sasuke (014) UPGRADE: Choose a card from opponent\'s hand to discard.',
+                  cards: oppCards_ss,
+                }),
+                descriptionKey: 'game.effect.desc.sasuke014DiscardOpponent',
+              };
+              return EffectEngine.createPendingTargetSelection(
+                newState, pendingEffect.sourcePlayer,
+                charResult_ss?.character ?? null,
+                pendingEffect.sourceMissionIndex,
+                'UPGRADE', true, step2_ss, [],
+              );
+            }
           }
         }
         break;
@@ -3506,6 +3535,27 @@ export class EffectEngine {
         const cost_kb3 = parsed_kb3.reducedCost ?? 0;
         const discardIdx_kb3 = parsed_kb3.discardIndex;
         newState = EffectEngine.kabuto053PlayFromDiscard(newState, pendingEffect.sourcePlayer, missionIdx_kb3, cost_kb3, discardIdx_kb3);
+        break;
+      }
+
+      // --- Kabuto 053 UPGRADE: Choose card from hand to discard ---
+      case 'KABUTO053_CHOOSE_DISCARD': {
+        const idx_kb53 = parseInt(targetId, 10);
+        const ps_kb53 = { ...newState[pendingEffect.sourcePlayer] };
+        if (idx_kb53 >= 0 && idx_kb53 < ps_kb53.hand.length) {
+          const hand_kb53 = [...ps_kb53.hand];
+          const discarded_kb53 = hand_kb53.splice(idx_kb53, 1)[0];
+          ps_kb53.hand = hand_kb53;
+          ps_kb53.discardPile = [...ps_kb53.discardPile, discarded_kb53];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps_kb53 };
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DISCARD',
+            `Kabuto Yakushi (053) UPGRADE: Discarded ${discarded_kb53.name_fr}.`,
+            'game.log.effect.discard',
+            { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: discarded_kb53.name_fr },
+          );
+        }
         break;
       }
 
@@ -4363,60 +4413,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /**
-   * Sasuke 014 "Sharingan": Resolve the hand reveal.
-   * After the player acknowledges the revealed card:
-   * - If isUpgrade: auto-discard the revealed opponent card, then opponent draws 1
-   * - If not upgrade: nothing more to do.
-   */
-  static sasuke014ResolveReveal(state: GameState, pending: PendingEffect): GameState {
-    let parsed: { isUpgrade: boolean; chosenIndex?: number };
-    try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
-
-    if (!parsed.isUpgrade) {
-      // Base AMBUSH: just the reveal, nothing more
-      return state;
-    }
-
-    // UPGRADE: discard the revealed opponent card, then opponent draws 1
-    const newState = deepClone(state);
-    const opponentPlayer = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
-    const oppPs = newState[opponentPlayer];
-    const chosenIdx = parsed.chosenIndex ?? 0;
-
-    if (chosenIdx >= 0 && chosenIdx < oppPs.hand.length) {
-      const hand = [...oppPs.hand];
-      const discarded = hand.splice(chosenIdx, 1)[0];
-      oppPs.hand = hand;
-      oppPs.discardPile = [...oppPs.discardPile, discarded];
-
-      newState.log = logAction(
-        newState.log, newState.turn, 'action', pending.sourcePlayer,
-        'EFFECT_DISCARD_FROM_HAND',
-        `Sasuke Uchiwa (014) UPGRADE: Discarded ${discarded.name_fr} from opponent's hand.`,
-        'game.log.effect.sasuke014DiscardOpponent',
-        { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discarded.name_fr },
-      );
-
-      // Opponent draws 1 card
-      if (oppPs.deck.length > 0) {
-        const deck = [...oppPs.deck];
-        const drawn = deck.pop()!;
-        oppPs.deck = deck;
-        oppPs.hand = [...oppPs.hand, drawn];
-
-        newState.log = logAction(
-          newState.log, newState.turn, 'action', opponentPlayer,
-          'DRAW',
-          `${opponentPlayer} draws 1 card (Sasuke 014 UPGRADE).`,
-          'game.log.effect.draw',
-          { card: 'SASUKE UCHIWA', id: 'KS-014-UC', count: '1' },
-        );
-      }
-    }
-
-    return newState;
-  }
+  // sasuke014ResolveReveal removed — AMBUSH now just shows hand, UPGRADE is separate handler
 
   /**
    * Defeat a character (remove from play, add to owner's discard).
@@ -5961,10 +5958,14 @@ export class EffectEngine {
     newState.activeMissions = [...newState.activeMissions];
     newState.activeMissions[targetMissionIdx] = mission;
 
-    // Return the entire character stack to player's hand
+    // Return only the top card to player's hand; discard cards underneath
     const ps = newState[player];
-    const cardsToReturn = target.stack.length > 0 ? [...target.stack] : [target.card];
-    ps.hand = [...ps.hand, ...cardsToReturn];
+    const returnCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
+    ps.hand = [...ps.hand, returnCard];
+    if (target.stack.length > 1) {
+      const underCards = target.stack.slice(0, -1);
+      ps.discardPile = [...ps.discardPile, ...underCards];
+    }
     ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
 
     newState.log = logAction(

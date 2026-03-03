@@ -7,8 +7,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 4 | Power: 4
  * Group: Sound Village | Keywords: Jutsu
  *
- * UPGRADE: Draw a card.
- *   (French: "Piochez une carte.")
+ * UPGRADE: Discard a card from your hand.
+ *   (French: "Défaussez une carte de votre main.")
  *
  * MAIN: Play the top character from your discard pile anywhere, paying 3 less.
  *   (French: "Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.")
@@ -19,16 +19,16 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
-  const playerState = { ...state[sourcePlayer] };
+  const playerState = state[sourcePlayer];
 
-  if (playerState.deck.length === 0) {
+  if (playerState.hand.length === 0) {
     return {
       state: {
         ...state,
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Kabuto Yakushi (053) UPGRADE: Deck is empty, cannot draw.',
+          'Kabuto Yakushi (053) UPGRADE: No cards in hand to discard.',
           'game.log.effect.noTarget',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' },
         ),
@@ -36,24 +36,37 @@ function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Draw 1 card
-  const deck = [...playerState.deck];
-  const drawnCard = deck.shift()!;
-  playerState.deck = deck;
-  playerState.hand = [...playerState.hand, drawnCard];
+  // Auto-discard if only 1 card in hand
+  if (playerState.hand.length === 1) {
+    const ps = { ...playerState };
+    const hand = [...ps.hand];
+    const discarded = hand.splice(0, 1)[0];
+    ps.hand = hand;
+    ps.discardPile = [...ps.discardPile, discarded];
+    return {
+      state: {
+        ...state,
+        [sourcePlayer]: ps,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_DISCARD',
+          `Kabuto Yakushi (053) UPGRADE: Discarded ${discarded.name_fr}.`,
+          'game.log.effect.discard',
+          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: discarded.name_fr },
+        ),
+      },
+    };
+  }
 
+  // Multiple cards — player chooses which to discard
+  const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
   return {
-    state: {
-      ...state,
-      [sourcePlayer]: playerState,
-      log: logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_DRAW',
-        'Kabuto Yakushi (053) UPGRADE: Drew 1 card.',
-        'game.log.effect.draw',
-        { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', count: '1' },
-      ),
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KABUTO053_CHOOSE_DISCARD',
+    validTargets: handIndices,
+    description: 'Kabuto Yakushi (053) UPGRADE: Choose a card from your hand to discard.',
+    descriptionKey: 'game.effect.desc.kabuto053ChooseDiscard',
   };
 }
 

@@ -66,6 +66,7 @@
     "edge": "Jeton d'Avantage",
     "deck": "Deck",
     "discard": "Defausse",
+    "opponentDiscard": "Defausse adversaire",
     "hand": "Main",
     "pass": "Passer",
     "play": "Jouer",

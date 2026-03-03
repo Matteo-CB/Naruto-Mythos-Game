@@ -283,16 +283,16 @@ function handleRevealCharacter(
 
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Check if this reveal is an upgrade over an existing character (same-name or flexible)
+  // Check if this reveal is a SAME-NAME upgrade over an existing character.
+  // Flexible upgrades (Ichibi→Gaara, etc.) are NOT auto-applied during reveal —
+  // the player must play from hand to trigger flexible upgrades.
   const upgradeTarget = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (c.isHidden) return false;
     const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     if (charTopCard.chakra <= cTop.chakra) return false;
-    // Same-name upgrade
-    if (cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase()) return true;
-    // Flexible upgrade (Orochimaru 138, Akamaru 029, etc.)
-    return checkFlexibleUpgrade(charTopCard, cTop);
+    // Same-name upgrade only during reveal
+    return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
   });
 
   // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE

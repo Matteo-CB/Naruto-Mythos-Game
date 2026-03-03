@@ -25,9 +25,9 @@ function temari121MainHandler(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    // MAIN always targets only friendly characters (not self)
+    // MAIN always targets only friendly characters (not self, not hidden)
     for (const char of mission[friendlySide]) {
-      if (char.instanceId !== sourceCard.instanceId) {
+      if (char.instanceId !== sourceCard.instanceId && !char.isHidden) {
         validTargets.push(char.instanceId);
       }
     }
@@ -69,15 +69,17 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    // Include friendly characters (not self)
+    // Include friendly characters (including self, not hidden)
     for (const char of mission[friendlySide]) {
-      if (char.instanceId !== sourceCard.instanceId) {
+      if (!char.isHidden) {
         validTargets.push(char.instanceId);
       }
     }
-    // Include enemy characters
+    // Include enemy characters (not hidden)
     for (const char of mission[enemySide]) {
-      validTargets.push(char.instanceId);
+      if (!char.isHidden) {
+        validTargets.push(char.instanceId);
+      }
     }
   }
 

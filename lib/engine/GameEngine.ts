@@ -724,6 +724,7 @@ export class GameEngine {
       handSize: oppState.hand.length,
       deckSize: oppState.deck.length,
       discardPileSize: oppState.discardPile.length,
+      discardPile: oppState.discardPile,  // Public information per rules
       chakra: oppState.chakra,
       missionPoints: oppState.missionPoints,
       hasPassed: oppState.hasPassed,

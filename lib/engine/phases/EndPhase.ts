@@ -163,8 +163,73 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
     );
   }
 
+  // Kimimaro 123 (R): At end of round, defeat self if controlling player has no cards in hand
+  newState = handleKimimaro123SelfDefeat(newState);
+
   // Rock Lee 117 (R): At end of round, must move to another mission, if able
   newState = handleRockLee117Move(newState);
+
+  return newState;
+}
+
+/**
+ * Kimimaro 123 (R) / 123 (RA): [⧗] At end of round, defeat this character
+ * if the controlling player has no cards in hand.
+ */
+function handleKimimaro123SelfDefeat(state: GameState): GameState {
+  let newState = { ...state };
+
+  for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+    const mission = newState.activeMissions[mi];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      const chars = mission[side];
+
+      for (const char of chars) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.number !== 123) continue;
+
+        // Check continuous self-defeat effect
+        const hasSelfDefeat = (topCard.effects ?? []).some(
+          (e: { type: string; description: string }) =>
+            e.type === 'MAIN' && e.description.includes('[⧗]') &&
+            e.description.toLowerCase().includes('defeat this character'),
+        );
+        if (!hasSelfDefeat) continue;
+
+        // Check if controlling player has no cards in hand
+        const controller = char.controlledBy ?? player;
+        if (newState[controller].hand.length > 0) continue;
+
+        // Defeat this character: discard entire stack to original owner
+        const owner = char.originalOwner ?? controller;
+        const missions = [...newState.activeMissions];
+        const m = { ...missions[mi] };
+        m[side] = m[side].filter((c) => c.instanceId !== char.instanceId);
+        missions[mi] = m;
+        newState.activeMissions = missions;
+
+        const ownerPs = { ...newState[owner] };
+        ownerPs.discardPile = [...ownerPs.discardPile, ...char.stack];
+        // Update character count
+        let count = 0;
+        for (const mm of missions) {
+          count += (owner === 'player1' ? mm.player1Characters : mm.player2Characters).length;
+        }
+        ownerPs.charactersInPlay = count;
+        newState[owner] = ownerPs;
+
+        newState.log = logAction(
+          newState.log, state.turn, 'end', controller,
+          'END_SELF_DEFEAT',
+          `Kimimaro (123): Defeated at end of round (no cards in hand).`,
+          'game.log.effect.kimimaro123SelfDefeat',
+          { card: 'KIMIMARO', id: `KS-123-R` },
+        );
+      }
+    }
+  }
 
   return newState;
 }
@@ -457,11 +522,16 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
         mission[side] = chars;
         missions[i] = mission;
 
-        // Return top card to original owner's hand
+        // Return top card to original owner's hand; discard the rest of the stack
         const owner = char.originalOwner;
         const ps = { ...newState[owner] };
         const returnCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         ps.hand = [...ps.hand, returnCard];
+        // Discard cards under the top card (evolution stack)
+        if (char.stack.length > 1) {
+          const underCards = char.stack.slice(0, -1);
+          ps.discardPile = [...ps.discardPile, ...underCards];
+        }
         ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
         newState[owner] = ps;
 

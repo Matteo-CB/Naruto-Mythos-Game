@@ -188,8 +188,10 @@ function DiscardPile({
 // Left side: Opponent piles
 // ---------------------
 export function OpponentSidePiles() {
+  const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const dims = useGameScale();
+  const [showDiscard, setShowDiscard] = useState(false);
   if (!visibleState || dims.isMobile) return null;
 
   const { opponentState } = visibleState;
@@ -197,22 +199,34 @@ export function OpponentSidePiles() {
   const discardCount = opponentState.discardPileSize;
 
   return (
-    <aside
-      className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
-      style={{
-        width: dims.sidePileW + 'px',
-        backgroundColor: 'rgba(8, 8, 12, 0.5)',
-        backdropFilter: 'blur(4px)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.04)',
-      }}
-    >
-      <DeckPile count={deckCount} accentColor="#b33e3e" />
-      <DiscardPile
-        count={discardCount}
-        accentColor="#b33e3e"
-        onClick={() => {}}
-      />
-    </aside>
+    <>
+      <aside
+        className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
+        style={{
+          width: dims.sidePileW + 'px',
+          backgroundColor: 'rgba(8, 8, 12, 0.5)',
+          backdropFilter: 'blur(4px)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.04)',
+        }}
+      >
+        <DeckPile count={deckCount} accentColor="#b33e3e" />
+        <DiscardPile
+          count={discardCount}
+          accentColor="#b33e3e"
+          onClick={() => discardCount > 0 && setShowDiscard(true)}
+        />
+      </aside>
+
+      <AnimatePresence>
+        {showDiscard && (
+          <DiscardPileViewer
+            cards={opponentState.discardPile}
+            onClose={() => setShowDiscard(false)}
+            title={t('game.opponentDiscard')}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

@@ -429,8 +429,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 056/130 - KIMIMARO (UC) - "Bone Pulse"
   'KS-056-UC': [
-    '[⧗] Enemy characters cost 1 more to play in this mission.',
-    'Discard a card to hide a character in play with cost 5 or less.',
+    '[⧗] If this character is affected by an enemy effect, the opponent must pay 1 Chakra, if able.',
+    'Discard a card to hide a character in play with cost 4 or less.',
   ],
 
   // 058/130 - JIROBO (UC) - "Earth Barrier"
@@ -588,14 +588,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP X where X is the number of characters moved this way.',
   ],
 
-  // 108/130 - NARUTO UZUMAKI (R) - "Shadow Clone Jutsu"
+  // 108/130 - NARUTO UZUMAKI (R) - "Fury of the Rasengan"
   'KS-108-R': [
-    'Put the top card of your deck as a hidden character in this mission.',
-    'Repeat the MAIN effect.',
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
   ],
   'KS-108-RA': [
-    'Put the top card of your deck as a hidden character in this mission.',
-    'Repeat the MAIN effect.',
+    'Hide an enemy character with Power 3 or less in this mission.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
   ],
 
   // 109/130 - SAKURA HARUNO (R) - "Medical Ninja"
@@ -929,10 +929,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // MOVIE VARIANT (MV)
   // =====================
 
-  // 108/130 - NARUTO UZUMAKI (MV) - "Movie Variant"
+  // 108/130 - NARUTO UZUMAKI (MV) - "I won't run away!"
   'KS-108-MV': [
     'Hide an enemy character with Power 3 or less in this mission.',
-    'MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.',
+    'MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.',
   ],
 
   // =====================
