@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { GameEngine } from '../engine/GameEngine';
 import { createTestConfig, createActionPhaseState, mockCharacter, mockMission } from './testHelpers';
-import type { GameState } from '../engine/types';
+import type { GameState, CharacterInPlay } from '../engine/types';
 
 describe('GameEngine', () => {
   describe('createGame', () => {
@@ -281,6 +281,39 @@ describe('GameEngine', () => {
 
       expect(hiddenChar).toBeDefined();
       expect(hiddenChar!.card).toBeUndefined(); // Cannot see opponent hidden card
+    });
+
+    it('should not show re-hidden card to opponent even if wasRevealedAtLeastOnce', () => {
+      const state = createActionPhaseState();
+      // Manually set up a character that was revealed then re-hidden (e.g., by Kabuto 054)
+      const reHiddenChar: CharacterInPlay = {
+        instanceId: 'rehidden-1',
+        card: state.player2.deck[0],
+        isHidden: true,
+        wasRevealedAtLeastOnce: true, // was previously face-visible
+        powerTokens: 0,
+        stack: [state.player2.deck[0]],
+        controlledBy: 'player2',
+        originalOwner: 'player2',
+        missionIndex: 0,
+      };
+
+      const newState: GameState = {
+        ...state,
+        activeMissions: state.activeMissions.map((m, i) =>
+          i === 0
+            ? { ...m, player2Characters: [reHiddenChar] }
+            : m,
+        ),
+      };
+
+      const visible = GameEngine.getVisibleState(newState, 'player1');
+      const oppChars = visible.activeMissions[0].player2Characters;
+      const hidden = oppChars.find((c) => c.instanceId === 'rehidden-1');
+
+      expect(hidden).toBeDefined();
+      expect(hidden!.isHidden).toBe(true);
+      expect(hidden!.card).toBeUndefined(); // Must NOT be visible even with wasRevealedAtLeastOnce
     });
   });
 

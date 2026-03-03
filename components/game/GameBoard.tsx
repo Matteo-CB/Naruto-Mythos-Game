@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { useGameStore } from "@/stores/gameStore";
@@ -907,6 +907,60 @@ function FullscreenCardDetail() {
   );
 }
 
+// ----- Beta Test Notification -----
+
+const BETA_DISMISSED_KEY = 'naruto-mythos-beta-dismissed';
+
+function BetaNotification() {
+  const t = useTranslations('common');
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem(BETA_DISMISSED_KEY)) {
+        setVisible(true);
+      }
+    } catch { /* SSR / privacy */ }
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 40 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 40 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-3 right-3 z-300 flex items-start gap-2 px-4 py-3 rounded-lg"
+      style={{
+        maxWidth: '340px',
+        backgroundColor: 'rgba(12, 12, 18, 0.92)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      <span className="text-xs leading-relaxed" style={{ color: '#cccccc' }}>
+        {t('betaBanner')}
+      </span>
+      <button
+        onClick={() => {
+          setVisible(false);
+          try { localStorage.setItem(BETA_DISMISSED_KEY, '1'); } catch { /* noop */ }
+        }}
+        className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer mt-0.5"
+        style={{
+          backgroundColor: 'rgba(179, 62, 62, 0.15)',
+          color: '#b33e3e',
+          border: '1px solid rgba(179, 62, 62, 0.3)',
+        }}
+      >
+        X
+      </button>
+    </motion.div>
+  );
+}
+
 // ----- Main Game Board -----
 
 export default function GameBoard() {
@@ -1003,6 +1057,8 @@ function GameBoardInner() {
         className="absolute inset-0 pointer-events-none"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }}
       />
+
+      <BetaNotification />
 
       {/* Left side: Opponent deck + discard */}
       <OpponentSidePiles />

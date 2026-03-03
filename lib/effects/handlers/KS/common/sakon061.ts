@@ -12,7 +12,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Counts missions with friendly Sound Four characters, then draws that many cards.
  */
 function handleSakon061Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
   // Count missions with at least one friendly Sound Four character
   let soundFourMissionCount = 0;
@@ -21,6 +21,7 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
       sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
     const hasSoundFour = friendlyChars.some((char) => {
+      if (char.instanceId === sourceCard.instanceId) return false;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });
