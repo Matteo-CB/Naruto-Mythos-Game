@@ -503,68 +503,40 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         border: '1px solid rgba(255, 255, 255, 0.04)',
       }}
     >
-      {/* Opponent power total */}
+      {/* Opponent characters — scrollable when overflowing */}
       <div
-        className="flex items-center gap-1.5 rounded-md px-2 py-0.5 shrink-0"
-        style={{ backgroundColor: 'rgba(179, 62, 62, 0.1)' }}
+        className="flex-1 flex flex-col min-h-0"
       >
-        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
-          {t('game.board.pwr')}
-        </span>
-        <span
-          className="text-xs font-bold tabular-nums"
-          style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
         >
-          {oppPower}
-        </span>
-      </div>
-
-      {/* Opponent characters */}
-      <div
-        className="flex-1 flex flex-wrap gap-0.5 justify-center content-end min-h-0"
-      >
-        {oppChars.map((char) => (
-          <CharacterSlot
-            key={char.instanceId}
-            character={char}
-            isOwn={false}
-            missionIndex={missionIndex}
-            myPlayer={myPlayer}
-          />
-        ))}
-      </div>
-
-      {/* Mission score strip — always visible regardless of card size */}
-      <div
-        className="flex items-center justify-center gap-1.5 shrink-0 w-full rounded-md px-1 py-0.5"
-        style={{ backgroundColor: `${rc}12`, border: `1px solid ${rc}30` }}
-      >
-        <span
-          className="text-[10px] font-bold px-1.5 rounded"
-          style={{ backgroundColor: rc, color: '#0a0a0a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
-        >
-          {mission.rank}
-        </span>
-        <span
-          className="text-[11px] font-bold tabular-nums"
-          style={{ color: rc, fontFamily: "'NJNaruto', Arial, sans-serif" }}
-        >
-          {totalPoints}
-        </span>
-        <span className="text-[8px]" style={{ color: '#666' }}>
-          ({mission.basePoints}+{mission.rankBonus})
-        </span>
-        {mission.wonBy && (
-          <span
-            className="text-[9px] font-bold uppercase"
-            style={{ color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e' }}
-          >
-            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
-          </span>
+          <div className="flex flex-wrap gap-0.5 justify-center content-end min-h-full">
+            {oppChars.map((char) => (
+              <CharacterSlot
+                key={char.instanceId}
+                character={char}
+                isOwn={false}
+                missionIndex={missionIndex}
+                myPlayer={myPlayer}
+              />
+            ))}
+          </div>
+        </div>
+        {/* Opponent power — compact inline */}
+        {oppChars.length > 0 && (
+          <div className="shrink-0 flex justify-center py-0.5">
+            <span
+              className="text-[10px] font-bold tabular-nums"
+              style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+            >
+              {oppPower}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* Mission card with targeting indicator */}
+      {/* Mission card — centered, never pushed */}
       <div className="relative w-full flex justify-center shrink-0">
         {/* Drop zone highlight */}
         {isTargetable && (
@@ -587,35 +559,67 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         <MissionCardDisplay mission={mission} index={missionIndex} myPlayer={myPlayer} />
       </div>
 
-      {/* Player characters */}
+      {/* Player characters — scrollable when overflowing */}
       <div
-        className="flex-1 flex flex-wrap gap-0.5 justify-center content-start min-h-0"
+        className="flex-1 flex flex-col min-h-0"
       >
-        {myChars.map((char) => (
-          <CharacterSlot
-            key={char.instanceId}
-            character={char}
-            isOwn={true}
-            missionIndex={missionIndex}
-            myPlayer={myPlayer}
-          />
-        ))}
+        {/* Player power — compact inline */}
+        {myChars.length > 0 && (
+          <div className="shrink-0 flex justify-center py-0.5">
+            <span
+              className="text-[10px] font-bold tabular-nums"
+              style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+            >
+              {myPower}
+            </span>
+          </div>
+        )}
+        <div
+          className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
+        >
+          <div className="flex flex-wrap gap-0.5 justify-center content-start min-h-full">
+            {myChars.map((char) => (
+              <CharacterSlot
+                key={char.instanceId}
+                character={char}
+                isOwn={true}
+                missionIndex={missionIndex}
+                myPlayer={myPlayer}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Player power total */}
+      {/* Score badge — absolute bottom, always visible */}
       <div
-        className="flex items-center gap-1.5 rounded-md px-2 py-0.5 shrink-0"
-        style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)' }}
+        className="shrink-0 flex items-center justify-center gap-1 w-full rounded-md px-1.5 py-0.5"
+        style={{
+          backgroundColor: `${rc}15`,
+          fontFamily: "'NJNaruto', Arial, sans-serif",
+        }}
       >
-        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
-          {t('game.board.pwr')}
+        <span
+          className="text-[10px] font-bold px-1 rounded"
+          style={{ backgroundColor: rc, color: '#0a0a0a' }}
+        >
+          {mission.rank}
         </span>
         <span
-          className="text-xs font-bold tabular-nums"
-          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+          className="text-[11px] font-bold tabular-nums"
+          style={{ color: rc }}
         >
-          {myPower}
+          {totalPoints}
         </span>
+        {mission.wonBy && (
+          <span
+            className="text-[9px] font-bold uppercase"
+            style={{ color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e' }}
+          >
+            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
+          </span>
+        )}
       </div>
     </motion.div>
   );
