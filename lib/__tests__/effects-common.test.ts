@@ -7,7 +7,8 @@ import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState } fr
 import { initializeRegistry } from '../effects/EffectRegistry';
 import { getEffectHandler } from '../effects/EffectRegistry';
 import type { EffectContext } from '../effects/EffectTypes';
-import type { GameState, CharacterInPlay } from '../engine/types';
+import type { GameState, CharacterInPlay, PendingEffect } from '../engine/types';
+import { EffectEngine } from '../effects/EffectEngine';
 
 beforeAll(() => {
   initializeRegistry();
@@ -1298,6 +1299,258 @@ describe('101/130 - Ton Ton', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-101-C', 'MAIN');
     expect(handler).toBeDefined();
+  });
+});
+
+// ===================================================================
+// 062/130 - SAKON UC: AMBUSH copy instant effect from Sound Four
+// ===================================================================
+describe('062/130 - Sakon UC (copy effect)', () => {
+  it('AMBUSH should return target selection with friendly Sound Four characters', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [{ type: 'AMBUSH', description: '[↯] Copy an instant effect ([↯]) of another friendly Sound Four character in play.' }],
+    });
+    const jirobo057 = mockCharInPlay({ instanceId: 'jirobo-1', missionIndex: 1 }, {
+      id: 'KS-057-C', number: 57, name_fr: 'JIRÔBÔ', keywords: ['Sound Four'], group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: 'POWERUP X. X is the number of missions where you have at least one friendly Sound Four character.' }],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [jirobo057], player2Characters: [] },
+      ],
+    });
+
+    const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
+    expect(handler).toBeDefined();
+    const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SAKON062_COPY_EFFECT');
+    expect(result.validTargets).toContain('jirobo-1');
+    expect(result.validTargets).not.toContain('sakon062-1'); // self excluded
+  });
+
+  it('AMBUSH should exclude hidden Sound Four from valid targets', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [{ type: 'AMBUSH', description: 'Copy effect' }],
+    });
+    const hiddenSF = mockCharInPlay({ instanceId: 'hidden-sf-1', isHidden: true, missionIndex: 1 }, {
+      name_fr: 'Tayuya', keywords: ['Sound Four'], group: 'Sound Village',
+      effects: [{ type: 'AMBUSH', description: 'POWERUP 2 a friendly Sound Village character.' }],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [hiddenSF], player2Characters: [] },
+      ],
+    });
+
+    const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
+    const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
+    // Hidden Sound Four chars are excluded — no valid targets
+    expect(result.requiresTargetSelection).toBeFalsy();
+  });
+
+  it('AMBUSH should exclude Sound Four with only continuous effects', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [{ type: 'AMBUSH', description: 'Copy effect' }],
+    });
+    // Tayuya 064: only continuous MAIN effect
+    const tayuya064 = mockCharInPlay({ instanceId: 'tayuya-1', missionIndex: 1 }, {
+      id: 'KS-064-C', number: 64, name_fr: 'TAYUYA', keywords: ['Sound Four'], group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: '[⧗] CHAKRA +X X is the number of missions...' }],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [tayuya064], player2Characters: [] },
+      ],
+    });
+
+    const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
+    const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
+    // Tayuya 064 only has [⧗] continuous — no copyable instant effects
+    expect(result.requiresTargetSelection).toBeFalsy();
+  });
+
+  it('AMBUSH should find Sound Four with multiple copyable effects', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [{ type: 'AMBUSH', description: 'Copy effect' }],
+    });
+    // Kidomaru 060: has both MAIN and AMBUSH instant effects
+    const kidomaru060 = mockCharInPlay({ instanceId: 'kid060-1', missionIndex: 1 }, {
+      id: 'KS-060-UC', number: 60, name_fr: 'KIDÔMARU', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [
+        { type: 'MAIN', description: 'Move a character from this mission.' },
+        { type: 'AMBUSH', description: '[↯] Defeat an enemy character with Power 1 or less in play.' },
+      ],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [kidomaru060], player2Characters: [] },
+      ],
+    });
+
+    const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
+    const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.validTargets).toContain('kid060-1');
+  });
+
+  it('copied Jirobo 057 MAIN should POWERUP Sakon (copier)', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', powerTokens: 0, missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+    });
+    const jirobo057 = mockCharInPlay({ instanceId: 'jirobo-1', missionIndex: 1 }, {
+      id: 'KS-057-C', number: 57, name_fr: 'JIRÔBÔ', keywords: ['Sound Four'], group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: 'POWERUP X.' }],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [jirobo057], player2Characters: [] },
+      ],
+      pendingEffects: [],
+      pendingActions: [],
+    });
+
+    const mockPending = {
+      id: 'test-pe-1',
+      sourceCardId: 'KS-062-UC',
+      sourceInstanceId: 'sakon062-1',
+      sourceMissionIndex: 0,
+      effectType: 'AMBUSH' as const,
+      effectDescription: '',
+      targetSelectionType: 'SAKON062_COPY_EFFECT',
+      sourcePlayer: 'player1' as const,
+      requiresTargetSelection: true,
+      validTargets: ['jirobo-1'],
+      isOptional: false,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    };
+
+    // Get the Jirobo 057 card data (the top card)
+    const jiroboTopCard = jirobo057.stack.length > 0 ? jirobo057.stack[jirobo057.stack.length - 1] : jirobo057.card;
+
+    const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jiroboTopCard, 'MAIN');
+    // Jirobo 057 MAIN: POWERUP X on self (Sakon as copier), X = missions with other Sound Four
+    // Mission 1 has Jirobo (Sound Four) → count = 1
+    const sakonAfter = resultState.activeMissions[0].player1Characters.find(
+      (c: CharacterInPlay) => c.instanceId === 'sakon062-1',
+    );
+    expect(sakonAfter?.powerTokens).toBe(1); // 1 mission with other Sound Four
+  });
+
+  it('copied Sakon 061 MAIN should draw cards for copier player', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+    });
+    const sakon061 = mockCharInPlay({ instanceId: 'sakon061-1', missionIndex: 1 }, {
+      id: 'KS-061-C', number: 61, name_fr: 'SAKON', keywords: ['Sound Four'], group: 'Sound Village',
+      effects: [{ type: 'MAIN', description: 'Draw X card(s).' }],
+    });
+    const deckCards = [mockCharacter({ name_fr: 'D1' }), mockCharacter({ name_fr: 'D2' }), mockCharacter({ name_fr: 'D3' })];
+    const baseState = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [sakon061], player2Characters: [] },
+      ],
+      pendingEffects: [],
+      pendingActions: [],
+    });
+    const state: GameState = {
+      ...baseState,
+      player1: { ...baseState.player1, deck: deckCards, hand: [] },
+    };
+
+    const mockPending = {
+      id: 'test-pe-2',
+      sourceCardId: 'KS-062-UC',
+      sourceInstanceId: 'sakon062-1',
+      sourceMissionIndex: 0,
+      effectType: 'AMBUSH' as const,
+      effectDescription: '',
+      targetSelectionType: 'SAKON062_COPY_EFFECT',
+      sourcePlayer: 'player1' as const,
+      requiresTargetSelection: true,
+      validTargets: ['sakon061-1'],
+      isOptional: false,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    };
+
+    const sakon061TopCard = sakon061.stack.length > 0 ? sakon061.stack[sakon061.stack.length - 1] : sakon061.card;
+
+    const resultState = EffectEngine.executeCopiedEffect(state, mockPending, sakon061TopCard, 'MAIN');
+    // Sakon 061 MAIN: Draw X, X = missions with Sound Four (excluding copier Sakon 062)
+    // Mission 1 has Sakon 061 (Sound Four) → count = 1, draw 1 card
+    expect(resultState.player1.hand.length).toBe(1);
+    expect(resultState.player1.deck.length).toBe(2);
+  });
+
+  it('copied Jirobo 058 MAIN should POWERUP Sound Four in copier mission only', () => {
+    const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', powerTokens: 0, missionIndex: 0 }, {
+      id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+    });
+    const tayuya = mockCharInPlay({ instanceId: 'tayuya-1', powerTokens: 0, missionIndex: 0 }, {
+      name_fr: 'TAYUYA', keywords: ['Sound Four'], group: 'Sound Village',
+    });
+    const jirobo058 = mockCharInPlay({ instanceId: 'jirobo058-1', missionIndex: 1 }, {
+      id: 'KS-058-UC', number: 58, name_fr: 'JIRÔBÔ', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
+      effects: [
+        { type: 'MAIN', description: 'POWERUP 1 to all other friendly Sound Four characters in this mission.' },
+        { type: 'UPGRADE', description: 'Apply the MAIN effect to Sound Four characters in the other missions.' },
+      ],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [sakon062, tayuya], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [jirobo058], player2Characters: [] },
+      ],
+      pendingEffects: [],
+      pendingActions: [],
+    });
+
+    const mockPending = {
+      id: 'test-pe-3',
+      sourceCardId: 'KS-062-UC',
+      sourceInstanceId: 'sakon062-1',
+      sourceMissionIndex: 0,
+      effectType: 'AMBUSH' as const,
+      effectDescription: '',
+      targetSelectionType: 'SAKON062_COPY_EFFECT',
+      sourcePlayer: 'player1' as const,
+      requiresTargetSelection: true,
+      validTargets: ['jirobo058-1'],
+      isOptional: false,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    };
+
+    const jirobo058TopCard = jirobo058.stack.length > 0 ? jirobo058.stack[jirobo058.stack.length - 1] : jirobo058.card;
+
+    const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jirobo058TopCard, 'MAIN');
+    // Jirobo 058 MAIN: POWERUP 1 to other Sound Four in "this mission" (= Sakon's mission 0)
+    // isUpgrade is false for copy, so scope = this mission only
+    // Tayuya is in mission 0 with Sound Four → should get POWERUP 1
+    const tayuyaAfter = resultState.activeMissions[0].player1Characters.find(
+      (c: CharacterInPlay) => c.instanceId === 'tayuya-1',
+    );
+    expect(tayuyaAfter?.powerTokens).toBe(1);
+    // Sakon is sourceCard (self) — excluded from the POWERUP target
+    const sakonAfter = resultState.activeMissions[0].player1Characters.find(
+      (c: CharacterInPlay) => c.instanceId === 'sakon062-1',
+    );
+    expect(sakonAfter?.powerTokens).toBe(0);
   });
 });
 

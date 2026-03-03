@@ -11,8 +11,21 @@
  *   BOT_DISCORD_TOKEN, SERVER_DISCORD_ID
  */
 
-import dotenv from 'dotenv';
-dotenv.config();
+import { readFileSync } from 'fs';
+
+// Load .env manually (no dotenv dependency needed)
+try {
+  const envFile = readFileSync(new URL('../.env', import.meta.url), 'utf-8');
+  for (const line of envFile.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+    if (!process.env[key]) process.env[key] = val;
+  }
+} catch { /* .env not found — rely on CLI args or existing env */ }
 
 const BOT_TOKEN = process.argv[2] || process.env.BOT_DISCORD_TOKEN;
 const GUILD_ID = process.argv[3] || process.env.SERVER_DISCORD_ID;
