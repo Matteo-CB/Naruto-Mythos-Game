@@ -4,15 +4,16 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
  * Card 062/130 - SAKON (UC)
- * Chakra: 5 | Power: 3
- * Group: Sound Village | Keywords: Sound Four
+ * Chakra: 4 | Power: 4
+ * Group: Sound Village | Keywords: Sound Four, Jutsu
  *
- * AMBUSH: Copy an instant effect (non-continuous [hourglass], non-SCORE [arrow]) of another
+ * AMBUSH: Copy an instant effect (non-continuous [⧗], non-SCORE, non-UPGRADE) of another
  * friendly character with keyword "Sound Four" in play.
  *   - Find all friendly non-hidden characters with keyword "Sound Four" across all missions
  *     (excluding self).
  *   - The player selects which Sound Four character to copy from.
- *   - The copied effect must be an instant effect (MAIN without [hourglass], or AMBUSH).
+ *   - The copied effect must be an instant effect (MAIN without [⧗], or AMBUSH without [⧗]).
+ *   - Effects starting with "effect:" or "effect." modifiers are also excluded.
  *   - The actual execution of the copied effect is handled by the engine after target selection.
  *
  * This is a complex copy effect. The handler returns target selection for which Sound Four
@@ -38,8 +39,8 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
         const hasInstantEffect = topCard.effects?.some((eff) => {
           if (eff.type === 'SCORE') return false;
           if (eff.type === 'UPGRADE') return false;
-          // Check for continuous marker [hourglass]
           if (eff.description && eff.description.includes('[⧗]')) return false;
+          if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
           return true;
         });
         if (hasInstantEffect) {
