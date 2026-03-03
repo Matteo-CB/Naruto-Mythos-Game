@@ -22,6 +22,7 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
       sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
     const hasSoundFour = friendlyChars.some((char) => {
+      if (char.instanceId === sourceCard.instanceId) return false;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });

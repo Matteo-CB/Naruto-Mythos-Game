@@ -736,7 +736,7 @@ export class GameEngine {
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
           // Can see if: own card, OR not hidden, OR was previously revealed (public knowledge)
-          const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
+          const canSee = isOwn || !c.isHidden;
           const power = calculateCharacterPower(state, c, side);
           const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
           return {

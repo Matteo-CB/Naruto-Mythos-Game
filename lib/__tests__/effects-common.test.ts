@@ -654,10 +654,10 @@ describe('057/130 - Jirobo', () => {
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
     const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
-    expect(updated?.powerTokens).toBe(2); // 2 missions with Sound Four
+    expect(updated?.powerTokens).toBe(1); // 1 mission with other Sound Four (self excluded)
   });
 
-  it('should get 0 POWERUP when no Sound Four anywhere', () => {
+  it('should get 0 POWERUP when no other Sound Four anywhere', () => {
     const jirobo = mockCharInPlay({ instanceId: 'jirobo-1', powerTokens: 0, isHidden: true }, {
       id: 'KS-057-C', number: 57, name_fr: 'Jirobo', keywords: ['Sound Four'],
     });
@@ -672,7 +672,31 @@ describe('057/130 - Jirobo', () => {
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
     const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
-    expect(updated?.powerTokens).toBe(1); // hidden Sound Four still counts for mission presence
+    expect(updated?.powerTokens).toBe(0); // self is excluded from Sound Four count
+  });
+
+  it('should count 2 when 2 other Sound Four chars are in different missions', () => {
+    const jirobo = mockCharInPlay({ instanceId: 'jirobo-1', powerTokens: 0 }, {
+      id: 'KS-057-C', number: 57, name_fr: 'Jirobo', keywords: ['Sound Four'],
+    });
+    const sf2 = mockCharInPlay({ instanceId: 'sf2' }, {
+      name_fr: 'Tayuya', keywords: ['Sound Four'],
+    });
+    const sf3 = mockCharInPlay({ instanceId: 'sf3' }, {
+      name_fr: 'Sakon', keywords: ['Sound Four'],
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        { card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null, player1Characters: [jirobo], player2Characters: [] },
+        { card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null, player1Characters: [sf2], player2Characters: [] },
+        { card: mockMission(), rank: 'B', basePoints: 3, rankBonus: 3, wonBy: null, player1Characters: [sf3], player2Characters: [] },
+      ],
+    });
+
+    const handler = getEffectHandler('KS-057-C', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', jirobo, 0));
+    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
+    expect(updated?.powerTokens).toBe(2); // 2 other missions with Sound Four (self excluded)
   });
 });
 
@@ -687,6 +711,9 @@ describe('059/130 - Kidomaru', () => {
     const ally = mockCharInPlay({ instanceId: 'ally-1' }, {
       name_fr: 'Ally', keywords: [],
     });
+    const sf2 = mockCharInPlay({ instanceId: 'sf2' }, {
+      name_fr: 'Tayuya', keywords: ['Sound Four'], group: 'Sound Village',
+    });
     const state = createActionPhaseState({
       activeMissions: [
         {
@@ -696,7 +723,7 @@ describe('059/130 - Kidomaru', () => {
         },
         {
           card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null,
-          player1Characters: [],
+          player1Characters: [sf2],
           player2Characters: [],
         },
       ],
@@ -704,11 +731,10 @@ describe('059/130 - Kidomaru', () => {
 
     const handler = getEffectHandler('KS-059-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // X=1 (one mission with Sound Four), so 1 move available
-    // Now returns target selection: choose which character to move
+    // X=1 (one other mission with Sound Four, self excluded), so 1 move available
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU_CHOOSE_CHARACTER');
-    expect(result.validTargets!.length).toBe(2); // both chars in mission 0 are movable
+    expect(result.validTargets!.length).toBe(3); // all 3 chars across missions are movable
   });
 });
 
@@ -736,7 +762,7 @@ describe('061/130 - Sakon', () => {
 
     const handler = getEffectHandler('KS-061-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakon, 0));
-    expect(result.state.player1.hand.length).toBe(2); // 2 Sound Four missions
+    expect(result.state.player1.hand.length).toBe(1); // 1 other Sound Four mission (self excluded)
   });
 });
 
@@ -747,6 +773,80 @@ describe('064/130 - Tayuya', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-064-C', 'MAIN');
     expect(handler).toBeDefined();
+  });
+});
+
+// ===================================================================
+// 060/130 - KIDÔMARU UC: MAIN move character; AMBUSH defeat power ≤ 1
+// ===================================================================
+describe('060/130 - Kidômaru UC', () => {
+  it('AMBUSH should include hidden enemies as valid targets (power 0 <= 1)', () => {
+    const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
+      id: 'KS-060-UC', number: 60, name_fr: 'Kidômaru', keywords: ['Sound Four', 'Jutsu'],
+    });
+    const hiddenEnemy = mockCharInPlay({ instanceId: 'hidden-1', isHidden: true, controlledBy: 'player2', originalOwner: 'player2' }, {
+      name_fr: 'Hidden Ninja', power: 3,
+    });
+    const state = createActionPhaseState({
+      activeMissions: [{
+        card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
+        player1Characters: [kidomaru],
+        player2Characters: [hiddenEnemy],
+      }],
+    });
+
+    const handler = getEffectHandler('KS-060-UC', 'AMBUSH')!;
+    const result = handler(makeCtx(state, 'player1', kidomaru, 0));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.validTargets).toContain('hidden-1'); // hidden = power 0 <= 1
+  });
+
+  it('AMBUSH should not target enemies with effective power > 1', () => {
+    const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
+      id: 'KS-060-UC', number: 60, name_fr: 'Kidômaru', keywords: ['Sound Four', 'Jutsu'],
+    });
+    const strongEnemy = mockCharInPlay({ instanceId: 'strong-1', controlledBy: 'player2', originalOwner: 'player2' }, {
+      name_fr: 'Strong Ninja', power: 3,
+    });
+    const state = createActionPhaseState({
+      activeMissions: [{
+        card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
+        player1Characters: [kidomaru],
+        player2Characters: [strongEnemy],
+      }],
+    });
+
+    const handler = getEffectHandler('KS-060-UC', 'AMBUSH')!;
+    const result = handler(makeCtx(state, 'player1', kidomaru, 0));
+    // power 3 > 1, no valid targets
+    expect(result.requiresTargetSelection).toBeFalsy();
+  });
+
+  it('MAIN should offer character selection in this mission', () => {
+    const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
+      id: 'KS-060-UC', number: 60, name_fr: 'Kidômaru', keywords: ['Sound Four', 'Jutsu'],
+    });
+    const ally = mockCharInPlay({ instanceId: 'ally-1', controlledBy: 'player1', originalOwner: 'player1' }, {
+      name_fr: 'Ally',
+    });
+    const state = createActionPhaseState({
+      activeMissions: [{
+        card: mockMission(), rank: 'D', basePoints: 3, rankBonus: 1, wonBy: null,
+        player1Characters: [kidomaru, ally],
+        player2Characters: [],
+      }, {
+        card: mockMission(), rank: 'C', basePoints: 3, rankBonus: 2, wonBy: null,
+        player1Characters: [],
+        player2Characters: [],
+      }],
+    });
+
+    const handler = getEffectHandler('KS-060-UC', 'MAIN')!;
+    const result = handler(makeCtx(state, 'player1', kidomaru, 0));
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KIDOMARU060_CHOOSE_CHARACTER');
+    expect(result.validTargets).toContain('ally-1');
+    expect(result.validTargets).not.toContain('kid-1'); // self excluded
   });
 });
 

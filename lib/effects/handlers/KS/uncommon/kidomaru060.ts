@@ -69,7 +69,6 @@ function handleKidomaru060Ambush(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (char.isHidden) continue;
       if (getEffectivePower(state, char, enemyPlayer) <= 1) {
         validTargets.push(char.instanceId);
       }

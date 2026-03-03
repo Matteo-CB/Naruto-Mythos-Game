@@ -17,6 +17,14 @@
 - Improved powerup token visuals (larger, metallic look, glow scales with count)
 - Improved upgrade indicator (green badge with stack count)
 - Improved upgrade + powertoken animations
+- NJNaruto font: added 38 accented glyphs (é, è, ê, ç, à, etc.) via `scripts/add-accents-to-font.py`
+- Beta notification banner in GameBoard (dismissible, localStorage, i18n EN/FR)
+
+### Tester Bug Fixes (March 2026)
+- Sound Four self-counting: Jirobo 057, Kidomaru 059, Sakon 061 now exclude self from X count
+- Kidomaru 060 AMBUSH: can now target hidden enemy characters (power 0 ≤ 1)
+- Hidden card visibility: `getVisibleState` no longer uses `wasRevealedAtLeastOnce` — hidden = invisible
+- MissionLane hover scroll: removed whileHover scale animation to prevent false scrollbar
 
 ### Images Added
 - 30+ new card images (UC, R, RA, S, M, Mission)
