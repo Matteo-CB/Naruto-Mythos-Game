@@ -110,7 +110,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         opacity: 1,
         y: 0,
       }}
-      whileHover={isRevealable ? { scale: 1.06, y: -4 } : { scale: 1.02 }}
+      whileHover={undefined}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
