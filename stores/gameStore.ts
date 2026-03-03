@@ -704,16 +704,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (isOnlineGame) {
       const socketState = useSocketStore.getState();
       if (socketState.socket && socketState.connected) {
-        set({ isProcessing: true });
+        // For mulligan, don't block UI — the MulliganDialog uses hasMulliganed from server state
+        const skipProcessingBlock = action.type === 'MULLIGAN';
+        if (!skipProcessingBlock) {
+          set({ isProcessing: true });
+        }
         socketState.performAction(action);
 
         // Safety timeout: if server doesn't respond in 10s, unblock the UI
-        setTimeout(() => {
-          if (get().isProcessing && get().isOnlineGame) {
-            console.warn('[gameStore] Online action timeout — unblocking UI');
-            set({ isProcessing: false });
-          }
-        }, 10000);
+        if (!skipProcessingBlock) {
+          setTimeout(() => {
+            if (get().isProcessing && get().isOnlineGame) {
+              console.warn('[gameStore] Online action timeout — unblocking UI');
+              set({ isProcessing: false });
+            }
+          }, 10000);
+        }
       } else {
         console.error('[gameStore] Cannot perform online action: socket not connected');
       }

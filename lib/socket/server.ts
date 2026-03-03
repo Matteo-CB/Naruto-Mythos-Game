@@ -472,6 +472,64 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
+    // Rejoin a room after reconnection (socket ID changed)
+    socket.on('game:rejoin', (data: { roomCode: string; userId: string }) => {
+      const { roomCode, userId } = data;
+      if (!roomCode || !userId) return;
+
+      const room = rooms.get(roomCode);
+      if (!room || !room.gameState) {
+        console.log(`[Socket] game:rejoin: room ${roomCode} not found or no game`);
+        return;
+      }
+
+      // Determine if this user is host or guest
+      const isHost = room.hostId === userId;
+      const isGuest = room.guestId === userId;
+      if (!isHost && !isGuest) {
+        console.log(`[Socket] game:rejoin: user ${userId} is not in room ${roomCode}`);
+        return;
+      }
+
+      const player = isHost ? 'player1' : 'player2';
+      const oldSocketId = isHost ? room.hostSocket : room.guestSocket;
+
+      console.log(`[Socket] game:rejoin: ${player} reconnecting in room ${roomCode}, old socket: ${oldSocketId}, new socket: ${socket.id}`);
+
+      // Update socket ID in room
+      if (isHost) {
+        room.hostSocket = socket.id;
+      } else {
+        room.guestSocket = socket.id;
+      }
+
+      // Update playerRooms map
+      if (oldSocketId) playerRooms.delete(oldSocketId);
+      playerRooms.set(socket.id, roomCode);
+
+      // Join the socket.io room
+      socket.join(roomCode);
+
+      // Cancel disconnect grace timer if running
+      if (room.disconnectTimer) {
+        clearTimeout(room.disconnectTimer);
+        room.disconnectTimer = null;
+        console.log(`[Socket] Cancelled disconnect timer for ${player} in room ${roomCode}`);
+      }
+
+      // Re-register user socket
+      registerUserSocket(userId, socket.id);
+
+      // Send current game state to the rejoining player
+      const visibleState = GameEngine.getVisibleState(room.gameState, player);
+      socket.emit('game:state-update', { visibleState, playerRole: player });
+
+      // Restart action timer if needed
+      if (room.gameState.phase === 'action' && !room.actionTimer) {
+        startActionTimer(room, roomCode, io);
+      }
+    });
+
     // Create a room
     socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);

@@ -313,7 +313,7 @@ export function MulliganDialog() {
           }}
         >
           <span className="text-sm" style={{ color: '#888888' }}>
-            {t('game.processing')}
+            {t('game.mulliganWaiting')}
           </span>
         </div>
       </motion.div>
