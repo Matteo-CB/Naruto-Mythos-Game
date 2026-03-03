@@ -8,7 +8,7 @@
 
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission } from '../engine/types';
 
-export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'impossible';
 
 interface PendingActionInfo {
   description: string;

@@ -81,7 +81,7 @@ interface GameStore {
   updateOnlineState: (visibleState: VisibleGameState) => void;
   endOnlineGame: (winner: string) => void;
   performAction: (action: GameAction) => void;
-  processAITurn: () => void;
+  processAITurn: () => void | Promise<void>;
   addAnimation: (event: Omit<AnimationEvent, 'id' | 'timestamp'>) => void;
   completeAnimation: (id: string) => void;
   setAnimating: (animating: boolean) => void;
@@ -844,7 +844,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
         } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => get().processAITurn(), 500);
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           set({ isProcessing: false });
         }
@@ -1136,14 +1138,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Delay scales with whether there was an animation
       const delay = animEvent ? 1000 : 500;
       setTimeout(() => {
-        get().processAITurn();
+        void get().processAITurn();
       }, delay);
     } else {
       set({ isProcessing: false });
     }
   },
 
-  processAITurn: () => {
+  processAITurn: async () => {
     const { gameState, humanPlayer, aiPlayer, addAnimation } = get();
     if (!gameState || !aiPlayer) {
       set({ isProcessing: false });
@@ -1263,7 +1265,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
         }
 
-        const aiAction = aiPlayer.getAction(currentState);
+        const aiAction = await aiPlayer.getActionAsync(currentState);
         if (!aiAction) break;
 
         // Capture animation for this AI action
@@ -1351,7 +1353,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
         } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => get().processAITurn(), 500);
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           set({ isProcessing: false });
         }

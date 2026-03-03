@@ -1,208 +1,91 @@
+/**
+ * Hard AI — strong level.
+ *
+ * ISMCTS 600 simulations, with neural network guidance when available.
+ */
+
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
-import { GameEngine } from '../../engine/GameEngine';
-import { BoardEvaluator } from '../evaluation/BoardEvaluator';
-import { deepClone } from '../../engine/utils/deepClone';
+import { NeuralISMCTS } from '../neural/NeuralISMCTS';
+import { NeuralEvaluator } from '../neural/NeuralEvaluator';
 
-/**
- * Hard AI: Minimax with alpha-beta pruning.
- * Looks ahead 3 plies to evaluate the best move.
- * Considers opponent's likely responses and manages resources strategically.
- */
 export class HardAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'hard';
-  private readonly maxDepth = 3;
-  private readonly maxBranching = 8; // Limit branching factor for performance
+
+  private mcts: NeuralISMCTS;
+  private evaluator: NeuralEvaluator;
+
+  constructor() {
+    this.evaluator = NeuralEvaluator.getInstance();
+    this.mcts = new NeuralISMCTS({
+      simulations: 600,
+      maxDepth: 6,
+      explorationC: 1.41,
+      evaluator: this.evaluator,
+      maxBranching: 12,
+      useBatchedEval: true,
+    });
+  }
 
   chooseAction(state: GameState, player: PlayerID, validActions: GameAction[]): GameAction {
-    if (validActions.length === 0) {
-      return { type: 'PASS' };
-    }
+    if (validActions.length === 1) return validActions[0];
 
-    // Mulligan: evaluate hand quality
     if (state.phase === 'mulligan') {
       return this.decideMulligan(state, player, validActions);
     }
 
-    // Use minimax for action phase
-    let bestAction = validActions[0];
-    let bestScore = -Infinity;
-
-    // Pre-sort actions by quick heuristic to improve pruning
-    const sortedActions = this.presortActions(validActions, state, player);
-
-    for (const action of sortedActions) {
-      try {
-        const newState = GameEngine.applyAction(state, player, action);
-        const score = this.minimax(
-          newState,
-          this.maxDepth - 1,
-          -Infinity,
-          Infinity,
-          false,
-          player,
-        );
-
-        if (score > bestScore) {
-          bestScore = score;
-          bestAction = action;
-        }
-      } catch {
-        // Skip invalid actions that cause errors
-        continue;
-      }
-    }
-
-    return bestAction;
+    return this.mcts.chooseActionSync(state, player, validActions);
   }
 
-  /**
-   * Minimax with alpha-beta pruning.
-   */
-  private minimax(
-    state: GameState,
-    depth: number,
-    alpha: number,
-    beta: number,
-    isMaximizing: boolean,
-    aiPlayer: PlayerID,
-  ): number {
-    // Terminal conditions
-    if (depth === 0 || state.phase === 'gameOver') {
-      return BoardEvaluator.evaluateTerminal(state, aiPlayer);
+  async chooseActionAsync(state: GameState, player: PlayerID, validActions: GameAction[]): Promise<GameAction> {
+    if (validActions.length === 1) return validActions[0];
+
+    if (state.phase === 'mulligan') {
+      return this.decideMulligan(state, player, validActions);
     }
 
-    const currentPlayer = isMaximizing ? aiPlayer : (aiPlayer === 'player1' ? 'player2' : 'player1');
-    const actions = GameEngine.getValidActions(state, currentPlayer);
+    await this.evaluator.load();
 
-    if (actions.length === 0) {
-      return BoardEvaluator.evaluate(state, aiPlayer);
+    if (this.evaluator.isReady()) {
+      return this.mcts.chooseActionAsync(state, player, validActions);
     }
 
-    // Limit branching factor
-    const limitedActions = this.limitActions(actions, state, currentPlayer);
-
-    if (isMaximizing) {
-      let maxEval = -Infinity;
-      for (const action of limitedActions) {
-        try {
-          const newState = GameEngine.applyAction(state, currentPlayer, action);
-          const evalScore = this.minimax(newState, depth - 1, alpha, beta, false, aiPlayer);
-          maxEval = Math.max(maxEval, evalScore);
-          alpha = Math.max(alpha, evalScore);
-          if (beta <= alpha) break; // Beta cutoff
-        } catch {
-          continue;
-        }
-      }
-      return maxEval;
-    } else {
-      let minEval = Infinity;
-      for (const action of limitedActions) {
-        try {
-          const newState = GameEngine.applyAction(state, currentPlayer, action);
-          const evalScore = this.minimax(newState, depth - 1, alpha, beta, true, aiPlayer);
-          minEval = Math.min(minEval, evalScore);
-          beta = Math.min(beta, evalScore);
-          if (beta <= alpha) break; // Alpha cutoff
-        } catch {
-          continue;
-        }
-      }
-      return minEval;
-    }
+    return this.mcts.chooseActionSync(state, player, validActions);
   }
 
-  /**
-   * Pre-sort actions by heuristic for better alpha-beta pruning.
-   */
-  private presortActions(actions: GameAction[], state: GameState, player: PlayerID): GameAction[] {
-    return [...actions].sort((a, b) => {
-      return this.quickScore(b, state, player) - this.quickScore(a, state, player);
-    });
-  }
-
-  /**
-   * Quick heuristic scoring for action ordering.
-   */
-  private quickScore(action: GameAction, state: GameState, player: PlayerID): number {
-    switch (action.type) {
-      case 'PLAY_CHARACTER': {
-        const card = state[player].hand[action.cardIndex];
-        if (!card) return 0;
-        return card.power * 3 + (card.effects?.length ?? 0) * 2;
-      }
-      case 'UPGRADE_CHARACTER': {
-        const card = state[player].hand[action.cardIndex];
-        if (!card) return 0;
-        return card.power * 4 + 5;
-      }
-      case 'REVEAL_CHARACTER':
-        return 15; // Reveals are often strong
-      case 'PLAY_HIDDEN':
-        return 5; // Low cost, moderate value
-      case 'PASS':
-        return -1;
-      default:
-        return 0;
-    }
-  }
-
-  /**
-   * Limit the number of actions explored for performance.
-   */
-  private limitActions(actions: GameAction[], state: GameState, player: PlayerID): GameAction[] {
-    if (actions.length <= this.maxBranching) return actions;
-
-    // Sort by quick heuristic and take top N
-    const sorted = this.presortActions(actions, state, player);
-    return sorted.slice(0, this.maxBranching);
-  }
-
-  /**
-   * Smart mulligan: evaluate hand based on curve and playability.
-   */
-  private decideMulligan(
-    state: GameState,
-    player: PlayerID,
-    validActions: GameAction[],
-  ): GameAction {
+  private decideMulligan(state: GameState, player: PlayerID, validActions: GameAction[]): GameAction {
     const hand = state[player].hand;
+    let score = 0;
 
-    // Score the hand
-    let handScore = 0;
+    const costs = hand.map((c) => c.chakra ?? 0);
+    const minCost = Math.min(...costs);
+    const avgCost = costs.reduce((s, c) => s + c, 0) / costs.length;
 
-    // Count of playable cards in early turns (cost <= 3)
-    const earlyPlays = hand.filter((c) => c.chakra <= 3).length;
-    handScore += earlyPlays * 3;
+    if (minCost <= 4) score += 3;
+    if (avgCost <= 6) score += 2;
+    score += hand.reduce((s, c) => s + (c.power ?? 0), 0) * 0.5;
 
-    // Mid-game cards (cost 4-6)
-    const midPlays = hand.filter((c) => c.chakra >= 4 && c.chakra <= 6).length;
-    handScore += midPlays * 2;
-
-    // Cards with effects
-    const effectCards = hand.filter((c) => c.effects && c.effects.length > 0).length;
-    handScore += effectCards * 1;
-
-    // Total power
-    const totalPower = hand.reduce((sum, c) => sum + c.power, 0);
-    handScore += totalPower * 0.5;
-
-    // Penalty for all expensive cards (can't play early)
-    if (earlyPlays === 0) {
-      handScore -= 5;
+    for (const card of hand) {
+      if (card.effects?.some((e) => e.type === 'AMBUSH')) score += 2;
+      if (card.effects?.some((e) => e.type === 'SCORE')) score += 1.5;
+      if (card.effects?.some((e) => /CHAKRA\s*\+/i.test(e.description))) score += 2;
     }
 
-    // Keep if score is decent (threshold: 8)
-    const keepAction = validActions.find(
-      (a) => a.type === 'MULLIGAN' && !a.doMulligan,
-    );
-    const mulliganAction = validActions.find(
-      (a) => a.type === 'MULLIGAN' && a.doMulligan,
-    );
+    const groups = hand.map((c) => c.group).filter(Boolean);
+    const groupCounts = new Map<string, number>();
+    for (const group of groups) {
+      groupCounts.set(group!, (groupCounts.get(group!) ?? 0) + 1);
+    }
 
-    if (handScore >= 8 && keepAction) return keepAction;
-    if (mulliganAction) return mulliganAction;
-    return validActions[0];
+    for (const count of groupCounts.values()) {
+      if (count >= 3) score += 4;
+      else if (count >= 2) score += 2;
+    }
+
+    const keep = validActions.find((a) => a.type === 'MULLIGAN' && !a.doMulligan);
+    const mulligan = validActions.find((a) => a.type === 'MULLIGAN' && a.doMulligan);
+
+    if (score >= 11 && keep) return keep;
+    return mulligan ?? validActions[0];
   }
 }

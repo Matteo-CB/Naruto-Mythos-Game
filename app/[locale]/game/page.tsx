@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
+import { TrainingCoachPanel } from '@/components/game/TrainingCoachPanel';
 
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion
 const GameBoard = dynamic(
@@ -129,6 +130,7 @@ export default function GamePage() {
   return (
     <>
       <GameBoard />
+      <TrainingCoachPanel />
       <LandscapeBlocker />
       {showConnectionLost && (
         <div
