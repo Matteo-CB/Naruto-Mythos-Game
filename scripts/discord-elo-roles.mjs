@@ -12,6 +12,10 @@
  */
 
 import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Load .env manually (no dotenv dependency needed)
 try {
@@ -60,20 +64,36 @@ async function discordFetch(path, options = {}) {
   return res;
 }
 
-// Old rank roles to delete
-const OLD_ROLE_NAMES = ['Genin', 'Chunin', 'Kage'];
+// Old rank roles to delete (already cleaned up — kept empty for safety)
+const OLD_ROLE_NAMES = [];
 
 // New ELO roles (ordered from lowest to highest tier)
+// iconFile: league WebP images used as role icons (requires Guild Boost Level 2)
 const ELO_ROLES = [
-  { name: '\u257C Academy Student \u257E', color: 0x888888, minElo: 0 },
-  { name: '\u257C Genin \u257E',           color: 0x3E8B3E, minElo: 450 },
-  { name: '\u257C Chunin \u257E',          color: 0xB37E3E, minElo: 550 },
-  { name: '\u257C Special Jonin \u257E',   color: 0x5A7ABB, minElo: 650 },
-  { name: '\u257C Elite Jonin \u257E',     color: 0x5865F2, minElo: 750 },
-  { name: '\u257C Legendary Sannin \u257E', color: 0x9B59B6, minElo: 900 },
-  { name: '\u257C Kage \u257E',            color: 0xC4A35A, minElo: 1050 },
-  { name: '\u257C Sage of Six Paths \u257E', color: 0xFFD700, minElo: 1200 },
+  { name: '\u257C Academy Student \u257E', color: 0x888888, minElo: 0,    iconFile: 'academy-student.webp' },
+  { name: '\u257C Genin \u257E',           color: 0x3E8B3E, minElo: 450,  iconFile: 'genin.webp' },
+  { name: '\u257C Chunin \u257E',          color: 0xB37E3E, minElo: 550,  iconFile: 'chunin.webp' },
+  { name: '\u257C Special Jonin \u257E',   color: 0x5A7ABB, minElo: 650,  iconFile: 'special-jonin.webp' },
+  { name: '\u257C Elite Jonin \u257E',     color: 0x5865F2, minElo: 750,  iconFile: 'elite-jonin.webp' },
+  { name: '\u257C Legendary Sannin \u257E', color: 0x9B59B6, minElo: 900,  iconFile: 'legendary-sannin.webp' },
+  { name: '\u257C Kage \u257E',            color: 0xC4A35A, minElo: 1050, iconFile: 'kage.webp' },
+  { name: '\u257C Sage of Six Paths \u257E', color: 0xFFD700, minElo: 1200, iconFile: 'sage-of-six-paths.webp' },
 ];
+
+/**
+ * Load a league icon as base64 data URI for Discord role icon.
+ * Discord accepts role icons as base64-encoded image data URIs.
+ */
+function loadIconAsBase64(filename) {
+  try {
+    const filePath = resolve(__dirname, '..', 'public', 'images', 'leagues', filename);
+    const buffer = readFileSync(filePath);
+    return `data:image/webp;base64,${buffer.toString('base64')}`;
+  } catch (err) {
+    console.warn(`    Warning: Could not load icon ${filename}: ${err.message}`);
+    return null;
+  }
+}
 
 async function main() {
   console.log('\n  Naruto Mythos TCG - ELO Roles Setup');
@@ -102,40 +122,104 @@ async function main() {
     }
   }
 
-  // Also check for existing decorated ELO roles (in case script is run twice)
+  // Check for existing ELO roles (to update in-place instead of delete/recreate)
   const existingEloRoleNames = ELO_ROLES.map((r) => r.name);
   const existingEloRoles = existingRoles.filter((r) => existingEloRoleNames.includes(r.name));
+  const existingEloMap = new Map(existingEloRoles.map((r) => [r.name, r]));
   if (existingEloRoles.length > 0) {
-    console.log(`\n    Found ${existingEloRoles.length} existing ELO roles — will delete and recreate.`);
-    for (const role of existingEloRoles) {
-      oldRoleIds.push(role.id);
-    }
+    console.log(`\n    Found ${existingEloRoles.length} existing ELO roles — will update in-place (members keep their roles).`);
   }
 
-  // Step 3: Create new ELO roles
-  console.log('\n  [3/5] Creating new ELO roles...');
+  // Step 3: Create or update ELO roles
+  console.log('\n  [3/5] Creating/updating ELO roles...');
   const newRoleIds = [];
 
   for (const roleDef of ELO_ROLES) {
+    // Load league icon as base64
+    const iconData = roleDef.iconFile ? loadIconAsBase64(roleDef.iconFile) : null;
+
+    const roleBody = {
+      name: roleDef.name,
+      color: roleDef.color,
+      hoist: true,
+      mentionable: false,
+    };
+
+    // Add icon if loaded (requires Guild Boost Level 2 / ROLE_ICONS feature)
+    if (iconData) {
+      roleBody.icon = iconData;
+    }
+
+    // Check if this role already exists — PATCH to update instead of recreating
+    const existingRole = existingEloMap.get(roleDef.name);
+
+    if (existingRole) {
+      // Update existing role via PATCH (preserves member assignments)
+      const res = await discordFetch(`/guilds/${GUILD_ID}/roles/${existingRole.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(roleBody),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        // If icon failed due to missing boosts, retry without icon
+        if (iconData && (errText.includes('ROLE_ICONS') || errText.includes('50101') || errText.includes('more boosts'))) {
+          console.log(`    Note: Guild needs more boosts for role icons. Updating "${roleDef.name}" without icon...`);
+          delete roleBody.icon;
+          const retryRes = await discordFetch(`/guilds/${GUILD_ID}/roles/${existingRole.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify(roleBody),
+          });
+          if (!retryRes.ok) {
+            console.error(`    ERROR updating "${roleDef.name}":`, await retryRes.text());
+          } else {
+            newRoleIds.push({ name: roleDef.name, id: existingRole.id });
+            console.log(`    ~ ${roleDef.name} (${existingRole.id}) [updated, no icon]`);
+          }
+          continue;
+        }
+        console.error(`    ERROR updating "${roleDef.name}":`, errText);
+        continue;
+      }
+
+      newRoleIds.push({ name: roleDef.name, id: existingRole.id });
+      console.log(`    ~ ${roleDef.name} (${existingRole.id}) [updated${iconData ? ', with icon' : ''}]`);
+      continue;
+    }
+
+    // Role doesn't exist yet — create it
+    roleBody.permissions = '0';
     const res = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
       method: 'POST',
-      body: JSON.stringify({
-        name: roleDef.name,
-        color: roleDef.color,
-        hoist: true,
-        mentionable: false,
-        permissions: '0',
-      }),
+      body: JSON.stringify(roleBody),
     });
 
     if (!res.ok) {
-      console.error(`    ERROR creating "${roleDef.name}":`, await res.text());
+      const errText = await res.text();
+      // If icon failed due to missing ROLE_ICONS feature or insufficient boosts, retry without icon
+      if (iconData && (errText.includes('ROLE_ICONS') || errText.includes('50101') || errText.includes('more boosts'))) {
+        console.log(`    Note: Guild needs more boosts for role icons. Creating "${roleDef.name}" without icon...`);
+        delete roleBody.icon;
+        const retryRes = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
+          method: 'POST',
+          body: JSON.stringify(roleBody),
+        });
+        if (!retryRes.ok) {
+          console.error(`    ERROR creating "${roleDef.name}":`, await retryRes.text());
+          continue;
+        }
+        const role = await retryRes.json();
+        newRoleIds.push({ name: roleDef.name, id: role.id });
+        console.log(`    + ${roleDef.name} (${role.id}) [created, no icon]`);
+        continue;
+      }
+      console.error(`    ERROR creating "${roleDef.name}":`, errText);
       continue;
     }
 
     const role = await res.json();
     newRoleIds.push({ name: roleDef.name, id: role.id });
-    console.log(`    + ${roleDef.name} (${role.id})`);
+    console.log(`    + ${roleDef.name} (${role.id}) [created${iconData ? ', with icon' : ''}]`);
   }
 
   // Step 4: Migrate channel permissions
