@@ -167,6 +167,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         if (uid) {
           socket.emit('auth:register', { userId: uid });
         }
+
+        // Rejoin active game room so server updates our socket ID
+        const rc = get().roomCode;
+        if (rc && uid && get().gameStarted) {
+          console.log('[Socket] Rejoining room', rc, 'after reconnect');
+          socket.emit('game:rejoin', { roomCode: rc, userId: uid });
+        }
       });
 
       socket.on('reconnect_failed', () => {
