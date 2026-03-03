@@ -95,5 +95,5 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
 
 export function registerHandler(): void {
   registerEffect('KS-002-UC', 'MAIN', handleHiruzen002Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
+  registerEffect('KS-002-UC', 'UPGRADE', handleHiruzen002Main);
 }

@@ -194,9 +194,17 @@ export default function SealedPage() {
 
     // Generate boosters
     import('@/lib/sealed/boosterGenerator').then((mod) => {
-      const pool = mod.generateSealedPool(6);
-      setSealedPool(pool);
-      setStep('opening');
+      try {
+        const pool = mod.generateSealedPool(6);
+        setSealedPool(pool);
+        setStep('opening');
+      } catch (err) {
+        console.error('[Sealed] Booster generation failed:', err);
+        setStep('mode-select');
+      }
+    }).catch((err) => {
+      console.error('[Sealed] Failed to load booster module:', err);
+      setStep('mode-select');
     });
   }, []);
 
@@ -215,49 +223,57 @@ export default function SealedPage() {
         setStep('starting');
 
         // Generate AI boosters and build AI deck
-        import('@/lib/sealed/boosterGenerator').then((boosterMod) => {
-          import('@/lib/sealed/aiSealedDeckBuilder').then((aiMod) => {
-            import('@/lib/data/cardLoader').then((cardMod) => {
-              const aiPool = boosterMod.generateSealedPool(6);
-              const aiDeck = aiMod.buildAISealedDeck(aiPool);
+        Promise.all([
+          import('@/lib/sealed/boosterGenerator'),
+          import('@/lib/sealed/aiSealedDeckBuilder'),
+          import('@/lib/data/cardLoader'),
+        ]).then(([boosterMod, aiMod, cardMod]) => {
+          try {
+            const aiPool = boosterMod.generateSealedPool(6);
+            const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
-              // AI missions: try to avoid overlap with player
-              const playerMissionIds = new Set(missions.map((m) => m.id));
-              let aiMissions = aiDeck.missions.filter((m) => !playerMissionIds.has(m.id));
+            // AI missions: try to avoid overlap with player
+            const playerMissionIds = new Set(missions.map((m) => m.id));
+            let aiMissions = aiDeck.missions.filter((m) => !playerMissionIds.has(m.id));
+            if (aiMissions.length < 3) {
+              const allMissions = cardMod.getPlayableMissions();
+              const remaining = allMissions.filter((m) => !playerMissionIds.has(m.id));
+              aiMissions = [...remaining].sort(() => Math.random() - 0.5).slice(0, 3);
               if (aiMissions.length < 3) {
-                const allMissions = cardMod.getPlayableMissions();
-                const remaining = allMissions.filter((m) => !playerMissionIds.has(m.id));
-                aiMissions = [...remaining].sort(() => Math.random() - 0.5).slice(0, 3);
-                if (aiMissions.length < 3) {
-                  aiMissions = aiDeck.missions.slice(0, 3);
-                }
+                aiMissions = aiDeck.missions.slice(0, 3);
               }
+            }
 
-              const config: GameConfig = {
-                player1: {
-                  userId: 'local-player',
-                  isAI: false,
-                  deck: characters,
-                  missionCards: missions,
-                },
-                player2: {
-                  userId: null,
-                  isAI: true,
-                  aiDifficulty: difficulty,
-                  deck: aiDeck.characters,
-                  missionCards: aiMissions,
-                },
-              };
+            const config: GameConfig = {
+              player1: {
+                userId: 'local-player',
+                isAI: false,
+                deck: characters,
+                missionCards: missions,
+              },
+              player2: {
+                userId: null,
+                isAI: true,
+                aiDifficulty: difficulty,
+                deck: aiDeck.characters,
+                missionCards: aiMissions,
+              },
+            };
 
-              setSealedDeck(
-                characters.map((c) => c.id),
-                missions.map((m) => m.id),
-              );
+            setSealedDeck(
+              characters.map((c) => c.id),
+              missions.map((m) => m.id),
+            );
 
-              startAIGame(config, difficulty, session?.user?.name ?? undefined);
-              router.push('/game');
-            });
-          });
+            startAIGame(config, difficulty, session?.user?.name ?? undefined);
+            router.push('/game');
+          } catch (err) {
+            console.error('[Sealed] AI deck generation failed:', err);
+            setStep('building');
+          }
+        }).catch((err) => {
+          console.error('[Sealed] Failed to load sealed modules:', err);
+          setStep('building');
         });
       } else if (mode === 'online') {
         // Submit deck via socket

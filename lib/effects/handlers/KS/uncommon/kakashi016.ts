@@ -69,6 +69,5 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
 
 export function registerKakashi016Handlers(): void {
   registerEffect('KS-016-UC', 'MAIN', handleKakashi016Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to remove the cost limit
+  registerEffect('KS-016-UC', 'UPGRADE', handleKakashi016Main);
 }

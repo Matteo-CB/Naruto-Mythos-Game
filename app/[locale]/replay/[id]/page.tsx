@@ -644,7 +644,7 @@ export default function ReplayPage({
     );
   }
 
-  const playerNames = game.gameState.playerNames ?? { player1: 'Player 1', player2: 'Player 2' };
+  const playerNames = game.gameState.playerNames ?? { player1: t('game.anim.player1'), player2: t('game.anim.player2') };
   const p1Name = playerNames.player1;
   const p2Name = playerNames.player2;
   const p1Won = game.winnerId === game.player1Id;

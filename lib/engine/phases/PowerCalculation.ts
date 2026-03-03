@@ -11,8 +11,14 @@ export function calculateCharacterPower(
   char: CharacterInPlay,
   player: PlayerID,
 ): number {
-  // Hidden characters have 0 power for scoring
-  if (char.isHidden) return 0;
+  // Hidden characters have 0 base power, but continuous effects (Kurenai 035, Naruto 145)
+  // can grant hidden characters bonus power for scoring.
+  if (char.isHidden) {
+    const mission = state.activeMissions[char.missionIndex];
+    if (!mission) return 0;
+    const hiddenBonus = calculateContinuousPowerModifier(state, player, char.missionIndex, char);
+    return Math.max(0, hiddenBonus);
+  }
 
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
   let power = topCard.power + char.powerTokens;

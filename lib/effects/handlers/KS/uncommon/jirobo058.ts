@@ -78,6 +78,5 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
 
 export function registerJirobo058Handlers(): void {
   registerEffect('KS-058-UC', 'MAIN', handleJirobo058Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to expand scope to all missions
+  registerEffect('KS-058-UC', 'UPGRADE', handleJirobo058Main);
 }

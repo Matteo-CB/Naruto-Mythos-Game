@@ -96,6 +96,9 @@ interface GameStore {
 
 let animationIdCounter = 0;
 
+// AI watchdog timer — detects if the AI is stuck and forces a retry
+let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
+
 /**
  * Helper to extract animation data from an action and the current game state.
  */
@@ -1150,6 +1153,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Clear any existing watchdog and set a new one.
+    // If processAITurn doesn't complete within 8s, force retry.
+    if (aiWatchdogTimer) clearTimeout(aiWatchdogTimer);
+    aiWatchdogTimer = setTimeout(() => {
+      const s = get();
+      if (!s.isAIGame || s.gameOver || !s.gameState || !s.aiPlayer) return;
+      const gs = s.gameState;
+      // Only intervene if it's the AI's turn and the game appears stuck
+      if (gs.activePlayer === s.aiPlayer.player && gs.phase !== 'gameOver' && !s.isProcessing) {
+        console.warn('[gameStore] AI watchdog: game appears stuck, forcing processAITurn retry');
+        // Clean stale pending effects that have no matching pending actions
+        if (gs.pendingEffects.length > 0 && gs.pendingActions.length === 0) {
+          set({ gameState: { ...gs, pendingEffects: [] } });
+        }
+        get().processAITurn();
+      }
+    }, 8000);
+
     // Let AI take actions until it's the human's turn or game ends
     let currentState = gameState;
     let iterations = 0;
@@ -1614,6 +1635,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       visibleState: visible,
       isProcessing: false,
     });
+
+    // Safety: if it's still the AI's turn after the loop exits, schedule another
+    // processAITurn call. This handles edge cases where phase transitions, effect
+    // cleanup, or max iterations left the AI as the active player with no immediate
+    // actions but more work to do (e.g., start phase auto-transition).
+    const humanPendingAfterLoop = currentState.pendingActions.filter((p) => p.player === humanPlayer);
+    const isGameDone = (currentState.phase as string) === 'gameOver';
+    const stillAITurn = !isGameDone &&
+      currentState.activePlayer === aiPlayer.player &&
+      !currentState.missionScoringComplete &&
+      humanPendingAfterLoop.length === 0;
+
+    if (stillAITurn) {
+      setTimeout(() => {
+        const s = get();
+        if (s.gameState && !s.isProcessing && !s.gameOver && s.isAIGame) {
+          get().processAITurn();
+        }
+      }, 1000);
+    }
   },
 
   addAnimation: (event) => {

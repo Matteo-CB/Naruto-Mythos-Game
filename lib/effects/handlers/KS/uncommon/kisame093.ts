@@ -126,6 +126,5 @@ function transferPowerTokens(
 
 export function registerHandler(): void {
   registerEffect('KS-093-UC', 'MAIN', handleKisame093Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to transfer ALL tokens instead of max 2
+  registerEffect('KS-093-UC', 'UPGRADE', handleKisame093Main);
 }

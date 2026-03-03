@@ -18,7 +18,8 @@
     "page": "Page",
     "rotateDevice": "Rotate your device to landscape mode to play",
     "fullscreen": "Fullscreen",
-    "play": "Play"
+    "play": "Play",
+    "close": "Close"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -243,7 +244,9 @@
       "rematchWaiting": "Waiting for opponent...",
       "rematchAccept": "Accept",
       "rematchDecline": "Decline",
-      "rematchDeclined": "Opponent declined the rematch"
+      "rematchDeclined": "Opponent declined the rematch",
+      "placementMatch": "Placement match {current}/{total}",
+      "nowRanked": "You are now ranked!"
     },
     "timer": {
       "autoPassed": "Time expired — auto-passed"
@@ -706,6 +709,7 @@
   },
   "leaderboard": {
     "title": "Leaderboard",
+    "subtitle": "Minimum {count} ranked matches to earn a league",
     "rank": "Rank",
     "player": "Player",
     "elo": "ELO",
@@ -713,7 +717,14 @@
     "losses": "L",
     "draws": "D",
     "winRate": "Win Rate",
-    "noPlayers": "No players ranked yet"
+    "noPlayers": "No players ranked yet",
+    "leagues": "Leagues",
+    "league": "League",
+    "games": "Games",
+    "eloRange": "{min} — {max}",
+    "eloRangeTop": "{min}+",
+    "unranked": "Unranked",
+    "placementProgress": "Placement: {current}/{total}"
   },
   "profile": {
     "title": "Player Profile",
@@ -735,7 +746,9 @@
       "eliteJonin": "Elite Jonin",
       "legendarySannin": "Legendary Sannin",
       "kage": "Kage",
-      "sageOfSixPaths": "Sage of Six Paths"
+      "sageOfSixPaths": "Sage of Six Paths",
+      "unranked": "Unranked",
+      "placement": "Placement: {current}/{total}"
     }
   },
   "replay": {

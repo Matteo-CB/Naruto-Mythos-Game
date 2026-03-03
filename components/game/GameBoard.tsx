@@ -984,16 +984,22 @@ function GameBoardInner() {
 
   const prevTurnRef = useRef<number | null>(null);
 
-  // Lock body scroll while game board is mounted — prevents mobile browser chrome from
-  // creating a scrollable document that would let the game board scroll off-screen.
+  // Lock scroll on both <html> and <body> while game board is mounted — prevents
+  // Framer Motion layout animations from temporarily pushing content beyond
+  // container bounds and triggering a scrollbar.
   useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    const prevMinHeight = document.body.style.minHeight;
-    document.body.style.overflow = 'hidden';
-    document.body.style.minHeight = 'unset';
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+    const prevMinHeight = body.style.minHeight;
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    body.style.minHeight = 'unset';
     return () => {
-      document.body.style.overflow = prevOverflow;
-      document.body.style.minHeight = prevMinHeight;
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+      body.style.minHeight = prevMinHeight;
     };
   }, []);
 

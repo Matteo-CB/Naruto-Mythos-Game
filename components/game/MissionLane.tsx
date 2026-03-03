@@ -103,7 +103,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   return (
     <motion.div
-      layout
+      layout="position"
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{
         scale: 1,
@@ -487,7 +487,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
   return (
     <motion.div
-      layout
+      layout="position"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: missionIndex * 0.1 }}

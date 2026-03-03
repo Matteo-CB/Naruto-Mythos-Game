@@ -103,6 +103,5 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
 
 export function registerZabuza087Handlers(): void {
   registerEffect('KS-087-UC', 'MAIN', handleZabuza087Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to defeat instead of hide
+  registerEffect('KS-087-UC', 'UPGRADE', handleZabuza087Main);
 }

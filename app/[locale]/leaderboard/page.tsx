@@ -8,8 +8,9 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
-import { EloBadge } from '@/components/EloBadge';
+import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
+import { LeaguesModal } from '@/components/LeaguesModal';
 
 interface LeaderboardUser {
   id: string;
@@ -30,6 +31,7 @@ export default function LeaderboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPlayers, setTotalPlayers] = useState(0);
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
+  const [leaguesModalOpen, setLeaguesModalOpen] = useState(false);
   const PLAYERS_PER_PAGE = 20;
 
   useEffect(() => {
@@ -59,7 +61,8 @@ export default function LeaderboardPage() {
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="leaderboard" />
-      <div className="max-w-2xl mx-auto relative z-10 flex-1 px-4 py-8">
+      <div className="max-w-3xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1
             className="text-2xl font-bold tracking-wider uppercase"
@@ -67,7 +70,21 @@ export default function LeaderboardPage() {
           >
             {t('title')}
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* View Leagues button — only when leagues enabled */}
+            {leaguesEnabled && (
+              <button
+                onClick={() => setLeaguesModalOpen(true)}
+                className="px-4 py-2 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
+                  border: '1px solid rgba(196, 163, 90, 0.3)',
+                  color: '#c4a35a',
+                }}
+              >
+                {t('leagues')}
+              </button>
+            )}
             <LanguageSwitcher />
             <Link
               href="/"
@@ -83,101 +100,149 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {loading ? (
-          <p className="text-sm" style={{ color: '#888888' }}>
-            {tc('loading')}
+        {/* Subtitle — only when leagues enabled */}
+        {leaguesEnabled && (
+          <p
+            className="text-xs mb-4"
+            style={{ color: '#666666' }}
+          >
+            {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
           </p>
-        ) : users.length === 0 ? (
-          <p className="text-sm" style={{ color: '#888888' }}>
-            {t('noPlayers')}
-          </p>
-        ) : (
-          <div className="overflow-x-auto" style={{ border: '1px solid #262626' }}>
-            {/* Header */}
-            <div
-              className="grid grid-cols-3 sm:grid-cols-6 gap-2 px-4 py-3 text-xs uppercase tracking-wider"
-              style={{ backgroundColor: '#141414', color: '#888888', minWidth: '0' }}
-            >
-              <span>{t('rank')}</span>
-              <span>{t('player')}</span>
-              <span>{t('elo')}</span>
-              <span className="hidden sm:block">{t('wins')}/{t('losses')}/{t('draws')}</span>
-              <span className="hidden sm:block">{t('winRate')}</span>
-              <span className="hidden sm:block" />
-            </div>
+        )}
 
-            {/* Rows */}
-            {users.map((user, index) => {
-              const total = user.wins + user.losses + user.draws;
-              const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
-              const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
+        {/* Rankings Table */}
+        <section>
+          {loading ? (
+            <p className="text-sm" style={{ color: '#888888' }}>
+              {tc('loading')}
+            </p>
+          ) : users.length === 0 ? (
+            <p className="text-sm" style={{ color: '#888888' }}>
+              {t('noPlayers')}
+            </p>
+          ) : (
+            <div className="overflow-x-auto" style={{ border: '1px solid #262626' }}>
+              {/* Table Header */}
+              <div
+                className="grid gap-2 px-4 py-3 text-xs uppercase tracking-wider"
+                style={{
+                  backgroundColor: '#141414',
+                  color: '#888888',
+                  gridTemplateColumns: leaguesEnabled
+                    ? '40px 1fr auto auto auto auto'
+                    : '40px 1fr auto auto auto',
+                }}
+              >
+                <span>#</span>
+                <span>{t('player')}</span>
+                {leaguesEnabled && <span className="hidden sm:block">{t('league')}</span>}
+                <span>{t('elo')}</span>
+                <span className="hidden sm:block">{t('wins')}/{t('losses')}/{t('draws')}</span>
+                <span className="hidden sm:block">{t('winRate')}</span>
+              </div>
 
-              return (
-                <div
-                  key={user.id}
-                  className="grid grid-cols-3 sm:grid-cols-6 gap-2 px-4 py-3 text-sm"
-                  style={{ borderTop: '1px solid #262626' }}
-                >
-                  <span style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}>
-                    {globalRank}
-                  </span>
-                  <span className="flex items-center gap-1 truncate">
-                    <Link
-                      href={`/profile/${user.username}` as '/'}
-                      className="underline truncate"
-                      style={{ color: '#e0e0e0' }}
+              {/* Table Rows */}
+              {users.map((user, index) => {
+                const total = user.wins + user.losses + user.draws;
+                const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
+                const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
+
+                return (
+                  <div
+                    key={user.id}
+                    className="grid gap-2 px-4 py-3 text-sm items-center"
+                    style={{
+                      borderTop: '1px solid #262626',
+                      gridTemplateColumns: leaguesEnabled
+                        ? '40px 1fr auto auto auto auto'
+                        : '40px 1fr auto auto auto',
+                    }}
+                  >
+                    {/* Rank */}
+                    <span
+                      className="font-bold tabular-nums"
+                      style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}
                     >
-                      {user.username}
-                    </Link>
-                    <UserBadges
-                      role={user.role}
-                      elo={user.elo}
-                      badgePrefs={user.badgePrefs}
-                      leaguesEnabled={leaguesEnabled}
-                      size="sm"
-                    />
-                  </span>
-                  <span className="flex items-center gap-2">
-                    {leaguesEnabled && <EloBadge elo={user.elo} size="sm" showElo={false} />}
-                    <span style={{ color: '#e0e0e0' }}>{user.elo}</span>
-                  </span>
-                  <span className="hidden sm:block" style={{ color: '#888888' }}>
-                    {user.wins}/{user.losses}/{user.draws}
-                  </span>
-                  <span className="hidden sm:block" style={{ color: '#888888' }}>{winRate}%</span>
-                  <span className="hidden sm:block" />
-                </div>
-              );
-            })}
-          </div>
-        )}
+                      {globalRank}
+                    </span>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 mt-4">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage <= 1}
-              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
-            >
-              {tc('previous')}
-            </button>
-            <span className="text-xs" style={{ color: '#888888' }}>
-              {currentPage} / {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage >= totalPages}
-              className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
-            >
-              {tc('next')}
-            </button>
-          </div>
-        )}
+                    {/* Player */}
+                    <span className="flex items-center gap-1.5 truncate min-w-0">
+                      <Link
+                        href={`/profile/${user.username}` as '/'}
+                        className="underline truncate"
+                        style={{ color: '#e0e0e0' }}
+                      >
+                        {user.username}
+                      </Link>
+                      <UserBadges
+                        role={user.role}
+                        elo={user.elo}
+                        badgePrefs={user.badgePrefs}
+                        leaguesEnabled={leaguesEnabled}
+                        size="sm"
+                      />
+                    </span>
+
+                    {/* League Badge — only when leagues enabled */}
+                    {leaguesEnabled && (
+                      <span className="hidden sm:flex items-center">
+                        <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
+                      </span>
+                    )}
+
+                    {/* ELO */}
+                    <span className="tabular-nums font-semibold" style={{ color: '#e0e0e0' }}>
+                      {user.elo}
+                    </span>
+
+                    {/* W/L/D */}
+                    <span className="hidden sm:block tabular-nums" style={{ color: '#888888' }}>
+                      {user.wins}/{user.losses}/{user.draws}
+                    </span>
+
+                    {/* Win Rate */}
+                    <span className="hidden sm:block tabular-nums" style={{ color: '#888888' }}>
+                      {winRate}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {tc('previous')}
+              </button>
+              <span className="text-xs tabular-nums" style={{ color: '#888888' }}>
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
+                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              >
+                {tc('next')}
+              </button>
+            </div>
+          )}
+        </section>
       </div>
       <Footer />
+
+      {/* Leagues Modal — only rendered when leagues enabled */}
+      {leaguesEnabled && (
+        <LeaguesModal open={leaguesModalOpen} onClose={() => setLeaguesModalOpen(false)} />
+      )}
     </main>
   );
 }

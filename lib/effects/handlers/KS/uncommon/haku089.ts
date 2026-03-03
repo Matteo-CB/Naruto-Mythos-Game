@@ -88,6 +88,5 @@ function handleHaku089Main(ctx: EffectContext): EffectResult {
 
 export function registerHaku089Handlers(): void {
   registerEffect('KS-089-UC', 'MAIN', handleHaku089Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to discard from own deck instead of opponent's
+  registerEffect('KS-089-UC', 'UPGRADE', handleHaku089Main);
 }
