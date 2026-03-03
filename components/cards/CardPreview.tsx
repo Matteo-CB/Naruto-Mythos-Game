@@ -346,6 +346,7 @@ function StatBadge({
             color: '#e0e0e0',
             fontSize: '12px',
             fontWeight: 700,
+            fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           {value}

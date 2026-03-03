@@ -125,8 +125,12 @@ export function SealedDeckBuilder({
         }
         return true;
       })
-      .sort((a, b) => (a.chakra ?? 0) - (b.chakra ?? 0));
-  }, [catalogChars, filterRarity, filterGroup, searchText]);
+      .sort((a, b) => {
+        const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
+        if (costDiff !== 0) return costDiff;
+        return getCardName(a, locale as 'en' | 'fr').localeCompare(getCardName(b, locale as 'en' | 'fr'));
+      });
+  }, [catalogChars, filterRarity, filterGroup, searchText, locale]);
 
   // Count characters in deck by version key
   const deckVersionCounts = useMemo(() => {
@@ -367,7 +371,11 @@ export function SealedDeckBuilder({
           {t('characters')}: {deckChars.length}
         </span>
         {[...deckChars]
-          .sort((a, b) => a.chakra - b.chakra)
+          .sort((a, b) => {
+            const costDiff = a.chakra - b.chakra;
+            if (costDiff !== 0) return costDiff;
+            return getCardName(a, locale as 'en' | 'fr').localeCompare(getCardName(b, locale as 'en' | 'fr'));
+          })
           .map((c, i) => {
             const originalIndex = deckChars.indexOf(c);
             return (

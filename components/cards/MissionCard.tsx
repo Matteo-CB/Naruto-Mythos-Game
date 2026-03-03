@@ -150,6 +150,7 @@ function MissionCardInner({
               fontWeight: 800,
               fontSize: '0.9em',
               lineHeight: 1,
+              fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
             {rank}
@@ -181,6 +182,7 @@ function MissionCardInner({
               color: '#e0e0e0',
               fontWeight: 700,
               fontSize: '0.8em',
+              fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
             {totalPoints}

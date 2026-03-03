@@ -142,6 +142,7 @@ function ReplayCard({
           fontSize: '8px',
           fontWeight: 'bold',
           borderBottomRightRadius: '3px',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {topCard.chakra}
@@ -160,6 +161,7 @@ function ReplayCard({
           fontSize: '8px',
           fontWeight: 'bold',
           borderBottomLeftRadius: '3px',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {power}
@@ -176,6 +178,7 @@ function ReplayCard({
             fontWeight: 'bold',
             borderTopLeftRadius: '2px',
             borderBottomLeftRadius: '2px',
+            fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           +{char.powerTokens}
@@ -193,6 +196,7 @@ function ReplayCard({
             fontWeight: 'bold',
             borderTopRightRadius: '2px',
             borderBottomRightRadius: '2px',
+            fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           x{char.stack.length + 1}
@@ -258,6 +262,7 @@ function ReplayHandCard({
           fontSize: '7px',
           fontWeight: 'bold',
           borderBottomRightRadius: '2px',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {card.chakra}
@@ -274,6 +279,7 @@ function ReplayHandCard({
           fontSize: '7px',
           fontWeight: 'bold',
           borderBottomLeftRadius: '2px',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {card.power}
@@ -340,7 +346,7 @@ function ReplayMissionLane({
           <div className="flex items-center justify-center gap-1.5">
             <span
               className="text-[9px] font-bold uppercase px-1 rounded"
-              style={{ backgroundColor: `${rankColor}30`, color: rankColor }}
+              style={{ backgroundColor: `${rankColor}30`, color: rankColor, fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
               {mission.rank}
             </span>
@@ -349,7 +355,7 @@ function ReplayMissionLane({
             </span>
           </div>
           <div className="flex items-center justify-center gap-1 mt-0.5">
-            <span className="text-[8px] font-semibold" style={{ color: rankColor }}>
+            <span className="text-[8px] font-semibold" style={{ color: rankColor, fontFamily: "'NJNaruto', Arial, sans-serif" }}>
               {totalPoints} pts
             </span>
             {mission.wonBy && (
