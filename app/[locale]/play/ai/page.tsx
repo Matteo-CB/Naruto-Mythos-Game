@@ -22,8 +22,6 @@ interface ResolvedDeck {
 export default function PlayAIPage() {
   const t = useTranslations();
   const { data: session } = useSession();
-  const userRole = (session?.user as Record<string, unknown> | undefined)?.role;
-  const canUseImpossible = userRole === 'tester' || userRole === 'admin';
 
   const DIFFICULTIES = [
     { key: 'easy' as AIDifficulty, label: t('playAI.difficulties.easy'), description: t('playAI.difficulties.easyDesc') },
@@ -31,9 +29,6 @@ export default function PlayAIPage() {
     { key: 'hard' as AIDifficulty, label: t('playAI.difficulties.hard'), description: t('playAI.difficulties.hardDesc') },
     { key: 'impossible' as AIDifficulty, label: t('playAI.difficulties.impossible'), description: t('playAI.difficulties.impossibleDesc') },
   ];
-  const availableDifficulties = canUseImpossible
-    ? DIFFICULTIES
-    : DIFFICULTIES.filter((d) => d.key !== 'impossible');
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
@@ -50,16 +45,8 @@ export default function PlayAIPage() {
     });
   }, []);
 
-  useEffect(() => {
-    if (!canUseImpossible && difficulty === 'impossible') {
-      setDifficulty('hard');
-    }
-  }, [canUseImpossible, difficulty]);
-
   const handleStart = () => {
     if (!cards || cards.characters.length < 30 || cards.missions.length < 3) return;
-    const selectedDifficulty =
-      difficulty === 'impossible' && !canUseImpossible ? 'hard' : difficulty;
 
     setIsLoading(true);
 
@@ -97,13 +84,13 @@ export default function PlayAIPage() {
       player2: {
         userId: null,
         isAI: true,
-        aiDifficulty: selectedDifficulty,
+        aiDifficulty: difficulty,
         deck: player2Deck,
         missionCards: player2Missions,
       },
     };
 
-    startAIGame(config, selectedDifficulty, session?.user?.name ?? undefined);
+    startAIGame(config, difficulty, session?.user?.name ?? undefined);
     router.push('/game');
   };
 
@@ -122,7 +109,7 @@ export default function PlayAIPage() {
         {/* Difficulty selection */}
         <div className="flex flex-col gap-2 w-full">
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">{t('playAI.selectDifficulty')}</p>
-          {availableDifficulties.map((d) => (
+          {DIFFICULTIES.map((d) => (
             <button
               key={d.key}
               onClick={() => setDifficulty(d.key)}

@@ -45,7 +45,7 @@ const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color:
 ];
 
 export default function TrainingPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
   const enableTraining = useTrainingStore((s) => s.enable);
@@ -56,8 +56,6 @@ export default function TrainingPage() {
   const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { bannedIds } = useBannedCards();
-  const userRole = (session?.user as Record<string, unknown> | undefined)?.role;
-  const canAccessTraining = userRole === 'tester' || userRole === 'admin';
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -68,14 +66,8 @@ export default function TrainingPage() {
     });
   }, []);
 
-  useEffect(() => {
-    if (status !== 'loading' && !canAccessTraining) {
-      router.replace('/');
-    }
-  }, [canAccessTraining, router, status]);
-
   const handleStart = () => {
-    if (!canAccessTraining || !cards || cards.characters.length < 30 || cards.missions.length < 3) return;
+    if (!cards || cards.characters.length < 30 || cards.missions.length < 3) return;
     setIsLoading(true);
 
     const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
@@ -116,24 +108,6 @@ export default function TrainingPage() {
     enableTraining();
     router.push('/game');
   };
-
-  if (status === 'loading') {
-    return (
-      <main className="flex min-h-screen flex-col bg-[#0a0a0a] relative">
-        <CloudBackground />
-
-        <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="relative z-10 text-sm text-[#888888]">Chargement...</div>
-        </div>
-
-        <Footer />
-      </main>
-    );
-  }
-
-  if (!canAccessTraining) {
-    return null;
-  }
 
   return (
     <main className="flex min-h-screen flex-col bg-[#0a0a0a] relative">
