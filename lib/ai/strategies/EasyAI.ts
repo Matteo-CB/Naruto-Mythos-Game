@@ -1,44 +1,44 @@
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
+import { NeuralISMCTS } from '../neural/NeuralISMCTS';
 
 /**
- * Easy AI: Picks random legal actions.
- * No strategic evaluation. Provides a casual opponent.
+ * Easy AI — beginner-friendly.
+ * Small ISMCTS budget + occasional deliberate mistakes.
  */
 export class EasyAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'easy';
+
+  private mcts = new NeuralISMCTS({
+    simulations: 50,
+    maxDepth: 3,
+    explorationC: 1.9,
+    evaluator: null,
+    maxBranching: 8,
+    useBatchedEval: false,
+  });
 
   chooseAction(state: GameState, player: PlayerID, validActions: GameAction[]): GameAction {
     if (validActions.length === 0) {
       return { type: 'PASS' };
     }
 
-    // For mulligan, slightly favor keeping (60% keep, 40% mulligan)
+    if (validActions.length === 1) {
+      return validActions[0];
+    }
+
     if (state.phase === 'mulligan') {
-      const keepAction = validActions.find(
-        (a) => a.type === 'MULLIGAN' && !a.doMulligan,
-      );
-      const mulliganAction = validActions.find(
-        (a) => a.type === 'MULLIGAN' && a.doMulligan,
-      );
-
-      if (keepAction && mulliganAction) {
-        return Math.random() < 0.6 ? keepAction : mulliganAction;
-      }
+      const keep = validActions.find((a) => a.type === 'MULLIGAN' && !a.doMulligan);
+      const mulligan = validActions.find((a) => a.type === 'MULLIGAN' && a.doMulligan);
+      if (!keep || !mulligan) return validActions[0];
+      return Math.random() < 0.65 ? keep : mulligan;
     }
 
-    // Add a slight bias toward playing cards over passing (70/30)
-    const playActions = validActions.filter((a) => a.type !== 'PASS');
-    const passAction = validActions.find((a) => a.type === 'PASS');
-
-    if (playActions.length > 0 && passAction) {
-      if (Math.random() < 0.7) {
-        return playActions[Math.floor(Math.random() * playActions.length)];
-      }
-      return passAction;
+    // Deliberate imperfection so Easy stays beatable.
+    if (Math.random() < 0.2) {
+      return validActions[Math.floor(Math.random() * validActions.length)];
     }
 
-    // Pure random
-    return validActions[Math.floor(Math.random() * validActions.length)];
+    return this.mcts.chooseActionSync(state, player, validActions);
   }
 }

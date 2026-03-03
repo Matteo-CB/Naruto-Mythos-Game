@@ -39,6 +39,7 @@
     "admin": "Administration",
     "signOut": "Sign Out",
     "sealed": "Sealed",
+    "training": "Training Mode",
     "settings": "Settings"
   },
   "settings": {
@@ -650,8 +651,8 @@
       "mediumDesc": "Greedy strategy",
       "hard": "Hard",
       "hardDesc": "Strategic evaluation",
-      "expert": "Expert",
-      "expertDesc": "Advanced tactics"
+      "impossible": "Impossible",
+      "impossibleDesc": "Neural network — almost unbeatable"
     },
     "startGame": "Start Game",
     "selectDifficultyDesc": "Select difficulty and start a match",

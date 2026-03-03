@@ -13,7 +13,7 @@ import { shuffle } from '../../engine/utils/shuffle';
  * Plans across multiple turns and evaluates SCORE effect timing.
  */
 export class ExpertAI implements AIStrategy {
-  readonly difficulty: AIDifficulty = 'expert';
+  readonly difficulty: AIDifficulty = 'impossible';
   private readonly simulations = 30;
   private readonly maxDepth = 3;
   private readonly maxBranching = 8;
