@@ -212,6 +212,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
                 fontWeight: 700,
                 fontSize: '0.7em',
                 lineHeight: 1,
+                fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
               {card.chakra}
@@ -250,6 +251,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
                 fontWeight: 700,
                 fontSize: '0.7em',
                 lineHeight: 1,
+                fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
               {totalPower}
@@ -276,6 +278,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               color: '#fca5a5',
               fontSize: '0.55em',
               fontWeight: 600,
+              fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
             +{powerTokens}

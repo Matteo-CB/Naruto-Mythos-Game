@@ -158,6 +158,7 @@ function CardInHandInner({
               color: '#60a5fa',
               fontSize: '11px',
               fontWeight: 700,
+              fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
             Cost: {effectiveCost}

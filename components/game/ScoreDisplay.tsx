@@ -59,7 +59,7 @@ function ScoreEntry({
           exit={{ scale: 0.5, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="text-2xl font-bold tabular-nums"
-          style={{ color }}
+          style={{ color, fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
           {score}
         </motion.span>

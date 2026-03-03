@@ -198,6 +198,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             color: character.powerTokens > 0 ? '#f0d890' : '#e0e0e0',
             border: character.powerTokens > 0 ? '1px solid rgba(196, 163, 90, 0.5)' : '1px solid rgba(255,255,255,0.1)',
             textShadow: character.powerTokens > 0 ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
+            fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           {totalPower}
@@ -253,6 +254,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
             backgroundColor: 'rgba(196, 163, 90, 0.9)',
             color: '#0a0a0a',
             boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+            fontFamily: "'NJNaruto', Arial, sans-serif",
           }}
         >
           {character.card.chakra}
@@ -375,6 +377,7 @@ function MissionCardDisplay({
           backgroundColor: rankColors[mission.rank],
           color: '#0a0a0a',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {mission.rank}
@@ -386,6 +389,7 @@ function MissionCardDisplay({
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           color: '#c4a35a',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {totalPoints} {t('game.board.pts')}
@@ -475,6 +479,12 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     }
   };
 
+  const totalPoints = mission.basePoints + mission.rankBonus;
+  const rankColor: Record<MissionRank, string> = {
+    D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e',
+  };
+  const rc = rankColor[mission.rank];
+
   return (
     <motion.div
       layout
@@ -482,7 +492,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: missionIndex * 0.1 }}
       onClick={handleClick}
-      className="flex flex-col items-center gap-0.5 rounded-xl px-1.5 py-1 h-full"
+      className="flex flex-col items-center gap-0.5 rounded-xl px-1 py-0.5 h-full"
       style={{
         minWidth: dims.emptyLaneMinW + 'px',
         maxWidth: dims.emptyLaneMaxW + 'px',
@@ -495,15 +505,15 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     >
       {/* Opponent power total */}
       <div
-        className="font-display flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
+        className="flex items-center gap-1.5 rounded-md px-2 py-0.5 shrink-0"
         style={{ backgroundColor: 'rgba(179, 62, 62, 0.1)' }}
       >
-        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666' }}>
+        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
           {t('game.board.pwr')}
         </span>
         <span
           className="text-xs font-bold tabular-nums"
-          style={{ color: '#b33e3e' }}
+          style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
           {oppPower}
         </span>
@@ -522,6 +532,36 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
             myPlayer={myPlayer}
           />
         ))}
+      </div>
+
+      {/* Mission score strip — always visible regardless of card size */}
+      <div
+        className="flex items-center justify-center gap-1.5 shrink-0 w-full rounded-md px-1 py-0.5"
+        style={{ backgroundColor: `${rc}12`, border: `1px solid ${rc}30` }}
+      >
+        <span
+          className="text-[10px] font-bold px-1.5 rounded"
+          style={{ backgroundColor: rc, color: '#0a0a0a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+        >
+          {mission.rank}
+        </span>
+        <span
+          className="text-[11px] font-bold tabular-nums"
+          style={{ color: rc, fontFamily: "'NJNaruto', Arial, sans-serif" }}
+        >
+          {totalPoints}
+        </span>
+        <span className="text-[8px]" style={{ color: '#666' }}>
+          ({mission.basePoints}+{mission.rankBonus})
+        </span>
+        {mission.wonBy && (
+          <span
+            className="text-[9px] font-bold uppercase"
+            style={{ color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e' }}
+          >
+            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
+          </span>
+        )}
       </div>
 
       {/* Mission card with targeting indicator */}
@@ -564,15 +604,15 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
       {/* Player power total */}
       <div
-        className="font-display flex items-center gap-1 rounded-md px-2 py-0.5 shrink-0"
+        className="flex items-center gap-1.5 rounded-md px-2 py-0.5 shrink-0"
         style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)' }}
       >
-        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666' }}>
+        <span className="text-[9px] uppercase tracking-wider" style={{ color: '#666666', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
           {t('game.board.pwr')}
         </span>
         <span
           className="text-xs font-bold tabular-nums"
-          style={{ color: '#c4a35a' }}
+          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
           {myPower}
         </span>
