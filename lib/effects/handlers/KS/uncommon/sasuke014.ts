@@ -7,10 +7,12 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 3 | Power: 4
  * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
  *
- * AMBUSH: Look at all cards in the opponent's hand. (Mandatory)
+ * AMBUSH: Look at the opponent's hand. (Mandatory)
  *
- * UPGRADE: Discard 1 of your cards. If you do, choose 1 card in
- *   the opponent's hand and discard it.
+ * UPGRADE: AMBUSH effect: In addition, discard 1 card.
+ *   If you do so, choose 1 card in the opponent's hand and discard it.
+ *   (The UPGRADE includes the AMBUSH effect — shows opponent's hand first,
+ *    then offers the discard chain.)
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
@@ -100,16 +102,39 @@ function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Player chooses a card from OWN hand to discard (optional — "if you do")
-  const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
+  // UPGRADE includes the AMBUSH effect ("AMBUSH effect: In addition...")
+  // First show opponent's hand (the AMBUSH part), then chain to discard flow
+  const allCards = opponentHand.map((c, i) => ({
+    name_fr: c.name_fr,
+    chakra: c.chakra ?? 0,
+    power: c.power ?? 0,
+    image_file: c.image_file,
+    originalIndex: i,
+  }));
+
+  const newState = {
+    ...state,
+    log: logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_LOOK_HAND',
+      'Sasuke Uchiwa (014) UPGRADE: Revealed all cards in opponent\'s hand.',
+      'game.log.effect.sasuke014Reveal',
+      { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
+    ),
+  };
+
   return {
-    state,
+    state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE_014_DISCARD_OWN',
-    validTargets: handIndices,
-    isOptional: true,
-    description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards to discard 1 from opponent\'s hand.',
-    descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+    targetSelectionType: 'SASUKE014_UPGRADE_HAND_REVEAL',
+    validTargets: ['confirm'],
+    description: JSON.stringify({
+      text: 'Sasuke (014) UPGRADE: Opponent\'s hand revealed.',
+      cards: allCards,
+      isUpgrade: true,
+    }),
+    descriptionKey: 'game.effect.desc.sasuke014UpgradeReveal',
+    isMandatory: true,
   };
 }
 
