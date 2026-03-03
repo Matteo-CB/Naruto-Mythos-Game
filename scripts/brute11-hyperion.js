@@ -2,7 +2,7 @@
 /**
  * brute11-hyperion.js  —  HYPERION IMAGE FINDER
  *
- * 202,500 concurrent workers  (50x brute10)
+ * 50,000 concurrent workers  (12x brute10)
  * ~44M+ URL combinations      (10x brute10)
  * 8-phase intelligent generation with:
  *   - Confirmed CDN pattern analysis (122 gallery URLs)
@@ -27,7 +27,7 @@ const fs    = require('fs');
 const path  = require('path');
 
 // ─── CONFIGURATION ──────────────────────────────────────────────────────────
-const CONCURRENCY    = 202_500;
+const CONCURRENCY    = 50_000;
 const TIMEOUT_MS     = 4000;
 const MIN_FILE_SIZE  = 5000;
 const SAVE_INTERVAL  = 30_000; // ms
@@ -47,8 +47,8 @@ const EXTS_ALL   = ['.webp', '.jpg', '.png'];
 
 const agent = new https.Agent({
   keepAlive: true,
-  maxSockets: 250_000,
-  maxFreeSockets: 50_000,
+  maxSockets: 60_000,
+  maxFreeSockets: 10_000,
   timeout: TIMEOUT_MS,
   scheduling: 'fifo',
 });
@@ -1055,8 +1055,7 @@ const phaseStats = {};
 let currentPhase = '';
 const startTime = Date.now();
 let lastSaveTime = Date.now();
-const testedUrls = [];  // For progress saving (capped to prevent OOM)
-const MAX_PROGRESS_URLS = 5_000_000; // Cap progress file size
+// No testedUrls array — this was causing OOM. Progress tracks counts only.
 
 function headCheck(url) {
   return new Promise((resolve) => {
@@ -1085,7 +1084,6 @@ function downloadFile(url, dest) {
 async function processUrl(url, cardId) {
   totalTested++;
   totalNew++;
-  if (testedUrls.length < MAX_PROGRESS_URLS) testedUrls.push(url);
 
   const size = await headCheck(url);
   if (size > 0) {
@@ -1146,10 +1144,12 @@ async function processPhase(name, generator) {
 function saveProgress() {
   try {
     const data = {
-      testedUrls: testedUrls,
       found: foundImages,
       totalTested,
       totalNew,
+      phaseStats: Object.fromEntries(
+        Object.entries(phaseStats).map(([k, v]) => [k, { urls: v.urls }])
+      ),
       timestamp: new Date().toISOString(),
     };
     fs.writeFileSync(PROGRESS_FILE, JSON.stringify(data));
@@ -1217,7 +1217,7 @@ function writeReport() {
 
 async function main() {
   console.log('='.repeat(70));
-  console.log('  BRUTE11-HYPERION  |  202,500 concurrent  |  ~44M URLs  |  22 cards');
+  console.log('  BRUTE11-HYPERION  |  50,000 concurrent  |  ~44M URLs  |  22 cards');
   console.log('='.repeat(70));
 
   if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -1238,6 +1238,9 @@ async function main() {
     writeReport();
     process.exit(0);
   });
+
+  // Free skipSet after building generators to reclaim ~150MB
+  // (generators capture the reference but only read during iteration)
 
   // Execute all 8 phases sequentially
   const phases = [
