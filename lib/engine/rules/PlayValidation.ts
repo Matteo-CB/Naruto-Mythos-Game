@@ -81,23 +81,6 @@ export function validatePlayHidden(
     return { valid: false, reason: `Not enough chakra to play hidden (need ${HIDDEN_PLAY_COST}).`, reasonKey: 'game.error.notEnoughChakraHidden', reasonParams: { need: HIDDEN_PLAY_COST } };
   }
 
-  // Shikamaru 111 (R): Opponent cannot play characters hidden in this mission
-  const opponent = player === 'player1' ? 'player2' : 'player1';
-  const mission = state.activeMissions[missionIndex];
-  const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
-  for (const c of opponentChars) {
-    if (c.isHidden) continue;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    if (topCard.number === 111 || topCard.number === 150) {
-      const hasRestriction = (topCard.effects ?? []).some(
-        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
-      );
-      if (hasRestriction) {
-        return { valid: false, reason: 'Shikamaru Nara blocks playing characters hidden in this mission.', reasonKey: 'game.error.shikamaruBlock' };
-      }
-    }
-  }
-
   // Hidden characters can coexist with same name until revealed
   // No name uniqueness check for hidden play
 
@@ -131,6 +114,22 @@ export function validateRevealCharacter(
 
   if (char.controlledBy !== player) {
     return { valid: false, reason: 'Cannot reveal opponent\'s character.', reasonKey: 'game.error.cannotRevealOpponent' };
+  }
+
+  // Shikamaru 111 (R) / 150: Opponent cannot reveal hidden characters in this mission
+  const opponent = player === 'player1' ? 'player2' : 'player1';
+  const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
+  for (const oc of opponentChars) {
+    if (oc.isHidden) continue;
+    const ocTop = oc.stack.length > 0 ? oc.stack[oc.stack.length - 1] : oc.card;
+    if (ocTop.number === 111 || ocTop.number === 150) {
+      const hasRestriction = (ocTop.effects ?? []).some(
+        (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
+      );
+      if (hasRestriction) {
+        return { valid: false, reason: 'Shikamaru Nara blocks revealing hidden characters in this mission.', reasonKey: 'game.error.shikamaruBlock' };
+      }
+    }
   }
 
   // Use topCard for upgraded hidden characters

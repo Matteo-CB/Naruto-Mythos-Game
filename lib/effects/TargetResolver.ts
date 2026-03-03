@@ -36,6 +36,8 @@ export interface TargetFilter {
   nonHiddenOnly?: boolean;
   /** If true, only include hidden (face-down) characters. */
   hiddenOnly?: boolean;
+  /** Maximum cost (inclusive). Hidden enemy characters have effective cost 0. */
+  maxCost?: number;
 }
 
 // ---------------------
@@ -143,18 +145,26 @@ function matchesTargetCriteria(
   // Get the active (top) card for attribute checks
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Calculate effective power: hidden characters have power 0 when targeted by enemy effects
+  // Hidden characters have cost 0 and power 0 when targeted by enemy effects
+  const isEnemyTarget = targetType === 'enemy_character' || targetType === 'enemy_hidden';
   const effectivePower = char.isHidden ? 0 : topCard.power + char.powerTokens;
+  const effectiveCost = (char.isHidden && isEnemyTarget) ? 0 : topCard.chakra;
 
   // Power filters
   if (filters?.maxPower !== undefined && effectivePower > filters.maxPower) return false;
   if (filters?.minPower !== undefined && effectivePower < filters.minPower) return false;
 
-  // Group filter
-  if (filters?.group && topCard.group !== filters.group) return false;
+  // Cost filters (use effective cost — 0 for enemy hidden characters)
+  if (filters?.maxCost !== undefined && effectiveCost > filters.maxCost) return false;
 
-  // Keyword filter
-  if (filters?.keyword && !(topCard.keywords ?? []).includes(filters.keyword)) return false;
+  // Group/keyword filters: hidden enemy characters have unknown identity
+  // so group and keyword filters should not match them
+  if (char.isHidden && isEnemyTarget) {
+    if (filters?.group || filters?.keyword) return false;
+  } else {
+    if (filters?.group && topCard.group !== filters.group) return false;
+    if (filters?.keyword && !(topCard.keywords ?? []).includes(filters.keyword)) return false;
+  }
 
   return true;
 }

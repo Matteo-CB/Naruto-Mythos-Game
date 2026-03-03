@@ -41,14 +41,18 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
 
   // Find character cards in the discard pile
   const discardPile = playerState.discardPile;
-  if (discardPile.length === 0) {
+  // Build valid targets as string indices into the discard pile (characters only)
+  const validTargets: string[] = [];
+  for (let idx = 0; idx < discardPile.length; idx++) {
+    if (discardPile[idx].card_type === 'character') {
+      validTargets.push(String(idx));
+    }
+  }
+  if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tsunade (004): No characters in discard pile to recover.',
       'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' }) } };
   }
-
-  // Build valid targets as string indices into the discard pile
-  const validTargets: string[] = discardPile.map((_, idx) => String(idx));
 
   // Always let player choose (optional effect)
   return {

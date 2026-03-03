@@ -292,6 +292,7 @@ export interface VisibleOpponentState {
   handSize: number;
   deckSize: number;
   discardPileSize: number;
+  discardPile: CardData[];  // Public information per rules
   chakra: number;
   missionPoints: number;
   hasPassed: boolean;

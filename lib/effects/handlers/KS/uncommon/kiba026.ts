@@ -113,7 +113,7 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
 
   // Draw Akamaru cards into hand
   ps.hand = [...ps.hand, ...akamaruCards];
-  // Put other cards back on top of deck
+  // Put other cards back on top of deck (same order)
   ps.deck = [...otherCards, ...remainingDeck];
 
   newState[sourcePlayer] = ps;
@@ -136,7 +136,26 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
     ) };
   }
 
-  return { state: newState };
+  // Show the top 3 cards to the player (info reveal, confirm only)
+  const revealData = JSON.stringify({
+    text: akamaruCards.length > 0
+      ? `Kiba (026): Found ${akamaruCards.length} Akamaru card(s) in top ${topCards.length}.`
+      : `Kiba (026): No Akamaru in top ${topCards.length}. Cards put back.`,
+    topCards: topCards.map(c => ({
+      name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+      image_file: c.image_file, isMatch: c.name_fr === 'AKAMARU',
+    })),
+  });
+
+  return {
+    state: newState,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KIBA026_UPGRADE_REVEAL',
+    validTargets: ['confirm'],
+    description: revealData,
+    descriptionKey: 'game.effect.desc.kiba026UpgradeReveal',
+    isMandatory: true,
+  };
 }
 
 export function registerKiba026Handlers(): void {

@@ -142,7 +142,7 @@ const HandCard = React.memo(function HandCard({
         </span>
         <span
           className="text-[10px] font-bold tabular-nums"
-          style={{ color: '#c4a35a' }}
+          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
           {card.power}
         </span>
@@ -157,6 +157,7 @@ const HandCard = React.memo(function HandCard({
             : 'rgba(179, 62, 62, 0.9)',
           color: '#0a0a0a',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+          fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         {card.chakra}
