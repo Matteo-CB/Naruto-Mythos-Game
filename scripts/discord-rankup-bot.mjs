@@ -48,16 +48,17 @@ const CHANNEL_NAME = 'rank-ups';
 
 // ──────────────────────────────────────────────
 // ELO RANK DEFINITIONS (must match discord-elo-roles.mjs)
+// Icons are the league WebP images served from the game site
 // ──────────────────────────────────────────────
 const RANKS = [
-  { name: 'Academy Student', role: '╼ Academy Student ╾', color: 0x888888, minElo: 0,    icon: '/images/icons/scroll-kunai.webp' },
-  { name: 'Genin',           role: '╼ Genin ╾',           color: 0x3E8B3E, minElo: 450,  icon: '/images/icons/kunai.webp' },
-  { name: 'Chunin',          role: '╼ Chunin ╾',          color: 0xB37E3E, minElo: 550,  icon: '/images/icons/shuriken.webp' },
-  { name: 'Special Jonin',   role: '╼ Special Jonin ╾',   color: 0x5A7ABB, minElo: 650,  icon: '/images/icons/kunai.webp' },
-  { name: 'Elite Jonin',     role: '╼ Elite Jonin ╾',     color: 0x5865F2, minElo: 750,  icon: '/images/icons/shuriken.webp' },
-  { name: 'Legendary Sannin',role: '╼ Legendary Sannin ╾',color: 0x9B59B6, minElo: 900,  icon: '/images/icons/scroll-kunai.webp' },
-  { name: 'Kage',            role: '╼ Kage ╾',            color: 0xC4A35A, minElo: 1050, icon: '/images/icons/uzumaki-spiral.webp' },
-  { name: 'Sage of Six Paths',role:'╼ Sage of Six Paths ╾',color: 0xFFD700, minElo: 1200, icon: '/images/icons/uzumaki-spiral.webp' },
+  { name: 'Academy Student', role: '\u257C Academy Student \u257E', color: 0x888888, minElo: 0,    icon: `${API_BASE}/images/leagues/academy-student.webp` },
+  { name: 'Genin',           role: '\u257C Genin \u257E',           color: 0x3E8B3E, minElo: 450,  icon: `${API_BASE}/images/leagues/genin.webp` },
+  { name: 'Chunin',          role: '\u257C Chunin \u257E',          color: 0xB37E3E, minElo: 550,  icon: `${API_BASE}/images/leagues/chunin.webp` },
+  { name: 'Special Jonin',   role: '\u257C Special Jonin \u257E',   color: 0x5A7ABB, minElo: 650,  icon: `${API_BASE}/images/leagues/special-jonin.webp` },
+  { name: 'Elite Jonin',     role: '\u257C Elite Jonin \u257E',     color: 0x5865F2, minElo: 750,  icon: `${API_BASE}/images/leagues/elite-jonin.webp` },
+  { name: 'Legendary Sannin',role: '\u257C Legendary Sannin \u257E',color: 0x9B59B6, minElo: 900,  icon: `${API_BASE}/images/leagues/legendary-sannin.webp` },
+  { name: 'Kage',            role: '\u257C Kage \u257E',            color: 0xC4A35A, minElo: 1050, icon: `${API_BASE}/images/leagues/kage.webp` },
+  { name: 'Sage of Six Paths',role:'\u257C Sage of Six Paths \u257E',color: 0xFFD700, minElo: 1200, icon: `${API_BASE}/images/leagues/sage-of-six-paths.webp` },
 ];
 
 // Rank-up messages (themed)
@@ -203,12 +204,17 @@ function buildRankUpEmbed(username, oldRank, newRank, elo, wins, losses) {
 
   return {
     embeds: [{
+      author: {
+        name: `${username}`,
+        icon_url: newRank.icon,
+      },
       title,
       description,
       color: newRank.color,
       fields,
       footer: {
         text: `Naruto Mythos TCG | ${isPromotion ? 'Promotion' : 'Rank Change'}`,
+        icon_url: `${API_BASE}/images/icons/uzumaki-spiral.webp`,
       },
       timestamp: new Date().toISOString(),
     }],
@@ -264,11 +270,15 @@ async function findOrCreateChannel() {
   const newChannel = await createRes.json();
   console.log(`  Created #${CHANNEL_NAME} channel (${newChannel.id})`);
 
-  // Post welcome message
+  // Post welcome message with league icon
   await discordFetch(`/channels/${newChannel.id}/messages`, {
     method: 'POST',
     body: JSON.stringify({
       embeds: [{
+        author: {
+          name: 'Naruto Mythos TCG',
+          icon_url: `${API_BASE}/images/icons/uzumaki-spiral.webp`,
+        },
         title: 'RANK-UP NOTIFICATIONS',
         description: [
           'This channel posts automatic notifications when players change rank.',
@@ -281,7 +291,10 @@ async function findOrCreateChannel() {
           'Grimpez les rangs en gagnant des matchs class\u00e9s !',
         ].join('\n'),
         color: 0xC4A35A,
-        footer: { text: 'Naruto Mythos TCG | Rank System' },
+        footer: {
+          text: 'Naruto Mythos TCG | Rank System',
+          icon_url: RANKS[RANKS.length - 1].icon,
+        },
         timestamp: new Date().toISOString(),
       }],
     }),

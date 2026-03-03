@@ -1,0 +1,639 @@
+================================================================================
+NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT REPORT
+================================================================================
+Generated: 2026-03-03T22:39:40.775Z
+Total Issues Found: 116
+
+--- SUMMARY BY SEVERITY ---
+CRITICAL: 111 issues
+HIGH: 3 issues
+MEDIUM: 2 issues
+LOW: 0 issues
+INFO: 0 issues
+
+--- SUMMARY BY CATEGORY ---
+Missing Handler: 11 issues
+FAQ Compliance: 4 issues
+Game Crash: 100 issues
+Rule Discrepancy: 1 issues
+
+================================================================================
+DETAILED ISSUES
+================================================================================
+
+--- CRITICAL ISSUES (111) ---
+
+[CRITICAL] Missing Handler
+  Card: KS-108-R NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-108-R (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-109-R SAKURA HARUNO
+  Description: No UPGRADE handler for KS-109-R (SAKURA HARUNO)
+  Expected: Handler implementing: MAIN effect: Instead, play the card paying 2 less.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-133-S NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-133-S (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-135-S SAKURA HARUNO
+  Description: No UPGRADE handler for KS-135-S (SAKURA HARUNO)
+  Expected: Handler implementing: MAIN effect: Instead, play the card paying 4 less.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-000-L NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-000-L (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-108-MV NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-108-MV (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-108-RA NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-108-RA (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-109-RA SAKURA HARUNO
+  Description: No UPGRADE handler for KS-109-RA (SAKURA HARUNO)
+  Expected: Handler implementing: MAIN effect: Instead, play the card paying 2 less.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-133-SV NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-133-SV (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-133-MV NARUTO UZUMAKI
+  Description: No UPGRADE handler for KS-133-MV (NARUTO UZUMAKI)
+  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Missing Handler
+  Card: KS-135-MV SAKURA HARUNO
+  Description: No UPGRADE handler for KS-135-MV (SAKURA HARUNO)
+  Expected: Handler implementing: MAIN effect: Instead, play the card paying 4 less.
+  Actual: No handler registered
+  Rule Reference: Every card effect must be individually coded
+
+[CRITICAL] Game Crash
+  Description: Game 1 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 2 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 3 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 4 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 5 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 6 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 7 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 8 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 9 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 10 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 11 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 12 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 13 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 14 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 15 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 16 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 17 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 18 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 19 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 20 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 21 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 22 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 23 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 24 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 25 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 26 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 27 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 28 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 29 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 30 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 31 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 32 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 33 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 34 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 35 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 36 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 37 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 38 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 39 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 40 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 41 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 42 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 43 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 44 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 45 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 46 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 47 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 48 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 49 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 50 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 51 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 52 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 53 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 54 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 55 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 56 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 57 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 58 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 59 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 60 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 61 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 62 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 63 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 64 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 65 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 66 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 67 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 68 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 69 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 70 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 71 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 72 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 73 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 74 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 75 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 76 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 77 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 78 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 79 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 80 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 81 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 82 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 83 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 84 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 85 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 86 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 87 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 88 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 89 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 90 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 91 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 92 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 93 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 94 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 95 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 96 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 97 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 98 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 99 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+[CRITICAL] Game Crash
+  Description: Game 100 crashed: Game creation failed: engine.createGame is not a function
+  Expected: Game should complete all 4 turns without errors
+  Actual: Game creation failed: engine.createGame is not a function
+
+
+--- HIGH ISSUES (3) ---
+
+[HIGH] FAQ Compliance
+  Card: KS-004-UC TSUNADE (Mitotic Regeneration)
+  Description: Hidden characters defeated when Tsunade 004 is in play should go to hand WITHOUT being revealed
+  Expected: Hidden char -> hand (stays hidden/unrevealed)
+  Actual: Needs verification that the card is not revealed when going to hand via Tsunade effect
+  Rule Reference: FAQ IMG_3971
+
+[HIGH] Rule Discrepancy
+  Description: FAQ IMG_3978 says hidden char has cost 1, but CLAUDE.md says cost 0 when targeted by enemy effects. Need to verify which is correct for enemy targeting.
+  Expected: Hidden character: cost 0 when targeted by enemy effects (per CLAUDE.md)
+  Actual: FAQ says "cost 1 and Power 0" - this may refer to the PLAY cost, not the effective cost for targeting
+  Rule Reference: FAQ IMG_3978 vs CLAUDE.md hidden character rules
+
+[HIGH] FAQ Compliance
+  Description: When an effect forces a character with same name into a mission where that name already exists, the new one should be discarded WITHOUT applying effects
+  Expected: Discard new character, no effects trigger
+  Actual: Needs verification in move effect handlers
+  Rule Reference: FAQ IMG_3979
+
+
+--- MEDIUM ISSUES (2) ---
+
+[MEDIUM] FAQ Compliance
+  Card: KS-022-UC SHIKAMARU NARA
+  Description: Verify Shikamaru only counts the last opponent turn for AMBUSH effect
+  Expected: If you take multiple turns after opponent passes, Shikamaru cannot move anybody (FAQ IMG_3972)
+  Actual: Needs verification
+  Rule Reference: FAQ IMG_3972
+
+[MEDIUM] FAQ Compliance
+  Description: Verify that "friendly" effects exclude the source card itself where appropriate
+  Expected: A character is NOT friendly to itself
+  Actual: Need to check all "friendly character" target resolution logic
+  Rule Reference: FAQ IMG_3973

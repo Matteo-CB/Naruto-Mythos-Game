@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest) {
       where: { userId: session.user.id },
       select: { id: true },
     });
-    const ownedIds = new Set(decks.map((d) => d.id));
+    const ownedIds = new Set(decks.map((d: { id: string }) => d.id));
     for (const id of orderedIds) {
       if (!ownedIds.has(id)) {
         return NextResponse.json({ error: 'Deck not found' }, { status: 404 });

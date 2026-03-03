@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { Link } from '@/lib/i18n/navigation';
+import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -37,6 +38,14 @@ export function GameEndScreen() {
   const [sealedDeckName, setSealedDeckName] = useState('');
   const [sealedSaveState, setSealedSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const autoSaveAttempted = useRef(false);
+  const [leaguesEnabled, setLeaguesEnabled] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => setLeaguesEnabled(data.leaguesEnabled ?? false))
+      .catch(() => {});
+  }, []);
 
   const handleSaveReplay = useCallback(async () => {
     if (saveState === 'saving' || saveState === 'saved') return;
@@ -127,7 +136,7 @@ export function GameEndScreen() {
 
     setSealedSaveState('saving');
     try {
-      const name = sealedDeckName.trim() || 'Sealed Deck';
+      const name = sealedDeckName.trim() || t('sealed.saveDeckPlaceholder');
       const res = await fetch('/api/decks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,7 +162,11 @@ export function GameEndScreen() {
 
   const isRanked = isOnlineGame && gameResult?.isRanked;
   const eloDelta = gameResult?.eloDelta;
+  const newElo = gameResult?.newElo;
+  const totalGames = gameResult?.totalGames;
   const winReason = gameResult?.winReason;
+  const isPlacement = totalGames !== undefined && totalGames < PLACEMENT_MATCHES_REQUIRED;
+  const justBecameRanked = totalGames !== undefined && totalGames === PLACEMENT_MATCHES_REQUIRED;
 
   const myPlayer = visibleState.myPlayer;
   const playerWon = winner === myPlayer;
@@ -320,7 +333,7 @@ export function GameEndScreen() {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4 }}
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-2"
             >
               <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                 {t('game.end.rankedMatch')}
@@ -331,6 +344,48 @@ export function GameEndScreen() {
               >
                 {eloDelta >= 0 ? '+' : ''}{eloDelta} ELO
               </span>
+
+              {/* New ELO + League badge — only when leagues enabled */}
+              {leaguesEnabled && newElo !== undefined && (
+                <div className="flex flex-col items-center gap-2 mt-1">
+                  <EloBadge elo={newElo} size="md" showElo totalGames={totalGames} />
+                </div>
+              )}
+
+              {/* Placement progress — only when leagues enabled */}
+              {leaguesEnabled && isPlacement && totalGames !== undefined && (
+                <div className="flex flex-col items-center gap-1 mt-1">
+                  <span className="text-xs" style={{ color: '#999' }}>
+                    {t('game.end.placementMatch', { current: totalGames, total: PLACEMENT_MATCHES_REQUIRED })}
+                  </span>
+                  <div
+                    className="rounded-full overflow-hidden"
+                    style={{ width: '120px', height: '4px', backgroundColor: 'rgba(255,255,255,0.08)' }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${(totalGames / PLACEMENT_MATCHES_REQUIRED) * 100}%`,
+                        backgroundColor: '#666',
+                        transition: 'width 0.5s ease',
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Just became ranked — only when leagues enabled */}
+              {leaguesEnabled && justBecameRanked && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 2.0, type: 'spring' }}
+                  className="text-sm font-bold uppercase tracking-wider mt-1"
+                  style={{ color: '#c4a35a' }}
+                >
+                  {t('game.end.nowRanked')}
+                </motion.span>
+              )}
             </motion.div>
           )}
 

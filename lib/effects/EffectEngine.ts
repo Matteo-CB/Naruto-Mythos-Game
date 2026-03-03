@@ -31,151 +31,64 @@ export class EffectEngine {
     let newState = deepClone(state);
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
 
-    // Cards where UPGRADE fires before MAIN when played as an upgrade.
-    // KS-137-S (Kakashi 137): UPGRADE = move self, MAIN = hide upgraded char in (new) mission.
-    // processRemainingEffects uses findCharByInstanceId so it picks up the new mission after the move.
-    const UPGRADE_BEFORE_MAIN = new Set(['KS-137-S']);
-    if (isUpgrade && UPGRADE_BEFORE_MAIN.has(topCard.id)) {
-      const hasUpgradeFirst = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-      if (hasUpgradeFirst) {
-        const upgradeHandler = getEffectHandler(topCard.id, 'UPGRADE');
-        if (upgradeHandler) {
-          try {
-            const ctx: EffectContext = {
-              state: newState,
-              sourcePlayer: player,
-              sourceCard: character,
-              sourceMissionIndex: missionIndex,
-              triggerType: 'UPGRADE',
-              isUpgrade: true,
-            };
-            const result = upgradeHandler(ctx);
-            const hasMainEffect2 = (topCard.effects ?? []).some(
-              (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
-            );
-            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-              // Queue MAIN to run after UPGRADE resolves
-              const remainingAfterUpgrade: EffectType[] = hasMainEffect2 ? ['MAIN'] : [];
-              newState = EffectEngine.createPendingTargetSelection(
-                result.state, player, character, missionIndex, 'UPGRADE', true,
-                result, remainingAfterUpgrade,
-              );
-              return newState;
-            }
-            newState = result.state;
-            // UPGRADE resolved immediately — fall through to MAIN below
-          } catch (err) {
-            console.error(`[EffectEngine] UPGRADE-first handler error for ${topCard.id}:`, err);
-          }
+    // Build the ordered list of effect types from the card definition (top-to-bottom).
+    // When played as upgrade, both MAIN and UPGRADE trigger in card-printed order.
+    // When not an upgrade, only MAIN triggers.
+    const relevantTypes = new Set<string>(isUpgrade ? ['MAIN', 'UPGRADE'] : ['MAIN']);
+    const orderedTypes: EffectType[] = [];
+    for (const effect of (topCard.effects ?? [])) {
+      if (relevantTypes.has(effect.type) && !orderedTypes.includes(effect.type as EffectType)) {
+        // Skip 'effect:' modifier lines — they modify previous effects, not standalone
+        if (effect.type === 'MAIN' && (effect.description.startsWith('effect:') || effect.description.startsWith('effect.'))) {
+          continue;
         }
+        orderedTypes.push(effect.type as EffectType);
       }
-      // MAIN fires after UPGRADE (using findCharByInstanceId in processRemainingEffects
-      // if UPGRADE created a pending; or here directly if UPGRADE resolved immediately).
-      const hasMain137 = (topCard.effects ?? []).some(
+    }
+
+    // Fallback: if no MAIN found in orderedTypes but card has one, add it
+    if (!orderedTypes.includes('MAIN')) {
+      const hasMain = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
       );
-      if (hasMain137) {
-        const mainHandler = getEffectHandler(topCard.id, 'MAIN');
-        if (mainHandler) {
-          try {
-            // Re-find the character in case UPGRADE moved it
-            const charResult = EffectEngine.findCharByInstanceId(newState, character.instanceId);
-            const updatedChar = charResult?.character ?? character;
-            const updatedMissionIndex = charResult?.missionIndex ?? missionIndex;
-            const ctx: EffectContext = {
-              state: newState,
-              sourcePlayer: player,
-              sourceCard: updatedChar,
-              sourceMissionIndex: updatedMissionIndex,
-              triggerType: 'MAIN',
-              isUpgrade: true,
-            };
-            const result = mainHandler(ctx);
-            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-              newState = EffectEngine.createPendingTargetSelection(
-                result.state, player, updatedChar, updatedMissionIndex, 'MAIN', true,
-                result, [],
-              );
-              return newState;
-            }
-            newState = result.state;
-          } catch (err) {
-            console.error(`[EffectEngine] MAIN (after UPGRADE-first) handler error for ${topCard.id}:`, err);
-          }
-        }
-      }
-      return newState;
+      if (hasMain) orderedTypes.unshift('MAIN');
     }
 
-    // Resolve MAIN effects
-    const hasMainEffect = (topCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && !e.description.startsWith('effect:') && !e.description.startsWith('effect.')
-    );
-    if (hasMainEffect) {
-      const handler = getEffectHandler(topCard.id, 'MAIN');
-      if (handler) {
-        try {
-          const ctx: EffectContext = {
-            state: newState,
-            sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
-            triggerType: 'MAIN',
-            isUpgrade,
-          };
-          const result = handler(ctx);
+    for (let i = 0; i < orderedTypes.length; i++) {
+      const effectType = orderedTypes[i];
 
-          if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-            // Handler needs target selection — create pending and pause
-            // Use result.state to preserve any state changes the handler already made
-            const remainingEffectTypes: EffectType[] = [];
-            if (isUpgrade) {
-              const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-              if (hasUpgradeEffect) remainingEffectTypes.push('UPGRADE');
-            }
-            newState = EffectEngine.createPendingTargetSelection(
-              result.state, player, character, missionIndex, 'MAIN', isUpgrade,
-              result, remainingEffectTypes,
-            );
-            return newState;
-          }
-          newState = result.state;
-        } catch (err) {
-          console.error(`[EffectEngine] MAIN handler error for ${topCard.id}:`, err);
+      const handler = getEffectHandler(topCard.id, effectType);
+      if (!handler) continue;
+
+      try {
+        // Re-find the character in case a previous effect moved it (e.g., Kakashi 137 UPGRADE moves self)
+        const charResult = i > 0 ? EffectEngine.findCharByInstanceId(newState, character.instanceId) : null;
+        const currentChar = charResult?.character ?? character;
+        const currentMissionIndex = charResult?.missionIndex ?? missionIndex;
+
+        const ctx: EffectContext = {
+          state: newState,
+          sourcePlayer: player,
+          sourceCard: currentChar,
+          sourceMissionIndex: currentMissionIndex,
+          triggerType: effectType,
+          isUpgrade,
+        };
+        const result = handler(ctx);
+
+        if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
+          // Queue remaining effect types (those after current position, in card order)
+          const remainingEffectTypes = orderedTypes.slice(i + 1);
+
+          newState = EffectEngine.createPendingTargetSelection(
+            result.state, player, currentChar, currentMissionIndex, effectType, isUpgrade,
+            result, remainingEffectTypes,
+          );
+          return newState;
         }
-      }
-    }
-
-    // If this is an upgrade, also resolve UPGRADE effects
-    if (isUpgrade) {
-      const hasUpgradeEffect = (topCard.effects ?? []).some((e) => e.type === 'UPGRADE');
-      if (hasUpgradeEffect) {
-        const handler = getEffectHandler(topCard.id, 'UPGRADE');
-        if (handler) {
-          try {
-            const ctx: EffectContext = {
-              state: newState,
-              sourcePlayer: player,
-              sourceCard: character,
-              sourceMissionIndex: missionIndex,
-              triggerType: 'UPGRADE',
-              isUpgrade: true,
-            };
-            const result = handler(ctx);
-
-            if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
-              // Use result.state to preserve any state changes the handler already made
-              newState = EffectEngine.createPendingTargetSelection(
-                result.state, player, character, missionIndex, 'UPGRADE', true,
-                result, [],
-              );
-              return newState;
-            }
-            newState = result.state;
-          } catch (err) {
-            console.error(`[EffectEngine] UPGRADE handler error for ${topCard.id}:`, err);
-          }
-        }
+        newState = result.state;
+      } catch (err) {
+        console.error(`[EffectEngine] ${effectType} handler error for ${topCard.id}:`, err);
       }
     }
 
@@ -671,6 +584,9 @@ export class EffectEngine {
                 }),
                 descriptionKey: 'game.effect.desc.itachi091ChooseDiscard',
               };
+              // Clean up old pending effect/action before chaining
+              newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+              newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
               return EffectEngine.createPendingTargetSelection(
                 newState, pendingEffect.sourcePlayer,
                 charResult091?.character ?? null,
@@ -722,6 +638,9 @@ export class EffectEngine {
             description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards to discard 1 from opponent\'s hand.',
             descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
           };
+          // Clean up old pending effect/action before chaining
+          newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+          newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
           return EffectEngine.createPendingTargetSelection(
             newState, pendingEffect.sourcePlayer,
             charResult_sur?.character ?? null,
@@ -2801,6 +2720,9 @@ export class EffectEngine {
                 }),
                 descriptionKey: 'game.effect.desc.sasuke014DiscardOpponent',
               };
+              // Clean up old pending effect/action before chaining
+              newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+              newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
               return EffectEngine.createPendingTargetSelection(
                 newState, pendingEffect.sourcePlayer,
                 charResult_ss?.character ?? null,
@@ -2952,6 +2874,9 @@ export class EffectEngine {
             description: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
             descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
           };
+          // Clean up old pending effect/action before chaining
+          newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+          newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
           return EffectEngine.createPendingTargetSelection(
             newState,
             pendingEffect.sourcePlayer,
@@ -3034,6 +2959,10 @@ export class EffectEngine {
           const { postMoveHide } = require('./handlers/KS/uncommon/choji018');
           const hideResult = postMoveHide(newState, pendingEffect.sourceInstanceId, destMIdx018, pendingEffect.sourcePlayer);
           if (hideResult.requiresTargetSelection && hideResult.validTargets && hideResult.validTargets.length > 0) {
+            // Clean up old pending effect/action before chaining
+            hideResult.state = { ...hideResult.state };
+            hideResult.state.pendingEffects = hideResult.state.pendingEffects.filter((e: { id: string }) => e.id !== pendingEffect.id);
+            hideResult.state.pendingActions = hideResult.state.pendingActions.filter((a: { sourceEffectId: string }) => a.sourceEffectId !== pendingEffect.id);
             return EffectEngine.createPendingTargetSelection(
               hideResult.state, pendingEffect.sourcePlayer,
               EffectEngine.findCharByInstanceId(hideResult.state, pendingEffect.sourceInstanceId)?.character ?? { instanceId: pendingEffect.sourceInstanceId, card: { id: pendingEffect.sourceCardId } as any, isHidden: false, wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [], controlledBy: pendingEffect.sourcePlayer, originalOwner: pendingEffect.sourcePlayer, missionIndex: destMIdx018 },

@@ -76,7 +76,7 @@ const HandCard = React.memo(function HandCard({
 
   return (
     <motion.div
-      layout
+      layout="position"
       initial={{ y: 100, opacity: 0, rotate: 0 }}
       animate={animateProps}
       whileHover={hoverProps}

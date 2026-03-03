@@ -66,4 +66,5 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
 
 export function registerItachi091Handlers(): void {
   registerEffect('KS-091-UC', 'MAIN', handleItachi091Main);
+  registerEffect('KS-091-UC', 'UPGRADE', handleItachi091Main);
 }

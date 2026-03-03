@@ -92,10 +92,14 @@ export function calculateEffectiveCost(
     // Only applies when revealing from hidden (isReveal), not when playing face-visible
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
-        // Check ALL characters in this mission (friendly + enemy, visible + hidden)
+        // Check friendly characters (all, player knows their own hidden cards)
+        // and visible enemy characters (hidden enemy identity is unknown)
         const enemySide = player === 'player1' ? mission.player2Characters : mission.player1Characters;
-        const allChars = [...(friendlyChars || []), ...(enemySide || [])];
-        const hasSasuke = allChars.some(
+        const checkableChars = [
+          ...(friendlyChars || []),
+          ...(enemySide || []).filter((c: any) => !c.isHidden),
+        ];
+        const hasSasuke = checkableChars.some(
           (c: any) => {
             const cTop = getTopCard(c);
             return cTop?.name_fr?.toUpperCase().includes('SASUKE');

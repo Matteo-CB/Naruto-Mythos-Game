@@ -118,6 +118,5 @@ function takeControlOfCharacter(
 
 export function registerHandler(): void {
   registerEffect('KS-020-UC', 'MAIN', handleIno020Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to adjust the cost threshold from 2 to 3
+  registerEffect('KS-020-UC', 'UPGRADE', handleIno020Main);
 }

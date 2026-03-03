@@ -71,6 +71,5 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
 
 export function registerShizune006Handlers(): void {
   registerEffect('KS-006-UC', 'MAIN', handleShizune006Main);
-  // UPGRADE triggers the same MAIN handler with ctx.isUpgrade = true
-  // The MAIN handler checks isUpgrade to apply the 2 Chakra bonus
+  registerEffect('KS-006-UC', 'UPGRADE', handleShizune006Main);
 }

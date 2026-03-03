@@ -34,6 +34,8 @@ interface SocketStore {
     player2Score: number;
     isRanked?: boolean;
     eloDelta?: number | null;
+    newElo?: number;
+    totalGames?: number;
     winReason?: 'score' | 'forfeit' | 'timeout';
     gameId?: string;
     replayData?: unknown;
@@ -54,6 +56,10 @@ interface SocketStore {
   sealedDeckSubmitted: boolean;
   sealedOpponentReady: boolean;
   sealedDeadline: number | null;
+
+  // Internal: online resync watchdog
+  _lastStateUpdate: number;
+  _resyncTimer: ReturnType<typeof setInterval> | null;
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
@@ -96,6 +102,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   sealedDeckSubmitted: false,
   sealedOpponentReady: false,
   sealedDeadline: null,
+  _lastStateUpdate: 0,
+  _resyncTimer: null as ReturnType<typeof setInterval> | null,
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -243,7 +251,30 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
-        set({ gameStarted: true });
+        set({ gameStarted: true, _lastStateUpdate: Date.now() });
+
+        // Start a periodic resync check — if no state update for 15s during
+        // an active game, request current state from the server.
+        // This prevents the game from appearing stuck if a state-update was lost.
+        const existingTimer = get()._resyncTimer;
+        if (existingTimer) clearInterval(existingTimer);
+        const resyncTimer = setInterval(() => {
+          const s = get();
+          if (!s.socket || !s.connected || s.gameEnded || !s.gameStarted) {
+            clearInterval(resyncTimer);
+            set({ _resyncTimer: null });
+            return;
+          }
+          const elapsed = Date.now() - (s._lastStateUpdate || 0);
+          if (elapsed > 15000 && s._lastStateUpdate > 0) {
+            console.warn('[Socket] No state update for 15s — requesting resync');
+            s.socket.emit('game:request-state');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            set({ _lastStateUpdate: Date.now() } as any); // Reset to avoid spamming
+          }
+        }, 5000);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        set({ _resyncTimer: resyncTimer } as any);
       });
 
       socket.on(
@@ -258,6 +289,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           const update: Partial<SocketStore> = {
             visibleState: data.visibleState,
             playerRole: data.playerRole,
+            _lastStateUpdate: Date.now(),
           };
           if (data.playerNames) {
             update.playerNames = data.playerNames;
@@ -284,7 +316,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           replayData?: unknown;
         }) => {
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId);
-          set({ gameEnded: true, gameResult: data, actionDeadline: null });
+          // Clean up resync timer
+          const resyncT = get()._resyncTimer;
+          if (resyncT) { clearInterval(resyncT); }
+          set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null });
         },
       );
 
@@ -384,7 +419,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   },
 
   disconnect: () => {
-    const { socket } = get();
+    const { socket, _resyncTimer } = get();
+    if (_resyncTimer) clearInterval(_resyncTimer);
     if (socket) {
       socket.removeAllListeners();
       socket.disconnect();
@@ -410,6 +446,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         sealedDeckSubmitted: false,
         sealedOpponentReady: false,
         sealedDeadline: null,
+        _resyncTimer: null,
       });
     }
   },

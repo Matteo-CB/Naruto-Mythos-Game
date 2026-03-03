@@ -46,6 +46,7 @@ const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
+let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
 
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -89,16 +90,31 @@ function cleanupPlayerRoom(socket: Socket): void {
  */
 function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> {
   const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> = [];
-  for (const [, room] of rooms) {
+  const staleRoomCodes: string[] = [];
+  for (const [code, room] of rooms) {
     if (room.isPrivate) continue;
     if (room.guestId) continue; // Already has a guest
     if (room.gameState) continue; // Game already started
+    // Verify host socket is still connected
+    if (room.hostSocket && ioInstance) {
+      const hostSock = ioInstance.sockets.sockets.get(room.hostSocket);
+      if (!hostSock || !hostSock.connected) {
+        staleRoomCodes.push(code);
+        continue;
+      }
+    }
     list.push({
       code: room.code,
       hostName: room.hostName ?? 'Unknown',
       gameMode: room.gameMode,
       createdAt: room.createdAt,
     });
+  }
+  // Cleanup stale rooms
+  for (const code of staleRoomCodes) {
+    const room = rooms.get(code);
+    if (room?.hostSocket) playerRooms.delete(room.hostSocket);
+    rooms.delete(code);
   }
   return list;
 }
@@ -157,7 +173,7 @@ async function finalizeGameEnd(
   const p1Score = room.gameState.player1.missionPoints;
   const p2Score = room.gameState.player2.missionPoints;
 
-  let eloData: { player1Delta: number; player2Delta: number } | null = null;
+  let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
   let gameRecordId: string | null = null;
 
   try {
@@ -169,12 +185,11 @@ async function finalizeGameEnd(
       if (player1 && player2) {
         const eloResult = winner === 'player1' ? 'player1' : 'player2';
         const changes = calculateEloChanges(player1.elo, player2.elo, eloResult);
-        eloData = { player1Delta: changes.player1Delta, player2Delta: changes.player2Delta };
 
         const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
         const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
 
-        await Promise.all([
+        const [updatedP1, updatedP2] = await Promise.all([
           prisma.user.update({
             where: { id: room.hostId },
             data: { elo: changes.player1NewElo, ...p1Stats },
@@ -184,6 +199,15 @@ async function finalizeGameEnd(
             data: { elo: changes.player2NewElo, ...p2Stats },
           }),
         ]);
+
+        eloData = {
+          player1Delta: changes.player1Delta,
+          player2Delta: changes.player2Delta,
+          player1NewElo: updatedP1.elo,
+          player2NewElo: updatedP2.elo,
+          player1TotalGames: updatedP1.wins + updatedP1.losses + updatedP1.draws,
+          player2TotalGames: updatedP2.wins + updatedP2.losses + updatedP2.draws,
+        };
 
         // Sync Discord roles (fire-and-forget)
         syncDiscordRole(room.hostId).catch(() => {});
@@ -256,6 +280,8 @@ async function finalizeGameEnd(
       player2Score: p2Score,
       isRanked: room.isRanked,
       eloDelta: eloData?.player1Delta ?? null,
+      newElo: eloData?.player1NewElo,
+      totalGames: eloData?.player1TotalGames,
       winReason,
       gameId: gameRecordId,
       replayData,
@@ -268,6 +294,8 @@ async function finalizeGameEnd(
       player2Score: p2Score,
       isRanked: room.isRanked,
       eloDelta: eloData?.player2Delta ?? null,
+      newElo: eloData?.player2NewElo,
+      totalGames: eloData?.player2TotalGames,
       winReason,
       gameId: gameRecordId,
       replayData,
@@ -459,6 +487,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 }
 
 export function setupSocketHandlers(io: SocketIOServer) {
+  ioInstance = io;
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
 
@@ -786,6 +815,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
+    // State resync request — client can request current state if they think they're stuck
+    socket.on('game:request-state', () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room || !room.gameState) return;
+      const player = socket.id === room.hostSocket ? 'player1' : 'player2';
+      const visibleState = GameEngine.getVisibleState(room.gameState, player);
+      socket.emit('game:state-update', { visibleState, playerRole: player });
+      console.log(`[Socket] Resync state sent to ${player} in room ${code}`);
+    });
+
     // Game action
     socket.on('action:perform', async (data: { action: GameAction }) => {
       const code = playerRooms.get(socket.id);
@@ -1034,7 +1075,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Matchmaking
-    socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean }) => {
+    socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
 
@@ -1099,6 +1140,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           code,
           hostId: data.userId,
           hostSocket: socket.id,
+          hostName: data.hostName ?? 'Unknown',
           guestId: null,
           guestSocket: null,
           gameState: null,
@@ -1122,6 +1164,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.join(code);
 
         socket.emit('matchmaking:waiting');
+        broadcastRoomList(io);
       }
     });
 

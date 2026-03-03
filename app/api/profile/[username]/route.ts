@@ -72,7 +72,7 @@ export async function GET(
       }),
     ]);
 
-    const recentGames = games.map(({ gameState, ...rest }) => ({
+    const recentGames = games.map(({ gameState, ...rest }: { gameState: unknown; [key: string]: unknown }) => ({
       ...rest,
       hasReplay: gameState !== null,
     }));
