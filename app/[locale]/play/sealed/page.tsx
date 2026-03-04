@@ -68,7 +68,7 @@ export default function SealedPage() {
   const [joinCode, setJoinCode] = useState('');
   const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
-  const [boosterCount, setBoosterCount] = useState<4 | 6>(6);
+  const [boosterCount, setBoosterCount] = useState<4 | 5 | 6>(6);
 
   // Auth check — redirect to login if not authenticated
   useEffect(() => {
@@ -449,27 +449,20 @@ export default function SealedPage() {
                     {t('boosterCountLabel')}
                   </span>
                   <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
-                    <button
-                      onClick={() => setBoosterCount(4)}
-                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: boosterCount === 4 ? '#c4a35a' : '#0a0a0a',
-                        color: boosterCount === 4 ? '#0a0a0a' : '#666',
-                      }}
-                    >
-                      4
-                    </button>
-                    <button
-                      onClick={() => setBoosterCount(6)}
-                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: boosterCount === 6 ? '#c4a35a' : '#0a0a0a',
-                        color: boosterCount === 6 ? '#0a0a0a' : '#666',
-                        borderLeft: '1px solid #333',
-                      }}
-                    >
-                      6
-                    </button>
+                    {([4, 5, 6] as const).map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setBoosterCount(n)}
+                        className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: boosterCount === n ? '#c4a35a' : '#0a0a0a',
+                          color: boosterCount === n ? '#0a0a0a' : '#666',
+                          borderLeft: n > 4 ? '1px solid #333' : undefined,
+                        }}
+                      >
+                        {n}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -505,27 +498,20 @@ export default function SealedPage() {
                     {t('boosterCountLabel')}
                   </span>
                   <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
-                    <button
-                      onClick={() => setBoosterCount(4)}
-                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: boosterCount === 4 ? '#c4a35a' : '#0a0a0a',
-                        color: boosterCount === 4 ? '#0a0a0a' : '#666',
-                      }}
-                    >
-                      4
-                    </button>
-                    <button
-                      onClick={() => setBoosterCount(6)}
-                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
-                      style={{
-                        backgroundColor: boosterCount === 6 ? '#c4a35a' : '#0a0a0a',
-                        color: boosterCount === 6 ? '#0a0a0a' : '#666',
-                        borderLeft: '1px solid #333',
-                      }}
-                    >
-                      6
-                    </button>
+                    {([4, 5, 6] as const).map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setBoosterCount(n)}
+                        className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: boosterCount === n ? '#c4a35a' : '#0a0a0a',
+                          color: boosterCount === n ? '#0a0a0a' : '#666',
+                          borderLeft: n > 4 ? '1px solid #333' : undefined,
+                        }}
+                      >
+                        {n}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
