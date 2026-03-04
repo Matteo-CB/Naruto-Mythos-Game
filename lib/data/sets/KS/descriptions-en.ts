@@ -313,8 +313,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 014/130 - SASUKE UCHIHA (UC) - "Sharingan"
   'KS-014-UC': [
-    'Look at a random card in the opponent\'s hand.',
-    'Discard the card you looked at and the opponent draws a card.',
+    'Look at the opponent\'s hand.',
+    'Additionally, discard 1 card. If you do, choose 1 card in the opponent\'s hand and discard it.',
   ],
 
   // 016/130 - KAKASHI HATAKE (UC) - "Copy Ninja"
