@@ -51,13 +51,16 @@ export default function TrainingPage() {
   const enableTraining = useTrainingStore((s) => s.enable);
   const resetTraining = useTrainingStore((s) => s.reset);
 
-  // Auth gate: redirect unauthenticated users
+  // Tester/admin gate: redirect unauthorized users
+  const userRole = (session?.user as Record<string, unknown>)?.role as string | undefined;
+  const isTesterOrAdmin = userRole === 'tester' || userRole === 'admin';
+
   useEffect(() => {
     if (status === 'loading') return;
-    if (!session) {
+    if (!session || !isTesterOrAdmin) {
       router.push('/');
     }
-  }, [session, status, router]);
+  }, [session, status, isTesterOrAdmin, router]);
 
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
@@ -117,7 +120,7 @@ export default function TrainingPage() {
     router.push('/game');
   };
 
-  if (status === 'loading' || !session) {
+  if (status === 'loading' || !isTesterOrAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <p className="text-[#888888] text-lg">...</p>
