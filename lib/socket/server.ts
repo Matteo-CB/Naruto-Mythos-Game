@@ -32,7 +32,7 @@ interface RoomData {
   replayInitialState: GameState | null;
   // Sealed mode
   isSealed: boolean;
-  sealedBoosterCount: 4 | 6;
+  sealedBoosterCount: 4 | 5 | 6;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
   // Rematch
@@ -561,7 +561,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 6 }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6 }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
