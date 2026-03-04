@@ -305,7 +305,7 @@ export default function SealedPage() {
     { key: 'easy' as AIDifficulty, label: tAI('difficulties.easy'), description: tAI('difficulties.easyDesc') },
     { key: 'medium' as AIDifficulty, label: tAI('difficulties.medium'), description: tAI('difficulties.mediumDesc') },
     { key: 'hard' as AIDifficulty, label: tAI('difficulties.hard'), description: tAI('difficulties.hardDesc') },
-    { key: 'expert' as AIDifficulty, label: tAI('difficulties.expert'), description: tAI('difficulties.expertDesc') },
+    { key: 'impossible' as AIDifficulty, label: tAI('difficulties.impossible'), description: tAI('difficulties.impossibleDesc') },
   ];
 
   // Loading state

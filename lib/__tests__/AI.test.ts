@@ -3,7 +3,7 @@ import { AIPlayer } from '../ai/AIPlayer';
 import { EasyAI } from '../ai/strategies/EasyAI';
 import { MediumAI } from '../ai/strategies/MediumAI';
 import { HardAI } from '../ai/strategies/HardAI';
-import { ExpertAI } from '../ai/strategies/ExpertAI';
+import { ImpossibleAI } from '../ai/strategies/ImpossibleAI';
 import { GameEngine } from '../engine/GameEngine';
 import { createActionPhaseState, createTestConfig } from './testHelpers';
 
@@ -109,9 +109,9 @@ describe('AI System', () => {
     });
   });
 
-  describe('ExpertAI', () => {
+  describe('ImpossibleAI', () => {
     it('should always return a valid action', { timeout: 120000 }, () => {
-      const ai = new ExpertAI();
+      const ai = new ImpossibleAI();
       const state = createActionPhaseState({ activePlayer: 'player2' });
       const validActions = GameEngine.getValidActions(state, 'player2');
 

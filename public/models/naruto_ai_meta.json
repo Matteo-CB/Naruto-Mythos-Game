@@ -1,0 +1,8 @@
+{
+  "feature_dim": 200,
+  "input_name": "input",
+  "output_name": "output",
+  "epoch": 80,
+  "val_auc": 0.9428953790470127,
+  "val_loss": 0.3549291645613106
+}

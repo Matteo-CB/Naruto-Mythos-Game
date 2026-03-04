@@ -30,6 +30,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
 
     for (let j = 0; j < friendlyChars.length; j++) {
       const char = friendlyChars[j];
+      if (char.isHidden) continue; // Hidden chars are anonymous — can't identify group
 
       // Check if this character is Leaf Village (includes self — card says "every", not "every other")
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;

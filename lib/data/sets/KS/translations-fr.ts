@@ -496,14 +496,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 053/130 - KABUTO YAKUSHI (UC) - "Jutsu des Ames Mortes"
   'KS-053-UC': [
-    'Piochez une carte.',
+    'Defaussez une carte.',
     'Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.',
   ],
 
   // 054/130 - KABUTO YAKUSHI (UC) - "Scalpel de Chakra"
   'KS-054-UC': [
     'POWERUP 1.',
-    'Cachez tous les personnages ennemis non caches avec une Puissance inferieure a celle de ce personnage dans cette mission.',
+    'Cachez tous les autres personnages non caches avec une Puissance inferieure a celle de ce personnage dans cette mission.',
   ],
 
   // 056/130 - KIMIMARO (UC) - "Pulsion Osseuse"

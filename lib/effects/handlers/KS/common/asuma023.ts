@@ -22,6 +22,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const char of mission[friendlySide]) {
     if (char.instanceId === sourceCard.instanceId) continue;
+    if (char.isHidden) continue; // Hidden chars are anonymous — can't identify keyword
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Team 10')) {
       validTargets.push(char.instanceId);

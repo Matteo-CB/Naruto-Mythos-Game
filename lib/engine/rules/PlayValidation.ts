@@ -224,18 +224,20 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.`, reasonKey: 'game.error.upgradeHigherCost', reasonParams: { newCost: newCard.chakra, currentCost: topCard.chakra } };
   }
 
-  // When upgrading over a hidden character, cost = full cost of newCard
+  // When upgrading over a hidden character, cost = full effective cost of newCard
   // (combines the reveal cost + upgrade diff in one action)
   const ps = state[player];
   if (target.isHidden) {
-    if (ps.chakra < newCard.chakra) {
-      return { valid: false, reason: `Not enough chakra. Need ${newCard.chakra} (reveal + upgrade), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: newCard.chakra, have: ps.chakra } };
+    const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
+    if (ps.chakra < effectiveCost) {
+      return { valid: false, reason: `Not enough chakra. Need ${effectiveCost} (reveal + upgrade), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
     }
     return { valid: true };
   }
 
-  // Pay only the difference for visible characters
-  const costDiff = newCard.chakra - topCard.chakra;
+  // Pay only the difference for visible characters (using effective cost with reductions)
+  const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
+  const costDiff = Math.max(0, effectiveCost - topCard.chakra);
   if (ps.chakra < costDiff) {
     return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakraUpgrade', reasonParams: { need: costDiff, have: ps.chakra } };
   }

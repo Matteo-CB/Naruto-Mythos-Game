@@ -261,8 +261,7 @@ describe('SECTION 1: Core Rule Compliance', () => {
       // Each player selects 3 missions, places them face-down, randomly selects 2
       // The 4 selected missions (2 per player) form the mission deck
       const config = createTestConfig();
-      const engine = new GameEngine();
-      const state = engine.createGame(config);
+      const state = GameEngine.createGame(config);
       // After setup, the missionDeck should have cards from both players
       // The exact count depends on the setup logic
       const totalMissionCards = state.missionDeck.length + state.activeMissions.length;
@@ -640,17 +639,17 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const naruto = placeCharOnMission(state, 'player1', 'KS-009-C', 0); // Team 7
 
       // Kakashi's continuous effect should give +1 Power to other Team 7 in same mission
-      const modifier = calculateContinuousPowerModifier(state, naruto, 0);
+      const modifier = calculateContinuousPowerModifier(state, 'player1', 0, naruto);
       // Should include +1 from Kakashi if Naruto has Team 7 keyword
     });
 
     it('KS-025-C Kiba Inuzuka - [⧗] CHAKRA +1 if Akamaru in same mission', () => {
       const state = createGameState();
-      placeCharOnMission(state, 'player1', 'KS-025-C', 0); // Kiba
+      const kiba = placeCharOnMission(state, 'player1', 'KS-025-C', 0); // Kiba
       placeCharOnMission(state, 'player1', 'KS-027-C', 0); // Akamaru
 
       // Kiba should provide CHAKRA +1 bonus during Start Phase
-      const bonus = calculateContinuousChakraBonus(state, 'player1');
+      const bonus = calculateContinuousChakraBonus(state, 'player1', 0, kiba);
       // Should be >= 1 (from Kiba+Akamaru)
     });
 
@@ -667,7 +666,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const gai = placeCharOnMission(state, 'player1', 'KS-042-C', 0);
       const rockLee = placeCharOnMission(state, 'player1', 'KS-038-C', 0); // Rock Lee, Team Guy
 
-      const modifier = calculateContinuousPowerModifier(state, rockLee, 0);
+      const modifier = calculateContinuousPowerModifier(state, 'player1', 0, rockLee);
       // Should include Gai's bonus for Team Guy
     });
 
@@ -771,9 +770,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     it('KS-108-R/RA Naruto - MAIN: Hide enemy Power 3 or less / UPGRADE: +POWERUP X', () => {
       const handler = getEffectHandler('KS-108-R', 'MAIN');
       expect(handler).toBeDefined();
-
-      const upgradeHandler = getEffectHandler('KS-108-R', 'UPGRADE');
-      expect(upgradeHandler).toBeDefined();
+      // UPGRADE logic is handled within the MAIN handler via ctx.isUpgrade
     });
 
     it('KS-120-R/RA Gaara - MAIN: Defeat enemy Power 1 or less in EVERY mission / UPGRADE: POWERUP X', () => {
@@ -927,10 +924,10 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
 
     it('Kiba 025 + Akamaru 027: CHAKRA +1 bonus should apply', () => {
       const state = createGameState();
-      placeCharOnMission(state, 'player1', 'KS-025-C', 0);
+      const kiba = placeCharOnMission(state, 'player1', 'KS-025-C', 0);
       placeCharOnMission(state, 'player1', 'KS-027-C', 0);
 
-      const bonus = calculateContinuousChakraBonus(state, 'player1');
+      const bonus = calculateContinuousChakraBonus(state, 'player1', 0, kiba);
       expect(bonus).toBeGreaterThanOrEqual(1);
     });
 
@@ -949,7 +946,7 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
 
       // Check both Naruto and Sasuke get +1 Power from Kakashi
       if (naruto.card.keywords?.includes('Team 7')) {
-        const modifier = calculateContinuousPowerModifier(state, naruto, 0);
+        const modifier = calculateContinuousPowerModifier(state, 'player1', 0, naruto);
         expect(modifier).toBeGreaterThanOrEqual(1);
       }
     });
@@ -1073,7 +1070,6 @@ describe('SECTION 4: Mass Game Simulation', () => {
     winner?: string;
     state: GameState;
   } {
-    const engine = new GameEngine();
     const config: GameConfig = {
       player1: {
         userId: 'sim-p1',
@@ -1093,7 +1089,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
 
     let state: GameState;
     try {
-      state = engine.createGame(config);
+      state = GameEngine.createGame(config);
     } catch (e: any) {
       return { completed: false, error: `Game creation failed: ${e.message}`, turns: 0, actions: 0, state: {} as GameState };
     }
@@ -1102,8 +1098,8 @@ describe('SECTION 4: Mass Game Simulation', () => {
 
     try {
       // Handle mulligans
-      state = engine.processAction(state, 'player1', { type: 'MULLIGAN', doMulligan: false });
-      state = engine.processAction(state, 'player2', { type: 'MULLIGAN', doMulligan: false });
+      state = GameEngine.applyAction(state, 'player1', { type: 'MULLIGAN', doMulligan: false });
+      state = GameEngine.applyAction(state, 'player2', { type: 'MULLIGAN', doMulligan: false });
       actions += 2;
 
       while (state.phase !== 'gameOver' && actions < maxActions) {
@@ -1112,7 +1108,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
           const pending = state.pendingActions[0];
           const selection = pending.options.length > 0 ? [pending.options[0]] : [];
           try {
-            state = engine.processAction(state, pending.player, {
+            state = GameEngine.applyAction(state, pending.player, {
               type: 'SELECT_TARGET',
               pendingActionId: pending.id,
               selectedTargets: selection,
@@ -1122,7 +1118,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
           } catch {
             // Try declining optional effect
             if (state.pendingEffects.length > 0 && state.pendingEffects[0].isOptional) {
-              state = engine.processAction(state, state.pendingEffects[0].sourcePlayer, {
+              state = GameEngine.applyAction(state, state.pendingEffects[0].sourcePlayer, {
                 type: 'DECLINE_OPTIONAL_EFFECT',
                 pendingEffectId: state.pendingEffects[0].id,
               });
@@ -1137,7 +1133,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
         if (state.pendingEffects.length > 0) {
           const effect = state.pendingEffects[0];
           if (effect.isOptional) {
-            state = engine.processAction(state, effect.sourcePlayer, {
+            state = GameEngine.applyAction(state, effect.sourcePlayer, {
               type: 'DECLINE_OPTIONAL_EFFECT',
               pendingEffectId: effect.id,
             });
@@ -1148,13 +1144,13 @@ describe('SECTION 4: Mass Game Simulation', () => {
 
         // Normal phase handling
         if (state.phase === 'start' || state.phase === 'end') {
-          state = engine.processAction(state, state.activePlayer, { type: 'ADVANCE_PHASE' });
+          state = GameEngine.applyAction(state, state.activePlayer, { type: 'ADVANCE_PHASE' });
           actions++;
           continue;
         }
 
         if (state.phase === 'mission') {
-          state = engine.processAction(state, state.activePlayer, { type: 'ADVANCE_PHASE' });
+          state = GameEngine.applyAction(state, state.activePlayer, { type: 'ADVANCE_PHASE' });
           actions++;
           continue;
         }
@@ -1173,7 +1169,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
                 // Try to play on first available mission
                 for (let m = 0; m < state.activeMissions.length; m++) {
                   try {
-                    state = engine.processAction(state, player, {
+                    state = GameEngine.applyAction(state, player, {
                       type: 'PLAY_CHARACTER',
                       cardIndex: i,
                       missionIndex: m,
@@ -1185,7 +1181,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
                   } catch {
                     // Try hidden
                     try {
-                      state = engine.processAction(state, player, {
+                      state = GameEngine.applyAction(state, player, {
                         type: 'PLAY_HIDDEN',
                         cardIndex: i,
                         missionIndex: m,
@@ -1203,11 +1199,11 @@ describe('SECTION 4: Mass Game Simulation', () => {
             }
 
             if (!played) {
-              state = engine.processAction(state, player, { type: 'PASS' });
+              state = GameEngine.applyAction(state, player, { type: 'PASS' });
               actions++;
             }
           } else {
-            state = engine.processAction(state, player, { type: 'PASS' });
+            state = GameEngine.applyAction(state, player, { type: 'PASS' });
             actions++;
           }
         }

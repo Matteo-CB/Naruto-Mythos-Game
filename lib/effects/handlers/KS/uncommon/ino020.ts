@@ -116,7 +116,12 @@ function takeControlOfCharacter(
   return newState;
 }
 
+function handleIno020UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to increase cost limit from 2 to 3.
+  return { state: ctx.state };
+}
+
 export function registerHandler(): void {
   registerEffect('KS-020-UC', 'MAIN', handleIno020Main);
-  registerEffect('KS-020-UC', 'UPGRADE', handleIno020Main);
+  registerEffect('KS-020-UC', 'UPGRADE', handleIno020UpgradeNoop);
 }

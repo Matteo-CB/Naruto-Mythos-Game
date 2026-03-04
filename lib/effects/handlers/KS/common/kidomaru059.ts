@@ -26,6 +26,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   for (const mission of state.activeMissions) {
     const hasSoundFour = mission[friendlySide].some((char) => {
       if (char.instanceId === ctx.sourceCard.instanceId) return false;
+      if (char.isHidden) return false; // Hidden chars are anonymous — can't identify keyword
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });

@@ -417,14 +417,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 053/130 - KABUTO YAKUSHI (UC) - "Dead Soul Jutsu"
   'KS-053-UC': [
-    'Draw a card.',
+    'Discard a card.',
     'Play the top character of your discard pile anywhere, paying its cost minus 3.',
   ],
 
   // 054/130 - KABUTO YAKUSHI (UC) - "Chakra Scalpel"
   'KS-054-UC': [
     'POWERUP 1.',
-    'Hide all non-hidden enemy characters with Power less than this character in this mission.',
+    'Hide all other non-hidden characters with Power less than this character in this mission.',
   ],
 
   // 056/130 - KIMIMARO (UC) - "Bone Pulse"

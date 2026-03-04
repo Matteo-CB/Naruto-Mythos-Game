@@ -64,7 +64,12 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
   };
 }
 
+function handleItachi091UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to include discard step.
+  return { state: ctx.state };
+}
+
 export function registerItachi091Handlers(): void {
   registerEffect('KS-091-UC', 'MAIN', handleItachi091Main);
-  registerEffect('KS-091-UC', 'UPGRADE', handleItachi091Main);
+  registerEffect('KS-091-UC', 'UPGRADE', handleItachi091UpgradeNoop);
 }

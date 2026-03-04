@@ -20,6 +20,7 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+      if (char.isHidden) continue; // Hidden chars are anonymous — can't identify by name
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.name_fr === 'NARUTO UZUMAKI') {
         validTargets.push(char.instanceId);

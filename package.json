@@ -19,6 +19,7 @@
     "next": "16.1.6",
     "next-auth": "5.0.0-beta.30",
     "next-intl": "^4.8.3",
+    "onnxruntime-web": "^1.24.2",
     "prisma": "^6.19.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",

@@ -23,9 +23,11 @@ function narutoLegendaryMainHandler(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   // Target 1: enemy with Power <= 5 in THIS mission
+  // Base mode (hide): exclude already-hidden chars (can't hide what's already hidden)
+  // Upgrade mode (defeat): include hidden chars (power 0 qualifies)
   const thisMission = state.activeMissions[sourceMissionIndex];
   const target1Candidates = thisMission[enemySideKey].filter(
-    (c) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 5
+    (c) => (isUpgrade || !c.isHidden) && getEffectivePower(state, c, opponentPlayer) <= 5
   );
 
   if (target1Candidates.length === 0) {
