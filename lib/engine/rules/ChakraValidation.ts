@@ -96,7 +96,7 @@ export function calculateEffectiveCost(
         // and visible enemy characters (hidden enemy identity is unknown)
         const enemySide = player === 'player1' ? mission.player2Characters : mission.player1Characters;
         const checkableChars = [
-          ...(friendlyChars || []),
+          ...(friendlyChars || []).filter((c: any) => !c.isHidden),
           ...(enemySide || []).filter((c: any) => !c.isHidden),
         ];
         const hasSasuke = checkableChars.some(

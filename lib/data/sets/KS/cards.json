@@ -1678,13 +1678,13 @@
       "effects": [
         {
           "type": "UPGRADE",
-          "description": "Draw a card.",
-          "description_fr": ""
+          "description": "Discard a card.",
+          "description_fr": "Defaussez une carte."
         },
         {
           "type": "MAIN",
           "description": "Play a character from your discard pile anywhere paying 3 less.",
-          "description_fr": ""
+          "description_fr": "Jouez un personnage de votre defausse n'importe ou en payant 3 de moins."
         }
       ],
       "image_url": "/images/cards/KS/uncommon/KS-053-UC.webp",
