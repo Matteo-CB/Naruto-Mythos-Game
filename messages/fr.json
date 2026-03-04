@@ -1406,6 +1406,8 @@
   "sealed": {
     "title": "Mode Scellé",
     "description": "Ouvrez 6 boosters, construisez un deck avec les cartes obtenues, puis combattez !",
+    "descriptionWithCount": "Ouvrez {count} boosters, construisez un deck avec les cartes obtenues, puis combattez !",
+    "boosterCountLabel": "Boosters",
     "vsAI": "Scelle vs IA",
     "vsAIDesc": "Ouvrez des boosters et construisez un deck pour affronter l'IA",
     "online": "Scelle en Ligne",

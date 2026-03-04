@@ -28,13 +28,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
     for (const char of friendlyChars) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) {
-        // Hidden characters can be moved but we can't check group. Include them since
-        // the player knows their own hidden cards.
-        // Actually, for Sand Village check: the player knows the card, but we check the actual card.
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.group === 'Sand Village') {
-          validTargets.push(char.instanceId);
-        }
+        continue; // Hidden characters can't be identified by group
       } else {
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if (topCard.group === 'Sand Village') {

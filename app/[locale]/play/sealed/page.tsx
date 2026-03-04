@@ -68,6 +68,7 @@ export default function SealedPage() {
   const [joinCode, setJoinCode] = useState('');
   const [onlineView, setOnlineView] = useState<'browse' | 'private'>('browse');
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
+  const [boosterCount, setBoosterCount] = useState<4 | 6>(6);
 
   // Auth check — redirect to login if not authenticated
   useEffect(() => {
@@ -153,13 +154,13 @@ export default function SealedPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined);
+      socketCreateRoom(session.user.id, false, false, true, 'sealed', session.user.name ?? undefined, boosterCount);
       setIsPrivateRoom(false);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
     }
-  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
 
   const handleOnlineCreatePrivate = useCallback(async () => {
     if (!session?.user?.id) return;
@@ -167,13 +168,13 @@ export default function SealedPage() {
       if (!socketConnected) {
         await socketConnect(session.user.id);
       }
-      socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined);
+      socketCreateRoom(session.user.id, true, false, true, 'sealed', session.user.name ?? undefined, boosterCount);
       setIsPrivateRoom(true);
       setStep('online-waiting');
     } catch {
       // Error handled via socket store
     }
-  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom]);
+  }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
 
   const handleOnlineJoin = useCallback(async (code?: string) => {
     const codeToJoin = code || joinCode.trim().toUpperCase();
@@ -195,7 +196,7 @@ export default function SealedPage() {
     // Generate boosters
     import('@/lib/sealed/boosterGenerator').then((mod) => {
       try {
-        const pool = mod.generateSealedPool(6);
+        const pool = mod.generateSealedPool(boosterCount);
         setSealedPool(pool);
         setStep('opening');
       } catch (err) {
@@ -206,7 +207,7 @@ export default function SealedPage() {
       console.error('[Sealed] Failed to load booster module:', err);
       setStep('mode-select');
     });
-  }, []);
+  }, [boosterCount]);
 
   const handleBoostersComplete = useCallback((cards: BoosterCard[]) => {
     setAllOpenedCards(cards);
@@ -229,7 +230,7 @@ export default function SealedPage() {
           import('@/lib/data/cardLoader'),
         ]).then(([boosterMod, aiMod, cardMod]) => {
           try {
-            const aiPool = boosterMod.generateSealedPool(6);
+            const aiPool = boosterMod.generateSealedPool(boosterCount);
             const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
             // AI missions: try to avoid overlap with player
@@ -391,7 +392,7 @@ export default function SealedPage() {
               {t('title')}
             </h1>
             <p className="text-sm" style={{ color: '#888888' }}>
-              {t('description')}
+              {t('descriptionWithCount', { count: boosterCount })}
             </p>
           </div>
 
@@ -442,6 +443,36 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-2 w-full"
               >
+                {/* Booster count selector */}
+                <div className="flex items-center justify-between p-3 rounded-lg mb-1" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+                  <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                    {t('boosterCountLabel')}
+                  </span>
+                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
+                    <button
+                      onClick={() => setBoosterCount(4)}
+                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: boosterCount === 4 ? '#c4a35a' : '#0a0a0a',
+                        color: boosterCount === 4 ? '#0a0a0a' : '#666',
+                      }}
+                    >
+                      4
+                    </button>
+                    <button
+                      onClick={() => setBoosterCount(6)}
+                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: boosterCount === 6 ? '#c4a35a' : '#0a0a0a',
+                        color: boosterCount === 6 ? '#0a0a0a' : '#666',
+                        borderLeft: '1px solid #333',
+                      }}
+                    >
+                      6
+                    </button>
+                  </div>
+                </div>
+
                 <p className="text-xs uppercase tracking-wider mb-1" style={{ color: '#888888' }}>
                   {tAI('selectDifficulty')}
                 </p>
@@ -468,6 +499,36 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-4 w-full"
               >
+                {/* Booster count selector */}
+                <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+                  <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
+                    {t('boosterCountLabel')}
+                  </span>
+                  <div className="flex rounded overflow-hidden" style={{ border: '1px solid #333' }}>
+                    <button
+                      onClick={() => setBoosterCount(4)}
+                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: boosterCount === 4 ? '#c4a35a' : '#0a0a0a',
+                        color: boosterCount === 4 ? '#0a0a0a' : '#666',
+                      }}
+                    >
+                      4
+                    </button>
+                    <button
+                      onClick={() => setBoosterCount(6)}
+                      className="px-4 py-1.5 text-sm font-bold transition-colors cursor-pointer"
+                      style={{
+                        backgroundColor: boosterCount === 6 ? '#c4a35a' : '#0a0a0a',
+                        color: boosterCount === 6 ? '#0a0a0a' : '#666',
+                        borderLeft: '1px solid #333',
+                      }}
+                    >
+                      6
+                    </button>
+                  </div>
+                </div>
+
                 {/* Browse / Private toggle */}
                 <div
                   className="flex w-full rounded-lg overflow-hidden"

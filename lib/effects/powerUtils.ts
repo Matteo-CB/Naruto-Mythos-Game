@@ -16,5 +16,7 @@ export function getEffectivePower(
   char: CharacterInPlay,
   player: PlayerID,
 ): number {
+  // Hidden characters have power 0 when targeted by enemy effects
+  if (char.isHidden) return 0;
   return calculateCharacterPower(state, char, player);
 }

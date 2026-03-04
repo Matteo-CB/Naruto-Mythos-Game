@@ -1722,6 +1722,8 @@
   "sealed": {
     "title": "Sealed Mode",
     "description": "Open 6 boosters, build a deck from the cards you pull, then battle!",
+    "descriptionWithCount": "Open {count} boosters, build a deck from the cards you pull, then battle!",
+    "boosterCountLabel": "Boosters",
     "vsAI": "Sealed vs AI",
     "vsAIDesc": "Open boosters and build a deck to fight the AI",
     "online": "Sealed Online",

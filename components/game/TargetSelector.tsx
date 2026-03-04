@@ -22,7 +22,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
   const locale = useLocale();
   const dims = useGameScale();
   const isHidden = character.isHidden;
-  const canSeeCard = character.isOwn && character.card;
+  const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && character.card;
 
   const imagePath = (canSeeCard || !isHidden)
     ? normalizeImagePath(character.card?.image_file)

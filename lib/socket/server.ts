@@ -32,6 +32,7 @@ interface RoomData {
   replayInitialState: GameState | null;
   // Sealed mode
   isSealed: boolean;
+  sealedBoosterCount: 4 | 6;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
   // Rematch
@@ -560,7 +561,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 6 }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
@@ -592,6 +593,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         disconnectTimer: null,
         replayInitialState: null,
         isSealed: gameMode === 'sealed',
+        sealedBoosterCount: data.sealedBoosterCount ?? 6,
         sealedTimer: null,
         sealedDeadline: null,
       };
@@ -660,8 +662,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (room.isSealed && room.guestId) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
-          const hostPool = generateSealedPool(6);
-          const guestPool = generateSealedPool(6);
+          const count = room.sealedBoosterCount ?? 6;
+          const hostPool = generateSealedPool(count);
+          const guestPool = generateSealedPool(count);
 
           // Send boosters to each player
           if (room.hostSocket) {
@@ -1155,6 +1158,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           disconnectTimer: null,
           replayInitialState: null,
           isSealed: false,
+          sealedBoosterCount: 6,
           sealedTimer: null,
           sealedDeadline: null,
         };
