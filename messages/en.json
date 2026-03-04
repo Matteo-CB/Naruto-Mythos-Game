@@ -516,7 +516,8 @@
         "kabuto053ChooseDiscard": "Kabuto (053) UPGRADE: Choose a card from your hand to discard.",
         "kiba026UpgradeReveal": "Kiba (026) UPGRADE: Looking at top 3 cards of your deck for Akamaru.",
         "sasuke014UpgradeReveal": "Sasuke (014) UPGRADE: Opponent's hand revealed.",
-        "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token."
+        "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token.",
+        "akamaru029ChooseHide": "Akamaru (029): Choose which enemy character (cost {cost}) to hide."
       }
     },
     "anim": {

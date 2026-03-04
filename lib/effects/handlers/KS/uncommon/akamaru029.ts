@@ -54,41 +54,61 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-029-UC' }) } };
   }
 
-  // Find the one with lowest cost
+  // Find the lowest cost
   let lowestCost = Infinity;
-  let lowestCostChar = nonHiddenEnemies[0];
   for (const char of nonHiddenEnemies) {
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     if (topCard.chakra < lowestCost) {
       lowestCost = topCard.chakra;
-      lowestCostChar = char;
     }
   }
 
-  // Hide the selected character
-  const missions = [...state.activeMissions];
-  const m = { ...missions[sourceMissionIndex] };
-  const chars = [...m[enemySide]];
-  const idx = chars.findIndex(c => c.instanceId === lowestCostChar.instanceId);
-  if (idx !== -1) {
-    const targetName = chars[idx].card.name_fr;
-    chars[idx] = { ...chars[idx], isHidden: true };
-    m[enemySide] = chars;
-    missions[sourceMissionIndex] = m;
+  // Find all enemies with that lowest cost
+  const tiedChars = nonHiddenEnemies.filter(c => {
+    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    return topCard.chakra === lowestCost;
+  });
 
-    const newState = { ...state, activeMissions: missions };
-    const log = logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT_HIDE',
-      `Akamaru (029): Hid ${targetName} (lowest cost enemy in this mission, upgrade effect).`,
-      'game.log.effect.hide',
-      { card: 'AKAMARU', id: 'KS-029-UC', target: targetName },
-    );
+  // If exactly one: auto-hide
+  if (tiedChars.length === 1) {
+    const target = tiedChars[0];
+    const missions = [...state.activeMissions];
+    const m = { ...missions[sourceMissionIndex] };
+    const chars = [...m[enemySide]];
+    const idx = chars.findIndex(c => c.instanceId === target.instanceId);
+    if (idx !== -1) {
+      const targetName = chars[idx].card.name_fr;
+      chars[idx] = { ...chars[idx], isHidden: true };
+      m[enemySide] = chars;
+      missions[sourceMissionIndex] = m;
 
-    return { state: { ...newState, log } };
+      const newState = { ...state, activeMissions: missions };
+      const log = logAction(
+        newState.log, newState.turn, newState.phase, sourcePlayer,
+        'EFFECT_HIDE',
+        `Akamaru (029): Hid ${targetName} (lowest cost enemy in this mission, upgrade effect).`,
+        'game.log.effect.hide',
+        { card: 'AKAMARU', id: 'KS-029-UC', target: targetName },
+      );
+
+      return { state: { ...newState, log } };
+    }
+    return { state };
   }
 
-  return { state };
+  // Multiple enemies tied for lowest cost: the player chooses which to hide
+  const validTargets = tiedChars.map(c => c.instanceId);
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'AKAMARU029_CHOOSE_HIDE',
+    validTargets,
+    selectingPlayer: sourcePlayer,
+    description: `Akamaru (029): Choose which enemy character (cost ${lowestCost}) to hide.`,
+    descriptionKey: 'game.effect.desc.akamaru029ChooseHide',
+    descriptionParams: { cost: String(lowestCost) },
+    isMandatory: true,
+  };
 }
 
 export function registerAkamaru029Handlers(): void {

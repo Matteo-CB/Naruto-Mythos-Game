@@ -516,7 +516,8 @@
         "kabuto053ChooseDiscard": "Kabuto (053) AMELIORATION : Choisissez une carte de votre main a defausser.",
         "kiba026UpgradeReveal": "Kiba (026) AMELIORATION : Regardez les 3 cartes du dessus de votre deck pour trouver Akamaru.",
         "sasuke014UpgradeReveal": "Sasuke (014) AMELIORATION : Main adverse revelee.",
-        "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Initiative."
+        "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Initiative.",
+        "akamaru029ChooseHide": "Akamaru (029) : Choisissez quel personnage ennemi (cout {cost}) cacher."
       }
     },
     "anim": {
