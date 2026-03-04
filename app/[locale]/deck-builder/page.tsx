@@ -49,6 +49,7 @@ export default function DeckBuilderPage() {
     text: string;
   } | null>(null);
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
+  const [overwriteConflict, setOverwriteConflict] = useState<{ id: string; name: string } | null>(null);
 
   // Zustand store
   const deckName = useDeckBuilderStore((s) => s.deckName);
@@ -132,6 +133,15 @@ export default function DeckBuilderPage() {
 
   const handleSave = useCallback(async () => {
     setSaveError(null);
+    const trimmedName = (deckName || '').trim() || 'Untitled Deck';
+    // Check if another saved deck (not the one we're editing) has the same name
+    const conflict = savedDecks.find(
+      (d) => d.name.toLowerCase() === trimmedName.toLowerCase() && d.id !== loadedDeckId
+    );
+    if (conflict) {
+      setOverwriteConflict({ id: conflict.id, name: conflict.name });
+      return;
+    }
     try {
       await saveDeck();
     } catch (err: unknown) {
@@ -139,7 +149,22 @@ export default function DeckBuilderPage() {
         err instanceof Error ? err.message : t("deckBuilder.failedToSave");
       setSaveError(message);
     }
-  }, [saveDeck, t]);
+  }, [saveDeck, t, deckName, savedDecks, loadedDeckId]);
+
+  const handleOverwriteConfirm = useCallback(async () => {
+    if (!overwriteConflict) return;
+    setSaveError(null);
+    try {
+      await deleteDeck(overwriteConflict.id);
+      await saveDeck();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : t("deckBuilder.failedToSave");
+      setSaveError(message);
+    } finally {
+      setOverwriteConflict(null);
+    }
+  }, [overwriteConflict, deleteDeck, saveDeck, t]);
 
   const handleLoadDeck = useCallback(
     async (deckId: string) => {
@@ -1078,6 +1103,49 @@ export default function DeckBuilderPage() {
                 </button>
               )}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Overwrite confirmation modal */}
+      <AnimatePresence>
+        {overwriteConflict && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-200 flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setOverwriteConflict(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#141414] border border-[#333] p-6 max-w-sm w-full mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-[#e0e0e0] text-sm mb-1 font-medium">
+                {t('deckBuilder.overwriteTitle')}
+              </p>
+              <p className="text-[#888] text-xs mb-5">
+                {t('deckBuilder.overwriteDesc', { name: overwriteConflict.name })}
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setOverwriteConflict(null)}
+                  className="px-3 py-1.5 bg-[#1a1a1a] border border-[#333] text-[#888] text-xs hover:bg-[#222] transition-colors"
+                >
+                  {t('deckBuilder.overwriteCancel')}
+                </button>
+                <button
+                  onClick={handleOverwriteConfirm}
+                  className="px-3 py-1.5 bg-[#2a1a1a] border border-[#b33e3e]/30 text-[#b33e3e] text-xs hover:bg-[#3a1a1a] transition-colors"
+                >
+                  {t('deckBuilder.overwriteConfirm')}
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
