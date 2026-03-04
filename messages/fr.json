@@ -303,6 +303,11 @@
       "tayuya065UpgradeRevealTitle": "Tayuya — Flute demoniaque",
       "tayuya065UpgradeRevealDrawn": "Carte(s) Invocation ajoutee(s) en main !",
       "tayuya065UpgradeRevealNone": "Aucune carte Invocation trouvee. Cartes remises sur le dessus.",
+      "kiba026UpgradeRevealTitle": "Kiba (026) — Revelation du deck",
+      "kiba026UpgradeRevealFound": "Akamaru trouve ! Ajoute a la main.",
+      "kiba026UpgradeRevealNone": "Pas d'Akamaru. Cartes remises sur le dessus.",
+      "kiba026Match": "PIOCHE (Akamaru)",
+      "kiba026PutBack": "Remise sur le dessus",
       "tayuya065Summon": "PIOCHEE (Invocation)",
       "tayuya065PutBack": "Remise sur le dessus",
       "cardDiscarded": "DEFAUSSEE",
@@ -503,7 +508,15 @@
         "mss07MoveHidden": "Choisissez un personnage cache allie a deplacer.",
         "mss08ChooseCard": "Choisissez une carte de votre main a placer comme personnage cache.",
         "rockLeeEndMove": "Rock Lee : Choisissez une mission ou le deplacer (fin de round).",
-        "sasuke107ChooseDestination": "Sasuke (107) : Choisissez une mission pour y deplacer {target}."
+        "sasuke107ChooseDestination": "Sasuke (107) : Choisissez une mission pour y deplacer {target}.",
+        "gaara139HideSameName": "Gaara (139) AMELIORATION : Cachez un {target} ennemi avec un cout inferieur a {cost}.",
+        "gaara153Defeat": "Selectionnez un personnage ennemi avec un cout inferieur a {hiddenCount} a vaincre.",
+        "gaara153HideSameName": "Gaara (153) AMELIORATION : Cachez un {target} ennemi avec un cout inferieur a {cost}.",
+        "itachi091ChooseDiscard": "Itachi (091) AMELIORATION : Choisissez une carte de la main adverse a defausser.",
+        "kabuto053ChooseDiscard": "Kabuto (053) AMELIORATION : Choisissez une carte de votre main a defausser.",
+        "kiba026UpgradeReveal": "Kiba (026) AMELIORATION : Regardez les 3 cartes du dessus de votre deck pour trouver Akamaru.",
+        "sasuke014UpgradeReveal": "Sasuke (014) AMELIORATION : Main adverse revelee.",
+        "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Initiative."
       }
     },
     "anim": {

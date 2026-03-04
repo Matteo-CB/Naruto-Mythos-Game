@@ -618,7 +618,8 @@ export function TargetSelector() {
           <div className="flex flex-wrap gap-3 mb-6 justify-center" style={{ maxWidth: '720px' }}>
             {cards.map((card, idx) => {
               const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
-              const borderColor = card.isSummon ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#555555';
+              const isHighlight = card.isSummon || card.isMatch;
+              const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#555555';
               return (
                 <motion.div
                   key={idx}
@@ -632,7 +633,7 @@ export function TargetSelector() {
                     borderRadius: '8px',
                     overflow: 'hidden',
                     border: `2px solid ${borderColor}`,
-                    boxShadow: card.isSummon
+                    boxShadow: isHighlight
                       ? `0 0 20px ${borderColor}40, 0 4px 16px rgba(0, 0, 0, 0.6)`
                       : card.isDiscarded
                         ? `0 0 16px rgba(179, 62, 62, 0.4), 0 4px 16px rgba(0, 0, 0, 0.6)`
@@ -664,9 +665,9 @@ export function TargetSelector() {
                     <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
                       {card.name_fr}
                     </div>
-                    {(card.isSummon || card.isDiscarded) && (
-                      <div className="text-[9px] mt-0.5" style={{ color: card.isSummon ? '#4aff6b' : '#b33e3e' }}>
-                        {card.isSummon ? t('game.effect.tayuya065Summon') : t('game.effect.cardDiscarded')}
+                    {(isHighlight || card.isDiscarded) && (
+                      <div className="text-[9px] mt-0.5" style={{ color: isHighlight ? '#4aff6b' : '#b33e3e' }}>
+                        {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : t('game.effect.cardDiscarded')}
                       </div>
                     )}
                   </div>
