@@ -93,7 +93,16 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
   };
 }
 
+/**
+ * UPGRADE: POWERUP 2 the character played with the MAIN effect.
+ * This is a no-op handler because the POWERUP 2 is already applied
+ * in hiruzen002PlaceCard when pending.isUpgrade is true.
+ */
+function handleHiruzen002Upgrade(ctx: EffectContext): EffectResult {
+  return { state: ctx.state };
+}
+
 export function registerHandler(): void {
   registerEffect('KS-002-UC', 'MAIN', handleHiruzen002Main);
-  registerEffect('KS-002-UC', 'UPGRADE', handleHiruzen002Main);
+  registerEffect('KS-002-UC', 'UPGRADE', handleHiruzen002Upgrade);
 }
