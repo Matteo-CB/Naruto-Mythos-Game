@@ -329,6 +329,46 @@ export default function Home() {
               )}
             </motion.nav>
 
+            {/* Training mode (only visible to testers/admins) */}
+            {session && (['tester', 'admin'].includes((session.user as Record<string, unknown>)?.role as string)) && (
+              <motion.div
+                className="mt-2 w-full"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 1.34, ease: 'easeOut' }}
+              >
+                <Link
+                  href="/play/training"
+                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                  style={{
+                    backgroundColor: '#141414',
+                    border: '1px solid #22c55e',
+                    color: '#22c55e',
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1.03)';
+                    target.style.borderColor = '#22c55e';
+                    target.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.15)';
+                    target.style.backgroundColor = '#1a1a1a';
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1)';
+                    target.style.borderColor = '#22c55e';
+                    target.style.boxShadow = 'none';
+                    target.style.backgroundColor = '#141414';
+                  }}
+                >
+                  <span
+                    className="absolute left-0 top-0 h-full w-1"
+                    style={{ backgroundColor: '#22c55e' }}
+                  />
+                  {t('training')}
+                </Link>
+              </motion.div>
+            )}
+
             {/* Admin link (only visible to admin) */}
             {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
               <motion.div

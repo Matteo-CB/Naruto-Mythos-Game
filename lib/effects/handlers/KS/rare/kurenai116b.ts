@@ -24,9 +24,9 @@ function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 4
+  // Find enemies with effective power <= 4 (hidden chars have power 0, so they qualify)
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 4)
+    .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 4)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {
@@ -71,6 +71,7 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[i];
     const friendlyChars = mission[friendlySide];
     const hasSameName = friendlyChars.some((c) => {
+      if (c.isHidden) return false; // Hidden chars are anonymous — name not revealed
       const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return tc.name_fr === charName;
     });

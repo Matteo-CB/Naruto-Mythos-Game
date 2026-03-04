@@ -86,7 +86,12 @@ function handleHaku089Main(ctx: EffectContext): EffectResult {
   return { state: { ...newState, log } };
 }
 
+function handleHaku089UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to discard from own deck instead.
+  return { state: ctx.state };
+}
+
 export function registerHaku089Handlers(): void {
   registerEffect('KS-089-UC', 'MAIN', handleHaku089Main);
-  registerEffect('KS-089-UC', 'UPGRADE', handleHaku089Main);
+  registerEffect('KS-089-UC', 'UPGRADE', handleHaku089UpgradeNoop);
 }

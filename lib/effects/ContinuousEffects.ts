@@ -134,6 +134,7 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
     const hasKeyword = chars.some(
       (c) => {
         if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
+        if (c.isHidden) return false; // Hidden chars are anonymous — can't identify keyword
         const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         return (top.keywords ?? []).includes(keyword) && c.controlledBy === player;
       },

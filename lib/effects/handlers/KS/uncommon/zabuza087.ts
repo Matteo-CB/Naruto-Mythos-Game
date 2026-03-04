@@ -101,7 +101,12 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
   return { state: newState };
 }
 
+function handleZabuza087UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to defeat instead of hide.
+  return { state: ctx.state };
+}
+
 export function registerZabuza087Handlers(): void {
   registerEffect('KS-087-UC', 'MAIN', handleZabuza087Main);
-  registerEffect('KS-087-UC', 'UPGRADE', handleZabuza087Main);
+  registerEffect('KS-087-UC', 'UPGRADE', handleZabuza087UpgradeNoop);
 }

@@ -82,7 +82,7 @@ export interface PlayerState {
   id: PlayerID;
   userId: string | null;
   isAI: boolean;
-  aiDifficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  aiDifficulty?: 'easy' | 'medium' | 'hard' | 'impossible';
   deck: CharacterCard[];
   hand: CharacterCard[];
   discardPile: CharacterCard[];
@@ -254,7 +254,7 @@ export type GameAction =
 export interface PlayerConfig {
   userId: string | null;
   isAI: boolean;
-  aiDifficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  aiDifficulty?: 'easy' | 'medium' | 'hard' | 'impossible';
   deck: CharacterCard[];
   missionCards: MissionCard[];
 }

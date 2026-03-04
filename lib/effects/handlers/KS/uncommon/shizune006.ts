@@ -18,24 +18,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 function handleShizune006Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
-
-  let newState = { ...state };
-
-  // UPGRADE bonus: Gain 2 Chakra
-  if (isUpgrade) {
-    const ps = { ...newState[sourcePlayer] };
-    ps.chakra += 2;
-    newState[sourcePlayer] = ps;
-
-    newState = { ...newState, log: logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT_CHAKRA',
-      'Shizune (006): Gained 2 Chakra (upgrade effect).',
-      'game.log.effect.gainChakra',
-      { card: 'SHIZUNE', id: 'KS-006-UC', amount: 2 },
-    ) };
-  }
+  const { state, sourcePlayer } = ctx;
 
   // MAIN: Move an enemy character with Power 3 or less
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
@@ -43,24 +26,22 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   const validTargets: string[] = [];
-  for (const mission of newState.activeMissions) {
+  for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
-      if (getEffectivePower(newState, char, opponentPlayer) <= 3) {
+      if (getEffectivePower(state, char, opponentPlayer) <= 3) {
         validTargets.push(char.instanceId);
       }
     }
   }
 
-  // If no valid targets, effect fizzles (but upgrade chakra already applied)
   if (validTargets.length === 0) {
-    return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shizune (006): No enemy character with Power 3 or less in play to move.',
       'game.log.effect.noTarget', { card: 'SHIZUNE', id: 'KS-006-UC' }) } };
   }
 
-  // Requires target selection: which enemy to move (and then which mission to move to)
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
     targetSelectionType: 'MOVE_ENEMY_POWER_3_OR_LESS',
     validTargets,
@@ -69,7 +50,21 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
   };
 }
 
+function handleShizune006Upgrade(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer } = ctx;
+  const ps = { ...state[sourcePlayer] };
+  ps.chakra += 2;
+  const newState = { ...state, [sourcePlayer]: ps };
+  return { state: { ...newState, log: logAction(
+    newState.log, newState.turn, newState.phase, sourcePlayer,
+    'EFFECT_CHAKRA',
+    'Shizune (006): Gained 2 Chakra (upgrade effect).',
+    'game.log.effect.gainChakra',
+    { card: 'SHIZUNE', id: 'KS-006-UC', amount: 2 },
+  ) } };
+}
+
 export function registerShizune006Handlers(): void {
   registerEffect('KS-006-UC', 'MAIN', handleShizune006Main);
-  registerEffect('KS-006-UC', 'UPGRADE', handleShizune006Main);
+  registerEffect('KS-006-UC', 'UPGRADE', handleShizune006Upgrade);
 }

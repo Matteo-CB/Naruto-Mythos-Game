@@ -124,7 +124,12 @@ function transferPowerTokens(
   return newState;
 }
 
+function handleKisame093UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to steal ALL tokens instead of 2.
+  return { state: ctx.state };
+}
+
 export function registerHandler(): void {
   registerEffect('KS-093-UC', 'MAIN', handleKisame093Main);
-  registerEffect('KS-093-UC', 'UPGRADE', handleKisame093Main);
+  registerEffect('KS-093-UC', 'UPGRADE', handleKisame093UpgradeNoop);
 }

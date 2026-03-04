@@ -67,7 +67,12 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
   };
 }
 
+function handleKakashi016UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to remove cost limit.
+  return { state: ctx.state };
+}
+
 export function registerKakashi016Handlers(): void {
   registerEffect('KS-016-UC', 'MAIN', handleKakashi016Main);
-  registerEffect('KS-016-UC', 'UPGRADE', handleKakashi016Main);
+  registerEffect('KS-016-UC', 'UPGRADE', handleKakashi016UpgradeNoop);
 }

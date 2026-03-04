@@ -21,8 +21,9 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Count total characters in this mission (both sides, including hidden)
-  const totalChars = mission.player1Characters.length + mission.player2Characters.length;
+  // Count total non-hidden characters in this mission (both sides)
+  const totalChars = mission.player1Characters.filter(c => !c.isHidden).length
+    + mission.player2Characters.filter(c => !c.isHidden).length;
 
   if (totalChars === 0) {
     // Should not happen since at least Jirobo himself is there

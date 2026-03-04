@@ -85,7 +85,7 @@ export const useUIStore = create<UIStore>((set) => ({
   selectedMissionIndex: null,
   selectedTargetId: null,
   // Selecting a hand card clears any hidden-character reveal selection (they are mutually exclusive).
-  selectCard: (index) => set({ selectedCardIndex: index, selectedTargetId: null }),
+  selectCard: (index) => set({ selectedCardIndex: index, selectedTargetId: null, selectedMissionIndex: null }),
   selectMission: (index) => set({ selectedMissionIndex: index }),
   // Selecting a hidden character for reveal clears any hand-card/mission selection (mutually exclusive).
   selectTarget: (id) => set({ selectedTargetId: id, selectedCardIndex: null, selectedMissionIndex: null }),

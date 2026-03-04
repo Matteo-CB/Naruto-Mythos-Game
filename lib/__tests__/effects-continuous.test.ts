@@ -122,7 +122,7 @@ describe('Chakra Bonuses', () => {
       });
 
       const bonus = calculateContinuousChakraBonus(state, 'player1', 0, tayuya);
-      expect(bonus).toBe(2); // 2 missions with Sound Four
+      expect(bonus).toBe(1); // 1 mission with Sound Four (Tayuya excludes self from count)
     });
   });
 

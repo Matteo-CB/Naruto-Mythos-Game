@@ -439,12 +439,13 @@ function handleUpgradeCharacter(
     ? existingChar.stack[existingChar.stack.length - 1]
     : existingChar.card;
 
-  // When upgrading over a hidden character, pay the full cost of the new card
+  // When upgrading over a hidden character, pay the full effective cost of the new card
   // (this combines the hidden reveal cost + upgrade diff in one action).
   // When upgrading over a visible character, pay only the chakra diff.
+  // Use calculateEffectiveCost to apply cost reductions (e.g. Kurenai 034 Team 8 -1).
   const isHiddenUpgrade = existingChar.isHidden;
-  const costDiff = isHiddenUpgrade ? newCard.chakra : newCard.chakra - existingTopCard.chakra;
-  if (costDiff <= 0) return state;
+  const effectiveNewCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
+  const costDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
 
   // Pay cost
   const ps = { ...playerState };

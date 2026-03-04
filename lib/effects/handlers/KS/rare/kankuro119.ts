@@ -24,9 +24,9 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 3
+  // Find enemies with effective power <= 3 (hidden chars have power 0, so they qualify)
   const validTargets: string[] = enemyChars
-    .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 3)
+    .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {

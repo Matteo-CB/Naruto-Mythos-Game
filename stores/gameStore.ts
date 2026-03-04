@@ -81,7 +81,7 @@ interface GameStore {
   updateOnlineState: (visibleState: VisibleGameState) => void;
   endOnlineGame: (winner: string) => void;
   performAction: (action: GameAction) => void;
-  processAITurn: () => void;
+  processAITurn: () => void | Promise<void>;
   addAnimation: (event: Omit<AnimationEvent, 'id' | 'timestamp'>) => void;
   completeAnimation: (id: string) => void;
   setAnimating: (animating: boolean) => void;
@@ -866,7 +866,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
         } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => get().processAITurn(), 500);
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           set({ isProcessing: false });
         }
@@ -1177,14 +1179,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Delay scales with whether there was an animation
       const delay = animEvent ? 1000 : 500;
       setTimeout(() => {
-        get().processAITurn();
+        void get().processAITurn();
       }, delay);
     } else {
       set({ isProcessing: false });
     }
   },
 
-  processAITurn: () => {
+  processAITurn: async () => {
     const { gameState, humanPlayer, aiPlayer, addAnimation } = get();
     if (!gameState || !aiPlayer) {
       set({ isProcessing: false });
@@ -1205,7 +1207,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (gs.pendingEffects.length > 0 && gs.pendingActions.length === 0) {
           set({ gameState: { ...gs, pendingEffects: [] } });
         }
-        get().processAITurn();
+        void get().processAITurn();
       }
     }, 8000);
 
@@ -1234,13 +1236,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 const parsed = JSON.parse(pendingEffectForOpt.effectDescription);
                 const revealCost = parsed.revealCost ?? 0;
                 const aiChakra = currentState[aiPlayer.player].chakra;
-                // Easy: always decline, Medium: decline if cost > 60% chakra, Hard/Expert: decline if cost > 80% chakra
+                // Easy: always decline, Medium: decline if cost > 60% chakra, Hard/Impossible: decline if cost > 80% chakra
                 if (aiPlayer.difficulty === 'easy') {
                   shouldDecline = true;
                 } else if (aiPlayer.difficulty === 'medium') {
                   shouldDecline = revealCost > aiChakra * 0.6 || revealCost >= aiChakra;
                 } else {
-                  // Hard/Expert: decline if paying would leave very little chakra
+                  // Hard/Impossible: decline if paying would leave very little chakra
                   shouldDecline = revealCost >= aiChakra || (aiChakra - revealCost) < 2;
                 }
               } catch { shouldDecline = Math.random() < 0.5; }
@@ -1322,7 +1324,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
         }
 
-        const aiAction = aiPlayer.getAction(currentState);
+        const aiAction = await aiPlayer.getActionAsync(currentState);
         if (!aiAction) break;
 
         // Capture animation for this AI action
@@ -1410,7 +1412,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
         } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => get().processAITurn(), 500);
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           set({ isProcessing: false });
         }
@@ -1689,7 +1693,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       setTimeout(() => {
         const s = get();
         if (s.gameState && !s.isProcessing && !s.gameOver && s.isAIGame) {
-          get().processAITurn();
+          void get().processAITurn();
         }
       }, 1000);
     }

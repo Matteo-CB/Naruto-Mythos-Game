@@ -76,7 +76,12 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
   return { state: { ...state, activeMissions: missions, log } };
 }
 
+function handleJirobo058UpgradeNoop(ctx: EffectContext): EffectResult {
+  // No-op: MAIN handler already checks isUpgrade to expand scope to all missions.
+  return { state: ctx.state };
+}
+
 export function registerJirobo058Handlers(): void {
   registerEffect('KS-058-UC', 'MAIN', handleJirobo058Main);
-  registerEffect('KS-058-UC', 'UPGRADE', handleJirobo058Main);
+  registerEffect('KS-058-UC', 'UPGRADE', handleJirobo058UpgradeNoop);
 }

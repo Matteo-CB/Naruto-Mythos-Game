@@ -40,6 +40,7 @@
     "admin": "Administration",
     "signOut": "Se deconnecter",
     "sealed": "Scellé",
+    "training": "Mode Entrainement",
     "settings": "Parametres"
   },
   "settings": {
@@ -671,8 +672,8 @@
       "mediumDesc": "Strategie gourmande",
       "hard": "Difficile",
       "hardDesc": "Evaluation strategique",
-      "expert": "Expert",
-      "expertDesc": "Tactiques avancees"
+      "impossible": "Impossible",
+      "impossibleDesc": "Reseau de neurones — quasi-imbattable"
     },
     "startGame": "Lancer la Partie",
     "selectDifficultyDesc": "Selectionnez la difficulte et lancez un match",

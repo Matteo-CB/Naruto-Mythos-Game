@@ -106,6 +106,7 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     const friendlyChars = mission[friendlySide];
     const hasSameName = friendlyChars.some((c) => {
       if (c.instanceId === sourceCard.instanceId) return false;
+      if (c.isHidden) return false; // Hidden chars are anonymous — name not revealed
       const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return tc.name_fr === charName;
     });

@@ -27,7 +27,7 @@ export default function PlayAIPage() {
     { key: 'easy' as AIDifficulty, label: t('playAI.difficulties.easy'), description: t('playAI.difficulties.easyDesc') },
     { key: 'medium' as AIDifficulty, label: t('playAI.difficulties.medium'), description: t('playAI.difficulties.mediumDesc') },
     { key: 'hard' as AIDifficulty, label: t('playAI.difficulties.hard'), description: t('playAI.difficulties.hardDesc') },
-    { key: 'expert' as AIDifficulty, label: t('playAI.difficulties.expert'), description: t('playAI.difficulties.expertDesc') },
+    { key: 'impossible' as AIDifficulty, label: t('playAI.difficulties.impossible'), description: t('playAI.difficulties.impossibleDesc') },
   ];
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
