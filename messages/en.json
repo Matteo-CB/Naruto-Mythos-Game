@@ -620,6 +620,10 @@
     "power": "Power",
     "addToDeck": "Add to Deck",
     "maxCopiesRule": "Max 2 copies of the same version",
+    "overwriteTitle": "A deck with this name already exists",
+    "overwriteDesc": "Do you want to replace \"{name}\" with the current deck?",
+    "overwriteConfirm": "Replace",
+    "overwriteCancel": "Cancel",
     "error": {
       "maxCopies": "Max {max} copies of {name}",
       "maxMissions": "Max {max} missions",
