@@ -10,6 +10,7 @@ import { validatePlayCharacter, validatePlayHidden } from '@/lib/engine/rules/Pl
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
+import { useTrainingStore } from '@/stores/trainingStore';
 
 interface AnimationEvent {
   id: string;
@@ -662,6 +663,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
+    // Disable training mode when starting a normal AI game
+    // (training page will re-enable it explicitly after calling startAIGame)
+    useTrainingStore.getState().disable();
+
     const state = GameEngine.createGame(config);
     const humanPlayer: PlayerID = config.player1.isAI ? 'player2' : 'player1';
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
