@@ -91,6 +91,17 @@ export default function DeckBuilderPage() {
     loadSavedDecks();
   }, [loadSavedDecks]);
 
+  // Auto-load deck from manage page (sessionStorage)
+  useEffect(() => {
+    try {
+      const pendingId = sessionStorage.getItem('loadDeckId');
+      if (pendingId && availableChars.length > 0 && availableMissions.length > 0) {
+        sessionStorage.removeItem('loadDeckId');
+        loadDeck(pendingId, availableChars, availableMissions);
+      }
+    } catch { /* SSR / privacy */ }
+  }, [availableChars, availableMissions, loadDeck]);
+
   // Auto-clear add error after 3 seconds
   useEffect(() => {
     if (addError) {
