@@ -476,6 +476,10 @@ export class GameEngine {
           const mission_g = newState.activeMissions[mi];
           const validTargets_g: string[] = [];
           for (const c of mission_g[enemySide_g]) {
+            if (c.isHidden) {
+              validTargets_g.push(c.instanceId); // hidden = power 0 ≤ 1
+              continue;
+            }
             const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
             const power = (topCard.power ?? 0) + c.powerTokens;
             if (power <= 1) validTargets_g.push(c.instanceId);
