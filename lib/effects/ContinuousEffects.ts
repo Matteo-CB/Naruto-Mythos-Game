@@ -64,7 +64,7 @@ export function calculateContinuousChakraBonus(
 
     // Tayuya 064: CHAKRA +X, X = missions with friendly Sound Four
     if (topCard.id === 'KS-064-C' || topCard.number === 64) {
-      const soundFourMissions = countMissionsWithKeyword(state, player, 'Sound Four');
+      const soundFourMissions = countMissionsWithKeyword(state, player, 'Sound Four', char.instanceId);
       bonus += soundFourMissions;
     }
 
@@ -127,12 +127,13 @@ export function calculateMissionChakraBonus(state: GameState, player: PlayerID):
 /**
  * Count missions where a player has at least one character with a given keyword.
  */
-function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: string): number {
+function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: string, excludeInstanceId?: string): number {
   let count = 0;
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     const hasKeyword = chars.some(
       (c) => {
+        if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
         const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         return (top.keywords ?? []).includes(keyword) && c.controlledBy === player;
       },
