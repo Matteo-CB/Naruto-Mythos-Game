@@ -373,8 +373,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 014/130 - SASUKE UCHIWA (UC) - "Sharingan"
   'KS-014-UC': [
-    'Regardez une carte aleatoire dans la main de l\'adversaire.',
-    'Defaussez la carte regardee et l\'adversaire pioche une carte.',
+    'Regardez la main de l\'adversaire.',
+    'De plus, defaussez 1 carte. Si vous le faites, choisissez 1 carte dans la main de l\'adversaire et defaussez-la.',
   ],
 
   // 016/130 - KAKASHI HATAKE (UC) - "Ninja Copieur"
