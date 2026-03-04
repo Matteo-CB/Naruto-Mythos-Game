@@ -30,7 +30,7 @@ interface PendingTargetSelection {
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
-  revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Sasuke 014, Itachi 091)
+  revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
@@ -484,13 +484,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
       const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
 
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Tayuya 065, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
       const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
       const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
+      const isKiba026Reveal = pendingEffect?.targetSelectionType === 'KIBA026_UPGRADE_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
       let revealedCards: PendingTargetSelection['revealedCards'];
       if (isInfoReveal && pendingEffect) {
@@ -566,6 +567,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               power: c.power,
               image_file: c.image_file,
               isSummon: c.isSummon,
+            }));
+          } else if (isKiba026Reveal) {
+            revealedCard = {
+              name_fr: 'Kiba Inuzuka',
+              chakra: 0,
+              power: 0,
+              canSteal: false,
+              revealTitleKey: 'game.effect.kiba026UpgradeRevealTitle',
+              revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
+                ? 'game.effect.kiba026UpgradeRevealFound'
+                : 'game.effect.kiba026UpgradeRevealNone',
+            };
+            revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isMatch: c.isMatch,
             }));
           }
         } catch { /* ignore */ }
@@ -986,13 +1005,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
       const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
 
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
+      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
       const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
       const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
       const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
       const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
       const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal;
+      const isKiba026Reveal = pendingEffect?.targetSelectionType === 'KIBA026_UPGRADE_REVEAL';
+      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
       let revealedCard: PendingTargetSelection['revealedCard'];
       let revealedCards: PendingTargetSelection['revealedCards'];
       if (isInfoReveal && pendingEffect) {
@@ -1068,6 +1088,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               power: c.power,
               image_file: c.image_file,
               isSummon: c.isSummon,
+            }));
+          } else if (isKiba026Reveal) {
+            revealedCard = {
+              name_fr: 'Kiba Inuzuka',
+              chakra: 0,
+              power: 0,
+              canSteal: false,
+              revealTitleKey: 'game.effect.kiba026UpgradeRevealTitle',
+              revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
+                ? 'game.effect.kiba026UpgradeRevealFound'
+                : 'game.effect.kiba026UpgradeRevealNone',
+            };
+            revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
+              name_fr: c.name_fr,
+              chakra: c.chakra,
+              power: c.power,
+              image_file: c.image_file,
+              isMatch: c.isMatch,
             }));
           }
         } catch { /* ignore */ }

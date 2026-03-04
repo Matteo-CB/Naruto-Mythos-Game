@@ -303,6 +303,11 @@
       "tayuya065UpgradeRevealTitle": "Tayuya — Demon Flute",
       "tayuya065UpgradeRevealDrawn": "Summon card(s) added to hand!",
       "tayuya065UpgradeRevealNone": "No Summon cards found. Cards put back on top.",
+      "kiba026UpgradeRevealTitle": "Kiba (026) — Deck Reveal",
+      "kiba026UpgradeRevealFound": "Found Akamaru! Drew to hand.",
+      "kiba026UpgradeRevealNone": "No Akamaru found. Cards put back on top.",
+      "kiba026Match": "DRAWN (Akamaru)",
+      "kiba026PutBack": "Put back on top",
       "tayuya065Summon": "DRAWN (Summon)",
       "tayuya065PutBack": "Put back on top",
       "cardDiscarded": "DISCARDED",
@@ -503,7 +508,15 @@
         "mss07MoveHidden": "Choose a hidden friendly character to move.",
         "mss08ChooseCard": "Choose a card from your hand to place as a hidden character.",
         "rockLeeEndMove": "Rock Lee: Choose a mission to move to (end of round).",
-        "sasuke107ChooseDestination": "Sasuke (107): Choose a mission to move {target} to."
+        "sasuke107ChooseDestination": "Sasuke (107): Choose a mission to move {target} to.",
+        "gaara139HideSameName": "Gaara (139) UPGRADE: Hide an enemy {target} with cost less than {cost}.",
+        "gaara153Defeat": "Select an enemy character with cost less than {hiddenCount} to defeat.",
+        "gaara153HideSameName": "Gaara (153) UPGRADE: Hide an enemy {target} with cost less than {cost}.",
+        "itachi091ChooseDiscard": "Itachi (091) UPGRADE: Choose a card from opponent's hand to discard.",
+        "kabuto053ChooseDiscard": "Kabuto (053) UPGRADE: Choose a card from your hand to discard.",
+        "kiba026UpgradeReveal": "Kiba (026) UPGRADE: Looking at top 3 cards of your deck for Akamaru.",
+        "sasuke014UpgradeReveal": "Sasuke (014) UPGRADE: Opponent's hand revealed.",
+        "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token."
       }
     },
     "anim": {
