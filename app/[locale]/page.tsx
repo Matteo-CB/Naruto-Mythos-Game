@@ -329,8 +329,8 @@ export default function Home() {
               )}
             </motion.nav>
 
-            {/* Training mode (only visible to testers/admins) */}
-            {session && (['tester', 'admin'].includes((session.user as Record<string, unknown>)?.role as string)) && (
+            {/* Training mode (visible to all logged-in users) */}
+            {session && (
               <motion.div
                 className="mt-2 w-full"
                 initial={{ opacity: 0, x: -20 }}
