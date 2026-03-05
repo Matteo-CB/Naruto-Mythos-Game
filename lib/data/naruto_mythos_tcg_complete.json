@@ -2051,7 +2051,9 @@
     "title_fr": "",
     "rarity": "R",
     "card_type": "character",
-    "has_visual": false
+    "has_visual": true,
+    "image_file": "images/cards/KS/rare/KS-115-R.webp",
+    "image_url": "/images/cards/KS/rare/KS-115-R.webp"
   },
   {
     "id": "116/130",
@@ -3172,5 +3174,71 @@
     "limited_edition": 1000,
     "image_file": "images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp",
     "image_url": "/images/legendary/LEGENDARY_NARUTO_UZUMAKI.webp"
+  },
+  {
+    "id": "104/MV",
+    "number": 104,
+    "name_fr": "TSUNADE",
+    "title_fr": "Sannin Légendaire",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-104-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-104-MV.webp"
+  },
+  {
+    "id": "113/MV",
+    "number": 113,
+    "name_fr": "KIBA INUZUKA",
+    "title_fr": "Crocs sur crocs",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-113-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-113-MV.webp"
+  },
+  {
+    "id": "120/MV",
+    "number": 120,
+    "name_fr": "GAARA",
+    "title_fr": "Cercueil de Sable",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-120-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-120-MV.webp"
+  },
+  {
+    "id": "128/MV",
+    "number": 128,
+    "name_fr": "ITACHI UCHIWA",
+    "title_fr": "Amaterasu",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-128-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-128-MV.webp"
+  },
+  {
+    "id": "111/MV",
+    "number": 111,
+    "name_fr": "SHIKAMARU NARA",
+    "title_fr": "Étranglement de l'ombre",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-111-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-111-MV.webp"
+  },
+  {
+    "id": "117/MV",
+    "number": 117,
+    "name_fr": "ROCK LEE",
+    "title_fr": "Poing de l'ivresse",
+    "rarity": "MV",
+    "card_type": "character",
+    "has_visual": true,
+    "image_file": "images/cards/KS/mythos_v/KS-117-MV.webp",
+    "image_url": "/images/cards/KS/mythos_v/KS-117-MV.webp"
   }
 ]

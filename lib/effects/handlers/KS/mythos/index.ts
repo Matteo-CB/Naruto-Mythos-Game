@@ -29,9 +29,9 @@ export function registerAllMythosHandlers(): void {
   registerSasuke146();             // 146/130 - SASUKE: Give Edge, POWERUP 3
   registerSakura147();             // 147/130 - SAKURA: [continuous] CHAKRA +2 if no Edge
   registerKakashi148Handlers();    // 148/130 - KAKASHI: Gain Edge / AMBUSH copy Team 7 effect
-  registerKiba149Handlers();       // 149/130 - KIBA: Hide Akamaru+another / UPGRADE defeat both
-  registerShikamaru150Handlers();  // 150/130 - SHIKAMARU: [continuous] block hidden / UPGRADE hide P3
-  registerRockLee151Handlers();    // 151/130 - ROCK LEE: [continuous] must move / UPGRADE discard POWERUP
-  registerItachi152Handlers();     // 152/130 - ITACHI: [continuous] enemy -1 Power / UPGRADE move friendly
-  registerGaara153Handlers();      // 153/130 - GAARA: Defeat P1 all missions / UPGRADE POWERUP X
+  registerKiba149Handlers();       // 113/130 V - KIBA MV: Hide Akamaru+another / UPGRADE defeat both
+  registerShikamaru150Handlers();  // 111/130 V - SHIKAMARU MV: [continuous] block hidden / UPGRADE hide P3
+  registerRockLee151Handlers();    // 117/130 V - ROCK LEE MV: [continuous] must move / UPGRADE discard POWERUP
+  registerItachi152Handlers();     // 128/130 V - ITACHI MV: [continuous] enemy -1 Power / UPGRADE move friendly
+  registerGaara153Handlers();      // 120/130 V - GAARA MV: registered in gaara120.ts (same effects as R)
 }

@@ -128,4 +128,6 @@ function gaara120UpgradeHandler(ctx: EffectContext): EffectResult {
 export function registerGaara120Handlers(): void {
   registerEffect('KS-120-R', 'MAIN', gaara120MainHandler);
   registerEffect('KS-120-R', 'UPGRADE', gaara120UpgradeHandler);
+  registerEffect('KS-120-MV', 'MAIN', gaara120MainHandler);
+  registerEffect('KS-120-MV', 'UPGRADE', gaara120UpgradeHandler);
 }

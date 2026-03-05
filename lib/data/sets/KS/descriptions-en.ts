@@ -569,6 +569,11 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.',
     'POWERUP X.',
   ],
+  // 104 - TSUNADE (MV) - "Legendary Sannin"
+  'KS-104-MV': [
+    'Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.',
+    'POWERUP X.',
+  ],
 
   // 105/130 - JIRAIYA (R) - "Earth Style: Mud Wall"
   'KS-105-R': [
@@ -885,34 +890,34 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Copy a non-upgrade instant effect of another friendly Team 7 character in play.',
   ],
 
-  // 149/130 - KIBA INUZUKA (MV) - "Fang Over Fang"
-  'KS-149-MV': [
+  // 113/130 V - KIBA INUZUKA (MV) - "Fang Over Fang"
+  'KS-113-MV': [
     'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
     'MAIN effect: Instead, defeat both of them.',
   ],
 
-  // 150/130 - SHIKAMARU NARA (MV) - "Shadow Strangle Jutsu"
-  'KS-150-MV': [
+  // 111/130 V - SHIKAMARU NARA (MV) - "Shadow Strangle Jutsu"
+  'KS-111-MV': [
     '[⧗] The opponent cannot play characters while hidden in this mission.',
     'Hide an enemy character with Power 3 or less in this mission.',
   ],
 
-  // 151/130 - ROCK LEE (MV) - "Loopy Fist"
-  'KS-151-MV': [
+  // 117/130 V - ROCK LEE (MV) - "Loopy Fist"
+  'KS-117-MV': [
     '[⧗] At the end of the round, you must move this character to another mission, if able.',
     'Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.',
   ],
 
-  // 152/130 - ITACHI UCHIHA (MV) - "Amaterasu"
-  'KS-152-MV': [
+  // 128/130 V - ITACHI UCHIHA (MV) - "Amaterasu"
+  'KS-128-MV': [
     'Move a friendly character in play.',
     '[⧗] Every enemy character in this mission has -1 Power.',
   ],
 
-  // 153/130 - GAARA (MV) - "Sand Burial"
-  'KS-153-MV': [
-    'Defeat an enemy character with a cost less than the number of friendly hidden characters in play.',
-    'MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character.',
+  // 120/130 V - GAARA (MV) - "Sand Coffin"
+  'KS-120-MV': [
+    'Defeat up to 1 enemy character with Power 1 or less in every mission.',
+    'POWERUP X, where X is the number of characters defeated by the MAIN effect.',
   ],
 
   // =====================
