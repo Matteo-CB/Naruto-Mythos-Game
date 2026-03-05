@@ -22,6 +22,7 @@ model User {
   role              String       @default("user")
   badgePrefs        String[]     @default([])
   animationsEnabled Boolean      @default(true)
+  gameBackground    String       @default("default")
   resetToken        String?
   resetTokenExpiry  DateTime?
   createdAt         DateTime     @default(now())
@@ -145,4 +146,12 @@ model SiteSettings {
   key            String  @unique
   leaguesEnabled Boolean @default(false)
   sealedEnabled   Boolean @default(false) @map("draftEnabled")
+}
+
+model GameBackground {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  url       String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
 }

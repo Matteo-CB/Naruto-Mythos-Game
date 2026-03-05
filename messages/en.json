@@ -1622,6 +1622,7 @@
     "home": "Home",
     "tabSettings": "Settings",
     "tabCards": "Cards",
+    "tabBackgrounds": "Backgrounds",
     "tabBugs": "Bug Reports",
     "unauthorized": "Unauthorized",
     "leagues": {
@@ -1660,6 +1661,24 @@
       "added": "Tester added",
       "removed": "Tester removed",
       "notFound": "User not found"
+    },
+    "backgrounds": {
+      "title": "Game Backgrounds",
+      "description": "Upload and manage backgrounds players can choose for their game board.",
+      "uploadLabel": "Upload New Background",
+      "nameLabel": "Background Name",
+      "namePlaceholder": "e.g. Forest Night",
+      "fileLabel": "Image File",
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "delete": "Delete",
+      "confirmDelete": "Delete this background?",
+      "noBackgrounds": "No backgrounds uploaded yet.",
+      "uploadSuccess": "Background uploaded",
+      "uploadError": "Upload failed",
+      "deleteSuccess": "Background deleted",
+      "deleteError": "Delete failed",
+      "default": "Default"
     },
     "actionLog": "Action Log",
     "sealed": {
