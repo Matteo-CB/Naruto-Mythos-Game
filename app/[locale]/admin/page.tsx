@@ -510,6 +510,70 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* ============ BACKGROUNDS TAB ============ */}
+        {tab === 'backgrounds' && (
+          <div className="max-w-2xl">
+            <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#888888' }}>{t('backgrounds.title')}</h2>
+              <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('backgrounds.description')}</p>
+
+              {/* Upload form */}
+              <div className="flex flex-col gap-3 mb-6 p-4 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('backgrounds.uploadLabel')}</label>
+                <input
+                  type="text"
+                  value={bgName}
+                  onChange={(e) => setBgName(e.target.value)}
+                  placeholder={t('backgrounds.namePlaceholder')}
+                  className="px-3 py-2 text-sm rounded"
+                  style={{ backgroundColor: '#141414', border: '1px solid #333333', color: '#e0e0e0', outline: 'none' }}
+                />
+                <input type="file" accept="image/*" onChange={(e) => setBgFile(e.target.files?.[0] || null)} className="text-xs" style={{ color: '#888888' }} />
+                <button
+                  onClick={handleBgUpload}
+                  disabled={bgUploading || !bgFile || !bgName.trim()}
+                  className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer self-start"
+                  style={{
+                    backgroundColor: bgUploading || !bgFile || !bgName.trim() ? '#333333' : '#c4a35a',
+                    color: '#0a0a0a',
+                    border: '1px solid #c4a35a',
+                    opacity: bgUploading || !bgFile || !bgName.trim() ? 0.5 : 1,
+                  }}
+                >
+                  {bgUploading ? t('backgrounds.uploading') : t('backgrounds.upload')}
+                </button>
+              </div>
+
+              {/* List */}
+              {bgLoading ? (
+                <p className="text-sm" style={{ color: '#888888' }}>{tc('common.loading')}</p>
+              ) : bgList.length === 0 ? (
+                <p className="text-sm" style={{ color: '#555555' }}>{t('backgrounds.noBackgrounds')}</p>
+              ) : (
+                <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                  {bgList.map((bg) => (
+                    <div key={bg.id} className="rounded-lg overflow-hidden" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}>
+                      <img src={bg.url} alt={bg.name} className="w-full object-cover" style={{ aspectRatio: '16/9' }} />
+                      <div className="p-2 flex items-center justify-between">
+                        <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>{bg.name}</span>
+                        {bgConfirmDeleteId === bg.id ? (
+                          <div className="flex gap-1">
+                            <button onClick={() => handleBgDelete(bg.id)} className="px-2 py-1 text-[10px] bg-[#2a1a1a] border border-[#b33e3e]/40 text-[#b33e3e] cursor-pointer">{tc('common.confirm')}</button>
+                            <button onClick={() => setBgConfirmDeleteId(null)} className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] cursor-pointer">{tc('common.cancel')}</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setBgConfirmDeleteId(bg.id)} className="px-2 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#b33e3e] hover:bg-[#1a1414] cursor-pointer">{t('backgrounds.delete')}</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
       <Footer />
     </main>
