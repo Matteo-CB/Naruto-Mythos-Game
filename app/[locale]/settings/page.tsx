@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 
 interface BackgroundOption {
   id: string;
-  filename: string;
+  name: string;
   url: string;
 }
 
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                     key={bg.id}
                     type="button"
                     disabled={!isLoaded}
-                    onClick={() => setGameBackground(bg.id)}
+                    onClick={() => setGameBackground(bg.id, bg.url)}
                     className="relative overflow-hidden transition-all"
                     style={{
                       aspectRatio: '16/9',
@@ -157,7 +157,7 @@ export default function SettingsPage() {
                   >
                     <img
                       src={bg.url}
-                      alt={bg.id}
+                      alt={bg.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />

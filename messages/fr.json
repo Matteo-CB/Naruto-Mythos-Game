@@ -1622,6 +1622,7 @@
     "home": "Accueil",
     "tabSettings": "Parametres",
     "tabCards": "Cartes",
+    "tabBackgrounds": "Fonds",
     "tabBugs": "Rapports de Bugs",
     "unauthorized": "Acces refuse",
     "leagues": {
@@ -1660,6 +1661,24 @@
       "added": "Testeur ajoute",
       "removed": "Testeur retire",
       "notFound": "Utilisateur introuvable"
+    },
+    "backgrounds": {
+      "title": "Fonds de Jeu",
+      "description": "Uploadez et gerez les fonds que les joueurs peuvent choisir pour leur plateau de jeu.",
+      "uploadLabel": "Uploader un Nouveau Fond",
+      "nameLabel": "Nom du Fond",
+      "namePlaceholder": "ex: Foret de Nuit",
+      "fileLabel": "Fichier Image",
+      "upload": "Uploader",
+      "uploading": "Upload en cours...",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce fond ?",
+      "noBackgrounds": "Aucun fond uploade.",
+      "uploadSuccess": "Fond uploade",
+      "uploadError": "Echec de l'upload",
+      "deleteSuccess": "Fond supprime",
+      "deleteError": "Echec de la suppression",
+      "default": "Defaut"
     },
     "actionLog": "Journal d'Actions",
     "sealed": {

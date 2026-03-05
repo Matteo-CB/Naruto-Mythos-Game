@@ -11,15 +11,13 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
+      select: { animationsEnabled: true, gameBackground: true },
     });
 
-    // animationsEnabled was added to schema after initial prisma generate;
-    // the field exists in MongoDB but the TS type may lag — use cast.
-    const u = user as unknown as Record<string, unknown>;
-    const animationsEnabled = u?.animationsEnabled ?? true;
-    const gameBackground = (u?.gameBackground as string) || 'bg-game';
-
-    return NextResponse.json({ animationsEnabled, gameBackground });
+    return NextResponse.json({
+      animationsEnabled: user?.animationsEnabled ?? true,
+      gameBackground: user?.gameBackground || 'default',
+    });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -33,24 +31,25 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { animationsEnabled } = body as { animationsEnabled: boolean };
+    const update: Record<string, unknown> = {};
 
-    if (typeof animationsEnabled !== 'boolean') {
-      return NextResponse.json({ error: 'Invalid value' }, { status: 400 });
+    if (typeof body.animationsEnabled === 'boolean') {
+      update.animationsEnabled = body.animationsEnabled;
+    }
+    if (typeof body.gameBackground === 'string' && body.gameBackground.length > 0) {
+      update.gameBackground = body.gameBackground;
     }
 
-    // Use $runCommandRaw to set the field without requiring prisma generate
-    await prisma.$runCommandRaw({
-      update: 'User',
-      updates: [
-        {
-          q: { _id: { $oid: session.user.id } },
-          u: { $set: { animationsEnabled } },
-        },
-      ],
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: 'No valid fields' }, { status: 400 });
+    }
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: update,
     });
 
-    return NextResponse.json({ success: true, animationsEnabled });
+    return NextResponse.json({ success: true, ...update });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

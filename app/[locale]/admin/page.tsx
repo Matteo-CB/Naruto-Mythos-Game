@@ -12,7 +12,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 
-type Tab = 'settings' | 'cards';
+type Tab = 'settings' | 'cards' | 'backgrounds';
 
 interface ActionResult {
   success: boolean;
@@ -46,6 +46,14 @@ export default function AdminPage() {
   const [cardFilter, setCardFilter] = useState<FilterMode>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
+  // ---- Backgrounds state ----
+  const [bgList, setBgList] = useState<Array<{ id: string; name: string; url: string; sortOrder: number }>>([]);
+  const [bgLoading, setBgLoading] = useState(true);
+  const [bgUploading, setBgUploading] = useState(false);
+  const [bgName, setBgName] = useState('');
+  const [bgFile, setBgFile] = useState<File | null>(null);
+  const [bgConfirmDeleteId, setBgConfirmDeleteId] = useState<string | null>(null);
+
   const isAdmin = session?.user?.email === ADMIN_EMAIL;
 
   const allCards = useMemo(() => {
@@ -60,6 +68,60 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => setTesters(data.testers ?? []))
       .catch(() => {});
+  };
+
+  const fetchBackgrounds = async () => {
+    setBgLoading(true);
+    try {
+      const res = await fetch('/api/admin/backgrounds');
+      const data = await res.json();
+      if (res.ok) setBgList(data.backgrounds ?? []);
+    } catch { /* ignore */ } finally {
+      setBgLoading(false);
+    }
+  };
+
+  const handleBgUpload = async () => {
+    if (!bgFile || !bgName.trim()) return;
+    setBgUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', bgFile);
+      formData.append('name', bgName.trim());
+      const res = await fetch('/api/admin/backgrounds', { method: 'POST', body: formData });
+      if (res.ok) {
+        addResult({ success: true, message: t('backgrounds.uploadSuccess') + ': ' + bgName.trim() });
+        setBgName('');
+        setBgFile(null);
+        fetchBackgrounds();
+      } else {
+        const data = await res.json();
+        addResult({ success: false, message: t('backgrounds.uploadError') + ': ' + (data.error || 'Unknown') });
+      }
+    } catch (err) {
+      addResult({ success: false, message: t('backgrounds.uploadError') + ': ' + err });
+    } finally {
+      setBgUploading(false);
+    }
+  };
+
+  const handleBgDelete = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/backgrounds', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        addResult({ success: true, message: t('backgrounds.deleteSuccess') });
+        fetchBackgrounds();
+      } else {
+        addResult({ success: false, message: t('backgrounds.deleteError') });
+      }
+    } catch {
+      addResult({ success: false, message: t('backgrounds.deleteError') });
+    }
+    setBgConfirmDeleteId(null);
   };
 
   const fetchBanned = async () => {
@@ -250,6 +312,7 @@ export default function AdminPage() {
   const tabs: { key: Tab; label: string }[] = [
     { key: 'settings', label: t('tabSettings') },
     { key: 'cards', label: t('tabCards') },
+    { key: 'backgrounds', label: t('tabBackgrounds') },
   ];
 
   return (

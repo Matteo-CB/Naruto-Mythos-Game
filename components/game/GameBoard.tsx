@@ -982,7 +982,7 @@ function GameBoardInner() {
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
-  const gameBackground = useSettingsStore((s) => s.gameBackground);
+  const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
 
   // Load user background preference on mount
@@ -1057,7 +1057,7 @@ function GameBoardInner() {
       style={{
         height: '100dvh',
         backgroundColor: "#0a0a0a",
-        backgroundImage: `url(/images/backgrounds/${gameBackground}.webp)`,
+        backgroundImage: `url(${gameBackgroundUrl})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",

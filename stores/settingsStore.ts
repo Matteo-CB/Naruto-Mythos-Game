@@ -2,28 +2,42 @@ import { create } from 'zustand';
 
 interface SettingsState {
   animationsEnabled: boolean;
-  gameBackground: string;
+  gameBackground: string; // background DB id or "default"
+  gameBackgroundUrl: string; // resolved URL for the background image
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
   setAnimationsEnabled: (v: boolean) => Promise<void>;
-  setGameBackground: (v: string) => Promise<void>;
+  setGameBackground: (id: string, url: string) => Promise<void>;
 }
 
-const DEFAULT_BACKGROUND = 'bg-game';
+const DEFAULT_BG_URL = '/images/backgrounds/bg-game.webp';
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
-  gameBackground: DEFAULT_BACKGROUND,
+  gameBackground: 'default',
+  gameBackgroundUrl: DEFAULT_BG_URL,
   isLoaded: false,
 
   fetchFromServer: async () => {
     try {
-      const res = await fetch('/api/user/preferences');
-      if (!res.ok) return;
-      const data = (await res.json()) as { animationsEnabled: boolean; gameBackground?: string };
+      const [prefsRes, bgsRes] = await Promise.all([
+        fetch('/api/user/preferences'),
+        fetch('/api/backgrounds'),
+      ]);
+
+      const prefs = prefsRes.ok ? await prefsRes.json() : {};
+      const bgsData = bgsRes.ok ? await bgsRes.json() : { backgrounds: [] };
+      const backgrounds = bgsData.backgrounds || [];
+      const bgId = prefs.gameBackground || 'default';
+
+      // Resolve URL from backgrounds list
+      const match = backgrounds.find((bg: { id: string }) => bg.id === bgId);
+      const bgUrl = match?.url || DEFAULT_BG_URL;
+
       set({
-        animationsEnabled: data.animationsEnabled,
-        gameBackground: data.gameBackground || DEFAULT_BACKGROUND,
+        animationsEnabled: prefs.animationsEnabled ?? true,
+        gameBackground: bgId,
+        gameBackgroundUrl: bgUrl,
         isLoaded: true,
       });
     } catch {
@@ -46,18 +60,19 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     }
   },
 
-  setGameBackground: async (v: string) => {
-    const prev = get().gameBackground;
-    set({ gameBackground: v });
+  setGameBackground: async (id: string, url: string) => {
+    const prevId = get().gameBackground;
+    const prevUrl = get().gameBackgroundUrl;
+    set({ gameBackground: id, gameBackgroundUrl: url });
     try {
       const res = await fetch('/api/user/preferences', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameBackground: v }),
+        body: JSON.stringify({ gameBackground: id }),
       });
       if (!res.ok) throw new Error('Failed to save');
     } catch {
-      set({ gameBackground: prev });
+      set({ gameBackground: prevId, gameBackgroundUrl: prevUrl });
     }
   },
 }));
