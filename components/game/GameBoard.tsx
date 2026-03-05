@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { useGameStore } from "@/stores/gameStore";
 import { useUIStore } from "@/stores/uiStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
 import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
 import { PlayerHand } from "./PlayerHand";
@@ -981,6 +982,11 @@ function GameBoardInner() {
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
+  const gameBackground = useSettingsStore((s) => s.gameBackground);
+  const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+
+  // Load user background preference on mount
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const prevTurnRef = useRef<number | null>(null);
 
@@ -1051,7 +1057,7 @@ function GameBoardInner() {
       style={{
         height: '100dvh',
         backgroundColor: "#0a0a0a",
-        backgroundImage: "url(/images/bg-game.jpg)",
+        backgroundImage: `url(/images/backgrounds/${gameBackground}.webp)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",

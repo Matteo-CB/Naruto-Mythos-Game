@@ -17,6 +17,7 @@ import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from "@/lib/utils/cardLocale";
 import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
+import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888',
@@ -394,6 +395,13 @@ export default function DeckBuilderPage() {
           >
             {t("deckManager.manageButton")}
           </Link>
+          <button
+            onClick={() => exportDeckAsImage(deckName, deckChars, deckMissions)}
+            disabled={deckChars.length === 0}
+            className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {t("deckBuilder.exportImage")}
+          </button>
         </div>
 
         {/* Rules panel */}

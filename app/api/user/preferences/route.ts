@@ -15,10 +15,11 @@ export async function GET() {
 
     // animationsEnabled was added to schema after initial prisma generate;
     // the field exists in MongoDB but the TS type may lag — use cast.
-    const animationsEnabled =
-      (user as unknown as Record<string, unknown>)?.animationsEnabled ?? true;
+    const u = user as unknown as Record<string, unknown>;
+    const animationsEnabled = u?.animationsEnabled ?? true;
+    const gameBackground = (u?.gameBackground as string) || 'bg-game';
 
-    return NextResponse.json({ animationsEnabled });
+    return NextResponse.json({ animationsEnabled, gameBackground });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

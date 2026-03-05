@@ -205,9 +205,9 @@ describe('EndPhase - Summon Return', () => {
     expect(result.player1.hand[0].name_fr).toBe('REMPART');
   });
 
-  it('should NOT return Kyodaigumo 103 via generic Summon return (handled separately)', () => {
-    const kyodaigumo = mockCharInPlay({ instanceId: 'kyo-1', controlledBy: 'player1', originalOwner: 'player1' }, {
-      id: 'KS-103-UC', number: 103, name_fr: 'KYODAIGUMO',
+  it('should NOT return Giant Spider 103 via generic Summon return (handled separately)', () => {
+    const giantSpider = mockCharInPlay({ instanceId: 'kyo-1', controlledBy: 'player1', originalOwner: 'player1' }, {
+      id: 'KS-103-UC', number: 103, name_fr: 'ARAIGNEE GEANTE',
       keywords: ['Summon'],
       effects: [{ type: 'MAIN', description: '[⧗] At the end of the round, hide a character with Power equal or less than this character. Then, you must return this character to your hand.' }],
     });
@@ -216,11 +216,11 @@ describe('EndPhase - Summon Return', () => {
       ...baseState,
       phase: 'end',
       player1: { ...baseState.player1, hand: [], charactersInPlay: 1 },
-      activeMissions: [makeMission('D', [kyodaigumo])],
+      activeMissions: [makeMission('D', [giantSpider])],
     };
 
     const result = executeEndPhase(state);
-    // Kyodaigumo should NOT be returned by generic Summon logic (it's handled by handleKyodaigumo103EndOfRound)
+    // Giant Spider should NOT be returned by generic Summon logic (it's handled by handleGiantSpider103EndOfRound)
     expect(result.activeMissions[0].player1Characters.length).toBe(1);
     expect(result.player1.hand.length).toBe(0);
   });

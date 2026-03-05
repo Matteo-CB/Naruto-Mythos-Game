@@ -66,7 +66,7 @@ const menuButtons = [
   { key: 'playAI' as const, href: '/play/ai', primary: true },
   { key: 'playOnline' as const, href: '/play/online', primary: false },
   { key: 'friends' as const, href: '/friends', primary: false },
-  { key: 'collection' as const, href: '/collection', primary: false },
+  { key: 'customization' as const, href: '/settings', primary: false },
   { key: 'deckBuilder' as const, href: '/deck-builder', primary: false },
   { key: 'learn' as const, href: '/learn', primary: false },
   { key: 'leaderboard' as const, href: '/leaderboard', primary: false },
@@ -88,6 +88,7 @@ export default function Home() {
   );
 
   const [sessionRefreshed, setSessionRefreshed] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -100,6 +101,16 @@ export default function Home() {
       updateSession();
     }
   }, [session, sessionRefreshed, updateSession]);
+
+  // Fetch fresh role from API to avoid stale JWT issues
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/user/me')
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => { if (data?.role) setUserRole(data.role); })
+        .catch(() => {});
+    }
+  }, [session]);
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
@@ -330,7 +341,7 @@ export default function Home() {
             </motion.nav>
 
             {/* Training mode (only visible to testers/admins) */}
-            {session && (['tester', 'admin'].includes((session.user as Record<string, unknown>)?.role as string)) && (
+            {session && (['tester', 'admin'].includes(userRole ?? (session.user as Record<string, unknown>)?.role as string)) && (
               <motion.div
                 className="mt-2 w-full"
                 initial={{ opacity: 0, x: -20 }}
@@ -445,29 +456,6 @@ export default function Home() {
                     }}
                   >
                     {t('profile')}
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: '1px solid #333333',
-                      color: '#888888',
-                    }}
-                    onMouseEnter={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#c4a35a';
-                      target.style.color = '#c4a35a';
-                      target.style.backgroundColor = 'rgba(196, 163, 90, 0.05)';
-                    }}
-                    onMouseLeave={(e) => {
-                      const target = e.currentTarget as HTMLElement;
-                      target.style.borderColor = '#333333';
-                      target.style.color = '#888888';
-                      target.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    {t('settings')}
                   </Link>
                   {!(session.user as Record<string, unknown>)?.discordId && (
                     <a
