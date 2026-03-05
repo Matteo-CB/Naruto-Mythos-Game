@@ -503,7 +503,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Rejoin a room after reconnection (socket ID changed)
-    socket.on('game:rejoin', (data: { roomCode: string; userId: string }) => {
+    socket.on('game:rejoin', async (data: { roomCode: string; userId: string }) => {
       const { roomCode, userId } = data;
       if (!roomCode || !userId) return;
 
@@ -561,13 +561,74 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       } else {
         // Pre-game rejoin (e.g. sealed deck-building phase)
-        // Notify both players that the room is still active
         console.log(`[Socket] game:rejoin: ${player} rejoined room ${roomCode} during pre-game phase`);
         socket.emit('room:rejoined', {
           code: roomCode,
           isSealed: room.isSealed,
           playerRole: player === 'player1' ? 'player1' : 'player2',
         });
+
+        // Re-check if both decks are submitted — if so, create the game
+        // This handles the case where both players submitted decks but the
+        // game creation event was lost due to a socket disconnection
+        if (room.hostDeck && room.guestDeck && !room.gameState) {
+          console.log(`[Socket] game:rejoin: Both decks already submitted in room ${roomCode}, creating game now`);
+          // Clear sealed timer
+          if (room.sealedTimer) {
+            clearTimeout(room.sealedTimer);
+            room.sealedTimer = null;
+            room.sealedDeadline = null;
+          }
+
+          const config: GameConfig = {
+            player1: {
+              userId: room.hostId,
+              isAI: false,
+              deck: room.hostDeck.characters,
+              missionCards: room.hostDeck.missions,
+            },
+            player2: {
+              userId: room.guestId!,
+              isAI: false,
+              deck: room.guestDeck.characters,
+              missionCards: room.guestDeck.missions,
+            },
+          };
+
+          room.gameState = GameEngine.createGame(config);
+          room.replayInitialState = null;
+
+          let hostName = 'Player 1';
+          let guestName = 'Player 2';
+          try {
+            const [hostUser, guestUser] = await Promise.all([
+              prisma.user.findUnique({ where: { id: room.hostId }, select: { username: true } }),
+              room.guestId ? prisma.user.findUnique({ where: { id: room.guestId }, select: { username: true } }) : null,
+            ]);
+            if (hostUser?.username) hostName = hostUser.username;
+            if (guestUser?.username) guestName = guestUser.username;
+          } catch { /* fallback to defaults */ }
+          room.hostName = hostName;
+          room.guestName = guestName;
+
+          const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+          const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+
+          if (room.hostSocket) {
+            io.to(room.hostSocket).emit('game:state-update', {
+              visibleState: p1State,
+              playerRole: 'player1',
+              playerNames: { player1: hostName, player2: guestName },
+            });
+          }
+          if (room.guestSocket) {
+            io.to(room.guestSocket).emit('game:state-update', {
+              visibleState: p2State,
+              playerRole: 'player2',
+              playerNames: { player1: hostName, player2: guestName },
+            });
+          }
+        }
       }
     });
 

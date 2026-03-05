@@ -2188,6 +2188,10 @@
     "rarity": "R",
     "card_type": "character",
     "has_visual": true,
+    "chakra": 6,
+    "power": 8,
+    "keywords": ["Jutsu"],
+    "group": "Sound Village",
     "image_file": "images\\rare\\123-130_KIMIMARO.webp"
   },
   {

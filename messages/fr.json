@@ -11,13 +11,13 @@
     "signOut": "Se deconnecter",
     "register": "S'inscrire",
     "language": "Langue",
-    "legal": "Mentions l\u00e9gales",
-    "createdBy": "Cr\u00e9\u00e9 par",
-    "previous": "Pr\u00e9c\u00e9dent",
+    "legal": "Mentions légales",
+    "createdBy": "Créé par",
+    "previous": "Précédent",
     "next": "Suivant",
     "page": "Page",
     "rotateDevice": "Tournez votre appareil en mode paysage pour jouer",
-    "fullscreen": "Plein \u00e9cran",
+    "fullscreen": "Plein écran",
     "play": "Jouer",
     "close": "Fermer"
   },
@@ -35,21 +35,24 @@
     "discord": "Discord",
     "profile": "Mon Profil",
     "friends": "Amis",
-    "betaBanner": "Nous sommes en phase de test. Des cartes peuvent manquer et des effets peuvent ne pas \u00eatre fonctionnels ! Vous pouvez nous aider en rejoignant le Discord et en communiquant les bugs dans le salon d\u00e9di\u00e9.",
+    "betaBanner": "Nous sommes en phase de test. Des cartes peuvent manquer et des effets peuvent ne pas être fonctionnels ! Vous pouvez nous aider en rejoignant le Discord et en communiquant les bugs dans le salon dédié.",
     "adminCards": "Gestion des Cartes",
     "admin": "Administration",
     "signOut": "Se deconnecter",
     "sealed": "Scellé",
     "training": "Mode Entrainement",
-    "settings": "Parametres"
+    "settings": "Parametres",
+    "customization": "Personnalisation"
   },
   "settings": {
-    "title": "Parametres",
+    "title": "Personnalisation",
     "animations": "Activer les animations",
     "animationsOn": "Les animations sont activees",
     "animationsOff": "Les animations sont desactivees",
     "loading": "Chargement...",
-    "back": "Retour au menu"
+    "back": "Retour au menu",
+    "gameBackground": "Fond de jeu",
+    "selected": "Actif"
   },
   "game": {
     "turn": "Tour {turn}",
@@ -158,7 +161,7 @@
         "akamaru": "Akamaru retourne en main (pas de Kiba dans la mission).",
         "akamaru028Return": "Akamaru (028) : Retourne en main en fin de tour.",
         "kidomaru060Return": "Kidômaru (060) : Doit retourner en main apres avoir utilise l'effet de fin de tour.",
-        "kyodaigumo103Return": "Kyodaigumo (103) : Doit retourner en main apres avoir utilise l'effet de fin de tour.",
+        "giantSpider103Return": "Araignee Geante (103) : Doit retourner en main apres avoir utilise l'effet de fin de tour.",
         "deckLook": "{card} ({id}) : Regarde les {count} premieres cartes du deck.",
         "discardCards": "{card} ({id}) : Defausse {count} carte(s).",
         "putOnDeck": "Remet {card} sur le dessus du deck.",
@@ -399,13 +402,13 @@
         "kidomaru060MoveCharacter": "Choisissez un personnage dans cette mission a deplacer vers une autre.",
         "kidomaru060DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins en jeu a vaincre.",
         "kidomaru060EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Kidômaru doit retourner dans votre main.",
-        "kyodaigumo103EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Kyodaigumo doit retourner dans votre main.",
+        "giantSpider103EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Araignee Geante doit retourner dans votre main.",
         "gemma049SacrificeDefeat": "Sacrifier Gemma Shiranui pour proteger {target} de la defaite ?",
         "gemma049SacrificeHide": "Sacrifier Gemma Shiranui pour proteger {target} d'etre cache ?",
         "kimimaro056DiscardAndHide": "Choisissez une carte a defausser, puis cachez un personnage avec cout 4 ou moins.",
         "kimimaro056ChooseHide": "Choisissez un personnage a cacher (cout 4 ou moins).",
-        "kin073ChooseEnemy": "Choisissez un personnage ennemi avec Puissance 4 ou moins \u00e0 cacher.",
-        "kin073ChooseDiscard": "Choisissez une carte de votre main \u00e0 d\u00e9fausser.",
+        "kin073ChooseEnemy": "Choisissez un personnage ennemi avec Puissance 4 ou moins à cacher.",
+        "kin073ChooseDiscard": "Choisissez une carte de votre main à défausser.",
         "kisame093StealTokens": "Selectionnez un personnage ennemi en jeu pour voler jusqu'a 2 jetons de Puissance.",
         "kisame093StealAllTokens": "Selectionnez un personnage ennemi en jeu pour voler TOUS les jetons de Puissance.",
         "kurenai035DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins dans cette mission a vaincre.",
@@ -639,6 +642,7 @@
     "overwriteDesc": "Voulez-vous remplacer \"{name}\" par le deck actuel ?",
     "overwriteConfirm": "Remplacer",
     "overwriteCancel": "Annuler",
+    "exportImage": "Exporter en image",
     "error": {
       "maxCopies": "Max {max} copies de {name}",
       "maxMissions": "Max {max} missions",
@@ -865,8 +869,11 @@
   },
   "learn": {
     "title": "Apprendre le jeu",
-    "rulesTab": "R\u00e8gles",
-    "tabs": { "tutorial": "Tutoriel", "quiz": "Quiz" },
+    "rulesTab": "Règles",
+    "tabs": {
+      "tutorial": "Tutoriel",
+      "quiz": "Quiz"
+    },
     "tutorial": {
       "prev": "Precedent",
       "next": "Suivant",
@@ -886,17 +893,17 @@
           "title": "Anatomie d'une carte",
           "desc": "Comprendre les elements d'une carte personnage.",
           "nameTitle": "Nom",
-          "nameBubble": "Le nom du personnage. Un seul personnage du m\u00eame nom peut \u00eatre pr\u00e9sent sur une mission par joueur.",
+          "nameBubble": "Le nom du personnage. Un seul personnage du même nom peut être présent sur une mission par joueur.",
           "titleTitle": "Titre",
-          "titleBubble": "Distingue les diff\u00e9rentes versions d'un m\u00eame personnage. M\u00eame nom mais titre diff\u00e9rent = carte diff\u00e9rente.",
-          "chakraTitle": "Co\u00fbt en Chakra",
-          "chakraBubble": "La quantit\u00e9 de chakra \u00e0 d\u00e9penser pour jouer cette carte face visible sur le terrain.",
+          "titleBubble": "Distingue les différentes versions d'un même personnage. Même nom mais titre différent = carte différente.",
+          "chakraTitle": "Coût en Chakra",
+          "chakraBubble": "La quantité de chakra à dépenser pour jouer cette carte face visible sur le terrain.",
           "powerTitle": "Puissance",
           "powerBubble": "La force de base de cette carte. Le joueur avec le plus de puissance totale sur une mission la remporte.",
           "effectsTitle": "Effets",
-          "effectsBubble": "Les capacit\u00e9s de la carte : PRINCIPAL (quand jou\u00e9e), AM\u00c9LIORATION (\u00e9volution), EMBUSCADE (r\u00e9v\u00e9l\u00e9e depuis cach\u00e9e), SCORE (en gagnant une mission).",
-          "rarityTitle": "Raret\u00e9",
-          "rarityBubble": "Indique la puissance et la raret\u00e9 : Commune (C), Peu Commune (UC), Rare (R), Art Rare (RA), Secr\u00e8te (S), Mythos (M)."
+          "effectsBubble": "Les capacités de la carte : PRINCIPAL (quand jouée), AMÉLIORATION (évolution), EMBUSCADE (révélée depuis cachée), SCORE (en gagnant une mission).",
+          "rarityTitle": "Rareté",
+          "rarityBubble": "Indique la puissance et la rareté : Commune (C), Peu Commune (UC), Rare (R), Art Rare (RA), Secrète (S), Mythos (M)."
         },
         "turnStructure": {
           "title": "Structure du tour",
@@ -906,17 +913,17 @@
           "mission": "Phase de Mission : Comparer la puissance et attribuer les points",
           "end": "Phase de Fin : Defausser le chakra, retirer tous les jetons de Puissance",
           "phase1Label": "Phase 1",
-          "phase1Name": "D\u00e9but",
+          "phase1Name": "Début",
           "phase2Label": "Phase 2",
           "phase2Name": "Action",
           "phase3Label": "Phase 3",
           "phase3Name": "Mission",
           "phase4Label": "Phase 4",
           "phase4Name": "Fin",
-          "startTitle": "Phase de D\u00e9but",
-          "startBubble": "R\u00e9v\u00e9ler une mission, gagner du chakra (5 + 1/personnage), piocher 2 cartes",
+          "startTitle": "Phase de Début",
+          "startBubble": "Révéler une mission, gagner du chakra (5 + 1/personnage), piocher 2 cartes",
           "actionTitle": "Phase d'Action",
-          "actionBubble": "Jouer des cartes, r\u00e9v\u00e9ler des personnages, ou passer"
+          "actionBubble": "Jouer des cartes, révéler des personnages, ou passer"
         },
         "playingCards": {
           "title": "Jouer des cartes",
@@ -925,14 +932,14 @@
           "hidden": "Cache : Payer 1 chakra, pas d'effets, carte face cachee",
           "reveal": "Reveler : Payer le cout imprime, effets PRINCIPAL et EMBUSCADE actives",
           "visibleLabel": "Face visible",
-          "hiddenLabel": "Cach\u00e9",
-          "revealLabel": "R\u00e9v\u00e9ler",
+          "hiddenLabel": "Caché",
+          "revealLabel": "Révéler",
           "visibleTitle": "Face visible",
-          "visibleBubble": "Payer le co\u00fbt complet, effets PRINCIPAL activ\u00e9s",
-          "hiddenTitle": "Cach\u00e9",
-          "hiddenBubble": "Payer 1 chakra, pas d'effets, carte face cach\u00e9e",
-          "revealTitle": "R\u00e9v\u00e9ler",
-          "revealBubble": "Payer le co\u00fbt imprim\u00e9, effets PRINCIPAL et EMBUSCADE activ\u00e9s"
+          "visibleBubble": "Payer le coût complet, effets PRINCIPAL activés",
+          "hiddenTitle": "Caché",
+          "hiddenBubble": "Payer 1 chakra, pas d'effets, carte face cachée",
+          "revealTitle": "Révéler",
+          "revealBubble": "Payer le coût imprimé, effets PRINCIPAL et EMBUSCADE activés"
         },
         "missions": {
           "title": "Missions et Score",
@@ -948,7 +955,7 @@
           "powerTitle": "La Puissance gagne",
           "powerBubble": "Minimum 1 de puissance pour gagner une mission",
           "edgeTitle": "Jeton d'Avantage",
-          "edgeBubble": "Les \u00e9galit\u00e9s sont bris\u00e9es par le d\u00e9tenteur du Jeton d'Avantage"
+          "edgeBubble": "Les égalités sont brisées par le détenteur du Jeton d'Avantage"
         },
         "upgrade": {
           "title": "Amelioration de personnage",
@@ -957,14 +964,14 @@
           "cost": "Payer uniquement la difference de cout (nouveau - ancien)",
           "effects": "Active les effets PRINCIPAL et AMELIORATION",
           "tokens": "Les jetons de puissance sont transferes a la nouvelle carte",
-          "sameNameTitle": "M\u00eame Nom",
-          "sameNameBubble": "M\u00eame nom, co\u00fbt en chakra strictement sup\u00e9rieur",
-          "costTitle": "Diff\u00e9rence de Co\u00fbt",
-          "costBubble": "Payer uniquement la diff\u00e9rence de co\u00fbt (nouveau - ancien)",
+          "sameNameTitle": "Même Nom",
+          "sameNameBubble": "Même nom, coût en chakra strictement supérieur",
+          "costTitle": "Différence de Coût",
+          "costBubble": "Payer uniquement la différence de coût (nouveau - ancien)",
           "effectsTitle": "Effets",
-          "effectsBubble": "Active les effets PRINCIPAL et AM\u00c9LIORATION",
+          "effectsBubble": "Active les effets PRINCIPAL et AMÉLIORATION",
           "tokensTitle": "Jetons de Puissance",
-          "tokensBubble": "Les jetons de puissance sont transf\u00e9r\u00e9s \u00e0 la nouvelle carte"
+          "tokensBubble": "Les jetons de puissance sont transférés à la nouvelle carte"
         },
         "special": {
           "title": "Mecaniques speciales",
@@ -973,13 +980,13 @@
           "powerTokens": "Jetons de Puissance : Ajoutes par POWERUP. Retires a chaque Phase de Fin.",
           "deckRules": "Deck : Min 30 personnages, max 2 copies par version, exactement 3 missions.",
           "edgeTitle": "Jeton d'Avantage",
-          "edgeDesc": "Le premier \u00e0 passer le re\u00e7oit. Brise les \u00e9galit\u00e9s, d\u00e9termine l'ordre de jeu.",
+          "edgeDesc": "Le premier à passer le reçoit. Brise les égalités, détermine l'ordre de jeu.",
           "tokensTitle": "Jetons de Puissance",
-          "tokensDesc": "Ajout\u00e9s par POWERUP. Retir\u00e9s \u00e0 chaque Phase de Fin.",
+          "tokensDesc": "Ajoutés par POWERUP. Retirés à chaque Phase de Fin.",
           "deckTitle": "Construction de Deck",
           "deckDesc": "Min 30 personnages, max 2 copies par version, exactement 3 missions.",
           "tipsTitle": "Conseils",
-          "tipsBubble": "G\u00e9rez votre chakra avec soin et utilisez les personnages cach\u00e9s pour bluffer votre adversaire."
+          "tipsBubble": "Gérez votre chakra avec soin et utilisez les personnages cachés pour bluffer votre adversaire."
         },
         "gameplay": {
           "title": "Jouer une partie",
@@ -987,38 +994,44 @@
           "deckLabel": "Deck",
           "missionDeckLabel": "Deck Mission",
           "chakraLabel": "Chakra",
-          "costLabel": "Co\u00fbt",
+          "costLabel": "Coût",
           "youLabel": "Vous",
           "oppLabel": "Adversaire",
           "edgeLabel": "Jeton d'Avantage",
           "pointsLabel": "Points",
           "tokensLabel": "Jetons de Puissance",
-          "removedLabel": "Retir\u00e9s",
+          "removedLabel": "Retirés",
           "nextTurnLabel": "Tour Suivant",
           "rankD": "Rang D (+1 pt)",
           "step0Title": "Mise en place",
           "step0Bubble": "Les deux joueurs piochent 5 cartes. Chaque joueur peut faire un mulligan : remettre toutes les cartes et en piocher 5 nouvelles.",
-          "step1Title": "Phase de D\u00e9but : Mission",
-          "step1Bubble": "Une nouvelle mission est r\u00e9v\u00e9l\u00e9e ! C'est une mission de rang D (+1 point). Chaque tour ajoute une nouvelle mission au plateau.",
-          "step2Title": "Phase de D\u00e9but : Chakra et Pioche",
+          "step1Title": "Phase de Début : Mission",
+          "step1Bubble": "Une nouvelle mission est révélée ! C'est une mission de rang D (+1 point). Chaque tour ajoute une nouvelle mission au plateau.",
+          "step2Title": "Phase de Début : Chakra et Pioche",
           "step2Bubble": "Vous gagnez 5 chakra (+1 par personnage en jeu) et piochez 2 cartes. Au premier tour, vous n'avez aucun personnage, donc vous recevez exactement 5.",
           "step3Title": "Phase d'Action : Jouer un personnage",
           "step3Bubble": "Vous jouez Naruto face visible sur la mission. Payez 3 chakra (de 5 a 2). Son effet PRINCIPAL s'active quand il est joue face visible.",
-          "step4Title": "Phase d'Action : Adversaire cach\u00e9",
-          "step4Bubble": "L'adversaire joue un personnage cach\u00e9 pour 1 chakra. Aucun effet ne s'active. Vous ne pouvez pas voir de quelle carte il s'agit.",
+          "step4Title": "Phase d'Action : Adversaire caché",
+          "step4Bubble": "L'adversaire joue un personnage caché pour 1 chakra. Aucun effet ne s'active. Vous ne pouvez pas voir de quelle carte il s'agit.",
           "step5Title": "Phase d'Action : Passer",
-          "step5Bubble": "Les deux joueurs passent. Le premier joueur a passer obtient le Jeton d'Avantage pour le prochain tour. Le Jeton brise les \u00e9galit\u00e9s et d\u00e9termine qui joue en premier.",
+          "step5Bubble": "Les deux joueurs passent. Le premier joueur a passer obtient le Jeton d'Avantage pour le prochain tour. Le Jeton brise les égalités et détermine qui joue en premier.",
           "step6Title": "Phase de Mission : Score",
-          "step6Bubble": "R\u00e9solution des missions ! Votre Naruto a 3 de puissance. Les personnages cach\u00e9s ont 0 de puissance. Vous remportez la mission et gagnez +1 point (bonus rang D).",
+          "step6Bubble": "Résolution des missions ! Votre Naruto a 3 de puissance. Les personnages cachés ont 0 de puissance. Vous remportez la mission et gagnez +1 point (bonus rang D).",
           "step7Title": "Phase de Fin",
-          "step7Bubble": "Fin du tour. Tout le chakra restant est d\u00e9fauss\u00e9 a 0. Tous les jetons de Puissance sont retir\u00e9s des personnages. Le tour suivant commence !"
+          "step7Bubble": "Fin du tour. Tout le chakra restant est défaussé a 0. Tous les jetons de Puissance sont retirés des personnages. Le tour suivant commence !"
         }
       }
     },
     "quiz": {
       "title": "Quiz",
       "selectDifficulty": "Choisir la difficulte",
-      "difficulties": { "1": "Genin", "2": "Chunin", "3": "Jonin", "4": "ANBU", "5": "Kage" },
+      "difficulties": {
+        "1": "Genin",
+        "2": "Chunin",
+        "3": "Jonin",
+        "4": "ANBU",
+        "5": "Kage"
+      },
       "difficultyDesc": {
         "1": "Stats de base et regles simples",
         "2": "Effets, groupes et missions",
@@ -1026,8 +1039,20 @@
         "4": "Toutes categories, distracteurs difficiles",
         "5": "Tout — cas limites, sans pitie"
       },
-      "questionCount": { "1": "10 questions", "2": "15 questions", "3": "20 questions", "4": "25 questions", "5": "30 questions" },
-      "timePerQuestion": { "1": "30s", "2": "25s", "3": "20s", "4": "15s", "5": "12s" },
+      "questionCount": {
+        "1": "10 questions",
+        "2": "15 questions",
+        "3": "20 questions",
+        "4": "25 questions",
+        "5": "30 questions"
+      },
+      "timePerQuestion": {
+        "1": "30s",
+        "2": "25s",
+        "3": "20s",
+        "4": "15s",
+        "5": "12s"
+      },
       "start": "Lancer le Quiz",
       "questions": "questions",
       "perQuestion": "par question",
@@ -1053,27 +1078,27 @@
       "sortHint": "Glissez les elements pour les ordonner",
       "selectErrors": "Selectionnez les affirmations incorrectes",
       "enterNumber": "Entrez un nombre",
-      "dropHere": "D\u00e9poser ici",
-      "dragItems": "Glisser les \u00e9l\u00e9ments ci-dessus",
-      "timeUp": "Temps \u00e9coul\u00e9 !",
+      "dropHere": "Déposer ici",
+      "dragItems": "Glisser les éléments ci-dessus",
+      "timeUp": "Temps écoulé !",
       "isError": "ERREUR",
-      "correctAnswer": "Bonne r\u00e9ponse",
-      "resultsTitle": "Quiz termin\u00e9 !",
+      "correctAnswer": "Bonne réponse",
+      "resultsTitle": "Quiz terminé !",
       "points": "points",
       "statCorrect": "Correct",
-      "statAccuracy": "Pr\u00e9cision",
-      "statBestStreak": "Meilleure s\u00e9rie",
+      "statAccuracy": "Précision",
+      "statBestStreak": "Meilleure série",
       "statAvgTime": "Temps moyen",
-      "hideBreakdown": "Masquer le d\u00e9tail",
-      "showBreakdown": "Voir le d\u00e9tail",
-      "statusTimeout": "Temps \u00e9coul\u00e9",
+      "hideBreakdown": "Masquer le détail",
+      "showBreakdown": "Voir le détail",
+      "statusTimeout": "Temps écoulé",
       "statusCorrect": "Correct",
       "statusPartial": "Partiel",
       "statusWrong": "Faux",
       "saving": "Sauvegarde...",
-      "scoreSaved": "Score sauvegard\u00e9 !",
-      "tryAgain": "R\u00e9essayer",
-      "changeDifficulty": "Changer la difficult\u00e9",
+      "scoreSaved": "Score sauvegardé !",
+      "tryAgain": "Réessayer",
+      "changeDifficulty": "Changer la difficulté",
       "saveScore": "Sauvegarder",
       "results": {
         "title": "Quiz termine",
@@ -1102,7 +1127,7 @@
         "date": "Date",
         "noScores": "Aucun score",
         "loading": "Chargement du classement...",
-        "error": "\u00c9chec du chargement",
+        "error": "Échec du chargement",
         "empty": "Aucun score"
       },
       "q": {
@@ -1156,7 +1181,7 @@
         "cardIs": "Cette carte est {name}",
         "missionIs": "Cette mission est {name}",
         "spotError": "L'affirmation incorrecte sur {name} est surlignee",
-        "title": "Le titre de {name} est \u00ab {title} \u00bb",
+        "title": "Le titre de {name} est « {title} »",
         "teamMember": "{name} est un membre de {keyword}.",
         "notInGroup": "{name} n'appartient pas a {group}.",
         "higherPower": "{name} a la plus grande Puissance avec {value}.",
@@ -1175,7 +1200,10 @@
         "effectIs": "{name} a un effet {type}",
         "rarityIs": "{name} est de rarete {rarity}"
       },
-      "unit": { "chakra": "chakra", "seconds": "s" },
+      "unit": {
+        "chakra": "chakra",
+        "seconds": "s"
+      },
       "group": {
         "leaf": "Village de Konoha",
         "sand": "Village du Sable",
@@ -1183,61 +1211,353 @@
         "akatsuki": "Akatsuki",
         "independent": "Independant"
       },
-      "rarity": { "C": "Commune", "UC": "Peu commune", "R": "Rare", "RA": "Rare Art", "S": "Secrete", "M": "Mythos" },
-      "effectType": { "MAIN": "PRINCIPAL", "UPGRADE": "AMELIORATION", "AMBUSH": "EMBUSCADE", "SCORE": "SCORE" },
+      "rarity": {
+        "C": "Commune",
+        "UC": "Peu commune",
+        "R": "Rare",
+        "RA": "Rare Art",
+        "S": "Secrete",
+        "M": "Mythos"
+      },
+      "effectType": {
+        "MAIN": "PRINCIPAL",
+        "UPGRADE": "AMELIORATION",
+        "AMBUSH": "EMBUSCADE",
+        "SCORE": "SCORE"
+      },
       "rules": {
-        "q1": { "text": "Combien de tours dans une partie ?", "oA": "2", "oB": "3", "oC": "4", "oD": "5", "exp": "Une partie complete dure exactement 4 tours." },
-        "q2": { "text": "Combien de cartes pioche chaque joueur en Phase de Debut ?", "oA": "1", "oB": "3", "oC": "2", "oD": "5", "exp": "Chaque joueur pioche 2 cartes au debut de chaque tour." },
-        "q3": { "text": "Chakra de base gagne chaque tour (avant bonus) ?", "oA": "3", "oB": "5", "oC": "7", "oD": "10", "exp": "Chaque joueur gagne 5 chakra de base plus 1 par personnage en jeu." },
-        "q4": { "text": "Cout pour jouer un personnage face cachee ?", "oA": "0", "oB": "1", "oC": "2", "oD": "Le cout imprime", "exp": "Jouer cache coute toujours exactement 1 chakra." },
-        "q5": { "text": "Que deviennent les jetons de Puissance en fin de tour ?", "oA": "Ils restent", "oB": "La moitie est retiree", "oC": "Tous sont retires", "oD": "Transferes en main", "exp": "Tous les jetons de Puissance sont retires en Phase de Fin." },
-        "q6": { "text": "Combien de cartes mission par joueur ?", "oA": "1", "oB": "2", "oC": "3", "oD": "4", "exp": "Chaque joueur selectionne 3 cartes mission." },
-        "q7": { "text": "Qui remporte une mission en cas d'egalite ?", "oA": "Joueur 1 toujours", "oB": "Personne", "oC": "Le detenteur du Jeton d'Avantage", "oD": "Mission annulee", "exp": "Le detenteur du Jeton d'Avantage remporte les egalites." },
-        "q8": { "text": "Nombre minimum de cartes personnage dans un deck ?", "oA": "20", "oB": "25", "oC": "35", "oD": "30", "exp": "Un deck doit contenir au moins 30 cartes personnage." },
-        "q9": { "text": "Copies max de la meme version dans un deck ?", "oA": "1", "oB": "3", "oC": "2", "oD": "4", "exp": "Maximum 2 copies de la meme version." },
-        "q10": { "text": "Qui recoit le Jeton d'Avantage en Phase d'Action ?", "oA": "L'adversaire", "oB": "Personne", "oC": "Le premier a passer", "oD": "Aleatoire", "exp": "Le premier joueur a passer prend le Jeton d'Avantage." },
-        "q11": { "text": "Puissance des personnages caches pour le score ?", "oA": "Leur puissance imprimee", "oB": "0", "oC": "1", "oD": "La moitie", "exp": "Les personnages caches ont 0 de puissance pour le score." },
-        "q12": { "text": "Ordre de resolution des missions ?", "oA": "Simultanement", "oB": "D, C, B, A", "oC": "A, B, C, D", "oD": "Aleatoire", "exp": "Les missions sont resolues de D a C a B a A." },
-        "q13": { "text": "Bonus de points pour une mission rang B ?", "oA": "+1", "oB": "+2", "oC": "+3", "oD": "+4", "exp": "D=+1, C=+2, B=+3, A=+4." },
-        "q14": { "text": "Quand un effet PRINCIPAL se declenche-t-il ?", "oA": "Seulement joue face visible", "oB": "Seulement en revelant", "oC": "Face visible et en revelant", "oD": "Debut de tour", "exp": "PRINCIPAL se declenche quand joue face visible et quand on revele un personnage cache." },
-        "q15": { "text": "Quand un effet EMBUSCADE se declenche-t-il ?", "oA": "Joue face visible", "oB": "Seulement en revelant un cache", "oC": "En ameliorant", "oD": "Fin de tour", "exp": "EMBUSCADE ne se declenche qu'en revelant un personnage cache." },
-        "q16": { "text": "Puissance minimale pour gagner une mission ?", "oA": "0", "oB": "2", "oC": "1", "oD": "3", "exp": "Il faut au moins 1 de puissance pour gagner." },
-        "q17": { "text": "Deck vide, que se passe-t-il ?", "oA": "Vous perdez", "oB": "Rien (pas de penalite)", "oC": "Perdre 1 chakra", "oD": "Melanger la defausse", "exp": "Deck vide = ne pas piocher. Pas de penalite." },
-        "q18": { "text": "Comment calculer le cout d'amelioration ?", "oA": "Cout total du nouveau", "oB": "Difference (nouveau - ancien)", "oC": "Moitie du nouveau", "oD": "Gratuit", "exp": "Cout d'amelioration = nouveau cout - ancien cout." },
-        "q19": { "text": "Deux personnages caches de meme nom sur une mission ?", "oA": "Jamais", "oB": "Seulement titres differents", "oC": "Oui, jusqu'a ce qu'un soit revele", "oD": "Seulement missions rang A", "exp": "Deux cartes cachees de meme nom coexistent jusqu'a revelation." },
-        "q20": { "text": "Jetons de Puissance lors d'une amelioration ?", "oA": "Retires", "oB": "Transferes a la nouvelle carte", "oC": "Doubles", "oD": "Vont au chakra", "exp": "Les jetons de Puissance sont transferes a la nouvelle carte." },
-        "q21": { "text": "Quand un effet AMELIORATION se declenche-t-il ?", "oA": "Gain de jetons de Puissance", "oB": "En revelant un cache", "oC": "En jouant par-dessus un meme nom a cout inferieur", "oD": "Debut de tour", "exp": "AMELIORATION ne se declenche qu'en ameliorant un personnage de meme nom a cout inferieur." },
-        "q22": { "text": "Meme nom, titres differents — meme mission ?", "oA": "Oui, les titres les differencient", "oB": "Non, un seul nom par mission par joueur", "oC": "Oui si groupes differents", "oD": "Seulement si couts differents", "exp": "Un seul personnage par nom par mission, quel que soit le titre." },
-        "q23": { "text": "Que signifie le symbole [⧗] ?", "oA": "Effet unique", "oB": "Capacite declenchee", "oC": "Effet continu/passif", "oD": "Effet retarde", "exp": "Le symbole [⧗] indique un effet continu." },
-        "q24": { "text": "Quel rang de mission apparait au tour 1 ?", "oA": "A", "oB": "B", "oC": "D", "oD": "C", "exp": "Tour 1=D, Tour 2=C, Tour 3=B, Tour 4=A." },
-        "q25": { "text": "Qui choisit l'ordre quand plusieurs effets se declenchent ?", "oA": "Le defenseur", "oB": "Le joueur actif", "oC": "Alphabetique", "oD": "Le detenteur du Jeton", "exp": "Le joueur actif choisit l'ordre de resolution." },
-        "q26": { "text": "Que signifie CHAKRA +X sur un personnage ?", "oA": "Coute X de moins", "oB": "Fournit X chakra supplementaire en Phase de Debut", "oC": "Gagne X puissance", "oD": "Pioche X cartes", "exp": "CHAKRA +X fournit du chakra supplementaire en Phase de Debut." },
-        "q27": { "text": "Carte ennemie controlee qui quitte le jeu ?", "oA": "Votre defausse", "oB": "Defausse du proprietaire original", "oC": "Retiree du jeu", "oD": "Main du controleur", "exp": "Les cartes retournent dans la defausse de leur proprietaire." },
-        "q28": { "text": "Les personnages caches fournissent du chakra en Phase de Debut ?", "oA": "Non, seulement les visibles", "oB": "Oui, +1 chacun", "oC": "Seulement avec CHAKRA +X", "oD": "Seulement tours 3-4", "exp": "Les personnages caches comptent pour le +1 chakra par personnage." },
-        "q29": { "text": "Combien de phases par tour ?", "oA": "3", "oB": "4", "oC": "5", "oD": "6", "exp": "Debut, Action, Mission, Fin = 4 phases." },
-        "q30": { "text": "Amelioration : que deviennent les anciens effets ?", "oA": "Les deux s'appliquent", "oB": "Seuls les effets de la nouvelle carte", "oC": "Le joueur choisit", "oD": "Tous annules", "exp": "Seuls les effets de la nouvelle carte (dessus) s'appliquent." },
-        "q31": { "text": "Quand peut-on faire un Mulligan ?", "oA": "Debut de chaque tour", "oB": "En piochant", "oC": "Une seule fois pendant la mise en place", "oD": "Apres la premiere Phase d'Action", "exp": "Le Mulligan ne peut etre fait qu'une seule fois pendant la mise en place." },
-        "q32": { "text": "Apres qu'un joueur passe, l'autre peut-il continuer ?", "oA": "Non, le tour se termine", "oB": "Seulement avec le Jeton", "oC": "Une seule action de plus", "oD": "Oui, plusieurs actions jusqu'a ce qu'il passe aussi", "exp": "Le joueur restant peut effectuer plusieurs actions." },
-        "q33": { "text": "Les effets sont optionnels ou obligatoires par defaut ?", "oA": "Optionnels sauf 'vous devez'", "oB": "Toujours obligatoires", "oC": "Toujours optionnels", "oD": "Depend du type d'effet", "exp": "Les effets sont optionnels sauf si le texte dit 'vous devez'." },
-        "q34": { "text": "Cartes existantes vs nouvelle carte — quels effets d'abord ?", "oA": "La nouvelle carte", "oB": "Les cartes existantes en jeu", "oC": "Le joueur actif choisit", "oD": "Simultanement", "exp": "Les effets des cartes existantes se resolvent avant ceux de la nouvelle." },
-        "q35": { "text": "Condition pour ameliorer un personnage ?", "oA": "Meme nom et meme cout", "oB": "Meme nom et cout strictement superieur", "oC": "Meme groupe, puissance superieure", "oD": "N'importe quelle carte plus forte", "exp": "Meme nom + cout en chakra strictement superieur." },
-        "q36": { "text": "Les effets SCORE necessitent-ils une condition ?", "oA": "Non, toujours actifs", "oB": "Il faut 1+ puissance pour gagner et declencher", "oC": "Seulement si le personnage a survecu", "oD": "Seulement missions rang B+", "exp": "Il faut au moins 1 de puissance pour gagner et declencher SCORE." },
-        "q37": { "text": "Les deux joueurs ont 0 puissance sur une mission ?", "oA": "Le Jeton d'Avantage gagne", "oB": "Personne ne gagne", "oC": "Mission defaussee", "oD": "Les deux gagnent les points", "exp": "Si les deux ont 0 puissance, personne ne gagne." },
-        "q38": { "text": "Les cartes Rare Art sont une version differente ?", "oA": "Oui, completement separees", "oB": "Non, meme version", "oC": "Seulement pour le deckbuilding", "oD": "Seulement pour le gameplay", "exp": "Les variantes Rare Art ne sont PAS une version differente." },
-        "q39": { "text": "Que se passe-t-il en revelant un personnage cache ?", "oA": "Seulement EMBUSCADE", "oB": "PRINCIPAL et EMBUSCADE s'activent", "oC": "Seulement PRINCIPAL", "oD": "Aucun effet", "exp": "Reveler active les effets PRINCIPAL et EMBUSCADE." },
-        "q40": { "text": "Fin du tour 4, scores egaux ?", "oA": "Egalite", "oB": "Le Jeton d'Avantage gagne", "oC": "Mission de departage", "oD": "Plus de cartes gagne", "exp": "En cas d'egalite apres le tour 4, le detenteur du Jeton d'Avantage gagne." }
+        "q1": {
+          "text": "Combien de tours dans une partie ?",
+          "oA": "2",
+          "oB": "3",
+          "oC": "4",
+          "oD": "5",
+          "exp": "Une partie complete dure exactement 4 tours."
+        },
+        "q2": {
+          "text": "Combien de cartes pioche chaque joueur en Phase de Debut ?",
+          "oA": "1",
+          "oB": "3",
+          "oC": "2",
+          "oD": "5",
+          "exp": "Chaque joueur pioche 2 cartes au debut de chaque tour."
+        },
+        "q3": {
+          "text": "Chakra de base gagne chaque tour (avant bonus) ?",
+          "oA": "3",
+          "oB": "5",
+          "oC": "7",
+          "oD": "10",
+          "exp": "Chaque joueur gagne 5 chakra de base plus 1 par personnage en jeu."
+        },
+        "q4": {
+          "text": "Cout pour jouer un personnage face cachee ?",
+          "oA": "0",
+          "oB": "1",
+          "oC": "2",
+          "oD": "Le cout imprime",
+          "exp": "Jouer cache coute toujours exactement 1 chakra."
+        },
+        "q5": {
+          "text": "Que deviennent les jetons de Puissance en fin de tour ?",
+          "oA": "Ils restent",
+          "oB": "La moitie est retiree",
+          "oC": "Tous sont retires",
+          "oD": "Transferes en main",
+          "exp": "Tous les jetons de Puissance sont retires en Phase de Fin."
+        },
+        "q6": {
+          "text": "Combien de cartes mission par joueur ?",
+          "oA": "1",
+          "oB": "2",
+          "oC": "3",
+          "oD": "4",
+          "exp": "Chaque joueur selectionne 3 cartes mission."
+        },
+        "q7": {
+          "text": "Qui remporte une mission en cas d'egalite ?",
+          "oA": "Joueur 1 toujours",
+          "oB": "Personne",
+          "oC": "Le detenteur du Jeton d'Avantage",
+          "oD": "Mission annulee",
+          "exp": "Le detenteur du Jeton d'Avantage remporte les egalites."
+        },
+        "q8": {
+          "text": "Nombre minimum de cartes personnage dans un deck ?",
+          "oA": "20",
+          "oB": "25",
+          "oC": "35",
+          "oD": "30",
+          "exp": "Un deck doit contenir au moins 30 cartes personnage."
+        },
+        "q9": {
+          "text": "Copies max de la meme version dans un deck ?",
+          "oA": "1",
+          "oB": "3",
+          "oC": "2",
+          "oD": "4",
+          "exp": "Maximum 2 copies de la meme version."
+        },
+        "q10": {
+          "text": "Qui recoit le Jeton d'Avantage en Phase d'Action ?",
+          "oA": "L'adversaire",
+          "oB": "Personne",
+          "oC": "Le premier a passer",
+          "oD": "Aleatoire",
+          "exp": "Le premier joueur a passer prend le Jeton d'Avantage."
+        },
+        "q11": {
+          "text": "Puissance des personnages caches pour le score ?",
+          "oA": "Leur puissance imprimee",
+          "oB": "0",
+          "oC": "1",
+          "oD": "La moitie",
+          "exp": "Les personnages caches ont 0 de puissance pour le score."
+        },
+        "q12": {
+          "text": "Ordre de resolution des missions ?",
+          "oA": "Simultanement",
+          "oB": "D, C, B, A",
+          "oC": "A, B, C, D",
+          "oD": "Aleatoire",
+          "exp": "Les missions sont resolues de D a C a B a A."
+        },
+        "q13": {
+          "text": "Bonus de points pour une mission rang B ?",
+          "oA": "+1",
+          "oB": "+2",
+          "oC": "+3",
+          "oD": "+4",
+          "exp": "D=+1, C=+2, B=+3, A=+4."
+        },
+        "q14": {
+          "text": "Quand un effet PRINCIPAL se declenche-t-il ?",
+          "oA": "Seulement joue face visible",
+          "oB": "Seulement en revelant",
+          "oC": "Face visible et en revelant",
+          "oD": "Debut de tour",
+          "exp": "PRINCIPAL se declenche quand joue face visible et quand on revele un personnage cache."
+        },
+        "q15": {
+          "text": "Quand un effet EMBUSCADE se declenche-t-il ?",
+          "oA": "Joue face visible",
+          "oB": "Seulement en revelant un cache",
+          "oC": "En ameliorant",
+          "oD": "Fin de tour",
+          "exp": "EMBUSCADE ne se declenche qu'en revelant un personnage cache."
+        },
+        "q16": {
+          "text": "Puissance minimale pour gagner une mission ?",
+          "oA": "0",
+          "oB": "2",
+          "oC": "1",
+          "oD": "3",
+          "exp": "Il faut au moins 1 de puissance pour gagner."
+        },
+        "q17": {
+          "text": "Deck vide, que se passe-t-il ?",
+          "oA": "Vous perdez",
+          "oB": "Rien (pas de penalite)",
+          "oC": "Perdre 1 chakra",
+          "oD": "Melanger la defausse",
+          "exp": "Deck vide = ne pas piocher. Pas de penalite."
+        },
+        "q18": {
+          "text": "Comment calculer le cout d'amelioration ?",
+          "oA": "Cout total du nouveau",
+          "oB": "Difference (nouveau - ancien)",
+          "oC": "Moitie du nouveau",
+          "oD": "Gratuit",
+          "exp": "Cout d'amelioration = nouveau cout - ancien cout."
+        },
+        "q19": {
+          "text": "Deux personnages caches de meme nom sur une mission ?",
+          "oA": "Jamais",
+          "oB": "Seulement titres differents",
+          "oC": "Oui, jusqu'a ce qu'un soit revele",
+          "oD": "Seulement missions rang A",
+          "exp": "Deux cartes cachees de meme nom coexistent jusqu'a revelation."
+        },
+        "q20": {
+          "text": "Jetons de Puissance lors d'une amelioration ?",
+          "oA": "Retires",
+          "oB": "Transferes a la nouvelle carte",
+          "oC": "Doubles",
+          "oD": "Vont au chakra",
+          "exp": "Les jetons de Puissance sont transferes a la nouvelle carte."
+        },
+        "q21": {
+          "text": "Quand un effet AMELIORATION se declenche-t-il ?",
+          "oA": "Gain de jetons de Puissance",
+          "oB": "En revelant un cache",
+          "oC": "En jouant par-dessus un meme nom a cout inferieur",
+          "oD": "Debut de tour",
+          "exp": "AMELIORATION ne se declenche qu'en ameliorant un personnage de meme nom a cout inferieur."
+        },
+        "q22": {
+          "text": "Meme nom, titres differents — meme mission ?",
+          "oA": "Oui, les titres les differencient",
+          "oB": "Non, un seul nom par mission par joueur",
+          "oC": "Oui si groupes differents",
+          "oD": "Seulement si couts differents",
+          "exp": "Un seul personnage par nom par mission, quel que soit le titre."
+        },
+        "q23": {
+          "text": "Que signifie le symbole [⧗] ?",
+          "oA": "Effet unique",
+          "oB": "Capacite declenchee",
+          "oC": "Effet continu/passif",
+          "oD": "Effet retarde",
+          "exp": "Le symbole [⧗] indique un effet continu."
+        },
+        "q24": {
+          "text": "Quel rang de mission apparait au tour 1 ?",
+          "oA": "A",
+          "oB": "B",
+          "oC": "D",
+          "oD": "C",
+          "exp": "Tour 1=D, Tour 2=C, Tour 3=B, Tour 4=A."
+        },
+        "q25": {
+          "text": "Qui choisit l'ordre quand plusieurs effets se declenchent ?",
+          "oA": "Le defenseur",
+          "oB": "Le joueur actif",
+          "oC": "Alphabetique",
+          "oD": "Le detenteur du Jeton",
+          "exp": "Le joueur actif choisit l'ordre de resolution."
+        },
+        "q26": {
+          "text": "Que signifie CHAKRA +X sur un personnage ?",
+          "oA": "Coute X de moins",
+          "oB": "Fournit X chakra supplementaire en Phase de Debut",
+          "oC": "Gagne X puissance",
+          "oD": "Pioche X cartes",
+          "exp": "CHAKRA +X fournit du chakra supplementaire en Phase de Debut."
+        },
+        "q27": {
+          "text": "Carte ennemie controlee qui quitte le jeu ?",
+          "oA": "Votre defausse",
+          "oB": "Defausse du proprietaire original",
+          "oC": "Retiree du jeu",
+          "oD": "Main du controleur",
+          "exp": "Les cartes retournent dans la defausse de leur proprietaire."
+        },
+        "q28": {
+          "text": "Les personnages caches fournissent du chakra en Phase de Debut ?",
+          "oA": "Non, seulement les visibles",
+          "oB": "Oui, +1 chacun",
+          "oC": "Seulement avec CHAKRA +X",
+          "oD": "Seulement tours 3-4",
+          "exp": "Les personnages caches comptent pour le +1 chakra par personnage."
+        },
+        "q29": {
+          "text": "Combien de phases par tour ?",
+          "oA": "3",
+          "oB": "4",
+          "oC": "5",
+          "oD": "6",
+          "exp": "Debut, Action, Mission, Fin = 4 phases."
+        },
+        "q30": {
+          "text": "Amelioration : que deviennent les anciens effets ?",
+          "oA": "Les deux s'appliquent",
+          "oB": "Seuls les effets de la nouvelle carte",
+          "oC": "Le joueur choisit",
+          "oD": "Tous annules",
+          "exp": "Seuls les effets de la nouvelle carte (dessus) s'appliquent."
+        },
+        "q31": {
+          "text": "Quand peut-on faire un Mulligan ?",
+          "oA": "Debut de chaque tour",
+          "oB": "En piochant",
+          "oC": "Une seule fois pendant la mise en place",
+          "oD": "Apres la premiere Phase d'Action",
+          "exp": "Le Mulligan ne peut etre fait qu'une seule fois pendant la mise en place."
+        },
+        "q32": {
+          "text": "Apres qu'un joueur passe, l'autre peut-il continuer ?",
+          "oA": "Non, le tour se termine",
+          "oB": "Seulement avec le Jeton",
+          "oC": "Une seule action de plus",
+          "oD": "Oui, plusieurs actions jusqu'a ce qu'il passe aussi",
+          "exp": "Le joueur restant peut effectuer plusieurs actions."
+        },
+        "q33": {
+          "text": "Les effets sont optionnels ou obligatoires par defaut ?",
+          "oA": "Optionnels sauf 'vous devez'",
+          "oB": "Toujours obligatoires",
+          "oC": "Toujours optionnels",
+          "oD": "Depend du type d'effet",
+          "exp": "Les effets sont optionnels sauf si le texte dit 'vous devez'."
+        },
+        "q34": {
+          "text": "Cartes existantes vs nouvelle carte — quels effets d'abord ?",
+          "oA": "La nouvelle carte",
+          "oB": "Les cartes existantes en jeu",
+          "oC": "Le joueur actif choisit",
+          "oD": "Simultanement",
+          "exp": "Les effets des cartes existantes se resolvent avant ceux de la nouvelle."
+        },
+        "q35": {
+          "text": "Condition pour ameliorer un personnage ?",
+          "oA": "Meme nom et meme cout",
+          "oB": "Meme nom et cout strictement superieur",
+          "oC": "Meme groupe, puissance superieure",
+          "oD": "N'importe quelle carte plus forte",
+          "exp": "Meme nom + cout en chakra strictement superieur."
+        },
+        "q36": {
+          "text": "Les effets SCORE necessitent-ils une condition ?",
+          "oA": "Non, toujours actifs",
+          "oB": "Il faut 1+ puissance pour gagner et declencher",
+          "oC": "Seulement si le personnage a survecu",
+          "oD": "Seulement missions rang B+",
+          "exp": "Il faut au moins 1 de puissance pour gagner et declencher SCORE."
+        },
+        "q37": {
+          "text": "Les deux joueurs ont 0 puissance sur une mission ?",
+          "oA": "Le Jeton d'Avantage gagne",
+          "oB": "Personne ne gagne",
+          "oC": "Mission defaussee",
+          "oD": "Les deux gagnent les points",
+          "exp": "Si les deux ont 0 puissance, personne ne gagne."
+        },
+        "q38": {
+          "text": "Les cartes Rare Art sont une version differente ?",
+          "oA": "Oui, completement separees",
+          "oB": "Non, meme version",
+          "oC": "Seulement pour le deckbuilding",
+          "oD": "Seulement pour le gameplay",
+          "exp": "Les variantes Rare Art ne sont PAS une version differente."
+        },
+        "q39": {
+          "text": "Que se passe-t-il en revelant un personnage cache ?",
+          "oA": "Seulement EMBUSCADE",
+          "oB": "PRINCIPAL et EMBUSCADE s'activent",
+          "oC": "Seulement PRINCIPAL",
+          "oD": "Aucun effet",
+          "exp": "Reveler active les effets PRINCIPAL et EMBUSCADE."
+        },
+        "q40": {
+          "text": "Fin du tour 4, scores egaux ?",
+          "oA": "Egalite",
+          "oB": "Le Jeton d'Avantage gagne",
+          "oC": "Mission de departage",
+          "oD": "Plus de cartes gagne",
+          "exp": "En cas d'egalite apres le tour 4, le detenteur du Jeton d'Avantage gagne."
+        }
       }
     }
   },
   "legal": {
     "back": "Retour",
-    "title": "Mentions l\u00e9gales",
+    "title": "Mentions légales",
     "disclaimer": "Avertissement",
-    "disclaimerText": "Naruto Mythos TCG est une adaptation num\u00e9rique cr\u00e9\u00e9e par des fans. Il s'agit d'un projet non commercial cr\u00e9\u00e9 \u00e0 des fins \u00e9ducatives et de divertissement.",
-    "intellectual": "Propri\u00e9t\u00e9 intellectuelle",
-    "intellectualText": "Naruto et tous les personnages, noms et \u00e9l\u00e9ments associ\u00e9s sont des marques d\u00e9pos\u00e9es de Masashi Kishimoto, Shueisha et de leurs propri\u00e9taires respectifs. Les designs de cartes et les m\u00e9caniques de jeu sont bas\u00e9s sur le jeu de cartes Naruto Mythos TCG.",
+    "disclaimerText": "Naruto Mythos TCG est une adaptation numérique créée par des fans. Il s'agit d'un projet non commercial créé à des fins éducatives et de divertissement.",
+    "intellectual": "Propriété intellectuelle",
+    "intellectualText": "Naruto et tous les personnages, noms et éléments associés sont des marques déposées de Masashi Kishimoto, Shueisha et de leurs propriétaires respectifs. Les designs de cartes et les mécaniques de jeu sont basés sur le jeu de cartes Naruto Mythos TCG.",
     "contact": "Contact",
-    "contactText": "Ce projet est d\u00e9velopp\u00e9 par HiddenLab. Visitez-nous sur"
+    "contactText": "Ce projet est développé par HiddenLab. Visitez-nous sur"
   },
   "friends": {
     "title": "Amis",

@@ -230,6 +230,17 @@ export function validateUpgradeCharacter(
   // (combines the reveal cost + upgrade diff in one action)
   const ps = state[player];
   if (target.isHidden) {
+    // When upgrading a hidden character, it will be revealed — check no visible same-name exists
+    const newCardName = newCard.name_fr;
+    const friendlyCharsInMission = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    const sameNameVisible = friendlyCharsInMission.some(
+      c => c.instanceId !== target.instanceId && !c.isHidden &&
+      (c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr === newCardName
+    );
+    if (sameNameVisible) {
+      return { valid: false, reason: 'Cannot upgrade: a visible character with the same name already exists in this mission.', reasonKey: 'game.error.upgradeHiddenDuplicateName', reasonParams: { name: newCardName } };
+    }
+
     const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
     if (ps.chakra < effectiveCost) {
       return { valid: false, reason: `Not enough chakra. Need ${effectiveCost} (reveal + upgrade), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };

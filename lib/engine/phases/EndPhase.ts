@@ -97,13 +97,13 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
 
         // --- Summon keyword return ---
         // All Summon cards return to hand at end of round.
-        // Exception: Kyodaigumo 103 has a "hide then return" flow handled separately.
+        // Exception: Giant Spider 103 has a "hide then return" flow handled separately.
         if (isSummon) {
-          const isKyodaigumo103 = (topCard.effects ?? []).some(
+          const isGiantSpider103 = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               e.description.toLowerCase().includes('hide a character'),
           );
-          if (!isKyodaigumo103) {
+          if (!isGiantSpider103) {
             charsToReturn.push({
               instanceId: char.instanceId,
               player: char.controlledBy,
@@ -421,13 +421,13 @@ export function handleAkamaru028Return(state: GameState): GameState {
 }
 
 /**
- * Kyodaigumo 103 (UC): [⧗] At end of round, player may optionally hide a character with Power ≤ Kyodaigumo's power.
- * If they do, Kyodaigumo must return to hand (handled in EffectEngine KYODAIGUMO103_CHOOSE_HIDE_TARGET case).
- * Uses state.endPhaseKyodaigumo103Ids to avoid processing the same card twice across resumptions.
+ * Giant Spider 103 (UC): [⧗] At end of round, player may optionally hide a character with Power ≤ Giant Spider's power.
+ * If they do, Giant Spider must return to hand (handled in EffectEngine GIANT_SPIDER103_CHOOSE_HIDE_TARGET case).
+ * Uses state.endPhaseGiantSpider103Ids to avoid processing the same card twice across resumptions.
  */
-export function handleKyodaigumo103EndOfRound(state: GameState): GameState {
+export function handleGiantSpider103EndOfRound(state: GameState): GameState {
   let newState = { ...state };
-  const alreadyProcessed = new Set<string>(newState.endPhaseKyodaigumo103Ids ?? []);
+  const alreadyProcessed = new Set<string>(newState.endPhaseGiantSpider103Ids ?? []);
 
   for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
     const mission = newState.activeMissions[mIdx];
@@ -461,20 +461,33 @@ export function handleKyodaigumo103EndOfRound(state: GameState): GameState {
         }
 
         alreadyProcessed.add(char.instanceId);
-        newState.endPhaseKyodaigumo103Ids = [...alreadyProcessed];
+        newState.endPhaseGiantSpider103Ids = [...alreadyProcessed];
 
-        if (validTargets.length === 0) continue;
+        // Giant Spider ALWAYS returns to hand at end of round, regardless of hide
+        if (validTargets.length === 0) {
+          // No valid hide targets — just return Giant Spider to hand
+          newState = returnCharacterToHand(newState, char.instanceId, player);
+          newState.log = logAction(
+            newState.log, newState.turn, 'end', player,
+            'END_RETURN_TO_HAND',
+            'Giant Spider (103): Returns to hand at end of round.',
+            'game.log.effect.giantSpider103Return',
+            { card: 'ARAIGNEE GEANTE', id: 'KS-103-UC' },
+          );
+          // Re-run to check for more Giant Spiders
+          return handleGiantSpider103EndOfRound(newState);
+        }
 
-        const effectId = `kyodaigumo103-hide-${char.instanceId}`;
-        const actionId = `kyodaigumo103-hide-action-${char.instanceId}`;
+        const effectId = `giantSpider103-hide-${char.instanceId}`;
+        const actionId = `giantSpider103-hide-action-${char.instanceId}`;
         newState.pendingEffects = [...newState.pendingEffects, {
           id: effectId,
           sourceCardId: topCard.id,
           sourceInstanceId: char.instanceId,
           sourceMissionIndex: mIdx,
           effectType: 'MAIN' as const,
-          effectDescription: JSON.stringify({ kyodaigumoInstanceId: char.instanceId }),
-          targetSelectionType: 'KYODAIGUMO103_CHOOSE_HIDE_TARGET',
+          effectDescription: JSON.stringify({ giantSpiderInstanceId: char.instanceId }),
+          targetSelectionType: 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET',
           sourcePlayer: player,
           requiresTargetSelection: true,
           validTargets,
@@ -487,8 +500,8 @@ export function handleKyodaigumo103EndOfRound(state: GameState): GameState {
           id: actionId,
           type: 'SELECT_TARGET' as const,
           player,
-          description: `Kyodaigumo (103): You may hide a character with Power ≤ ${powerThreshold}. If you do, Kyodaigumo must return to your hand.`,
-          descriptionKey: 'game.effect.desc.kyodaigumo103EndHide',
+          description: `Giant Spider (103): You may hide a character with Power ≤ ${powerThreshold}. If you do, Giant Spider must return to your hand.`,
+          descriptionKey: 'game.effect.desc.giantSpider103EndHide',
           options: validTargets,
           minSelections: 1,
           maxSelections: 1,

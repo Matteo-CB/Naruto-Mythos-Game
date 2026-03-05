@@ -556,24 +556,8 @@ export class EffectEngine {
           const opp091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const oppHand091 = newState[opp091].hand;
           if (oppHand091.length > 0) {
-            // Auto-discard if only 1 card
-            if (oppHand091.length === 1) {
-              const ps091 = { ...newState[opp091] };
-              const hand091 = [...ps091.hand];
-              const discarded091 = hand091.splice(0, 1)[0];
-              ps091.hand = hand091;
-              ps091.discardPile = [...ps091.discardPile, discarded091];
-              newState = { ...newState, [opp091]: ps091 };
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-                'EFFECT_DISCARD_FROM_HAND',
-                `Itachi Uchiwa (091) UPGRADE: Discarded ${discarded091.name_fr} from opponent's hand.`,
-                'game.log.effect.itachi091DiscardOpponent',
-                { card: 'ITACHI UCHIWA', id: 'KS-091-UC', target: discarded091.name_fr },
-              );
-            } else {
-              // Multiple cards — source player chooses which to discard
-              const oppIndices091 = oppHand091.map((_: unknown, i: number) => String(i));
+            // Always show selection UI — player chooses which card to discard
+            const oppIndices091 = oppHand091.map((_: unknown, i: number) => String(i));
               const oppCards091 = oppHand091.map((c, i) => ({
                 name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
                 image_file: c.image_file, originalIndex: i,
@@ -599,7 +583,6 @@ export class EffectEngine {
                 pendingEffect.sourceMissionIndex,
                 'MAIN', false, step2091, [],
               );
-            }
           }
         }
         break;
@@ -1437,21 +1420,21 @@ export class EffectEngine {
         break;
       }
 
-      // --- Kyodaigumo 103 optional end-of-round: hide a character, then must return to hand ---
-      case 'KYODAIGUMO103_CHOOSE_HIDE_TARGET': {
+      // --- Giant Spider 103 optional end-of-round: hide a character, then must return to hand ---
+      case 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET': {
         // Hide the selected character
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
-        // Kyodaigumo must return to hand
-        let k103Data: { kyodaigumoInstanceId?: string } = {};
+        // Giant Spider must return to hand
+        let k103Data: { giantSpiderInstanceId?: string } = {};
         try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        if (k103Data.kyodaigumoInstanceId) {
-          newState = returnCharacterToHand(newState, k103Data.kyodaigumoInstanceId, pendingEffect.sourcePlayer);
+        if (k103Data.giantSpiderInstanceId) {
+          newState = returnCharacterToHand(newState, k103Data.giantSpiderInstanceId, pendingEffect.sourcePlayer);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'END_RETURN',
-            'Kyodaigumo (103): Must return to hand after using end-of-round effect.',
-            'game.log.effect.kyodaigumo103Return',
-            { card: 'KYODAIGUMO', id: 'KS-103-UC' },
+            'Giant Spider (103): Must return to hand after using end-of-round effect.',
+            'game.log.effect.giantSpider103Return',
+            { card: 'ARAIGNEE GEANTE', id: 'KS-103-UC' },
           );
         }
         break;
@@ -2890,9 +2873,9 @@ export class EffectEngine {
             charResult_k73d?.character ?? null,
             pendingEffect.sourceMissionIndex,
             'MAIN',
-            false,
+            pendingEffect.isUpgrade,
             step2Result_k73d,
-            [],
+            pendingEffect.remainingEffectTypes ?? [],
           );
         }
         break;

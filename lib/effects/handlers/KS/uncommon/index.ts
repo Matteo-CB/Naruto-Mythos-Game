@@ -51,7 +51,7 @@ import { registerHaku089Handlers } from './haku089';
 import { registerItachi091Handlers } from './itachi091';
 import { registerHandler as registerKisame093 } from './kisame093';
 import { registerManda102Handlers } from './manda102';
-import { registerHandler as registerKyodaigumo103 } from './kyodaigumo103';
+import { registerHandler as registerGiantSpider103 } from './giantSpider103';
 
 /**
  * Register all uncommon card effect handlers with the effect registry.
@@ -106,5 +106,5 @@ export function registerAllUncommonHandlers(): void {
   registerItachi091Handlers();  // 091/130 - ITACHI UCHIWA: Look at hand / UPGRADE discard from hand
   registerKisame093();          // 093/130 - KISAME HOSHIGAKI: Steal Power tokens from enemy
   registerManda102Handlers();   // 102/130 - MANDA: AMBUSH defeat Summon / [continuous] return
-  registerKyodaigumo103();      // 103/130 - KYODAIGUMO: [continuous] hide+return at end of round
+  registerGiantSpider103();     // 103/130 - ARAIGNEE GEANTE (GIANT SPIDER): [continuous] hide+return at end of round
 }

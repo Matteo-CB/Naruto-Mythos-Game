@@ -190,7 +190,9 @@ For each mission:
 - The card is placed face-down — it is a **hidden character**
 - No effects activate
 - **You may look at your own hidden cards at any time**
-- Hidden characters have **cost 0 and power 0** when targeted by opponent effects
+- Hidden characters have **cost 0 and power 0** (but power tokens still count toward total power)
+- **Hidden characters have NO visible keywords, group, or effects** — they cannot be targeted by effects that check keywords or group, even by the owning player (e.g., Hiruzen cannot POWERUP a hidden Leaf Village ally because the hidden card has no visible group)
+- Exception: effects that PLAY or REVEAL a character (e.g., Jiraiya "play a Summon") verify keyword AFTER the reveal, not before
 
 #### Revealing a Hidden Character
 - Pay the card's **printed chakra cost**

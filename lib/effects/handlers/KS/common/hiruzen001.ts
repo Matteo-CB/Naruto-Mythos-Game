@@ -24,6 +24,8 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
     for (const char of friendlyChars) {
       // Must not be self, must be Leaf Village
       if (char.instanceId === sourceCard.instanceId) continue;
+      // Hidden characters have no visible keywords/group — skip
+      if (char.isHidden) continue;
 
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.group === 'Leaf Village') {

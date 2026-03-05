@@ -6,13 +6,23 @@ import { useTranslations } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+interface BackgroundOption {
+  id: string;
+  filename: string;
+  url: string;
+}
 
 export default function SettingsPage() {
   const { status } = useSession();
   const router = useRouter();
   const t = useTranslations('settings');
-  const { animationsEnabled, isLoaded, fetchFromServer, setAnimationsEnabled } = useSettingsStore();
+  const {
+    animationsEnabled, gameBackground, isLoaded,
+    fetchFromServer, setAnimationsEnabled, setGameBackground,
+  } = useSettingsStore();
+  const [backgrounds, setBackgrounds] = useState<BackgroundOption[]>([]);
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -28,6 +38,14 @@ export default function SettingsPage() {
     }
   }, [status, fetchFromServer]);
 
+  // Fetch available backgrounds
+  useEffect(() => {
+    fetch('/api/backgrounds')
+      .then((r) => r.ok ? r.json() : { backgrounds: [] })
+      .then((data) => setBackgrounds(data.backgrounds || []))
+      .catch(() => {});
+  }, []);
+
   if (status === 'loading' || status === 'unauthenticated') {
     return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }} />;
   }
@@ -41,7 +59,7 @@ export default function SettingsPage() {
       <DecorativeIcons animated={animationsEnabled} />
 
       <div
-        className="relative z-10 w-full max-w-xs px-4 py-8"
+        className="relative z-10 w-full max-w-md px-4 py-8"
         style={{ zIndex: 1 }}
       >
         {/* Title */}
@@ -103,6 +121,65 @@ export default function SettingsPage() {
             {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
           </p>
         </div>
+
+        {/* Game Background picker */}
+        {backgrounds.length > 0 && (
+          <div
+            className="mt-4 flex flex-col gap-4 p-5"
+            style={{
+              backgroundColor: '#111111',
+              border: '1px solid #262626',
+            }}
+          >
+            <span
+              className="text-sm font-medium tracking-wide"
+              style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}
+            >
+              {t('gameBackground')}
+            </span>
+
+            <div className="grid grid-cols-2 gap-3">
+              {backgrounds.map((bg) => {
+                const isSelected = gameBackground === bg.id;
+                return (
+                  <button
+                    key={bg.id}
+                    type="button"
+                    disabled={!isLoaded}
+                    onClick={() => setGameBackground(bg.id)}
+                    className="relative overflow-hidden transition-all"
+                    style={{
+                      aspectRatio: '16/9',
+                      border: isSelected ? '2px solid #c4a35a' : '2px solid #333333',
+                      opacity: isLoaded ? 1 : 0.5,
+                      cursor: isLoaded ? 'pointer' : 'default',
+                    }}
+                  >
+                    <img
+                      src={bg.url}
+                      alt={bg.id}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    {isSelected && (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center"
+                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)' }}
+                      >
+                        <span
+                          className="text-xs font-bold uppercase tracking-wider"
+                          style={{ color: '#c4a35a' }}
+                        >
+                          {t('selected')}
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Back link */}
         <div className="mt-6 text-center">

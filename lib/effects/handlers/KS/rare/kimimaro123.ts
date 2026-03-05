@@ -6,8 +6,8 @@ import type { CharacterInPlay } from '@/lib/engine/types';
 
 /**
  * Card 123/130 - KIMIMARO (R)
- * Chakra: 5, Power: 5
- * Group: Sound Village, Keywords: Sound Five
+ * Chakra: 6, Power: 8
+ * Group: Sound Village, Keywords: Jutsu
  *
  * MAIN [continuous]: At end of round, if the controlling player has no cards in hand,
  *   this character must be defeated.
@@ -85,6 +85,7 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
     validTargets: handIndices,
     description: 'Kimimaro (123) UPGRADE: Choose a card to discard. Then choose a character with cost 5 or less to defeat.',
     descriptionKey: 'game.effect.desc.kimimaro123Discard',
+    isOptional: true,
   };
 }
 

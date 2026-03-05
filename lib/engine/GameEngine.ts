@@ -25,7 +25,7 @@ import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
-import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleKyodaigumo103EndOfRound } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 
@@ -222,14 +222,14 @@ export class GameEngine {
             newState = handleAkamaru028Return(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
-            // Continue processing Kyodaigumo 103 optional end-of-round hides
-            newState = handleKyodaigumo103EndOfRound(newState);
+            // Continue processing Giant Spider 103 optional end-of-round hides
+            newState = handleGiantSpider103EndOfRound(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
             // All end-of-round effects resolved — finish end phase transition
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
-            newState.endPhaseKyodaigumo103Ids = undefined;
+            newState.endPhaseGiantSpider103Ids = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -243,7 +243,7 @@ export class GameEngine {
           newState.pendingEffects = [];
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
-          newState.endPhaseKyodaigumo103Ids = undefined;
+          newState.endPhaseGiantSpider103Ids = undefined;
           if (newState.turn >= TOTAL_TURNS) {
             newState = GameEngine.endGame(newState);
           } else {
@@ -368,8 +368,8 @@ export class GameEngine {
       return newState;
     }
 
-    // Process Kyodaigumo 103 optional end-of-round hides
-    newState = handleKyodaigumo103EndOfRound(newState);
+    // Process Giant Spider 103 optional end-of-round hides
+    newState = handleGiantSpider103EndOfRound(newState);
     if (newState.pendingActions.length > 0) {
       return newState;
     }
@@ -377,7 +377,7 @@ export class GameEngine {
     // Clean up end phase tracking
     newState.endPhaseMovedIds = undefined;
     newState.endPhaseAkamaru028Ids = undefined;
-    newState.endPhaseKyodaigumo103Ids = undefined;
+    newState.endPhaseGiantSpider103Ids = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
@@ -624,6 +624,22 @@ export class GameEngine {
           return EffectEngine.processRemainingEffects(newState, effect);
         }
         return newState;
+      }
+
+      // Special case: Giant Spider 103 — declining the hide still returns Giant Spider to hand
+      if (effect.targetSelectionType === 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET') {
+        let k103Data: { giantSpiderInstanceId?: string } = {};
+        try { k103Data = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        if (k103Data.giantSpiderInstanceId) {
+          newState = returnCharacterToHand(newState, k103Data.giantSpiderInstanceId, effect.sourcePlayer);
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, effect.sourcePlayer,
+            'END_RETURN',
+            'Giant Spider (103): Returns to hand at end of round.',
+            'game.log.effect.giantSpider103Return',
+            { card: 'ARAIGNEE GEANTE', id: 'KS-103-UC' },
+          );
+        }
       }
 
       // Remove the effect and its associated action
