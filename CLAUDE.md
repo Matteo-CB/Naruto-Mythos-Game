@@ -105,7 +105,7 @@ Copy all images from `output/images/` into `public/images/` to serve them static
 
 **Special effect keywords:**
 - `CHAKRA +X` — This character provides X extra chakra during the Start Phase (in addition to the normal +1 per character in play)
-- `POWERUP X` — Place X Power tokens on the target character (default target: the card generating the effect)
+- `POWERUP X` — Place X Power tokens on the target character (default target: the card generating the effect). When the effect text says just "POWERUP X" with no specified target, the tokens go on the card itself (self). When X = count of characters, the source card does NOT count itself in the count.
 - `[⧗]` symbol — Indicates a continuous/passive effect (active while the character is face-visible)
 - `[↯]` symbol — Indicates a SCORE effect
 
@@ -161,7 +161,7 @@ Evaluate missions in rank order: **D → C → B → A**
 For each mission:
 1. Count total power of each player's characters assigned to this mission
    - Include Power token bonuses
-   - Hidden characters have 0 power for scoring purposes (they contribute nothing to power comparison while hidden)
+   - Hidden characters have 0 BASE power but power tokens still count toward their total power
    - Continuous `[⧗]` effects apply during scoring
 2. The player with more total power **wins** the mission
 3. **Ties:** the player with the Edge token wins the tie
@@ -237,7 +237,7 @@ A player may play a character card of the **same name** over an existing charact
 
 - Represent bonus power beyond a card's printed Power stat
 - Added via `POWERUP X` effects (place X tokens on the target character)
-- Can be placed on hidden characters (hidden characters then have power equal to their token count, but this only matters when they are revealed)
+- Can be placed on hidden characters — hidden characters have 0 BASE power but power tokens still contribute to their total power (tokens count even while hidden)
 - Tokens are transferred to the new card when a character is upgraded
 - **All Power tokens are removed at the end of each turn (End Phase)**
 

@@ -327,7 +327,7 @@ function startActionTimer(
 
   // Notify the active player of the deadline
   if (targetSocket) {
-    io.to(targetSocket).emit('game:action-deadline', { deadline });
+    io.to(targetSocket).emit('game:action-deadline', { deadline, durationMs: ACTION_TIMEOUT_MS });
   }
 
   room.actionTimer = setTimeout(async () => {

@@ -508,6 +508,12 @@ export class EffectEngine {
     let newState = deepClone(state);
     const targetId = selectedTargets[0]; // Most effects select 1 target
 
+    // Validate target is in valid targets list (prevents wrong character from being affected)
+    if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
+      console.warn(`[EffectEngine] Invalid target ${targetId} — not in validTargets for ${pendingEffect.targetSelectionType}`);
+      return state;
+    }
+
     // Kimimaro 056 continuous protection: if an enemy effect targets this character,
     // the opponent must pay 1 chakra (if able). The effect still happens regardless.
     newState = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);

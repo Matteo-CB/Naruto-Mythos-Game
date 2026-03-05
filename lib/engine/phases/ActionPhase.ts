@@ -302,7 +302,9 @@ function handleRevealCharacter(
     const existingTopCard = upgradeTarget.stack.length > 0
       ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
       : upgradeTarget.card;
-    costToPay = Math.max(0, charTopCard.chakra - existingTopCard.chakra);
+    // Use fullCost (with cost reductions applied) minus existing card cost
+    // e.g. Gaara 075 (cost 3, -2 when hidden reveal) upgrading over cost 2 = max(0, 1 - 2) = 0
+    costToPay = Math.max(0, fullCost - existingTopCard.chakra);
   }
 
   // Pay cost

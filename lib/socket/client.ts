@@ -331,8 +331,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       // --- Timer events ---
 
-      socket.on('game:action-deadline', (data: { deadline: number }) => {
-        set({ actionDeadline: data.deadline });
+      socket.on('game:action-deadline', (data: { deadline: number; durationMs?: number }) => {
+        // Use durationMs to compute local deadline (avoids server/client clock skew)
+        const localDeadline = data.durationMs ? Date.now() + data.durationMs : data.deadline;
+        set({ actionDeadline: localDeadline });
       });
 
       socket.on('game:action-deadline-pause', () => {
