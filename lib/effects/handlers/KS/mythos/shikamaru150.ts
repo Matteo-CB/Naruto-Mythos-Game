@@ -4,7 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 /**
- * Card 150/130 - SHIKAMARU NARA (M)
+ * Card 111/130 V - SHIKAMARU NARA (M)
  * Chakra: 6, Power: 5
  * Group: Leaf Village, Keywords: Team 10, Jutsu
  *
@@ -26,9 +26,9 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
     log: logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_CONTINUOUS',
-      'Shikamaru Nara (150): Opponent cannot play characters hidden in this mission (continuous).',
+      'Shikamaru Nara (111 MV): Opponent cannot play characters hidden in this mission (continuous).',
       'game.log.effect.continuous',
-      { card: 'SHIKAMARU NARA', id: 'KS-150-MV' },
+      { card: 'SHIKAMARU NARA', id: 'KS-111-MV' },
     ),
   };
 
@@ -49,9 +49,9 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Shikamaru Nara (150): No enemy with Power 3 or less in this mission to hide (upgrade).',
+          'Shikamaru Nara (111 MV): No enemy with Power 3 or less in this mission to hide (upgrade).',
           'game.log.effect.noTarget',
-          { card: 'SHIKAMARU NARA', id: 'KS-150-MV' },
+          { card: 'SHIKAMARU NARA', id: 'KS-111-MV' },
         ),
       };
       return { state };
@@ -62,7 +62,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
       requiresTargetSelection: true,
       targetSelectionType: 'SHIKAMARU150_CHOOSE_HIDE',
       validTargets: validTargets.map((c) => c.instanceId),
-      description: 'Shikamaru Nara (150): Choose an enemy with Power 3 or less in this mission to hide.',
+      description: 'Shikamaru Nara (111 MV): Choose an enemy with Power 3 or less in this mission to hide.',
       descriptionKey: 'game.effect.desc.shikamaru150HideEnemy',
     };
   }
@@ -76,6 +76,6 @@ function shikamaru150UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerShikamaru150Handlers(): void {
-  registerEffect('KS-150-MV', 'MAIN', shikamaru150MainHandler);
-  registerEffect('KS-150-MV', 'UPGRADE', shikamaru150UpgradeHandler);
+  registerEffect('KS-111-MV', 'MAIN', shikamaru150MainHandler);
+  registerEffect('KS-111-MV', 'UPGRADE', shikamaru150UpgradeHandler);
 }

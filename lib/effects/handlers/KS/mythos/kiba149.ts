@@ -7,7 +7,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
- * Card 149/130 - KIBA INUZUKA (M)
+ * Card 113/130 V - KIBA INUZUKA (M)
  * Chakra: 5, Power: 4
  * Group: Leaf Village, Keywords: Team 8
  *
@@ -52,9 +52,9 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Kiba Inuzuka (149): No friendly non-hidden Akamaru in play, effect fizzles.',
+      'Kiba Inuzuka (113 MV): No friendly non-hidden Akamaru in play, effect fizzles.',
       'game.log.effect.noTarget',
-      { card: 'KIBA INUZUKA', id: 'KS-149-MV' },
+      { card: 'KIBA INUZUKA', id: 'KS-113-MV' },
     );
     return { state: { ...state, log } };
   }
@@ -67,9 +67,9 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
       log: logAction(
         state.log, state.turn, state.phase, ctx.sourcePlayer,
         'EFFECT_DEFEAT',
-        `Kiba Inuzuka (149): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
+        `Kiba Inuzuka (113 MV): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
         'game.log.effect.defeat',
-        { card: 'KIBA INUZUKA', id: 'KS-149-MV', target: akamaru.card.name_fr },
+        { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr },
       ),
     };
   } else {
@@ -88,9 +88,9 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_HIDE',
-          `Kiba Inuzuka (149): Hid friendly ${akamaru.card.name_fr}.`,
+          `Kiba Inuzuka (113 MV): Hid friendly ${akamaru.card.name_fr}.`,
           'game.log.effect.hide',
-          { card: 'KIBA INUZUKA', id: 'KS-149-MV', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
+          { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr, mission: `mission ${akamaruMissionIndex}` },
         ),
       };
     }
@@ -123,9 +123,9 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
       log: logAction(
         state.log, state.turn, state.phase, ctx.sourcePlayer,
         'EFFECT_NO_TARGET',
-        'Kiba Inuzuka (149): No other non-hidden character in this mission to target.',
+        'Kiba Inuzuka (113 MV): No other non-hidden character in this mission to target.',
         'game.log.effect.noTarget',
-        { card: 'KIBA INUZUKA', id: 'KS-149-MV' },
+        { card: 'KIBA INUZUKA', id: 'KS-113-MV' },
       ),
     };
     return { state };
@@ -137,8 +137,8 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: useDefeat ? 'KIBA149_CHOOSE_DEFEAT_TARGET' : 'KIBA149_CHOOSE_HIDE_TARGET',
     validTargets,
     description: useDefeat
-      ? 'Kiba Inuzuka (149): Choose another character in this mission to defeat.'
-      : 'Kiba Inuzuka (149): Choose another character in this mission to hide.',
+      ? 'Kiba Inuzuka (113 MV): Choose another character in this mission to defeat.'
+      : 'Kiba Inuzuka (113 MV): Choose another character in this mission to hide.',
     descriptionKey: useDefeat
       ? 'game.effect.desc.kiba149Defeat'
       : 'game.effect.desc.kiba149Hide',
@@ -151,6 +151,6 @@ function kiba149UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerKiba149Handlers(): void {
-  registerEffect('KS-149-MV', 'MAIN', kiba149MainHandler);
-  registerEffect('KS-149-MV', 'UPGRADE', kiba149UpgradeHandler);
+  registerEffect('KS-113-MV', 'MAIN', kiba149MainHandler);
+  registerEffect('KS-113-MV', 'UPGRADE', kiba149UpgradeHandler);
 }

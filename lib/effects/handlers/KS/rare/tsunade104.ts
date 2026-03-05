@@ -58,4 +58,6 @@ function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
 export function registerTsunade104Handlers(): void {
   registerEffect('KS-104-R', 'MAIN', tsunade104MainHandler);
   registerEffect('KS-104-R', 'UPGRADE', tsunade104UpgradeHandler);
+  registerEffect('KS-104-MV', 'MAIN', tsunade104MainHandler);
+  registerEffect('KS-104-MV', 'UPGRADE', tsunade104UpgradeHandler);
 }

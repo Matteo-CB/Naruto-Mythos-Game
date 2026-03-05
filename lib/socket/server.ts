@@ -508,8 +508,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!roomCode || !userId) return;
 
       const room = rooms.get(roomCode);
-      if (!room || !room.gameState) {
-        console.log(`[Socket] game:rejoin: room ${roomCode} not found or no game`);
+      if (!room) {
+        console.log(`[Socket] game:rejoin: room ${roomCode} not found`);
         return;
       }
 
@@ -550,13 +550,24 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Re-register user socket
       registerUserSocket(userId, socket.id);
 
-      // Send current game state to the rejoining player
-      const visibleState = GameEngine.getVisibleState(room.gameState, player);
-      socket.emit('game:state-update', { visibleState, playerRole: player });
+      // If game is active, send current game state to the rejoining player
+      if (room.gameState) {
+        const visibleState = GameEngine.getVisibleState(room.gameState, player);
+        socket.emit('game:state-update', { visibleState, playerRole: player });
 
-      // Restart action timer if needed
-      if (room.gameState.phase === 'action' && !room.actionTimer) {
-        startActionTimer(room, roomCode, io);
+        // Restart action timer if needed
+        if (room.gameState.phase === 'action' && !room.actionTimer) {
+          startActionTimer(room, roomCode, io);
+        }
+      } else {
+        // Pre-game rejoin (e.g. sealed deck-building phase)
+        // Notify both players that the room is still active
+        console.log(`[Socket] game:rejoin: ${player} rejoined room ${roomCode} during pre-game phase`);
+        socket.emit('room:rejoined', {
+          code: roomCode,
+          isSealed: room.isSealed,
+          playerRole: player === 'player1' ? 'player1' : 'player2',
+        });
       }
     });
 
@@ -1219,6 +1230,26 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
               broadcastState(room, io);
               await finalizeGameEnd(room, code, io, 'forfeit');
+            }, DISCONNECT_GRACE_MS);
+          } else if (room.isSealed && room.guestId && !room.gameState) {
+            // Sealed pre-game disconnect: use grace period instead of immediate cleanup
+            // This allows reconnection during the long deck-building phase
+            console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
+            room.disconnectTimer = setTimeout(() => {
+              // If the player hasn't reconnected, clean up
+              if (isHost) {
+                console.log(`[Socket] Grace period expired for host in sealed room ${code}, removing room`);
+                if (room.sealedTimer) clearTimeout(room.sealedTimer);
+                const wasPublic = !room.isPrivate;
+                rooms.delete(code);
+                if (wasPublic) broadcastRoomList(io);
+              } else {
+                console.log(`[Socket] Grace period expired for guest in sealed room ${code}, resetting guest`);
+                room.guestId = null;
+                room.guestSocket = null;
+                room.guestDeck = null;
+                if (!room.isPrivate) broadcastRoomList(io);
+              }
             }, DISCONNECT_GRACE_MS);
           } else if (isHost) {
             // Host disconnected before game started - remove room

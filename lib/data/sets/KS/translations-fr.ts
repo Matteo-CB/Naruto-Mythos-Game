@@ -648,6 +648,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Depensez n\'importe quelle quantite de Chakra supplementaire. POWERUP X, ou X est la quantite de Chakra supplementaire depensee.',
     'POWERUP X.',
   ],
+  // 104 - TSUNADE (MV) - "Sannin Legendaire"
+  'KS-104-MV': [
+    'Depensez n\'importe quelle quantite de Chakra supplementaire. POWERUP X, ou X est la quantite de Chakra supplementaire depensee.',
+    'POWERUP X.',
+  ],
 
   // 105/130 - JIRAYA (R) - "Doton : Mur de Boue"
   'KS-105-R': [
@@ -895,34 +900,34 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Copiez un effet instantané non-amélioration d\'un autre personnage Equipe 7 allié en jeu.',
   ],
 
-  // 149/130 - KIBA INUZUKA (MV) - "Crocs Lacerateurs"
-  'KS-149-MV': [
+  // 113/130 V - KIBA INUZUKA (MV) - "Crocs sur crocs"
+  'KS-113-MV': [
     'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
     'effet MAIN : A la place, vainquez-les tous les deux.',
   ],
 
-  // 150/130 - SHIKAMARU NARA (MV) - "Etranglement des Ombres"
-  'KS-150-MV': [
+  // 111/130 V - SHIKAMARU NARA (MV) - "Etranglement des Ombres"
+  'KS-111-MV': [
     '[⧗] L\'adversaire ne peut pas jouer de personnages en cache dans cette mission.',
     'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
   ],
 
-  // 151/130 - ROCK LEE (MV) - "Poing Loufoque"
-  'KS-151-MV': [
+  // 117/130 V - ROCK LEE (MV) - "Poing Loufoque"
+  'KS-117-MV': [
     '[⧗] A la fin du tour, vous devez deplacer ce personnage vers une autre mission, si possible.',
     'Revelez et defaussez la carte du dessus de votre deck : POWERUP X ou X est le cout de la carte defaussee.',
   ],
 
-  // 152/130 - ITACHI UCHIHA (MV) - "Amaterasu"
-  'KS-152-MV': [
+  // 128/130 V - ITACHI UCHIHA (MV) - "Amaterasu"
+  'KS-128-MV': [
     'Deplacez un personnage allie en jeu.',
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
   ],
 
-  // 153/130 - GAARA (MV) - "Cercueil de Sable"
-  'KS-153-MV': [
-    'Vainquez un personnage ennemi avec un cout inferieur au nombre de personnages allies caches en jeu.',
-    'effet MAIN : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
+  // 120/130 V - GAARA (MV) - "Cercueil de Sable"
+  'KS-120-MV': [
+    'Vainquez jusqu\'a 1 personnage ennemi avec une Puissance de 1 ou moins dans chaque mission.',
+    'POWERUP X, ou X est le nombre de personnages vaincus par l\'effet MAIN.',
   ],
 
   // =====================

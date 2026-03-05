@@ -176,9 +176,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           socket.emit('auth:register', { userId: uid });
         }
 
-        // Rejoin active game room so server updates our socket ID
+        // Rejoin active room so server updates our socket ID
+        // This handles both active games AND sealed pre-game (deck-building) phase
         const rc = get().roomCode;
-        if (rc && uid && get().gameStarted) {
+        if (rc && uid) {
           console.log('[Socket] Rejoining room', rc, 'after reconnect');
           socket.emit('game:rejoin', { roomCode: rc, userId: uid });
         }
@@ -211,6 +212,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('room:player-left', () => {
         console.log('[Socket] Player left');
         set({ opponentJoined: false });
+      });
+
+      socket.on('room:rejoined', (data: { code: string; isSealed: boolean; playerRole: 'player1' | 'player2' }) => {
+        console.log('[Socket] Rejoined room:', data.code, 'sealed:', data.isSealed, 'role:', data.playerRole);
+        set({ roomCode: data.code, playerRole: data.playerRole, isSealedRoom: data.isSealed });
       });
 
       socket.on('room:error', (data: { message: string }) => {

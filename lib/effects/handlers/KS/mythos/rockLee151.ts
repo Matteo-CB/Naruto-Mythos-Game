@@ -3,7 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
- * Card 151/130 - ROCK LEE (M)
+ * Card 117/130 V - ROCK LEE (M)
  * Chakra: 5, Power: 5
  * Group: Leaf Village, Keywords: Team Gai
  *
@@ -28,9 +28,9 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
     log: logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_CONTINUOUS',
-      'Rock Lee (151): Must move to another mission at end of round (continuous).',
+      'Rock Lee (117 MV): Must move to another mission at end of round (continuous).',
       'game.log.effect.continuous',
-      { card: 'ROCK LEE', id: 'KS-151-MV' },
+      { card: 'ROCK LEE', id: 'KS-117-MV' },
     ),
   };
 
@@ -45,9 +45,9 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Rock Lee (151): Deck is empty, cannot reveal top card (upgrade fizzle).',
+          'Rock Lee (117 MV): Deck is empty, cannot reveal top card (upgrade fizzle).',
           'game.log.effect.noTarget',
-          { card: 'ROCK LEE', id: 'KS-151-MV' },
+          { card: 'ROCK LEE', id: 'KS-117-MV' },
         ),
       };
       return { state };
@@ -66,9 +66,9 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
       log: logAction(
         state.log, state.turn, state.phase, ctx.sourcePlayer,
         'EFFECT_DISCARD',
-        `Rock Lee (151): Revealed and discarded ${topCard.name_fr} (cost ${topCard.chakra}) from top of deck (upgrade).`,
+        `Rock Lee (117 MV): Revealed and discarded ${topCard.name_fr} (cost ${topCard.chakra}) from top of deck (upgrade).`,
         'game.log.effect.revealDiscard',
-        { card: 'ROCK LEE', id: 'KS-151-MV', target: topCard.name_fr, cost: topCard.chakra },
+        { card: 'ROCK LEE', id: 'KS-117-MV', target: topCard.name_fr, cost: topCard.chakra },
       ),
     };
 
@@ -96,9 +96,9 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
           log: logAction(
             state.log, state.turn, state.phase, ctx.sourcePlayer,
             'EFFECT_POWERUP',
-            `Rock Lee (151): POWERUP ${powerupAmount} (cost of discarded ${topCard.name_fr}).`,
+            `Rock Lee (117 MV): POWERUP ${powerupAmount} (cost of discarded ${topCard.name_fr}).`,
             'game.log.effect.powerupSelf',
-            { card: 'ROCK LEE', id: 'KS-151-MV', amount: powerupAmount },
+            { card: 'ROCK LEE', id: 'KS-117-MV', amount: powerupAmount },
           ),
         };
       }
@@ -108,9 +108,9 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_POWERUP',
-          `Rock Lee (151): Discarded card had cost 0, no power tokens added (upgrade).`,
+          `Rock Lee (117 MV): Discarded card had cost 0, no power tokens added (upgrade).`,
           'game.log.effect.powerupSelf',
-          { card: 'ROCK LEE', id: 'KS-151-MV', amount: 0 },
+          { card: 'ROCK LEE', id: 'KS-117-MV', amount: 0 },
         ),
       };
     }
@@ -125,6 +125,6 @@ function rockLee151UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerRockLee151Handlers(): void {
-  registerEffect('KS-151-MV', 'MAIN', rockLee151MainHandler);
-  registerEffect('KS-151-MV', 'UPGRADE', rockLee151UpgradeHandler);
+  registerEffect('KS-117-MV', 'MAIN', rockLee151MainHandler);
+  registerEffect('KS-117-MV', 'UPGRADE', rockLee151UpgradeHandler);
 }

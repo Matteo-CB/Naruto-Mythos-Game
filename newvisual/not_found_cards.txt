@@ -1,26 +1,55 @@
-Cards NOT found on CDN (brute-force across 10 scripts, 4 184 391+ URLs tested):
+Cards NOT found on CDN (brute-force across 20 scripts, 20M+ URLs tested):
 
-KS-045-UC — Anko
-KS-115-R — Shino
-KS-115-RA — Shino
-KS-116-RA — Neji
-KS-122-R — Jirobo
-KS-122-RA — Jirobo
-KS-124-R — Kidomaru
-KS-124-RA — Kidomaru
-KS-126-R — Orochimaru
-KS-127-R — Sakon
-KS-127-RA — Sakon
-KS-129-R — Kyubi
-KS-129-RA — Kyubi
-KS-130-R — One-Tail
-KS-134-S — Kyubi
-KS-135-MV — Sakura (Mythos V)
-KS-136-MV — Sasuke (Mythos V)
-KS-149-MV — Kiba (Mythos V)
-KS-150-MV — Shikamaru (Mythos V)
-KS-151-MV — RockLee (Mythos V)
-KS-152-MV — Itachi (Mythos V)
-KS-153-MV — Gaara (Mythos V)
+=== UC (1 card) ===
+KS-045-UC — Anko Mitarashi "Shadow Snake Hands" (AMBUSH: defeat hidden enemy)
+  CDN name ref: 44_C_Anko_Proctor (C version found)
 
-22 cards remaining.
+=== R (5 cards) ===
+KS-122-R — Jirobo "Arhat Fist" (MAIN: POWERUP X / UPGRADE: defeat P1)
+  CDN name ref: 57_C_Jiroubou_Bearer, 58_UC_Jirobo_Earth_Dome
+KS-124-R — Kidomaru "Spider Bow: Fierce Rip" (AMBUSH: defeat P3 other mission)
+  CDN name ref: 59_C_Kidomaru_Bearer, 60_UC_Kidomaru_Spider_Web
+KS-126-R — Orochimaru "Get out of my way." (SCORE: defeat weakest)
+  CDN name ref: 50_C_Orochimaru_Undercover, 51_UC_Orochimaru_Substitution
+KS-127-R — Sakon "Stone Fist" ([⧗] enemies -1 Power)
+  CDN name ref: 61_C_Sakon_Bearer, 62_UC_Sakon_Black_Seal
+KS-129-R — Nine-Tails/Kyubi "Demon Fox Cloak" (upgrade over Naruto, invincible)
+  CDN name ref: 76_UC_One-Tail_Partial_Trasformation (analogy)
+KS-130-R — One-Tail/Ichibi "I hope you're ready to die!" (invincible, upgrade over Gaara)
+  CDN name ref: 76_UC_One-Tail_Partial_Trasformation
+
+=== RA (4 cards) ===
+KS-115-RA — Shino Aburame "Insect Wall Technique"
+  CDN name ref: 115_R_Shino_Wall_Insects (R version found), pattern: R_ART
+KS-122-RA — Jirobo "Arhat Fist"
+  CDN name ref: same as KS-122-R, pattern: R_ART
+KS-124-RA — Kidomaru "Spider Bow: Fierce Rip"
+  CDN name ref: same as KS-124-R, pattern: R_ART
+KS-127-RA — Sakon "Stone Fist"
+  CDN name ref: same as KS-127-R, pattern: R_ART
+KS-129-RA — Nine-Tails/Kyubi "Demon Fox Cloak"
+  CDN name ref: same as KS-129-R, pattern: R_ART
+
+=== S (1 card) ===
+KS-134-S — Nine-Tailed Fox/Kyubi "The Beast Awakens" (invincible, UPGRADE: defeat all P5)
+  CDN name ref: 138_Secret_GOLD_Orochimaru_Transference_Ritual (pattern)
+
+=== MV (2 cards — handled by brute19) ===
+KS-135-MV — Sakura Haruno "He's looking... right at me!"
+KS-136-MV — Sasuke Uchiha "You're annoying."
+
+=== MV with local image but CDN URL unknown (2 cards) ===
+KS-111-MV — Shikamaru "Shadow Strangle Jutsu" [has image]
+KS-117-MV — Rock Lee "Loopy Fist" [has image]
+
+17 cards total (13 without images, 2 MV without images, 2 MV with images but no CDN URL).
+
+=== CDN Patterns (proven) ===
+UC:  {num}_UC_{Name}_{Title}-1920w.webp
+R:   {num}_R_{Name}_{Title}-1920w.webp
+RA:  {num}_R_ART_{Name}_{Title}-1920w.webp
+S:   {num}_Secret_GOLD_{Name}_{Title}-1920w.webp
+SV:  {num}_SecretV_GOLD_{Name}_{Title}-1920w.webp
+M:   {num}_M_Special_{Name}_{Title}-1920w.webp
+MV:  {num}_M_{Name}-1920w.webp (sometimes +suffix)
+Leg: Legendary_{Name}_-1920w.webp

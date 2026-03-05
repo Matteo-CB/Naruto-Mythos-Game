@@ -3326,7 +3326,8 @@
       "chakra": 5,
       "power": 6,
       "keywords": [
-        "Sannin"
+        "Sannin",
+        "Jutsu"
       ],
       "group": "Leaf Village",
       "effects": [
@@ -3715,7 +3716,7 @@
       "name_fr": "SHINO ABURAME",
       "title_fr": "Technique du Mur d'Insectes",
       "title_en": "Insect Wall Technique",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": ["Équipe 8", "Jutsu"],
@@ -3732,9 +3733,9 @@
           "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/rare/KS-115-R.webp",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-115-R.webp",
       "data_complete": true,
       "old_id": "115/130"
     },
@@ -5181,20 +5182,20 @@
       "data_complete": true,
       "old_id": "Legendary"
     },
-    "KS-149-MV": {
-      "id": "KS-149-MV",
+    "KS-113-MV": {
+      "id": "KS-113-MV",
       "rarity": "MV",
-      "number": "149",
+      "number": "113",
       "set": "KS",
       "card_type": "character",
       "name_en": "KIBA INUZUKA",
       "name_fr": "KIBA INUZUKA",
       "title_fr": "Crocs sur crocs",
       "title_en": "Fang Over Fang",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 6,
-      "keywords": ["Team 8"],
+      "keywords": ["Team 8", "Jutsu"],
       "group": "Leaf Village",
       "effects": [
         {
@@ -5206,17 +5207,17 @@
           "description": "MAIN effect: Instead, defeat both of them."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/mythos_v/KS-113-MV.webp",
       "rarity_display": "Mythos V",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos_v/KS-113-MV.webp",
       "data_complete": true,
-      "old_id": "149/130",
+      "old_id": "113/130",
       "is_rare_art": false
     },
-    "KS-150-MV": {
-      "id": "KS-150-MV",
+    "KS-111-MV": {
+      "id": "KS-111-MV",
       "rarity": "MV",
-      "number": "150",
+      "number": "111",
       "set": "KS",
       "card_type": "character",
       "name_en": "SHIKAMARU NARA",
@@ -5240,15 +5241,15 @@
       ],
       "image_url": "",
       "rarity_display": "Mythos V",
-      "image_file": "images/cards/KS/mythos_v/KS-150-MV.webp",
+      "image_file": "images/cards/KS/mythos_v/KS-111-MV.webp",
       "data_complete": true,
-      "old_id": "150/130",
+      "old_id": "111/130",
       "is_rare_art": false
     },
-    "KS-151-MV": {
-      "id": "KS-151-MV",
+    "KS-117-MV": {
+      "id": "KS-117-MV",
       "rarity": "MV",
-      "number": "151",
+      "number": "117",
       "set": "KS",
       "card_type": "character",
       "name_en": "ROCK LEE",
@@ -5272,22 +5273,22 @@
       ],
       "image_url": "",
       "rarity_display": "Mythos V",
-      "image_file": "images/cards/KS/mythos_v/KS-151-MV.webp",
+      "image_file": "images/cards/KS/mythos_v/KS-117-MV.webp",
       "data_complete": true,
-      "old_id": "151/130",
+      "old_id": "117/130",
       "is_rare_art": false
     },
-    "KS-152-MV": {
-      "id": "KS-152-MV",
+    "KS-128-MV": {
+      "id": "KS-128-MV",
       "rarity": "MV",
-      "number": "152",
+      "number": "128",
       "set": "KS",
       "card_type": "character",
       "name_en": "ITACHI UCHIHA",
       "name_fr": "ITACHI UCHIWA",
       "title_fr": "Amaterasu",
       "title_en": "Amaterasu",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 6,
       "keywords": ["Rogue Ninja", "Jutsu"],
@@ -5302,43 +5303,43 @@
           "description": "[⧗] Every enemy character in this mission has -1 Power."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/mythos_v/KS-128-MV.webp",
       "rarity_display": "Mythos V",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos_v/KS-128-MV.webp",
       "data_complete": true,
-      "old_id": "152/130",
+      "old_id": "128/130",
       "is_rare_art": false
     },
-    "KS-153-MV": {
-      "id": "KS-153-MV",
+    "KS-120-MV": {
+      "id": "KS-120-MV",
       "rarity": "MV",
-      "number": "153",
+      "number": "120",
       "set": "KS",
       "card_type": "character",
       "name_en": "GAARA",
       "name_fr": "GAARA",
       "title_fr": "Cercueil de Sable",
-      "title_en": "Sand Burial",
-      "has_visual": false,
-      "chakra": 5,
+      "title_en": "Sand Coffin",
+      "has_visual": true,
+      "chakra": 4,
       "power": 4,
       "keywords": ["Team Baki", "Jutsu"],
       "group": "Sand Village",
       "effects": [
         {
           "type": "MAIN",
-          "description": "Defeat an enemy character with a cost less than the number of friendly hidden characters in play."
+          "description": "Defeat up to 1 enemy character with Power 1 or less in every mission."
         },
         {
           "type": "UPGRADE",
-          "description": "MAIN effect: In addition, hide one other enemy character with same name and cost less than the defeated character."
+          "description": "POWERUP X, where X is the number of characters defeated by the MAIN effect."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/mythos_v/KS-120-MV.webp",
       "rarity_display": "Mythos V",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos_v/KS-120-MV.webp",
       "data_complete": true,
-      "old_id": "153/130",
+      "old_id": "120/130",
       "is_rare_art": false
     },
     "KS-108-MV": {
@@ -5825,7 +5826,7 @@
       "name_fr": "NEJI HYÛGA",
       "title_fr": "Hakke Soixante-Quatre Paumes",
       "title_en": "Eight Trigrams Sixty-Four Palms",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 6,
       "power": 5,
       "keywords": [
@@ -5845,9 +5846,9 @@
           "description_fr": ""
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/rare_art/KS-116-RA.webp",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-116-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "116/130 A"
@@ -6548,6 +6549,42 @@
       "image_url": "",
       "rarity_display": "Mythos V",
       "image_file": "",
+      "data_complete": true,
+      "old_id": ""
+    },
+    "KS-104-MV": {
+      "id": "KS-104-MV",
+      "rarity": "MV",
+      "number": "104",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "title_fr": "Sannin Légendaire",
+      "title_en": "Legendary Sannin",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Spend any amount of additional Chakra. POWERUP X, where X is the amount of additional Chakra spent.",
+          "description_fr": ""
+        },
+        {
+          "type": "UPGRADE",
+          "description": "POWERUP X.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-104-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-104-MV.webp",
       "data_complete": true,
       "old_id": ""
     }

@@ -4,7 +4,7 @@ import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
- * Card 152/130 - ITACHI UCHIHA (M)
+ * Card 128/130 V - ITACHI UCHIHA (M)
  * Chakra: 6, Power: 5
  * Group: Akatsuki, Keywords: Rogue Ninja
  *
@@ -28,9 +28,9 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
     log: logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_CONTINUOUS',
-      'Itachi Uchiha (152): Every enemy character in this mission has -1 Power (continuous).',
+      'Itachi Uchiha (128 MV): Every enemy character in this mission has -1 Power (continuous).',
       'game.log.effect.continuous',
-      { card: 'ITACHI UCHIHA', id: 'KS-152-MV' },
+      { card: 'ITACHI UCHIHA', id: 'KS-128-MV' },
     ),
   };
 
@@ -54,9 +54,9 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Itachi Uchiha (152): No friendly character in play to move (upgrade).',
+          'Itachi Uchiha (128 MV): No friendly character in play to move (upgrade).',
           'game.log.effect.noTarget',
-          { card: 'ITACHI UCHIHA', id: 'KS-152-MV' },
+          { card: 'ITACHI UCHIHA', id: 'KS-128-MV' },
         ),
       };
       return { state };
@@ -68,7 +68,7 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
         requiresTargetSelection: true,
         targetSelectionType: 'ITACHI152_CHOOSE_MOVE',
         validTargets,
-        description: 'Itachi Uchiha (152): Choose a friendly character to move to another mission.',
+        description: 'Itachi Uchiha (128 MV): Choose a friendly character to move to another mission.',
         descriptionKey: 'game.effect.desc.itachi152MoveFriendly',
       };
     }
@@ -125,9 +125,9 @@ function autoMoveCharacter(
       log: logAction(
         state.log, state.turn, state.phase, ctx.sourcePlayer,
         'EFFECT_NO_TARGET',
-        'Itachi Uchiha (152): No other mission to move to (upgrade).',
+        'Itachi Uchiha (128 MV): No other mission to move to (upgrade).',
         'game.log.effect.noTarget',
-        { card: 'ITACHI UCHIHA', id: 'KS-152-MV' },
+        { card: 'ITACHI UCHIHA', id: 'KS-128-MV' },
       ),
     };
   }
@@ -155,9 +155,9 @@ function autoMoveCharacter(
     log: logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_MOVE',
-      `Itachi Uchiha (152): Moved ${charToMove.card.name_fr} from mission ${fromMissionIndex} to mission ${bestMission} (upgrade).`,
+      `Itachi Uchiha (128 MV): Moved ${charToMove.card.name_fr} from mission ${fromMissionIndex} to mission ${bestMission} (upgrade).`,
       'game.log.effect.moveCharacter',
-      { card: 'ITACHI UCHIHA', id: 'KS-152-MV', target: charToMove.card.name_fr, mission: `mission ${bestMission}` },
+      { card: 'ITACHI UCHIHA', id: 'KS-128-MV', target: charToMove.card.name_fr, mission: `mission ${bestMission}` },
     ),
   };
 }
@@ -168,6 +168,6 @@ function itachi152UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerItachi152Handlers(): void {
-  registerEffect('KS-152-MV', 'MAIN', itachi152MainHandler);
-  registerEffect('KS-152-MV', 'UPGRADE', itachi152UpgradeHandler);
+  registerEffect('KS-128-MV', 'MAIN', itachi152MainHandler);
+  registerEffect('KS-128-MV', 'UPGRADE', itachi152UpgradeHandler);
 }
