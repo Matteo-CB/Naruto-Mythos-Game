@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { Link } from '@/lib/i18n/navigation';
+import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
 import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 
@@ -26,6 +27,7 @@ export default function ManageDecksPage() {
   const [renameValue, setRenameValue] = useState('');
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [exportingId, setExportingId] = useState<string | null>(null);
 
   const fetchDecks = useCallback(async () => {
     try {
@@ -89,6 +91,24 @@ export default function ManageDecksPage() {
       // ignore
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleExport = async (deck: DeckItem) => {
+    setExportingId(deck.id);
+    try {
+      const { getCharacterById, getMissionById } = await import('@/lib/data/cardIndex');
+      const chars = deck.cardIds
+        .map((id) => getCharacterById(id))
+        .filter((c): c is NonNullable<typeof c> => c != null);
+      const missions = deck.missionIds
+        .map((id) => getMissionById(id))
+        .filter((m): m is NonNullable<typeof m> => m != null);
+      await exportDeckAsImage(deck.name, chars, missions);
+    } catch {
+      // ignore
+    } finally {
+      setExportingId(null);
     }
   };
 
@@ -308,6 +328,13 @@ export default function ManageDecksPage() {
                             >
                               {t('deckBuilder.editDeck')}
                             </Link>
+                            <button
+                              onClick={() => handleExport(deck)}
+                              disabled={exportingId === deck.id}
+                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors disabled:opacity-40"
+                            >
+                              {exportingId === deck.id ? '...' : t('deckBuilder.exportImage')}
+                            </button>
                             <button
                               onClick={() => setConfirmDeleteId(deck.id)}
                               className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#b33e3e] hover:bg-[#1a1414] hover:border-[#b33e3e]/30 transition-colors"

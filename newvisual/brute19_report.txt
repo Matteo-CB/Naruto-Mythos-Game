@@ -1,0 +1,14 @@
+======================================================================
+BRUTE19 - ULTIMATE MV HUNTER
+Date: 2026-03-05T14:25:53.051Z
+======================================================================
+
+URLs: 1 511 051 | Time: 3136.4s | Workers: 10000 | Errors: 0
+Dictionary: 193 CDN + 159 Naruto + 291 generic + specific
+Sakura nums: [135,109,134,137,11,12,147] | Sasuke nums: [136,107,134,137,13,14,146]
+Found: 0
+
+No images found after exhaustive search.
+These MV cards are almost certainly not yet on the CDN.
+
+======================================================================
