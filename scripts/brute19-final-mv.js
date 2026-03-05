@@ -27,7 +27,7 @@ const https = require('https');
 const fs    = require('fs');
 const path  = require('path');
 
-const CONCURRENCY   = 50000;
+const CONCURRENCY   = 10000;
 const TIMEOUT_MS    = 6000;
 const MIN_FILE_SIZE = 4000;
 const OUT_DIR       = path.join(__dirname, '..', 'newvisual');
@@ -35,7 +35,7 @@ const REPORT_FILE   = path.join(OUT_DIR, 'brute19_report.txt');
 const PROGRESS_FILE = path.join(OUT_DIR, 'brute19_progress.json');
 const BASE = 'https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/';
 
-const agent = new https.Agent({ keepAlive: true, maxSockets: 50000, maxFreeSockets: 5000, timeout: TIMEOUT_MS });
+const agent = new https.Agent({ keepAlive: true, maxSockets: 10000, maxFreeSockets: 2000, timeout: TIMEOUT_MS });
 const C = { reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', green: '\x1b[32m', yellow: '\x1b[33m', cyan: '\x1b[36m', red: '\x1b[31m' };
 
 // ═══════════════════════════════════════════════════════════════════════════

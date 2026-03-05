@@ -313,7 +313,7 @@ describe('GameEngine', () => {
 
       expect(hidden).toBeDefined();
       expect(hidden!.isHidden).toBe(true);
-      expect(hidden!.card).toBeUndefined(); // Must NOT be visible even with wasRevealedAtLeastOnce
+      expect(hidden!.card).toBeDefined(); // Re-hidden cards are public info — card data is visible
     });
   });
 

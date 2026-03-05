@@ -306,7 +306,7 @@ describe('StartPhase - Chakra Bonus Calculation', () => {
 // POWER CALCULATION
 // ===================================================================
 describe('PowerCalculation - with continuous modifiers', () => {
-  it('hidden characters should have 0 power', () => {
+  it('hidden characters should have 0 base power but power tokens count', () => {
     const hidden = mockCharInPlay({ instanceId: 'h-1', isHidden: true, powerTokens: 5 }, {
       power: 10, name_fr: 'Hidden',
     });
@@ -315,7 +315,8 @@ describe('PowerCalculation - with continuous modifiers', () => {
     });
 
     const power = calculateCharacterPower(state, hidden, 'player1');
-    expect(power).toBe(0);
+    // Base power (10) is ignored for hidden chars, but power tokens (5) still count
+    expect(power).toBe(5);
   });
 
   it('should include base power + tokens + continuous modifiers', () => {
