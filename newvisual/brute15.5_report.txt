@@ -1,0 +1,30 @@
+======================================================================
+BRUTE15.5-TARGETED REPORT
+Date: 2026-03-05T00:52:41.893Z
+======================================================================
+
+Total URLs tested: 5264
+Time elapsed: 36.8s
+Errors: 0
+Images found: 8
+
+FOUND IMAGES:
+----------------------------------------------------------------------
+  [legendary] Naruto: Legendary_Naruto_-1920w.webp (179.3 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/Legendary_Naruto_-1920w.webp
+  [mv] Tsunade #104: 104_M_Tsunade-1920w.webp (166.5 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/104_M_Tsunade-1920w.webp
+  [mv] Naruto #108: 108_M_Naruto-1920w.webp (288.9 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/108_M_Naruto-1920w.webp
+  [mv] Shikamaru #111: 111_M_Shikamaru-1920w.webp (172.8 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/111_M_Shikamaru-1920w.webp
+  [mv] Kiba #113: 113_M_Kiba-1920w.webp (172.6 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/113_M_Kiba-1920w.webp
+  [mv] Rock Lee #117: 117_M_Rock_Lee-1920w.webp (170.4 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/117_M_Rock_Lee-1920w.webp
+  [mv] Gaara #120: 120_M_Gaara-1920w.webp (216.3 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/120_M_Gaara-1920w.webp
+  [mv] Itachi #128: 128_M_Itachi-1920w.webp (163.8 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/128_M_Itachi-1920w.webp
+
+======================================================================

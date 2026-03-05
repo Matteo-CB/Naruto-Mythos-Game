@@ -1,0 +1,16 @@
+======================================================================
+BRUTE16 - LEGENDARY HUNTER REPORT
+Date: 2026-03-05T01:18:44.028Z
+======================================================================
+
+Total URLs tested: 21946
+Time elapsed: 289.3s
+Errors: 0
+Images found: 1
+
+FOUND IMAGES:
+----------------------------------------------------------------------
+  Naruto: Legendary_Naruto_-1920w.webp (179.3 KB)
+    URL: https://lirp.cdn-website.com/99e556bf/dms3rep/multi/opt/Legendary_Naruto_-1920w.webp
+
+======================================================================
