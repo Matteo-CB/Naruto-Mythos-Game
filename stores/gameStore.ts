@@ -546,7 +546,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       // Detect dedicated confirm UIs
-      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
       const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
 
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
@@ -1117,7 +1117,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       // Detect dedicated confirm UIs
-      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
       const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
 
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
@@ -1687,7 +1687,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       // Detect dedicated confirm UIs
-      const isSakura011DrawAI = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW';
+      const isSakura011DrawAI = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
       const isKiba113ConfirmHideAI = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
 
       // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
