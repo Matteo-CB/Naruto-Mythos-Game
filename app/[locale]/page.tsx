@@ -63,9 +63,7 @@ const floatingElements = [
 
 // Menu button configs - game section
 const menuButtons = [
-  { key: 'playAI' as const, href: '/play/ai', primary: true },
-  { key: 'playOnline' as const, href: '/play/online', primary: false },
-  { key: 'friends' as const, href: '/friends', primary: false },
+  { key: 'play' as const, href: '/play', primary: true },
   { key: 'customization' as const, href: '/settings', primary: false },
   { key: 'deckBuilder' as const, href: '/deck-builder', primary: false },
   { key: 'learn' as const, href: '/learn', primary: false },
@@ -381,44 +379,6 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* Admin link (only visible to admin) */}
-            {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
-              <motion.div
-                className="mt-2 w-full"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 1.35, ease: 'easeOut' }}
-              >
-                <Link
-                  href="/admin"
-                  className="group relative flex w-full h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                  style={{
-                    backgroundColor: '#141414',
-                    border: '1px solid #ef4444',
-                    color: '#ef4444',
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1.03)';
-                    target.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.15)';
-                    target.style.backgroundColor = '#1a1a1a';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1)';
-                    target.style.boxShadow = 'none';
-                    target.style.backgroundColor = '#141414';
-                  }}
-                >
-                  <span
-                    className="absolute left-0 top-0 h-full w-1 transition-all"
-                    style={{ backgroundColor: '#ef4444' }}
-                  />
-                  {t('admin')}
-                </Link>
-              </motion.div>
-            )}
-
             {/* Divider */}
             <motion.div
               className="my-2.5 h-px w-full sm:my-3"
@@ -458,6 +418,29 @@ export default function Home() {
                   >
                     {t('profile')}
                   </Link>
+                  {session?.user?.email === 'matteo.biyikli3224@gmail.com' && (
+                    <Link
+                      href="/admin"
+                      className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #ef4444',
+                        color: '#ef4444',
+                      }}
+                      onMouseEnter={(e) => {
+                        const target = e.currentTarget as HTMLElement;
+                        target.style.backgroundColor = 'rgba(239, 68, 68, 0.05)';
+                        target.style.boxShadow = '0 0 16px rgba(239, 68, 68, 0.12)';
+                      }}
+                      onMouseLeave={(e) => {
+                        const target = e.currentTarget as HTMLElement;
+                        target.style.backgroundColor = 'transparent';
+                        target.style.boxShadow = 'none';
+                      }}
+                    >
+                      {t('admin')}
+                    </Link>
+                  )}
                   {!(session.user as Record<string, unknown>)?.discordId && (
                     <a
                       href="/api/user/link-discord"

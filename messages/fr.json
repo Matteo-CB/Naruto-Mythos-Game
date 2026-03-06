@@ -19,7 +19,8 @@
     "rotateDevice": "Tournez votre appareil en mode paysage pour jouer",
     "fullscreen": "Plein écran",
     "play": "Jouer",
-    "close": "Fermer"
+    "close": "Fermer",
+    "all": "Tous"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -43,7 +44,11 @@
     "training": "Mode Entrainement",
     "settings": "Parametres",
     "customization": "Personnalisation",
-    "tournaments": "Tournois"
+    "tournaments": "Tournois",
+    "play": "Jouer",
+    "vsAI": "contre l'IA",
+    "online": "En ligne",
+    "sealedMode": "Scellé"
   },
   "settings": {
     "title": "Personnalisation",
@@ -583,6 +588,7 @@
       "rarity": "Rarete"
     },
     "close": "Fermer",
+    "all": "Tous",
     "cardsShown": "{count} cartes affichees",
     "basePoints": "Points de Base",
     "id": "ID",
@@ -861,6 +867,7 @@
     "mission": "Mission",
     "character": "Personnage",
     "close": "Fermer",
+    "all": "Tous",
     "fullscreen": "Details complets",
     "name": "Nom",
     "title": "Titre",
@@ -1895,5 +1902,14 @@
     "visibility": "Visibilite",
     "createSimulator": "Creer un tournoi simulateur",
     "createPlayer": "Creer un tournoi joueur"
+  },
+  "playHub": {
+    "title": "Jouer",
+    "subtitle": "Choisissez votre mode de jeu",
+    "onlineTitle": "Jouer en ligne",
+    "onlineDesc": "Affrontez de vrais joueurs en classe ou en prive",
+    "aiTitle": "Jouer contre l IA",
+    "aiDesc": "Entrainez-vous contre des IA de difficulte variable",
+    "backToMenu": "Retour au menu"
   }
 }
