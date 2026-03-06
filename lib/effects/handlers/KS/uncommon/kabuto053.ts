@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 
 /**
  * Card 053/130 - KABUTO YAKUSHI (UC)
@@ -110,7 +111,9 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   }
 
   const reducedCost = Math.max(0, (topCard.chakra ?? 0) - 3);
-  if (playerState.chakra < reducedCost) {
+  const canAffordFresh = playerState.chakra >= reducedCost;
+  const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, topCard as { name_fr: string; chakra: number }, 3);
+  if (!canAffordFresh && !canUpgrade) {
     return {
       state: {
         ...state,

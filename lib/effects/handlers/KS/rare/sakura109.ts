@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 
 /**
  * Card 109/130 - SAKURA HARUNO "Ninja Medical" (R)
@@ -22,13 +23,15 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
   const playerState = state[sourcePlayer];
   const costReduction = ctx.isUpgrade ? 2 : 0;
 
-  // Find affordable Leaf Village characters in discard pile
+  // Find affordable Leaf Village characters in discard pile (fresh play OR upgrade)
   const validIndices: string[] = [];
   for (let i = 0; i < playerState.discardPile.length; i++) {
     const card = playerState.discardPile[i];
     if (card.card_type === 'character' && card.group === 'Leaf Village') {
-      const cost = Math.max(0, card.chakra - costReduction);
-      if (playerState.chakra >= cost) {
+      const freshCost = Math.max(0, card.chakra - costReduction);
+      const canFresh = playerState.chakra >= freshCost;
+      const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, costReduction);
+      if (canFresh || canUpgrade) {
         validIndices.push(String(i));
       }
     }

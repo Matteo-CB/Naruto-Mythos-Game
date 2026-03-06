@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import type { CharacterInPlay, CharacterCard } from '@/lib/engine/types';
 
@@ -28,13 +29,15 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
 
-  // Find Sound Village characters in hand that the player can afford (cost - 2)
+  // Find Sound Village characters in hand that the player can afford (fresh play OR upgrade, cost - 2)
   const affordableIndices: string[] = [];
   for (let i = 0; i < playerState.hand.length; i++) {
     const card = playerState.hand[i];
     if (card.group === 'Sound Village') {
-      const cost = Math.max(0, card.chakra - 2);
-      if (playerState.chakra >= cost) {
+      const freshCost = Math.max(0, card.chakra - 2);
+      const canFresh = playerState.chakra >= freshCost;
+      const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 2);
+      if (canFresh || canUpgrade) {
         affordableIndices.push(String(i));
       }
     }
