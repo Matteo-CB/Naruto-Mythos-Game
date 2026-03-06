@@ -9,6 +9,7 @@ import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTri
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
+import { getEffectivePower } from './powerUtils';
 
 /**
  * Central effect resolver.
@@ -692,11 +693,11 @@ export class EffectEngine {
         // Now find candidates for target 2: enemy Power <= 2 in any mission (excluding target 1)
         const target2Candidates_nl: string[] = [];
         for (const mission of newState.activeMissions) {
+          const enemyPlayer_nl = sourcePlayer_nl === 'player1' ? 'player2' : 'player1';
           for (const char of mission[enemySideKey_nl]) {
             if (char.instanceId === targetId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-            if (topCard.power + char.powerTokens <= 2) {
+            if (getEffectivePower(newState, char, enemyPlayer_nl as PlayerID) <= 2) {
               target2Candidates_nl.push(char.instanceId);
             }
           }
@@ -2037,9 +2038,8 @@ export class EffectEngine {
           for (const mission of newState.activeMissions) {
             for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-              const effectivePower = char.isHidden ? 0 : (topCard.power + char.powerTokens);
-              if (effectivePower <= maxPower) {
+              const charOwner_d = mission.player1Characters.includes(char) ? 'player1' : 'player2';
+              if (getEffectivePower(newState, char, charOwner_d as PlayerID) <= maxPower) {
                 defeatTargets.push(char.instanceId);
               }
             }
@@ -2094,10 +2094,10 @@ export class EffectEngine {
             pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
           for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
             const mission = newState.activeMissions[mIdx];
+            const enemyPlayer_g2 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
             const toMove = mission[enemySide_g].filter(c => {
               if (c.isHidden) return false;
-              const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              return (topCard.power + c.powerTokens) <= maxPower_g;
+              return getEffectivePower(newState, c, enemyPlayer_g2 as PlayerID) <= maxPower_g;
             });
             for (const char of toMove) {
               // Move to a different mission (first available)
@@ -2180,10 +2180,10 @@ export class EffectEngine {
             pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
           const thisMission = newState.activeMissions[pendingEffect.sourceMissionIndex];
           if (thisMission) {
+            const enemyPlayer_n2 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
             const hideTargets_n = thisMission[enemySide_n].filter(c => {
               if (c.isHidden) return false;
-              const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              return (topCard.power + c.powerTokens) <= 4;
+              return getEffectivePower(newState, c, enemyPlayer_n2 as PlayerID) <= 4;
             }).map(c => c.instanceId);
             if (hideTargets_n.length === 1) {
               newState = EffectEngine.hideCharacterWithLog(newState, hideTargets_n[0], pendingEffect.sourcePlayer);
@@ -3724,11 +3724,10 @@ export class EffectEngine {
         let chainedToNext = false;
         for (let mi = startMission_g; mi < newState.activeMissions.length; mi++) {
           const mission_g = newState.activeMissions[mi];
-          const validTargets_g = mission_g[enemySide_g].filter((c: CharacterInPlay) => {
-            if (c.isHidden) return true; // hidden = power 0
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            return (topCard.power + c.powerTokens) <= 1;
-          });
+          const opponentPlayer_g2 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const validTargets_g = mission_g[enemySide_g].filter((c: CharacterInPlay) =>
+            getEffectivePower(newState, c, opponentPlayer_g2 as PlayerID) <= 1
+          );
 
           if (validTargets_g.length === 0) continue;
 
@@ -4672,13 +4671,10 @@ export class EffectEngine {
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
     const isUpgrade = parsed.isUpgrade ?? false;
 
-    // Get the target's power BEFORE hiding
+    // Get the target's effective power BEFORE hiding (includes continuous modifiers)
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) return state;
-    const topCard = charResult.character.stack.length > 0
-      ? charResult.character.stack[charResult.character.stack.length - 1]
-      : charResult.character.card;
-    const targetPower = topCard.power + charResult.character.powerTokens;
+    const targetPower = getEffectivePower(state, charResult.character, charResult.player);
 
     // Hide the target
     let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
@@ -4723,13 +4719,10 @@ export class EffectEngine {
     let remainingPower = parsed.remainingPower ?? 6;
     const hiddenIds = parsed.hiddenIds ?? [];
 
-    // Get target's power before hiding
+    // Get target's effective power before hiding (includes continuous modifiers)
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult || charResult.character.isHidden) return state;
-    const topCard = charResult.character.stack.length > 0
-      ? charResult.character.stack[charResult.character.stack.length - 1]
-      : charResult.character.card;
-    const targetPower = topCard.power + charResult.character.powerTokens;
+    const targetPower = getEffectivePower(state, charResult.character, charResult.player);
 
     // Hide the target
     let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
@@ -4746,8 +4739,8 @@ export class EffectEngine {
           if (char.isHidden) continue;
           if (char.instanceId === pending.sourceInstanceId) continue; // not self (Kyubi)
           if (hiddenIds.includes(char.instanceId)) continue;
-          const tc = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-          const pw = tc.power + char.powerTokens;
+          const charOwner3 = newState.activeMissions[i].player1Characters.includes(char) ? 'player1' : 'player2';
+          const pw = getEffectivePower(newState, char, charOwner3 as PlayerID);
           if (pw <= remainingPower && pw > 0) {
             validNext.push(char.instanceId);
           }
