@@ -57,9 +57,10 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
   const validTargets: { char: import('@/lib/engine/types').CharacterInPlay; missionIndex: number }[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][enemySide]) {
-      if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if (topCard.chakra < hiddenCount) {
+      // Hidden characters have cost 0 per rules
+      const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+      if (effectiveCost < hiddenCount) {
         validTargets.push({ char, missionIndex: i });
       }
     }

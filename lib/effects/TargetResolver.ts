@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
+import { getEffectivePower } from './powerUtils';
 
 /**
  * Centralized target resolution for card effects.
@@ -100,8 +101,11 @@ export function getValidTargets(
     }
 
     for (const chars of charLists) {
+      // Determine which player owns this character list
+      const isPlayerList = chars === (player === 'player1' ? mission.player1Characters : mission.player2Characters);
+      const listOwner: PlayerID = isPlayerList ? player : opponent;
       for (const char of chars) {
-        if (matchesTargetCriteria(state, char, targetType, filters)) {
+        if (matchesTargetCriteria(state, char, listOwner, targetType, filters)) {
           results.push(char.instanceId);
         }
       }
@@ -121,6 +125,7 @@ export function getValidTargets(
 function matchesTargetCriteria(
   state: GameState,
   char: CharacterInPlay,
+  charPlayer: PlayerID,
   targetType: TargetType,
   filters?: TargetFilter,
 ): boolean {
@@ -145,9 +150,9 @@ function matchesTargetCriteria(
   // Get the active (top) card for attribute checks
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Hidden characters have cost 0 and power 0 when targeted by enemy effects
+  // Use getEffectivePower for accurate power (includes continuous modifiers like Yashamaru +2)
   const isEnemyTarget = targetType === 'enemy_character' || targetType === 'enemy_hidden';
-  const effectivePower = char.isHidden ? 0 : topCard.power + char.powerTokens;
+  const effectivePower = getEffectivePower(state, char, charPlayer);
   const effectiveCost = (char.isHidden && isEnemyTarget) ? 0 : topCard.chakra;
 
   // Power filters
