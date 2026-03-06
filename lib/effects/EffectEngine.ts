@@ -3510,7 +3510,17 @@ export class EffectEngine {
       // --- Hiruzen 002: Choose Leaf character from hand ---
       case 'HIRUZEN002_CHOOSE_CARD': {
         const player = pendingEffect.sourcePlayer;
-        const cardIndex = parseInt(targetId, 10);
+
+        // Handle hidden Leaf Village character reveal
+        if (targetId.startsWith('HIDDEN_')) {
+          const instanceId_h002 = targetId.slice(7);
+          newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, instanceId_h002, 1, pendingEffect.isUpgrade ? 2 : 0);
+          break;
+        }
+
+        // Strip HAND_ prefix if present
+        const rawId_h002 = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
+        const cardIndex = parseInt(rawId_h002, 10);
         const ps = newState[player];
         if (cardIndex < 0 || cardIndex >= ps.hand.length) break;
 
@@ -4920,7 +4930,13 @@ export class EffectEngine {
 
   /** Play a Summon card from hand with a specified cost reduction. Two-stage: picks card, then mission. */
   static playSummonFromHandWithReduction(state: GameState, pending: PendingEffect, targetId: string, costReduction: number): GameState {
-    const handIndex = parseInt(targetId, 10);
+    // Handle hidden character reveal
+    if (targetId.startsWith('HIDDEN_')) {
+      return EffectEngine.revealHiddenWithReduction(state, pending, targetId.slice(7), costReduction);
+    }
+    // Strip HAND_ prefix if present
+    const rawId = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
+    const handIndex = parseInt(rawId, 10);
     if (isNaN(handIndex)) return state;
 
     const newState = deepClone(state);
@@ -6050,7 +6066,13 @@ export class EffectEngine {
 
   /** Jiraiya Stage 1: player chose a Summon card from hand. Store it and prompt for mission. */
   static jiraiyaChooseSummon(state: GameState, pending: PendingEffect, targetId: string): GameState {
-    const handIndex = parseInt(targetId, 10);
+    // Handle hidden character reveal
+    if (targetId.startsWith('HIDDEN_')) {
+      return EffectEngine.revealHiddenWithReduction(state, pending, targetId.slice(7), 1);
+    }
+    // Strip HAND_ prefix if present
+    const rawId = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
+    const handIndex = parseInt(rawId, 10);
     if (isNaN(handIndex)) return state;
 
     const newState = deepClone(state);
@@ -7373,6 +7395,58 @@ export class EffectEngine {
   }
 
   /** Find a character across all missions by instanceId */
+  /**
+   * Reveal a hidden character on the board with a cost reduction.
+   * Pays reduced cost, sets isHidden=false, triggers resolveRevealEffects (MAIN + AMBUSH).
+   * Optionally applies POWERUP (e.g., Hiruzen 002 upgrade gives +2 power tokens).
+   */
+  static revealHiddenWithReduction(
+    state: GameState,
+    pending: PendingEffect,
+    instanceId: string,
+    costReduction: number,
+    powerUpBonus: number = 0,
+  ): GameState {
+    const newState = deepClone(state);
+    const player = pending.sourcePlayer;
+    const ps = newState[player];
+
+    const charResult = EffectEngine.findCharByInstanceId(newState, instanceId);
+    if (!charResult || !charResult.character.isHidden) return state;
+
+    const char = charResult.character;
+    const mIdx = charResult.missionIndex;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
+    // Pay reduced cost
+    const cost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+    if (ps.chakra < cost) return state;
+    ps.chakra -= cost;
+
+    // Reveal the character
+    char.isHidden = false;
+    char.wasRevealedAtLeastOnce = true;
+
+    // Apply POWERUP bonus if any (e.g., Hiruzen 002 UPGRADE)
+    if (powerUpBonus > 0) {
+      char.powerTokens += powerUpBonus;
+    }
+
+    newState.log = logAction(
+      newState.log, newState.turn, 'action', player,
+      'EFFECT',
+      `Effect: Revealed ${topCard.name_fr} on mission ${mIdx + 1} for ${cost} chakra (cost reduced by ${costReduction}).`,
+      'game.log.effect.revealHiddenReduced',
+      { card: topCard.name_fr, mission: String(mIdx + 1), cost: String(cost), reduction: String(costReduction) },
+    );
+
+    // Update character count
+    ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
+
+    // Trigger reveal effects (MAIN + AMBUSH)
+    return EffectEngine.resolveRevealEffects(newState, player, char, mIdx);
+  }
+
   static findCharByInstanceId(
     state: GameState,
     instanceId: string,

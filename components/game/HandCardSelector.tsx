@@ -17,7 +17,9 @@ interface HandCardInfo {
     chakra?: number;
     power?: number;
     image_file?: string;
+    missionLabel?: string;
   };
+  targetId?: string;
 }
 
 function HandCard({
@@ -41,7 +43,7 @@ function HandCard({
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 250, damping: 20 }}
       whileHover={{ scale: 1.08, y: -8 }}
       whileTap={{ scale: 0.95 }}
-      onClick={() => onSelect(String(index))}
+      onClick={() => onSelect(cardInfo.targetId ?? String(index))}
       className="relative no-select"
       style={{
         width: dims.handSelectorCard.w + 'px',
@@ -111,6 +113,20 @@ function HandCard({
           }}
         >
           {card.power}
+        </div>
+      )}
+
+      {/* Mission label for hidden board characters */}
+      {card.missionLabel && (
+        <div
+          className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold uppercase"
+          style={{
+            backgroundColor: 'rgba(139, 92, 246, 0.9)',
+            color: '#fff',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          {card.missionLabel}
         </div>
       )}
 

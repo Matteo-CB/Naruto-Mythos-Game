@@ -138,8 +138,8 @@ describe('007/130 - Jiraiya', () => {
     // Now returns target selection: choose which Summon from hand
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('JIRAIYA_CHOOSE_SUMMON');
-    expect(result.validTargets).toContain('0'); // summonCard at index 0
-    expect(result.validTargets).not.toContain('1'); // Naruto is not a Summon
+    expect(result.validTargets).toContain('HAND_0'); // summonCard at index 0
+    expect(result.validTargets).not.toContain('HAND_1'); // Naruto is not a Summon
   });
 
   it('should fizzle when no Summon cards in hand', () => {
