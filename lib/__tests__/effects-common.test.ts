@@ -1135,7 +1135,7 @@ describe('088/130 - Haku', () => {
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('HAKU088_CONFIRM_DRAW');
     expect(result.isOptional).toBe(true);
-    expect(result.validTargets).toEqual(['draw']);
+    expect(result.validTargets).toEqual(['confirm']);
   });
 
   it('should do nothing when deck is empty', () => {
