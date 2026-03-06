@@ -1,16 +1,15 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 /**
  * Card 132/130 - JIRAYA (S)
  * Chakra: 7, Power: 6
  * Group: Leaf Village, Keywords: Sannin
  *
- * MAIN: Play a Summon character from your hand anywhere, paying 5 less.
- *   - Find all character cards in hand with the "Summon" keyword.
- *   - The player can afford the card at (cost - 5, minimum 0).
- *   - If no Summon characters in hand or none affordable, fizzles.
+ * MAIN: Play a Summon character anywhere, paying 5 less.
+ *   - Includes Summon cards in hand AND hidden Summon characters on the board.
  *
  * UPGRADE: The opponent must choose characters to be defeated until they
  *   only have up to 2 assigned per mission.
@@ -19,40 +18,33 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
-  const playerState = { ...state[ctx.sourcePlayer] };
+  const { state, sourcePlayer } = ctx;
+  const costReduction = 5;
 
-  // Find Summon characters in hand that are affordable at cost - 5
-  const affordableSummons: { handIndex: number; reducedCost: number }[] = [];
-  for (let i = 0; i < playerState.hand.length; i++) {
-    const card = playerState.hand[i];
-    if (card.card_type === 'character' && card.keywords && card.keywords.includes('Summon')) {
-      const reducedCost = Math.max(0, card.chakra - 5);
-      if (playerState.chakra >= reducedCost) {
-        affordableSummons.push({ handIndex: i, reducedCost });
-      }
-    }
+  const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
+  const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
+
+  const allTargets = [
+    ...handTargets.map(i => `HAND_${i}`),
+    ...hiddenTargets.map(h => `HIDDEN_${h.instanceId}`),
+  ];
+
+  if (allTargets.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jiraya (132): No affordable Summon characters available.',
+      'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-132-S' }) } };
   }
 
-  if (affordableSummons.length === 0) {
-    const log = logAction(
-      state.log, state.turn, state.phase, ctx.sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Jiraya (132): No affordable Summon character in hand to play.',
-      'game.log.effect.noTarget',
-      { card: 'JIRAYA', id: 'KS-132-S' },
-    );
-    return { state: { ...state, log } };
-  }
-
-  // Player chooses which Summon to play (stage 1)
-  // Stage 2 (mission choice) is handled by playSummonFromHandWithReduction in EffectEngine
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'JIRAIYA132_CHOOSE_SUMMON',
-    validTargets: affordableSummons.map((s) => String(s.handIndex)),
-    description: 'Jiraya (132): Choose a Summon character from your hand to play (paying 5 less).',
+    validTargets: allTargets,
+    description: JSON.stringify({
+      text: 'Jiraya (132): Choose a Summon character to play (paying 5 less).',
+      hiddenChars: hiddenTargets,
+      costReduction,
+    }),
     descriptionKey: 'game.effect.desc.jiraiya132ChooseSummon',
   };
 }

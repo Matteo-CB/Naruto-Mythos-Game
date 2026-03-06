@@ -29,7 +29,7 @@ interface PendingTargetSelection {
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
-  handCards?: Array<{ index: number; card: { name_fr: string; chakra?: number; power?: number; image_file?: string } }>; // for hand selection
+  handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   revealedCards?: Array<{ name_fr: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
@@ -480,6 +480,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: idx,
               card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
             };
+          });
+        } else if (
+          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
+          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
+          tst === 'HIRUZEN002_CHOOSE_CARD'
+        ) {
+          // Mixed hand + hidden board characters
+          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
+
+          const playerHand = visibleState.myState.hand;
+          const missionRanks = (visibleState.activeMissions ?? []).map((m: any) => m.rank || '?');
+
+          handCards = pendingAction.options.map((optStr, optIdx) => {
+            if (optStr.startsWith('HIDDEN_')) {
+              const instId = optStr.slice(7);
+              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
+              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: hInfo ? {
+                  name_fr: hInfo.name_fr,
+                  name_en: hInfo.name_en,
+                  chakra: hInfo.chakra,
+                  power: hInfo.power,
+                  image_file: hInfo.image_file,
+                  missionLabel: `Mission ${mLabel}`,
+                } : { name_fr: '???', missionLabel: '?' },
+              };
+            } else {
+              // HAND_ prefix or plain index
+              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
+              const idx = parseInt(rawIdx, 10);
+              const card = playerHand[idx];
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: card ? {
+                  name_fr: card.name_fr,
+                  chakra: card.chakra,
+                  power: card.power,
+                  image_file: card.image_file,
+                } : { name_fr: '???' },
+              };
+            }
           });
         } else {
           const playerHand = visibleState.myState.hand;
@@ -1007,6 +1053,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: idx,
               card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
             };
+          });
+        } else if (
+          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
+          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
+          tst === 'HIRUZEN002_CHOOSE_CARD'
+        ) {
+          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
+
+          const playerHand = newState[humanPlayer].hand;
+          const missionRanks = (newState.activeMissions ?? []).map((m: any) => m.rank || '?');
+
+          handCards = pendingAction.options.map((optStr, optIdx) => {
+            if (optStr.startsWith('HIDDEN_')) {
+              const instId = optStr.slice(7);
+              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
+              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: hInfo ? {
+                  name_fr: hInfo.name_fr,
+                  name_en: hInfo.name_en,
+                  chakra: hInfo.chakra,
+                  power: hInfo.power,
+                  image_file: hInfo.image_file,
+                  missionLabel: `Mission ${mLabel}`,
+                } : { name_fr: '???', missionLabel: '?' },
+              };
+            } else {
+              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
+              const idx = parseInt(rawIdx, 10);
+              const card = playerHand[idx];
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: card ? {
+                  name_fr: card.name_fr,
+                  chakra: card.chakra,
+                  power: card.power,
+                  image_file: card.image_file,
+                } : { name_fr: '???' },
+              };
+            }
           });
         } else {
           const playerHand = newState[humanPlayer].hand;
@@ -1536,6 +1626,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: idx,
               card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
             };
+          });
+        } else if (
+          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
+          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
+          tst === 'HIRUZEN002_CHOOSE_CARD'
+        ) {
+          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
+
+          const playerHand = currentState[humanPlayer].hand;
+          const missionRanks = (currentState.activeMissions ?? []).map((m: any) => m.rank || '?');
+
+          handCards = pendingAction.options.map((optStr, optIdx) => {
+            if (optStr.startsWith('HIDDEN_')) {
+              const instId = optStr.slice(7);
+              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
+              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: hInfo ? {
+                  name_fr: hInfo.name_fr,
+                  name_en: hInfo.name_en,
+                  chakra: hInfo.chakra,
+                  power: hInfo.power,
+                  image_file: hInfo.image_file,
+                  missionLabel: `Mission ${mLabel}`,
+                } : { name_fr: '???', missionLabel: '?' },
+              };
+            } else {
+              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
+              const idx = parseInt(rawIdx, 10);
+              const card = playerHand[idx];
+              return {
+                index: optIdx,
+                targetId: optStr,
+                card: card ? {
+                  name_fr: card.name_fr,
+                  chakra: card.chakra,
+                  power: card.power,
+                  image_file: card.image_file,
+                } : { name_fr: '???' },
+              };
+            }
           });
         } else {
           const playerHand = currentState[humanPlayer].hand;

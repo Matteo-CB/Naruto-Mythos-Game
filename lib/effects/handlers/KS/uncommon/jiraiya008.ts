@@ -1,48 +1,36 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
-/**
- * Card 008/130 - JIRAYA "Doton, Les Marecages des Limbes" (UC)
- * Chakra: 5 | Power: 5
- * Group: Leaf Village | Keywords: Sannin, Jutsu
- *
- * MAIN: Play a Summon character anywhere, paying 2 less.
- *   - Player chooses which Summon card from hand, then which mission to place it on.
- *   - Two-stage target selection via playSummonFromHandWithReduction.
- *
- * UPGRADE: Hide an enemy character with cost 3 or less in this mission.
- */
 function handleJiraiya008Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
-  const playerState = state[sourcePlayer];
+  const costReduction = 2;
 
-  // Find all Summon cards in hand that the player can afford at cost-2
-  const affordableSummonIndices: string[] = [];
-  for (let i = 0; i < playerState.hand.length; i++) {
-    const card = playerState.hand[i];
-    if (card.keywords && card.keywords.includes('Summon')) {
-      const reducedCost = Math.max(0, card.chakra - 2);
-      if (playerState.chakra >= reducedCost) {
-        affordableSummonIndices.push(String(i));
-      }
-    }
-  }
+  const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
+  const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
 
-  if (affordableSummonIndices.length === 0) {
+  const allTargets = [
+    ...handTargets.map(i => `HAND_${i}`),
+    ...hiddenTargets.map(h => `HIDDEN_${h.instanceId}`),
+  ];
+
+  if (allTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Jiraiya (008): No affordable Summon character in hand.',
-      'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' }) } };
+      'Jiraiya (008): No affordable Summon characters available.',
+      'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-008-UC' }) } };
   }
 
-  // Player chooses which Summon to play (stage 1)
-  // Stage 2 (mission choice) is handled by playSummonFromHandWithReduction in EffectEngine
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'JIRAIYA008_CHOOSE_SUMMON',
-    validTargets: affordableSummonIndices,
-    description: 'Jiraiya (008): Choose a Summon character from your hand to play (paying 2 less).',
+    validTargets: allTargets,
+    description: JSON.stringify({
+      text: 'Jiraiya (008): Choose a Summon character to play (paying 2 less).',
+      hiddenChars: hiddenTargets,
+      costReduction,
+    }),
     descriptionKey: 'game.effect.desc.jiraiya008ChooseSummon',
   };
 }
@@ -70,7 +58,6 @@ function handleJiraiya008Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' }) } };
   }
 
-  // Always let player choose (optional effect)
   return {
     state,
     requiresTargetSelection: true,

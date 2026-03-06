@@ -1,58 +1,37 @@
+import type { CharacterInPlay } from '@/lib/engine/types';
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import type { CharacterInPlay } from '@/lib/engine/types';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
-/**
- * Card 105/130 - JIRAYA (R)
- * Chakra: 6, Power: 5
- * Group: Leaf Village, Keywords: Sannin
- *
- * MAIN: Play a Summon character from hand anywhere, paying 3 less.
- *   Find Summon keyword characters in hand that the player can afford (cost - 3).
- *   Requires target selection for which Summon to play and which mission to place it on.
- *
- * UPGRADE: Move any enemy character from this mission to another mission.
- *   Requires target selection for which enemy to move and where.
- */
+function handleJiraiya105Main(ctx: EffectContext): EffectResult {
+  const { state, sourcePlayer } = ctx;
+  const costReduction = 3;
 
-function jiraiya105MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
-  const playerState = state[sourcePlayer];
+  const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
+  const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
 
-  // MAIN: Play a Summon character from hand, paying 3 less
-  const affordableSummonIndices: string[] = [];
-  for (let i = 0; i < playerState.hand.length; i++) {
-    const card = playerState.hand[i];
-    if (card.keywords && card.keywords.includes('Summon')) {
-      const cost = Math.max(0, card.chakra - 3);
-      if (playerState.chakra >= cost) {
-        affordableSummonIndices.push(String(i));
-      }
-    }
-  }
+  const allTargets = [
+    ...handTargets.map(i => `HAND_${i}`),
+    ...hiddenTargets.map(h => `HIDDEN_${h.instanceId}`),
+  ];
 
-  if (affordableSummonIndices.length === 0) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Jiraiya (105): No affordable Summon characters in hand (cost reduced by 3).',
-          'game.log.effect.noTarget',
-          { card: 'JIRAIYA', id: 'KS-105-R' },
-        ),
-      },
-    };
+  if (allTargets.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jiraiya (105): No affordable Summon characters available.',
+      'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-105-R' }) } };
   }
 
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
-    validTargets: affordableSummonIndices,
-    description: 'Jiraiya (105): Choose a Summon character from your hand to play (paying 3 less).',
+    validTargets: allTargets,
+    description: JSON.stringify({
+      text: 'Jiraiya (105): Choose a Summon character to play (paying 3 less).',
+      hiddenChars: hiddenTargets,
+      costReduction,
+    }),
     descriptionKey: 'game.effect.desc.jiraiya105ChooseSummon',
   };
 }
@@ -64,22 +43,12 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find enemy characters in this mission that can be moved (hidden chars included)
   const validTargets: string[] = enemyChars.map((c: CharacterInPlay) => c.instanceId);
 
   if (validTargets.length === 0) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Jiraiya (105) UPGRADE: No enemy characters in this mission to move.',
-          'game.log.effect.noTarget',
-          { card: 'JIRAIYA', id: 'KS-105-R' },
-        ),
-      },
-    };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jiraiya (105) UPGRADE: No enemy characters in this mission to move.',
+      'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' }) } };
   }
 
   return {
@@ -93,6 +62,6 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
 }
 
 export function registerJiraiya105Handlers(): void {
-  registerEffect('KS-105-R', 'MAIN', jiraiya105MainHandler);
+  registerEffect('KS-105-R', 'MAIN', handleJiraiya105Main);
   registerEffect('KS-105-R', 'UPGRADE', jiraiya105UpgradeHandler);
 }
