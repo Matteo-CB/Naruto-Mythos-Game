@@ -35,6 +35,7 @@ model User {
   matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
   matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
   accounts          Account[]
+  tournamentWins    Int          @default(0)
 }
 
 model Account {
@@ -154,4 +155,74 @@ model GameBackground {
   url       String
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
+}
+
+model Tournament {
+  id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  type               String
+  status             String
+  gameMode           String
+  maxPlayers         Int
+  currentRound       Int                     @default(0)
+  totalRounds        Int                     @default(0)
+  isPublic           Boolean                 @default(true)
+  joinCode           String?                 @unique
+  creatorId          String                  @db.ObjectId
+  creatorUsername     String
+  requiresDiscord    Boolean                 @default(false)
+  useBanList         Boolean                 @default(true)
+  sealedBoosterCount Int?
+  discordRoleReward  String?
+  discordRoleBadge   String?
+  bannedCardIds      String[]                @default([])
+  startedAt          DateTime?
+  completedAt        DateTime?
+  winnerId           String?                 @db.ObjectId
+  winnerUsername      String?
+  createdAt          DateTime                @default(now())
+  participants       TournamentParticipant[]
+  matches            TournamentMatch[]
+}
+
+model TournamentParticipant {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId    String     @db.ObjectId
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId          String     @db.ObjectId
+  username        String
+  seed            Int?
+  eliminated      Boolean    @default(false)
+  eliminatedRound Int?
+  hasBye          Boolean    @default(false)
+  sealedPool      Json?
+  sealedDeck      Json?
+  joinedAt        DateTime   @default(now())
+
+  @@unique([tournamentId, userId])
+}
+
+model TournamentMatch {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId    String     @db.ObjectId
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  round           Int
+  matchIndex      Int
+  player1Id       String?    @db.ObjectId
+  player2Id       String?    @db.ObjectId
+  player1Username String?
+  player2Username String?
+  winnerId        String?    @db.ObjectId
+  winnerUsername   String?
+  isBye           Boolean    @default(false)
+  status          String
+  roomCode        String?
+  gameId          String?    @db.ObjectId
+  absenceDeadline DateTime?
+  absentPlayerId  String?    @db.ObjectId
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime   @default(now())
+
+  @@unique([tournamentId, round, matchIndex])
 }
