@@ -70,6 +70,7 @@ const menuButtons = [
   { key: 'deckBuilder' as const, href: '/deck-builder', primary: false },
   { key: 'learn' as const, href: '/learn', primary: false },
   { key: 'leaderboard' as const, href: '/leaderboard', primary: false },
+  { key: 'tournaments' as const, href: '/tournaments', primary: false },
 ];
 
 // Account buttons

@@ -5,6 +5,7 @@ import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { registerTournamentHandlers, handleTournamentMatchEnd } from '@/lib/socket/tournamentHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
@@ -37,6 +38,9 @@ interface RoomData {
   sealedDeadline: number | null;
   // Rematch
   rematchOffer?: 'player1' | 'player2';
+  // Tournament
+  tournamentId?: string;
+  tournamentMatchId?: string;
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -250,6 +254,13 @@ async function finalizeGameEnd(
         },
       });
       gameRecordId = gameRecord.id;
+      // If this game is part of a tournament, update tournament state
+      if (room.tournamentId && room.tournamentMatchId && gameRecordId) {
+        const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
+        handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, gameRecordId).catch(err => {
+          console.error('[Socket] Tournament match end error:', err);
+        });
+      }
     }
   } catch (eloErr) {
     console.error('[Socket] Error persisting game result:', eloErr);
@@ -494,6 +505,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
+    // Register tournament socket handlers
+    registerTournamentHandlers(io, socket);
 
     // Register user identity for targeted notifications
     socket.on('auth:register', (data: { userId: string }) => {

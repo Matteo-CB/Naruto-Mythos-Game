@@ -125,3 +125,49 @@ export async function syncDiscordRole(userId: string): Promise<void> {
     console.error('[Discord] Role sync error:', error);
   }
 }
+
+
+/**
+ * Assign a tournament reward role to a player.
+ * Creates the role in the guild if it does not exist.
+ */
+export async function assignTournamentRole(userId: string, roleName: string): Promise<void> {
+  if (!BOT_TOKEN || !GUILD_ID || !roleName) return;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { discordId: true },
+    });
+
+    if (!user?.discordId) return;
+
+    // Find or create the role
+    let guildRoles = await getGuildRoles();
+    let role = guildRoles.find((r) => r.name === roleName);
+
+    if (!role) {
+      // Create the role with a gold-ish color
+      const createRes = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
+        method: 'POST',
+        body: JSON.stringify({ name: roleName, color: 0xc4a35a, mentionable: false }),
+      });
+      if (!createRes.ok) {
+        console.error('[Discord] Failed to create tournament role:', createRes.status);
+        return;
+      }
+      role = await createRes.json() as DiscordRole;
+      invalidateRoleCache();
+    }
+
+    // Assign the role to the member
+    const res = await discordFetch(`/guilds/${GUILD_ID}/members/${user.discordId}/roles/${role.id}`, {
+      method: 'PUT',
+    });
+    if (!res.ok && res.status !== 204) {
+      console.error('[Discord] Failed to assign tournament role:', res.status);
+    }
+  } catch (error) {
+    console.error('[Discord] Tournament role assign error:', error);
+  }
+}
