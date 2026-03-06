@@ -19,7 +19,8 @@
     "rotateDevice": "Rotate your device to landscape mode to play",
     "fullscreen": "Fullscreen",
     "play": "Play",
-    "close": "Close"
+    "close": "Close",
+    "all": "All"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -43,7 +44,11 @@
     "training": "Training Mode",
     "settings": "Settings",
     "customization": "Customization",
-    "tournaments": "Tournaments"
+    "tournaments": "Tournaments",
+    "play": "Play",
+    "vsAI": "vs AI",
+    "online": "Online",
+    "sealedMode": "Sealed"
   },
   "settings": {
     "title": "Customization",
@@ -583,6 +588,7 @@
       "rarity": "Rarity"
     },
     "close": "Close",
+    "all": "All",
     "cardsShown": "{count} cards shown",
     "basePoints": "Base Points",
     "id": "ID",
@@ -861,6 +867,7 @@
     "mission": "Mission",
     "character": "Character",
     "close": "Close",
+    "all": "All",
     "fullscreen": "Full Details",
     "name": "Name",
     "title": "Title",
@@ -1895,5 +1902,14 @@
     "visibility": "Visibility",
     "createSimulator": "Create Simulator Tournament",
     "createPlayer": "Create Player Tournament"
+  },
+  "playHub": {
+    "title": "Play",
+    "subtitle": "Choose your game mode",
+    "onlineTitle": "Play Online",
+    "onlineDesc": "Challenge real players in ranked or private matches",
+    "aiTitle": "Play vs AI",
+    "aiDesc": "Train against AI opponents of varying difficulty",
+    "backToMenu": "Back to Menu"
   }
 }
