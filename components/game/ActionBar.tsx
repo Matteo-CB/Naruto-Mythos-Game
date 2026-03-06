@@ -8,6 +8,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 import { useGameScale } from './GameScaleContext';
 
 export function ActionBar() {
@@ -134,8 +135,10 @@ export function ActionBar() {
           if (c.instanceId === selectedTargetId || c.isHidden) return false;
           const cTop = c.topCard ?? c.card;
           if (!cTop) return false;
-          return cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase()
-            && hiddenTopCard.chakra > cTop.chakra;
+          if (hiddenTopCard.chakra <= cTop.chakra) return false;
+          const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
+          const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
+          return isSameName || isFlexible;
         });
         if (upgradeOver) {
           const existingTop = upgradeOver.topCard ?? upgradeOver.card;
