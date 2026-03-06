@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 
 /**
  * Card 135/130 - SAKURA HARUNO "Corps Medical du Village de la Feuille" (S)
@@ -44,12 +45,14 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
   ps.deck = deck;
   newState[sourcePlayer] = ps;
 
-  // Find character cards among them that the player can afford
+  // Find character cards among them that the player can afford (fresh play OR upgrade)
   const validIndices: string[] = [];
   for (let i = 0; i < topCards.length; i++) {
     if (topCards[i].card_type === 'character') {
-      const cost = Math.max(0, topCards[i].chakra - costReduction);
-      if (ps.chakra >= cost) {
+      const freshCost = Math.max(0, topCards[i].chakra - costReduction);
+      const canFresh = ps.chakra >= freshCost;
+      const canUpgrade = canAffordAsUpgrade(newState, sourcePlayer, topCards[i] as { name_fr: string; chakra: number }, costReduction);
+      if (canFresh || canUpgrade) {
         validIndices.push(String(i));
       }
     }

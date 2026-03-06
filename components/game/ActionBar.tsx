@@ -347,10 +347,11 @@ export function ActionBar() {
           {cardAndMissionReady && upgradeTargets.map((target) => {
             const charCard = target.topCard ?? target.card;
             const isHiddenTarget = target.isHidden;
-            // For hidden targets: pay full cost (reveal + upgrade). For visible: pay diff.
+            // For hidden targets: pay full effective cost (reveal + upgrade). For visible: pay diff.
+            // Use effectiveCost (which includes Kurenai, Gamakichi, etc. modifiers) instead of raw chakra.
             const upgradeCost = isHiddenTarget
-              ? (selectedCard?.chakra ?? 0)
-              : (selectedCard?.chakra ?? 0) - (charCard?.chakra ?? 0);
+              ? effectiveCost
+              : effectiveCost - (charCard?.chakra ?? 0);
             const canAffordUpgrade = myState.chakra >= upgradeCost;
             const targetName = charCard?.name_fr ?? '';
             const upgradeLabel = isHiddenTarget
