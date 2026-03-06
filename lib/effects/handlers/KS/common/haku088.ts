@@ -38,7 +38,7 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'HAKU088_CONFIRM_DRAW',
-    validTargets: ['draw'],
+    validTargets: ['confirm'],
     isOptional: true,
     description: 'Haku (088): Draw 1 card, then put 1 card from your hand on top of your deck.',
     descriptionKey: 'game.effect.desc.haku088Draw',

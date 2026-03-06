@@ -439,7 +439,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
           // Source player selects from opponent's hand — card info stored in effectDescription
           let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
             const card = oppCards[idx];
@@ -1031,10 +1031,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
           // Source player selects from opponent's hand — card info stored in effectDescription
           let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
             const card = oppCards[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                name_en: card.name_en,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
+          // Opponent's hand cards stored in effectDescription JSON
+          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = oppCards091[idx];
             return {
               index: idx,
               card: card ? {
@@ -1608,7 +1626,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
           // Source player selects from opponent's hand — card info stored in effectDescription
           let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').opponentCards ?? []; } catch { /* ignore */ }
+          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
             const card = oppCards[idx];
@@ -1616,6 +1634,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               index: idx,
               card: card ? {
                 name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
+          // Opponent's hand cards stored in effectDescription JSON
+          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = oppCards091[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                name_en: card.name_en,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
               } : { name_fr: '???' },
             };
           });
