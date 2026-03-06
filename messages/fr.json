@@ -408,7 +408,7 @@
         "kidomaru060MoveCharacter": "Choisissez un personnage dans cette mission a deplacer vers une autre.",
         "kidomaru060DefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins en jeu a vaincre.",
         "kidomaru060EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Kidômaru doit retourner dans votre main.",
-        "giantSpider103EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. Si vous le faites, Araignee Geante doit retourner dans votre main.",
+        "giantSpider103EndHide": "Vous pouvez cacher un personnage avec une Puissance egale ou inferieure. L'Araignee Geante doit retourner dans votre main.",
         "gemma049SacrificeDefeat": "Sacrifier Gemma Shiranui pour proteger {target} de la defaite ?",
         "gemma049SacrificeHide": "Sacrifier Gemma Shiranui pour proteger {target} d'etre cache ?",
         "kimimaro056DiscardAndHide": "Choisissez une carte a defausser, puis cachez un personnage avec cout 4 ou moins.",

@@ -566,8 +566,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 073/130 - KIN TSUCHI (UC) - "Aiguilles aux Grelots"
   'KS-073-UC': [
-    'Defaussez une carte pour cacher un personnage ennemi avec une Puissance de 4 ou moins dans cette mission.',
-    'effet MAIN : A la place, placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
+    'Defaussez une carte pour cacher un personnage ennemi avec une Puissance de 4 ou moins.',
+    'UPGRADE : Placez la carte du dessus de votre deck en tant que personnage cache dans cette mission.',
   ],
 
   // 076/130 - ICHIBI (UC) - "Queue Unique"
@@ -636,7 +636,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 103/130 - KYODAIGUMO (UC) - "Araignee Geante"
   'KS-103-UC': [
-    '[⧗] A la fin du tour, cachez ce personnage et renvoyez-le en main.',
+    '[⧗] A la fin du tour, cachez un personnage avec une Puissance egale ou inferieure a ce personnage. Puis, vous devez renvoyer ce personnage dans votre main.',
   ],
 
   // =====================

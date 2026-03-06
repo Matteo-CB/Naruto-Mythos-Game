@@ -1424,15 +1424,15 @@ export class EffectEngine {
       case 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET': {
         // Hide the selected character
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
-        // Giant Spider must return to hand
+        // Giant Spider must return to hand — UNLESS it hid itself (continuous effect gone)
         let k103Data: { giantSpiderInstanceId?: string } = {};
         try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        if (k103Data.giantSpiderInstanceId) {
+        if (k103Data.giantSpiderInstanceId && targetId !== k103Data.giantSpiderInstanceId) {
           newState = returnCharacterToHand(newState, k103Data.giantSpiderInstanceId, pendingEffect.sourcePlayer);
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'END_RETURN',
-            'Giant Spider (103): Must return to hand after using end-of-round effect.',
+            'Giant Spider (103): Returns to hand at end of round.',
             'game.log.effect.giantSpider103Return',
             { card: 'ARAIGNEE GEANTE', id: 'KS-103-UC' },
           );
