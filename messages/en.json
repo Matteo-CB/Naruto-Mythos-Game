@@ -408,7 +408,7 @@
         "kidomaru060MoveCharacter": "Choose a character in this mission to move to another mission.",
         "kidomaru060DefeatLowPower": "Select an enemy character with Power 1 or less in play to defeat.",
         "kidomaru060EndHide": "You may hide a character with Power equal or less. If you do, Kidômaru must return to your hand.",
-        "giantSpider103EndHide": "You may hide a character with Power equal or less. If you do, Giant Spider must return to your hand.",
+        "giantSpider103EndHide": "You may hide a character with Power equal or less. Giant Spider must return to your hand.",
         "gemma049SacrificeDefeat": "Sacrifice Gemma Shiranui to protect {target} from being defeated?",
         "gemma049SacrificeHide": "Sacrifice Gemma Shiranui to protect {target} from being hidden?",
         "kimimaro056DiscardAndHide": "Choose a card to discard, then hide a character with cost 4 or less.",

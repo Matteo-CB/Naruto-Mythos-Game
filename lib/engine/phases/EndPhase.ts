@@ -421,8 +421,8 @@ export function handleAkamaru028Return(state: GameState): GameState {
 }
 
 /**
- * Giant Spider 103 (UC): [⧗] At end of round, player may optionally hide a character with Power ≤ Giant Spider's power.
- * If they do, Giant Spider must return to hand (handled in EffectEngine GIANT_SPIDER103_CHOOSE_HIDE_TARGET case).
+ * Giant Spider 103 (UC): [⧗] At end of round, player may hide a character with Power ≤ Giant Spider's power.
+ * Giant Spider always returns to hand. If it hides itself, it does NOT return (continuous effect gone).
  * Uses state.endPhaseGiantSpider103Ids to avoid processing the same card twice across resumptions.
  */
 export function handleGiantSpider103EndOfRound(state: GameState): GameState {
@@ -444,14 +444,13 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
         // Power tokens are already removed at this point — compare against printed power
         const powerThreshold = topCard.power ?? 4;
 
-        // Find all non-hidden, non-self characters with printed power ≤ threshold
+        // Find all non-hidden characters with printed power ≤ threshold
         const validTargets: string[] = [];
         for (let mi = 0; mi < newState.activeMissions.length; mi++) {
           const m = newState.activeMissions[mi];
           for (const s of ['player1Characters', 'player2Characters'] as const) {
             for (const c of m[s]) {
               if (c.isHidden) continue;
-              if (c.instanceId === char.instanceId) continue;
               const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
               if ((cTop.power ?? 0) <= powerThreshold) {
                 validTargets.push(c.instanceId);

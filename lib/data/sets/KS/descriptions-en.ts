@@ -487,8 +487,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 073/130 - KIN TSUCHI (UC) - "Bell Needles"
   'KS-073-UC': [
-    'Discard a card to hide an enemy character with Power 4 or less in this mission.',
-    'MAIN effect: Instead, put the top card of your deck as a hidden character in this mission.',
+    'Discard a card to hide an enemy character with Power 4 or less.',
+    'UPGRADE: Place the top card of your deck as a hidden character in this mission.',
   ],
 
   // 076/130 - ICHIBI (UC) - "One-Tail"
@@ -557,7 +557,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 103/130 - KYODAIGUMO (UC) - "Giant Spider"
   'KS-103-UC': [
-    '[⧗] At the end of the round, hide this character and return it to your hand.',
+    '[⧗] At the end of the round, hide a character with Power equal or less than this character. Then, you must return this character to your hand.',
   ],
 
   // =====================

@@ -454,6 +454,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : { name_fr: '???' },
             };
           });
+        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
+          // Opponent's hand cards stored in effectDescription JSON
+          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+          handCards = pendingAction.options.map((indexStr) => {
+            const idx = parseInt(indexStr, 10);
+            const card = oppCards091[idx];
+            return {
+              index: idx,
+              card: card ? {
+                name_fr: card.name_fr,
+                name_en: card.name_en,
+                chakra: card.chakra,
+                power: card.power,
+                image_file: card.image_file,
+              } : { name_fr: '???' },
+            };
+          });
         } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
           // Opponent's hand cards shown as face-down (card backs)
           handCards = pendingAction.options.map((indexStr) => {
