@@ -215,7 +215,20 @@
         "endMove": "{card} ({id}): Moved to another mission at end of round.",
         "neji037": "{card} ({id}): POWERUP 1 — enemy played a character in this mission.",
         "hinata031": "{card} ({id}): Gained 1 Chakra — enemy played a character in this mission.",
-        "kankuro078RevealHidden": "{card} ({id}): Revealed {target} (paid {cost} chakra, 1 less than full cost)."
+        "kankuro078RevealHidden": "{card} ({id}): Revealed {target} (paid {cost} chakra, 1 less than full cost).",
+        "dosu069RevealUpgrade": "{card} ({id}): Forced reveal of {target} (upgrade cost applied).",
+        "immune": "{card} ({id}): {target} is immune to this effect.",
+        "itachi091DiscardOpponent": "{card} ({id}): Opponent discards {target}.",
+        "kimimaro123SelfDefeat": "Kimimaro (123): No cards in hand at end of round. Kimimaro is defeated.",
+        "kin073Discard": "{card} ({id}): {target} discarded from hand.",
+        "nameConflictBlocked": "{card} ({id}): Cannot play {target} — same name already present on this mission.",
+        "orochimaru051Pending": "Orochimaru (051): Lost this mission. Choose a destination mission.",
+        "revealHiddenReduced": "Revealed {card} on mission {mission} for {cost} chakra (cost reduced by {reduction}).",
+        "shino033CostReduction": "{card} ({id}): Next character costs {reduction} less chakra.",
+        "tenten118SecondDefeat": "{card} ({id}): Defeated a second hidden enemy character.",
+        "upgradeFromHand": "{card} ({id}): Upgraded {target} from hand on mission {mission} for {cost} chakra.",
+        "upgradeLeafReduced": "{card} ({id}): Upgraded {target} (Leaf Village reduced cost) on mission {mission} for {cost} chakra.",
+        "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -527,7 +540,12 @@
         "kiba026UpgradeReveal": "Kiba (026) UPGRADE: Looking at top 3 cards of your deck for Akamaru.",
         "sasuke014UpgradeReveal": "Sasuke (014) UPGRADE: Opponent's hand revealed.",
         "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token.",
-        "akamaru029ChooseHide": "Akamaru (029): Choose which enemy character (cost {cost}) to hide."
+        "akamaru029ChooseHide": "Akamaru (029): Choose which enemy character (cost {cost}) to hide.",
+        "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Your last card will be discarded. Choose a character with cost 5 or less to defeat.",
+        "narutoLegendaryDefeatTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to defeat in this mission.",
+        "narutoLegendaryHideTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to hide in this mission.",
+        "orochimaru051ChooseDestination": "Orochimaru (051): Choose a mission to move this character to.",
+        "tenten118DefeatHiddenInPlay": "Tenten (118): Choose a hidden enemy character anywhere in play to defeat."
       }
     },
     "anim": {

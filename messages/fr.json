@@ -215,7 +215,20 @@
         "endMove": "{card} ({id}) : Deplace vers une autre mission en fin de tour.",
         "neji037": "{card} ({id}) : POWERUP 1 — l'ennemi a joue un personnage dans cette mission.",
         "hinata031": "{card} ({id}) : Gagne 1 Chakra — l'ennemi a joue un personnage dans cette mission.",
-        "kankuro078RevealHidden": "{card} ({id}) : Revele {target} (paye {cost} chakra, 1 de moins que le cout complet)."
+        "kankuro078RevealHidden": "{card} ({id}) : Revele {target} (paye {cost} chakra, 1 de moins que le cout complet).",
+        "dosu069RevealUpgrade": "{card} ({id}) : Revelation forcee de {target} (cout d'amelioration applique).",
+        "immune": "{card} ({id}) : {target} est immunise contre cet effet.",
+        "itachi091DiscardOpponent": "{card} ({id}) : L'adversaire defausse {target}.",
+        "kimimaro123SelfDefeat": "Kimimaro (123) : Aucune carte en main en fin de tour. Kimimaro est vaincu.",
+        "kin073Discard": "{card} ({id}) : {target} defausse de la main.",
+        "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {target} — meme nom deja present sur cette mission.",
+        "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
+        "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
+        "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",
+        "tenten118SecondDefeat": "{card} ({id}) : A vaincu un deuxieme personnage ennemi cache.",
+        "upgradeFromHand": "{card} ({id}) : Amelioration de {target} depuis la main sur mission {mission} pour {cost} chakra.",
+        "upgradeLeafReduced": "{card} ({id}) : Amelioration de {target} (cout Feuille reduit) sur mission {mission} pour {cost} chakra.",
+        "upgradeSummon": "{card} ({id}) : Amelioration de l'invocation {target} sur mission {mission} pour {cost} chakra."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -527,7 +540,12 @@
         "kiba026UpgradeReveal": "Kiba (026) AMELIORATION : Regardez les 3 cartes du dessus de votre deck pour trouver Akamaru.",
         "sasuke014UpgradeReveal": "Sasuke (014) AMELIORATION : Main adverse revelee.",
         "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Initiative.",
-        "akamaru029ChooseHide": "Akamaru (029) : Choisissez quel personnage ennemi (cout {cost}) cacher."
+        "akamaru029ChooseHide": "Akamaru (029) : Choisissez quel personnage ennemi (cout {cost}) cacher.",
+        "kimimaro123AutoDiscardDefeat": "Kimimaro (123) AMELIORATION : Votre derniere carte sera defaussee. Choisissez un personnage de cout 5 ou moins a vaincre.",
+        "narutoLegendaryDefeatTarget1": "Naruto (Legendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins a vaincre sur cette mission.",
+        "narutoLegendaryHideTarget1": "Naruto (Legendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins a cacher sur cette mission.",
+        "orochimaru051ChooseDestination": "Orochimaru (051) : Choisissez une mission ou deplacer ce personnage.",
+        "tenten118DefeatHiddenInPlay": "Tenten (118) : Choisissez un personnage ennemi cache en jeu a vaincre."
       }
     },
     "anim": {

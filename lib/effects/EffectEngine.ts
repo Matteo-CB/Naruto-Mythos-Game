@@ -434,6 +434,7 @@ export class EffectEngine {
     } else if (
       tst === 'DISCARD_CARD' ||
       tst === 'KIMIMARO_CHOOSE_DISCARD' ||
+      tst === 'KIMIMARO123_CHOOSE_DISCARD' ||
       tst === 'CHOJI_CHOOSE_DISCARD' ||
       tst === 'MSS03_OPPONENT_DISCARD' ||
       tst === 'SAKURA_012_DISCARD' ||
@@ -2523,6 +2524,39 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
+      // --- Orochimaru 051: Choose destination mission after losing ---
+      case 'OROCHIMARU051_CHOOSE_DESTINATION': {
+        const destMIdx_o51 = parseInt(targetId, 10);
+        if (!isNaN(destMIdx_o51) && destMIdx_o51 >= 0 && destMIdx_o51 < newState.activeMissions.length) {
+          const srcMIdx_o51 = pendingEffect.sourceMissionIndex;
+          const charResult_o51 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          if (charResult_o51) {
+            const side_o51 = charResult_o51.player === 'player1' ? 'player1Characters' : 'player2Characters';
+            // Move the character to the destination mission
+            const missions_o51 = [...newState.activeMissions];
+            const srcM_o51 = { ...missions_o51[srcMIdx_o51] };
+            const destM_o51 = { ...missions_o51[destMIdx_o51] };
+            const char_o51 = srcM_o51[side_o51].find(c => c.instanceId === pendingEffect.sourceInstanceId);
+            if (char_o51) {
+              srcM_o51[side_o51] = srcM_o51[side_o51].filter(c => c.instanceId !== pendingEffect.sourceInstanceId);
+              const movedChar_o51 = { ...char_o51, missionIndex: destMIdx_o51 };
+              destM_o51[side_o51] = [...destM_o51[side_o51], movedChar_o51];
+              missions_o51[srcMIdx_o51] = srcM_o51;
+              missions_o51[destMIdx_o51] = destM_o51;
+              newState = { ...newState, activeMissions: missions_o51 };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+                'EFFECT_MOVE',
+                `Orochimaru (051): Lost mission ${srcMIdx_o51 + 1}, moves to mission ${destMIdx_o51 + 1}.`,
+                'game.log.effect.orochimaru051Move',
+                { card: 'OROCHIMARU', id: 'KS-051-UC' },
+              );
+            }
+          }
+        }
+        break;
+      }
+
       // --- Gemma 049: Sacrifice choice (defeat protection) ---
       case 'GEMMA049_SACRIFICE_CHOICE': {
         // Player accepted â€” sacrifice Gemma to protect the original target from defeat
@@ -3074,8 +3108,22 @@ export class EffectEngine {
           ? hiddenChar_k78.stack[hiddenChar_k78.stack.length - 1]
           : hiddenChar_k78.card;
 
-        // Cost = max(0, card.chakra - 1)
-        const revealCost_k78 = Math.max(0, (topCard_k78.chakra ?? 0) - 1);
+        // Check if revealing this card would be an upgrade (same-name visible char with lower cost)
+        const friendlySide_k78 = pendingEffect.sourcePlayer === "player1" ? "player1Characters" : "player2Characters";
+        const m_k78_check = newState.activeMissions[mIdx_k78];
+        const sameNameVisible_k78 = m_k78_check[friendlySide_k78].find(c => {
+          if (c.isHidden || c.instanceId === targetId) return false;
+          const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return tc.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase()
+            && (topCard_k78.chakra ?? 0) > (tc.chakra ?? 0);
+        });
+        let revealCost_k78: number;
+        if (sameNameVisible_k78) {
+          const existingTC = sameNameVisible_k78.stack.length > 0 ? sameNameVisible_k78.stack[sameNameVisible_k78.stack.length - 1] : sameNameVisible_k78.card;
+          revealCost_k78 = Math.max(0, ((topCard_k78.chakra ?? 0) - (existingTC.chakra ?? 0)) - 1);
+        } else {
+          revealCost_k78 = Math.max(0, (topCard_k78.chakra ?? 0) - 1);
+        }
         const ps_k78 = { ...newState[pendingEffect.sourcePlayer] };
         if (ps_k78.chakra < revealCost_k78) break; // can't afford
         ps_k78.chakra -= revealCost_k78;
@@ -5055,13 +5103,7 @@ export class EffectEngine {
     if (handIndex < 0 || handIndex >= ps.hand.length) return state;
 
     const chosenCard = ps.hand[handIndex];
-    const cost = Math.max(0, chosenCard.chakra - costReduction);
-
-    if (ps.chakra < cost) return state;
-
-    // Remove card from hand, pay cost
-    ps.hand.splice(handIndex, 1);
-    ps.chakra -= cost;
+    // Cost deferred to placement time (upgrade vs fresh play)
 
     // Find valid missions (fresh play or upgrade over same-name with lower cost)
     const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -5076,12 +5118,14 @@ export class EffectEngine {
         return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
       });
       if (!sameNameChar) {
-        validMissions.push(String(i));
+        const fcT = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
+        if (ps.chakra >= fcT) validMissions.push(String(i));
       } else {
         const existingTopCard = sameNameChar.stack.length > 0
           ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
         if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-          validMissions.push(String(i));
+          const ucT = Math.max(0, ((chosenCard.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
+          if (ps.chakra >= ucT) validMissions.push(String(i));
         }
       }
     }
@@ -5089,7 +5133,7 @@ export class EffectEngine {
     if (validMissions.length === 0) {
       // Refund â€” no valid mission
       ps.hand.push(chosenCard);
-      ps.chakra += cost;
+      // No refund needed (cost not paid upfront)
       return state;
     }
 
@@ -5174,12 +5218,18 @@ export class EffectEngine {
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
+      // Calculate actual upgrade cost with reduction
+      const eTopGpm = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTopGpm.chakra ?? 0)) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
       state.log = logAction(
         state.log, state.turn, 'action', player,
         'EFFECT_UPGRADE',
-        `${cardName} (${cardId}): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${cost} chakra (reduced by ${costReduction}).`,
+        `${cardName} (${cardId}): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (reduced by ${costReduction}).`,
         'game.log.effect.upgradeFromHand',
-        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
     } else {
       // Safety check: ensure no same-name visible character exists (name uniqueness)
@@ -5200,6 +5250,11 @@ export class EffectEngine {
         );
         return state;
       }
+
+      // Calculate fresh play cost with reduction
+      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
 
       const charInPlay: CharacterInPlay = {
         instanceId: generateInstanceId(),
@@ -5222,9 +5277,9 @@ export class EffectEngine {
 
       state.log = logAction(
         state.log, state.turn, 'action', player,
-        'EFFECT', `${cardName} (${cardId}): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${cost} chakra (reduced by ${costReduction}).`,
+        'EFFECT', `${cardName} (${cardId}): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (reduced by ${costReduction}).`,
         'game.log.effect.playSummon',
-        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(cost) },
+        { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
     }
 
@@ -5686,7 +5741,7 @@ export class EffectEngine {
     } else {
       card = ps.discardPile.pop()!;
     }
-    ps.chakra -= cost;
+    // Cost deferred to placement time (upgrade vs fresh play)
 
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -5719,10 +5774,16 @@ export class EffectEngine {
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
+
+      // Calculate actual upgrade cost with reduction
+      const existingTop_k053 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const actualCost = Math.max(0, ((card.chakra ?? 0) - (existingTop_k053.chakra ?? 0)) - 3);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, player,
         'EFFECT_UPGRADE',
-        `Kabuto Yakushi (053): Upgraded ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
+        `Kabuto Yakushi (053): Upgraded ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${actualCost} chakra (3 less).`,
         'game.log.effect.upgradeFromDiscard',
         { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
       );
@@ -5744,6 +5805,11 @@ export class EffectEngine {
         );
         return newState;
       }
+
+      // Calculate fresh play cost with reduction
+      const actualCost_fresh = Math.max(0, (card.chakra ?? 0) - 3);
+      if (ps.chakra < actualCost_fresh) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost_fresh;
 
       const charInPlay: CharacterInPlay = {
         instanceId: generateInstanceId(),
@@ -5771,9 +5837,9 @@ export class EffectEngine {
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, player,
         'EFFECT',
-        `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${cost} chakra (3 less).`,
+        `Kabuto Yakushi (053): Played ${card.name_fr} from discard pile on mission ${missionIdx + 1} for ${actualCost_fresh} chakra (3 less).`,
         'game.log.effect.playFromDiscard',
-        { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(cost) },
+        { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr, mission: String(missionIdx + 1), cost: String(actualCost_fresh) },
       );
     }
 
@@ -6586,12 +6652,8 @@ export class EffectEngine {
     const chosenCard = ps.discardPile[discardIndex];
     const isUpgrade = pending.isUpgrade;
     const costReduction = isUpgrade ? 2 : 0;
-    const cost = Math.max(0, chosenCard.chakra - costReduction);
 
-    if (ps.chakra < cost) return state;
-
-    // Pay cost, remove from discard
-    ps.chakra -= cost;
+    // Cost deferred to placement time (upgrade vs fresh play)
     ps.discardPile.splice(discardIndex, 1);
 
     // Find valid missions
@@ -6609,21 +6671,23 @@ export class EffectEngine {
 
       if (!sameNameChar) {
         // No same-name â†’ fresh play is valid
-        validMissions.push(String(i));
+        const freshCost109 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
+        if (ps.chakra >= freshCost109) validMissions.push(String(i));
       } else {
         // Same-name exists â†’ check if upgrade is valid (strictly higher chakra)
         const existingTopCard = sameNameChar.stack.length > 0
           ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
         if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-          validMissions.push(String(i));
+          const upgradeCost109 = Math.max(0, ((chosenCard.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
+          if (ps.chakra >= upgradeCost109) validMissions.push(String(i));
         }
       }
     }
 
     if (validMissions.length === 0) {
       // Refund
-      ps.chakra += cost;
-      ps.discardPile.splice(discardIndex, 0, chosenCard);
+      // No refund needed (cost not paid upfront)
+      ps.discardPile.push(chosenCard);
       return state;
     }
 
@@ -6631,7 +6695,7 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.sakura109Place(newState, player, parseInt(validMissions[0], 10), cost, isUpgrade);
+      return EffectEngine.sakura109Place(newState, player, parseInt(validMissions[0], 10), costReduction, isUpgrade);
     }
 
     const effectId = generateInstanceId();
@@ -6643,7 +6707,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost, isUpgrade }),
+      effectDescription: JSON.stringify({ costReduction, isUpgrade }),
       targetSelectionType: 'SAKURA109_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -6678,12 +6742,12 @@ export class EffectEngine {
     const player = pending.sourcePlayer;
     let cost = 0;
     let isUpgrade = false;
-    try { const d = JSON.parse(pending.effectDescription); cost = d.cost ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
-    return EffectEngine.sakura109Place(newState, player, missionIndex, cost, isUpgrade);
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
+    return EffectEngine.sakura109Place(newState, player, missionIndex, costReduction, isUpgrade);
   }
 
   /** Sakura 109 helper: place the card (last in discard) on the mission. Handles both fresh play and upgrade. */
-  private static sakura109Place(state: GameState, player: PlayerID, missionIndex: number, cost: number, isUpgrade: boolean): GameState {
+  private static sakura109Place(state: GameState, player: PlayerID, missionIndex: number, costReduction: number, isUpgrade: boolean): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
     if (!card) return state;
@@ -6720,16 +6784,26 @@ export class EffectEngine {
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
-      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
+      // Calculate upgrade cost with reduction
+      const existingTop109 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const actualCost = Math.max(0, ((card.chakra ?? 0) - (existingTop109.chakra ?? 0)) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
+      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${actualCost})` : ` (paid ${actualCost})`;
       state.log = logAction(
         state.log, state.turn, state.phase, player,
         'EFFECT_UPGRADE',
         `Sakura Haruno (109): Upgraded ${card.name_fr} from discard pile on mission ${missionIndex + 1}${costDesc}.`,
         'game.log.effect.upgradeFromDiscard',
-        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
       );
     } else {
       // Fresh play
+      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
       const newChar: CharacterInPlay = {
         instanceId: generateInstanceId(),
         card: card as any,
@@ -6749,13 +6823,13 @@ export class EffectEngine {
 
       ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
 
-      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${cost})` : ` (paid ${cost})`;
+      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${actualCost})` : ` (paid ${actualCost})`;
       state.log = logAction(
         state.log, state.turn, state.phase, player,
         'EFFECT_PLAY',
         `Sakura Haruno (109): Played ${card.name_fr} from discard pile to mission ${missionIndex + 1}${costDesc}.`,
         'game.log.effect.playFromDiscard',
-        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
       );
     }
 
@@ -6801,23 +6875,7 @@ export class EffectEngine {
     // Discard the non-chosen cards
     ps.discardPile.push(...otherCards);
 
-    // Check if we can afford the chosen card
-    const cost = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
-    if (ps.chakra < cost) {
-      // Can't afford â€” discard all including the chosen one
-      ps.discardPile.push(chosenCard);
-      newState.log = logAction(
-        newState.log, newState.turn, newState.phase, player,
-        'EFFECT_NO_CHAKRA',
-        `Sakura Haruno (135): Cannot afford to play ${chosenCard.name_fr} (cost ${cost}). All cards discarded.`,
-        'game.log.effect.noChakra',
-        { card: 'SAKURA HARUNO', id: 'KS-135-S' },
-      );
-      return newState;
-    }
-
-    // Pay cost
-    ps.chakra -= cost;
+    // Cost deferred to placement time (upgrade vs fresh play)
 
     // Find valid missions (fresh play or upgrade)
     const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -6834,13 +6892,15 @@ export class EffectEngine {
 
       if (!sameNameChar) {
         // No same-name character â†’ fresh play is valid
-        validMissions.push(String(i));
+        const fc135 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
+        if (ps.chakra >= fc135) validMissions.push(String(i));
       } else {
         // Same-name exists â†’ check if upgrade is valid (strictly higher chakra)
         const existingTopCard = sameNameChar.stack.length > 0
           ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
         if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-          validMissions.push(String(i));
+          const uc135 = Math.max(0, ((chosenCard.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
+          if (ps.chakra >= uc135) validMissions.push(String(i));
         }
       }
     }
@@ -6848,7 +6908,7 @@ export class EffectEngine {
     if (validMissions.length === 0) {
       // No valid mission â€” discard
       ps.discardPile.push(chosenCard);
-      ps.chakra += cost;
+      // No refund needed (cost not paid upfront)
       return newState;
     }
 
@@ -6856,7 +6916,7 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.sakura135Place(newState, player, parseInt(validMissions[0], 10), cost, costReduction > 0);
+      return EffectEngine.sakura135Place(newState, player, parseInt(validMissions[0], 10), costReduction, costReduction > 0);
     }
 
     const effectId = generateInstanceId();
@@ -6868,7 +6928,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost, isUpgrade: costReduction > 0 }),
+      effectDescription: JSON.stringify({ costReduction, isUpgrade: costReduction > 0 }),
       targetSelectionType: 'SAKURA135_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -6903,12 +6963,12 @@ export class EffectEngine {
     const player = pending.sourcePlayer;
     let cost = 0;
     let isUpgrade = false;
-    try { const d = JSON.parse(pending.effectDescription); cost = d.cost ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
-    return EffectEngine.sakura135Place(newState, player, missionIndex, cost, isUpgrade);
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
+    return EffectEngine.sakura135Place(newState, player, missionIndex, costReduction, isUpgrade);
   }
 
   /** Sakura 135 helper: place card (last in discard) on mission. Handles both fresh play and upgrade. */
-  private static sakura135Place(state: GameState, player: PlayerID, missionIndex: number, cost: number, isUpgrade: boolean): GameState {
+  private static sakura135Place(state: GameState, player: PlayerID, missionIndex: number, costReduction: number, isUpgrade: boolean): GameState {
     const ps = state[player];
     const card = ps.discardPile.pop();
     if (!card) return state;
@@ -6946,16 +7006,26 @@ export class EffectEngine {
       placedChar = updatedChars[existingIdx];
       isCardUpgrade = true;
 
-      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
+      // Calculate upgrade cost with reduction
+      const eTop135 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTop135.chakra ?? 0)) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
+      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${actualCost})` : ` (paid ${actualCost})`;
       state.log = logAction(
         state.log, state.turn, state.phase, player,
         'EFFECT_UPGRADE',
         `Sakura Haruno (135): Upgraded ${card.name_fr} on mission ${missionIndex + 1}${costDesc}.`,
         'game.log.effect.upgradeFromDeck',
-        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
       );
     } else {
       // Fresh play
+      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
       const newChar: CharacterInPlay = {
         instanceId: generateInstanceId(),
         card: card as any,
@@ -6975,13 +7045,13 @@ export class EffectEngine {
 
       ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
 
-      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${cost})` : ` (paid ${cost})`;
+      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${actualCost})` : ` (paid ${actualCost})`;
       state.log = logAction(
         state.log, state.turn, state.phase, player,
         'EFFECT_PLAY',
         `Sakura Haruno (135): Played ${card.name_fr} from top of deck to mission ${missionIndex + 1}${costDesc}.`,
         'game.log.effect.playFromDeck',
-        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost },
+        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
       );
     }
 
@@ -7425,8 +7495,22 @@ export class EffectEngine {
     const mIdx = charResult.missionIndex;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-    // Pay reduced cost
-    const cost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+    // Check if revealing this card would be an upgrade (same-name visible char on same mission)
+    const friendlySideRhr = player === "player1" ? "player1Characters" : "player2Characters";
+    const missionRhr = newState.activeMissions[mIdx];
+    const sameNameVisibleRhr = missionRhr[friendlySideRhr].find(c => {
+      if (c.isHidden || c.instanceId === instanceId) return false;
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
+        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
+    });
+    let cost: number;
+    if (sameNameVisibleRhr) {
+      const existingTC = sameNameVisibleRhr.stack.length > 0 ? sameNameVisibleRhr.stack[sameNameVisibleRhr.stack.length - 1] : sameNameVisibleRhr.card;
+      cost = Math.max(0, ((topCard.chakra ?? 0) - (existingTC.chakra ?? 0)) - costReduction);
+    } else {
+      cost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+    }
     if (ps.chakra < cost) return state;
     ps.chakra -= cost;
 
