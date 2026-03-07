@@ -6741,7 +6741,7 @@ export class EffectEngine {
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
-    let cost = 0;
+    let costReduction = 0;
     let isUpgrade = false;
     try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
     return EffectEngine.sakura109Place(newState, player, missionIndex, costReduction, isUpgrade);
@@ -6962,7 +6962,7 @@ export class EffectEngine {
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
-    let cost = 0;
+    let costReduction = 0;
     let isUpgrade = false;
     try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
     return EffectEngine.sakura135Place(newState, player, missionIndex, costReduction, isUpgrade);
