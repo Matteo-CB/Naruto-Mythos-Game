@@ -1,0 +1,100 @@
+import { describe, it, expect, beforeAll } from 'vitest';
+import { initializeRegistry, getEffectHandler } from '@/lib/effects/EffectRegistry';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { GameEngine } from '@/lib/engine/GameEngine';
+import type { GameState, CharacterInPlay, ActiveMission, Card, MissionCard, PlayerID } from '@/lib/engine/types';
+import type { EffectContext } from '@/lib/effects/EffectTypes';
+
+function mockCard(ov: Partial<Card> = {}): Card {
+  return { id: 'KS-999-C', number: 999, name_fr: 'Test', title_fr: 'Test', rarity: 'C', card_type: 'character', has_visual: true, chakra: 2, power: 2, keywords: [], group: 'Leaf Village', effects: [], ...ov } as Card;
+}
+
+function mockChar(ov: Partial<CharacterInPlay> = {}): CharacterInPlay {
+  return { card: ov.card ?? mockCard(), instanceId: ov.instanceId ?? 'c-'+Math.random().toString(36).slice(2,8), isHidden: false, powerTokens: 0, stack: [], controlledBy: ov.controlledBy ?? 'player1', originalOwner: ov.originalOwner ?? 'player1', wasRevealedAtLeastOnce: false, ...ov } as CharacterInPlay;
+}
+
+function mockMission(ov: Partial<ActiveMission> = {}): ActiveMission {
+  return { card: { id: 'MSS 01', number: 1, name_fr: 'Test Mission', title_fr: 'M', rarity: 'Mission', card_type: 'mission', has_visual: true, effects: [], mission_points: 1 } as MissionCard, rank: 'D', basePoints: 1, rankBonus: 1, player1Characters: [], player2Characters: [], wonBy: null, ...ov } as ActiveMission;
+}
+
+function makePlayer(ov: Partial<GameState['player1']> = {}) {
+  return { userId: 'u1', isAI: false, deck: [], hand: [], discardPile: [], chakra: 10, missionPoints: 0, hasPassed: false, charactersInPlay: 0, unusedMission: null, hasMulliganed: false, ...ov };
+}
+
+function makeState(ov: Partial<GameState> = {}): GameState {
+  return { turn: 2, phase: 'action', activePlayer: 'player1', edgeHolder: 'player1', player1: makePlayer(), player2: makePlayer({ userId: 'u2', isAI: true, aiDifficulty: 'easy' }), missionDeck: [], activeMissions: [mockMission(), mockMission({ rank: 'C', rankBonus: 2 })], log: [], pendingEffects: [], pendingActions: [], actionHistory: [], ...ov } as GameState;
+}
+
+
+describe('Ino 020 (UC) - Take Control', () => {
+  beforeAll(async () => { await initializeRegistry(); });
+
+  const ino019 = mockCard({ id: 'KS-019-C', number: 19, name_fr: 'INO YAMANAKA', title_fr: 'La fleuriste', chakra: 2, power: 1, effects: [{ type: 'MAIN', description: 'Some effect' }], keywords: ['Team 10'], group: 'Leaf Village' });
+  const ino020 = mockCard({ id: 'KS-020-UC', number: 20, name_fr: 'INO YAMANAKA', title_fr: 'Transposition', rarity: 'UC', chakra: 3, power: 0, effects: [{ type: 'MAIN', description: 'Take control of an enemy character with cost 2 or less in this mission.' }, { type: 'UPGRADE', description: 'MAIN effect: Instead, the cost limit is 3 or less.' }], keywords: ['Team 10', 'Jutsu'], group: 'Leaf Village' });
+
+  it('MAIN fresh: costLimit=2, cost-3 NOT targetable', () => {
+    const e3 = mockChar({ instanceId: 'e3', card: mockCard({ id: 'KS-050-C', name_fr: 'OROCHIMARU', chakra: 3, power: 3 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const e2 = mockChar({ instanceId: 'e2', card: mockCard({ id: 'KS-046-C', name_fr: 'EBISU', chakra: 2, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const ino = mockChar({ instanceId: 'ino1', card: ino020 });
+    const state = makeState({ activeMissions: [mockMission({ player1Characters: [ino], player2Characters: [e3, e2] }), mockMission({ rank: 'C', rankBonus: 2 })] });
+    const handler = getEffectHandler('KS-020-UC', 'MAIN');
+    expect(handler).toBeTruthy();
+    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: ino, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: false });
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.validTargets).toContain('e2');
+    expect(result.validTargets).not.toContain('e3');
+  });
+
+  it('MAIN upgrade: costLimit=3, cost-3 IS targetable', () => {
+    const e3 = mockChar({ instanceId: 'e3', card: mockCard({ id: 'KS-050-C', name_fr: 'OROCHIMARU', chakra: 3, power: 3 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const ino = mockChar({ instanceId: 'ino1', card: ino020 });
+    const state = makeState({ activeMissions: [mockMission({ player1Characters: [ino], player2Characters: [e3] }), mockMission({ rank: 'C', rankBonus: 2 })] });
+    const handler = getEffectHandler('KS-020-UC', 'MAIN');
+    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: ino, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: true });
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.validTargets).toContain('e3');
+  });
+
+  it('takeControlOfEnemy transfers character', () => {
+    const enemy = mockChar({ instanceId: 'et', card: mockCard({ id: 'KS-050-C', name_fr: 'OROCHIMARU', chakra: 3, power: 3 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const ino = mockChar({ instanceId: 'ino1', card: ino020 });
+    const state = makeState({ activeMissions: [mockMission({ player1Characters: [ino], player2Characters: [enemy] }), mockMission({ rank: 'C', rankBonus: 2 })] });
+    const pe = { id: 'pe1', sourcePlayer: 'player1' as PlayerID, sourceCardId: 'KS-020-UC', sourceInstanceId: 'ino1', sourceMissionIndex: 0, effectType: 'MAIN' as const, isUpgrade: true, targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION', validTargets: ['et'], effectDescription: 'tc', isOptional: true };
+    const ns = EffectEngine.takeControlOfEnemy(state, pe as any, 'et');
+    expect(ns.activeMissions[0].player2Characters.some(c => c.instanceId === 'et')).toBe(false);
+    expect(ns.activeMissions[0].player1Characters.some(c => c.instanceId === 'et')).toBe(true);
+    expect(ns.activeMissions[0].player1Characters.find(c => c.instanceId === 'et')?.controlledBy).toBe('player1');
+  });
+
+  it('handler pre-filters same-name targets', () => {
+    const enemyIno = mockChar({ instanceId: 'ei', card: mockCard({ id: 'KS-019-C', name_fr: 'INO YAMANAKA', chakra: 2, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const enemyOther = mockChar({ instanceId: 'eo', card: mockCard({ id: 'KS-046-C', name_fr: 'EBISU', chakra: 1, power: 1 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const myIno = mockChar({ instanceId: 'ino1', card: ino020 });
+    const state = makeState({ activeMissions: [mockMission({ player1Characters: [myIno], player2Characters: [enemyIno, enemyOther] }), mockMission({ rank: 'C', rankBonus: 2 })] });
+    const handler = getEffectHandler('KS-020-UC', 'MAIN');
+    const result = handler!({ state, sourcePlayer: 'player1', sourceCard: myIno, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: true });
+    expect(result.requiresTargetSelection).toBe(true);
+    // Enemy Ino should be excluded (same name as friendly Ino)
+    expect(result.validTargets).not.toContain('ei');
+    // Enemy Ebisu should still be valid
+    expect(result.validTargets).toContain('eo');
+  });
+
+  it('full integration: upgrade 019->020, select cost-3 target', () => {
+    const e3 = mockChar({ instanceId: 'e3', card: mockCard({ id: 'KS-050-C', name_fr: 'OROCHIMARU', chakra: 3, power: 3 }), controlledBy: 'player2', originalOwner: 'player2' });
+    const i19 = mockChar({ instanceId: 'i19', card: ino019 });
+    const state = makeState({
+      player1: makePlayer({ hand: [ino020], charactersInPlay: 1 }),
+      player2: makePlayer({ userId: 'u2', isAI: true, aiDifficulty: 'easy', charactersInPlay: 1 }),
+      activeMissions: [mockMission({ player1Characters: [i19], player2Characters: [e3] }), mockMission({ rank: 'C', rankBonus: 2 })],
+    });
+    const afterUpgrade = GameEngine.applyAction(state, 'player1', { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'i19' });
+    expect(afterUpgrade.pendingActions.length).toBeGreaterThan(0);
+    const pa = afterUpgrade.pendingActions[0];
+    expect(pa.player).toBe('player1');
+    expect(pa.options).toContain('e3');
+    const afterSelect = GameEngine.applyAction(afterUpgrade, 'player1', { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: ['e3'] });
+    expect(afterSelect.activeMissions[0].player2Characters.some(c => c.instanceId === 'e3')).toBe(false);
+    expect(afterSelect.activeMissions[0].player1Characters.some(c => c.instanceId === 'e3')).toBe(true);
+  });
+});

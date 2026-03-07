@@ -43,3 +43,6 @@ next-env.d.ts
 output/
 .claude/
 nul
+
+# brute-force script data
+newvisual/brute*_progress.json
