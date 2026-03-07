@@ -108,7 +108,10 @@
       "has_visual": true,
       "chakra": 4,
       "power": 4,
-      "keywords": ["Sannin", "Jutsu"],
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -782,7 +785,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1 .",
+          "description": "[⧗] If Akamaru is in the same mission, CHAKRA +1 .",
           "description_fr": ""
         }
       ],
@@ -818,7 +821,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Look at the 3 top cards of your deck, reveal and draw any [u]Akamaru[/u] characters, then put back the other cards.",
+          "description": "Look at the 3 top cards of your deck, reveal and draw any Akamaru characters, then put back the other cards.",
           "description_fr": ""
         }
       ],
@@ -848,7 +851,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] If there isn't a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand.",
+          "description": "[⧗] If there isn't a Kiba Inuzuka in this mission at the end of the round, you must return this character to your hand.",
           "description_fr": ""
         }
       ],
@@ -884,7 +887,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "[↯] POWERUP 2 a friendly [u]Kiba Inuzuka[/u] in this mission.",
+          "description": "[↯] POWERUP 2 a friendly Kiba Inuzuka in this mission.",
           "description_fr": ""
         }
       ],
@@ -1431,7 +1434,10 @@
       "has_visual": false,
       "chakra": 3,
       "power": 4,
-      "keywords": ["Special Jonin", "Jutsu"],
+      "keywords": [
+        "Special Jonin",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -1494,7 +1500,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a [u]Naruto Uzumaki[/u] character in play.",
+          "description": "Move a Naruto Uzumaki character in play.",
           "description_fr": ""
         }
       ],
@@ -1643,7 +1649,9 @@
       "has_visual": true,
       "chakra": 3,
       "power": 3,
-      "keywords": ["Sound Village"],
+      "keywords": [
+        "Sound Village"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -2332,7 +2340,10 @@
       "has_visual": true,
       "chakra": 4,
       "power": 4,
-      "keywords": ["Sound Ninja", "Jutsu"],
+      "keywords": [
+        "Sound Ninja",
+        "Jutsu"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -2431,7 +2442,9 @@
       "has_visual": true,
       "chakra": 6,
       "power": 9,
-      "keywords": ["Tailed Beast"],
+      "keywords": [
+        "Tailed Beast"
+      ],
       "group": "Sand Village",
       "effects": [
         {
@@ -2694,7 +2707,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] This character has +2 Power if there's a friendly [u]Gaara[/u] in this mission.",
+          "description": "[⧗] This character has +2 Power if there's a friendly Gaara in this mission.",
           "description_fr": ""
         }
       ],
@@ -2880,7 +2893,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less.",
+          "description": "[⧗] If there is a Sasuke Uchiha in this mission, you can play this character while hidden paying 3 less.",
           "description_fr": ""
         }
       ],
@@ -3077,7 +3090,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] Pay 1 less to play this character if there's a friendly [u]Naruto Uzumaki[/u] in this mission.",
+          "description": "[⧗] Pay 1 less to play this character if there's a friendly Naruto Uzumaki in this mission.",
           "description_fr": ""
         },
         {
@@ -3142,7 +3155,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "If there is a friendly [u]Tsunade[/u] in play, POWERUP 2.",
+          "description": "If there is a friendly Tsunade in play, POWERUP 2.",
           "description_fr": ""
         },
         {
@@ -3237,7 +3250,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] If there's a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power.",
+          "description": "[⧗] If there's a friendly Tsunade or Shizune in this mission, this character has +1 Power.",
           "description_fr": ""
         }
       ],
@@ -3655,7 +3668,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.",
+          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission.",
           "description_fr": ""
         },
         {
@@ -3719,7 +3732,10 @@
       "has_visual": true,
       "chakra": 5,
       "power": 6,
-      "keywords": ["Équipe 8", "Jutsu"],
+      "keywords": [
+        "Équipe 8",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -3963,7 +3979,10 @@
       "has_visual": false,
       "chakra": 5,
       "power": 6,
-      "keywords": ["Sound Four", "Taijutsu"],
+      "keywords": [
+        "Sound Four",
+        "Taijutsu"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -4031,7 +4050,10 @@
       "has_visual": false,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Sound Four", "Jutsu"],
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -4135,7 +4157,10 @@
       "has_visual": false,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Sound Four", "Jutsu"],
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -4204,7 +4229,9 @@
       "has_visual": false,
       "chakra": 7,
       "power": 10,
-      "keywords": ["Tailed Beast"],
+      "keywords": [
+        "Tailed Beast"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -4376,7 +4403,9 @@
       "has_visual": false,
       "chakra": 8,
       "power": 12,
-      "keywords": ["Tailed Beast"],
+      "keywords": [
+        "Tailed Beast"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -4747,7 +4776,9 @@
       "has_visual": true,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Team 7"],
+      "keywords": [
+        "Team 7"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -5195,12 +5226,15 @@
       "has_visual": true,
       "chakra": 6,
       "power": 6,
-      "keywords": ["Team 8", "Jutsu"],
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission."
+          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission."
         },
         {
           "type": "UPGRADE",
@@ -5227,7 +5261,10 @@
       "has_visual": true,
       "chakra": 6,
       "power": 5,
-      "keywords": ["Team 10", "Jutsu"],
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -5259,7 +5296,10 @@
       "has_visual": true,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Team Guy", "Taijutsu"],
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -5291,7 +5331,10 @@
       "has_visual": true,
       "chakra": 6,
       "power": 6,
-      "keywords": ["Rogue Ninja", "Jutsu"],
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
       "group": "Akatsuki",
       "effects": [
         {
@@ -5323,7 +5366,10 @@
       "has_visual": true,
       "chakra": 4,
       "power": 4,
-      "keywords": ["Team Baki", "Jutsu"],
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
       "group": "Sand Village",
       "effects": [
         {
@@ -5729,7 +5775,7 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.",
+          "description": "Hide a friendly Akamaru character. If you do, hide another character in this mission.",
           "description_fr": ""
         },
         {
@@ -5795,7 +5841,10 @@
       "has_visual": false,
       "chakra": 5,
       "power": 6,
-      "keywords": ["Équipe 8", "Jutsu"],
+      "keywords": [
+        "Équipe 8",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6046,11 +6095,22 @@
       "has_visual": false,
       "chakra": 5,
       "power": 6,
-      "keywords": ["Sound Four", "Taijutsu"],
+      "keywords": [
+        "Sound Four",
+        "Taijutsu"
+      ],
       "group": "Sound Village",
       "effects": [
-        { "type": "MAIN", "description": "POWERUP X where X is the number of characters in this mission.", "description_fr": "POWERUP X ou X est le nombre de personnages dans cette mission." },
-        { "type": "UPGRADE", "description": "Defeat an enemy character with Power 1 or less in this mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 1 ou moins dans cette mission." }
+        {
+          "type": "MAIN",
+          "description": "POWERUP X where X is the number of characters in this mission.",
+          "description_fr": "POWERUP X ou X est le nombre de personnages dans cette mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Defeat an enemy character with Power 1 or less in this mission.",
+          "description_fr": "Vaincre un personnage ennemi avec une Puissance de 1 ou moins dans cette mission."
+        }
       ],
       "image_url": "",
       "rarity_display": "",
@@ -6108,11 +6168,22 @@
       "has_visual": false,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Sound Four", "Jutsu"],
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
       "group": "Sound Village",
       "effects": [
-        { "type": "AMBUSH", "description": "Defeat an enemy character with Power 3 or less in another mission.", "description_fr": "Vaincre un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission." },
-        { "type": "UPGRADE", "description": "AMBUSH effect: Instead, the Power limit is 5 or less.", "description_fr": "Effet EMBUSCADE : La limite de Puissance est désormais 5 ou moins." }
+        {
+          "type": "AMBUSH",
+          "description": "Defeat an enemy character with Power 3 or less in another mission.",
+          "description_fr": "Vaincre un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "AMBUSH effect: Instead, the Power limit is 5 or less.",
+          "description_fr": "Effet EMBUSCADE : La limite de Puissance est désormais 5 ou moins."
+        }
       ],
       "image_url": "",
       "rarity_display": "",
@@ -6207,7 +6278,10 @@
       "has_visual": false,
       "chakra": 5,
       "power": 5,
-      "keywords": ["Sound Four", "Jutsu"],
+      "keywords": [
+        "Sound Four",
+        "Jutsu"
+      ],
       "group": "Sound Village",
       "effects": [
         {
@@ -6278,11 +6352,21 @@
       "has_visual": false,
       "chakra": 7,
       "power": 10,
-      "keywords": ["Tailed Beast"],
+      "keywords": [
+        "Tailed Beast"
+      ],
       "group": "Leaf Village",
       "effects": [
-        { "type": "MAIN", "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.", "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur Naruto Uzumaki." },
-        { "type": "MAIN", "description": "[⧗] Can't be hidden or defeated by enemy effects.", "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis." }
+        {
+          "type": "MAIN",
+          "description": "[⧗] You can play this character as an upgrade over Naruto Uzumaki.",
+          "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur Naruto Uzumaki."
+        },
+        {
+          "type": "MAIN",
+          "description": "[⧗] Can't be hidden or defeated by enemy effects.",
+          "description_fr": "[⧗] Ne peut pas être caché ou vaincu par les effets ennemis."
+        }
       ],
       "image_url": "",
       "rarity_display": "",
@@ -6341,7 +6425,10 @@
       "has_visual": true,
       "chakra": 7,
       "power": 6,
-      "keywords": ["Sannin", "Hokage"],
+      "keywords": [
+        "Sannin",
+        "Hokage"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6369,7 +6456,10 @@
       "has_visual": true,
       "chakra": 6,
       "power": 6,
-      "keywords": ["Team 7", "Jutsu"],
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6402,7 +6492,10 @@
       "has_visual": true,
       "chakra": 6,
       "power": 6,
-      "keywords": ["Team 7", "Jutsu"],
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6433,7 +6526,10 @@
       "has_visual": true,
       "chakra": 7,
       "power": 8,
-      "keywords": ["Team 7", "Jutsu"],
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6466,7 +6562,10 @@
       "has_visual": true,
       "chakra": 7,
       "power": 7,
-      "keywords": ["Team 7", "Jutsu"],
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6499,7 +6598,9 @@
       "has_visual": false,
       "chakra": 5,
       "power": 4,
-      "keywords": ["Team 7"],
+      "keywords": [
+        "Team 7"
+      ],
       "group": "Leaf Village",
       "effects": [
         {
@@ -6532,7 +6633,10 @@
       "has_visual": false,
       "chakra": 7,
       "power": 8,
-      "keywords": ["Team 7", "Jutsu"],
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
       "group": "Leaf Village",
       "effects": [
         {

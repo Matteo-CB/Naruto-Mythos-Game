@@ -54,12 +54,12 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 025/130 - KIBA INUZUKA (C) - "Genin de l'Equipe 8"
   'KS-025-C': [
-    '[⧗] Si [u]Akamaru[/u] est dans la meme mission, CHAKRA +1.',
+    '[⧗] Si Akamaru est dans la meme mission, CHAKRA +1.',
   ],
 
   // 027/130 - AKAMARU (C) - "Chien Ninja"
   'KS-027-C': [
-    '[⧗] S\'il n\'y a pas de [u]Kiba Inuzuka[/u] dans cette mission a la fin du tour, vous devez renvoyer ce personnage en main.',
+    '[⧗] S\'il n\'y a pas de Kiba Inuzuka dans cette mission a la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
   // 034/130 - YUHI KURENAI (C) - "Sensei de l'Equipe 8"
@@ -100,7 +100,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 047/130 - IRUKA (C) - "Instructeur de l'Academie"
   'KS-047-C': [
-    'Deplacez un personnage [u]Naruto Uzumaki[/u] en jeu.',
+    'Deplacez un personnage Naruto Uzumaki en jeu.',
   ],
 
   // 048/130 - HAYATE GEKKO (C) - "Shinobi talentueux"
@@ -187,7 +187,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 084/130 - YASHAMARU (C) - "Tuteur de Gaara"
   'KS-084-C': [
-    '[⧗] Ce personnage a +2 Puissance s\'il y a un [u]Gaara[/u] allie dans cette mission.',
+    '[⧗] Ce personnage a +2 Puissance s\'il y a un Gaara allie dans cette mission.',
   ],
 
   // 088/130 - HAKU (C) - "Orphelin du Pays de l'Eau"
@@ -197,7 +197,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 090/130 - ITACHI UCHIWA (C) - "Akatsuki"
   'KS-090-C': [
-    '[⧗] S\'il y a un [u]Sasuke Uchiha[/u] dans cette mission, vous pouvez jouer ce personnage en cache en payant 3 de moins.',
+    '[⧗] S\'il y a un Sasuke Uchiha dans cette mission, vous pouvez jouer ce personnage en cache en payant 3 de moins.',
   ],
 
   // 092/130 - KISAME HOSHIGAKI (C) - "Le Ninja Deserteur du Village du Brouillard"
@@ -218,7 +218,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 096/130 - GAMAKITCHI (C) - "Fils aine de Gama Bunta"
   'KS-096-C': [
-    '[⧗] Payez 1 de moins pour jouer ce personnage s\'il y a un [u]Naruto Uzumaki[/u] allie dans cette mission.',
+    '[⧗] Payez 1 de moins pour jouer ce personnage s\'il y a un Naruto Uzumaki allie dans cette mission.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
@@ -229,7 +229,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 098/130 - KATSUYU (C) - "Limace Geante"
   'KS-098-C': [
-    'S\'il y a une [u]Tsunade[/u] alliee en jeu, POWERUP 2.',
+    'S\'il y a une Tsunade alliee en jeu, POWERUP 2.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
@@ -245,7 +245,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 101/130 - TON TON (C) - "Cochon Ninja de Tsunade"
   'KS-101-C': [
-    '[⧗] S\'il y a une [u]Tsunade[/u] ou une [u]Shizune[/u] alliee dans cette mission, ce personnage a +1 Puissance.',
+    '[⧗] S\'il y a une Tsunade ou une Shizune alliee dans cette mission, ce personnage a +1 Puissance.',
   ],
 
   // 108/130 - NARUTO UZUMAKI (R) - "Believe it!"
@@ -413,18 +413,18 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 026/130 - KIBA INUZUKA (UC) - "Crocs Lacerateurs"
   'KS-026-UC': [
     'Cachez le personnage ennemi non caché avec le plus faible coût dans cette mission.',
-    'Regardez les 3 cartes du dessus de votre deck, revelez et piochez tous les personnages [u]Akamaru[/u], puis remettez les autres cartes.',
+    'Regardez les 3 cartes du dessus de votre deck, revelez et piochez tous les personnages Akamaru, puis remettez les autres cartes.',
   ],
 
   // 028/130 - AKAMARU (UC) - "Clone Homme-Bete"
   'KS-028-UC': [
     'A la fin du tour, vous pouvez retourner cette carte dans votre main.',
-    'POWERUP 2 sur un [u]Kiba Inuzuka[/u] allie dans cette mission.',
+    'POWERUP 2 sur un Kiba Inuzuka allie dans cette mission.',
   ],
 
   // 029/130 - AKAMARU (UC) - "Marquage Dynamique"
   'KS-029-UC': [
-    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus [u]Kiba Inuzuka[/u].',
+    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus Kiba Inuzuka.',
     'Cachez le personnage ennemi non caché avec le plus faible coût dans cette mission.',
   ],
 
@@ -572,7 +572,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 076/130 - ICHIBI (UC) - "Queue Unique"
   'KS-076-UC': [
-    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus [u]Gaara[/u].',
+    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus Gaara.',
     '[⧗] Ne peut pas etre cache ou vaincu par des effets ennemis.',
   ],
 
@@ -700,7 +700,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 113/130 - KIBA INUZUKA (R) - "Crocs Lacerateurs"
   'KS-113-R': [
-    'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
+    'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
     'effet MAIN : A la place, vainquez-les tous les deux.',
   ],
 
@@ -812,7 +812,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 129/130 - KYUBI (R) - "Manteau du Demon Renard"
   'KS-129-R': [
-    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus [u]Naruto Uzumaki[/u].',
+    '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus Naruto Uzumaki.',
     '[⧗] Ne peut pas etre cache ou vaincu par des effets ennemis.',
   ],
 
@@ -902,7 +902,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 113/130 V - KIBA INUZUKA (MV) - "Crocs sur crocs"
   'KS-113-MV': [
-    'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
+    'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
     'effet MAIN : A la place, vainquez-les tous les deux.',
   ],
 
@@ -983,7 +983,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
     'Repetez l\'effet MAIN.',
   ],
   'KS-113-RA': [
-    'Cachez un personnage [u]Akamaru[/u] allie. Si vous le faites, cachez un autre personnage dans cette mission.',
+    'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
     'effet MAIN : A la place, vainquez-les tous les deux.',
   ],
   'KS-117-RA': [

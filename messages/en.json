@@ -123,7 +123,7 @@
       "upgradeCharacter": "Upgrades {oldCard} to {card} ({title}) on mission {mission} for {cost} chakra.",
       "pass": "Passes.",
       "passEdge": "Passes. Takes the Edge token.",
-      "scoreMission": "Mission {index} ({rank}): \"{name}\" — P1: {p1Power} vs P2: {p2Power}.",
+      "scoreMission": "Mission {index} ({rank}): \"{name}\". P1: {p1Power} vs P2: {p2Power}.",
       "winMission": "Wins mission {index} for {points} pts ({base} + {bonus} rank bonus). Total: {total}.",
       "noWinner": "No power on mission {index}. No winner.",
       "tieBreak": "Tie on mission {index}. Edge holder wins.",
@@ -186,18 +186,18 @@
         "recoverFromDiscard": "{card} ({id}): Recovered {target} from discard pile to hand.",
         "kabutoSteal": "{card} ({id}): Stole a card and placed it hidden on mission {mission}.",
         "playSummonReduced": "{card} ({id}): Played {target} as Summon on mission {mission} for {cost} chakra (reduced cost).",
-        "moveBlocked": "{card} ({id}): Move blocked — {target} cannot be moved.",
+        "moveBlocked": "{card} ({id}): Move blocked. {target} cannot be moved.",
         "copyEffect": "{card} ({id}): Copied the effect of {target}.",
         "copy": "{card} ({id}): Copied effect of {target}.",
         "devolve": "{card} ({id}): De-evolved {target} (removed top card from stack).",
-        "orochimaruCannotSteal": "{card} ({id}): Cannot take control of {target} — cost too high.",
+        "orochimaruCannotSteal": "{card} ({id}): Cannot take control of {target}, cost too high.",
         "discardPowerup": "{card} ({id}): Discarded {target} from deck. POWERUP {amount}.",
         "discardSelf": "{card} ({id}): Discarded {target} from hand.",
         "kimimaro056Protection": "{card} ({id}): Opponent pays 1 Chakra for targeting this character.",
         "playLeafReduced": "{card} ({id}): Played {target} on mission {mission} for {cost} chakra (reduced cost).",
         "upgradeFromDiscard": "{card} ({id}): Upgraded {target} from discard pile on {mission} (paid {cost}).",
         "upgradeFromDeck": "{card} ({id}): Upgraded {target} from deck on {mission} (paid {cost}).",
-        "takeControlBlocked": "{card} ({id}): Cannot take control of {target} — same name conflict.",
+        "takeControlBlocked": "{card} ({id}): Cannot take control of {target}, same name conflict.",
         "moveNameConflictDiscard": "{card} ({id}): {target} discarded due to same-name conflict after move.",
         "powerupMultiple": "{card} ({id}): POWERUP {amount} on {count} character(s).",
         "opponentDiscard": "{card} ({id}): Opponent discarded {amount} card(s) from hand.",
@@ -213,15 +213,15 @@
         "sasuke014DiscardOpponent": "{card} ({id}): Discarded {target} from opponent's hand.",
         "orochimaru051Move": "{card} ({id}): Lost mission, moving to another mission.",
         "endMove": "{card} ({id}): Moved to another mission at end of round.",
-        "neji037": "{card} ({id}): POWERUP 1 — enemy played a character in this mission.",
-        "hinata031": "{card} ({id}): Gained 1 Chakra — enemy played a character in this mission.",
+        "neji037": "{card} ({id}): POWERUP 1, enemy played a character in this mission.",
+        "hinata031": "{card} ({id}): Gained 1 Chakra, enemy played a character in this mission.",
         "kankuro078RevealHidden": "{card} ({id}): Revealed {target} (paid {cost} chakra, 1 less than full cost).",
         "dosu069RevealUpgrade": "{card} ({id}): Forced reveal of {target} (upgrade cost applied).",
         "immune": "{card} ({id}): {target} is immune to this effect.",
         "itachi091DiscardOpponent": "{card} ({id}): Opponent discards {target}.",
         "kimimaro123SelfDefeat": "Kimimaro (123): No cards in hand at end of round. Kimimaro is defeated.",
         "kin073Discard": "{card} ({id}): {target} discarded from hand.",
-        "nameConflictBlocked": "{card} ({id}): Cannot play {target} — same name already present on this mission.",
+        "nameConflictBlocked": "{card} ({id}): Cannot play {target}, same name already present on this mission.",
         "orochimaru051Pending": "Orochimaru (051): Lost this mission. Choose a destination mission.",
         "revealHiddenReduced": "Revealed {card} on mission {mission} for {cost} chakra (cost reduced by {reduction}).",
         "shino033CostReduction": "{card} ({id}): Next character costs {reduction} less chakra.",
@@ -272,7 +272,7 @@
       "nowRanked": "You are now ranked!"
     },
     "timer": {
-      "autoPassed": "Time expired — auto-passed"
+      "autoPassed": "Time expired, auto-passed"
     },
     "opponent": "Opponent",
     "you": "You",
@@ -312,21 +312,21 @@
       "details": "Details"
     },
     "effect": {
-      "orochimaruReveal": "Orochimaru — Infiltration",
-      "orochimaruSteal": "Cost 3 or less — Taking control!",
-      "orochimaruTooExpensive": "Cost too high — Cannot take control.",
-      "itachi091RevealTitle": "Itachi — Mangekyo Sharingan",
+      "orochimaruReveal": "Orochimaru: Infiltration",
+      "orochimaruSteal": "Cost 3 or less. Taking control!",
+      "orochimaruTooExpensive": "Cost too high. Cannot take control.",
+      "itachi091RevealTitle": "Itachi: Mangekyo Sharingan",
       "itachi091RevealResult": "Card revealed from opponent's hand.",
       "itachi091DiscardResult": "Card will be discarded. Opponent draws a replacement.",
-      "dosuLookRevealTitle": "Dosu Kinuta — Hidden Character Revealed",
+      "dosuLookRevealTitle": "Dosu Kinuta: Hidden Character Revealed",
       "dosuLookRevealResult": "You looked at this hidden character.",
-      "sasuke014RevealTitle": "Sasuke — Sharingan",
+      "sasuke014RevealTitle": "Sasuke: Sharingan",
       "sasuke014RevealResult": "Card revealed from opponent's hand.",
       "sasuke014DiscardResult": "This card will be discarded. Opponent draws 1 card.",
-      "tayuya065UpgradeRevealTitle": "Tayuya — Demon Flute",
+      "tayuya065UpgradeRevealTitle": "Tayuya: Demon Flute",
       "tayuya065UpgradeRevealDrawn": "Summon card(s) added to hand!",
       "tayuya065UpgradeRevealNone": "No Summon cards found. Cards put back on top.",
-      "kiba026UpgradeRevealTitle": "Kiba (026) — Deck Reveal",
+      "kiba026UpgradeRevealTitle": "Kiba (026): Deck Reveal",
       "kiba026UpgradeRevealFound": "Found Akamaru! Drew to hand.",
       "kiba026UpgradeRevealNone": "No Akamaru found. Cards put back on top.",
       "kiba026Match": "DRAWN (Akamaru)",
@@ -703,7 +703,7 @@
       "hard": "Hard",
       "hardDesc": "Strategic evaluation",
       "impossible": "Impossible",
-      "impossibleDesc": "Neural network — almost unbeatable"
+      "impossibleDesc": "Neural network, almost unbeatable"
     },
     "startGame": "Start Game",
     "selectDifficultyDesc": "Select difficulty and start a match",
@@ -729,7 +729,7 @@
     "modeNormal": "Normal",
     "modeNormalDesc": "Standard rules, control both players",
     "modeFree": "Free Mode",
-    "modeFreeDesc": "Sandbox — manipulate deck, move cards freely"
+    "modeFreeDesc": "Sandbox, manipulate deck, move cards freely"
   },
   "sandbox": {
     "addChakra": "+ Chakra",
@@ -767,8 +767,8 @@
     "join": "Join",
     "casual": "Casual",
     "ranked": "Ranked",
-    "casualDesc": "Unranked match — play for fun, no ELO changes",
-    "rankedDesc": "Ranked match — ELO rating will be updated",
+    "casualDesc": "Unranked match, play for fun, no ELO changes",
+    "rankedDesc": "Ranked match, ELO rating will be updated",
     "publicRooms": "Public Rooms",
     "privateRoom": "Private Room",
     "createPublicRoom": "Create Room",
@@ -781,9 +781,9 @@
       "sealed": "Sealed"
     },
     "modeDesc": {
-      "casual": "Unranked match — play for fun, no ELO changes",
-      "ranked": "Ranked match — ELO rating will be updated",
-      "sealed": "Sealed mode — build a deck from random boosters"
+      "casual": "Unranked match, play for fun, no ELO changes",
+      "ranked": "Ranked match, ELO rating will be updated",
+      "sealed": "Sealed mode, build a deck from random boosters"
     }
   },
   "leaderboard": {
@@ -800,7 +800,7 @@
     "leagues": "Leagues",
     "league": "League",
     "games": "Games",
-    "eloRange": "{min} — {max}",
+    "eloRange": "{min} - {max}",
     "eloRangeTop": "{min}+",
     "unranked": "Unranked",
     "placementProgress": "Placement: {current}/{total}"
@@ -1094,7 +1094,7 @@
         "2": "Effects, groups, and missions",
         "3": "Advanced rules and tricky questions",
         "4": "All categories, harder distractors",
-        "5": "Everything — edge cases, no mercy"
+        "5": "Everything, edge cases, no mercy"
       },
       "questionCount": {
         "1": "10 questions",
@@ -1452,7 +1452,7 @@
           "exp": "UPGRADE triggers only when upgrading over a same-name lower-cost character."
         },
         "q22": {
-          "text": "Same name, different titles — same mission?",
+          "text": "Same name, different titles, same mission?",
           "oA": "Yes, titles make them different",
           "oB": "No, one name per mission per player",
           "oC": "Yes if different groups",
@@ -1548,7 +1548,7 @@
           "exp": "Effects are optional unless the text says 'you must'."
         },
         "q34": {
-          "text": "Existing cards vs newly played card — whose effects resolve first?",
+          "text": "Existing cards vs newly played card, whose effects resolve first?",
           "oA": "Newly played card",
           "oB": "Existing cards in play",
           "oC": "Active player chooses",

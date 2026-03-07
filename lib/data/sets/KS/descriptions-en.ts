@@ -64,12 +64,12 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 025/130 - KIBA INUZUKA (C) - "Team 8 Genin"
   'KS-025-C': [
-    '[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1.',
+    '[⧗] If Akamaru is in the same mission, CHAKRA +1.',
   ],
 
   // 027/130 - AKAMARU (C) - "Ninja Dog"
   'KS-027-C': [
-    '[⧗] If there isn\'t a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand.',
+    '[⧗] If there isn\'t a Kiba Inuzuka in this mission at the end of the round, you must return this character to your hand.',
   ],
 
   // 030/130 - HINATA HYUGA (C) - "Gentle Fist"
@@ -119,7 +119,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 047/130 - IRUKA (C) - "Academy Instructor"
   'KS-047-C': [
-    'Move a [u]Naruto Uzumaki[/u] character in play.',
+    'Move a Naruto Uzumaki character in play.',
   ],
 
   // 048/130 - HAYATE GEKKO (C) - "Talented Shinobi"
@@ -211,7 +211,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 084/130 - YASHAMARU (C) - "Gaara\'s Caretaker"
   'KS-084-C': [
-    '[⧗] This character has +2 Power if there\'s a friendly [u]Gaara[/u] in this mission.',
+    '[⧗] This character has +2 Power if there\'s a friendly Gaara in this mission.',
   ],
 
   // 088/130 - HAKU (C) - "Orphan of the Land of Water"
@@ -221,7 +221,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 090/130 - ITACHI UCHIHA (C) - "Akatsuki"
   'KS-090-C': [
-    '[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less.',
+    '[⧗] If there is a Sasuke Uchiha in this mission, you can play this character while hidden paying 3 less.',
   ],
 
   // 092/130 - KISAME HOSHIGAKI (C) - "Rogue Ninja of the Hidden Mist"
@@ -242,7 +242,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 096/130 - GAMAKICHI (C) - "Gamabunta\'s Eldest Son"
   'KS-096-C': [
-    '[⧗] Pay 1 less to play this character if there\'s a friendly [u]Naruto Uzumaki[/u] in this mission.',
+    '[⧗] Pay 1 less to play this character if there\'s a friendly Naruto Uzumaki in this mission.',
     '[⧗] At the end of the round, you must return this character to your hand.',
   ],
 
@@ -253,7 +253,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 098/130 - KATSUYU (C) - "Giant Slug"
   'KS-098-C': [
-    'If there is a friendly [u]Tsunade[/u] in play, POWERUP 2.',
+    'If there is a friendly Tsunade in play, POWERUP 2.',
     '[⧗] At the end of the round, you must return this character to your hand.',
   ],
 
@@ -269,7 +269,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 101/130 - TON TON (C) - "Tsunade\'s Ninja Pig"
   'KS-101-C': [
-    '[⧗] If there\'s a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power.',
+    '[⧗] If there\'s a friendly Tsunade or Shizune in this mission, this character has +1 Power.',
   ],
 
   // =====================
@@ -348,18 +348,18 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 026/130 - KIBA INUZUKA (UC) - "Fang Over Fang"
   'KS-026-UC': [
     'Hide the lowest cost enemy character in this mission.',
-    'Look at the top 3 cards of your deck, reveal and draw all [u]Akamaru[/u] characters, then put back the other cards.',
+    'Look at the top 3 cards of your deck, reveal and draw all Akamaru characters, then put back the other cards.',
   ],
 
   // 028/130 - AKAMARU (UC) - "Man Beast Clone"
   'KS-028-UC': [
     'At the end of the turn, you may return this character to your hand.',
-    'POWERUP 2 a friendly [u]Kiba Inuzuka[/u] in this mission.',
+    'POWERUP 2 a friendly Kiba Inuzuka in this mission.',
   ],
 
   // 029/130 - AKAMARU (UC) - "Two-Headed Wolf"
   'KS-029-UC': [
-    '[⧗] You can play this character as an upgrade over [u]Kiba Inuzuka[/u].',
+    '[⧗] You can play this character as an upgrade over Kiba Inuzuka.',
     'Hide the non-hidden enemy character with the lowest cost in this mission.',
   ],
 
@@ -493,7 +493,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 076/130 - ICHIBI (UC) - "One-Tail"
   'KS-076-UC': [
-    '[⧗] You can play this character as an upgrade over [u]Gaara[/u].',
+    '[⧗] You can play this character as an upgrade over Gaara.',
     '[⧗] Can\'t be hidden or defeated by enemy effects.',
   ],
 
@@ -633,7 +633,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 113/130 - KIBA INUZUKA (R) - "Fang Over Fang"
   'KS-113-R': [
-    'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
+    'Hide a friendly Akamaru character. If you do, hide another character in this mission.',
     'MAIN effect: Instead, defeat both of them.',
   ],
 
@@ -755,7 +755,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 129/130 - KYUBI (R) - "Demon Fox Cloak"
   'KS-129-R': [
-    '[⧗] You can play this character as an upgrade over [u]Naruto Uzumaki[/u].',
+    '[⧗] You can play this character as an upgrade over Naruto Uzumaki.',
     '[⧗] Can\'t be hidden or defeated by enemy effects.',
   ],
 
@@ -892,7 +892,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 113/130 V - KIBA INUZUKA (MV) - "Fang Over Fang"
   'KS-113-MV': [
-    'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
+    'Hide a friendly Akamaru character. If you do, hide another character in this mission.',
     'MAIN effect: Instead, defeat both of them.',
   ],
 
@@ -973,7 +973,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Repeat the MAIN effect.',
   ],
   'KS-113-RA': [
-    'Hide a friendly [u]Akamaru[/u] character. If you do, hide another character in this mission.',
+    'Hide a friendly Akamaru character. If you do, hide another character in this mission.',
     'MAIN effect: Instead, defeat both of them.',
   ],
   'KS-117-RA': [
