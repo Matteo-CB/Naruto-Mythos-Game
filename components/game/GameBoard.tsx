@@ -27,6 +27,7 @@ import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
+import { SandboxToolbar } from "./SandboxToolbar";
 
 // ----- Shared color maps -----
 
@@ -913,7 +914,7 @@ function FullscreenCardDetail() {
 const BETA_DISMISSED_KEY = 'naruto-mythos-beta-dismissed';
 
 function BetaNotification() {
-  const t = useTranslations('common');
+  const t = useTranslations('home');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -1071,6 +1072,7 @@ function GameBoardInner() {
       />
 
       <BetaNotification />
+      <SandboxToolbar />
 
       {/* Left side: Opponent deck + discard */}
       <OpponentSidePiles />

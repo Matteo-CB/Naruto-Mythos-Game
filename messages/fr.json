@@ -724,7 +724,25 @@
     "switchMessage": "Passez l appareil a {player}",
     "switchConfirm": "Pret",
     "player1": "Joueur 1",
-    "player2": "Joueur 2"
+    "player2": "Joueur 2",
+    "selectMode": "Mode de jeu",
+    "modeNormal": "Normal",
+    "modeNormalDesc": "Regles standard, controlez les deux joueurs",
+    "modeFree": "Mode Libre",
+    "modeFreeDesc": "Sandbox — manipulez le deck, deplacez les cartes"
+  },
+  "sandbox": {
+    "addChakra": "+ Chakra",
+    "drawCard": "Piocher",
+    "viewDeck": "Voir le Deck",
+    "discard": "Defausser",
+    "defeat": "Vaincre",
+    "moveChar": "Deplacer",
+    "moveToTop": "Mettre dessus",
+    "deckOrder": "Ordre du Deck (haut en bas)",
+    "clickToMoveTop": "Cliquez sur une carte pour la mettre en haut du deck",
+    "close": "Fermer",
+    "emptyDeck": "Le deck est vide"
   },
   "online": {
     "title": "Jouer en Ligne",

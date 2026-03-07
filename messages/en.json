@@ -724,7 +724,25 @@
     "switchMessage": "Pass the device to {player}",
     "switchConfirm": "Ready",
     "player1": "Player 1",
-    "player2": "Player 2"
+    "player2": "Player 2",
+    "selectMode": "Select Mode",
+    "modeNormal": "Normal",
+    "modeNormalDesc": "Standard rules, control both players",
+    "modeFree": "Free Mode",
+    "modeFreeDesc": "Sandbox — manipulate deck, move cards freely"
+  },
+  "sandbox": {
+    "addChakra": "+ Chakra",
+    "drawCard": "Draw",
+    "viewDeck": "View Deck",
+    "discard": "Discard",
+    "defeat": "Defeat",
+    "moveChar": "Move",
+    "moveToTop": "Move to Top",
+    "deckOrder": "Deck Order (top to bottom)",
+    "clickToMoveTop": "Click a card to move it to the top of the deck",
+    "close": "Close",
+    "emptyDeck": "Deck is empty"
   },
   "online": {
     "title": "Play Online",
