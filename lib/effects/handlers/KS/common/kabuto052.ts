@@ -39,26 +39,12 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
   newState[opponentPlayer] = ops;
 
   // Find valid missions to place the hidden character
-  // Check for same-name conflict (a player cannot have two characters with the same name in one mission)
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
+  // The stolen card is placed HIDDEN — hidden characters have no visible name,
+  // so the same-name restriction does NOT apply. Any mission is valid.
+  // The name conflict will only be checked later if/when the hidden card is revealed.
   const validMissionIndices: number[] = [];
   for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
-    const mission = newState.activeMissions[mIdx];
-    const friendlyChars = mission[friendlySide];
-
-    // Hidden characters don't reveal their name, but we still check for visible same-name conflicts
-    // Since the card is being placed hidden, name conflicts are only checked for visible characters
-    const hasSameNameVisible = friendlyChars.some(c => {
-      if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr === stolenCard.name_fr;
-    });
-
-    if (!hasSameNameVisible) {
-      validMissionIndices.push(mIdx);
-    }
+    validMissionIndices.push(mIdx);
   }
 
   if (validMissionIndices.length === 0) {

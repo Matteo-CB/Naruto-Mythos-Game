@@ -586,7 +586,8 @@
       "connectionTimeout": "Connection timed out. Server may be unavailable.",
       "connectionLost": "Lost connection to server.",
       "reconnectFailed": "Unable to reconnect to server.",
-      "notConnected": "Not connected to server."
+      "notConnected": "Not connected to server.",
+      "maintenance": "The server is under maintenance. Please wait..."
     }
   },
   "collection": {
@@ -712,6 +713,18 @@
     "selectDeck": "Select Your Deck",
     "randomDeck": "Random Deck",
     "randomDeckDesc": "30 random characters and 3 random missions"
+  },
+  "hotseat": {
+    "title": "Solo v Self",
+    "subtitle": "Control both sides to test your cards",
+    "player1Deck": "Player 1 Deck",
+    "player2Deck": "Player 2 Deck",
+    "startGame": "Start Game",
+    "switchTitle": "Switch Player",
+    "switchMessage": "Pass the device to {player}",
+    "switchConfirm": "Ready",
+    "player1": "Player 1",
+    "player2": "Player 2"
   },
   "online": {
     "title": "Play Online",
@@ -1928,6 +1941,14 @@
     "onlineDesc": "Challenge real players in ranked or private matches",
     "aiTitle": "Play vs AI",
     "aiDesc": "Train against AI opponents of varying difficulty",
+    "hotseatTitle": "Solo v Self",
+    "hotseatDesc": "Control both sides to test cards and strategies",
     "backToMenu": "Back to Menu"
+  },
+  "maintenance": {
+    "title": "NARUTO MYTHOS",
+    "subtitle": "Trading Card Game",
+    "message": "The simulator is under maintenance. The update takes about 5 minutes.",
+    "timerLabel": "Time elapsed"
   }
 }
