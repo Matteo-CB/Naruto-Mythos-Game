@@ -414,12 +414,6 @@ export function ActionBar() {
               variant={revealUpgradeTargets.length > 0 ? "secondary" : "primary"}
             />
           )}
-                : `${t('game.reveal')} (${revealCost} ${t('game.chakra').toLowerCase()})`}
-              onClick={handleReveal}
-              disabled={!canAffordReveal}
-              variant="primary"
-            />
-          )}
 
           {/* Cancel selection */}
           {(hasCardSelected || hasTargetSelected || hasMissionSelected) && (
