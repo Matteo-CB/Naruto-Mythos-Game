@@ -942,7 +942,7 @@ function BetaNotification() {
         backdropFilter: 'blur(12px)',
       }}
     >
-      <span className="text-xs leading-relaxed" style={{ color: '#cccccc' }}>
+      <span className="text-[9px] leading-relaxed" style={{ color: '#cccccc', fontFamily: 'Inter, sans-serif' }}>
         {t('betaBanner')}
       </span>
       <button

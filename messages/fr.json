@@ -123,7 +123,7 @@
       "upgradeCharacter": "Ameliore {oldCard} en {card} ({title}) sur mission {mission} pour {cost} chakra.",
       "pass": "Passe.",
       "passEdge": "Passe. Prend le jeton Initiative.",
-      "scoreMission": "Mission {index} ({rank}) : \"{name}\" — J1 : {p1Power} vs J2 : {p2Power}.",
+      "scoreMission": "Mission {index} ({rank}) : \"{name}\". J1 : {p1Power} vs J2 : {p2Power}.",
       "winMission": "Remporte mission {index} pour {points} pts ({base} + {bonus} bonus rang). Total : {total}.",
       "noWinner": "Pas de puissance sur mission {index}. Pas de gagnant.",
       "tieBreak": "Egalite sur mission {index}. Le detenteur de l'Initiative gagne.",
@@ -186,18 +186,18 @@
         "recoverFromDiscard": "{card} ({id}) : Recupere {target} de la defausse en main.",
         "kabutoSteal": "{card} ({id}) : Vole une carte et la place cachee sur mission {mission}.",
         "playSummonReduced": "{card} ({id}) : Joue {target} comme Invocation sur mission {mission} pour {cost} chakra (cout reduit).",
-        "moveBlocked": "{card} ({id}) : Deplacement bloque — {target} ne peut pas etre deplace.",
+        "moveBlocked": "{card} ({id}) : Deplacement bloque. {{target}} ne peut pas etre deplace.",
         "copyEffect": "{card} ({id}) : Copie l'effet de {target}.",
         "copy": "{card} ({id}) : Copie l'effet de {target}.",
         "devolve": "{card} ({id}) : Devolution de {target} (carte du dessus retiree).",
-        "orochimaruCannotSteal": "{card} ({id}) : Impossible de prendre le controle de {target} — cout trop eleve.",
+        "orochimaruCannotSteal": "{card} ({id}) : Impossible de prendre le controle de {{target}}, cout trop eleve.",
         "discardPowerup": "{card} ({id}) : Defausse {target} du deck. POWERUP {amount}.",
         "discardSelf": "{card} ({id}) : Defausse {target} de la main.",
         "kimimaro056Protection": "{card} ({id}) : L'adversaire paie 1 Chakra pour cibler ce personnage.",
         "playLeafReduced": "{card} ({id}) : Joue {target} sur mission {mission} pour {cost} chakra (cout reduit).",
         "upgradeFromDiscard": "{card} ({id}) : Evolue {target} depuis la defausse sur {mission} (paye {cost}).",
         "upgradeFromDeck": "{card} ({id}) : Evolue {target} depuis le deck sur {mission} (paye {cost}).",
-        "takeControlBlocked": "{card} ({id}) : Impossible de prendre le controle de {target} — conflit de nom.",
+        "takeControlBlocked": "{card} ({id}) : Impossible de prendre le controle de {{target}}, conflit de nom.",
         "moveNameConflictDiscard": "{card} ({id}) : {target} defausse pour conflit de nom apres deplacement.",
         "powerupMultiple": "{card} ({id}) : POWERUP {amount} sur {count} personnage(s).",
         "opponentDiscard": "{card} ({id}) : L'adversaire defausse {amount} carte(s) de sa main.",
@@ -213,15 +213,15 @@
         "sasuke014DiscardOpponent": "{card} ({id}) : Defausse {target} de la main adverse.",
         "orochimaru051Move": "{card} ({id}) : Mission perdue, se deplace vers une autre mission.",
         "endMove": "{card} ({id}) : Deplace vers une autre mission en fin de tour.",
-        "neji037": "{card} ({id}) : POWERUP 1 — l'ennemi a joue un personnage dans cette mission.",
-        "hinata031": "{card} ({id}) : Gagne 1 Chakra — l'ennemi a joue un personnage dans cette mission.",
+        "neji037": "{card} ({id}) : POWERUP 1, l'ennemi a joue un personnage dans cette mission.",
+        "hinata031": "{card} ({id}) : Gagne 1 Chakra, l'ennemi a joue un personnage dans cette mission.",
         "kankuro078RevealHidden": "{card} ({id}) : Revele {target} (paye {cost} chakra, 1 de moins que le cout complet).",
         "dosu069RevealUpgrade": "{card} ({id}) : Revelation forcee de {target} (cout d'amelioration applique).",
         "immune": "{card} ({id}) : {target} est immunise contre cet effet.",
         "itachi091DiscardOpponent": "{card} ({id}) : L'adversaire defausse {target}.",
         "kimimaro123SelfDefeat": "Kimimaro (123) : Aucune carte en main en fin de tour. Kimimaro est vaincu.",
         "kin073Discard": "{card} ({id}) : {target} defausse de la main.",
-        "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {target} — meme nom deja present sur cette mission.",
+        "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {{target}}, meme nom deja present sur cette mission.",
         "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
         "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
         "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",
@@ -272,7 +272,7 @@
       "nowRanked": "Vous etes maintenant classe !"
     },
     "timer": {
-      "autoPassed": "Temps ecoule — passe automatique"
+      "autoPassed": "Temps ecoule, passe automatique"
     },
     "opponent": "Adversaire",
     "you": "Vous",
@@ -312,21 +312,21 @@
       "details": "Détails"
     },
     "effect": {
-      "orochimaruReveal": "Orochimaru — Infiltration",
-      "orochimaruSteal": "Cout 3 ou moins — Prise de controle !",
-      "orochimaruTooExpensive": "Cout trop eleve — Impossible de prendre le controle.",
-      "itachi091RevealTitle": "Itachi — Mangekyo Sharingan",
+      "orochimaruReveal": "Orochimaru: Infiltration",
+      "orochimaruSteal": "Cout 3 ou moins. Prise de controle !",
+      "orochimaruTooExpensive": "Cout trop eleve. Impossible de prendre le controle.",
+      "itachi091RevealTitle": "Itachi: Mangekyo Sharingan",
       "itachi091RevealResult": "Carte revelee de la main adverse.",
       "itachi091DiscardResult": "La carte sera defaussee. L'adversaire pioche un remplacement.",
-      "dosuLookRevealTitle": "Dosu Kinuta — Personnage cache revele",
+      "dosuLookRevealTitle": "Dosu Kinuta: Personnage cache revele",
       "dosuLookRevealResult": "Vous avez regarde ce personnage cache.",
-      "sasuke014RevealTitle": "Sasuke — Sharingan",
+      "sasuke014RevealTitle": "Sasuke: Sharingan",
       "sasuke014RevealResult": "Carte revelee de la main adverse.",
       "sasuke014DiscardResult": "Cette carte sera defaussee. L'adversaire pioche 1 carte.",
-      "tayuya065UpgradeRevealTitle": "Tayuya — Flute demoniaque",
+      "tayuya065UpgradeRevealTitle": "Tayuya: Flute demoniaque",
       "tayuya065UpgradeRevealDrawn": "Carte(s) Invocation ajoutee(s) en main !",
       "tayuya065UpgradeRevealNone": "Aucune carte Invocation trouvee. Cartes remises sur le dessus.",
-      "kiba026UpgradeRevealTitle": "Kiba (026) — Revelation du deck",
+      "kiba026UpgradeRevealTitle": "Kiba (026): Revelation du deck",
       "kiba026UpgradeRevealFound": "Akamaru trouve ! Ajoute a la main.",
       "kiba026UpgradeRevealNone": "Pas d'Akamaru. Cartes remises sur le dessus.",
       "kiba026Match": "PIOCHE (Akamaru)",
@@ -703,7 +703,7 @@
       "hard": "Difficile",
       "hardDesc": "Evaluation strategique",
       "impossible": "Impossible",
-      "impossibleDesc": "Reseau de neurones — quasi-imbattable"
+      "impossibleDesc": "Reseau de neurones, quasi-imbattable"
     },
     "startGame": "Lancer la Partie",
     "selectDifficultyDesc": "Selectionnez la difficulte et lancez un match",
@@ -729,7 +729,7 @@
     "modeNormal": "Normal",
     "modeNormalDesc": "Regles standard, controlez les deux joueurs",
     "modeFree": "Mode Libre",
-    "modeFreeDesc": "Sandbox — manipulez le deck, deplacez les cartes"
+    "modeFreeDesc": "Sandbox, manipulez le deck, deplacez les cartes"
   },
   "sandbox": {
     "addChakra": "+ Chakra",
@@ -767,8 +767,8 @@
     "join": "Rejoindre",
     "casual": "Casual",
     "ranked": "Classe",
-    "casualDesc": "Match non classe — jouez pour le plaisir, pas de changement ELO",
-    "rankedDesc": "Match classe — votre classement ELO sera mis a jour",
+    "casualDesc": "Match non classe, jouez pour le plaisir, pas de changement ELO",
+    "rankedDesc": "Match classe, votre classement ELO sera mis a jour",
     "publicRooms": "Salons Publics",
     "privateRoom": "Salon Prive",
     "createPublicRoom": "Creer un Salon",
@@ -781,9 +781,9 @@
       "sealed": "Scellé"
     },
     "modeDesc": {
-      "casual": "Match non classe — jouez pour le plaisir, pas de changement ELO",
-      "ranked": "Match classe — votre classement ELO sera mis a jour",
-      "sealed": "Mode scellé — construisez un deck a partir de boosters aleatoires"
+      "casual": "Match non classe, jouez pour le plaisir, pas de changement ELO",
+      "ranked": "Match classe, votre classement ELO sera mis a jour",
+      "sealed": "Mode scelle, construisez un deck a partir de boosters aleatoires"
     }
   },
   "leaderboard": {
@@ -800,7 +800,7 @@
     "leagues": "Ligues",
     "league": "Ligue",
     "games": "Matchs",
-    "eloRange": "{min} — {max}",
+    "eloRange": "{{min}} - {{max}}",
     "eloRangeTop": "{min}+",
     "unranked": "Non classe",
     "placementProgress": "Placement : {current}/{total}"
@@ -1094,7 +1094,7 @@
         "2": "Effets, groupes et missions",
         "3": "Regles avancees et questions pieges",
         "4": "Toutes categories, distracteurs difficiles",
-        "5": "Tout — cas limites, sans pitie"
+        "5": "Tout, cas limites, sans pitie"
       },
       "questionCount": {
         "1": "10 questions",
@@ -1452,7 +1452,7 @@
           "exp": "AMELIORATION ne se declenche qu'en ameliorant un personnage de meme nom a cout inferieur."
         },
         "q22": {
-          "text": "Meme nom, titres differents — meme mission ?",
+          "text": "Meme nom, titres differents, meme mission ?",
           "oA": "Oui, les titres les differencient",
           "oB": "Non, un seul nom par mission par joueur",
           "oC": "Oui si groupes differents",
@@ -1548,7 +1548,7 @@
           "exp": "Les effets sont optionnels sauf si le texte dit 'vous devez'."
         },
         "q34": {
-          "text": "Cartes existantes vs nouvelle carte — quels effets d'abord ?",
+          "text": "Cartes existantes vs nouvelle carte, quels effets d'abord ?",
           "oA": "La nouvelle carte",
           "oB": "Les cartes existantes en jeu",
           "oC": "Le joueur actif choisit",

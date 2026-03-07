@@ -436,7 +436,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] If [u]Akamaru[/u] is in the same mission, CHAKRA +1 ."
+        "description": "[⧗] If Akamaru is in the same mission, CHAKRA +1 ."
       }
     ],
     "image_url": "/images/common/025-130_KIBA_INUZUKA.webp",
@@ -470,7 +470,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] If there isn't a [u]Kiba Inuzuka[/u] in this mission at the end of the round, you must return this character to your hand."
+        "description": "[⧗] If there isn't a Kiba Inuzuka in this mission at the end of the round, you must return this character to your hand."
       }
     ],
     "image_url": "/images/common/027-130_AKAMARU.webp",
@@ -837,7 +837,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "Move a [u]Naruto Uzumaki[/u] character in play."
+        "description": "Move a Naruto Uzumaki character in play."
       }
     ],
     "image_url": "/images/common/047-130_IRUKA.webp",
@@ -1478,7 +1478,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] This character has +2 Power if there's a friendly [u]Gaara[/u] in this mission."
+        "description": "[⧗] This character has +2 Power if there's a friendly Gaara in this mission."
       }
     ],
     "image_url": "/images/common/084-130_YASHAMARU.webp",
@@ -1574,7 +1574,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] If there is a [u]Sasuke Uchiha[/u] in this mission, you can play this character while hidden paying 3 less."
+        "description": "[⧗] If there is a Sasuke Uchiha in this mission, you can play this character while hidden paying 3 less."
       }
     ],
     "image_url": "/images/common/090-130_ITACHI_UCHIWA.webp",
@@ -1711,7 +1711,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] Pay 1 less to play this character if there's a friendly [u]Naruto Uzumaki[/u] in this mission."
+        "description": "[⧗] Pay 1 less to play this character if there's a friendly Naruto Uzumaki in this mission."
       },
       {
         "type": "MAIN",
@@ -1763,7 +1763,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "If there is a friendly [u]Tsunade[/u] in play, POWERUP 2 ."
+        "description": "If there is a friendly Tsunade in play, POWERUP 2 ."
       },
       {
         "type": "MAIN",
@@ -1837,7 +1837,7 @@
     "effects": [
       {
         "type": "MAIN",
-        "description": "[⧗] If there's a friendly [u]Tsunade[/u] or [u]Shizune[/u] in this mission, this character has +1 Power."
+        "description": "[⧗] If there's a friendly Tsunade or Shizune in this mission, this character has +1 Power."
       }
     ],
     "image_url": "/images/common/101-130_TON_TON.webp",
