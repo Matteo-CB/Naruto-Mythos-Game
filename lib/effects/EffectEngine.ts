@@ -5104,6 +5104,7 @@ export class EffectEngine {
 
     const chosenCard = ps.hand[handIndex];
     // Cost deferred to placement time (upgrade vs fresh play)
+    ps.hand.splice(handIndex, 1);
 
     // Find valid missions (fresh play or upgrade over same-name with lower cost)
     const friendlySide: 'player1Characters' | 'player2Characters' =
@@ -5141,7 +5142,7 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), cost, cardName, cardId, costReduction);
+      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, cardName, cardId, costReduction);
     }
 
     // Create stage 2: choose mission
@@ -5154,7 +5155,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost, cardName, cardId, costReduction }),
+      effectDescription: JSON.stringify({ cost: 0, cardName, cardId, costReduction }),
       targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
