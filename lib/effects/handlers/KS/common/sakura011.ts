@@ -8,17 +8,16 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Leaf Village | Keywords: Team 7
  * MAIN: If there's another Team 7 character in this mission, draw a card.
  *
- * Checks if there is at least one other friendly non-hidden Team 7 character in the same
+ * Checks if there is at least one other non-hidden Team 7 character in the same
  * mission. If so, the player draws 1 card from their deck.
  */
 function handleSakura011Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
-  const friendlyChars =
-    sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const allChars = [...mission.player1Characters, ...mission.player2Characters];
 
   // Check for another Team 7 character in this mission (not self, not hidden)
-  const hasOtherTeam7 = friendlyChars.some((char) => {
+  const hasOtherTeam7 = allChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
