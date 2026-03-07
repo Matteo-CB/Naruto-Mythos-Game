@@ -8,7 +8,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { TrainingCoachPanel } from '@/components/game/TrainingCoachPanel';
-import { HotseatSwitchOverlay } from '@/components/game/HotseatSwitchOverlay';
+
 
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion
 const GameBoard = dynamic(
@@ -132,7 +132,7 @@ export default function GamePage() {
     <>
       <GameBoard />
       <TrainingCoachPanel />
-      <HotseatSwitchOverlay />
+
       <LandscapeBlocker />
       {showConnectionLost && (
         <div

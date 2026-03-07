@@ -1040,7 +1040,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else if (get().isHotseatGame) {
           const nextPlayer = advanced.activePlayer;
           if (nextPlayer !== hp) {
-            set({ hotseatSwitchPending: true, hotseatNextPlayer: nextPlayer, isProcessing: false });
+            set({ hotseatNextPlayer: nextPlayer, isProcessing: false });
+            setTimeout(() => get().confirmHotseatSwitch(), 400);
           } else {
             set({ isProcessing: false });
           }
@@ -1433,7 +1434,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         (newState.phase !== 'mulligan' && newState.activePlayer !== humanPlayer && (newState.phase as string) !== 'gameOver');
 
       if (needsSwitch) {
-        set({ hotseatSwitchPending: true, hotseatNextPlayer: otherPlayer, isProcessing: false });
+        set({ hotseatNextPlayer: otherPlayer, isProcessing: false });
+        setTimeout(() => get().confirmHotseatSwitch(), 400);
       } else {
         set({ isProcessing: false });
       }
