@@ -238,7 +238,7 @@ export interface ContinuousEffect {
 export type GameAction =
   | { type: 'PLAY_CHARACTER'; cardIndex: number; missionIndex: number; hidden: false }
   | { type: 'PLAY_HIDDEN'; cardIndex: number; missionIndex: number }
-  | { type: 'REVEAL_CHARACTER'; missionIndex: number; characterInstanceId: string }
+  | { type: 'REVEAL_CHARACTER'; missionIndex: number; characterInstanceId: string; upgradeTargetInstanceId?: string }
   | { type: 'UPGRADE_CHARACTER'; cardIndex: number; missionIndex: number; targetInstanceId: string }
   | { type: 'PASS' }
   | { type: 'MULLIGAN'; doMulligan: boolean }

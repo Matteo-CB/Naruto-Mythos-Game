@@ -41,7 +41,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'REVEAL_CHARACTER':
-      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId);
+      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId);
       if (newState === beforeAction) return state;
       break;
     case 'UPGRADE_CHARACTER':
@@ -264,6 +264,7 @@ function handleRevealCharacter(
   player: PlayerID,
   missionIndex: number,
   characterInstanceId: string,
+  upgradeTargetInstanceId?: string,
 ): GameState {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) return state;
 
@@ -283,16 +284,33 @@ function handleRevealCharacter(
 
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Check if this reveal is an upgrade over an existing character.
-  // Supports both same-name upgrades AND flexible upgrades (Akamaru→Kiba, Ichibi→Gaara, etc.)
-  const upgradeTarget = chars.find((c) => {
-    if (c.instanceId === characterInstanceId) return false;
-    if (c.isHidden) return false;
-    const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    if (charTopCard.chakra <= cTop.chakra) return false;
-    const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
-    return isSameName || checkFlexibleUpgrade(charTopCard, cTop);
-  });
+  // Determine upgrade target:
+  // If upgradeTargetInstanceId is provided, use that specific target (player chose to upgrade).
+  // If not provided, auto-detect ONLY for same-name upgrades (mandatory, can't have 2 same-name chars).
+  // Flexible (different-name) upgrades are NEVER auto-detected — player must explicitly choose.
+  let upgradeTarget: CharacterInPlay | undefined;
+  if (upgradeTargetInstanceId) {
+    // Player explicitly chose to upgrade this target
+    const candidate = chars.find((c) => c.instanceId === upgradeTargetInstanceId);
+    if (candidate && !candidate.isHidden) {
+      const cTop = candidate.stack.length > 0 ? candidate.stack[candidate.stack.length - 1] : candidate.card;
+      if (charTopCard.chakra > cTop.chakra) {
+        const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
+        if (isSameName || checkFlexibleUpgrade(charTopCard, cTop)) {
+          upgradeTarget = candidate;
+        }
+      }
+    }
+  } else {
+    // Auto-detect: only same-name upgrades (mandatory — can't have 2 same-name chars)
+    upgradeTarget = chars.find((c) => {
+      if (c.instanceId === characterInstanceId) return false;
+      if (c.isHidden) return false;
+      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      if (charTopCard.chakra <= cTop.chakra) return false;
+      return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
+    });
+  }
 
   // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE
   const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);

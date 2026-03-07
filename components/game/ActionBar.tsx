@@ -102,10 +102,10 @@ export function ActionBar() {
       const isIchibiUpgrade = selectedCard.number === 76
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
         && charCard.name_fr.toUpperCase() === 'GAARA';
-      // Ukon 063/124 can upgrade any character with printed cost 0–4
+      // Ukon 063/124 can upgrade any Sound Village character
       const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
         && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
-        && (charCard.chakra ?? 0) <= 4;
+        && (charCard.group ?? '').toLowerCase().includes('sound');
       // Kyubi 129 can upgrade over any Naruto Uzumaki
       const isKyubiUpgrade = selectedCard.number === 129
         && charCard.name_fr.toUpperCase().includes('NARUTO');
@@ -117,11 +117,9 @@ export function ActionBar() {
 
   // Can reveal: need a hidden character selected as target
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
-
-  // Determine chakra cost for reveal (checks if reveal would be an upgrade — pays only the difference)
-  // Also applies cost reduction effects (e.g., Itachi 090 pays 3 less with Sasuke, Gaara 075 pays 2 less)
-  let revealCost = 0;
-  let isRevealUpgrade = false;
+  // Compute all reveal upgrade targets and the base reveal cost
+  let revealBaseCost = 0;
+  const revealUpgradeTargets: { instanceId: string; name: string; cost: number; isSameName: boolean }[] = [];
   if (hasTargetSelected && visibleState.activeMissions) {
     for (let mi = 0; mi < visibleState.activeMissions.length; mi++) {
       const m = visibleState.activeMissions[mi];
@@ -130,33 +128,34 @@ export function ActionBar() {
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
-        // Check if there's a visible same-name character with lower cost on the same mission (upgrade)
-        const upgradeOver = myChars.find((c) => {
-          if (c.instanceId === selectedTargetId || c.isHidden) return false;
+        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
+        // Find ALL valid upgrade targets on this mission
+        for (const c of myChars) {
+          if (c.instanceId === selectedTargetId || c.isHidden) continue;
           const cTop = c.topCard ?? c.card;
-          if (!cTop) return false;
-          if (hiddenTopCard.chakra <= cTop.chakra) return false;
+          if (!cTop) continue;
+          if (hiddenTopCard.chakra <= cTop.chakra) continue;
           const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
           const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
-          return isSameName || isFlexible;
-        });
-        if (upgradeOver) {
-          const existingTop = upgradeOver.topCard ?? upgradeOver.card;
-          // Apply cost discounts first (e.g. Gaara 075 -2 when revealed hidden),
-          // then subtract existing card's cost. Never below 0.
-          const discountedFull = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
-          revealCost = Math.max(0, discountedFull - (existingTop?.chakra ?? 0));
-          isRevealUpgrade = true;
-        } else {
-          // Use calculateEffectiveCost to apply reveal cost reductions
-          // (Itachi 090: -3 with Sasuke, Gaara 075: -2 when hidden)
-          revealCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
+          if (isSameName || isFlexible) {
+            const upgradeCost = Math.max(0, revealBaseCost - (cTop.chakra ?? 0));
+            revealUpgradeTargets.push({
+              instanceId: c.instanceId,
+              name: cTop.name_fr,
+              cost: upgradeCost,
+              isSameName,
+            });
+          }
         }
         break;
       }
     }
   }
-  const canAffordReveal = myState.chakra >= revealCost;
+  // Can show plain "Reveal" button only if NO same-name upgrade targets exist
+  // (same-name upgrade is mandatory — can't have 2 same-name chars on one mission)
+  const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
+  const canShowPlainReveal = !hasSameNameRevealUpgrade;
+  const canAffordReveal = myState.chakra >= revealBaseCost;
 
   // Handlers
   const handlePlayVisible = () => {
@@ -185,8 +184,8 @@ export function ActionBar() {
     if (!error) clearSelection();
   };
 
-  const handleReveal = () => {
-    if (!canReveal || !canAffordReveal || !selectedTargetId) {
+  const handleReveal = (upgradeTargetInstanceId?: string) => {
+    if (!canReveal || !selectedTargetId) {
       console.warn('[ActionBar] handleReveal blocked:', { canReveal, canAffordReveal, selectedTargetId });
       return;
     }
@@ -208,6 +207,7 @@ export function ActionBar() {
         type: 'REVEAL_CHARACTER',
         missionIndex: targetMissionIndex,
         characterInstanceId: selectedTargetId,
+          upgradeTargetInstanceId,
       });
     } else {
       console.warn('[ActionBar] handleReveal: character not found in any mission', { selectedTargetId });
@@ -391,11 +391,29 @@ export function ActionBar() {
             />
           )}
 
-          {/* Reveal button */}
-          {canReveal && (
+          {/* Reveal upgrade button(s) — one per valid upgrade target */}
+          {canReveal && revealUpgradeTargets.map((opt) => {
+            const canAfford = myState.chakra >= opt.cost;
+            return (
+              <ActionButton
+                key={`reveal-upgrade-${opt.instanceId}`}
+                label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name} (${opt.cost} ${t('game.chakra').toLowerCase()})`}
+                onClick={() => handleReveal(opt.instanceId)}
+                disabled={!canAfford}
+                variant="primary"
+              />
+            );
+          })}
+
+          {/* Plain reveal button — shown when card has different name from all upgrade targets */}
+          {canReveal && canShowPlainReveal && (
             <ActionButton
-              label={isRevealUpgrade
-                ? `${t('game.reveal')} + ${t('game.actions.upgrade')} (${revealCost} ${t('game.chakra').toLowerCase()})`
+              label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}
+              onClick={() => handleReveal()}
+              disabled={!canAffordReveal}
+              variant={revealUpgradeTargets.length > 0 ? "secondary" : "primary"}
+            />
+          )}
                 : `${t('game.reveal')} (${revealCost} ${t('game.chakra').toLowerCase()})`}
               onClick={handleReveal}
               disabled={!canAffordReveal}
