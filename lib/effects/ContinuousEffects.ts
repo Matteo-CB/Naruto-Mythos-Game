@@ -405,6 +405,7 @@ export function isProtectedFromEnemyHide(
 
   for (const char of mission[friendlySide]) {
     if (char.isHidden) continue;
+    if (char.instanceId === targetChar.instanceId) continue; // A character is not friendly to itself
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
     // Shino 115 (R/RA): protects all allies in this mission from being hidden by enemy effects

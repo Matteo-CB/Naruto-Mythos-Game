@@ -4,7 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
  * Card 063/130 - UKON (UC)
- * Chakra: 4 | Power: 3
+ * Chakra: 5 | Power: 6
  * Group: Sound Village | Keywords: Sound Four
  *
  * MAIN [continuous]: This character can be played as an upgrade over any character
@@ -25,7 +25,7 @@ function handleUkon063Main(ctx: EffectContext): EffectResult {
     ctx.state.phase,
     ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
-    'Ukon (063): Can be played as upgrade over any character with cost 4 or less (continuous).',
+    'Ukon (063): Can be played as upgrade over any Sound Village character (continuous).',
     'game.log.effect.continuous',
     { card: 'UKON', id: 'KS-063-UC' },
   );

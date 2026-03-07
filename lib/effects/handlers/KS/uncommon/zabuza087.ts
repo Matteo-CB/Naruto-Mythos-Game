@@ -5,9 +5,9 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
- * Card 087/130 - ZABUZA MOMOCHI "Demon of the Mist" (UC)
- * Chakra: 5 | Power: 6
- * Group: Independent | Keywords: Rogue Ninja, Weapon
+ * Card 087/130 - ZABUZA MOMOCHI "Water Prison Jutsu" (UC)
+ * Chakra: 5 | Power: 5
+ * Group: Independent | Keywords: Rogue Ninja, Jutsu
  *
  * MAIN: If only one non-hidden enemy character in this mission, hide them.
  *   - Check the number of non-hidden enemy characters in this mission.

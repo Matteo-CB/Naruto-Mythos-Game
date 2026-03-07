@@ -402,7 +402,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 022/130 - SHIKAMARU NARA (UC) - "Possession des Ombres"
   'KS-022-UC': [
-    'Deplacez un personnage ennemi de la mission qui vient d\'etre revelee vers cette mission.',
+    'Déplacez un personnage ennemi joué lors du précédent tour de l\'adversaire.',
   ],
 
   // 024/130 - ASUMA SARUTOBI (UC) - "Lames Volantes"
@@ -412,7 +412,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 026/130 - KIBA INUZUKA (UC) - "Crocs Lacerateurs"
   'KS-026-UC': [
-    'Cachez le personnage ennemi avec le plus faible cout dans cette mission.',
+    'Cachez le personnage ennemi non caché avec le plus faible coût dans cette mission.',
     'Regardez les 3 cartes du dessus de votre deck, revelez et piochez tous les personnages [u]Akamaru[/u], puis remettez les autres cartes.',
   ],
 
@@ -425,7 +425,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 029/130 - AKAMARU (UC) - "Marquage Dynamique"
   'KS-029-UC': [
     '[⧗] Vous pouvez jouer ce personnage en amelioration par-dessus [u]Kiba Inuzuka[/u].',
-    'Cachez le personnage ennemi avec le plus faible cout dans cette mission.',
+    'Cachez le personnage ennemi non caché avec le plus faible coût dans cette mission.',
   ],
 
   // 030/130 - HINATA HYUGA (C) - "Poing Souple"
@@ -485,8 +485,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 051/130 - OROCHIMARU (UC) - "Sannin"
   'KS-051-UC': [
-    '[⧗] A la fin de chaque Phase de Mission, si vous avez perdu une mission ou ce personnage est assigne, deplacez ce personnage vers la prochaine mission non resolue.',
-    'Vainquez un personnage ennemi cache dans cette mission.',
+    '[⧗] Si vous avez perdu cette mission lors de la Phase d\'Évaluation de Mission, déplacez ce personnage vers une autre mission.',
+    'Vainquez un personnage ennemi caché en jeu.',
   ],
 
   // 052/130 - KABUTO YAKUSHI (C) - "La Taupe"

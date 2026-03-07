@@ -195,7 +195,7 @@ export default function PlayOnlinePage() {
       if (!connected) {
         await connect(session.user.id);
       }
-      createRoom(session.user.id, true, false, false, 'casual', session.user.name ?? undefined);
+      createRoom(session.user.id, true, selectedMode === 'ranked', false, selectedMode, session.user.name ?? undefined);
       setIsPrivateRoom(true);
     } catch {
       // Error set in socket store
@@ -461,6 +461,23 @@ export default function PlayOnlinePage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
+                    {/* Mode selector tabs */}
+                    <div className="flex w-full rounded-t-lg overflow-hidden">
+                      {(['casual', 'ranked'] as GameMode[]).map((mode) => (
+                        <button
+                          key={mode}
+                          onClick={() => setSelectedMode(mode)}
+                          className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors"
+                          style={modeStyle(mode)}
+                        >
+                          {t(`online.mode.${mode}`)}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs -mt-2" style={{ color: '#555555' }}>
+                      {t(`online.modeDesc.${selectedMode}`)}
+                    </p>
+
                     <button
                       onClick={handleCreatePrivateRoom}
                       className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"

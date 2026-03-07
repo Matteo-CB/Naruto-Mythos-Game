@@ -337,7 +337,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 022/130 - SHIKAMARU NARA (UC) - "Shadow Possession Jutsu"
   'KS-022-UC': [
-    'Move an enemy character from the mission that was just revealed to this mission.',
+    'Move an enemy character played during the opponent\'s previous turn.',
   ],
 
   // 024/130 - ASUMA SARUTOBI (UC) - "Flying Swallow"
@@ -357,10 +357,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP 2 a friendly [u]Kiba Inuzuka[/u] in this mission.',
   ],
 
-  // 029/130 - AKAMARU (UC) - "Dynamic Marking"
+  // 029/130 - AKAMARU (UC) - "Two-Headed Wolf"
   'KS-029-UC': [
     '[⧗] You can play this character as an upgrade over [u]Kiba Inuzuka[/u].',
-    'Hide the lowest cost enemy character in this mission.',
+    'Hide the non-hidden enemy character with the lowest cost in this mission.',
   ],
 
   // 031/130 - HINATA HYUGA (UC) - "Byakugan"
@@ -411,8 +411,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 051/130 - OROCHIMARU (UC) - "Sannin"
   'KS-051-UC': [
-    '[⧗] At the end of each Mission Phase, if you lost a mission where this character is assigned, move this character to the next unresolved mission.',
-    'Defeat a hidden enemy character in this mission.',
+    '[⧗] If you lost this mission during the Mission Evaluation phase, move this character to another mission.',
+    'Defeat a hidden enemy character in play.',
   ],
 
   // 053/130 - KABUTO YAKUSHI (UC) - "Dead Soul Jutsu"
@@ -525,9 +525,9 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     '[↯] Defeat this character and another character in this mission.',
   ],
 
-  // 087/130 - ZABUZA MOMOCHI (UC) - "Demon of the Mist"
+  // 087/130 - ZABUZA MOMOCHI (UC) - "Water Prison Jutsu"
   'KS-087-UC': [
-    'If there is only one enemy character in this mission, hide it.',
+    'If there is only one non-hidden enemy character in this mission, hide them.',
     'MAIN effect: Instead, defeat it.',
   ],
 

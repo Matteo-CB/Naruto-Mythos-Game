@@ -5,9 +5,9 @@ import { shouldRetainPowerTokens } from '../../effects/ContinuousEffects';
 /**
  * Execute the End Phase:
  * 1. Discard all remaining chakra from both players' pools to 0
- * 2. Remove ALL Power tokens from all characters in play
- * 3. Handle end-of-round triggers (Summon returns, Akamaru check)
- * 4. Rock Lee exception: keeps power tokens
+ * 2. Giant Spider 103 hide trigger (before token removal so tokens count)
+ * 3. Remove ALL Power tokens from all characters in play
+ * 4. Handle end-of-round triggers (Summon returns, Akamaru check)
  */
 export function executeEndPhase(state: GameState): GameState {
   let newState = { ...state };
@@ -25,10 +25,13 @@ export function executeEndPhase(state: GameState): GameState {
     'game.log.resetChakra',
   );
 
-  // 2. Remove power tokens (with Rock Lee exception)
+  // 2. Handle Giant Spider 103 BEFORE removing tokens (needs power tokens for threshold)
+  newState = handleGiantSpider103EndOfRound(newState);
+
+  // 3. Remove power tokens (with Rock Lee exception)
   newState = removeAllPowerTokens(newState);
 
-  // 3. Handle end-of-round triggers
+  // 4. Handle remaining end-of-round triggers (Summon returns, Akamaru check, etc.)
   newState = handleEndOfRoundTriggers(newState);
 
   return newState;
@@ -190,13 +193,8 @@ function handleKimimaro123SelfDefeat(state: GameState): GameState {
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if (topCard.number !== 123) continue;
 
-        // Check continuous self-defeat effect
-        const hasSelfDefeat = (topCard.effects ?? []).some(
-          (e: { type: string; description: string }) =>
-            e.type === 'MAIN' && e.description.includes('[⧗]') &&
-            e.description.toLowerCase().includes('defeat this character'),
-        );
-        if (!hasSelfDefeat) continue;
+        // Card 123 always has the continuous self-defeat effect.
+        // We already confirmed topCard.number === 123 above.
 
         // Check if controlling player has no cards in hand
         const controller = char.controlledBy ?? player;
@@ -441,10 +439,10 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if (topCard.number !== 103) continue;
 
-        // Power tokens are already removed at this point — compare against printed power
-        const powerThreshold = topCard.power ?? 4;
+        // Include power tokens in threshold (Giant Spider runs before token removal now)
+        const powerThreshold = (topCard.power ?? 4) + char.powerTokens;
 
-        // Find all non-hidden characters with printed power ≤ threshold
+        // Find all non-hidden characters with effective power ≤ threshold
         const validTargets: string[] = [];
         for (let mi = 0; mi < newState.activeMissions.length; mi++) {
           const m = newState.activeMissions[mi];
@@ -452,7 +450,7 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
             for (const c of m[s]) {
               if (c.isHidden) continue;
               const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              if ((cTop.power ?? 0) <= powerThreshold) {
+              if (((cTop.power ?? 0) + c.powerTokens) <= powerThreshold) {
                 validTargets.push(c.instanceId);
               }
             }
@@ -534,16 +532,11 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
         mission[side] = chars;
         missions[i] = mission;
 
-        // Return top card to original owner's hand; discard the rest of the stack
+        // Return entire stack to original owner's hand
         const owner = char.originalOwner;
         const ps = { ...newState[owner] };
-        const returnCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        ps.hand = [...ps.hand, returnCard];
-        // Discard cards under the top card (evolution stack)
-        if (char.stack.length > 1) {
-          const underCards = char.stack.slice(0, -1);
-          ps.discardPile = [...ps.discardPile, ...underCards];
-        }
+        const allCards = char.stack.length > 0 ? [...char.stack] : [char.card];
+        ps.hand = [...ps.hand, ...allCards];
         ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
         newState[owner] = ps;
 
