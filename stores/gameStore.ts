@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig } from '@/lib/engine/types';
+import type { GameState, GameAction, PlayerID, VisibleGameState, GameConfig, CharacterInPlay } from '@/lib/engine/types';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { AIPlayer, type AIDifficulty } from '@/lib/ai/AIPlayer';
 import { aiSelectTarget } from '@/lib/ai/targetSelection';
@@ -48,6 +48,7 @@ interface GameStore {
   aiPlayer: AIPlayer | null;
   isAIGame: boolean;
   isHotseatGame: boolean;
+  isSandboxMode: boolean;
   hotseatSwitchPending: boolean;
   hotseatNextPlayer: PlayerID | null;
   isOnlineGame: boolean;
@@ -80,7 +81,7 @@ interface GameStore {
 
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
-  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string) => void;
+  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => void;
   confirmHotseatSwitch: () => void;
   replayAIGame: () => void;
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => void;
@@ -98,6 +99,14 @@ interface GameStore {
   setSealedDeck: (cardIds: string[], missionIds: string[]) => void;
   resetGame: () => void;
   endAIGameAsForfeit: () => void;
+
+  // Sandbox actions (free mode only)
+  sandboxDrawCard: (deckIndex: number) => void;
+  sandboxAddChakra: (amount: number) => void;
+  sandboxDiscardFromHand: (handIndex: number) => void;
+  sandboxDefeatCharacter: (missionIndex: number, instanceId: string) => void;
+  sandboxMoveCharacter: (fromMission: number, instanceId: string, toMission: number) => void;
+  sandboxMoveToTopDeck: (deckIndex: number) => void;
 }
 
 let animationIdCounter = 0;
@@ -320,6 +329,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   aiPlayer: null,
   isAIGame: false,
   isHotseatGame: false,
+  isSandboxMode: false,
   hotseatSwitchPending: false,
   hotseatNextPlayer: null,
   isOnlineGame: false,
@@ -794,7 +804,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string) => {
+  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => {
     useTrainingStore.getState().disable();
     const state = GameEngine.createGame(config);
     const visible = GameEngine.getVisibleState(state, 'player1');
@@ -806,6 +816,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       aiPlayer: null,
       isAIGame: false,
       isHotseatGame: true,
+      isSandboxMode: !!sandbox,
       hotseatSwitchPending: false,
       hotseatNextPlayer: null,
       isOnlineGame: false,
@@ -2103,6 +2114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       aiPlayer: null,
       isAIGame: false,
       isHotseatGame: false,
+      isSandboxMode: false,
       hotseatSwitchPending: false,
       hotseatNextPlayer: null,
       isOnlineGame: false,
@@ -2124,5 +2136,92 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { humanPlayer } = get();
     const winner = humanPlayer === 'player1' ? 'player2' : 'player1';
     set({ gameOver: true, winner });
+  },
+
+  // ─── Sandbox actions (free mode only) ───
+
+  sandboxDrawCard: (deckIndex: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const ps = s[humanPlayer];
+    if (deckIndex < 0 || deckIndex >= ps.deck.length) return;
+    const [card] = ps.deck.splice(deckIndex, 1);
+    ps.hand.push(card);
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxAddChakra: (amount: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    s[humanPlayer].chakra += amount;
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxDiscardFromHand: (handIndex: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const ps = s[humanPlayer];
+    if (handIndex < 0 || handIndex >= ps.hand.length) return;
+    const [card] = ps.hand.splice(handIndex, 1);
+    ps.discardPile.push(card);
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxDefeatCharacter: (missionIndex: number, instanceId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    // Search in both player1 and player2 characters
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const idx = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (idx !== -1) {
+        const [char] = mission[side].splice(idx, 1);
+        // Discard all cards in the stack to owner's discard
+        const owner = char.originalOwner || char.controlledBy;
+        s[owner].discardPile.push(char.card);
+        if (char.stack) {
+          for (const stackCard of char.stack) {
+            s[owner].discardPile.push(stackCard);
+          }
+        }
+        break;
+      }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxMoveCharacter: (fromMission: number, instanceId: string, toMission: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    if (fromMission === toMission) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const srcMission = s.activeMissions[fromMission];
+    const dstMission = s.activeMissions[toMission];
+    if (!srcMission || !dstMission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const idx = srcMission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (idx !== -1) {
+        const [char] = srcMission[side].splice(idx, 1);
+        dstMission[side].push(char);
+        break;
+      }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxMoveToTopDeck: (deckIndex: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const ps = s[humanPlayer];
+    if (deckIndex < 0 || deckIndex >= ps.deck.length) return;
+    const [card] = ps.deck.splice(deckIndex, 1);
+    ps.deck.unshift(card);
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
   },
 }));
