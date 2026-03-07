@@ -5,7 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 /**
  * Card 103/130 - ARAIGNEE GEANTE (GIANT SPIDER) (UC)
  * Chakra: 3 | Power: 4
- * Group: Sound Village | Keywords: Summon
+ * Group: Independent | Keywords: Summon
  *
  * MAIN [hourglass]: At end of round, hide a character with Power equal to or less than
  *   this character's Power, then must return this character to hand.

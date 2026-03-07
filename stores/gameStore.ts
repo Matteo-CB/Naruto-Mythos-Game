@@ -674,6 +674,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } catch { /* ignore */ }
       }
 
+      // Debug: MSS05 tracing (online)
+      if (pendingEffect?.targetSelectionType === 'MSS05_RETURN_TO_HAND') {
+        console.warn('[MSS05 UI online]', { humanPlayer, player: pendingAction.player, options: pendingAction.options, myPlayer: visibleState.myPlayer });
+      }
+
       set({
         visibleState,
         isProcessing: false,
@@ -988,7 +993,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
-        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
+        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
           const playerDiscard = newState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);
@@ -1261,6 +1266,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             power: cd.power,
           };
         } catch { /* ignore */ }
+      }
+
+      // Debug: MSS05 tracing
+      if (pendingEffect?.targetSelectionType === 'MSS05_RETURN_TO_HAND') {
+        console.warn('[MSS05 UI local]', { humanPlayer, player: pendingAction.player, options: pendingAction.options });
       }
 
       set({
@@ -1592,7 +1602,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
-        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD') {
+        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
           const playerDiscard = currentState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
             const idx = parseInt(indexStr, 10);

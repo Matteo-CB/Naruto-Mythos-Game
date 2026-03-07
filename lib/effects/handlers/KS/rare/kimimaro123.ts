@@ -16,7 +16,7 @@ import type { CharacterInPlay } from '@/lib/engine/types';
  *
  * UPGRADE: Discard a card from hand to defeat a character with cost 5 or less in play.
  *   Two-stage target selection:
- *   Stage 1: Choose which card to discard from hand.
+ *   Stage 1: Choose which card to discard from hand (skipped if only 1 card).
  *   Stage 2: Choose a character with cost <= 5 in play to defeat.
  */
 
@@ -46,21 +46,19 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
   }
 
   // Check if there are any characters with cost <= 5 in play to defeat
-  let hasValidTarget = false;
+  const defeatTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId !== sourceCard.instanceId) {
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.chakra <= 5) {
-          hasValidTarget = true;
-          break;
+        if ((topCard.chakra ?? 0) <= 5) {
+          defeatTargets.push(char.instanceId);
         }
       }
     }
-    if (hasValidTarget) break;
   }
 
-  if (!hasValidTarget) {
+  if (defeatTargets.length === 0) {
     return {
       state: {
         ...state,
@@ -75,7 +73,20 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Stage 1: Choose which card to discard from hand
+  // If only 1 card in hand, auto-discard and go straight to defeat target selection
+  if (playerState.hand.length === 1) {
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'KIMIMARO123_AUTO_DISCARD_DEFEAT',
+      validTargets: defeatTargets,
+      description: 'Kimimaro (123) UPGRADE: Your last card will be discarded. Choose a character with cost 5 or less to defeat.',
+      descriptionKey: 'game.effect.desc.kimimaro123AutoDiscardDefeat',
+      isOptional: true,
+    };
+  }
+
+  // Stage 1: Choose which card to discard from hand (2+ cards)
   const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
 
   return {

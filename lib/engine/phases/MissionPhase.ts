@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, ActiveMission, MissionScoringProgress } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
+import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
@@ -299,8 +300,8 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
       );
       if (!hasMove) continue;
 
-      // Find a valid destination
-      let destIdx = -1;
+      // Collect ALL valid destination missions
+      const validDests: number[] = [];
       for (let i = 0; i < newState.activeMissions.length; i++) {
         if (i === missionIndex) continue;
         const destMission = newState.activeMissions[i];
@@ -309,37 +310,100 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
           (c) => !c.isHidden && c.card.name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
         );
         if (!hasSameName) {
-          destIdx = i;
-          break;
+          validDests.push(i);
         }
       }
 
-      if (destIdx === -1) continue;
+      if (validDests.length === 0) continue;
 
-      // Move the character
-      const missions = [...newState.activeMissions];
-      const srcMission = { ...missions[missionIndex] };
-      const destMission = { ...missions[destIdx] };
+      if (validDests.length === 1) {
+        // Auto-move when only one valid destination
+        const destIdx = validDests[0];
+        newState = moveOrochimaru051(newState, missionIndex, destIdx, char.instanceId, side, player);
+        break;
+      }
 
-      srcMission[side] = srcMission[side].filter((c) => c.instanceId !== char.instanceId);
-      const movedChar = { ...char, missionIndex: destIdx };
-      destMission[side] = [...destMission[side], movedChar];
-
-      missions[missionIndex] = srcMission;
-      missions[destIdx] = destMission;
-      newState = { ...newState, activeMissions: missions };
+      // Multiple destinations: ask the player to choose
+      const effectId = generateInstanceId();
+      const actionId = generateInstanceId();
+      newState = { ...newState };
+      newState.pendingEffects = [...newState.pendingEffects, {
+        id: effectId,
+        sourceCardId: topCard.id,
+        sourceInstanceId: char.instanceId,
+        sourceMissionIndex: missionIndex,
+        effectType: 'MAIN' as const,
+        effectDescription: 'Orochimaru (051): Choose a mission to move to.',
+        targetSelectionType: 'OROCHIMARU051_CHOOSE_DESTINATION',
+        sourcePlayer: player,
+        requiresTargetSelection: true,
+        validTargets: validDests.map(String),
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: false,
+      }];
+      newState.pendingActions = [...newState.pendingActions, {
+        id: actionId,
+        type: 'SELECT_TARGET' as const,
+        player,
+        description: 'Orochimaru (051): Choose a mission to move this character to.',
+        descriptionKey: 'game.effect.desc.orochimaru051ChooseDestination',
+        options: validDests.map(String),
+        minSelections: 1,
+        maxSelections: 1,
+        sourceEffectId: effectId,
+      }];
 
       newState.log = logAction(
         newState.log, newState.turn, 'mission', player,
-        'EFFECT_MOVE',
-        `Orochimaru (051): Lost mission ${missionIndex + 1}, moves to mission ${destIdx + 1}.`,
-        'game.log.effect.orochimaru051Move',
+        'EFFECT_PENDING',
+        'Orochimaru (051): Lost this mission. Choose a destination mission.',
+        'game.log.effect.orochimaru051Pending',
         { card: 'OROCHIMARU', id: 'KS-051-UC' },
       );
 
       break;
     }
   }
+
+  return newState;
+}
+
+/**
+ * Execute the actual Orochimaru 051 move to a specific destination mission.
+ */
+export function moveOrochimaru051(
+  state: GameState,
+  sourceMissionIndex: number,
+  destMissionIndex: number,
+  instanceId: string,
+  side: 'player1Characters' | 'player2Characters',
+  player: PlayerID,
+): GameState {
+  let newState = { ...state };
+  const missions = [...newState.activeMissions];
+  const srcMission = { ...missions[sourceMissionIndex] };
+  const destMission = { ...missions[destMissionIndex] };
+
+  const char = srcMission[side].find((c) => c.instanceId === instanceId);
+  if (!char) return state;
+
+  srcMission[side] = srcMission[side].filter((c) => c.instanceId !== instanceId);
+  const movedChar = { ...char, missionIndex: destMissionIndex };
+  destMission[side] = [...destMission[side], movedChar];
+
+  missions[sourceMissionIndex] = srcMission;
+  missions[destMissionIndex] = destMission;
+  newState.activeMissions = missions;
+
+  newState.log = logAction(
+    newState.log, newState.turn, 'mission', player,
+    'EFFECT_MOVE',
+    'Orochimaru (051): Lost mission ' + (sourceMissionIndex + 1) + ', moves to mission ' + (destMissionIndex + 1) + '.',
+    'game.log.effect.orochimaru051Move',
+    { card: 'OROCHIMARU', id: 'KS-051-UC' },
+  );
 
   return newState;
 }
