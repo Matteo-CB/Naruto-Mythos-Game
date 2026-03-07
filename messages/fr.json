@@ -586,7 +586,8 @@
       "connectionTimeout": "Connexion expiree. Le serveur est peut-etre indisponible.",
       "connectionLost": "Connexion au serveur perdue.",
       "reconnectFailed": "Impossible de se reconnecter au serveur.",
-      "notConnected": "Non connecte au serveur."
+      "notConnected": "Non connecte au serveur.",
+      "maintenance": "Le serveur est en maintenance. Veuillez patienter..."
     }
   },
   "collection": {
@@ -712,6 +713,18 @@
     "selectDeck": "Choisir votre Deck",
     "randomDeck": "Deck Aleatoire",
     "randomDeckDesc": "30 personnages et 3 missions aleatoires"
+  },
+  "hotseat": {
+    "title": "Solo v Self",
+    "subtitle": "Controlez les deux cotes pour tester vos cartes",
+    "player1Deck": "Deck Joueur 1",
+    "player2Deck": "Deck Joueur 2",
+    "startGame": "Lancer la partie",
+    "switchTitle": "Changement de joueur",
+    "switchMessage": "Passez l appareil a {player}",
+    "switchConfirm": "Pret",
+    "player1": "Joueur 1",
+    "player2": "Joueur 2"
   },
   "online": {
     "title": "Jouer en Ligne",
@@ -1928,6 +1941,14 @@
     "onlineDesc": "Affrontez de vrais joueurs en classe ou en prive",
     "aiTitle": "Jouer contre l IA",
     "aiDesc": "Entrainez-vous contre des IA de difficulte variable",
+    "hotseatTitle": "Solo v Self",
+    "hotseatDesc": "Controlez les deux cotes pour tester vos cartes et strategies",
     "backToMenu": "Retour au menu"
+  },
+  "maintenance": {
+    "title": "NARUTO MYTHOS",
+    "subtitle": "Jeu de Cartes a Collectionner",
+    "message": "Le simulateur est en maintenance, la mise a jour dure environ 5 minutes.",
+    "timerLabel": "Temps ecoule"
   }
 }

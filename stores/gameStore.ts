@@ -47,6 +47,9 @@ interface GameStore {
   humanPlayer: PlayerID;
   aiPlayer: AIPlayer | null;
   isAIGame: boolean;
+  isHotseatGame: boolean;
+  hotseatSwitchPending: boolean;
+  hotseatNextPlayer: PlayerID | null;
   isOnlineGame: boolean;
   isProcessing: boolean;
   gameOver: boolean;
@@ -77,6 +80,8 @@ interface GameStore {
 
   // Actions
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
+  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string) => void;
+  confirmHotseatSwitch: () => void;
   replayAIGame: () => void;
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => void;
   updateOnlineState: (visibleState: VisibleGameState) => void;
@@ -314,6 +319,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   humanPlayer: 'player1',
   aiPlayer: null,
   isAIGame: false,
+  isHotseatGame: false,
+  hotseatSwitchPending: false,
+  hotseatNextPlayer: null,
   isOnlineGame: false,
   isProcessing: false,
   gameOver: false,
@@ -786,6 +794,96 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string) => {
+    useTrainingStore.getState().disable();
+    const state = GameEngine.createGame(config);
+    const visible = GameEngine.getVisibleState(state, 'player1');
+
+    set({
+      gameState: state,
+      visibleState: visible,
+      humanPlayer: 'player1',
+      aiPlayer: null,
+      isAIGame: false,
+      isHotseatGame: true,
+      hotseatSwitchPending: false,
+      hotseatNextPlayer: null,
+      isOnlineGame: false,
+      isProcessing: false,
+      gameOver: false,
+      winner: null,
+      playerDisplayNames: { player1: player1Name, player2: player2Name },
+      replayInitialState: null,
+      animationQueue: [],
+      pendingTargetSelection: null,
+      lastAIGameConfig: null,
+    });
+  },
+
+  confirmHotseatSwitch: () => {
+    const { gameState, hotseatNextPlayer, playerDisplayNames } = get();
+    if (!gameState || !hotseatNextPlayer) return;
+
+    const newPlayer = hotseatNextPlayer;
+    const visible = GameEngine.getVisibleState(gameState, newPlayer);
+
+    set({
+      humanPlayer: newPlayer,
+      visibleState: visible,
+      hotseatSwitchPending: false,
+      hotseatNextPlayer: null,
+      pendingTargetSelection: null,
+    });
+
+    // Check for pending actions for the new player
+    const pendingActions = gameState.pendingActions.filter((p) => p.player === newPlayer);
+    if (pendingActions.length > 0) {
+      const pa = pendingActions[0];
+      const pe = gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
+      const isEffectChoice = pa.type === 'CHOOSE_EFFECT';
+      const isHandSelection = pa.type === 'PUT_CARD_ON_DECK' || pa.type === 'DISCARD_CARD' || pa.type === 'CHOOSE_CARD_FROM_LIST';
+
+      set({
+        isProcessing: false,
+        pendingTargetSelection: {
+          validTargets: pa.options,
+          description: pa.description,
+          descriptionKey: pa.descriptionKey,
+          descriptionParams: pa.descriptionParams,
+          selectionType: isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
+          playerName: playerDisplayNames[newPlayer],
+          onSelect: (targetId: string) => {
+            get().performAction({
+              type: 'SELECT_TARGET',
+              pendingActionId: pa.id,
+              selectedTargets: [targetId],
+            });
+          },
+          onDecline: pe?.isOptional ? () => {
+            if (pe) {
+              get().performAction({
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pe.id,
+              });
+            }
+          } : undefined,
+          declineLabelKey: pe?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
+            ? 'game.effect.dosu069Defeat'
+            : pe?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
+              ? 'game.effect.gemma049DeclineDefeat'
+              : pe?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
+                ? 'game.effect.gemma049DeclineHide'
+                : pe?.targetSelectionType === 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT'
+                  ? 'game.effect.dosu069Defeat'
+                  : undefined,
+        },
+      });
+      return;
+    }
+
+    set({ isProcessing: false });
+  },
+
   replayAIGame: () => {
     const { lastAIGameConfig } = get();
     if (!lastAIGameConfig) return;
@@ -939,6 +1037,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (advanced.phase === 'gameOver') {
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+        } else if (get().isHotseatGame) {
+          const nextPlayer = advanced.activePlayer;
+          if (nextPlayer !== hp) {
+            set({ hotseatSwitchPending: true, hotseatNextPlayer: nextPlayer, isProcessing: false });
+          } else {
+            set({ isProcessing: false });
+          }
         } else if (get().isAIGame && get().aiPlayer) {
           setTimeout(() => {
             void get().processAITurn();
@@ -1312,6 +1417,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : undefined,
         },
       });
+      return;
+    }
+
+    // Hotseat: check if the other player needs to act next
+    if (get().isHotseatGame) {
+      const otherPlayer: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
+      const otherPending = newState.pendingActions.filter((p) => p.player === otherPlayer);
+
+      // During mulligan: if current player has mulliganed but the other hasn't, switch
+      const mulliganSwitch = newState.phase === 'mulligan' &&
+        newState[humanPlayer].hasMulliganed && !newState[otherPlayer].hasMulliganed;
+
+      const needsSwitch = otherPending.length > 0 || mulliganSwitch ||
+        (newState.phase !== 'mulligan' && newState.activePlayer !== humanPlayer && (newState.phase as string) !== 'gameOver');
+
+      if (needsSwitch) {
+        set({ hotseatSwitchPending: true, hotseatNextPlayer: otherPlayer, isProcessing: false });
+      } else {
+        set({ isProcessing: false });
+      }
       return;
     }
 
@@ -1975,6 +2100,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       visibleState: null,
       aiPlayer: null,
       isAIGame: false,
+      isHotseatGame: false,
+      hotseatSwitchPending: false,
+      hotseatNextPlayer: null,
       isOnlineGame: false,
       isProcessing: false,
       gameOver: false,

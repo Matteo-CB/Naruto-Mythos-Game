@@ -4846,7 +4846,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "[↯] Copy an instant effect ([↯]) of another friendly Team 7 character in play.",
+          "description": "Copy a non-continuous instant effect of another friendly Team 7 character in play.",
           "description_fr": ""
         }
       ],

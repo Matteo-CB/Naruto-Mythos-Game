@@ -5,7 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
  * Card 148/130 - KAKASHI HATAKE (M)
- * Chakra: 5, Power: 4
+ * Chakra: 4, Power: 5
  * Group: Leaf Village, Keywords: Team 7
  *
  * MAIN: Gain the Edge token.

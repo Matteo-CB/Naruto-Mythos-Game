@@ -3683,11 +3683,11 @@ export class EffectEngine {
 
       case 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT': {
         // Jiraiya 132 UPGRADE: opponent chooses which of their characters to defeat
-        // until <= 2 per mission. Chain more selections if needed.
+        // until <= 2 in THIS mission only. Chain more selections if needed.
         let jirDesc: { missionIndex?: number; sourcePlayer?: string } = {};
         try { jirDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
 
-        const missionIdx_j = jirDesc.missionIndex ?? 0;
+        const missionIdx_j = jirDesc.missionIndex ?? pendingEffect.sourceMissionIndex;
         const jirSourcePlayer = (jirDesc.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
 
         // Defeat the opponent's selected character
@@ -3700,21 +3700,24 @@ export class EffectEngine {
           { card: 'JIRAYA', id: 'KS-132-S', target: targetId },
         );
 
-        // Check if any mission still has > 2 enemy characters
+        // Check if THIS mission still has > 2 enemy characters (only Jiraiya's mission)
         const enemySide_j: 'player1Characters' | 'player2Characters' =
           jirSourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const opponent_j = jirSourcePlayer === 'player1' ? 'player2' : 'player1';
 
-        for (let mi_j = 0; mi_j < newState.activeMissions.length; mi_j++) {
-          const mission_j = newState.activeMissions[mi_j];
+        // Track forced resolver — opponent gets the turn after all defeats resolve
+        newState.pendingForcedResolver = opponent_j;
+
+        const mission_j = newState.activeMissions[missionIdx_j];
+        if (mission_j) {
           const enemyChars_j = mission_j[enemySide_j];
 
           if (enemyChars_j.length > 2) {
-            // Chain another selection for the opponent
+            // Chain another selection for the opponent (same mission)
             const chainData_j = JSON.stringify({
-              missionIndex: mi_j,
+              missionIndex: missionIdx_j,
               sourcePlayer: jirSourcePlayer,
-              text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${mi_j + 1} (${enemyChars_j.length} > 2).`,
+              text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${enemyChars_j.length} > 2).`,
             });
             const effectId_j = generateInstanceId();
             const actionId_j = generateInstanceId();
@@ -3738,15 +3741,14 @@ export class EffectEngine {
               id: actionId_j,
               type: 'SELECT_TARGET' as PendingAction['type'],
               player: opponent_j,
-              description: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${mi_j + 1} (${enemyChars_j.length} > 2).`,
+              description: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${enemyChars_j.length} > 2).`,
               descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
-              descriptionParams: { mission: String(mi_j + 1), count: String(enemyChars_j.length) },
+              descriptionParams: { mission: String(missionIdx_j + 1), count: String(enemyChars_j.length) },
               options: enemyChars_j.map((c: CharacterInPlay) => c.instanceId),
               minSelections: 1,
               maxSelections: 1,
               sourceEffectId: effectId_j,
             }];
-            break;
           }
         }
         break;

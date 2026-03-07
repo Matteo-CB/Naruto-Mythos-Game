@@ -90,10 +90,12 @@ function DiscardPile({
   count,
   accentColor,
   onClick,
+  topCardImage,
 }: {
   count: number;
   accentColor: string;
   onClick: () => void;
+  topCardImage?: string;
 }) {
   const t = useTranslations();
   const dims = useGameScale();
@@ -146,10 +148,10 @@ function DiscardPile({
             }}
           >
             <img
-              src="/images/card-back.webp"
+              src={topCardImage || '/images/card-back.webp'}
               alt="Discard"
               className="w-full h-full"
-              style={{ objectFit: 'cover', filter: 'brightness(0.4) sepia(0.3)' }}
+              style={{ objectFit: 'cover', filter: topCardImage ? 'none' : 'brightness(0.4) sepia(0.3)' }}
               draggable={false}
             />
           </div>
@@ -197,6 +199,9 @@ export function OpponentSidePiles() {
   const { opponentState } = visibleState;
   const deckCount = opponentState.deckSize;
   const discardCount = opponentState.discardPileSize;
+  const opponentTopDiscard = opponentState.discardPile.length > 0
+    ? opponentState.discardPile[opponentState.discardPile.length - 1]
+    : undefined;
 
   return (
     <>
@@ -214,6 +219,7 @@ export function OpponentSidePiles() {
           count={discardCount}
           accentColor="#b33e3e"
           onClick={() => discardCount > 0 && setShowDiscard(true)}
+          topCardImage={opponentTopDiscard?.image_file ? `/${opponentTopDiscard.image_file.replace(/\\/g, '/')}` : undefined}
         />
       </aside>
 
@@ -244,6 +250,9 @@ export function PlayerSidePiles() {
   const { myState } = visibleState;
   const deckCount = myState.deck.length;
   const discardCount = myState.discardPile.length;
+  const playerTopDiscard = discardCount > 0
+    ? myState.discardPile[discardCount - 1]
+    : undefined;
 
   return (
     <>
@@ -261,6 +270,7 @@ export function PlayerSidePiles() {
           count={discardCount}
           accentColor="#c4a35a"
           onClick={() => setShowDiscard(true)}
+          topCardImage={playerTopDiscard?.image_file ? `/${playerTopDiscard.image_file.replace(/\\/g, '/')}` : undefined}
         />
       </aside>
 

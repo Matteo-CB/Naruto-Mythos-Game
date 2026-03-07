@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naruto Mythos TCG - Maintenance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'NJNaruto';
+      src: url('/_maint/fonts/njnaruto-accented.woff2') format('woff2'),
+           url('/_maint/fonts/njnaruto-accented.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e0e0e0;
+      --fg-secondary: #888888;
+      --surface: #141414;
+      --border: #262626;
+      --accent: #c4a35a;
+      --accent-glow: rgba(196, 163, 90, 0.3);
+      --accent-dim: rgba(196, 163, 90, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    h1, h2, h3, span, button, .font-display {
+      font-family: 'NJNaruto', Arial, sans-serif;
+    }
+
+    /* ---- Language toggle ---- */
+    .lang-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'NJNaruto', Arial, sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .lang-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    /* ---- Cloud background ---- */
+    .cloud-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .cloud {
+      position: absolute;
+      filter: saturate(0.7);
+      animation: cloud-drift var(--dur, 22s) ease-in-out infinite;
+    }
+    @keyframes cloud-drift {
+      0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
+      25% { transform: translate(5px, -8px) rotate(var(--rot, 0deg)); }
+      50% { transform: translate(-3px, 4px) rotate(var(--rot, 0deg)); }
+      75% { transform: translate(4px, 6px) rotate(var(--rot, 0deg)); }
+    }
+
+    /* ---- Main content ---- */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 40px var(--accent-glow), 0 0 80px rgba(196, 163, 90, 0.1);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      font-family: 'NJNaruto', Arial, sans-serif;
+      font-size: clamp(0.65rem, 2vw, 0.85rem);
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      margin-top: 4px;
+    }
+
+    .divider {
+      width: 120px;
+      height: 1px;
+      background: var(--accent-dim);
+      margin: 24px 0;
+    }
+
+    .message {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+      color: var(--fg);
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    .timer-section {
+      margin-top: 28px;
+    }
+    .timer-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+    .timer {
+      font-family: 'NJNaruto', Arial, sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--accent);
+      text-shadow: 0 0 30px var(--accent-glow);
+      letter-spacing: 0.12em;
+      margin-top: 4px;
+    }
+
+    /* ---- 3D Carousel ---- */
+    .carousel-section {
+      margin-top: 40px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .carousel-container {
+      perspective: 1200px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .carousel-wrapper {
+      transform: rotateX(-8deg);
+      transform-style: preserve-3d;
+    }
+
+    .carousel {
+      position: relative;
+      transform-style: preserve-3d;
+      animation: carousel-spin 35s linear infinite;
+    }
+
+    @keyframes carousel-spin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+
+    .carousel-card {
+      position: absolute;
+      border-radius: 8px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7), 0 0 12px rgba(196, 163, 90, 0.08);
+      border: 1px solid rgba(196, 163, 90, 0.15);
+    }
+
+    .carousel-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .carousel-reflection {
+      position: relative;
+      width: 60%;
+      height: 50px;
+      margin-top: -10px;
+      background: radial-gradient(ellipse at center, rgba(196, 163, 90, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ---- Responsive: Desktop ---- */
+    .carousel-container { height: 320px; }
+    .carousel {
+      width: 160px;
+      height: 224px;
+    }
+    .carousel-card {
+      width: 160px;
+      height: 224px;
+    }
+
+    /* ---- Responsive: Tablet ---- */
+    @media (max-width: 1023px) {
+      .carousel-container { height: 280px; }
+      .carousel { width: 140px; height: 196px; }
+      .carousel-card { width: 140px; height: 196px; }
+    }
+
+    /* ---- Responsive: Mobile ---- */
+    @media (max-width: 639px) {
+      .carousel-container { height: 220px; }
+      .carousel { width: 100px; height: 140px; }
+      .carousel-card { width: 100px; height: 140px; }
+    }
+
+    /* ---- Reduced motion ---- */
+    @media (prefers-reduced-motion: reduce) {
+      .carousel { animation-play-state: paused; }
+      .cloud { animation-play-state: paused; }
+    }
+
+    /* ---- Status dot ---- */
+    .status-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      color: var(--fg-secondary);
+      letter-spacing: 0.05em;
+      z-index: 10;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #b33e3e;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cloud background -->
+  <div class="cloud-bg" aria-hidden="true" id="clouds"></div>
+
+  <!-- Language toggle -->
+  <button class="lang-toggle" id="lang-toggle" aria-label="Switch language">EN</button>
+
+  <!-- Main content -->
+  <div class="content">
+    <h1 class="title">NARUTO MYTHOS</h1>
+    <p class="subtitle" id="subtitle"></p>
+
+    <div class="divider"></div>
+
+    <p class="message" id="message"></p>
+
+    <div class="timer-section">
+      <p class="timer-label" id="timer-label"></p>
+      <p class="timer" id="timer">00:00</p>
+    </div>
+
+    <div class="carousel-section">
+      <div class="carousel-container">
+        <div class="carousel-wrapper">
+          <div class="carousel" id="carousel"></div>
+        </div>
+      </div>
+      <div class="carousel-reflection"></div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="status-dot"></span>
+    <span id="status-text"></span>
+  </div>
+
+  <script>
+    // ---- Translations ----
+    var TEXTS = {
+      fr: {
+        subtitle: 'Jeu de Cartes a Collectionner',
+        message: 'Le simulateur est en maintenance, la mise a jour dure environ 5 minutes.',
+        timerLabel: 'Temps ecoule',
+        toggle: 'EN',
+        status: 'Reconnexion automatique en cours...'
+      },
+      en: {
+        subtitle: 'Trading Card Game',
+        message: 'The simulator is under maintenance. The update takes about 5 minutes.',
+        timerLabel: 'Time elapsed',
+        toggle: 'FR',
+        status: 'Auto-reconnecting...'
+      }
+    };
+
+    var currentLang = (navigator.language || '').startsWith('fr') ? 'fr' : 'en';
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      var t = TEXTS[lang];
+      document.getElementById('subtitle').textContent = t.subtitle;
+      document.getElementById('message').textContent = t.message;
+      document.getElementById('timer-label').textContent = t.timerLabel;
+      document.getElementById('lang-toggle').textContent = t.toggle;
+      document.getElementById('status-text').textContent = t.status;
+      document.documentElement.lang = lang;
+    }
+
+    document.getElementById('lang-toggle').addEventListener('click', function() {
+      applyLanguage(currentLang === 'fr' ? 'en' : 'fr');
+    });
+
+    applyLanguage(currentLang);
+
+    // ---- Timer ----
+    var startTime = Date.now();
+    function updateTimer() {
+      var elapsed = Math.floor((Date.now() - startTime) / 1000);
+      var h = Math.floor(elapsed / 3600);
+      var m = Math.floor((elapsed % 3600) / 60);
+      var s = elapsed % 60;
+      var display = '';
+      if (h > 0) {
+        display = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      } else {
+        display = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+      document.getElementById('timer').textContent = display;
+      requestAnimationFrame(updateTimer);
+    }
+    updateTimer();
+
+    // ---- Clouds ----
+    var cloudData = [
+      { src: '/_maint/images/icons/cloud-2.webp', top: '2%', left: '4%', w: 110, o: 0.10, rot: -8, dur: 20 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '5%', left: '28%', w: 80, o: 0.07, rot: 5, dur: 24 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '1%', left: '55%', w: 100, o: 0.11, rot: -3, dur: 18 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '6%', left: '80%', w: 90, o: 0.08, rot: 10, dur: 22 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '18%', left: '10%', w: 75, o: 0.07, rot: 15, dur: 26 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '20%', left: '42%', w: 110, o: 0.09, rot: -12, dur: 20 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '15%', left: '72%', w: 85, o: 0.08, rot: 3, dur: 23 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '35%', left: '2%', w: 95, o: 0.10, rot: -5, dur: 19 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '37%', left: '32%', w: 75, o: 0.07, rot: 8, dur: 25 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '33%', left: '60%', w: 100, o: 0.09, rot: -10, dur: 21 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '40%', left: '84%', w: 70, o: 0.08, rot: 6, dur: 24 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '55%', left: '6%', w: 80, o: 0.08, rot: 12, dur: 22 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '52%', left: '38%', w: 90, o: 0.10, rot: -7, dur: 20 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '58%', left: '68%', w: 100, o: 0.09, rot: 4, dur: 26 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '72%', left: '12%', w: 85, o: 0.09, rot: -15, dur: 19 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '75%', left: '48%', w: 70, o: 0.07, rot: 9, dur: 23 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '70%', left: '78%', w: 105, o: 0.10, rot: -4, dur: 21 },
+      { src: '/_maint/images/icons/cloud-5.webp', top: '82%', left: '3%', w: 90, o: 0.08, rot: 7, dur: 25 },
+      { src: '/_maint/images/icons/cloud-2.webp', top: '84%', left: '35%', w: 75, o: 0.07, rot: -11, dur: 20 },
+      { src: '/_maint/images/icons/cloud-6.webp', top: '80%', left: '62%', w: 95, o: 0.09, rot: 3, dur: 22 }
+    ];
+
+    var cloudContainer = document.getElementById('clouds');
+    cloudData.forEach(function(c) {
+      var img = document.createElement('img');
+      img.src = c.src;
+      img.alt = '';
+      img.className = 'cloud';
+      img.style.top = c.top;
+      img.style.left = c.left;
+      img.style.width = c.w + 'px';
+      img.style.opacity = c.o;
+      img.style.setProperty('--rot', c.rot + 'deg');
+      img.style.setProperty('--dur', c.dur + 's');
+      img.loading = 'lazy';
+      cloudContainer.appendChild(img);
+    });
+
+    // ---- 3D Card Carousel ----
+    var CARDS = [
+      '/_maint/images/cards/KS/rare_art/KS-108-RA.webp',
+      '/_maint/images/cards/KS/mythos/KS-143-M.webp',
+      '/_maint/images/cards/KS/rare_art/KS-128-RA.webp',
+      '/_maint/images/cards/KS/secret/KS-133-S.webp',
+      '/_maint/images/cards/KS/rare_art/KS-120-RA.webp',
+      '/_maint/images/cards/KS/mythos/KS-148-M.webp',
+      '/_maint/images/cards/KS/rare_art/KS-107-RA.webp',
+      '/_maint/images/cards/KS/secret/KS-136-S.webp',
+      '/_maint/images/cards/KS/rare_art/KS-123-RA.webp',
+      '/_maint/images/cards/KS/mythos/KS-144-M.webp',
+      '/_maint/images/cards/KS/rare_art/KS-125-RA.webp',
+      '/_maint/images/cards/KS/secret/KS-137-S.webp'
+    ];
+
+    function getCarouselRadius() {
+      var w = window.innerWidth;
+      if (w < 640) return 160;
+      if (w < 1024) return 250;
+      return 340;
+    }
+
+    function buildCarousel() {
+      var carousel = document.getElementById('carousel');
+      carousel.innerHTML = '';
+      var N = CARDS.length;
+      var angle = 360 / N;
+      var radius = getCarouselRadius();
+
+      CARDS.forEach(function(src, i) {
+        var card = document.createElement('div');
+        card.className = 'carousel-card';
+        card.style.transform = 'rotateY(' + (i * angle) + 'deg) translateZ(' + radius + 'px)';
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.draggable = false;
+        card.appendChild(img);
+        carousel.appendChild(card);
+      });
+    }
+
+    buildCarousel();
+
+    // Rebuild on resize for responsive radius
+    var resizeTimeout;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(buildCarousel, 200);
+    });
+
+    // ---- Auto-refresh: check if server is back ----
+    setInterval(function() {
+      fetch('/api/health', { cache: 'no-store', mode: 'no-cors' })
+        .then(function(res) {
+          if (res.ok || res.type === 'opaque') {
+            // Try a proper check
+            return fetch('/api/health', { cache: 'no-store' });
+          }
+          return null;
+        })
+        .then(function(res) {
+          if (res && res.ok) {
+            window.location.reload();
+          }
+        })
+        .catch(function() {
+          // Server still down
+        });
+    }, 10000);
+  </script>
+</body>
+</html>

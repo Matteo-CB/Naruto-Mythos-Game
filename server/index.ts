@@ -59,4 +59,43 @@ app.prepare().then(() => {
     console.log(`> Server ready on http://${hostname}:${port}`);
     console.log(`> Environment: ${process.env.NODE_ENV || 'development'}`);
   });
+
+  // Graceful shutdown — warn clients before going down
+  const gracefulShutdown = async (signal: string) => {
+    console.log(`> ${signal} received. Starting graceful shutdown...`);
+
+    // 1. Warn all connected clients
+    try {
+      io.emit('server:maintenance', { timestamp: Date.now() });
+      console.log('> Maintenance warning sent to all connected clients');
+    } catch (err) {
+      console.error('> Failed to emit maintenance warning:', err);
+    }
+
+    // 2. Wait so clients receive the message
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // 3. Disconnect all sockets
+    try {
+      io.disconnectSockets(true);
+      console.log('> All sockets disconnected');
+    } catch (err) {
+      console.error('> Error disconnecting sockets:', err);
+    }
+
+    // 4. Close HTTP server
+    httpServer.close(() => {
+      console.log('> HTTP server closed');
+      process.exit(0);
+    });
+
+    // 5. Force exit after 10s if close hangs
+    setTimeout(() => {
+      console.error('> Forced shutdown after timeout');
+      process.exit(1);
+    }, 10000);
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 });

@@ -5,16 +5,16 @@ import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/eff
 
 /**
  * Card 132/130 - JIRAYA (S)
- * Chakra: 7, Power: 6
- * Group: Leaf Village, Keywords: Sannin
+ * Chakra: 8, Power: 8
+ * Group: Leaf Village, Keywords: Sannin, Jutsu
  *
  * MAIN: Play a Summon character anywhere, paying 5 less.
  *   - Includes Summon cards in hand AND hidden Summon characters on the board.
  *
  * UPGRADE: The opponent must choose characters to be defeated until they
- *   only have up to 2 assigned per mission.
+ *   only have up to 2 assigned in THIS mission (where Jiraiya is).
  *   - The OPPONENT selects which of their characters to defeat.
- *   - Processed one mission at a time, one defeat at a time.
+ *   - Processed one defeat at a time, only in Jiraiya's mission.
  */
 
 function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
@@ -55,32 +55,37 @@ function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Check each mission for > 2 enemy characters
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    const enemyChars = mission[enemySide];
+  // Only check THIS mission (where Jiraiya is), not all missions
+  const missionIndex = ctx.sourceMissionIndex;
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return { state };
 
-    if (enemyChars.length > 2) {
-      // Opponent must choose which to defeat (one at a time)
-      const validTargets = enemyChars.map((c) => c.instanceId);
-      return {
-        state,
-        requiresTargetSelection: true,
-        targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
-        validTargets,
-        selectingPlayer: opponent,
-        description: JSON.stringify({
-          missionIndex: i,
-          sourcePlayer: ctx.sourcePlayer,
-          text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${i + 1} (${enemyChars.length} > 2).`,
-        }),
-        descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
-        descriptionParams: { mission: String(i + 1), count: String(enemyChars.length) },
-      };
-    }
+  const enemyChars = mission[enemySide];
+
+  if (enemyChars.length > 2) {
+    // Opponent must choose which to defeat (one at a time)
+    const validTargets = enemyChars.map((c) => c.instanceId);
+
+    // Track forced resolver so the turn goes to the opponent after resolution
+    state.pendingForcedResolver = opponent;
+
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
+      validTargets,
+      selectingPlayer: opponent,
+      description: JSON.stringify({
+        missionIndex,
+        sourcePlayer: ctx.sourcePlayer,
+        text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIndex + 1} (${enemyChars.length} > 2).`,
+      }),
+      descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
+      descriptionParams: { mission: String(missionIndex + 1), count: String(enemyChars.length) },
+    };
   }
 
-  // All missions already have <= 2 enemy characters
+  // Already <= 2 enemy characters in this mission
   return { state };
 }
 

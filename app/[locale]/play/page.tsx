@@ -15,6 +15,7 @@ export default function PlayHubPage() {
   const modes = [
     { key: "online", href: "/play/online" as const, titleKey: "onlineTitle" as const, descKey: "onlineDesc" as const },
     { key: "ai", href: "/play/ai" as const, titleKey: "aiTitle" as const, descKey: "aiDesc" as const },
+    { key: "hotseat", href: "/play/hotseat" as const, titleKey: "hotseatTitle" as const, descKey: "hotseatDesc" as const },
   ];
 
   return (

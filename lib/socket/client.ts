@@ -422,6 +422,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         useSocialStore.getState().handleMatchInviteCancelled(data.inviteId);
       });
 
+      // --- Maintenance events ---
+
+      socket.on('server:maintenance', () => {
+        console.log('[Socket] Server going down for maintenance');
+        set({ error: 'Server maintenance', errorKey: 'game.error.maintenance' });
+      });
+
       set({ socket });
     });
   },
