@@ -24,6 +24,8 @@ import { shuffle } from '../../engine/utils/shuffle';
 import { BoardEvaluator } from '../evaluation/BoardEvaluator';
 import { FeatureExtractor } from './FeatureExtractor';
 import type { NeuralEvaluator } from './NeuralEvaluator';
+import { getCardTier, hasUpgradeTarget } from '../evaluation/CardTiers';
+import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
 
 // ─── Action Key ────────────────────────────────────────────────────────────────
 
@@ -452,7 +454,8 @@ export class NeuralISMCTS {
   private heuristicValue(state: GameState, aiPlayer: PlayerID): number {
     const rawScore = BoardEvaluator.evaluate(state, aiPlayer);
     // Sigmoid normalization to [0, 1]
-    return 1 / (1 + Math.exp(-rawScore / 60));
+    // Divisor 100: recalibrated for the expanded score range from turn-aware BoardEvaluator
+    return 1 / (1 + Math.exp(-rawScore / 100));
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -524,21 +527,110 @@ export class NeuralISMCTS {
       case 'PLAY_CHARACTER': {
         const card = state[p].hand[action.cardIndex];
         if (!card) return 0;
-        return (card.power ?? 0) * 3 + (card.effects?.length ?? 0) * 2 + 5;
+        const tier = getCardTier(card);
+        const power = card.power ?? 0;
+        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
+        let score = tier * 2 + power * 1.5 + missionQV * 1.5;
+        // Bonus for upgrades detected in this context
+        if (hasUpgradeTarget(state, p, card)) {
+          score += 8;
+        }
+        return score;
       }
       case 'UPGRADE_CHARACTER': {
         const card = state[p].hand[action.cardIndex];
-        return card ? (card.power ?? 0) * 4 + 10 : 0;
+        if (!card) return 0;
+        const tier = getCardTier(card);
+        const power = card.power ?? 0;
+        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
+        // Upgrades are almost always strong plays
+        return tier * 3 + power * 2 + missionQV * 2 + 5;
       }
-      case 'REVEAL_CHARACTER':
-        return 12;
-      case 'PLAY_HIDDEN':
-        return 4;
+      case 'REVEAL_CHARACTER': {
+        // Find the actual hidden character to evaluate
+        const mission = state.activeMissions[action.missionIndex];
+        if (!mission) return 12;
+        const chars = p === 'player1' ? mission.player1Characters : mission.player2Characters;
+        const hidden = chars.find(c => c.instanceId === action.characterInstanceId);
+        if (!hidden) return 12;
+        const card = hidden.stack.length > 0 ? hidden.stack[hidden.stack.length - 1] : hidden.card;
+        const tier = getCardTier(card);
+        const power = card.power ?? 0;
+        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
+        let score = tier * 2 + power * 2 + missionQV;
+        // AMBUSH bonus — the main reason to play hidden then reveal
+        if (card.effects?.some(e => e.type === 'AMBUSH')) {
+          score += tier * 1.5;
+        }
+        return score;
+      }
+      case 'PLAY_HIDDEN': {
+        const card = state[p].hand[action.cardIndex];
+        if (!card) return 2;
+        const tier = getCardTier(card);
+        let score = 2;
+        // AMBUSH cards benefit greatly from being played hidden
+        if (card.effects?.some(e => e.type === 'AMBUSH')) {
+          score += tier * 1.5;
+        }
+        // Early turns: hiding for later is more strategic
+        if ((state.turn ?? 1) <= 2) score += 1;
+        return score;
+      }
       case 'PASS':
-        return 1;
+        return this.quickPassScore(state, p);
       default:
         return 2;
     }
+  }
+
+  /**
+   * Quick mission value assessment for branching decisions.
+   * Considers mission value and how contested it is.
+   */
+  private getMissionQuickValue(state: GameState, missionIndex: number, player: PlayerID): number {
+    const mission = state.activeMissions[missionIndex];
+    if (!mission || mission.wonBy) return 0;
+
+    const value = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
+    const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
+
+    const myChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    const oppChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+    const myPower = myChars.reduce((s, c) => s + calculateCharacterPower(state, c, player), 0);
+    const oppPower = oppChars.reduce((s, c) => s + calculateCharacterPower(state, c, opponent), 0);
+    const gap = myPower - oppPower;
+
+    if (Math.abs(gap) <= 3) {
+      return value * 1.3; // Contested — high priority
+    }
+    if (gap > 3) {
+      return value * 0.7; // Already winning — less urgent
+    }
+    // Losing by a lot
+    return value * 0.8;
+  }
+
+  /**
+   * Dynamic PASS scoring: passing isn't always bad.
+   */
+  private quickPassScore(state: GameState, player: PlayerID): number {
+    const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
+
+    // If no chakra left, passing is natural
+    if (state[player].chakra === 0) return 5;
+
+    // If opponent hasn't passed, passing first gives Edge token
+    if (!state[opponent].hasPassed && state.edgeHolder !== player) {
+      return 3; // Edge is valuable
+    }
+
+    // If opponent has already passed and we still can play, passing is suboptimal
+    if (state[opponent].hasPassed) {
+      return -3; // We have free actions — don't waste them
+    }
+
+    return 1;
   }
 
   /**
@@ -562,7 +654,12 @@ export class NeuralISMCTS {
 
   /**
    * Determinize: create a copy of the state with opponent's hidden hand filled in
-   * using random cards from the unknown pool.
+   * using random cards from the unknown card pool.
+   *
+   * Key improvements over naive approach:
+   * - Uses opponent's actual remaining deck as candidate pool (not AI's own deck)
+   * - Exact hand size from placeholder count (not a formula guess)
+   * - Falls back to AI deck as proxy only when opponent deck is empty
    */
   private determinize(state: GameState, aiPlayer: PlayerID): GameState {
     const cloned = deepClone(state);
@@ -572,18 +669,20 @@ export class NeuralISMCTS {
     const hasVisibleOpponentHand = oppState.hand.length > 0 && !this.isHiddenHandPlaceholder(oppState.hand);
     if (hasVisibleOpponentHand) return cloned;
 
-    // Build pool of cards that could be in the opponent's hand:
-    // We use our own deck as a proxy (cards we haven't played or drawn)
-    // In a real implementation this would be filtered by known revealed cards.
-    const pool = shuffle([...cloned[aiPlayer].deck]);
+    // Build pool from opponent's deck (cards they haven't drawn/played yet)
+    // Fall back to AI's deck as proxy if opponent's deck is empty
+    let pool = cloned[opponent].deck.length > 0
+      ? shuffle([...cloned[opponent].deck])
+      : shuffle([...cloned[aiPlayer].deck]);
 
     if (pool.length === 0) return cloned;
 
-    // Estimate hand size: typical is 5 at start, decreasing by 1-2 per turn played
-    const estimatedHandSize = oppState.hand.length > 0
+    // Exact hand size from placeholder count (sanitization preserves hand.length)
+    const handSize = oppState.hand.length > 0
       ? Math.min(pool.length, oppState.hand.length)
-      : Math.min(pool.length, Math.max(1, 5 - (state.turn - 1)));
-    cloned[opponent].hand = pool.slice(0, estimatedHandSize);
+      : Math.min(pool.length, Math.max(1, 3));
+
+    cloned[opponent].hand = pool.slice(0, handSize);
 
     return cloned;
   }

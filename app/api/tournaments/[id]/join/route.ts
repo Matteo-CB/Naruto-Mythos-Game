@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
 // POST — join a tournament
 export async function POST(
@@ -38,14 +39,28 @@ export async function POST(
       }
     }
 
+    // Load user for subsequent checks
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { username: true, discordId: true, elo: true },
+    });
+
     // Simulator tournaments require Discord link
     if (tournament.requiresDiscord) {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { discordId: true, username: true },
-      });
       if (!user?.discordId) {
         return NextResponse.json({ error: 'Discord account required for simulator tournaments' }, { status: 400 });
+      }
+    }
+
+    // League restriction check (simulator tournaments only)
+    if (
+      tournament.type === 'simulator' &&
+      Array.isArray(tournament.allowedLeagues) &&
+      tournament.allowedLeagues.length > 0
+    ) {
+      const playerLeague = getPlayerLeague(user?.elo ?? 0);
+      if (!tournament.allowedLeagues.includes(playerLeague)) {
+        return NextResponse.json({ error: 'Your current rank does not meet the requirements for this tournament' }, { status: 403 });
       }
     }
 
@@ -56,11 +71,6 @@ export async function POST(
     if (existing) {
       return NextResponse.json({ error: 'Already joined' }, { status: 400 });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { username: true },
-    });
 
     const participant = await prisma.tournamentParticipant.create({
       data: {

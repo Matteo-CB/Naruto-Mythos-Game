@@ -47,6 +47,7 @@ export interface TournamentData {
   sealedBoosterCount: number | null;
   discordRoleReward: string | null;
   bannedCardIds: string[];
+  allowedLeagues: string[];
   winnerId: string | null;
   winnerUsername: string | null;
   participants: TournamentParticipant[];
@@ -88,6 +89,7 @@ export interface CreateTournamentInput {
   discordRoleReward?: string;
   discordRoleBadge?: string;
   bannedCardIds?: string[];
+  allowedLeagues?: string[];
 }
 
 export const useTournamentStore = create<TournamentStore>()((set, get) => ({

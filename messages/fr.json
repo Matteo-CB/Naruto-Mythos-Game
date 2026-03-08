@@ -1950,7 +1950,22 @@
     "noTournaments": "Aucun tournoi",
     "visibility": "Visibilite",
     "createSimulator": "Creer un tournoi simulateur",
-    "createPlayer": "Creer un tournoi joueur"
+    "createPlayer": "Creer un tournoi joueur",
+    "allowedLeagues": "Ligues autorisees",
+    "allowedLeaguesHint": "Laissez vide pour autoriser toutes les ligues",
+    "leagueRestricted": "Restreint a : {leagues}",
+    "leagueNotAllowed": "Votre rang actuel ne correspond pas aux criteres",
+    "allLeagues": "Toutes les ligues",
+    "leagueName": {
+      "academyStudent": "Etudiant de l'Academie",
+      "genin": "Genin",
+      "chunin": "Chunin",
+      "specialJonin": "Jonin Special",
+      "eliteJonin": "Jonin d'Elite",
+      "legendarySannin": "Sannin Legendaire",
+      "kage": "Kage",
+      "sageOfSixPaths": "Sage des Six Chemins"
+    }
   },
   "playHub": {
     "title": "Jouer",

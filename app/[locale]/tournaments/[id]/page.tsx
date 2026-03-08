@@ -17,6 +17,7 @@ import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentMatch } from '@/stores/tournamentStore';
+import { LEAGUE_TIERS, getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
@@ -85,6 +86,14 @@ export default function TournamentDetailPage() {
             <span style={{ color: '#666666' }}>{t('players')}: {tour.participants.length}/{tour.maxPlayers}</span>
             <span style={{ color: '#666666' }}>{t('createdBy')}: {tour.creatorUsername}</span>
           </div>
+          {tour.allowedLeagues && tour.allowedLeagues.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+              <span style={{ color: '#888' }}>{t('allowedLeagues')}:</span>
+              {tour.allowedLeagues.map(leagueKey => (
+                <span key={leagueKey} className="px-2 py-0.5 uppercase tracking-wider" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#ccc' }}>{t(`leagueName.${leagueKey}`)}</span>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{error}</div>}

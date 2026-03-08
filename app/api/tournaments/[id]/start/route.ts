@@ -47,19 +47,39 @@ export async function POST(
       return NextResponse.json({ error: 'Need at least 2 players' }, { status: 400 });
     }
 
-    // Shuffle participants for random seeding
-    const shuffled = [...tournament.participants].sort(() => Math.random() - 0.5);
+    // Check if manual seeds were assigned (via the pairings API)
+    const hasManualSeeds = tournament.participants.some(p => p.seed !== null && p.seed !== undefined);
 
-    // Assign seeds
-    for (let i = 0; i < shuffled.length; i++) {
-      await prisma.tournamentParticipant.update({
-        where: { id: shuffled[i].id },
-        data: { seed: i + 1 },
-      });
+    let orderedParticipants;
+    if (hasManualSeeds) {
+      // Respect manual pairings — sort by seed (unset seeds go last, randomized)
+      const seeded = tournament.participants.filter(p => p.seed !== null && p.seed !== undefined);
+      const unseeded = [...tournament.participants.filter(p => p.seed === null || p.seed === undefined)]
+        .sort(() => Math.random() - 0.5);
+      seeded.sort((a, b) => (a.seed ?? 0) - (b.seed ?? 0));
+      orderedParticipants = [...seeded, ...unseeded];
+      // Assign seeds to any unseeded participants
+      for (let i = 0; i < orderedParticipants.length; i++) {
+        if (orderedParticipants[i].seed === null || orderedParticipants[i].seed === undefined) {
+          await prisma.tournamentParticipant.update({
+            where: { id: orderedParticipants[i].id },
+            data: { seed: i + 1 },
+          });
+        }
+      }
+    } else {
+      // No manual seeds — shuffle randomly
+      orderedParticipants = [...tournament.participants].sort(() => Math.random() - 0.5);
+      for (let i = 0; i < orderedParticipants.length; i++) {
+        await prisma.tournamentParticipant.update({
+          where: { id: orderedParticipants[i].id },
+          data: { seed: i + 1 },
+        });
+      }
     }
 
     // Generate bracket
-    const participants = shuffled.map(p => ({
+    const participants = orderedParticipants.map(p => ({
       userId: p.userId,
       username: p.username,
     }));

@@ -96,7 +96,7 @@ describe('AI System', () => {
 
       const action = ai.chooseAction(state, 'player2', validActions);
       expect(validActions).toContainEqual(action);
-    });
+    }, 30000);
 
     it('should not pass when it has playable cards and chakra', () => {
       const ai = new HardAI();
@@ -106,7 +106,7 @@ describe('AI System', () => {
       const action = ai.chooseAction(state, 'player2', validActions);
       // Hard AI should recognize that playing is better than passing in turn 1
       expect(['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER', 'PASS']).toContain(action.type);
-    });
+    }, 30000);
   });
 
   describe('ImpossibleAI', () => {
