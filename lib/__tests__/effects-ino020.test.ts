@@ -2,11 +2,10 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { initializeRegistry, getEffectHandler } from '@/lib/effects/EffectRegistry';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { GameEngine } from '@/lib/engine/GameEngine';
-import type { GameState, CharacterInPlay, ActiveMission, Card, MissionCard, PlayerID } from '@/lib/engine/types';
-import type { EffectContext } from '@/lib/effects/EffectTypes';
+import type { GameState, CharacterInPlay, ActiveMission, CharacterCard, MissionCard, PlayerID } from '@/lib/engine/types';
 
-function mockCard(ov: Partial<Card> = {}): Card {
-  return { id: 'KS-999-C', number: 999, name_fr: 'Test', title_fr: 'Test', rarity: 'C', card_type: 'character', has_visual: true, chakra: 2, power: 2, keywords: [], group: 'Leaf Village', effects: [], ...ov } as Card;
+function mockCard(ov: Partial<CharacterCard> = {}): CharacterCard {
+  return { id: 'KS-999-C', cardId: 'KS-999-C', set: 'KS', number: 999, name_fr: 'Test', title_fr: 'Test', rarity: 'C', card_type: 'character', has_visual: true, chakra: 2, power: 2, keywords: [], group: 'Leaf Village', effects: [], ...ov } as CharacterCard;
 }
 
 function mockChar(ov: Partial<CharacterInPlay> = {}): CharacterInPlay {
@@ -14,15 +13,15 @@ function mockChar(ov: Partial<CharacterInPlay> = {}): CharacterInPlay {
 }
 
 function mockMission(ov: Partial<ActiveMission> = {}): ActiveMission {
-  return { card: { id: 'MSS 01', number: 1, name_fr: 'Test Mission', title_fr: 'M', rarity: 'Mission', card_type: 'mission', has_visual: true, effects: [], mission_points: 1 } as MissionCard, rank: 'D', basePoints: 1, rankBonus: 1, player1Characters: [], player2Characters: [], wonBy: null, ...ov } as ActiveMission;
+  return { card: { id: 'MSS 01', cardId: 'MSS-01', set: 'KS', number: 1, name_fr: 'Test Mission', title_fr: 'M', rarity: 'MMS', card_type: 'mission', has_visual: true, effects: [], chakra: 0, power: 0, keywords: [], group: '', basePoints: 1 } as MissionCard, rank: 'D', basePoints: 1, rankBonus: 1, player1Characters: [], player2Characters: [], wonBy: null, ...ov } as ActiveMission;
 }
 
 function makePlayer(ov: Partial<GameState['player1']> = {}) {
-  return { userId: 'u1', isAI: false, deck: [], hand: [], discardPile: [], chakra: 10, missionPoints: 0, hasPassed: false, charactersInPlay: 0, unusedMission: null, hasMulliganed: false, ...ov };
+  return { id: (ov.id ?? 'player1') as PlayerID, userId: 'u1', isAI: false, deck: [], hand: [], discardPile: [], missionCards: [], chakra: 10, missionPoints: 0, hasPassed: false, charactersInPlay: 0, unusedMission: null, hasMulliganed: false, ...ov };
 }
 
 function makeState(ov: Partial<GameState> = {}): GameState {
-  return { turn: 2, phase: 'action', activePlayer: 'player1', edgeHolder: 'player1', player1: makePlayer(), player2: makePlayer({ userId: 'u2', isAI: true, aiDifficulty: 'easy' }), missionDeck: [], activeMissions: [mockMission(), mockMission({ rank: 'C', rankBonus: 2 })], log: [], pendingEffects: [], pendingActions: [], actionHistory: [], ...ov } as GameState;
+  return { turn: 2, phase: 'action', activePlayer: 'player1', edgeHolder: 'player1', player1: makePlayer(), player2: makePlayer({ id: 'player2' as PlayerID, userId: 'u2', isAI: true, aiDifficulty: 'easy' }), missionDeck: [], activeMissions: [mockMission(), mockMission({ rank: 'C', rankBonus: 2 })], log: [], pendingEffects: [], pendingActions: [], actionHistory: [], ...ov } as GameState;
 }
 
 
@@ -85,7 +84,7 @@ describe('Ino 020 (UC) - Take Control', () => {
     const i19 = mockChar({ instanceId: 'i19', card: ino019 });
     const state = makeState({
       player1: makePlayer({ hand: [ino020], charactersInPlay: 1 }),
-      player2: makePlayer({ userId: 'u2', isAI: true, aiDifficulty: 'easy', charactersInPlay: 1 }),
+      player2: makePlayer({ id: 'player2' as PlayerID, userId: 'u2', isAI: true, aiDifficulty: 'easy', charactersInPlay: 1 }),
       activeMissions: [mockMission({ player1Characters: [i19], player2Characters: [e3] }), mockMission({ rank: 'C', rankBonus: 2 })],
     });
     const afterUpgrade = GameEngine.applyAction(state, 'player1', { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'i19' });

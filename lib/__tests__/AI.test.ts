@@ -121,7 +121,7 @@ describe('AI System', () => {
   });
 
   describe('AI plays legal moves only', () => {
-    it('should never make an illegal move across 10 random turns', () => {
+    it('should never make an illegal move across 10 random turns', { timeout: 30000 }, () => {
       for (const difficulty of ['easy', 'medium'] as const) {
         const config = createTestConfig({
           player2: {

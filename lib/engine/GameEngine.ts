@@ -626,6 +626,23 @@ export class GameEngine {
         return newState;
       }
 
+      // Special case: Kiba 113/149 UPGRADE confirmation declined → continue with hide mode
+      if (effect.targetSelectionType === 'KIBA113_CONFIRM_UPGRADE' || effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        if (effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
+          newState = EffectEngine.kiba149ExecuteStep1(newState, effect, false);
+        } else {
+          newState = EffectEngine.kiba113QueueAkamaruChoice(newState, effect, false);
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
       // Special case: Giant Spider 103 — declining the hide still returns Giant Spider to hand
       if (effect.targetSelectionType === 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET') {
         let k103Data: { giantSpiderInstanceId?: string } = {};
