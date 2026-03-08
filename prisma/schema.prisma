@@ -176,6 +176,7 @@ model Tournament {
   discordRoleReward  String?
   discordRoleBadge   String?
   bannedCardIds      String[]                @default([])
+  allowedLeagues     String[]                @default([])
   startedAt          DateTime?
   completedAt        DateTime?
   winnerId           String?                 @db.ObjectId

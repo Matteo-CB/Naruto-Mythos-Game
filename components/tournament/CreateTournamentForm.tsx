@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
+import { RANK_TIERS } from '@/components/EloBadge';
 
 interface Props {
   isAdmin: boolean;
@@ -22,6 +23,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [useBanList, setUseBanList] = useState(true);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);
   const [discordRole, setDiscordRole] = useState('');
+  const [allowedLeagues, setAllowedLeagues] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -39,6 +41,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         useBanList,
         ...(gameMode === 'sealed' && type === 'simulator' ? { sealedBoosterCount: sealedBoosters } : {}),
         ...(discordRole && type === 'simulator' ? { discordRoleReward: discordRole } : {}),
+        ...(type === 'simulator' && allowedLeagues.length > 0 ? { allowedLeagues } : {}),
       };
       const id = await createTournament(input);
       router.push(`/tournaments/${id}`);
@@ -125,6 +128,40 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             style={{ backgroundColor: '#0a0a0a', left: useBanList ? '22px' : '2px', transition: 'left 150ms ease' }} />
         </button>
       </div>
+
+      {type === 'simulator' && isAdmin && (
+        <div className="flex flex-col gap-1.5">
+          <label style={labelStyle}>{t('allowedLeagues')}</label>
+          <p className="text-xs" style={{ color: '#666' }}>{t('allowedLeaguesHint')}</p>
+          <div className="flex flex-wrap gap-2">
+            {RANK_TIERS.map(tier => {
+              const isSelected = allowedLeagues.includes(tier.key);
+              return (
+                <button
+                  key={tier.key}
+                  type="button"
+                  onClick={() => {
+                    setAllowedLeagues(prev =>
+                      isSelected
+                        ? prev.filter(k => k !== tier.key)
+                        : [...prev, tier.key],
+                    );
+                  }}
+                  className="px-2.5 py-1 text-xs font-medium uppercase tracking-wider"
+                  style={{
+                    backgroundColor: isSelected ? tier.bgColor : '#1a1a1a',
+                    color: isSelected ? tier.color : '#666',
+                    border: `1px solid ${isSelected ? tier.borderColor : '#333'}`,
+                    boxShadow: isSelected ? `0 0 8px ${tier.glowColor}` : 'none',
+                  }}
+                >
+                  {t(`leagueName.${tier.key}`)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {type === 'simulator' && (
         <div className="flex flex-col gap-1">

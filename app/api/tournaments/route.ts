@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
+import { validateLeagueKeys } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     const {
       name, type, gameMode, maxPlayers, isPublic,
       useBanList, sealedBoosterCount, discordRoleReward,
-      discordRoleBadge, bannedCardIds,
+      discordRoleBadge, bannedCardIds, allowedLeagues,
     } = body;
 
     if (!['simulator', 'player'].includes(type)) {
@@ -73,6 +74,15 @@ export async function POST(req: NextRequest) {
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
+
+    // Validate allowedLeagues (simulator only)
+    const leagueRestrictions: string[] = [];
+    if (type === 'simulator' && Array.isArray(allowedLeagues) && allowedLeagues.length > 0) {
+      if (!validateLeagueKeys(allowedLeagues)) {
+        return NextResponse.json({ error: 'Invalid league tier keys' }, { status: 400 });
+      }
+      leagueRestrictions.push(...allowedLeagues);
     }
 
     const user = await prisma.user.findUnique({
@@ -97,6 +107,7 @@ export async function POST(req: NextRequest) {
         discordRoleReward: type === 'simulator' ? (discordRoleReward || null) : null,
         discordRoleBadge: type === 'simulator' ? (discordRoleBadge || null) : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
+        allowedLeagues: leagueRestrictions,
       },
     });
 
