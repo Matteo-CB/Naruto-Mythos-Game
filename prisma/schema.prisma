@@ -227,3 +227,15 @@ model TournamentMatch {
 
   @@unique([tournamentId, round, matchIndex])
 }
+
+model CardIssue {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  cardId      String
+  cardName    String
+  description String
+  status      String   @default("to_fix") // to_fix | fixed_unpublished | fixed_published | verified
+  reportedBy  String
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
