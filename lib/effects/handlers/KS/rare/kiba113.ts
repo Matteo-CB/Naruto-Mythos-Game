@@ -4,18 +4,26 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
- * Card 113/130 - KIBA INUZUKA (R)
+ * Card 113/130 - KIBA INUZUKA (R) "Fang over Fang"
  * Chakra: 4, Power: 3
  * Group: Leaf Village, Keywords: Team 8
  *
  * MAIN: Hide a friendly Akamaru in play; if you do, hide an enemy character in this mission.
- *   Step 1 (optional): Choose WHICH Akamaru to hide → KIBA113_CHOOSE_AKAMARU
- *     - Player sees all non-hidden friendly Akamarous as selectable targets
- *     - Player may decline (isOptional: true)
- *   Step 2 (mandatory once step 1 chosen): Choose enemy in Kiba's mission to hide → KIBA113_HIDE_TARGET
+ *   Confirmation popup first (like Sasuke 146), then target selection.
  *
- * UPGRADE: Defeat both targets instead of hiding.
- *   Step 1: KIBA113_CHOOSE_AKAMARU_DEFEAT (optional) → KIBA113_DEFEAT_TARGET (mandatory)
+ * UPGRADE: MAIN effect changes: instead of hiding, defeat both targets.
+ *   Separate confirmation popup after MAIN confirmation.
+ *
+ * Flow (upgrade path):
+ *   1. KIBA113_CONFIRM_MAIN → optional confirm popup (self target)
+ *   2. KIBA113_CONFIRM_UPGRADE → optional confirm popup (self target)
+ *   3. KIBA113_CHOOSE_AKAMARU / KIBA113_CHOOSE_AKAMARU_DEFEAT → pick Akamaru
+ *   4. KIBA113_HIDE_TARGET / KIBA113_DEFEAT_TARGET → pick enemy
+ *
+ * Flow (non-upgrade path):
+ *   1. KIBA113_CONFIRM_MAIN → optional confirm popup (self target)
+ *   2. KIBA113_CHOOSE_AKAMARU → pick Akamaru
+ *   3. KIBA113_HIDE_TARGET → pick enemy
  */
 
 function kiba113MainHandler(ctx: EffectContext): EffectResult {
@@ -73,26 +81,21 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Encode source context into effectDescription
+  // Return a confirmation popup (like Sasuke 146): self as target, optional
   const extraData = JSON.stringify({
     sourceMissionIndex,
     sourceCardInstanceId: sourceCard.instanceId,
     isUpgrade: isUpgrade ? 'true' : 'false',
   });
 
-  const selectionType = isUpgrade ? 'KIBA113_CHOOSE_AKAMARU_DEFEAT' : 'KIBA113_CHOOSE_AKAMARU';
-  const descKey = isUpgrade
-    ? 'game.effect.desc.kiba113ChooseAkamaruDefeat'
-    : 'game.effect.desc.kiba113ChooseAkamaru';
-
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: selectionType,
-    validTargets: akamaruTargets,
+    targetSelectionType: 'KIBA113_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
     description: extraData,
-    descriptionKey: descKey,
+    descriptionKey: 'game.effect.desc.kiba113ConfirmMain',
   };
 }
 

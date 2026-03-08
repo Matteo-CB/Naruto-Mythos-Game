@@ -8,6 +8,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
+import { defeatFriendlyCharacter } from './defeatUtils';
 import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
@@ -1151,6 +1152,81 @@ export class EffectEngine {
       case 'SASUKE136_CHOOSE_FRIENDLY': {
         // Stage 1: defeat the chosen friendly character
         newState = EffectEngine.defeatFriendlyForSasuke136(newState, pendingEffect, targetId);
+        break;
+      }
+
+      // =============================================
+      // KIBA113 / KIBA149: Confirmation popups (like Sasuke 146)
+      // =============================================
+      case 'KIBA113_CONFIRM_MAIN':
+      case 'KIBA149_CONFIRM_MAIN': {
+        // Player confirmed MAIN effect activation
+        const isK149 = pendingEffect.targetSelectionType === 'KIBA149_CONFIRM_MAIN';
+        const cardLabel = isK149 ? 'KS-113-MV' : 'KS-113-R';
+        let confirmData: { sourceMissionIndex: number; sourceCardInstanceId: string; isUpgrade: string } | null = null;
+        try { confirmData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (!confirmData) break;
+
+        const isUpgradeMode = confirmData.isUpgrade === 'true';
+        const srcMI_c = confirmData.sourceMissionIndex;
+
+        if (isUpgradeMode) {
+          // Show UPGRADE confirmation popup (optional)
+          const upgradeEffId = generateInstanceId();
+          const upgradeActId = generateInstanceId();
+          const upgradeType = isK149 ? 'KIBA149_CONFIRM_UPGRADE' : 'KIBA113_CONFIRM_UPGRADE';
+          const upgradeDescKey = isK149 ? 'game.effect.desc.kiba149ConfirmUpgrade' : 'game.effect.desc.kiba113ConfirmUpgrade';
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: upgradeEffId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: srcMI_c,
+            effectType: pendingEffect.effectType,
+            effectDescription: pendingEffect.effectDescription,
+            targetSelectionType: upgradeType,
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: [confirmData.sourceCardInstanceId],
+            isOptional: true,
+            isMandatory: false,
+            resolved: false,
+            isUpgrade: true,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: upgradeActId,
+            type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: isK149
+              ? 'Kiba Inuzuka (113 MV) UPGRADE: Instead, defeat both of them.'
+              : 'Kiba Inuzuka (113) UPGRADE: Instead, defeat both of them.',
+            descriptionKey: upgradeDescKey,
+            options: [confirmData.sourceCardInstanceId],
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: upgradeEffId,
+          }];
+        } else {
+          // No upgrade — proceed directly to target selection (hide mode)
+          if (isK149) {
+            // Kiba 149: auto-pick first Akamaru, hide it, then ask for second target
+            newState = EffectEngine.kiba149ExecuteStep1(newState, pendingEffect, false);
+          } else {
+            // Kiba 113: ask player to choose Akamaru
+            newState = EffectEngine.kiba113QueueAkamaruChoice(newState, pendingEffect, false);
+          }
+        }
+        break;
+      }
+
+      case 'KIBA113_CONFIRM_UPGRADE':
+      case 'KIBA149_CONFIRM_UPGRADE': {
+        // Player confirmed UPGRADE modification → use defeat mode
+        const isK149_u = pendingEffect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE';
+        if (isK149_u) {
+          newState = EffectEngine.kiba149ExecuteStep1(newState, pendingEffect, true);
+        } else {
+          newState = EffectEngine.kiba113QueueAkamaruChoice(newState, pendingEffect, true);
+        }
         break;
       }
 
@@ -7638,5 +7714,228 @@ export class EffectEngine {
     }
 
     return { replaced: false, replacement: 'hide' };
+  }
+
+  /**
+   * Kiba 113 (R): Queue Akamaru choice (step after confirmation).
+   * Creates KIBA113_CHOOSE_AKAMARU or KIBA113_CHOOSE_AKAMARU_DEFEAT pending effect.
+   */
+  static kiba113QueueAkamaruChoice(state: GameState, pending: PendingEffect, useDefeat: boolean): GameState {
+    let newState = { ...state };
+    let confData: { sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
+    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    if (!confData) return newState;
+
+    const friendlySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    // Collect all non-hidden friendly Akamarous
+    const akamaruTargets: string[] = [];
+    for (let i = 0; i < newState.activeMissions.length; i++) {
+      const mission = newState.activeMissions[i];
+      for (const char of mission[friendlySide]) {
+        if (!char.isHidden) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.name_fr.toLowerCase().includes('akamaru')) {
+            akamaruTargets.push(char.instanceId);
+          }
+        }
+      }
+    }
+
+    if (akamaruTargets.length === 0) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Kiba Inuzuka (113): No friendly non-hidden Akamaru in play.',
+        'game.log.effect.noTarget',
+        { card: 'KIBA INUZUKA', id: 'KS-113-R' },
+      );
+      return newState;
+    }
+
+    const selType = useDefeat ? 'KIBA113_CHOOSE_AKAMARU_DEFEAT' : 'KIBA113_CHOOSE_AKAMARU';
+    const descKey = useDefeat
+      ? 'game.effect.desc.kiba113ChooseAkamaruDefeat'
+      : 'game.effect.desc.kiba113ChooseAkamaru';
+    const extraData = JSON.stringify({ sourceMissionIndex: confData.sourceMissionIndex });
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: effId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: confData.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: extraData,
+      targetSelectionType: selType,
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets: akamaruTargets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: useDefeat,
+    }];
+    newState.pendingActions = [...newState.pendingActions, {
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pending.sourcePlayer,
+      description: useDefeat
+        ? 'Kiba Inuzuka (113): Choose which Akamaru to defeat.'
+        : 'Kiba Inuzuka (113): Choose which Akamaru to hide.',
+      descriptionKey: descKey,
+      options: akamaruTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+
+    return newState;
+  }
+
+  /**
+   * Kiba 149 (MV): Execute step 1 — auto-pick first Akamaru, hide/defeat it,
+   * then queue second target selection.
+   */
+  static kiba149ExecuteStep1(state: GameState, pending: PendingEffect, useDefeat: boolean): GameState {
+    let newState = { ...state };
+    let confData: { sourceMissionIndex: number; sourceCardInstanceId: string } | null = null;
+    try { confData = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
+    if (!confData) return newState;
+
+    const friendlySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+    const enemySide: 'player1Characters' | 'player2Characters' =
+      pending.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    const opponentPlayer: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+
+    // Find first non-hidden Akamaru
+    let akamaru: CharacterInPlay | null = null;
+    let akamaruMI = -1;
+    for (let i = 0; i < newState.activeMissions.length; i++) {
+      for (const char of newState.activeMissions[i][friendlySide]) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        if (topCard.name_fr.toUpperCase().includes('AKAMARU')) {
+          akamaru = char;
+          akamaruMI = i;
+          break;
+        }
+      }
+      if (akamaru) break;
+    }
+
+    if (!akamaru || akamaruMI === -1) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Kiba Inuzuka (113 MV): No friendly non-hidden Akamaru in play.',
+        'game.log.effect.noTarget',
+        { card: 'KIBA INUZUKA', id: 'KS-113-MV' },
+      );
+      return newState;
+    }
+
+    // Apply action to Akamaru
+    if (useDefeat) {
+      newState = defeatFriendlyCharacter(newState, akamaruMI, akamaru.instanceId, pending.sourcePlayer);
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_DEFEAT',
+        `Kiba Inuzuka (113 MV): Defeated friendly ${akamaru.card.name_fr} (upgrade).`,
+        'game.log.effect.defeat',
+        { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr },
+      );
+    } else {
+      // Hide Akamaru
+      const missions = [...newState.activeMissions];
+      const mission = { ...missions[akamaruMI] };
+      const chars = [...mission[friendlySide]];
+      const idx = chars.findIndex((c) => c.instanceId === akamaru!.instanceId);
+      if (idx !== -1) {
+        chars[idx] = { ...chars[idx], isHidden: true };
+        mission[friendlySide] = chars;
+        missions[akamaruMI] = mission;
+        newState = {
+          ...newState,
+          activeMissions: missions,
+          log: logAction(
+            newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+            'EFFECT_HIDE',
+            `Kiba Inuzuka (113 MV): Hid friendly ${akamaru.card.name_fr}.`,
+            'game.log.effect.hide',
+            { card: 'KIBA INUZUKA', id: 'KS-113-MV', target: akamaru.card.name_fr, mission: `mission ${akamaruMI}` },
+          ),
+        };
+      }
+    }
+
+    // Gather second targets in source mission (not self, not Akamaru)
+    const srcMI = confData.sourceMissionIndex;
+    const thisMission = newState.activeMissions[srcMI];
+    if (!thisMission) return newState;
+
+    const validTargets: string[] = [];
+    for (const char of thisMission[friendlySide]) {
+      if (char.isHidden) continue;
+      if (char.instanceId === confData.sourceCardInstanceId) continue;
+      if (char.instanceId === akamaru.instanceId) continue;
+      validTargets.push(char.instanceId);
+    }
+    for (const char of thisMission[enemySide]) {
+      if (char.isHidden) continue;
+      if (!useDefeat && !canBeHiddenByEnemy(newState, char, opponentPlayer)) continue;
+      validTargets.push(char.instanceId);
+    }
+
+    if (validTargets.length === 0) {
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, pending.sourcePlayer,
+        'EFFECT_NO_TARGET',
+        'Kiba Inuzuka (113 MV): No other non-hidden character in this mission to target.',
+        'game.log.effect.noTarget',
+        { card: 'KIBA INUZUKA', id: 'KS-113-MV' },
+      );
+      return newState;
+    }
+
+    const step2Type = useDefeat ? 'KIBA149_CHOOSE_DEFEAT_TARGET' : 'KIBA149_CHOOSE_HIDE_TARGET';
+    const step2DescKey = useDefeat ? 'game.effect.desc.kiba149Defeat' : 'game.effect.desc.kiba149Hide';
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: effId,
+      sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: srcMI,
+      effectType: pending.effectType,
+      effectDescription: '',
+      targetSelectionType: step2Type,
+      sourcePlayer: pending.sourcePlayer,
+      requiresTargetSelection: true,
+      validTargets,
+      isOptional: false,
+      isMandatory: true,
+      resolved: false,
+      isUpgrade: useDefeat,
+    }];
+    newState.pendingActions = [...newState.pendingActions, {
+      id: actId,
+      type: 'SELECT_TARGET' as PendingAction['type'],
+      player: pending.sourcePlayer,
+      description: useDefeat
+        ? 'Kiba Inuzuka (113 MV): Choose another character in this mission to defeat.'
+        : 'Kiba Inuzuka (113 MV): Choose another character in this mission to hide.',
+      descriptionKey: step2DescKey,
+      options: validTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+
+    return newState;
   }
 }
