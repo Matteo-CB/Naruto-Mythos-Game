@@ -23,6 +23,16 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
+    const id = searchParams.get('id');
+
+    // Single issue fetch
+    if (id) {
+      const issue = await prisma.cardIssue.findUnique({ where: { id } });
+      if (!issue) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+      return NextResponse.json({ issue });
+    }
 
     const where = status && status !== 'all' ? { status } : {};
     const issues = await prisma.cardIssue.findMany({
@@ -36,7 +46,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST — create a new card issue
+// POST — create a new card issue (supports multiple cards)
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -45,16 +55,16 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { cardId, cardName, description } = body;
+    const { cardIds, cardNames, description } = body;
 
-    if (!cardId || !cardName || !description) {
+    if (!cardIds || !cardNames || !description || !Array.isArray(cardIds) || cardIds.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const issue = await prisma.cardIssue.create({
       data: {
-        cardId,
-        cardName,
+        cardIds,
+        cardNames,
         description,
         status: 'to_fix',
         reportedBy: session!.user!.name!,
@@ -67,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH — update issue status or description
+// PATCH — update issue status, description, or add/remove cards
 export async function PATCH(req: NextRequest) {
   try {
     const session = await auth();
@@ -76,12 +86,52 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { id, status, description } = body;
+    const { id, status, description, addCardId, addCardName, removeCardIndex } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing issue id' }, { status: 400 });
     }
 
+    // Add a card to existing issue
+    if (addCardId && addCardName) {
+      const existing = await prisma.cardIssue.findUnique({ where: { id } });
+      if (!existing) {
+        return NextResponse.json({ error: 'Issue not found' }, { status: 404 });
+      }
+      const issue = await prisma.cardIssue.update({
+        where: { id },
+        data: {
+          cardIds: { push: addCardId },
+          cardNames: { push: addCardName },
+          updatedBy: session!.user!.name!,
+        },
+      });
+      return NextResponse.json({ issue });
+    }
+
+    // Remove a card by index from existing issue
+    if (removeCardIndex !== undefined && typeof removeCardIndex === 'number') {
+      const existing = await prisma.cardIssue.findUnique({ where: { id } });
+      if (!existing) {
+        return NextResponse.json({ error: 'Issue not found' }, { status: 404 });
+      }
+      if (existing.cardIds.length <= 1) {
+        return NextResponse.json({ error: 'Cannot remove last card from issue. Delete the issue instead.' }, { status: 400 });
+      }
+      const newCardIds = existing.cardIds.filter((_, i) => i !== removeCardIndex);
+      const newCardNames = existing.cardNames.filter((_, i) => i !== removeCardIndex);
+      const issue = await prisma.cardIssue.update({
+        where: { id },
+        data: {
+          cardIds: newCardIds,
+          cardNames: newCardNames,
+          updatedBy: session!.user!.name!,
+        },
+      });
+      return NextResponse.json({ issue });
+    }
+
+    // Standard update: status / description
     const updateData: Record<string, string> = {};
     if (status) updateData.status = status;
     if (description !== undefined) updateData.description = description;

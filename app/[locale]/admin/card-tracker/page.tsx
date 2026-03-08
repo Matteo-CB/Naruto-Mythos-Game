@@ -18,8 +18,8 @@ type FilterStatus = 'all' | IssueStatus;
 
 interface CardIssue {
   id: string;
-  cardId: string;
-  cardName: string;
+  cardIds: string[];
+  cardNames: string[];
   description: string;
   status: IssueStatus;
   reportedBy: string;
@@ -42,14 +42,24 @@ export default function CardTrackerPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [showForm, setShowForm] = useState(false);
+
+  // Multi-card selection for new issue form
+  const [selectedCards, setSelectedCards] = useState<(CharacterCard | MissionCard)[]>([]);
   const [cardSearch, setCardSearch] = useState('');
-  const [selectedCard, setSelectedCard] = useState<(CharacterCard | MissionCard) | null>(null);
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDesc, setEditDesc] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Detail view
+  const [detailIssue, setDetailIssue] = useState<CardIssue | null>(null);
+  const [addCardSearch, setAddCardSearch] = useState('');
+  const [addCardDropdownOpen, setAddCardDropdownOpen] = useState(false);
+  const addCardRef = useRef<HTMLDivElement>(null);
+  const [detailEditingDesc, setDetailEditingDesc] = useState(false);
+  const [detailEditDesc, setDetailEditDesc] = useState('');
 
   const username = session?.user?.name ?? '';
   const isAuthorized = TRACKER_USERS.includes(username);
@@ -68,8 +78,18 @@ export default function CardTrackerPage() {
       c.name_fr.toLowerCase().includes(q) ||
       c.id.toLowerCase().includes(q) ||
       (c.cardId && c.cardId.toLowerCase().includes(q))
-    ).slice(0, 12);
-  }, [cardSearch, allCards]);
+    ).filter(c => !selectedCards.some(sc => (sc.cardId ?? sc.id) === (c.cardId ?? c.id))).slice(0, 12);
+  }, [cardSearch, allCards, selectedCards]);
+
+  const addCardFilteredCards = useMemo(() => {
+    if (!addCardSearch.trim()) return [];
+    const q = addCardSearch.toLowerCase();
+    return allCards.filter(c =>
+      c.name_fr.toLowerCase().includes(q) ||
+      c.id.toLowerCase().includes(q) ||
+      (c.cardId && c.cardId.toLowerCase().includes(q))
+    ).filter(c => !detailIssue?.cardIds.includes(c.cardId ?? c.id)).slice(0, 12);
+  }, [addCardSearch, allCards, detailIssue]);
 
   useEffect(() => {
     if (!isAuthorized) return;
@@ -81,6 +101,9 @@ export default function CardTrackerPage() {
     function handleClick(e: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (addCardRef.current && !addCardRef.current.contains(e.target as Node)) {
+        setAddCardDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -98,19 +121,19 @@ export default function CardTrackerPage() {
   }
 
   async function createIssue() {
-    if (!selectedCard || !description.trim()) return;
+    if (selectedCards.length === 0 || !description.trim()) return;
     setSubmitting(true);
     try {
       await fetch('/api/admin/card-tracker', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cardId: selectedCard.cardId ?? selectedCard.id,
-          cardName: selectedCard.name_fr,
+          cardIds: selectedCards.map(c => c.cardId ?? c.id),
+          cardNames: selectedCards.map(c => c.name_fr),
           description: description.trim(),
         }),
       });
-      setSelectedCard(null);
+      setSelectedCards([]);
       setCardSearch('');
       setDescription('');
       setShowForm(false);
@@ -127,24 +150,69 @@ export default function CardTrackerPage() {
         body: JSON.stringify({ id, status }),
       });
       fetchIssues();
+      if (detailIssue?.id === id) {
+        setDetailIssue(prev => prev ? { ...prev, status } : null);
+      }
     } catch { /* ignore */ }
   }
 
-  async function updateDescription(id: string) {
+  async function updateDescription(id: string, desc?: string) {
+    const newDesc = desc ?? editDesc;
     try {
       await fetch('/api/admin/card-tracker', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, description: editDesc }),
+        body: JSON.stringify({ id, description: newDesc }),
       });
       setEditingId(null);
+      setDetailEditingDesc(false);
       fetchIssues();
+      if (detailIssue?.id === id) {
+        setDetailIssue(prev => prev ? { ...prev, description: newDesc } : null);
+      }
+    } catch { /* ignore */ }
+  }
+
+  async function addCardToIssue(issueId: string, card: CharacterCard | MissionCard) {
+    try {
+      const res = await fetch('/api/admin/card-tracker', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: issueId,
+          addCardId: card.cardId ?? card.id,
+          addCardName: card.name_fr,
+        }),
+      });
+      const data = await res.json();
+      if (data.issue) {
+        setDetailIssue(data.issue);
+        setAddCardSearch('');
+        setAddCardDropdownOpen(false);
+        fetchIssues();
+      }
+    } catch { /* ignore */ }
+  }
+
+  async function removeCardFromIssue(issueId: string, cardIndex: number) {
+    try {
+      const res = await fetch('/api/admin/card-tracker', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: issueId, removeCardIndex: cardIndex }),
+      });
+      const data = await res.json();
+      if (data.issue) {
+        setDetailIssue(data.issue);
+        fetchIssues();
+      }
     } catch { /* ignore */ }
   }
 
   async function deleteIssue(id: string) {
     try {
       await fetch(`/api/admin/card-tracker?id=${id}`, { method: 'DELETE' });
+      if (detailIssue?.id === id) setDetailIssue(null);
       fetchIssues();
     } catch { /* ignore */ }
   }
@@ -175,11 +243,229 @@ export default function CardTrackerPage() {
     );
   }
 
-  // Find card object for each issue (for thumbnail)
   function findCard(cardId: string): (CharacterCard | MissionCard) | undefined {
     return allCards.find(c => c.cardId === cardId || c.id === cardId);
   }
 
+  // ─── DETAIL VIEW ───
+  if (detailIssue) {
+    const config = STATUS_CONFIG[detailIssue.status];
+    return (
+      <div className="relative min-h-screen" style={{ backgroundColor: '#0a0a0a' }}>
+        <CloudBackground />
+        <div className="relative z-10 mx-auto max-w-3xl px-4 py-6 sm:px-6">
+          {/* Back button */}
+          <button
+            onClick={() => setDetailIssue(null)}
+            className="mb-4 text-sm transition-colors"
+            style={{ color: '#666' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#999'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#666'; }}
+          >
+            &larr; Back to list
+          </button>
+
+          {/* Issue Header */}
+          <div className="mb-6 rounded-lg p-5" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#e0e0e0' }}>
+                  {detailIssue.cardNames.join(', ')}
+                </div>
+                <div className="mt-1" style={{ fontSize: 12, color: '#555' }}>
+                  {detailIssue.cardIds.join(', ')}
+                </div>
+              </div>
+              <span
+                className="flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+                style={{ backgroundColor: config.bg, color: config.color, border: `1px solid ${config.color}40` }}
+              >
+                {config.label}
+              </span>
+            </div>
+
+            {/* Description */}
+            <div className="mb-4">
+              <div className="mb-1" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</div>
+              {detailEditingDesc ? (
+                <div className="flex gap-2">
+                  <textarea
+                    value={detailEditDesc}
+                    onChange={(e) => setDetailEditDesc(e.target.value)}
+                    rows={4}
+                    className="flex-1 resize-none rounded px-3 py-2 text-sm"
+                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => updateDescription(detailIssue.id, detailEditDesc)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded"
+                      style={{ backgroundColor: '#22c55e20', color: '#22c55e', border: '1px solid #22c55e40' }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setDetailEditingDesc(false)}
+                      className="px-3 py-1.5 text-xs rounded"
+                      style={{ color: '#666' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="cursor-pointer rounded px-3 py-2 text-sm transition-colors whitespace-pre-wrap"
+                  style={{ color: '#ccc', backgroundColor: '#1a1a1a', border: '1px solid #262626', lineHeight: 1.6 }}
+                  onClick={() => { setDetailEditingDesc(true); setDetailEditDesc(detailIssue.description); }}
+                  title="Click to edit"
+                >
+                  {detailIssue.description}
+                </div>
+              )}
+            </div>
+
+            {/* Status Selector + Meta */}
+            <div className="flex flex-wrap items-center gap-4">
+              <div>
+                <div className="mb-1" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</div>
+                <select
+                  value={detailIssue.status}
+                  onChange={(e) => updateStatus(detailIssue.id, e.target.value as IssueStatus)}
+                  className="rounded px-3 py-1.5 text-xs font-medium"
+                  style={{
+                    backgroundColor: '#1a1a1a',
+                    border: `1px solid ${config.color}40`,
+                    color: config.color,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {(Object.keys(STATUS_CONFIG) as IssueStatus[]).map(s => (
+                    <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <div className="mb-1" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reported</div>
+                <div style={{ fontSize: 12, color: '#888' }}>
+                  {detailIssue.reportedBy} - {new Date(detailIssue.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+              {detailIssue.updatedBy && (
+                <div>
+                  <div className="mb-1" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Updated by</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>
+                    {detailIssue.updatedBy} - {new Date(detailIssue.updatedAt).toLocaleDateString()}
+                  </div>
+                </div>
+              )}
+              {isAdmin && (
+                <button
+                  onClick={() => deleteIssue(detailIssue.id)}
+                  className="ml-auto text-xs font-medium transition-colors"
+                  style={{ color: '#ef4444', opacity: 0.7 }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.7'; }}
+                >
+                  Delete Issue
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Affected Cards Section */}
+          <div className="rounded-lg p-5" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+            <div className="mb-3 flex items-center justify-between">
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0' }}>
+                Affected Cards ({detailIssue.cardIds.length})
+              </div>
+            </div>
+
+            {/* Cards Grid */}
+            <div className="mb-4 grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}>
+              {detailIssue.cardIds.map((cardId, idx) => {
+                const card = findCard(cardId);
+                return (
+                  <div
+                    key={`${cardId}-${idx}`}
+                    className="group relative rounded-lg p-2 transition-all"
+                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #262626' }}
+                  >
+                    <div className="mb-2" style={{ aspectRatio: '0.72', overflow: 'hidden', borderRadius: 4 }}>
+                      {card ? <CardFace card={card} /> : (
+                        <div className="flex h-full items-center justify-center" style={{ backgroundColor: '#222', fontSize: 10, color: '#555' }}>
+                          {cardId}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#e0e0e0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {detailIssue.cardNames[idx]}
+                    </div>
+                    <div style={{ fontSize: 9, color: '#555' }}>{cardId}</div>
+                    {/* Remove button */}
+                    {detailIssue.cardIds.length > 1 && (
+                      <button
+                        onClick={() => removeCardFromIssue(detailIssue.id, idx)}
+                        className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs transition-all"
+                        style={{ backgroundColor: '#ef444430', color: '#ef4444', opacity: 0, border: '1px solid #ef444440' }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0'; }}
+                        title="Remove this card from issue"
+                      >
+                        x
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Add Card to Issue */}
+            <div className="relative" ref={addCardRef}>
+              <input
+                type="text"
+                value={addCardSearch}
+                onChange={(e) => { setAddCardSearch(e.target.value); setAddCardDropdownOpen(true); }}
+                onFocus={() => setAddCardDropdownOpen(true)}
+                placeholder="Add another card to this issue..."
+                className="w-full rounded px-3 py-2 text-sm"
+                style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
+              />
+              {addCardDropdownOpen && addCardFilteredCards.length > 0 && (
+                <div
+                  className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-lg"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
+                >
+                  {addCardFilteredCards.map(card => (
+                    <button
+                      key={card.id}
+                      onClick={() => addCardToIssue(detailIssue.id, card)}
+                      className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors"
+                      style={{ borderBottom: '1px solid #222' }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#222'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+                    >
+                      <div style={{ width: 32, flexShrink: 0 }}>
+                        <CardFace card={card} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0' }}>{card.name_fr}</div>
+                        <div style={{ fontSize: 10, color: '#666' }}>{card.cardId ?? card.id}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ─── LIST VIEW ───
   return (
     <div className="relative min-h-screen" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
@@ -216,67 +502,72 @@ export default function CardTrackerPage() {
               New Card Issue
             </div>
 
-            {/* Card Selector */}
-            <div className="relative mb-3" ref={searchRef}>
-              {selectedCard ? (
-                <div className="flex items-center gap-3 rounded p-2" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}>
-                  <div style={{ width: 48, flexShrink: 0 }}>
-                    <CardFace card={selectedCard} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#e0e0e0' }}>{selectedCard.name_fr}</div>
-                    <div style={{ fontSize: 11, color: '#666' }}>{selectedCard.cardId ?? selectedCard.id}</div>
-                  </div>
-                  <button
-                    onClick={() => { setSelectedCard(null); setCardSearch(''); }}
-                    style={{ color: '#666', fontSize: 18, padding: '0 4px' }}
+            {/* Selected Cards Chips */}
+            {selectedCards.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {selectedCards.map((card, idx) => (
+                  <div
+                    key={card.id}
+                    className="flex items-center gap-2 rounded-full px-3 py-1"
+                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
                   >
-                    x
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <input
-                    type="text"
-                    value={cardSearch}
-                    onChange={(e) => { setCardSearch(e.target.value); setDropdownOpen(true); }}
-                    onFocus={() => setDropdownOpen(true)}
-                    placeholder="Search card by name or ID..."
-                    className="w-full rounded px-3 py-2 text-sm"
-                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
-                  />
-                  {dropdownOpen && filteredCards.length > 0 && (
-                    <div
-                      className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg"
-                      style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
-                    >
-                      {filteredCards.map(card => (
-                        <button
-                          key={card.id}
-                          onClick={() => {
-                            setSelectedCard(card);
-                            setCardSearch('');
-                            setDropdownOpen(false);
-                          }}
-                          className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors"
-                          style={{ borderBottom: '1px solid #222' }}
-                          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#222'; }}
-                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
-                        >
-                          <div style={{ width: 36, flexShrink: 0 }}>
-                            <CardFace card={card} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div style={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {card.name_fr}
-                            </div>
-                            <div style={{ fontSize: 10, color: '#666' }}>{card.cardId ?? card.id} - {card.rarity}</div>
-                          </div>
-                        </button>
-                      ))}
+                    <div style={{ width: 20, flexShrink: 0 }}>
+                      <CardFace card={card} />
                     </div>
-                  )}
-                </>
+                    <span style={{ fontSize: 11, color: '#e0e0e0', fontWeight: 500 }}>{card.name_fr}</span>
+                    <span style={{ fontSize: 9, color: '#555' }}>{card.cardId ?? card.id}</span>
+                    <button
+                      onClick={() => setSelectedCards(prev => prev.filter((_, i) => i !== idx))}
+                      style={{ color: '#666', fontSize: 14, marginLeft: 2 }}
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Card Selector (always shown for adding more) */}
+            <div className="relative mb-3" ref={searchRef}>
+              <input
+                type="text"
+                value={cardSearch}
+                onChange={(e) => { setCardSearch(e.target.value); setDropdownOpen(true); }}
+                onFocus={() => setDropdownOpen(true)}
+                placeholder={selectedCards.length > 0 ? 'Add another card...' : 'Search card by name or ID...'}
+                className="w-full rounded px-3 py-2 text-sm"
+                style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
+              />
+              {dropdownOpen && filteredCards.length > 0 && (
+                <div
+                  className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
+                >
+                  {filteredCards.map(card => (
+                    <button
+                      key={card.id}
+                      onClick={() => {
+                        setSelectedCards(prev => [...prev, card]);
+                        setCardSearch('');
+                        setDropdownOpen(false);
+                      }}
+                      className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors"
+                      style={{ borderBottom: '1px solid #222' }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#222'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+                    >
+                      <div style={{ width: 36, flexShrink: 0 }}>
+                        <CardFace card={card} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div style={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {card.name_fr}
+                        </div>
+                        <div style={{ fontSize: 10, color: '#666' }}>{card.cardId ?? card.id} - {card.rarity}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -292,14 +583,14 @@ export default function CardTrackerPage() {
 
             <button
               onClick={createIssue}
-              disabled={!selectedCard || !description.trim() || submitting}
+              disabled={selectedCards.length === 0 || !description.trim() || submitting}
               className="px-4 py-2 text-sm font-semibold transition-all"
               style={{
-                backgroundColor: selectedCard && description.trim() ? '#9333ea' : '#333',
-                color: selectedCard && description.trim() ? '#fff' : '#666',
+                backgroundColor: selectedCards.length > 0 && description.trim() ? '#9333ea' : '#333',
+                color: selectedCards.length > 0 && description.trim() ? '#fff' : '#666',
                 borderRadius: 6,
                 opacity: submitting ? 0.5 : 1,
-                cursor: selectedCard && description.trim() && !submitting ? 'pointer' : 'not-allowed',
+                cursor: selectedCards.length > 0 && description.trim() && !submitting ? 'pointer' : 'not-allowed',
               }}
             >
               {submitting ? 'Submitting...' : 'Submit Issue'}
@@ -346,21 +637,41 @@ export default function CardTrackerPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {filteredIssues.map(issue => {
-              const card = findCard(issue.cardId);
               const config = STATUS_CONFIG[issue.status];
               const isEditing = editingId === issue.id;
+              const firstCard = findCard(issue.cardIds[0]);
 
               return (
                 <div
                   key={issue.id}
-                  className="flex gap-3 rounded-lg p-3 transition-all"
+                  className="flex gap-3 rounded-lg p-3 transition-all cursor-pointer"
                   style={{ backgroundColor: '#141414', border: `1px solid #262626` }}
+                  onClick={(e) => {
+                    // Don't open detail if clicking on interactive elements
+                    const target = e.target as HTMLElement;
+                    if (target.tagName === 'BUTTON' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA' || target.tagName === 'OPTION' || target.closest('button') || target.closest('select')) return;
+                    setDetailIssue(issue);
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#3a3a3a'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#262626'; }}
                 >
-                  {/* Card Thumbnail */}
-                  <div style={{ width: 56, flexShrink: 0 }}>
-                    {card ? <CardFace card={card} /> : (
-                      <div className="flex items-center justify-center rounded" style={{ width: 56, height: 78, backgroundColor: '#1a1a1a', border: '1px solid #333', fontSize: 8, color: '#555', textAlign: 'center' }}>
-                        {issue.cardId}
+                  {/* Card Thumbnails */}
+                  <div className="flex flex-shrink-0 gap-1" style={{ width: issue.cardIds.length > 1 ? 'auto' : 56 }}>
+                    {issue.cardIds.slice(0, 3).map((cardId, idx) => {
+                      const card = findCard(cardId);
+                      return (
+                        <div key={`${cardId}-${idx}`} style={{ width: 48, flexShrink: 0 }}>
+                          {card ? <CardFace card={card} /> : (
+                            <div className="flex items-center justify-center rounded" style={{ width: 48, height: 67, backgroundColor: '#1a1a1a', border: '1px solid #333', fontSize: 7, color: '#555', textAlign: 'center' }}>
+                              {cardId}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {issue.cardIds.length > 3 && (
+                      <div className="flex items-center justify-center rounded" style={{ width: 48, height: 67, backgroundColor: '#1a1a1a', border: '1px solid #333', fontSize: 11, color: '#666' }}>
+                        +{issue.cardIds.length - 3}
                       </div>
                     )}
                   </div>
@@ -369,8 +680,14 @@ export default function CardTrackerPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <div>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#e0e0e0' }}>{issue.cardName}</span>
-                        <span className="ml-2" style={{ fontSize: 11, color: '#555' }}>{issue.cardId}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#e0e0e0' }}>
+                          {issue.cardNames.join(', ')}
+                        </span>
+                        {issue.cardIds.length > 1 && (
+                          <span className="ml-2" style={{ fontSize: 10, color: '#666' }}>
+                            ({issue.cardIds.length} cards)
+                          </span>
+                        )}
                       </div>
                       {/* Status Badge */}
                       <span
@@ -390,6 +707,7 @@ export default function CardTrackerPage() {
                           rows={2}
                           className="flex-1 resize-none rounded px-2 py-1 text-xs"
                           style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none' }}
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex flex-col gap-1">
                           <button
@@ -410,12 +728,8 @@ export default function CardTrackerPage() {
                       </div>
                     ) : (
                       <div
-                        className="mb-2 cursor-pointer rounded px-2 py-1 text-xs transition-colors"
-                        style={{ color: '#999', backgroundColor: 'transparent', lineHeight: 1.5 }}
-                        onClick={() => { setEditingId(issue.id); setEditDesc(issue.description); }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#1a1a1a'; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
-                        title="Click to edit"
+                        className="mb-2 rounded px-2 py-1 text-xs"
+                        style={{ color: '#999', lineHeight: 1.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                       >
                         {issue.description}
                       </div>

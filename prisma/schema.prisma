@@ -230,8 +230,8 @@ model TournamentMatch {
 
 model CardIssue {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  cardId      String
-  cardName    String
+  cardIds     String[] // Array of card IDs sharing the same issue
+  cardNames   String[] // Parallel array of card names
   description String
   status      String   @default("to_fix") // to_fix | fixed_unpublished | fixed_published | verified
   reportedBy  String
