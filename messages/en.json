@@ -94,6 +94,10 @@
       "youHaveEdge": "You have the Edge token — you play first and win ties.",
       "opponentHasEdge": "Your opponent has the Edge token — they play first and win ties."
     },
+    "edgeCoinFlip": {
+      "youWin": "You have the Edge",
+      "opponentWins": "Opponent has the Edge"
+    },
     "actions": {
       "playCharacter": "Play character on mission",
       "playHiddenCharacter": "Play face-down (1 chakra)",
