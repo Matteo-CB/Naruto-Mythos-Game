@@ -48,21 +48,13 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' }) } };
   }
 
-  // Find all non-hidden characters in play with cost <= 4 (not self)
+  // Find all non-hidden characters in play with cost <= 4 (including self)
   const validHideTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    for (const char of mission.player1Characters) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.isHidden) continue;
-      if (char.instanceId === sourceCard.instanceId) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if ((topCard.chakra ?? 0) <= 4) {
-        validHideTargets.push(char.instanceId);
-      }
-    }
-    for (const char of mission.player2Characters) {
-      if (char.isHidden) continue;
-      if (char.instanceId === sourceCard.instanceId) continue;
+      // Self is a valid target (can hide itself)
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 4) {
         validHideTargets.push(char.instanceId);

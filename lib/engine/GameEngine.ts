@@ -24,7 +24,7 @@ import { generateGameId, generateInstanceId, resetIdCounter } from './utils/id';
 import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
-import { executeMissionPhase, resumeMissionScoring } from './phases/MissionPhase';
+import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } from './phases/MissionPhase';
 import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
@@ -190,6 +190,27 @@ export class GameEngine {
           newState.missionScoringComplete = undefined;
           newState = GameEngine.transitionToEndPhase(newState);
           break;
+        }
+        // Handle CHOOSE_SCORE_ORDER: player chose which SCORE effect to resolve next
+        if (action.type === 'SELECT_TARGET') {
+          const chooseScorePending = newState.pendingEffects.find(
+            (e) => e.targetSelectionType === 'CHOOSE_SCORE_ORDER',
+          );
+          if (chooseScorePending) {
+            // Extract the label from the selected option (format: "SCORE::<label>")
+            const selectedOption = action.selectedTargets[0] ?? '';
+            const label = selectedOption.startsWith('SCORE::') ? selectedOption.substring(7) : selectedOption;
+            newState = resolveChosenScoreEffect(newState, label);
+            // If new pending actions were created (either another CHOOSE_SCORE_ORDER or a handler pending), wait
+            if (newState.pendingActions.length > 0) break;
+            // All SCORE effects for this mission resolved — resume remaining missions
+            if (newState.missionScoringProgress) {
+              newState = resumeMissionScoring(newState);
+              if (newState.pendingActions.length > 0) break;
+            }
+            newState.missionScoringComplete = true;
+            break;
+          }
         }
         // Handle target selections for SCORE effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {

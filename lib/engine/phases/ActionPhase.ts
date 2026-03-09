@@ -169,6 +169,10 @@ function handlePlayCharacter(
     log,
   };
 
+  // Existing cards' effects trigger BEFORE the newly played card's effects
+  // Trigger on-play continuous reactions from opponent's characters in this mission
+  newState = triggerOnPlayReactions(newState, player, missionIndex);
+
   // Trigger MAIN effects via EffectEngine
   // Re-fetch the character from the updated state (it may have moved)
   const updatedMission = newState.activeMissions[missionIndex];
@@ -177,9 +181,6 @@ function handlePlayCharacter(
   if (playedChar) {
     newState = EffectEngine.resolvePlayEffects(newState, player, playedChar, missionIndex, false);
   }
-
-  // Trigger on-play continuous reactions from opponent's characters in this mission
-  newState = triggerOnPlayReactions(newState, player, missionIndex);
 
   return newState;
 }
@@ -368,6 +369,10 @@ function handleRevealCharacter(
       log,
     };
 
+    // Existing cards' effects trigger BEFORE the newly played card's effects
+    // Trigger on-play reactions (reveal counts as playing a character)
+    newState = triggerOnPlayReactions(newState, player, missionIndex);
+
     // Trigger MAIN + UPGRADE + AMBUSH effects via EffectEngine
     const updatedMission = newState.activeMissions[missionIndex];
     const updatedMissionChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
@@ -376,9 +381,6 @@ function handleRevealCharacter(
       // Resolve all three effect types: MAIN + UPGRADE + AMBUSH
       newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex);
     }
-
-    // Trigger on-play reactions (reveal counts as playing a character)
-    newState = triggerOnPlayReactions(newState, player, missionIndex);
     return newState;
   }
 
@@ -413,6 +415,10 @@ function handleRevealCharacter(
     log,
   };
 
+  // Existing cards' effects trigger BEFORE the newly played card's effects
+  // Trigger on-play reactions (reveal counts as playing a character)
+  newState = triggerOnPlayReactions(newState, player, missionIndex);
+
   // Trigger MAIN + AMBUSH effects via EffectEngine
   const revealedMission = newState.activeMissions[missionIndex];
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
@@ -420,9 +426,6 @@ function handleRevealCharacter(
   if (revealedChar) {
     newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
-
-  // Trigger on-play reactions (reveal counts as playing a character)
-  newState = triggerOnPlayReactions(newState, player, missionIndex);
 
   return newState;
 }
@@ -515,6 +518,10 @@ function handleUpgradeCharacter(
     activeMissions: missions,
     log,
   };
+
+  // Existing cards' effects trigger BEFORE the newly played card's effects
+  // Trigger on-play continuous reactions from opponent's characters in this mission
+  newState = triggerOnPlayReactions(newState, player, missionIndex);
 
   // Trigger MAIN + UPGRADE effects via EffectEngine
   const upgradedMission = newState.activeMissions[missionIndex];

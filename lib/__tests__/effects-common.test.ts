@@ -847,7 +847,7 @@ describe('060/130 - Kidômaru UC', () => {
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU060_CHOOSE_CHARACTER');
     expect(result.validTargets).toContain('ally-1');
-    expect(result.validTargets).not.toContain('kid-1'); // self excluded
+    expect(result.validTargets).toContain('kid-1'); // self included (can move itself)
   });
 });
 

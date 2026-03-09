@@ -11,7 +11,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN: Gain the Edge token.
  *   - Sets state.edgeHolder to sourcePlayer.
  *
- * AMBUSH: Copy an instant effect (non-continuous [hourglass], non-SCORE) of another
+ * AMBUSH: Copy an instant effect (non-continuous [hourglass]) of another
  *         friendly Team 7 character in play.
  *   - Find all friendly characters across all missions with keyword "Team 7" (not self).
  *   - For each, check their effects: find MAIN or UPGRADE effects that are NOT
@@ -57,12 +57,14 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
 
-      // Check if this character has any non-continuous, non-SCORE, non-UPGRADE instant effects
+      // Check if this character has any non-continuous, non-UPGRADE instant effects
       const hasCopyableEffect = topCard.effects.some((effect) => {
-        // Only copy MAIN or AMBUSH instant effects (not UPGRADE, not SCORE)
-        if (effect.type !== 'MAIN' && effect.type !== 'AMBUSH') return false;
+        // Only copy MAIN, AMBUSH, or SCORE instant effects (not UPGRADE)
+        if (effect.type !== 'MAIN' && effect.type !== 'AMBUSH' && effect.type !== 'SCORE') return false;
         // Skip continuous effects (marked with [⧗] symbol)
         if (effect.description.includes('[⧗]')) return false;
+        // Exclude effect modifiers
+        if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
         return true;
       });
 

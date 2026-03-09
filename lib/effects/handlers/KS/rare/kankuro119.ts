@@ -57,19 +57,11 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
 function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all characters in play (any player, any mission)
+  // Find all characters in play (any player, any mission, including self)
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
-    for (const char of mission.player1Characters) {
-      // Don't move self
-      if (char.instanceId !== sourceCard.instanceId) {
-        validTargets.push(char.instanceId);
-      }
-    }
-    for (const char of mission.player2Characters) {
-      if (char.instanceId !== sourceCard.instanceId) {
-        validTargets.push(char.instanceId);
-      }
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+      validTargets.push(char.instanceId);
     }
   }
 

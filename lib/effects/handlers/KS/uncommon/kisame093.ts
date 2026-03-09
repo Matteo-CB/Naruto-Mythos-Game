@@ -40,15 +40,14 @@ function handleKisame093Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: 'KS-093-UC' }) } };
   }
 
-  // If exactly one target, apply automatically
-  if (validTargets.length === 1) {
+  // If exactly one target AND upgrade (steal ALL), apply automatically
+  if (validTargets.length === 1 && isUpgrade) {
     const targetId = validTargets[0];
-    const maxTransfer = isUpgrade ? Infinity : 2;
-    const newState = transferPowerTokens(state, targetId, sourceCard.instanceId, maxTransfer, sourceMissionIndex, sourcePlayer, isUpgrade);
+    const newState = transferPowerTokens(state, targetId, sourceCard.instanceId, Infinity, sourceMissionIndex, sourcePlayer, isUpgrade);
     return { state: newState };
   }
 
-  // Multiple targets: requires selection
+  // Requires target selection (non-upgrade will chain a token amount choice in EffectEngine)
   const desc = isUpgrade
     ? 'Select an enemy character in play to steal ALL Power tokens from (upgrade).'
     : 'Select an enemy character in play to steal up to 2 Power tokens from.';

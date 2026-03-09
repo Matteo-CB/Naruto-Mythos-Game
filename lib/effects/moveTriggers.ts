@@ -7,7 +7,9 @@ import { canBeHiddenByEnemy } from './ContinuousEffects';
  * Check and trigger Ninja Hounds 100 continuous move effect.
  *
  * Card text: "[hourglass] Each time this character moves to a different mission,
- *            look at a hidden character in this mission."
+ *            look at a hidden enemy character in this mission."
+ *
+ * Creates a pending action so the player can choose which hidden enemy character to peek at.
  */
 export function checkNinjaHoundsTrigger(
   state: GameState,
@@ -31,21 +33,118 @@ export function checkNinjaHoundsTrigger(
   const mission = state.activeMissions[destMissionIndex];
   if (!mission) return state;
 
-  const allChars = [...mission.player1Characters, ...mission.player2Characters];
-  const hiddenChar = allChars.find(
+  // Find hidden ENEMY characters in the destination mission
+  const enemySide: 'player1Characters' | 'player2Characters' =
+    player === 'player1' ? 'player2Characters' : 'player1Characters';
+  const hiddenEnemies = mission[enemySide].filter(
     (c) => c.isHidden && c.instanceId !== movedChar.instanceId,
   );
 
-  if (!hiddenChar) return state;
+  if (hiddenEnemies.length === 0) {
+    return {
+      ...state,
+      log: logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT_NO_TARGET',
+        `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} but no hidden enemy characters to look at.`,
+        'game.log.effect.noTarget',
+        { card: 'Chiens Ninjas', id: 'KS-100-C' },
+      ),
+    };
+  }
+
+  if (hiddenEnemies.length === 1) {
+    // Auto-select if only one target, but still create a reveal pending to show the card info
+    const target = hiddenEnemies[0];
+    const effectId = generateInstanceId();
+    const actionId = generateInstanceId();
+    const revealData = JSON.stringify({
+      cardName: target.card.name_fr,
+      cardCost: target.card.chakra,
+      cardPower: target.card.power,
+      cardImageFile: target.card.image_file,
+    });
+
+    return {
+      ...state,
+      pendingEffects: [...state.pendingEffects, {
+        id: effectId,
+        sourceCardId: topCard.id ?? 'KS-100-C',
+        sourceInstanceId: movedChar.instanceId,
+        sourceMissionIndex: destMissionIndex,
+        effectType: 'MAIN' as const,
+        effectDescription: revealData,
+        targetSelectionType: 'DOSU_LOOK_REVEAL',
+        sourcePlayer: player,
+        requiresTargetSelection: true,
+        validTargets: ['confirm'],
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: false,
+      }],
+      pendingActions: [...state.pendingActions, {
+        id: actionId,
+        type: 'SELECT_TARGET' as const,
+        player,
+        description: `Ninja Hounds (100): Revealed ${target.card.name_fr} (Cost ${target.card.chakra}, Power ${target.card.power}).`,
+        descriptionKey: 'game.effect.desc.ninjaHounds100LookReveal',
+        descriptionParams: { target: target.card.name_fr, cost: String(target.card.chakra), power: String(target.card.power) },
+        options: ['confirm'],
+        minSelections: 1,
+        maxSelections: 1,
+        sourceEffectId: effectId,
+      }],
+      log: logAction(
+        state.log, state.turn, state.phase, player,
+        'EFFECT',
+        `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} - looked at hidden ${target.card.name_fr}.`,
+        'game.log.effect.lookAtHidden',
+        { card: 'Chiens Ninjas', id: 'KS-100-C', target: target.card.name_fr },
+      ),
+    };
+  }
+
+  // Multiple hidden enemies: let the player choose which one to look at
+  const validTargets = hiddenEnemies.map((c) => c.instanceId);
+  const effectId = generateInstanceId();
+  const actionId = generateInstanceId();
 
   return {
     ...state,
+    pendingEffects: [...state.pendingEffects, {
+      id: effectId,
+      sourceCardId: topCard.id ?? 'KS-100-C',
+      sourceInstanceId: movedChar.instanceId,
+      sourceMissionIndex: destMissionIndex,
+      effectType: 'MAIN' as const,
+      effectDescription: 'Ninja Hounds (100): Choose a hidden enemy character to look at.',
+      targetSelectionType: 'NINJA_HOUNDS_LOOK_AT_HIDDEN',
+      sourcePlayer: player,
+      requiresTargetSelection: true,
+      validTargets,
+      isOptional: true,
+      isMandatory: false,
+      resolved: false,
+      isUpgrade: false,
+    }],
+    pendingActions: [...state.pendingActions, {
+      id: actionId,
+      type: 'SELECT_TARGET' as const,
+      player,
+      description: 'Ninja Hounds (100): Choose a hidden enemy character in this mission to look at.',
+      descriptionKey: 'game.effect.desc.ninjaHounds100LookAtHidden',
+      options: validTargets,
+      minSelections: 1,
+      maxSelections: 1,
+      sourceEffectId: effectId,
+    }],
     log: logAction(
       state.log, state.turn, state.phase, player,
-      'EFFECT',
-      `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} - looked at hidden ${hiddenChar.card.name_fr}.`,
-      'game.log.effect.lookAtHidden',
-      { card: 'Chiens Ninjas', id: 'KS-100-C', target: hiddenChar.card.name_fr },
+      'EFFECT_CONTINUOUS',
+      `Ninja Hounds (100): Moved to mission ${destMissionIndex + 1} - choose a hidden enemy to look at.`,
+      'game.log.effect.continuous',
+      { card: 'Chiens Ninjas', id: 'KS-100-C' },
     ),
   };
 }

@@ -14,6 +14,9 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 function handlePakkun099Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  if (!sourceCard) {
+    return { state }; // Character no longer in play
+  }
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 

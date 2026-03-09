@@ -51,8 +51,9 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE has the same "spend extra chakra for POWERUP" logic
-  return tsunade104MainHandler(ctx);
+  // No-op: the MAIN handler already handles the "spend extra chakra for POWERUP"
+  // logic. The UPGRADE effect text describes the same ability, not an additional one.
+  return { state: ctx.state };
 }
 
 export function registerTsunade104Handlers(): void {

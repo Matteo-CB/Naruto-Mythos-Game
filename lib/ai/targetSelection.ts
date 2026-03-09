@@ -39,6 +39,12 @@ export function aiSelectTarget(
   // Confirm / acknowledge — always confirm
   if (options.includes('confirm')) return 'confirm';
 
+  // Token amount choice (e.g., "1" or "2"): AI always picks the maximum
+  if (pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountRemove' ||
+      pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountSteal') {
+    return options.reduce((max, opt) => parseInt(opt, 10) > parseInt(max, 10) ? opt : max, options[0]);
+  }
+
   // Easy: always random
   if (difficulty === 'easy') {
     return randomPick(options);
@@ -54,6 +60,11 @@ export function aiSelectTarget(
   // SACRIFICE OWN CHARACTER (e.g., Jiraiya 132 UPGRADE — opponent chooses own chars to defeat)
   if (desc.includes('choose one of your characters to defeat') || desc.includes('choisissez un de vos personnages')) {
     return selectSacrificeTarget(options, state, aiPlayer, difficulty);
+  }
+
+  // SCORE ORDER: AI picks first option (order is a minor strategic detail)
+  if (desc.includes('score effect') || desc.includes('effet score')) {
+    return options[0];
   }
 
   // DEFEAT / DESTROY: remove the strongest enemy

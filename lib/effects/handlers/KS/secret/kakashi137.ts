@@ -27,7 +27,7 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     const sidePlayer = side === 'player1Characters' ? 'player1' : 'player2';
     const isEnemy = sidePlayer !== ctx.sourcePlayer;
     for (const c of mission[side]) {
-      if (!c.isHidden && c.stack.length >= 2 && c.instanceId !== ctx.sourceCard.instanceId) {
+      if (!c.isHidden && c.stack.length >= 2) {
         // Skip immune enemy characters
         if (isEnemy && !canBeHiddenByEnemy(state, c, sidePlayer)) continue;
         validTargets.push(c.instanceId);

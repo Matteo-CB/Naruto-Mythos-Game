@@ -14,6 +14,29 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
  */
 
 /**
+ * Sort AoE targets so that Gemma Shiranui (card 49 / KS-049-C) is processed LAST.
+ *
+ * Gemma 049 has a continuous sacrifice effect: she can be defeated instead of
+ * a friendly Leaf Village character in the same mission. When an AoE defeats
+ * or hides multiple characters including Gemma AND a Leaf Village ally,
+ * non-Gemma targets must be processed first so Gemma can still offer her
+ * protection before she herself is affected.
+ */
+export function sortTargetsGemmaLast<T extends { card: { number: number }; stack: { number: number }[] }>(
+  targets: T[],
+): T[] {
+  return [...targets].sort((a, b) => {
+    const aTopCard = a.stack.length > 0 ? a.stack[a.stack.length - 1] : a.card;
+    const bTopCard = b.stack.length > 0 ? b.stack[b.stack.length - 1] : b.card;
+    const aIsGemma = aTopCard.number === 49;
+    const bIsGemma = bTopCard.number === 49;
+    if (aIsGemma && !bIsGemma) return 1;  // Gemma goes last
+    if (!aIsGemma && bIsGemma) return -1;
+    return 0;
+  });
+}
+
+/**
  * Find a character by instanceId across all missions.
  * Returns the character, the mission index, and which side it's on.
  */
