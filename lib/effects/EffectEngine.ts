@@ -5615,86 +5615,10 @@ export class EffectEngine {
     }
     // Strip HAND_ prefix if present
     const rawId = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
-    const handIndex = parseInt(rawId, 10);
-    if (isNaN(handIndex)) return state;
-
-    const newState = deepClone(state);
-    const player = pending.sourcePlayer;
-    const ps = newState[player];
-
-    if (handIndex < 0 || handIndex >= ps.hand.length) return state;
-
-    const chosenCard = ps.hand[handIndex];
-    const cost = Math.max(0, chosenCard.chakra - costReduction);
-
-    if (ps.chakra < cost) return state;
-
-    // Remove card from hand, pay cost
-    ps.hand.splice(handIndex, 1);
-    ps.chakra -= cost;
-
-    // Find valid missions (fresh play or upgrade over same-name/flexible with lower cost)
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
-
-    const validMissions: string[] = [];
-    for (let i = 0; i < newState.activeMissions.length; i++) {
-      const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(mission, friendlySide, chosenCard, Infinity, 0)) {
-        validMissions.push(String(i));
-      }
-    }
-
-    if (validMissions.length === 0) {
-      // Refund -- no valid mission
-      ps.hand.push(chosenCard);
-      ps.chakra += cost;
-      return state;
-    }
-
-    // Store chosen card in discard temporarily for stage 2 to recover
-    ps.discardPile.push(chosenCard);
-
-    if (validMissions.length === 1) {
-      // Auto-resolve single mission
-      return EffectEngine.jiraiyaPlaceOnMission(newState, player, parseInt(validMissions[0], 10), cost);
-    }
-
-    // Create stage 2: choose mission
-    const effectId = generateInstanceId();
-    const actionId = generateInstanceId();
-
-    newState.pendingEffects.push({
-      id: effectId,
-      sourceCardId: pending.sourceCardId,
-      sourceInstanceId: pending.sourceInstanceId,
-      sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost }),
-      targetSelectionType: 'JIRAIYA_CHOOSE_MISSION',
-      sourcePlayer: player,
-      requiresTargetSelection: true,
-      validTargets: validMissions,
-      isOptional: true,
-      isMandatory: false,
-      resolved: false,
-      isUpgrade: false,
-    });
-
-    newState.pendingActions.push({
-      id: actionId,
-      type: 'SELECT_TARGET',
-      player,
-      description: `Choose a mission to play the Summon character on (cost reduced by ${costReduction}).`,
-      descriptionKey: 'game.effect.desc.chooseMissionSummon',
-      descriptionParams: { reduction: costReduction },
-      options: validMissions,
-      minSelections: 1,
-      maxSelections: 1,
-      sourceEffectId: effectId,
-    });
-
-    return newState;
+    // Delegate to the generic handler which supports upgrade-or-fresh choice
+    return EffectEngine.playCharFromHandWithReduction(
+      state, pending, rawId, costReduction, 'Summon', 'Jiraya', pending.sourceCardId ?? '',
+    );
   }
 
   /** Play a character card from hand with a specified cost reduction (e.g., Tayuya Sound Village). Two-stage if multiple missions. */
@@ -6006,7 +5930,7 @@ export class EffectEngine {
     return EffectEngine.moveCharToMissionDirect(state, charInstanceId, destMissionIndex, charOwner, effectCardName, effectCardId, effectInitiator);
   }
 
-  /** Jiraiya: play a Summon card from hand. targetId format: "cardIndex:missionIndex" */
+  /** Jiraiya 007: play a Summon card from hand. targetId format: "cardIndex:missionIndex" */
   static playSummonFromHand(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const parts = targetId.split(':');
     if (parts.length < 2) return state;
@@ -6022,18 +5946,13 @@ export class EffectEngine {
     const card = ps.hand[cardIndex];
     if (!card.keywords?.includes('Summon')) return state;
 
-    // Cost with 1 reduction
-    const cost = Math.max(0, card.chakra - 1);
-    if (ps.chakra < cost) return state;
-    ps.chakra -= cost;
-
-    // Remove from hand
+    // Remove from hand (cost deferred to genericPlaceOnMission)
     ps.hand.splice(cardIndex, 1);
 
-    // Store in discard temporarily and use jiraiyaPlaceOnMission (handles upgrades + MAIN effects)
+    // Store in discard temporarily for genericPlaceOnMission to recover
     ps.discardPile.push(card);
 
-    return EffectEngine.jiraiyaPlaceOnMission(newState, player, missionIndex, cost);
+    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'Jiraya', pending.sourceCardId ?? 'KS-007-C', 1);
   }
 
   /** Kimimaro step 2: hide the selected target character */
@@ -6853,85 +6772,10 @@ export class EffectEngine {
     }
     // Strip HAND_ prefix if present
     const rawId = targetId.startsWith('HAND_') ? targetId.slice(5) : targetId;
-    const handIndex = parseInt(rawId, 10);
-    if (isNaN(handIndex)) return state;
-
-    const newState = deepClone(state);
-    const player = pending.sourcePlayer;
-    const ps = newState[player];
-
-    if (handIndex < 0 || handIndex >= ps.hand.length) return state;
-
-    const chosenCard = ps.hand[handIndex];
-    const cost = Math.max(0, chosenCard.chakra - 1);
-
-    if (ps.chakra < cost) return state;
-
-    // Remove card from hand, pay cost
-    ps.hand.splice(handIndex, 1);
-    ps.chakra -= cost;
-
-    // Find valid missions (fresh play or upgrade over same-name/flexible with lower cost)
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
-
-    const validMissions: string[] = [];
-    for (let i = 0; i < newState.activeMissions.length; i++) {
-      const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(mission, friendlySide, chosenCard, Infinity, 0)) {
-        validMissions.push(String(i));
-      }
-    }
-
-    if (validMissions.length === 0) {
-      // Refund -- no valid mission
-      ps.hand.push(chosenCard);
-      ps.chakra += cost;
-      return state;
-    }
-
-    // Store chosen card in discard temporarily for stage 2 to recover
-    ps.discardPile.push(chosenCard);
-
-    if (validMissions.length === 1) {
-      // Auto-resolve single mission
-      return EffectEngine.jiraiyaPlaceOnMission(newState, player, parseInt(validMissions[0], 10), cost);
-    }
-
-    // Create stage 2: choose mission
-    const effectId = generateInstanceId();
-    const actionId = generateInstanceId();
-
-    newState.pendingEffects.push({
-      id: effectId,
-      sourceCardId: pending.sourceCardId,
-      sourceInstanceId: pending.sourceInstanceId,
-      sourceMissionIndex: pending.sourceMissionIndex,
-      effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost }),
-      targetSelectionType: 'JIRAIYA_CHOOSE_MISSION',
-      sourcePlayer: player,
-      requiresTargetSelection: true,
-      validTargets: validMissions,
-      isOptional: true,
-      isMandatory: false,
-      resolved: false,
-      isUpgrade: false,
-    });
-
-    newState.pendingActions.push({
-      id: actionId,
-      type: 'SELECT_TARGET',
-      player,
-      description: `Jiraiya (007): Choose a mission to play the Summon character on.`,
-      descriptionKey: 'game.effect.desc.jiraiya007PlaySummon',
-      options: validMissions,
-      minSelections: 1,
-      maxSelections: 1,
-      sourceEffectId: effectId,
-    });
-
-    return newState;
+    // Delegate to the generic handler which supports upgrade-or-fresh choice
+    return EffectEngine.playCharFromHandWithReduction(
+      state, pending, rawId, 1, 'Summon', 'Jiraya', pending.sourceCardId ?? 'KS-007-C',
+    );
   }
 
   /** Jiraiya Stage 2: player chose a mission. Place the Summon there. */
@@ -6940,9 +6784,12 @@ export class EffectEngine {
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
-    let cost = 0;
-    try { cost = JSON.parse(pending.effectDescription).cost ?? 0; } catch { /* ignore */ }
-    return EffectEngine.jiraiyaPlaceOnMission(newState, player, missionIndex, cost);
+    let costReduction = 0;
+    try {
+      const desc = JSON.parse(pending.effectDescription);
+      costReduction = desc.costReduction ?? 0;
+    } catch { /* ignore */ }
+    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'Jiraya', pending.sourceCardId ?? '', costReduction);
   }
 
   /** Jiraiya helper: place the Summon card (last in discard) onto a mission */
@@ -7355,39 +7202,22 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const sameNameChar = mission[friendlySide].find(c => {
-        if (c.isHidden) return false;
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
-      });
-
-      if (!sameNameChar) {
-        // No same-name â†' fresh play is valid
-        const freshCost109 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
-        if (ps.chakra >= freshCost109) validMissions.push(String(i));
-      } else {
-        // Same-name exists â†' check if upgrade is valid (strictly higher chakra)
-        const existingTopCard = sameNameChar.stack.length > 0
-          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
-        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-          const upgradeCost109 = Math.max(0, ((chosenCard.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
-          if (ps.chakra >= upgradeCost109) validMissions.push(String(i));
-        }
+      if (isMissionValidForPlay(mission, friendlySide, chosenCard, ps.chakra, costReduction)) {
+        validMissions.push(String(i));
       }
     }
 
     if (validMissions.length === 0) {
       // Refund
-      // No refund needed (cost not paid upfront)
       ps.discardPile.push(chosenCard);
       return state;
     }
 
-    // Store card temporarily in discard pile end for stage 2
+    // Store card temporarily in discard pile end for genericPlaceOnMission to recover
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.sakura109Place(newState, player, parseInt(validMissions[0], 10), costReduction, isUpgrade);
+      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-109-R', costReduction);
     }
 
     const effectId = generateInstanceId();
@@ -7399,8 +7229,8 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ costReduction, isUpgrade }),
-      targetSelectionType: 'SAKURA109_CHOOSE_MISSION',
+      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-109-R', costReduction }),
+      targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
@@ -7426,110 +7256,18 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Sakura 109 Stage 2: place the chosen card on the selected mission. */
+  /** Sakura 109 Stage 2 (legacy compat): redirect to genericPlaceOnMission. */
   static sakura109ChooseMission(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const missionIndex = parseInt(targetId, 10);
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    let isUpgrade = false;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
-    return EffectEngine.sakura109Place(newState, player, missionIndex, costReduction, isUpgrade);
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
+    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-109-R', costReduction);
   }
 
-  /** Sakura 109 helper: place the card (last in discard) on the mission. Handles both fresh play and upgrade. */
-  private static sakura109Place(state: GameState, player: PlayerID, missionIndex: number, costReduction: number, isUpgrade: boolean): GameState {
-    const ps = state[player];
-    const card = ps.discardPile.pop();
-    if (!card) return state;
-
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
-
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[missionIndex] };
-
-    // Check if there's a same-name character to upgrade
-    const existingIdx = mission[friendlySide].findIndex(c => {
-      if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
-        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
-    });
-
-    let placedChar: CharacterInPlay;
-    let isCardUpgrade = false;
-
-    if (existingIdx >= 0) {
-      // Upgrade the existing character
-      const existing = mission[friendlySide][existingIdx];
-      const updatedChars = [...mission[friendlySide]];
-      updatedChars[existingIdx] = {
-        ...existing,
-        card: card as any,
-        stack: [...existing.stack, card as any],
-      };
-      mission[friendlySide] = updatedChars;
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = updatedChars[existingIdx];
-      isCardUpgrade = true;
-
-      // Calculate upgrade cost with reduction
-      const existingTop109 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
-      const actualCost = Math.max(0, ((card.chakra ?? 0) - (existingTop109.chakra ?? 0)) - costReduction);
-      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
-      ps.chakra -= actualCost;
-
-      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${actualCost})` : ` (paid ${actualCost})`;
-      state.log = logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_UPGRADE',
-        `Sakura Haruno (109): Upgraded ${card.name_fr} from discard pile on mission ${missionIndex + 1}${costDesc}.`,
-        'game.log.effect.upgradeFromDiscard',
-        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
-      );
-    } else {
-      // Fresh play
-      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
-      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
-      ps.chakra -= actualCost;
-
-      const newChar: CharacterInPlay = {
-        instanceId: generateInstanceId(),
-        card: card as any,
-        isHidden: false,
-        wasRevealedAtLeastOnce: true,
-        powerTokens: 0,
-        stack: [card as any],
-        controlledBy: player,
-        originalOwner: player,
-        missionIndex,
-      };
-
-      mission[friendlySide] = [...mission[friendlySide], newChar];
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = newChar;
-
-      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
-
-      const costDesc = isUpgrade ? ` (cost reduced by 2, paid ${actualCost})` : ` (paid ${actualCost})`;
-      state.log = logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_PLAY',
-        `Sakura Haruno (109): Played ${card.name_fr} from discard pile to mission ${missionIndex + 1}${costDesc}.`,
-        'game.log.effect.playFromDiscard',
-        { card: 'SAKURA HARUNO', id: 'KS-109-R', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
-      );
-    }
-
-    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
-    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
-
-    return state;
-  }
+  // sakura109Place removed — now uses genericPlaceOnMission via sakura109ChooseMission
 
   // =====================================
   // Sakura 135 (S) â€' Top 3 cards (two-stage)
@@ -7576,39 +7314,21 @@ export class EffectEngine {
     const validMissions: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       const mission = newState.activeMissions[i];
-      const sameNameChar = mission[friendlySide].find(c => {
-        if (c.isHidden) return false;
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr.toUpperCase() === chosenCard.name_fr.toUpperCase();
-      });
-
-      if (!sameNameChar) {
-        // No same-name character â†' fresh play is valid
-        const fc135 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
-        if (ps.chakra >= fc135) validMissions.push(String(i));
-      } else {
-        // Same-name exists â†' check if upgrade is valid (strictly higher chakra)
-        const existingTopCard = sameNameChar.stack.length > 0
-          ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
-        if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-          const uc135 = Math.max(0, ((chosenCard.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
-          if (ps.chakra >= uc135) validMissions.push(String(i));
-        }
+      if (isMissionValidForPlay(mission, friendlySide, chosenCard, ps.chakra, costReduction)) {
+        validMissions.push(String(i));
       }
     }
 
     if (validMissions.length === 0) {
-      // No valid mission â€' discard
       ps.discardPile.push(chosenCard);
-      // No refund needed (cost not paid upfront)
       return newState;
     }
 
-    // Store chosen card at end of discard for stage 2
+    // Store chosen card at end of discard for genericPlaceOnMission to recover
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.sakura135Place(newState, player, parseInt(validMissions[0], 10), costReduction, costReduction > 0);
+      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
     }
 
     const effectId = generateInstanceId();
@@ -7620,8 +7340,8 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ costReduction, isUpgrade: costReduction > 0 }),
-      targetSelectionType: 'SAKURA135_CHOOSE_MISSION',
+      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-135-S', costReduction }),
+      targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
@@ -7647,110 +7367,15 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Sakura 135 Stage 2: place the chosen card on the selected mission. */
+  /** Sakura 135 Stage 2 (legacy compat): redirect to genericPlaceOnMission. */
   static sakura135ChooseMission(state: GameState, pending: PendingEffect, targetId: string): GameState {
     const missionIndex = parseInt(targetId, 10);
     if (isNaN(missionIndex)) return state;
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    let isUpgrade = false;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; isUpgrade = d.isUpgrade ?? false; } catch { /* ignore */ }
-    return EffectEngine.sakura135Place(newState, player, missionIndex, costReduction, isUpgrade);
-  }
-
-  /** Sakura 135 helper: place card (last in discard) on mission. Handles both fresh play and upgrade. */
-  private static sakura135Place(state: GameState, player: PlayerID, missionIndex: number, costReduction: number, isUpgrade: boolean): GameState {
-    const ps = state[player];
-    const card = ps.discardPile.pop();
-    if (!card) return state;
-
-    const friendlySide: 'player1Characters' | 'player2Characters' =
-      player === 'player1' ? 'player1Characters' : 'player2Characters';
-
-    const missions = [...state.activeMissions];
-    const mission = { ...missions[missionIndex] };
-
-    // Check if there's a same-name character to upgrade
-    const existingIdx = mission[friendlySide].findIndex(c => {
-      if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
-        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
-    });
-
-    let placedChar: CharacterInPlay;
-    let isCardUpgrade = false;
-
-    if (existingIdx >= 0) {
-      // Upgrade the existing character
-      const existing = mission[friendlySide][existingIdx];
-      const updatedChars = [...mission[friendlySide]];
-      updatedChars[existingIdx] = {
-        ...existing,
-        card: card as any,
-        stack: [...existing.stack, card as any],
-        // Power tokens transfer through upgrade
-      };
-      mission[friendlySide] = updatedChars;
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = updatedChars[existingIdx];
-      isCardUpgrade = true;
-
-      // Calculate upgrade cost with reduction
-      const eTop135 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
-      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTop135.chakra ?? 0)) - costReduction);
-      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
-      ps.chakra -= actualCost;
-
-      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${actualCost})` : ` (paid ${actualCost})`;
-      state.log = logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_UPGRADE',
-        `Sakura Haruno (135): Upgraded ${card.name_fr} on mission ${missionIndex + 1}${costDesc}.`,
-        'game.log.effect.upgradeFromDeck',
-        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
-      );
-    } else {
-      // Fresh play
-      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
-      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
-      ps.chakra -= actualCost;
-
-      const newChar: CharacterInPlay = {
-        instanceId: generateInstanceId(),
-        card: card as any,
-        isHidden: false,
-        wasRevealedAtLeastOnce: true,
-        powerTokens: 0,
-        stack: [card as any],
-        controlledBy: player,
-        originalOwner: player,
-        missionIndex,
-      };
-
-      mission[friendlySide] = [...mission[friendlySide], newChar];
-      missions[missionIndex] = mission;
-      state.activeMissions = missions;
-      placedChar = newChar;
-
-      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
-
-      const costDesc = isUpgrade ? ` (cost reduced by 4, paid ${actualCost})` : ` (paid ${actualCost})`;
-      state.log = logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_PLAY',
-        `Sakura Haruno (135): Played ${card.name_fr} from top of deck to mission ${missionIndex + 1}${costDesc}.`,
-        'game.log.effect.playFromDeck',
-        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: card.name_fr, mission: `mission ${missionIndex + 1}`, cost: actualCost },
-      );
-    }
-
-    // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
-    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
-
-    return state;
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
+    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
   }
 
   // =====================================
