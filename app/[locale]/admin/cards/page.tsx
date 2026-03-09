@@ -11,6 +11,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 type FilterMode = 'all' | 'banned' | 'authorized';
 
@@ -30,7 +31,7 @@ export default function AdminCardsPage() {
   }, []);
 
   useEffect(() => {
-    if (session?.user?.email === ADMIN_EMAIL) {
+    if (session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '')) {
       fetchBanned();
     }
   }, [session]);

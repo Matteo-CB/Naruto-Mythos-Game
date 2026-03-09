@@ -962,8 +962,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.gameState.actionHistory = [];
         }
 
-        // Detect silently rejected play actions (validation failed, state unchanged)
+        // Detect silently rejected actions (validation failed, state unchanged)
         const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
+        const isTargetAction = data.action.type === 'SELECT_TARGET';
+
+        // SELECT_TARGET silent failure: pending effects/actions didn't change
+        if (isTargetAction && room.gameState.log.length === oldLogLength) {
+          const prevPendingCount = prevState.pendingEffects.length + prevState.pendingActions.length;
+          const newPendingCount = room.gameState.pendingEffects.length + room.gameState.pendingActions.length;
+          if (prevPendingCount === newPendingCount) {
+            console.warn(`[Socket] SELECT_TARGET silently failed for ${player}: state unchanged (pending: ${prevPendingCount} -> ${newPendingCount})`);
+            socket.emit('game:error', { message: 'Effect failed to apply. Please try again.', errorKey: 'game.error.effectFailed' });
+            broadcastState(room, io);
+            return;
+          }
+        }
+
         if (isPlayAction && room.gameState.log.length === oldLogLength) {
           // Action was rejected — get the specific validation reason
           let errorMessage = 'Action not allowed.';

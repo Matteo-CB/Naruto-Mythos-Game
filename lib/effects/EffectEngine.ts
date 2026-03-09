@@ -595,7 +595,7 @@ export class EffectEngine {
 
     // Validate target is in valid targets list (prevents wrong character from being affected)
     if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
-      console.warn(`[EffectEngine] Invalid target ${targetId} â€' not in validTargets for ${pendingEffect.targetSelectionType}`);
+      console.warn(`[EffectEngine] Invalid target ${targetId} — not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
       return state;
     }
 
@@ -4983,7 +4983,10 @@ export class EffectEngine {
    */
   static defeatCharacter(state: GameState, targetId: string, sourcePlayer?: PlayerID): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
-    if (!charResult) return state;
+    if (!charResult) {
+      console.warn(`[EffectEngine] defeatCharacter: character ${targetId} not found in any mission. Cannot defeat.`);
+      return state;
+    }
 
     const effectSource = sourcePlayer ?? (charResult.player === 'player1' ? 'player2' : 'player1');
     const isEnemyEffect = effectSource !== charResult.player;

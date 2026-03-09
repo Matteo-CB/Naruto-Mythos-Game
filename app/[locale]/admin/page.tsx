@@ -11,6 +11,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 type Tab = 'settings' | 'cards' | 'backgrounds';
 
@@ -54,7 +55,7 @@ export default function AdminPage() {
   const [bgFile, setBgFile] = useState<File | null>(null);
   const [bgConfirmDeleteId, setBgConfirmDeleteId] = useState<string | null>(null);
 
-  const isAdmin = session?.user?.email === ADMIN_EMAIL;
+  const isAdmin = session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
 
   const allCards = useMemo(() => {
     const chars = getPlayableCharacters();

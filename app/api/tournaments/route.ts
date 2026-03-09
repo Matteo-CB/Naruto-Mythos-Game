@@ -5,7 +5,7 @@ import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { validateLeagueKeys } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 function isAdmin(session: { user?: { email?: string | null; name?: string | null } } | null): boolean {
   if (!session?.user) return false;

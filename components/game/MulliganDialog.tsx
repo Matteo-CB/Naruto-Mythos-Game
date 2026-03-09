@@ -369,6 +369,22 @@ export function MulliganDialog() {
           <span className="text-sm text-center" style={{ color: '#888888' }}>
             {t('game.mulligan.description')}
           </span>
+          <span
+            className="text-xs text-center px-3 py-1.5 rounded-md"
+            style={{
+              color: visibleState.edgeHolder === visibleState.myPlayer ? '#c4a35a' : '#b33e3e',
+              backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
+                ? 'rgba(196, 163, 90, 0.1)'
+                : 'rgba(179, 62, 62, 0.1)',
+              border: `1px solid ${visibleState.edgeHolder === visibleState.myPlayer
+                ? 'rgba(196, 163, 90, 0.3)'
+                : 'rgba(179, 62, 62, 0.3)'}`,
+            }}
+          >
+            {visibleState.edgeHolder === visibleState.myPlayer
+              ? t('game.mulligan.youHaveEdge')
+              : t('game.mulligan.opponentHasEdge')}
+          </span>
         </div>
 
         {/* Cards */}

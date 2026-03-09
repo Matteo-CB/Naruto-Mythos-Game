@@ -90,7 +90,9 @@
       "description": "You may return your hand and draw 5 new cards. This can only be done once.",
       "keep": "Keep Hand",
       "redraw": "Redraw",
-      "clickHint": "Click a card to inspect it"
+      "clickHint": "Click a card to inspect it",
+      "youHaveEdge": "You have the Edge token — you play first and win ties.",
+      "opponentHasEdge": "Your opponent has the Edge token — they play first and win ties."
     },
     "actions": {
       "playCharacter": "Play character on mission",
@@ -597,6 +599,7 @@
       "upgradeHigherCost": "Upgrade must have strictly higher chakra cost. New: {newCost}, Current: {currentCost}.",
       "notEnoughChakraUpgrade": "Not enough chakra. Need {need} (difference), have {have}.",
       "actionNotAllowed": "Action not allowed.",
+      "effectFailed": "Effect failed to apply. Please try again.",
       "invalidUpgradeTarget": "Invalid upgrade target.",
       "connectionTimeout": "Connection timed out. Server may be unavailable.",
       "connectionLost": "Lost connection to server.",

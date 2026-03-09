@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 export async function GET() {
   try {

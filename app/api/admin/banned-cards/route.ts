@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 // GET — list all banned card IDs (public, needed by all clients)
 export async function GET() {
@@ -23,7 +24,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
+    if (!session?.user?.email && !session?.user?.name) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (session.user.email !== ADMIN_EMAIL && !ADMIN_USERNAMES.includes(session.user.name ?? '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
