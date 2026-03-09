@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 099/130 - PAKKUN (Common)
@@ -25,6 +26,13 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
     ? sourceCard.stack[sourceCard.stack.length - 1]
     : sourceCard.card;
   const charName = topCard.name_fr;
+
+  // Kurenai 035: if enemy Kurenai blocks movement from this mission, fizzle
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_BLOCKED',
+      'Pakkun (099): Movement blocked by Yuhi Kurenai (035).',
+      'game.log.effect.moveBlockedKurenai', { card: 'PAKKUN', id: 'KS-099-C' }) } };
+  }
 
   // Find all valid destination missions (not current, no same-name conflict)
   const validTargets: string[] = [];

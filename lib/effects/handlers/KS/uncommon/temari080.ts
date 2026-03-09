@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 080/130 - TEMARI "Wind Scythe" (UC)
@@ -22,11 +23,15 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
   // Find all friendly Sand Village characters across all missions (not self)
+  // Only include characters whose source mission is NOT blocked by Kurenai 035
   const validTargets: string[] = [];
-  for (const mission of state.activeMissions) {
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    const mission = state.activeMissions[mi];
     const friendlyChars = mission[friendlySide];
+    const kurenaiBlocked = isMovementBlockedByKurenai(state, mi, sourcePlayer);
     for (const char of friendlyChars) {
       if (char.instanceId === sourceCard.instanceId) continue;
+      if (kurenaiBlocked) continue; // Can't move chars from a Kurenai-blocked mission
       if (char.isHidden) {
         continue; // Hidden characters can't be identified by group
       } else {
@@ -65,6 +70,18 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
 function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+  // Kurenai 035: if enemy Kurenai blocks movement from this mission, fizzle
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_BLOCKED',
+      'Temari (080): Movement blocked by Yuhi Kurenai (035).',
+      'game.log.effect.moveBlockedKurenai',
+      { card: 'TEMARI', id: 'KS-080-UC' },
+    );
+    return { state: { ...state, log } };
+  }
 
   // Find valid destination missions for self (must not have same-name conflict)
   const topCard = sourceCard.stack.length > 0

@@ -9,7 +9,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
-import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
@@ -4538,6 +4538,19 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(state, instanceId);
     if (!charResult) return state;
     if (charResult.missionIndex === destMissionIndex) return state;
+
+    // Kurenai 035 (UC): ENEMY characters cannot move from this mission
+    if (isMovementBlockedByKurenai(state, charResult.missionIndex, charResult.player)) {
+      const loggedState = deepClone(state);
+      loggedState.log = logAction(
+        loggedState.log, loggedState.turn, loggedState.phase, charResult.player,
+        'EFFECT_BLOCKED',
+        `Yuhi Kurenai (035): ${charResult.character.card.name_fr} cannot be moved from this mission.`,
+        'game.log.effect.moveBlockedKurenai',
+        { card: 'YUHI KURENAI', id: 'KS-035-UC', target: charResult.character.card.name_fr },
+      );
+      return loggedState;
+    }
 
     // Enforce same-name-per-mission rule
     if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
