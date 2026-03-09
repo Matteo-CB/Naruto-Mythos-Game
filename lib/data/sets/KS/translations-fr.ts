@@ -390,14 +390,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Jutsu de Decuplement"
   'KS-018-UC': [
-    '[⧗] Apres avoir deplace ce personnage vers une autre mission, cachez un personnage ennemi avec moins de Puissance.',
-    'Deplacez ce personnage sur une autre mission.',
+    '[⧗] Apres avoir deplace ce personnage, cachez un personnage ennemi dans cette mission avec moins de Puissance que ce personnage.',
+    'Deplacez ce personnage.',
   ],
 
   // 020/130 - INO YAMANAKA (UC) - "Transfert de l\'Esprit"
   'KS-020-UC': [
     'Prenez le controle d\'un personnage ennemi avec un cout de 2 ou moins dans cette mission.',
-    'effet MAIN : A la place, la limite de cout est de 3.',
+    'effet MAIN : A la place, la limite de cout est de 3 ou moins.',
   ],
 
   // 022/130 - SHIKAMARU NARA (UC) - "Possession des Ombres"
@@ -407,7 +407,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 024/130 - ASUMA SARUTOBI (UC) - "Lames Volantes"
   'KS-024-UC': [
-    'Piochez une carte, puis defaussez une carte. POWERUP 3 si vous avez defausse un personnage Equipe 10.',
+    'Piochez une carte. Puis, defaussez une carte pour POWERUP 3.',
   ],
 
   // 026/130 - KIBA INUZUKA (UC) - "Crocs Lacerateurs"
@@ -457,7 +457,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 037/130 - NEJI HYUGA (UC) - "Huit Trigrammes"
   'KS-037-UC': [
-    '[⧗] Quand un personnage ennemi est joue dans cette mission, POWERUP 1.',
+    '[⧗] Quand un personnage ennemi non cache est joue dans cette mission, POWERUP 1.',
     'Retirez tous les jetons de Puissance d\'un personnage ennemi dans cette mission.',
   ],
 
@@ -469,7 +469,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 041/130 - TENTEN (UC) - "Dragons Jumeaux"
   'KS-041-UC': [
     'Vainquez un personnage cache dans cette mission.',
-    'POWERUP 1 sur un autre personnage Village de Konoha allie dans cette mission.',
+    'POWERUP 1 sur un autre personnage Village de Konoha en jeu.',
   ],
 
   // 043/130 - GAI MAITO (UC) - "Entree Dynamique"
@@ -503,7 +503,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 054/130 - KABUTO YAKUSHI (UC) - "Scalpel de Chakra"
   'KS-054-UC': [
     'POWERUP 1.',
-    'Cachez tous les autres personnages non caches avec une Puissance inferieure a celle de ce personnage dans cette mission.',
+    'Cachez tous les autres personnages dans cette mission avec une Puissance inferieure a celle de ce personnage.',
   ],
 
   // 056/130 - KIMIMARO (UC) - "Pulsion Osseuse"
@@ -514,8 +514,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 058/130 - JIROBO (UC) - "Barriere de Terre"
   'KS-058-UC': [
-    'POWERUP 1 sur chaque personnage Quartet du Son allie dans cette mission.',
-    'effet MAIN : A la place, POWERUP 1 sur chaque personnage Quartet du Son allie dans toutes les missions.',
+    'POWERUP 1 sur tous les autres personnages Quartet du Son allies dans cette mission.',
+    'effet MAIN : Appliquez l\'effet MAIN aux personnages Quartet du Son dans les autres missions.',
   ],
 
   // 060/130 - KIDOMARU (UC) - "Toile d\'Araignee"
@@ -554,7 +554,6 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 069/130 - DOSU KINUTA (UC) - "Bras Melodieux"
   'KS-069-UC': [
-    'Regardez un personnage cache en jeu.',
     'Choisissez un personnage ennemi cache en jeu. L\'adversaire doit soit le jouer en payant 2 de plus, soit le vaincre.',
   ],
 
@@ -579,7 +578,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 078/130 - KANKURO (UC) - "Maitre des Marionnettes"
   'KS-078-UC': [
     'Deplacez n\'importe quel personnage avec une Puissance de 4 ou moins.',
-    'Jouez un personnage allie tout en etant cache, en payant 1 de moins.',
+    'Jouez un personnage allie en cache, en payant 1 de moins.',
   ],
 
   // 080/130 - TEMARI (UC) - "Lame de Vent"
@@ -590,7 +589,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 082/130 - BAKI (UC) - "Lame de Vent"
   'KS-082-UC': [
-    '[↯] Vainquez un personnage ennemi cache en jeu.',
+    '[↯] Vainquez un personnage cache en jeu.',
     'Vainquez un personnage ennemi avec une Puissance de 1 ou moins dans cette mission.',
   ],
 
@@ -601,7 +600,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 085/130 - YASHAMARU (UC) - "Tuteur de Gaara"
   'KS-085-UC': [
-    '[↯] Vainquez ce personnage et un autre personnage dans cette mission.',
+    '[↯] Vainquez ce personnage. Si vous le faites, vainquez un autre personnage dans cette mission.',
   ],
 
   // 087/130 - ZABUZA MOMOCHI (UC) - "Prison Aqueuse"
@@ -619,13 +618,13 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 091/130 - ITACHI UCHIWA (UC) - "Mangekyo Sharingan"
   'KS-091-UC': [
     'Regardez la main de l\'adversaire.',
-    'effet MAIN : En plus, l\'adversaire defausse cette carte et pioche une carte.',
+    'effet MAIN : En plus, choisissez 1 carte dans la main de l\'adversaire et defaussez-la.',
   ],
 
   // 093/130 - KISAME HOSHIGAKI (UC) - "Samehada"
   'KS-093-UC': [
-    'Volez jusqu\'a 2 jetons de Puissance d\'un personnage ennemi et placez-les sur ce personnage.',
-    'effet MAIN : En plus, volez depuis n\'importe quelle mission.',
+    'Retirez jusqu\'a 2 jetons de Puissance d\'un personnage ennemi en jeu et placez-les sur ce personnage.',
+    'effet MAIN : A la place, retirez tous les jetons de Puissance et placez-les sur ce personnage.',
   ],
 
   // 102/130 - MANDA (UC) - "Roi des Serpents"
@@ -838,7 +837,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 132/130 - JIRAYA (S) - "Dans l\'Estomac du Crapaud"
   'KS-132-S': [
     'Jouez un personnage Invocation n\'importe ou en payant 5 de moins.',
-    'L\'adversaire doit choisir des personnages a vaincre jusqu\'a ce qu\'il n\'en ait plus que 2 par mission au maximum.',
+    'L\'adversaire doit choisir des personnages a vaincre jusqu\'a ce qu\'il n\'en ait plus que 2 dans cette mission au maximum.',
   ],
 
   // 134/130 - KYUBI (S) - "Destruction"

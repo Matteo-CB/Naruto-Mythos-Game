@@ -325,14 +325,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Expansion Jutsu"
   'KS-018-UC': [
-    '[⧗] After you move this character to another mission, hide an enemy character with less Power there.',
-    'Move this character to another mission.',
+    '[⧗] After you move this character, hide an enemy character in this mission with less Power than this character.',
+    'Move this character.',
   ],
 
   // 020/130 - INO YAMANAKA (UC) - "Mind Transfer Jutsu"
   'KS-020-UC': [
     'Take control of an enemy character with cost 2 or less in this mission.',
-    'MAIN effect: Instead, the cost limit is 3.',
+    'MAIN effect: Instead, the cost limit is 3 or less.',
   ],
 
   // 022/130 - SHIKAMARU NARA (UC) - "Shadow Possession Jutsu"
@@ -340,14 +340,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Move an enemy character played during the opponent\'s previous turn.',
   ],
 
-  // 024/130 - ASUMA SARUTOBI (UC) - "Flying Swallow"
+  // 024/130 - ASUMA SARUTOBI (UC) - "Chakra Blade"
   'KS-024-UC': [
-    'Draw a card, then discard a card. POWERUP 3 if you discarded a Team 10 character.',
+    'Draw a card. Then, discard a card to POWERUP 3.',
   ],
 
-  // 026/130 - KIBA INUZUKA (UC) - "Fang Over Fang"
+  // 026/130 - KIBA INUZUKA (UC) - "All-Four Jutsu"
   'KS-026-UC': [
-    'Hide the lowest cost enemy character in this mission.',
+    'Hide the non-hidden enemy character with the lowest cost in this mission.',
     'Look at the top 3 cards of your deck, reveal and draw all Akamaru characters, then put back the other cards.',
   ],
 
@@ -365,7 +365,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 031/130 - HINATA HYUGA (UC) - "Byakugan"
   'KS-031-UC': [
-    '[⧗] When an enemy character is played in this mission, gain 1 Chakra.',
+    '[⧗] When a non-hidden enemy character is played in this mission, gain 1 Chakra.',
   ],
 
   // 033/130 - SHINO ABURAME (UC) - "Parasitic Insects"
@@ -374,15 +374,15 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Move this character.',
   ],
 
-  // 035/130 - KURENAI YUHI (UC) - "Demonic Illusion"
+  // 035/130 - KURENAI YUHI (UC) - "Tree Bind: Death"
   'KS-035-UC': [
     '[⧗] Enemy characters can\'t be moved from this mission.',
     'Defeat an enemy character with Power 1 or less in this mission.',
   ],
 
-  // 037/130 - NEJI HYUGA (UC) - "Eight Trigrams"
+  // 037/130 - NEJI HYUGA (UC) - "Eight Trigrams: Palm Rotation"
   'KS-037-UC': [
-    '[⧗] When an enemy character is played in this mission, POWERUP 1.',
+    '[⧗] When a non-hidden enemy character is played in this mission, POWERUP 1.',
     'Remove all Power tokens from an enemy character in this mission.',
   ],
 
@@ -392,10 +392,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP 2.',
   ],
 
-  // 041/130 - TENTEN (UC) - "Rising Twin Dragons"
+  // 041/130 - TENTEN (UC) - "Weapons Specialist"
   'KS-041-UC': [
     'Defeat a hidden character in this mission.',
-    'POWERUP 1 another friendly Leaf Village character in this mission.',
+    'POWERUP 1 another Leaf Village character in play.',
   ],
 
   // 043/130 - GAI MAITO (UC) - "Dynamic Entry"
@@ -421,10 +421,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Play the top character of your discard pile anywhere, paying its cost minus 3.',
   ],
 
-  // 054/130 - KABUTO YAKUSHI (UC) - "Chakra Scalpel"
+  // 054/130 - KABUTO YAKUSHI (UC) - "Temple of Nirvana Technique"
   'KS-054-UC': [
     'POWERUP 1.',
-    'Hide all other non-hidden characters with Power less than this character in this mission.',
+    'Hide all other characters in this mission with less Power than this character.',
   ],
 
   // 056/130 - KIMIMARO (UC) - "Bone Pulse"
@@ -433,10 +433,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Discard a card to hide a character in play with cost 4 or less.',
   ],
 
-  // 058/130 - JIROBO (UC) - "Earth Barrier"
+  // 058/130 - JIROBO (UC) - "Earth Style Barrier: Earth Dome Prison"
   'KS-058-UC': [
-    'POWERUP 1 each friendly Sound Four character in this mission.',
-    'MAIN effect: Instead, POWERUP 1 each friendly Sound Four character in every mission.',
+    'POWERUP 1 to all other friendly Sound Four characters in this mission.',
+    'MAIN effect: Apply the MAIN effect to Sound Four characters in the other missions.',
   ],
 
   // 060/130 - KIDOMARU (UC) - "Spider Web"
@@ -475,8 +475,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 069/130 - DOSU KINUTA (UC) - "Melody Arm"
   'KS-069-UC': [
-    'Look at a hidden character in play.',
-    'Force an enemy hidden character in this mission to reveal itself or be defeated.',
+    'Choose a hidden enemy character in play. Opponent must either play them paying 2 more, or defeat them.',
   ],
 
   // 071/130 - ZAKU ABUMI (UC) - "Slicing Sound Wave"
@@ -499,8 +498,8 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 078/130 - KANKURO (UC) - "Puppet Master"
   'KS-078-UC': [
-    'Move any character with Power 4 or less to another mission.',
-    'Play a character while hidden in this mission, paying 1 less.',
+    'Move any character with Power 4 or less.',
+    'Play a friendly character while hidden, paying 1 less.',
   ],
 
   // 080/130 - TEMARI (UC) - "Wind Scythe Jutsu"
@@ -509,9 +508,9 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Move this character to another mission.',
   ],
 
-  // 082/130 - BAKI (UC) - "Blade of Wind"
+  // 082/130 - BAKI (UC) - "Wind Sword"
   'KS-082-UC': [
-    '[↯] Defeat a hidden enemy character in play.',
+    '[↯] Defeat a hidden character in play.',
     'Defeat an enemy character with Power 1 or less in this mission.',
   ],
 
@@ -522,7 +521,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 085/130 - YASHAMARU (UC) - "Gaara\'s Caretaker"
   'KS-085-UC': [
-    '[↯] Defeat this character and another character in this mission.',
+    '[↯] Defeat this character. If you do so, defeat another character in this mission.',
   ],
 
   // 087/130 - ZABUZA MOMOCHI (UC) - "Water Prison Jutsu"
@@ -540,13 +539,13 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 091/130 - ITACHI UCHIHA (UC) - "Mangekyo Sharingan"
   'KS-091-UC': [
     'Look at the opponent\'s hand.',
-    'MAIN effect: In addition, the opponent discards that card and draws a card.',
+    'MAIN effect: In addition, choose 1 card in the opponent\'s hand and discard it.',
   ],
 
   // 093/130 - KISAME HOSHIGAKI (UC) - "Samehada"
   'KS-093-UC': [
-    'Steal up to 2 Power tokens from an enemy character and put them on this character.',
-    'MAIN effect: In addition, steal from any mission.',
+    'Remove up to 2 Power tokens from an enemy character in play and put them on this character.',
+    'MAIN effect: Instead, remove all Power tokens and put them on this character.',
   ],
 
   // 102/130 - MANDA (UC) - "King of Snakes"
@@ -778,10 +777,10 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'POWERUP 1 every friendly Leaf Village character in play.',
   ],
 
-  // 132/130 - JIRAIYA (S) - "Inside the Toad"
+  // 132/130 - JIRAIYA (S) - "Toad Mouth Trap"
   'KS-132-S': [
     'Play a Summon character anywhere, paying 5 less.',
-    'The opponent must choose characters to be defeated until they only have up to 2 assigned in each mission.',
+    'The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.',
   ],
 
   // 133/130 - NARUTO UZUMAKI (S) - "Rasengan"
@@ -796,7 +795,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     'Hide any number of non-hidden characters in play with total Power of 6 or less.',
   ],
 
-  // 135/130 - SAKURA HARUNO (S) - "Leaf Village Medical Corps"
+  // 135/130 - SAKURA HARUNO (S) - "The Leaf Medical Corps"
   'KS-135-S': [
     'Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.',
     'effect: Instead, play the card paying 4 less.',
