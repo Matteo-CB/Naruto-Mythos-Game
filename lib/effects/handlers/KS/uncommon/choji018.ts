@@ -4,6 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import type { PlayerID } from '@/lib/engine/types';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * Card 018/130 - CHOJI AKIMICHI "Le Boulet Humain" (UC)
@@ -127,27 +128,10 @@ export function postMoveHide(
   }
 
   if (hideTargets.length === 1) {
-    // Auto-hide single target
+    // Auto-hide single target via hideCharacterWithLog (respects Gemma 049, Kimimaro 056, etc.)
     const targetId = hideTargets[0];
-    const missions = [...state.activeMissions];
-    const m = { ...missions[destMissionIdx] };
-    const chars = [...m[enemySide]];
-    const idx = chars.findIndex(c => c.instanceId === targetId);
-    if (idx !== -1) {
-      const targetName = chars[idx].card.name_fr;
-      chars[idx] = { ...chars[idx], isHidden: true };
-      m[enemySide] = chars;
-      missions[destMissionIdx] = m;
-      const log = logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_HIDE',
-        `Choji Akimichi (018): Hid ${targetName} after moving (less Power).`,
-        'game.log.effect.hide',
-        { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', target: targetName },
-      );
-      return { state: { ...state, activeMissions: missions, log } };
-    }
-    return { state };
+    let newState = EffectEngine.hideCharacterWithLog(state, targetId, sourcePlayer);
+    return { state: newState };
   }
 
   // Multiple targets: player chooses

@@ -474,6 +474,36 @@ function buildPendingTargetSelectionUI(
           card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
         };
       });
+    } else if (tst === 'TAYUYA125_CHOOSE_SOUND') {
+      // Tayuya 125 UPGRADE: mix of hand indices and board:instanceId targets
+      let hiddenCharsInfo125: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+      try { hiddenCharsInfo125 = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
+      const missionRanks125 = dataSource.activeMissions.map((m) => m.rank || '?');
+      handCards = pendingAction.options.map((optStr, optIdx) => {
+        if (optStr.startsWith('board:')) {
+          const instId = optStr.slice(6);
+          const hInfo = hiddenCharsInfo125.find((h) => h.instanceId === instId);
+          const mLabel = hInfo ? (missionRanks125[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
+          return {
+            index: optIdx,
+            targetId: optStr,
+            card: hInfo ? {
+              name_fr: hInfo.name_fr, name_en: hInfo.name_en, chakra: hInfo.chakra, power: hInfo.power,
+              image_file: hInfo.image_file, missionLabel: `Mission ${mLabel} (hidden)`,
+            } : { name_fr: '???', missionLabel: '?' },
+          };
+        } else {
+          const idx = parseInt(optStr, 10);
+          const card = dataSource.playerHand[idx];
+          return {
+            index: optIdx,
+            targetId: optStr,
+            card: card ? {
+              name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+            } : { name_fr: '???' },
+          };
+        }
+      });
     } else if (
       tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
       tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
@@ -1040,20 +1070,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (advanced.phase === 'gameOver') {
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
-        } else if (get().isHotseatGame) {
-          const nextPlayer = advanced.activePlayer;
-          if (nextPlayer !== hp) {
-            set({ hotseatNextPlayer: nextPlayer, isProcessing: false });
-            setTimeout(() => get().confirmHotseatSwitch(), 400);
+        } else {
+          // Check for pending actions (e.g., Rock Lee 117 end-phase move with multiple destinations)
+          const humanPendingEndPhase = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
+          if (humanPendingEndPhase.length > 0) {
+            const pa = humanPendingEndPhase[0];
+            const pe = advanced.pendingEffects.find((e: { id: string }) => e.id === pa.sourceEffectId);
+            const ds: PendingSelectionDataSource = {
+              playerHand: advanced[hp].hand ?? [],
+              playerDiscard: advanced[hp].discardPile ?? [],
+              playerDeckSize: advanced[hp].deck?.length ?? 0,
+              activeMissions: (advanced.activeMissions ?? []).map((m: { rank: string }) => ({ rank: m.rank })),
+            };
+            const sel = buildPendingTargetSelectionUI(
+              pa, pe, ds, get().playerDisplayNames[hp],
+              (targetId: string) => {
+                get().performAction({
+                  type: 'SELECT_TARGET',
+                  pendingActionId: pa.id,
+                  selectedTargets: [targetId],
+                });
+              },
+              () => {
+                if (pe) {
+                  get().performAction({
+                    type: 'DECLINE_OPTIONAL_EFFECT',
+                    pendingEffectId: pe.id,
+                  });
+                }
+              },
+            );
+            set({ isProcessing: false, pendingTargetSelection: sel });
+          } else if (get().isHotseatGame) {
+            const nextPlayer = advanced.activePlayer;
+            if (nextPlayer !== hp) {
+              set({ hotseatNextPlayer: nextPlayer, isProcessing: false });
+              setTimeout(() => get().confirmHotseatSwitch(), 400);
+            } else {
+              set({ isProcessing: false });
+            }
+          } else if (get().isAIGame && get().aiPlayer) {
+            setTimeout(() => {
+              void get().processAITurn();
+            }, 500);
           } else {
             set({ isProcessing: false });
           }
-        } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => {
-            void get().processAITurn();
-          }, 500);
-        } else {
-          set({ isProcessing: false });
         }
       }, 1500);
       return;
@@ -1354,12 +1416,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (advanced.phase === 'gameOver') {
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
-        } else if (get().isAIGame && get().aiPlayer) {
-          setTimeout(() => {
-            void get().processAITurn();
-          }, 500);
         } else {
-          set({ isProcessing: false });
+          // Check for pending actions (e.g., Rock Lee 117 end-phase move)
+          const humanPendingEnd = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
+          if (humanPendingEnd.length > 0) {
+            const pa2 = humanPendingEnd[0];
+            const pe2 = advanced.pendingEffects.find((e: { id: string }) => e.id === pa2.sourceEffectId);
+            const ds2: PendingSelectionDataSource = {
+              playerHand: advanced[hp].hand ?? [],
+              playerDiscard: advanced[hp].discardPile ?? [],
+              playerDeckSize: advanced[hp].deck?.length ?? 0,
+              activeMissions: (advanced.activeMissions ?? []).map((m: { rank: string }) => ({ rank: m.rank })),
+            };
+            const sel2 = buildPendingTargetSelectionUI(
+              pa2, pe2, ds2, get().playerDisplayNames[hp],
+              (targetId: string) => {
+                get().performAction({
+                  type: 'SELECT_TARGET',
+                  pendingActionId: pa2.id,
+                  selectedTargets: [targetId],
+                });
+              },
+              () => {
+                if (pe2) {
+                  get().performAction({
+                    type: 'DECLINE_OPTIONAL_EFFECT',
+                    pendingEffectId: pe2.id,
+                  });
+                }
+              },
+            );
+            set({ isProcessing: false, pendingTargetSelection: sel2 });
+          } else if (get().isAIGame && get().aiPlayer) {
+            setTimeout(() => {
+              void get().processAITurn();
+            }, 500);
+          } else {
+            set({ isProcessing: false });
+          }
         }
       }, 1500);
       return;

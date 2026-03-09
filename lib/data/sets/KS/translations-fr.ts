@@ -390,7 +390,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Jutsu de Decuplement"
   'KS-018-UC': [
-    '[⧗] Quand ce personnage est deplace sur une autre mission, cachez un personnage ennemi avec moins de Puissance.',
+    '[⧗] Apres avoir deplace ce personnage vers une autre mission, cachez un personnage ennemi avec moins de Puissance.',
     'Deplacez ce personnage sur une autre mission.',
   ],
 
@@ -451,14 +451,14 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 035/130 - KURENAI YUHI (UC) - "Illusion Demoniaque"
   'KS-035-UC': [
-    '[⧗] Les personnages ne peuvent pas etre deplaces depuis cette mission.',
+    '[⧗] Les personnages ennemis ne peuvent pas etre deplaces depuis cette mission.',
     'Vainquez un personnage ennemi avec une Puissance de 1 ou moins dans cette mission.',
   ],
 
   // 037/130 - NEJI HYUGA (UC) - "Huit Trigrammes"
   'KS-037-UC': [
     '[⧗] Quand un personnage ennemi est joue dans cette mission, POWERUP 1.',
-    'Retirez jusqu\'a 3 jetons de Puissance d\'un personnage ennemi en jeu.',
+    'Retirez tous les jetons de Puissance d\'un personnage ennemi dans cette mission.',
   ],
 
   // 038/130 - ROCK LEE (C) - "Entrainement au Poing violent"
@@ -548,7 +548,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 067/130 - REMPART (UC) - "Barriere"
   'KS-067-UC': [
-    '[⧗] Le personnage ennemi non cache le plus fort dans cette mission a une Puissance de 0.',
+    '[⧗] Le personnage ennemi le plus fort dans cette mission perd tous ses jetons de Puissance et a une Puissance de 0.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
@@ -591,7 +591,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 082/130 - BAKI (UC) - "Lame de Vent"
   'KS-082-UC': [
     '[↯] Vainquez un personnage ennemi cache en jeu.',
-    'POWERUP 1 sur chaque personnage Village du Sable allie dans cette mission.',
+    'Vainquez un personnage ennemi avec une Puissance de 1 ou moins dans cette mission.',
   ],
 
   // 083/130 - RASA (UC) - "Quatrieme Kazekage"
@@ -618,7 +618,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 091/130 - ITACHI UCHIWA (UC) - "Mangekyo Sharingan"
   'KS-091-UC': [
-    'Regardez une carte aleatoire dans la main de l\'adversaire.',
+    'Regardez la main de l\'adversaire.',
     'effet MAIN : En plus, l\'adversaire defausse cette carte et pioche une carte.',
   ],
 
@@ -807,7 +807,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 128/130 - ITACHI UCHIWA (R) - "Je les controle tous."
   'KS-128-R': [
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
-    'Deplacez un personnage allie vers cette mission.',
+    'Deplacez un personnage allie en jeu.',
   ],
 
   // 129/130 - KYUBI (R) - "Manteau du Demon Renard"
@@ -897,7 +897,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 148/130 - KAKASHI HATAKE (M) - "Equipe 7 Originelle"
   'KS-148-M': [
     'Gagnez l\'Initiative.',
-    'Copiez un effet instantané non-amélioration d\'un autre personnage Equipe 7 allié en jeu.',
+    'Copiez un effet instantané d\'un autre personnage Equipe 7 allié en jeu.',
   ],
 
   // 113/130 V - KIBA INUZUKA (MV) - "Crocs sur crocs"
@@ -1012,7 +1012,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-128-RA': [
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
-    'Deplacez un personnage allie vers cette mission.',
+    'Deplacez un personnage allie en jeu.',
   ],
 
   // =====================
@@ -1031,7 +1031,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // MSS 04 - Assassinat / Assassination
   'KS-004-MMS': [
-    '[↯] Vainquez un personnage ennemi cache.',
+    '[↯] Vainquez un personnage ennemi cache en jeu.',
   ],
 
   // MSS 05 - Ramener / Bring it Back
