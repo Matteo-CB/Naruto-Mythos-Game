@@ -26,6 +26,7 @@ interface HandCardProps {
   onPreview: (card: CharacterCard, position: { x: number; y: number }) => void;
   onPreviewHide: () => void;
   onPin: (card: CharacterCard) => void;
+  onZoom: (card: CharacterCard) => void;
 }
 
 const HandCard = React.memo(function HandCard({
@@ -38,6 +39,7 @@ const HandCard = React.memo(function HandCard({
   onPreview,
   onPreviewHide,
   onPin,
+  onZoom,
 }: HandCardProps) {
   const locale = useLocale();
   const dims = useGameScale();
@@ -85,6 +87,10 @@ const HandCard = React.memo(function HandCard({
         e.stopPropagation();
         onSelect(index);
         onPin(card);
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onZoom(card);
       }}
       onMouseEnter={(e) => {
         const rect = (e.target as HTMLElement).getBoundingClientRect();
@@ -182,6 +188,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const visibleState = useGameStore((s) => s.visibleState);
   const isProcessing = useGameStore((s) => s.isProcessing);
 
@@ -225,6 +232,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
               onPreview={showPreview}
               onPreviewHide={hidePreview}
               onPin={pinCard}
+              onZoom={zoomCard}
             />
           );
         })}

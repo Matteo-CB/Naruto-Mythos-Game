@@ -1965,6 +1965,7 @@
     "full": "Tournoi complet",
     "alreadyJoined": "Deja inscrit",
     "requiresDiscordError": "Liez d'abord votre compte Discord",
+    "organizer": "Organisateur",
     "notCreator": "Seul le createur peut faire cela",
     "alreadyStarted": "Tournoi deja lance",
     "minPlayers": "Il faut au moins 2 joueurs",

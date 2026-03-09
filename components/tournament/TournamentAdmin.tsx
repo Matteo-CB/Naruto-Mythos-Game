@@ -50,7 +50,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
       style={{ backgroundColor: '#111111', border: '1px solid #262626' }}
     >
       <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-        Admin
+        {isAdmin ? 'Admin' : t('organizer')}
       </h3>
 
       {activeTournament.status === 'registration' && (
