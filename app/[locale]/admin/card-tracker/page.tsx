@@ -226,6 +226,120 @@ export default function CardTrackerPage() {
     return counts;
   }, [issues]);
 
+  // ─── EXPORT ───
+  const [showExport, setShowExport] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'txt' | 'json'>('txt');
+  const [exportStatuses, setExportStatuses] = useState<Record<IssueStatus, boolean>>({
+    to_fix: true,
+    fixed_unpublished: true,
+    fixed_published: true,
+    verified: true,
+  });
+  const [exportSortBy, setExportSortBy] = useState<'status' | 'date' | 'card'>('status');
+
+  function toggleExportStatus(s: IssueStatus) {
+    setExportStatuses(prev => ({ ...prev, [s]: !prev[s] }));
+  }
+
+  function buildExportData() {
+    const selected = issues.filter(i => exportStatuses[i.status]);
+    const statusOrder: IssueStatus[] = ['to_fix', 'fixed_unpublished', 'fixed_published', 'verified'];
+
+    const sorted = [...selected].sort((a, b) => {
+      if (exportSortBy === 'status') {
+        const diff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+        if (diff !== 0) return diff;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      if (exportSortBy === 'date') {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      // card name
+      return a.cardNames[0].localeCompare(b.cardNames[0]);
+    });
+
+    return sorted;
+  }
+
+  function exportData() {
+    const data = buildExportData();
+    if (data.length === 0) return;
+
+    const statusOrder: IssueStatus[] = ['to_fix', 'fixed_unpublished', 'fixed_published', 'verified'];
+    let content: string;
+    let filename: string;
+    let mime: string;
+
+    if (exportFormat === 'json') {
+      const jsonData = data.map(i => ({
+        cards: i.cardIds.map((id, idx) => ({ id, name: i.cardNames[idx] })),
+        description: i.description,
+        status: i.status,
+        statusLabel: STATUS_CONFIG[i.status].label,
+        reportedBy: i.reportedBy,
+        updatedBy: i.updatedBy,
+        createdAt: i.createdAt,
+        updatedAt: i.updatedAt,
+      }));
+      content = JSON.stringify(jsonData, null, 2);
+      filename = `card-tracker-export-${new Date().toISOString().slice(0, 10)}.json`;
+      mime = 'application/json';
+    } else {
+      const lines: string[] = [];
+      lines.push('='.repeat(70));
+      lines.push(`CARD TRACKER EXPORT — ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`);
+      lines.push(`Total: ${data.length} issue(s)`);
+      lines.push('='.repeat(70));
+      lines.push('');
+
+      if (exportSortBy === 'status') {
+        // Group by status
+        for (const status of statusOrder) {
+          const group = data.filter(i => i.status === status);
+          if (group.length === 0) continue;
+          lines.push('-'.repeat(50));
+          lines.push(`  ${STATUS_CONFIG[status].label.toUpperCase()} (${group.length})`);
+          lines.push('-'.repeat(50));
+          lines.push('');
+          for (const issue of group) {
+            const cards = issue.cardIds.map((id, idx) => `${issue.cardNames[idx]} [${id}]`).join(', ');
+            lines.push(`  Card(s): ${cards}`);
+            lines.push(`  Issue:   ${issue.description}`);
+            lines.push(`  By:      ${issue.reportedBy} — ${new Date(issue.createdAt).toLocaleDateString()}`);
+            if (issue.updatedBy) {
+              lines.push(`  Updated: ${issue.updatedBy} — ${new Date(issue.updatedAt).toLocaleDateString()}`);
+            }
+            lines.push('');
+          }
+        }
+      } else {
+        for (const issue of data) {
+          const cards = issue.cardIds.map((id, idx) => `${issue.cardNames[idx]} [${id}]`).join(', ');
+          const statusLabel = STATUS_CONFIG[issue.status].label;
+          lines.push(`  [${statusLabel}] ${cards}`);
+          lines.push(`  Issue:   ${issue.description}`);
+          lines.push(`  By:      ${issue.reportedBy} — ${new Date(issue.createdAt).toLocaleDateString()}`);
+          if (issue.updatedBy) {
+            lines.push(`  Updated: ${issue.updatedBy} — ${new Date(issue.updatedAt).toLocaleDateString()}`);
+          }
+          lines.push('');
+        }
+      }
+
+      content = lines.join('\n');
+      filename = `card-tracker-export-${new Date().toISOString().slice(0, 10)}.txt`;
+      mime = 'text/plain';
+    }
+
+    const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   if (!session) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#0a0a0a', color: '#666' }}>
@@ -478,18 +592,34 @@ export default function CardTrackerPage() {
               Card Tracker
             </h1>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-all"
-            style={{
-              backgroundColor: showForm ? '#1a1a1a' : '#9333ea20',
-              border: `1px solid ${showForm ? '#333' : '#9333ea'}`,
-              color: showForm ? '#999' : '#9333ea',
-              borderRadius: 6,
-            }}
-          >
-            {showForm ? 'Cancel' : '+ Report Issue'}
-          </button>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <button
+                onClick={() => setShowExport(!showExport)}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-all"
+                style={{
+                  backgroundColor: showExport ? '#1a1a1a' : '#3b82f620',
+                  border: `1px solid ${showExport ? '#333' : '#3b82f6'}`,
+                  color: showExport ? '#999' : '#3b82f6',
+                  borderRadius: 6,
+                }}
+              >
+                {showExport ? 'Close' : 'Export'}
+              </button>
+            )}
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-all"
+              style={{
+                backgroundColor: showForm ? '#1a1a1a' : '#9333ea20',
+                border: `1px solid ${showForm ? '#333' : '#9333ea'}`,
+                color: showForm ? '#999' : '#9333ea',
+                borderRadius: 6,
+              }}
+            >
+              {showForm ? 'Cancel' : '+ Report Issue'}
+            </button>
+          </div>
         </div>
 
         {/* New Issue Form */}
@@ -594,6 +724,109 @@ export default function CardTrackerPage() {
               }}
             >
               {submitting ? 'Submitting...' : 'Submit Issue'}
+            </button>
+          </div>
+        )}
+
+        {/* Export Panel (admin only) */}
+        {showExport && isAdmin && (
+          <div
+            className="mb-6 rounded-lg p-4"
+            style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+          >
+            <div className="mb-3" style={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0' }}>
+              Export Issues
+            </div>
+
+            {/* Status checkboxes */}
+            <div className="mb-3">
+              <div className="mb-1.5" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Include statuses
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(STATUS_CONFIG) as IssueStatus[]).map(s => {
+                  const cfg = STATUS_CONFIG[s];
+                  const checked = exportStatuses[s];
+                  const count = statusCounts[s] || 0;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => toggleExportStatus(s)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all"
+                      style={{
+                        backgroundColor: checked ? cfg.bg : 'transparent',
+                        border: `1px solid ${checked ? cfg.color + '60' : '#333'}`,
+                        color: checked ? cfg.color : '#555',
+                        borderRadius: 20,
+                        opacity: checked ? 1 : 0.5,
+                      }}
+                    >
+                      {cfg.label}
+                      <span
+                        className="ml-0.5 rounded-full px-1.5 py-0.5 text-[10px]"
+                        style={{ backgroundColor: checked ? cfg.color + '30' : '#222', color: checked ? cfg.color : '#555' }}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sort by + Format */}
+            <div className="mb-4 flex flex-wrap items-end gap-4">
+              <div>
+                <div className="mb-1.5" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Sort by
+                </div>
+                <select
+                  value={exportSortBy}
+                  onChange={(e) => setExportSortBy(e.target.value as 'status' | 'date' | 'card')}
+                  className="rounded px-3 py-1.5 text-xs font-medium"
+                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#e0e0e0', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="status">Status (To Fix → Verified)</option>
+                  <option value="date">Date (newest first)</option>
+                  <option value="card">Card name (A-Z)</option>
+                </select>
+              </div>
+              <div>
+                <div className="mb-1.5" style={{ fontSize: 11, color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Format
+                </div>
+                <div className="flex gap-1">
+                  {(['txt', 'json'] as const).map(fmt => (
+                    <button
+                      key={fmt}
+                      onClick={() => setExportFormat(fmt)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded transition-all"
+                      style={{
+                        backgroundColor: exportFormat === fmt ? '#3b82f620' : 'transparent',
+                        border: `1px solid ${exportFormat === fmt ? '#3b82f660' : '#333'}`,
+                        color: exportFormat === fmt ? '#3b82f6' : '#666',
+                      }}
+                    >
+                      .{fmt.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Download button */}
+            <button
+              onClick={exportData}
+              disabled={!Object.values(exportStatuses).some(v => v)}
+              className="px-5 py-2 text-sm font-semibold transition-all"
+              style={{
+                backgroundColor: Object.values(exportStatuses).some(v => v) ? '#3b82f6' : '#333',
+                color: Object.values(exportStatuses).some(v => v) ? '#fff' : '#666',
+                borderRadius: 6,
+                cursor: Object.values(exportStatuses).some(v => v) ? 'pointer' : 'not-allowed',
+              }}
+            >
+              Download {exportFormat.toUpperCase()} ({buildExportData().length} issues)
             </button>
           </div>
         )}
