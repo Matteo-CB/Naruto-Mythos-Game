@@ -20,7 +20,7 @@ import type { TournamentMatch } from '@/stores/tournamentStore';
 import { LEAGUE_TIERS, getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
