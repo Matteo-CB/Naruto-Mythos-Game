@@ -155,3 +155,38 @@ export function calculateEffectiveCost(
 
   return Math.max(0, cost);
 }
+
+/**
+ * Check if Kurenai 034's continuous cost reduction applies to this card on this mission.
+ * Used by PlayValidation to enforce minimum 1 cost on upgrades when Kurenai's reduction is active.
+ */
+export function hasKurenai034CostReduction(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
+  player: PlayerID,
+  card: CharacterCard,
+  missionIndex: number,
+): boolean {
+  if (missionIndex < 0 || missionIndex >= (state.activeMissions?.length ?? 0)) return false;
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return false;
+
+  const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+  const allCharsInMission = [...(friendlyChars || []), ...(enemyChars || [])];
+
+  for (const charInMission of allCharsInMission) {
+    if (charInMission.isHidden) continue;
+    const topCard = getTopCard(charInMission);
+    if (!topCard) continue;
+    for (const effect of topCard.effects ?? []) {
+      if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+      if (topCard.number === 34 && effect.description.includes('Team 8') && effect.description.includes('less')) {
+        if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}

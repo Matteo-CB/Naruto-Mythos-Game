@@ -735,7 +735,7 @@ describe('059/130 - Kidomaru', () => {
     // X=1 (one other mission with Sound Four, self excluded), so 1 move available
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU_CHOOSE_CHARACTER');
-    expect(result.validTargets!.length).toBe(3); // all 3 chars across missions are movable
+    expect(result.validTargets!.length).toBe(2); // ally + sf2 (Kidomaru itself excluded from movable targets)
   });
 });
 

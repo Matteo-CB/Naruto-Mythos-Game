@@ -57,10 +57,9 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
 
-      // Check if this character has any non-continuous, non-UPGRADE instant effects
+      // Check if this character has any non-continuous instant effects (including UPGRADE)
+      // Kakashi 148 CAN copy UPGRADE instant effects (card text doesn't say "non-upgrade")
       const hasCopyableEffect = topCard.effects.some((effect) => {
-        // Only copy MAIN, AMBUSH, or SCORE instant effects (not UPGRADE)
-        if (effect.type !== 'MAIN' && effect.type !== 'AMBUSH' && effect.type !== 'SCORE') return false;
         // Skip continuous effects (marked with [⧗] symbol)
         if (effect.description.includes('[⧗]')) return false;
         // Exclude effect modifiers

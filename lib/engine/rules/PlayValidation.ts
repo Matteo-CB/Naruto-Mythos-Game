@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
-import { calculateEffectiveCost } from './ChakraValidation';
+import { calculateEffectiveCost, hasKurenai034CostReduction } from './ChakraValidation';
 import { calculateCharacterPower } from '../phases/PowerCalculation';
 
 export interface ValidationResult {
@@ -164,7 +164,10 @@ export function validateRevealCharacter(
       // Reveal-for-upgrade: pay only the DIFFERENCE (effective cost - existing cost)
       // Use effective cost (with cost reductions, e.g. Gaara 075 "play while hidden paying 2 less")
       const revealCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
-      effectiveCost = Math.max(0, revealCost - existingTopCard.chakra);
+      const revealDiff = Math.max(0, revealCost - existingTopCard.chakra);
+      // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
+      effectiveCost = hasKurenai034CostReduction(state, player, charTopCard, missionIndex)
+        ? Math.max(1, revealDiff) : revealDiff;
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {
@@ -250,7 +253,10 @@ export function validateUpgradeCharacter(
 
   // Pay only the difference for visible characters (using effective cost with reductions)
   const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
-  const costDiff = Math.max(0, effectiveCost - topCard.chakra);
+  const rawDiff = Math.max(0, effectiveCost - topCard.chakra);
+  // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
+  const costDiff = hasKurenai034CostReduction(state, player, newCard, missionIndex)
+    ? Math.max(1, rawDiff) : rawDiff;
   if (ps.chakra < costDiff) {
     return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakraUpgrade', reasonParams: { need: costDiff, have: ps.chakra } };
   }

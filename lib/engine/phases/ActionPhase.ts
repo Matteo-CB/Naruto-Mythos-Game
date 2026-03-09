@@ -4,7 +4,7 @@ import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
 import { logAction } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
-import { calculateEffectiveCost } from '../rules/ChakraValidation';
+import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 
 /**
@@ -323,7 +323,10 @@ function handleRevealCharacter(
       : upgradeTarget.card;
     // Use fullCost (with cost reductions applied) minus existing card cost
     // e.g. Gaara 075 (cost 3, -2 when hidden reveal) upgrading over cost 2 = max(0, 1 - 2) = 0
-    costToPay = Math.max(0, fullCost - existingTopCard.chakra);
+    const rawDiff = Math.max(0, fullCost - existingTopCard.chakra);
+    // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
+    costToPay = hasKurenai034CostReduction(state, player, charTopCard, missionIndex)
+      ? Math.max(1, rawDiff) : rawDiff;
   }
 
   // Pay cost
@@ -468,7 +471,10 @@ function handleUpgradeCharacter(
   // Use calculateEffectiveCost to apply cost reductions (e.g. Kurenai 034 Team 8 -1).
   const isHiddenUpgrade = existingChar.isHidden;
   const effectiveNewCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
-  const costDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
+  const rawUpgradeDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
+  // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
+  const costDiff = (!isHiddenUpgrade && hasKurenai034CostReduction(state, player, newCard, missionIndex))
+    ? Math.max(1, rawUpgradeDiff) : rawUpgradeDiff;
 
   // Pay cost
   const ps = { ...playerState };

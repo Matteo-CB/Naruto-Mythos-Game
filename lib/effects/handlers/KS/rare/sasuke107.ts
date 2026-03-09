@@ -23,22 +23,49 @@ function side(player: PlayerID): 'player1Characters' | 'player2Characters' {
 
 /**
  * Find valid destination missions for a character.
- * Returns ALL other missions (excluding source) since the move is MANDATORY.
- * If a same-name conflict exists at the destination and upgrade is not possible,
- * the moved character will be discarded by moveCharTo.
+ * Prefers conflict-free missions. Only allows missions with same-name conflicts
+ * if ALL other missions have conflicts (since the move is MANDATORY).
  */
 function getValidMissions(
   state: GameState,
-  _charInstanceId: string,
-  _player: PlayerID,
+  charInstanceId: string,
+  player: PlayerID,
   sourceMissionIndex: number,
 ): number[] {
-  const valid: number[] = [];
+  const friendlySide = side(player);
+
+  // Find the character's name
+  let charName = '';
+  for (const m of state.activeMissions) {
+    const c = m[friendlySide].find((ch) => ch.instanceId === charInstanceId);
+    if (c) {
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      charName = topCard.name_fr.toUpperCase();
+      break;
+    }
+  }
+
+  const conflictFree: number[] = [];
+  const withConflict: number[] = [];
+
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
-    valid.push(i);
+
+    const hasConflict = charName && state.activeMissions[i][friendlySide].some((c) => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === charName;
+    });
+
+    if (hasConflict) {
+      withConflict.push(i);
+    } else {
+      conflictFree.push(i);
+    }
   }
-  return valid;
+
+  // Prefer conflict-free; only allow conflict missions if no conflict-free ones exist
+  return conflictFree.length > 0 ? conflictFree : withConflict;
 }
 
 /**
@@ -70,7 +97,7 @@ function moveCharTo(
 
   if (!movedChar) return state;
 
-  // Check for upgrade at destination
+  // Check for name conflict at destination — forced moves ALWAYS discard the moved character
   const destMission = { ...missions[destMissionIndex] };
   const destChars = [...destMission[friendlySide]];
   const movedTopCard = movedChar.stack.length > 0
@@ -78,46 +105,26 @@ function moveCharTo(
     : movedChar.card;
   const movedName = movedTopCard.name_fr.toUpperCase();
 
-  const upgradeTargetIdx = destChars.findIndex((c) => {
+  const conflictIdx = destChars.findIndex((c) => {
     if (c.isHidden) return false;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    return topCard.name_fr.toUpperCase() === movedName
-      && (movedTopCard.chakra ?? 0) > (topCard.chakra ?? 0);
+    return topCard.name_fr.toUpperCase() === movedName;
   });
 
-  if (upgradeTargetIdx !== -1) {
-    // Merge into existing character (upgrade at destination)
-    const existing = destChars[upgradeTargetIdx];
-    const movedStack = movedChar.stack.length > 0 ? movedChar.stack : [movedChar.card];
-    destChars[upgradeTargetIdx] = {
-      ...existing,
-      card: movedTopCard,
-      stack: [...existing.stack, ...movedStack],
-      powerTokens: existing.powerTokens + movedChar.powerTokens,
-    };
-  } else {
-    // Check for name conflict that can't be resolved by upgrade
-    const conflictIdx = destChars.findIndex((c) => {
-      if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr.toUpperCase() === movedName;
-    });
-
-    if (conflictIdx !== -1) {
-      // Name conflict, can't upgrade -> discard the moved character
-      const owner = movedChar.originalOwner;
-      const ownerState = { ...state[owner] };
-      const cardsToDiscard = movedChar.stack.length > 0 ? [...movedChar.stack] : [movedChar.card];
-      ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-      ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
-      destMission[friendlySide] = destChars;
-      missions[destMissionIndex] = destMission;
-      return { ...state, activeMissions: missions, [owner]: ownerState };
-    }
-
-    // Place as new character
-    destChars.push({ ...movedChar, missionIndex: destMissionIndex });
+  if (conflictIdx !== -1) {
+    // Name conflict — discard the moved character (no auto-upgrade on forced moves)
+    const owner = movedChar.originalOwner;
+    const ownerState = { ...state[owner] };
+    const cardsToDiscard = movedChar.stack.length > 0 ? [...movedChar.stack] : [movedChar.card];
+    ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
+    ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
+    destMission[friendlySide] = destChars;
+    missions[destMissionIndex] = destMission;
+    return { ...state, activeMissions: missions, [owner]: ownerState };
   }
+
+  // No conflict — place as new character
+  destChars.push({ ...movedChar, missionIndex: destMissionIndex });
 
   destMission[friendlySide] = destChars;
   missions[destMissionIndex] = destMission;
