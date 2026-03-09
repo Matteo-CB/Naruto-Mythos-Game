@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
-import { shouldRetainPowerTokens } from '../../effects/ContinuousEffects';
+import { shouldRetainPowerTokens, isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
 
 /**
  * Execute the End Phase:
@@ -266,6 +266,9 @@ export function handleRockLee117Move(
             (e.description.includes('move this character') || e.description.includes('must move')),
         );
         if (!hasMove) continue;
+
+        // Kurenai 035: enemy characters cannot move from this mission
+        if (isMovementBlockedByKurenai(newState, mIdx, player)) continue;
 
         // Find ALL valid destinations (any other mission, respecting name uniqueness)
         const validDests: number[] = [];

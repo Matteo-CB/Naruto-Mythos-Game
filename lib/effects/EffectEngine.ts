@@ -23,11 +23,22 @@ function findUpgradeTargetIdx(
   card: { name_fr: string; chakra: number; number?: number; effects?: Array<{ type: string; description: string }> },
   excludeInstanceId?: string,
 ): number {
+  // Orochimaru 051/138 restriction: "upgrade to any character that is NOT a Summon nor Orochimaru"
+  // This restriction applies to ALL upgrade paths (same-name AND flexible).
+  const hasFlexibleRestriction = (card.number === 51 || card.number === 138) &&
+    (card.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'));
+
   // First check same-name upgrade (highest priority)
   const sameNameIdx = chars.findIndex(c => {
     if (c.isHidden) return false;
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    // Block same-name upgrade onto Orochimaru/Summon for cards with flexible restriction
+    if (hasFlexibleRestriction) {
+      const isSummon = (topCard.keywords ?? []).includes('Summon');
+      const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
+      if (isSummon || isOrochimaru) return false;
+    }
     return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
       && (card.chakra ?? 0) > (topCard.chakra ?? 0);
   });
@@ -1560,7 +1571,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // MOVE types (two-stage: character selection â†’ destination selection)
+      // MOVE types (two-stage: character selection â†' destination selection)
       // =============================================
       case 'JIRAIYA105_MOVE_ENEMY':
       case 'KANKURO119_MOVE_CHARACTER':
@@ -2817,8 +2828,30 @@ export class EffectEngine {
         break;
       }
 
+      // --- Effect-play upgrade choice: player chose "FRESH" or an upgrade target instanceId ---
+      case 'EFFECT_PLAY_UPGRADE_OR_FRESH': {
+        let meta_upch: { cardName?: string; cardId?: string; costReduction?: number; missionIndex?: number } = {};
+        try { meta_upch = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const mi_upch = meta_upch.missionIndex ?? pendingEffect.sourceMissionIndex;
+        if (targetId === 'FRESH') {
+          // Player chose fresh play: call genericPlaceOnMission which will now not find an upgrade
+          // (because the card is back in discard and we pass forceNoUpgrade via a flag)
+          newState = EffectEngine.genericPlaceOnMissionForced(
+            newState, pendingEffect.sourcePlayer, mi_upch,
+            meta_upch.cardName ?? '', meta_upch.cardId ?? '', meta_upch.costReduction ?? 0, false,
+          );
+        } else {
+          // Player chose to upgrade over a specific target
+          newState = EffectEngine.genericPlaceOnMissionForced(
+            newState, pendingEffect.sourcePlayer, mi_upch,
+            meta_upch.cardName ?? '', meta_upch.cardId ?? '', meta_upch.costReduction ?? 0, true, targetId,
+          );
+        }
+        break;
+      }
+
       // =============================================
-      // SIMPLE DEFEAT types (target = instanceId â†’ defeat the character)
+      // SIMPLE DEFEAT types (target = instanceId â†' defeat the character)
       // =============================================
       case 'DEFEAT_ANY_CHARACTER_THIS_MISSION':
       case 'DEFEAT_ENEMY_POWER_1_THIS_MISSION':
@@ -3004,7 +3037,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // SIMPLE POWERUP types (target = instanceId â†’ add power tokens)
+      // SIMPLE POWERUP types (target = instanceId â†' add power tokens)
       // =============================================
       case 'AKAMARU_028_POWERUP_KIBA': {
         const akRes = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -3068,7 +3101,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // SIMPLE DISCARD types (target = hand index â†’ discard from hand)
+      // SIMPLE DISCARD types (target = hand index â†' discard from hand)
       // =============================================
       case 'SAKURA_012_DISCARD': {
         const idx_sk = parseInt(targetId, 10);
@@ -3395,7 +3428,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // MOVE SELF types (target = mission index â†’ move self there)
+      // MOVE SELF types (target = mission index â†' move self there)
       // =============================================
       case 'CHOJI_018_MOVE_SELF': {
         // Move Choji, then trigger post-move hide
@@ -5396,7 +5429,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Check if Tsunade 004 UC is face-visible on a player's side (defeat â†’ hand redirect) */
+  /** Check if Tsunade 004 UC is face-visible on a player's side (defeat â†' hand redirect) */
   static hasTsunade004Active(state: GameState, player: PlayerID): boolean {
     for (const mission of state.activeMissions) {
       const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -5757,6 +5790,53 @@ export class EffectEngine {
     // Check if there's an upgrade target (same-name or flexible cross-name)
     const existingIdx = findUpgradeTargetIdx(mission[friendlySide], card);
 
+    // Check if fresh play is also possible (no name conflict with existing visible chars)
+    const hasNameConflict = mission[friendlySide].some((c: CharacterInPlay) => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+    });
+
+    // If upgrade AND fresh play are both possible, let the player choose
+    if (existingIdx >= 0 && !hasNameConflict) {
+      // Find ALL upgrade targets (there could be multiple)
+      const upgradeTargetIds: string[] = [];
+      for (let i = 0; i < mission[friendlySide].length; i++) {
+        const c = mission[friendlySide][i];
+        if (c.isHidden) continue;
+        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        if (isSameName || isFlex) upgradeTargetIds.push(c.instanceId);
+      }
+
+      // Push card back to discard (will be re-popped when choice is resolved)
+      ps.discardPile.push(card);
+
+      // Create pending effect for the choice
+      const effectId = `generic-upgrade-choice-${generateInstanceId()}`;
+      state.pendingEffects = [...state.pendingEffects, {
+        id: effectId,
+        sourceCardId: cardId,
+        sourceInstanceId: '',
+        sourceMissionIndex: missionIndex,
+        effectType: 'MAIN' as EffectType,
+        effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
+        targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
+        sourcePlayer: player,
+        requiresTargetSelection: true,
+        validTargets: ['FRESH', ...upgradeTargetIds],
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: false,
+        description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+        descriptionParams: { card: card.name_fr },
+      } as PendingEffect];
+      return state;
+    }
+
     let placedChar: CharacterInPlay;
     let isCardUpgrade = false;
 
@@ -5842,6 +5922,73 @@ export class EffectEngine {
     // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
     state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
+    return state;
+  }
+
+  /**
+   * Place a card on a mission with an explicit choice: fresh play or upgrade over a specific target.
+   * Called after the player responds to EFFECT_PLAY_UPGRADE_OR_FRESH.
+   */
+  private static genericPlaceOnMissionForced(
+    state: GameState, player: PlayerID, missionIndex: number,
+    cardName: string, cardId: string, costReduction: number,
+    doUpgrade: boolean, upgradeTargetId?: string,
+  ): GameState {
+    const ps = state[player];
+    const card = ps.discardPile.pop();
+    if (!card) return state;
+
+    const friendlySide: 'player1Characters' | 'player2Characters' =
+      player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    const missions = [...state.activeMissions];
+    const mission = { ...missions[missionIndex] };
+    let placedChar: CharacterInPlay;
+    let isCardUpgrade = false;
+
+    if (doUpgrade && upgradeTargetId) {
+      const existingIdx = mission[friendlySide].findIndex(c => c.instanceId === upgradeTargetId);
+      if (existingIdx === -1) { ps.discardPile.push(card); return state; }
+      const existing = mission[friendlySide][existingIdx];
+      const eTop = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTop.chakra ?? 0)) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
+      const updatedChars = [...mission[friendlySide]];
+      updatedChars[existingIdx] = { ...existing, card: card as any, stack: [...existing.stack, card as any] };
+      mission[friendlySide] = updatedChars;
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = updatedChars[existingIdx];
+      isCardUpgrade = true;
+
+      state.log = logAction(state.log, state.turn, 'action', player,
+        'EFFECT_UPGRADE', `${cardName} (${cardId}): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra.`,
+        'game.log.effect.upgradeFromHand', { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) });
+    } else {
+      // Fresh play
+      const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
+      if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
+      ps.chakra -= actualCost;
+
+      const charInPlay: CharacterInPlay = {
+        instanceId: generateInstanceId(), card: card as any, isHidden: false,
+        wasRevealedAtLeastOnce: true, powerTokens: 0, stack: [card as any],
+        controlledBy: player, originalOwner: player, missionIndex,
+      };
+      mission[friendlySide] = [...mission[friendlySide], charInPlay];
+      missions[missionIndex] = mission;
+      state.activeMissions = missions;
+      placedChar = charInPlay;
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(state, player);
+
+      state.log = logAction(state.log, state.turn, 'action', player,
+        'EFFECT', `${cardName} (${cardId}): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra.`,
+        'game.log.effect.playSummon', { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) });
+    }
+
+    state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
     return state;
   }
 
@@ -7213,11 +7360,11 @@ export class EffectEngine {
       });
 
       if (!sameNameChar) {
-        // No same-name â†’ fresh play is valid
+        // No same-name â†' fresh play is valid
         const freshCost109 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
         if (ps.chakra >= freshCost109) validMissions.push(String(i));
       } else {
-        // Same-name exists â†’ check if upgrade is valid (strictly higher chakra)
+        // Same-name exists â†' check if upgrade is valid (strictly higher chakra)
         const existingTopCard = sameNameChar.stack.length > 0
           ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
         if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
@@ -7434,11 +7581,11 @@ export class EffectEngine {
       });
 
       if (!sameNameChar) {
-        // No same-name character â†’ fresh play is valid
+        // No same-name character â†' fresh play is valid
         const fc135 = Math.max(0, (chosenCard.chakra ?? 0) - costReduction);
         if (ps.chakra >= fc135) validMissions.push(String(i));
       } else {
-        // Same-name exists â†’ check if upgrade is valid (strictly higher chakra)
+        // Same-name exists â†' check if upgrade is valid (strictly higher chakra)
         const existingTopCard = sameNameChar.stack.length > 0
           ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
         if ((chosenCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {

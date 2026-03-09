@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * Card 029/130 - AKAMARU "Le Loup Bicephale" (UC)
@@ -69,31 +70,11 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
     return topCard.chakra === lowestCost;
   });
 
-  // If exactly one: auto-hide
+  // If exactly one: auto-hide (use centralized hide to respect protections)
   if (tiedChars.length === 1) {
     const target = tiedChars[0];
-    const missions = [...state.activeMissions];
-    const m = { ...missions[sourceMissionIndex] };
-    const chars = [...m[enemySide]];
-    const idx = chars.findIndex(c => c.instanceId === target.instanceId);
-    if (idx !== -1) {
-      const targetName = chars[idx].card.name_fr;
-      chars[idx] = { ...chars[idx], isHidden: true };
-      m[enemySide] = chars;
-      missions[sourceMissionIndex] = m;
-
-      const newState = { ...state, activeMissions: missions };
-      const log = logAction(
-        newState.log, newState.turn, newState.phase, sourcePlayer,
-        'EFFECT_HIDE',
-        `Akamaru (029): Hid ${targetName} (lowest cost enemy in this mission, upgrade effect).`,
-        'game.log.effect.hide',
-        { card: 'AKAMARU', id: 'KS-029-UC', target: targetName },
-      );
-
-      return { state: { ...newState, log } };
-    }
-    return { state };
+    const hiddenState = EffectEngine.hideCharacterWithLog(state, target.instanceId, sourcePlayer);
+    return { state: hiddenState };
   }
 
   // Multiple enemies tied for lowest cost: the player chooses which to hide

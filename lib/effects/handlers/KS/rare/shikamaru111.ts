@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
@@ -69,34 +70,12 @@ function applyHide(
   state: EffectContext['state'],
   targetInstanceId: string,
   sourcePlayer: EffectContext['sourcePlayer'],
-  enemySide: 'player1Characters' | 'player2Characters',
-  missionIndex: number,
+  _enemySide: 'player1Characters' | 'player2Characters',
+  _missionIndex: number,
 ): EffectResult {
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[missionIndex] };
-  const chars = [...mission[enemySide]];
-  const idx = chars.findIndex((c) => c.instanceId === targetInstanceId);
-
-  if (idx === -1) return { state };
-
-  const targetName = chars[idx].card.name_fr;
-  chars[idx] = { ...chars[idx], isHidden: true };
-  mission[enemySide] = chars;
-  missions[missionIndex] = mission;
-
-  return {
-    state: {
-      ...state,
-      activeMissions: missions,
-      log: logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_HIDE',
-        `Shikamaru Nara (111) UPGRADE: Hid enemy ${targetName} in this mission.`,
-        'game.log.effect.hide',
-        { card: 'SHIKAMARU NARA', id: 'KS-111-R', target: targetName },
-      ),
-    },
-  };
+  // Use centralized hide to respect Kimimaro 056 protection, Gemma 049 sacrifice, and immunities
+  const newState = EffectEngine.hideCharacterWithLog(state, targetInstanceId, sourcePlayer);
+  return { state: newState };
 }
 
 export function registerShikamaru111Handlers(): void {
