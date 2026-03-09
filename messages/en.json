@@ -121,6 +121,7 @@
       "playCharacter": "Plays {card} ({title}) on mission {mission} for {cost} chakra.",
       "playHidden": "Plays a hidden character on mission {mission}.",
       "revealCharacter": "Reveals {card} ({title}) on mission {mission} for {cost} chakra.",
+      "revealUpgrade": "Reveals {card} ({title}) to upgrade on mission {mission} for {cost} chakra.",
       "upgradeCharacter": "Upgrades {oldCard} to {card} ({title}) on mission {mission} for {cost} chakra.",
       "pass": "Passes.",
       "passEdge": "Passes. Takes the Edge token.",
@@ -229,7 +230,9 @@
         "tenten118SecondDefeat": "{card} ({id}): Defeated a second hidden enemy character.",
         "upgradeFromHand": "{card} ({id}): Upgraded {target} from hand on mission {mission} for {cost} chakra.",
         "upgradeLeafReduced": "{card} ({id}): Upgraded {target} (Leaf Village reduced cost) on mission {mission} for {cost} chakra.",
-        "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra."
+        "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra.",
+        "sasuke107Discard": "{card} ({id}): {target} discarded — name conflict (mandatory move).",
+        "kimimaro056ProtectionBlocked": "{card} ({id}): Cannot pay 1 Chakra — effect fails."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -389,6 +392,7 @@
         "anko045DefeatHidden": "Select a hidden enemy character in play to defeat.",
         "asuma024DiscardForPowerup": "Discard a card from your hand to give Asuma POWERUP 3.",
         "baki082ScoreDefeatHidden": "Select a hidden enemy character in play to defeat.",
+        "baki082UpgradeDefeatLowPower": "Select an enemy character with Power 1 or less in this mission to defeat.",
         "baki082UpgradePowerup": "POWERUP 1 on each friendly Sand Village character in this mission.",
         "choji018MoveSelf": "Select a mission to move Choji Akimichi to.",
         "choji018HideEnemy": "Choose an enemy character with less Power to hide.",
@@ -439,6 +443,8 @@
         "manda102DefeatSummon": "Select an enemy Summon character in this mission to defeat.",
         "naruto010MoveSelf": "Select a mission to move Naruto Uzumaki to.",
         "neji037RemoveTokens": "Select an enemy character in this mission to remove all Power tokens from.",
+        "ninjaHounds100LookAtHidden": "Choose a hidden enemy character in this mission to look at.",
+        "ninjaHounds100LookReveal": "Ninja Hounds (100): Revealed {target} (Cost {cost}, Power {power}).",
         "orochimaru051DefeatHidden": "Select a hidden enemy character in play to defeat.",
         "sakon062CopyEffect": "Select a friendly Sound Four character to copy an effect from.",
         "sakura012Discard": "You drew a card. You must discard 1 card from your hand.",
@@ -466,6 +472,7 @@
         "tenten041DefeatHidden": "Select a hidden character in this mission to defeat.",
         "tenten041PowerupLeaf": "Select a friendly Leaf Village character to give POWERUP 1.",
         "tsunade004RecoverFromDiscard": "Choose a character from your discard pile to put into your hand.",
+        "yashamaru085ScoreConfirm": "Defeat this character to then defeat another character in this mission. Activate?",
         "yashamaru085ScoreDefeatAnother": "Self was defeated. Select another character in this mission to defeat.",
         "zaku071MoveEnemy": "Select an enemy character in this mission to move ({friendlyCount} vs {enemyCount}).",
         "asuma113bDiscard": "Choose a card from your hand to discard. Then defeat a character with Power equal to or less than the discarded card's Power.",

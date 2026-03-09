@@ -121,6 +121,7 @@
       "playCharacter": "Joue {card} ({title}) sur mission {mission} pour {cost} chakra.",
       "playHidden": "Joue un personnage cache sur mission {mission}.",
       "revealCharacter": "Revele {card} ({title}) sur mission {mission} pour {cost} chakra.",
+      "revealUpgrade": "Revele {card} ({title}) pour ameliorer sur mission {mission} pour {cost} chakra.",
       "upgradeCharacter": "Ameliore {oldCard} en {card} ({title}) sur mission {mission} pour {cost} chakra.",
       "pass": "Passe.",
       "passEdge": "Passe. Prend le jeton Initiative.",
@@ -229,7 +230,9 @@
         "tenten118SecondDefeat": "{card} ({id}) : A vaincu un deuxieme personnage ennemi cache.",
         "upgradeFromHand": "{card} ({id}) : Amelioration de {target} depuis la main sur mission {mission} pour {cost} chakra.",
         "upgradeLeafReduced": "{card} ({id}) : Amelioration de {target} (cout Feuille reduit) sur mission {mission} pour {cost} chakra.",
-        "upgradeSummon": "{card} ({id}) : Amelioration de l'invocation {target} sur mission {mission} pour {cost} chakra."
+        "upgradeSummon": "{card} ({id}) : Amelioration de l'invocation {target} sur mission {mission} pour {cost} chakra.",
+        "sasuke107Discard": "{card} ({id}) : {target} defausse — conflit de nom (deplacement obligatoire).",
+        "kimimaro056ProtectionBlocked": "{card} ({id}) : Ne peut pas payer 1 Chakra — l'effet echoue."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -389,6 +392,7 @@
         "anko045DefeatHidden": "Selectionnez un personnage cache ennemi en jeu a vaincre.",
         "asuma024DiscardForPowerup": "Defaussez une carte de votre main pour donner a Asuma POWERUP 3.",
         "baki082ScoreDefeatHidden": "Selectionnez un personnage ennemi cache en jeu a vaincre.",
+        "baki082UpgradeDefeatLowPower": "Selectionnez un personnage ennemi avec Puissance 1 ou moins dans cette mission a vaincre.",
         "baki082UpgradePowerup": "POWERUP 1 sur chaque personnage Village du Sable allie dans cette mission.",
         "choji018MoveSelf": "Selectionnez une mission pour y deplacer Choji Akimichi.",
         "choji018HideEnemy": "Choisissez un personnage ennemi avec moins de Puissance a cacher.",
@@ -439,6 +443,8 @@
         "manda102DefeatSummon": "Selectionnez une Invocation ennemie dans cette mission a vaincre.",
         "naruto010MoveSelf": "Selectionnez une mission pour y deplacer Naruto Uzumaki.",
         "neji037RemoveTokens": "Selectionnez un personnage ennemi dans cette mission pour retirer tous les jetons de Puissance.",
+        "ninjaHounds100LookAtHidden": "Choisissez un personnage ennemi cache dans cette mission a regarder.",
+        "ninjaHounds100LookReveal": "Chiens Ninja (100) : {target} revele (Cout {cost}, Puissance {power}).",
         "orochimaru051DefeatHidden": "Selectionnez un personnage cache ennemi en jeu a vaincre.",
         "sakon062CopyEffect": "Selectionnez un personnage allie Quatre du Son pour copier un de ses effets.",
         "sakura012Discard": "Vous avez pioche une carte. Vous devez defausser 1 carte de votre main.",
@@ -466,6 +472,7 @@
         "tenten041DefeatHidden": "Selectionnez un personnage cache dans cette mission a vaincre.",
         "tenten041PowerupLeaf": "Selectionnez un personnage allie Village de Konoha pour POWERUP 1.",
         "tsunade004RecoverFromDiscard": "Choisissez un personnage de votre defausse a remettre en main.",
+        "yashamaru085ScoreConfirm": "Vaincre ce personnage pour ensuite vaincre un autre personnage dans cette mission. Activer ?",
         "yashamaru085ScoreDefeatAnother": "Auto-vaincu. Selectionnez un autre personnage dans cette mission a vaincre.",
         "zaku071MoveEnemy": "Selectionnez un personnage ennemi dans cette mission a deplacer ({friendlyCount} vs {enemyCount}).",
         "asuma113bDiscard": "Choisissez une carte de votre main a defausser. Puis vaincre un personnage avec Puissance egale ou inferieure a la carte defaussee.",
