@@ -94,6 +94,10 @@
       "youHaveEdge": "Vous avez le jeton Initiative — vous jouez en premier et gagnez les egalites.",
       "opponentHasEdge": "Votre adversaire a le jeton Initiative — il joue en premier et gagne les egalites."
     },
+    "edgeCoinFlip": {
+      "youWin": "Vous avez l'Initiative",
+      "opponentWins": "L'adversaire a l'Initiative"
+    },
     "actions": {
       "playCharacter": "Jouer un personnage sur une mission",
       "playHiddenCharacter": "Jouer face cachee (1 chakra)",

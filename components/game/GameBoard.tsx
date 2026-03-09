@@ -28,6 +28,7 @@ import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 import { SandboxToolbar } from "./SandboxToolbar";
+import { EdgeCoinFlip } from "./EdgeCoinFlip";
 
 // ----- Shared color maps -----
 
@@ -1171,6 +1172,7 @@ function GameBoardInner() {
       <FullscreenCardDetail />
       <MobileDetailsButton />
 
+      <EdgeCoinFlip />
       <MulliganDialog />
       <GameLog />
       <AnimationController />
