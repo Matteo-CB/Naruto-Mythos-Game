@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 107/130 - SASUKE UCHIWA (R)
@@ -80,6 +81,19 @@ function moveCharTo(
 ): GameState {
   const friendlySide = side(player);
   const missions = [...state.activeMissions];
+
+  // Check Kurenai 035 movement block before moving
+  // Find source mission of the character
+  for (let i = 0; i < missions.length; i++) {
+    const chars = missions[i][friendlySide];
+    if (chars.some(c => c.instanceId === charInstanceId)) {
+      if (isMovementBlockedByKurenai(state, i, player)) {
+        // Movement blocked — character stays in place
+        return state;
+      }
+      break;
+    }
+  }
 
   // Find and remove from source mission
   let movedChar: CharacterInPlay | null = null;

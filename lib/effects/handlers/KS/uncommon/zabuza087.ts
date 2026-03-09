@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * Card 087/130 - ZABUZA MOMOCHI "Water Prison Jutsu" (UC)
@@ -73,32 +74,9 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  const newState = { ...state };
-  const missions = [...newState.activeMissions];
-  const m = { ...missions[sourceMissionIndex] };
-  const chars = [...m[enemySide]];
-  const charIdx = chars.findIndex((c) => c.instanceId === target.instanceId);
-
-  if (charIdx !== -1) {
-    chars[charIdx] = { ...chars[charIdx], isHidden: true };
-    m[enemySide] = chars;
-    missions[sourceMissionIndex] = m;
-
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_HIDE',
-      `Zabuza Momochi (087): Hid ${target.card.name_fr} (only non-hidden enemy in mission).`,
-      'game.log.effect.hide',
-      { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: target.card.name_fr },
-    );
-
-    return { state: { ...newState, activeMissions: missions, log } };
-  }
-
-  return { state: newState };
+  // Use centralized hide to respect Kimimaro 056 protection, Gemma 049 sacrifice, and immunities
+  const hiddenState = EffectEngine.hideCharacterWithLog(state, target.instanceId, sourcePlayer);
+  return { state: hiddenState };
 }
 
 function handleZabuza087UpgradeNoop(ctx: EffectContext): EffectResult {

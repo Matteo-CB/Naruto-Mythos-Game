@@ -856,6 +856,104 @@ export function TargetSelector() {
     );
   }
 
+  // ---- EFFECT_PLAY_UPGRADE_OR_FRESH: choose between fresh play and upgrade ----
+  if (pendingTargetSelection.selectionType === 'EFFECT_PLAY_UPGRADE_OR_FRESH') {
+    const upgradeTargets = validTargets.filter(id => id !== 'FRESH');
+    // Find the upgrade target characters from active missions
+    const upgradeChars: { char: VisibleCharacter; missionIdx: number }[] = [];
+    for (const mission of visibleState.activeMissions) {
+      const myChars = visibleState.myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+      for (const c of myChars) {
+        if (upgradeTargets.includes(c.instanceId)) {
+          upgradeChars.push({ char: c, missionIdx: visibleState.activeMissions.indexOf(mission) });
+        }
+      }
+    }
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
+        >
+          {/* Title */}
+          <motion.span
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm font-bold uppercase tracking-widest mb-6"
+            style={{ color: '#c4a35a' }}
+          >
+            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+          </motion.span>
+
+          <div className="flex gap-6 items-start">
+            {/* Fresh play option */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 16 }}
+              className="flex flex-col items-center gap-3"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleSelect('FRESH')}
+                className="flex flex-col items-center gap-2 px-6 py-5 rounded-lg cursor-pointer"
+                style={{
+                  backgroundColor: 'rgba(74, 158, 255, 0.1)',
+                  border: '2px solid #4a9eff',
+                  boxShadow: '0 0 16px rgba(74, 158, 255, 0.3)',
+                  minWidth: '120px',
+                }}
+              >
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#4a9eff' }}>
+                  {t('game.effect.freshPlay')}
+                </span>
+                <span className="text-[10px]" style={{ color: '#888888' }}>
+                  {t('game.effect.freshPlayDesc')}
+                </span>
+              </motion.button>
+            </motion.div>
+
+            {/* Divider */}
+            <div className="flex flex-col items-center justify-center self-stretch">
+              <div className="w-px flex-1" style={{ backgroundColor: '#333333' }} />
+              <span className="text-[10px] py-2" style={{ color: '#555555' }}>{t('game.effect.or')}</span>
+              <div className="w-px flex-1" style={{ backgroundColor: '#333333' }} />
+            </div>
+
+            {/* Upgrade targets */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 16 }}
+              className="flex flex-col items-center gap-3"
+            >
+              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                {t('game.effect.upgradeOver')}
+              </span>
+              <div className="flex gap-2 flex-wrap justify-center">
+                {upgradeChars.map(({ char }) => (
+                  <TargetCharacter
+                    key={char.instanceId}
+                    character={char}
+                    isValidTarget={true}
+                    onSelect={handleSelect}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       <motion.div

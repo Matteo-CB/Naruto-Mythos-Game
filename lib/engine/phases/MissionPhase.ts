@@ -3,6 +3,7 @@ import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
+import { isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
@@ -544,6 +545,9 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
       );
       if (!hasMove) continue;
+
+      // Kurenai 035: enemy characters cannot move from this mission
+      if (isMovementBlockedByKurenai(newState, missionIndex, player)) continue;
 
       // Collect ALL valid destination missions
       const validDests: number[] = [];

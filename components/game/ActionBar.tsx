@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
-import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { calculateEffectiveCost, hasKurenai034CostReduction } from '@/lib/engine/rules/ChakraValidation';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 import { useGameScale } from './GameScaleContext';
 
@@ -88,12 +88,19 @@ export function ActionBar() {
       // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
-      const sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
+      let sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
       // Flexible upgrade: Orochimaru 051/138 can upgrade over non-Summon, non-Orochimaru
-      const isFlexible = (selectedCard.number === 51 || selectedCard.number === 138)
-        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'))
+      const hasFlexRestriction = (selectedCard.number === 51 || selectedCard.number === 138)
+        && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'));
+      const isFlexible = hasFlexRestriction
         && !(charCard.keywords ?? []).includes('Summon')
         && !charCard.name_fr.toUpperCase().includes('OROCHIMARU');
+      // Orochimaru 051/138 restriction blocks ALL upgrades onto Orochimaru/Summon (including same-name)
+      if (hasFlexRestriction && (
+        (charCard.keywords ?? []).includes('Summon') || charCard.name_fr.toUpperCase().includes('OROCHIMARU')
+      )) {
+        sameNameMatch = false;
+      }
       // Akamaru 029 can upgrade over Kiba Inuzuka
       const isAkamaruUpgrade = selectedCard.number === 29
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('Kiba Inuzuka'))
@@ -138,7 +145,10 @@ export function ActionBar() {
           const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
           const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
           if (isSameName || isFlexible) {
-            const upgradeCost = Math.max(0, revealBaseCost - (cTop.chakra ?? 0));
+            const rawRevUpgCost = Math.max(0, revealBaseCost - (cTop.chakra ?? 0));
+            // Kurenai 034: minimum cost 1 on upgrade display
+            const upgradeCost = hasKurenai034CostReduction(visibleState, myPlayer, hiddenTopCard, mi)
+              ? Math.max(1, rawRevUpgCost) : rawRevUpgCost;
             revealUpgradeTargets.push({
               instanceId: c.instanceId,
               name: cTop.name_fr,
@@ -352,9 +362,13 @@ export function ActionBar() {
             const isHiddenTarget = target.isHidden;
             // For hidden targets: pay full effective cost (reveal + upgrade). For visible: pay diff.
             // Use effectiveCost (which includes Kurenai, Gamakichi, etc. modifiers) instead of raw chakra.
-            const upgradeCost = isHiddenTarget
+            const rawUpgradeCost = isHiddenTarget
               ? effectiveCost
               : effectiveCost - (charCard?.chakra ?? 0);
+            // Kurenai 034: minimum cost 1 applies to upgrade cost display (matches actual charge)
+            const upgradeCost = (!isHiddenTarget && selectedCard && visibleState && selectedMissionIndex !== null
+              && hasKurenai034CostReduction(visibleState, myPlayer, selectedCard, selectedMissionIndex))
+              ? Math.max(1, rawUpgradeCost) : rawUpgradeCost;
             const canAffordUpgrade = myState.chakra >= upgradeCost;
             const targetName = charCard?.name_fr ?? '';
             const upgradeLabel = isHiddenTarget

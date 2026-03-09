@@ -487,3 +487,36 @@ export function canBeHiddenByEnemy(
   if (isProtectedFromEnemyHide(state, char, charOwner)) return false;
   return true;
 }
+
+/**
+ * Check if Kurenai 035's continuous effect blocks an ENEMY character from moving
+ * out of a given mission. Returns true if movement is blocked.
+ *
+ * Kurenai 035 (UC) MAIN [⧗]: "Enemy characters cannot move from this mission."
+ * Only blocks characters that are enemies relative to Kurenai's controller.
+ */
+export function isMovementBlockedByKurenai(
+  state: GameState,
+  sourceMissionIndex: number,
+  charOwner: PlayerID,
+): boolean {
+  const sourceMission = state.activeMissions[sourceMissionIndex];
+  if (!sourceMission) return false;
+  const allChars = [...sourceMission.player1Characters, ...sourceMission.player2Characters];
+  for (const ch of allChars) {
+    if (ch.isHidden) continue;
+    const chTop = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+    if (chTop.number === 35) {
+      const hasRestriction = (chTop.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+          (e.description.includes('cannot move') || e.description.includes("can't be moved")),
+      );
+      if (hasRestriction) {
+        const kurenaiOwner = sourceMission.player1Characters.some(c => c.instanceId === ch.instanceId)
+          ? 'player1' : 'player2';
+        if (charOwner !== kurenaiOwner) return true;
+      }
+    }
+  }
+  return false;
+}

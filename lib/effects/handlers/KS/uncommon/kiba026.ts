@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * Card 026/130 - KIBA INUZUKA "Ninpo ! La Danse du Chien !" (UC)
@@ -50,32 +51,11 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
     return topCard.chakra === lowestCost;
   });
 
-  // If exactly one: auto-hide
+  // If exactly one: auto-hide (use centralized hide to respect protections)
   if (tiedChars.length === 1) {
     const target = tiedChars[0];
-    const missions = [...newState.activeMissions];
-    const m = { ...missions[sourceMissionIndex] };
-    const chars = [...m[enemySide]];
-    const idx = chars.findIndex(c => c.instanceId === target.instanceId);
-    if (idx !== -1) {
-      const targetName = chars[idx].card.name_fr;
-      chars[idx] = { ...chars[idx], isHidden: true };
-      m[enemySide] = chars;
-      missions[sourceMissionIndex] = m;
-      return {
-        state: {
-          ...newState,
-          activeMissions: missions,
-          log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer,
-            'EFFECT_HIDE',
-            `Kiba Inuzuka (026): Hid ${targetName} (lowest cost enemy in this mission).`,
-            'game.log.effect.hide',
-            { card: 'KIBA INUZUKA', id: 'KS-026-UC', target: targetName },
-          ),
-        },
-      };
-    }
-    return { state: newState };
+    const hiddenState = EffectEngine.hideCharacterWithLog(newState, target.instanceId, sourcePlayer);
+    return { state: hiddenState };
   }
 
   // Multiple enemies tied for lowest cost: the KIBA PLAYER chooses which enemy to hide

@@ -16,7 +16,7 @@ export function getEffectivePower(
   char: CharacterInPlay,
   player: PlayerID,
 ): number {
-  // Hidden characters have 0 base power, but power tokens still count
-  if (char.isHidden) return char.powerTokens;
+  // Hidden characters also need continuous modifiers (e.g., Itachi 128 -1 power).
+  // Delegate to calculateCharacterPower which handles both hidden and visible.
   return calculateCharacterPower(state, char, player);
 }

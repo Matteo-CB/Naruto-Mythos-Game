@@ -224,6 +224,17 @@ export function validateUpgradeCharacter(
     }
   }
 
+  // Orochimaru 051/138 restriction: "upgrade to any character that is NOT a Summon nor Orochimaru"
+  // This restriction blocks ALL upgrade paths (same-name AND flexible) onto Orochimaru/Summon targets.
+  if ((newCard.number === 51 || newCard.number === 138) &&
+    (newCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))) {
+    const isSummon = (topCard.keywords ?? []).includes('Summon');
+    const isOrochimaru = topCard.name_fr.toUpperCase().includes('OROCHIMARU');
+    if (isSummon || isOrochimaru) {
+      return { valid: false, reason: 'Cannot upgrade onto a Summon or Orochimaru.', reasonKey: 'game.error.flexibleUpgradeRestriction' };
+    }
+  }
+
   // Must have strictly higher cost
   if (newCard.chakra <= topCard.chakra) {
     return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.`, reasonKey: 'game.error.upgradeHigherCost', reasonParams: { newCost: newCard.chakra, currentCost: topCard.chakra } };

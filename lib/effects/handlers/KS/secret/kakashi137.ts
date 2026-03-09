@@ -3,6 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * Card 137/130 - KAKASHI HATAKE "L'Eclair Pourfendeur" (S)
@@ -62,29 +63,8 @@ function hideUpgradedCharacter(
   ctx: EffectContext,
   targetInstanceId: string,
 ): EffectContext['state'] {
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[ctx.sourceMissionIndex] };
-
-  for (const side of ['player1Characters', 'player2Characters'] as const) {
-    const chars = [...mission[side]];
-    const idx = chars.findIndex((c) => c.instanceId === targetInstanceId);
-    if (idx !== -1) {
-      const target = chars[idx];
-      chars[idx] = { ...target, isHidden: true };
-      mission[side] = chars;
-      missions[ctx.sourceMissionIndex] = mission;
-
-      const log = logAction(
-        state.log, state.turn, state.phase, ctx.sourcePlayer,
-        'EFFECT_HIDE',
-        `Kakashi Hatake (137): Hid upgraded ${target.card.name_fr} in this mission.`,
-        'game.log.effect.hide',
-        { card: 'KAKASHI HATAKE', id: 'KS-137-S', target: target.card.name_fr, mission: `mission ${ctx.sourceMissionIndex}` },
-      );
-      return { ...state, activeMissions: missions, log };
-    }
-  }
-  return state;
+  // Use centralized hide to respect Kimimaro 056 protection, Gemma 049 sacrifice, and immunities
+  return EffectEngine.hideCharacterWithLog(state, targetInstanceId, ctx.sourcePlayer);
 }
 
 function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
