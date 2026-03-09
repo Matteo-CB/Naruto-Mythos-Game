@@ -18,6 +18,7 @@ export function EffectChoiceSelector() {
   const t = useTranslations();
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
+  const declineTarget = useGameStore((s) => s.declineTarget);
 
   const handleSelect = useCallback(
     (effectType: string, description: string) => {
@@ -26,11 +27,16 @@ export function EffectChoiceSelector() {
     [selectTarget],
   );
 
+  const handleDecline = useCallback(() => {
+    declineTarget();
+  }, [declineTarget]);
+
   if (!pendingTargetSelection || pendingTargetSelection.selectionType !== 'CHOOSE_EFFECT') {
     return null;
   }
 
-  const { effectChoices, description, descriptionKey, descriptionParams, playerName } = pendingTargetSelection;
+  const { effectChoices, description, descriptionKey, descriptionParams, onDecline, playerName } = pendingTargetSelection;
+  const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
 
   if (!effectChoices || effectChoices.length === 0) return null;
@@ -170,6 +176,26 @@ export function EffectChoiceSelector() {
             );
           })}
         </motion.div>
+
+        {/* Skip / Decline button for optional effects */}
+        {canDecline && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleDecline}
+            className="mt-6 px-6 py-2.5 rounded-md text-sm font-medium uppercase tracking-wider cursor-pointer"
+            style={{
+              backgroundColor: 'transparent',
+              color: '#888888',
+              border: '1px solid #333333',
+            }}
+          >
+            {t('game.board.skip')}
+          </motion.button>
+        )}
       </motion.div>
     </AnimatePresence>
   );
