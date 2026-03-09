@@ -322,6 +322,333 @@ function getAnimationForAIAction(
   }
 }
 
+/**
+ * Data source abstraction for building pending target selection UI.
+ * Online mode provides VisibleGameState, local modes provide full GameState.
+ */
+interface PendingSelectionDataSource {
+  playerHand: Array<{ name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }>;
+  playerDiscard: Array<{ name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }>;
+  playerDeckSize: number;
+  activeMissions: Array<{ rank?: string }>;
+}
+
+interface PendingActionData {
+  id: string;
+  player: PlayerID;
+  type: string;
+  options: string[];
+  description: string;
+  descriptionKey?: string;
+  descriptionParams?: Record<string, string | number>;
+  sourceEffectId?: string;
+}
+
+interface PendingEffectData {
+  id: string;
+  targetSelectionType?: string;
+  effectDescription: string;
+  isOptional?: boolean;
+}
+
+/**
+ * Shared utility: builds PendingTargetSelection UI from pending action/effect data.
+ * Replaces 4 duplicated code paths (updateOnlineState, confirmHotseatSwitch, performAction, processAITurn).
+ */
+function buildPendingTargetSelectionUI(
+  pendingAction: PendingActionData,
+  pendingEffect: PendingEffectData | undefined,
+  dataSource: PendingSelectionDataSource,
+  playerName: string,
+  onSelect: (targetId: string) => void,
+  onDecline: () => void,
+): PendingTargetSelection {
+  const tst = pendingEffect?.targetSelectionType ?? '';
+
+  // Determine selection type flags
+  const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
+  const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
+    pendingAction.type === 'DISCARD_CARD' ||
+    pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+
+  // Build effect choices for copy-effect UI (Kakashi/Sakon)
+  let effectChoices: PendingTargetSelection['effectChoices'];
+  if (isEffectChoice) {
+    effectChoices = pendingAction.options.map((opt) => {
+      const sepIdx = opt.indexOf('::');
+      return {
+        effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
+        description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
+      };
+    });
+  }
+
+  // Build hand card info for hand selection UI
+  let handCards: PendingTargetSelection['handCards'];
+  if (isHandSelection) {
+    if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        const card = dataSource.playerDiscard[idx];
+        return {
+          index: idx,
+          card: card ? {
+            name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+          } : { name_fr: '???' },
+        };
+      });
+    } else if (tst === 'SAKURA135_CHOOSE_CARD') {
+      let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
+      try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
+      const numDrawn = topCardsInfo.length || 3;
+      const drawnCards = dataSource.playerDiscard.slice(dataSource.playerDiscard.length - numDrawn);
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
+        const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
+        return {
+          index: idx,
+          card: card ? {
+            name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+          } : info ? {
+            name_fr: info.name, chakra: info.chakra, power: info.power,
+          } : { name_fr: '???' },
+        };
+      });
+    } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
+      handCards = pendingAction.options.map((amountStr) => {
+        const amount = parseInt(amountStr, 10);
+        return {
+          index: amount,
+          card: {
+            name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
+            name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
+            chakra: amount, power: amount,
+          },
+        };
+      });
+    } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+      const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+      handCards = pendingAction.options.map((amountStr) => {
+        const amount = parseInt(amountStr, 10);
+        return {
+          index: amount,
+          card: {
+            name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+            name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+            chakra: 0, power: amount,
+          },
+        };
+      });
+    } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
+      let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+      try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        const card = oppCards[idx];
+        return {
+          index: idx,
+          card: card ? {
+            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
+          } : { name_fr: '???' },
+        };
+      });
+    } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
+      let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
+      try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        const card = oppCards091[idx];
+        return {
+          index: idx,
+          card: card ? {
+            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
+          } : { name_fr: '???' },
+        };
+      });
+    } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        return {
+          index: idx,
+          card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
+        };
+      });
+    } else if (
+      tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
+      tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
+      tst === 'HIRUZEN002_CHOOSE_CARD'
+    ) {
+      let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+      try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
+      const missionRanks = dataSource.activeMissions.map((m) => m.rank || '?');
+      handCards = pendingAction.options.map((optStr, optIdx) => {
+        if (optStr.startsWith('HIDDEN_')) {
+          const instId = optStr.slice(7);
+          const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
+          const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
+          return {
+            index: optIdx,
+            targetId: optStr,
+            card: hInfo ? {
+              name_fr: hInfo.name_fr, name_en: hInfo.name_en, chakra: hInfo.chakra, power: hInfo.power,
+              image_file: hInfo.image_file, missionLabel: `Mission ${mLabel}`,
+            } : { name_fr: '???', missionLabel: '?' },
+          };
+        } else {
+          const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
+          const idx = parseInt(rawIdx, 10);
+          const card = dataSource.playerHand[idx];
+          return {
+            index: optIdx,
+            targetId: optStr,
+            card: card ? {
+              name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+            } : { name_fr: '???' },
+          };
+        }
+      });
+    } else {
+      handCards = pendingAction.options.map((indexStr) => {
+        const idx = parseInt(indexStr, 10);
+        const card = dataSource.playerHand[idx];
+        return {
+          index: idx,
+          card: card ? {
+            name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
+          } : { name_fr: '???' },
+        };
+      });
+    }
+  }
+
+  // Detect dedicated confirm UIs
+  const isSakura011Draw = tst === 'SAKURA011_DRAW' || tst === 'HAKU088_CONFIRM_DRAW';
+  const isKiba113ConfirmHide = tst === 'KIBA113_CONFIRM_HIDE_AKAMARU' || tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+
+  // Detect info reveal types
+  const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';
+  const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL';
+  const isDosuLookReveal = tst === 'DOSU_LOOK_REVEAL';
+  const isSasuke014Reveal = tst === 'SASUKE014_HAND_REVEAL' || tst === 'SASUKE014_UPGRADE_HAND_REVEAL';
+  const isTayuya065Reveal = tst === 'TAYUYA065_UPGRADE_REVEAL';
+  const isKiba026Reveal = tst === 'KIBA026_UPGRADE_REVEAL';
+  const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
+
+  let revealedCard: PendingTargetSelection['revealedCard'];
+  let revealedCards: PendingTargetSelection['revealedCards'];
+  if (isInfoReveal && pendingEffect) {
+    try {
+      const rd = JSON.parse(pendingEffect.effectDescription);
+      if (isOroReveal) {
+        revealedCard = {
+          name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: rd.canSteal,
+        };
+      } else if (isItachi091Reveal) {
+        revealedCard = {
+          name_fr: '', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.itachi091RevealTitle',
+          revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
+        };
+        revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
+          name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isDiscarded: c.isDiscarded ?? false,
+        }));
+      } else if (isDosuLookReveal) {
+        revealedCard = {
+          name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
+          image_file: rd.cardImageFile, canSteal: false,
+          revealTitleKey: 'game.effect.dosuLookRevealTitle',
+          revealResultKey: 'game.effect.dosuLookRevealResult',
+        };
+      } else if (isSasuke014Reveal) {
+        revealedCard = {
+          name_fr: '', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.sasuke014RevealTitle',
+          revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
+        };
+        revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
+          name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file,
+        }));
+      } else if (isTayuya065Reveal) {
+        revealedCard = {
+          name_fr: 'Tayuya', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
+          revealResultKey: rd.drawnCount > 0 ? 'game.effect.tayuya065UpgradeRevealDrawn' : 'game.effect.tayuya065UpgradeRevealNone',
+        };
+        revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
+          name_fr: c.name, chakra: c.chakra, power: c.power, image_file: c.image_file, isSummon: c.isSummon,
+        }));
+      } else if (isKiba026Reveal) {
+        revealedCard = {
+          name_fr: 'Kiba Inuzuka', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.kiba026UpgradeRevealTitle',
+          revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
+            ? 'game.effect.kiba026UpgradeRevealFound' : 'game.effect.kiba026UpgradeRevealNone',
+        };
+        revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
+          name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isMatch: c.isMatch,
+        }));
+      }
+    } catch { /* ignore */ }
+  }
+
+  // Build dedicated confirm UI data
+  let deckSize: number | undefined;
+  let confirmCardData: PendingTargetSelection['confirmCardData'];
+  if (isSakura011Draw) {
+    deckSize = dataSource.playerDeckSize;
+  }
+  if (isKiba113ConfirmHide && pendingEffect) {
+    try {
+      const cd = JSON.parse(pendingEffect.effectDescription);
+      confirmCardData = {
+        name_fr: cd.name_fr ?? '', name_en: cd.name_en,
+        image_file: cd.image_file, chakra: cd.chakra, power: cd.power,
+      };
+    } catch { /* ignore */ }
+  }
+
+  // Determine selection type
+  const selectionType: PendingTargetSelection['selectionType'] = isInfoReveal
+    ? 'INFO_REVEAL'
+    : isEffectChoice ? 'CHOOSE_EFFECT'
+    : isHandSelection ? 'CHOOSE_FROM_HAND'
+    : isSakura011Draw ? 'DRAW_CARD'
+    : isKiba113ConfirmHide ? (tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE')
+    : 'TARGET_CHARACTER';
+
+  // Build decline label key for specific effects
+  let declineLabelKey: string | undefined;
+  if (tst === 'DOSU069_OPPONENT_CHOICE') {
+    declineLabelKey = 'game.effect.dosu069Defeat';
+  } else if (tst === 'GEMMA049_SACRIFICE_CHOICE') {
+    declineLabelKey = 'game.effect.gemma049DeclineDefeat';
+  } else if (tst === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
+    declineLabelKey = 'game.effect.gemma049DeclineHide';
+  } else if (tst === 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT') {
+    declineLabelKey = 'game.effect.dosu069Defeat';
+  }
+
+  return {
+    validTargets: pendingAction.options,
+    description: pendingAction.description,
+    descriptionKey: pendingAction.descriptionKey,
+    descriptionParams: pendingAction.descriptionParams,
+    selectionType,
+    effectChoices,
+    handCards,
+    revealedCard,
+    revealedCards,
+    deckSize,
+    confirmCardData,
+    playerName,
+    onSelect,
+    onDecline: pendingEffect?.isOptional ? onDecline : undefined,
+    declineLabelKey,
+  };
+}
+
 export const useGameStore = create<GameStore>((set, get) => ({
   gameState: null,
   visibleState: null,
@@ -379,377 +706,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingAction = pendingForMe[0];
       const pendingEffect = visibleState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
-      // Determine selection type for UI
-      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
-      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
-        pendingAction.type === 'DISCARD_CARD' ||
-        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+      const dataSource: PendingSelectionDataSource = {
+        playerHand: visibleState.myState.hand ?? [],
+        playerDiscard: visibleState.myState.discardPile ?? [],
+        playerDeckSize: visibleState.myState.deck?.length ?? 0,
+        activeMissions: (visibleState.activeMissions ?? []).map((m: any) => ({ rank: m.rank })),
+      };
 
-      // Build effect choices for copy-effect UI
-      let effectChoices: PendingTargetSelection['effectChoices'];
-      if (isEffectChoice) {
-        effectChoices = pendingAction.options.map((opt) => {
-          const sepIdx = opt.indexOf('::');
-          return {
-            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
-            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
-          };
-        });
-      }
-
-      // Build hand card info for hand selection UI
-      let handCards: PendingTargetSelection['handCards'];
-      if (isHandSelection) {
-        const tst = pendingEffect?.targetSelectionType ?? '';
-        if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
-          const playerDiscard = visibleState.myState.discardPile;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerDiscard[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
+      const pendingSelection = buildPendingTargetSelectionUI(
+        pendingAction, pendingEffect, dataSource,
+        get().playerDisplayNames[humanPlayer],
+        (targetId: string) => {
+          get().performAction({
+            type: 'SELECT_TARGET',
+            pendingActionId: pendingAction.id,
+            selectedTargets: [targetId],
           });
-        } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-          // Cards drawn from deck are stored at end of discard pile; effectDescription JSON has info
-          let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
-          try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
-          const playerDiscard = visibleState.myState.discardPile;
-          const numDrawn = topCardsInfo.length || 3;
-          const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
-            const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : info ? {
-                name_fr: info.name,
-                chakra: info.chakra,
-                power: info.power,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            return {
-              index: amount,
-              card: {
-                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
-                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
-                chakra: amount,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
-            return {
-              index: amount,
-              card: {
-                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
-                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
-                chakra: 0,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
-          // Source player selects from opponent's hand — card info stored in effectDescription
-          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                name_en: card.name_en,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
-          // Opponent's hand cards stored in effectDescription JSON
-          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards091[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                name_en: card.name_en,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
-          // Opponent's hand cards shown as face-down (card backs)
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            return {
-              index: idx,
-              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
-            };
-          });
-        } else if (
-          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
-          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-          tst === 'HIRUZEN002_CHOOSE_CARD'
-        ) {
-          // Mixed hand + hidden board characters
-          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
-          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
-
-          const playerHand = visibleState.myState.hand;
-          const missionRanks = (visibleState.activeMissions ?? []).map((m: any) => m.rank || '?');
-
-          handCards = pendingAction.options.map((optStr, optIdx) => {
-            if (optStr.startsWith('HIDDEN_')) {
-              const instId = optStr.slice(7);
-              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
-              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: hInfo ? {
-                  name_fr: hInfo.name_fr,
-                  name_en: hInfo.name_en,
-                  chakra: hInfo.chakra,
-                  power: hInfo.power,
-                  image_file: hInfo.image_file,
-                  missionLabel: `Mission ${mLabel}`,
-                } : { name_fr: '???', missionLabel: '?' },
-              };
-            } else {
-              // HAND_ prefix or plain index
-              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
-              const idx = parseInt(rawIdx, 10);
-              const card = playerHand[idx];
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: card ? {
-                  name_fr: card.name_fr,
-                  chakra: card.chakra,
-                  power: card.power,
-                  image_file: card.image_file,
-                } : { name_fr: '???' },
-              };
-            }
-          });
-        } else {
-          const playerHand = visibleState.myState.hand;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerHand[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        }
-      }
-
-      // Detect dedicated confirm UIs
-      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
-      const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
-
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
-      const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
-      const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
-      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
-      const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
-      const isKiba026Reveal = pendingEffect?.targetSelectionType === 'KIBA026_UPGRADE_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
-      let revealedCard: PendingTargetSelection['revealedCard'];
-      let revealedCards: PendingTargetSelection['revealedCards'];
-      if (isInfoReveal && pendingEffect) {
-        try {
-          const rd = JSON.parse(pendingEffect.effectDescription);
-          if (isOroReveal) {
-            revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
-              canSteal: rd.canSteal,
-            };
-          } else if (isItachi091Reveal) {
-            revealedCard = {
-              name_fr: '',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.itachi091RevealTitle',
-              revealResultKey: rd.isUpgrade
-                ? 'game.effect.itachi091DiscardResult'
-                : 'game.effect.itachi091RevealResult',
-            };
-            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isDiscarded: c.isDiscarded ?? false,
-            }));
-          } else if (isDosuLookReveal) {
-            revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
-              canSteal: false,
-              revealTitleKey: 'game.effect.dosuLookRevealTitle',
-              revealResultKey: 'game.effect.dosuLookRevealResult',
-            };
-          } else if (isSasuke014Reveal) {
-            revealedCard = {
-              name_fr: '',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.sasuke014RevealTitle',
-              revealResultKey: rd.isUpgrade
-                ? 'game.effect.sasuke014DiscardResult'
-                : 'game.effect.sasuke014RevealResult',
-            };
-            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-            }));
-          } else if (isTayuya065Reveal) {
-            revealedCard = {
-              name_fr: 'Tayuya',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
-              revealResultKey: rd.drawnCount > 0
-                ? 'game.effect.tayuya065UpgradeRevealDrawn'
-                : 'game.effect.tayuya065UpgradeRevealNone',
-            };
-            revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
-              name_fr: c.name,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isSummon: c.isSummon,
-            }));
-          } else if (isKiba026Reveal) {
-            revealedCard = {
-              name_fr: 'Kiba Inuzuka',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.kiba026UpgradeRevealTitle',
-              revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
-                ? 'game.effect.kiba026UpgradeRevealFound'
-                : 'game.effect.kiba026UpgradeRevealNone',
-            };
-            revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isMatch: c.isMatch,
-            }));
+        },
+        () => {
+          if (pendingEffect) {
+            get().performAction({
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pendingEffect.id,
+            });
           }
-        } catch { /* ignore */ }
-      }
-
-      // Build dedicated confirm UI data
-      let deckSize: number | undefined;
-      let confirmCardData: PendingTargetSelection['confirmCardData'];
-      if (isSakura011Draw) {
-        deckSize = visibleState.myState.deck?.length ?? 0;
-      }
-      if (isKiba113ConfirmHide && pendingEffect) {
-        try {
-          const cd = JSON.parse(pendingEffect.effectDescription);
-          confirmCardData = {
-            name_fr: cd.name_fr ?? '',
-            name_en: cd.name_en,
-            image_file: cd.image_file,
-            chakra: cd.chakra,
-            power: cd.power,
-          };
-        } catch { /* ignore */ }
-      }
-
-      // Debug: MSS05 tracing (online)
-      if (pendingEffect?.targetSelectionType === 'MSS05_RETURN_TO_HAND') {
-        console.warn('[MSS05 UI online]', { humanPlayer, player: pendingAction.player, options: pendingAction.options, myPlayer: visibleState.myPlayer });
-      }
+        },
+      );
 
       set({
         visibleState,
         isProcessing: false,
-        pendingTargetSelection: {
-          validTargets: pendingAction.options,
-          description: pendingAction.description,
-          descriptionKey: pendingAction.descriptionKey,
-          descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011Draw ? 'DRAW_CARD' : isKiba113ConfirmHide ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
-          effectChoices,
-          handCards,
-          revealedCard,
-          revealedCards,
-          deckSize,
-          confirmCardData,
-          playerName: get().playerDisplayNames[get().humanPlayer],
-          onSelect: (targetId: string) => {
-            get().performAction({
-              type: 'SELECT_TARGET',
-              pendingActionId: pendingAction.id,
-              selectedTargets: [targetId],
-            });
-          },
-          onDecline: pendingEffect?.isOptional ? () => {
-            if (pendingEffect) {
-              get().performAction({
-                type: 'DECLINE_OPTIONAL_EFFECT',
-                pendingEffectId: pendingEffect.id,
-              });
-            }
-          } : undefined,
-          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
-            ? 'game.effect.dosu069Defeat'
-            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
-              ? 'game.effect.gemma049DeclineDefeat'
-              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
-                ? 'game.effect.gemma049DeclineHide'
-                : undefined,
-        },
+        pendingTargetSelection: pendingSelection,
       });
     } else {
       set({ visibleState, isProcessing: false, pendingTargetSelection: null });
@@ -865,44 +852,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (pendingActions.length > 0) {
       const pa = pendingActions[0];
       const pe = gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
-      const isEffectChoice = pa.type === 'CHOOSE_EFFECT';
-      const isHandSelection = pa.type === 'PUT_CARD_ON_DECK' || pa.type === 'DISCARD_CARD' || pa.type === 'CHOOSE_CARD_FROM_LIST';
 
-      set({
-        isProcessing: false,
-        pendingTargetSelection: {
-          validTargets: pa.options,
-          description: pa.description,
-          descriptionKey: pa.descriptionKey,
-          descriptionParams: pa.descriptionParams,
-          selectionType: isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : 'TARGET_CHARACTER',
-          playerName: playerDisplayNames[newPlayer],
-          onSelect: (targetId: string) => {
-            get().performAction({
-              type: 'SELECT_TARGET',
-              pendingActionId: pa.id,
-              selectedTargets: [targetId],
-            });
-          },
-          onDecline: pe?.isOptional ? () => {
-            if (pe) {
-              get().performAction({
-                type: 'DECLINE_OPTIONAL_EFFECT',
-                pendingEffectId: pe.id,
-              });
-            }
-          } : undefined,
-          declineLabelKey: pe?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
-            ? 'game.effect.dosu069Defeat'
-            : pe?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
-              ? 'game.effect.gemma049DeclineDefeat'
-              : pe?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
-                ? 'game.effect.gemma049DeclineHide'
-                : pe?.targetSelectionType === 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT'
-                  ? 'game.effect.dosu069Defeat'
-                  : undefined,
+      const dataSource: PendingSelectionDataSource = {
+        playerHand: gameState[newPlayer].hand ?? [],
+        playerDiscard: gameState[newPlayer].discardPile ?? [],
+        playerDeckSize: gameState[newPlayer].deck?.length ?? 0,
+        activeMissions: (gameState.activeMissions ?? []).map((m) => ({ rank: m.rank })),
+      };
+
+      const pendingSelection = buildPendingTargetSelectionUI(
+        pa, pe, dataSource, playerDisplayNames[newPlayer],
+        (targetId: string) => {
+          get().performAction({
+            type: 'SELECT_TARGET',
+            pendingActionId: pa.id,
+            selectedTargets: [targetId],
+          });
         },
-      });
+        () => {
+          if (pe) {
+            get().performAction({
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pe.id,
+            });
+          }
+        },
+      );
+
+      set({ isProcessing: false, pendingTargetSelection: pendingSelection });
       return;
     }
 
@@ -1087,390 +1064,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingAction = humanPending[0];
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
-      // Determine selection type for UI
-      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
-      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
-        pendingAction.type === 'DISCARD_CARD' ||
-        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+      const dataSource: PendingSelectionDataSource = {
+        playerHand: newState[humanPlayer].hand ?? [],
+        playerDiscard: newState[humanPlayer].discardPile ?? [],
+        playerDeckSize: newState[humanPlayer].deck?.length ?? 0,
+        activeMissions: (newState.activeMissions ?? []).map((m) => ({ rank: m.rank })),
+      };
 
-      // Build effect choices for copy-effect UI
-      let effectChoices: PendingTargetSelection['effectChoices'];
-      if (isEffectChoice) {
-        effectChoices = pendingAction.options.map((opt) => {
-          const sepIdx = opt.indexOf('::');
-          return {
-            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
-            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
-          };
-        });
-      }
-
-      // Build hand card info for hand selection UI
-      let handCards: PendingTargetSelection['handCards'];
-      if (isHandSelection) {
-        const tst = pendingEffect?.targetSelectionType ?? '';
-        // Sakura 109: indices are into the discard pile
-        // Sakura 135: indices are into drawn cards stored at end of discard pile (use JSON description)
-        if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            return {
-              index: amount,
-              card: {
-                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
-                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
-                chakra: amount,
-                power: amount,
-              },
-            };
+      const pendingSelection = buildPendingTargetSelectionUI(
+        pendingAction, pendingEffect, dataSource,
+        get().playerDisplayNames[humanPlayer],
+        (targetId: string) => {
+          get().performAction({
+            type: 'SELECT_TARGET',
+            pendingActionId: pendingAction.id,
+            selectedTargets: [targetId],
           });
-        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
-            return {
-              index: amount,
-              card: {
-                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
-                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
-                chakra: 0,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
-          const playerDiscard = newState[humanPlayer].discardPile;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerDiscard[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-          // Cards are stored at end of discard pile; effectDescription JSON has topCards info
-          let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
-          try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
-          const playerDiscard = newState[humanPlayer].discardPile;
-          const numDrawn = topCardsInfo.length || 3;
-          const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
-            const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : info ? {
-                name_fr: info.name,
-                chakra: info.chakra,
-                power: info.power,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
-            return {
-              index: amount,
-              card: {
-                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
-                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
-                chakra: 0,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
-          // Source player selects from opponent's hand — card info stored in effectDescription
-          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                name_en: card.name_en,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
-          // Opponent's hand cards stored in effectDescription JSON
-          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards091[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                name_en: card.name_en,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            return {
-              index: idx,
-              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
-            };
-          });
-        } else if (
-          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
-          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-          tst === 'HIRUZEN002_CHOOSE_CARD'
-        ) {
-          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
-          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
-
-          const playerHand = newState[humanPlayer].hand;
-          const missionRanks = (newState.activeMissions ?? []).map((m: any) => m.rank || '?');
-
-          handCards = pendingAction.options.map((optStr, optIdx) => {
-            if (optStr.startsWith('HIDDEN_')) {
-              const instId = optStr.slice(7);
-              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
-              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: hInfo ? {
-                  name_fr: hInfo.name_fr,
-                  name_en: hInfo.name_en,
-                  chakra: hInfo.chakra,
-                  power: hInfo.power,
-                  image_file: hInfo.image_file,
-                  missionLabel: `Mission ${mLabel}`,
-                } : { name_fr: '???', missionLabel: '?' },
-              };
-            } else {
-              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
-              const idx = parseInt(rawIdx, 10);
-              const card = playerHand[idx];
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: card ? {
-                  name_fr: card.name_fr,
-                  chakra: card.chakra,
-                  power: card.power,
-                  image_file: card.image_file,
-                } : { name_fr: '???' },
-              };
-            }
-          });
-        } else {
-          const playerHand = newState[humanPlayer].hand;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerHand[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        }
-      }
-
-      // Detect dedicated confirm UIs
-      const isSakura011Draw = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
-      const isKiba113ConfirmHide = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
-
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, Kiba 026, etc.)
-      const isOroReveal = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
-      const isItachi091Reveal = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isDosuLookReveal = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
-      const isSasuke014Reveal = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL' || pendingEffect?.targetSelectionType === 'SASUKE014_UPGRADE_HAND_REVEAL';
-      const isTayuya065Reveal = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
-      const isKiba026Reveal = pendingEffect?.targetSelectionType === 'KIBA026_UPGRADE_REVEAL';
-      const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
-      let revealedCard: PendingTargetSelection['revealedCard'];
-      let revealedCards: PendingTargetSelection['revealedCards'];
-      if (isInfoReveal && pendingEffect) {
-        try {
-          const rd = JSON.parse(pendingEffect.effectDescription);
-          if (isOroReveal) {
-            revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
-              canSteal: rd.canSteal,
-            };
-          } else if (isItachi091Reveal) {
-            revealedCard = {
-              name_fr: '',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.itachi091RevealTitle',
-              revealResultKey: rd.isUpgrade
-                ? 'game.effect.itachi091DiscardResult'
-                : 'game.effect.itachi091RevealResult',
-            };
-            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isDiscarded: c.isDiscarded ?? false,
-            }));
-          } else if (isDosuLookReveal) {
-            revealedCard = {
-              name_fr: rd.cardName,
-              chakra: rd.cardCost,
-              power: rd.cardPower,
-              image_file: rd.cardImageFile,
-              canSteal: false,
-              revealTitleKey: 'game.effect.dosuLookRevealTitle',
-              revealResultKey: 'game.effect.dosuLookRevealResult',
-            };
-          } else if (isSasuke014Reveal) {
-            revealedCard = {
-              name_fr: '',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.sasuke014RevealTitle',
-              revealResultKey: rd.isUpgrade
-                ? 'game.effect.sasuke014DiscardResult'
-                : 'game.effect.sasuke014RevealResult',
-            };
-            revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-            }));
-          } else if (isTayuya065Reveal) {
-            revealedCard = {
-              name_fr: 'Tayuya',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
-              revealResultKey: rd.drawnCount > 0
-                ? 'game.effect.tayuya065UpgradeRevealDrawn'
-                : 'game.effect.tayuya065UpgradeRevealNone',
-            };
-            revealedCards = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
-              name_fr: c.name,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isSummon: c.isSummon,
-            }));
-          } else if (isKiba026Reveal) {
-            revealedCard = {
-              name_fr: 'Kiba Inuzuka',
-              chakra: 0,
-              power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.kiba026UpgradeRevealTitle',
-              revealResultKey: rd.topCards?.some((c: { isMatch?: boolean }) => c.isMatch)
-                ? 'game.effect.kiba026UpgradeRevealFound'
-                : 'game.effect.kiba026UpgradeRevealNone',
-            };
-            revealedCards = (rd.topCards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isMatch?: boolean }) => ({
-              name_fr: c.name_fr,
-              chakra: c.chakra,
-              power: c.power,
-              image_file: c.image_file,
-              isMatch: c.isMatch,
-            }));
-          }
-        } catch { /* ignore */ }
-      }
-
-      // Build dedicated confirm UI data
-      let deckSize: number | undefined;
-      let confirmCardData: PendingTargetSelection['confirmCardData'];
-      if (isSakura011Draw) {
-        deckSize = newState[humanPlayer].deck?.length ?? 0;
-      }
-      if (isKiba113ConfirmHide && pendingEffect) {
-        try {
-          const cd = JSON.parse(pendingEffect.effectDescription);
-          confirmCardData = {
-            name_fr: cd.name_fr ?? '',
-            name_en: cd.name_en,
-            image_file: cd.image_file,
-            chakra: cd.chakra,
-            power: cd.power,
-          };
-        } catch { /* ignore */ }
-      }
-
-      // Debug: MSS05 tracing
-      if (pendingEffect?.targetSelectionType === 'MSS05_RETURN_TO_HAND') {
-        console.warn('[MSS05 UI local]', { humanPlayer, player: pendingAction.player, options: pendingAction.options });
-      }
-
-      set({
-        isProcessing: false,
-        pendingTargetSelection: {
-          validTargets: pendingAction.options,
-          description: pendingAction.description,
-          descriptionKey: pendingAction.descriptionKey,
-          descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoReveal ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011Draw ? 'DRAW_CARD' : isKiba113ConfirmHide ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
-          effectChoices,
-          handCards,
-          revealedCard,
-          revealedCards,
-          deckSize,
-          confirmCardData,
-          playerName: get().playerDisplayNames[get().humanPlayer],
-          onSelect: (targetId: string) => {
-            get().performAction({
-              type: 'SELECT_TARGET',
-              pendingActionId: pendingAction.id,
-              selectedTargets: [targetId],
-            });
-          },
-          onDecline: pendingEffect?.isOptional ? () => {
-            if (pendingEffect) {
-              get().performAction({
-                type: 'DECLINE_OPTIONAL_EFFECT',
-                pendingEffectId: pendingEffect.id,
-              });
-            }
-          } : undefined,
-          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
-            ? 'game.effect.dosu069Defeat'
-            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
-              ? 'game.effect.gemma049DeclineDefeat'
-              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
-                ? 'game.effect.gemma049DeclineHide'
-                : undefined,
         },
-      });
+        () => {
+          if (pendingEffect) {
+            get().performAction({
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pendingEffect.id,
+            });
+          }
+        },
+      );
+
+      set({ isProcessing: false, pendingTargetSelection: pendingSelection });
       return;
     }
 
@@ -1750,315 +1371,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const pendingAction = humanPendingAfterAI[0];
       const pendingEffect = currentState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
-      const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
-      const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
-        pendingAction.type === 'DISCARD_CARD' ||
-        pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
+      const dataSource: PendingSelectionDataSource = {
+        playerHand: currentState[humanPlayer].hand ?? [],
+        playerDiscard: currentState[humanPlayer].discardPile ?? [],
+        playerDeckSize: currentState[humanPlayer].deck?.length ?? 0,
+        activeMissions: (currentState.activeMissions ?? []).map((m) => ({ rank: m.rank })),
+      };
 
-      let effectChoices: PendingTargetSelection['effectChoices'];
-      if (isEffectChoice) {
-        effectChoices = pendingAction.options.map((opt) => {
-          const sepIdx = opt.indexOf('::');
-          return {
-            effectType: sepIdx >= 0 ? opt.substring(0, sepIdx) : opt,
-            description: sepIdx >= 0 ? opt.substring(sepIdx + 2) : '',
-          };
-        });
-      }
-
-      let handCards: PendingTargetSelection['handCards'];
-      if (isHandSelection) {
-        const tst = pendingEffect?.targetSelectionType ?? '';
-        if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            return {
-              index: amount,
-              card: {
-                name_fr: amount === 0 ? 'Passer (0)' : `POWERUP ${amount}`,
-                name_en: amount === 0 ? 'Skip (0)' : `POWERUP ${amount}`,
-                chakra: amount,
-                power: amount,
-              },
-            };
+      const pendingSelection = buildPendingTargetSelectionUI(
+        pendingAction, pendingEffect, dataSource,
+        get().playerDisplayNames[humanPlayer],
+        (targetId: string) => {
+          get().performAction({
+            type: 'SELECT_TARGET',
+            pendingActionId: pendingAction.id,
+            selectedTargets: [targetId],
           });
-        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
-            return {
-              index: amount,
-              card: {
-                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
-                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
-                chakra: 0,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
-          const playerDiscard = currentState[humanPlayer].discardPile;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerDiscard[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-          let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
-          try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
-          const playerDiscard = currentState[humanPlayer].discardPile;
-          const numDrawn = topCardsInfo.length || 3;
-          const drawnCards = playerDiscard.slice(playerDiscard.length - numDrawn);
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
-            const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
-              } : info ? {
-                name_fr: info.name, chakra: info.chakra, power: info.power,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
-          handCards = pendingAction.options.map((amountStr) => {
-            const amount = parseInt(amountStr, 10);
-            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
-            return {
-              index: amount,
-              card: {
-                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
-                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
-                chakra: 0,
-                power: amount,
-              },
-            };
-          });
-        } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
-          // Source player selects from opponent's hand — card info stored in effectDescription
-          let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
-          // Opponent's hand cards stored in effectDescription JSON
-          let oppCards091: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
-          try { oppCards091 = JSON.parse(pendingEffect?.effectDescription ?? '{}').cards ?? []; } catch { /* ignore */ }
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = oppCards091[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr,
-                name_en: card.name_en,
-                chakra: card.chakra,
-                power: card.power,
-                image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            return {
-              index: idx,
-              card: { name_fr: `Carte ${idx + 1}`, image_file: '/images/card-back.webp' },
-            };
-          });
-        } else if (
-          tst === 'JIRAIYA_CHOOSE_SUMMON' || tst === 'JIRAIYA008_CHOOSE_SUMMON' ||
-          tst === 'JIRAIYA105_CHOOSE_SUMMON' || tst === 'JIRAIYA132_CHOOSE_SUMMON' ||
-          tst === 'HIRUZEN002_CHOOSE_CARD'
-        ) {
-          let hiddenCharsInfo: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
-          try { hiddenCharsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
-
-          const playerHand = currentState[humanPlayer].hand;
-          const missionRanks = (currentState.activeMissions ?? []).map((m: any) => m.rank || '?');
-
-          handCards = pendingAction.options.map((optStr, optIdx) => {
-            if (optStr.startsWith('HIDDEN_')) {
-              const instId = optStr.slice(7);
-              const hInfo = hiddenCharsInfo.find((h) => h.instanceId === instId);
-              const mLabel = hInfo ? (missionRanks[hInfo.missionIndex] || `M${hInfo.missionIndex + 1}`) : '?';
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: hInfo ? {
-                  name_fr: hInfo.name_fr,
-                  name_en: hInfo.name_en,
-                  chakra: hInfo.chakra,
-                  power: hInfo.power,
-                  image_file: hInfo.image_file,
-                  missionLabel: `Mission ${mLabel}`,
-                } : { name_fr: '???', missionLabel: '?' },
-              };
-            } else {
-              const rawIdx = optStr.startsWith('HAND_') ? optStr.slice(5) : optStr;
-              const idx = parseInt(rawIdx, 10);
-              const card = playerHand[idx];
-              return {
-                index: optIdx,
-                targetId: optStr,
-                card: card ? {
-                  name_fr: card.name_fr,
-                  chakra: card.chakra,
-                  power: card.power,
-                  image_file: card.image_file,
-                } : { name_fr: '???' },
-              };
-            }
-          });
-        } else {
-          const playerHand = currentState[humanPlayer].hand;
-          handCards = pendingAction.options.map((indexStr) => {
-            const idx = parseInt(indexStr, 10);
-            const card = playerHand[idx];
-            return {
-              index: idx,
-              card: card ? {
-                name_fr: card.name_fr, chakra: card.chakra, power: card.power, image_file: card.image_file,
-              } : { name_fr: '???' },
-            };
-          });
-        }
-      }
-
-      // Detect dedicated confirm UIs
-      const isSakura011DrawAI = pendingEffect?.targetSelectionType === 'SAKURA011_DRAW' || pendingEffect?.targetSelectionType === 'HAKU088_CONFIRM_DRAW';
-      const isKiba113ConfirmHideAI = pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_HIDE_AKAMARU' || pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
-
-      // Detect info reveal types (Orochimaru, Itachi 091, Dosu look, Sasuke 014, Tayuya 065, etc.)
-      const isOroRevealAI = pendingEffect?.targetSelectionType === 'OROCHIMARU_REVEAL_RESULT';
-      const isItachi091RevealAI = pendingEffect?.targetSelectionType === 'ITACHI091_HAND_REVEAL';
-      const isDosuLookRevealAI = pendingEffect?.targetSelectionType === 'DOSU_LOOK_REVEAL';
-      const isSasuke014RevealAI = pendingEffect?.targetSelectionType === 'SASUKE014_HAND_REVEAL';
-      const isTayuya065RevealAI = pendingEffect?.targetSelectionType === 'TAYUYA065_UPGRADE_REVEAL';
-      const isInfoRevealAI = isOroRevealAI || isItachi091RevealAI || isDosuLookRevealAI || isSasuke014RevealAI || isTayuya065RevealAI;
-      let revealedCardAI: PendingTargetSelection['revealedCard'];
-      let revealedCardsAI: PendingTargetSelection['revealedCards'];
-      if (isInfoRevealAI && pendingEffect) {
-        try {
-          const rd = JSON.parse(pendingEffect.effectDescription);
-          if (isOroRevealAI) {
-            revealedCardAI = {
-              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
-              image_file: rd.cardImageFile, canSteal: rd.canSteal,
-            };
-          } else if (isItachi091RevealAI) {
-            revealedCardAI = {
-              name_fr: '', chakra: 0, power: 0, canSteal: false,
-              revealTitleKey: 'game.effect.itachi091RevealTitle',
-              revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
-            };
-            revealedCardsAI = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
-              name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isDiscarded: c.isDiscarded ?? false,
-            }));
-          } else if (isDosuLookRevealAI) {
-            revealedCardAI = {
-              name_fr: rd.cardName, chakra: rd.cardCost, power: rd.cardPower,
-              image_file: rd.cardImageFile, canSteal: false,
-              revealTitleKey: 'game.effect.dosuLookRevealTitle',
-              revealResultKey: 'game.effect.dosuLookRevealResult',
-            };
-          } else if (isSasuke014RevealAI) {
-            revealedCardAI = {
-              name_fr: '', chakra: 0, power: 0, canSteal: false,
-              revealTitleKey: 'game.effect.sasuke014RevealTitle',
-              revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
-            };
-            revealedCardsAI = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
-              name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file,
-            }));
-          } else if (isTayuya065RevealAI) {
-            revealedCardAI = {
-              name_fr: 'Tayuya', chakra: 0, power: 0,
-              canSteal: false,
-              revealTitleKey: 'game.effect.tayuya065UpgradeRevealTitle',
-              revealResultKey: rd.drawnCount > 0 ? 'game.effect.tayuya065UpgradeRevealDrawn' : 'game.effect.tayuya065UpgradeRevealNone',
-            };
-            revealedCardsAI = (rd.topCards ?? []).map((c: { name: string; chakra: number; power: number; image_file?: string; isSummon: boolean }) => ({
-              name_fr: c.name, chakra: c.chakra, power: c.power, image_file: c.image_file, isSummon: c.isSummon,
-            }));
+        },
+        () => {
+          if (pendingEffect) {
+            get().performAction({
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pendingEffect.id,
+            });
           }
-        } catch { /* ignore */ }
-      }
-
-      // Build dedicated confirm UI data
-      let deckSizeAI: number | undefined;
-      let confirmCardDataAI: PendingTargetSelection['confirmCardData'];
-      if (isSakura011DrawAI) {
-        deckSizeAI = currentState[humanPlayer].deck?.length ?? 0;
-      }
-      if (isKiba113ConfirmHideAI && pendingEffect) {
-        try {
-          const cd = JSON.parse(pendingEffect.effectDescription);
-          confirmCardDataAI = {
-            name_fr: cd.name_fr ?? '',
-            name_en: cd.name_en,
-            image_file: cd.image_file,
-            chakra: cd.chakra,
-            power: cd.power,
-          };
-        } catch { /* ignore */ }
-      }
+        },
+      );
 
       set({
         gameState: currentState,
         visibleState: visible,
         isProcessing: false,
-        pendingTargetSelection: {
-          validTargets: pendingAction.options,
-          description: pendingAction.description,
-          descriptionKey: pendingAction.descriptionKey,
-          descriptionParams: pendingAction.descriptionParams,
-          selectionType: isInfoRevealAI ? 'INFO_REVEAL' : isEffectChoice ? 'CHOOSE_EFFECT' : isHandSelection ? 'CHOOSE_FROM_HAND' : isSakura011DrawAI ? 'DRAW_CARD' : isKiba113ConfirmHideAI ? (pendingEffect?.targetSelectionType === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE') : 'TARGET_CHARACTER',
-          effectChoices,
-          handCards,
-          revealedCard: revealedCardAI,
-          revealedCards: revealedCardsAI,
-          deckSize: deckSizeAI,
-          confirmCardData: confirmCardDataAI,
-          playerName: get().playerDisplayNames[humanPlayer],
-          onSelect: (targetId: string) => {
-            get().performAction({
-              type: 'SELECT_TARGET',
-              pendingActionId: pendingAction.id,
-              selectedTargets: [targetId],
-            });
-          },
-          onDecline: pendingEffect?.isOptional ? () => {
-            if (pendingEffect) {
-              get().performAction({
-                type: 'DECLINE_OPTIONAL_EFFECT',
-                pendingEffectId: pendingEffect.id,
-              });
-            }
-          } : undefined,
-          declineLabelKey: pendingEffect?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE'
-            ? 'game.effect.dosu069Defeat'
-            : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE'
-              ? 'game.effect.gemma049DeclineDefeat'
-              : pendingEffect?.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE'
-                ? 'game.effect.gemma049DeclineHide'
-                : undefined,
-        },
+        pendingTargetSelection: pendingSelection,
       });
       return;
     }
