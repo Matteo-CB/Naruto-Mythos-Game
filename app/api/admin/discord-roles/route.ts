@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { ELO_ROLES, getAllEloRoleNames } from '@/lib/discord/roles';
 
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 const DISCORD_API = 'https://discord.com/api/v10';
 const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
 const GUILD_ID = process.env.SERVER_DISCORD_ID;

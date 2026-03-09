@@ -8,6 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 interface ActionResult {
   success: boolean;
@@ -28,7 +29,7 @@ export default function AdminSettingsPage() {
   const [testerSearch, setTesterSearch] = useState('');
   const [testerAdding, setTesterAdding] = useState(false);
 
-  const isAdmin = session?.user?.email === ADMIN_EMAIL;
+  const isAdmin = session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
 
   const fetchTesters = () => {
     fetch('/api/admin/testers')

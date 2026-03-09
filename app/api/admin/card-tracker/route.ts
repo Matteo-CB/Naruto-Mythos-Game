@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
 const TRACKER_USERS = ['Kutxyt', 'admin', 'Andy'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 function isAuthorized(name: string | null | undefined): boolean {
   return !!name && TRACKER_USERS.includes(name);

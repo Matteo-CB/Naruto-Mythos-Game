@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
 
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 export async function POST() {
   try {

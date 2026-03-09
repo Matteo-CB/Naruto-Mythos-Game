@@ -11,7 +11,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const TRACKER_USERS = ['Kutxyt', 'admin', 'Andy'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
 
 type IssueStatus = 'to_fix' | 'fixed_unpublished' | 'fixed_published' | 'verified';
 type FilterStatus = 'all' | IssueStatus;
