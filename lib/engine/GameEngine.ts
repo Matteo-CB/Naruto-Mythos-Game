@@ -623,7 +623,7 @@ export class GameEngine {
 
       // Special case: Gemma 049 sacrifice (hide) — declining means the original target gets hidden
       if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
-        let parsed049h: { targetInstanceId?: string; effectSource?: string } = {};
+        let parsed049h: { targetInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
         try { parsed049h = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
         const hideTargetId049 = parsed049h.targetInstanceId ?? '';
         const effectSource049h = (parsed049h.effectSource ?? (effect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as import('./types').PlayerID;
@@ -640,6 +640,11 @@ export class GameEngine {
               { card: '???', id: '', target: charResult049h.character.card.name_fr, mission: String(charResult049h.missionIndex + 1) },
             );
           }
+        }
+        // Resume batch hide if there are remaining targets
+        if (parsed049h.batchRemainingTargets && parsed049h.batchRemainingTargets.length > 0) {
+          const batchPlayer = (parsed049h.batchSourcePlayer ?? effectSource049h) as import('./types').PlayerID;
+          newState = EffectEngine.resumeBatchHideAfterGemma(newState, parsed049h.batchRemainingTargets, batchPlayer);
         }
         if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
           return EffectEngine.processRemainingEffects(newState, effect);
