@@ -104,16 +104,31 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   let currentState = state;
   let hiddenCount = 0;
 
-  for (const target of orderedTargets) {
-    const stateBefore = currentState;
+  for (let ti = 0; ti < orderedTargets.length; ti++) {
+    const target = orderedTargets[ti];
+    const pendingCountBefore = currentState.pendingEffects.length;
     currentState = EffectEngine.hideCharacterWithLog(currentState, target.instanceId, sourcePlayer);
-    // Check if the character was actually hidden (state changed and no pending effect created instead)
+
+    // Check if a Gemma 049 sacrifice pending was created — if so, store remaining targets and break
+    const gemmaHidePending = currentState.pendingEffects.find(
+      (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
+        && currentState.pendingEffects.length > pendingCountBefore,
+    );
+    if (gemmaHidePending) {
+      // Store remaining targets (after current) in the pending effect so they can be processed after the choice
+      const remainingIds = orderedTargets.slice(ti + 1).map(t => t.instanceId);
+      const existingDesc = JSON.parse(gemmaHidePending.effectDescription);
+      existingDesc.batchRemainingTargets = remainingIds;
+      existingDesc.batchSourcePlayer = sourcePlayer;
+      existingDesc.batchHiddenCount = hiddenCount;
+      gemmaHidePending.effectDescription = JSON.stringify(existingDesc);
+      break; // Stop — remaining targets will be processed after the Gemma choice resolves
+    }
+
+    // Check if the character was actually hidden
     const charAfter = EffectEngine.findCharByInstanceId(currentState, target.instanceId);
     if (charAfter && charAfter.character.isHidden) {
       hiddenCount++;
-    } else if (currentState !== stateBefore) {
-      // State changed but char not hidden — likely a pending effect (Gemma sacrifice, etc.)
-      // Count as "processed" but not hidden
     }
   }
 

@@ -3017,8 +3017,8 @@ export class EffectEngine {
 
       // --- Gemma 049: Sacrifice choice (hide protection) ---
       case 'GEMMA049_SACRIFICE_HIDE_CHOICE': {
-        // Player accepted â€' sacrifice Gemma to protect the original target from being hidden
-        let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
+        // Player accepted — sacrifice Gemma to protect the original target from being hidden
+        let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
         try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const gemmaHideId = g049HideData.sacrificeInstanceId ?? targetId;
         const gemmaHideResult = EffectEngine.findCharByInstanceId(newState, gemmaHideId);
@@ -3033,6 +3033,11 @@ export class EffectEngine {
           'game.log.effect.gemma049SacrificeHide',
           { card: 'GEMMA SHIRANUI', id: 'KS-049-C' },
         );
+        // Resume batch hide if there are remaining targets
+        if (g049HideData.batchRemainingTargets && g049HideData.batchRemainingTargets.length > 0) {
+          const batchPlayer = (g049HideData.batchSourcePlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as PlayerID;
+          newState = EffectEngine.resumeBatchHideAfterGemma(newState, g049HideData.batchRemainingTargets, batchPlayer);
+        }
         break;
       }
 
@@ -5598,6 +5603,35 @@ export class EffectEngine {
       ),
     };
     return newState;
+  }
+
+  /** Resume batch hide processing after Gemma 049 sacrifice choice resolves.
+   *  Hides remaining targets that were deferred when Gemma's sacrifice interrupted the batch. */
+  static resumeBatchHideAfterGemma(state: GameState, remainingTargetIds: string[], batchSourcePlayer: PlayerID): GameState {
+    let currentState = state;
+    let hiddenCount = 0;
+    for (const targetId of remainingTargetIds) {
+      const pendingCountBefore = currentState.pendingEffects.length;
+      currentState = EffectEngine.hideCharacterWithLog(currentState, targetId, batchSourcePlayer);
+      // If another Gemma pending was created (shouldn't happen since Gemma is gone, but just in case)
+      const newGemmaPending = currentState.pendingEffects.find(
+        (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
+          && currentState.pendingEffects.length > pendingCountBefore,
+      );
+      if (newGemmaPending) {
+        // Store remaining targets in this new pending too
+        const restIds = remainingTargetIds.slice(remainingTargetIds.indexOf(targetId) + 1);
+        const desc = JSON.parse(newGemmaPending.effectDescription);
+        desc.batchRemainingTargets = restIds;
+        desc.batchSourcePlayer = batchSourcePlayer;
+        desc.batchHiddenCount = hiddenCount;
+        newGemmaPending.effectDescription = JSON.stringify(desc);
+        break;
+      }
+      const charAfter = EffectEngine.findCharByInstanceId(currentState, targetId);
+      if (charAfter && charAfter.character.isHidden) hiddenCount++;
+    }
+    return currentState;
   }
 
   /** Discard a card from a player's hand by index. Returns updated state with card moved to discard pile. */
