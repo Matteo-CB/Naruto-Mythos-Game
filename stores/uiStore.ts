@@ -24,6 +24,7 @@ interface UIStore {
   unpinCard: () => void;
   showFullscreenCard: boolean;
   toggleFullscreenCard: () => void;
+  zoomCard: (card: CharacterCard | MissionCard, missionContext?: MissionContext) => void;
 
   // Selection state
   selectedCardIndex: number | null;
@@ -80,6 +81,14 @@ export const useUIStore = create<UIStore>((set) => ({
   }),
   showFullscreenCard: false,
   toggleFullscreenCard: () => set((state) => ({ showFullscreenCard: !state.showFullscreenCard })),
+  zoomCard: (card, missionContext) => set({
+    pinnedCard: card,
+    pinnedMissionContext: missionContext ?? null,
+    previewCard: null,
+    previewPosition: null,
+    previewMissionContext: null,
+    showFullscreenCard: true,
+  }),
 
   selectedCardIndex: null,
   selectedMissionIndex: null,

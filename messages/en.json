@@ -1965,6 +1965,7 @@
     "full": "Tournament is full",
     "alreadyJoined": "Already joined",
     "requiresDiscordError": "Link Discord account first",
+    "organizer": "Organizer",
     "notCreator": "Only the creator can do this",
     "alreadyStarted": "Tournament already started",
     "minPlayers": "Need at least 2 players",

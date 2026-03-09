@@ -34,6 +34,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const { bannedIds } = useBannedCards();
 
   // Granular selector — only re-renders when turn ownership actually changes
@@ -81,6 +82,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     }
   };
 
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isUnknownHiddenEnemy && character.card) {
+      zoomCard(character.card);
+    }
+  };
+
   // Image path: show for ANY card that has card data + image_file (own, opponent visible, or re-hidden)
   // Banned cards always show card back (no image)
   const isBanned = hasCardData && character.card ? bannedIds.has(character.card.id) : false;
@@ -113,6 +121,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       whileHover={undefined}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="relative no-select"
@@ -310,6 +319,7 @@ function MissionCardDisplay({
   const showPreview = useUIStore((s) => s.showPreview);
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const rankColors: Record<MissionRank, string> = {
     D: '#3e8b3e',
     C: '#c4a35a',
@@ -336,6 +346,14 @@ function MissionCardDisplay({
       onClick={(e) => {
         e.stopPropagation();
         pinCard(mission.card, {
+          rank: mission.rank,
+          basePoints: mission.basePoints,
+          rankBonus: mission.rankBonus,
+        });
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        zoomCard(mission.card, {
           rank: mission.rank,
           basePoints: mission.basePoints,
           rankBonus: mission.rankBonus,
