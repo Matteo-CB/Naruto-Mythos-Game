@@ -120,7 +120,7 @@ export class EffectEngine {
     const orderedTypes: EffectType[] = [];
     for (const effect of (topCard.effects ?? [])) {
       if (relevantTypes.has(effect.type) && !orderedTypes.includes(effect.type as EffectType)) {
-        // Skip 'effect:' modifier lines â€” they modify previous effects, not standalone
+        // Skip 'effect:' modifier lines â€' they modify previous effects, not standalone
         if (effect.type === 'MAIN' && (effect.description.startsWith('effect:') || effect.description.startsWith('effect.'))) {
           continue;
         }
@@ -191,7 +191,7 @@ export class EffectEngine {
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
 
     // Build the ordered list of effect types from the card definition (top-to-bottom).
-    // When revealed as an upgrade, MAIN, AMBUSH, and UPGRADE all trigger â€” in card order.
+    // When revealed as an upgrade, MAIN, AMBUSH, and UPGRADE all trigger â€' in card order.
     const relevantTypes = new Set<string>(['MAIN', 'UPGRADE', 'AMBUSH']);
     const orderedTypes: EffectType[] = [];
     for (const effect of (topCard.effects ?? [])) {
@@ -417,7 +417,7 @@ export class EffectEngine {
 
   /**
    * Resolve a single SCORE effect (mission card or character).
-   * Returns { state, pending } â€” pending=true means a target selection was created.
+   * Returns { state, pending } â€' pending=true means a target selection was created.
    * Used by MissionPhase to track progress through SCORE effects.
    */
   static resolveScoreEffectSingle(
@@ -595,13 +595,20 @@ export class EffectEngine {
 
     // Validate target is in valid targets list (prevents wrong character from being affected)
     if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
-      console.warn(`[EffectEngine] Invalid target ${targetId} â€” not in validTargets for ${pendingEffect.targetSelectionType}`);
+      console.warn(`[EffectEngine] Invalid target ${targetId} â€' not in validTargets for ${pendingEffect.targetSelectionType}`);
       return state;
     }
 
-    // Kimimaro 056 continuous protection: if an enemy effect targets this character,
-    // the opponent must pay 1 chakra (if able). The effect still happens regardless.
-    newState = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
+    // Kimimaro 056 continuous protection: opponent must pay 1 chakra to affect him.
+    // If opponent can't pay, the effect is CANCELLED.
+    const kimimaro056Result = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
+    newState = kimimaro056Result.state;
+    if (kimimaro056Result.blocked) {
+      // Effect cancelled — clean up pending and return
+      newState.pendingEffects = newState.pendingEffects.filter((pe) => pe.id !== pendingEffect.id);
+      newState.pendingActions = newState.pendingActions.filter((pa) => pa.sourceEffectId !== pendingEffect.id);
+      return EffectEngine.processRemainingEffects(newState, pendingEffect);
+    }
 
     switch (pendingEffect.targetSelectionType) {
       case 'POWERUP_2_LEAF_VILLAGE':
@@ -694,7 +701,7 @@ export class EffectEngine {
           const opp091 = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const oppHand091 = newState[opp091].hand;
           if (oppHand091.length > 0) {
-            // Always show selection UI â€” player chooses which card to discard
+            // Always show selection UI â€' player chooses which card to discard
             const oppIndices091 = oppHand091.map((_: unknown, i: number) => String(i));
               const oppCards091 = oppHand091.map((c, i) => ({
                 name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
@@ -735,23 +742,23 @@ export class EffectEngine {
         break;
 
       case 'DOSU_LOOK_REVEAL':
-        // Acknowledgment only â€” no additional action needed
+        // Acknowledgment only â€' no additional action needed
         break;
 
       case 'TAYUYA065_UPGRADE_REVEAL':
-        // Acknowledgment only â€” no additional action needed
+        // Acknowledgment only â€' no additional action needed
         break;
 
       case 'KIBA026_UPGRADE_REVEAL':
-        // Acknowledgment only â€” draw and deck rearrangement already applied
+        // Acknowledgment only â€' draw and deck rearrangement already applied
         break;
 
       case 'SASUKE014_HAND_REVEAL':
-        // Acknowledgment only â€” AMBUSH just shows opponent's hand
+        // Acknowledgment only â€' AMBUSH just shows opponent's hand
         break;
 
       case 'SASUKE014_UPGRADE_HAND_REVEAL': {
-        // UPGRADE includes AMBUSH effect â€” opponent's hand was shown, now chain to discard flow
+        // UPGRADE includes AMBUSH effect â€' opponent's hand was shown, now chain to discard flow
         const ps_sur = { ...newState[pendingEffect.sourcePlayer] };
         const opp_sur = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const oppHand_sur = newState[opp_sur].hand;
@@ -1039,7 +1046,7 @@ export class EffectEngine {
         newState = EffectEngine.itachi143MoveEnemy(newState, pendingEffect, targetId);
         break;
 
-      // --- Gaara 153 (M) â€” same logic as 139 (S) ---
+      // --- Gaara 153 (M) â€' same logic as 139 (S) ---
       case 'GAARA153_DEFEAT_BY_COST': {
         const gaara153Info = EffectEngine.findCharByInstanceId(newState, targetId);
         const gaara153DefeatedName = gaara153Info ? gaara153Info.character.card.name_fr : '';
@@ -1498,7 +1505,7 @@ export class EffectEngine {
       case 'CHOJI018_HIDE_ENEMY':
       case 'GAARA139_HIDE_SAME_NAME':
       case 'GAARA153_HIDE_SAME_NAME':
-      case 'KIBA026_OPPONENT_CHOOSE_HIDE': // legacy â€” kept for backward compat with old saved states
+      case 'KIBA026_OPPONENT_CHOOSE_HIDE': // legacy â€' kept for backward compat with old saved states
       case 'KIBA026_PLAYER_CHOOSE_HIDE':
       case 'AKAMARU029_CHOOSE_HIDE':
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
@@ -1536,7 +1543,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // Itachi 128 â€” single-stage: move chosen friendly character to Itachi's mission
+      // Itachi 128 â€' single-stage: move chosen friendly character to Itachi's mission
       // =============================================
       case 'ITACHI128_MOVE_TO_THIS_MISSION': {
         let parsed128: { destMissionIndex?: number } = {};
@@ -1575,23 +1582,23 @@ export class EffectEngine {
             }
           }
           if (validDestMissions.length === 0) {
-            // No valid destination â€” can't move
+            // No valid destination â€' can't move
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
               'EFFECT_BLOCKED',
-              `Cannot move ${moveCharResult.character.card.name_fr} â€” no valid destination mission.`,
+              `Cannot move ${moveCharResult.character.card.name_fr} â€' no valid destination mission.`,
               'game.log.effect.moveBlocked',
               { target: moveCharResult.character.card.name_fr },
             );
           } else if (validDestMissions.length === 1) {
-            // Only one valid destination â€” auto-move
+            // Only one valid destination â€' auto-move
             newState = EffectEngine.moveCharToMissionDirectPublic(
               newState, targetId, parseInt(validDestMissions[0], 10),
               moveCharResult.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
               pendingEffect.sourcePlayer, // effectInitiator: the player who owns the move effect
             );
           } else {
-            // Multiple valid destinations â€” prompt for selection
+            // Multiple valid destinations â€' prompt for selection
             const moveEffectId = generateInstanceId();
             const moveActionId = generateInstanceId();
             // Map the original type to a destination type
@@ -1611,6 +1618,7 @@ export class EffectEngine {
               isMandatory: false,
               resolved: false,
               isUpgrade: pendingEffect.isUpgrade,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
             });
             newState.pendingActions.push({
               id: moveActionId,
@@ -1675,7 +1683,7 @@ export class EffectEngine {
       case 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET': {
         // Hide the selected character
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
-        // Giant Spider must return to hand â€” UNLESS it hid itself (continuous effect gone)
+        // Giant Spider must return to hand â€' UNLESS it hid itself (continuous effect gone)
         let k103Data: { giantSpiderInstanceId?: string } = {};
         try { k103Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         if (k103Data.giantSpiderInstanceId && targetId !== k103Data.giantSpiderInstanceId) {
@@ -1691,7 +1699,7 @@ export class EffectEngine {
         break;
       }
 
-      // --- MOVE types (destination selection â€” use moveSelfToMission) ---
+      // --- MOVE types (destination selection â€' use moveSelfToMission) ---
       case 'KURENAI116B_MOVE_SELF':
       case 'KAKASHI137_MOVE_SELF':
       case 'PAKKUN_MOVE_DESTINATION':
@@ -1699,7 +1707,7 @@ export class EffectEngine {
         break;
 
       case 'KAKASHI137_HIDE_UPGRADED': {
-        // Hide the selected upgraded character â€” use hideCharacterWithLog for proper protection checks
+        // Hide the selected upgraded character â€' use hideCharacterWithLog for proper protection checks
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
@@ -1937,7 +1945,7 @@ export class EffectEngine {
             continue;
           }
 
-          // Multiple valid missions â€” create new pending for player choice
+          // Multiple valid missions â€' create new pending for player choice
           const nextEffectId = generateInstanceId();
           const nextActionId = generateInstanceId();
           newState.pendingEffects.push({
@@ -1975,7 +1983,7 @@ export class EffectEngine {
             maxSelections: 1,
             sourceEffectId: nextEffectId,
           });
-          break; // Stop processing â€” wait for player choice
+          break; // Stop processing â€' wait for player choice
         }
 
         // If we got through all remaining chars (or there were none left), apply POWERUP
@@ -2004,7 +2012,7 @@ export class EffectEngine {
         break;
       }
 
-      // --- Shikamaru 022 â€” move enemy character (two-stage: char then destination) ---
+      // --- Shikamaru 022 â€' move enemy character (two-stage: char then destination) ---
       case 'SHIKAMARU_MOVE_ENEMY': {
         // Stage 1: player chose which enemy character to move. Now prompt for destination.
         const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -2082,7 +2090,7 @@ export class EffectEngine {
         break;
       }
 
-      // --- Shizune 006 â€” move enemy with power 3 or less (two-stage: char then destination) ---
+      // --- Shizune 006 â€' move enemy with power 3 or less (two-stage: char then destination) ---
       case 'MOVE_ENEMY_POWER_3_OR_LESS': {
         const shizChar = EffectEngine.findCharByInstanceId(newState, targetId);
         if (shizChar) {
@@ -2149,7 +2157,7 @@ export class EffectEngine {
         break;
       }
 
-      // --- Zaku 071 â€” move enemy from this mission (two-stage: char then destination) ---
+      // --- Zaku 071 â€' move enemy from this mission (two-stage: char then destination) ---
       case 'MOVE_ENEMY_FROM_THIS_MISSION': {
         // Stage 1: player chose which enemy character to move. Now prompt for destination.
         const zakuChar = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -2217,7 +2225,7 @@ export class EffectEngine {
         break;
       }
 
-      // --- Ino 110 (R) â€” move weakest enemy (two-stage: char then destination, optional hide on upgrade) ---
+      // --- Ino 110 (R) â€' move weakest enemy (two-stage: char then destination, optional hide on upgrade) ---
       case 'INO110_CHOOSE_ENEMY': {
         // Stage 1: player chose which weakest enemy to move. Now prompt for destination.
         const ino110Char = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -2643,7 +2651,12 @@ export class EffectEngine {
       // SPECIAL types
       // =============================================
       case 'TAYUYA125_CHOOSE_SOUND':
-        newState = EffectEngine.playCharFromHandWithReduction(newState, pendingEffect, targetId, 2, 'Sound Village', 'Tayuya', 'KS-125-R');
+        if (targetId.startsWith('board:')) {
+          // Reveal a hidden board character paying cost - 2
+          newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, targetId.slice(6), 2);
+        } else {
+          newState = EffectEngine.playCharFromHandWithReduction(newState, pendingEffect, targetId, 2, 'Sound Village', 'Tayuya', 'KS-125-R');
+        }
         break;
 
       case 'ICHIBI130_CHOOSE_MISSION': {
@@ -2696,12 +2709,12 @@ export class EffectEngine {
         }
 
         if (k148Copyable.length === 1) {
-          // Single copyable effect â€” execute directly
+          // Single copyable effect â€' execute directly
           newState = EffectEngine.executeCopiedEffect(
             newState, pendingEffect, k148TopCard, k148Copyable[0].type as EffectType,
           );
         } else {
-          // Multiple copyable effects â€” Stage 2: let the player choose which effect
+          // Multiple copyable effects â€' Stage 2: let the player choose which effect
           const choiceEffectId = generateInstanceId();
           const choiceActionId = generateInstanceId();
           const effectOptions = k148Copyable.map((eff) => `${eff.type}::${eff.description}`);
@@ -2950,7 +2963,7 @@ export class EffectEngine {
 
       // --- Gemma 049: Sacrifice choice (defeat protection) ---
       case 'GEMMA049_SACRIFICE_CHOICE': {
-        // Player accepted â€” sacrifice Gemma to protect the original target from defeat
+        // Player accepted â€' sacrifice Gemma to protect the original target from defeat
         let g049Data: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
         try { g049Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const gemmaId = g049Data.sacrificeInstanceId ?? targetId;
@@ -2971,7 +2984,7 @@ export class EffectEngine {
 
       // --- Gemma 049: Sacrifice choice (hide protection) ---
       case 'GEMMA049_SACRIFICE_HIDE_CHOICE': {
-        // Player accepted â€” sacrifice Gemma to protect the original target from being hidden
+        // Player accepted â€' sacrifice Gemma to protect the original target from being hidden
         let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string } = {};
         try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const gemmaHideId = g049HideData.sacrificeInstanceId ?? targetId;
@@ -3135,7 +3148,7 @@ export class EffectEngine {
                 { card: 'SASUKE UCHIWA', id: 'KS-014-UC', target: discardedOpp.name_fr },
               );
             } else {
-              // Multiple cards â€” source player chooses
+              // Multiple cards â€' source player chooses
               const oppIndices_ss = oppHand_ss.map((_: unknown, i: number) => String(i));
               const oppCards_ss = oppHand_ss.map((c, i) => ({
                 name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
@@ -3245,7 +3258,7 @@ export class EffectEngine {
         break;
       }
       case 'KIMIMARO056_CHOOSE_HIDE': {
-        // Stage 2: hide the selected character (cost â‰¤ 4) â€” use hideCharacterWithLog for protection checks
+        // Stage 2: hide the selected character (cost â‰¤ 4) â€' use hideCharacterWithLog for protection checks
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
@@ -3297,7 +3310,7 @@ export class EffectEngine {
         } else if (k73HideTargets.length === 1) {
           newState = EffectEngine.hideCharacterWithLog(newState, k73HideTargets[0], pendingEffect.sourcePlayer);
         } else {
-          // Multiple targets â€” let player choose
+          // Multiple targets â€' let player choose
           const charResult_k73d = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
           const step2Result_k73d: EffectResult = {
             state: newState,
@@ -3485,7 +3498,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // KANKURO078_REVEAL_HIDDEN_REDUCED (Kankuro 078 UPGRADE â€” correct implementation)
+      // KANKURO078_REVEAL_HIDDEN_REDUCED (Kankuro 078 UPGRADE â€' correct implementation)
       // Reveal a hidden friendly character paying 1 less than its reveal cost.
       // =============================================
       case 'KANKURO078_REVEAL_HIDDEN_REDUCED': {
@@ -3569,7 +3582,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // PLAY_HIDDEN_FROM_HAND_FREE (Kankuro 078 UPGRADE â€” deprecated, replaced by KANKURO078_REVEAL_HIDDEN_REDUCED)
+      // PLAY_HIDDEN_FROM_HAND_FREE (Kankuro 078 UPGRADE â€' deprecated, replaced by KANKURO078_REVEAL_HIDDEN_REDUCED)
       // =============================================
       case 'PLAY_HIDDEN_FROM_HAND_FREE': {
         // Stage 1: card chosen from hand. Store index and prompt for mission.
@@ -3691,7 +3704,7 @@ export class EffectEngine {
         const canAfford_dosu = newState[opponentPlayer_dosu].chakra >= revealCost_dosu;
 
         if (!canAfford_dosu) {
-          // Opponent can't afford to reveal â€” auto-defeat
+          // Opponent can't afford to reveal â€' auto-defeat
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost_dosu}), character defeated.`,
@@ -3732,7 +3745,7 @@ export class EffectEngine {
           maxSelections: 1,
           sourceEffectId: effectId_dosu,
         }];
-        // Track that the opponent is the forced resolver â€” they get the turn after resolution
+        // Track that the opponent is the forced resolver â€' they get the turn after resolution
         newState.pendingForcedResolver = opponentPlayer_dosu;
         break;
       }
@@ -3808,7 +3821,7 @@ export class EffectEngine {
             }
           }
         } else {
-          // Normal reveal (no upgrade) â€” reveal and trigger MAIN + AMBUSH
+          // Normal reveal (no upgrade) â€' reveal and trigger MAIN + AMBUSH
           const missions_dosu69 = [...newState.activeMissions];
           const m_dosu69 = { ...missions_dosu69[mIdx_dosu69] };
           const chars_dosu69 = [...m_dosu69[side_dosu69]];
@@ -3864,9 +3877,12 @@ export class EffectEngine {
           ? copyTargetResult.character.stack[copyTargetResult.character.stack.length - 1]
           : copyTargetResult.character.card;
 
-        // Kakashi 016 / Sakon 062: non-UPGRADE, non-continuous
+        // Kakashi 016: non-UPGRADE, non-continuous
+        // Sakon 062 / Kakashi 148: CAN include UPGRADE (handled by their own resolution paths)
+        // For this shared path (Kakashi 016 / Sakon 062), allow UPGRADE for Sakon 062
+        const isSakon062 = pendingEffect.targetSelectionType === 'SAKON062_COPY_EFFECT';
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
-          if (eff.type === 'UPGRADE') return false;
+          if (!isSakon062 && eff.type === 'UPGRADE') return false;
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
           return true;
@@ -3880,12 +3896,12 @@ export class EffectEngine {
         }
 
         if (copyableEffects.length === 1) {
-          // Single copyable effect â€” execute directly
+          // Single copyable effect â€' execute directly
           newState = EffectEngine.executeCopiedEffect(
             newState, pendingEffect, copyTargetTopCard, copyableEffects[0].type as EffectType,
           );
         } else {
-          // Multiple copyable effects â€” Stage 2: let the player choose
+          // Multiple copyable effects â€' Stage 2: let the player choose
           const choiceEffId = generateInstanceId();
           const choiceActId = generateInstanceId();
           const effectOpts = copyableEffects.map((eff) => `${eff.type}::${eff.description}`);
@@ -3922,7 +3938,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // COPY_EFFECT_CHOSEN: Stage 2 â€” the player chose which specific effect to copy
+      // COPY_EFFECT_CHOSEN: Stage 2 â€' the player chose which specific effect to copy
       // Used by Kakashi 016, Kakashi 106, Kakashi 148, and Sakon 062 when multiple effects exist.
       // targetId format: "EFFECT_TYPE::description"
       // effectDescription stores JSON: { charInstanceId, cardId }
@@ -4039,7 +4055,7 @@ export class EffectEngine {
           break;
         }
 
-        // Multiple valid missions â€” create second pending for mission selection
+        // Multiple valid missions â€' create second pending for mission selection
         // Store the chosen card index in the effect description as JSON
         const isUpgrade = pendingEffect.isUpgrade;
         const effectId2 = generateInstanceId();
@@ -4205,7 +4221,7 @@ export class EffectEngine {
 
           if (validTargets_g.length === 0) continue;
 
-          // Always prompt for remaining missions too â€” player can skip (optional "up to 1")
+          // Always prompt for remaining missions too â€' player can skip (optional "up to 1")
           const chainData_g = JSON.stringify({
             defeatedCount: defeatedCount_g,
             nextMissionIndex: mi + 1,
@@ -4282,7 +4298,8 @@ export class EffectEngine {
           ps104.chakra -= chakraAmount;
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps104 };
 
-          // POWERUP on self
+          // POWERUP on self — double if this is an upgrade (UPGRADE repeats the MAIN POWERUP)
+          const powerupAmount = pendingEffect.isUpgrade ? chakraAmount * 2 : chakraAmount;
           const charResult104 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
           if (charResult104) {
             const missions104 = [...newState.activeMissions];
@@ -4291,7 +4308,7 @@ export class EffectEngine {
               charResult104.player === 'player1' ? 'player1Characters' : 'player2Characters';
             mission104[side104] = mission104[side104].map((c: CharacterInPlay) =>
               c.instanceId === pendingEffect.sourceInstanceId
-                ? { ...c, powerTokens: c.powerTokens + chakraAmount }
+                ? { ...c, powerTokens: c.powerTokens + powerupAmount }
                 : c,
             );
             missions104[charResult104.missionIndex] = mission104;
@@ -4301,9 +4318,11 @@ export class EffectEngine {
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_POWERUP',
-            `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount}.`,
+            pendingEffect.isUpgrade
+              ? `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount} (MAIN) + POWERUP ${chakraAmount} (UPGRADE) = POWERUP ${powerupAmount}.`
+              : `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount}.`,
             'game.log.effect.powerupSelf',
-            { card: 'TSUNADE', id: 'KS-104-R', amount: chakraAmount },
+            { card: 'TSUNADE', id: 'KS-104-R', amount: powerupAmount },
           );
         } else {
           newState.log = logAction(
@@ -4494,7 +4513,7 @@ export class EffectEngine {
       loggedState.log = logAction(
         loggedState.log, loggedState.turn, loggedState.phase, charResult.player,
         'EFFECT_BLOCKED',
-        `Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} â€” a character with the same name already exists there.`,
+        `Cannot move ${charResult.character.card.name_fr} to mission ${destMissionIndex + 1} â€' a character with the same name already exists there.`,
         'game.log.effect.moveBlocked',
         { target: charResult.character.card.name_fr },
       );
@@ -4730,12 +4749,12 @@ export class EffectEngine {
     try { parsed = JSON.parse(pending.effectDescription); } catch { return state; }
 
     if (!parsed.canSteal) {
-      // Cost > 3, cannot steal â€” just log
+      // Cost > 3, cannot steal â€' just log
       return {
         ...state,
         log: logAction(
           state.log, state.turn, 'action', pending.sourcePlayer,
-          'EFFECT', `${parsed.cardName} costs too much â€” Orochimaru cannot take control.`,
+          'EFFECT', `${parsed.cardName} costs too much â€' Orochimaru cannot take control.`,
           'game.log.effect.orochimaruCannotSteal',
           { card: 'Orochimaru', id: pending.sourceCardId, target: parsed.cardName },
         ),
@@ -4954,7 +4973,7 @@ export class EffectEngine {
     return newState;
   }
 
-  // sasuke014ResolveReveal removed â€” AMBUSH now just shows hand, UPGRADE is separate handler
+  // sasuke014ResolveReveal removed â€' AMBUSH now just shows hand, UPGRADE is separate handler
 
   /**
    * Defeat a character (remove from play, add to owner's discard).
@@ -4975,14 +4994,14 @@ export class EffectEngine {
     );
     if (replacement.replaced) {
       if (replacement.replacement === 'immune') {
-        // Character is immune to defeat â€” do nothing
+        // Character is immune to defeat â€' do nothing
         return state;
       }
       if (replacement.replacement === 'hide') {
         return EffectEngine.hideCharacter(state, targetId);
       }
       if (replacement.replacement === 'sacrifice' && replacement.sacrificeInstanceId) {
-        // Gemma 049: optional sacrifice â€” create pending choice for the owning player
+        // Gemma 049: optional sacrifice â€' create pending choice for the owning player
         let newState = { ...state };
         const effectId = generateInstanceId();
         const actionId = generateInstanceId();
@@ -5162,7 +5181,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Naruto 133 S â€” Stage 1: hide/defeat target 1, then chain to target 2 */
+  /** Naruto 133 S â€' Stage 1: hide/defeat target 1, then chain to target 2 */
   static naruto133ApplyTarget1(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { missionIndex?: number; useDefeat?: boolean } = {};
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
@@ -5184,7 +5203,7 @@ export class EffectEngine {
     const validTarget2: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][enemySideKey]) {
-        // Use effective power (includes continuous effects like MSS02 +1) â€” not just base+tokens
+        // Use effective power (includes continuous effects like MSS02 +1) â€' not just base+tokens
         const power = calculateCharacterPower(newState, char, enemyPlayer);
         if (power <= 2) {
           validTarget2.push(char.instanceId);
@@ -5252,7 +5271,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Naruto 108 R â€” hide target and apply POWERUP if upgrade */
+  /** Naruto 108 R â€' hide target and apply POWERUP if upgrade */
   static naruto108ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { isUpgrade?: boolean } = {};
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
@@ -5299,7 +5318,7 @@ export class EffectEngine {
     return newState;
   }
 
-  /** Kyubi 134 S â€” iterative multi-hide: hide target, then offer more picks if budget remains */
+  /** Kyubi 134 S â€' iterative multi-hide: hide target, then offer more picks if budget remains */
   static kyubi134ApplyHide(state: GameState, pending: PendingEffect, targetId: string): GameState {
     let parsed: { remainingPower?: number; hiddenIds?: string[] } = {};
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
@@ -5337,7 +5356,7 @@ export class EffectEngine {
 
     if (validNext.length === 0) return newState; // No more valid targets
 
-    // Offer another pick (optional â€” player can decline)
+    // Offer another pick (optional â€' player can decline)
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -5448,12 +5467,12 @@ export class EffectEngine {
 
     // Check hide immunity from enemy effects (Ichibi 076/130, Kyubi 129)
     if (isEnemyEffect && EffectEngine.isImmuneToEnemyHide(charResult.character)) {
-      return state; // Immune â€” hide blocked
+      return state; // Immune â€' hide blocked
     }
 
     // Check Shino 115 mission-level protection: friendly allies cannot be hidden by enemy effects
     if (isEnemyEffect && isProtectedFromEnemyHide(state, charResult.character, charResult.player)) {
-      return state; // Protected by Shino 115 â€” hide blocked
+      return state; // Protected by Shino 115 â€' hide blocked
     }
 
     // Check Gemma 049 sacrifice: can sacrifice Gemma to protect friendly Leaf Village from enemy hide
@@ -5773,12 +5792,12 @@ export class EffectEngine {
         return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       });
       if (hasNameConflict) {
-        // Can't place â€” discard instead of creating a duplicate
+        // Can't place â€' discard instead of creating a duplicate
         ps.discardPile.push(card);
         state.log = logAction(
           state.log, state.turn, 'action', player,
           'EFFECT_BLOCKED',
-          `${cardName} (${cardId}): Cannot play ${card.name_fr} on mission ${missionIndex + 1} â€” same name already present.`,
+          `${cardName} (${cardId}): Cannot play ${card.name_fr} on mission ${missionIndex + 1} â€' same name already present.`,
           'game.log.effect.nameConflictBlocked',
           { card: cardName, id: cardId, target: card.name_fr },
         );
@@ -5918,7 +5937,7 @@ export class EffectEngine {
     const validHideTargets: string[] = [];
 
     for (const mission of newState.activeMissions) {
-      // Enemy chars â€” check immunity
+      // Enemy chars â€' check immunity
       for (const char of mission[enemySide]) {
         if (char.isHidden) continue;
         if (!canBeHiddenByEnemy(newState, char, opponent)) continue;
@@ -5927,7 +5946,7 @@ export class EffectEngine {
           validHideTargets.push(char.instanceId);
         }
       }
-      // Friendly chars â€” no immunity check needed
+      // Friendly chars â€' no immunity check needed
       for (const char of mission[friendlySide]) {
         if (char.isHidden) continue;
         if (char.instanceId === pending.sourceInstanceId) continue;
@@ -5939,7 +5958,7 @@ export class EffectEngine {
     }
 
     if (validHideTargets.length === 0) {
-      return newState; // No valid target â€” card was discarded but no hide
+      return newState; // No valid target â€' card was discarded but no hide
     }
 
     if (validHideTargets.length === 1) {
@@ -5947,7 +5966,7 @@ export class EffectEngine {
       return EffectEngine.hideCharacterWithLog(newState, validHideTargets[0], player);
     }
 
-    // Multiple targets â€” create a new pending for hide target selection
+    // Multiple targets â€' create a new pending for hide target selection
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
 
@@ -6009,7 +6028,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Haku 088 â€” Draw 1, put 1 back (two-step)
+  // Haku 088 â€' Draw 1, put 1 back (two-step)
   // =====================================
 
   /**
@@ -6072,7 +6091,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // MSS 08 â€” Set a Trap (two-stage)
+  // MSS 08 â€' Set a Trap (two-stage)
   // =====================================
 
   /** MSS 08 Stage 1: player chose which card from hand. Store it and prompt for mission. */
@@ -6090,7 +6109,7 @@ export class EffectEngine {
     const chosenCard = ps.hand.splice(handIndex, 1)[0];
 
     // Store the card temporarily in the discard pile (we'll move it in stage 2)
-    // Actually, store it in a pending way â€” push to discard pile temporarily
+    // Actually, store it in a pending way â€' push to discard pile temporarily
     // and record the card id for stage 2
     ps.discardPile.push(chosenCard);
 
@@ -6181,7 +6200,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // MSS 03 â€” Find the Traitor (opponent discard)
+  // MSS 03 â€' Find the Traitor (opponent discard)
   // =====================================
 
   /** MSS 03: Opponent chose a card to discard from hand. */
@@ -6211,40 +6230,40 @@ export class EffectEngine {
   }
 
   // =====================================
-  // MSS 05 â€” Bring it Back (return to hand)
+  // MSS 05 â€' Bring it Back (return to hand)
   // =====================================
 
   /** MSS 05: Player chose a character to return to hand. */
   // =====================================
-  // Kimimaro 056 â€” Continuous protection
+  // Kimimaro 056 â€' Continuous protection
   // =====================================
 
   /**
    * Check if the target of an effect is Kimimaro 056 with the continuous protection.
    * If so, the opponent (effect source) must pay 1 chakra if able.
    */
-  static applyKimimaro056Protection(state: GameState, pending: PendingEffect, targetId: string): GameState {
+  static applyKimimaro056Protection(state: GameState, pending: PendingEffect, targetId: string): { state: GameState; blocked: boolean } {
     // Find the targeted character across all missions
     for (const mission of state.activeMissions) {
       for (const side of ['player1Characters', 'player2Characters'] as const) {
         for (const char of mission[side]) {
           if (char.instanceId !== targetId) continue;
-          if (char.isHidden) return state; // Hidden = no continuous effects
+          if (char.isHidden) return { state, blocked: false }; // Hidden = no continuous effects
 
           const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-          if (topCard.number !== 56) return state;
+          if (topCard.number !== 56) return { state, blocked: false };
 
           // Check if this card has the continuous protection effect
           const hasProtection = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
           );
-          if (!hasProtection) return state;
+          if (!hasProtection) return { state, blocked: false };
 
           // Only triggers for enemy effects (not friendly)
           const charOwner = char.controlledBy;
-          if (charOwner === pending.sourcePlayer) return state; // Friendly effect, no protection
+          if (charOwner === pending.sourcePlayer) return { state, blocked: false }; // Friendly effect, no protection
 
-          // Opponent must pay 1 chakra if able
+          // Opponent must pay 1 chakra to affect Kimimaro. If they can't pay, the effect is CANCELLED.
           const opponent = pending.sourcePlayer;
           if (state[opponent].chakra >= 1) {
             state[opponent].chakra -= 1;
@@ -6255,16 +6274,26 @@ export class EffectEngine {
               'game.log.effect.kimimaro056Protection',
               { card: 'KIMIMARO', id: 'KS-056-UC' },
             );
+            return { state, blocked: false };
+          } else {
+            // Can't pay — effect is cancelled
+            state.log = logAction(
+              state.log, state.turn, state.phase, charOwner,
+              'EFFECT_CONTINUOUS',
+              `Kimimaro (056): ${opponent} cannot pay 1 Chakra — effect on Kimimaro is cancelled.`,
+              'game.log.effect.kimimaro056Blocked',
+              { card: 'KIMIMARO', id: 'KS-056-UC' },
+            );
+            return { state, blocked: true };
           }
-          return state;
         }
       }
     }
-    return state;
+    return { state, blocked: false };
   }
 
   // =====================================
-  // Hiruzen 002 â€” Place chosen Leaf character
+  // Hiruzen 002 â€' Place chosen Leaf character
   // =====================================
 
   static kabuto053PlayFromDiscard(state: GameState, player: PlayerID, missionIdx: number, cost: number, discardIndex?: number): GameState {
@@ -6336,7 +6365,7 @@ export class EffectEngine {
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, player,
           'EFFECT_BLOCKED',
-          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} â€” same name already present.`,
+          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} â€' same name already present.`,
           'game.log.effect.nameConflictBlocked',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr },
         );
@@ -6489,7 +6518,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // MSS 05 â€” Bring it Back
+  // MSS 05 â€' Bring it Back
   // =====================================
 
   static mss05ReturnToHand(state: GameState, pending: PendingEffect, targetId: string): GameState {
@@ -6544,7 +6573,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // MSS 07 â€” I Have to Go (move hidden, two-stage)
+  // MSS 07 â€' I Have to Go (move hidden, two-stage)
   // =====================================
 
   /** MSS 07 Stage 1: Player chose a hidden character to move. Now prompt for destination mission. */
@@ -6661,7 +6690,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Jiraiya 007 â€” Play Summon (two-stage)
+  // Jiraiya 007 â€' Play Summon (two-stage)
   // =====================================
 
   /** Jiraiya Stage 1: player chose a Summon card from hand. Store it and prompt for mission. */
@@ -6839,7 +6868,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Asuma 023 â€” Move Team 10 (two-stage)
+  // Asuma 023 â€' Move Team 10 (two-stage)
   // =====================================
 
   /** Asuma Stage 1: player chose which Team 10 char to move. Prompt for destination. */
@@ -6914,7 +6943,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Iruka 047 â€” Move Naruto (two-stage)
+  // Iruka 047 â€' Move Naruto (two-stage)
   // =====================================
 
   /** Iruka Stage 1: player chose which Naruto to move. Prompt for destination. */
@@ -6987,7 +7016,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Kidomaru 059 â€” Multi-move (multi-stage)
+  // Kidomaru 059 â€' Multi-move (multi-stage)
   // =====================================
 
   /** Kidomaru Stage 1: player chose which character to move. Prompt for destination. */
@@ -7146,7 +7175,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Sakura 109 (R) â€” Play from discard (two-stage)
+  // Sakura 109 (R) â€' Play from discard (two-stage)
   // =====================================
 
   /** Sakura 109 Stage 1: player chose a Leaf Village char from discard. Pay cost, prompt for mission. */
@@ -7351,7 +7380,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Sakura 135 (S) â€” Top 3 cards (two-stage)
+  // Sakura 135 (S) â€' Top 3 cards (two-stage)
   // =====================================
 
   /** Sakura 135 Stage 1: player chose a card from the top 3. Discard others, prompt for mission. */
@@ -7417,7 +7446,7 @@ export class EffectEngine {
     }
 
     if (validMissions.length === 0) {
-      // No valid mission â€” discard
+      // No valid mission â€' discard
       ps.discardPile.push(chosenCard);
       // No refund needed (cost not paid upfront)
       return newState;
@@ -7573,7 +7602,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Choji 112 (R) â€” Discard + POWERUP
+  // Choji 112 (R) â€' Discard + POWERUP
   // =====================================
 
   /** Choji: player chose which card to discard. Apply POWERUP X. If upgrade, create second prompt. */
@@ -7667,7 +7696,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Ino 020 â€” Take control of enemy character
+  // Ino 020 â€' Take control of enemy character
   // =====================================
 
   /** Ino 020: take control of an enemy character in this mission. */
@@ -7694,7 +7723,7 @@ export class EffectEngine {
         blockedState.log = logAction(
           blockedState.log, blockedState.turn, blockedState.phase, player,
           'EFFECT_BLOCKED',
-          `Ino Yamanaka (020): Cannot take control of ${charResult.character.card.name_fr} â€” a character with the same name already exists on your side of this mission.`,
+          `Ino Yamanaka (020): Cannot take control of ${charResult.character.card.name_fr} â€' a character with the same name already exists on your side of this mission.`,
           'game.log.effect.takeControlBlocked',
           { card: 'INO YAMANAKA', id: 'KS-020-UC', target: charResult.character.card.name_fr },
         );
@@ -7733,7 +7762,7 @@ export class EffectEngine {
   }
 
   // =====================================
-  // Itachi 143 (M) â€” Move character to this mission
+  // Itachi 143 (M) â€' Move character to this mission
   // =====================================
 
   /** Itachi 143 MAIN: move a friendly character to Itachi's mission. */
@@ -7852,7 +7881,7 @@ export class EffectEngine {
           state.log = logAction(
             state.log, state.turn, state.phase, charOwner,
             'EFFECT_BLOCKED',
-            `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} â€” Gaara's continuous effect protects against enemy effects.`,
+            `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} â€' Gaara's continuous effect protects against enemy effects.`,
             'game.log.effect.moveBlocked',
             { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
           );
@@ -7861,8 +7890,8 @@ export class EffectEngine {
       }
     }
 
-    // Kurenai 035 (UC): Characters cannot be moved from this mission
-    // Check if the source mission has a face-visible Kurenai 035 on EITHER side
+    // Kurenai 035 (UC): ENEMY characters cannot move from this mission
+    // Only blocks characters that are enemies relative to Kurenai's controller
     {
       const sourceMission = state.activeMissions[charResult.missionIndex];
       const allCharsInMission = [...sourceMission.player1Characters, ...sourceMission.player2Characters];
@@ -7874,14 +7903,19 @@ export class EffectEngine {
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('cannot move') || e.description.includes("can't be moved")),
           );
           if (hasRestriction) {
-            state.log = logAction(
-              state.log, state.turn, state.phase, charOwner,
-              'EFFECT_BLOCKED',
-              `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} â€” Kurenai blocks all movement from this mission.`,
-              'game.log.effect.moveBlocked',
-              { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
-            );
-            return state;
+            // Determine Kurenai's controller
+            const kurenaiOwner = sourceMission.player1Characters.some(c => c.instanceId === ch.instanceId) ? 'player1' : 'player2';
+            // Only block if the character being moved is an ENEMY of Kurenai's controller
+            if (charOwner !== kurenaiOwner) {
+              state.log = logAction(
+                state.log, state.turn, state.phase, charOwner,
+                'EFFECT_BLOCKED',
+                `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} — Kurenai blocks enemy movement from this mission.`,
+                'game.log.effect.moveBlocked',
+                { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
+              );
+              return state;
+            }
           }
         }
       }

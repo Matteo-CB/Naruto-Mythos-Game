@@ -16,7 +16,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * UPGRADE: Discard a card from your hand to hide a character in play with cost 4 or less.
  *   - Step 1: Select a card from hand to discard.
- *   - Step 2: Select a character in play (friendly or enemy, not self) with printed
+ *   - Step 2: Select a character in play (friendly or enemy, including self) with printed
  *     cost <= 4 to hide.
  *   - If the hand is empty or no valid target exists, the effect fizzles.
  */

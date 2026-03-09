@@ -39,11 +39,12 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
-  // Find all movable friendly characters (those in missions with at least one other mission)
+  // Find all movable friendly characters (excluding self)
   const validTargets: string[] = [];
   if (state.activeMissions.length > 1) {
     for (let i = 0; i < state.activeMissions.length; i++) {
       for (const char of state.activeMissions[i][friendlySide]) {
+        if (char.instanceId === ctx.sourceCard.instanceId) continue; // Cannot move itself
         validTargets.push(char.instanceId);
       }
     }

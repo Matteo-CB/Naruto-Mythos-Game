@@ -16,7 +16,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, isUpgrade } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const opponentHand = state[opponentPlayer].hand;
 
@@ -51,6 +51,27 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     ),
   };
 
+  // When played as upgrade, the AMBUSH is enhanced: after reveal, chain to discard flow
+  // Use SASUKE014_UPGRADE_HAND_REVEAL to trigger the discard chain
+  if (isUpgrade) {
+    const playerState = state[sourcePlayer];
+    if (playerState.hand.length > 0) {
+      return {
+        state: newState,
+        requiresTargetSelection: true,
+        targetSelectionType: 'SASUKE014_UPGRADE_HAND_REVEAL',
+        validTargets: ['confirm'],
+        description: JSON.stringify({
+          text: 'Sasuke (014) UPGRADE: Opponent\'s hand revealed.',
+          cards: allCards,
+          isUpgrade: true,
+        }),
+        descriptionKey: 'game.effect.desc.sasuke014UpgradeReveal',
+        isMandatory: true,
+      };
+    }
+  }
+
   return {
     state: newState,
     requiresTargetSelection: true,
@@ -66,76 +87,9 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
 }
 
 function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
-  const playerState = state[sourcePlayer];
-  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
-  const opponentHand = state[opponentPlayer].hand;
-
-  // Must have cards in own hand AND opponent must have cards
-  if (playerState.hand.length === 0) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Sasuke Uchiwa (014) UPGRADE: No cards in own hand to discard.',
-          'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
-        ),
-      },
-    };
-  }
-
-  if (opponentHand.length === 0) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Sasuke Uchiwa (014) UPGRADE: Opponent has no cards in hand.',
-          'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
-        ),
-      },
-    };
-  }
-
-  // UPGRADE includes the AMBUSH effect ("AMBUSH effect: In addition...")
-  // First show opponent's hand (the AMBUSH part), then chain to discard flow
-  const allCards = opponentHand.map((c, i) => ({
-    name_fr: c.name_fr,
-    chakra: c.chakra ?? 0,
-    power: c.power ?? 0,
-    image_file: c.image_file,
-    originalIndex: i,
-  }));
-
-  const newState = {
-    ...state,
-    log: logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_LOOK_HAND',
-      'Sasuke Uchiwa (014) UPGRADE: Revealed all cards in opponent\'s hand.',
-      'game.log.effect.sasuke014Reveal',
-      { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
-    ),
-  };
-
-  return {
-    state: newState,
-    requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE014_UPGRADE_HAND_REVEAL',
-    validTargets: ['confirm'],
-    description: JSON.stringify({
-      text: 'Sasuke (014) UPGRADE: Opponent\'s hand revealed.',
-      cards: allCards,
-      isUpgrade: true,
-    }),
-    descriptionKey: 'game.effect.desc.sasuke014UpgradeReveal',
-    isMandatory: true,
-  };
+  // UPGRADE modifies AMBUSH — the AMBUSH handler checks ctx.isUpgrade
+  // and chains the discard flow when true. No separate UPGRADE action needed.
+  return { state: ctx.state };
 }
 
 export function registerSasuke014Handlers(): void {
