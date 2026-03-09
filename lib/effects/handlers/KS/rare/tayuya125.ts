@@ -76,12 +76,36 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
+  // Embed hidden board char info so the UI can display card names/images for board: targets
+  const hiddenBoardChars: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
+  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
+    const mission = state.activeMissions[mIdx];
+    for (const char of mission[friendlySide]) {
+      if (!char.isHidden) continue;
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (topCard.group === 'Sound Village') {
+        hiddenBoardChars.push({
+          instanceId: char.instanceId,
+          name_fr: topCard.name_fr,
+          name_en: topCard.name_en,
+          chakra: topCard.chakra ?? 0,
+          power: topCard.power ?? 0,
+          image_file: topCard.image_file,
+          missionIndex: mIdx,
+        });
+      }
+    }
+  }
+
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'TAYUYA125_CHOOSE_SOUND',
     validTargets,
-    description: 'Tayuya (125) UPGRADE: Choose a Sound Village character from hand or hidden on board to play/reveal (paying 2 less).',
+    description: JSON.stringify({
+      text: 'Tayuya (125) UPGRADE: Choose a Sound Village character from hand or hidden on board to play/reveal (paying 2 less).',
+      hiddenChars: hiddenBoardChars,
+    }),
     descriptionKey: 'game.effect.desc.tayuya125PlaySound',
   };
 }

@@ -325,7 +325,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 018/130 - CHOJI AKIMICHI (UC) - "Expansion Jutsu"
   'KS-018-UC': [
-    '[⧗] When this character moves to another mission, hide an enemy character with less Power there.',
+    '[⧗] After you move this character to another mission, hide an enemy character with less Power there.',
     'Move this character to another mission.',
   ],
 
@@ -376,14 +376,14 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 035/130 - KURENAI YUHI (UC) - "Demonic Illusion"
   'KS-035-UC': [
-    '[⧗] Characters can\'t be moved from this mission.',
+    '[⧗] Enemy characters can\'t be moved from this mission.',
     'Defeat an enemy character with Power 1 or less in this mission.',
   ],
 
   // 037/130 - NEJI HYUGA (UC) - "Eight Trigrams"
   'KS-037-UC': [
     '[⧗] When an enemy character is played in this mission, POWERUP 1.',
-    'Remove up to 3 Power tokens from an enemy character in play.',
+    'Remove all Power tokens from an enemy character in this mission.',
   ],
 
   // 039/130 - ROCK LEE (UC) - "Primary Lotus"
@@ -469,7 +469,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 067/130 - REMPART (UC) - "Barrier"
   'KS-067-UC': [
-    '[⧗] The strongest non-hidden enemy character in this mission has Power 0.',
+    '[⧗] The strongest enemy character in this mission loses all Power tokens and has its Power set to 0.',
     '[⧗] At the end of the round, you must return this character to your hand.',
   ],
 
@@ -512,7 +512,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 082/130 - BAKI (UC) - "Blade of Wind"
   'KS-082-UC': [
     '[↯] Defeat a hidden enemy character in play.',
-    'POWERUP 1 each friendly Sand Village character in this mission.',
+    'Defeat an enemy character with Power 1 or less in this mission.',
   ],
 
   // 083/130 - RASA (UC) - "Fourth Kazekage"
@@ -539,7 +539,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 091/130 - ITACHI UCHIHA (UC) - "Mangekyo Sharingan"
   'KS-091-UC': [
-    'Look at a random card in the opponent\'s hand.',
+    'Look at the opponent\'s hand.',
     'MAIN effect: In addition, the opponent discards that card and draws a card.',
   ],
 
@@ -750,7 +750,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 128/130 - ITACHI UCHIHA (R) - "I control them all."
   'KS-128-R': [
     '[⧗] Every enemy character in this mission has -1 Power.',
-    'Move a friendly character to this mission.',
+    'Move a friendly character in play.',
   ],
 
   // 129/130 - KYUBI (R) - "Demon Fox Cloak"
@@ -887,7 +887,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 148/130 - KAKASHI HATAKE (M) - "Original Team 7"
   'KS-148-M': [
     'Gain the Edge.',
-    'Copy a non-upgrade instant effect of another friendly Team 7 character in play.',
+    'Copy an instant effect of another friendly Team 7 character in play.',
   ],
 
   // 113/130 V - KIBA INUZUKA (MV) - "Fang Over Fang"
@@ -1002,7 +1002,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   ],
   'KS-128-RA': [
     '[⧗] Every enemy character in this mission has -1 Power.',
-    'Move a friendly character to this mission.',
+    'Move a friendly character in play.',
   ],
 
   // =====================
@@ -1021,7 +1021,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // MSS 04 - Assassination
   'KS-004-MMS': [
-    '[↯] Defeat an enemy hidden character.',
+    '[↯] Defeat an enemy hidden character in play.',
   ],
 
   // MSS 05 - Bring it Back

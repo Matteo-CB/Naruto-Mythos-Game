@@ -2,7 +2,9 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
-import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { sortTargetsGemmaLast } from '@/lib/effects/defeatUtils';
+import type { PlayerID, CharacterInPlay } from '@/lib/engine/types';
 
 /**
  * Card 054/130 - KABUTO YAKUSHI (UC)
@@ -16,7 +18,8 @@ import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
  *   - Get effective power of self (printed power + power tokens; if hidden, 0).
  *   - Find ALL characters (friend + foe, excluding self) in this mission whose
  *     effective power is strictly less than self's effective power.
- *   - Hide them all (set isHidden = true).
+ *   - Hide them all via hideCharacterWithLog (respects Gemma 049 sacrifice, Kimimaro 056
+ *     protection, Shino 115 protection, and hide immunity).
  *   - Note: When isUpgrade, the UPGRADE POWERUP 1 is applied first, so self's power
  *     is already incremented before the MAIN effect evaluates.
  */
@@ -70,50 +73,67 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
-  // Find ALL characters (friend + foe, excluding self) in this mission with power < self power
-  let hiddenCount = 0;
-  const missions = [...state.activeMissions];
-  const missionCopy = { ...missions[sourceMissionIndex] };
+  // Collect all valid hide targets (friend + foe, excluding self) with power < self power
+  const hideTargets: { instanceId: string; char: CharacterInPlay; sidePlayer: PlayerID }[] = [];
 
   for (const side of ['player1Characters', 'player2Characters'] as const) {
-    const sidePlayer = side === 'player1Characters' ? 'player1' : 'player2';
-    const isEnemy = sidePlayer !== sourcePlayer;
-    const chars = [...missionCopy[side]];
-    for (let i = 0; i < chars.length; i++) {
-      const char = chars[i];
+    const sidePlayer = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+    for (const char of mission[side]) {
       if (char.instanceId === sourceCard.instanceId) continue; // skip self
       if (char.isHidden) continue;
-      // Check hide immunity for enemy characters
-      if (isEnemy && !canBeHiddenByEnemy(state, char, sidePlayer as import('@/lib/engine/types').PlayerID)) continue;
-      const charPower = getEffectivePower(state, char, sidePlayer as import('@/lib/engine/types').PlayerID);
+      const charPower = getEffectivePower(state, char, sidePlayer);
       if (charPower < selfPower) {
-        chars[i] = { ...char, isHidden: true };
-        hiddenCount++;
+        hideTargets.push({ instanceId: char.instanceId, char, sidePlayer });
       }
     }
-    missionCopy[side] = chars;
   }
 
-  missions[sourceMissionIndex] = missionCopy;
-
-  if (hiddenCount === 0) {
+  if (hideTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Kabuto Yakushi (054): No characters with less than ${selfPower} power in this mission.`,
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'EFFECT_HIDE',
-    `Kabuto Yakushi (054): Hid ${hiddenCount} character(s) with less than ${selfPower} power in this mission.`,
-    'game.log.effect.hide',
-    { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount) },
-  );
+  // Sort targets so Gemma 049 is processed last (she can sacrifice to protect one ally)
+  const sortedTargets = sortTargetsGemmaLast(hideTargets.map(t => t.char));
+  const sortedInstanceIds = sortedTargets.map(c => c.instanceId);
+  const orderedTargets = sortedInstanceIds.map(id => hideTargets.find(t => t.instanceId === id)!);
 
-  return { state: { ...state, activeMissions: missions, log } };
+  // Hide each target individually via hideCharacterWithLog — this properly triggers
+  // Gemma 049 sacrifice, Kimimaro 056 protection, Shino 115 protection, and hide immunity
+  let currentState = state;
+  let hiddenCount = 0;
+
+  for (const target of orderedTargets) {
+    const stateBefore = currentState;
+    currentState = EffectEngine.hideCharacterWithLog(currentState, target.instanceId, sourcePlayer);
+    // Check if the character was actually hidden (state changed and no pending effect created instead)
+    const charAfter = EffectEngine.findCharByInstanceId(currentState, target.instanceId);
+    if (charAfter && charAfter.character.isHidden) {
+      hiddenCount++;
+    } else if (currentState !== stateBefore) {
+      // State changed but char not hidden — likely a pending effect (Gemma sacrifice, etc.)
+      // Count as "processed" but not hidden
+    }
+  }
+
+  if (hiddenCount > 0) {
+    currentState = {
+      ...currentState,
+      log: logAction(
+        currentState.log,
+        currentState.turn,
+        currentState.phase,
+        sourcePlayer,
+        'EFFECT_HIDE',
+        `Kabuto Yakushi (054): Hid ${hiddenCount} character(s) with less than ${selfPower} power in this mission.`,
+        'game.log.effect.hide',
+        { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount) },
+      ),
+    };
+  }
+
+  return { state: currentState };
 }
 
 export function registerKabuto054Handlers(): void {

@@ -3232,8 +3232,8 @@ export class EffectEngine {
             { card: 'KIMIMARO', id: 'KS-056-UC', target: discarded_km.name_fr },
           );
 
-          // Stage 2: find valid characters to hide (cost â‰¤ 4, not Kimimaro itself, not already hidden)
-          // Filter out enemy chars immune to hide
+          // Stage 2: find valid characters to hide (cost â‰¤ 4, not already hidden)
+          // Kimimaro CAN hide itself. Filter out enemy chars immune to hide.
           const validHideTargets_km: string[] = [];
           for (const mission_km of newState.activeMissions) {
             for (const side_km of ['player1Characters', 'player2Characters'] as const) {
@@ -3241,7 +3241,6 @@ export class EffectEngine {
               const isEnemy_km = sideOwner_km !== pendingEffect.sourcePlayer;
               for (const char_km of mission_km[side_km]) {
                 if (char_km.isHidden) continue;
-                if (char_km.instanceId === pendingEffect.sourceInstanceId) continue;
                 if (isEnemy_km && !canBeHiddenByEnemy(newState, char_km, sideOwner_km)) continue;
                 const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
                 if ((topCard_km.chakra ?? 0) <= 4) {
@@ -5512,7 +5511,11 @@ export class EffectEngine {
     }
 
     // Check Gemma 049 sacrifice: can sacrifice Gemma to protect friendly Leaf Village from enemy hide
-    if (isEnemyEffect && charResult.character.card.group === 'Leaf Village') {
+    // Skip if there's already a pending Gemma sacrifice choice (batch hide dedup — Gemma can only sacrifice once)
+    const alreadyHasGemmaPending = state.pendingEffects.some(
+      (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved,
+    );
+    if (isEnemyEffect && charResult.character.card.group === 'Leaf Village' && !alreadyHasGemmaPending) {
       const mission = state.activeMissions[charResult.missionIndex];
       const friendlyChars = charResult.player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const friendly of friendlyChars) {
@@ -6096,10 +6099,9 @@ export class EffectEngine {
           validHideTargets.push(char.instanceId);
         }
       }
-      // Friendly chars â€' no immunity check needed
+      // Friendly chars â€' no immunity check needed (Kimimaro CAN hide itself)
       for (const char of mission[friendlySide]) {
         if (char.isHidden) continue;
-        if (char.instanceId === pending.sourceInstanceId) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         if ((topCard.chakra ?? 0) <= 3) {
           validHideTargets.push(char.instanceId);
