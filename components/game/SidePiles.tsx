@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
+import { normalizeImagePath } from '@/lib/utils/imagePath';
 
 // Card dimensions now come from useGameScale()
 
@@ -219,7 +220,7 @@ export function OpponentSidePiles() {
           count={discardCount}
           accentColor="#b33e3e"
           onClick={() => discardCount > 0 && setShowDiscard(true)}
-          topCardImage={opponentTopDiscard?.image_file ? `/${opponentTopDiscard.image_file.replace(/\\/g, '/')}` : undefined}
+          topCardImage={normalizeImagePath(opponentTopDiscard?.image_file) ?? undefined}
         />
       </aside>
 
@@ -270,7 +271,7 @@ export function PlayerSidePiles() {
           count={discardCount}
           accentColor="#c4a35a"
           onClick={() => setShowDiscard(true)}
-          topCardImage={playerTopDiscard?.image_file ? `/${playerTopDiscard.image_file.replace(/\\/g, '/')}` : undefined}
+          topCardImage={normalizeImagePath(playerTopDiscard?.image_file) ?? undefined}
         />
       </aside>
 
