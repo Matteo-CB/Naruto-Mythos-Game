@@ -129,7 +129,9 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
             e.description.toLowerCase().includes('return'),
         );
         if (hasAkamaruReturn) {
-          const hasKiba = chars.some(
+          // Check ALL characters in this mission (both sides) for Kiba
+          const allMissionChars = [...mission.player1Characters, ...mission.player2Characters];
+          const hasKiba = allMissionChars.some(
             (c) => {
               if (c.instanceId === char.instanceId || c.isHidden) return false;
               const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;

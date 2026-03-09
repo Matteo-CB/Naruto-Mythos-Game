@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
+import { defeatEnemyCharacter, sortTargetsGemmaLast } from '@/lib/effects/defeatUtils';
 import type { CharacterInPlay } from '@/lib/engine/types';
 
 /**
@@ -83,10 +83,13 @@ function defeatAllHiddenEnemies(
     return { state };
   }
 
+  // Sort targets so Gemma 049 is processed last (AoE ordering fix)
+  const sortedTargets = sortTargetsGemmaLast(hiddenEnemies);
+
   let newState = state;
   let defeatedCount = 0;
 
-  for (const hidden of hiddenEnemies) {
+  for (const hidden of sortedTargets) {
     newState = defeatEnemyCharacter(newState, missionIndex, hidden.instanceId, sourcePlayer);
     defeatedCount++;
   }

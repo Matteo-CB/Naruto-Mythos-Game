@@ -23,51 +23,20 @@ function side(player: PlayerID): 'player1Characters' | 'player2Characters' {
 
 /**
  * Find valid destination missions for a character.
- * A mission is valid if:
- * - It's not the source mission
- * - No same-name visible character exists there, OR
- * - A same-name visible character exists with strictly lower cost (upgrade possible)
+ * Returns ALL other missions (excluding source) since the move is MANDATORY.
+ * If a same-name conflict exists at the destination and upgrade is not possible,
+ * the moved character will be discarded by moveCharTo.
  */
 function getValidMissions(
   state: GameState,
-  charInstanceId: string,
-  player: PlayerID,
+  _charInstanceId: string,
+  _player: PlayerID,
   sourceMissionIndex: number,
 ): number[] {
-  const friendlySide = side(player);
-
-  // Find the character
-  let charObj: CharacterInPlay | null = null;
-  for (const m of state.activeMissions) {
-    const c = m[friendlySide].find((ch) => ch.instanceId === charInstanceId);
-    if (c) { charObj = c; break; }
-  }
-  if (!charObj) return [];
-
-  const topCard = charObj.stack.length > 0 ? charObj.stack[charObj.stack.length - 1] : charObj.card;
-  const charName = topCard.name_fr.toUpperCase();
-  const charCost = topCard.chakra ?? 0;
-
   const valid: number[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
-    const destChars = state.activeMissions[i][friendlySide];
-    const sameNameChar = destChars.find((c) => {
-      if (c.isHidden) return false;
-      const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return ct.name_fr.toUpperCase() === charName;
-    });
-
-    if (!sameNameChar) {
-      valid.push(i);
-    } else {
-      const existingTop = sameNameChar.stack.length > 0
-        ? sameNameChar.stack[sameNameChar.stack.length - 1]
-        : sameNameChar.card;
-      if (charCost > (existingTop.chakra ?? 0)) {
-        valid.push(i); // Can upgrade at destination
-      }
-    }
+    valid.push(i);
   }
   return valid;
 }
@@ -127,6 +96,25 @@ function moveCharTo(
       powerTokens: existing.powerTokens + movedChar.powerTokens,
     };
   } else {
+    // Check for name conflict that can't be resolved by upgrade
+    const conflictIdx = destChars.findIndex((c) => {
+      if (c.isHidden) return false;
+      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return topCard.name_fr.toUpperCase() === movedName;
+    });
+
+    if (conflictIdx !== -1) {
+      // Name conflict, can't upgrade -> discard the moved character
+      const owner = movedChar.originalOwner;
+      const ownerState = { ...state[owner] };
+      const cardsToDiscard = movedChar.stack.length > 0 ? [...movedChar.stack] : [movedChar.card];
+      ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
+      ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
+      destMission[friendlySide] = destChars;
+      missions[destMissionIndex] = destMission;
+      return { ...state, activeMissions: missions, [owner]: ownerState };
+    }
+
     // Place as new character
     destChars.push({ ...movedChar, missionIndex: destMissionIndex });
   }
@@ -222,18 +210,45 @@ function processNextMove(
   const validMissions = getValidMissions(state, charId, player, sourceMissionIndex);
 
   if (validMissions.length === 0) {
-    // Can't move anywhere — skip
-    const logged = {
-      ...state,
+    // No other missions exist — mandatory move means discard
+    let discardState = { ...state };
+    const friendlySide = side(player);
+
+    // Find and remove the character from its current mission
+    const missions = [...discardState.activeMissions];
+    let discardedChar: CharacterInPlay | null = null;
+    for (let i = 0; i < missions.length; i++) {
+      const chars = missions[i][friendlySide];
+      const cIdx = chars.findIndex((c) => c.instanceId === charId);
+      if (cIdx !== -1) {
+        missions[i] = { ...missions[i] };
+        const newChars = [...missions[i][friendlySide]];
+        [discardedChar] = newChars.splice(cIdx, 1);
+        missions[i][friendlySide] = newChars;
+        break;
+      }
+    }
+
+    if (discardedChar) {
+      const owner = discardedChar.originalOwner;
+      const ownerState = { ...discardState[owner] };
+      const cardsToDiscard = discardedChar.stack.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
+      ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
+      ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
+      discardState = { ...discardState, activeMissions: missions, [owner]: ownerState };
+    }
+
+    discardState = {
+      ...discardState,
       log: logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_NO_TARGET',
-        `Sasuke Uchiwa (107): Cannot move ${charName} — no valid destination mission.`,
-        'game.log.effect.noTarget',
-        { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
+        discardState.log, discardState.turn, discardState.phase, player,
+        'EFFECT_DISCARD',
+        `Sasuke Uchiwa (107): ${charName} discarded — no valid destination mission (mandatory move).`,
+        'game.log.effect.sasuke107Discard',
+        { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName },
       ),
     };
-    return processNextMove(logged, charIds, idx + 1, movedCount, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
+    return processNextMove(discardState, charIds, idx + 1, movedCount + 1, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
   }
 
   if (validMissions.length === 1) {
@@ -300,28 +315,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Check we have other missions
-  let hasOtherMissions = false;
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    if (i !== sourceMissionIndex) { hasOtherMissions = true; break; }
-  }
-
-  if (!hasOtherMissions) {
-    return {
-      state: {
-        ...state,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Sasuke Uchiwa (107): No other missions available to move characters to.',
-          'game.log.effect.noTarget',
-          { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
-        ),
-      },
-    };
-  }
-
-  // Process characters one by one
+  // Process characters one by one (if no other missions exist, processNextMove will discard them)
   const charIds = charsToMove.map((c) => c.instanceId);
   return processNextMove(
     state, charIds, 0, 0, isUpgrade, sourcePlayer,

@@ -9,7 +9,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  * Group: Sound Village | Keywords: Sound Four, Jutsu
  *
  * MAIN: Move a character from this mission (to another mission).
- *   - Any character (friendly or enemy), non-hidden, in this mission.
+ *   - Any character (friendly or enemy, including hidden and self) in this mission.
  *   - Two-stage: pick character, then pick destination mission.
  *   - Uses targetSelectionType 'KIDOMARU060_CHOOSE_CHARACTER' → 'KIDOMARU060_MOVE_DESTINATION'
  *
@@ -21,7 +21,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 function handleKidomaru060Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all non-hidden characters in this mission (any player) except self
+  // Find all characters in this mission (any player, including hidden, including self)
   const mission = state.activeMissions[sourceCard.missionIndex];
   if (!mission) {
     return { state };
@@ -29,8 +29,6 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
 
   const validTargets: string[] = [];
   for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-    if (char.instanceId === sourceCard.instanceId) continue;
-    if (char.isHidden) continue;
     validTargets.push(char.instanceId);
   }
 

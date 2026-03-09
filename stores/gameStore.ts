@@ -454,6 +454,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
+        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+            return {
+              index: amount,
+              card: {
+                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+                chakra: 0,
+                power: amount,
+              },
+            };
+          });
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
           // Source player selects from opponent's hand — card info stored in effectDescription
           let oppCards: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string }> = [];
@@ -1110,6 +1124,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
+        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+            return {
+              index: amount,
+              card: {
+                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+                chakra: 0,
+                power: amount,
+              },
+            };
+          });
         } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
           const playerDiscard = newState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
@@ -1148,6 +1176,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 chakra: info.chakra,
                 power: info.power,
               } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+            return {
+              index: amount,
+              card: {
+                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+                chakra: 0,
+                power: amount,
+              },
             };
           });
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {
@@ -1740,6 +1782,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               },
             };
           });
+        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+            return {
+              index: amount,
+              card: {
+                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+                chakra: 0,
+                power: amount,
+              },
+            };
+          });
         } else if (tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
           const playerDiscard = currentState[humanPlayer].discardPile;
           handCards = pendingAction.options.map((indexStr) => {
@@ -1769,6 +1825,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : info ? {
                 name_fr: info.name, chakra: info.chakra, power: info.power,
               } : { name_fr: '???' },
+            };
+          });
+        } else if (tst === 'CHOOSE_TOKEN_AMOUNT_REMOVE' || tst === 'CHOOSE_TOKEN_AMOUNT_STEAL') {
+          handCards = pendingAction.options.map((amountStr) => {
+            const amount = parseInt(amountStr, 10);
+            const isSteal = tst === 'CHOOSE_TOKEN_AMOUNT_STEAL';
+            return {
+              index: amount,
+              card: {
+                name_fr: isSteal ? `Voler ${amount} jeton(s)` : `Retirer ${amount} jeton(s)`,
+                name_en: isSteal ? `Steal ${amount} token(s)` : `Remove ${amount} token(s)`,
+                chakra: 0,
+                power: amount,
+              },
             };
           });
         } else if (tst === 'SASUKE_014_DISCARD_OPPONENT') {

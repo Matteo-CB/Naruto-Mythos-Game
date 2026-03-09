@@ -38,9 +38,10 @@ export function calculateContinuousChakraBonus(
     if (effect.type !== 'MAIN') continue;
     if (!effect.description.includes('[⧗]')) continue;
 
-    // Kiba 025: If Akamaru is in the same mission, CHAKRA +1
+    // Kiba 025: If Akamaru is in the same mission (friendly or enemy), CHAKRA +1
     if (topCard.id === 'KS-025-C' || topCard.number === 25) {
-      const hasAkamaru = friendlyChars.some(
+      const allMissionChars = [...friendlyChars, ...enemyChars];
+      const hasAkamaru = allMissionChars.some(
         (c) => {
           if (c.isHidden) return false;
           const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
@@ -186,6 +187,25 @@ export function calculateContinuousPowerModifier(
         if (hasEffect && state.edgeHolder === player) hiddenBonus += 1;
       }
     }
+
+    // Apply -1 Power debuffs from enemy continuous effects (Itachi 128, Sakon 127) to hidden chars too
+    const enemyCharsHidden = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+    for (const enemy of enemyCharsHidden) {
+      if (enemy.isHidden) continue;
+      const eTop = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+      for (const effect of eTop.effects ?? []) {
+        if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+        // Itachi 128 / 152: Every enemy in this mission has -1 Power
+        if (eTop.number === 128 || eTop.number === 152) {
+          hiddenBonus -= 1;
+        }
+        // Sakon 127: Each enemy character in this mission has -1 Power
+        if (eTop.number === 127 && effect.description.includes('-1 Power')) {
+          hiddenBonus -= 1;
+        }
+      }
+    }
+
     return hiddenBonus;
   }
 
@@ -197,12 +217,13 @@ export function calculateContinuousPowerModifier(
 
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
-  // Check all friendly characters in the same mission for continuous power effects on others
-  for (const friendly of friendlyChars) {
-    if (friendly.isHidden) continue;
-    if (friendly.instanceId === char.instanceId) continue; // Skip self for "other" effects
+  // Check all characters (both sides) in the same mission for continuous power effects on others
+  const allMissionChars = [...friendlyChars, ...enemyChars];
+  for (const otherChar of allMissionChars) {
+    if (otherChar.isHidden) continue;
+    if (otherChar.instanceId === char.instanceId) continue; // Skip self for "other" effects
 
-    const topCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+    const topCard = otherChar.stack.length > 0 ? otherChar.stack[otherChar.stack.length - 1] : otherChar.card;
 
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
@@ -337,11 +358,16 @@ export function calculateContinuousPowerModifier(
     }
 
     // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
-    // Must use effective power (base + tokens + all prior continuous modifiers) for the threshold check
+    // Use base power + tokens only (NOT accumulated modifier) for the threshold check.
+    // Continuous [⧗] effects are passive and simultaneous — they should all evaluate against
+    // the character's inherent state (base + tokens), not against an intermediate value that
+    // depends on code ordering. This avoids non-commutative interactions with effects like
+    // Sasuke 013's self-penalty: both effects independently read base+tokens and contribute
+    // their modifier additively, so order never matters.
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
       const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      const effectivePower = (selfTop.power ?? 0) + char.powerTokens + modifier;
-      if (effectivePower >= 4) {
+      const basePlusTok = (selfTop.power ?? 0) + char.powerTokens;
+      if (basePlusTok >= 4) {
         modifier += 1;
       }
     }

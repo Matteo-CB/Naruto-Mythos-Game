@@ -36,11 +36,12 @@ export function calculateEffectiveCost(
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   if (!friendlyChars) return cost;
 
-  // Check cost modifiers from continuous effects in this mission
-  for (const friendly of friendlyChars) {
-    if (friendly.isHidden) continue;
+  // Check cost modifiers from continuous effects in this mission (both sides)
+  const allCharsInMission = [...(friendlyChars || []), ...(player === 'player1' ? mission.player2Characters : mission.player1Characters) || []];
+  for (const charInMission of allCharsInMission) {
+    if (charInMission.isHidden) continue;
 
-    const topCard = getTopCard(friendly);
+    const topCard = getTopCard(charInMission);
     if (!topCard) continue;
 
     for (const effect of topCard.effects ?? []) {

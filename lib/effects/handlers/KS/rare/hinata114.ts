@@ -51,12 +51,10 @@ function hinata114MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // Step 2: Find all other friendly characters in play for POWERUP 1
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  // Step 2: Find all other characters in play for POWERUP 1 (both sides)
   const validTargets: string[] = [];
   for (const mission of newState.activeMissions) {
-    for (const char of mission[friendlySide]) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId !== sourceCard.instanceId) {
         validTargets.push(char.instanceId);
       }

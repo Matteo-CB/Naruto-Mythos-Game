@@ -617,7 +617,7 @@
       "name_en": "INO YAMANAKA",
       "name_fr": "INO YAMANAKA",
       "title_fr": "Transposition",
-      "title_en": "Transposition",
+      "title_en": "Mind Transfer Jutsu",
       "has_visual": true,
       "chakra": 3,
       "power": 0,
@@ -804,7 +804,7 @@
       "name_en": "KIBA INUZUKA",
       "name_fr": "KIBA INUZUKA",
       "title_fr": "Ninpô ! La Danse du Chien !",
-      "title_en": "Ninja Art: Beast Mimicry!",
+      "title_en": "All-Four Jutsu",
       "has_visual": true,
       "chakra": 3,
       "power": 3,
@@ -1100,7 +1100,7 @@
       "name_en": "KURENAI YUHI",
       "name_fr": "KURENAI YUHI",
       "title_fr": "Lien de l'Arbre : Mort",
-      "title_en": "Sawarabi no Mai: Bracken Dance",
+      "title_en": "Tree Bind: Death",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -1167,7 +1167,7 @@
       "name_en": "NEJI HYUGA",
       "name_fr": "NEJI HYÛGA",
       "title_fr": "Le « Tourbillon Divin » du Hakke",
-      "title_en": "Eight Trigrams Rotation",
+      "title_en": "Eight Trigrams: Palm Rotation",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -1299,7 +1299,7 @@
       "name_en": "TENTEN",
       "name_fr": "TENTEN",
       "title_fr": "Spécialiste des armes",
-      "title_en": "Weapons Specialist",
+      "title_en": "Weapon Specialist",
       "has_visual": true,
       "chakra": 3,
       "power": 3,
@@ -1710,7 +1710,7 @@
       "name_en": "KABUTO YAKUSHI",
       "name_fr": "KABUTO YAKUSHI",
       "title_fr": "Technique du Temple Nirvana",
-      "title_en": "Temple of Nirvana Technique",
+      "title_en": "Nirvana Temple Jutsu",
       "has_visual": true,
       "chakra": 5,
       "power": 5,
@@ -1726,7 +1726,7 @@
         },
         {
           "type": "MAIN",
-          "description": "Hide all non-hidden enemy characters in this mission with less Power than this character.",
+          "description": "Hide all other characters in this mission with less Power than this character.",
           "description_fr": ""
         }
       ],
@@ -1840,7 +1840,7 @@
       "name_en": "JIROBO",
       "name_fr": "JIRÔBÔ",
       "title_fr": "La Geôle de Terre",
-      "title_en": "Earth Prison",
+      "title_en": "Earth Style Barrier: Earth Dome Prison",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -2635,7 +2635,7 @@
       "name_en": "BAKI",
       "name_fr": "BAKI",
       "title_fr": "Épée de vent",
-      "title_en": "Sword of Kusanagi",
+      "title_en": "Wind Sword",
       "has_visual": true,
       "chakra": 4,
       "power": 4,
@@ -2646,12 +2646,12 @@
       "effects": [
         {
           "type": "SCORE",
-          "description": "[↯] Defeat a hidden enemy character in play.",
+          "description": "[!] Defeat a hidden character in play.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "POWERUP 1 on each friendly Sand Village character in this mission.",
+          "description": "Defeat an enemy character with Power 1 or less in this mission.",
           "description_fr": ""
         }
       ],
@@ -4232,7 +4232,7 @@
       "keywords": [
         "Tailed Beast"
       ],
-      "group": "Leaf Village",
+      "group": "Independent",
       "effects": [
         {
           "type": "MAIN",
@@ -4327,7 +4327,7 @@
       "name_en": "JIRAIYA",
       "name_fr": "JIRAYA",
       "title_fr": "Dans l'Estomac du Crapaud",
-      "title_en": "Inside the Toad's Stomach",
+      "title_en": "Toad Mouth Trap",
       "has_visual": true,
       "chakra": 8,
       "power": 8,
@@ -4432,7 +4432,7 @@
       "name_en": "SAKURA HARUNO",
       "name_fr": "SAKURA HARUNO",
       "title_fr": "Corps Médical du Village de la Feuille",
-      "title_en": "Leaf Village Medical Corps",
+      "title_en": "The Leaf Medical Corps",
       "has_visual": true,
       "chakra": 5,
       "power": 4,
@@ -6355,7 +6355,7 @@
       "keywords": [
         "Tailed Beast"
       ],
-      "group": "Leaf Village",
+      "group": "Independent",
       "effects": [
         {
           "type": "MAIN",

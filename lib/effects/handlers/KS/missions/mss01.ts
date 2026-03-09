@@ -17,12 +17,11 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Collect all friendly characters in play (hidden characters are valid POWERUP targets per rules)
+  // Collect all characters in play (both sides — hidden characters are valid POWERUP targets per rules)
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    const chars = mission[friendlySide];
-    for (const c of chars) {
+    for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
       validTargets.push(c.instanceId);
     }
   }
@@ -63,7 +62,15 @@ function applyMss01Powerup(
 
   const missions = state.activeMissions.map((mission, mIdx) => ({
     ...mission,
-    [friendlySide]: mission[friendlySide].map((char) => {
+    player1Characters: mission.player1Characters.map((char) => {
+      if (char.instanceId === targetInstanceId) {
+        targetName = char.card.name_fr;
+        targetMissionIndex = mIdx;
+        return { ...char, powerTokens: char.powerTokens + 2 };
+      }
+      return char;
+    }),
+    player2Characters: mission.player2Characters.map((char) => {
       if (char.instanceId === targetInstanceId) {
         targetName = char.card.name_fr;
         targetMissionIndex = mIdx;

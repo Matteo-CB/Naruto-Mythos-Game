@@ -14,11 +14,9 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleIno019Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
-  const friendlyChars =
-    sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-
-  // Check for another Team 10 character in this mission (not self, not hidden)
-  const hasOtherTeam10 = friendlyChars.some((char) => {
+  // Check for another Team 10 character in this mission (not self, not hidden, both sides)
+  const allChars = [...mission.player1Characters, ...mission.player2Characters];
+  const hasOtherTeam10 = allChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;

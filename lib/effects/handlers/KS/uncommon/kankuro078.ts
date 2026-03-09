@@ -28,8 +28,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-      // Exclude self
-      if (char.instanceId === sourceCard.instanceId) continue;
+      // Self is a valid target (Power 4 = valid)
       if (getEffectivePower(state, char, char.controlledBy) <= 4) {
         validTargets.push(char.instanceId);
       }

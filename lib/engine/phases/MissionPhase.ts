@@ -1,4 +1,4 @@
-import type { GameState, PlayerID, ActiveMission, MissionScoringProgress } from '../types';
+import type { GameState, PlayerID, ActiveMission, MissionScoringProgress, ScoreEffectSource, PendingEffect, PendingAction } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
 import { generateInstanceId } from '../utils/id';
@@ -170,34 +170,25 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
 }
 
 /**
- * Resolve SCORE effects for a mission, saving progress when target selection is needed.
+ * Collect all SCORE effect sources for a mission (mission card + winner's characters).
  */
-function resolveScoreEffectsWithProgress(
+function collectScoreEffectSources(
   state: GameState,
   player: PlayerID,
   missionIndex: number,
-  rankIndex: number,
-): GameState {
-  let newState = { ...state };
-  const mission = newState.activeMissions[missionIndex];
-  const processedCharIds: string[] = [];
+): ScoreEffectSource[] {
+  const mission = state.activeMissions[missionIndex];
+  const sources: ScoreEffectSource[] = [];
 
   // Mission card SCORE effects
   const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
   if (hasMissionScore) {
-    const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, mission.card.id, null);
-    if (result.pending) {
-      // Save progress: mission card SCORE not done, no characters processed
-      newState = result.state;
-      newState.missionScoringProgress = {
-        currentRankIndex: rankIndex,
-        missionCardScoreDone: false,
-        processedCharacterIds: [],
-        winner: player,
-      };
-      return newState;
-    }
-    newState = result.state;
+    const scoreEffect = (mission.card.effects ?? []).find((e) => e.type === 'SCORE');
+    sources.push({
+      cardId: mission.card.id,
+      instanceId: null,
+      label: `${mission.card.name_fr} (Mission) — ${scoreEffect?.description ?? 'SCORE'}`,
+    });
   }
 
   // Winner's character SCORE effects
@@ -208,27 +199,243 @@ function resolveScoreEffectsWithProgress(
     const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;
 
-    const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, topCard.id, char);
-    processedCharIds.push(char.instanceId);
-
-    if (result.pending) {
-      newState = result.state;
-      newState.missionScoringProgress = {
-        currentRankIndex: rankIndex,
-        missionCardScoreDone: true,
-        processedCharacterIds: [...processedCharIds],
-        winner: player,
-      };
-      return newState;
-    }
-    newState = result.state;
+    const scoreEffect = (topCard.effects ?? []).find((e) => e.type === 'SCORE');
+    sources.push({
+      cardId: topCard.id,
+      instanceId: char.instanceId,
+      label: `${topCard.name_fr} — ${scoreEffect?.description ?? 'SCORE'}`,
+    });
   }
+
+  return sources;
+}
+
+/**
+ * Create a CHOOSE_SCORE_ORDER pending action so the player picks which SCORE effect resolves next.
+ */
+function createScoreOrderChoice(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+  pendingSources: ScoreEffectSource[],
+): GameState {
+  let newState = { ...state };
+
+  const effectId = generateInstanceId();
+  const actionId = generateInstanceId();
+
+  const pendingEffect: PendingEffect = {
+    id: effectId,
+    sourceCardId: '',
+    sourceInstanceId: '',
+    sourceMissionIndex: missionIndex,
+    effectType: 'SCORE',
+    effectDescription: 'Choose which SCORE effect to resolve next.',
+    targetSelectionType: 'CHOOSE_SCORE_ORDER',
+    sourcePlayer: player,
+    requiresTargetSelection: true,
+    validTargets: pendingSources.map((s) => s.instanceId ?? `mission::${s.cardId}`),
+    isOptional: false,
+    isMandatory: true,
+    resolved: false,
+    isUpgrade: false,
+  };
+
+  // Options are encoded as "SCORE::<label>" for the CHOOSE_EFFECT UI
+  const pendingAction: PendingAction = {
+    id: actionId,
+    type: 'CHOOSE_EFFECT',
+    player,
+    description: 'Choose which SCORE effect to resolve next.',
+    descriptionKey: 'game.effect.desc.chooseScoreOrder',
+    options: pendingSources.map((s) => `SCORE::${s.label}`),
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: effectId,
+  };
+
+  newState.pendingEffects = [...newState.pendingEffects, pendingEffect];
+  newState.pendingActions = [...newState.pendingActions, pendingAction];
+
+  // Save progress with the full list of pending SCORE effects
+  newState.missionScoringProgress = {
+    currentRankIndex: rankIndex,
+    missionCardScoreDone: false,
+    processedCharacterIds: [],
+    winner: player,
+    pendingScoreEffects: pendingSources,
+  };
 
   return newState;
 }
 
 /**
- * Resume remaining character SCORE effects after a pending was resolved.
+ * Resolve SCORE effects for a mission, saving progress when target selection is needed.
+ * If multiple SCORE effects exist, the player chooses resolution order.
+ */
+function resolveScoreEffectsWithProgress(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+): GameState {
+  const sources = collectScoreEffectSources(state, player, missionIndex);
+
+  if (sources.length === 0) {
+    return state;
+  }
+
+  // Single SCORE effect: resolve directly (no choice needed)
+  if (sources.length === 1) {
+    return resolveSingleScoreEffect(state, player, missionIndex, rankIndex, sources[0]);
+  }
+
+  // Multiple SCORE effects: let the player choose the order
+  return createScoreOrderChoice(state, player, missionIndex, rankIndex, sources);
+}
+
+/**
+ * Resolve a single identified SCORE effect source.
+ */
+function resolveSingleScoreEffect(
+  state: GameState,
+  player: PlayerID,
+  missionIndex: number,
+  rankIndex: number,
+  source: ScoreEffectSource,
+): GameState {
+  let newState = { ...state };
+  const mission = newState.activeMissions[missionIndex];
+
+  // Find the character in play (null for mission card SCORE)
+  let character = null;
+  if (source.instanceId) {
+    const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+    character = chars.find((c) => c.instanceId === source.instanceId) ?? null;
+  }
+
+  const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, source.cardId, character);
+
+  if (result.pending) {
+    newState = result.state;
+    // Mark which effects have been processed
+    const processedCharIds: string[] = source.instanceId ? [source.instanceId] : [];
+    newState.missionScoringProgress = {
+      currentRankIndex: rankIndex,
+      missionCardScoreDone: !source.instanceId ? true : (newState.missionScoringProgress?.missionCardScoreDone ?? false),
+      processedCharacterIds: processedCharIds,
+      winner: player,
+      pendingScoreEffects: newState.missionScoringProgress?.pendingScoreEffects,
+    };
+    return newState;
+  }
+
+  newState = result.state;
+  return newState;
+}
+
+/**
+ * Called when the player selects which SCORE effect to resolve next from a CHOOSE_SCORE_ORDER pending.
+ * Returns the updated state after resolving the chosen effect (or creating its own pending).
+ */
+export function resolveChosenScoreEffect(
+  state: GameState,
+  selectedLabel: string,
+): GameState {
+  let newState = { ...state };
+  const progress = newState.missionScoringProgress;
+  if (!progress || !progress.pendingScoreEffects) return state;
+
+  // Remove the CHOOSE_SCORE_ORDER pending effect and action
+  newState.pendingEffects = newState.pendingEffects.filter(
+    (e) => e.targetSelectionType !== 'CHOOSE_SCORE_ORDER',
+  );
+  newState.pendingActions = newState.pendingActions.filter(
+    (a) => !a.options.some((o) => o.startsWith('SCORE::')) || a.type !== 'CHOOSE_EFFECT',
+  );
+
+  // Find the selected source by matching label
+  const selectedSource = progress.pendingScoreEffects.find((s) => s.label === selectedLabel);
+  if (!selectedSource) return state;
+
+  // Remove the selected source from pending list
+  const remainingSources = progress.pendingScoreEffects.filter((s) => s !== selectedSource);
+
+  const currentRank = RANK_ORDER[progress.currentRankIndex];
+  const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
+  if (missionIdx === -1) return state;
+
+  // Update progress with remaining sources
+  newState.missionScoringProgress = {
+    ...progress,
+    missionCardScoreDone: selectedSource.instanceId === null ? true : progress.missionCardScoreDone,
+    processedCharacterIds: selectedSource.instanceId
+      ? [...progress.processedCharacterIds, selectedSource.instanceId]
+      : progress.processedCharacterIds,
+    pendingScoreEffects: remainingSources.length > 0 ? remainingSources : undefined,
+  };
+
+  // Resolve the selected SCORE effect
+  const result = resolveSingleScoreEffect(
+    newState,
+    progress.winner,
+    missionIdx,
+    progress.currentRankIndex,
+    selectedSource,
+  );
+
+  // If the resolved effect created its own pending (target selection), wait
+  if (result.pendingActions.length > 0) {
+    // Preserve the remaining sources in progress
+    if (remainingSources.length > 0 && result.missionScoringProgress) {
+      result.missionScoringProgress.pendingScoreEffects = remainingSources;
+    }
+    return result;
+  }
+
+  // Effect resolved without pending. If more SCORE effects remain, present choice again.
+  if (remainingSources.length > 1) {
+    return createScoreOrderChoice(result, progress.winner, missionIdx, progress.currentRankIndex, remainingSources);
+  }
+
+  if (remainingSources.length === 1) {
+    // Only one left — resolve directly
+    const lastResult = resolveSingleScoreEffect(
+      result,
+      progress.winner,
+      missionIdx,
+      progress.currentRankIndex,
+      remainingSources[0],
+    );
+    if (lastResult.pendingActions.length > 0) {
+      // Update progress for the last effect
+      if (lastResult.missionScoringProgress) {
+        lastResult.missionScoringProgress.missionCardScoreDone = remainingSources[0].instanceId === null
+          ? true : lastResult.missionScoringProgress.missionCardScoreDone;
+        if (remainingSources[0].instanceId) {
+          lastResult.missionScoringProgress.processedCharacterIds = [
+            ...lastResult.missionScoringProgress.processedCharacterIds,
+            remainingSources[0].instanceId,
+          ];
+        }
+      }
+      return lastResult;
+    }
+    return lastResult;
+  }
+
+  // All SCORE effects resolved — clear pendingScoreEffects
+  if (result.missionScoringProgress) {
+    result.missionScoringProgress.pendingScoreEffects = undefined;
+  }
+
+  return result;
+}
+
+/**
+ * Resume remaining SCORE effects after a pending (from an individual SCORE handler) was resolved.
+ * This handles both the ordered-choice flow (pendingScoreEffects) and legacy sequential flow.
  */
 function resolveRemainingScoreEffects(
   state: GameState,
@@ -237,16 +444,54 @@ function resolveRemainingScoreEffects(
   progress: MissionScoringProgress,
 ): GameState {
   let newState = { ...state };
-  const mission = newState.activeMissions[missionIndex];
 
   // If mission card SCORE wasn't done, it means we're resuming after its pending was resolved.
   // The handler already ran and created a pending; that pending has now been resolved.
-  // Mark it as done and proceed to character SCORE effects — do NOT re-run the handler.
+  // Mark it as done — do NOT re-run the handler.
   if (!progress.missionCardScoreDone) {
     progress = { ...progress, missionCardScoreDone: true };
   }
 
-  // Continue with character SCORE effects, skipping already-processed ones
+  // If we have a pending SCORE effects list (player-ordered flow), use it
+  if (progress.pendingScoreEffects && progress.pendingScoreEffects.length > 0) {
+    const remaining = progress.pendingScoreEffects;
+
+    if (remaining.length > 1) {
+      // Multiple remain — present choice again
+      return createScoreOrderChoice(newState, player, missionIndex, progress.currentRankIndex, remaining);
+    }
+
+    if (remaining.length === 1) {
+      // Single remaining — resolve directly
+      const lastResult = resolveSingleScoreEffect(
+        newState,
+        player,
+        missionIndex,
+        progress.currentRankIndex,
+        remaining[0],
+      );
+      if (lastResult.pendingActions.length > 0) {
+        if (lastResult.missionScoringProgress) {
+          lastResult.missionScoringProgress.missionCardScoreDone = remaining[0].instanceId === null
+            ? true : lastResult.missionScoringProgress.missionCardScoreDone;
+          if (remaining[0].instanceId) {
+            lastResult.missionScoringProgress.processedCharacterIds = [
+              ...lastResult.missionScoringProgress.processedCharacterIds,
+              remaining[0].instanceId,
+            ];
+          }
+        }
+        return lastResult;
+      }
+      return lastResult;
+    }
+
+    // All resolved
+    return newState;
+  }
+
+  // Fallback: sequential flow (no pendingScoreEffects — legacy or single-effect path)
+  const mission = newState.activeMissions[missionIndex];
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   const processedCharIds = [...progress.processedCharacterIds];
 

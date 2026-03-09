@@ -59,11 +59,11 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly non-hidden Leaf Village characters across all missions, excluding self
+  // Find all non-hidden Leaf Village characters across all missions (both sides), excluding self
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    for (const char of mission[friendlySide]) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;

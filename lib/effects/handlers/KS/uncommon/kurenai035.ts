@@ -9,10 +9,10 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  * Chakra: 4 | Power: 3
  * Group: Leaf Village | Keywords: Jutsu
  *
- * MAIN [continuous]: Enemy characters cannot move from this mission.
- *   - This is a continuous/passive effect. The actual logic of blocking enemy
- *     character movement from this mission is handled in ContinuousEffects.ts
- *     and move validation. The MAIN handler here is a no-op that logs activation.
+ * MAIN [continuous]: Characters cannot be moved from this mission.
+ *   - This is a continuous/passive effect. The actual logic of blocking ALL
+ *     character movement from this mission is handled in EffectEngine.ts
+ *     moveCharToMissionDirect. The MAIN handler here is a no-op that logs activation.
  *
  * UPGRADE: Defeat an enemy character with Power 1 or less in this mission.
  *   - Find non-hidden enemy characters in this mission with effective power <= 1.
@@ -21,15 +21,15 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 function handleKurenai035Main(ctx: EffectContext): EffectResult {
-  // Continuous effect [hourglass] - enemy characters cannot move from this mission.
-  // This is passively enforced in ContinuousEffects.ts / move validation.
+  // Continuous effect [hourglass] - characters cannot be moved from this mission.
+  // This is passively enforced in EffectEngine.ts moveCharToMissionDirect.
   const log = logAction(
     ctx.state.log,
     ctx.state.turn,
     ctx.state.phase,
     ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
-    'Yuhi Kurenai (035): Enemy characters cannot move from this mission (continuous).',
+    'Yuhi Kurenai (035): Characters cannot be moved from this mission (continuous).',
     'game.log.effect.continuous',
     { card: 'YUHI KURENAI', id: 'KS-035-UC' },
   );

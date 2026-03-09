@@ -18,9 +18,10 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all Team 10 characters in this mission (not self)
+  // Find all Team 10 characters in this mission (not self, both sides)
   const validTargets: string[] = [];
-  for (const char of mission[friendlySide]) {
+  const allChars = [...mission.player1Characters, ...mission.player2Characters];
+  for (const char of allChars) {
     if (char.instanceId === sourceCard.instanceId) continue;
     if (char.isHidden) continue; // Hidden chars are anonymous — can't identify keyword
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;

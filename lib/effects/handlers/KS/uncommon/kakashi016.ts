@@ -9,7 +9,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * MAIN: Copy a non-upgrade instant effect of an enemy character with cost 4 or less in play.
  *   - Find enemy characters with printed cost <= 4 that have non-UPGRADE instant effects
- *     (MAIN or AMBUSH effects, not continuous [hourglass] and not UPGRADE or SCORE).
+ *     (MAIN, AMBUSH, or SCORE effects, not continuous [hourglass] and not UPGRADE).
  *   - Requires target selection to choose which enemy character's effect to copy.
  *   - The actual effect copy/execution is handled by the game engine after target selection.
  *
@@ -32,11 +32,13 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.chakra > costLimit) continue;
 
-      // Check if the character has any non-UPGRADE, non-SCORE, non-continuous instant effects
+      // Check if the character has any non-UPGRADE, non-continuous instant effects
       const hasInstantEffect = topCard.effects?.some(effect => {
-        if (effect.type === 'UPGRADE' || effect.type === 'SCORE') return false;
+        if (effect.type === 'UPGRADE') return false;
         // Exclude continuous effects (marked with [hourglass] symbol)
         if (effect.description.includes('[⧗]')) return false;
+        // Exclude effect modifiers
+        if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
         return true;
       });
 

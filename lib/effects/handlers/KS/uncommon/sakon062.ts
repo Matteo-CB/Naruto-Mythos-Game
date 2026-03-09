@@ -7,12 +7,12 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 4 | Power: 4
  * Group: Sound Village | Keywords: Sound Four, Jutsu
  *
- * AMBUSH: Copy an instant effect (non-continuous [⧗], non-SCORE, non-UPGRADE) of another
+ * AMBUSH: Copy an instant effect (non-continuous [⧗], non-UPGRADE) of another
  * friendly character with keyword "Sound Four" in play.
  *   - Find all friendly non-hidden characters with keyword "Sound Four" across all missions
  *     (excluding self).
  *   - The player selects which Sound Four character to copy from.
- *   - The copied effect must be an instant effect (MAIN without [⧗], or AMBUSH without [⧗]).
+ *   - The copied effect must be an instant effect (MAIN, AMBUSH, or SCORE without [⧗]).
  *   - Effects starting with "effect:" or "effect." modifiers are also excluded.
  *   - The actual execution of the copied effect is handled by the engine after target selection.
  *
@@ -35,9 +35,8 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
-        // Check if this card has at least one non-continuous, non-SCORE effect
+        // Check if this card has at least one non-continuous, non-UPGRADE effect
         const hasInstantEffect = topCard.effects?.some((eff) => {
-          if (eff.type === 'SCORE') return false;
           if (eff.type === 'UPGRADE') return false;
           if (eff.description && eff.description.includes('[⧗]')) return false;
           if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;

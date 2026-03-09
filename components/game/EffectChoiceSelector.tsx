@@ -9,6 +9,7 @@ const EFFECT_TYPE_COLORS: Record<string, { bg: string; border: string; text: str
   MAIN: { bg: '#0a1a14', border: '#3e8b3e', text: '#4aff6b', glow: 'rgba(62, 139, 62, 0.4)' },
   AMBUSH: { bg: '#1a0a14', border: '#b33e8b', text: '#ff6bb3', glow: 'rgba(179, 62, 139, 0.4)' },
   UPGRADE: { bg: '#14140a', border: '#c4a35a', text: '#ffd700', glow: 'rgba(196, 163, 90, 0.4)' },
+  SCORE: { bg: '#0a0a1a', border: '#3e5cb3', text: '#6b9eff', glow: 'rgba(62, 92, 179, 0.4)' },
 };
 
 const DEFAULT_COLORS = { bg: '#141414', border: '#555555', text: '#e0e0e0', glow: 'rgba(85, 85, 85, 0.3)' };

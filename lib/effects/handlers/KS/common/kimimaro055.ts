@@ -52,7 +52,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
   for (const mission of state.activeMissions) {
     for (const char of mission[friendlySide]) {
       if (char.isHidden) continue;
-      if (char.instanceId === ctx.sourceCard.instanceId) continue;
+      // Self is a valid target (can hide itself)
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 3) {
         validTargets.push(char.instanceId);

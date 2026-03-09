@@ -99,6 +99,16 @@ export interface PlayerState {
 // Game State
 // ---------------------
 
+/** Identifies a single SCORE effect source (mission card or character). */
+export interface ScoreEffectSource {
+  /** Card ID of the source (mission card or top card of character stack) */
+  cardId: string;
+  /** Instance ID of the character (null for mission card SCORE) */
+  instanceId: string | null;
+  /** Human-readable label: card name + effect type */
+  label: string;
+}
+
 export interface MissionScoringProgress {
   /** Index into rankOrder ['D','C','B','A'] — which rank we're currently scoring */
   currentRankIndex: number;
@@ -108,6 +118,9 @@ export interface MissionScoringProgress {
   processedCharacterIds: string[];
   /** The player who won the current mission (needed for resumption) */
   winner: PlayerID;
+  /** When multiple SCORE effects are available, this lists all unresolved ones.
+   *  The player picks which to resolve next via a CHOOSE_SCORE_ORDER pending. */
+  pendingScoreEffects?: ScoreEffectSource[];
 }
 
 export interface GameState {
