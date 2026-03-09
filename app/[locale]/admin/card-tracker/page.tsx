@@ -11,7 +11,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const TRACKER_USERS = ['Kutxyt', 'admin', 'Andy'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 type IssueStatus = 'to_fix' | 'fixed_unpublished' | 'fixed_published' | 'verified';
 type FilterStatus = 'all' | IssueStatus;
@@ -474,7 +474,7 @@ export default function CardTrackerPage() {
                   </div>
                 </div>
               )}
-              {isAdmin && (
+              {isAuthorized && (
                 <button
                   onClick={() => deleteIssue(detailIssue.id)}
                   className="ml-auto text-xs font-medium transition-colors"
@@ -998,8 +998,8 @@ export default function CardTrackerPage() {
                         </span>
                       )}
 
-                      {/* Delete (admin only) */}
-                      {isAdmin && (
+                      {/* Delete (authorized tracker users) */}
+                      {isAuthorized && (
                         <button
                           onClick={() => deleteIssue(issue.id)}
                           className="ml-auto text-[10px] font-medium transition-colors"

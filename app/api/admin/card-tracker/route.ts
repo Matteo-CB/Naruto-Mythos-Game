@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
 const TRACKER_USERS = ['Kutxyt', 'admin', 'Andy'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 function isAuthorized(name: string | null | undefined): boolean {
   return !!name && TRACKER_USERS.includes(name);
@@ -148,12 +148,12 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE — remove an issue (admin only)
+// DELETE — remove an issue (tracker users can delete their own reports)
 export async function DELETE(req: NextRequest) {
   try {
     const session = await auth();
-    if (!isAdmin(session?.user?.name)) {
-      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+    if (!isAuthorized(session?.user?.name)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);

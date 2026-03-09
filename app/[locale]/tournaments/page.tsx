@@ -14,7 +14,7 @@ import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 type Tab = 'simulator' | 'player' | 'create';
 

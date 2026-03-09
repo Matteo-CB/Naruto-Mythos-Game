@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 async function isAdmin() {

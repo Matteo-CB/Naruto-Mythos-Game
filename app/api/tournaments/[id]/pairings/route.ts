@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 function isAdmin(session: { user?: { email?: string | null; name?: string | null } } | null): boolean {
   if (!session?.user) return false;

@@ -8,7 +8,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 interface ActionResult {
   success: boolean;

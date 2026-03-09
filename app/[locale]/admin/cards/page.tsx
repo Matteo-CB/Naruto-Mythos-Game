@@ -11,7 +11,7 @@ import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoade
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
-const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Andy', 'Daiki0'];
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
 type FilterMode = 'all' | 'banned' | 'authorized';
 
