@@ -8,7 +8,15 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "start:server": "node --import tsx server/index.ts",
-    "lint": "eslint"
+    "lint": "eslint",
+    "selfplay": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/selfplay.ts",
+    "selfplay:parallel": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/selfplayParallel.ts",
+    "benchmark": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/benchmark.ts",
+    "benchmark:tournament": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/benchmarkTournament.ts",
+    "export:decks": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/exportStrongDecks.ts",
+    "merge:decks": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/mergeStrongDecks.ts",
+    "merge:selfplay": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/mergeSelfplayOutputs.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -43,8 +51,13 @@
     "eslint-config-next": "16.1.6",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.0.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "optionalDependencies": {
+    "onnxruntime-node": "^1.20.1"
   }
 }

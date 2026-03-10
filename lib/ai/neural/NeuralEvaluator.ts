@@ -12,6 +12,27 @@ function isBrowserRuntime(): boolean {
   return typeof window !== 'undefined';
 }
 
+function getPreferredExecutionProviders(): string[] {
+  if (isBrowserRuntime()) return [];
+
+  const envOverride = process.env.NARUTO_ORT_PROVIDERS?.trim();
+  if (envOverride) {
+    return envOverride
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean);
+  }
+
+  switch (process.platform) {
+    case 'win32':
+      return ['dml', 'cpu'];
+    case 'linux':
+      return ['cuda', 'cpu'];
+    default:
+      return ['cpu'];
+  }
+}
+
 function defaultModelPath(modelPath?: string): string {
   if (modelPath) return modelPath;
 
@@ -29,7 +50,6 @@ async function getOrt(): Promise<OrtModule | null> {
   try {
     ortModule = isBrowserRuntime()
       ? await import('onnxruntime-web')
-      // @ts-expect-error — optional runtime dependency, gracefully handled
       : await import('onnxruntime-node');
     return ortModule;
   } catch {
@@ -38,21 +58,38 @@ async function getOrt(): Promise<OrtModule | null> {
 }
 
 export class NeuralEvaluator {
-  private static _instance: NeuralEvaluator | null = null;
+  private static _instances = new Map<string, NeuralEvaluator>();
 
   private session: InferenceSession | null = null;
   private inputName = 'input';
   private outputName = 'output';
   private _ready = false;
   private loadPromise: Promise<void> | null = null;
+  private loadedModelPath = '';
+  private modelPathHint?: string;
 
-  private constructor() {}
+  private constructor(modelPathHint?: string) {
+    this.modelPathHint = modelPathHint;
+  }
 
-  static getInstance(): NeuralEvaluator {
-    if (!NeuralEvaluator._instance) {
-      NeuralEvaluator._instance = new NeuralEvaluator();
+  static getInstance(modelPath?: string): NeuralEvaluator {
+    const key = (modelPath ?? '__default__').replace(/\\/g, '/').trim() || '__default__';
+    const existing = NeuralEvaluator._instances.get(key);
+    if (existing) return existing;
+
+    const created = new NeuralEvaluator(modelPath);
+    NeuralEvaluator._instances.set(key, created);
+    return created;
+  }
+
+  static clearInstances(): void {
+    for (const evaluator of NeuralEvaluator._instances.values()) {
+      evaluator.session = null;
+      evaluator._ready = false;
+      evaluator.loadPromise = null;
+      evaluator.loadedModelPath = '';
     }
-    return NeuralEvaluator._instance;
+    NeuralEvaluator._instances.clear();
   }
 
   isReady(): boolean {
@@ -60,8 +97,15 @@ export class NeuralEvaluator {
   }
 
   async load(modelPath?: string): Promise<void> {
-    if (this.loadPromise) return this.loadPromise;
+    const resolvedPath = defaultModelPath(modelPath ?? this.modelPathHint);
+    if (this._ready && this.session && this.loadedModelPath === resolvedPath) {
+      return;
+    }
+    if (this.loadPromise && this.loadedModelPath === resolvedPath) {
+      return this.loadPromise;
+    }
 
+    this.loadedModelPath = resolvedPath;
     this.loadPromise = (async () => {
       const ort = await getOrt();
       if (!ort) {
@@ -69,15 +113,19 @@ export class NeuralEvaluator {
         return;
       }
 
-      const resolvedPath = defaultModelPath(modelPath);
-
       try {
         const sessionOptions = isBrowserRuntime()
           ? {}
           : {
-              executionProviders: ['cuda', 'cpu'],
+              executionProviders: getPreferredExecutionProviders(),
               graphOptimizationLevel: 'all',
             };
+
+        if (!isBrowserRuntime()) {
+          console.log(
+            `[NeuralEvaluator] Requested providers: ${sessionOptions.executionProviders.join(', ')}`,
+          );
+        }
 
         this.session = await ort.InferenceSession.create(resolvedPath, sessionOptions);
 
@@ -93,15 +141,18 @@ export class NeuralEvaluator {
         console.log(`[NeuralEvaluator] Input: "${this.inputName}", Output: "${this.outputName}"`);
       } catch (err) {
         console.warn(`[NeuralEvaluator] Failed to load model: ${err}. Using heuristic fallback.`);
+        this.session = null;
         this._ready = false;
+        this.loadedModelPath = '';
       }
     })();
 
     return this.loadPromise;
   }
 
-  evaluateSync(_features: Float32Array): number {
+  evaluateSync(features: Float32Array): number {
     // The ONNX runtimes exposed here are async-only.
+    void features;
     return 0.5;
   }
 
@@ -137,7 +188,7 @@ export class NeuralEvaluator {
 }
 
 export async function initNeuralEvaluator(modelPath?: string): Promise<NeuralEvaluator> {
-  const evaluator = NeuralEvaluator.getInstance();
+  const evaluator = NeuralEvaluator.getInstance(modelPath);
   await evaluator.load(modelPath);
   return evaluator;
 }

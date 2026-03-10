@@ -7,7 +7,6 @@
  */
 
 import { create } from 'zustand';
-import type { GameState, PlayerID } from '@/lib/engine/types';
 import type { CoachAdvice } from '@/lib/ai/coaching/CoachTypes';
 
 export type MoveQuality = 'great' | 'good' | 'ok' | 'mistake' | 'blunder';
@@ -25,7 +24,7 @@ export interface TrainingStore {
   /** Quality of the last player move */
   lastMoveQuality: MoveQuality | null;
 
-  /** Win probability delta from last move (positive = improved position) */
+  /** Delta vs best move from previous position (chosen - best, usually <= 0) */
   lastMoveDelta: number | null;
 
   /** Whether the coaching panel is expanded/visible */
@@ -67,14 +66,14 @@ export const useTrainingStore = create<TrainingStore>((set) => ({
 // ─── Move quality classification ─────────────────────────────────────────────
 
 /**
- * Classify a move based on the change in win probability.
- * delta = newWinProb - oldWinProb (from the player's perspective)
+ * Classify a move based on expected value vs the best move.
+ * delta = chosenMoveWinRate - bestMoveWinRate (0 is best, negative is worse)
  */
 export function classifyMove(delta: number): MoveQuality {
-  if (delta >= 0.08) return 'great';
-  if (delta >= 0.02) return 'good';
-  if (delta >= -0.03) return 'ok';
-  if (delta >= -0.10) return 'mistake';
+  if (delta >= -0.01) return 'great';
+  if (delta >= -0.03) return 'good';
+  if (delta >= -0.07) return 'ok';
+  if (delta >= -0.15) return 'mistake';
   return 'blunder';
 }
 

@@ -22,6 +22,11 @@ export interface AIStrategy {
   readonly difficulty: AIDifficulty;
 }
 
+export interface AIStrategyOptions {
+  modelPath?: string;
+  simulations?: number;
+}
+
 const HIDDEN_HAND_CARD_ID = '__hidden_hand__';
 
 function createHiddenHandPlaceholder(index: number): CharacterCard {
@@ -50,26 +55,26 @@ export class AIPlayer {
   private strategy: AIStrategy;
   readonly player: PlayerID;
 
-  constructor(difficulty: AIDifficulty, player: PlayerID) {
+  constructor(difficulty: AIDifficulty, player: PlayerID, options: AIStrategyOptions = {}) {
     this.player = player;
-    this.strategy = AIPlayer.createStrategy(difficulty);
+    this.strategy = AIPlayer.createStrategy(difficulty, options);
   }
 
   /**
    * Factory method to create the appropriate strategy.
    */
-  static createStrategy(difficulty: AIDifficulty): AIStrategy {
+  static createStrategy(difficulty: AIDifficulty, options: AIStrategyOptions = {}): AIStrategy {
     switch (difficulty) {
       case 'easy':
         return new EasyAI();
       case 'medium':
         return new MediumAI();
       case 'hard':
-        return new HardAI();
+        return new HardAI(options.modelPath, options.simulations);
       case 'impossible':
-        return new ImpossibleAI();
+        return new ImpossibleAI(options.modelPath, options.simulations);
       default:
-        return new ImpossibleAI();
+        return new ImpossibleAI(options.modelPath, options.simulations);
     }
   }
 

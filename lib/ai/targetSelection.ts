@@ -7,7 +7,6 @@
  */
 
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission } from '../engine/types';
-import { getCardTier, hasUpgradeTarget } from './evaluation/CardTiers';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'impossible';
 
@@ -39,12 +38,6 @@ export function aiSelectTarget(
   // Confirm / acknowledge — always confirm
   if (options.includes('confirm')) return 'confirm';
 
-  // Token amount choice (e.g., "1" or "2"): AI always picks the maximum
-  if (pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountRemove' ||
-      pendingAction.descriptionKey === 'game.effect.desc.chooseTokenAmountSteal') {
-    return options.reduce((max, opt) => parseInt(opt, 10) > parseInt(max, 10) ? opt : max, options[0]);
-  }
-
   // Easy: always random
   if (difficulty === 'easy') {
     return randomPick(options);
@@ -60,11 +53,6 @@ export function aiSelectTarget(
   // SACRIFICE OWN CHARACTER (e.g., Jiraiya 132 UPGRADE — opponent chooses own chars to defeat)
   if (desc.includes('choose one of your characters to defeat') || desc.includes('choisissez un de vos personnages')) {
     return selectSacrificeTarget(options, state, aiPlayer, difficulty);
-  }
-
-  // SCORE ORDER: AI picks first option (order is a minor strategic detail)
-  if (desc.includes('score effect') || desc.includes('effet score')) {
-    return options[0];
   }
 
   // DEFEAT / DESTROY: remove the strongest enemy
@@ -157,23 +145,6 @@ function getCharCost(char: CharacterInPlay): number {
   return topCard.chakra ?? 0;
 }
 
-/**
- * Card tier of a character's top card.
- */
-function getCharTier(char: CharacterInPlay): number {
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return getCardTier(topCard);
-}
-
-/**
- * Check if a character has SCORE effects.
- */
-function hasScoreEffect(char: CharacterInPlay): boolean {
-  if (char.isHidden) return false;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  return topCard.effects?.some(e => e.type === 'SCORE') ?? false;
-}
-
 // ---------------------------------------------------------------------------
 // Helpers — mission evaluation
 // ---------------------------------------------------------------------------
@@ -208,8 +179,8 @@ function getMissionPowerGap(state: GameState, missionIndex: number, aiPlayer: Pl
  * For POWERUP effects: place tokens on the character where they matter most.
  *
  * Medium: favor characters on higher-value missions.
- * Hard/Expert: prioritize mission-flipping — placing tokens where they can
- * swing a mission from losing to winning is the highest-value play.
+ * Hard/Expert: favor characters on contested, high-value missions where
+ * the additional power might swing the outcome.
  */
 function selectPowerupTarget(
   options: string[],
@@ -219,7 +190,6 @@ function selectPowerupTarget(
 ): string {
   let bestOption = options[0];
   let bestScore = -Infinity;
-  const turn = state.turn ?? 1;
 
   for (const opt of options) {
     const found = findCharacterInState(state, opt);
@@ -231,25 +201,17 @@ function selectPowerupTarget(
 
     let score: number;
     if (difficulty === 'medium') {
+      // Medium: simply prefer higher mission value, break ties with char power
       score = missionValue * 10 + charPower;
     } else {
-      // Hard/Expert: mission-flip awareness
+      // Hard / Expert: prioritize contested missions (gap close to 0)
+      // where extra power tokens can flip the result
+      const contestedness = Math.max(0, 10 - Math.abs(powerGap));
+      score = missionValue * 2 + contestedness * 3 + charPower;
+      // Bonus: slightly losing is more urgent than slightly winning
       if (powerGap < 0 && powerGap > -5) {
-        // We're slightly losing — tokens could flip this mission!
-        score = missionValue * 4 + Math.max(0, 10 - Math.abs(powerGap)) * 3;
-      } else if (powerGap >= 0 && powerGap <= 3) {
-        // Contested — tokens help secure the win
-        score = missionValue * 2.5 + charPower;
-      } else if (powerGap > 3) {
-        // Already winning by a lot — tokens are wasted here
-        score = missionValue * 0.5 + charPower * 0.3;
-      } else {
-        // Losing badly — tokens won't flip, low priority
-        score = missionValue * 0.8;
+        score += 5;
       }
-
-      // Turn 4 multiplier: last scoring, tokens matter more
-      if (turn === 4) score *= 1.5;
     }
 
     if (score > bestScore) {
@@ -266,10 +228,11 @@ function selectPowerupTarget(
 // ---------------------------------------------------------------------------
 
 /**
- * For DEFEAT/HIDE effects: target the enemy whose removal has the highest impact.
+ * For DEFEAT/HIDE effects: target the strongest enemy, weighted by mission value.
  *
  * Medium: pick the enemy with the highest effective power.
- * Hard/Expert: prioritize mission-flipping targets, SCORE denial, and card tier.
+ * Hard/Expert: also factor in mission value — removing a strong character
+ * from a valuable mission is the optimal play.
  */
 function selectDefeatTarget(
   options: string[],
@@ -291,24 +254,16 @@ function selectDefeatTarget(
 
     let score: number;
     if (difficulty === 'medium') {
+      // Medium: simply target the strongest character
       score = charPower * 10 + charCost;
     } else {
-      // Hard/Expert: power-weighted by mission value
-      score = charPower * missionValue * 0.5 + charCost * 0.5;
-
-      // Mission-flip bonus: defeating this char flips the mission from losing to winning
+      // Hard/Expert: combine power, mission value, and how much
+      // removing this character would improve our position
+      score = charPower * 3 + missionValue * 2 + charCost;
+      // Extra value if defeating this character would flip a mission from losing to winning
       if (powerGap < 0 && powerGap + charPower >= 0) {
-        score += missionValue * 5;
+        score += 10;
       }
-
-      // SCORE denial: defeating a char with SCORE effects prevents bonus value
-      if (hasScoreEffect(found.char)) {
-        score += missionValue * 2;
-      }
-
-      // Card tier threat: higher-tier cards are more dangerous to leave alive
-      const tier = getCharTier(found.char);
-      score += tier * 1.5;
     }
 
     if (score > bestScore) {
@@ -400,7 +355,8 @@ function selectMoveTarget(
 
 /**
  * When choosing a mission destination for a move effect.
- * Hard/Expert: considers departure cost (losing source mission) vs arrival benefit.
+ * Depends on context: moving a friendly favors where we need help;
+ * moving an enemy favors where we already dominate.
  */
 function selectMissionDestination(
   options: string[],
@@ -418,22 +374,12 @@ function selectMissionDestination(
 
     let score: number;
     if (difficulty === 'medium') {
+      // Medium: favor higher-value missions
       score = missionValue;
     } else {
-      // Hard/Expert: favor contested high-value missions where help matters
-      if (powerGap < 0 && powerGap > -5) {
-        // Losing slightly — moving here could flip it
-        score = missionValue * 3;
-      } else if (powerGap >= 0 && powerGap <= 2) {
-        // Contested — reinforce to secure
-        score = missionValue * 2;
-      } else if (powerGap > 2) {
-        // Already winning — low priority
-        score = missionValue * 0.5;
-      } else {
-        // Losing badly — help needed but may not be enough
-        score = missionValue * 1.2;
-      }
+      // Hard/Expert: favor missions where we need help the most
+      // (negative gap + high value = most impactful destination)
+      score = missionValue * 2 - powerGap;
     }
 
     if (score > bestScore) {
@@ -450,8 +396,8 @@ function selectMissionDestination(
 // ---------------------------------------------------------------------------
 
 /**
- * When forced to discard, pick the card with the lowest strategic value.
- * Uses card tiers + affordability context.
+ * When forced to discard, pick the card with the lowest value.
+ * Options are typically card indices in hand.
  */
 function selectDiscardTarget(
   options: string[],
@@ -459,31 +405,19 @@ function selectDiscardTarget(
   aiPlayer: PlayerID,
   difficulty: AIDifficulty,
 ): string {
+  // If options are hand indices, try to discard the weakest card
   const hand = state[aiPlayer].hand;
-  const chakra = state[aiPlayer].chakra;
 
   let worstOption = options[0];
   let worstScore = Infinity;
 
   for (const opt of options) {
+    // Options could be indices or instanceIds — try index first
     const idx = parseInt(opt);
     if (!isNaN(idx) && idx >= 0 && idx < hand.length) {
       const card = hand[idx];
-
-      let cardValue: number;
-      if (difficulty === 'medium') {
-        cardValue = (card.power ?? 0) + (card.chakra ?? 0);
-      } else {
-        // Hard/Expert: use card tier + affordability
-        const tier = getCardTier(card);
-        const cost = card.chakra ?? 0;
-        cardValue = tier * 3;
-        // Can't afford = less valuable to keep
-        if (cost > chakra + 5) cardValue *= 0.5;
-        // Has upgrade target = more valuable
-        if (hasUpgradeTarget(state, aiPlayer, card)) cardValue += 5;
-      }
-
+      // Score: power + chakra cost as a rough card quality measure
+      const cardValue = (card.power ?? 0) + (card.chakra ?? 0);
       if (cardValue < worstScore) {
         worstScore = cardValue;
         worstOption = opt;

@@ -11,14 +11,17 @@ import { NeuralEvaluator } from '../neural/NeuralEvaluator';
 
 export class HardAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'hard';
+  static readonly DEFAULT_SIMULATIONS = 600;
 
   private mcts: NeuralISMCTS;
   private evaluator: NeuralEvaluator;
+  private modelPath?: string;
 
-  constructor() {
-    this.evaluator = NeuralEvaluator.getInstance();
+  constructor(modelPath?: string, simulations?: number) {
+    this.modelPath = modelPath;
+    this.evaluator = NeuralEvaluator.getInstance(modelPath);
     this.mcts = new NeuralISMCTS({
-      simulations: 600,
+      simulations: simulations ?? HardAI.DEFAULT_SIMULATIONS,
       maxDepth: 6,
       explorationC: 1.41,
       evaluator: this.evaluator,
@@ -44,7 +47,7 @@ export class HardAI implements AIStrategy {
       return this.decideMulligan(state, player, validActions);
     }
 
-    await this.evaluator.load();
+    await this.evaluator.load(this.modelPath);
 
     if (this.evaluator.isReady()) {
       return this.mcts.chooseActionAsync(state, player, validActions);
