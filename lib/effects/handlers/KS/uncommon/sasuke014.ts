@@ -11,7 +11,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * UPGRADE: AMBUSH effect: In addition, discard 1 card.
  *   If you do so, choose 1 card in the opponent's hand and discard it.
- *   (The UPGRADE includes the AMBUSH effect — shows opponent's hand first,
+ *   (The UPGRADE includes the AMBUSH effect - shows opponent's hand first,
  *    then offers the discard chain.)
  */
 
@@ -87,7 +87,7 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
 }
 
 function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
-  // UPGRADE modifies AMBUSH — the AMBUSH handler checks ctx.isUpgrade
+  // UPGRADE modifies AMBUSH - the AMBUSH handler checks ctx.isUpgrade
   // and chains the discard flow when true. No separate UPGRADE action needed.
   return { state: ctx.state };
 }

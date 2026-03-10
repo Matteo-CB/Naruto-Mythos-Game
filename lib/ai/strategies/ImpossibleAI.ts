@@ -1,10 +1,10 @@
 /**
- * Impossible AI — Niveau Impossible
+ * Impossible AI - Niveau Impossible
  *
  * ISMCTS 3000 simulations + réseau de neurones (GPU NVIDIA si disponible).
  * Profondeur 8 → peut voir ~2 tours complets d'avance.
  * Exploration réduite (c=1.2) pour maximiser l'exploitation des bonnes lignes.
- * Le niveau le plus fort possible — quasi-imbattable avec le modèle entraîné.
+ * Le niveau le plus fort possible - quasi-imbattable avec le modèle entraîné.
  *
  * Sans modèle: ~800ms par action (heuristique)
  * Avec modèle GPU: ~1-2s par action (NN evaluation)
@@ -115,7 +115,7 @@ export class ImpossibleAI implements AIStrategy {
     const keep = validActions.find(a => a.type === 'MULLIGAN' && !a.doMulligan);
     const mulligan = validActions.find(a => a.type === 'MULLIGAN' && a.doMulligan);
 
-    // Seuil élevé — Impossible garde seulement les très bonnes mains
+    // Seuil élevé - Impossible garde seulement les très bonnes mains
     if (score >= 16 && keep) return keep;
     return mulligan ?? validActions[0];
   }

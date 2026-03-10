@@ -89,7 +89,7 @@ export function GameLog() {
 
   return (
     <>
-      {/* Toggle button — positioned above the right side piles (only visible when log is closed) */}
+      {/* Toggle button - positioned above the right side piles (only visible when log is closed) */}
       {!showGameLog && (
         <button
           onClick={toggleGameLog}

@@ -39,13 +39,6 @@ const phaseColorMap: Record<string, string> = {
   mulligan: '#5A7ABB',
 };
 
-// Fixed slot dimensions
-const CARD_W = 58;
-const CARD_H = 80;
-const HAND_CARD_W = 48;
-const HAND_CARD_H = 67;
-const MAX_CHARS_PER_SLOT = 4;
-
 // ----- Sub-components -----
 
 function ReplayCard({
@@ -75,15 +68,14 @@ function ReplayCard({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.8 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
-        className="relative rounded-md overflow-hidden"
+        className="relative rounded-md overflow-hidden shrink-0"
         style={{
-          width: CARD_W,
-          height: CARD_H,
+          width: 'var(--replay-card-w)',
+          height: 'var(--replay-card-h)',
           backgroundColor: '#12121a',
           border: '1px solid #2a2a3a',
         }}
       >
-        {/* Face-down pattern */}
         <div
           className="absolute inset-0"
           style={{
@@ -91,11 +83,11 @@ function ReplayCard({
           }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span style={{ color: '#3a3a4a', fontSize: '18px', fontWeight: 'bold', fontFamily: "'NJNaruto', Arial, sans-serif" }}>?</span>
+          <span style={{ color: '#3a3a4a', fontSize: '20px', fontWeight: 'bold', fontFamily: "'NJNaruto', Arial, sans-serif" }}>?</span>
         </div>
         <div
           className="absolute bottom-0 left-0 right-0 text-center py-0.5"
-          style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: '#555', fontSize: '6px' }}
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: '#555', fontSize: '7px' }}
         >
           HIDDEN
         </div>
@@ -111,15 +103,14 @@ function ReplayCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="relative rounded-md overflow-hidden"
+      className="relative rounded-md overflow-hidden shrink-0"
       style={{
-        width: CARD_W,
-        height: CARD_H,
+        width: 'var(--replay-card-w)',
+        height: 'var(--replay-card-h)',
         border: `1.5px solid ${rarityColor}`,
         boxShadow: `0 2px 8px rgba(0,0,0,0.4), 0 0 1px ${rarityColor}40`,
       }}
     >
-      {/* Card image */}
       {imagePath ? (
         <img
           src={imagePath}
@@ -132,11 +123,7 @@ function ReplayCard({
         <div className="absolute inset-0" style={{ backgroundColor: '#1a1a2e' }} />
       )}
 
-      {/* Subtle vignette */}
-      <div
-        className="absolute inset-0"
-        style={{ boxShadow: 'inset 0 0 12px rgba(0,0,0,0.4)' }}
-      />
+      <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 12px rgba(0,0,0,0.4)' }} />
 
       {/* Card name */}
       <div
@@ -144,7 +131,7 @@ function ReplayCard({
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
           color: '#e0e0e0',
-          fontSize: '6.5px',
+          fontSize: 'var(--replay-card-name-fs)',
           lineHeight: '1.2',
         }}
       >
@@ -155,11 +142,11 @@ function ReplayCard({
       <div
         className="absolute top-0 left-0 flex items-center justify-center"
         style={{
-          width: '15px',
-          height: '15px',
+          width: 'var(--replay-badge-size)',
+          height: 'var(--replay-badge-size)',
           backgroundColor: 'rgba(90, 122, 187, 0.95)',
           color: '#fff',
-          fontSize: '8px',
+          fontSize: 'var(--replay-badge-fs)',
           fontWeight: 'bold',
           borderBottomRightRadius: '4px',
           fontFamily: "'NJNaruto', Arial, sans-serif",
@@ -172,13 +159,13 @@ function ReplayCard({
       <div
         className="absolute top-0 right-0 flex items-center justify-center"
         style={{
-          width: '15px',
-          height: '15px',
+          width: 'var(--replay-badge-size)',
+          height: 'var(--replay-badge-size)',
           backgroundColor: hasPowerTokens
             ? 'rgba(196, 163, 90, 0.95)'
             : 'rgba(179, 62, 62, 0.95)',
           color: '#fff',
-          fontSize: '8px',
+          fontSize: 'var(--replay-badge-fs)',
           fontWeight: 'bold',
           borderBottomLeftRadius: '4px',
           fontFamily: "'NJNaruto', Arial, sans-serif",
@@ -190,11 +177,11 @@ function ReplayCard({
       {/* Power tokens indicator */}
       {hasPowerTokens && (
         <div
-          className="absolute bottom-[14px] right-0 px-1"
+          className="absolute bottom-[16px] right-0 px-1"
           style={{
             backgroundColor: 'rgba(196, 163, 90, 0.95)',
             color: '#0a0a0a',
-            fontSize: '7px',
+            fontSize: '8px',
             fontWeight: 'bold',
             borderTopLeftRadius: '3px',
             borderBottomLeftRadius: '3px',
@@ -208,11 +195,11 @@ function ReplayCard({
       {/* Stack indicator */}
       {char.stack.length > 0 && (
         <div
-          className="absolute bottom-[14px] left-0 px-1"
+          className="absolute bottom-[16px] left-0 px-1"
           style={{
             backgroundColor: 'rgba(155, 89, 182, 0.95)',
             color: '#fff',
-            fontSize: '7px',
+            fontSize: '8px',
             fontWeight: 'bold',
             borderTopRightRadius: '3px',
             borderBottomRightRadius: '3px',
@@ -248,8 +235,8 @@ function ReplayHandCard({
       transition={{ duration: 0.2, delay: index * 0.03 }}
       className="relative rounded overflow-hidden shrink-0"
       style={{
-        width: HAND_CARD_W,
-        height: HAND_CARD_H,
+        width: 'var(--replay-hand-w)',
+        height: 'var(--replay-hand-h)',
         border: `1px solid ${rarityColor}`,
         boxShadow: `0 1px 4px rgba(0,0,0,0.3)`,
       }}
@@ -273,7 +260,7 @@ function ReplayHandCard({
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
           color: '#e0e0e0',
-          fontSize: '5.5px',
+          fontSize: 'var(--replay-hand-name-fs)',
         }}
       >
         {name}
@@ -283,11 +270,11 @@ function ReplayHandCard({
       <div
         className="absolute top-0 left-0 flex items-center justify-center"
         style={{
-          width: '13px',
-          height: '13px',
+          width: 'var(--replay-hand-badge)',
+          height: 'var(--replay-hand-badge)',
           backgroundColor: 'rgba(90, 122, 187, 0.95)',
           color: '#fff',
-          fontSize: '7px',
+          fontSize: 'var(--replay-hand-badge-fs)',
           fontWeight: 'bold',
           borderBottomRightRadius: '3px',
           fontFamily: "'NJNaruto', Arial, sans-serif",
@@ -300,11 +287,11 @@ function ReplayHandCard({
       <div
         className="absolute top-0 right-0 flex items-center justify-center"
         style={{
-          width: '13px',
-          height: '13px',
+          width: 'var(--replay-hand-badge)',
+          height: 'var(--replay-hand-badge)',
           backgroundColor: 'rgba(179, 62, 62, 0.95)',
           color: '#fff',
-          fontSize: '7px',
+          fontSize: 'var(--replay-hand-badge-fs)',
           fontWeight: 'bold',
           borderBottomLeftRadius: '3px',
           fontFamily: "'NJNaruto', Arial, sans-serif",
@@ -334,13 +321,14 @@ function CharacterSlot({
 
   return (
     <div
-      className="flex flex-wrap gap-1 justify-center p-1.5"
+      className="flex flex-wrap gap-1 justify-center p-1.5 flex-1"
       style={{
-        minHeight: CARD_H + 12,
+        minHeight: '50px',
         backgroundColor: chars.length > 0 ? playerColor : 'transparent',
         borderTop: !isTop ? `1px solid ${borderColor}` : 'none',
         borderBottom: isTop ? `1px solid ${borderColor}` : 'none',
         alignItems: isTop ? 'flex-end' : 'flex-start',
+        alignContent: isTop ? 'flex-end' : 'flex-start',
       }}
     >
       <AnimatePresence mode="popLayout">
@@ -348,16 +336,6 @@ function CharacterSlot({
           <ReplayCard key={char.instanceId} char={char} state={state} locale={locale} index={i} />
         ))}
       </AnimatePresence>
-      {chars.length === 0 && (
-        <div
-          className="flex items-center justify-center rounded"
-          style={{
-            width: CARD_W,
-            height: CARD_H,
-            border: '1px dashed rgba(255,255,255,0.06)',
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -370,14 +348,13 @@ function ReplayMissionLane({
   mission: ActiveMission;
   state: GameState;
   locale: 'en' | 'fr';
-  }) {
+}) {
   const t = useTranslations();
   const missionName = getCardName(mission.card, locale);
   const rankColor = rankColorMap[mission.rank] ?? '#888';
   const totalPoints = mission.basePoints + mission.rankBonus;
   const missionImage = mission.card.image_file ? normalizeImagePath(mission.card.image_file) : null;
 
-  // Calculate power totals for each player on this mission
   const p1Power = mission.player1Characters.reduce(
     (sum, c) => sum + calculateCharacterPower(state, c, c.controlledBy), 0
   );
@@ -393,11 +370,12 @@ function ReplayMissionLane({
 
   return (
     <div
-      className="flex flex-col rounded-lg overflow-hidden"
+      className="flex flex-col rounded-lg overflow-hidden flex-1"
       style={{
         backgroundColor: 'rgba(10, 10, 14, 0.7)',
         border: `1px solid ${wonBorderColor}`,
         transition: 'border-color 0.3s ease',
+        minWidth: 0,
       }}
     >
       {/* Player 2 characters */}
@@ -406,7 +384,7 @@ function ReplayMissionLane({
       {/* Power comparison bar (P2) */}
       {(mission.player2Characters.length > 0 || mission.player1Characters.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5" style={{ backgroundColor: 'rgba(179,62,62,0.06)' }}>
-          <span className="text-[8px] font-bold tabular-nums" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
+          <span className="text-[9px] font-bold tabular-nums" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
             {p2Power}
           </span>
         </div>
@@ -414,14 +392,13 @@ function ReplayMissionLane({
 
       {/* Mission card center */}
       <div
-        className="relative w-full px-2 py-2 text-center overflow-hidden"
+        className="relative w-full px-2 py-2 text-center overflow-hidden shrink-0"
         style={{
           borderTop: `1px solid ${rankColor}30`,
           borderBottom: `1px solid ${rankColor}30`,
           minHeight: '52px',
         }}
       >
-        {/* Mission card image background */}
         {missionImage && (
           <div
             className="absolute inset-0"
@@ -437,7 +414,7 @@ function ReplayMissionLane({
         <div className="relative z-10">
           <div className="flex items-center justify-center gap-1.5">
             <span
-              className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+              className="text-[11px] font-bold uppercase px-1.5 py-0.5 rounded"
               style={{
                 backgroundColor: `${rankColor}25`,
                 color: rankColor,
@@ -447,20 +424,20 @@ function ReplayMissionLane({
             >
               {mission.rank}
             </span>
-            <span className="text-[10px] truncate font-medium" style={{ color: '#e0e0e0', maxWidth: '100px' }}>
+            <span className="text-[11px] truncate font-medium" style={{ color: '#e0e0e0', maxWidth: '140px' }}>
               {missionName}
             </span>
           </div>
           <div className="flex items-center justify-center gap-2 mt-1">
             <span
-              className="text-[9px] font-bold"
+              className="text-[10px] font-bold"
               style={{ color: rankColor, fontFamily: "'NJNaruto', Arial, sans-serif" }}
             >
               {totalPoints} pts
             </span>
             {mission.wonBy && (
               <span
-                className="text-[8px] font-bold uppercase px-1.5 py-0.5 rounded"
+                className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"
                 style={{
                   backgroundColor: mission.wonBy === 'player1' ? 'rgba(196,163,90,0.2)' : 'rgba(179,62,62,0.2)',
                   color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e',
@@ -476,7 +453,7 @@ function ReplayMissionLane({
       {/* Power comparison bar (P1) */}
       {(mission.player2Characters.length > 0 || mission.player1Characters.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5" style={{ backgroundColor: 'rgba(196,163,90,0.06)' }}>
-          <span className="text-[8px] font-bold tabular-nums" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
+          <span className="text-[9px] font-bold tabular-nums" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
             {p1Power}
           </span>
         </div>
@@ -492,14 +469,15 @@ function EmptyMissionSlot({ turnIndex }: { turnIndex: number }) {
   const t = useTranslations();
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-lg"
+      className="flex flex-col items-center justify-center rounded-lg flex-1"
       style={{
-        minHeight: CARD_H * 2 + 80,
+        minHeight: '120px',
         backgroundColor: 'rgba(10, 10, 14, 0.3)',
         border: '1px dashed rgba(255, 255, 255, 0.06)',
+        minWidth: 0,
       }}
     >
-      <span className="text-[10px] font-medium" style={{ color: 'rgba(255, 255, 255, 0.1)', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
+      <span className="text-[11px] font-medium" style={{ color: 'rgba(255, 255, 255, 0.1)', fontFamily: "'NJNaruto', Arial, sans-serif" }}>
         {t('game.turn', { turn: turnIndex + 1 })}
       </span>
     </div>
@@ -526,21 +504,18 @@ function PlayerBar({
 
   return (
     <div
-      className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2"
+      className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5 shrink-0"
       style={{
-        backgroundColor: isActive ? bgColor : 'transparent',
+        backgroundColor: isActive ? bgColor : 'rgba(0,0,0,0.2)',
         borderBottom: isTop ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
         borderTop: !isTop ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
+        backdropFilter: 'blur(6px)',
       }}
     >
       {/* Left: name + badges */}
       <div className="flex items-center gap-2">
-        {/* Active indicator dot */}
         {isActive && (
-          <div
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: color }}
-          />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
         )}
         <span className="text-xs font-bold" style={{ color }}>
           {playerNames[player]}
@@ -623,10 +598,11 @@ function HandRow({
 
   return (
     <div
-      className="flex items-center justify-center gap-1 px-3 py-1.5 overflow-x-auto"
+      className="flex items-center justify-center gap-1 px-3 py-1 overflow-x-auto shrink-0"
       style={{
-        minHeight: HAND_CARD_H + 8,
+        minHeight: '52px',
         backgroundColor: bgColor,
+        backdropFilter: 'blur(4px)',
       }}
     >
       <AnimatePresence mode="popLayout">
@@ -635,15 +611,13 @@ function HandRow({
         ))}
       </AnimatePresence>
       {cards.length === 0 && (
-        <span className="text-[9px]" style={{ color: '#333' }}>
-          -
-        </span>
+        <span className="text-[9px]" style={{ color: '#333' }}>-</span>
       )}
     </div>
   );
 }
 
-// ----- Main ReplayBoard -----
+// ----- Main ReplayBoard (Fullscreen) -----
 
 interface ReplayBoardProps {
   state: GameState;
@@ -658,88 +632,75 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl }: Repla
 
   return (
     <div
-      className="relative rounded-xl overflow-hidden"
+      className="w-full h-full flex flex-col overflow-hidden"
       style={{
-        backgroundColor: '#0a0a0e',
-        border: '1px solid #1e1e28',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        ['--replay-card-w' as string]: '72px',
+        ['--replay-card-h' as string]: '100px',
+        ['--replay-card-name-fs' as string]: '7.5px',
+        ['--replay-badge-size' as string]: '17px',
+        ['--replay-badge-fs' as string]: '9px',
+        ['--replay-hand-w' as string]: '56px',
+        ['--replay-hand-h' as string]: '78px',
+        ['--replay-hand-name-fs' as string]: '6px',
+        ['--replay-hand-badge' as string]: '14px',
+        ['--replay-hand-badge-fs' as string]: '8px',
       }}
     >
-      {/* User's custom background */}
-      {backgroundUrl && (
-        <>
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${backgroundUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.55)' }}
-          />
-        </>
-      )}
-      {/* All content above the background */}
-      <div className="relative z-10">
-        {/* Turn / Phase banner */}
-        <div
-          className="flex items-center justify-center gap-3 px-4 py-2"
+      {/* Turn / Phase banner */}
+      <div
+        className="flex items-center justify-center gap-3 px-4 py-1.5 shrink-0"
+        style={{
+          backgroundColor: `${phaseColor}12`,
+          borderBottom: `1px solid ${phaseColor}20`,
+        }}
+      >
+        <span
+          className="text-xs font-bold uppercase tracking-[0.15em]"
+          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+        >
+          {t('game.turn', { turn: state.turn })}
+        </span>
+        <span className="text-[10px]" style={{ color: '#444' }}>/</span>
+        <span
+          className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded"
           style={{
-            backgroundColor: backgroundUrl ? `${phaseColor}15` : `${phaseColor}08`,
-            borderBottom: `1px solid ${phaseColor}20`,
+            color: phaseColor,
+            backgroundColor: `${phaseColor}18`,
           }}
         >
-          <span
-            className="text-[11px] font-bold uppercase tracking-[0.15em]"
-            style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
-          >
-            {t('game.turn', { turn: state.turn })}
-          </span>
-          <span className="text-[10px]" style={{ color: backgroundUrl ? '#555' : '#333' }}>/</span>
-          <span
-            className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded"
-            style={{
-              color: phaseColor,
-              backgroundColor: `${phaseColor}18`,
-            }}
-          >
-            {t(`game.phase.${state.phase}`)}
-          </span>
-        </div>
-
-        {/* Player 2 stats */}
-        <PlayerBar player="player2" state={state} playerNames={playerNames} isTop={true} />
-
-        {/* Player 2 hand */}
-        <HandRow cards={state.player2.hand} locale={locale} player="player2" />
-
-        {/* Mission area */}
-        <div className="grid grid-cols-4 gap-2 px-3 py-3">
-          {Array.from({ length: 4 }).map((_, slotIdx) => {
-            const mission = state.activeMissions[slotIdx];
-            if (mission) {
-              return (
-                <ReplayMissionLane
-                  key={`mission-${slotIdx}`}
-                  mission={mission}
-                  state={state}
-                  locale={locale}
-                />
-              );
-            }
-            return <EmptyMissionSlot key={`empty-${slotIdx}`} turnIndex={slotIdx} />;
-          })}
-        </div>
-
-        {/* Player 1 hand */}
-        <HandRow cards={state.player1.hand} locale={locale} player="player1" />
-
-        {/* Player 1 stats */}
-        <PlayerBar player="player1" state={state} playerNames={playerNames} isTop={false} />
+          {t(`game.phase.${state.phase}`)}
+        </span>
       </div>
+
+      {/* Player 2 stats */}
+      <PlayerBar player="player2" state={state} playerNames={playerNames} isTop={true} />
+
+      {/* Player 2 hand */}
+      <HandRow cards={state.player2.hand} locale={locale} player="player2" />
+
+      {/* Mission area - fills remaining space */}
+      <div className="flex-1 flex items-stretch gap-2 px-3 py-1.5 min-h-0 overflow-hidden">
+        {Array.from({ length: 4 }).map((_, slotIdx) => {
+          const mission = state.activeMissions[slotIdx];
+          if (mission) {
+            return (
+              <ReplayMissionLane
+                key={`mission-${slotIdx}`}
+                mission={mission}
+                state={state}
+                locale={locale}
+              />
+            );
+          }
+          return <EmptyMissionSlot key={`empty-${slotIdx}`} turnIndex={slotIdx} />;
+        })}
+      </div>
+
+      {/* Player 1 hand */}
+      <HandRow cards={state.player1.hand} locale={locale} player="player1" />
+
+      {/* Player 1 stats */}
+      <PlayerBar player="player1" state={state} playerNames={playerNames} isTop={false} />
     </div>
   );
 }

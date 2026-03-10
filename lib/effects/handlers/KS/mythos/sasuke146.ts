@@ -25,7 +25,7 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, ctx.sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Sasuke Uchiwa (146): Does not hold the Edge token — cannot give it. Effect fizzles.',
+          'Sasuke Uchiwa (146): Does not hold the Edge token - cannot give it. Effect fizzles.',
           'game.log.effect.noTarget',
           { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
         ),
@@ -33,7 +33,7 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Effect is optional ("If you do") — route through pending action so player can skip.
+  // Effect is optional ("If you do") - route through pending action so player can skip.
   // The "target" is Sasuke himself (confirms the player wants to activate the effect).
   return {
     state,

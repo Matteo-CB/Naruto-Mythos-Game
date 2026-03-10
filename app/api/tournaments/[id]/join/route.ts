@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
-// POST — join a tournament
+// POST - join a tournament
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -32,7 +32,7 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
     }
 
-    // Private tournament — verify code
+    // Private tournament - verify code
     if (!tournament.isPublic && tournament.joinCode) {
       if (body.joinCode !== tournament.joinCode) {
         return NextResponse.json({ error: 'Invalid join code' }, { status: 403 });

@@ -10,7 +10,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 
-// Pool of featured cards — one is picked randomly on each page load
+// Pool of featured cards - one is picked randomly on each page load
 const FEATURED_CARDS = [
   { src: '/images/cards/KS/rare_art/KS-108-RA.webp', alt: 'Naruto Uzumaki - Rare Art', rarity: 'rare' as const },
   { src: '/images/cards/KS/rare_art/KS-107-RA.webp', alt: 'Sasuke Uchiwa - Rare Art', rarity: 'rare' as const },
@@ -23,7 +23,7 @@ const FEATURED_CARDS = [
   { src: '/images/cards/KS/mythos/KS-146-M.webp', alt: 'Sasuke Uchiwa - Mythos', rarity: 'mythos' as const },
 ];
 
-// Cloud positions — only cloud-2, cloud-5, cloud-6
+// Cloud positions - only cloud-2, cloud-5, cloud-6
 const cloudPositions = [
   // Row 1 - top
   { src: '/images/icons/cloud-2.webp', top: '2%', left: '4%', width: 110, opacity: 0.10, rotate: -8 },
@@ -337,6 +337,41 @@ export default function Home() {
                   </Link>
                 </motion.div>
               )}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 1.34, ease: 'easeOut' }}
+              >
+                <Link
+                  href="/play/training"
+                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                  style={{
+                    backgroundColor: '#141414',
+                    border: '1px solid #22c55e',
+                    color: '#22c55e',
+                  }}
+                  onMouseEnter={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1.03)';
+                    target.style.borderColor = '#22c55e';
+                    target.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.15)';
+                    target.style.backgroundColor = '#1a1a1a';
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget as HTMLElement;
+                    target.style.transform = 'scale(1)';
+                    target.style.borderColor = '#22c55e';
+                    target.style.boxShadow = 'none';
+                    target.style.backgroundColor = '#141414';
+                  }}
+                >
+                  <span
+                    className="absolute left-0 top-0 h-full w-1"
+                    style={{ backgroundColor: '#22c55e' }}
+                  />
+                  {t('training')}
+                </Link>
+              </motion.div>
             </motion.nav>
 
             {/* Training mode (only visible to testers/admins) */}
@@ -607,7 +642,7 @@ export default function Home() {
             </motion.p>
           </div>
 
-          {/* RIGHT SIDE: Holographic card — hidden on small screens */}
+          {/* RIGHT SIDE: Holographic card - hidden on small screens */}
           <motion.div
             className="relative hidden flex-shrink-0 items-center justify-center lg:flex"
             initial={{ opacity: 0, x: 80 }}

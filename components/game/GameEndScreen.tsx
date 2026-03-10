@@ -351,14 +351,14 @@ export function GameEndScreen() {
                 {eloDelta >= 0 ? '+' : ''}{eloDelta} ELO
               </span>
 
-              {/* New ELO + League badge — only when leagues enabled */}
+              {/* New ELO + League badge - only when leagues enabled */}
               {leaguesEnabled && newElo !== undefined && (
                 <div className="flex flex-col items-center gap-2 mt-1">
                   <EloBadge elo={newElo} size="md" showElo totalGames={totalGames} />
                 </div>
               )}
 
-              {/* Placement progress — only when leagues enabled */}
+              {/* Placement progress - only when leagues enabled */}
               {leaguesEnabled && isPlacement && totalGames !== undefined && (
                 <div className="flex flex-col items-center gap-1 mt-1">
                   <span className="text-xs" style={{ color: '#999' }}>
@@ -380,7 +380,7 @@ export function GameEndScreen() {
                 </div>
               )}
 
-              {/* Just became ranked — only when leagues enabled */}
+              {/* Just became ranked - only when leagues enabled */}
               {leaguesEnabled && justBecameRanked && (
                 <motion.span
                   initial={{ opacity: 0, scale: 0.8 }}

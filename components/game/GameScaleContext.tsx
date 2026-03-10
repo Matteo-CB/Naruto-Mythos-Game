@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 // ── Base dimensions (designed for ~1400×900 viewport) ──────────────
 
 const BASE = {
-  // Card sizes — larger for desktop readability (TCG Arena style)
+  // Card sizes - larger for desktop readability (TCG Arena style)
   handCardW: 100, handCardH: 140,
   missionCardW: 90, missionCardH: 126,
   sideCardW: 64, sideCardH: 90,

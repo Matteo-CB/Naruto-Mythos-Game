@@ -10,8 +10,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * one friendly Sound Four character.
  *
  * Multi-stage target selection:
- *   Stage 1: KIDOMARU_CHOOSE_CHARACTER — choose which friendly character to move
- *   Stage 2: KIDOMARU_CHOOSE_DESTINATION — choose which mission to move them to
+ *   Stage 1: KIDOMARU_CHOOSE_CHARACTER - choose which friendly character to move
+ *   Stage 2: KIDOMARU_CHOOSE_DESTINATION - choose which mission to move them to
  *   Repeat stages 1-2 up to X times.
  *
  * The number of moves remaining is encoded in the description JSON.
@@ -26,7 +26,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
   for (const mission of state.activeMissions) {
     const hasSoundFour = mission[friendlySide].some((char) => {
       if (char.instanceId === ctx.sourceCard.instanceId) return false;
-      if (char.isHidden) return false; // Hidden chars are anonymous — can't identify keyword
+      if (char.isHidden) return false; // Hidden chars are anonymous - can't identify keyword
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });

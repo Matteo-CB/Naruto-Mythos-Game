@@ -35,7 +35,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
   switch (action.type) {
     case 'PLAY_CHARACTER':
       newState = handlePlayCharacter(newState, player, action.cardIndex, action.missionIndex);
-      if (newState === beforeAction) return state; // Failed — don't skip turn
+      if (newState === beforeAction) return state; // Failed - don't skip turn
       break;
     case 'PLAY_HIDDEN':
       newState = handlePlayHidden(newState, player, action.cardIndex, action.missionIndex);
@@ -69,7 +69,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
   }
 
   // If both haven't passed, alternate active player (unless one has passed)
-  // Don't switch if there are pending effects/actions — the current player must resolve them first
+  // Don't switch if there are pending effects/actions - the current player must resolve them first
   if (!newState.player1.hasPassed && !newState.player2.hasPassed) {
     if (action.type !== 'PASS' && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
       newState.activePlayer = otherPlayer;
@@ -300,7 +300,7 @@ function handleRevealCharacter(
   // Determine upgrade target:
   // If upgradeTargetInstanceId is provided, use that specific target (player chose to upgrade).
   // If not provided, auto-detect ONLY for same-name upgrades (mandatory, can't have 2 same-name chars).
-  // Flexible (different-name) upgrades are NEVER auto-detected — player must explicitly choose.
+  // Flexible (different-name) upgrades are NEVER auto-detected - player must explicitly choose.
   let upgradeTarget: CharacterInPlay | undefined;
   if (upgradeTargetInstanceId) {
     // Player explicitly chose to upgrade this target
@@ -315,7 +315,7 @@ function handleRevealCharacter(
       }
     }
   } else {
-    // Auto-detect: only same-name upgrades (mandatory — can't have 2 same-name chars)
+    // Auto-detect: only same-name upgrades (mandatory - can't have 2 same-name chars)
     upgradeTarget = chars.find((c) => {
       if (c.instanceId === characterInstanceId) return false;
       if (c.isHidden) return false;
@@ -347,7 +347,7 @@ function handleRevealCharacter(
   ps.chakra -= costToPay;
 
   if (upgradeTarget) {
-    // Reveal-for-upgrade: merge stacks — put the revealed card's stack on top of the existing one
+    // Reveal-for-upgrade: merge stacks - put the revealed card's stack on top of the existing one
     const upgradeTargetIdx = chars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
     const upgraded = { ...upgradeTarget };
     upgraded.stack = [...upgraded.stack, ...char.stack];

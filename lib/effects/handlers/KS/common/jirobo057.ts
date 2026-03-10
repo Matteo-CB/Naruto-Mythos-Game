@@ -23,7 +23,7 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
 
     const hasSoundFour = friendlyChars.some((char) => {
       if (char.instanceId === sourceCard.instanceId) return false;
-      if (char.isHidden) return false; // Hidden chars are anonymous — can't identify keyword
+      if (char.isHidden) return false; // Hidden chars are anonymous - can't identify keyword
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });

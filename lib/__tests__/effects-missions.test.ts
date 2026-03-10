@@ -254,7 +254,7 @@ describe('MSS 07 - I Have to Go', () => {
     const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Effect is optional — always asks the player (no auto-move)
+    // Effect is optional - always asks the player (no auto-move)
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
     expect(result.validTargets).toBeDefined();

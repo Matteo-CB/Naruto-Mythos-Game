@@ -689,7 +689,7 @@ export function TargetSelector() {
               : ''}
           </motion.span>
 
-          {/* Cards grid — clickable with selection indicator */}
+          {/* Cards grid - clickable with selection indicator */}
           <div className="flex flex-wrap gap-3 mb-6 justify-center" style={{ maxWidth: '720px' }}>
             {cards.map((card, idx) => {
               const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;

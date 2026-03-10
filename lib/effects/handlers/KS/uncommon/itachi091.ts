@@ -48,7 +48,7 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // Show all opponent hand cards — confirm only
+  // Show all opponent hand cards - confirm only
   return {
     state: newState,
     requiresTargetSelection: true,

@@ -159,7 +159,7 @@ function matchesTargetCriteria(
   if (filters?.maxPower !== undefined && effectivePower > filters.maxPower) return false;
   if (filters?.minPower !== undefined && effectivePower < filters.minPower) return false;
 
-  // Cost filters (use effective cost — 0 for enemy hidden characters)
+  // Cost filters (use effective cost - 0 for enemy hidden characters)
   if (filters?.maxCost !== undefined && effectiveCost > filters.maxCost) return false;
 
   // Group/keyword filters: hidden enemy characters have unknown identity

@@ -69,7 +69,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
     }, flipDuration);
   }, [highRarity, onRevealed]);
 
-  // Auto-reveal with staggered delay — useEffect ensures it runs only once
+  // Auto-reveal with staggered delay - useEffect ensures it runs only once
   useEffect(() => {
     if (!autoReveal || hasFlippedRef.current) return;
     const timer = setTimeout(() => {

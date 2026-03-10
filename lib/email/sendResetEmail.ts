@@ -10,8 +10,8 @@ export async function sendResetEmail(email: string, token: string, locale: strin
   const isEn = locale === 'en';
 
   const subject = isEn
-    ? 'Naruto Mythos — Reset your password'
-    : 'Naruto Mythos — Reinitialiser votre mot de passe';
+    ? 'Naruto Mythos - Reset your password'
+    : 'Naruto Mythos - Reinitialiser votre mot de passe';
 
   const html = `
     <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #0a0a0a; color: #e0e0e0;">

@@ -126,7 +126,7 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
   }
 
   // Matches found: let the player choose which to draw (0 to N)
-  // Don't modify state yet — resolution handler will apply the draw
+  // Don't modify state yet - resolution handler will apply the draw
   return {
     state: newState,
     requiresTargetSelection: true,

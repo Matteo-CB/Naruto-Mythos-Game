@@ -126,7 +126,7 @@ export function calculateEffectiveCost(
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       // Tayuya 125 (R/RA): Non-hidden enemy characters cost an additional 1 Chakra to play in this mission
-      // Only applies to face-visible plays from hand — not to reveals (character is hidden at action start)
+      // Only applies to face-visible plays from hand - not to reveals (character is hidden at action start)
       if (!isReveal && enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
         cost += 1;
       }

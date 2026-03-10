@@ -8,7 +8,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Sound Village | Keywords: Sound Four, Jutsu
  *
  * MAIN [⧗]: Each enemy character in this mission has -1 Power.
- *   → Continuous effect — implemented in ContinuousEffects.ts via calculateContinuousPowerModifier().
+ *   → Continuous effect - implemented in ContinuousEffects.ts via calculateContinuousPowerModifier().
  *
  * UPGRADE: Move a friendly character in play to another mission.
  *   → On upgrade: choose any friendly character in play, then choose destination mission.

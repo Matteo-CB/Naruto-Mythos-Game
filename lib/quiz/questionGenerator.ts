@@ -285,7 +285,7 @@ type Gen = (
   rng: () => number
 ) => QuizQuestion | null;
 
-// --------------- STATS (no images — must recall from memory) ---------------
+// --------------- STATS (no images - must recall from memory) ---------------
 
 const genChakraCostMC: Gen = (chars, _, rng) => {
   const card = pickOne(
@@ -1116,11 +1116,11 @@ const genWhoWinsMissionMC: Gen = (_, __, rng) => {
   const variant = rng();
   let p1Power: number, p2Power: number;
   if (variant < 0.15) {
-    // Both 0 — nobody wins
+    // Both 0 - nobody wins
     p1Power = 0;
     p2Power = 0;
   } else if (variant < 0.4) {
-    // Tie — edge decides
+    // Tie - edge decides
     const power = Math.floor(rng() * 6) + 1;
     p1Power = power;
     p2Power = power;
@@ -1390,7 +1390,7 @@ export function generateQuizQuestions(
   const missions = getPlayableMissions();
   const totalCount = count ?? QUESTION_COUNTS[difficulty] ?? 15;
 
-  // Select generators by difficulty — scenario/strategy questions get high weights
+  // Select generators by difficulty - scenario/strategy questions get high weights
   const generators: Array<{ gen: Gen; weight: number }> = [];
 
   // Difficulty 1+: basic stats (low weight), identity, groups, + new scenario questions
@@ -1449,7 +1449,7 @@ export function generateQuizQuestions(
     );
   }
 
-  // Get rules questions — increase proportion to 30-35%
+  // Get rules questions - increase proportion to 30-35%
   let rulesQs: QuizQuestion[] = [];
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports

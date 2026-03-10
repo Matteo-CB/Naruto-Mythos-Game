@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST — force-forfeit a player in a match
+// POST - force-forfeit a player in a match
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; matchId: string }> },
@@ -119,7 +119,7 @@ export async function POST(
           });
         }
       } else {
-        // No next match = this was the final — tournament complete
+        // No next match = this was the final - tournament complete
         await prisma.tournament.update({
           where: { id },
           data: {

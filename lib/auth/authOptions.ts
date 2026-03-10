@@ -135,7 +135,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return true;
         }
 
-        // No existing user with this discordId — check if there's a linked Account
+        // No existing user with this discordId - check if there's a linked Account
         const existingAccount = await prisma.account.findUnique({
           where: {
             provider_providerAccountId: {
@@ -147,7 +147,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (existingAccount) {
-          // Account already linked — update discordId/username on user
+          // Account already linked - update discordId/username on user
           await prisma.user.update({
             where: { id: existingAccount.userId },
             data: { discordId, discordUsername },
@@ -161,7 +161,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return true;
         }
 
-        // Brand new Discord user — create user + account
+        // Brand new Discord user - create user + account
         // Generate a unique username from Discord username
         let baseUsername = discordUsername.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 17);
         if (baseUsername.length < 3) baseUsername = `user_${discordId.slice(-6)}`;

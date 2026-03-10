@@ -9,7 +9,6 @@ import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { TrainingCoachPanel } from '@/components/game/TrainingCoachPanel';
 
-
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion
 const GameBoard = dynamic(
   () => import('@/components/game/GameBoard').then((mod) => mod.default),
@@ -26,7 +25,6 @@ const GameBoard = dynamic(
 export default function GamePage() {
   const router = useRouter();
   const t = useTranslations('common');
-  const tGame = useTranslations('game');
   const gameState = useGameStore((s) => s.gameState);
   const visibleState = useGameStore((s) => s.visibleState);
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
@@ -51,7 +49,7 @@ export default function GamePage() {
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hasActiveGame) {
-      // Give a brief delay before redirecting — state may be propagating
+      // Give a brief delay before redirecting - state may be propagating
       redirectTimerRef.current = setTimeout(() => {
         if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState) {
           router.push('/');
@@ -79,7 +77,7 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
-  // Handle rematch restart — reset gameOver so the board shows again
+  // Handle rematch restart - reset gameOver so the board shows again
   const rematchState = useSocketStore((s) => s.rematchState);
   const gameOver = useGameStore((s) => s.gameOver);
   useEffect(() => {
@@ -133,7 +131,6 @@ export default function GamePage() {
     <>
       <GameBoard />
       <TrainingCoachPanel />
-
       <LandscapeBlocker />
       {showConnectionLost && (
         <div
@@ -143,7 +140,7 @@ export default function GamePage() {
             color: '#e0e0e0',
           }}
         >
-          {socketErrorKey ? tGame(socketErrorKey.replace('game.', '')) : socketError || tGame('error.connectionLost')}
+          {socketErrorKey ? t(socketErrorKey) : socketError || t('game.error.connectionLost')}
         </div>
       )}
     </>

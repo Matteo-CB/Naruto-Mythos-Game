@@ -58,7 +58,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
     revealedCountRef.current += 1;
 
     if (revealedCountRef.current >= sortedCards.length) {
-      // All cards revealed — lock to prevent more calls
+      // All cards revealed - lock to prevent more calls
       isTransitioningRef.current = true;
 
       setTimeout(() => {
@@ -147,7 +147,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             }}
             onClick={handleBoosterTap}
           >
-            {/* Booster image — displayed naturally, no cropping */}
+            {/* Booster image - displayed naturally, no cropping */}
             <img
               src="/images/booster.webp"
               alt={t('boosterPack')}

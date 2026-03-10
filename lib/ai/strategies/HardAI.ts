@@ -1,5 +1,5 @@
 /**
- * Hard AI — strong level.
+ * Hard AI - strong level.
  *
  * ISMCTS 600 simulations, with neural network guidance when available.
  */

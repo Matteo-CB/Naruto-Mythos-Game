@@ -37,7 +37,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const zoomCard = useUIStore((s) => s.zoomCard);
   const { bannedIds } = useBannedCards();
 
-  // Granular selector — only re-renders when turn ownership actually changes
+  // Granular selector - only re-renders when turn ownership actually changes
   const isMyTurn = useGameStore((s) =>
     !s.isProcessing &&
     s.visibleState?.phase === 'action' &&
@@ -195,7 +195,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </>
       )}
 
-      {/* Power display (bottom-right) — CSS animation replaces Framer Motion repeat:Infinity */}
+      {/* Power display (bottom-right) - CSS animation replaces Framer Motion repeat:Infinity */}
       {!isHidden && (
         <div
           className={`absolute bottom-0.5 right-0.5 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
@@ -270,7 +270,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {/* Stack/upgrade indicator — CSS animation replaces Framer Motion repeat:Infinity */}
+      {/* Stack/upgrade indicator - CSS animation replaces Framer Motion repeat:Infinity */}
       {character.stackSize > 1 && (
         <motion.div
           initial={{ scale: 0 }}
@@ -521,7 +521,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         border: '1px solid rgba(255, 255, 255, 0.04)',
       }}
     >
-      {/* Opponent characters — scrollable when overflowing */}
+      {/* Opponent characters - scrollable when overflowing */}
       <div
         className="flex-1 flex flex-col min-h-0"
       >
@@ -541,7 +541,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
             ))}
           </div>
         </div>
-        {/* Opponent power — compact inline */}
+        {/* Opponent power - compact inline */}
         {oppChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
@@ -554,7 +554,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         )}
       </div>
 
-      {/* Mission card — centered, never pushed */}
+      {/* Mission card - centered, never pushed */}
       <div className="relative w-full flex justify-center shrink-0">
         {/* Drop zone highlight */}
         {isTargetable && (
@@ -577,11 +577,11 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         <MissionCardDisplay mission={mission} index={missionIndex} myPlayer={myPlayer} />
       </div>
 
-      {/* Player characters — scrollable when overflowing */}
+      {/* Player characters - scrollable when overflowing */}
       <div
         className="flex-1 flex flex-col min-h-0"
       >
-        {/* Player power — compact inline */}
+        {/* Player power - compact inline */}
         {myChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
@@ -610,7 +610,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         </div>
       </div>
 
-      {/* Score badge — absolute bottom, always visible */}
+      {/* Score badge - absolute bottom, always visible */}
       <div
         className="shrink-0 flex items-center justify-center gap-1 w-full rounded-md px-1.5 py-0.5"
         style={{

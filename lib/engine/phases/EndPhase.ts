@@ -285,7 +285,7 @@ export function handleRockLee117Move(
           }
         }
 
-        if (validDests.length === 0) continue; // No valid destination — "if able" clause
+        if (validDests.length === 0) continue; // No valid destination - "if able" clause
 
         if (validDests.length === 1) {
           // Auto-move: only 1 valid destination
@@ -346,7 +346,7 @@ export function handleRockLee117Move(
           maxSelections: 1,
           sourceEffectId: effectId,
         }];
-        // Return immediately — wait for player to choose
+        // Return immediately - wait for player to choose
         return newState;
       }
     }
@@ -414,7 +414,7 @@ export function handleAkamaru028Return(state: GameState): GameState {
           maxSelections: 1,
           sourceEffectId: effectId,
         }];
-        // Return immediately — wait for player to choose (or decline)
+        // Return immediately - wait for player to choose (or decline)
         return newState;
       }
     }
@@ -467,7 +467,7 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
 
         // Giant Spider ALWAYS returns to hand at end of round, regardless of hide
         if (validTargets.length === 0) {
-          // No valid hide targets — just return Giant Spider to hand
+          // No valid hide targets - just return Giant Spider to hand
           newState = returnCharacterToHand(newState, char.instanceId, player);
           newState.log = logAction(
             newState.log, newState.turn, 'end', player,
@@ -509,7 +509,7 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
           maxSelections: 1,
           sourceEffectId: effectId,
         }];
-        // Return immediately — wait for player to choose (or decline)
+        // Return immediately - wait for player to choose (or decline)
         return newState;
       }
     }

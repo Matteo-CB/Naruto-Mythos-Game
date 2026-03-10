@@ -46,7 +46,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
 
   const resolveAndSelect = (deckId: string | null) => {
     if (!deckId) {
-      // Random deck — exclude banned cards
+      // Random deck - exclude banned cards
       const availableChars = allCharacters.filter((c) => !bannedIds.has(c.id));
       const availableMissions = allMissions.filter((m) => !bannedIds.has(m.id));
       const shuffledChars = [...availableChars].sort(() => Math.random() - 0.5);
@@ -79,7 +79,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
     }
 
     if (characters.length === 0) {
-      console.warn('[DeckSelector] Deck resolved to 0 characters — IDs may be outdated:', deck.cardIds.slice(0, 5));
+      console.warn('[DeckSelector] Deck resolved to 0 characters - IDs may be outdated:', deck.cardIds.slice(0, 5));
     }
 
     onSelect({ characters, missions });

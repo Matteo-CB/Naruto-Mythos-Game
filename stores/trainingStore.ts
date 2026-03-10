@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Training Mode Store — completely separate from the main game store.
+ * Training Mode Store - completely separate from the main game store.
  * Tracks coaching state for the training mode only.
  * Zero impact on normal gameplay.
  */

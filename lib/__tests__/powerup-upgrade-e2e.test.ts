@@ -58,7 +58,7 @@ describe('POWERUP end-to-end', () => {
     const p1Chars = newState.activeMissions[0].player1Characters;
     expect(p1Chars.length).toBe(2);
 
-    // Effect is optional — pending target selection should be waiting
+    // Effect is optional - pending target selection should be waiting
     expect(newState.pendingEffects.length).toBeGreaterThan(0);
     const pendingEff = newState.pendingEffects.find(e => e.targetSelectionType === 'POWERUP_2_LEAF_VILLAGE');
     expect(pendingEff).toBeDefined();
@@ -193,7 +193,7 @@ describe('UPGRADE end-to-end', () => {
       }],
     });
 
-    // Step 1: Apply the upgrade action — this creates a pending target selection for MAIN effect
+    // Step 1: Apply the upgrade action - this creates a pending target selection for MAIN effect
     const stateAfterUpgrade = GameEngine.applyAction(state, 'player1', {
       type: 'UPGRADE_CHARACTER',
       cardIndex: 0,
@@ -227,7 +227,7 @@ describe('UPGRADE end-to-end', () => {
     const updatedEnemy = finalState.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
     expect(updatedEnemy!.isHidden).toBe(true);
 
-    // UPGRADE effect: POWERUP X where X = enemy power (3) — applied inside naruto108ApplyHide
+    // UPGRADE effect: POWERUP X where X = enemy power (3) - applied inside naruto108ApplyHide
     const finalUpgraded = finalState.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
     expect(finalUpgraded!.powerTokens).toBe(3);
   });
@@ -297,7 +297,7 @@ describe('UPGRADE end-to-end', () => {
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-120-R');
 
-    // MAIN effect is optional ("up to 1" per mission) — should create pending selection
+    // MAIN effect is optional ("up to 1" per mission) - should create pending selection
     const gaara120Pending = newState.pendingEffects.find(e => e.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT');
     expect(gaara120Pending).toBeDefined();
     expect(gaara120Pending!.isOptional).toBe(true);

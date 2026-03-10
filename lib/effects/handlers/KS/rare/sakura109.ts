@@ -14,8 +14,8 @@ import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeChec
  * UPGRADE: MAIN effect: Instead, play the card paying 2 less.
  *
  * Two-stage target selection:
- *   Stage 1: SAKURA109_CHOOSE_DISCARD — choose which Leaf Village char from discard
- *   Stage 2: SAKURA109_CHOOSE_MISSION — choose which mission to play it on
+ *   Stage 1: SAKURA109_CHOOSE_DISCARD - choose which Leaf Village char from discard
+ *   Stage 2: SAKURA109_CHOOSE_MISSION - choose which mission to play it on
  */
 
 function sakura109MainHandler(ctx: EffectContext): EffectResult {

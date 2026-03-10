@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
-// GET — all matches for a tournament (bracket display)
+// GET - all matches for a tournament (bracket display)
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

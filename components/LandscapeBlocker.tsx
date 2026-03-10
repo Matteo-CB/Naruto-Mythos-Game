@@ -12,7 +12,7 @@ async function requestFullscreenAndLandscape() {
       (el as any).webkitRequestFullscreen();
     }
   } catch {
-    // Fullscreen denied — continue anyway
+    // Fullscreen denied - continue anyway
   }
 
   // Try to lock orientation to landscape (Screen Orientation API)
@@ -22,7 +22,7 @@ async function requestFullscreenAndLandscape() {
       await orientation.lock('landscape');
     }
   } catch {
-    // Orientation lock not supported or denied — that's fine
+    // Orientation lock not supported or denied - that's fine
   }
 }
 
@@ -35,7 +35,7 @@ export function LandscapeBlocker() {
 
   return (
     <>
-      {/* Portrait overlay — tells user to rotate to landscape */}
+      {/* Portrait overlay - tells user to rotate to landscape */}
       <div className="portrait-blocker">
         <div className="portrait-blocker-content">
           <div className="phone-rotate-animation">
@@ -52,7 +52,7 @@ export function LandscapeBlocker() {
         </div>
       </div>
 
-      {/* Small floating fullscreen button — visible on touch devices, unobtrusive */}
+      {/* Small floating fullscreen button - visible on touch devices, unobtrusive */}
       <button
         className="fullscreen-float"
         onClick={handleFullscreen}

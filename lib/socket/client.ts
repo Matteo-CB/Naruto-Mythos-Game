@@ -272,7 +272,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Game started');
         set({ gameStarted: true, _lastStateUpdate: Date.now() });
 
-        // Start a periodic resync check — if no state update for 15s during
+        // Start a periodic resync check - if no state update for 15s during
         // an active game, request current state from the server.
         // This prevents the game from appearing stuck if a state-update was lost.
         const existingTimer = get()._resyncTimer;
@@ -286,7 +286,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           }
           const elapsed = Date.now() - (s._lastStateUpdate || 0);
           if (elapsed > 15000 && s._lastStateUpdate > 0) {
-            console.warn('[Socket] No state update for 15s — requesting resync');
+            console.warn('[Socket] No state update for 15s - requesting resync');
             s.socket.emit('game:request-state');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             set({ _lastStateUpdate: Date.now() } as any); // Reset to avoid spamming

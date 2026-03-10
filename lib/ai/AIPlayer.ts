@@ -13,7 +13,7 @@ export type AIDifficulty = 'easy' | 'medium' | 'hard' | 'impossible';
 export interface AIStrategy {
   /**
    * Choose the best action from the set of valid actions.
-   * The AI only receives visible state information — never reads hidden cards.
+   * The AI only receives visible state information - never reads hidden cards.
    */
   chooseAction(state: GameState, player: PlayerID, validActions: GameAction[]): GameAction;
   chooseActionAsync?(state: GameState, player: PlayerID, validActions: GameAction[]): Promise<GameAction>;

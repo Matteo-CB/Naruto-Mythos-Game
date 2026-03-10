@@ -138,7 +138,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 // 120/130 - GAARA (R): Defeat Power<=1 in every mission + UPGRADE POWERUP X
 // ===================================================================
 describe('120/130 - Gaara (R)', () => {
-  it('should prompt player to defeat enemies with Power 1 or less (optional — always shows UI)', () => {
+  it('should prompt player to defeat enemies with Power 1 or less (optional - always shows UI)', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-r', powerTokens: 0 }, {
       id: 'KS-120-R', number: 120, name_fr: 'Gaara', power: 4,
     });
@@ -163,7 +163,7 @@ describe('120/130 - Gaara (R)', () => {
 
     const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
-    // Effect is optional ("up to 1") — always prompts player, never auto-defeats
+    // Effect is optional ("up to 1") - always prompts player, never auto-defeats
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
     expect(result.targetSelectionType).toBe('GAARA120_CHOOSE_DEFEAT');
@@ -348,7 +348,7 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
     const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0, 'MAIN', true));
-    // Cost = 6 - 4 = 2, player has 5 chakra — affordable
+    // Cost = 6 - 4 = 2, player has 5 chakra - affordable
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('SAKURA135_CHOOSE_CARD');
     expect(result.validTargets).toContain('0');

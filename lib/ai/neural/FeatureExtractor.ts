@@ -63,7 +63,7 @@ export class FeatureExtractor {
     for (let m = 0; m < 4; m++) {
       const mission: ActiveMission | undefined = state.activeMissions[m];
       if (!mission) {
-        // Mission not revealed yet — all zeros (no info)
+        // Mission not revealed yet - all zeros (no info)
         idx += 16;
         continue;
       }
@@ -223,7 +223,7 @@ export class FeatureExtractor {
   static flipPerspective(features: Float32Array): Float32Array {
     // We re-extract with swapped players, but since we only have the feature vector
     // we apply known symmetries manually.
-    // Simpler: just re-extract with opposite player — done at the call site.
-    return features; // placeholder — augmentation done at data generation time
+    // Simpler: just re-extract with opposite player - done at the call site.
+    return features; // placeholder - augmentation done at data generation time
   }
 }

@@ -1,5 +1,5 @@
 /**
- * MissionEvaluator — Confidence-based mission scoring for AI decisions.
+ * MissionEvaluator - Confidence-based mission scoring for AI decisions.
  *
  * Each mission is scored using a confidence value (-1.5 to +1.5) that
  * represents how likely the AI is to win it, adjusted for context:
@@ -33,7 +33,7 @@ export class MissionEvaluator {
     mission: ActiveMission,
     player: PlayerID,
   ): number {
-    // Already scored — return the actual outcome
+    // Already scored - return the actual outcome
     if (mission.wonBy) {
       const missionValue = mission.basePoints + mission.rankBonus;
       return mission.wonBy === player ? missionValue * 1.5 : -missionValue * 1.0;
@@ -53,7 +53,7 @@ export class MissionEvaluator {
     const missionValue = mission.basePoints + mission.rankBonus;
     const totalPower = myPower + oppPower;
 
-    // Both at 0 — no one wins
+    // Both at 0 - no one wins
     if (myPower === 0 && oppPower === 0) return 0;
 
     // ─── Calculate base confidence ────────────────────────────────────
@@ -70,12 +70,12 @@ export class MissionEvaluator {
       const powerDiff = myPower - oppPower;
 
       if (powerDiff > 0) {
-        // Winning — confidence scales with lead relative to total power
+        // Winning - confidence scales with lead relative to total power
         const leadRatio = powerDiff / Math.max(1, totalPower);
         confidence = 0.5 + leadRatio * 2.0;
         confidence = Math.min(confidence, 1.5);
       } else if (powerDiff === 0) {
-        // Tied — edge holder wins
+        // Tied - edge holder wins
         confidence = state.edgeHolder === player ? 0.3 : -0.3;
       } else {
         // Losing
@@ -88,7 +88,7 @@ export class MissionEvaluator {
     // ─── Contextual adjustments ───────────────────────────────────────
 
     if (state.phase === 'action') {
-      // Opponent has passed — our advantage/disadvantage is locked in
+      // Opponent has passed - our advantage/disadvantage is locked in
       if (state[opponent].hasPassed && confidence > 0) {
         confidence *= 1.3; // More certain of winning
       }

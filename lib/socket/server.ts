@@ -380,7 +380,7 @@ function startActionTimer(
       if (winner) {
         await finalizeGameEnd(room, code, io, 'score');
       } else if (room.gameState.missionScoringComplete) {
-        // Mission scoring done — auto-advance after brief pause
+        // Mission scoring done - auto-advance after brief pause
         setTimeout(async () => {
           if (!room.gameState || !room.gameState.missionScoringComplete) return;
           room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
@@ -589,7 +589,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           playerRole: player === 'player1' ? 'player1' : 'player2',
         });
 
-        // Re-check if both decks are submitted — if so, create the game
+        // Re-check if both decks are submitted - if so, create the game
         // This handles the case where both players submitted decks but the
         // game creation event was lost due to a socket disconnection
         if (room.hostDeck && room.guestDeck && !room.gameState) {
@@ -747,7 +747,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isSealed: room.isSealed,
       });
 
-      // Room is now full — broadcast updated list (room removed from available)
+      // Room is now full - broadcast updated list (room removed from available)
       if (!room.isPrivate) {
         broadcastRoomList(io);
       }
@@ -922,7 +922,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Game started event emitted to room ${code}`);
 
         // Start action timer once game reaches action phase
-        // (mulligan phase doesn't use the timer — timer starts on first action phase)
+        // (mulligan phase doesn't use the timer - timer starts on first action phase)
         if (room.gameState.phase === 'action') {
           startActionTimer(room, code, io);
         }
@@ -938,7 +938,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // State resync request — client can request current state if they think they're stuck
+    // State resync request - client can request current state if they think they're stuck
     socket.on('game:request-state', () => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1020,7 +1020,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
 
         if (isPlayAction && room.gameState.log.length === oldLogLength) {
-          // Action was rejected — get the specific validation reason
+          // Action was rejected - get the specific validation reason
           let errorMessage = 'Action not allowed.';
           let errorKey = 'game.error.actionNotAllowed';
           let errorParams: Record<string, string | number> | undefined;
@@ -1080,7 +1080,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (winner) {
           await finalizeGameEnd(room, code, io, 'score');
         } else if (room.gameState.missionScoringComplete) {
-          // Mission scoring done — wait briefly so clients see SCORE results, then auto-advance
+          // Mission scoring done - wait briefly so clients see SCORE results, then auto-advance
           clearActionTimer(room);
           setTimeout(async () => {
             try {
@@ -1099,13 +1099,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
             }
           }, 1500);
         } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
-          // Opponent must respond to a forced choice — start their timer, pause active player's
+          // Opponent must respond to a forced choice - start their timer, pause active player's
           startForcedResolverTimer(room, code, io);
         } else if (room.gameState.phase === 'action') {
           // Restart timer for next active player
           startActionTimer(room, code, io);
         } else {
-          // Phase changed (mission, end, etc.) — clear timer
+          // Phase changed (mission, end, etc.) - clear timer
           clearActionTimer(room);
         }
       } catch (err) {
@@ -1243,7 +1243,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             foundRoom = room;
             break;
           } else {
-            // Stale room — host disconnected without cleanup
+            // Stale room - host disconnected without cleanup
             console.log(`[Socket] Matchmaking: removing stale room ${code} (host socket disconnected)`);
             rooms.delete(code);
             playerRooms.delete(room.hostSocket);

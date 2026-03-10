@@ -219,13 +219,13 @@ export default function DeckBuilderPage() {
       return;
     }
 
-    // Last part is the deck name (underscores = spaces) — only if it doesn't contain '--'
+    // Last part is the deck name (underscores = spaces) - only if it doesn't contain '--'
     const lastPart = parts[parts.length - 1];
     const hasDeckName = !lastPart.includes("--");
     const deckNameFromCode = hasDeckName ? lastPart.replace(/_/g, " ") : "";
     const cardParts = hasDeckName ? parts.slice(0, -1) : parts;
 
-    // Build lookup maps by cardId — use ALL cards (not just playable) so imports
+    // Build lookup maps by cardId - use ALL cards (not just playable) so imports
     // work for cards without visuals and banned cards too
     const charByCardId = new Map(allChars.map((c) => [c.cardId, c]));
     const missionByCardId = new Map(allMissions.map((m) => [m.cardId, m]));
@@ -628,7 +628,7 @@ export default function DeckBuilderPage() {
 
         {/* Available cards */}
         <div className="flex-1 overflow-y-auto px-4 py-3">
-          {/* Import section — prominent */}
+          {/* Import section - prominent */}
           <div className="mb-5 border border-[#262626] bg-[#0e0e0e]">
             <div className="px-4 py-3">
               <h2 className="text-sm font-bold text-[#e0e0e0] mb-1">

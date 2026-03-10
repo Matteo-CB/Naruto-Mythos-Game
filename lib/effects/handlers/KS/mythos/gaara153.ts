@@ -1,6 +1,6 @@
 /**
  * Card 120/130 V - GAARA (MV)
- * Same effects as KS-120-R — handler registered in gaara120.ts (rare).
+ * Same effects as KS-120-R - handler registered in gaara120.ts (rare).
  * This file is kept for import compatibility from mythos/index.ts.
  */
 

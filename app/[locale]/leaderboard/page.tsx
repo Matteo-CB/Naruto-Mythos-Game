@@ -71,7 +71,7 @@ export default function LeaderboardPage() {
             {t('title')}
           </h1>
           <div className="flex items-center gap-3">
-            {/* View Leagues button — only when leagues enabled */}
+            {/* View Leagues button - only when leagues enabled */}
             {leaguesEnabled && (
               <button
                 onClick={() => setLeaguesModalOpen(true)}
@@ -100,7 +100,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {/* Subtitle — only when leagues enabled */}
+        {/* Subtitle - only when leagues enabled */}
         {leaguesEnabled && (
           <p
             className="text-xs mb-4"
@@ -184,7 +184,7 @@ export default function LeaderboardPage() {
                       />
                     </span>
 
-                    {/* League Badge — only when leagues enabled */}
+                    {/* League Badge - only when leagues enabled */}
                     {leaguesEnabled && (
                       <span className="hidden sm:flex items-center">
                         <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
@@ -239,7 +239,7 @@ export default function LeaderboardPage() {
       </div>
       <Footer />
 
-      {/* Leagues Modal — only rendered when leagues enabled */}
+      {/* Leagues Modal - only rendered when leagues enabled */}
       {leaguesEnabled && (
         <LeaguesModal open={leaguesModalOpen} onClose={() => setLeaguesModalOpen(false)} />
       )}

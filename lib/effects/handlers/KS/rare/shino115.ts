@@ -8,7 +8,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Leaf Village | Keywords: Équipe 8, Jutsu
  *
  * MAIN [⧗]: Friendly characters in this mission cannot be hidden by enemy effects.
- *   → Continuous effect — implemented in ContinuousEffects.ts via checkCanHideCharacter().
+ *   → Continuous effect - implemented in ContinuousEffects.ts via checkCanHideCharacter().
  *
  * AMBUSH: Move a friendly character in this mission to another mission.
  *   → On reveal: choose a friendly in this mission, then choose destination mission.

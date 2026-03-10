@@ -134,7 +134,7 @@ export class GameEngine {
     if (!newState.actionHistory) newState.actionHistory = [];
     newState.actionHistory.push({ player, action });
 
-    // FORFEIT can happen in any phase — handle before the phase switch
+    // FORFEIT can happen in any phase - handle before the phase switch
     if (action.type === 'FORFEIT') {
       newState.phase = 'gameOver';
       newState.forfeitedBy = player;
@@ -203,7 +203,7 @@ export class GameEngine {
             newState = resolveChosenScoreEffect(newState, label);
             // If new pending actions were created (either another CHOOSE_SCORE_ORDER or a handler pending), wait
             if (newState.pendingActions.length > 0) break;
-            // All SCORE effects for this mission resolved — resume remaining missions
+            // All SCORE effects for this mission resolved - resume remaining missions
             if (newState.missionScoringProgress) {
               newState = resumeMissionScoring(newState);
               if (newState.pendingActions.length > 0) break;
@@ -223,7 +223,7 @@ export class GameEngine {
               // If resumption created new pending actions, wait for resolution
               if (newState.pendingActions.length > 0) break;
             }
-            // All SCORE effects resolved — pause for UI to show results
+            // All SCORE effects resolved - pause for UI to show results
             newState.missionScoringComplete = true;
           }
         }
@@ -247,7 +247,7 @@ export class GameEngine {
             newState = handleGiantSpider103EndOfRound(newState);
             if (newState.pendingActions.length > 0) break; // More choices needed
 
-            // All end-of-round effects resolved — finish end phase transition
+            // All end-of-round effects resolved - finish end phase transition
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
             newState.endPhaseGiantSpider103Ids = undefined;
@@ -345,7 +345,7 @@ export class GameEngine {
   static transitionToMissionPhase(state: GameState): GameState {
     // Guard: prevent double execution of mission scoring in the same turn
     if (state.missionScoredThisTurn) {
-      console.warn('[GameEngine] transitionToMissionPhase called twice in the same turn — skipping');
+      console.warn('[GameEngine] transitionToMissionPhase called twice in the same turn - skipping');
       return GameEngine.transitionToEndPhase(state);
     }
 
@@ -361,7 +361,7 @@ export class GameEngine {
       return newState;
     }
 
-    // All scoring done — pause so UI can show SCORE results (POWERUP tokens, etc.)
+    // All scoring done - pause so UI can show SCORE results (POWERUP tokens, etc.)
     // before End Phase removes them. The caller sends ADVANCE_PHASE to proceed.
     newState.missionScoringComplete = true;
     return newState;
@@ -460,7 +460,7 @@ export class GameEngine {
       // Find the associated PendingEffect
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
       if (!pendingEffect) {
-        // No effect found — just remove the pending action
+        // No effect found - just remove the pending action
         newState.pendingActions = newState.pendingActions.filter((p) => p.id !== action.pendingActionId);
         return newState;
       }
@@ -478,7 +478,7 @@ export class GameEngine {
       const effect = newState.pendingEffects[effectIdx];
       if (!effect.isOptional) return state;
 
-      // Special case: Gaara 120 — declining means "skip this mission, continue to remaining missions"
+      // Special case: Gaara 120 - declining means "skip this mission, continue to remaining missions"
       if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {
         let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
         try { gDesc = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -507,7 +507,7 @@ export class GameEngine {
           }
           if (validTargets_g.length === 0) continue;
 
-          // Prompt for this mission (isOptional: true — player can skip)
+          // Prompt for this mission (isOptional: true - player can skip)
           const chainData = JSON.stringify({ defeatedCount, nextMissionIndex: mi + 1, isUpgrade, sourceInstanceId, sourceMissionIndex, missionIndex: mi });
           const effId = generateInstanceId();
           const actId = generateInstanceId();
@@ -568,7 +568,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Dosu 069 — declining means the opponent lets the character be defeated
+      // Special case: Dosu 069 - declining means the opponent lets the character be defeated
       if (effect.targetSelectionType === 'DOSU069_OPPONENT_CHOICE') {
         let parsed: { targetInstanceId?: string; sourcePlayer?: string } = {};
         try { parsed = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -594,7 +594,7 @@ export class GameEngine {
         }
       }
 
-      // Special case: Gemma 049 sacrifice (defeat) — declining means the original target gets defeated
+      // Special case: Gemma 049 sacrifice (defeat) - declining means the original target gets defeated
       if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE') {
         let parsed049: { targetInstanceId?: string; effectSource?: string } = {};
         try { parsed049 = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -621,7 +621,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Gemma 049 sacrifice (hide) — declining means the original target gets hidden
+      // Special case: Gemma 049 sacrifice (hide) - declining means the original target gets hidden
       if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
         let parsed049h: { targetInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
         try { parsed049h = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -699,7 +699,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Giant Spider 103 — declining the hide still returns Giant Spider to hand
+      // Special case: Giant Spider 103 - declining the hide still returns Giant Spider to hand
       if (effect.targetSelectionType === 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET') {
         let k103Data: { giantSpiderInstanceId?: string } = {};
         try { k103Data = JSON.parse(effect.effectDescription); } catch { /* ignore */ }

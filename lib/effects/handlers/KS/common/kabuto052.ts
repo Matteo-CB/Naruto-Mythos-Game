@@ -39,7 +39,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
   newState[opponentPlayer] = ops;
 
   // Find valid missions to place the hidden character
-  // The stolen card is placed HIDDEN — hidden characters have no visible name,
+  // The stolen card is placed HIDDEN - hidden characters have no visible name,
   // so the same-name restriction does NOT apply. Any mission is valid.
   // The name conflict will only be checked later if/when the hidden card is revealed.
   const validMissionIndices: number[] = [];

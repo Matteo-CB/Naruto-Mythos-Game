@@ -27,7 +27,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
   // Process missions sequentially. For each mission with valid targets, always prompt the player
-  // (effect is optional — "up to 1" means the player can skip defeating in any mission).
+  // (effect is optional - "up to 1" means the player can skip defeating in any mission).
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
     const enemyChars = mission[enemySide];
@@ -37,7 +37,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
       continue;
     }
 
-    // Always show selection UI — player can skip this mission (optional "up to 1")
+    // Always show selection UI - player can skip this mission (optional "up to 1")
     return {
       state,
       requiresTargetSelection: true,

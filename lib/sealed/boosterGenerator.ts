@@ -77,10 +77,10 @@ export function generateBooster(boosterIndex: number): BoosterPack {
   // Secret: 10% chance, Legendary: 0.125% chance (Mythos excluded from sealed)
   const specialRoll = Math.random();
   if (specialRoll < 0.00125 && legendaries.length > 0) {
-    // Legendary — replace last card
+    // Legendary - replace last card
     cards[cards.length - 1] = toBoosterCard(pickRandom(legendaries), true);
   } else if (specialRoll < 0.10 && secrets.length > 0) {
-    // Secret — replace last card
+    // Secret - replace last card
     cards[cards.length - 1] = toBoosterCard(pickRandom(secrets), true);
   }
 

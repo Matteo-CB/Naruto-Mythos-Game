@@ -11,8 +11,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *   - No chakra cost is paid for this placement.
  *
  * Two-stage target selection:
- *   Stage 1: MSS08_CHOOSE_CARD — choose which card from hand
- *   Stage 2: MSS08_CHOOSE_MISSION — choose which mission to place it on
+ *   Stage 1: MSS08_CHOOSE_CARD - choose which card from hand
+ *   Stage 2: MSS08_CHOOSE_MISSION - choose which mission to place it on
  */
 
 function mss08ScoreHandler(ctx: EffectContext): EffectResult {

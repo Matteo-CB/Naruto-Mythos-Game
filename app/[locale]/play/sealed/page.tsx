@@ -70,7 +70,7 @@ export default function SealedPage() {
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [boosterCount, setBoosterCount] = useState<4 | 5 | 6>(6);
 
-  // Auth check — redirect to login if not authenticated
+  // Auth check - redirect to login if not authenticated
   useEffect(() => {
     if (status === 'loading') return;
     if (status === 'unauthenticated') {

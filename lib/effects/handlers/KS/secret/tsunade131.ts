@@ -20,6 +20,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
     for (let j = 0; j < friendlyChars.length; j++) {
       const char = friendlyChars[j];
       if (char.isHidden) continue;
+      if (char.instanceId === ctx.sourceCard.instanceId) continue; // Don't POWERUP itself
       const topCard =
         char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.group === "Leaf Village") {

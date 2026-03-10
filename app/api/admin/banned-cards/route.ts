@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db/prisma';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-// GET — list all banned card IDs (public, needed by all clients)
+// GET - list all banned card IDs (public, needed by all clients)
 export async function GET() {
   try {
     const bannedCards = await prisma.bannedCard.findMany({
@@ -20,7 +20,7 @@ export async function GET() {
   }
 }
 
-// POST — toggle a card's ban status (admin only)
+// POST - toggle a card's ban status (admin only)
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();

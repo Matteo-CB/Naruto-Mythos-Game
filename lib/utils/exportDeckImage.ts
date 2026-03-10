@@ -25,7 +25,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 /**
  * Generate a deck image as a downloadable PNG.
- * Fully client-side — no DB storage.
+ * Fully client-side - no DB storage.
  */
 export async function exportDeckAsImage(
   deckName: string,

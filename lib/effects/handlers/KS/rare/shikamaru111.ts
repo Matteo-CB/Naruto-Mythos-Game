@@ -54,7 +54,7 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Always require target selection (effect is optional — player can skip)
+  // Always require target selection (effect is optional - player can skip)
   return {
     state,
     requiresTargetSelection: true,

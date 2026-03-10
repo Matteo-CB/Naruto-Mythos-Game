@@ -14,8 +14,8 @@ import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeChec
  * UPGRADE (effect:): Instead, play the card paying 4 less.
  *
  * Two-stage target selection:
- *   Stage 1: SAKURA135_CHOOSE_CARD — choose which character card from top 3 to play
- *   Stage 2: SAKURA135_CHOOSE_MISSION — choose which mission to play it on
+ *   Stage 1: SAKURA135_CHOOSE_CARD - choose which character card from top 3 to play
+ *   Stage 2: SAKURA135_CHOOSE_MISSION - choose which mission to play it on
  *
  * The handler draws the top 3 cards and stores them in the pending state.
  * The EffectEngine methods handle the rest.
@@ -59,7 +59,7 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
   }
 
   if (validIndices.length === 0) {
-    // No affordable character cards — discard all
+    // No affordable character cards - discard all
     ps.discardPile = [...ps.discardPile, ...topCards];
     newState[sourcePlayer] = ps;
     const log = logAction(
