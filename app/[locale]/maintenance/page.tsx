@@ -236,7 +236,7 @@ export default function MaintenancePage() {
             animation: 'pulse-dot 2s ease-in-out infinite',
           }}
         />
-        <span className="font-body">Preview mode</span>
+        <span className="font-body">{t('statusOffline')}</span>
       </div>
 
       <style jsx>{`

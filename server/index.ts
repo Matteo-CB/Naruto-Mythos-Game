@@ -2,8 +2,9 @@ import express from 'express';
 import { createServer } from 'http';
 import next from 'next';
 import { Server as SocketIOServer } from 'socket.io';
-import { setupSocketHandlers } from '@/lib/socket/server';
+import { setupSocketHandlers, startMaintenanceDrain } from '@/lib/socket/server';
 import { setIO } from '@/lib/socket/io';
+import { isMaintenanceActive } from '@/lib/socket/maintenance';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = process.env.HOSTNAME || 'localhost';
@@ -51,6 +52,31 @@ app.prepare().then(() => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // Maintenance mode redirect (before Next.js handler)
+  expressApp.use((req, res, nextMiddleware) => {
+    if (!isMaintenanceActive()) return nextMiddleware();
+
+    const url = req.url;
+
+    // Allow through: API routes, maintenance page, static assets, _next
+    if (
+      url.startsWith('/api/') ||
+      url.includes('/maintenance') ||
+      url.startsWith('/_next/') ||
+      url.startsWith('/images/') ||
+      url.startsWith('/fonts/') ||
+      /\.(ico|png|jpg|webp|svg|css|js|woff2?)(\?|$)/.test(url)
+    ) {
+      return nextMiddleware();
+    }
+
+    // Detect locale from URL or default to 'en'
+    const localeMatch = url.match(/^\/(en|fr)(\/|$)/);
+    const locale = localeMatch ? localeMatch[1] : 'en';
+
+    res.redirect(302, `/${locale}/maintenance`);
+  });
+
   expressApp.all(/.*/, (req, res) => {
     return handle(req, res);
   });
@@ -60,40 +86,18 @@ app.prepare().then(() => {
     console.log(`> Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 
-  // Graceful shutdown - warn clients before going down
-  const gracefulShutdown = async (signal: string) => {
-    console.log(`> ${signal} received. Starting graceful shutdown...`);
+  // Graceful shutdown - use maintenance drain to let games finish
+  const gracefulShutdown = (signal: string) => {
+    console.log(`> ${signal} received. Starting maintenance drain...`);
 
-    // 1. Warn all connected clients
-    try {
-      io.emit('server:maintenance', { timestamp: Date.now() });
-      console.log('> Maintenance warning sent to all connected clients');
-    } catch (err) {
-      console.error('> Failed to emit maintenance warning:', err);
+    // If maintenance drain was already triggered via API, let it continue
+    if (isMaintenanceActive()) {
+      console.log('> Maintenance already active, waiting for drain to complete.');
+      return;
     }
 
-    // 2. Wait so clients receive the message
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // 3. Disconnect all sockets
-    try {
-      io.disconnectSockets(true);
-      console.log('> All sockets disconnected');
-    } catch (err) {
-      console.error('> Error disconnecting sockets:', err);
-    }
-
-    // 4. Close HTTP server
-    httpServer.close(() => {
-      console.log('> HTTP server closed');
-      process.exit(0);
-    });
-
-    // 5. Force exit after 10s if close hangs
-    setTimeout(() => {
-      console.error('> Forced shutdown after timeout');
-      process.exit(1);
-    }, 10000);
+    // Start the drain (blocks new games, waits up to 5 min for active games)
+    startMaintenanceDrain(io);
   };
 
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

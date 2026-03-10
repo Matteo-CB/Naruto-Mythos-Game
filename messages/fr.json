@@ -20,7 +20,8 @@
     "fullscreen": "Plein écran",
     "play": "Jouer",
     "close": "Fermer",
-    "all": "Tous"
+    "all": "Tous",
+    "maintenanceBanner": "Maintenance imminente du serveur. Aucune nouvelle partie ne pourra etre lancee apres votre partie en cours. Le site sera de retour dans quelques minutes."
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -623,7 +624,8 @@
       "connectionLost": "Connexion au serveur perdue.",
       "reconnectFailed": "Impossible de se reconnecter au serveur.",
       "notConnected": "Non connecte au serveur.",
-      "maintenance": "Le serveur est en maintenance. Veuillez patienter..."
+      "maintenance": "Le serveur est en maintenance. Veuillez patienter...",
+      "maintenanceNoNewGames": "Le serveur entre en maintenance. Aucune nouvelle partie ne peut etre lancee. Le site sera de retour dans quelques minutes."
     }
   },
   "collection": {
@@ -2028,6 +2030,7 @@
     "title": "NARUTO MYTHOS",
     "subtitle": "Jeu de Cartes a Collectionner",
     "message": "Le simulateur est en maintenance, la mise a jour dure environ 5 minutes.",
-    "timerLabel": "Temps ecoule"
+    "timerLabel": "Temps ecoule",
+    "statusOffline": "Serveur hors ligne"
   }
 }

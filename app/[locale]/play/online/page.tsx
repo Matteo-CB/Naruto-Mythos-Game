@@ -100,6 +100,14 @@ export default function PlayOnlinePage() {
     }
   }, [error, clearError]);
 
+  // Redirect to maintenance page if server is draining and player is not in a game
+  const maintenanceWarning = useSocketStore((s) => s.maintenanceWarning);
+  useEffect(() => {
+    if (maintenanceWarning && !gameStarted) {
+      router.push('/maintenance');
+    }
+  }, [maintenanceWarning, gameStarted, router]);
+
   // When game starts: initialize gameStore with online state and navigate to /game
   const playerNames = useSocketStore((s) => s.playerNames);
   const gameInitRef = useRef(false);

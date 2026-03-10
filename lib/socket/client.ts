@@ -46,6 +46,9 @@ interface SocketStore {
   // Public room browser
   publicRooms: PublicRoom[];
 
+  // Maintenance
+  maintenanceWarning: boolean;
+
   // Rematch state
   rematchState: 'none' | 'offered' | 'received' | 'accepted' | 'declined';
 
@@ -98,6 +101,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   actionDeadline: null,
   isSealedRoom: false,
   publicRooms: [],
+  maintenanceWarning: false,
   rematchState: 'none',
   sealedBoosters: null,
   sealedAllCards: null,
@@ -447,6 +451,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ error: 'Server maintenance', errorKey: 'game.error.maintenance' });
       });
 
+      socket.on('server:maintenance-warning', () => {
+        console.log('[Socket] Maintenance warning received');
+        set({ maintenanceWarning: true });
+      });
+
       set({ socket });
     });
   },
@@ -472,6 +481,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         gameResult: null,
         actionDeadline: null,
         publicRooms: [],
+        maintenanceWarning: false,
         rematchState: 'none',
         isSealedRoom: false,
         sealedBoosters: null,

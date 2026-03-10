@@ -29,6 +29,7 @@ import { normalizeImagePath } from "@/lib/utils/imagePath";
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/utils/cardLocale";
 import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
+import { useSocketStore } from "@/lib/socket/client";
 
 // ----- Shared color maps -----
 
@@ -910,6 +911,45 @@ function FullscreenCardDetail() {
   );
 }
 
+// ----- Maintenance Notification -----
+
+function MaintenanceNotification() {
+  const t = useTranslations('common');
+  const socketWarning = useSocketStore((s) => s.maintenanceWarning);
+  const [apiWarning, setApiWarning] = useState(false);
+
+  // For AI/hotseat games (no socket), poll the API once on mount
+  useEffect(() => {
+    if (socketWarning) return;
+    fetch('/api/admin/maintenance')
+      .then((r) => { if (r.ok) return r.json(); return null; })
+      .then((data) => { if (data?.active) setApiWarning(true); })
+      .catch(() => {});
+  }, [socketWarning]);
+
+  if (!socketWarning && !apiWarning) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 40 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-14 right-3 z-300 flex items-start gap-2 px-4 py-3 rounded-lg"
+      style={{
+        maxWidth: '340px',
+        backgroundColor: 'rgba(40, 30, 10, 0.92)',
+        border: '1px solid rgba(196, 163, 90, 0.25)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(12px)',
+      }}
+    >
+      <span className="text-[9px] leading-relaxed" style={{ color: '#c4a35a', fontFamily: 'Inter, sans-serif' }}>
+        {t('maintenanceBanner')}
+      </span>
+    </motion.div>
+  );
+}
+
 // ----- Beta Test Notification -----
 
 const BETA_DISMISSED_KEY = 'naruto-mythos-beta-dismissed';
@@ -1072,6 +1112,7 @@ function GameBoardInner() {
         style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }}
       />
 
+      <MaintenanceNotification />
       <BetaNotification />
       <SandboxToolbar />
 
