@@ -605,7 +605,20 @@ export class EffectEngine {
     const targetId = selectedTargets[0]; // Most effects select 1 target
 
     // Validate target is in valid targets list (prevents wrong character from being affected)
-    if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
+    // Multi-select types (Kiba 026 / Tayuya 065 UPGRADE) send comma-separated indices or "skip"
+    const isMultiSelectType = pendingEffect.targetSelectionType === 'KIBA026_UPGRADE_CHOOSE'
+      || pendingEffect.targetSelectionType === 'TAYUYA065_UPGRADE_CHOOSE';
+    if (isMultiSelectType) {
+      // Allow "skip" to pass through; validate each comma-separated index
+      if (targetId !== 'skip' && pendingEffect.validTargets && pendingEffect.validTargets.length > 0) {
+        const indices = targetId.split(',');
+        const allValid = indices.every(idx => pendingEffect.validTargets!.includes(idx));
+        if (!allValid) {
+          console.warn(`[EffectEngine] Invalid multi-select target ${targetId} — not all in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
+          return state;
+        }
+      }
+    } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
       console.warn(`[EffectEngine] Invalid target ${targetId} — not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
       return state;
     }
@@ -1489,7 +1502,7 @@ export class EffectEngine {
       }
 
       // =============================================
-      // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for enemy target
+      // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for target (any side)
       // =============================================
       case 'KIBA113_CHOOSE_AKAMARU':
       case 'KIBA113_CHOOSE_AKAMARU_DEFEAT': {
@@ -1501,6 +1514,7 @@ export class EffectEngine {
         if (!k113Data) break;
 
         const srcMI = k113Data.sourceMissionIndex;
+        const friendlySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         const enemySide_k113 = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
         // Apply action to the chosen Akamaru (targetId)
@@ -1516,12 +1530,13 @@ export class EffectEngine {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         }
 
-        // Gather valid targets for step 2 in source mission: non-hidden enemies
+        // Gather valid targets for step 2: ANY non-hidden character in source mission
+        // (both friendly and enemy), excluding Kiba himself and the Akamaru just targeted
         const srcMission_k113 = newState.activeMissions[srcMI];
         if (!srcMission_k113) break;
         const step2Targets: string[] = [];
-        for (const char of srcMission_k113[enemySide_k113]) {
-          if (!char.isHidden) {
+        for (const char of [...srcMission_k113[friendlySide_k113], ...srcMission_k113[enemySide_k113]]) {
+          if (!char.isHidden && char.instanceId !== targetId && char.instanceId !== pendingEffect.sourceInstanceId) {
             step2Targets.push(char.instanceId);
           }
         }
@@ -1529,7 +1544,7 @@ export class EffectEngine {
         if (step2Targets.length === 0) {
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No non-hidden enemy in this mission to target.',
+            'EFFECT_NO_TARGET', 'Kiba Inuzuka (113): No non-hidden character in this mission to target.',
             'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-113-R' },
           );
           break;
@@ -1538,8 +1553,8 @@ export class EffectEngine {
         const step2Type = isDefeatMode ? 'KIBA113_DEFEAT_TARGET' : 'KIBA113_HIDE_TARGET';
         const step2DescKey = isDefeatMode ? 'game.effect.desc.kiba113Defeat' : 'game.effect.desc.kiba113Hide';
         const step2Desc = isDefeatMode
-          ? 'Kiba Inuzuka (113) UPGRADE: Choose an enemy character in this mission to defeat.'
-          : 'Kiba Inuzuka (113): Choose an enemy character in this mission to hide.';
+          ? 'Kiba Inuzuka (113) UPGRADE: Choose a character in this mission to defeat.'
+          : 'Kiba Inuzuka (113): Choose a character in this mission to hide.';
 
         const step2EffId = generateInstanceId();
         const step2ActId = generateInstanceId();

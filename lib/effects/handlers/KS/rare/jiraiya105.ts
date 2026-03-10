@@ -3,6 +3,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 function handleJiraiya105Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -37,10 +38,21 @@ function handleJiraiya105Main(ctx: EffectContext): EffectResult {
 }
 
 function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
+
+  // Defensive: re-lookup Jiraiya's actual position (may differ from ctx.sourceMissionIndex
+  // if the MAIN effect resolution changed state before UPGRADE fires via processRemainingEffects)
+  const charResult = EffectEngine.findCharByInstanceId(state, sourceCard.instanceId);
+  const actualMissionIndex = charResult?.missionIndex ?? ctx.sourceMissionIndex;
+
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-  const mission = state.activeMissions[sourceMissionIndex];
+  const mission = state.activeMissions[actualMissionIndex];
+  if (!mission) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Jiraiya (105) UPGRADE: Mission not found.',
+      'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' }) } };
+  }
   const enemyChars = mission[enemySide];
 
   const validTargets: string[] = enemyChars.map((c: CharacterInPlay) => c.instanceId);
