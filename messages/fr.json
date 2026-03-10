@@ -75,7 +75,7 @@
     "chakra": "Chakra",
     "power": "Puissance",
     "score": "Score",
-    "edge": "Jeton d'Avantage",
+    "edge": "Jeton d'Edge",
     "deck": "Deck",
     "discard": "Defausse",
     "opponentDiscard": "Defausse adversaire",
@@ -261,7 +261,7 @@
       "finalScore": "Score Final",
       "playAgain": "Rejouer",
       "backToMenu": "Retour au Menu",
-      "tieBreaker": "Egalite brisee par le detenteur du Jeton d'Avantage",
+      "tieBreaker": "Egalite brisee par le detenteur du Jeton d'Edge",
       "rankedMatch": "Match Classe",
       "opponentAbandoned": "L'adversaire a abandonne",
       "youAbandoned": "Vous avez abandonne",
@@ -1042,7 +1042,7 @@
           "desc": "Remportez les missions en ayant la plus grande puissance totale.",
           "ranks": "Tour 1 = D (+1pt), Tour 2 = C (+2pt), Tour 3 = B (+3pt), Tour 4 = A (+4pt)",
           "scoring": "Total = base + bonus de rang. La plus grande puissance l'emporte.",
-          "edge": "Les egalites sont brisees par le detenteur du Jeton d'Avantage",
+          "edge": "Les egalites sont brisees par le detenteur du Jeton d'Edge",
           "minimum": "Minimum 1 de puissance pour gagner une mission",
           "ranksTitle": "Rangs de Mission",
           "ranksBubble": "Tour 1 = D (+1pt), Tour 2 = C (+2pt), Tour 3 = B (+3pt), Tour 4 = A (+4pt)",
@@ -1050,8 +1050,8 @@
           "bonusBubble": "Total = base + bonus de rang. La plus grande puissance l'emporte.",
           "powerTitle": "La Puissance gagne",
           "powerBubble": "Minimum 1 de puissance pour gagner une mission",
-          "edgeTitle": "Jeton d'Avantage",
-          "edgeBubble": "Les égalités sont brisées par le détenteur du Jeton d'Avantage"
+          "edgeTitle": "Jeton d'Edge",
+          "edgeBubble": "Les égalités sont brisées par le détenteur du Jeton d'Edge"
         },
         "upgrade": {
           "title": "UPGRADE de personnage",
@@ -1072,10 +1072,10 @@
         "special": {
           "title": "Mecaniques speciales",
           "desc": "Les mecaniques cles qui font la difference.",
-          "edgeToken": "Jeton d'Avantage : Le premier a passer le recoit. Brise les egalites, determine l'ordre de jeu.",
+          "edgeToken": "Jeton d'Edge : Le premier a passer le recoit. Brise les egalites, determine l'ordre de jeu.",
           "powerTokens": "Jetons de Puissance : Ajoutes par POWERUP. Retires a chaque Phase de Fin.",
           "deckRules": "Deck : Min 30 personnages, max 2 copies par version, exactement 3 missions.",
-          "edgeTitle": "Jeton d'Avantage",
+          "edgeTitle": "Jeton d'Edge",
           "edgeDesc": "Le premier à passer le reçoit. Brise les égalités, détermine l'ordre de jeu.",
           "tokensTitle": "Jetons de Puissance",
           "tokensDesc": "Ajoutés par POWERUP. Retirés à chaque Phase de Fin.",
@@ -1093,7 +1093,7 @@
           "costLabel": "Coût",
           "youLabel": "Vous",
           "oppLabel": "Adversaire",
-          "edgeLabel": "Jeton d'Avantage",
+          "edgeLabel": "Jeton d'Edge",
           "pointsLabel": "Points",
           "tokensLabel": "Jetons de Puissance",
           "removedLabel": "Retirés",
@@ -1110,7 +1110,7 @@
           "step4Title": "Phase d'Action : Adversaire caché",
           "step4Bubble": "L'adversaire joue un personnage caché pour 1 chakra. Aucun effet ne s'active. Vous ne pouvez pas voir de quelle carte il s'agit.",
           "step5Title": "Phase d'Action : Passer",
-          "step5Bubble": "Les deux joueurs passent. Le premier joueur a passer obtient le Jeton d'Avantage pour le prochain tour. Le Jeton brise les égalités et détermine qui joue en premier.",
+          "step5Bubble": "Les deux joueurs passent. Le premier joueur a passer obtient le Jeton d'Edge pour le prochain tour. Le Jeton brise les égalités et détermine qui joue en premier.",
           "step6Title": "Phase de Mission : Score",
           "step6Bubble": "Résolution des missions ! Votre Naruto a 3 de puissance. Les personnages cachés ont 0 de puissance. Vous remportez la mission et gagnez +1 point (bonus rang D).",
           "step7Title": "Phase de Fin",
@@ -1258,7 +1258,7 @@
         "higherPower": "Lequel de ces personnages a la plus grande Puissance ?",
         "startPhaseChakra": "Phase de Debut : Vous controlez {count} personnage(s) en jeu. Combien de chakra gagnez-vous ?",
         "missionTotalPoints": "Une mission avec {base} points de base est placee au tour {rank} (bonus de rang +{bonus}). Quel est le total ?",
-        "whoWinsMission": "J1 a {p1Power} de puissance, J2 a {p2Power} de puissance. Le joueur {edge} a l'Avantage. Qui gagne ?",
+        "whoWinsMission": "J1 a {p1Power} de puissance, J2 a {p2Power} de puissance. Le joueur {edge} a l'Edge. Qui gagne ?",
         "canUpgrade": "Pouvez-vous UPGRADE {name} du cout {fromCost} au cout {toCost} ?",
         "missionRank": "Quel rang a une mission placee au tour {turn} ?",
         "canAfford": "Vous avez {chakra} chakra. Pouvez-vous jouer {name} (cout {cost}) ?",
@@ -1283,7 +1283,7 @@
         "higherPower": "{name} a la plus grande Puissance avec {value}.",
         "startPhaseChakra": "Base {base} + {count} personnage(s) = {total} chakra.",
         "missionTotalPoints": "Base {base} + bonus de rang {bonus} = {total} points.",
-        "whoWinsMission": "J1 : {p1Power} puissance, J2 : {p2Power} puissance, Avantage : Joueur {edge}.",
+        "whoWinsMission": "J1 : {p1Power} puissance, J2 : {p2Power} puissance, Edge : Joueur {edge}.",
         "canUpgrade": "UPGRADE {name} : de {fromCost} a {toCost}. Le cout doit etre strictement superieur.",
         "missionRank": "La mission du tour {turn} a le rang {rank}.",
         "canAfford": "{name} coute {cost} chakra. Vous avez {chakra}.",
@@ -1374,9 +1374,9 @@
           "text": "Qui remporte une mission en cas d'egalite ?",
           "oA": "Joueur 1 toujours",
           "oB": "Personne",
-          "oC": "Le detenteur du Jeton d'Avantage",
+          "oC": "Le detenteur du Jeton d'Edge",
           "oD": "Mission annulee",
-          "exp": "Le detenteur du Jeton d'Avantage remporte les egalites."
+          "exp": "Le detenteur du Jeton d'Edge remporte les egalites."
         },
         "q8": {
           "text": "Nombre minimum de cartes personnage dans un deck ?",
@@ -1395,12 +1395,12 @@
           "exp": "Maximum 2 copies de la meme version."
         },
         "q10": {
-          "text": "Qui recoit le Jeton d'Avantage en Phase d'Action ?",
+          "text": "Qui recoit le Jeton d'Edge en Phase d'Action ?",
           "oA": "L'adversaire",
           "oB": "Personne",
           "oC": "Le premier a passer",
           "oD": "Aleatoire",
-          "exp": "Le premier joueur a passer prend le Jeton d'Avantage."
+          "exp": "Le premier joueur a passer prend le Jeton d'Edge."
         },
         "q11": {
           "text": "Puissance des personnages caches pour le score ?",
@@ -1612,7 +1612,7 @@
         },
         "q37": {
           "text": "Les deux joueurs ont 0 puissance sur une mission ?",
-          "oA": "Le Jeton d'Avantage gagne",
+          "oA": "Le Jeton d'Edge gagne",
           "oB": "Personne ne gagne",
           "oC": "Mission defaussee",
           "oD": "Les deux gagnent les points",
@@ -1637,10 +1637,10 @@
         "q40": {
           "text": "Fin du tour 4, scores egaux ?",
           "oA": "Egalite",
-          "oB": "Le Jeton d'Avantage gagne",
+          "oB": "Le Jeton d'Edge gagne",
           "oC": "Mission de departage",
           "oD": "Plus de cartes gagne",
-          "exp": "En cas d'egalite apres le tour 4, le detenteur du Jeton d'Avantage gagne."
+          "exp": "En cas d'egalite apres le tour 4, le detenteur du Jeton d'Edge gagne."
         }
       }
     }

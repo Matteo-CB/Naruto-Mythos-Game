@@ -186,7 +186,7 @@ export class Coach {
     const pts = `${pointValue} pts`;
     switch (recommendation) {
       case 'abandon':
-        return `Adversaire trop fort ici (${oppPower} vs ${myPower}). Mission ${pts} — pas rentable a défendre.`;
+        return `Adversaire trop fort ici (${oppPower} vs ${myPower}). Mission ${pts}, pas rentable a défendre.`;
       case 'defend':
         return `Adversaire devant (${oppPower} vs ${myPower}). Ajouter +${oppPower - myPower + 1} puissance pour reprendre.`;
       case 'secure':
@@ -214,21 +214,21 @@ export class Coach {
         const mission = state.activeMissions[action.missionIndex];
         if (!card || !mission) return `Jouer une carte sur Mission ${mission?.rank ?? '?'} ${winPct}`;
         const effects = card.effects?.map(e => e.type).join(', ') ?? '';
-        return `Jouer ${card.name_fr} (${card.power} force) sur Mission ${mission.rank} ${winPct}${effects ? ` — effets: ${effects}` : ''}`;
+        return `Jouer ${card.name_fr} (${card.power} force) sur Mission ${mission.rank} ${winPct}${effects ? `. Effets: ${effects}` : ''}`;
       }
       case 'PLAY_HIDDEN': {
         const card = state[player].hand[action.cardIndex];
         const mission = state.activeMissions[action.missionIndex];
         const name = card ? card.name_fr : 'carte';
         const hasAmbush = card?.effects?.some(e => e.type === 'AMBUSH');
-        return `Cacher ${name} sur Mission ${mission?.rank ?? '?'} ${winPct}${hasAmbush ? ' — effet AMBUSH disponible a la révélation' : ''}`;
+        return `Cacher ${name} sur Mission ${mission?.rank ?? '?'} ${winPct}${hasAmbush ? '. Effet AMBUSH disponible a la révélation' : ''}`;
       }
       case 'REVEAL_CHARACTER': {
         const mission = state.activeMissions[action.missionIndex];
         const chars = player === 'player1' ? mission?.player1Characters : mission?.player2Characters;
         const char = chars?.find(c => c.instanceId === action.characterInstanceId);
         const name = char ? char.card.name_fr : 'personnage caché';
-        return `Révéler ${name} sur Mission ${mission?.rank ?? '?'} ${winPct} — active AMBUSH`;
+        return `Révéler ${name} sur Mission ${mission?.rank ?? '?'} ${winPct}, active AMBUSH`;
       }
       case 'UPGRADE_CHARACTER': {
         const card = state[player].hand[action.cardIndex];
@@ -236,7 +236,7 @@ export class Coach {
         return `Améliorer vers ${card?.name_fr ?? '?'} (${card?.power ?? 0} force) sur Mission ${mission?.rank ?? '?'} ${winPct}`;
       }
       case 'PASS':
-        return `Passer ${winPct} — recuperer le jeton Avantage pour le prochain tour`;
+        return `Passer ${winPct}. Recuperer le jeton d'Edge pour le prochain tour`;
       default:
         return `Action ${action.type} ${winPct}`;
     }
@@ -316,7 +316,7 @@ export class Coach {
         // AMBUSH cards: better hidden
         if (hasAmbush) {
           rating += 0.5;
-          reason = `Carte AMBUSH — envisage de la cacher d'abord`;
+          reason = `Carte AMBUSH, envisage de la cacher d'abord`;
         } else {
           reason = `${power} force`;
           if (hasScore) reason += ', effet SCORE';
@@ -357,14 +357,14 @@ export class Coach {
 
     if (oppHiddenCount > 0) {
       warnings.push(
-        `L'adversaire a ${oppHiddenCount} personnage(s) caché(s) — ils peuvent avoir des effets AMBUSH puissants.`
+        `L'adversaire a ${oppHiddenCount} personnage(s) caché(s). Ils peuvent avoir des effets AMBUSH puissants.`
       );
     }
 
     // Opponent has enough chakra to play high-cost cards
     if (oppState.chakra >= 6 && oppState.hand.length > 0) {
       warnings.push(
-        `L'adversaire a ${oppState.chakra} chakra — il peut jouer des cartes puissantes.`
+        `L'adversaire a ${oppState.chakra} chakra. Il peut jouer des cartes puissantes.`
       );
     }
 
@@ -372,7 +372,7 @@ export class Coach {
     if (myState.missionPoints < oppState.missionPoints && state.turn >= 3) {
       const deficit = oppState.missionPoints - myState.missionPoints;
       warnings.push(
-        `Tu es en retard de ${deficit} points au tour ${state.turn}/4 — il faut agir vite.`
+        `Tu es en retard de ${deficit} points au tour ${state.turn}/4. Il faut agir vite.`
       );
     }
 
@@ -383,7 +383,7 @@ export class Coach {
 
     // Low chakra for late game
     if (state.turn === 4 && myState.chakra < 3 && myState.hand.length > 0) {
-      warnings.push('Peu de chakra au dernier tour — gere bien tes ressources.');
+      warnings.push('Peu de chakra au dernier tour. Gere bien tes ressources.');
     }
 
     return warnings;
@@ -404,7 +404,7 @@ export class Coach {
 
     if (highValueMission) {
       tips.push(
-        `Mission ${highValueMission.rank} (${highValueMission.pointValue} pts) est contestée — priorité haute.`
+        `Mission ${highValueMission.rank} (${highValueMission.pointValue} pts) est contestée, priorité haute.`
       );
     }
 
@@ -412,13 +412,13 @@ export class Coach {
     const ambushCard = myState.hand.find(c => c.effects?.some(e => e.type === 'AMBUSH'));
     if (ambushCard && state.turn <= 3) {
       tips.push(
-        `Tu as ${ambushCard.name_fr} avec effet AMBUSH — envisage de la jouer cachée maintenant pour révéler plus tard.`
+        `Tu as ${ambushCard.name_fr} avec effet AMBUSH. Envisage de la jouer cachée maintenant pour révéler plus tard.`
       );
     }
 
     // Edge token tip
     if (state.edgeHolder !== player && !myState.hasPassed) {
-      tips.push('Passe en premier si tu es en avance — tu récupèreras le jeton Avantage.');
+      tips.push('Passe en premier si tu es en avance. Tu récupèreras le jeton d\'Edge.');
     }
 
     // Upgrade available

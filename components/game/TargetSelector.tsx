@@ -4,7 +4,8 @@ import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
-import type { VisibleCharacter, VisibleMission, MissionRank } from '@/lib/engine/types';
+import { useUIStore } from '@/stores/uiStore';
+import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -21,6 +22,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
   const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const isHidden = character.isHidden;
   const canSeeCard = (character.isOwn || character.wasRevealedAtLeastOnce) && character.card;
 
@@ -156,6 +158,21 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         >
           {displayName}
         </div>
+      )}
+
+      {/* Details button (visible cards only) */}
+      {character.card && !isHidden && (
+        <button
+          onClick={(e) => { e.stopPropagation(); zoomCard(character.card as CharacterCard | MissionCard); }}
+          className="absolute top-0.5 right-0.5 rounded px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            color: '#c4a35a',
+            border: '1px solid rgba(196,163,90,0.4)',
+          }}
+        >
+          {t('game.board.details')}
+        </button>
       )}
     </motion.div>
   );
@@ -411,7 +428,7 @@ export function TargetSelector() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-xs mb-8"
+            className="font-body text-xs mb-8"
             style={{ color: '#555555' }}
           >
             {t('game.effect.sakura011DrawDeck', { count: deckCount })}
@@ -542,6 +559,21 @@ export function TargetSelector() {
                 {cardData?.name_fr ?? '???'}
               </span>
             </div>
+
+            {/* Details button */}
+            {cardData && (
+              <button
+                onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(cardData as CharacterCard); }}
+                className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer"
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.85)',
+                  color: '#c4a35a',
+                  border: '1px solid rgba(196,163,90,0.4)',
+                }}
+              >
+                {t('game.board.details')}
+              </button>
+            )}
           </motion.div>
 
           {/* Action buttons */}
@@ -683,6 +715,19 @@ export function TargetSelector() {
                   >
                     {card.chakra}
                   </div>
+
+                  {/* Details button */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(card as unknown as CharacterCard); }}
+                    className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                    style={{
+                      backgroundColor: 'rgba(0,0,0,0.85)',
+                      color: '#c4a35a',
+                      border: '1px solid rgba(196,163,90,0.4)',
+                    }}
+                  >
+                    {t('game.board.details')}
+                  </button>
                 </motion.div>
               );
             })}
@@ -696,7 +741,7 @@ export function TargetSelector() {
             className="mb-6 text-center"
           >
             <span
-              className="text-sm font-medium"
+              className="font-body text-sm font-medium"
               style={{ color: resultColor }}
             >
               {revealedCard?.revealResultKey
@@ -812,6 +857,19 @@ export function TargetSelector() {
             >
               {revealedCard.chakra}
             </div>
+
+            {/* Details button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(revealedCard as unknown as CharacterCard); }}
+              className="absolute top-1.5 right-1.5 rounded px-2 py-1 text-[9px] font-bold cursor-pointer"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.85)',
+                color: '#c4a35a',
+                border: '1px solid rgba(196,163,90,0.4)',
+              }}
+            >
+              {t('game.board.details')}
+            </button>
           </motion.div>
 
           {/* Result text */}
@@ -822,7 +880,7 @@ export function TargetSelector() {
             className="mb-6 text-center"
           >
             <span
-              className="text-sm font-medium"
+              className="font-body text-sm font-medium"
               style={{ color: resultColor }}
             >
               {revealedCard.revealResultKey

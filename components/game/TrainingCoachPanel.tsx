@@ -87,26 +87,26 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
 
     if (myChars.length === 0 && oppChars.length === 0) {
       status = 'empty'; recommendation = 'attack';
-      note = `Mission ${mission.rank} libre — ${pointValue} pts à prendre`;
+      note = `Mission ${mission.rank} libre, ${pointValue} pts à prendre`;
     } else if (myPower === 0 && oppPower === 0) {
       status = 'tied'; recommendation = 'attack';
-      note = `Égalité à 0 — jeton Avantage décisif`;
+      note = `Égalité à 0, jeton d'Edge décisif`;
     } else if (myPower > oppPower * 1.4) {
       status = 'dominating'; recommendation = 'monitor'; myWinProbability = 0.88;
-      note = `Tu domines (${myPower} vs ${oppPower}) — ${pointValue} pts assurés`;
+      note = `Tu domines (${myPower} vs ${oppPower}). ${pointValue} pts assurés`;
     } else if (myPower > oppPower) {
       status = 'winning'; recommendation = 'secure'; myWinProbability = 0.68;
-      note = `Tu mènes (${myPower} vs ${oppPower}) — consolide`;
+      note = `Tu mènes (${myPower} vs ${oppPower}), consolide`;
     } else if (myPower === oppPower && myPower > 0) {
       status = 'tied'; recommendation = 'attack'; myWinProbability = 0.5;
-      note = `Égalité (${myPower} chacun) — avantage au jeton`;
+      note = `Égalité (${myPower} chacun), avantage au jeton`;
     } else if (oppPower > myPower * 1.4 && oppChars.length >= 2) {
       status = 'losing'; recommendation = pointValue >= 5 ? 'defend' : 'abandon';
       myWinProbability = 0.15;
-      note = `Adversaire dominant (${oppPower} vs ${myPower})${pointValue < 5 ? ' — envisage d\'abandonner' : ''}`;
+      note = `Adversaire dominant (${oppPower} vs ${myPower})${pointValue < 5 ? '. Envisage d\'abandonner' : ''}`;
     } else {
       status = 'losing'; recommendation = 'defend'; myWinProbability = 0.3;
-      note = `Tu es derrière (${myPower} vs ${oppPower}) — +${oppPower - myPower + 1} force nécessaire`;
+      note = `Tu es derrière (${myPower} vs ${oppPower}). +${oppPower - myPower + 1} force nécessaire`;
     }
 
     return { missionIndex: idx, rank: mission.rank, myWinProbability, myPower, opponentPower: oppPower, pointValue, status, recommendation, note };
@@ -123,7 +123,7 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
       action: stat.action,
       winRateGain: stat.winRate - winProb,
       explanation: describeAction(stat.action, sanitized, stat.winRate),
-      advantage: `${stat.visits} simulations — ${(stat.winRate * 100).toFixed(0)}% victoire`,
+      advantage: `${stat.visits} simulations, ${(stat.winRate * 100).toFixed(0)}% victoire`,
     }));
 
   // Hand ratings
@@ -156,8 +156,8 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
   const oppHidden = state.activeMissions.reduce(
     (s, m) => s + m.player2Characters.filter(c => c.isHidden).length, 0
   );
-  if (oppHidden > 0) warnings.push(`${oppHidden} personnage(s) caché(s) adverses — attention aux AMBUSH`);
-  if (state.player2.chakra >= 6) warnings.push(`Adversaire a ${state.player2.chakra} chakra — peut jouer une grosse carte`);
+  if (oppHidden > 0) warnings.push(`${oppHidden} personnage(s) caché(s) adverses. Attention aux AMBUSH`);
+  if (state.player2.chakra >= 6) warnings.push(`Adversaire a ${state.player2.chakra} chakra. Peut jouer une grosse carte`);
   if (myState.missionPoints < state.player2.missionPoints && state.turn >= 3)
     warnings.push(`Retard de ${state.player2.missionPoints - myState.missionPoints} pts au tour ${state.turn}/4`);
 
@@ -166,7 +166,7 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
   const bestMission = missionAnalysis.find(m => m.status === 'empty' || m.status === 'tied');
   if (bestMission) tips.push(`Mission ${bestMission.rank} (${bestMission.pointValue} pts) à saisir`);
   const ambushCard = myState.hand.find(c => c.effects?.some(e => e.type === 'AMBUSH'));
-  if (ambushCard) tips.push(`${ambushCard.name_fr} a un effet AMBUSH — joue-la cachée`);
+  if (ambushCard) tips.push(`${ambushCard.name_fr} a un effet AMBUSH. Joue-la cachée`);
 
   return {
     winProbability: winProb,
@@ -188,25 +188,25 @@ function describeAction(action: any, state: GameState, winRate: number): string 
     case 'PLAY_CHARACTER': {
       const card = state.player1.hand[action.cardIndex];
       const mission = state.activeMissions[action.missionIndex];
-      return `Jouer ${card?.name_fr ?? '?'} (${card?.power ?? 0} force) sur Mission ${mission?.rank ?? '?'} — ${pct}`;
+      return `Jouer ${card?.name_fr ?? '?'} (${card?.power ?? 0} force) sur Mission ${mission?.rank ?? '?'}, ${pct}`;
     }
     case 'PLAY_HIDDEN': {
       const card = state.player1.hand[action.cardIndex];
       const mission = state.activeMissions[action.missionIndex];
-      return `Cacher ${card?.name_fr ?? '?'} sur Mission ${mission?.rank ?? '?'} — ${pct}`;
+      return `Cacher ${card?.name_fr ?? '?'} sur Mission ${mission?.rank ?? '?'}, ${pct}`;
     }
     case 'REVEAL_CHARACTER': {
       const mission = state.activeMissions[action.missionIndex];
-      return `Révéler personnage caché sur Mission ${mission?.rank ?? '?'} — ${pct}`;
+      return `Révéler personnage caché sur Mission ${mission?.rank ?? '?'}, ${pct}`;
     }
     case 'UPGRADE_CHARACTER': {
       const card = state.player1.hand[action.cardIndex];
-      return `Améliorer vers ${card?.name_fr ?? '?'} — ${pct}`;
+      return `Améliorer vers ${card?.name_fr ?? '?'}, ${pct}`;
     }
     case 'PASS':
-      return `Passer — ${pct}`;
+      return `Passer, ${pct}`;
     default:
-      return `${action.type} — ${pct}`;
+      return `${action.type}, ${pct}`;
   }
 }
 
@@ -407,7 +407,7 @@ export function TrainingCoachPanel() {
                   <section>
                     <SectionTitle>Meilleur coup</SectionTitle>
                     <div
-                      className="px-3 py-2.5 text-xs text-[#c0c0c0]"
+                      className="font-body px-3 py-2.5 text-xs text-[#c0c0c0]"
                       style={{ backgroundColor: '#161616', border: '1px solid #2a2a2a' }}
                     >
                       {coachAdvice.bestAction.explanation}
@@ -435,7 +435,7 @@ export function TrainingCoachPanel() {
                       {coachAdvice.warnings.map((w, i) => (
                         <div
                           key={i}
-                          className="text-xs px-2.5 py-1.5"
+                          className="font-body text-xs px-2.5 py-1.5"
                           style={{
                             backgroundColor: '#1a0f0f',
                             border: '1px solid #3a1a1a',
@@ -457,7 +457,7 @@ export function TrainingCoachPanel() {
                       {coachAdvice.tips.map((tip, i) => (
                         <div
                           key={i}
-                          className="text-xs px-2.5 py-1.5"
+                          className="font-body text-xs px-2.5 py-1.5"
                           style={{
                             backgroundColor: '#0f1a0f',
                             border: '1px solid #1a3a1a',
@@ -473,7 +473,7 @@ export function TrainingCoachPanel() {
 
                 {/* Footer */}
                 <p className="text-[10px] text-[#333] text-center pt-2">
-                  {coachAdvice.neuralNetUsed ? 'Réseau de neurones actif' : 'Mode heuristique'} — {coachAdvice.simulationsUsed} sims
+                  {coachAdvice.neuralNetUsed ? 'Réseau de neurones actif' : 'Mode heuristique'}, {coachAdvice.simulationsUsed} sims
                 </p>
               </div>
             ) : (
