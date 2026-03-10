@@ -16,7 +16,10 @@
     "export:decks": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/exportStrongDecks.ts",
     "merge:decks": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/mergeStrongDecks.ts",
     "merge:selfplay": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/mergeSelfplayOutputs.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "duel": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/benchmarkParallel.ts --a impossible --b impossible --a-mode heuristic --b-mode heuristic --a-sims 150 --b-sims 150 --games 100 --decks ai_training/strong_decks_curated.json --output scripts/bench/duel_result.json",
+    "duel:fast": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/benchmarkParallel.ts --a impossible --b impossible --a-mode heuristic --b-mode heuristic --a-sims 100 --b-sims 100 --games 50 --decks ai_training/strong_decks_curated.json --output scripts/bench/duel_result.json",
+    "duel:neural": "node -r tsconfig-paths/register node_modules/ts-node/dist/bin.js --project scripts/tsconfig.json scripts/benchmarkParallel.ts --a impossible --b impossible --a-mode neural --b-mode heuristic --a-sims 250 --b-sims 250 --games 100 --workers 4 --decks ai_training/strong_decks_curated.json --output scripts/bench/duel_result.json"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
