@@ -657,6 +657,8 @@ function buildPendingTargetSelectionUI(
     declineLabelKey = 'game.effect.gemma049DeclineDefeat';
   } else if (tst === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
     declineLabelKey = 'game.effect.gemma049DeclineHide';
+  } else if (tst === 'GEMMA049_CHOOSE_PROTECT_HIDE') {
+    declineLabelKey = 'game.effect.gemma049DeclineHide';
   } else if (tst === 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT') {
     declineLabelKey = 'game.effect.dosu069Defeat';
   }

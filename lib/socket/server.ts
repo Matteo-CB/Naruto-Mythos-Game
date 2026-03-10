@@ -36,6 +36,8 @@ interface RoomData {
   sealedBoosterCount: 4 | 5 | 6;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
+  // Timer toggle (casual rooms can disable)
+  timerEnabled: boolean;
   // Rematch
   rematchOffer?: 'player1' | 'player2';
   // Tournament
@@ -329,6 +331,8 @@ function startActionTimer(
   if (!room.gameState) return;
   // Only run timer during action phase (also excludes gameOver)
   if (room.gameState.phase !== 'action') return;
+  // Skip timer if disabled for this room (casual rooms can opt out)
+  if (!room.timerEnabled) return;
 
   const activePlayer = room.gameState.activePlayer;
   const targetSocket = activePlayer === 'player1' ? room.hostSocket : room.guestSocket;
@@ -481,20 +485,24 @@ function startForcedResolverTimer(
  */
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
-  const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-  const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+  try {
+    const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+    const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
 
-  if (room.hostSocket) {
-    io.to(room.hostSocket).emit('game:state-update', {
-      visibleState: p1State,
-      playerRole: 'player1',
-    });
-  }
-  if (room.guestSocket) {
-    io.to(room.guestSocket).emit('game:state-update', {
-      visibleState: p2State,
-      playerRole: 'player2',
-    });
+    if (room.hostSocket) {
+      io.to(room.hostSocket).emit('game:state-update', {
+        visibleState: p1State,
+        playerRole: 'player1',
+      });
+    }
+    if (room.guestSocket) {
+      io.to(room.guestSocket).emit('game:state-update', {
+        visibleState: p2State,
+        playerRole: 'player2',
+      });
+    }
+  } catch (err) {
+    console.error('[Socket] broadcastState error:', err instanceof Error ? err.message : err);
   }
 }
 
@@ -646,7 +654,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6 }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean }) => {
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
@@ -681,6 +689,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         sealedBoosterCount: data.sealedBoosterCount ?? 6,
         sealedTimer: null,
         sealedDeadline: null,
+        timerEnabled: gameMode === 'ranked' ? true : (data.timerEnabled ?? true),
       };
 
       rooms.set(code, room);
@@ -788,6 +797,27 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Submit deck selection (works for both normal and sealed)
+    // Player wants to change their deck (before game starts)
+    socket.on('room:change-deck', () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room || room.gameState) return; // Can't change deck after game started
+
+      if (socket.id === room.hostSocket) {
+        room.hostDeck = null;
+      } else if (socket.id === room.guestSocket) {
+        room.guestDeck = null;
+      }
+
+      // Notify the other player that this player is changing deck
+      const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
+      if (otherSocket) {
+        io.to(otherSocket).emit('room:opponent-changing-deck');
+      }
+      console.log(`[Socket] Player ${socket.id} changing deck in room ${code}`);
+    });
+
     socket.on('room:select-deck', async (data: {
       characters: CharacterCard[];
       missions: MissionCard[];
@@ -900,6 +930,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const who = socket.id === room.hostSocket ? 'host' : 'guest';
         console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);
         socket.emit('room:deck-accepted');
+        // Notify opponent that this player has (re-)selected their deck
+        const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
+        if (otherSocket) {
+          io.to(otherSocket).emit('room:opponent-deck-ready');
+        }
       }
     });
 
@@ -966,12 +1001,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
         const isTargetAction = data.action.type === 'SELECT_TARGET';
 
-        // SELECT_TARGET silent failure: pending effects/actions didn't change
+        // SELECT_TARGET silent failure: only flag if truly nothing changed at all
+        // Compare log, pending effects/actions, phase, activePlayer, and board state
         if (isTargetAction && room.gameState.log.length === oldLogLength) {
           const prevPendingCount = prevState.pendingEffects.length + prevState.pendingActions.length;
           const newPendingCount = room.gameState.pendingEffects.length + room.gameState.pendingActions.length;
-          if (prevPendingCount === newPendingCount) {
-            console.warn(`[Socket] SELECT_TARGET silently failed for ${player}: state unchanged (pending: ${prevPendingCount} -> ${newPendingCount})`);
+          const phaseChanged = prevState.phase !== room.gameState.phase;
+          const activePlayerChanged = prevState.activePlayer !== room.gameState.activePlayer;
+          const chakraChanged = prevState.player1.chakra !== room.gameState.player1.chakra || prevState.player2.chakra !== room.gameState.player2.chakra;
+          const boardChanged = JSON.stringify(prevState.activeMissions) !== JSON.stringify(room.gameState.activeMissions);
+          const handChanged = prevState.player1.hand.length !== room.gameState.player1.hand.length || prevState.player2.hand.length !== room.gameState.player2.hand.length;
+          if (prevPendingCount === newPendingCount && !phaseChanged && !activePlayerChanged && !chakraChanged && !boardChanged && !handChanged) {
+            console.warn(`[Socket] SELECT_TARGET silently failed for ${player}: state truly unchanged (pending: ${prevPendingCount} -> ${newPendingCount})`);
             socket.emit('game:error', { message: 'Effect failed to apply. Please try again.', errorKey: 'game.error.effectFailed' });
             broadcastState(room, io);
             return;
@@ -1042,15 +1083,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
           // Mission scoring done — wait briefly so clients see SCORE results, then auto-advance
           clearActionTimer(room);
           setTimeout(async () => {
-            if (!room.gameState || !room.gameState.missionScoringComplete) return;
-            room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
-            broadcastState(room, io);
+            try {
+              if (!room.gameState || !room.gameState.missionScoringComplete) return;
+              room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
+              broadcastState(room, io);
 
-            const winnerAfterEnd = GameEngine.getWinner(room.gameState);
-            if (winnerAfterEnd) {
-              await finalizeGameEnd(room, code, io, 'score');
-            } else if (room.gameState.phase === 'action') {
-              startActionTimer(room, code, io);
+              const winnerAfterEnd = GameEngine.getWinner(room.gameState);
+              if (winnerAfterEnd) {
+                await finalizeGameEnd(room, code, io, 'score');
+              } else if (room.gameState.phase === 'action') {
+                startActionTimer(room, code, io);
+              }
+            } catch (err) {
+              console.error('[Socket] Auto-advance error:', err instanceof Error ? err.message : err);
             }
           }, 1500);
         } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
@@ -1260,6 +1305,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           sealedBoosterCount: 6,
           sealedTimer: null,
           sealedDeadline: null,
+          timerEnabled: true,
         };
 
         rooms.set(code, room);
@@ -1302,8 +1348,25 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const isHost = room.hostSocket === socket.id;
           const player = isHost ? 'player1' : 'player2';
 
+          // Handle disconnect during game-over (rematch pending or post-game)
+          if (room.gameState && room.gameState.phase === 'gameOver') {
+            console.log(`[Socket] ${player} disconnected during gameOver in room ${code}`);
+            const opponentSocket = isHost ? room.guestSocket : room.hostSocket;
+            if (opponentSocket) {
+              // If a rematch was offered, notify the opponent it's declined
+              if (room.rematchOffer) {
+                room.rematchOffer = undefined;
+                io.to(opponentSocket).emit('game:rematch-declined');
+              }
+              // Notify opponent that the other player left
+              io.to(opponentSocket).emit('game:opponent-left');
+            }
+            // Clean up room since the game is over and a player left
+            rooms.delete(code);
+          }
+
           // Handle disconnect during an active game
-          if (room.gameState && room.gameState.phase !== 'gameOver') {
+          else if (room.gameState && room.gameState.phase !== 'gameOver') {
             console.log(`[Socket] ${player} disconnected during game in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
             clearActionTimer(room);
 

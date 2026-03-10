@@ -11,6 +11,7 @@ import { ReplayBoard } from '@/components/replay/ReplayBoard';
 import { PlaybackControls } from '@/components/replay/PlaybackControls';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import { resetIdCounter, getIdCounter, setIdCounter } from '@/lib/engine/utils/id';
+import { useSettingsStore } from '@/stores/settingsStore';
 import type { GameState, GamePhase, GameAction, PlayerID } from '@/lib/engine/types';
 
 interface ReplayLogEntry {
@@ -49,7 +50,6 @@ interface GameData {
     log: ReplayLogEntry[];
     playerNames: { player1: string; player2: string };
     finalMissions?: MissionResult[];
-    // Visual replay data (new games only)
     initialState?: GameState;
     actionHistory?: Array<{ player: PlayerID; action: GameAction }>;
   } | null;
@@ -70,6 +70,332 @@ function formatTimestamp(ts: number): string {
   const mins = date.getMinutes().toString().padStart(2, '0');
   const secs = date.getSeconds().toString().padStart(2, '0');
   return `${mins}:${secs}`;
+}
+
+// ----- Share Button -----
+
+function ShareButton({ gameId }: { gameId: string }) {
+  const t = useTranslations('replay');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}`;
+
+    // Try native share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: t('title'),
+          url,
+        });
+        return;
+      } catch {
+        // User cancelled or not supported, fall through to clipboard
+      }
+    }
+
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleShare}
+      className="px-4 py-2 text-sm font-medium tracking-wider uppercase transition-colors cursor-pointer rounded"
+      style={{
+        backgroundColor: copied ? 'rgba(62,139,62,0.15)' : '#141414',
+        border: copied ? '1px solid rgba(62,139,62,0.4)' : '1px solid #262626',
+        color: copied ? '#4a9e4a' : '#888888',
+      }}
+    >
+      {copied ? t('linkCopied') : t('share')}
+    </button>
+  );
+}
+
+// ----- Match Stats Summary -----
+
+function MatchStats({
+  game,
+  playerNames,
+  missions,
+  backgroundUrl,
+}: {
+  game: GameData;
+  playerNames: { player1: string; player2: string };
+  missions: MissionResult[];
+  backgroundUrl?: string;
+}) {
+  const t = useTranslations('replay');
+  const p1Won = game.winnerId === game.player1Id;
+  const p2Won = game.winnerId === game.player2Id;
+
+  const p1Missions = missions.filter(m => m.wonBy === 'player1').length;
+  const p2Missions = missions.filter(m => m.wonBy === 'player2').length;
+
+  // Score bar: visual ratio of P1 vs P2 score
+  const totalScore = game.player1Score + game.player2Score;
+  const p1Pct = totalScore > 0 ? (game.player1Score / totalScore) * 100 : 50;
+
+  return (
+    <div
+      className="relative rounded-xl overflow-hidden"
+      style={{
+        backgroundColor: '#101018',
+        border: '1px solid #1e1e28',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+      }}
+    >
+      {/* Background from user settings */}
+      {backgroundUrl && (
+        <>
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${backgroundUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          />
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} />
+        </>
+      )}
+
+      <div className="relative z-10">
+        {/* Score header */}
+        <div className="px-6 pt-6 pb-4">
+          <div className="flex items-center justify-center gap-8 sm:gap-12">
+            {/* Player 1 */}
+            <div className="flex flex-col items-center gap-1.5 min-w-[110px]">
+              <span
+                className="text-sm font-bold uppercase tracking-wider"
+                style={{ color: p1Won ? '#c4a35a' : '#999' }}
+              >
+                {playerNames.player1}
+              </span>
+              <span
+                className="text-5xl font-bold tabular-nums"
+                style={{
+                  color: '#c4a35a',
+                  fontFamily: "'NJNaruto', Arial, sans-serif",
+                  textShadow: p1Won ? '0 0 16px rgba(196,163,90,0.35)' : 'none',
+                }}
+              >
+                {game.player1Score}
+              </span>
+              <div className="flex items-center gap-2">
+                {p1Won && (
+                  <span
+                    className="text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded"
+                    style={{
+                      backgroundColor: 'rgba(196,163,90,0.15)',
+                      color: '#c4a35a',
+                      border: '1px solid rgba(196,163,90,0.3)',
+                    }}
+                  >
+                    {t('winner')}
+                  </span>
+                )}
+                <span
+                  className="text-[9px] tabular-nums px-1.5 py-0.5 rounded"
+                  style={{
+                    backgroundColor: 'rgba(196,163,90,0.08)',
+                    color: '#c4a35a',
+                    border: '1px solid rgba(196,163,90,0.15)',
+                  }}
+                >
+                  {p1Missions}/{missions.length}
+                </span>
+              </div>
+            </div>
+
+            {/* VS divider */}
+            <div className="flex flex-col items-center gap-1">
+              <span
+                className="text-lg font-bold uppercase"
+                style={{ color: '#2a2a34', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              >
+                {t('vsLabel')}
+              </span>
+            </div>
+
+            {/* Player 2 */}
+            <div className="flex flex-col items-center gap-1.5 min-w-[110px]">
+              <span
+                className="text-sm font-bold uppercase tracking-wider"
+                style={{ color: p2Won ? '#b33e3e' : '#999' }}
+              >
+                {playerNames.player2}
+              </span>
+              <span
+                className="text-5xl font-bold tabular-nums"
+                style={{
+                  color: '#b33e3e',
+                  fontFamily: "'NJNaruto', Arial, sans-serif",
+                  textShadow: p2Won ? '0 0 16px rgba(179,62,62,0.35)' : 'none',
+                }}
+              >
+                {game.player2Score}
+              </span>
+              <div className="flex items-center gap-2">
+                {p2Won && (
+                  <span
+                    className="text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded"
+                    style={{
+                      backgroundColor: 'rgba(179,62,62,0.15)',
+                      color: '#b33e3e',
+                      border: '1px solid rgba(179,62,62,0.3)',
+                    }}
+                  >
+                    {t('winner')}
+                  </span>
+                )}
+                <span
+                  className="text-[9px] tabular-nums px-1.5 py-0.5 rounded"
+                  style={{
+                    backgroundColor: 'rgba(179,62,62,0.08)',
+                    color: '#b33e3e',
+                    border: '1px solid rgba(179,62,62,0.15)',
+                  }}
+                >
+                  {p2Missions}/{missions.length}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Score comparison bar */}
+          {totalScore > 0 && (
+            <div className="mt-4 mx-auto" style={{ maxWidth: '320px' }}>
+              <div className="flex h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a24' }}>
+                <div
+                  className="h-full rounded-l-full"
+                  style={{
+                    width: `${p1Pct}%`,
+                    backgroundColor: '#c4a35a',
+                    transition: 'width 0.5s ease',
+                  }}
+                />
+                <div
+                  className="h-full rounded-r-full"
+                  style={{
+                    width: `${100 - p1Pct}%`,
+                    backgroundColor: '#b33e3e',
+                    transition: 'width 0.5s ease',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Game type + date + ELO */}
+        <div
+          className="flex items-center justify-center gap-4 flex-wrap px-4 py-2.5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+        >
+          <span
+            className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.04)',
+              color: '#666',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            {game.isAiGame ? t('aiGame', { difficulty: game.aiDifficulty ?? 'medium' }) : t('onlineGame')}
+          </span>
+          {game.eloChange != null && game.eloChange !== 0 && (
+            <span
+              className="text-[10px] font-bold tabular-nums px-2 py-0.5 rounded"
+              style={{
+                backgroundColor: game.eloChange > 0 ? 'rgba(62,139,62,0.1)' : 'rgba(179,62,62,0.1)',
+                color: game.eloChange > 0 ? '#4a9e4a' : '#b33e3e',
+                border: `1px solid ${game.eloChange > 0 ? 'rgba(62,139,62,0.25)' : 'rgba(179,62,62,0.25)'}`,
+              }}
+            >
+              ELO {game.eloChange > 0 ? '+' : ''}{game.eloChange}
+            </span>
+          )}
+          {game.completedAt && (
+            <span className="text-[10px]" style={{ color: '#555' }}>
+              {new Date(game.completedAt).toLocaleDateString()} {new Date(game.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+        </div>
+
+        {/* Mission results grid */}
+        {missions.length > 0 && (
+          <div
+            className="px-4 py-4"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+          >
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {missions.map((mission, i) => {
+                const rankColor = { D: '#3E8B3E', C: '#5A7ABB', B: '#9B59B6', A: '#C4A35A' }[mission.rank] ?? '#888';
+                const wonColor = mission.wonBy === 'player1' ? '#c4a35a' : mission.wonBy === 'player2' ? '#b33e3e' : null;
+
+                return (
+                  <div
+                    key={i}
+                    className="rounded-lg px-3 py-3 text-center"
+                    style={{
+                      backgroundColor: backgroundUrl ? 'rgba(10,10,14,0.6)' : '#0a0a0e',
+                      border: `1px solid ${wonColor ? `${wonColor}35` : '#1e1e28'}`,
+                    }}
+                  >
+                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                      <span
+                        className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+                        style={{
+                          backgroundColor: `${rankColor}20`,
+                          color: rankColor,
+                          fontFamily: "'NJNaruto', Arial, sans-serif",
+                        }}
+                      >
+                        {mission.rank}
+                      </span>
+                      <span
+                        className="text-[10px] font-bold tabular-nums"
+                        style={{ color: rankColor, fontFamily: "'NJNaruto', Arial, sans-serif" }}
+                      >
+                        {mission.basePoints + mission.rankBonus} pts
+                      </span>
+                    </div>
+                    <p className="text-[10px] font-medium truncate mb-1.5" style={{ color: '#c0c0c0' }}>
+                      {mission.name_fr}
+                    </p>
+                    {mission.wonBy ? (
+                      <p className="text-[10px] font-bold" style={{ color: wonColor! }}>
+                        {playerNames[mission.wonBy]}
+                      </p>
+                    ) : (
+                      <p className="text-[9px]" style={{ color: '#444' }}>-</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ----- Text Timeline Component (fallback for old games) -----
@@ -129,40 +455,54 @@ function TextTimeline({
   const displayEntries = filteredLog.slice(0, visibleCount);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{
+        backgroundColor: '#101018',
+        border: '1px solid #1e1e28',
+      }}
+    >
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+      >
+        <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888' }}>
           {tr('eventTimeline')}
         </h2>
         <div className="flex items-center gap-2">
           <button
             onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
-            className="px-3 py-1 text-xs rounded cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: isPlaying ? '#b33e3e' : '#4a9e4a' }}
+            className="px-3 py-1 text-[10px] font-bold rounded cursor-pointer"
+            style={{
+              backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
+              border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.3)' : 'rgba(62,139,62,0.3)'}`,
+              color: isPlaying ? '#b33e3e' : '#4a9e4a',
+            }}
           >
             {isPlaying ? tr('pause') : tr('autoPlay')}
           </button>
-          <select
-            value={speed}
-            onChange={(e) => setSpeed(e.target.value as 'slow' | 'normal' | 'fast')}
-            className="text-xs rounded px-2 py-1 cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888888' }}
+          <button
+            onClick={() => {
+              const order: Array<'slow' | 'normal' | 'fast'> = ['slow', 'normal', 'fast'];
+              setSpeed(order[(order.indexOf(speed) + 1) % 3]);
+            }}
+            className="px-2 py-1 text-[10px] rounded cursor-pointer"
+            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#888' }}
           >
-            <option value="slow">{tr('slow')}</option>
-            <option value="normal">{tr('normal')}</option>
-            <option value="fast">{tr('fast')}</option>
-          </select>
+            {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+          </button>
         </div>
       </div>
 
-      <div className="flex gap-1 mb-3 flex-wrap">
+      {/* Turn filters */}
+      <div className="flex gap-1 px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
         <button
           onClick={() => setSelectedTurn(null)}
-          className="px-3 py-1 text-xs rounded cursor-pointer"
+          className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
           style={{
-            backgroundColor: selectedTurn === null ? '#c4a35a' : '#1a1a2e',
-            color: selectedTurn === null ? '#0a0a0a' : '#888888',
-            border: `1px solid ${selectedTurn === null ? '#c4a35a' : '#333'}`,
+            backgroundColor: selectedTurn === null ? '#c4a35a' : '#16161e',
+            color: selectedTurn === null ? '#0a0a0a' : '#666',
+            border: selectedTurn === null ? '1px solid #c4a35a' : '1px solid #2a2a34',
           }}
         >
           {tr('allTurns')}
@@ -171,26 +511,28 @@ function TextTimeline({
           <button
             key={turn}
             onClick={() => setSelectedTurn(turn)}
-            className="px-3 py-1 text-xs rounded cursor-pointer"
+            className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
             style={{
-              backgroundColor: selectedTurn === turn ? '#c4a35a' : '#1a1a2e',
-              color: selectedTurn === turn ? '#0a0a0a' : '#888888',
-              border: `1px solid ${selectedTurn === turn ? '#c4a35a' : '#333'}`,
+              backgroundColor: selectedTurn === turn ? '#c4a35a' : '#16161e',
+              color: selectedTurn === turn ? '#0a0a0a' : '#666',
+              border: selectedTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
+              fontFamily: "'NJNaruto', Arial, sans-serif",
             }}
           >
-            {tr('turnLabel', { turn })}
+            T{turn}
           </button>
         ))}
       </div>
 
+      {/* Log entries */}
       <div
         ref={scrollRef}
-        className="rounded-lg overflow-y-auto"
-        style={{ backgroundColor: '#0e0e12', border: '1px solid #262626', maxHeight: '500px' }}
+        className="overflow-y-auto"
+        style={{ maxHeight: '400px' }}
       >
         {displayEntries.length === 0 ? (
           <div className="flex items-center justify-center py-12">
-            <span className="text-sm" style={{ color: '#555555' }}>{tr('noLog')}</span>
+            <span className="text-sm" style={{ color: '#333' }}>{tr('noLog')}</span>
           </div>
         ) : (
           displayEntries.map((entry, i) => {
@@ -199,15 +541,27 @@ function TextTimeline({
             return (
               <div
                 key={`${entry.timestamp}-${i}`}
-                className="flex items-start gap-2 px-3 py-1.5 text-xs"
-                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
+                className="flex items-start gap-2 px-4 py-1.5 text-xs"
+                style={{
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
+                  backgroundColor: entry.player ? `${playerColor}05` : 'transparent',
+                }}
               >
-                <span className="shrink-0 tabular-nums" style={{ color: '#555555' }}>{formatTimestamp(entry.timestamp)}</span>
-                <span className="shrink-0 rounded px-1 py-0.5 text-[10px] uppercase font-medium" style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', color: '#777777' }}>
+                <span className="shrink-0 tabular-nums text-[10px]" style={{ color: '#444', minWidth: '32px' }}>
+                  {formatTimestamp(entry.timestamp)}
+                </span>
+                <span
+                  className="shrink-0 rounded px-1 py-0.5 text-[9px] uppercase font-bold"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
+                >
                   T{entry.turn} {formatPhase(entry.phase)}
                 </span>
-                {entry.player && <span className="shrink-0 font-medium" style={{ color: playerColor }}>{displayName}</span>}
-                <span style={{ color: '#e0e0e0' }}>
+                {entry.player && (
+                  <span className="shrink-0 font-bold text-[10px]" style={{ color: playerColor }}>
+                    {displayName}
+                  </span>
+                )}
+                <span className="text-[11px]" style={{ color: '#c0c0c0' }}>
                   {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
                 </span>
               </div>
@@ -226,11 +580,13 @@ function VisualReplay({
   actionHistory,
   log,
   playerNames,
+  backgroundUrl,
 }: {
   initialState: GameState;
   actionHistory: Array<{ player: PlayerID; action: GameAction }>;
   log: ReplayLogEntry[];
   playerNames: { player1: string; player2: string };
+  backgroundUrl?: string;
 }) {
   const tr = useTranslations('replay');
   const t = useTranslations();
@@ -238,39 +594,18 @@ function VisualReplay({
   const [currentStep, setCurrentStep] = useState(0);
   const [showLog, setShowLog] = useState(false);
 
-  // Pre-compute all game states from initial state + action history.
-  // transitionToStartPhase() bundles the entire Start Phase (reveal mission, grant
-  // chakra, draw cards) + transition to action phase in one atomic call, so those
-  // transitions never appear as separate states in the action history. We inject
-  // synthetic "start" phase snapshots whenever a turn boundary is crossed so the
-  // replay UI shows each turn's Start Phase properly.
   const states = useMemo(() => {
-    // Reset the instance ID counter so deterministic IDs match the original game.
     resetIdCounter();
 
-    // The initial state is already in action phase (Start Phase for Turn 1 was
-    // consumed during the mulligan→start transition). Insert a synthetic Turn 1
-    // "start" state so the replay begins with "Turn 1 — Start Phase".
     const turn1Start: GameState = { ...initialState, phase: 'start' as GamePhase };
     const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
 
-    // Build a mapping from original IDs → replay IDs so that SELECT_TARGET,
-    // DECLINE_OPTIONAL_EFFECT, REVEAL_CHARACTER, and UPGRADE_CHARACTER actions
-    // (which embed IDs generated by the original server) can be remapped to
-    // match the IDs generated during this local replay.
-    //
-    // Strategy: we track which IDs exist in the current replay state and map
-    // the original action's ID references to the closest match.
-
     function remapAction(action: GameAction, state: GameState): GameAction {
       if (action.type === 'SELECT_TARGET') {
-        // Remap pendingActionId to match current state's pending action
         const origId = action.pendingActionId;
         const found = state.pendingActions.find((p) => p.id === origId);
         if (!found && state.pendingActions.length > 0) {
-          // ID mismatch — use the first pending action for this player
-          // (or just the first one if only one exists)
           const remapped = state.pendingActions[0];
           return { ...action, pendingActionId: remapped.id };
         }
@@ -286,22 +621,17 @@ function VisualReplay({
         return action;
       }
       if (action.type === 'REVEAL_CHARACTER') {
-        // Remap characterInstanceId — find by mission index + position
         const mission = state.activeMissions[action.missionIndex];
         if (mission) {
           const origId = action.characterInstanceId;
-          // Check if the ID exists in the current state
           const allChars = [...mission.player1Characters, ...mission.player2Characters];
           const found = allChars.find((c) => c.instanceId === origId);
           if (!found) {
-            // Find hidden characters owned by the acting player in this mission
             const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
             const hiddenChars = playerChars.filter((c) => c.isHidden);
             if (hiddenChars.length === 1) {
               return { ...action, characterInstanceId: hiddenChars[0].instanceId };
             }
-            // Multiple hidden — try matching by card name from the original action
-            // As a fallback, use the first hidden character
             if (hiddenChars.length > 0) {
               return { ...action, characterInstanceId: hiddenChars[0].instanceId };
             }
@@ -310,14 +640,12 @@ function VisualReplay({
         return action;
       }
       if (action.type === 'UPGRADE_CHARACTER') {
-        // Remap targetInstanceId
         const mission = state.activeMissions[action.missionIndex];
         if (mission) {
           const origId = action.targetInstanceId;
           const allChars = [...mission.player1Characters, ...mission.player2Characters];
           const found = allChars.find((c) => c.instanceId === origId);
           if (!found) {
-            // Find visible characters with the same name
             const card = state[state.activePlayer].hand[action.cardIndex];
             if (card) {
               const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -335,44 +663,35 @@ function VisualReplay({
       return action;
     }
 
-    // ---- Main loop: apply each recorded action ----
     for (const { player, action } of actionHistory) {
       const prevTurn = current.turn;
       const counterBefore = getIdCounter();
       const remappedAction = remapAction(action, current);
       try {
         const next = GameEngine.applyAction(current, player, remappedAction);
-        // Always use the result — even if the action had "no visible effect",
-        // the ID counter has advanced and we must stay in sync.
         current = next;
       } catch {
-        // Action threw — restore counter to prevent desync, keep current state
         setIdCounter(counterBefore);
         continue;
       }
 
-      // If turn changed, inject a synthetic start-phase snapshot
       if (current.turn !== prevTurn && current.phase === 'action') {
         result.push({ ...current, phase: 'start' as GamePhase });
       }
       result.push(current);
     }
 
-    // ---- Recovery loop: advance stuck states after actionHistory is exhausted ----
-    // Handles: auto-resolve pending effects, force phase transitions,
-    // clean up stale state, and advance through remaining turns.
+    // Recovery loop
     let recovery = 0;
     while (current.phase !== 'gameOver' && recovery < 120) {
       let advanced: GameState | null = null;
       try {
-        // --- Clean up stale pendingEffects without matching pendingActions ---
         if (current.pendingEffects.length > 0 && current.pendingActions.length === 0) {
           current = { ...current, pendingEffects: [] };
         }
 
         if (current.phase === 'action') {
           if (current.player1.hasPassed && current.player2.hasPassed) {
-            // Both passed — try PASS to trigger mission phase transition
             for (const p of ['player1', 'player2'] as PlayerID[]) {
               try {
                 const attempt = GameEngine.applyAction(current, p, { type: 'PASS' });
@@ -382,7 +701,6 @@ function VisualReplay({
                 }
               } catch { /* try next */ }
             }
-            // If PASS didn't advance, force mission phase + ADVANCE_PHASE
             if (!advanced) {
               try {
                 const forced: GameState = { ...current, phase: 'mission' as GamePhase, missionScoredThisTurn: false };
@@ -390,11 +708,9 @@ function VisualReplay({
               } catch { /* fallthrough */ }
             }
           }
-          // Not both passed — can't simulate player decisions; break
           if (!advanced) break;
 
         } else if ((current.phase === 'mission' || current.phase === 'end') && current.pendingActions.length > 0) {
-          // Resolve pending actions (SCORE effects, Rock Lee moves, Akamaru returns)
           const pending = current.pendingActions[0];
           const effect = current.pendingEffects.find((e) => e.id === pending.sourceEffectId);
           const isOptional = effect?.isOptional || pending.minSelections === 0 || pending.options.length === 0;
@@ -412,7 +728,6 @@ function VisualReplay({
             });
           }
 
-          // If the action didn't resolve the pending, force-remove it
           if (!advanced || advanced.pendingActions.length === current.pendingActions.length) {
             const cleaned = advanced ?? current;
             advanced = {
@@ -425,22 +740,18 @@ function VisualReplay({
           }
 
         } else if (current.phase === 'mission' && current.pendingActions.length === 0) {
-          // Mission phase done — advance to end phase
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
 
         } else if (current.phase === 'end' && current.pendingActions.length === 0) {
-          // End phase done — advance to next turn or game over
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
 
         } else {
           break;
         }
       } catch {
-        // Last resort: force ADVANCE_PHASE
         try {
           advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
         } catch {
-          // If even that fails, try forcing the phase transition directly
           if (current.phase === 'mission') {
             advanced = {
               ...current,
@@ -453,7 +764,6 @@ function VisualReplay({
             if (current.turn > 4) {
               advanced = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
             } else {
-              // Force next turn — we lose the start phase details but at least the replay continues
               advanced = {
                 ...current,
                 phase: 'action' as GamePhase,
@@ -472,7 +782,6 @@ function VisualReplay({
 
       if (!advanced) break;
 
-      // Detect progress — must change phase, turn, pending count, or missionScoringComplete
       const madeProgress = advanced.phase !== current.phase ||
         advanced.turn !== current.turn ||
         advanced.pendingActions.length !== current.pendingActions.length ||
@@ -480,7 +789,6 @@ function VisualReplay({
         Boolean(advanced.missionScoringComplete) !== Boolean(current.missionScoringComplete);
       if (!madeProgress) break;
 
-      // Inject start-phase snapshot for turn changes
       if (advanced.turn !== current.turn && advanced.phase === 'action') {
         result.push({ ...advanced, phase: 'start' as GamePhase });
       }
@@ -503,7 +811,6 @@ function VisualReplay({
     return result;
   }, [initialState, actionHistory]);
 
-  // Compute turn start indices for quick navigation
   const turnStarts = useMemo(() => {
     const starts: Array<{ turn: number; step: number }> = [];
     const seenTurns = new Set<number>();
@@ -517,12 +824,9 @@ function VisualReplay({
     return starts;
   }, [states]);
 
-  // Build action label from the log entry closest to this step
   const actionLabel = useMemo(() => {
     const state = states[currentStep];
     if (!state) return '';
-    // Find the log entry that was added at this step
-    // The log grows as actions are applied; compare log lengths
     if (currentStep === 0) return tr('start');
     const prevLogLen = states[currentStep - 1]?.log?.length ?? 0;
     const curLogLen = state.log?.length ?? 0;
@@ -540,7 +844,6 @@ function VisualReplay({
 
   const handleStepChange = useCallback((step: number) => {
     if (step === -1) {
-      // Advance by one (used by auto-play)
       setCurrentStep((prev) => Math.min(states.length - 1, prev + 1));
     } else {
       setCurrentStep(Math.max(0, Math.min(states.length - 1, step)));
@@ -551,32 +854,28 @@ function VisualReplay({
   if (!currentState) return null;
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {/* Visual board */}
-      <div className="mb-4">
-        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} />
-      </div>
+      <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} />
 
       {/* Playback controls */}
-      <div className="mb-4">
-        <PlaybackControls
-          currentStep={currentStep}
-          totalSteps={states.length}
-          onStepChange={handleStepChange}
-          turnStarts={turnStarts}
-          actionLabel={actionLabel}
-        />
-      </div>
+      <PlaybackControls
+        currentStep={currentStep}
+        totalSteps={states.length}
+        onStepChange={handleStepChange}
+        turnStarts={turnStarts}
+        actionLabel={actionLabel}
+      />
 
       {/* Toggle log */}
-      <div>
+      <div className="flex flex-col gap-3">
         <button
           onClick={() => setShowLog(!showLog)}
-          className="px-3 py-1.5 text-xs rounded cursor-pointer mb-3"
+          className="self-start px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer"
           style={{
-            backgroundColor: showLog ? '#c4a35a' : '#1a1a2e',
-            color: showLog ? '#0a0a0a' : '#888',
-            border: `1px solid ${showLog ? '#c4a35a' : '#333'}`,
+            backgroundColor: showLog ? '#c4a35a' : '#16161e',
+            color: showLog ? '#0a0a0a' : '#666',
+            border: `1px solid ${showLog ? '#c4a35a' : '#2a2a34'}`,
           }}
         >
           {tr('eventTimeline')}
@@ -601,6 +900,13 @@ export default function ReplayPage({
   const [game, setGame] = useState<GameData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
+  const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+
+  // Fetch user's background preference
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   useEffect(() => {
     fetch(`/api/game/${id}`)
@@ -621,7 +927,17 @@ export default function ReplayPage({
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#888888' }}>{tr('loading')}</p>
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="w-6 h-6 rounded-full"
+            style={{
+              border: '2px solid #2a2a34',
+              borderTopColor: '#c4a35a',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
+          <p className="text-xs" style={{ color: '#555' }}>{tr('loading')}</p>
+        </div>
       </main>
     );
   }
@@ -629,8 +945,14 @@ export default function ReplayPage({
   if (error || !game) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#b33e3e' }}>{error}</p>
-        <Link href="/" style={{ color: '#888888' }}>{tr('back')}</Link>
+        <p className="text-sm" style={{ color: '#b33e3e' }}>{error}</p>
+        <Link
+          href="/"
+          className="px-4 py-2 text-sm rounded"
+          style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+        >
+          {tr('back')}
+        </Link>
       </main>
     );
   }
@@ -638,20 +960,21 @@ export default function ReplayPage({
   if (!game.gameState) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#0a0a0a' }}>
-        <p style={{ color: '#888888' }}>{tr('noLog')}</p>
-        <Link href="/" style={{ color: '#888888' }}>{tr('back')}</Link>
+        <p className="text-sm" style={{ color: '#555' }}>{tr('noLog')}</p>
+        <Link
+          href="/"
+          className="px-4 py-2 text-sm rounded"
+          style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+        >
+          {tr('back')}
+        </Link>
       </main>
     );
   }
 
   const playerNames = game.gameState.playerNames ?? { player1: t('game.anim.player1'), player2: t('game.anim.player2') };
-  const p1Name = playerNames.player1;
-  const p2Name = playerNames.player2;
-  const p1Won = game.winnerId === game.player1Id;
   const missions = game.gameState.finalMissions ?? [];
   const log = game.gameState.log ?? [];
-
-  // Determine if visual replay is available
   const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
   return (
@@ -663,80 +986,30 @@ export default function ReplayPage({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-bold" style={{ color: '#e0e0e0' }}>
+            <h1
+              className="text-xl font-bold uppercase tracking-wider"
+              style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+            >
               {tr('title')}
             </h1>
-            {game.completedAt && (
-              <p className="text-xs mt-1" style={{ color: '#555555' }}>
-                {new Date(game.completedAt).toLocaleDateString()} - {new Date(game.completedAt).toLocaleTimeString()}
-              </p>
-            )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ShareButton gameId={id} />
             <LanguageSwitcher />
             <Link
               href="/"
-              className="px-4 py-2 text-sm"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+              className="px-4 py-2 text-sm rounded"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
             >
               {tr('back')}
             </Link>
           </div>
         </div>
 
-        {/* Match Summary */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-        >
-          <div className="flex items-center justify-center gap-6 mb-4">
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-sm font-medium" style={{ color: p1Won ? '#c4a35a' : '#e0e0e0' }}>{p1Name}</span>
-              <span className="text-3xl font-bold tabular-nums" style={{ color: '#c4a35a' }}>{game.player1Score}</span>
-            </div>
-            <span className="text-lg font-bold" style={{ color: '#333333' }}>{tr('vsLabel')}</span>
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-sm font-medium" style={{ color: !p1Won ? '#c4a35a' : '#e0e0e0' }}>{p2Name}</span>
-              <span className="text-3xl font-bold tabular-nums" style={{ color: '#b33e3e' }}>{game.player2Score}</span>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <span className="text-xs" style={{ color: '#555555' }}>
-              {game.isAiGame ? tr('aiGame', { difficulty: game.aiDifficulty ?? 'medium' }) : tr('onlineGame')}
-            </span>
-          </div>
+        {/* Match summary with scores and missions */}
+        <div className="mb-6">
+          <MatchStats game={game} playerNames={playerNames} missions={missions} backgroundUrl={gameBackgroundUrl} />
         </div>
-
-        {/* Mission Results (for all games) */}
-        {missions.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#888888' }}>
-              {tr('missionSummary')}
-            </h2>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {missions.map((mission, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg p-3 text-center"
-                  style={{
-                    backgroundColor: '#141414',
-                    border: `1px solid ${mission.wonBy ? (mission.wonBy === 'player1' ? '#c4a35a30' : '#b33e3e30') : '#262626'}`,
-                  }}
-                >
-                  <p className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>{mission.name_fr}</p>
-                  <p className="text-[10px] mt-1" style={{ color: '#555555' }}>
-                    {tr('rank', { rank: mission.rank })} - {tr('points', { points: mission.basePoints + mission.rankBonus })}
-                  </p>
-                  {mission.wonBy && (
-                    <p className="text-[10px] font-medium mt-1" style={{ color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e' }}>
-                      {playerNames[mission.wonBy]}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Visual Replay or Text-only fallback */}
         {hasVisualReplay ? (
@@ -745,6 +1018,7 @@ export default function ReplayPage({
             actionHistory={game.gameState.actionHistory!}
             log={log}
             playerNames={playerNames}
+            backgroundUrl={gameBackgroundUrl}
           />
         ) : (
           <TextTimeline log={log} playerNames={playerNames} />

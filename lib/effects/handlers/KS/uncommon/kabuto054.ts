@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { generateInstanceId } from '@/lib/engine/utils/id';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { sortTargetsGemmaLast } from '@/lib/effects/defeatUtils';
@@ -99,8 +100,88 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   const sortedInstanceIds = sortedTargets.map(c => c.instanceId);
   const orderedTargets = sortedInstanceIds.map(id => hideTargets.find(t => t.instanceId === id)!);
 
-  // Hide each target individually via hideCharacterWithLog — this properly triggers
-  // Gemma 049 sacrifice, Kimimaro 056 protection, Shino 115 protection, and hide immunity
+  // --- Gemma 049 pre-scan: if Gemma is present and multiple friendly LV targets are being hidden,
+  //     let the player choose WHICH character to protect before processing the batch ---
+  const alreadyHasGemmaPending = state.pendingEffects.some(
+    (pe) => (pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' || pe.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') && !pe.resolved,
+  );
+  if (!alreadyHasGemmaPending) {
+    const friendlyChars = sourcePlayer === 'player1'
+      ? mission.player2Characters  // Kabuto is on sourcePlayer's side → enemies are the other side
+      : mission.player1Characters;
+
+    // Check both sides for Gemma + multiple LV targets
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const sidePlayer = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+      if (sidePlayer === sourcePlayer) continue; // Gemma protects from ENEMY effects, so only check the opponent's side
+      const sideChars = mission[side];
+
+      // Find Gemma on this side
+      let gemmaChar: CharacterInPlay | null = null;
+      for (const ch of sideChars) {
+        if (ch.isHidden) continue;
+        const fTopCard = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+        if (fTopCard.number === 49) {
+          const hasSacrifice = (fTopCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+              e.description.includes('Leaf Village') && e.description.includes('defeat this character instead'),
+          );
+          if (hasSacrifice) { gemmaChar = ch; break; }
+        }
+      }
+      if (!gemmaChar) continue;
+
+      // Find LV targets being hidden on Gemma's side
+      const lvTargetIds = orderedTargets
+        .filter(t => t.sidePlayer === sidePlayer && t.char.card.group === 'Leaf Village')
+        .map(t => t.instanceId);
+
+      if (lvTargetIds.length >= 2) {
+        // Multiple LV targets → let player choose which to protect
+        let newState = { ...state };
+        const effectId = generateInstanceId();
+        const actionId = generateInstanceId();
+        const allTargetIds = orderedTargets.map(t => t.instanceId);
+
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId,
+          sourceCardId: 'KS-049-C',
+          sourceInstanceId: gemmaChar.instanceId,
+          sourceMissionIndex: sourceMissionIndex,
+          effectType: 'MAIN' as const,
+          effectDescription: JSON.stringify({
+            sacrificeInstanceId: gemmaChar.instanceId,
+            effectSource: sourcePlayer,
+            batchAllTargets: allTargetIds,
+            batchLVTargets: lvTargetIds,
+            batchSourcePlayer: sourcePlayer,
+          }),
+          targetSelectionType: 'GEMMA049_CHOOSE_PROTECT_HIDE',
+          sourcePlayer: sidePlayer,
+          requiresTargetSelection: true,
+          validTargets: lvTargetIds,
+          isOptional: true,
+          isMandatory: false,
+          resolved: false,
+          isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: actionId,
+          type: 'SELECT_TARGET' as 'SELECT_TARGET',
+          player: sidePlayer,
+          description: `Gemma Shiranui (049): Choose which Leaf Village character to protect from being hidden (or skip).`,
+          descriptionKey: 'game.effect.desc.gemma049ChooseProtect',
+          options: lvTargetIds,
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId,
+        }];
+        return { state: newState };
+      }
+    }
+  }
+
+  // --- Normal batch hide processing (single or no LV target, or no Gemma) ---
   let currentState = state;
   let hiddenCount = 0;
 

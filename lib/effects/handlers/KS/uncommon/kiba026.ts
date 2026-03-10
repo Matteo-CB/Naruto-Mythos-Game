@@ -88,25 +88,21 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
   const topCards = ps.deck.slice(0, 3);
   const remainingDeck = ps.deck.slice(3);
 
-  const akamaruCards = topCards.filter(c => c.name_fr === 'AKAMARU');
-  const otherCards = topCards.filter(c => c.name_fr !== 'AKAMARU');
+  // Find matching Akamaru cards with their indices
+  const matchIndices: number[] = [];
+  for (let i = 0; i < topCards.length; i++) {
+    if (topCards[i].name_fr === 'AKAMARU') matchIndices.push(i);
+  }
 
-  // Draw Akamaru cards into hand
-  ps.hand = [...ps.hand, ...akamaruCards];
-  // Put other cards back on top of deck (same order)
-  ps.deck = [...otherCards, ...remainingDeck];
+  const cardInfos = topCards.map(c => ({
+    name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+    image_file: c.image_file, isMatch: c.name_fr === 'AKAMARU',
+  }));
 
-  newState[sourcePlayer] = ps;
-
-  if (akamaruCards.length > 0) {
-    newState = { ...newState, log: logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT_DRAW',
-      `Kiba Inuzuka (026): Drew ${akamaruCards.length} Akamaru card(s) from top 3 of deck (upgrade effect).`,
-      'game.log.effect.draw',
-      { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: akamaruCards.length },
-    ) };
-  } else {
+  if (matchIndices.length === 0) {
+    // No matches: put all back, show confirm-only reveal
+    ps.deck = [...topCards, ...remainingDeck];
+    newState[sourcePlayer] = ps;
     newState = { ...newState, log: logAction(
       newState.log, newState.turn, newState.phase, sourcePlayer,
       'EFFECT',
@@ -114,27 +110,37 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.lookAtDeck',
       { card: 'KIBA INUZUKA', id: 'KS-026-UC' },
     ) };
+
+    return {
+      state: newState,
+      requiresTargetSelection: true,
+      targetSelectionType: 'KIBA026_UPGRADE_REVEAL',
+      validTargets: ['confirm'],
+      description: JSON.stringify({
+        text: `Kiba (026): No Akamaru in top ${topCards.length}. Cards put back.`,
+        topCards: cardInfos,
+      }),
+      descriptionKey: 'game.effect.desc.kiba026UpgradeReveal',
+      isMandatory: true,
+    };
   }
 
-  // Show the top 3 cards to the player (info reveal, confirm only)
-  const revealData = JSON.stringify({
-    text: akamaruCards.length > 0
-      ? `Kiba (026): Found ${akamaruCards.length} Akamaru card(s) in top ${topCards.length}.`
-      : `Kiba (026): No Akamaru in top ${topCards.length}. Cards put back.`,
-    topCards: topCards.map(c => ({
-      name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
-      image_file: c.image_file, isMatch: c.name_fr === 'AKAMARU',
-    })),
-  });
-
+  // Matches found: let the player choose which to draw (0 to N)
+  // Don't modify state yet — resolution handler will apply the draw
   return {
     state: newState,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIBA026_UPGRADE_REVEAL',
-    validTargets: ['confirm'],
-    description: revealData,
-    descriptionKey: 'game.effect.desc.kiba026UpgradeReveal',
-    isMandatory: true,
+    targetSelectionType: 'KIBA026_UPGRADE_CHOOSE',
+    validTargets: matchIndices.map(i => String(i)),
+    minSelections: 0,
+    maxSelections: matchIndices.length,
+    description: JSON.stringify({
+      text: `Kiba (026): Found ${matchIndices.length} Akamaru card(s) in top ${topCards.length}. Choose which to draw.`,
+      topCards: cardInfos,
+      topCardsRaw: topCards,
+      remainingDeck,
+    }),
+    descriptionKey: 'game.effect.desc.kiba026UpgradeChoose',
   };
 }
 

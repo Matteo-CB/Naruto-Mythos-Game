@@ -34,6 +34,7 @@ export default function PlayOnlinePage() {
   const [deckSelected, setDeckSelected] = useState(false);
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(true);
 
   const {
     connected,
@@ -49,6 +50,8 @@ export default function PlayOnlinePage() {
     createRoom,
     joinRoom,
     selectDeck,
+    changeDeck,
+    opponentChangingDeck,
     requestRoomList,
     clearError,
   } = useSocketStore();
@@ -183,7 +186,8 @@ export default function PlayOnlinePage() {
       if (!connected) {
         await connect(session.user.id);
       }
-      createRoom(session.user.id, false, selectedMode === 'ranked', false, selectedMode, session.user.name ?? undefined);
+      const isRanked = selectedMode === 'ranked';
+      createRoom(session.user.id, false, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
       setIsPrivateRoom(false);
     } catch {
       // Error set in socket store
@@ -195,7 +199,8 @@ export default function PlayOnlinePage() {
       if (!connected) {
         await connect(session.user.id);
       }
-      createRoom(session.user.id, true, selectedMode === 'ranked', false, selectedMode, session.user.name ?? undefined);
+      const isRanked = selectedMode === 'ranked';
+      createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
       setIsPrivateRoom(true);
     } catch {
       // Error set in socket store
@@ -278,9 +283,18 @@ export default function PlayOnlinePage() {
         )}
 
         {deckSelected && (
-          <p className="text-xs" style={{ color: '#c4a35a' }}>
-            {t('online.waitingForOpponent')}
-          </p>
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-xs" style={{ color: '#c4a35a' }}>
+              {opponentChangingDeck ? t('online.opponentChangingDeck') : t('online.waitingForOpponent')}
+            </p>
+            <button
+              onClick={() => { changeDeck(); setDeckSelected(false); }}
+              className="px-4 py-2 text-xs rounded cursor-pointer"
+              style={{ backgroundColor: '#141414', border: '1px solid #333', color: '#888' }}
+            >
+              {t('online.changeDeck')}
+            </button>
+          </div>
         )}
 
         {/* Main UI (hide once deck selection is shown) */}
@@ -477,6 +491,38 @@ export default function PlayOnlinePage() {
                     <p className="text-xs -mt-2" style={{ color: '#555555' }}>
                       {t(`online.modeDesc.${selectedMode}`)}
                     </p>
+
+                    {/* Timer toggle (casual only) */}
+                    {selectedMode === 'casual' && (
+                      <div
+                        className="flex items-center justify-between w-full px-4 py-3 rounded-lg"
+                        style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
+                            {t('online.timer.label')}
+                          </span>
+                          <span className="text-[10px]" style={{ color: '#555555' }}>
+                            {t('online.timer.description')}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setTimerEnabled(!timerEnabled)}
+                          className="relative w-10 h-5 rounded-full transition-colors"
+                          style={{
+                            backgroundColor: timerEnabled ? '#c4a35a' : '#333333',
+                          }}
+                        >
+                          <span
+                            className="absolute top-0.5 w-4 h-4 rounded-full transition-transform"
+                            style={{
+                              backgroundColor: '#0a0a0a',
+                              left: timerEnabled ? '22px' : '2px',
+                            }}
+                          />
+                        </button>
+                      </div>
+                    )}
 
                     <button
                       onClick={handleCreatePrivateRoom}

@@ -652,6 +652,36 @@ export class GameEngine {
         return newState;
       }
 
+      // Special case: Gemma 049 batch protect choice declined → process all targets normally (no protection)
+      if (effect.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') {
+        let parsed049cp: { batchAllTargets?: string[]; batchSourcePlayer?: string } = {};
+        try { parsed049cp = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        // Keep the pending effect as "not resolved" during batch processing so that
+        // hideCharacterWithLog's alreadyHasGemmaPending check prevents re-triggering Gemma.
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        // Hide all batch targets normally (Gemma won't re-trigger because the pending is still present)
+        const batchAll049 = parsed049cp.batchAllTargets ?? [];
+        const batchSourceP049 = (parsed049cp.batchSourcePlayer ?? (effect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as import('./types').PlayerID;
+        let hiddenCount049 = 0;
+        for (const bId of batchAll049) {
+          newState = EffectEngine.hideCharacterWithLog(newState, bId, batchSourceP049);
+          const charAfter = EffectEngine.findCharByInstanceId(newState, bId);
+          if (charAfter && charAfter.character.isHidden) hiddenCount049++;
+        }
+        // Now remove the pending effect
+        newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== effect.id);
+        if (hiddenCount049 > 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, batchSourceP049,
+            'EFFECT_HIDE',
+            `Kabuto Yakushi (054): Hid ${hiddenCount049} character(s) in this mission (Gemma protection declined).`,
+            'game.log.effect.hide',
+            { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount049) },
+          );
+        }
+        return newState;
+      }
+
       // Special case: Kiba 113/149 UPGRADE confirmation declined → continue with hide mode
       if (effect.targetSelectionType === 'KIBA113_CONFIRM_UPGRADE' || effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
         newState.pendingEffects.splice(effectIdx, 1);

@@ -9,7 +9,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
-import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
@@ -581,8 +581,8 @@ export class EffectEngine {
       descriptionKey: result.descriptionKey,
       descriptionParams: result.descriptionParams,
       options: result.validTargets ?? [],
-      minSelections: 1,
-      maxSelections: 1,
+      minSelections: result.minSelections ?? 1,
+      maxSelections: result.maxSelections ?? 1,
       sourceEffectId: effectId,
     };
 
@@ -761,8 +761,78 @@ export class EffectEngine {
         break;
 
       case 'KIBA026_UPGRADE_REVEAL':
-        // Acknowledgment only â€' draw and deck rearrangement already applied
+        // Acknowledgment only — draw and deck rearrangement already applied
         break;
+
+      case 'KIBA026_UPGRADE_CHOOSE': {
+        // Player chose which Akamaru cards to draw from top 3
+        const descData026 = JSON.parse(pendingEffect.effectDescription);
+        const topCardsRaw026 = descData026.topCardsRaw;
+        const remainingDeck026 = descData026.remainingDeck;
+        const selectedIndices026 = targetId === 'skip' ? [] : targetId.split(',').map(Number);
+        const ps026 = { ...newState[pendingEffect.sourcePlayer] };
+        const drawnCards026: string[] = [];
+        const putBack026: typeof topCardsRaw026 = [];
+        for (let i = 0; i < topCardsRaw026.length; i++) {
+          if (selectedIndices026.includes(i)) {
+            ps026.hand = [...ps026.hand, topCardsRaw026[i]];
+            drawnCards026.push(topCardsRaw026[i].name_fr);
+          } else {
+            putBack026.push(topCardsRaw026[i]);
+          }
+        }
+        ps026.deck = [...putBack026, ...remainingDeck026];
+        newState[pendingEffect.sourcePlayer] = ps026;
+        if (drawnCards026.length > 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DRAW',
+            `Kiba Inuzuka (026): Drew ${drawnCards026.length} Akamaru card(s) from top 3 (upgrade).`,
+            'game.log.effect.draw',
+            { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: drawnCards026.length });
+        } else {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            'Kiba Inuzuka (026): Chose not to draw any Akamaru. Cards put back.',
+            'game.log.effect.lookAtDeck',
+            { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
+        }
+        break;
+      }
+
+      case 'TAYUYA065_UPGRADE_CHOOSE': {
+        // Player chose which Summon cards to draw from top 3
+        const descData065 = JSON.parse(pendingEffect.effectDescription);
+        const topCardsRaw065 = descData065.topCardsRaw;
+        const remainingDeck065 = descData065.remainingDeck;
+        const selectedIndices065 = targetId === 'skip' ? [] : targetId.split(',').map(Number);
+        const ps065 = { ...newState[pendingEffect.sourcePlayer] };
+        const drawnCards065: string[] = [];
+        const putBack065: typeof topCardsRaw065 = [];
+        for (let i = 0; i < topCardsRaw065.length; i++) {
+          if (selectedIndices065.includes(i)) {
+            ps065.hand = [...ps065.hand, topCardsRaw065[i]];
+            drawnCards065.push(topCardsRaw065[i].name_fr);
+          } else {
+            putBack065.push(topCardsRaw065[i]);
+          }
+        }
+        ps065.deck = [...putBack065, ...remainingDeck065];
+        newState[pendingEffect.sourcePlayer] = ps065;
+        if (drawnCards065.length > 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_DRAW',
+            `Tayuya (065): Drew ${drawnCards065.length} Summon card(s) from top 3 (upgrade).`,
+            'game.log.effect.draw',
+            { card: 'TAYUYA', id: 'KS-065-UC', count: drawnCards065.length });
+        } else {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            'Tayuya (065): Chose not to draw any Summon cards. Cards put back.',
+            'game.log.effect.lookAtDeck',
+            { card: 'TAYUYA', id: 'KS-065-UC' });
+        }
+        break;
+      }
 
       case 'SASUKE014_HAND_REVEAL':
         // Acknowledgment only â€' AMBUSH just shows opponent's hand
@@ -3037,6 +3107,70 @@ export class EffectEngine {
         if (g049HideData.batchRemainingTargets && g049HideData.batchRemainingTargets.length > 0) {
           const batchPlayer = (g049HideData.batchSourcePlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as PlayerID;
           newState = EffectEngine.resumeBatchHideAfterGemma(newState, g049HideData.batchRemainingTargets, batchPlayer);
+        }
+        break;
+      }
+
+      // --- Gemma 049: Choose which LV char to protect (batch hide with multiple LV targets) ---
+      case 'GEMMA049_CHOOSE_PROTECT_HIDE': {
+        let g049ChooseData: {
+          sacrificeInstanceId?: string; effectSource?: string;
+          batchAllTargets?: string[]; batchLVTargets?: string[];
+          batchSourcePlayer?: string;
+        } = {};
+        try { g049ChooseData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const batchAll = g049ChooseData.batchAllTargets ?? [];
+        const batchSourceP = (g049ChooseData.batchSourcePlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as PlayerID;
+        const protectedCharId = targetId; // The char the player chose to protect
+
+        // Sacrifice Gemma
+        const gemmaChooseId = g049ChooseData.sacrificeInstanceId;
+        if (gemmaChooseId) {
+          const gemmaRes = EffectEngine.findCharByInstanceId(newState, gemmaChooseId);
+          newState = EffectEngine.defeatCharacterDirect(newState, gemmaChooseId);
+          if (gemmaRes) {
+            newState = triggerOnDefeatEffects(newState, gemmaRes.character, gemmaRes.player);
+          }
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_SACRIFICE',
+            'Gemma Shiranui (049): Sacrificed to protect an ally from being hidden.',
+            'game.log.effect.gemma049SacrificeHide',
+            { card: 'GEMMA SHIRANUI', id: 'KS-049-C' },
+          );
+        }
+
+        // Process all batch targets, skipping the protected character
+        let batchHiddenCount = 0;
+        for (const batchTargetId of batchAll) {
+          if (batchTargetId === protectedCharId) continue; // Skip the protected char
+          const pendingCountBefore = newState.pendingEffects.length;
+          newState = EffectEngine.hideCharacterWithLog(newState, batchTargetId, batchSourceP);
+          // If another Gemma pending was created (shouldn't happen since Gemma is gone)
+          const newGemmaPending = newState.pendingEffects.find(
+            (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
+              && newState.pendingEffects.length > pendingCountBefore,
+          );
+          if (newGemmaPending) {
+            const restIds = batchAll.slice(batchAll.indexOf(batchTargetId) + 1).filter(id => id !== protectedCharId);
+            const desc = JSON.parse(newGemmaPending.effectDescription);
+            desc.batchRemainingTargets = restIds;
+            desc.batchSourcePlayer = batchSourceP;
+            desc.batchHiddenCount = batchHiddenCount;
+            newGemmaPending.effectDescription = JSON.stringify(desc);
+            break;
+          }
+          const charAfter = EffectEngine.findCharByInstanceId(newState, batchTargetId);
+          if (charAfter && charAfter.character.isHidden) batchHiddenCount++;
+        }
+        if (batchHiddenCount > 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, batchSourceP,
+            'EFFECT_HIDE',
+            `Kabuto Yakushi (054): Hid ${batchHiddenCount} character(s) in this mission.`,
+            'game.log.effect.hide',
+            { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(batchHiddenCount) },
+          );
         }
         break;
       }
@@ -5531,7 +5665,7 @@ export class EffectEngine {
     // Check Gemma 049 sacrifice: can sacrifice Gemma to protect friendly Leaf Village from enemy hide
     // Skip if there's already a pending Gemma sacrifice choice (batch hide dedup — Gemma can only sacrifice once)
     const alreadyHasGemmaPending = state.pendingEffects.some(
-      (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved,
+      (pe) => (pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' || pe.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') && !pe.resolved,
     );
     if (isEnemyEffect && charResult.character.card.group === 'Leaf Village' && !alreadyHasGemmaPending) {
       const mission = state.activeMissions[charResult.missionIndex];
@@ -5896,6 +6030,11 @@ export class EffectEngine {
     // Trigger the placed card's MAIN effects (and UPGRADE if it was an upgrade)
     state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
 
+    // Trigger opponent's continuous on-play reactions (e.g., Hinata 031 chakra, Neji 037 powerup)
+    if (!placedChar.isHidden) {
+      state = triggerOnPlayReactions(state, player, missionIndex);
+    }
+
     return state;
   }
 
@@ -5963,6 +6102,12 @@ export class EffectEngine {
     }
 
     state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
+
+    // Trigger opponent's continuous on-play reactions (e.g., Hinata 031 chakra, Neji 037 powerup)
+    if (!placedChar.isHidden) {
+      state = triggerOnPlayReactions(state, player, missionIndex);
+    }
+
     return state;
   }
 
@@ -7730,7 +7875,7 @@ export class EffectEngine {
             // Determine Kurenai's controller
             const kurenaiOwner = sourceMission.player1Characters.some(c => c.instanceId === ch.instanceId) ? 'player1' : 'player2';
             // Only block if the character being moved is an ENEMY of Kurenai's controller
-            if (charOwner !== kurenaiOwner) {
+            if (charResult.player !== kurenaiOwner) {
               state.log = logAction(
                 state.log, state.turn, state.phase, charOwner,
                 'EFFECT_BLOCKED',

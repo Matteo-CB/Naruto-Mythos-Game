@@ -33,6 +33,10 @@ export interface EffectResult {
   isOptional?: boolean;
   /** If true, the effect cannot be skipped (e.g., "you must" effects). */
   isMandatory?: boolean;
+  /** Minimum number of targets the player must select (0 = can skip). */
+  minSelections?: number;
+  /** Maximum number of targets the player can select. */
+  maxSelections?: number;
 }
 
 /**

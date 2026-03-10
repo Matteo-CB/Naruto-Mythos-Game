@@ -6,13 +6,14 @@ import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
-import { Link } from '@/lib/i18n/navigation';
+import { Link, useRouter } from '@/lib/i18n/navigation';
 import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export function GameEndScreen() {
   const t = useTranslations();
+  const router = useRouter();
   const { data: session } = useSession();
   const gameOver = useGameStore((s) => s.gameOver);
   const winner = useGameStore((s) => s.winner);
@@ -32,6 +33,11 @@ export function GameEndScreen() {
   const declineRematch = useSocketStore((s) => s.declineRematch);
   const replayAIGame = useGameStore((s) => s.replayAIGame);
   const lastAIGameConfig = useGameStore((s) => s.lastAIGameConfig);
+
+  const handleChangeDeck = useCallback(() => {
+    resetGame();
+    router.push('/play/ai');
+  }, [resetGame, router]);
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
@@ -479,21 +485,36 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* AI Replay button */}
+            {/* AI Replay buttons */}
             {isAIGame && lastAIGameConfig && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={replayAIGame}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                style={{
-                  backgroundColor: '#1a1a2e',
-                  color: '#c4a35a',
-                  border: '1px solid #c4a35a',
-                }}
-              >
-                {t('game.end.replay')}
-              </motion.button>
+              <div className="flex gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={replayAIGame}
+                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                  style={{
+                    backgroundColor: '#1a1a2e',
+                    color: '#c4a35a',
+                    border: '1px solid #c4a35a',
+                  }}
+                >
+                  {t('game.end.replay')}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleChangeDeck}
+                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                  style={{
+                    backgroundColor: '#1a1a2e',
+                    color: '#888',
+                    border: '1px solid #333',
+                  }}
+                >
+                  {t('game.end.changeDeck')}
+                </motion.button>
+              </div>
             )}
 
             {/* Online Rematch button */}
