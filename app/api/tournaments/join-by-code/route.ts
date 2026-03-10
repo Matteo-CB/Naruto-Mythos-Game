@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-// POST — join a tournament by code
+// POST - join a tournament by code
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();

@@ -118,7 +118,6 @@ export function PlaybackControls({
 
   const progressPct = totalSteps > 1 ? (currentStep / (totalSteps - 1)) * 100 : 0;
 
-  // Which turn are we currently in?
   const currentTurn = (() => {
     for (let i = turnStarts.length - 1; i >= 0; i--) {
       if (currentStep >= turnStarts[i].step) return turnStarts[i].turn;
@@ -136,7 +135,6 @@ export function PlaybackControls({
     onStepChange(Math.round(pct * (totalSteps - 1)));
   };
 
-  // Drag-to-scrub support
   const isDraggingRef = useRef(false);
   const handleMouseDown = (e: React.MouseEvent) => {
     isDraggingRef.current = true;
@@ -160,17 +158,17 @@ export function PlaybackControls({
 
   return (
     <div
-      className="rounded-xl overflow-hidden"
+      className="w-full overflow-hidden"
       style={{
-        backgroundColor: '#101018',
-        border: '1px solid #1e1e28',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(10, 10, 18, 0.92)',
+        backdropFilter: 'blur(12px)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       {/* Action label */}
       {actionLabel && (
         <div
-          className="text-center px-4 py-2"
+          className="text-center px-4 py-1"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
         >
           <span className="text-[11px] leading-relaxed" style={{ color: '#c0c0c0' }}>
@@ -180,20 +178,19 @@ export function PlaybackControls({
       )}
 
       {/* Progress bar with turn markers */}
-      <div className="px-4 pt-3 pb-1">
+      <div className="px-4 pt-2 pb-0.5">
         <div
           ref={progressBarRef}
-          className="relative w-full h-2 rounded-full cursor-pointer group"
+          className="relative w-full h-1.5 rounded-full cursor-pointer group"
           style={{ backgroundColor: '#1a1a24' }}
           onMouseDown={handleMouseDown}
         >
-          {/* Turn markers */}
           {turnStarts.map(({ turn, step }) => {
             const pct = totalSteps > 1 ? (step / (totalSteps - 1)) * 100 : 0;
             return (
               <div
                 key={turn}
-                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-full"
+                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5 rounded-full"
                 style={{
                   left: `${pct}%`,
                   backgroundColor: 'rgba(255,255,255,0.15)',
@@ -202,7 +199,6 @@ export function PlaybackControls({
               />
             );
           })}
-          {/* Fill */}
           <div
             className="absolute left-0 top-0 h-full rounded-full"
             style={{
@@ -211,11 +207,10 @@ export function PlaybackControls({
               transition: isPlaying ? 'none' : 'width 0.15s ease-out',
             }}
           />
-          {/* Scrubber */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full transition-all group-hover:scale-125"
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full transition-all group-hover:scale-125"
             style={{
-              left: `calc(${progressPct}% - 7px)`,
+              left: `calc(${progressPct}% - 6px)`,
               backgroundColor: '#c4a35a',
               border: '2px solid #0a0a0a',
               boxShadow: '0 0 6px rgba(196,163,90,0.4)',
@@ -226,14 +221,14 @@ export function PlaybackControls({
       </div>
 
       {/* Controls row */}
-      <div className="flex items-center justify-between px-4 py-2.5 gap-3">
+      <div className="flex items-center justify-between px-4 py-1.5 gap-3">
         {/* Turn jump pills */}
         <div className="flex items-center gap-1">
           {turnStarts.map(({ turn, step }) => (
             <button
               key={turn}
               onClick={() => { stopPlay(); onStepChange(step); }}
-              className={`${btnBase} px-2.5 py-1 text-[10px] font-bold`}
+              className={`${btnBase} px-2 py-0.5 text-[10px] font-bold`}
               style={{
                 backgroundColor: currentTurn === turn ? '#c4a35a' : '#16161e',
                 color: currentTurn === turn ? '#0a0a0a' : '#666',
@@ -250,7 +245,7 @@ export function PlaybackControls({
         <div className="flex items-center gap-1">
           <button
             onClick={goToStart}
-            className={`${btnBase} w-8 h-8 text-[10px]`}
+            className={`${btnBase} w-7 h-7 text-[10px]`}
             style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('start')}
           >
@@ -258,7 +253,7 @@ export function PlaybackControls({
           </button>
           <button
             onClick={stepBack}
-            className={`${btnBase} w-8 h-8 text-xs`}
+            className={`${btnBase} w-7 h-7 text-xs`}
             style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('stepBack')}
           >
@@ -266,7 +261,7 @@ export function PlaybackControls({
           </button>
           <button
             onClick={isPlaying ? stopPlay : startPlay}
-            className={`${btnBase} w-10 h-8 text-xs font-bold`}
+            className={`${btnBase} w-9 h-7 text-xs font-bold`}
             style={{
               backgroundColor: isPlaying ? 'rgba(179,62,62,0.12)' : 'rgba(62,139,62,0.12)',
               border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.4)' : 'rgba(62,139,62,0.4)'}`,
@@ -277,7 +272,7 @@ export function PlaybackControls({
           </button>
           <button
             onClick={stepForward}
-            className={`${btnBase} w-8 h-8 text-xs`}
+            className={`${btnBase} w-7 h-7 text-xs`}
             style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('stepForward')}
           >
@@ -285,7 +280,7 @@ export function PlaybackControls({
           </button>
           <button
             onClick={goToEnd}
-            className={`${btnBase} w-8 h-8 text-[10px]`}
+            className={`${btnBase} w-7 h-7 text-[10px]`}
             style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('end')}
           >
@@ -297,7 +292,7 @@ export function PlaybackControls({
         <div className="flex items-center gap-3">
           <button
             onClick={cycleSpeed}
-            className={`${btnBase} px-2.5 py-1 text-[10px] font-medium`}
+            className={`${btnBase} px-2 py-0.5 text-[10px] font-medium`}
             style={{
               backgroundColor: '#16161e',
               border: '1px solid #2a2a34',
@@ -311,22 +306,6 @@ export function PlaybackControls({
             {currentStep + 1}/{totalSteps}
           </span>
         </div>
-      </div>
-
-      {/* Keyboard hints */}
-      <div
-        className="flex items-center justify-center gap-4 px-4 py-1.5"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}
-      >
-        <span className="text-[8px]" style={{ color: '#333' }}>
-          Space: {isPlaying ? t('pause') : t('autoPlay')}
-        </span>
-        <span className="text-[8px]" style={{ color: '#333' }}>
-          &larr;&rarr;: Step
-        </span>
-        <span className="text-[8px]" style={{ color: '#333' }}>
-          1-4: Jump to turn
-        </span>
       </div>
     </div>
   );

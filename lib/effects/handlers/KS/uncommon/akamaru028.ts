@@ -48,7 +48,7 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' }) } };
   }
 
-  // Always require target selection (effect is optional — player can skip)
+  // Always require target selection (effect is optional - player can skip)
   return {
     state,
     requiresTargetSelection: true,

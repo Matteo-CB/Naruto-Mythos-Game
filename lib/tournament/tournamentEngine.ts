@@ -41,7 +41,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
   const size = nextPowerOf2(participants.length);
   const totalRounds = Math.log2(size);
 
-  // Seed array — nulls become byes
+  // Seed array - nulls become byes
   const seeded: (Participant | null)[] = [...participants];
   while (seeded.length < size) seeded.push(null);
 
@@ -157,7 +157,7 @@ function propagateWinner(matches: BracketMatch[], completed: BracketMatch): Brac
   }
 
   // If one slot is a bye propagation (the other feeder was also a bye/completed)
-  // and the other slot is still null, we wait — it'll fill when the other feeder completes.
+  // and the other slot is still null, we wait - it'll fill when the other feeder completes.
 
   return nextMatch;
 }

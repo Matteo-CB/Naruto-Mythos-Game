@@ -110,7 +110,7 @@ export interface ScoreEffectSource {
 }
 
 export interface MissionScoringProgress {
-  /** Index into rankOrder ['D','C','B','A'] — which rank we're currently scoring */
+  /** Index into rankOrder ['D','C','B','A'] - which rank we're currently scoring */
   currentRankIndex: number;
   /** Whether the mission card's SCORE effect has been processed for the current mission */
   missionCardScoreDone: boolean;
@@ -151,7 +151,7 @@ export interface GameState {
   /** Set when all mission scoring is complete but End Phase hasn't run yet.
    * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
   missionScoringComplete?: boolean;
-  /** Which player forfeited (abandon or timeout) — if set, game is over */
+  /** Which player forfeited (abandon or timeout) - if set, game is over */
   forfeitedBy?: PlayerID;
   /** Consecutive timeout count per player (online timer) */
   consecutiveTimeouts: { player1: number; player2: number };

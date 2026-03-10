@@ -13,7 +13,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST — start the tournament (generate bracket)
+// POST - start the tournament (generate bracket)
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -52,7 +52,7 @@ export async function POST(
 
     let orderedParticipants;
     if (hasManualSeeds) {
-      // Respect manual pairings — sort by seed (unset seeds go last, randomized)
+      // Respect manual pairings - sort by seed (unset seeds go last, randomized)
       const seeded = tournament.participants.filter(p => p.seed !== null && p.seed !== undefined);
       const unseeded = [...tournament.participants.filter(p => p.seed === null || p.seed === undefined)]
         .sort(() => Math.random() - 0.5);
@@ -68,7 +68,7 @@ export async function POST(
         }
       }
     } else {
-      // No manual seeds — shuffle randomly
+      // No manual seeds - shuffle randomly
       orderedParticipants = [...tournament.participants].sort(() => Math.random() - 0.5);
       for (let i = 0; i < orderedParticipants.length; i++) {
         await prisma.tournamentParticipant.update({

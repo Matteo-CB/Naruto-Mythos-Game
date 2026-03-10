@@ -13,7 +13,7 @@ function isAdmin(name: string | null | undefined): boolean {
   return !!name && ADMIN_USERNAMES.includes(name);
 }
 
-// GET — list all card issues
+// GET - list all card issues
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST — create a new card issue (supports multiple cards)
+// POST - create a new card issue (supports multiple cards)
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// PATCH — update issue status, description, or add/remove cards
+// PATCH - update issue status, description, or add/remove cards
 export async function PATCH(req: NextRequest) {
   try {
     const session = await auth();
@@ -148,7 +148,7 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
-// DELETE — remove an issue (tracker users can delete their own reports)
+// DELETE - remove an issue (tracker users can delete their own reports)
 export async function DELETE(req: NextRequest) {
   try {
     const session = await auth();

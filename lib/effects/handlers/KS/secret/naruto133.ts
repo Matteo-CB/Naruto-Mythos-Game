@@ -15,8 +15,8 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  * MAIN "effect:": Instead, defeat both of them (applies on upgrade).
  *
  * Two-stage target selection:
- *   Stage 1: NARUTO133_CHOOSE_TARGET1 — pick enemy Power ≤ 5 in this mission
- *   Stage 2: NARUTO133_CHOOSE_TARGET2 — pick enemy Power ≤ 2 in any mission
+ *   Stage 1: NARUTO133_CHOOSE_TARGET1 - pick enemy Power ≤ 5 in this mission
+ *   Stage 2: NARUTO133_CHOOSE_TARGET2 - pick enemy Power ≤ 2 in any mission
  */
 
 function naruto133MainHandler(ctx: EffectContext): EffectResult {

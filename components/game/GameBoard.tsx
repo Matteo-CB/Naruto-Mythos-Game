@@ -474,7 +474,7 @@ function CardPreview() {
   const displayMissionContext = pinnedCard ? pinnedMissionContext : previewMissionContext;
   const isPinned = !!pinnedCard;
 
-  // Hide the side panel on mobile — users can still tap cards for fullscreen detail
+  // Hide the side panel on mobile - users can still tap cards for fullscreen detail
   if (!displayCard || dims.isMobile) return null;
 
   return (
@@ -752,11 +752,11 @@ function FullscreenCardDetail() {
     </>
   );
 
-  // Mobile: bottom sheet — slides up from bottom, no backdrop click (avoids ghost-click bug)
+  // Mobile: bottom sheet - slides up from bottom, no backdrop click (avoids ghost-click bug)
   if (dims.isMobile) {
     return (
       <>
-        {/* Backdrop — pointer-events-none to prevent ghost clicks from the Details tap */}
+        {/* Backdrop - pointer-events-none to prevent ghost clicks from the Details tap */}
         <div
           className="fixed inset-0 pointer-events-none"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", zIndex: 299 }}
@@ -777,7 +777,7 @@ function FullscreenCardDetail() {
             boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.7)",
           }}
         >
-          {/* Close button — only toggles fullscreen, keeps card pinned so Details btn reappears */}
+          {/* Close button - only toggles fullscreen, keeps card pinned so Details btn reappears */}
           <button
             onClick={() => toggleFullscreenCard()}
             className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold cursor-pointer"
@@ -790,7 +790,7 @@ function FullscreenCardDetail() {
             X
           </button>
 
-          {/* Card image — sized to fill a good portion of the sheet */}
+          {/* Card image - sized to fill a good portion of the sheet */}
           {imagePath ? (
             <div
               className="w-full shrink-0 flex items-center justify-center"
@@ -992,7 +992,7 @@ function GameBoardInner() {
 
   const prevTurnRef = useRef<number | null>(null);
 
-  // Lock scroll on both <html> and <body> while game board is mounted — prevents
+  // Lock scroll on both <html> and <body> while game board is mounted - prevents
   // Framer Motion layout animations from temporarily pushing content beyond
   // container bounds and triggering a scrollbar.
   useEffect(() => {
@@ -1024,7 +1024,7 @@ function GameBoardInner() {
     }
   }, [visibleState?.turn, addAnimation, visibleState]);
 
-  // Clicking the board background unpins — but not when the fullscreen sheet is open
+  // Clicking the board background unpins - but not when the fullscreen sheet is open
   // (mobile ghost-tap: when Details button disappears after tap, a synthetic click fires at
   //  the same coordinates and passes through the pointer-events-none backdrop to the board div)
   const handleBoardClick = useCallback(() => {

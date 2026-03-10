@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// GET — single tournament detail
+// GET - single tournament detail
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -45,7 +45,7 @@ export async function GET(
   }
 }
 
-// DELETE — cancel a tournament (creator or admin)
+// DELETE - cancel a tournament (creator or admin)
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

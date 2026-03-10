@@ -190,7 +190,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
     const pendingCountBefore = currentState.pendingEffects.length;
     currentState = EffectEngine.hideCharacterWithLog(currentState, target.instanceId, sourcePlayer);
 
-    // Check if a Gemma 049 sacrifice pending was created — if so, store remaining targets and break
+    // Check if a Gemma 049 sacrifice pending was created - if so, store remaining targets and break
     const gemmaHidePending = currentState.pendingEffects.find(
       (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
         && currentState.pendingEffects.length > pendingCountBefore,
@@ -203,7 +203,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
       existingDesc.batchSourcePlayer = sourcePlayer;
       existingDesc.batchHiddenCount = hiddenCount;
       gemmaHidePending.effectDescription = JSON.stringify(existingDesc);
-      break; // Stop — remaining targets will be processed after the Gemma choice resolves
+      break; // Stop - remaining targets will be processed after the Gemma choice resolves
     }
 
     // Check if the character was actually hidden

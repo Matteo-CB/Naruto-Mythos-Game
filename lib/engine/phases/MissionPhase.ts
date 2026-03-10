@@ -49,7 +49,7 @@ export function resumeMissionScoring(state: GameState): GameState {
   const progress = newState.missionScoringProgress;
 
   if (!progress) {
-    // No progress saved — nothing to resume
+    // No progress saved - nothing to resume
     return newState;
   }
 
@@ -70,7 +70,7 @@ export function resumeMissionScoring(state: GameState): GameState {
     newState = handleOrochimaru051Move(newState, missionIdx, mission.wonBy ?? null);
   }
 
-  // Clear progress for this mission — continue to remaining missions
+  // Clear progress for this mission - continue to remaining missions
   newState = { ...newState, missionScoringProgress: undefined };
 
   // Continue scoring from the next rank
@@ -106,14 +106,14 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
     { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, p1Power, p2Power },
   );
 
-  // Determine winner — a player must have at least 1 power to win
+  // Determine winner - a player must have at least 1 power to win
   let winner: PlayerID | null = null;
 
   if (p1Power === 0 && p2Power === 0) {
-    // Both have 0 power — neither wins
+    // Both have 0 power - neither wins
     winner = null;
     log = logSystem(log, state.turn, 'mission', 'NO_WINNER',
-      `Mission ${missionIndex + 1}: Both players have 0 power — no winner.`,
+      `Mission ${missionIndex + 1}: Both players have 0 power - no winner.`,
       'game.log.noWinner',
       { index: missionIndex + 1 },
     );
@@ -188,7 +188,7 @@ function collectScoreEffectSources(
     sources.push({
       cardId: mission.card.id,
       instanceId: null,
-      label: `${mission.card.name_fr} (Mission) — ${scoreEffect?.description ?? 'SCORE'}`,
+      label: `${mission.card.name_fr} (Mission) - ${scoreEffect?.description ?? 'SCORE'}`,
     });
   }
 
@@ -204,7 +204,7 @@ function collectScoreEffectSources(
     sources.push({
       cardId: topCard.id,
       instanceId: char.instanceId,
-      label: `${topCard.name_fr} — ${scoreEffect?.description ?? 'SCORE'}`,
+      label: `${topCard.name_fr} - ${scoreEffect?.description ?? 'SCORE'}`,
     });
   }
 
@@ -401,7 +401,7 @@ export function resolveChosenScoreEffect(
   }
 
   if (remainingSources.length === 1) {
-    // Only one left — resolve directly
+    // Only one left - resolve directly
     const lastResult = resolveSingleScoreEffect(
       result,
       progress.winner,
@@ -426,7 +426,7 @@ export function resolveChosenScoreEffect(
     return lastResult;
   }
 
-  // All SCORE effects resolved — clear pendingScoreEffects
+  // All SCORE effects resolved - clear pendingScoreEffects
   if (result.missionScoringProgress) {
     result.missionScoringProgress.pendingScoreEffects = undefined;
   }
@@ -448,7 +448,7 @@ function resolveRemainingScoreEffects(
 
   // If mission card SCORE wasn't done, it means we're resuming after its pending was resolved.
   // The handler already ran and created a pending; that pending has now been resolved.
-  // Mark it as done — do NOT re-run the handler.
+  // Mark it as done - do NOT re-run the handler.
   if (!progress.missionCardScoreDone) {
     progress = { ...progress, missionCardScoreDone: true };
   }
@@ -458,12 +458,12 @@ function resolveRemainingScoreEffects(
     const remaining = progress.pendingScoreEffects;
 
     if (remaining.length > 1) {
-      // Multiple remain — present choice again
+      // Multiple remain - present choice again
       return createScoreOrderChoice(newState, player, missionIndex, progress.currentRankIndex, remaining);
     }
 
     if (remaining.length === 1) {
-      // Single remaining — resolve directly
+      // Single remaining - resolve directly
       const lastResult = resolveSingleScoreEffect(
         newState,
         player,
@@ -491,7 +491,7 @@ function resolveRemainingScoreEffects(
     return newState;
   }
 
-  // Fallback: sequential flow (no pendingScoreEffects — legacy or single-effect path)
+  // Fallback: sequential flow (no pendingScoreEffects - legacy or single-effect path)
   const mission = newState.activeMissions[missionIndex];
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   const processedCharIds = [...progress.processedCharacterIds];

@@ -17,7 +17,7 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Collect all characters in play (both sides — hidden characters are valid POWERUP targets per rules)
+  // Collect all characters in play (both sides - hidden characters are valid POWERUP targets per rules)
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {

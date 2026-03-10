@@ -36,7 +36,7 @@ function handleHinata030Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-030-C' }) } };
   }
 
-  // Always require target selection (effect is optional — player can skip)
+  // Always require target selection (effect is optional - player can skip)
   return {
     state,
     requiresTargetSelection: true,

@@ -38,7 +38,7 @@ export function SealedDeckBuilder({
   const t = useTranslations('sealed');
   const locale = useLocale() as 'en' | 'fr';
 
-  // Deck state — arrays, like the site's deck builder
+  // Deck state - arrays, like the site's deck builder
   const [deckChars, setDeckChars] = useState<BoosterCard[]>([]);
   const [deckMissions, setDeckMissions] = useState<BoosterCard[]>([]);
 
@@ -333,7 +333,7 @@ export function SealedDeckBuilder({
         </div>
       </div>
 
-      {/* Deck selection bar — always visible above the pool */}
+      {/* Deck selection bar - always visible above the pool */}
       <div
         className="shrink-0 px-3 py-1.5 flex items-center gap-3 overflow-x-auto"
         style={{ backgroundColor: '#111', borderBottom: '1px solid #262626', minHeight: '36px' }}
@@ -394,7 +394,7 @@ export function SealedDeckBuilder({
 
       {/* Main content */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-        {/* Left: Pool catalog — single scroll area */}
+        {/* Left: Pool catalog - single scroll area */}
         <div className="flex-1 overflow-y-auto" style={{ borderRight: '1px solid #262626', minHeight: 0 }}>
           {/* Filters */}
           <div className="px-3 py-2 flex flex-wrap items-center gap-2 sticky top-0 z-10" style={{ borderBottom: '1px solid #1a1a1a', backgroundColor: '#0a0a0a' }}>

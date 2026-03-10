@@ -93,7 +93,7 @@ function isMissionValidForPlay(
     return availableChakra >= upgradeCost;
   }
 
-  // No upgrade target — check for name conflict
+  // No upgrade target - check for name conflict
   if (hasSameNameConflict(chars, card, excludeInstanceId)) {
     return false; // Same name exists but can't upgrade (lower or equal cost)
   }
@@ -636,12 +636,12 @@ export class EffectEngine {
         const indices = targetId.split(',');
         const allValid = indices.every(idx => pendingEffect.validTargets!.includes(idx));
         if (!allValid) {
-          console.warn(`[EffectEngine] Invalid multi-select target ${targetId} — not all in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
+          console.warn(`[EffectEngine] Invalid multi-select target ${targetId} - not all in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
           return state;
         }
       }
     } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
-      console.warn(`[EffectEngine] Invalid target ${targetId} — not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
+      console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
       return state;
     }
 
@@ -650,7 +650,7 @@ export class EffectEngine {
     const kimimaro056Result = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
     newState = kimimaro056Result.state;
     if (kimimaro056Result.blocked) {
-      // Effect cancelled — clean up pending and return
+      // Effect cancelled - clean up pending and return
       newState.pendingEffects = newState.pendingEffects.filter((pe) => pe.id !== pendingEffect.id);
       newState.pendingActions = newState.pendingActions.filter((pa) => pa.sourceEffectId !== pendingEffect.id);
       return EffectEngine.processRemainingEffects(newState, pendingEffect);
@@ -796,7 +796,7 @@ export class EffectEngine {
         break;
 
       case 'KIBA026_UPGRADE_REVEAL':
-        // Acknowledgment only — draw and deck rearrangement already applied
+        // Acknowledgment only - draw and deck rearrangement already applied
         break;
 
       case 'KIBA026_UPGRADE_CHOOSE': {
@@ -1499,7 +1499,7 @@ export class EffectEngine {
             sourceEffectId: upgradeEffId,
           }];
         } else {
-          // No upgrade — proceed directly to target selection (hide mode)
+          // No upgrade - proceed directly to target selection (hide mode)
           if (isK149) {
             // Kiba 149: auto-pick first Akamaru, hide it, then ask for second target
             newState = EffectEngine.kiba149ExecuteStep1(newState, pendingEffect, false);
@@ -1866,11 +1866,11 @@ export class EffectEngine {
             }
           }
           if (charSourceMission107 >= 0 && isMovementBlockedByKurenai(newState, charSourceMission107, player107)) {
-            // Movement blocked by Kurenai — skip this char, process remaining
+            // Movement blocked by Kurenai - skip this char, process remaining
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, player107,
               'EFFECT_BLOCKED',
-              `Sasuke Uchiwa (107): Movement blocked by Kurenai Yuhi (035) — character stays in place.`,
+              `Sasuke Uchiwa (107): Movement blocked by Kurenai Yuhi (035) - character stays in place.`,
               'game.log.effect.moveBlocked',
               { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
             );
@@ -1938,7 +1938,7 @@ export class EffectEngine {
                 newState.log = logAction(
                   newState.log, newState.turn, newState.phase, player107,
                   'EFFECT_DISCARD',
-                  `Sasuke Uchiwa (107): ${movedChar107.card.name_fr} discarded — name conflict at mission ${destMission107 + 1} (mandatory move).`,
+                  `Sasuke Uchiwa (107): ${movedChar107.card.name_fr} discarded - name conflict at mission ${destMission107 + 1} (mandatory move).`,
                   'game.log.effect.sasuke107Discard',
                   { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr },
                 );
@@ -1982,12 +1982,12 @@ export class EffectEngine {
             }
           }
           if (nextCharMission107 >= 0 && isMovementBlockedByKurenai(newState, nextCharMission107, player107)) {
-            // Blocked by Kurenai — skip this char
+            // Blocked by Kurenai - skip this char
             nextIdx107++;
             continue;
           }
 
-          // Get valid missions for this char — all non-source missions (mandatory move)
+          // Get valid missions for this char - all non-source missions (mandatory move)
           const nextValidMissions: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
             if (i === srcMission107) continue;
@@ -1995,7 +1995,7 @@ export class EffectEngine {
           }
 
           if (nextValidMissions.length === 0) {
-            // No other missions exist — mandatory move means discard
+            // No other missions exist - mandatory move means discard
             let discardedNextChar: CharacterInPlay | null = null;
             for (let i = 0; i < newState.activeMissions.length; i++) {
               const chars = newState.activeMissions[i][friendlySide107];
@@ -2017,7 +2017,7 @@ export class EffectEngine {
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, player107,
               'EFFECT_DISCARD',
-              `Sasuke Uchiwa (107): ${nextCharName} discarded — no valid destination mission (mandatory move).`,
+              `Sasuke Uchiwa (107): ${nextCharName} discarded - no valid destination mission (mandatory move).`,
               'game.log.effect.sasuke107Discard',
               { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName },
             );
@@ -2074,7 +2074,7 @@ export class EffectEngine {
                   newState.log = logAction(
                     newState.log, newState.turn, newState.phase, player107,
                     'EFFECT_DISCARD',
-                    `Sasuke Uchiwa (107): ${nextCharName} discarded — name conflict at mission ${autoDestIdx + 1} (mandatory move).`,
+                    `Sasuke Uchiwa (107): ${nextCharName} discarded - name conflict at mission ${autoDestIdx + 1} (mandatory move).`,
                     'game.log.effect.sasuke107Discard',
                     { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName },
                   );
@@ -3138,7 +3138,7 @@ export class EffectEngine {
           break;
         }
 
-        // Multiple targets — queue another pending effect for selection
+        // Multiple targets - queue another pending effect for selection
         const yashTargets = yashAllChars.map((c: CharacterInPlay) => c.instanceId);
         const yashEffId = generateInstanceId();
         const yashActId = generateInstanceId();
@@ -3228,7 +3228,7 @@ export class EffectEngine {
 
       // --- Gemma 049: Sacrifice choice (hide protection) ---
       case 'GEMMA049_SACRIFICE_HIDE_CHOICE': {
-        // Player accepted — sacrifice Gemma to protect the original target from being hidden
+        // Player accepted - sacrifice Gemma to protect the original target from being hidden
         let g049HideData: { targetInstanceId?: string; sacrificeInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
         try { g049HideData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const gemmaHideId = g049HideData.sacrificeInstanceId ?? targetId;
@@ -4439,7 +4439,7 @@ export class EffectEngine {
           jirSourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const opponent_j = jirSourcePlayer === 'player1' ? 'player2' : 'player1';
 
-        // Track forced resolver — opponent gets the turn after all defeats resolve
+        // Track forced resolver - opponent gets the turn after all defeats resolve
         newState.pendingForcedResolver = opponent_j;
 
         const mission_j = newState.activeMissions[missionIdx_j];
@@ -4610,7 +4610,7 @@ export class EffectEngine {
           ps104.chakra -= chakraAmount;
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps104 };
 
-          // POWERUP on self — double if this is an upgrade (UPGRADE repeats the MAIN POWERUP)
+          // POWERUP on self - double if this is an upgrade (UPGRADE repeats the MAIN POWERUP)
           const powerupAmount = pendingEffect.isUpgrade ? chakraAmount * 2 : chakraAmount;
           const charResult104 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
           if (charResult104) {
@@ -4954,12 +4954,12 @@ export class EffectEngine {
         (e) => e.type !== 'UPGRADE' && !e.description.includes('[⧗]') && !e.description.startsWith('effect:') && !e.description.startsWith('effect.'),
       );
       if (copyableEffects.length === 1) {
-        // Single copyable effect — execute directly
+        // Single copyable effect - execute directly
         return EffectEngine.executeCopiedEffect(
           newState, pending, discardedCard, copyableEffects[0].type as EffectType,
         );
       } else if (copyableEffects.length > 1) {
-        // Multiple copyable effects — let the player choose
+        // Multiple copyable effects - let the player choose
         const choiceEffectId = generateInstanceId();
         const choiceActionId = generateInstanceId();
         const effectOptions = copyableEffects.map((eff) => `${eff.type}::${eff.description}`);
@@ -5773,7 +5773,7 @@ export class EffectEngine {
         );
         if (hasProtection) {
           if (state[sourcePlayer].chakra >= 1) {
-            // Opponent pays 1 chakra — effect proceeds
+            // Opponent pays 1 chakra - effect proceeds
             state = {
               ...state,
               [sourcePlayer]: { ...state[sourcePlayer], chakra: state[sourcePlayer].chakra - 1 },
@@ -5786,13 +5786,13 @@ export class EffectEngine {
               ),
             };
           } else {
-            // Opponent cannot pay — effect fails, hide is blocked
+            // Opponent cannot pay - effect fails, hide is blocked
             return {
               ...state,
               log: logAction(
                 state.log, state.turn, state.phase, charResult.player,
                 'EFFECT_CONTINUOUS',
-                `Kimimaro (056): ${sourcePlayer} cannot pay 1 Chakra — effect fails.`,
+                `Kimimaro (056): ${sourcePlayer} cannot pay 1 Chakra - effect fails.`,
                 'game.log.effect.kimimaro056ProtectionBlocked',
                 { card: 'KIMIMARO', id: 'KS-056-UC' },
               ),
@@ -5813,7 +5813,7 @@ export class EffectEngine {
     }
 
     // Check Gemma 049 sacrifice: can sacrifice Gemma to protect friendly Leaf Village from enemy hide
-    // Skip if there's already a pending Gemma sacrifice choice (batch hide dedup — Gemma can only sacrifice once)
+    // Skip if there's already a pending Gemma sacrifice choice (batch hide dedup - Gemma can only sacrifice once)
     const alreadyHasGemmaPending = state.pendingEffects.some(
       (pe) => (pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' || pe.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') && !pe.resolved,
     );
@@ -6689,11 +6689,11 @@ export class EffectEngine {
             );
             return { state, blocked: false };
           } else {
-            // Can't pay — effect is cancelled
+            // Can't pay - effect is cancelled
             state.log = logAction(
               state.log, state.turn, state.phase, charOwner,
               'EFFECT_CONTINUOUS',
-              `Kimimaro (056): ${opponent} cannot pay 1 Chakra — effect on Kimimaro is cancelled.`,
+              `Kimimaro (056): ${opponent} cannot pay 1 Chakra - effect on Kimimaro is cancelled.`,
               'game.log.effect.kimimaro056Blocked',
               { card: 'KIMIMARO', id: 'KS-056-UC' },
             );
@@ -6811,7 +6811,7 @@ export class EffectEngine {
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, player,
           'EFFECT_BLOCKED',
-          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} — same name already present.`,
+          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} - same name already present.`,
           'game.log.effect.nameConflictBlocked',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr },
         );
@@ -6893,7 +6893,7 @@ export class EffectEngine {
         if (isSameName || isFlex) upgradeTargetIds_h002.push(c.instanceId);
       }
 
-      // Card is still in hand (splice hasn't happened yet) — it will be removed when the choice resolves.
+      // Card is still in hand (splice hasn't happened yet) - it will be removed when the choice resolves.
 
       // Create pending effect for the choice
       const effectId_h002 = `hiruzen002-upgrade-choice-${generateInstanceId()}`;
@@ -7678,7 +7678,7 @@ export class EffectEngine {
     return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-109-R', costReduction);
   }
 
-  // sakura109Place removed — now uses genericPlaceOnMission via sakura109ChooseMission
+  // sakura109Place removed - now uses genericPlaceOnMission via sakura109ChooseMission
 
   // =====================================
   // Sakura 135 (S) â€' Top 3 cards (two-stage)
@@ -8098,7 +8098,7 @@ export class EffectEngine {
               state.log = logAction(
                 state.log, state.turn, state.phase, charOwner,
                 'EFFECT_BLOCKED',
-                `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} — Kurenai blocks enemy movement from this mission.`,
+                `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} - Kurenai blocks enemy movement from this mission.`,
                 'game.log.effect.moveBlocked',
                 { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
               );
@@ -8476,7 +8476,7 @@ export class EffectEngine {
   }
 
   /**
-   * Kiba 149 (MV): Execute step 1 — auto-pick first Akamaru, hide/defeat it,
+   * Kiba 149 (MV): Execute step 1 - auto-pick first Akamaru, hide/defeat it,
    * then queue second target selection.
    */
   static kiba149ExecuteStep1(state: GameState, pending: PendingEffect, useDefeat: boolean): GameState {

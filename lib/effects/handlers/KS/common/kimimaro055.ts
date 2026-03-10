@@ -13,7 +13,7 @@ import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
  *   1. Discards the last card from hand.
  *   2. Hides the first valid non-hidden character with cost <= 3.
  *      Prefers enemy characters over friendly ones.
- * Optional effect — fizzles if no cards in hand or no valid target.
+ * Optional effect - fizzles if no cards in hand or no valid target.
  */
 function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -60,7 +60,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
     }
   }
 
-  // No valid target to hide — effect fizzles (don't discard)
+  // No valid target to hide - effect fizzles (don't discard)
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kimimaro (055): No character with cost 3 or less to hide.',

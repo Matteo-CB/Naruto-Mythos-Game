@@ -24,7 +24,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
     for (const char of friendlyChars) {
       // Must not be self, must be Leaf Village
       if (char.instanceId === sourceCard.instanceId) continue;
-      // Hidden characters have no visible keywords/group — skip
+      // Hidden characters have no visible keywords/group - skip
       if (char.isHidden) continue;
 
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -41,7 +41,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' }) } };
   }
 
-  // Always require target selection (effect is optional — player can skip)
+  // Always require target selection (effect is optional - player can skip)
   return {
     state,
     requiresTargetSelection: true,

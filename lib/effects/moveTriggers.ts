@@ -281,7 +281,7 @@ export function checkChoji018PostMoveTrigger(
     log: logAction(
       state.log, state.turn, state.phase, charController,
       'EFFECT_CONTINUOUS',
-      'Choji Akimichi (018): After moving — choose an enemy to hide.',
+      'Choji Akimichi (018): After moving - choose an enemy to hide.',
       'game.log.effect.continuous',
       { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' },
     ),

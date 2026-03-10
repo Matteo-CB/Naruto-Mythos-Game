@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 // @ts-nocheck
 /**
- * NARUTO MYTHOS TCG — COMPREHENSIVE GAME ENGINE AUDIT
+ * NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT
  *
  * Standalone script that:
  * 1. Loads ALL card data & rules
@@ -336,7 +336,7 @@ function simulateGame(maxActions = 500): {
 
 async function main() {
   console.log('='.repeat(70));
-  console.log('  NARUTO MYTHOS TCG — COMPREHENSIVE GAME ENGINE AUDIT');
+  console.log('  NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT');
   console.log('='.repeat(70));
   console.log();
 
@@ -400,7 +400,7 @@ async function main() {
         handlersFound++;
       } else if (!isPureContinuous) {
         handlersMissing++;
-        missingHandlerCards.push(`${cardId} (${c.name_en || c.name_fr}) — ${effect.type}: ${desc.substring(0, 80)}`);
+        missingHandlerCards.push(`${cardId} (${c.name_en || c.name_fr}) - ${effect.type}: ${desc.substring(0, 80)}`);
         addIssue({
           severity: 'CRITICAL',
           category: 'Missing Effect Handler',
@@ -433,7 +433,7 @@ async function main() {
   console.log('\n[5/7] Testing individual card effects...');
 
   // --- Kisame 144 M: Steal 1 Chakra ---
-  test('KS-144-M Kisame — MAIN steals 1 chakra from opponent', () => {
+  test('KS-144-M Kisame - MAIN steals 1 chakra from opponent', () => {
     const handler = getEffectHandler('KS-144-M', 'MAIN');
     assert(!!handler, 'Handler should exist');
     const state = createActionState();
@@ -449,13 +449,13 @@ async function main() {
   });
 
   // --- Hiruzen 001-C: POWERUP 2 friendly Leaf Village ---
-  test('KS-001-C Hiruzen — MAIN handler exists', () => {
+  test('KS-001-C Hiruzen - MAIN handler exists', () => {
     const h = getEffectHandler('KS-001-C', 'MAIN');
     assert(!!h, 'Handler should exist');
   });
 
   // --- Tsunade 003-C: Continuous on-defeat chakra ---
-  test('KS-003-C Tsunade — continuous defeat trigger recognized', () => {
+  test('KS-003-C Tsunade - continuous defeat trigger recognized', () => {
     const card = ALL_CARDS['KS-003-C'] as any;
     assert(card.effects[0].description.includes('[⧗]'), 'Should be continuous');
     assert(card.effects[0].description.toLowerCase().includes('defeated'), 'Should mention defeat');
@@ -463,33 +463,33 @@ async function main() {
   });
 
   // --- Orochimaru 050-C: AMBUSH ---
-  test('KS-050-C Orochimaru — AMBUSH handler exists', () => {
+  test('KS-050-C Orochimaru - AMBUSH handler exists', () => {
     const h = getEffectHandler('KS-050-C', 'AMBUSH');
     assert(!!h, 'AMBUSH handler should exist');
   });
 
   // --- Naruto 133-S: Two-stage hide/defeat ---
-  test('KS-133-S Naruto Rasengan — MAIN handler exists', () => {
+  test('KS-133-S Naruto Rasengan - MAIN handler exists', () => {
     const h = getEffectHandler('KS-133-S', 'MAIN');
     assert(!!h, 'MAIN handler should exist');
   });
 
   // --- Itachi 143-M: Move friendly (MAIN) + Move enemy (AMBUSH) ---
-  test('KS-143-M Itachi — MAIN and AMBUSH handlers exist', () => {
+  test('KS-143-M Itachi - MAIN and AMBUSH handlers exist', () => {
     assert(!!getEffectHandler('KS-143-M', 'MAIN'), 'MAIN');
     assert(!!getEffectHandler('KS-143-M', 'AMBUSH'), 'AMBUSH');
   });
 
   // --- Mission SCORE effects ---
   for (const missionId of ['KS-001-MMS', 'KS-003-MMS', 'KS-004-MMS', 'KS-005-MMS', 'KS-006-MMS', 'KS-007-MMS', 'KS-008-MMS']) {
-    test(`${missionId} — SCORE handler exists`, () => {
+    test(`${missionId} - SCORE handler exists`, () => {
       const h = getEffectHandler(missionId, 'SCORE');
       assert(!!h, `SCORE handler missing for ${missionId}`);
     });
   }
 
   // --- Kiba + Akamaru Synergy ---
-  test('Kiba 025 + Akamaru 027 — CHAKRA +1 bonus', () => {
+  test('Kiba 025 + Akamaru 027 - CHAKRA +1 bonus', () => {
     const state = createActionState();
     placeChar(state, 'player1', 'KS-025-C', 0);
     placeChar(state, 'player1', 'KS-027-C', 0);
@@ -498,7 +498,7 @@ async function main() {
   });
 
   // --- Kakashi 015 Team 7 Power ---
-  test('Kakashi 015 + Team 7 character — Power modifier', () => {
+  test('Kakashi 015 + Team 7 character - Power modifier', () => {
     const state = createActionState();
     placeChar(state, 'player1', 'KS-015-C', 0);
     const naruto = placeChar(state, 'player1', 'KS-009-C', 0);
@@ -725,7 +725,7 @@ async function main() {
 
   const r: string[] = [];
   r.push('='.repeat(80));
-  r.push('  NARUTO MYTHOS TCG — GAME ENGINE AUDIT REPORT');
+  r.push('  NARUTO MYTHOS TCG - GAME ENGINE AUDIT REPORT');
   r.push('='.repeat(80));
   r.push(`Date: ${new Date().toISOString()}`);
   r.push(`Cards in database: ${totalCards} (${totalChars} characters, ${totalMissions} missions)`);
@@ -757,13 +757,13 @@ async function main() {
   const failed = testResults.filter(t => !t.passed);
   if (failed.length > 0) {
     r.push('--- FAILED TESTS ---');
-    failed.forEach(t => r.push(`  FAIL: ${t.name} — ${t.message}`));
+    failed.forEach(t => r.push(`  FAIL: ${t.name} - ${t.message}`));
     r.push('');
   }
 
   // Detailed issues
   r.push('='.repeat(80));
-  r.push('  DETAILED ISSUES — CORRECTIONS NEEDED');
+  r.push('  DETAILED ISSUES - CORRECTIONS NEEDED');
   r.push('='.repeat(80));
 
   for (const sev of ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO']) {

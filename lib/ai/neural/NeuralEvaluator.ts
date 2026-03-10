@@ -29,7 +29,6 @@ async function getOrt(): Promise<OrtModule | null> {
   try {
     ortModule = isBrowserRuntime()
       ? await import('onnxruntime-web')
-      // @ts-expect-error — optional runtime dependency, gracefully handled
       : await import('onnxruntime-node');
     return ortModule;
   } catch {

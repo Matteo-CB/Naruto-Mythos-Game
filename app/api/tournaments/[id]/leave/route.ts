@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-// POST — leave a tournament (only during registration)
+// POST - leave a tournament (only during registration)
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

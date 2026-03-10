@@ -63,7 +63,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
     const friendlyChars = mission[friendlySide];
     const hasSameName = friendlyChars.some((c) => {
       if (c.instanceId === sourceCard.instanceId) return false;
-      if (c.isHidden) return false; // Hidden chars are anonymous — name not revealed
+      if (c.isHidden) return false; // Hidden chars are anonymous - name not revealed
       const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return top.name_fr === charName;
     });

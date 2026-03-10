@@ -95,7 +95,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Multiple matches (rare edge case — e.g., upgrade placed same name), offer choice
+  // Multiple matches (rare edge case - e.g., upgrade placed same name), offer choice
   return {
     state,
     requiresTargetSelection: true,

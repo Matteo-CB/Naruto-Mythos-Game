@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST — set manual pairings (admin only, simulator tournaments)
+// POST - set manual pairings (admin only, simulator tournaments)
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },

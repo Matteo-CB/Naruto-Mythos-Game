@@ -12,7 +12,7 @@ async function isAdmin() {
 }
 
 /**
- * GET /api/admin/backgrounds — list all backgrounds (admin)
+ * GET /api/admin/backgrounds - list all backgrounds (admin)
  */
 export async function GET() {
   if (!(await isAdmin())) {
@@ -27,7 +27,7 @@ export async function GET() {
 }
 
 /**
- * POST /api/admin/backgrounds — upload a new background
+ * POST /api/admin/backgrounds - upload a new background
  * Expects multipart form: file (image), name (string)
  * Stores image as a static file in public/images/backgrounds/
  */
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * DELETE /api/admin/backgrounds — delete a background by id
+ * DELETE /api/admin/backgrounds - delete a background by id
  * Body: { id: string }
  */
 export async function DELETE(request: NextRequest) {

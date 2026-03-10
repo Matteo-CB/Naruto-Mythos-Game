@@ -57,7 +57,7 @@ export function GameInfo() {
 
   return (
     <div className="flex flex-col gap-2.5 p-3 h-full overflow-y-auto">
-      {/* Turn + Phase + Active — combined card */}
+      {/* Turn + Phase + Active - combined card */}
       <div
         className="flex flex-col gap-2 p-2.5 rounded-lg"
         style={{

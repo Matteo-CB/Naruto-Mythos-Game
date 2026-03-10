@@ -9,8 +9,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN: Move another Team 10 character from this mission.
  *
  * Two-stage target selection:
- *   Stage 1: ASUMA_CHOOSE_TEAM10 — choose which Team 10 char in this mission to move
- *   Stage 2: ASUMA_CHOOSE_DESTINATION — choose which mission to move them to
+ *   Stage 1: ASUMA_CHOOSE_TEAM10 - choose which Team 10 char in this mission to move
+ *   Stage 2: ASUMA_CHOOSE_DESTINATION - choose which mission to move them to
  */
 function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -23,7 +23,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
   for (const char of allChars) {
     if (char.instanceId === sourceCard.instanceId) continue;
-    if (char.isHidden) continue; // Hidden chars are anonymous — can't identify keyword
+    if (char.isHidden) continue; // Hidden chars are anonymous - can't identify keyword
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Team 10')) {
       validTargets.push(char.instanceId);

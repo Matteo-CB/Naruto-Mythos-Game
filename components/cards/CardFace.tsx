@@ -286,7 +286,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Name and title (bottom-left) — only for cards with images */}
+      {/* Name and title (bottom-left) - only for cards with images */}
       {hasImage && (
         <div
           style={{

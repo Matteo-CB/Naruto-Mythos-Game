@@ -3,7 +3,7 @@ import type { AIStrategy, AIDifficulty } from '../AIPlayer';
 import { NeuralISMCTS } from '../neural/NeuralISMCTS';
 
 /**
- * Easy AI — beginner-friendly.
+ * Easy AI - beginner-friendly.
  * Small ISMCTS budget + occasional deliberate mistakes.
  */
 export class EasyAI implements AIStrategy {

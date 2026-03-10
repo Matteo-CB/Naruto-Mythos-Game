@@ -1917,7 +1917,7 @@ export function QuizSession() {
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Question image — blurred when it would reveal the answer */}
+            {/* Question image - blurred when it would reveal the answer */}
             <QuestionImage
               src={question.questionImage}
               blurred={

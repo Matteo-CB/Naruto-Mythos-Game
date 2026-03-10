@@ -114,7 +114,7 @@ export function calculateMissionChakraBonus(state: GameState, player: PlayerID):
     for (const effect of mission.card.effects ?? []) {
       if (!effect.description.includes('[⧗]')) continue;
 
-      // MSS-10: CHAKRA +1 for both players — applies immediately when mission is in play (MAIN type)
+      // MSS-10: CHAKRA +1 for both players - applies immediately when mission is in play (MAIN type)
       if (effect.type === 'MAIN'
           && effect.description.includes('CHAKRA +1')
           && effect.description.includes('both players')) {
@@ -136,7 +136,7 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
     const hasKeyword = chars.some(
       (c) => {
         if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-        if (c.isHidden) return false; // Hidden chars are anonymous — can't identify keyword
+        if (c.isHidden) return false; // Hidden chars are anonymous - can't identify keyword
         const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         return (top.keywords ?? []).includes(keyword) && c.controlledBy === player;
       },
@@ -348,7 +348,7 @@ export function calculateContinuousPowerModifier(
 
   // -------------------------------------------------------
   // Mission [⧗] effects that modify power continuously (MAIN type).
-  // Active as soon as the mission is in play — no wonBy guard.
+  // Active as soon as the mission is in play - no wonBy guard.
   // -------------------------------------------------------
   for (const mEffect of mission.card.effects ?? []) {
     if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;
@@ -360,7 +360,7 @@ export function calculateContinuousPowerModifier(
 
     // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
     // Use base power + tokens only (NOT accumulated modifier) for the threshold check.
-    // Continuous [⧗] effects are passive and simultaneous — they should all evaluate against
+    // Continuous [⧗] effects are passive and simultaneous - they should all evaluate against
     // the character's inherent state (base + tokens), not against an intermediate value that
     // depends on code ordering. This avoids non-commutative interactions with effects like
     // Sasuke 013's self-penalty: both effects independently read base+tokens and contribute
@@ -560,7 +560,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
         newState.log = logAction(
           newState.log, newState.turn, 'action', opponent,
           'EFFECT_CONTINUOUS',
-          `Neji Hyuga (037): POWERUP 1 — enemy played a non-hidden character in this mission.`,
+          `Neji Hyuga (037): POWERUP 1 - enemy played a non-hidden character in this mission.`,
           'game.log.effect.neji037',
           { card: 'NEJI HYUGA', id: 'KS-037-UC' },
         );
@@ -574,7 +574,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
         newState.log = logAction(
           newState.log, newState.turn, 'action', opponent,
           'EFFECT_CONTINUOUS',
-          `Hinata Hyuga (031): Gained 1 Chakra — enemy played a non-hidden character in this mission.`,
+          `Hinata Hyuga (031): Gained 1 Chakra - enemy played a non-hidden character in this mission.`,
           'game.log.effect.hinata031',
           { card: 'HINATA HYUGA', id: 'KS-031-UC' },
         );

@@ -950,7 +950,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
 
   // =====================
-  // RARE ART (RA) — cartes sans entree R equivalente
+  // RARE ART (RA) - cartes sans entree R equivalente
   // =====================
 
   'KS-104-RA': [
@@ -1089,7 +1089,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
 
   // =====================
-  // SECRET V (SV) — Variantes dorées des cartes Secret
+  // SECRET V (SV) - Variantes dorées des cartes Secret
   // =====================
 
   'KS-131-SV': [

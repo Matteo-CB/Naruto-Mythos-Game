@@ -115,7 +115,7 @@ interface GameStore {
 
 let animationIdCounter = 0;
 
-// AI watchdog timer — detects if the AI is stuck and forces a retry
+// AI watchdog timer - detects if the AI is stuck and forces a retry
 let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
 /**
@@ -969,7 +969,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (isOnlineGame) {
       const socketState = useSocketStore.getState();
       if (socketState.socket && socketState.connected) {
-        // For mulligan, don't block UI — the MulliganDialog uses hasMulliganed from server state
+        // For mulligan, don't block UI - the MulliganDialog uses hasMulliganed from server state
         const skipProcessingBlock = action.type === 'MULLIGAN';
         if (!skipProcessingBlock) {
           set({ isProcessing: true });
@@ -980,7 +980,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!skipProcessingBlock) {
           setTimeout(() => {
             if (get().isProcessing && get().isOnlineGame) {
-              console.warn('[gameStore] Online action timeout — unblocking UI');
+              console.warn('[gameStore] Online action timeout - unblocking UI');
               set({ isProcessing: false });
             }
           }, 10000);
@@ -1017,7 +1017,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER') {
       const logGrew = newState.log.length > gameState.log.length;
       if (!logGrew) {
-        // Action was rejected — get the specific validation reason
+        // Action was rejected - get the specific validation reason
         let errorReason = '';
         let errorKey: string | null = null;
         let errorParams: Record<string, string | number> | null = null;
@@ -1059,7 +1059,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (gameState.phase === 'mulligan' && newState.phase !== 'mulligan' && !get().replayInitialState) {
       resetIdCounter();
       const snapshot = deepClone(newState);
-      snapshot.actionHistory = []; // Clear — replay starts from this point
+      snapshot.actionHistory = []; // Clear - replay starts from this point
       set({ replayInitialState: snapshot });
       // Reset actionHistory so only post-mulligan actions are recorded
       newState.actionHistory = [];
@@ -1095,7 +1095,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Mission scoring complete — show scored state briefly, then auto-advance to End Phase
+    // Mission scoring complete - show scored state briefly, then auto-advance to End Phase
     if (newState.missionScoringComplete) {
       set({ isProcessing: false });
       setTimeout(() => {
@@ -1108,6 +1108,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (advanced.phase === 'gameOver') {
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+        } else if (get().isAIGame && get().aiPlayer) {
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           // Check for pending actions (e.g., Rock Lee 117 end-phase move with multiple destinations)
           const humanPendingEndPhase = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
@@ -1325,7 +1329,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             iterations++;
             continue;
           } else {
-            // No valid targets — decline the optional effect or force-cleanup
+            // No valid targets - decline the optional effect or force-cleanup
             const pendingEffect = currentState.pendingEffects.find(
               (e) => e.id === pendingAction.sourceEffectId,
             );
@@ -1335,7 +1339,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 pendingEffectId: pendingEffect.id,
               });
             } else {
-              // Non-optional effect with no valid targets — force cleanup to prevent freeze
+              // Non-optional effect with no valid targets - force cleanup to prevent freeze
               console.warn('[gameStore] AI: force-cleaning non-optional pending with no targets:', pendingAction.id);
               currentState = {
                 ...currentState,
@@ -1354,7 +1358,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const humanPending = currentState.pendingActions.filter((p) => p.player === humanPlayer);
         if (humanPending.length > 0) break;
 
-        // Mission scoring complete — break to show scored state, then auto-advance
+        // Mission scoring complete - break to show scored state, then auto-advance
         if (currentState.missionScoringComplete) break;
 
         // Check if it's the AI's turn
@@ -1420,7 +1424,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (iterations >= maxIterations) {
       const stuckPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
       if (stuckPending.length > 0) {
-        console.warn('[gameStore] AI hit max iterations with', stuckPending.length, 'pending actions — force cleanup');
+        console.warn('[gameStore] AI hit max iterations with', stuckPending.length, 'pending actions - force cleanup');
         const stuckEffectIds = new Set(stuckPending.map((p) => p.sourceEffectId));
         currentState = {
           ...currentState,
@@ -1437,7 +1441,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
 
-    // Mission scoring complete — show scored state, then auto-advance to End Phase
+    // Mission scoring complete - show scored state, then auto-advance to End Phase
     if (currentState.missionScoringComplete) {
       set({
         gameState: currentState,
@@ -1454,6 +1458,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (advanced.phase === 'gameOver') {
           get().addAnimation({ type: 'game-end', data: { winner: GameEngine.getWinner(advanced) } });
           set({ gameOver: true, winner: GameEngine.getWinner(advanced), isProcessing: false });
+        } else if (get().isAIGame && get().aiPlayer) {
+          setTimeout(() => {
+            void get().processAITurn();
+          }, 500);
         } else {
           // Check for pending actions (e.g., Rock Lee 117 end-phase move)
           const humanPendingEnd = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
@@ -1622,7 +1630,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection) {
       const onSelect = pendingTargetSelection.onSelect;
-      // Clear BEFORE calling onSelect — performAction may set a NEW
+      // Clear BEFORE calling onSelect - performAction may set a NEW
       // pendingTargetSelection for chained effects (e.g. MAIN → AMBUSH).
       // Clearing after would wipe out the new pending.
       set({ pendingTargetSelection: null });
@@ -1634,7 +1642,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection?.onDecline) {
       const onDecline = pendingTargetSelection.onDecline;
-      // Clear BEFORE calling onDecline — same chained-effect reasoning.
+      // Clear BEFORE calling onDecline - same chained-effect reasoning.
       set({ pendingTargetSelection: null });
       onDecline();
     } else {

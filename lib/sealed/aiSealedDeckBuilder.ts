@@ -106,7 +106,7 @@ export function buildAISealedDeck(pool: SealedPool): {
     .map(m => ({ card: m, score: scoreMission(m) }))
     .sort((a, b) => b.score - a.score);
 
-  // Remove duplicate missions (same card ID) — keep highest scored
+  // Remove duplicate missions (same card ID) - keep highest scored
   const seenMissionIds = new Set<string>();
   const uniqueMissions: typeof scoredMissions = [];
   for (const m of scoredMissions) {
@@ -148,7 +148,7 @@ export function buildAISealedDeck(pool: SealedPool): {
     selectedChars.push(sc.card as unknown as CharacterCard);
   }
 
-  // Ensure we have enough characters — if less than 30, add remaining
+  // Ensure we have enough characters - if less than 30, add remaining
   if (selectedChars.length < MIN_DECK_SIZE) {
     for (const sc of scoredChars) {
       if (selectedChars.length >= MIN_DECK_SIZE) break;

@@ -14,7 +14,7 @@ import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
  *
  * MAIN: Play the top character from your discard pile anywhere, paying 3 less.
  *   (French: "Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.")
- *   - Always the top card (last added) — no browsing/choosing.
+ *   - Always the top card (last added) - no browsing/choosing.
  *   - If the top card is not a character or not affordable, fizzles.
  *   - Player chooses which mission to play it on.
  */
@@ -60,7 +60,7 @@ function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Multiple cards — player chooses which to discard
+  // Multiple cards - player chooses which to discard
   const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
   return {
     state,

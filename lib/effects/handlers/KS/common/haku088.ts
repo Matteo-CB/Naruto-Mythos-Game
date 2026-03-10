@@ -8,7 +8,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Independent | Keywords: Rogue Ninja
  * MAIN: Draw 1 card. If you do, you must put 1 card from your hand on top of your deck.
  *
- * The draw is OPTIONAL ("if you do" implies player choice — no "must" on the draw).
+ * The draw is OPTIONAL ("if you do" implies player choice - no "must" on the draw).
  * If the player chooses to draw, they MUST put 1 card from hand back on top of deck.
  * If the deck is empty, the effect fizzles entirely.
  *
@@ -33,7 +33,7 @@ function handleHaku088Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Offer optional draw — if accepted, EffectEngine draws and chains mandatory put-back
+  // Offer optional draw - if accepted, EffectEngine draws and chains mandatory put-back
   return {
     state,
     requiresTargetSelection: true,

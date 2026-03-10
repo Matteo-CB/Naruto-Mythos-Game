@@ -7,11 +7,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
  * SCORE: [⧗] Characters with 4 Power or more in this mission have +1 Power.
  *
  * Continuous power bonus handled by ContinuousEffects.ts calculateContinuousPowerModifier().
- * This handler is a no-op — the continuous effect is evaluated during power calculation.
+ * This handler is a no-op - the continuous effect is evaluated during power calculation.
  */
 
 function mss09ScoreHandler(ctx: EffectContext): EffectResult {
-  // Continuous [⧗] power bonus — handled by ContinuousEffects.ts
+  // Continuous [⧗] power bonus - handled by ContinuousEffects.ts
   return { state: ctx.state };
 }
 

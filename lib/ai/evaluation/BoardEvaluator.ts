@@ -1,5 +1,5 @@
 /**
- * BoardEvaluator — Central heuristic for AI decision-making.
+ * BoardEvaluator - Central heuristic for AI decision-making.
  *
  * Returns a score from the perspective of the given player.
  * Positive = favorable, negative = unfavorable.
@@ -59,7 +59,7 @@ export class BoardEvaluator {
     // 1. Mission points scored (always most important)
     score += (state[player].missionPoints - state[opponent].missionPoints) * w.missionPoints;
 
-    // 2. Mission control (projected wins — confidence-based)
+    // 2. Mission control (projected wins - confidence-based)
     score += MissionEvaluator.evaluateMissionControl(state, player) * w.missionControl;
 
     // 3. Board presence (characters + power, weighted by mission value)
@@ -162,7 +162,7 @@ export class BoardEvaluator {
     const edgeImpact = (tiedMissionValue * 3 + closeMissionValue * 0.5) * turnMultiplier;
 
     if (hasEdge) {
-      // Minimum value of 5 — edge is always somewhat valuable
+      // Minimum value of 5 - edge is always somewhat valuable
       return Math.max(5, edgeImpact);
     }
     // Not having edge when missions are tied is bad
@@ -228,7 +228,7 @@ export class BoardEvaluator {
         // Base value from card tier
         let value = tier * 0.5;
 
-        // AMBUSH synergy — we hid this card on purpose for the AMBUSH
+        // AMBUSH synergy - we hid this card on purpose for the AMBUSH
         if (card.effects?.some(e => e.type === 'AMBUSH')) {
           value += tier * 0.8;
         }
@@ -390,7 +390,7 @@ export class BoardEvaluator {
 
     let score = 0;
 
-    // Opponent has passed, we haven't — free actions!
+    // Opponent has passed, we haven't - free actions!
     if (state[opponent].hasPassed && !state[player].hasPassed) {
       const playableCards = state[player].hand.filter(
         c => (c.chakra ?? 0) <= state[player].chakra || state[player].chakra >= 1,
@@ -398,7 +398,7 @@ export class BoardEvaluator {
       score += playableCards * 2 + state[player].chakra * 0.5;
     }
 
-    // We've passed, opponent hasn't — they get free actions
+    // We've passed, opponent hasn't - they get free actions
     if (state[player].hasPassed && !state[opponent].hasPassed) {
       score -= 3;
     }
@@ -418,7 +418,7 @@ export class BoardEvaluator {
         if (c.isHidden) continue;
         const card = topCard(c);
         if (isSummon(card)) {
-          // Summons return to hand at end of turn — discount their board presence
+          // Summons return to hand at end of turn - discount their board presence
           const power = calculateCharacterPower(state, c, player);
           discount += power * 0.3; // ~30% discount on summon power value
         }

@@ -84,7 +84,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
   // Filter to weakest enemies (may be multiple tied)
   const weakest = nonHiddenEnemies.filter((c) => getEffectivePower(state, c, opponentPlayer) === minPower);
 
-  // If exactly one weakest enemy, skip enemy selection step — go directly to destination choice.
+  // If exactly one weakest enemy, skip enemy selection step - go directly to destination choice.
   // The INO110_CHOOSE_ENEMY handler in EffectEngine will handle destination selection + upgrade hide.
   if (weakest.length === 1) {
     return {
@@ -102,7 +102,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Multiple tied for weakest — player must choose which one to move
+  // Multiple tied for weakest - player must choose which one to move
   const validTargets = weakest.map((c) => c.instanceId);
 
   return {

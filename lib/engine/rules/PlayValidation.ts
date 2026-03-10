@@ -135,7 +135,7 @@ export function validateRevealCharacter(
   // Use topCard for upgraded hidden characters
   const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
 
-  // Name uniqueness check — detect reveal-for-upgrade before chakra check
+  // Name uniqueness check - detect reveal-for-upgrade before chakra check
   // Check same-name upgrade target
   const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
@@ -244,7 +244,7 @@ export function validateUpgradeCharacter(
   // (combines the reveal cost + upgrade diff in one action)
   const ps = state[player];
   if (target.isHidden) {
-    // When upgrading a hidden character, it will be revealed — check no visible same-name exists
+    // When upgrading a hidden character, it will be revealed - check no visible same-name exists
     const newCardName = newCard.name_fr;
     const friendlyCharsInMission = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     const sameNameVisible = friendlyCharsInMission.some(
@@ -285,7 +285,7 @@ export function validateUpgradeCharacter(
  * - Ukon 063 (UC) / 124b (R): Can upgrade any character with printed cost 0–4
  */
 export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
-  // Already same name — standard upgrade, no special rule needed
+  // Already same name - standard upgrade, no special rule needed
   if (newCard.name_fr.toUpperCase() === targetCard.name_fr.toUpperCase()) return false;
 
   // Orochimaru 051/138: Can upgrade over any non-Summon, non-Orochimaru

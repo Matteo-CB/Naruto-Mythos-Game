@@ -14,7 +14,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// GET — list tournaments with optional filters
+// GET - list tournaments with optional filters
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST — create a tournament
+// POST - create a tournament
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();

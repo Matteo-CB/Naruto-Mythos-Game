@@ -30,7 +30,7 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-011-C' }) } };
   }
 
-  // Effect is optional — route through pending action so player can skip.
+  // Effect is optional - route through pending action so player can skip.
   // Uses dedicated DRAW_CARD UI (shows deck + Draw/Skip buttons).
   return {
     state,

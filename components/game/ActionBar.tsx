@@ -162,7 +162,7 @@ export function ActionBar() {
     }
   }
   // Can show plain "Reveal" button only if NO same-name upgrade targets exist
-  // (same-name upgrade is mandatory — can't have 2 same-name chars on one mission)
+  // (same-name upgrade is mandatory - can't have 2 same-name chars on one mission)
   const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
   const canShowPlainReveal = !hasSameNameRevealUpgrade;
   const canAffordReveal = myState.chakra >= revealBaseCost;
@@ -356,7 +356,7 @@ export function ActionBar() {
             </span>
           )}
 
-          {/* Upgrade button(s) — shown first when available */}
+          {/* Upgrade button(s) - shown first when available */}
           {cardAndMissionReady && upgradeTargets.map((target) => {
             const charCard = target.topCard ?? target.card;
             const isHiddenTarget = target.isHidden;
@@ -385,7 +385,7 @@ export function ActionBar() {
             );
           })}
 
-          {/* Play visible button — secondary when upgrade targets exist */}
+          {/* Play visible button - secondary when upgrade targets exist */}
           {cardAndMissionReady && (
             <ActionButton
               label={`${t('game.play')} (${costLabel} ${t('game.chakra').toLowerCase()})`}
@@ -405,7 +405,7 @@ export function ActionBar() {
             />
           )}
 
-          {/* Reveal upgrade button(s) — one per valid upgrade target */}
+          {/* Reveal upgrade button(s) - one per valid upgrade target */}
           {canReveal && revealUpgradeTargets.map((opt) => {
             const canAfford = myState.chakra >= opt.cost;
             return (
@@ -419,7 +419,7 @@ export function ActionBar() {
             );
           })}
 
-          {/* Plain reveal button — shown when card has different name from all upgrade targets */}
+          {/* Plain reveal button - shown when card has different name from all upgrade targets */}
           {canReveal && canShowPlainReveal && (
             <ActionButton
               label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}

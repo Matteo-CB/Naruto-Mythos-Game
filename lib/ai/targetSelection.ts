@@ -1,5 +1,5 @@
 /**
- * AI Target Selection — intelligent target picking for pending actions.
+ * AI Target Selection - intelligent target picking for pending actions.
  *
  * When the AI faces a target-selection prompt (POWERUP, DEFEAT, MOVE, etc.)
  * this module evaluates the options and picks the strategically best one
@@ -36,7 +36,7 @@ export function aiSelectTarget(
   if (options.length === 0) return '';
   if (options.length === 1) return options[0];
 
-  // Confirm / acknowledge — always confirm
+  // Confirm / acknowledge - always confirm
   if (options.includes('confirm')) return 'confirm';
 
   // Token amount choice (e.g., "1" or "2"): AI always picks the maximum
@@ -57,7 +57,7 @@ export function aiSelectTarget(
     return selectPowerupTarget(options, state, aiPlayer, difficulty);
   }
 
-  // SACRIFICE OWN CHARACTER (e.g., Jiraiya 132 UPGRADE — opponent chooses own chars to defeat)
+  // SACRIFICE OWN CHARACTER (e.g., Jiraiya 132 UPGRADE - opponent chooses own chars to defeat)
   if (desc.includes('choose one of your characters to defeat') || desc.includes('choisissez un de vos personnages')) {
     return selectSacrificeTarget(options, state, aiPlayer, difficulty);
   }
@@ -92,7 +92,7 @@ export function aiSelectTarget(
     return selectDefeatTarget(options, state, aiPlayer, difficulty);
   }
 
-  // DISCARD from hand — pick lowest value card
+  // DISCARD from hand - pick lowest value card
   if (desc.includes('discard') || desc.includes('défausse')) {
     return selectDiscardTarget(options, state, aiPlayer, difficulty);
   }
@@ -113,7 +113,7 @@ export function aiSelectTarget(
 }
 
 // ---------------------------------------------------------------------------
-// Helpers — finding characters in state
+// Helpers - finding characters in state
 // ---------------------------------------------------------------------------
 
 interface FoundCharacter {
@@ -175,7 +175,7 @@ function hasScoreEffect(char: CharacterInPlay): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers — mission evaluation
+// Helpers - mission evaluation
 // ---------------------------------------------------------------------------
 
 function getMissionValue(state: GameState, missionIndex: number): number {
@@ -208,7 +208,7 @@ function getMissionPowerGap(state: GameState, missionIndex: number, aiPlayer: Pl
  * For POWERUP effects: place tokens on the character where they matter most.
  *
  * Medium: favor characters on higher-value missions.
- * Hard/Expert: prioritize mission-flipping — placing tokens where they can
+ * Hard/Expert: prioritize mission-flipping - placing tokens where they can
  * swing a mission from losing to winning is the highest-value play.
  */
 function selectPowerupTarget(
@@ -235,16 +235,16 @@ function selectPowerupTarget(
     } else {
       // Hard/Expert: mission-flip awareness
       if (powerGap < 0 && powerGap > -5) {
-        // We're slightly losing — tokens could flip this mission!
+        // We're slightly losing - tokens could flip this mission!
         score = missionValue * 4 + Math.max(0, 10 - Math.abs(powerGap)) * 3;
       } else if (powerGap >= 0 && powerGap <= 3) {
-        // Contested — tokens help secure the win
+        // Contested - tokens help secure the win
         score = missionValue * 2.5 + charPower;
       } else if (powerGap > 3) {
-        // Already winning by a lot — tokens are wasted here
+        // Already winning by a lot - tokens are wasted here
         score = missionValue * 0.5 + charPower * 0.3;
       } else {
-        // Losing badly — tokens won't flip, low priority
+        // Losing badly - tokens won't flip, low priority
         score = missionValue * 0.8;
       }
 
@@ -326,7 +326,7 @@ function selectDefeatTarget(
 
 /**
  * When forced to sacrifice own characters (e.g., Jiraiya 132 UPGRADE):
- * pick the weakest character — lowest power, lowest cost, on the
+ * pick the weakest character - lowest power, lowest cost, on the
  * least valuable mission.
  */
 function selectSacrificeTarget(
@@ -351,7 +351,7 @@ function selectSacrificeTarget(
       // Medium: sacrifice lowest power character
       score = charPower * 10 + charCost;
     } else {
-      // Hard/Expert: factor in mission value — prefer sacrificing from missions
+      // Hard/Expert: factor in mission value - prefer sacrificing from missions
       // we're already dominating (high gap) or low-value missions
       const powerGap = getMissionPowerGap(state, found.missionIndex, aiPlayer);
       score = charPower * 3 + missionValue + charCost;
@@ -378,8 +378,8 @@ function selectSacrificeTarget(
  * For MOVE effects: choose where to move a character.
  *
  * Options can be either:
- * - Mission indices (numbers like "0", "1", "2", "3") — choosing destination
- * - Character instanceIds — choosing which character to move
+ * - Mission indices (numbers like "0", "1", "2", "3") - choosing destination
+ * - Character instanceIds - choosing which character to move
  */
 function selectMoveTarget(
   options: string[],
@@ -394,7 +394,7 @@ function selectMoveTarget(
     return selectMissionDestination(options, state, aiPlayer, difficulty);
   }
 
-  // Options are character instanceIds — pick the strongest to move
+  // Options are character instanceIds - pick the strongest to move
   return selectDefeatTarget(options, state, aiPlayer, difficulty);
 }
 
@@ -422,16 +422,16 @@ function selectMissionDestination(
     } else {
       // Hard/Expert: favor contested high-value missions where help matters
       if (powerGap < 0 && powerGap > -5) {
-        // Losing slightly — moving here could flip it
+        // Losing slightly - moving here could flip it
         score = missionValue * 3;
       } else if (powerGap >= 0 && powerGap <= 2) {
-        // Contested — reinforce to secure
+        // Contested - reinforce to secure
         score = missionValue * 2;
       } else if (powerGap > 2) {
-        // Already winning — low priority
+        // Already winning - low priority
         score = missionValue * 0.5;
       } else {
-        // Losing badly — help needed but may not be enough
+        // Losing badly - help needed but may not be enough
         score = missionValue * 1.2;
       }
     }

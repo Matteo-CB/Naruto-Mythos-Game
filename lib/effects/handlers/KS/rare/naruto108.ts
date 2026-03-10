@@ -63,5 +63,5 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
 
 export function registerNaruto108Handlers(): void {
   registerEffect('KS-108-R', 'MAIN', naruto108MainHandler);
-  // No AMBUSH effect for this card — the old "place top card as hidden" was incorrect
+  // No AMBUSH effect for this card - the old "place top card as hidden" was incorrect
 }

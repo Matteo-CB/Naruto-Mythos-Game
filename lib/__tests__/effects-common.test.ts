@@ -48,7 +48,7 @@ describe('001/130 - Hiruzen Sarutobi', () => {
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
-    // Effect is optional — always routes to target selection even with 1 target
+    // Effect is optional - always routes to target selection even with 1 target
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
     expect(result.validTargets).toContain('ally-1');
@@ -203,7 +203,7 @@ describe('011/130 - Sakura Haruno', () => {
 
     const handler = getEffectHandler('KS-011-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
-    // Effect is now optional — returns requiresTargetSelection so player can skip
+    // Effect is now optional - returns requiresTargetSelection so player can skip
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('SAKURA011_DRAW');
     // State is unchanged (draw happens in EffectEngine when player confirms)
@@ -1129,7 +1129,7 @@ describe('088/130 - Haku', () => {
 
     const handler = getEffectHandler('KS-088-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', haku, 0));
-    // Draw is optional — should NOT auto-draw; instead prompt for confirmation
+    // Draw is optional - should NOT auto-draw; instead prompt for confirmation
     expect(result.state.player1.hand.length).toBe(1); // unchanged (no auto-draw)
     expect(result.state.player1.deck.length).toBe(1); // deck unchanged
     expect(result.requiresTargetSelection).toBe(true);
@@ -1349,7 +1349,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
 
     const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
-    // Hidden Sound Four chars are excluded — no valid targets
+    // Hidden Sound Four chars are excluded - no valid targets
     expect(result.requiresTargetSelection).toBeFalsy();
   });
 
@@ -1372,7 +1372,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
 
     const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
-    // Tayuya 064 only has [⧗] continuous — no copyable instant effects
+    // Tayuya 064 only has [⧗] continuous - no copyable instant effects
     expect(result.requiresTargetSelection).toBeFalsy();
   });
 
@@ -1546,7 +1546,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
       (c: CharacterInPlay) => c.instanceId === 'tayuya-1',
     );
     expect(tayuyaAfter?.powerTokens).toBe(1);
-    // Sakon is sourceCard (self) — excluded from the POWERUP target
+    // Sakon is sourceCard (self) - excluded from the POWERUP target
     const sakonAfter = resultState.activeMissions[0].player1Characters.find(
       (c: CharacterInPlay) => c.instanceId === 'sakon062-1',
     );

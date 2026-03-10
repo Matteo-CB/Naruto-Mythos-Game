@@ -60,7 +60,7 @@ app.prepare().then(() => {
     console.log(`> Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 
-  // Graceful shutdown — warn clients before going down
+  // Graceful shutdown - warn clients before going down
   const gracefulShutdown = async (signal: string) => {
     console.log(`> ${signal} received. Starting graceful shutdown...`);
 

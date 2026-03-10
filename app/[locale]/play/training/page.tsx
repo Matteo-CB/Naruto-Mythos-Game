@@ -21,7 +21,7 @@ const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color:
   {
     key: 'easy',
     labelFr: 'Facile',
-    descFr: 'Idéal pour apprendre. L\'IA fait des erreurs occasionnelles',
+    descFr: 'Idéal pour apprendre - l\'IA fait des erreurs occasionnelles',
     color: '#4ade80',
   },
   {
@@ -33,34 +33,23 @@ const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color:
   {
     key: 'hard',
     labelFr: 'Difficile',
-    descFr: 'Très fort. Planification sur plusieurs tours',
+    descFr: 'Très fort - planification sur plusieurs tours',
     color: '#f97316',
   },
   {
     key: 'impossible',
     labelFr: 'Impossible',
-    descFr: 'Réseau de neurones, quasi-imbattable. Apprends de tes erreurs',
+    descFr: 'Réseau de neurones - quasi-imbattable. Apprends de tes erreurs',
     color: '#ef4444',
   },
 ];
 
 export default function TrainingPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
   const enableTraining = useTrainingStore((s) => s.enable);
   const resetTraining = useTrainingStore((s) => s.reset);
-
-  // Tester/admin gate: redirect unauthorized users
-  const userRole = (session?.user as Record<string, unknown>)?.role as string | undefined;
-  const isTesterOrAdmin = userRole === 'tester' || userRole === 'admin';
-
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session || !isTesterOrAdmin) {
-      router.push('/');
-    }
-  }, [session, status, isTesterOrAdmin, router]);
 
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
@@ -120,14 +109,6 @@ export default function TrainingPage() {
     router.push('/game');
   };
 
-  if (status === 'loading' || !isTesterOrAdmin) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <p className="text-[#888888] text-lg">...</p>
-      </div>
-    );
-  }
-
   return (
     <main className="flex min-h-screen flex-col bg-[#0a0a0a] relative">
       <CloudBackground />
@@ -153,12 +134,12 @@ export default function TrainingPage() {
           >
             <p className="text-[#c4a35a] font-medium mb-1">Ce que le Coach analyse :</p>
             <ul className="text-[#888] space-y-0.5 text-xs list-none">
-              <li>Probabilité de victoire en temps réel</li>
-              <li>Qualité de chaque coup (Excellent / Bon / Erreur / Grosse erreur)</li>
-              <li>Recommandation du meilleur coup disponible</li>
-              <li>Analyse de chaque mission (domination / contestée / perdue)</li>
-              <li>Note de chaque carte dans ta main (0-10)</li>
-              <li>Avertissements et conseils stratégiques</li>
+              <li>- Probabilité de victoire en temps réel</li>
+              <li>- Qualité de chaque coup (Excellent / Bon / Erreur / Grosse erreur)</li>
+              <li>- Recommandation du meilleur coup disponible</li>
+              <li>- Analyse de chaque mission (domination / contestée / perdue)</li>
+              <li>- Note de chaque carte dans ta main (0-10)</li>
+              <li>- Avertissements et conseils stratégiques</li>
             </ul>
           </div>
 

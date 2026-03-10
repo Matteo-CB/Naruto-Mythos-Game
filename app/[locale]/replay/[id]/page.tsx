@@ -4,9 +4,6 @@ import { useState, useEffect, useMemo, useRef, useCallback, use } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
-import { CloudBackground } from '@/components/CloudBackground';
-import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ReplayBoard } from '@/components/replay/ReplayBoard';
 import { PlaybackControls } from '@/components/replay/PlaybackControls';
 import { GameEngine } from '@/lib/engine/GameEngine';
@@ -81,26 +78,18 @@ function ShareButton({ gameId }: { gameId: string }) {
   const handleShare = async () => {
     const url = `${window.location.origin}${window.location.pathname}`;
 
-    // Try native share API first (mobile)
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: t('title'),
-          url,
-        });
+        await navigator.share({ title: t('title'), url });
         return;
-      } catch {
-        // User cancelled or not supported, fall through to clipboard
-      }
+      } catch { /* fall through */ }
     }
 
-    // Fallback: copy to clipboard
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = url;
       textArea.style.position = 'fixed';
@@ -117,10 +106,10 @@ function ShareButton({ gameId }: { gameId: string }) {
   return (
     <button
       onClick={handleShare}
-      className="px-4 py-2 text-sm font-medium tracking-wider uppercase transition-colors cursor-pointer rounded"
+      className="px-3 py-1 text-[10px] font-medium tracking-wider uppercase transition-colors cursor-pointer rounded"
       style={{
-        backgroundColor: copied ? 'rgba(62,139,62,0.15)' : '#141414',
-        border: copied ? '1px solid rgba(62,139,62,0.4)' : '1px solid #262626',
+        backgroundColor: copied ? 'rgba(62,139,62,0.15)' : 'rgba(20,20,20,0.8)',
+        border: copied ? '1px solid rgba(62,139,62,0.4)' : '1px solid rgba(255,255,255,0.1)',
         color: copied ? '#4a9e4a' : '#888888',
       }}
     >
@@ -129,283 +118,69 @@ function ShareButton({ gameId }: { gameId: string }) {
   );
 }
 
-// ----- Match Stats Summary -----
+// ----- Score Overlay (top-right) -----
 
-function MatchStats({
+function ScoreOverlay({
   game,
   playerNames,
-  missions,
-  backgroundUrl,
 }: {
   game: GameData;
   playerNames: { player1: string; player2: string };
-  missions: MissionResult[];
-  backgroundUrl?: string;
 }) {
   const t = useTranslations('replay');
   const p1Won = game.winnerId === game.player1Id;
   const p2Won = game.winnerId === game.player2Id;
 
-  const p1Missions = missions.filter(m => m.wonBy === 'player1').length;
-  const p2Missions = missions.filter(m => m.wonBy === 'player2').length;
-
-  // Score bar: visual ratio of P1 vs P2 score
-  const totalScore = game.player1Score + game.player2Score;
-  const p1Pct = totalScore > 0 ? (game.player1Score / totalScore) * 100 : 50;
-
   return (
     <div
-      className="relative rounded-xl overflow-hidden"
+      className="flex items-center gap-4 px-4 py-2 rounded-lg"
       style={{
-        backgroundColor: '#101018',
-        border: '1px solid #1e1e28',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(10, 10, 18, 0.88)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      {/* Background from user settings */}
-      {backgroundUrl && (
-        <>
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `url(${backgroundUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} />
-        </>
-      )}
-
-      <div className="relative z-10">
-        {/* Score header */}
-        <div className="px-6 pt-6 pb-4">
-          <div className="flex items-center justify-center gap-8 sm:gap-12">
-            {/* Player 1 */}
-            <div className="flex flex-col items-center gap-1.5 min-w-[110px]">
-              <span
-                className="text-sm font-bold uppercase tracking-wider"
-                style={{ color: p1Won ? '#c4a35a' : '#999' }}
-              >
-                {playerNames.player1}
-              </span>
-              <span
-                className="text-5xl font-bold tabular-nums"
-                style={{
-                  color: '#c4a35a',
-                  fontFamily: "'NJNaruto', Arial, sans-serif",
-                  textShadow: p1Won ? '0 0 16px rgba(196,163,90,0.35)' : 'none',
-                }}
-              >
-                {game.player1Score}
-              </span>
-              <div className="flex items-center gap-2">
-                {p1Won && (
-                  <span
-                    className="text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: 'rgba(196,163,90,0.15)',
-                      color: '#c4a35a',
-                      border: '1px solid rgba(196,163,90,0.3)',
-                    }}
-                  >
-                    {t('winner')}
-                  </span>
-                )}
-                <span
-                  className="text-[9px] tabular-nums px-1.5 py-0.5 rounded"
-                  style={{
-                    backgroundColor: 'rgba(196,163,90,0.08)',
-                    color: '#c4a35a',
-                    border: '1px solid rgba(196,163,90,0.15)',
-                  }}
-                >
-                  {p1Missions}/{missions.length}
-                </span>
-              </div>
-            </div>
-
-            {/* VS divider */}
-            <div className="flex flex-col items-center gap-1">
-              <span
-                className="text-lg font-bold uppercase"
-                style={{ color: '#2a2a34', fontFamily: "'NJNaruto', Arial, sans-serif" }}
-              >
-                {t('vsLabel')}
-              </span>
-            </div>
-
-            {/* Player 2 */}
-            <div className="flex flex-col items-center gap-1.5 min-w-[110px]">
-              <span
-                className="text-sm font-bold uppercase tracking-wider"
-                style={{ color: p2Won ? '#b33e3e' : '#999' }}
-              >
-                {playerNames.player2}
-              </span>
-              <span
-                className="text-5xl font-bold tabular-nums"
-                style={{
-                  color: '#b33e3e',
-                  fontFamily: "'NJNaruto', Arial, sans-serif",
-                  textShadow: p2Won ? '0 0 16px rgba(179,62,62,0.35)' : 'none',
-                }}
-              >
-                {game.player2Score}
-              </span>
-              <div className="flex items-center gap-2">
-                {p2Won && (
-                  <span
-                    className="text-[9px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: 'rgba(179,62,62,0.15)',
-                      color: '#b33e3e',
-                      border: '1px solid rgba(179,62,62,0.3)',
-                    }}
-                  >
-                    {t('winner')}
-                  </span>
-                )}
-                <span
-                  className="text-[9px] tabular-nums px-1.5 py-0.5 rounded"
-                  style={{
-                    backgroundColor: 'rgba(179,62,62,0.08)',
-                    color: '#b33e3e',
-                    border: '1px solid rgba(179,62,62,0.15)',
-                  }}
-                >
-                  {p2Missions}/{missions.length}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Score comparison bar */}
-          {totalScore > 0 && (
-            <div className="mt-4 mx-auto" style={{ maxWidth: '320px' }}>
-              <div className="flex h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a24' }}>
-                <div
-                  className="h-full rounded-l-full"
-                  style={{
-                    width: `${p1Pct}%`,
-                    backgroundColor: '#c4a35a',
-                    transition: 'width 0.5s ease',
-                  }}
-                />
-                <div
-                  className="h-full rounded-r-full"
-                  style={{
-                    width: `${100 - p1Pct}%`,
-                    backgroundColor: '#b33e3e',
-                    transition: 'width 0.5s ease',
-                  }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Game type + date + ELO */}
-        <div
-          className="flex items-center justify-center gap-4 flex-wrap px-4 py-2.5"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+      {/* P1 */}
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }}>
+          {playerNames.player1}
+        </span>
+        <span
+          className="text-lg font-bold tabular-nums"
+          style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
         >
-          <span
-            className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.04)',
-              color: '#666',
-              border: '1px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            {game.isAiGame ? t('aiGame', { difficulty: game.aiDifficulty ?? 'medium' }) : t('onlineGame')}
-          </span>
-          {game.eloChange != null && game.eloChange !== 0 && (
-            <span
-              className="text-[10px] font-bold tabular-nums px-2 py-0.5 rounded"
-              style={{
-                backgroundColor: game.eloChange > 0 ? 'rgba(62,139,62,0.1)' : 'rgba(179,62,62,0.1)',
-                color: game.eloChange > 0 ? '#4a9e4a' : '#b33e3e',
-                border: `1px solid ${game.eloChange > 0 ? 'rgba(62,139,62,0.25)' : 'rgba(179,62,62,0.25)'}`,
-              }}
-            >
-              ELO {game.eloChange > 0 ? '+' : ''}{game.eloChange}
-            </span>
-          )}
-          {game.completedAt && (
-            <span className="text-[10px]" style={{ color: '#555' }}>
-              {new Date(game.completedAt).toLocaleDateString()} {new Date(game.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          )}
-        </div>
+          {game.player1Score}
+        </span>
+      </div>
 
-        {/* Mission results grid */}
-        {missions.length > 0 && (
-          <div
-            className="px-4 py-4"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
-          >
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {missions.map((mission, i) => {
-                const rankColor = { D: '#3E8B3E', C: '#5A7ABB', B: '#9B59B6', A: '#C4A35A' }[mission.rank] ?? '#888';
-                const wonColor = mission.wonBy === 'player1' ? '#c4a35a' : mission.wonBy === 'player2' ? '#b33e3e' : null;
+      <span className="text-[10px]" style={{ color: '#333' }}>-</span>
 
-                return (
-                  <div
-                    key={i}
-                    className="rounded-lg px-3 py-3 text-center"
-                    style={{
-                      backgroundColor: backgroundUrl ? 'rgba(10,10,14,0.6)' : '#0a0a0e',
-                      border: `1px solid ${wonColor ? `${wonColor}35` : '#1e1e28'}`,
-                    }}
-                  >
-                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                      <span
-                        className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
-                        style={{
-                          backgroundColor: `${rankColor}20`,
-                          color: rankColor,
-                          fontFamily: "'NJNaruto', Arial, sans-serif",
-                        }}
-                      >
-                        {mission.rank}
-                      </span>
-                      <span
-                        className="text-[10px] font-bold tabular-nums"
-                        style={{ color: rankColor, fontFamily: "'NJNaruto', Arial, sans-serif" }}
-                      >
-                        {mission.basePoints + mission.rankBonus} pts
-                      </span>
-                    </div>
-                    <p className="text-[10px] font-medium truncate mb-1.5" style={{ color: '#c0c0c0' }}>
-                      {mission.name_fr}
-                    </p>
-                    {mission.wonBy ? (
-                      <p className="text-[10px] font-bold" style={{ color: wonColor! }}>
-                        {playerNames[mission.wonBy]}
-                      </p>
-                    ) : (
-                      <p className="text-[9px]" style={{ color: '#444' }}>-</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+      {/* P2 */}
+      <div className="flex items-center gap-2">
+        <span
+          className="text-lg font-bold tabular-nums"
+          style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+        >
+          {game.player2Score}
+        </span>
+        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }}>
+          {playerNames.player2}
+        </span>
       </div>
     </div>
   );
 }
 
-// ----- Text Timeline Component (fallback for old games) -----
+// ----- Text Timeline Component (fullscreen overlay) -----
 
 function TextTimeline({
   log,
   playerNames,
+  onClose,
 }: {
   log: ReplayLogEntry[];
   playerNames: { player1: string; player2: string };
+  onClose: () => void;
 }) {
   const t = useTranslations();
   const tr = useTranslations('replay');
@@ -456,124 +231,130 @@ function TextTimeline({
 
   return (
     <div
-      className="rounded-xl overflow-hidden"
-      style={{
-        backgroundColor: '#101018',
-        border: '1px solid #1e1e28',
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+        className="w-full max-w-2xl max-h-[80vh] flex flex-col rounded-xl overflow-hidden mx-4"
+        style={{ backgroundColor: '#101018', border: '1px solid #1e1e28' }}
       >
-        <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888' }}>
-          {tr('eventTimeline')}
-        </h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
-            className="px-3 py-1 text-[10px] font-bold rounded cursor-pointer"
-            style={{
-              backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
-              border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.3)' : 'rgba(62,139,62,0.3)'}`,
-              color: isPlaying ? '#b33e3e' : '#4a9e4a',
-            }}
-          >
-            {isPlaying ? tr('pause') : tr('autoPlay')}
-          </button>
-          <button
-            onClick={() => {
-              const order: Array<'slow' | 'normal' | 'fast'> = ['slow', 'normal', 'fast'];
-              setSpeed(order[(order.indexOf(speed) + 1) % 3]);
-            }}
-            className="px-2 py-1 text-[10px] rounded cursor-pointer"
-            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#888' }}
-          >
-            {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
-          </button>
-        </div>
-      </div>
-
-      {/* Turn filters */}
-      <div className="flex gap-1 px-4 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-        <button
-          onClick={() => setSelectedTurn(null)}
-          className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
-          style={{
-            backgroundColor: selectedTurn === null ? '#c4a35a' : '#16161e',
-            color: selectedTurn === null ? '#0a0a0a' : '#666',
-            border: selectedTurn === null ? '1px solid #c4a35a' : '1px solid #2a2a34',
-          }}
+        <div
+          className="flex items-center justify-between px-4 py-3 shrink-0"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
         >
-          {tr('allTurns')}
-        </button>
-        {turns.map((turn) => (
+          <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888' }}>
+            {tr('eventTimeline')}
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
+              className="px-3 py-1 text-[10px] font-bold rounded cursor-pointer"
+              style={{
+                backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
+                border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.3)' : 'rgba(62,139,62,0.3)'}`,
+                color: isPlaying ? '#b33e3e' : '#4a9e4a',
+              }}
+            >
+              {isPlaying ? tr('pause') : tr('autoPlay')}
+            </button>
+            <button
+              onClick={() => {
+                const order: Array<'slow' | 'normal' | 'fast'> = ['slow', 'normal', 'fast'];
+                setSpeed(order[(order.indexOf(speed) + 1) % 3]);
+              }}
+              className="px-2 py-1 text-[10px] rounded cursor-pointer"
+              style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#888' }}
+            >
+              {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+            </button>
+            <button
+              onClick={onClose}
+              className="px-2 py-1 text-[10px] rounded cursor-pointer"
+              style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#888' }}
+            >
+              X
+            </button>
+          </div>
+        </div>
+
+        {/* Turn filters */}
+        <div className="flex gap-1 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
           <button
-            key={turn}
-            onClick={() => setSelectedTurn(turn)}
+            onClick={() => setSelectedTurn(null)}
             className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
             style={{
-              backgroundColor: selectedTurn === turn ? '#c4a35a' : '#16161e',
-              color: selectedTurn === turn ? '#0a0a0a' : '#666',
-              border: selectedTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
-              fontFamily: "'NJNaruto', Arial, sans-serif",
+              backgroundColor: selectedTurn === null ? '#c4a35a' : '#16161e',
+              color: selectedTurn === null ? '#0a0a0a' : '#666',
+              border: selectedTurn === null ? '1px solid #c4a35a' : '1px solid #2a2a34',
             }}
           >
-            T{turn}
+            {tr('allTurns')}
           </button>
-        ))}
-      </div>
+          {turns.map((turn) => (
+            <button
+              key={turn}
+              onClick={() => setSelectedTurn(turn)}
+              className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
+              style={{
+                backgroundColor: selectedTurn === turn ? '#c4a35a' : '#16161e',
+                color: selectedTurn === turn ? '#0a0a0a' : '#666',
+                border: selectedTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
+                fontFamily: "'NJNaruto', Arial, sans-serif",
+              }}
+            >
+              T{turn}
+            </button>
+          ))}
+        </div>
 
-      {/* Log entries */}
-      <div
-        ref={scrollRef}
-        className="overflow-y-auto"
-        style={{ maxHeight: '400px' }}
-      >
-        {displayEntries.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <span className="text-sm" style={{ color: '#333' }}>{tr('noLog')}</span>
-          </div>
-        ) : (
-          displayEntries.map((entry, i) => {
-            const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
-            const displayName = entry.player ? playerNames[entry.player] : null;
-            return (
-              <div
-                key={`${entry.timestamp}-${i}`}
-                className="flex items-start gap-2 px-4 py-1.5 text-xs"
-                style={{
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
-                  backgroundColor: entry.player ? `${playerColor}05` : 'transparent',
-                }}
-              >
-                <span className="shrink-0 tabular-nums text-[10px]" style={{ color: '#444', minWidth: '32px' }}>
-                  {formatTimestamp(entry.timestamp)}
-                </span>
-                <span
-                  className="shrink-0 rounded px-1 py-0.5 text-[9px] uppercase font-bold"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
+        {/* Log entries */}
+        <div ref={scrollRef} className="overflow-y-auto flex-1">
+          {displayEntries.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <span className="text-sm" style={{ color: '#333' }}>{tr('noLog')}</span>
+            </div>
+          ) : (
+            displayEntries.map((entry, i) => {
+              const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
+              const displayName = entry.player ? playerNames[entry.player] : null;
+              return (
+                <div
+                  key={`${entry.timestamp}-${i}`}
+                  className="flex items-start gap-2 px-4 py-1.5 text-xs"
+                  style={{
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
+                    backgroundColor: entry.player ? `${playerColor}05` : 'transparent',
+                  }}
                 >
-                  T{entry.turn} {formatPhase(entry.phase)}
-                </span>
-                {entry.player && (
-                  <span className="shrink-0 font-bold text-[10px]" style={{ color: playerColor }}>
-                    {displayName}
+                  <span className="shrink-0 tabular-nums text-[10px]" style={{ color: '#444', minWidth: '32px' }}>
+                    {formatTimestamp(entry.timestamp)}
                   </span>
-                )}
-                <span className="text-[11px]" style={{ color: '#c0c0c0' }}>
-                  {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
-                </span>
-              </div>
-            );
-          })
-        )}
+                  <span
+                    className="shrink-0 rounded px-1 py-0.5 text-[9px] uppercase font-bold"
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
+                  >
+                    T{entry.turn} {formatPhase(entry.phase)}
+                  </span>
+                  {entry.player && (
+                    <span className="shrink-0 font-bold text-[10px]" style={{ color: playerColor }}>
+                      {displayName}
+                    </span>
+                  )}
+                  <span className="text-[11px]" style={{ color: '#c0c0c0' }}>
+                    {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
+                  </span>
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ----- Visual Replay Component -----
+// ----- Visual Replay Component (fullscreen) -----
 
 function VisualReplay({
   initialState,
@@ -581,12 +362,14 @@ function VisualReplay({
   log,
   playerNames,
   backgroundUrl,
+  game,
 }: {
   initialState: GameState;
   actionHistory: Array<{ player: PlayerID; action: GameAction }>;
   log: ReplayLogEntry[];
   playerNames: { player1: string; player2: string };
   backgroundUrl?: string;
+  game: GameData;
 }) {
   const tr = useTranslations('replay');
   const t = useTranslations();
@@ -629,9 +412,6 @@ function VisualReplay({
           if (!found) {
             const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
             const hiddenChars = playerChars.filter((c) => c.isHidden);
-            if (hiddenChars.length === 1) {
-              return { ...action, characterInstanceId: hiddenChars[0].instanceId };
-            }
             if (hiddenChars.length > 0) {
               return { ...action, characterInstanceId: hiddenChars[0].instanceId };
             }
@@ -854,33 +634,259 @@ function VisualReplay({
   if (!currentState) return null;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Visual board */}
-      <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} />
-
-      {/* Playback controls */}
-      <PlaybackControls
-        currentStep={currentStep}
-        totalSteps={states.length}
-        onStepChange={handleStepChange}
-        turnStarts={turnStarts}
-        actionLabel={actionLabel}
+    <div
+      className="w-screen flex flex-col overflow-hidden no-select"
+      style={{
+        height: '100dvh',
+        backgroundColor: '#0a0a0a',
+        backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+        overscrollBehavior: 'none',
+      }}
+    >
+      {/* Background overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ backgroundColor: backgroundUrl ? 'rgba(0, 0, 0, 0.35)' : 'transparent' }}
       />
 
-      {/* Toggle log */}
-      <div className="flex flex-col gap-3">
+      {/* Top-left: back + share + log buttons */}
+      <div className="absolute top-2 left-2 z-30 flex items-center gap-1.5">
+        <Link
+          href="/"
+          className="px-3 py-1 text-[10px] font-medium rounded"
+          style={{
+            backgroundColor: 'rgba(10, 10, 18, 0.88)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: '#888',
+          }}
+        >
+          {tr('back')}
+        </Link>
+        <ShareButton gameId={game.id} />
         <button
           onClick={() => setShowLog(!showLog)}
-          className="self-start px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer"
+          className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer"
           style={{
-            backgroundColor: showLog ? '#c4a35a' : '#16161e',
-            color: showLog ? '#0a0a0a' : '#666',
-            border: `1px solid ${showLog ? '#c4a35a' : '#2a2a34'}`,
+            backgroundColor: showLog ? '#c4a35a' : 'rgba(10, 10, 18, 0.88)',
+            backdropFilter: 'blur(12px)',
+            color: showLog ? '#0a0a0a' : '#888',
+            border: showLog ? '1px solid #c4a35a' : '1px solid rgba(255,255,255,0.08)',
           }}
         >
           {tr('eventTimeline')}
         </button>
-        {showLog && <TextTimeline log={log} playerNames={playerNames} />}
+      </div>
+
+      {/* Top-right: score overlay */}
+      <div className="absolute top-2 right-2 z-30">
+        <ScoreOverlay game={game} playerNames={playerNames} />
+      </div>
+
+      {/* Board fills everything above controls */}
+      <div className="flex-1 min-h-0 relative z-10">
+        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} />
+      </div>
+
+      {/* Playback controls docked at bottom */}
+      <div className="shrink-0 relative z-20">
+        <PlaybackControls
+          currentStep={currentStep}
+          totalSteps={states.length}
+          onStepChange={handleStepChange}
+          turnStarts={turnStarts}
+          actionLabel={actionLabel}
+        />
+      </div>
+
+      {/* Log overlay */}
+      {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} />}
+    </div>
+  );
+}
+
+// ----- Text-only Replay (fallback, also fullscreen) -----
+
+function TextOnlyReplay({
+  log,
+  playerNames,
+  game,
+}: {
+  log: ReplayLogEntry[];
+  playerNames: { player1: string; player2: string };
+  game: GameData;
+}) {
+  const t = useTranslations();
+  const tr = useTranslations('replay');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [selectedTurn, setSelectedTurn] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
+  const [visibleCount, setVisibleCount] = useState(log.length);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const SPEEDS = { slow: 1500, normal: 800, fast: 300 };
+  const filteredLog = selectedTurn === null ? log : log.filter((e) => e.turn === selectedTurn);
+  const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
+
+  const stopAutoPlay = useCallback(() => {
+    setIsPlaying(false);
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setVisibleCount((prev) => {
+          if (prev >= filteredLog.length) { stopAutoPlay(); return filteredLog.length; }
+          return prev + 1;
+        });
+      }, SPEEDS[speed]);
+    }
+    return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
+  }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
+
+  useEffect(() => {
+    if (scrollRef.current && isPlaying) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [visibleCount, isPlaying]);
+
+  useEffect(() => { setVisibleCount(filteredLog.length); stopAutoPlay(); }, [selectedTurn, filteredLog.length, stopAutoPlay]);
+
+  const formatPhase = (phase: GamePhase): string => {
+    const key = phaseTranslationKeys[phase];
+    return key ? t(key) : phase;
+  };
+
+  const displayEntries = filteredLog.slice(0, visibleCount);
+
+  return (
+    <div
+      className="w-screen flex flex-col"
+      style={{ height: '100dvh', backgroundColor: '#0a0a0a', overscrollBehavior: 'none' }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid #1e1e28' }}>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="px-3 py-1 text-[10px] rounded"
+            style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+          >
+            {tr('back')}
+          </Link>
+          <h1
+            className="text-sm font-bold uppercase tracking-wider"
+            style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+          >
+            {tr('title')}
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-bold tabular-nums" style={{ color: '#c4a35a', fontFamily: "'NJNaruto'" }}>
+            {game.player1Score}
+          </span>
+          <span className="text-[10px]" style={{ color: '#333' }}>-</span>
+          <span className="text-sm font-bold tabular-nums" style={{ color: '#b33e3e', fontFamily: "'NJNaruto'" }}>
+            {game.player2Score}
+          </span>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center gap-2 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <button
+          onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
+          className="px-3 py-1 text-[10px] font-bold rounded cursor-pointer"
+          style={{
+            backgroundColor: isPlaying ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
+            border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.3)' : 'rgba(62,139,62,0.3)'}`,
+            color: isPlaying ? '#b33e3e' : '#4a9e4a',
+          }}
+        >
+          {isPlaying ? tr('pause') : tr('autoPlay')}
+        </button>
+        <button
+          onClick={() => {
+            const order: Array<'slow' | 'normal' | 'fast'> = ['slow', 'normal', 'fast'];
+            setSpeed(order[(order.indexOf(speed) + 1) % 3]);
+          }}
+          className="px-2 py-1 text-[10px] rounded cursor-pointer"
+          style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#888' }}
+        >
+          {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+        </button>
+        <div className="flex-1" />
+        <button
+          onClick={() => setSelectedTurn(null)}
+          className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
+          style={{
+            backgroundColor: selectedTurn === null ? '#c4a35a' : '#16161e',
+            color: selectedTurn === null ? '#0a0a0a' : '#666',
+            border: selectedTurn === null ? '1px solid #c4a35a' : '1px solid #2a2a34',
+          }}
+        >
+          {tr('allTurns')}
+        </button>
+        {turns.map((turn) => (
+          <button
+            key={turn}
+            onClick={() => setSelectedTurn(turn)}
+            className="px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer"
+            style={{
+              backgroundColor: selectedTurn === turn ? '#c4a35a' : '#16161e',
+              color: selectedTurn === turn ? '#0a0a0a' : '#666',
+              border: selectedTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
+              fontFamily: "'NJNaruto', Arial, sans-serif",
+            }}
+          >
+            T{turn}
+          </button>
+        ))}
+      </div>
+
+      {/* Log entries */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        {displayEntries.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <span className="text-sm" style={{ color: '#333' }}>{tr('noLog')}</span>
+          </div>
+        ) : (
+          displayEntries.map((entry, i) => {
+            const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
+            const displayName = entry.player ? playerNames[entry.player] : null;
+            return (
+              <div
+                key={`${entry.timestamp}-${i}`}
+                className="flex items-start gap-2 px-4 py-1.5 text-xs"
+                style={{
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
+                  backgroundColor: entry.player ? `${playerColor}05` : 'transparent',
+                }}
+              >
+                <span className="shrink-0 tabular-nums text-[10px]" style={{ color: '#444', minWidth: '32px' }}>
+                  {formatTimestamp(entry.timestamp)}
+                </span>
+                <span
+                  className="shrink-0 rounded px-1 py-0.5 text-[9px] uppercase font-bold"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', color: '#555', minWidth: '50px', textAlign: 'center' }}
+                >
+                  T{entry.turn} {formatPhase(entry.phase)}
+                </span>
+                {entry.player && (
+                  <span className="shrink-0 font-bold text-[10px]" style={{ color: playerColor }}>
+                    {displayName}
+                  </span>
+                )}
+                <span className="text-[11px]" style={{ color: '#c0c0c0' }}>
+                  {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
+                </span>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -903,7 +909,6 @@ export default function ReplayPage({
   const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
 
-  // Fetch user's background preference
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
@@ -926,7 +931,7 @@ export default function ReplayPage({
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="w-screen flex items-center justify-center" style={{ height: '100dvh', backgroundColor: '#0a0a0a' }}>
         <div className="flex flex-col items-center gap-3">
           <div
             className="w-6 h-6 rounded-full"
@@ -944,7 +949,7 @@ export default function ReplayPage({
 
   if (error || !game) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="w-screen flex flex-col items-center justify-center gap-4" style={{ height: '100dvh', backgroundColor: '#0a0a0a' }}>
         <p className="text-sm" style={{ color: '#b33e3e' }}>{error}</p>
         <Link
           href="/"
@@ -959,7 +964,7 @@ export default function ReplayPage({
 
   if (!game.gameState) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ backgroundColor: '#0a0a0a' }}>
+      <main className="w-screen flex flex-col items-center justify-center gap-4" style={{ height: '100dvh', backgroundColor: '#0a0a0a' }}>
         <p className="text-sm" style={{ color: '#555' }}>{tr('noLog')}</p>
         <Link
           href="/"
@@ -973,57 +978,27 @@ export default function ReplayPage({
   }
 
   const playerNames = game.gameState.playerNames ?? { player1: t('game.anim.player1'), player2: t('game.anim.player2') };
-  const missions = game.gameState.finalMissions ?? [];
   const log = game.gameState.log ?? [];
   const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
+  if (hasVisualReplay) {
+    return (
+      <VisualReplay
+        initialState={game.gameState.initialState!}
+        actionHistory={game.gameState.actionHistory!}
+        log={log}
+        playerNames={playerNames}
+        backgroundUrl={gameBackgroundUrl}
+        game={game}
+      />
+    );
+  }
+
   return (
-    <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
-      <CloudBackground />
-      <DecorativeIcons />
-
-      <div className="max-w-4xl mx-auto relative z-10 flex-1 px-4 py-6 w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1
-              className="text-xl font-bold uppercase tracking-wider"
-              style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
-            >
-              {tr('title')}
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShareButton gameId={id} />
-            <LanguageSwitcher />
-            <Link
-              href="/"
-              className="px-4 py-2 text-sm rounded"
-              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
-            >
-              {tr('back')}
-            </Link>
-          </div>
-        </div>
-
-        {/* Match summary with scores and missions */}
-        <div className="mb-6">
-          <MatchStats game={game} playerNames={playerNames} missions={missions} backgroundUrl={gameBackgroundUrl} />
-        </div>
-
-        {/* Visual Replay or Text-only fallback */}
-        {hasVisualReplay ? (
-          <VisualReplay
-            initialState={game.gameState.initialState!}
-            actionHistory={game.gameState.actionHistory!}
-            log={log}
-            playerNames={playerNames}
-            backgroundUrl={gameBackgroundUrl}
-          />
-        ) : (
-          <TextTimeline log={log} playerNames={playerNames} />
-        )}
-      </div>
-    </main>
+    <TextOnlyReplay
+      log={log}
+      playerNames={playerNames}
+      game={game}
+    />
   );
 }
