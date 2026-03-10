@@ -633,7 +633,7 @@ function AbandonConfirmDialog({
         <span className="text-lg font-bold text-center" style={{ color: '#e0e0e0' }}>
           {t('game.actions.abandonConfirmTitle')}
         </span>
-        <span className="text-sm text-center" style={{ color: '#888888' }}>
+        <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
           {t('game.actions.abandonConfirmMessage')}
         </span>
         <div className="flex gap-3 mt-2">
