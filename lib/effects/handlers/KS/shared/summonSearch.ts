@@ -1,4 +1,5 @@
 import type { GameState, PlayerID } from '@/lib/engine/types';
+import { canAffordAsUpgrade } from './upgradeCheck';
 
 export interface HiddenCharTarget {
   instanceId: string;
@@ -24,8 +25,8 @@ export function findAffordableSummonsInHand(
   for (let i = 0; i < ps.hand.length; i++) {
     const card = ps.hand[i];
     if (card.keywords && card.keywords.includes('Summon')) {
-      const cost = Math.max(0, card.chakra - costReduction);
-      if (ps.chakra >= cost) {
+      const freshCost = Math.max(0, card.chakra - costReduction);
+      if (ps.chakra >= freshCost || canAffordAsUpgrade(state, player, card, costReduction)) {
         indices.push(i);
       }
     }

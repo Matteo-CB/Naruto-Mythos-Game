@@ -9,9 +9,7 @@ interface PlaybackControlsProps {
   currentStep: number;
   totalSteps: number;
   onStepChange: (step: number) => void;
-  /** Turn numbers where each turn starts (step index) */
   turnStarts: Array<{ turn: number; step: number }>;
-  /** Label describing what happened at the current step */
   actionLabel?: string;
 }
 
@@ -26,6 +24,7 @@ export function PlaybackControls({
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   const stopPlay = useCallback(() => {
     setIsPlaying(false);
@@ -37,17 +36,16 @@ export function PlaybackControls({
 
   const startPlay = useCallback(() => {
     if (currentStep >= totalSteps - 1) {
-      // At the end, restart from beginning
       onStepChange(0);
     }
     setIsPlaying(true);
   }, [currentStep, totalSteps, onStepChange]);
 
-  // Auto-advance effect
+  // Auto-advance
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
-        onStepChange(-1); // -1 signals "advance by one"
+        onStepChange(-1);
       }, SPEEDS[speed]);
     }
     return () => {
@@ -58,77 +56,189 @@ export function PlaybackControls({
     };
   }, [isPlaying, speed, onStepChange]);
 
-  // Stop when reaching end
+  // Stop at end
   useEffect(() => {
     if (isPlaying && currentStep >= totalSteps - 1) {
       stopPlay();
     }
   }, [currentStep, totalSteps, isPlaying, stopPlay]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          if (isPlaying) stopPlay();
+          else startPlay();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          stopPlay();
+          onStepChange(Math.max(0, currentStep - 1));
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          stopPlay();
+          onStepChange(Math.min(totalSteps - 1, currentStep + 1));
+          break;
+        case 'Home':
+          e.preventDefault();
+          stopPlay();
+          onStepChange(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          stopPlay();
+          onStepChange(totalSteps - 1);
+          break;
+        case '1': case '2': case '3': case '4': {
+          const turnNum = parseInt(e.key);
+          const ts = turnStarts.find(ts => ts.turn === turnNum);
+          if (ts) { stopPlay(); onStepChange(ts.step); }
+          break;
+        }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isPlaying, currentStep, totalSteps, stopPlay, startPlay, onStepChange, turnStarts]);
+
   const goToStart = () => { stopPlay(); onStepChange(0); };
   const goToEnd = () => { stopPlay(); onStepChange(totalSteps - 1); };
   const stepBack = () => { stopPlay(); onStepChange(Math.max(0, currentStep - 1)); };
   const stepForward = () => { stopPlay(); onStepChange(Math.min(totalSteps - 1, currentStep + 1)); };
 
+  const cycleSpeed = () => {
+    const order: Array<'slow' | 'normal' | 'fast'> = ['slow', 'normal', 'fast'];
+    const idx = order.indexOf(speed);
+    setSpeed(order[(idx + 1) % order.length]);
+  };
+
   const progressPct = totalSteps > 1 ? (currentStep / (totalSteps - 1)) * 100 : 0;
+
+  // Which turn are we currently in?
+  const currentTurn = (() => {
+    for (let i = turnStarts.length - 1; i >= 0; i--) {
+      if (currentStep >= turnStarts[i].step) return turnStarts[i].turn;
+    }
+    return turnStarts[0]?.turn ?? 1;
+  })();
+
+  // Scrub via click or drag on progress bar
+  const handleProgressClick = (e: React.MouseEvent) => {
+    const bar = progressBarRef.current;
+    if (!bar) return;
+    const rect = bar.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    stopPlay();
+    onStepChange(Math.round(pct * (totalSteps - 1)));
+  };
+
+  // Drag-to-scrub support
+  const isDraggingRef = useRef(false);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDraggingRef.current = true;
+    handleProgressClick(e);
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isDraggingRef.current || !progressBarRef.current) return;
+      const rect = progressBarRef.current.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+      onStepChange(Math.round(pct * (totalSteps - 1)));
+    };
+    const onMouseUp = () => {
+      isDraggingRef.current = false;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const btnBase = "flex items-center justify-center rounded transition-colors cursor-pointer";
 
   return (
     <div
-      className="rounded-lg px-4 py-3"
-      style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
+      className="rounded-xl overflow-hidden"
+      style={{
+        backgroundColor: '#101018',
+        border: '1px solid #1e1e28',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+      }}
     >
       {/* Action label */}
       {actionLabel && (
-        <div className="text-center mb-2">
-          <span className="text-[11px]" style={{ color: '#e0e0e0' }}>
+        <div
+          className="text-center px-4 py-2"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+        >
+          <span className="text-[11px] leading-relaxed" style={{ color: '#c0c0c0' }}>
             {actionLabel}
           </span>
         </div>
       )}
 
-      {/* Progress bar */}
-      <div
-        className="relative w-full h-2 rounded-full mb-3 cursor-pointer"
-        style={{ backgroundColor: '#0a0a0a' }}
-        onClick={(e) => {
-          stopPlay();
-          const rect = e.currentTarget.getBoundingClientRect();
-          const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-          onStepChange(Math.round(pct * (totalSteps - 1)));
-        }}
-      >
+      {/* Progress bar with turn markers */}
+      <div className="px-4 pt-3 pb-1">
         <div
-          className="absolute left-0 top-0 h-full rounded-full transition-all"
-          style={{ width: `${progressPct}%`, backgroundColor: '#c4a35a' }}
-        />
-        {/* Scrubber dot */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
-          style={{
-            left: `calc(${progressPct}% - 6px)`,
-            backgroundColor: '#c4a35a',
-            border: '2px solid #0a0a0a',
-          }}
-        />
+          ref={progressBarRef}
+          className="relative w-full h-2 rounded-full cursor-pointer group"
+          style={{ backgroundColor: '#1a1a24' }}
+          onMouseDown={handleMouseDown}
+        >
+          {/* Turn markers */}
+          {turnStarts.map(({ turn, step }) => {
+            const pct = totalSteps > 1 ? (step / (totalSteps - 1)) * 100 : 0;
+            return (
+              <div
+                key={turn}
+                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3 rounded-full"
+                style={{
+                  left: `${pct}%`,
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  zIndex: 1,
+                }}
+              />
+            );
+          })}
+          {/* Fill */}
+          <div
+            className="absolute left-0 top-0 h-full rounded-full"
+            style={{
+              width: `${progressPct}%`,
+              backgroundColor: '#c4a35a',
+              transition: isPlaying ? 'none' : 'width 0.15s ease-out',
+            }}
+          />
+          {/* Scrubber */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full transition-all group-hover:scale-125"
+            style={{
+              left: `calc(${progressPct}% - 7px)`,
+              backgroundColor: '#c4a35a',
+              border: '2px solid #0a0a0a',
+              boxShadow: '0 0 6px rgba(196,163,90,0.4)',
+              zIndex: 2,
+            }}
+          />
+        </div>
       </div>
 
       {/* Controls row */}
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-between">
-        {/* Turn jump buttons */}
+      <div className="flex items-center justify-between px-4 py-2.5 gap-3">
+        {/* Turn jump pills */}
         <div className="flex items-center gap-1">
           {turnStarts.map(({ turn, step }) => (
             <button
               key={turn}
               onClick={() => { stopPlay(); onStepChange(step); }}
-              className="px-2 py-1 text-[9px] rounded cursor-pointer transition-colors"
+              className={`${btnBase} px-2.5 py-1 text-[10px] font-bold`}
               style={{
-                backgroundColor: currentStep >= step && (turn === turnStarts[turnStarts.length - 1]?.turn || currentStep < (turnStarts.find(ts => ts.turn === turn + 1)?.step ?? Infinity))
-                  ? '#c4a35a'
-                  : '#1a1a2e',
-                color: currentStep >= step && (turn === turnStarts[turnStarts.length - 1]?.turn || currentStep < (turnStarts.find(ts => ts.turn === turn + 1)?.step ?? Infinity))
-                  ? '#0a0a0a'
-                  : '#888',
-                border: '1px solid #333',
+                backgroundColor: currentTurn === turn ? '#c4a35a' : '#16161e',
+                color: currentTurn === turn ? '#0a0a0a' : '#666',
+                border: currentTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
+                fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
               T{turn}
@@ -136,69 +246,87 @@ export function PlaybackControls({
           ))}
         </div>
 
-        {/* Playback buttons */}
+        {/* Main controls */}
         <div className="flex items-center gap-1">
           <button
             onClick={goToStart}
-            className="px-2 py-1 text-xs rounded cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888' }}
+            className={`${btnBase} w-8 h-8 text-[10px]`}
+            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('start')}
           >
-            |&lt;&lt;
+            |&lt;
           </button>
           <button
             onClick={stepBack}
-            className="px-2 py-1 text-xs rounded cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888' }}
+            className={`${btnBase} w-8 h-8 text-xs`}
+            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('stepBack')}
           >
             &lt;
           </button>
           <button
             onClick={isPlaying ? stopPlay : startPlay}
-            className="px-3 py-1 text-xs rounded cursor-pointer font-bold"
+            className={`${btnBase} w-10 h-8 text-xs font-bold`}
             style={{
-              backgroundColor: isPlaying ? '#2a1a1a' : '#1a2a1a',
-              border: `1px solid ${isPlaying ? '#b33e3e' : '#3E8B3E'}`,
+              backgroundColor: isPlaying ? 'rgba(179,62,62,0.12)' : 'rgba(62,139,62,0.12)',
+              border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.4)' : 'rgba(62,139,62,0.4)'}`,
               color: isPlaying ? '#b33e3e' : '#4a9e4a',
             }}
           >
-            {isPlaying ? t('pause') : t('autoPlay')}
+            {isPlaying ? '||' : '|>'}
           </button>
           <button
             onClick={stepForward}
-            className="px-2 py-1 text-xs rounded cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888' }}
+            className={`${btnBase} w-8 h-8 text-xs`}
+            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('stepForward')}
           >
             &gt;
           </button>
           <button
             onClick={goToEnd}
-            className="px-2 py-1 text-xs rounded cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888' }}
+            className={`${btnBase} w-8 h-8 text-[10px]`}
+            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
             title={t('end')}
           >
-            &gt;&gt;|
+            &gt;|
           </button>
         </div>
 
-        {/* Speed + step counter */}
-        <div className="flex items-center gap-2">
-          <select
-            value={speed}
-            onChange={(e) => setSpeed(e.target.value as 'slow' | 'normal' | 'fast')}
-            className="text-[10px] rounded px-1.5 py-1 cursor-pointer"
-            style={{ backgroundColor: '#1a1a2e', border: '1px solid #333', color: '#888' }}
+        {/* Speed + counter */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={cycleSpeed}
+            className={`${btnBase} px-2.5 py-1 text-[10px] font-medium`}
+            style={{
+              backgroundColor: '#16161e',
+              border: '1px solid #2a2a34',
+              color: speed === 'fast' ? '#c4a35a' : speed === 'slow' ? '#5A7ABB' : '#888',
+            }}
+            title={`${t('speed')}: ${t(speed)}`}
           >
-            <option value="slow">{t('slow')}</option>
-            <option value="normal">{t('normal')}</option>
-            <option value="fast">{t('fast')}</option>
-          </select>
+            {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+          </button>
           <span className="text-[10px] tabular-nums" style={{ color: '#555' }}>
-            {currentStep + 1} / {totalSteps}
+            {currentStep + 1}/{totalSteps}
           </span>
         </div>
+      </div>
+
+      {/* Keyboard hints */}
+      <div
+        className="flex items-center justify-center gap-4 px-4 py-1.5"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.03)' }}
+      >
+        <span className="text-[8px]" style={{ color: '#333' }}>
+          Space: {isPlaying ? t('pause') : t('autoPlay')}
+        </span>
+        <span className="text-[8px]" style={{ color: '#333' }}>
+          &larr;&rarr;: Step
+        </span>
+        <span className="text-[8px]" style={{ color: '#333' }}>
+          1-4: Jump to turn
+        </span>
       </div>
     </div>
   );

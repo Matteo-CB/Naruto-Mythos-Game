@@ -38,6 +38,10 @@ interface PendingTargetSelection {
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
+  // Multi-select support (Kiba 026 / Tayuya 065 UPGRADE choose)
+  isMultiSelect?: boolean;
+  minSelections?: number;
+  maxSelections?: number;
 }
 
 interface GameStore {
@@ -342,6 +346,8 @@ interface PendingActionData {
   descriptionKey?: string;
   descriptionParams?: Record<string, string | number>;
   sourceEffectId?: string;
+  minSelections?: number;
+  maxSelections?: number;
 }
 
 interface PendingEffectData {
@@ -563,6 +569,9 @@ function buildPendingTargetSelectionUI(
   const isSasuke014Reveal = tst === 'SASUKE014_HAND_REVEAL' || tst === 'SASUKE014_UPGRADE_HAND_REVEAL';
   const isTayuya065Reveal = tst === 'TAYUYA065_UPGRADE_REVEAL';
   const isKiba026Reveal = tst === 'KIBA026_UPGRADE_REVEAL';
+  const isTayuya065Choose = tst === 'TAYUYA065_UPGRADE_CHOOSE';
+  const isKiba026Choose = tst === 'KIBA026_UPGRADE_CHOOSE';
+  const isMultiSelectChoose = isTayuya065Choose || isKiba026Choose;
   const isInfoReveal = isOroReveal || isItachi091Reveal || isDosuLookReveal || isSasuke014Reveal || isTayuya065Reveal || isKiba026Reveal;
 
   let revealedCard: PendingTargetSelection['revealedCard'];
@@ -623,6 +632,30 @@ function buildPendingTargetSelectionUI(
     } catch { /* ignore */ }
   }
 
+  // Build revealedCards for multi-select CHOOSE types (Kiba 026 / Tayuya 065 UPGRADE)
+  if (isMultiSelectChoose && pendingEffect) {
+    try {
+      const rd = JSON.parse(pendingEffect.effectDescription);
+      if (isKiba026Choose) {
+        revealedCard = {
+          name_fr: 'Kiba Inuzuka', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.kiba026UpgradeChooseTitle',
+          revealResultKey: 'game.effect.kiba026UpgradeChooseHint',
+        };
+      } else {
+        revealedCard = {
+          name_fr: 'Tayuya', chakra: 0, power: 0, canSteal: false,
+          revealTitleKey: 'game.effect.tayuya065UpgradeChooseTitle',
+          revealResultKey: 'game.effect.tayuya065UpgradeChooseHint',
+        };
+      }
+      revealedCards = (rd.topCards ?? []).map((c: { name_fr?: string; name?: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean }) => ({
+        name_fr: c.name_fr ?? c.name ?? '???', chakra: c.chakra, power: c.power,
+        image_file: c.image_file, isSummon: c.isSummon, isMatch: c.isMatch,
+      }));
+    } catch { /* ignore */ }
+  }
+
   // Build dedicated confirm UI data
   let deckSize: number | undefined;
   let confirmCardData: PendingTargetSelection['confirmCardData'];
@@ -646,7 +679,7 @@ function buildPendingTargetSelectionUI(
     : isHandSelection ? 'CHOOSE_FROM_HAND'
     : isSakura011Draw ? 'DRAW_CARD'
     : isKiba113ConfirmHide ? (tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE')
-    : tst === 'EFFECT_PLAY_UPGRADE_OR_FRESH' ? 'EFFECT_PLAY_UPGRADE_OR_FRESH'
+    : (tst === 'EFFECT_PLAY_UPGRADE_OR_FRESH' || tst === 'HIRUZEN002_UPGRADE_OR_FRESH') ? 'EFFECT_PLAY_UPGRADE_OR_FRESH'
     : 'TARGET_CHARACTER';
 
   // Build decline label key for specific effects
@@ -677,8 +710,11 @@ function buildPendingTargetSelectionUI(
     confirmCardData,
     playerName,
     onSelect,
-    onDecline: pendingEffect?.isOptional ? onDecline : undefined,
-    declineLabelKey,
+    onDecline: isMultiSelectChoose ? onDecline : (pendingEffect?.isOptional ? onDecline : undefined),
+    declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
+    isMultiSelect: isMultiSelectChoose || undefined,
+    minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : undefined,
+    maxSelections: isMultiSelectChoose ? (pendingAction.maxSelections ?? 1) : undefined,
   };
 }
 

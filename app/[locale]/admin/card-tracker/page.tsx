@@ -287,7 +287,7 @@ export default function CardTrackerPage() {
     } else {
       const lines: string[] = [];
       lines.push('='.repeat(70));
-      lines.push(`CARD TRACKER EXPORT — ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`);
+      lines.push(`CARD TRACKER EXPORT - ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`);
       lines.push(`Total: ${data.length} issue(s)`);
       lines.push('='.repeat(70));
       lines.push('');
@@ -305,9 +305,9 @@ export default function CardTrackerPage() {
             const cards = issue.cardIds.map((id, idx) => `${issue.cardNames[idx]} [${id}]`).join(', ');
             lines.push(`  Card(s): ${cards}`);
             lines.push(`  Issue:   ${issue.description}`);
-            lines.push(`  By:      ${issue.reportedBy} — ${new Date(issue.createdAt).toLocaleDateString()}`);
+            lines.push(`  By:      ${issue.reportedBy}, ${new Date(issue.createdAt).toLocaleDateString()}`);
             if (issue.updatedBy) {
-              lines.push(`  Updated: ${issue.updatedBy} — ${new Date(issue.updatedAt).toLocaleDateString()}`);
+              lines.push(`  Updated: ${issue.updatedBy}, ${new Date(issue.updatedAt).toLocaleDateString()}`);
             }
             lines.push('');
           }
@@ -318,9 +318,9 @@ export default function CardTrackerPage() {
           const statusLabel = STATUS_CONFIG[issue.status].label;
           lines.push(`  [${statusLabel}] ${cards}`);
           lines.push(`  Issue:   ${issue.description}`);
-          lines.push(`  By:      ${issue.reportedBy} — ${new Date(issue.createdAt).toLocaleDateString()}`);
+          lines.push(`  By:      ${issue.reportedBy}, ${new Date(issue.createdAt).toLocaleDateString()}`);
           if (issue.updatedBy) {
-            lines.push(`  Updated: ${issue.updatedBy} — ${new Date(issue.updatedAt).toLocaleDateString()}`);
+            lines.push(`  Updated: ${issue.updatedBy}, ${new Date(issue.updatedAt).toLocaleDateString()}`);
           }
           lines.push('');
         }
