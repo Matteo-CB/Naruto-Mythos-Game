@@ -230,6 +230,32 @@ export default function DeckBuilderPage() {
     const charByCardId = new Map(allChars.map((c) => [c.cardId, c]));
     const missionByCardId = new Map(allMissions.map((m) => [m.cardId, m]));
 
+    // Fallback: lookup by card number (for external sites with wrong rarities)
+    const charByNumber = new Map<number, CharacterCard[]>();
+    for (const c of allChars) {
+      const arr = charByNumber.get(c.number) || [];
+      arr.push(c);
+      charByNumber.set(c.number, arr);
+    }
+    const missionByNumber = new Map<number, MissionCard>();
+    for (const m of allMissions) {
+      missionByNumber.set(m.number, m);
+    }
+
+    // Normalize external rarity formats to our format
+    const normalizeCardId = (raw: string): string => {
+      let id = raw.trim();
+      // "R ART" -> "RA"
+      id = id.replace(/-R ART$/, '-RA');
+      // "SECRET" -> "S"
+      id = id.replace(/-SECRET$/, '-S');
+      // "SV" (Secret Variant) -> "S"
+      id = id.replace(/-SV$/, '-S');
+      // "MYTHOS" -> "M"
+      id = id.replace(/-MYTHOS$/, '-M');
+      return id;
+    };
+
     const chars: CharacterCard[] = [];
     const missions: MissionCard[] = [];
     const notFound: string[] = [];
@@ -241,8 +267,9 @@ export default function DeckBuilderPage() {
         return;
       }
 
-      const cardId = match[1];
+      const rawCardId = match[1];
       const qty = parseInt(match[2], 10);
+      const cardId = normalizeCardId(rawCardId);
 
       // Check missions first (MMS rarity)
       const mission = missionByCardId.get(cardId);
@@ -257,7 +284,31 @@ export default function DeckBuilderPage() {
         continue;
       }
 
-      notFound.push(cardId);
+      // Fallback: extract number and find by number (handles wrong rarities)
+      const numMatch = cardId.match(/^KS-(\d+)/);
+      if (numMatch) {
+        const num = parseInt(numMatch[1], 10);
+        // Try mission by number
+        const mByNum = missionByNumber.get(num);
+        if (mByNum) {
+          for (let i = 0; i < qty; i++) missions.push(mByNum);
+          continue;
+        }
+        // Try character by number (pick first match, prefer matching rarity)
+        const candidates = charByNumber.get(num);
+        if (candidates && candidates.length > 0) {
+          // If the normalized ID has a rarity suffix, try to match it
+          const rarityMatch = cardId.match(/^KS-\d+-(.*)/);
+          const wantRarity = rarityMatch ? rarityMatch[1] : '';
+          const exact = candidates.find((c) => c.cardId === cardId);
+          const byRarity = candidates.find((c) => c.rarity === wantRarity);
+          const pick = exact || byRarity || candidates[0];
+          for (let i = 0; i < qty; i++) chars.push(pick);
+          continue;
+        }
+      }
+
+      notFound.push(rawCardId);
     }
 
     // Apply the imported deck

@@ -132,9 +132,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
           ? '2px solid #c4a35a'
-          : isRevealable
-            ? '2px solid #3e8b3e'
-            : '1px solid rgba(255, 255, 255, 0.08)',
+          : '1px solid rgba(255, 255, 255, 0.08)',
         overflow: 'hidden',
         boxShadow: isSelected
           ? '0 0 16px rgba(196, 163, 90, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)'
@@ -556,20 +554,13 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
       {/* Mission card - centered, never pushed */}
       <div className="relative w-full flex justify-center shrink-0">
-        {/* Drop zone highlight */}
-        {isTargetable && (
-          <motion.div
-            animate={{
-              boxShadow: isSelected
-                ? '0 0 24px rgba(196, 163, 90, 0.5)'
-                : '0 0 10px rgba(196, 163, 90, 0.2)',
-            }}
-            transition={{ repeat: Infinity, repeatType: 'reverse', duration: 1 }}
+        {/* Drop zone highlight - only when this mission is selected */}
+        {isSelected && (
+          <div
             className="absolute inset-0 rounded-lg -m-1.5"
             style={{
-              border: isSelected
-                ? '2px solid #c4a35a'
-                : '2px dashed rgba(196, 163, 90, 0.4)',
+              border: '2px solid #c4a35a',
+              boxShadow: '0 0 16px rgba(196, 163, 90, 0.4)',
               pointerEvents: 'none',
             }}
           />

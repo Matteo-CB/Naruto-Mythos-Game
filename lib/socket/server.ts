@@ -9,6 +9,7 @@ import { registerTournamentHandlers, handleTournamentMatchEnd } from '@/lib/sock
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
+import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
 
 interface RoomData {
   code: string;
@@ -655,6 +656,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     // Create a room
     socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean }) => {
+      if (isMaintenanceActive()) {
+        socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
+        return;
+      }
+
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
       // Clean up any existing room this player might be in
@@ -1223,6 +1229,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
     // Matchmaking
     socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
+      if (isMaintenanceActive()) {
+        socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
+        return;
+      }
+
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
 
@@ -1427,4 +1438,71 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Player disconnected: ${socket.id}`);
     });
   });
+}
+
+// --- Maintenance drain utilities ---
+
+export function getActiveGameCount(): number {
+  let count = 0;
+  for (const room of rooms.values()) {
+    if (room.gameState && room.gameState.phase !== 'gameOver') {
+      count++;
+    }
+  }
+  return count;
+}
+
+const DRAIN_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+const DRAIN_CHECK_INTERVAL_MS = 5000; // Check every 5 seconds
+
+export function startMaintenanceDrain(io: SocketIOServer): void {
+  if (isMaintenanceActive()) {
+    console.log('[Maintenance] Already active, skipping.');
+    return;
+  }
+
+  activateMaintenance();
+  const activeGames = getActiveGameCount();
+  console.log(`[Maintenance] Drain started. ${activeGames} active game(s).`);
+
+  // Broadcast warning to all connected clients
+  io.emit('server:maintenance-warning', { activeGames });
+
+  // If no active games, shut down immediately
+  if (activeGames === 0) {
+    console.log('[Maintenance] No active games. Shutting down now.');
+    io.emit('server:maintenance', { timestamp: Date.now() });
+    setTimeout(() => process.exit(0), 2000);
+    return;
+  }
+
+  // Poll every 5s to check when all games finish
+  const checkInterval = setInterval(() => {
+    const remaining = getActiveGameCount();
+    console.log(`[Maintenance] ${remaining} game(s) still active.`);
+    if (remaining === 0) {
+      clearInterval(checkInterval);
+      console.log('[Maintenance] All games finished. Shutting down.');
+      io.emit('server:maintenance', { timestamp: Date.now() });
+      setTimeout(() => {
+        io.disconnectSockets(true);
+        process.exit(0);
+      }, 2000);
+    }
+  }, DRAIN_CHECK_INTERVAL_MS);
+
+  setCheckInterval(checkInterval);
+
+  // Hard timeout after 5 minutes
+  const timeout = setTimeout(() => {
+    clearInterval(checkInterval);
+    console.log('[Maintenance] Drain timeout (5 min). Force shutting down.');
+    io.emit('server:maintenance', { timestamp: Date.now() });
+    setTimeout(() => {
+      io.disconnectSockets(true);
+      process.exit(0);
+    }, 2000);
+  }, DRAIN_TIMEOUT_MS);
+
+  setDrainTimeout(timeout);
 }

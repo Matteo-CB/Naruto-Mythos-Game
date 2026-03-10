@@ -20,7 +20,8 @@
     "fullscreen": "Fullscreen",
     "play": "Play",
     "close": "Close",
-    "all": "All"
+    "all": "All",
+    "maintenanceBanner": "Server maintenance incoming. No new games can be started after your current game. The site will be back in a few minutes."
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -623,7 +624,8 @@
       "connectionLost": "Lost connection to server.",
       "reconnectFailed": "Unable to reconnect to server.",
       "notConnected": "Not connected to server.",
-      "maintenance": "The server is under maintenance. Please wait..."
+      "maintenance": "The server is under maintenance. Please wait...",
+      "maintenanceNoNewGames": "Server entering maintenance. No new games can be started. The site will be back in a few minutes."
     }
   },
   "collection": {
@@ -2028,6 +2030,7 @@
     "title": "NARUTO MYTHOS",
     "subtitle": "Trading Card Game",
     "message": "The simulator is under maintenance. The update takes about 5 minutes.",
-    "timerLabel": "Time elapsed"
+    "timerLabel": "Time elapsed",
+    "statusOffline": "Server offline"
   }
 }
