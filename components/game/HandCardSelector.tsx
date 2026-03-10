@@ -4,9 +4,11 @@ import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
+import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 interface HandCardInfo {
   index: number;
@@ -29,8 +31,10 @@ function HandCard({
   cardInfo: HandCardInfo;
   onSelect: (index: string) => void;
 }) {
+  const t = useTranslations();
   const locale = useLocale();
   const dims = useGameScale();
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const { card, index } = cardInfo;
 
   const imagePath = normalizeImagePath(card.image_file);
@@ -140,6 +144,19 @@ function HandCard({
       >
         {getCardName(card as Parameters<typeof getCardName>[0], locale as 'en' | 'fr')}
       </div>
+
+      {/* Details button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); zoomCard(card as CharacterCard | MissionCard); }}
+        className="absolute bottom-7 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          color: '#c4a35a',
+          border: '1px solid rgba(196,163,90,0.4)',
+        }}
+      >
+        {t('game.board.details')}
+      </button>
     </motion.div>
   );
 }

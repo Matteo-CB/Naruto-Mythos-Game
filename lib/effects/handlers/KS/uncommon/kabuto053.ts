@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
+import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 
 /**
  * Card 053/130 - KABUTO YAKUSHI (UC)
@@ -128,26 +129,42 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find valid missions (fresh play or upgrade over same-name with lower cost)
+  // Find valid missions (fresh play or upgrade over same-name/flexible with lower cost)
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
   const validMissions: string[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     const mission = state.activeMissions[mi];
-    const sameNameChar = mission[friendlySide].find((c) => {
+    const chars = mission[friendlySide];
+
+    // Check for upgrade targets (same-name or flexible cross-name)
+    let hasUpgradeTarget = false;
+    for (const c of chars) {
+      if (c.isHidden) continue;
+      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
+        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
+      const isFlex = checkFlexibleUpgrade(topCard as any, tc)
+        && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
+      if (isSameName || isFlex) {
+        const upgradeCost = Math.max(0, ((topCard.chakra ?? 0) - (tc.chakra ?? 0)) - 3);
+        if (playerState.chakra >= upgradeCost) {
+          hasUpgradeTarget = true;
+          break;
+        }
+      }
+    }
+
+    // Check for fresh play (no same-name conflict)
+    const hasNameConflict = chars.some((c) => {
       if (c.isHidden) return false;
       const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
     });
-    if (!sameNameChar) {
+
+    if (hasUpgradeTarget || (!hasNameConflict && canAffordFresh)) {
       validMissions.push(String(mi));
-    } else {
-      const existingTopCard = sameNameChar.stack.length > 0
-        ? sameNameChar.stack[sameNameChar.stack.length - 1] : sameNameChar.card;
-      if ((topCard.chakra ?? 0) > (existingTopCard.chakra ?? 0)) {
-        validMissions.push(String(mi));
-      }
     }
   }
 

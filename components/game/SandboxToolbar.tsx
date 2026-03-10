@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import type { CharacterCard } from '@/lib/engine/types';
 
@@ -163,12 +164,14 @@ function DeckCardItem({
   showIndex: boolean;
   onClick: () => void;
 }) {
+  const t = useTranslations();
+  const zoomCard = useUIStore((s) => s.zoomCard);
   const imagePath = normalizeImagePath(card.image_file);
 
   return (
     <button
       onClick={onClick}
-      className="relative w-full overflow-hidden transition-transform hover:scale-105"
+      className="group relative w-full overflow-hidden transition-transform hover:scale-105"
       style={{
         aspectRatio: '63/88',
         backgroundColor: '#1a1a1a',
@@ -203,6 +206,19 @@ function DeckCardItem({
         style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#ccc' }}
       >
         {card.name_en || card.name_fr}
+      </span>
+
+      {/* Details button */}
+      <span
+        onClick={(e) => { e.stopPropagation(); zoomCard(card); }}
+        className="absolute top-0 right-0 rounded-bl px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.85)',
+          color: '#c4a35a',
+          border: '1px solid rgba(196,163,90,0.3)',
+        }}
+      >
+        {t('game.board.details')}
       </span>
     </button>
   );

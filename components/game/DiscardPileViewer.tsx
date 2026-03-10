@@ -1,10 +1,12 @@
 'use client';
 
+import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale } from 'next-intl';
-import type { CardData } from '@/lib/engine/types';
+import { useLocale, useTranslations } from 'next-intl';
+import type { CardData, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
+import { useUIStore } from '@/stores/uiStore';
 
 interface DiscardPileViewerProps {
   cards: CardData[];
@@ -14,6 +16,13 @@ interface DiscardPileViewerProps {
 
 export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerProps) {
   const locale = useLocale();
+  const t = useTranslations();
+  const zoomCard = useUIStore((s) => s.zoomCard);
+
+  const handleDetails = useCallback((card: CardData) => {
+    zoomCard(card as CharacterCard | MissionCard);
+  }, [zoomCard]);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -94,31 +103,45 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.03, duration: 0.15 }}
-                      className="flex flex-col items-center gap-1 p-1.5 rounded-lg"
+                      className="group relative flex flex-col items-center gap-1 p-1.5 rounded-lg"
                       style={{
                         backgroundColor: 'rgba(255, 255, 255, 0.03)',
                         border: '1px solid rgba(255, 255, 255, 0.05)',
                       }}
                     >
-                      {imagePath ? (
-                        <img
-                          src={imagePath}
-                          alt={getCardName(card, locale as 'en' | 'fr')}
-                          draggable={false}
-                          className="w-full rounded"
-                          style={{ aspectRatio: '5/7', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div
-                          className="w-full rounded flex items-center justify-center"
+                      <div className="relative w-full">
+                        {imagePath ? (
+                          <img
+                            src={imagePath}
+                            alt={getCardName(card, locale as 'en' | 'fr')}
+                            draggable={false}
+                            className="w-full rounded"
+                            style={{ aspectRatio: '5/7', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div
+                            className="w-full rounded flex items-center justify-center"
+                            style={{
+                              aspectRatio: '5/7',
+                              backgroundColor: '#1a1a1a',
+                            }}
+                          >
+                            <span className="text-[9px]" style={{ color: '#555' }}>?</span>
+                          </div>
+                        )}
+                        {/* Details button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDetails(card); }}
+                          className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                           style={{
-                            aspectRatio: '5/7',
-                            backgroundColor: '#1a1a1a',
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            color: '#c4a35a',
+                            border: '1px solid rgba(196,163,90,0.4)',
                           }}
                         >
-                          <span className="text-[9px]" style={{ color: '#555' }}>?</span>
-                        </div>
-                      )}
+                          {t('game.board.details')}
+                        </button>
+                      </div>
                       <span
                         className="text-[9px] text-center leading-tight w-full truncate"
                         style={{ color: '#999999' }}

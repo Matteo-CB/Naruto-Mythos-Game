@@ -1820,6 +1820,25 @@ export class EffectEngine {
 
         // Move the character to the chosen mission (with upgrade support)
         if (charId107) {
+          // Check Kurenai 035 movement block before moving
+          let charSourceMission107 = -1;
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (newState.activeMissions[i][friendlySide107].some(c => c.instanceId === charId107)) {
+              charSourceMission107 = i;
+              break;
+            }
+          }
+          if (charSourceMission107 >= 0 && isMovementBlockedByKurenai(newState, charSourceMission107, player107)) {
+            // Movement blocked by Kurenai — skip this char, process remaining
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, player107,
+              'EFFECT_BLOCKED',
+              `Sasuke Uchiwa (107): Movement blocked by Kurenai Yuhi (035) — character stays in place.`,
+              'game.log.effect.moveBlocked',
+              { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
+            );
+            // Fall through to process remaining chars below
+          } else {
           // Find and remove from source mission
           let movedChar107: CharacterInPlay | null = null;
           for (let i = 0; i < newState.activeMissions.length; i++) {
@@ -1902,6 +1921,7 @@ export class EffectEngine {
 
             movedCount107++;
           }
+        } // end else (not blocked by Kurenai)
         }
 
         // Process remaining characters
@@ -1916,6 +1936,19 @@ export class EffectEngine {
             if (c) { nextCharExists = true; nextCharName = c.card.name_fr; break; }
           }
           if (!nextCharExists) { nextIdx107++; continue; }
+
+          // Check Kurenai 035 movement block for this remaining char
+          let nextCharMission107 = -1;
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (newState.activeMissions[i][friendlySide107].some(c => c.instanceId === nextCharId)) {
+              nextCharMission107 = i; break;
+            }
+          }
+          if (nextCharMission107 >= 0 && isMovementBlockedByKurenai(newState, nextCharMission107, player107)) {
+            // Blocked by Kurenai — skip this char
+            nextIdx107++;
+            continue;
+          }
 
           // Get valid missions for this char — all non-source missions (mandatory move)
           const nextValidMissions: string[] = [];
@@ -2916,6 +2949,77 @@ export class EffectEngine {
             newState, pendingEffect.sourcePlayer, mi_upch,
             meta_upch.cardName ?? '', meta_upch.cardId ?? '', meta_upch.costReduction ?? 0, true, targetId,
           );
+        }
+        break;
+      }
+
+      // --- Hiruzen 002: Player chose fresh play or upgrade target for the Leaf char ---
+      case 'HIRUZEN002_UPGRADE_OR_FRESH': {
+        let meta_h002: { cardIndex?: number; missionIndex?: number; isHiruzenUpgrade?: boolean } = {};
+        try { meta_h002 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const mi_h002 = meta_h002.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const ci_h002 = meta_h002.cardIndex ?? 0;
+        const isHiruzenUpg = meta_h002.isHiruzenUpgrade ?? false;
+        const player_h002 = pendingEffect.sourcePlayer;
+        const ps_h002 = newState[player_h002];
+        if (ci_h002 < 0 || ci_h002 >= ps_h002.hand.length) break;
+        const card_h002 = ps_h002.hand[ci_h002];
+
+        const fSide_h002: 'player1Characters' | 'player2Characters' =
+          player_h002 === 'player1' ? 'player1Characters' : 'player2Characters';
+        const missions_h002 = [...newState.activeMissions];
+        const mission_h002 = { ...missions_h002[mi_h002] };
+
+        if (targetId === 'FRESH') {
+          // Fresh play
+          const freshCost_h002 = Math.max(0, card_h002.chakra - 1);
+          if (ps_h002.chakra < freshCost_h002) break;
+          ps_h002.chakra -= freshCost_h002;
+          ps_h002.hand.splice(ci_h002, 1);
+
+          const charInPlay_h002: CharacterInPlay = {
+            instanceId: generateInstanceId(), card: card_h002, isHidden: false,
+            wasRevealedAtLeastOnce: true, powerTokens: isHiruzenUpg ? 2 : 0,
+            stack: [card_h002], controlledBy: player_h002, originalOwner: player_h002, missionIndex: mi_h002,
+          };
+          mission_h002[fSide_h002] = [...mission_h002[fSide_h002], charInPlay_h002];
+          missions_h002[mi_h002] = mission_h002;
+          newState.activeMissions = missions_h002;
+          ps_h002.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player_h002);
+
+          const upgradeNote_h002 = isHiruzenUpg ? ' with POWERUP 2 (upgrade)' : '';
+          newState.log = logAction(newState.log, newState.turn, 'action', player_h002,
+            'EFFECT', `Hiruzen Sarutobi (002): Plays ${card_h002.name_fr} on mission ${mi_h002 + 1} (1 less)${upgradeNote_h002}.`,
+            'game.log.effect.playLeafReduced',
+            { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr, mission: String(mi_h002 + 1), cost: String(freshCost_h002) });
+
+          newState = EffectEngine.resolvePlayEffects(newState, player_h002, charInPlay_h002, mi_h002, false);
+        } else {
+          // Upgrade over the chosen target
+          const existIdx_h002 = mission_h002[fSide_h002].findIndex(c => c.instanceId === targetId);
+          if (existIdx_h002 === -1) break;
+          const existing_h002 = mission_h002[fSide_h002][existIdx_h002];
+          const eTop_h002 = existing_h002.stack.length > 0 ? existing_h002.stack[existing_h002.stack.length - 1] : existing_h002.card;
+          const upgCost_h002 = Math.max(0, (card_h002.chakra - eTop_h002.chakra) - 1);
+          if (ps_h002.chakra < upgCost_h002) break;
+          ps_h002.chakra -= upgCost_h002;
+          ps_h002.hand.splice(ci_h002, 1);
+
+          const updatedChars_h002 = [...mission_h002[fSide_h002]];
+          updatedChars_h002[existIdx_h002] = {
+            ...existing_h002, card: card_h002, stack: [...existing_h002.stack, card_h002],
+            powerTokens: existing_h002.powerTokens + (isHiruzenUpg ? 2 : 0),
+          };
+          mission_h002[fSide_h002] = updatedChars_h002;
+          missions_h002[mi_h002] = mission_h002;
+          newState.activeMissions = missions_h002;
+
+          newState.log = logAction(newState.log, newState.turn, 'action', player_h002,
+            'EFFECT_UPGRADE', `Hiruzen Sarutobi (002): Upgraded ${card_h002.name_fr} on mission ${mi_h002 + 1}${isHiruzenUpg ? ' with POWERUP 2' : ''}.`,
+            'game.log.effect.upgradeLeafReduced',
+            { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr, mission: String(mi_h002 + 1), cost: String(upgCost_h002) });
+
+          newState = EffectEngine.resolvePlayEffects(newState, player_h002, updatedChars_h002[existIdx_h002], mi_h002, true);
         }
         break;
       }
@@ -6578,13 +6682,51 @@ export class EffectEngine {
     const missions = [...newState.activeMissions];
     const mission = { ...missions[missionIdx] };
 
-    // Check if there's a same-name character to upgrade
-    const existingIdx = mission[friendlySide].findIndex(c => {
-      if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-      return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
-        && (card.chakra ?? 0) > (topCard.chakra ?? 0);
-    });
+    // Check if there's an upgrade target (same-name or flexible cross-name)
+    const existingIdx = findUpgradeTargetIdx(mission[friendlySide], card);
+
+    // Check if fresh play is also possible (no same-name conflict)
+    const hasNameConflict_k053 = hasSameNameConflict(mission[friendlySide], card);
+
+    // If upgrade AND fresh play are both possible, let the player choose
+    if (existingIdx >= 0 && !hasNameConflict_k053) {
+      // Find ALL upgrade targets (there could be multiple)
+      const upgradeTargetIds_k053: string[] = [];
+      for (let i = 0; i < mission[friendlySide].length; i++) {
+        const c = mission[friendlySide][i];
+        if (c.isHidden) continue;
+        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        if (isSameName || isFlex) upgradeTargetIds_k053.push(c.instanceId);
+      }
+
+      // Push card back to discard (will be re-popped when choice is resolved)
+      ps.discardPile.push(card);
+
+      // Create pending effect for the choice
+      const effectId_k053 = `kabuto053-upgrade-choice-${generateInstanceId()}`;
+      newState.pendingEffects = [...newState.pendingEffects, {
+        id: effectId_k053,
+        sourceCardId: 'KS-053-UC',
+        sourceInstanceId: '',
+        sourceMissionIndex: missionIdx,
+        effectType: 'MAIN' as EffectType,
+        effectDescription: JSON.stringify({ cardName: 'KABUTO YAKUSHI', cardId: 'KS-053-UC', costReduction: 3, missionIndex: missionIdx }),
+        targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
+        sourcePlayer: player,
+        requiresTargetSelection: true,
+        validTargets: ['FRESH', ...upgradeTargetIds_k053],
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: false,
+        description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+        descriptionParams: { card: card.name_fr },
+      } as PendingEffect];
+      return newState;
+    }
 
     let placedChar: CharacterInPlay;
     let isCardUpgrade = false;
@@ -6618,17 +6760,12 @@ export class EffectEngine {
       );
     } else {
       // Safety check: name uniqueness
-      const hasNameConflict_k053 = mission[friendlySide].some((c: CharacterInPlay) => {
-        if (c.isHidden) return false;
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
-      });
       if (hasNameConflict_k053) {
         ps.discardPile.push(card);
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, player,
           'EFFECT_BLOCKED',
-          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} â€' same name already present.`,
+          `Kabuto Yakushi (053): Cannot play ${card.name_fr} on mission ${missionIdx + 1} — same name already present.`,
           'game.log.effect.nameConflictBlocked',
           { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: card.name_fr },
         );
@@ -6657,11 +6794,7 @@ export class EffectEngine {
       newState.activeMissions = missions;
       placedChar = charInPlay;
 
-      let charCount = 0;
-      for (const m of newState.activeMissions) {
-        charCount += (player === 'player1' ? m.player1Characters : m.player2Characters).length;
-      }
-      ps.charactersInPlay = charCount;
+      ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
 
       newState.log = logAction(
         newState.log, newState.turn, newState.phase, player,
@@ -6695,9 +6828,49 @@ export class EffectEngine {
     // Check if there's an upgrade target (same-name or flexible cross-name)
     const existingIdx = findUpgradeTargetIdx(mission[friendlySide_h002], card);
 
+    // Check if fresh play is also possible (no same-name conflict)
+    const hasNameConflict_h002 = hasSameNameConflict(mission[friendlySide_h002], card);
+
     // Safety check: name conflict without upgrade possibility
-    if (existingIdx < 0) {
-      if (hasSameNameConflict(mission[friendlySide_h002], card)) return state;
+    if (existingIdx < 0 && hasNameConflict_h002) return state;
+
+    // If upgrade AND fresh play are both possible, let the player choose
+    if (existingIdx >= 0 && !hasNameConflict_h002) {
+      // Find ALL upgrade targets (there could be multiple)
+      const upgradeTargetIds_h002: string[] = [];
+      for (let i = 0; i < mission[friendlySide_h002].length; i++) {
+        const c = mission[friendlySide_h002][i];
+        if (c.isHidden) continue;
+        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        if (isSameName || isFlex) upgradeTargetIds_h002.push(c.instanceId);
+      }
+
+      // Card is still in hand (splice hasn't happened yet) — it will be removed when the choice resolves.
+
+      // Create pending effect for the choice
+      const effectId_h002 = `hiruzen002-upgrade-choice-${generateInstanceId()}`;
+      newState.pendingEffects = [...newState.pendingEffects, {
+        id: effectId_h002,
+        sourceCardId: 'KS-002-UC',
+        sourceInstanceId: pending.sourceInstanceId,
+        sourceMissionIndex: missionIndex,
+        effectType: 'MAIN' as EffectType,
+        effectDescription: JSON.stringify({ cardIndex, missionIndex, isHiruzenUpgrade: !!pending.isUpgrade }),
+        targetSelectionType: 'HIRUZEN002_UPGRADE_OR_FRESH',
+        sourcePlayer: player,
+        requiresTargetSelection: true,
+        validTargets: ['FRESH', ...upgradeTargetIds_h002],
+        isOptional: false,
+        isMandatory: true,
+        resolved: false,
+        isUpgrade: pending.isUpgrade,
+        description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+        descriptionParams: { card: card.name_fr },
+      } as PendingEffect];
+      return newState;
     }
 
     // Compute actual cost: for upgrades pay (diff - 1), for fresh play pay (cost - 1)

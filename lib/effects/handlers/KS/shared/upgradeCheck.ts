@@ -1,17 +1,18 @@
-import type { GameState, PlayerID } from '@/lib/engine/types';
+import type { GameState, PlayerID, CharacterCard } from '@/lib/engine/types';
+import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 
 /**
  * Check if a card could be played as an upgrade over an existing same-name
- * character on any mission, considering a cost reduction.
+ * OR flexible-upgrade-eligible character on any mission, considering a cost reduction.
  *
  * Returns true if there exists at least one mission where the player has a
- * visible same-name character with strictly lower chakra, and the upgrade cost
- * (difference minus reduction) is affordable.
+ * visible character (same-name or flexible-upgrade target) with strictly lower
+ * chakra, and the upgrade cost (difference minus reduction) is affordable.
  */
 export function canAffordAsUpgrade(
   state: GameState,
   player: PlayerID,
-  card: { name_fr: string; chakra: number },
+  card: { name_fr: string; chakra: number; number?: number; effects?: Array<{ type: string; description: string }> },
   costReduction: number,
 ): boolean {
   const ps = state[player];
@@ -23,12 +24,18 @@ export function canAffordAsUpgrade(
       if (char.controlledBy !== player) continue;
 
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if (topCard.name_fr.toUpperCase() !== card.name_fr.toUpperCase()) continue;
       if (card.chakra <= (topCard.chakra ?? 0)) continue;
 
-      const upgradeCost = Math.max(0, card.chakra - (topCard.chakra ?? 0) - costReduction);
-      if (ps.chakra >= upgradeCost) {
-        return true;
+      // Check same-name upgrade
+      const isSameName = topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      // Check flexible (cross-name) upgrade
+      const isFlexible = !isSameName && checkFlexibleUpgrade(card as CharacterCard, topCard);
+
+      if (isSameName || isFlexible) {
+        const upgradeCost = Math.max(0, card.chakra - (topCard.chakra ?? 0) - costReduction);
+        if (ps.chakra >= upgradeCost) {
+          return true;
+        }
       }
     }
   }
