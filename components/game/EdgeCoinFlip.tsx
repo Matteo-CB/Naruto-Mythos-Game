@@ -96,6 +96,7 @@ export function EdgeCoinFlip() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
+  const isHotseatGame = useGameStore((s) => s.isHotseatGame);
   const isTrainingMode = useTrainingStore((s) => s.isTrainingMode);
   const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
 
@@ -173,7 +174,7 @@ export function EdgeCoinFlip() {
 
   // Trigger
   useEffect(() => {
-    if (!isMulliganPhase || hasTriggered || isSandboxMode || isTrainingMode) return;
+    if (!isMulliganPhase || hasTriggered || isSandboxMode || isHotseatGame || isTrainingMode) return;
     setHasTriggered(true);
     if (!animationsEnabled) {
       setPhase('result');
@@ -181,7 +182,7 @@ export function EdgeCoinFlip() {
       return () => clearTimeout(timer);
     }
     setPhase('animating');
-  }, [isMulliganPhase, hasTriggered, isSandboxMode, isTrainingMode, animationsEnabled]);
+  }, [isMulliganPhase, hasTriggered, isSandboxMode, isHotseatGame, isTrainingMode, animationsEnabled]);
 
   // Start rAF loop when animating
   useEffect(() => {
@@ -205,7 +206,7 @@ export function EdgeCoinFlip() {
     setPhase('done');
   }, []);
 
-  if (phase === 'idle' || phase === 'done' || isSandboxMode || isTrainingMode) return null;
+  if (phase === 'idle' || phase === 'done' || isSandboxMode || isHotseatGame || isTrainingMode) return null;
 
   const isResult = phase === 'result';
 
