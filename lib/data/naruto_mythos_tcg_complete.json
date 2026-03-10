@@ -2810,11 +2810,13 @@
     "id": "115/130 A",
     "number": 115,
     "name_fr": "SHINO ABURAME",
-    "title_fr": "",
+    "title_fr": "\"Je suis un membre du clan Aburame du Village Caché de la Feuille.\"",
     "rarity": "RA",
     "card_type": "character",
-    "has_visual": false,
-    "is_rare_art": true
+    "has_visual": true,
+    "is_rare_art": true,
+    "image_file": "images/cards/KS/rare_art/KS-115-RA.webp",
+    "image_url": "/images/cards/KS/rare_art/KS-115-RA.webp"
   },
   {
     "id": "116/130 A",

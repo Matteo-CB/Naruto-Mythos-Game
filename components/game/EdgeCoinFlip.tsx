@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useTrainingStore } from '@/stores/trainingStore';
 
 /**
  * Edge Token coin-flip driven by requestAnimationFrame for absolute
@@ -95,6 +96,7 @@ export function EdgeCoinFlip() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
+  const isTrainingMode = useTrainingStore((s) => s.isTrainingMode);
   const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
 
   const [phase, setPhase] = useState<Phase>('idle');
@@ -171,7 +173,7 @@ export function EdgeCoinFlip() {
 
   // Trigger
   useEffect(() => {
-    if (!isMulliganPhase || hasTriggered || isSandboxMode) return;
+    if (!isMulliganPhase || hasTriggered || isSandboxMode || isTrainingMode) return;
     setHasTriggered(true);
     if (!animationsEnabled) {
       setPhase('result');
@@ -179,7 +181,7 @@ export function EdgeCoinFlip() {
       return () => clearTimeout(timer);
     }
     setPhase('animating');
-  }, [isMulliganPhase, hasTriggered, isSandboxMode, animationsEnabled]);
+  }, [isMulliganPhase, hasTriggered, isSandboxMode, isTrainingMode, animationsEnabled]);
 
   // Start rAF loop when animating
   useEffect(() => {
@@ -203,7 +205,7 @@ export function EdgeCoinFlip() {
     setPhase('done');
   }, []);
 
-  if (phase === 'idle' || phase === 'done' || isSandboxMode) return null;
+  if (phase === 'idle' || phase === 'done' || isSandboxMode || isTrainingMode) return null;
 
   const isResult = phase === 'result';
 
