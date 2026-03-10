@@ -46,3 +46,16 @@ nul
 
 # brute-force script data
 newvisual/brute*_progress.json
+
+# AI training — checkpoints lourds (garder uniquement .onnx et _meta.json)
+public/models/*.pth
+public/models/checkpoint_*.pth
+public/models/training_history.png
+
+# Données de self-play (peuvent être très volumineuses)
+scripts/training_data*.json
+scripts/expert_iter_*.json
+scripts/expert_iteration_pool.json
+scripts/bench/
+ai_training/__pycache__/
+ai_training/*.pyc

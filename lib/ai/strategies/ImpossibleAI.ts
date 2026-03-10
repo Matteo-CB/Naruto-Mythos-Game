@@ -23,14 +23,17 @@ import { NeuralEvaluator } from '../neural/NeuralEvaluator';
 
 export class ImpossibleAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'impossible';
+  static readonly DEFAULT_SIMULATIONS = 2200;
 
   private mcts: NeuralISMCTS;
   private evaluator: NeuralEvaluator;
+  private modelPath?: string;
 
-  constructor() {
-    this.evaluator = NeuralEvaluator.getInstance();
+  constructor(modelPath?: string, simulations?: number) {
+    this.modelPath = modelPath;
+    this.evaluator = NeuralEvaluator.getInstance(modelPath);
     this.mcts = new NeuralISMCTS({
-      simulations: 2200,
+      simulations: simulations ?? ImpossibleAI.DEFAULT_SIMULATIONS,
       maxDepth: 8,
       explorationC: 1.2, // moins d'exploration, plus d'exploitation
       evaluator: this.evaluator,
@@ -56,7 +59,7 @@ export class ImpossibleAI implements AIStrategy {
       return this.decideMulligan(state, player, validActions);
     }
 
-    await this.evaluator.load();
+    await this.evaluator.load(this.modelPath);
 
     if (this.evaluator.isReady()) {
       return this.mcts.chooseActionAsync(state, player, validActions);

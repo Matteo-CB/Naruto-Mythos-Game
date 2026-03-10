@@ -24,8 +24,6 @@ import { shuffle } from '../../engine/utils/shuffle';
 import { BoardEvaluator } from '../evaluation/BoardEvaluator';
 import { FeatureExtractor } from './FeatureExtractor';
 import type { NeuralEvaluator } from './NeuralEvaluator';
-import { getCardTier, hasUpgradeTarget } from '../evaluation/CardTiers';
-import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
 
 // ─── Action Key ────────────────────────────────────────────────────────────────
 
@@ -155,12 +153,8 @@ export class NeuralISMCTS {
     const root = new MCTSNode(0);
 
     for (let i = 0; i < this.config.simulations; i++) {
-      try {
-        const determinized = this.determinize(state, aiPlayer);
-        this.simulate(root, determinized, aiPlayer, 0);
-      } catch {
-        // Skip failed simulations — partial tree is better than no tree
-      }
+      const determinized = this.determinize(state, aiPlayer);
+      this.simulate(root, determinized, aiPlayer, 0);
     }
 
     return this.pickBestAction(root, validActions);
@@ -194,14 +188,10 @@ export class NeuralISMCTS {
 
       // Collect leaf states from this batch
       for (let i = 0; i < batch; i++) {
-        try {
-          const determinized = this.determinize(state, aiPlayer);
-          const { path, leafState } = this.simulateCollectLeaf(root, determinized, aiPlayer, 0);
-          leafStates.push(leafState);
-          leafPaths.push(path);
-        } catch {
-          // Skip failed simulations
-        }
+        const determinized = this.determinize(state, aiPlayer);
+        const { path, leafState } = this.simulateCollectLeaf(root, determinized, aiPlayer);
+        leafStates.push(leafState);
+        leafPaths.push(path);
       }
 
       // Batch evaluate all leaf states
@@ -303,15 +293,7 @@ export class NeuralISMCTS {
     }
 
     // Limit branching factor for performance
-    let limitedActions: GameAction[];
-    try {
-      limitedActions = this.limitBranching(actions, state, actingPlayer);
-    } catch {
-      // If quickScore crashes (e.g. determinized hand mismatch), skip branching
-      limitedActions = actions.length > this.config.maxBranching
-        ? actions.slice(0, this.config.maxBranching)
-        : actions;
-    }
+    const limitedActions = this.limitBranching(actions, state, actingPlayer);
 
     // Find untried actions at this node
     const untriedActions = limitedActions.filter(a => !node.expandedKeys.has(actionKey(a)));
@@ -376,7 +358,6 @@ export class NeuralISMCTS {
     node: MCTSNode,
     state: GameState,
     aiPlayer: PlayerID,
-    depth: number,
   ): { path: MCTSNode[]; leafState: GameState } {
     const path: MCTSNode[] = [node];
     let currentState = state;
@@ -405,14 +386,7 @@ export class NeuralISMCTS {
         break;
       }
 
-      let limitedActions: GameAction[];
-      try {
-        limitedActions = this.limitBranching(actions, currentState, actingPlayer);
-      } catch {
-        limitedActions = actions.length > this.config.maxBranching
-          ? actions.slice(0, this.config.maxBranching)
-          : actions;
-      }
+      const limitedActions = this.limitBranching(actions, currentState, actingPlayer);
       const untriedActions = limitedActions.filter(
         a => !currentNode.expandedKeys.has(actionKey(a))
       );
@@ -477,8 +451,7 @@ export class NeuralISMCTS {
   private heuristicValue(state: GameState, aiPlayer: PlayerID): number {
     const rawScore = BoardEvaluator.evaluate(state, aiPlayer);
     // Sigmoid normalization to [0, 1]
-    // Divisor 100: recalibrated for the expanded score range from turn-aware BoardEvaluator
-    return 1 / (1 + Math.exp(-rawScore / 100));
+    return 1 / (1 + Math.exp(-rawScore / 60));
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -550,110 +523,21 @@ export class NeuralISMCTS {
       case 'PLAY_CHARACTER': {
         const card = state[p].hand[action.cardIndex];
         if (!card) return 0;
-        const tier = getCardTier(card);
-        const power = card.power ?? 0;
-        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
-        let score = tier * 2 + power * 1.5 + missionQV * 1.5;
-        // Bonus for upgrades detected in this context
-        if (hasUpgradeTarget(state, p, card)) {
-          score += 8;
-        }
-        return score;
+        return (card.power ?? 0) * 3 + (card.effects?.length ?? 0) * 2 + 5;
       }
       case 'UPGRADE_CHARACTER': {
         const card = state[p].hand[action.cardIndex];
-        if (!card) return 0;
-        const tier = getCardTier(card);
-        const power = card.power ?? 0;
-        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
-        // Upgrades are almost always strong plays
-        return tier * 3 + power * 2 + missionQV * 2 + 5;
+        return card ? (card.power ?? 0) * 4 + 10 : 0;
       }
-      case 'REVEAL_CHARACTER': {
-        // Find the actual hidden character to evaluate
-        const mission = state.activeMissions[action.missionIndex];
-        if (!mission) return 12;
-        const chars = p === 'player1' ? mission.player1Characters : mission.player2Characters;
-        const hidden = chars.find(c => c.instanceId === action.characterInstanceId);
-        if (!hidden) return 12;
-        const card = hidden.stack.length > 0 ? hidden.stack[hidden.stack.length - 1] : hidden.card;
-        const tier = getCardTier(card);
-        const power = card.power ?? 0;
-        const missionQV = this.getMissionQuickValue(state, action.missionIndex, p);
-        let score = tier * 2 + power * 2 + missionQV;
-        // AMBUSH bonus — the main reason to play hidden then reveal
-        if (card.effects?.some(e => e.type === 'AMBUSH')) {
-          score += tier * 1.5;
-        }
-        return score;
-      }
-      case 'PLAY_HIDDEN': {
-        const card = state[p].hand[action.cardIndex];
-        if (!card) return 2;
-        const tier = getCardTier(card);
-        let score = 2;
-        // AMBUSH cards benefit greatly from being played hidden
-        if (card.effects?.some(e => e.type === 'AMBUSH')) {
-          score += tier * 1.5;
-        }
-        // Early turns: hiding for later is more strategic
-        if ((state.turn ?? 1) <= 2) score += 1;
-        return score;
-      }
+      case 'REVEAL_CHARACTER':
+        return 12;
+      case 'PLAY_HIDDEN':
+        return 4;
       case 'PASS':
-        return this.quickPassScore(state, p);
+        return 1;
       default:
         return 2;
     }
-  }
-
-  /**
-   * Quick mission value assessment for branching decisions.
-   * Considers mission value and how contested it is.
-   */
-  private getMissionQuickValue(state: GameState, missionIndex: number, player: PlayerID): number {
-    const mission = state.activeMissions[missionIndex];
-    if (!mission || mission.wonBy) return 0;
-
-    const value = (mission.basePoints ?? 0) + (mission.rankBonus ?? 0);
-    const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
-
-    const myChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-    const oppChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
-    const myPower = myChars.reduce((s, c) => s + calculateCharacterPower(state, c, player), 0);
-    const oppPower = oppChars.reduce((s, c) => s + calculateCharacterPower(state, c, opponent), 0);
-    const gap = myPower - oppPower;
-
-    if (Math.abs(gap) <= 3) {
-      return value * 1.3; // Contested — high priority
-    }
-    if (gap > 3) {
-      return value * 0.7; // Already winning — less urgent
-    }
-    // Losing by a lot
-    return value * 0.8;
-  }
-
-  /**
-   * Dynamic PASS scoring: passing isn't always bad.
-   */
-  private quickPassScore(state: GameState, player: PlayerID): number {
-    const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
-
-    // If no chakra left, passing is natural
-    if (state[player].chakra === 0) return 5;
-
-    // If opponent hasn't passed, passing first gives Edge token
-    if (!state[opponent].hasPassed && state.edgeHolder !== player) {
-      return 3; // Edge is valuable
-    }
-
-    // If opponent has already passed and we still can play, passing is suboptimal
-    if (state[opponent].hasPassed) {
-      return -3; // We have free actions — don't waste them
-    }
-
-    return 1;
   }
 
   /**
@@ -677,12 +561,7 @@ export class NeuralISMCTS {
 
   /**
    * Determinize: create a copy of the state with opponent's hidden hand filled in
-   * using random cards from the unknown card pool.
-   *
-   * Key improvements over naive approach:
-   * - Uses opponent's actual remaining deck as candidate pool (not AI's own deck)
-   * - Exact hand size from placeholder count (not a formula guess)
-   * - Falls back to AI deck as proxy only when opponent deck is empty
+   * using random cards from the unknown pool.
    */
   private determinize(state: GameState, aiPlayer: PlayerID): GameState {
     const cloned = deepClone(state);
@@ -692,20 +571,18 @@ export class NeuralISMCTS {
     const hasVisibleOpponentHand = oppState.hand.length > 0 && !this.isHiddenHandPlaceholder(oppState.hand);
     if (hasVisibleOpponentHand) return cloned;
 
-    // Build pool from opponent's deck (cards they haven't drawn/played yet)
-    // Fall back to AI's deck as proxy if opponent's deck is empty
-    let pool = cloned[opponent].deck.length > 0
-      ? shuffle([...cloned[opponent].deck])
-      : shuffle([...cloned[aiPlayer].deck]);
+    // Build pool of cards that could be in the opponent's hand:
+    // We use our own deck as a proxy (cards we haven't played or drawn)
+    // In a real implementation this would be filtered by known revealed cards.
+    const pool = shuffle([...cloned[aiPlayer].deck]);
 
     if (pool.length === 0) return cloned;
 
-    // Exact hand size from placeholder count (sanitization preserves hand.length)
-    const handSize = oppState.hand.length > 0
+    // Estimate hand size: typical is 5 at start, decreasing by 1-2 per turn played
+    const estimatedHandSize = oppState.hand.length > 0
       ? Math.min(pool.length, oppState.hand.length)
-      : Math.min(pool.length, Math.max(1, 3));
-
-    cloned[opponent].hand = pool.slice(0, handSize);
+      : Math.min(pool.length, Math.max(1, 5 - (state.turn - 1)));
+    cloned[opponent].hand = pool.slice(0, estimatedHandSize);
 
     return cloned;
   }
@@ -713,6 +590,87 @@ export class NeuralISMCTS {
   /**
    * Get detailed statistics for analysis/coaching.
    */
+  async getActionStatsAsync(
+    state: GameState,
+    aiPlayer: PlayerID,
+    validActions: GameAction[],
+    simulations?: number,
+  ): Promise<Array<{ action: GameAction; visits: number; winRate: number; key: string }>> {
+    const root = new MCTSNode(0);
+    const sims = simulations ?? this.config.simulations;
+
+    if (!this.config.useBatchedEval || !this.config.evaluator?.isReady()) {
+      for (let i = 0; i < sims; i++) {
+        const determinized = this.determinize(state, aiPlayer);
+        this.simulate(root, determinized, aiPlayer, 0);
+      }
+    } else {
+      const batchSize = 64;
+      for (let start = 0; start < sims; start += batchSize) {
+        const batch = Math.min(batchSize, sims - start);
+        const leafStates: GameState[] = [];
+        const leafPaths: MCTSNode[][] = [];
+
+        for (let i = 0; i < batch; i++) {
+          const determinized = this.determinize(state, aiPlayer);
+          const { path, leafState } = this.simulateCollectLeaf(root, determinized, aiPlayer);
+          leafStates.push(leafState);
+          leafPaths.push(path);
+        }
+
+        const evaluator = this.config.evaluator!;
+        const featureBatch = leafStates.map((leafState) => {
+          if (leafState.phase === 'gameOver') return null;
+          return FeatureExtractor.extract(leafState, aiPlayer);
+        });
+
+        const nonNullIndices = featureBatch
+          .map((features, index) => (features ? index : -1))
+          .filter((index) => index >= 0);
+        const nonNullFeatures = nonNullIndices.map((index) => featureBatch[index]!);
+
+        let nnValues: number[] = [];
+        if (nonNullFeatures.length > 0) {
+          nnValues = await evaluator.evaluateBatch(nonNullFeatures);
+        }
+
+        for (let i = 0; i < batch; i++) {
+          const leafState = leafStates[i];
+          const path = leafPaths[i];
+
+          let value: number;
+          if (leafState.phase === 'gameOver') {
+            value = this.terminalValue(leafState, aiPlayer);
+          } else {
+            const nnIdx = nonNullIndices.indexOf(i);
+            if (nnIdx >= 0) {
+              const p1WinProb = nnValues[nnIdx];
+              value = aiPlayer === 'player1' ? p1WinProb : (1 - p1WinProb);
+            } else {
+              value = this.heuristicValue(leafState, aiPlayer);
+            }
+          }
+
+          for (const node of path) {
+            node.visits++;
+            node.totalValue += value;
+          }
+        }
+      }
+    }
+
+    return validActions.map((action) => {
+      const key = actionKey(action);
+      const child = root.children.get(key);
+      return {
+        action,
+        key,
+        visits: child?.visits ?? 0,
+        winRate: child?.value ?? 0.5,
+      };
+    });
+  }
+
   getActionStats(
     state: GameState,
     aiPlayer: PlayerID,

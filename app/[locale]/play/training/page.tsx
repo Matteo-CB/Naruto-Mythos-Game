@@ -11,6 +11,11 @@ import { useTrainingStore } from '@/stores/trainingStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
 import { useBannedCards } from '@/lib/hooks/useBannedCards';
+import {
+  loadStrongAIDeckPool,
+  pickAIDeckByDifficulty,
+  pickAIMissionsAvoidingPlayer,
+} from '@/lib/ai/decks/aiDeckProvider';
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -21,7 +26,7 @@ const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color:
   {
     key: 'easy',
     labelFr: 'Facile',
-    descFr: 'Idéal pour apprendre. L\'IA fait des erreurs occasionnelles',
+    descFr: 'Idéal pour apprendre — l\'IA fait des erreurs occasionnelles',
     color: '#4ade80',
   },
   {
@@ -33,34 +38,23 @@ const DIFFICULTIES: { key: AIDifficulty; labelFr: string; descFr: string; color:
   {
     key: 'hard',
     labelFr: 'Difficile',
-    descFr: 'Très fort. Planification sur plusieurs tours',
+    descFr: 'Très fort — planification sur plusieurs tours',
     color: '#f97316',
   },
   {
     key: 'impossible',
     labelFr: 'Impossible',
-    descFr: 'Réseau de neurones, quasi-imbattable. Apprends de tes erreurs',
+    descFr: 'Réseau de neurones — quasi-imbattable. Apprends de tes erreurs',
     color: '#ef4444',
   },
 ];
 
 export default function TrainingPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const startAIGame = useGameStore((s) => s.startAIGame);
   const enableTraining = useTrainingStore((s) => s.enable);
   const resetTraining = useTrainingStore((s) => s.reset);
-
-  // Tester/admin gate: redirect unauthorized users
-  const userRole = (session?.user as Record<string, unknown>)?.role as string | undefined;
-  const isTesterOrAdmin = userRole === 'tester' || userRole === 'admin';
-
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session || !isTesterOrAdmin) {
-      router.push('/');
-    }
-  }, [session, status, isTesterOrAdmin, router]);
 
   const [difficulty, setDifficulty] = useState<AIDifficulty>('medium');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
@@ -77,56 +71,65 @@ export default function TrainingPage() {
     });
   }, []);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!cards || cards.characters.length < 30 || cards.missions.length < 3) return;
     setIsLoading(true);
+    try {
+      const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
+      const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
 
-    const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
-    const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
+      const player1Deck = selectedDeck
+        ? selectedDeck.characters
+        : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
+      const player1Missions = selectedDeck
+        ? selectedDeck.missions
+        : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    const player1Deck = selectedDeck
-      ? selectedDeck.characters
-      : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
-    const player1Missions = selectedDeck
-      ? selectedDeck.missions
-      : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
+      const aiPool = await loadStrongAIDeckPool({
+        allCharacters: availableChars,
+        allMissions: availableMissions,
+        bannedIds,
+        limit: 10,
+        source: 'curated',
+      });
+      const aiDeck = pickAIDeckByDifficulty(
+        aiPool,
+        difficulty,
+        availableChars,
+        availableMissions,
+        bannedIds,
+      );
+      const player2Missions = pickAIMissionsAvoidingPlayer(
+        aiDeck.missions,
+        player1Missions,
+        availableMissions,
+        bannedIds,
+      );
 
-    const player2Deck = [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
-    const playerMissionIds = new Set(player1Missions.map((m) => m.id));
-    const aiMissionPool = availableMissions.filter((m) => !playerMissionIds.has(m.id));
-    const player2Missions = (aiMissionPool.length >= 3 ? aiMissionPool : availableMissions)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
+      const config: GameConfig = {
+        player1: {
+          userId: 'local-player',
+          isAI: false,
+          deck: player1Deck,
+          missionCards: player1Missions,
+        },
+        player2: {
+          userId: null,
+          isAI: true,
+          aiDifficulty: difficulty,
+          deck: aiDeck.characters,
+          missionCards: player2Missions,
+        },
+      };
 
-    const config: GameConfig = {
-      player1: {
-        userId: 'local-player',
-        isAI: false,
-        deck: player1Deck,
-        missionCards: player1Missions,
-      },
-      player2: {
-        userId: null,
-        isAI: true,
-        aiDifficulty: difficulty,
-        deck: player2Deck,
-        missionCards: player2Missions,
-      },
-    };
-
-    resetTraining();
-    startAIGame(config, difficulty, session?.user?.name ?? undefined);
-    enableTraining();
-    router.push('/game');
+      resetTraining();
+      startAIGame(config, difficulty, session?.user?.name ?? undefined);
+      enableTraining();
+      router.push('/game');
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  if (status === 'loading' || !isTesterOrAdmin) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
-        <p className="text-[#888888] text-lg">...</p>
-      </div>
-    );
-  }
 
   return (
     <main className="flex min-h-screen flex-col bg-[#0a0a0a] relative">
@@ -153,12 +156,12 @@ export default function TrainingPage() {
           >
             <p className="text-[#c4a35a] font-medium mb-1">Ce que le Coach analyse :</p>
             <ul className="text-[#888] space-y-0.5 text-xs list-none">
-              <li>Probabilité de victoire en temps réel</li>
-              <li>Qualité de chaque coup (Excellent / Bon / Erreur / Grosse erreur)</li>
-              <li>Recommandation du meilleur coup disponible</li>
-              <li>Analyse de chaque mission (domination / contestée / perdue)</li>
-              <li>Note de chaque carte dans ta main (0-10)</li>
-              <li>Avertissements et conseils stratégiques</li>
+              <li>— Probabilité de victoire en temps réel</li>
+              <li>— Qualité de chaque coup (Excellent / Bon / Erreur / Grosse erreur)</li>
+              <li>— Recommandation du meilleur coup disponible</li>
+              <li>— Analyse de chaque mission (domination / contestée / perdue)</li>
+              <li>— Note de chaque carte dans ta main (0-10)</li>
+              <li>— Avertissements et conseils stratégiques</li>
             </ul>
           </div>
 

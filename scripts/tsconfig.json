@@ -21,7 +21,12 @@
   },
   "files": [
     "selfplay.ts",
-    "benchmark.ts"
+    "benchmark.ts",
+    "exportStrongDecks.ts",
+    "selfplayParallel.ts",
+    "mergeSelfplayOutputs.ts",
+    "mergeStrongDecks.ts",
+    "benchmarkTournament.ts"
   ],
   "exclude": ["../node_modules"]
 }
