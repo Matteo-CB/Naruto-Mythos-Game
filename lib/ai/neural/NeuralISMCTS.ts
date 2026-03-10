@@ -155,8 +155,12 @@ export class NeuralISMCTS {
     const root = new MCTSNode(0);
 
     for (let i = 0; i < this.config.simulations; i++) {
-      const determinized = this.determinize(state, aiPlayer);
-      this.simulate(root, determinized, aiPlayer, 0);
+      try {
+        const determinized = this.determinize(state, aiPlayer);
+        this.simulate(root, determinized, aiPlayer, 0);
+      } catch {
+        // Skip failed simulations — partial tree is better than no tree
+      }
     }
 
     return this.pickBestAction(root, validActions);
@@ -190,10 +194,14 @@ export class NeuralISMCTS {
 
       // Collect leaf states from this batch
       for (let i = 0; i < batch; i++) {
-        const determinized = this.determinize(state, aiPlayer);
-        const { path, leafState } = this.simulateCollectLeaf(root, determinized, aiPlayer, 0);
-        leafStates.push(leafState);
-        leafPaths.push(path);
+        try {
+          const determinized = this.determinize(state, aiPlayer);
+          const { path, leafState } = this.simulateCollectLeaf(root, determinized, aiPlayer, 0);
+          leafStates.push(leafState);
+          leafPaths.push(path);
+        } catch {
+          // Skip failed simulations
+        }
       }
 
       // Batch evaluate all leaf states
@@ -295,7 +303,15 @@ export class NeuralISMCTS {
     }
 
     // Limit branching factor for performance
-    const limitedActions = this.limitBranching(actions, state, actingPlayer);
+    let limitedActions: GameAction[];
+    try {
+      limitedActions = this.limitBranching(actions, state, actingPlayer);
+    } catch {
+      // If quickScore crashes (e.g. determinized hand mismatch), skip branching
+      limitedActions = actions.length > this.config.maxBranching
+        ? actions.slice(0, this.config.maxBranching)
+        : actions;
+    }
 
     // Find untried actions at this node
     const untriedActions = limitedActions.filter(a => !node.expandedKeys.has(actionKey(a)));
@@ -389,7 +405,14 @@ export class NeuralISMCTS {
         break;
       }
 
-      const limitedActions = this.limitBranching(actions, currentState, actingPlayer);
+      let limitedActions: GameAction[];
+      try {
+        limitedActions = this.limitBranching(actions, currentState, actingPlayer);
+      } catch {
+        limitedActions = actions.length > this.config.maxBranching
+          ? actions.slice(0, this.config.maxBranching)
+          : actions;
+      }
       const untriedActions = limitedActions.filter(
         a => !currentNode.expandedKeys.has(actionKey(a))
       );
