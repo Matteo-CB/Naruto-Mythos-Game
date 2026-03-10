@@ -91,8 +91,8 @@
       "keep": "Keep Hand",
       "redraw": "Redraw",
       "clickHint": "Click a card to inspect it",
-      "youHaveEdge": "You have the Edge token — you play first and win ties.",
-      "opponentHasEdge": "Your opponent has the Edge token — they play first and win ties."
+      "youHaveEdge": "You have the Edge token. You play first and win ties.",
+      "opponentHasEdge": "Your opponent has the Edge token. They play first and win ties."
     },
     "edgeCoinFlip": {
       "youWin": "You have the Edge",
@@ -237,8 +237,8 @@
         "upgradeFromHand": "{card} ({id}): Upgraded {target} from hand on mission {mission} for {cost} chakra.",
         "upgradeLeafReduced": "{card} ({id}): Upgraded {target} (Leaf Village reduced cost) on mission {mission} for {cost} chakra.",
         "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra.",
-        "sasuke107Discard": "{card} ({id}): {target} discarded — name conflict (mandatory move).",
-        "kimimaro056ProtectionBlocked": "{card} ({id}): Cannot pay 1 Chakra — effect fails."
+        "sasuke107Discard": "{card} ({id}): {target} discarded, name conflict (mandatory move).",
+        "kimimaro056ProtectionBlocked": "{card} ({id}): Cannot pay 1 Chakra. Effect fails."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -272,7 +272,8 @@
       "replaySaved": "Replay Saved",
       "watchReplay": "Watch Replay",
       "saveError": "Failed to save replay",
-      "replay": "Replay",
+      "replay": "Play Again",
+      "changeDeck": "Change Deck",
       "rematch": "Rematch",
       "rematchWaiting": "Waiting for opponent...",
       "rematchAccept": "Accept",
@@ -442,6 +443,7 @@
         "giantSpider103EndHide": "You may hide a character with Power equal or less. Giant Spider must return to your hand.",
         "gemma049SacrificeDefeat": "Sacrifice Gemma Shiranui to protect {target} from being defeated?",
         "gemma049SacrificeHide": "Sacrifice Gemma Shiranui to protect {target} from being hidden?",
+        "gemma049ChooseProtect": "Gemma Shiranui (049): Choose which Leaf Village character to protect from being hidden (or skip).",
         "kimimaro056DiscardAndHide": "Choose a card to discard, then hide a character with cost 4 or less.",
         "kimimaro056ChooseHide": "Choose a character to hide (cost 4 or less).",
         "kin073ChooseEnemy": "Choose an enemy character with Power 4 or less to hide.",
@@ -784,12 +786,18 @@
     "enterCode": "Enter the 6-character room code",
     "roomCreated": "Room created. Share this code:",
     "waitingForOpponent": "Waiting for opponent...",
+    "opponentChangingDeck": "Opponent is changing their deck...",
+    "changeDeck": "Change Deck",
     "opponentJoined": "Opponent joined! Select your deck to start.",
     "startMatchmaking": "Start Matchmaking",
     "searching": "Searching for opponent...",
     "matchFound": "Match found! Preparing game...",
     "signedInAs": "Signed in as {name}",
     "createPrivateRoom": "Create Private Room",
+    "timer": {
+      "label": "Action Timer",
+      "description": "2 min per action, auto-pass on timeout"
+    },
     "findMatchDesc": "Find a random opponent near your skill level",
     "cancel": "Cancel",
     "join": "Join",
@@ -888,7 +896,10 @@
     "step": "Step {current} / {total}",
     "noVisualData": "Visual replay not available for this game",
     "visualReplay": "Visual Replay",
-    "textLog": "Text Log"
+    "textLog": "Text Log",
+    "share": "Share",
+    "linkCopied": "Link Copied",
+    "winner": "Winner"
   },
   "auth": {
     "signIn": "Sign In",

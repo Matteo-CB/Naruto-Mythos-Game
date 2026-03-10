@@ -63,9 +63,11 @@ interface SocketStore {
 
   connect: (userId?: string) => Promise<void>;
   disconnect: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[]) => void;
+  changeDeck: () => void;
+  opponentChangingDeck: boolean;
   performAction: (action: GameAction) => void;
   joinMatchmaking: (userId: string, isRanked?: boolean) => void;
   leaveMatchmaking: () => void;
@@ -102,6 +104,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   sealedDeckSubmitted: false,
   sealedOpponentReady: false,
   sealedDeadline: null,
+  opponentChangingDeck: false,
   _lastStateUpdate: 0,
   _resyncTimer: null as ReturnType<typeof setInterval> | null,
 
@@ -193,7 +196,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('connect_error', (err) => {
         clearTimeout(timeoutId);
         console.error('[Socket] Connection error:', err.message);
-        set({ error: `Connection failed: ${err.message}` });
+        set({ error: `Connection failed: ${err.message}`, errorKey: 'game.error.connectionLost' });
         reject(new Error(`Socket connection failed: ${err.message}`));
       });
 
@@ -212,6 +215,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('room:player-left', () => {
         console.log('[Socket] Player left');
         set({ opponentJoined: false });
+      });
+
+      socket.on('room:opponent-changing-deck', () => {
+        console.log('[Socket] Opponent is changing their deck');
+        set({ opponentChangingDeck: true });
+      });
+
+      socket.on('room:opponent-deck-ready', () => {
+        console.log('[Socket] Opponent deck is ready');
+        set({ opponentChangingDeck: false });
       });
 
       socket.on('room:rejoined', (data: { code: string; isSealed: boolean; playerRole: 'player1' | 'player2' }) => {
@@ -375,6 +388,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ rematchState: 'declined' });
       });
 
+      socket.on('game:opponent-left', () => {
+        console.log('[Socket] Opponent left the game');
+        set({ rematchState: 'declined' });
+      });
+
       // --- Matchmaking events ---
 
       socket.on('matchmaking:waiting', () => {
@@ -461,17 +479,18 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         sealedDeckSubmitted: false,
         sealedOpponentReady: false,
         sealedDeadline: null,
+        opponentChangingDeck: false,
         _resyncTimer: null,
       });
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}`);
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${timerEnabled === false ? ' (no timer)' : ''}`);
       set({ isSealedRoom: isSealed, rematchState: 'none' });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, timerEnabled });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -498,6 +517,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     } else {
       console.error('[Socket] Cannot select deck: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
+    }
+  },
+
+  changeDeck: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      console.log('[Socket] Emitting room:change-deck');
+      socket.emit('room:change-deck');
+      set({ opponentChangingDeck: false });
     }
   },
 
