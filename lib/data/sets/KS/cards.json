@@ -5836,9 +5836,9 @@
       "card_type": "character",
       "name_en": "Shino Aburame",
       "name_fr": "SHINO ABURAME",
-      "title_fr": "Technique du Mur d'Insectes",
-      "title_en": "Insect Wall Technique",
-      "has_visual": false,
+      "title_fr": "\"Je suis un membre du clan Aburame du Village Caché de la Feuille.\"",
+      "title_en": "\"I am a member of the Hidden Leaf Village's Aburame clan.\"",
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -5858,9 +5858,9 @@
           "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
         }
       ],
-      "image_url": "",
+      "image_url": "/images/cards/KS/rare_art/KS-115-RA.webp",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-115-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "115/130 A"
