@@ -174,7 +174,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
 
         {/* Title */}
         {title && (
-          <span className="text-xs -mt-1" style={{ color: '#999999' }}>
+          <span className="font-body text-xs -mt-1" style={{ color: '#999999' }}>
             {title}
           </span>
         )}
@@ -188,7 +188,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
           }}
         >
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
+            <span className="font-body text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
               {t('collection.details.cost')}
             </span>
             <span className="text-base font-bold" style={{ color: '#c4a35a' }}>
@@ -197,7 +197,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
           </div>
           <div className="w-px h-6 shrink-0" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
+            <span className="font-body text-[10px] uppercase tracking-wider" style={{ color: '#888888' }}>
               {t('collection.details.power')}
             </span>
             <span className="text-base font-bold" style={{ color: '#e0e0e0' }}>
@@ -227,7 +227,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
 
         {/* Group */}
         {card.group && (
-          <span className="text-[10px]" style={{ color: '#777777' }}>
+          <span className="font-body text-[10px]" style={{ color: '#777777' }}>
             {t('collection.details.group')}: {getCardGroup(card.group, locale)}
           </span>
         )}
@@ -312,7 +312,7 @@ export function MulliganDialog() {
             backdropFilter: 'blur(16px)',
           }}
         >
-          <span className="text-sm" style={{ color: '#888888' }}>
+          <span className="font-body text-sm" style={{ color: '#888888' }}>
             {t('game.mulliganWaiting')}
           </span>
         </div>
@@ -366,11 +366,11 @@ export function MulliganDialog() {
           >
             {t('game.mulligan.title')}
           </span>
-          <span className="text-sm text-center" style={{ color: '#888888' }}>
+          <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
             {t('game.mulligan.description')}
           </span>
           <span
-            className="text-xs text-center px-3 py-1.5 rounded-md"
+            className="font-body text-xs text-center px-3 py-1.5 rounded-md"
             style={{
               color: visibleState.edgeHolder === visibleState.myPlayer ? '#c4a35a' : '#b33e3e',
               backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
@@ -402,7 +402,7 @@ export function MulliganDialog() {
 
         {/* Click hint */}
         {!selectedCard && (
-          <span className="text-[11px]" style={{ color: '#555555' }}>
+          <span className="font-body text-[11px]" style={{ color: '#555555' }}>
             {t('game.mulligan.clickHint')}
           </span>
         )}
