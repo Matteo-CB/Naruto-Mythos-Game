@@ -239,3 +239,21 @@ model CardIssue {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Suggestion {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  category    String   // gameplay | ui | cards | balance | social | other
+  status      String   @default("backlog") // backlog | planned | in_progress | done_unpublished | done_published | rejected
+  priority    String   @default("normal") // low | normal | high | critical
+  images      String[] // base64 data URLs
+  audioUrl    String?  // base64 data URL for audio
+  submittedBy String
+  assignedTo  String?
+  updatedBy   String?
+  adminNotes  String?
+  upvotes     Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
