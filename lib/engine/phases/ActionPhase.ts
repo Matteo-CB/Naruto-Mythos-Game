@@ -94,22 +94,33 @@ function handlePlayCharacter(
 
   const card = playerState.hand[cardIndex];
 
-  // Auto-detect upgrade: if a same-name visible character with strictly lower cost
-  // exists on this mission, redirect to upgrade logic so the player pays only
-  // the difference (per game rules). Flexible upgrades (cross-name) are NOT
-  // auto-detected — player must explicitly choose to upgrade via the UI.
+  // Auto-detect upgrade: if a same-name or flexible-upgrade-eligible visible character
+  // with strictly lower cost exists on this mission, redirect to upgrade logic.
   const missionForUpgradeCheck = state.activeMissions[missionIndex];
   const chars = player === 'player1' ? missionForUpgradeCheck.player1Characters : missionForUpgradeCheck.player2Characters;
+
+  // Check same-name upgrade first (highest priority)
   const autoUpgradeTarget = chars.find((c) => {
     if (c.isHidden || c.controlledBy !== player) return false;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     if (card.chakra <= topCard.chakra) return false;
-    // Same name only — mandatory per rules
     return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
   });
 
   if (autoUpgradeTarget) {
     return handleUpgradeCharacter(state, player, cardIndex, missionIndex, autoUpgradeTarget.instanceId);
+  }
+
+  // Also auto-detect flexible (cross-name) upgrades (e.g. Ichibi→Gaara, Akamaru→Kiba, Orochimaru→any)
+  const flexUpgradeTarget = chars.find((c) => {
+    if (c.isHidden || c.controlledBy !== player) return false;
+    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    if (card.chakra <= topCard.chakra) return false;
+    return checkFlexibleUpgrade(card, topCard);
+  });
+
+  if (flexUpgradeTarget) {
+    return handleUpgradeCharacter(state, player, cardIndex, missionIndex, flexUpgradeTarget.instanceId);
   }
 
   const effectiveCost = calculateEffectiveCost(state, player, card, missionIndex, false);

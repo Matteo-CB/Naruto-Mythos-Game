@@ -487,9 +487,31 @@ export class EffectEngine {
   ): GameState {
     // Safeguard: if validTargets is empty, skip creating the pending effect entirely
     // This prevents stuck UI when a handler returns requiresTargetSelection with no valid targets
+    // IMPORTANT: still process remaining effects (e.g. UPGRADE after MAIN) so they don't get silently dropped
     if (!result.validTargets || result.validTargets.length === 0) {
       console.warn(`[EffectEngine] Skipping pending target selection with empty validTargets for ${result.targetSelectionType}`);
-      return result.state;
+      let skipState = result.state;
+      if (remainingEffectTypes.length > 0) {
+        const syntheticPending: PendingEffect = {
+          id: generateInstanceId(),
+          sourceCardId: character ? (character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card).id : '',
+          sourceInstanceId: character?.instanceId ?? '',
+          sourceMissionIndex: missionIndex,
+          effectType,
+          effectDescription: '',
+          targetSelectionType: '',
+          sourcePlayer: player,
+          requiresTargetSelection: false,
+          validTargets: [],
+          isOptional: true,
+          isMandatory: false,
+          resolved: true,
+          isUpgrade,
+          remainingEffectTypes: remainingEffectTypes,
+        };
+        skipState = EffectEngine.processRemainingEffects(skipState, syntheticPending);
+      }
+      return skipState;
     }
 
     const effectId = generateInstanceId();
@@ -4672,8 +4694,8 @@ export class EffectEngine {
       }
 
       default:
-        // Unknown target selection type â log warning
-        console.warn(`[EffectEngine] Unknown targetSelectionType: ${pendingEffect.targetSelectionType}`);
+        // Unknown target selection type - log as error (likely a missing case in this switch)
+        console.error(`[EffectEngine] UNHANDLED targetSelectionType: "${pendingEffect.targetSelectionType}" for card ${pendingEffect.sourceCardId} (${pendingEffect.effectType}). Effect DROPPED. Add a case to applyTargetedEffect().`);
         break;
     }
 
@@ -4696,19 +4718,28 @@ export class EffectEngine {
     let newState = state;
     const remaining = resolvedPending.remainingEffectTypes ?? [];
 
-    // Find the character in its current location
+    // Find the character in its current location (may have moved since the original effect)
     const charResult = EffectEngine.findCharByInstanceId(newState, resolvedPending.sourceInstanceId);
-    if (!charResult) return newState;
+    if (!charResult) {
+      console.warn(`[EffectEngine] processRemainingEffects: source character ${resolvedPending.sourceInstanceId} (${resolvedPending.sourceCardId}) not found on board. Remaining effects [${remaining.join(', ')}] skipped.`);
+      return newState;
+    }
 
     const { character, missionIndex } = charResult;
     const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
 
     for (const effectType of remaining) {
       const hasEffect = (topCard.effects ?? []).some((e) => e.type === effectType);
-      if (!hasEffect) continue;
+      if (!hasEffect) {
+        console.warn(`[EffectEngine] processRemainingEffects: card ${topCard.id} (${topCard.name_fr}) has no ${effectType} effect. Skipping.`);
+        continue;
+      }
 
       const handler = getEffectHandler(topCard.id, effectType);
-      if (!handler) continue;
+      if (!handler) {
+        console.warn(`[EffectEngine] processRemainingEffects: no handler registered for ${topCard.id} ${effectType}. Skipping.`);
+        continue;
+      }
 
       const ctx: EffectContext = {
         state: newState,
