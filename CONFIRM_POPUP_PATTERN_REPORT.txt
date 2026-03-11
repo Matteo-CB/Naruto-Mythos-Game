@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 2 (KS-011 a KS-020)
+BATCH ACTUEL: Batch 3 (KS-021 a KS-030)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -98,6 +98,34 @@ BUG CORRIGE BATCH 2:
   - KS-018: Apres le deplacement, si plusieurs ennemis a cacher, le popup de
     selection avait un bouton SKIP. L'effet continu [hourglass] est MANDATORY,
     donc isMandatory: true ajoute dans postMoveHide().
+
+CARTES TRAITEES - BATCH 3
+================================================================================
+
+CARTE         | EFFETS                              | TYPE UPGRADE    | STATUS
+------------- | ----------------------------------- | --------------- | ------
+KS-021-C      | MAIN: Draw if Edge holder           | N/A (pas d'UPG) | OK
+KS-022-UC     | AMBUSH: Move enemy played last turn  | N/A (pas d'UPG) | OK + R8 Kurenai
+KS-023-C      | MAIN: Move Team 10 char             | N/A (pas d'UPG) | OK + R8 Kurenai
+KS-024-UC     | AMBUSH: Draw + Discard for POWERUP 3 | N/A (pas d'UPG) | OK (discard mandatory)
+KS-025-C      | MAIN: Continu (CHAKRA +1 si Akamaru) | -              | SKIP (continu)
+KS-026-UC     | MAIN: Hide lowest-cost enemy         | SEPARE          | OK
+              | UPGRADE: Peek top 3 for Akamaru     |                 | OK (SKIP ok, draw 0)
+KS-027-C      | MAIN: Continu (return to hand)       | -              | SKIP (continu)
+KS-028-UC     | AMBUSH: POWERUP 2 friendly Kiba      | N/A             | OK
+KS-029-UC     | MAIN: Continu (upgrade over Kiba)    | SEPARE          | OK
+              | UPGRADE: Hide lowest-cost enemy      |                 |
+KS-030-C      | MAIN: Remove up to 2 tokens          | N/A (pas d'UPG) | OK (target mandatory, amount SKIP ok)
+
+NOTES BATCH 3:
+  - KS-022: R8 Kurenai check par mission cible + activeMissions >= 2
+  - KS-023: R8 Kurenai check par controleur du personnage deplace (ami ou ennemi)
+  - KS-024: Apres CONFIRM, le discard est MANDATORY (isMandatory: true)
+  - KS-026 MAIN: Apres CONFIRM, auto-hide si 1 cible, child mandatory si plusieurs
+  - KS-026 UPGRADE: Apres CONFIRM, child garde isOptional (draw 0 Akamaru est valide)
+  - KS-028: Auto-POWERUP si 1 Kiba, child mandatory si plusieurs
+  - KS-029: Auto-hide si 1 cible, child mandatory si plusieurs
+  - KS-030: Target selection mandatory (pas de SKIP), token amount garde SKIP
 
 ================================================================================
 4. BUGS RENCONTRES ET CAUSES RACINES
@@ -309,6 +337,16 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     1. isMovementBlockedByKurenai(state, sourceMissionIndex, movedCharOwner)
     2. state.activeMissions.length >= 2 (au moins 2 missions pour pouvoir deplacer)
     Si bloque ou pas de destination -> log EFFECT_NO_TARGET, pas de popup
+
+2026-03-11 - Batch 3 (KS-021 a KS-030):
+  - 8 cartes traitees: KS-021, 022, 023, 024, 026(x2), 028, 029, 030
+  - 2 cartes skip: KS-025 (continu), KS-027 (continu)
+  - R8 appliquee: KS-022 (move enemy), KS-023 (move Team 10)
+  - KS-024: discard mandatory apres CONFIRM (isMandatory: true)
+  - KS-026 Type B: MAIN mandatory child, UPGRADE optional child
+  - KS-028/029: auto-apply si 1 cible, child mandatory si plusieurs
+  - KS-030: target mandatory, token amount garde SKIP
+  - Regles R1-R9 respectees
 
   NOUVELLE REGLE R9: UPGRADE TYPE A -> POPUP UPGRADE SEPAREE
     Pour les cartes Type A (UPGRADE modifie MAIN), quand jouee en upgrade:

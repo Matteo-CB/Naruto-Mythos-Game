@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 022/130 - SHIKAMARU NARA "Manipulation des Ombres" (UC)
@@ -90,11 +91,20 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
   }
 
+  // R8: Need at least 2 missions to move a character
+  if (state.activeMissions.length < 2) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Shikamaru Nara (022): Only 1 mission in play — cannot move.',
+      'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
+  }
+
   // Find matching enemy characters on the board
   const validTargets: string[] = [];
   for (const played of playedChars) {
     const mission = state.activeMissions[played.mission];
     if (!mission) continue;
+    // R8: Skip missions where Kurenai blocks enemy movement
+    if (isMovementBlockedByKurenai(state, played.mission, opponent)) continue;
     for (const char of mission[enemySide]) {
       if (char.isHidden) continue;
       // Avoid duplicates (same instanceId already added)
@@ -112,26 +122,15 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
   }
 
-  // If exactly one target, auto-select for the move destination prompt
-  if (validTargets.length === 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'SHIKAMARU_MOVE_ENEMY',
-      validTargets,
-      description: 'Move an enemy character to another mission.',
-      descriptionKey: 'game.effect.desc.shikamaru022MoveEnemy',
-    };
-  }
-
-  // Multiple targets — let the player choose which one to move
+  // Confirmation popup before move
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SHIKAMARU_MOVE_ENEMY',
-    validTargets,
-    description: 'Select an enemy character to move to another mission.',
-    descriptionKey: 'game.effect.desc.shikamaru022MoveEnemy',
+    targetSelectionType: 'SHIKAMARU022_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.shikamaru022ConfirmAmbush',
   };
 }
 

@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 023/130 - ASUMA SARUTOBI (Common)
@@ -15,9 +16,15 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleAsuma023Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
+  // Pre-check: need at least 2 missions to move a character
+  if (state.activeMissions.length <= 1) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Asuma Sarutobi (023): No other mission available to move Team 10 character to.',
+      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' }) } };
+  }
+
+  // R8: Check Kurenai block — the moved character's controller determines block
   // Find all Team 10 characters in this mission (not self, both sides)
   const validTargets: string[] = [];
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
@@ -26,6 +33,10 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
     if (char.isHidden) continue; // Hidden chars are anonymous - can't identify keyword
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Team 10')) {
+      // Determine the controller of this character
+      const charController = mission.player1Characters.includes(char) ? 'player1' : 'player2';
+      // R8: Skip if Kurenai blocks movement from this mission for this character's controller
+      if (isMovementBlockedByKurenai(state, sourceMissionIndex, charController)) continue;
       validTargets.push(char.instanceId);
     }
   }
@@ -36,20 +47,15 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' }) } };
   }
 
-  // Check that there is at least one other mission to move to
-  if (state.activeMissions.length <= 1) {
-    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Asuma Sarutobi (023): No other mission available to move Team 10 character to.',
-      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' }) } };
-  }
-
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ASUMA_CHOOSE_TEAM10',
-    validTargets,
-    description: 'Asuma Sarutobi (023): Choose a Team 10 character in this mission to move.',
-    descriptionKey: 'game.effect.desc.asuma023MoveTeam10',
+    targetSelectionType: 'ASUMA023_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.asuma023ConfirmMain',
   };
 }
 

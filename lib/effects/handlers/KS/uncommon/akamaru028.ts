@@ -25,7 +25,7 @@ function handleAkamaru028Main(ctx: EffectContext): EffectResult {
 }
 
 function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -48,15 +48,15 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' }) } };
   }
 
-  // Always require target selection (effect is optional - player can skip)
+  // Confirmation popup before POWERUP
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'AKAMARU_028_POWERUP_KIBA',
-    validTargets: kibaTargets,
+    targetSelectionType: 'AKAMARU028_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: 'Select a friendly Kiba Inuzuka in this mission to give POWERUP 2.',
-    descriptionKey: 'game.effect.desc.akamaru028PowerupKiba',
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.akamaru028ConfirmAmbush',
   };
 }
 

@@ -17,47 +17,17 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *   - Requires target selection for which card to discard from hand.
  */
 function handleAsuma024Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
-  let newState = { ...state };
-  const ps = { ...newState[sourcePlayer] };
-
-  // Step 1: Draw a card
-  if (ps.deck.length > 0) {
-    const newDeck = [...ps.deck];
-    const drawnCard = newDeck.shift()!;
-    ps.deck = newDeck;
-    ps.hand = [...ps.hand, drawnCard];
-  }
-  newState[sourcePlayer] = ps;
-
-  newState = { ...newState, log: logAction(
-    newState.log, newState.turn, newState.phase, sourcePlayer,
-    'EFFECT_DRAW',
-    'Asuma Sarutobi (024): Drew 1 card (ambush).',
-    'game.log.effect.draw',
-    { card: 'ASUMA SARUTOBI', id: 'KS-024-UC', count: 1 },
-  ) };
-
-  // Step 2: Discard a card to POWERUP 3
-  // If no cards in hand, can't discard, so no POWERUP
-  const currentPs = newState[sourcePlayer];
-  if (currentPs.hand.length === 0) {
-    return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Asuma Sarutobi (024): No cards in hand to discard for POWERUP 3.',
-      'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-024-UC' }) } };
-  }
-
-  // Requires target selection: choose a card from hand to discard (plain numbers for parseInt compatibility)
-  const validTargets = currentPs.hand.map((_, idx) => String(idx));
-
+  // Confirmation popup before draw+discard
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ASUMA_024_DISCARD_FOR_POWERUP',
-    validTargets,
-    description: 'Discard a card from your hand to give Asuma POWERUP 3. (Optional - decline to skip POWERUP.)',
-    descriptionKey: 'game.effect.desc.asuma024DiscardForPowerup',
+    targetSelectionType: 'ASUMA024_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.asuma024ConfirmAmbush',
   };
 }
 
