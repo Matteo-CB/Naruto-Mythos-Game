@@ -9,9 +9,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * AMBUSH: Remove up to 2 Power tokens from an enemy character in this mission and put
  * them on this character.
  *
- * This effect only triggers when Kisame is revealed from hidden (AMBUSH).
- * Select an enemy character in the same mission that has power tokens.
- * Remove up to 2 tokens from it and add them to Kisame.
+ * Confirmation popup before target selection (AMBUSH effects are optional).
  */
 function handleKisame092Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -20,84 +18,25 @@ function handleKisame092Ambush(ctx: EffectContext): EffectResult {
   const enemyChars =
     opponentPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
-  // Find enemy characters with power tokens in this mission
-  const validTargets: string[] = [];
-  for (const char of enemyChars) {
-    if (char.powerTokens > 0) {
-      validTargets.push(char.instanceId);
-    }
-  }
+  // Pre-check: enemy characters with power tokens in this mission?
+  const hasTokenTarget = enemyChars.some((char) => char.powerTokens > 0);
 
-  // If no valid targets, effect fizzles
-  if (validTargets.length === 0) {
+  if (!hasTokenTarget) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kisame Hoshigaki (092): No enemy with Power tokens in this mission.',
       'game.log.effect.noTarget', { card: 'KISAME HOSHIGAKI', id: 'KS-092-C' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'STEAL_POWER_TOKENS_ENEMY_THIS_MISSION',
-    validTargets,
-    description: 'Select an enemy character in this mission to steal up to 2 Power tokens from.',
-    descriptionKey: 'game.effect.desc.kisame092StealTokens',
+    targetSelectionType: 'KISAME092_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kisame092ConfirmAmbush',
   };
-}
-
-function transferPowerTokens(
-  state: import('@/lib/effects/EffectTypes').EffectContext['state'],
-  fromInstanceId: string,
-  toInstanceId: string,
-  maxTransfer: number,
-  missionIndex: number,
-  sourcePlayer: import('@/lib/engine/types').PlayerID,
-): import('@/lib/effects/EffectTypes').EffectContext['state'] {
-  // First, find how many tokens the target actually has
-  let tokensAvailable = 0;
-  let targetName = '';
-  const mission = state.activeMissions[missionIndex];
-  for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-    if (char.instanceId === fromInstanceId) {
-      tokensAvailable = char.powerTokens;
-      targetName = char.card.name_fr;
-      break;
-    }
-  }
-
-  const tokensToTransfer = Math.min(maxTransfer, tokensAvailable);
-
-  const newState = { ...state };
-  newState.activeMissions = state.activeMissions.map((m, idx) => {
-    if (idx !== missionIndex) return m;
-    return {
-      ...m,
-      player1Characters: m.player1Characters.map((char) => {
-        if (char.instanceId === fromInstanceId) {
-          return { ...char, powerTokens: char.powerTokens - tokensToTransfer };
-        }
-        if (char.instanceId === toInstanceId) {
-          return { ...char, powerTokens: char.powerTokens + tokensToTransfer };
-        }
-        return char;
-      }),
-      player2Characters: m.player2Characters.map((char) => {
-        if (char.instanceId === fromInstanceId) {
-          return { ...char, powerTokens: char.powerTokens - tokensToTransfer };
-        }
-        if (char.instanceId === toInstanceId) {
-          return { ...char, powerTokens: char.powerTokens + tokensToTransfer };
-        }
-        return char;
-      }),
-    };
-  });
-
-  newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_STEAL_TOKENS',
-    `Kisame Hoshigaki (092): Stole up to ${maxTransfer} Power tokens from ${targetName}.`,
-    'game.log.effect.stealTokens', { card: 'KISAME HOSHIGAKI', id: 'KS-092-C', amount: maxTransfer, target: targetName });
-
-  return newState;
 }
 
 export function registerHandler(): void {

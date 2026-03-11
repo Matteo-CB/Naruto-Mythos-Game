@@ -29,6 +29,7 @@ import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGi
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
+import { getEffectivePower } from '../effects/powerUtils';
 
 export class GameEngine {
   /**
@@ -727,6 +728,280 @@ export class GameEngine {
             'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
         } else {
           newState = EffectEngine.haku089DiscardAndPowerup(newState, effect as any, h089dOpponent as import('./types').PlayerID, h089dMI);
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // --- Batch 10: Modifier DECLINE handlers ---
+
+      // Itachi 091 UPGRADE modifier declined → execute base MAIN (reveal hand only, no discard)
+      if (effect.targetSelectionType === 'ITACHI091_CONFIRM_UPGRADE_MODIFIER') {
+        const i091dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const i091dOppHand = newState[i091dOpponent].hand;
+        if (i091dOppHand.length > 0) {
+          const i091dCards = i091dOppHand.map((c: any, i: number) => ({
+            name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+            image_file: c.image_file, originalIndex: i,
+          }));
+          const i091dEffId = generateInstanceId();
+          const i091dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: i091dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: effect.effectType,
+            effectDescription: JSON.stringify({ isUpgrade: false }),
+            targetSelectionType: 'ITACHI091_HAND_REVEAL',
+            sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [effect.sourceInstanceId],
+            isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: i091dActId, type: 'SELECT_TARGET' as any,
+            player: effect.sourcePlayer,
+            description: JSON.stringify({ text: 'Itachi Uchiwa (091) MAIN: Opponent hand revealed.', cards: i091dCards }),
+            descriptionKey: 'game.effect.desc.itachi091HandReveal',
+            options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: i091dEffId,
+          });
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Kisame 093 UPGRADE modifier declined → execute base MAIN (steal up to 2, not all)
+      if (effect.targetSelectionType === 'KISAME093_CONFIRM_UPGRADE_MODIFIER') {
+        const k093dEnemySide: 'player1Characters' | 'player2Characters' =
+          effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const k093dValidTargets: string[] = [];
+        for (const m of newState.activeMissions) {
+          for (const c of m[k093dEnemySide]) {
+            if (c.powerTokens > 0) k093dValidTargets.push(c.instanceId);
+          }
+        }
+        if (k093dValidTargets.length > 0) {
+          const k093dEffId = generateInstanceId();
+          const k093dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: k093dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: effect.effectType,
+            effectDescription: '', targetSelectionType: 'STEAL_POWER_TOKENS_ENEMY_IN_PLAY',
+            sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: k093dValidTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: k093dActId, type: 'SELECT_TARGET' as any,
+            player: effect.sourcePlayer,
+            description: 'Kisame Hoshigaki (093): Choose an enemy character to steal Power tokens from.',
+            descriptionKey: 'game.effect.desc.kisame093StealTarget',
+            options: k093dValidTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k093dEffId,
+          });
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Kakashi 106 UPGRADE modifier declined → execute base MAIN (devolve only, no copy)
+      if (effect.targetSelectionType === 'KAKASHI106_CONFIRM_UPGRADE_MODIFIER') {
+        const k106dEnemySide: 'player1Characters' | 'player2Characters' =
+          effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const k106dValidTargets: string[] = [];
+        for (const m of newState.activeMissions) {
+          for (const c of m[k106dEnemySide]) {
+            if (c.stack.length > 1) k106dValidTargets.push(c.instanceId);
+          }
+        }
+        if (k106dValidTargets.length > 0) {
+          const k106dEffId = generateInstanceId();
+          const k106dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: k106dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: effect.effectType,
+            effectDescription: '', targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
+            sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: k106dValidTargets, isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: k106dActId, type: 'SELECT_TARGET' as any,
+            player: effect.sourcePlayer,
+            description: 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve.',
+            descriptionKey: 'game.effect.desc.kakashi106DevolveTarget',
+            options: k106dValidTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k106dEffId,
+          });
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Naruto 108 UPGRADE modifier declined → execute base MAIN (hide only, no POWERUP)
+      if (effect.targetSelectionType === 'NARUTO108_CONFIRM_UPGRADE_MODIFIER') {
+        let n108dData: { missionIndex?: number } = {};
+        try { n108dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const n108dMI = n108dData.missionIndex ?? effect.sourceMissionIndex;
+        const n108dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const n108dMission = newState.activeMissions[n108dMI];
+        if (n108dMission) {
+          const n108dEnemySide = n108dOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
+          const n108dValidTargets = n108dMission[n108dEnemySide]
+            .filter((c: any) => !c.isHidden && getEffectivePower(newState, c, n108dOpponent) <= 3)
+            .map((c: any) => c.instanceId);
+          if (n108dValidTargets.length > 0) {
+            const n108dEffId = generateInstanceId();
+            const n108dActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: n108dEffId, sourceCardId: effect.sourceCardId,
+              sourceInstanceId: effect.sourceInstanceId,
+              sourceMissionIndex: n108dMI,
+              effectType: effect.effectType,
+              effectDescription: JSON.stringify({ isUpgrade: false }),
+              targetSelectionType: 'NARUTO108_CHOOSE_HIDE_TARGET',
+              sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+              validTargets: n108dValidTargets, isOptional: true, isMandatory: false,
+              resolved: false, isUpgrade: false,
+            });
+            newState.pendingActions.push({
+              id: n108dActId, type: 'SELECT_TARGET' as any,
+              player: effect.sourcePlayer,
+              description: 'Naruto Uzumaki (108): Choose an enemy with Power 3 or less to hide.',
+              descriptionKey: 'game.effect.desc.naruto108ChooseHideTarget',
+              options: n108dValidTargets, minSelections: 1, maxSelections: 1,
+              sourceEffectId: n108dEffId,
+            });
+          }
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Sakura 109 UPGRADE modifier declined → execute base MAIN (full cost, costReduction: 0)
+      if (effect.targetSelectionType === 'SAKURA109_CONFIRM_UPGRADE_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const s109dPS = newState[effect.sourcePlayer];
+        const s109dValidTargets = s109dPS.discardPile
+          .map((c: any, i: number) => ({ c, i }))
+          .filter(({ c }: any) => c.card_type === 'character' && c.group === 'Leaf Village' && s109dPS.chakra >= (c.chakra ?? 0))
+          .map(({ i }: any) => String(i));
+        if (s109dValidTargets.length > 0) {
+          const s109dEffId = generateInstanceId();
+          const s109dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: s109dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: effect.effectType,
+            effectDescription: '', targetSelectionType: 'SAKURA109_CHOOSE_DISCARD',
+            sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: s109dValidTargets, isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: s109dActId, type: 'SELECT_TARGET' as any,
+            player: effect.sourcePlayer,
+            description: 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play.',
+            descriptionKey: 'game.effect.desc.sakura109ChooseDiscard',
+            options: s109dValidTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: s109dEffId,
+          });
+        } else {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, effect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Sakura Haruno (109): No affordable Leaf Village character in discard.',
+            'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-109-R' });
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Ino 110 UPGRADE modifier declined → execute base MAIN (move only, no hide)
+      if (effect.targetSelectionType === 'INO110_CONFIRM_UPGRADE_MODIFIER') {
+        let i110dData: { missionIndex?: number } = {};
+        try { i110dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const i110dMI = i110dData.missionIndex ?? effect.sourceMissionIndex;
+        const i110dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const i110dMission = newState.activeMissions[i110dMI];
+        if (i110dMission) {
+          const i110dEnemySide = i110dOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
+          const i110dEnemies = i110dMission[i110dEnemySide];
+          if (i110dEnemies.length >= 2) {
+            const i110dNonHidden = i110dEnemies.filter((c: any) => !c.isHidden);
+            if (i110dNonHidden.length > 0) {
+              let i110dMinPower = Infinity;
+              for (const c of i110dNonHidden) {
+                const p = getEffectivePower(newState, c, i110dOpponent);
+                if (p < i110dMinPower) i110dMinPower = p;
+              }
+              const i110dWeakest = i110dNonHidden
+                .filter((c: any) => getEffectivePower(newState, c, i110dOpponent) === i110dMinPower)
+                .map((c: any) => c.instanceId);
+              if (i110dWeakest.length > 0) {
+                const i110dEffId = generateInstanceId();
+                const i110dActId = generateInstanceId();
+                newState.pendingEffects.push({
+                  id: i110dEffId, sourceCardId: effect.sourceCardId,
+                  sourceInstanceId: effect.sourceInstanceId,
+                  sourceMissionIndex: i110dMI,
+                  effectType: effect.effectType,
+                  effectDescription: '', targetSelectionType: 'INO110_CHOOSE_ENEMY',
+                  sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+                  validTargets: i110dWeakest, isOptional: true, isMandatory: false,
+                  resolved: false, isUpgrade: false,
+                });
+                newState.pendingActions.push({
+                  id: i110dActId, type: 'SELECT_TARGET' as any,
+                  player: effect.sourcePlayer,
+                  description: 'Ino Yamanaka (110): Choose the weakest enemy to move.',
+                  descriptionKey: 'game.effect.desc.ino110ChooseEnemy',
+                  options: i110dWeakest, minSelections: 1, maxSelections: 1,
+                  sourceEffectId: i110dEffId,
+                });
+              }
+            }
+          }
         }
 
         if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {

@@ -225,15 +225,38 @@ describe('UPGRADE end-to-end', () => {
     const costDiff = naruto108.chakra - naruto009.chakra;
     expect(stateAfterUpgrade.player1.chakra).toBe(20 - costDiff);
 
-    // MAIN effect requires target selection (enemy with power 3 <= 3)
+    // MAIN effect now returns CONFIRM popup first
     expect(stateAfterUpgrade.pendingActions.length).toBeGreaterThan(0);
-    const pendingAction = stateAfterUpgrade.pendingActions[0];
-    expect(pendingAction.options).toContain('enemy-1');
+    const confirmAction = stateAfterUpgrade.pendingActions[0];
+    // CONFIRM popup has the source card instanceId as option
+    expect(confirmAction.options).toContain('naruto-in-play');
 
-    // Step 2: Resolve the pending target selection by selecting the enemy
-    const finalState = GameEngine.applyAction(stateAfterUpgrade, 'player1', {
+    // Step 2: Confirm the MAIN effect
+    const stateAfterConfirm = GameEngine.applyAction(stateAfterUpgrade, 'player1', {
       type: 'SELECT_TARGET',
-      pendingActionId: pendingAction.id,
+      pendingActionId: confirmAction.id,
+      selectedTargets: ['naruto-in-play'],
+    });
+
+    // After confirming, it should show UPGRADE modifier popup (since this is an upgrade)
+    expect(stateAfterConfirm.pendingActions.length).toBeGreaterThan(0);
+    const modifierAction = stateAfterConfirm.pendingActions[0];
+
+    // Step 3: Confirm the UPGRADE modifier
+    const stateAfterModifier = GameEngine.applyAction(stateAfterConfirm, 'player1', {
+      type: 'SELECT_TARGET',
+      pendingActionId: modifierAction.id,
+      selectedTargets: ['naruto-in-play'],
+    });
+
+    // Step 4: Now select the target enemy
+    expect(stateAfterModifier.pendingActions.length).toBeGreaterThan(0);
+    const targetAction = stateAfterModifier.pendingActions[0];
+    expect(targetAction.options).toContain('enemy-1');
+
+    const finalState = GameEngine.applyAction(stateAfterModifier, 'player1', {
+      type: 'SELECT_TARGET',
+      pendingActionId: targetAction.id,
       selectedTargets: ['enemy-1'],
     });
 

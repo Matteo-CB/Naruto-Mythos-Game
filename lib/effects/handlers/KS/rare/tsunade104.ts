@@ -11,10 +11,12 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *   amount of additional Chakra spent. Player chooses from 0..N.
  *
  * UPGRADE: POWERUP X (same logic).
+ *
+ * Confirmation popup before chakra choice (MAIN effects are optional).
  */
 
 function tsunade104MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
   const maxChakra = playerState.chakra;
 
@@ -33,26 +35,19 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Build options: 0 through maxChakra (0 means decline)
-  const validTargets: string[] = [];
-  for (let i = 0; i <= maxChakra; i++) {
-    validTargets.push(String(i));
-  }
-
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TSUNADE104_CHOOSE_CHAKRA',
-    validTargets,
-    description: `Tsunade (104): Choose how much extra chakra to spend (0-${maxChakra}). POWERUP X.`,
-    descriptionKey: 'game.effect.desc.tsunade104ChooseChakra',
-    descriptionParams: { max: maxChakra },
+    targetSelectionType: 'TSUNADE104_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: `Tsunade (104) MAIN: Spend extra chakra for POWERUP X (max ${maxChakra}).`,
+    descriptionKey: 'game.effect.desc.tsunade104ConfirmMain',
   };
 }
 
 function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
-  // No-op: the MAIN handler already handles the "spend extra chakra for POWERUP"
-  // logic. The UPGRADE effect text describes the same ability, not an additional one.
   return { state: ctx.state };
 }
 

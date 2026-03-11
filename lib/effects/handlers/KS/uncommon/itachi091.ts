@@ -7,16 +7,19 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 5 | Power: 5
  * Group: Akatsuki | Keywords: Rogue Ninja, Kekkei Genkai
  *
- * MAIN: Look at all cards in the opponent's hand. (Mandatory)
+ * MAIN: Look at all cards in the opponent's hand.
  *
- * UPGRADE: In addition, choose 1 card from the opponent's hand and discard it.
+ * UPGRADE: MAIN effect: In addition, choose 1 card from the opponent's hand and discard it.
+ *
+ * Confirmation popup before looking at hand. Modifier pattern for UPGRADE.
  */
 
 function handleItachi091Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const opponentHand = state[opponentPlayer].hand;
 
+  // Pre-check: opponent has cards in hand?
   if (opponentHand.length === 0) {
     const log = logAction(
       state.log, state.turn, state.phase, sourcePlayer,
@@ -28,44 +31,20 @@ function handleItachi091Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Show ALL opponent hand cards
-  const allCards = opponentHand.map((c, i) => ({
-    name_fr: c.name_fr,
-    chakra: c.chakra ?? 0,
-    power: c.power ?? 0,
-    image_file: c.image_file,
-    originalIndex: i,
-  }));
-
-  const newState = {
-    ...state,
-    log: logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_LOOK_HAND',
-      'Itachi Uchiwa (091): Revealed all cards in opponent\'s hand.',
-      'game.log.effect.itachi091Reveal',
-      { card: 'ITACHI UCHIWA', id: 'KS-091-UC' },
-    ),
-  };
-
-  // Show all opponent hand cards - confirm only
+  // Confirmation popup
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ITACHI091_HAND_REVEAL',
-    validTargets: ['confirm'],
-    description: JSON.stringify({
-      text: 'Itachi (091): Opponent\'s hand revealed.',
-      cards: allCards,
-      isUpgrade,
-    }),
-    descriptionKey: 'game.effect.desc.itachi091Reveal',
-    isMandatory: true,
+    targetSelectionType: 'ITACHI091_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Itachi Uchiwa (091) MAIN: Look at all cards in opponent\'s hand.',
+    descriptionKey: 'game.effect.desc.itachi091ConfirmMain',
   };
 }
 
 function handleItachi091UpgradeNoop(ctx: EffectContext): EffectResult {
-  // No-op: MAIN handler already checks isUpgrade to include discard step.
+  // No-op: modifier handled via CONFIRM_MAIN → CONFIRM_UPGRADE_MODIFIER in engine.
   return { state: ctx.state };
 }
 

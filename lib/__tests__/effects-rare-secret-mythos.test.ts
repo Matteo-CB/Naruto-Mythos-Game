@@ -87,8 +87,9 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
     const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('NARUTO108_CHOOSE_HIDE_TARGET');
-    expect(result.validTargets).toContain('enemy-1');
+    expect(result.targetSelectionType).toBe('NARUTO108_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('naruto-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when no enemy with Power 3 or less exists', () => {
@@ -108,7 +109,7 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(false);
   });
 
-  it('UPGRADE should require target selection with isUpgrade flag for POWERUP bonus', () => {
+  it('UPGRADE should return CONFIRM_MAIN with isOptional (modifier pattern)', () => {
     const naruto = mockCharInPlay({ instanceId: 'naruto-1', powerTokens: 0 }, {
       id: 'KS-108-R', number: 108, name_fr: 'NARUTO UZUMAKI', power: 5, chakra: 5,
     });
@@ -121,13 +122,10 @@ describe('108/130 - Naruto Uzumaki (RA)', () => {
 
     const handler = getEffectHandler('KS-108-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
-    // Should require target selection (same handler, isUpgrade passed in description)
+    // Returns CONFIRM popup (same handler for MAIN and UPGRADE)
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('NARUTO108_CHOOSE_HIDE_TARGET');
-    expect(result.validTargets).toContain('enemy-1');
-    // The description should contain isUpgrade flag for the resolution step
-    const desc = JSON.parse(result.description!);
-    expect(desc.isUpgrade).toBe(true);
+    expect(result.targetSelectionType).toBe('NARUTO108_CONFIRM_MAIN');
+    expect(result.isOptional).toBe(true);
   });
 
   it('RA variant 108/130 A should use same handler', () => {
@@ -704,12 +702,12 @@ describe('110/130 - Ino Yamanaka (R)', () => {
     const handler = getEffectHandler('KS-110-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ino, 0));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('INO110_CHOOSE_ENEMY');
-    // Only the weakest should be a valid target
-    expect(result.validTargets).toEqual(['enemy-weak']);
+    expect(result.targetSelectionType).toBe('INO110_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('ino-1');
+    expect(result.isOptional).toBe(true);
   });
 
-  it('MAIN should offer multiple targets when tied for weakest', () => {
+  it('MAIN should return CONFIRM popup when tied for weakest', () => {
     const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
       id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
     });
@@ -731,9 +729,8 @@ describe('110/130 - Ino Yamanaka (R)', () => {
     const handler = getEffectHandler('KS-110-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ino, 0));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toHaveLength(2);
-    expect(result.validTargets).toContain('enemy-a');
-    expect(result.validTargets).toContain('enemy-b');
+    expect(result.targetSelectionType).toBe('INO110_CONFIRM_MAIN');
+    expect(result.isOptional).toBe(true);
   });
 
   it('MAIN should fizzle when only one mission in play', () => {
@@ -762,7 +759,7 @@ describe('110/130 - Ino Yamanaka (R)', () => {
     )).toBe(true);
   });
 
-  it('UPGRADE flag should be passed through for hide effect', () => {
+  it('UPGRADE should return CONFIRM popup (modifier pattern)', () => {
     const ino = mockCharInPlay({ instanceId: 'ino-1' }, {
       id: 'KS-110-R', number: 110, name_fr: 'INO YAMANAKA', chakra: 5, power: 4,
     });
@@ -784,6 +781,7 @@ describe('110/130 - Ino Yamanaka (R)', () => {
     const handler = getEffectHandler('KS-110-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ino, 0, 'MAIN', true));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.description).toContain('hide');
+    expect(result.targetSelectionType).toBe('INO110_CONFIRM_MAIN');
+    expect(result.isOptional).toBe(true);
   });
 });

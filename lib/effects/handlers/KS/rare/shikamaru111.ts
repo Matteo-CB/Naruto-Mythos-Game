@@ -3,7 +3,6 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
-import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
 /**
@@ -16,8 +15,8 @@ import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
  *   the engine handles the play restriction in the action validation layer.
  *
  * UPGRADE: Hide an enemy character with Power 3 or less in this mission.
- *   When isUpgrade: find non-hidden enemies in this mission with effective power <= 3.
- *   Target selection if multiple valid targets. Hide the selected target.
+ *
+ * Confirmation popup before target selection.
  */
 
 function shikamaru111MainHandler(ctx: EffectContext): EffectResult {
@@ -27,14 +26,14 @@ function shikamaru111MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 3 that can be hidden
+  // Pre-check: non-hidden enemies with effective power <= 3 that can be hidden
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => canBeHiddenByEnemy(state, c, opponentPlayer) && getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -54,28 +53,16 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Always require target selection (effect is optional - player can skip)
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SHIKAMARU111_HIDE_ENEMY',
-    validTargets,
+    targetSelectionType: 'SHIKAMARU111_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: 'Shikamaru Nara (111) UPGRADE: Choose an enemy character with Power 3 or less to hide.',
-    descriptionKey: 'game.effect.desc.shikamaru111HideEnemy',
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.shikamaru111ConfirmUpgrade',
   };
-}
-
-function applyHide(
-  state: EffectContext['state'],
-  targetInstanceId: string,
-  sourcePlayer: EffectContext['sourcePlayer'],
-  _enemySide: 'player1Characters' | 'player2Characters',
-  _missionIndex: number,
-): EffectResult {
-  // Use centralized hide to respect Kimimaro 056 protection, Gemma 049 sacrifice, and immunities
-  const newState = EffectEngine.hideCharacterWithLog(state, targetInstanceId, sourcePlayer);
-  return { state: newState };
 }
 
 export function registerShikamaru111Handlers(): void {

@@ -13,31 +13,33 @@ import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeChec
  *
  * UPGRADE: MAIN effect: Instead, play the card paying 2 less.
  *
- * Two-stage target selection:
- *   Stage 1: SAKURA109_CHOOSE_DISCARD - choose which Leaf Village char from discard
- *   Stage 2: SAKURA109_CHOOSE_MISSION - choose which mission to play it on
+ * Confirmation popup before target selection. Modifier pattern for UPGRADE.
  */
 
 function sakura109MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
-  const costReduction = ctx.isUpgrade ? 2 : 0;
 
-  // Find affordable Leaf Village characters in discard pile (fresh play OR upgrade)
-  const validIndices: string[] = [];
+  // Pre-check with BOTH cost reductions (full cost OR cost-2) to see if anything is affordable
+  let hasAffordable = false;
   for (let i = 0; i < playerState.discardPile.length; i++) {
     const card = playerState.discardPile[i];
     if (card.card_type === 'character' && card.group === 'Leaf Village') {
-      const freshCost = Math.max(0, card.chakra - costReduction);
-      const canFresh = playerState.chakra >= freshCost;
-      const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, costReduction);
-      if (canFresh || canUpgrade) {
-        validIndices.push(String(i));
+      // Check full cost
+      const canFreshFull = playerState.chakra >= card.chakra;
+      const canUpgradeFull = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 0);
+      // Check cost-2 (if this is an upgrade play)
+      const freshCost2 = Math.max(0, card.chakra - 2);
+      const canFresh2 = playerState.chakra >= freshCost2;
+      const canUpgrade2 = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 2);
+      if (canFreshFull || canUpgradeFull || canFresh2 || canUpgrade2) {
+        hasAffordable = true;
+        break;
       }
     }
   }
 
-  if (validIndices.length === 0) {
+  if (!hasAffordable) {
     const log = logAction(
       state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
@@ -48,17 +50,15 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SAKURA109_CHOOSE_DISCARD',
-    validTargets: validIndices,
-    description: ctx.isUpgrade
-      ? 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play (paying 2 less).'
-      : 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play.',
-    descriptionKey: ctx.isUpgrade
-      ? 'game.effect.desc.sakura109PlayFromDiscardUpgrade'
-      : 'game.effect.desc.sakura109PlayFromDiscard',
+    targetSelectionType: 'SAKURA109_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Sakura Haruno (109) MAIN: Play a Leaf Village character from your discard pile.',
+    descriptionKey: 'game.effect.desc.sakura109ConfirmMain',
   };
 }
 

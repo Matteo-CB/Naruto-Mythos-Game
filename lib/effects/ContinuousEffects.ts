@@ -200,10 +200,6 @@ export function calculateContinuousPowerModifier(
         if (eTop.number === 128 || eTop.number === 152) {
           hiddenBonus -= 1;
         }
-        // Sakon 127: Each enemy character in this mission has -1 Power
-        if (eTop.number === 127 && effect.description.includes('-1 Power')) {
-          hiddenBonus -= 1;
-        }
       }
     }
 
@@ -257,11 +253,6 @@ export function calculateContinuousPowerModifier(
 
       // Itachi 128 (R) / 152 (M): Every enemy in this mission has -1 Power
       if (enemyTopCard.number === 128 || enemyTopCard.number === 152) {
-        modifier -= 1;
-      }
-
-      // Sakon 127 (R/RA): Each enemy character in this mission has -1 Power
-      if (enemyTopCard.number === 127 && effect.description.includes('-1 Power')) {
         modifier -= 1;
       }
 

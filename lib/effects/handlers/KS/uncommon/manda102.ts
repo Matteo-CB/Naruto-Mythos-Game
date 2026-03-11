@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
@@ -9,38 +8,28 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Independent | Keywords: Summon
  *
  * AMBUSH: Defeat an enemy character with keyword "Summon" in this mission.
- *   - Triggered only when Manda is revealed from hidden (AMBUSH).
- *   - Find non-hidden enemy characters in this mission with keyword "Summon".
- *   - If exactly 1 valid target, auto-defeat.
- *   - If multiple valid targets, requires target selection.
  *
  * MAIN [hourglass]: At end of round, must return this character to hand.
- *   - Continuous effect handled by the engine in EndPhase.
- *   - The handler registers a no-op for the continuous return-to-hand.
+ *
+ * Confirmation popup before target selection (AMBUSH effects are optional).
  */
 
 function handleManda102Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemy characters with keyword "Summon" in this mission
-  const validTargets: string[] = [];
-  for (const char of enemyChars) {
-    if (char.isHidden) continue;
+  // Pre-check: non-hidden enemy characters with keyword "Summon" in this mission?
+  const hasSummon = enemyChars.some((char) => {
+    if (char.isHidden) return false;
     const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    if (topCard.keywords && topCard.keywords.includes('Summon')) {
-      validTargets.push(char.instanceId);
-    }
-  }
+    return topCard.keywords && topCard.keywords.includes('Summon');
+  });
 
-  if (validTargets.length === 0) {
+  if (!hasSummon) {
     const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
+      state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET',
       'Manda (102): No enemy character with keyword "Summon" in this mission.',
       'game.log.effect.noTarget',
@@ -49,25 +38,22 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'DEFEAT_ENEMY_SUMMON_THIS_MISSION',
-    validTargets,
-    description: 'Manda (102) AMBUSH: Select an enemy character with keyword "Summon" in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.manda102DefeatSummon',
+    targetSelectionType: 'MANDA102_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.manda102ConfirmAmbush',
   };
 }
 
 function handleManda102Main(ctx: EffectContext): EffectResult {
-  // Continuous [hourglass]: return to hand at end of round.
-  // This is handled passively by EndPhase.ts.
   const state = ctx.state;
   const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
+    state.log, state.turn, state.phase, ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
     'Manda (102): Must return to hand at end of round (continuous).',
     'game.log.effect.continuous',

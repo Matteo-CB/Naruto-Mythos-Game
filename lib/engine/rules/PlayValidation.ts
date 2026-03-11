@@ -282,7 +282,7 @@ export function validateUpgradeCharacter(
  * - Orochimaru 051 (UC) / 138 (S): Can upgrade any non-Summon, non-Orochimaru
  * - Akamaru 029 (UC): Can upgrade over Kiba Inuzuka
  * - Ichibi 076 (UC): Can upgrade any Gaara
- * - Ukon 063 (UC) / 124b (R): Can upgrade any character with printed cost 0–4
+ * - Ukon 063 (UC) / 124b (R) / Sakon 127 (R/RA): Can upgrade over any Sound Village character
  */
 export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: CharacterCard): boolean {
   // Already same name - standard upgrade, no special rule needed
@@ -326,8 +326,8 @@ export function checkFlexibleUpgrade(newCard: CharacterCard, targetCard: Charact
     }
   }
 
-  // Ukon 063 (UC) / 124 (R): Can upgrade over any Sound Village character
-  if (newCard.number === 63 || newCard.number === 124) {
+  // Ukon 063 (UC) / 124b (R) / Sakon 127 (R/RA): Can upgrade over any Sound Village character
+  if (newCard.number === 63 || newCard.number === 124 || newCard.number === 127) {
     const hasFlexible = (newCard.effects ?? []).some(
       (e) => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'),
     );

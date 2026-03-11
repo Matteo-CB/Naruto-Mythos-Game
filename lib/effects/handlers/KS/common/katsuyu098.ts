@@ -9,14 +9,12 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN (1): If there is a friendly Tsunade in play, POWERUP 2.
  * MAIN (2) [continuous]: At the end of the round, you must return this character to your hand.
  *
- * The first MAIN triggers on play: check if the player controls a non-hidden Tsunade
- * anywhere in play. If so, add 2 power tokens to this character (self).
- * The second MAIN is continuous and handled in EndPhase.ts.
+ * Confirmation popup before POWERUP (MAIN effects are optional).
  */
 function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Check for a friendly Tsunade anywhere in play (across all missions)
+  // Pre-check: friendly Tsunade anywhere in play?
   let hasTsunade = false;
   for (const mission of state.activeMissions) {
     const friendlyChars =
@@ -40,31 +38,16 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KATSUYU', id: 'KS-098-C' }) } };
   }
 
-  // POWERUP 2 on self
-  const newState = { ...state };
-  newState.activeMissions = state.activeMissions.map((m) => ({
-    ...m,
-    player1Characters: m.player1Characters.map((char) =>
-      char.instanceId === sourceCard.instanceId
-        ? { ...char, powerTokens: char.powerTokens + 2 }
-        : char,
-    ),
-    player2Characters: m.player2Characters.map((char) =>
-      char.instanceId === sourceCard.instanceId
-        ? { ...char, powerTokens: char.powerTokens + 2 }
-        : char,
-    ),
-  }));
-
-  newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_POWERUP',
-    `Katsuyu (098): POWERUP 2 (Tsunade synergy).`,
-    'game.log.effect.powerupSelf',
-    { card: 'Katsuyu', id: 'KS-098-C', amount: 2 },
-  );
-
-  return { state: newState };
+  // Confirmation popup
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KATSUYU098_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Katsuyu (098) MAIN: POWERUP 2 (friendly Tsunade in play).',
+    descriptionKey: 'game.effect.desc.katsuyu098ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {

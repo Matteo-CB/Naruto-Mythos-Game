@@ -201,11 +201,19 @@ function processNextMove(
 ): EffectResult {
   // All chars processed
   if (idx >= charIds.length) {
-    let finalState = state;
+    // UPGRADE: POWERUP X is optional — show CONFIRM popup instead of auto-applying
     if (isUpgrade && movedCount > 0) {
-      finalState = applyUpgradePowerup(finalState, sasukeInstanceId, movedCount, player, sourceMissionIndex);
+      return {
+        state,
+        requiresTargetSelection: true,
+        targetSelectionType: 'SASUKE107_CONFIRM_UPGRADE',
+        validTargets: [sasukeInstanceId],
+        isOptional: true,
+        description: JSON.stringify({ movedCount, sasukeInstanceId, sourceMissionIndex }),
+        descriptionKey: 'game.effect.desc.sasuke107ConfirmUpgrade',
+      };
     }
-    return { state: finalState };
+    return { state };
   }
 
   const charId = charIds[idx];

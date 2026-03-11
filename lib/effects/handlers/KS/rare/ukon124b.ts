@@ -19,13 +19,13 @@ import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
  *   Find non-hidden enemies in this mission with effective power <= 5. Target selection. Hide.
  */
 
-function ukon124bMainHandler(ctx: EffectContext): EffectResult {
+export function ukon124bMainHandler(ctx: EffectContext): EffectResult {
   // Continuous effect: can be played as upgrade over any Sound Village character.
   // Handled by the engine's upgrade validation logic.
   return { state: ctx.state };
 }
 
-function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
+export function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =

@@ -5,8 +5,19 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
+/**
+ * Card 105/130 - JIRAIYA (R)
+ * Chakra: 5, Power: 5
+ * Group: Leaf Village, Keywords: Sannin
+ *
+ * MAIN: Play a Summon from hand or from hidden on board, paying 3 less chakra.
+ * UPGRADE: Move an enemy character from this mission to another mission (separate effect).
+ *
+ * Confirmation popup before both MAIN and UPGRADE target selections.
+ */
+
 function handleJiraiya105Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const costReduction = 3;
 
   const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
@@ -23,25 +34,21 @@ function handleJiraiya105Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-105-R' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
-    validTargets: allTargets,
-    description: JSON.stringify({
-      text: 'Jiraiya (105): Choose a Summon character to play (paying 3 less).',
-      hiddenChars: hiddenTargets,
-      costReduction,
-    }),
-    descriptionKey: 'game.effect.desc.jiraiya105ChooseSummon',
+    targetSelectionType: 'JIRAIYA105_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Jiraiya (105) MAIN: Play a Summon character paying 3 less chakra.',
+    descriptionKey: 'game.effect.desc.jiraiya105ConfirmMain',
   };
 }
 
 function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Defensive: re-lookup Jiraiya's actual position (may differ from ctx.sourceMissionIndex
-  // if the MAIN effect resolution changed state before UPGRADE fires via processRemainingEffects)
   const charResult = EffectEngine.findCharByInstanceId(state, sourceCard.instanceId);
   const actualMissionIndex = charResult?.missionIndex ?? ctx.sourceMissionIndex;
 
@@ -63,13 +70,15 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'JIRAIYA105_MOVE_ENEMY',
-    validTargets: validTargets,
-    description: 'Jiraiya (105) UPGRADE: Choose an enemy character in this mission to move to another mission.',
-    descriptionKey: 'game.effect.desc.jiraiya105MoveEnemy',
+    targetSelectionType: 'JIRAIYA105_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: actualMissionIndex }),
+    descriptionKey: 'game.effect.desc.jiraiya105ConfirmUpgrade',
   };
 }
 
