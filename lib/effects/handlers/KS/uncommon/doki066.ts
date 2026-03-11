@@ -46,30 +46,16 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Steal 1 chakra from opponent
-  const newState = { ...state };
-  const playerState = { ...newState[sourcePlayer] };
-  const opponentState = { ...newState[opponentPlayer] };
-
-  const stealAmount = Math.min(1, opponentState.chakra); // Can't steal more than opponent has
-  opponentState.chakra = opponentState.chakra - stealAmount;
-  playerState.chakra = playerState.chakra + stealAmount;
-
-  newState[sourcePlayer] = playerState;
-  newState[opponentPlayer] = opponentState;
-
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_STEAL_CHAKRA',
-    `Doki (066): Sound Four ally present - stole ${stealAmount} Chakra from opponent.`,
-    'game.log.effect.stealChakra',
-    { card: 'DOKI', id: 'KS-066-UC', amount: String(stealAmount) },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup before stealing chakra
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'DOKI066_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.doki066ConfirmMain',
+  };
 }
 
 export function registerDoki066Handlers(): void {

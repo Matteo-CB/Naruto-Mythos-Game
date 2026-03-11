@@ -55,14 +55,15 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-062-UC' }) } };
   }
 
-  // If exactly one target, still require selection (engine needs to know which effect to copy)
+  // Confirmation popup before copy
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SAKON062_COPY_EFFECT',
-    validTargets,
-    description: 'Select a friendly Sound Four character to copy an instant effect from.',
-    descriptionKey: 'game.effect.desc.sakon062CopyEffect',
+    targetSelectionType: 'SAKON062_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.sakon062ConfirmAmbush',
   };
 }
 

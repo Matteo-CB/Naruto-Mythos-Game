@@ -45,14 +45,15 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
-  // Always let player choose (optional effect)
+  // Confirmation popup before POWERUP
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TAYUYA065_POWERUP_SOUND',
-    validTargets,
-    description: 'Select a friendly Sound Village character in play to give POWERUP 2.',
-    descriptionKey: 'game.effect.desc.tayuya065PowerupSound',
+    targetSelectionType: 'TAYUYA065_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.tayuya065ConfirmAmbush',
   };
 }
 
@@ -66,71 +67,15 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
-  // Look at top 3 cards
-  const lookCount = Math.min(3, ps.deck.length);
-  const topCards = ps.deck.slice(0, lookCount);
-  const remainingDeck = ps.deck.slice(lookCount);
-
-  // Find matching Summon cards with their indices
-  const matchIndices: number[] = [];
-  for (let i = 0; i < topCards.length; i++) {
-    if (topCards[i].keywords && topCards[i].keywords.includes('Summon')) matchIndices.push(i);
-  }
-
-  const cardInfos = topCards.map(c => ({
-    name: c.name_fr,
-    name_fr: c.name_fr,
-    chakra: c.chakra ?? 0,
-    power: c.power ?? 0,
-    image_file: c.image_file,
-    isSummon: !!(c.keywords && c.keywords.includes('Summon')),
-    isMatch: !!(c.keywords && c.keywords.includes('Summon')),
-  }));
-
-  let newState = { ...state };
-
-  if (matchIndices.length === 0) {
-    // No matches: put all back, show confirm-only reveal
-    ps.deck = [...topCards, ...remainingDeck];
-    newState[sourcePlayer] = ps;
-    newState = { ...newState, log: logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT',
-      `Tayuya (065): Looked at top ${lookCount} card(s) of deck. No Summon cards found. Cards put back on top.`,
-      'game.log.effect.lookAtDeck',
-      { card: 'TAYUYA', id: 'KS-065-UC' },
-    ) };
-
-    return {
-      state: newState,
-      requiresTargetSelection: true,
-      targetSelectionType: 'TAYUYA065_UPGRADE_REVEAL',
-      validTargets: ['confirm'],
-      description: JSON.stringify({
-        text: `Tayuya (065): No Summon in top ${lookCount}. Cards put back.`,
-        topCards: cardInfos,
-      }),
-      descriptionKey: 'game.effect.desc.tayuya065UpgradeReveal',
-      isMandatory: true,
-    };
-  }
-
-  // Matches found: let the player choose which to draw (0 to N)
-  // Don't modify state yet - resolution handler will apply the draw
+  // Confirmation popup before peeking at deck
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TAYUYA065_UPGRADE_CHOOSE',
-    validTargets: matchIndices.map(i => String(i)),
-    minSelections: 0,
-    maxSelections: matchIndices.length,
-    description: JSON.stringify({
-      text: `Tayuya (065): Found ${matchIndices.length} Summon card(s) in top ${lookCount}. Choose which to draw.`,
-      topCards: cardInfos,
-      topCardsRaw: topCards,
-      remainingDeck,
-    }),
-    descriptionKey: 'game.effect.desc.tayuya065UpgradeChoose',
+    targetSelectionType: 'TAYUYA065_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.tayuya065ConfirmUpgrade',
   };
 }
 

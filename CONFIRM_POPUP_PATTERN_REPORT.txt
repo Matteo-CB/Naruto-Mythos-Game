@@ -432,4 +432,24 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - R4 propagation: OROCHIMARU051 UPGRADE, KABUTO053 UPGRADE, KIMIMARO056 UPGRADE
   - Regles R1-R10 respectees
 
+2026-03-11 - Batch 7 (KS-061 a KS-070):
+  - 6 cartes traitees (4 skipped: KS-063 continu, KS-064 continu, KS-067 continu, KS-070 mandatory instant)
+  - KS-061 (MAIN draw X), KS-062 (AMBUSH copy effect), KS-065 (AMBUSH+UPGRADE),
+    KS-066 (MAIN steal chakra), KS-068 (MAIN+AMBUSH), KS-069 (UPGRADE+MAIN)
+  - Andy feedback: KS-065 same as KS-026 pattern (2 separate effects, no SKIP on AMBUSH children,
+    SKIP kept on UPGRADE draw = draw 0 valid)
+  - Andy feedback: KS-070 mandatory instant effect -> ignore (no CONFIRM)
+  - KS-061 MAIN: re-count Sound Four missions, draw X directly after CONFIRM
+  - KS-062 AMBUSH: re-find Sound Four targets, auto-select si 1 + execute copy, child mandatory si plusieurs
+  - KS-065 AMBUSH: re-find Sound Village targets, auto-POWERUP 2 si 1, child mandatory (no SKIP) si plusieurs
+  - KS-065 UPGRADE: re-peek top 3, no Summon -> info reveal child, Summon found -> choose child (SKIP=draw 0)
+  - KS-066 MAIN: re-check Sound Four in mission, steal 1 chakra directly after CONFIRM
+  - KS-068 MAIN: re-find hidden chars, auto-look si 1, child mandatory si plusieurs
+  - KS-068 AMBUSH: re-find hidden chars, auto-defeat si 1, child mandatory si plusieurs
+  - KS-069 UPGRADE: re-find hidden chars, auto-look si 1, child mandatory si plusieurs + R4 propagation
+  - KS-069 MAIN: re-find hidden enemy chars, auto-select si 1 (FORCE_REVEAL_OR_DEFEAT logic inline),
+    child mandatory si plusieurs
+  - R4 propagation: DOSU069 UPGRADE, TAYUYA065 UPGRADE
+  - Regles R1-R10 respectees
+
 ================================================================================

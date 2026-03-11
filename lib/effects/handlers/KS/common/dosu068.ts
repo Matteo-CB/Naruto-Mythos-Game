@@ -42,13 +42,15 @@ function handleDosu068Main(ctx: EffectContext): EffectResult {
     };
   }
 
+  // Confirmation popup before looking
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
-    validTargets,
-    description: 'Dosu Kinuta (068): Select a hidden character in play to look at.',
-    descriptionKey: 'game.effect.desc.dosu068LookAtHidden',
+    targetSelectionType: 'DOSU068_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.dosu068ConfirmMain',
   };
 }
 
@@ -80,13 +82,15 @@ function handleDosu068Ambush(ctx: EffectContext): EffectResult {
     };
   }
 
+  // Confirmation popup before defeat
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER',
-    validTargets,
-    description: 'Dosu Kinuta (068) AMBUSH: Select a hidden character in play to defeat.',
-    descriptionKey: 'game.effect.desc.dosu068Defeat',
+    targetSelectionType: 'DOSU068_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.dosu068ConfirmAmbush',
   };
 }
 

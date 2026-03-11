@@ -45,13 +45,15 @@ function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Confirmation popup before looking
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
-    validTargets,
-    description: 'Dosu Kinuta (069) UPGRADE: Select a hidden character in play to look at.',
-    descriptionKey: 'game.effect.desc.dosu069LookAtHidden',
+    targetSelectionType: 'DOSU069_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.dosu069ConfirmUpgrade',
   };
 }
 
@@ -84,13 +86,15 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Confirmation popup before force reveal/defeat
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'FORCE_REVEAL_OR_DEFEAT',
-    validTargets,
-    description: 'Dosu Kinuta (069): Choose a hidden enemy character in play. Opponent must play them paying 2 more, or defeat them.',
-    descriptionKey: 'game.effect.desc.dosu069ForceRevealOrDefeat',
+    targetSelectionType: 'DOSU069_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.dosu069ConfirmMain',
   };
 }
 

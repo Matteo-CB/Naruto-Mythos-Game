@@ -4563,6 +4563,580 @@ export class EffectEngine {
       }
 
       // =============================================
+      // BATCH 7 CONFIRM CASES (KS-061 to KS-070)
+      // =============================================
+
+      case 'SAKON061_CONFIRM_MAIN': {
+        // Re-count missions with friendly Sound Four (excluding self), draw X cards
+        const s061Player = pendingEffect.sourcePlayer;
+        const s061FriendlySide = s061Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        let s061Count = 0;
+        for (const mission of newState.activeMissions) {
+          const hasSF = (mission as any)[s061FriendlySide].some((char: CharacterInPlay) => {
+            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
+            if (char.isHidden) return false;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            return topCard.keywords && topCard.keywords.includes('Sound Four');
+          });
+          if (hasSF) s061Count++;
+        }
+
+        if (s061Count === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s061Player,
+            'EFFECT_NO_TARGET', 'Sakon (061): No missions with friendly Sound Four characters (state changed).',
+            'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-061-C' });
+          break;
+        }
+
+        const ps061 = { ...newState[s061Player] };
+        const newDeck061 = [...ps061.deck];
+        const newHand061 = [...ps061.hand];
+        for (let i = 0; i < s061Count; i++) {
+          if (newDeck061.length === 0) break;
+          newHand061.push(newDeck061.shift()!);
+        }
+        const drawn061 = newHand061.length - ps061.hand.length;
+        ps061.deck = newDeck061;
+        ps061.hand = newHand061;
+        newState = { ...newState, [s061Player]: ps061 };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s061Player,
+          'EFFECT_DRAW', `Sakon (061): Drew ${drawn061} card(s).`,
+          'game.log.effect.draw', { card: 'Sakon', id: 'KS-061-C', count: String(drawn061) });
+        break;
+      }
+
+      case 'SAKON062_CONFIRM_AMBUSH': {
+        // Re-find friendly Sound Four targets with copyable effects
+        const s062Player = pendingEffect.sourcePlayer;
+        const s062FriendlySide = s062Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s062Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[s062FriendlySide] as CharacterInPlay[]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+              const hasInstant = topCard.effects?.some((eff: any) => {
+                if (eff.description && eff.description.includes('[⧗]')) return false;
+                if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
+                return true;
+              });
+              if (hasInstant) s062Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (s062Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s062Player,
+            'EFFECT_NO_TARGET', 'Sakon (062): No friendly Sound Four with copyable effect (state changed).',
+            'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-062-UC' });
+          break;
+        }
+
+        if (s062Targets.length === 1) {
+          // Auto-select the single target — feed into existing SAKON062_COPY_EFFECT logic
+          const s062AutoResult = EffectEngine.findCharByInstanceId(newState, s062Targets[0]);
+          if (!s062AutoResult) break;
+          const s062TopCard = s062AutoResult.character.stack.length > 0
+            ? s062AutoResult.character.stack[s062AutoResult.character.stack.length - 1]
+            : s062AutoResult.character.card;
+          const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
+            if (eff.description.includes('[⧗]')) return false;
+            if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+            return true;
+          });
+          if (s062Copyable.length === 0) break;
+          if (s062Copyable.length === 1) {
+            newState = EffectEngine.executeCopiedEffect(newState, pendingEffect, s062TopCard, s062Copyable[0].type as EffectType);
+          } else {
+            const s062ChoiceEffId = generateInstanceId();
+            const s062ChoiceActId = generateInstanceId();
+            const s062Opts = s062Copyable.map((eff: any) => `${eff.type}::${eff.description}`);
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: s062ChoiceEffId, sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: s062Targets[0], cardId: s062TopCard.id }),
+              targetSelectionType: 'COPY_EFFECT_CHOSEN',
+              sourcePlayer: s062Player, requiresTargetSelection: true,
+              validTargets: s062Opts, isOptional: false, isMandatory: true,
+              resolved: false, isUpgrade: false,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: s062ChoiceActId, type: 'CHOOSE_EFFECT' as PendingAction['type'],
+              player: s062Player,
+              description: `Choose which effect of ${s062TopCard.name_fr} to copy.`,
+              descriptionKey: 'game.effect.desc.chooseEffectToCopy',
+              descriptionParams: { target: s062TopCard.name_fr },
+              options: s062Opts, minSelections: 1, maxSelections: 1,
+              sourceEffectId: s062ChoiceEffId,
+            }];
+          }
+          break;
+        }
+
+        // Multiple targets — create mandatory child SAKON062_COPY_EFFECT
+        const s062EffId = generateInstanceId();
+        const s062ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s062EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'SAKON062_COPY_EFFECT',
+          sourcePlayer: s062Player, requiresTargetSelection: true,
+          validTargets: s062Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s062ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: s062Player,
+          description: 'Select a friendly Sound Four character to copy an instant effect from.',
+          descriptionKey: 'game.effect.desc.sakon062CopyEffect',
+          options: s062Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s062EffId,
+        }];
+        break;
+      }
+
+      case 'TAYUYA065_CONFIRM_AMBUSH': {
+        // Re-find friendly Sound Village characters (excluding self)
+        const t065aPlayer = pendingEffect.sourcePlayer;
+        const t065aFriendlySide = t065aPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const t065aTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[t065aFriendlySide] as CharacterInPlay[]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.group === 'Sound Village') t065aTargets.push(char.instanceId);
+          }
+        }
+
+        if (t065aTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t065aPlayer,
+            'EFFECT_NO_TARGET', 'Tayuya (065): No friendly Sound Village character to POWERUP (state changed).',
+            'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' });
+          break;
+        }
+
+        if (t065aTargets.length === 1) {
+          // Auto-apply POWERUP 2
+          const t065aTargetId = t065aTargets[0];
+          newState.activeMissions = newState.activeMissions.map((m) => ({
+            ...m,
+            player1Characters: m.player1Characters.map((c: CharacterInPlay) =>
+              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + 2 } : c),
+            player2Characters: m.player2Characters.map((c: CharacterInPlay) =>
+              c.instanceId === t065aTargetId ? { ...c, powerTokens: c.powerTokens + 2 } : c),
+          }));
+          const t065aChar = EffectEngine.findCharByInstanceId(newState, t065aTargetId);
+          const t065aName = t065aChar ? t065aChar.character.card.name_fr : 'unknown';
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t065aPlayer,
+            'EFFECT_POWERUP', `Tayuya (065): POWERUP 2 on ${t065aName} (ambush).`,
+            'game.log.effect.powerup', { card: 'TAYUYA', id: 'KS-065-UC', amount: '2', target: t065aName });
+          break;
+        }
+
+        // Multiple targets — mandatory child (no SKIP per Andy)
+        const t065aEffId = generateInstanceId();
+        const t065aActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: t065aEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'TAYUYA065_POWERUP_SOUND',
+          sourcePlayer: t065aPlayer, requiresTargetSelection: true,
+          validTargets: t065aTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: t065aActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: t065aPlayer,
+          description: 'Select a friendly Sound Village character in play to give POWERUP 2.',
+          descriptionKey: 'game.effect.desc.tayuya065PowerupSound',
+          options: t065aTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: t065aEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'TAYUYA065_CONFIRM_UPGRADE': {
+        // Re-peek top 3 cards of deck
+        const t065uPlayer = pendingEffect.sourcePlayer;
+        const ps065u = { ...newState[t065uPlayer] };
+        if (ps065u.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t065uPlayer,
+            'EFFECT', 'Tayuya (065): Deck empty (state changed).',
+            'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' });
+          break;
+        }
+
+        const lookCount065 = Math.min(3, ps065u.deck.length);
+        const topCards065 = ps065u.deck.slice(0, lookCount065);
+        const remainingDeck065 = ps065u.deck.slice(lookCount065);
+        const matchIndices065: number[] = [];
+        for (let i = 0; i < topCards065.length; i++) {
+          if (topCards065[i].keywords && topCards065[i].keywords.includes('Summon')) matchIndices065.push(i);
+        }
+        const cardInfos065 = topCards065.map((c: any) => ({
+          name: c.name_fr, name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+          image_file: c.image_file, isSummon: !!(c.keywords && c.keywords.includes('Summon')),
+          isMatch: !!(c.keywords && c.keywords.includes('Summon')),
+        }));
+
+        if (matchIndices065.length === 0) {
+          // No Summon: put back, show info-only reveal
+          ps065u.deck = [...topCards065, ...remainingDeck065];
+          newState = { ...newState, [t065uPlayer]: ps065u };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t065uPlayer,
+            'EFFECT', `Tayuya (065): Looked at top ${lookCount065} of deck, no Summon found (upgrade).`,
+            'game.log.effect.lookAtDeck', { card: 'TAYUYA', id: 'KS-065-UC' });
+
+          const t065rEffId = generateInstanceId();
+          const t065rActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: t065rEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({
+              text: `Tayuya (065): No Summon in top ${lookCount065}. Cards put back.`,
+              topCards: cardInfos065,
+            }),
+            targetSelectionType: 'TAYUYA065_UPGRADE_REVEAL',
+            sourcePlayer: t065uPlayer, requiresTargetSelection: true,
+            validTargets: ['confirm'], isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: t065rActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: t065uPlayer,
+            description: JSON.stringify({
+              text: `Tayuya (065): No Summon in top ${lookCount065}. Cards put back.`,
+              topCards: cardInfos065,
+            }),
+            descriptionKey: 'game.effect.desc.tayuya065UpgradeReveal',
+            options: ['confirm'], minSelections: 1, maxSelections: 1,
+            sourceEffectId: t065rEffId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        // Summon found: create TAYUYA065_UPGRADE_CHOOSE child (SKIP ok per Andy — draw 0 valid)
+        const t065cEffId = generateInstanceId();
+        const t065cActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: t065cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: `Tayuya (065): Found ${matchIndices065.length} Summon card(s) in top ${lookCount065}. Choose which to draw.`,
+            topCards: cardInfos065,
+            topCardsRaw: topCards065,
+            remainingDeck: remainingDeck065,
+          }),
+          targetSelectionType: 'TAYUYA065_UPGRADE_CHOOSE',
+          sourcePlayer: t065uPlayer, requiresTargetSelection: true,
+          validTargets: matchIndices065.map((i: number) => String(i)),
+          isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: t065cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: t065uPlayer,
+          description: JSON.stringify({
+            text: `Tayuya (065): Found ${matchIndices065.length} Summon card(s) in top ${lookCount065}. Choose which to draw.`,
+            topCards: cardInfos065,
+          }),
+          descriptionKey: 'game.effect.desc.tayuya065UpgradeChoose',
+          options: matchIndices065.map((i: number) => String(i)),
+          minSelections: 0, maxSelections: matchIndices065.length,
+          sourceEffectId: t065cEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'DOKI066_CONFIRM_MAIN': {
+        // Re-check friendly Sound Four in source mission, steal 1 chakra
+        const d066Player = pendingEffect.sourcePlayer;
+        const d066Opponent = d066Player === 'player1' ? 'player2' : 'player1';
+        const d066SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!d066SrcChar) break;
+        const d066Mission = newState.activeMissions[d066SrcChar.missionIndex];
+        if (!d066Mission) break;
+        const d066FriendlySide = d066Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const d066HasSF = (d066Mission as any)[d066FriendlySide].some((char: CharacterInPlay) => {
+          if (char.instanceId === pendingEffect.sourceInstanceId) return false;
+          if (char.isHidden) return false;
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          return topCard.keywords && topCard.keywords.includes('Sound Four');
+        });
+
+        if (!d066HasSF) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, d066Player,
+            'EFFECT_NO_TARGET', 'Doki (066): No friendly Sound Four in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'DOKI', id: 'KS-066-UC' });
+          break;
+        }
+
+        const d066Ps = { ...newState[d066Player] };
+        const d066OpPs = { ...newState[d066Opponent] };
+        const d066Amount = Math.min(1, d066OpPs.chakra);
+        d066OpPs.chakra -= d066Amount;
+        d066Ps.chakra += d066Amount;
+        newState = { ...newState, [d066Player]: d066Ps, [d066Opponent]: d066OpPs };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, d066Player,
+          'EFFECT_STEAL_CHAKRA', `Doki (066): Sound Four ally present - stole ${d066Amount} Chakra from opponent.`,
+          'game.log.effect.stealChakra', { card: 'DOKI', id: 'KS-066-UC', amount: String(d066Amount) });
+        break;
+      }
+
+      case 'DOSU068_CONFIRM_MAIN': {
+        // Re-find hidden chars in play, look at one
+        const d068mTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.isHidden) d068mTargets.push(char.instanceId);
+          }
+        }
+
+        if (d068mTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Dosu Kinuta (068): No hidden characters in play (state changed).',
+            'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' });
+          break;
+        }
+
+        if (d068mTargets.length === 1) {
+          // Auto-look
+          newState = EffectEngine.dosuLookAtHidden(newState, pendingEffect, d068mTargets[0]);
+          break;
+        }
+
+        // Multiple — mandatory child
+        const d068mEffId = generateInstanceId();
+        const d068mActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: d068mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: d068mTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: d068mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Dosu Kinuta (068): Select a hidden character in play to look at.',
+          descriptionKey: 'game.effect.desc.dosu068LookAtHidden',
+          options: d068mTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: d068mEffId,
+        }];
+        break;
+      }
+
+      case 'DOSU068_CONFIRM_AMBUSH': {
+        // Re-find hidden chars in play, defeat one
+        const d068aTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.isHidden) d068aTargets.push(char.instanceId);
+          }
+        }
+
+        if (d068aTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Dosu Kinuta (068): No hidden characters in play to defeat (state changed).',
+            'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-068-C' });
+          break;
+        }
+
+        if (d068aTargets.length === 1) {
+          // Auto-defeat
+          newState = EffectEngine.defeatCharacter(newState, d068aTargets[0], pendingEffect.sourcePlayer);
+          break;
+        }
+
+        // Multiple — mandatory child
+        const d068aEffId = generateInstanceId();
+        const d068aActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: d068aEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: d068aTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: d068aActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Dosu Kinuta (068) AMBUSH: Select a hidden character in play to defeat.',
+          descriptionKey: 'game.effect.desc.dosu068Defeat',
+          options: d068aTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: d068aEffId,
+        }];
+        break;
+      }
+
+      case 'DOSU069_CONFIRM_UPGRADE': {
+        // Re-find hidden chars in play, look at one. R4 propagation (Type B, MAIN remaining)
+        const d069uTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.isHidden) d069uTargets.push(char.instanceId);
+          }
+        }
+
+        if (d069uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Dosu Kinuta (069): No hidden characters in play (state changed).',
+            'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-069-UC' });
+          break;
+        }
+
+        if (d069uTargets.length === 1) {
+          // Auto-look
+          newState = EffectEngine.dosuLookAtHidden(newState, pendingEffect, d069uTargets[0]);
+          break;
+        }
+
+        // Multiple — mandatory child with R4 propagation
+        const d069uEffId = generateInstanceId();
+        const d069uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: d069uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'LOOK_AT_HIDDEN_CHARACTER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: d069uTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: d069uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Dosu Kinuta (069) UPGRADE: Select a hidden character in play to look at.',
+          descriptionKey: 'game.effect.desc.dosu069LookAtHidden',
+          options: d069uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: d069uEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'DOSU069_CONFIRM_MAIN': {
+        // Re-find hidden enemy chars, force reveal/defeat
+        const d069mPlayer = pendingEffect.sourcePlayer;
+        const d069mEnemySide = d069mPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const d069mTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[d069mEnemySide] as CharacterInPlay[]) {
+            if (char.isHidden) d069mTargets.push(char.instanceId);
+          }
+        }
+
+        if (d069mTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
+            'EFFECT_NO_TARGET', 'Dosu Kinuta (069): No hidden enemy characters in play (state changed).',
+            'game.log.effect.noTarget', { card: 'DOSU KINUTA', id: 'KS-069-UC' });
+          break;
+        }
+
+        if (d069mTargets.length === 1) {
+          // Auto-select — replicate FORCE_REVEAL_OR_DEFEAT logic
+          const d069mAutoTargetId = d069mTargets[0];
+          const d069mOpponent = d069mPlayer === 'player1' ? 'player2' : 'player1';
+          const d069mCharResult = EffectEngine.findCharByInstanceId(newState, d069mAutoTargetId);
+          if (!d069mCharResult) {
+            newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
+            break;
+          }
+          const d069mTopCard = d069mCharResult.character.stack.length > 0
+            ? d069mCharResult.character.stack[d069mCharResult.character.stack.length - 1]
+            : d069mCharResult.character.card;
+          const d069mRevealCost = (d069mTopCard.chakra ?? 0) + 2;
+          const d069mCanAfford = newState[d069mOpponent].chakra >= d069mRevealCost;
+
+          if (!d069mCanAfford) {
+            newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
+            newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
+              'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${d069mRevealCost}), character defeated.`,
+              'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(d069mRevealCost) });
+            break;
+          }
+
+          // Create DOSU069_OPPONENT_CHOICE pending
+          const d069mOcEffId = generateInstanceId();
+          const d069mOcActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: d069mOcEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: d069mCharResult.missionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ targetInstanceId: d069mAutoTargetId, revealCost: d069mRevealCost, sourcePlayer: d069mPlayer }),
+            targetSelectionType: 'DOSU069_OPPONENT_CHOICE',
+            sourcePlayer: d069mPlayer, requiresTargetSelection: true,
+            validTargets: [d069mAutoTargetId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: false,
+            selectingPlayer: d069mOpponent,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: d069mOcActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: d069mOpponent,
+            originPlayer: d069mPlayer,
+            description: `Dosu Kinuta (069): Your hidden character was targeted. Click to reveal (pay ${d069mRevealCost} chakra) or skip to let it be defeated.`,
+            descriptionKey: 'game.effect.desc.dosu069OpponentChoice',
+            descriptionParams: { cost: String(d069mRevealCost) },
+            options: [d069mAutoTargetId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: d069mOcEffId,
+          }];
+          newState.pendingForcedResolver = d069mOpponent;
+          break;
+        }
+
+        // Multiple — mandatory child FORCE_REVEAL_OR_DEFEAT
+        const d069mEffId = generateInstanceId();
+        const d069mActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: d069mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'FORCE_REVEAL_OR_DEFEAT',
+          sourcePlayer: d069mPlayer, requiresTargetSelection: true,
+          validTargets: d069mTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: d069mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: d069mPlayer,
+          description: 'Dosu Kinuta (069): Choose a hidden enemy character. Opponent must play them paying 2 extra, or defeat them.',
+          descriptionKey: 'game.effect.desc.dosu069ForceRevealOrDefeat',
+          options: d069mTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: d069mEffId,
+        }];
+        break;
+      }
+
+      // =============================================
       // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for target (any side)
       // =============================================
       case 'KIBA113_CHOOSE_AKAMARU':
