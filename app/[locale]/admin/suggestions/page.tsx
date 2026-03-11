@@ -358,7 +358,7 @@ export default function SuggestionsPage() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center gap-3">
-          <Link href="/" className="font-body text-sm" style={{ color: '#888' }}>{tCommon('home') ?? 'Home'}</Link>
+          <Link href="/" className="font-body text-sm" style={{ color: '#888' }}>{tCommon('home')}</Link>
           <span style={{ color: '#333' }}>/</span>
           <h1 className="font-display text-lg tracking-wide" style={{ color: '#c4a35a' }}>{t('title')}</h1>
         </div>

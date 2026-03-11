@@ -25,18 +25,8 @@ export default function AdminSettingsPage() {
   const [leaguesLoading, setLeaguesLoading] = useState(true);
   const [leaguesToggling, setLeaguesToggling] = useState(false);
   const [results, setResults] = useState<ActionResult[]>([]);
-  const [testers, setTesters] = useState<Array<{ id: string; username: string; elo: number }>>([]);
-  const [testerSearch, setTesterSearch] = useState('');
-  const [testerAdding, setTesterAdding] = useState(false);
 
   const isAdmin = session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
-
-  const fetchTesters = () => {
-    fetch('/api/admin/testers')
-      .then((res) => res.json())
-      .then((data) => setTesters(data.testers ?? []))
-      .catch(() => {});
-  };
 
   useEffect(() => {
     if (isAdmin) {
@@ -47,7 +37,6 @@ export default function AdminSettingsPage() {
           setLeaguesLoading(false);
         })
         .catch(() => setLeaguesLoading(false));
-      fetchTesters();
     }
   }, [isAdmin]);
 
@@ -131,46 +120,6 @@ export default function AdminSettingsPage() {
       addResult({ success: false, message: `Discord Roles error: ${err}` });
     } finally {
       setDiscordRolesLoading(false);
-    }
-  };
-
-  const handleAddTester = async () => {
-    if (!testerSearch.trim()) return;
-    setTesterAdding(true);
-    try {
-      const res = await fetch('/api/admin/testers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: testerSearch.trim(), action: 'add' }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        addResult({ success: true, message: t('testers.added') + `: ${testerSearch.trim()}` });
-        setTesterSearch('');
-        fetchTesters();
-      } else {
-        addResult({ success: false, message: data.error === 'User not found' ? t('testers.notFound') : data.error });
-      }
-    } catch (err) {
-      addResult({ success: false, message: `Error: ${err}` });
-    } finally {
-      setTesterAdding(false);
-    }
-  };
-
-  const handleRemoveTester = async (username: string) => {
-    try {
-      const res = await fetch('/api/admin/testers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, action: 'remove' }),
-      });
-      if (res.ok) {
-        addResult({ success: true, message: t('testers.removed') + `: ${username}` });
-        fetchTesters();
-      }
-    } catch (err) {
-      addResult({ success: false, message: `Error: ${err}` });
     }
   };
 
@@ -341,81 +290,6 @@ export default function AdminSettingsPage() {
               {discordSyncLoading ? t('discord.syncing') : t('discord.syncAll')}
             </button>
           </div>
-        </div>
-
-        {/* Testers Management */}
-        <div
-          className="rounded-lg p-6 mb-6"
-          style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-        >
-          <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>
-            {t('testers.title')}
-          </h2>
-          <p className="text-xs mb-4" style={{ color: '#555555' }}>
-            {t('testers.description')}
-          </p>
-
-          {/* Add tester */}
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={testerSearch}
-              onChange={(e) => setTesterSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddTester()}
-              placeholder={t('testers.search')}
-              className="flex-1 px-3 py-2 text-sm rounded"
-              style={{
-                backgroundColor: '#0a0a0a',
-                border: '1px solid #333333',
-                color: '#e0e0e0',
-                outline: 'none',
-              }}
-            />
-            <button
-              onClick={handleAddTester}
-              disabled={testerAdding || !testerSearch.trim()}
-              className="px-4 py-2 text-sm font-bold uppercase tracking-wider rounded cursor-pointer"
-              style={{
-                backgroundColor: '#00CED1',
-                color: '#0a0a0a',
-                border: '1px solid #00CED1',
-                opacity: testerAdding || !testerSearch.trim() ? 0.5 : 1,
-              }}
-            >
-              {t('testers.add')}
-            </button>
-          </div>
-
-          {/* Tester list */}
-          {testers.length === 0 ? (
-            <p className="text-xs" style={{ color: '#555555' }}>{t('testers.noTesters')}</p>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {testers.map((tester) => (
-                <div
-                  key={tester.id}
-                  className="flex items-center justify-between px-3 py-2 rounded"
-                  style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm" style={{ color: '#e0e0e0' }}>{tester.username}</span>
-                    <span className="text-xs" style={{ color: '#555555' }}>ELO {tester.elo}</span>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveTester(tester.username)}
-                    className="text-xs px-2 py-1 rounded cursor-pointer"
-                    style={{
-                      backgroundColor: 'rgba(179, 62, 62, 0.1)',
-                      color: '#b33e3e',
-                      border: '1px solid rgba(179, 62, 62, 0.3)',
-                    }}
-                  >
-                    {t('testers.remove')}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Results Log */}

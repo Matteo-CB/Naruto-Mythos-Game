@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 interface RoleBadgeProps {
-  role: 'admin' | 'tester';
+  role: 'admin';
   size?: 'sm' | 'md';
 }
 
@@ -17,16 +17,6 @@ const BADGE_CONFIG = {
     borderColor: 'rgba(196, 163, 90, 0.4)',
     glowColor: 'rgba(196, 163, 90, 0.3)',
     innerGlow: 'rgba(179, 62, 62, 0.15)',
-  },
-  tester: {
-    symbol: '\u2261',         // ≡ triple bar (testing)
-    secondarySymbol: '\u25C8', // ◈
-    color: '#00CED1',
-    accentColor: '#20B2AA',
-    bgColor: 'rgba(0, 206, 209, 0.06)',
-    borderColor: 'rgba(0, 206, 209, 0.35)',
-    glowColor: 'rgba(0, 206, 209, 0.25)',
-    innerGlow: 'rgba(32, 178, 170, 0.12)',
   },
 } as const;
 
