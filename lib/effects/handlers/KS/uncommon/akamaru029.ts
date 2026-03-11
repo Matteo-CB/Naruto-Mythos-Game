@@ -55,40 +55,15 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-029-UC' }) } };
   }
 
-  // Find the lowest cost
-  let lowestCost = Infinity;
-  for (const char of nonHiddenEnemies) {
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    if (topCard.chakra < lowestCost) {
-      lowestCost = topCard.chakra;
-    }
-  }
-
-  // Find all enemies with that lowest cost
-  const tiedChars = nonHiddenEnemies.filter(c => {
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    return topCard.chakra === lowestCost;
-  });
-
-  // If exactly one: auto-hide (use centralized hide to respect protections)
-  if (tiedChars.length === 1) {
-    const target = tiedChars[0];
-    const hiddenState = EffectEngine.hideCharacterWithLog(state, target.instanceId, sourcePlayer);
-    return { state: hiddenState };
-  }
-
-  // Multiple enemies tied for lowest cost: the player chooses which to hide
-  const validTargets = tiedChars.map(c => c.instanceId);
+  // Confirmation popup before hiding
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'AKAMARU029_CHOOSE_HIDE',
-    validTargets,
-    selectingPlayer: sourcePlayer,
-    description: `Akamaru (029): Choose which enemy character (cost ${lowestCost}) to hide.`,
-    descriptionKey: 'game.effect.desc.akamaru029ChooseHide',
-    descriptionParams: { cost: String(lowestCost) },
-    isMandatory: true,
+    targetSelectionType: 'AKAMARU029_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.akamaru029ConfirmUpgrade',
   };
 }
 

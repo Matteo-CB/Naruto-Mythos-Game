@@ -2422,6 +2422,541 @@ export class EffectEngine {
       }
 
       // =============================================
+      // BATCH 3 CONFIRM CASES (KS-021 to KS-030)
+      // =============================================
+
+      case 'SHIKAMARU021_CONFIRM_MAIN': {
+        // Draw 1 card immediately (edge holder already verified by handler)
+        const ps021 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps021.deck.length > 0) {
+          const deck021 = [...ps021.deck];
+          const drawn021 = deck021.shift()!;
+          ps021.deck = deck021;
+          ps021.hand = [...ps021.hand, drawn021];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps021 };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DRAW', 'Shikamaru Nara (021): Drew 1 card (Edge holder).',
+          'game.log.effect.draw', { card: 'SHIKAMARU NARA', id: 'KS-021-C', count: 1 });
+        break;
+      }
+
+      case 'SHIKAMARU022_CONFIRM_AMBUSH': {
+        // Re-scan log for enemy characters played during opponent's last turn
+        const s022Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const s022EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const s022Turn = newState.turn;
+
+        const PLAY_ACTIONS_022 = new Set([
+          'PLAY_CHARACTER', 'REVEAL_CHARACTER', 'REVEAL_UPGRADE', 'UPGRADE_CHARACTER',
+        ]);
+        const EFFECT_PLAY_ACTIONS_022 = new Set([
+          'EFFECT', 'EFFECT_UPGRADE', 'EFFECT_PLAY',
+        ]);
+
+        const s022PlayedChars: { name: string; mission: number }[] = [];
+        let s022PrimaryIdx = -1;
+        for (let i = newState.log.length - 1; i >= 0; i--) {
+          const entry = newState.log[i];
+          if (entry.turn !== s022Turn || entry.phase !== 'action') continue;
+          if (entry.player !== s022Opponent) continue;
+          if (entry.action === 'PASS' || entry.action === 'PLAY_HIDDEN') break;
+          if (PLAY_ACTIONS_022.has(entry.action)) { s022PrimaryIdx = i; break; }
+        }
+        if (s022PrimaryIdx >= 0) {
+          for (let i = s022PrimaryIdx; i < newState.log.length; i++) {
+            const entry = newState.log[i];
+            if (entry.turn !== s022Turn || entry.phase !== 'action') break;
+            if (entry.player !== s022Opponent) break;
+            const missionNum = entry.messageParams?.mission != null ? Number(entry.messageParams.mission) - 1 : null;
+            if (PLAY_ACTIONS_022.has(entry.action)) {
+              const charName = (entry.messageParams?.card as string) ?? null;
+              if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
+            } else if (EFFECT_PLAY_ACTIONS_022.has(entry.action)) {
+              const charName = (entry.messageParams?.target as string) ?? null;
+              if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
+            }
+          }
+        }
+
+        const s022Targets: string[] = [];
+        for (const played of s022PlayedChars) {
+          const mission = newState.activeMissions[played.mission];
+          if (!mission) continue;
+          for (const char of mission[s022EnemySide]) {
+            if (char.isHidden) continue;
+            if (s022Targets.includes(char.instanceId)) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
+              s022Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (s022Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Shikamaru Nara (022): No valid targets (state changed).',
+            'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' });
+          break;
+        }
+
+        const s022EffId = generateInstanceId();
+        const s022ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s022EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'SHIKAMARU_MOVE_ENEMY',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: s022Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s022ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character to move to another mission.',
+          descriptionKey: 'game.effect.desc.shikamaru022MoveEnemy',
+          options: s022Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s022EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'ASUMA023_CONFIRM_MAIN': {
+        // Re-find Team 10 chars in source mission
+        const a023SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!a023SrcChar) break;
+        const a023MIdx = a023SrcChar.missionIndex;
+        const a023Mission = newState.activeMissions[a023MIdx];
+        if (!a023Mission) break;
+
+        const a023Targets: string[] = [];
+        const a023AllChars = [...a023Mission.player1Characters, ...a023Mission.player2Characters];
+        for (const char of a023AllChars) {
+          if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+          if (char.isHidden) continue;
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.keywords?.includes('Team 10')) {
+            a023Targets.push(char.instanceId);
+          }
+        }
+
+        if (a023Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Asuma Sarutobi (023): No Team 10 character in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-023-C' });
+          break;
+        }
+
+        const a023EffId = generateInstanceId();
+        const a023ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: a023EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: a023MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'ASUMA_CHOOSE_TEAM10',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: a023Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: a023ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Choose a Team 10 character in this mission to move.',
+          descriptionKey: 'game.effect.desc.asuma023MoveTeam10',
+          options: a023Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: a023EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'ASUMA024_CONFIRM_AMBUSH': {
+        // Draw 1 card, then chain to mandatory discard for POWERUP 3
+        const ps024 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps024.deck.length > 0) {
+          const deck024 = [...ps024.deck];
+          const drawn024 = deck024.shift()!;
+          ps024.deck = deck024;
+          ps024.hand = [...ps024.hand, drawn024];
+        }
+        newState = { ...newState, [pendingEffect.sourcePlayer]: ps024 };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DRAW', 'Asuma Sarutobi (024): Drew 1 card (ambush).',
+          'game.log.effect.draw', { card: 'ASUMA SARUTOBI', id: 'KS-024-UC', count: 1 });
+
+        const currentPs024 = newState[pendingEffect.sourcePlayer];
+        if (currentPs024.hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Asuma Sarutobi (024): No cards in hand to discard for POWERUP 3.',
+            'game.log.effect.noTarget', { card: 'ASUMA SARUTOBI', id: 'KS-024-UC' });
+          break;
+        }
+
+        const a024Targets = currentPs024.hand.map((_: any, idx: number) => String(idx));
+        const a024EffId = generateInstanceId();
+        const a024ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: a024EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'ASUMA_024_DISCARD_FOR_POWERUP',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: a024Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: a024ActId, type: 'DISCARD_CARD' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Discard a card from your hand to give Asuma POWERUP 3.',
+          descriptionKey: 'game.effect.desc.asuma024DiscardForPowerup',
+          options: a024Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: a024EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KIBA026_CONFIRM_MAIN': {
+        // Re-find non-hidden enemies with lowest cost in this mission
+        const k026SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!k026SrcChar) break;
+        const k026MIdx = k026SrcChar.missionIndex;
+        const k026Mission = newState.activeMissions[k026MIdx];
+        if (!k026Mission) break;
+        const k026EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k026Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+
+        const k026NonHidden = k026Mission[k026EnemySide].filter((c: CharacterInPlay) => {
+          if (c.isHidden) return false;
+          // Check canBeHiddenByEnemy via centralized utility
+          return canBeHiddenByEnemy(newState, c, k026Opponent);
+        });
+
+        if (k026NonHidden.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kiba Inuzuka (026): No non-hidden enemy to hide (state changed).',
+            'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
+          break;
+        }
+
+        let k026LowestCost = Infinity;
+        for (const char of k026NonHidden) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.chakra < k026LowestCost) k026LowestCost = topCard.chakra;
+        }
+        const k026Tied = k026NonHidden.filter((c: CharacterInPlay) => {
+          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return topCard.chakra === k026LowestCost;
+        });
+
+        if (k026Tied.length === 1) {
+          // Auto-hide
+          newState = EffectEngine.hideCharacterWithLog(newState, k026Tied[0].instanceId, pendingEffect.sourcePlayer);
+          break;
+        }
+
+        // Multiple tied — create mandatory child
+        const k026Targets = k026Tied.map((c: CharacterInPlay) => c.instanceId);
+        const k026EffId = generateInstanceId();
+        const k026ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k026EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: k026MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIBA026_PLAYER_CHOOSE_HIDE',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: k026Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k026ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: `Choose which enemy character (cost ${k026LowestCost}) to hide.`,
+          descriptionKey: 'game.effect.desc.kiba026PlayerChoose',
+          descriptionParams: { cost: String(k026LowestCost) },
+          options: k026Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k026EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KIBA026_CONFIRM_UPGRADE': {
+        // Re-peek top 3 cards of deck
+        const ps026 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps026.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', 'Kiba Inuzuka (026): Deck empty (state changed).',
+            'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
+          break;
+        }
+        const topCards026 = ps026.deck.slice(0, 3);
+        const remainingDeck026 = ps026.deck.slice(3);
+        const matchIndices026: number[] = [];
+        for (let i = 0; i < topCards026.length; i++) {
+          if (topCards026[i].name_fr === 'AKAMARU') matchIndices026.push(i);
+        }
+        const cardInfos026 = topCards026.map((c: any) => ({
+          name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+          image_file: c.image_file, isMatch: c.name_fr === 'AKAMARU',
+        }));
+
+        if (matchIndices026.length === 0) {
+          // No Akamaru: put back, show confirm-only reveal
+          ps026.deck = [...topCards026, ...remainingDeck026];
+          newState = { ...newState, [pendingEffect.sourcePlayer]: ps026 };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', 'Kiba Inuzuka (026): Looked at top 3 of deck, no Akamaru found (upgrade).',
+            'game.log.effect.lookAtDeck', { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
+
+          const k026rEffId = generateInstanceId();
+          const k026rActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: k026rEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({
+              text: `Kiba (026): No Akamaru in top ${topCards026.length}. Cards put back.`,
+              topCards: cardInfos026,
+            }),
+            targetSelectionType: 'KIBA026_UPGRADE_REVEAL',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: ['confirm'], isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: k026rActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: JSON.stringify({
+              text: `Kiba (026): No Akamaru in top ${topCards026.length}. Cards put back.`,
+              topCards: cardInfos026,
+            }),
+            descriptionKey: 'game.effect.desc.kiba026UpgradeReveal',
+            options: ['confirm'], minSelections: 1, maxSelections: 1,
+            sourceEffectId: k026rEffId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        // Akamaru found: create KIBA026_UPGRADE_CHOOSE child (SKIP ok — draw 0 valid)
+        const k026cEffId = generateInstanceId();
+        const k026cActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k026cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: `Kiba (026): Found ${matchIndices026.length} Akamaru card(s) in top ${topCards026.length}. Choose which to draw.`,
+            topCards: cardInfos026,
+            topCardsRaw: topCards026,
+            remainingDeck: remainingDeck026,
+          }),
+          targetSelectionType: 'KIBA026_UPGRADE_CHOOSE',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: matchIndices026.map((i: number) => String(i)),
+          isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k026cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: JSON.stringify({
+            text: `Kiba (026): Found ${matchIndices026.length} Akamaru card(s) in top ${topCards026.length}. Choose which to draw.`,
+            topCards: cardInfos026,
+          }),
+          descriptionKey: 'game.effect.desc.kiba026UpgradeChoose',
+          options: matchIndices026.map((i: number) => String(i)),
+          minSelections: 0, maxSelections: matchIndices026.length,
+          sourceEffectId: k026cEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'AKAMARU028_CONFIRM_AMBUSH': {
+        // Re-find friendly Kiba targets in this mission
+        const a028SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!a028SrcChar) break;
+        const a028MIdx = a028SrcChar.missionIndex;
+        const a028Mission = newState.activeMissions[a028MIdx];
+        if (!a028Mission) break;
+        const a028FriendlySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const a028KibaTargets: string[] = [];
+        for (const char of a028Mission[a028FriendlySide]) {
+          if (char.isHidden) continue;
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.name_fr === 'KIBA INUZUKA') a028KibaTargets.push(char.instanceId);
+        }
+
+        if (a028KibaTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Akamaru (028): No friendly Kiba Inuzuka (state changed).',
+            'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' });
+          break;
+        }
+
+        if (a028KibaTargets.length === 1) {
+          // Auto-apply POWERUP 2
+          newState = EffectEngine.applyPowerupToTarget(newState, a028KibaTargets[0], 2);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_POWERUP', 'Akamaru (028): POWERUP 2 on Kiba Inuzuka (ambush).',
+            'game.log.effect.powerup', { card: 'AKAMARU', id: 'KS-028-UC', amount: 2, target: 'KIBA INUZUKA' });
+          break;
+        }
+
+        // Multiple Kiba — create mandatory child
+        const a028EffId = generateInstanceId();
+        const a028ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: a028EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: a028MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'AKAMARU_028_POWERUP_KIBA',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: a028KibaTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: a028ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a friendly Kiba Inuzuka to give POWERUP 2.',
+          descriptionKey: 'game.effect.desc.akamaru028PowerupKiba',
+          options: a028KibaTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: a028EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'AKAMARU029_CONFIRM_UPGRADE': {
+        // Re-find non-hidden enemies with lowest cost in this mission
+        const a029SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!a029SrcChar) break;
+        const a029MIdx = a029SrcChar.missionIndex;
+        const a029Mission = newState.activeMissions[a029MIdx];
+        if (!a029Mission) break;
+        const a029EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const a029Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+
+        const a029NonHidden = a029Mission[a029EnemySide].filter((c: CharacterInPlay) => {
+          if (c.isHidden) return false;
+          return canBeHiddenByEnemy(newState, c, a029Opponent);
+        });
+
+        if (a029NonHidden.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Akamaru (029): No non-hidden enemy to hide (state changed).',
+            'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-029-UC' });
+          break;
+        }
+
+        let a029LowestCost = Infinity;
+        for (const char of a029NonHidden) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.chakra < a029LowestCost) a029LowestCost = topCard.chakra;
+        }
+        const a029Tied = a029NonHidden.filter((c: CharacterInPlay) => {
+          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return topCard.chakra === a029LowestCost;
+        });
+
+        if (a029Tied.length === 1) {
+          newState = EffectEngine.hideCharacterWithLog(newState, a029Tied[0].instanceId, pendingEffect.sourcePlayer);
+          break;
+        }
+
+        const a029Targets = a029Tied.map((c: CharacterInPlay) => c.instanceId);
+        const a029EffId = generateInstanceId();
+        const a029ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: a029EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: a029MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'AKAMARU029_CHOOSE_HIDE',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: a029Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: a029ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: `Choose which enemy character (cost ${a029LowestCost}) to hide.`,
+          descriptionKey: 'game.effect.desc.akamaru029ChooseHide',
+          descriptionParams: { cost: String(a029LowestCost) },
+          options: a029Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: a029EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'HINATA030_CONFIRM_MAIN': {
+        // Re-find enemies with power tokens across all missions
+        const h030EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const h030Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[h030EnemySide]) {
+            if (char.powerTokens > 0) h030Targets.push(char.instanceId);
+          }
+        }
+
+        if (h030Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Hinata Hyuga (030): No enemy with Power tokens (state changed).',
+            'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-030-C' });
+          break;
+        }
+
+        const h030EffId = generateInstanceId();
+        const h030ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: h030EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'REMOVE_POWER_TOKENS_ENEMY',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: h030Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: h030ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character to remove up to 2 Power tokens from.',
+          descriptionKey: 'game.effect.desc.hinata030RemoveTokens',
+          options: h030Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: h030EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      // =============================================
       // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for target (any side)
       // =============================================
       case 'KIBA113_CHOOSE_AKAMARU':
