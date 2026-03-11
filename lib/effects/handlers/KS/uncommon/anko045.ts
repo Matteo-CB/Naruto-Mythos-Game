@@ -41,25 +41,15 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'ANKO MITARASHI', id: 'KS-045-UC' }) } };
   }
 
-  // Auto-apply if exactly one target
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const missionIdx = targetMissionMap[targetId];
-    let newState = defeatEnemyCharacter(state, missionIdx, targetId, sourcePlayer);
-    newState = { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_DEFEAT',
-      `Anko Mitarashi (045): Defeated a hidden enemy character in mission ${missionIdx + 1} (ambush).`,
-      'game.log.effect.defeat', { card: 'ANKO MITARASHI', id: 'KS-045-UC', target: '' }) };
-    return { state: newState };
-  }
-
-  // Multiple targets: require target selection
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ANKO_DEFEAT_HIDDEN_ENEMY',
-    validTargets,
-    description: 'Select a hidden enemy character in play to defeat.',
-    descriptionKey: 'game.effect.desc.anko045DefeatHidden',
+    targetSelectionType: 'ANKO045_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.anko045ConfirmAmbush',
   };
 }
 
