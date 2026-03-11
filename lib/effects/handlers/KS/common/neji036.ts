@@ -36,13 +36,15 @@ function handleNeji036Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-036-C' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'REMOVE_POWER_TOKENS_ENEMY',
-    validTargets,
-    description: 'Select an enemy character to remove up to 2 Power tokens from.',
-    descriptionKey: 'game.effect.desc.neji036RemoveTokens',
+    targetSelectionType: 'NEJI036_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.neji036ConfirmMain',
   };
 }
 

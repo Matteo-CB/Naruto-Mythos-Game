@@ -2957,6 +2957,312 @@ export class EffectEngine {
       }
 
       // =============================================
+      // BATCH 4 CONFIRM CASES (KS-032 to KS-039)
+      // =============================================
+      case 'SHINO032_CONFIRM_MAIN': {
+        // Both players draw 1 card
+        const s032Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const ps032 = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps032.deck.length > 0) {
+          const deck032 = [...ps032.deck];
+          const drawn032 = deck032.shift()!;
+          ps032.deck = deck032;
+          ps032.hand = [...ps032.hand, drawn032];
+        }
+        newState[pendingEffect.sourcePlayer] = ps032;
+
+        const ops032 = { ...newState[s032Opponent] };
+        if (ops032.deck.length > 0) {
+          const deck032o = [...ops032.deck];
+          const drawn032o = deck032o.shift()!;
+          ops032.deck = deck032o;
+          ops032.hand = [...ops032.hand, drawn032o];
+        }
+        newState[s032Opponent] = ops032;
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DRAW', 'Shino Aburame (032): Each player draws a card.',
+          'game.log.effect.bothDraw', { card: 'SHINO ABURAME', id: 'KS-032-C', count: 1 });
+        break;
+      }
+
+      case 'SHINO033_CONFIRM_UPGRADE': {
+        // Re-find valid destination missions (not current, no same-name, R8 Kurenai)
+        const s033SrcMI = pendingEffect.sourceMissionIndex;
+        const s033Player = pendingEffect.sourcePlayer;
+        const s033FriendlySide = s033Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        // Find the source character to get its name
+        let s033CharName = '';
+        const s033SrcMission = newState.activeMissions[s033SrcMI];
+        if (s033SrcMission) {
+          for (const c of s033SrcMission[s033FriendlySide]) {
+            if (c.instanceId === pendingEffect.sourceInstanceId) {
+              const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              s033CharName = top.name_fr;
+              break;
+            }
+          }
+        }
+
+        const s033Targets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === s033SrcMI) continue;
+          const mission = newState.activeMissions[i];
+          const friendlyChars = mission[s033FriendlySide];
+          const hasSameName = friendlyChars.some((c: CharacterInPlay) => {
+            if (c.instanceId === pendingEffect.sourceInstanceId) return false;
+            if (c.isHidden) return false;
+            const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return top.name_fr === s033CharName;
+          });
+          if (!hasSameName) s033Targets.push(String(i));
+        }
+
+        if (s033Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s033Player,
+            'EFFECT_NO_TARGET', 'Shino Aburame (033): No valid mission to move to (state changed).',
+            'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' });
+          break;
+        }
+
+        const s033EffId = generateInstanceId();
+        const s033ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s033EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'SHINO_MOVE_SELF',
+          sourcePlayer: s033Player, requiresTargetSelection: true,
+          validTargets: s033Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s033ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: s033Player,
+          description: 'Select a mission to move Shino Aburame to.',
+          descriptionKey: 'game.effect.desc.shino033MoveSelf',
+          options: s033Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s033EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KURENAI035_CONFIRM_UPGRADE': {
+        // Re-find enemy characters with effective power <= 1 in this mission
+        const k035Player = pendingEffect.sourcePlayer;
+        const k035Opponent = k035Player === 'player1' ? 'player2' : 'player1';
+        const k035EnemySide = k035Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        const k035Mission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+        const k035Targets: string[] = [];
+
+        if (k035Mission) {
+          for (const char of k035Mission[k035EnemySide]) {
+            if (getEffectivePower(newState, char, k035Opponent as PlayerID) <= 1) {
+              k035Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (k035Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k035Player,
+            'EFFECT_NO_TARGET', 'Yuhi Kurenai (035): No enemy with Power 1 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'YUHI KURENAI', id: 'KS-035-UC' });
+          break;
+        }
+
+        if (k035Targets.length === 1) {
+          // Auto-defeat single target
+          newState = EffectEngine.defeatCharacter(newState, k035Targets[0], k035Player);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k035Player,
+            'EFFECT_DEFEAT', 'Yuhi Kurenai (035): Defeated enemy character with Power 1 or less (upgrade).',
+            'game.log.effect.defeat', { card: 'YUHI KURENAI', id: 'KS-035-UC' });
+          break;
+        }
+
+        // Multiple targets — mandatory child
+        const k035EffId = generateInstanceId();
+        const k035ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k035EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KURENAI_DEFEAT_LOW_POWER',
+          sourcePlayer: k035Player, requiresTargetSelection: true,
+          validTargets: k035Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k035ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: k035Player,
+          description: 'Select an enemy character with Power 1 or less to defeat.',
+          descriptionKey: 'game.effect.desc.kurenai035DefeatLowPower',
+          options: k035Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k035EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'NEJI036_CONFIRM_MAIN': {
+        // Re-find enemies with power tokens across all missions (same as HINATA030)
+        const n036EnemySide: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const n036Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[n036EnemySide]) {
+            if (char.powerTokens > 0) n036Targets.push(char.instanceId);
+          }
+        }
+
+        if (n036Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Neji Hyuga (036): No enemy with Power tokens (state changed).',
+            'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-036-C' });
+          break;
+        }
+
+        const n036EffId = generateInstanceId();
+        const n036ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: n036EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'REMOVE_POWER_TOKENS_ENEMY',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: n036Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: n036ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character to remove up to 2 Power tokens from.',
+          descriptionKey: 'game.effect.desc.neji036RemoveTokens',
+          options: n036Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: n036EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'NEJI037_CONFIRM_UPGRADE': {
+        // Re-find non-hidden enemies with power tokens in this mission
+        const n037Player = pendingEffect.sourcePlayer;
+        const n037Opponent = n037Player === 'player1' ? 'player2' : 'player1';
+        const n037EnemySide = n037Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        const n037Mission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+        const n037Targets: string[] = [];
+
+        if (n037Mission) {
+          for (const char of n037Mission[n037EnemySide]) {
+            if (!char.isHidden && char.powerTokens > 0) {
+              n037Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (n037Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, n037Player,
+            'EFFECT_NO_TARGET', 'Neji Hyuga (037): No enemy with Power tokens in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-037-UC' });
+          break;
+        }
+
+        if (n037Targets.length === 1) {
+          // Auto-remove all tokens from single target
+          const n037Res = EffectEngine.findCharByInstanceId(newState, n037Targets[0]);
+          if (n037Res) {
+            const missions_n037 = [...newState.activeMissions];
+            const m_n037 = { ...missions_n037[n037Res.missionIndex] };
+            const side_n037 = n037Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
+            m_n037[side_n037] = m_n037[side_n037].map((c: CharacterInPlay) =>
+              c.instanceId === n037Targets[0] ? { ...c, powerTokens: 0 } : c
+            );
+            missions_n037[n037Res.missionIndex] = m_n037;
+            newState = { ...newState, activeMissions: missions_n037 };
+            newState.log = logAction(newState.log, newState.turn, newState.phase, n037Player,
+              'EFFECT_REMOVE_TOKENS', `Neji Hyuga (037): Removed all Power tokens from ${n037Res.character.card.name_fr} (upgrade).`,
+              'game.log.effect.removeTokens', { card: 'NEJI HYUGA', id: 'KS-037-UC', amount: n037Res.character.powerTokens, target: n037Res.character.card.name_fr });
+          }
+          break;
+        }
+
+        // Multiple targets — mandatory child
+        const n037EffId = generateInstanceId();
+        const n037ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: n037EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'NEJI037_REMOVE_ALL_TOKENS',
+          sourcePlayer: n037Player, requiresTargetSelection: true,
+          validTargets: n037Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: n037ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: n037Player,
+          description: 'Select an enemy character to remove all Power tokens from.',
+          descriptionKey: 'game.effect.desc.neji037RemoveTokens',
+          options: n037Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: n037EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'ROCKLEE038_CONFIRM_AMBUSH': {
+        // POWERUP 1 on self
+        const rl038Player = pendingEffect.sourcePlayer;
+        const rl038Side = rl038Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const rl038MI = pendingEffect.sourceMissionIndex;
+        const missions_rl038 = [...newState.activeMissions];
+        const m_rl038 = { ...missions_rl038[rl038MI] };
+        const chars_rl038 = [...m_rl038[rl038Side]];
+        const idx_rl038 = chars_rl038.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_rl038 !== -1) {
+          chars_rl038[idx_rl038] = { ...chars_rl038[idx_rl038], powerTokens: chars_rl038[idx_rl038].powerTokens + 1 };
+          m_rl038[rl038Side] = chars_rl038;
+          missions_rl038[rl038MI] = m_rl038;
+          newState = { ...newState, activeMissions: missions_rl038 };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, rl038Player,
+          'EFFECT_POWERUP', 'Rock Lee (038): POWERUP 1 on self (ambush).',
+          'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: 'KS-038-C', amount: 1 });
+        break;
+      }
+
+      case 'ROCKLEE039_CONFIRM_UPGRADE': {
+        // POWERUP 2 on self
+        const rl039Player = pendingEffect.sourcePlayer;
+        const rl039Side = rl039Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const rl039MI = pendingEffect.sourceMissionIndex;
+        const missions_rl039 = [...newState.activeMissions];
+        const m_rl039 = { ...missions_rl039[rl039MI] };
+        const chars_rl039 = [...m_rl039[rl039Side]];
+        const idx_rl039 = chars_rl039.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_rl039 !== -1) {
+          chars_rl039[idx_rl039] = { ...chars_rl039[idx_rl039], powerTokens: chars_rl039[idx_rl039].powerTokens + 2 };
+          m_rl039[rl039Side] = chars_rl039;
+          missions_rl039[rl039MI] = m_rl039;
+          newState = { ...newState, activeMissions: missions_rl039 };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, rl039Player,
+          'EFFECT_POWERUP', 'Rock Lee (039): POWERUP 2 on self (upgrade).',
+          'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: 'KS-039-UC', amount: 2 });
+        break;
+      }
+
+      // =============================================
       // KIBA113: Player chose which Akamaru to hide/defeat, then prompt for target (any side)
       // =============================================
       case 'KIBA113_CHOOSE_AKAMARU':

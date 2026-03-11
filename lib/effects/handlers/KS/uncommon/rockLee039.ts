@@ -34,37 +34,18 @@ function rockLeeMainHandler(ctx: EffectContext): EffectResult {
 }
 
 function rockLeeUpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE: POWERUP 2 - add 2 power tokens to self
-  const state = { ...ctx.state };
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[ctx.sourceMissionIndex] };
+  const { state, sourceCard } = ctx;
 
-  const side = ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const chars = [...mission[side]];
-  const charIndex = chars.findIndex((c) => c.instanceId === ctx.sourceCard.instanceId);
-
-  if (charIndex !== -1) {
-    chars[charIndex] = {
-      ...chars[charIndex],
-      powerTokens: chars[charIndex].powerTokens + 2,
-    };
-    mission[side] = chars;
-    missions[ctx.sourceMissionIndex] = mission;
-
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_POWERUP',
-      'Rock Lee: POWERUP 2 (upgrade effect). Power tokens added: 2.',
-      'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: 'KS-039-UC', amount: 2 },
-    );
-
-    return { state: { ...state, activeMissions: missions, log } };
-  }
-
-  return { state };
+  // Confirmation popup before POWERUP
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'ROCKLEE039_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.rockLee039ConfirmUpgrade',
+  };
 }
 
 export function registerRockLee039Handlers(): void {

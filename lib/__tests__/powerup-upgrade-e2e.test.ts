@@ -306,7 +306,7 @@ describe('UPGRADE end-to-end', () => {
     expect(m0Enemies.find(c => c.instanceId === 'weak1')).toBeDefined();
   });
 
-  it('Rock Lee 039 UPGRADE should POWERUP 2', () => {
+  it('Rock Lee 039 UPGRADE should return CONFIRM popup then POWERUP 2', () => {
     const rockLee = findCard('KS-039-UC')!;
     expect(rockLee).toBeDefined();
 
@@ -345,7 +345,21 @@ describe('UPGRADE end-to-end', () => {
       targetInstanceId: 'lee-in-play',
     });
 
-    const upgraded = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'lee-in-play');
+    // After upgrade, should have a pending CONFIRM popup for UPGRADE effect
+    expect(newState.pendingEffects.length).toBeGreaterThan(0);
+    const confirmPending = newState.pendingEffects.find(p => p.targetSelectionType === 'ROCKLEE039_CONFIRM_UPGRADE');
+    expect(confirmPending).toBeDefined();
+    const confirmAction = newState.pendingActions.find(a => a.sourceEffectId === confirmPending!.id);
+    expect(confirmAction).toBeDefined();
+
+    // Confirm the popup to apply POWERUP 2
+    const confirmedState = GameEngine.applyAction(newState, 'player1', {
+      type: 'SELECT_TARGET',
+      pendingActionId: confirmAction!.id,
+      selectedTargets: ['lee-in-play'],
+    });
+
+    const upgraded = confirmedState.activeMissions[0].player1Characters.find(c => c.instanceId === 'lee-in-play');
     expect(upgraded).toBeDefined();
     // Should have 1 (existing) + 2 (UPGRADE POWERUP) = 3 tokens
     expect(upgraded!.powerTokens).toBe(3);

@@ -33,7 +33,7 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
 // 039/130 - ROCK LEE (UC): Continuous token retention + UPGRADE POWERUP 2
 // ===================================================================
 describe('039/130 - Rock Lee', () => {
-  it('should POWERUP 2 on UPGRADE', () => {
+  it('should POWERUP 2 on UPGRADE (returns CONFIRM popup)', () => {
     const lee = mockCharInPlay({ instanceId: 'lee-1', powerTokens: 1 }, {
       id: 'KS-039-UC', number: 39, name_fr: 'Rock Lee', keywords: ['Team Guy'], group: 'Leaf Village',
       effects: [
@@ -48,8 +48,10 @@ describe('039/130 - Rock Lee', () => {
     const handler = getEffectHandler('KS-039-UC', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', lee, 0, 'UPGRADE', true));
-    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'lee-1');
-    expect(updated?.powerTokens).toBe(3); // 1 existing + 2 upgrade
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('ROCKLEE039_CONFIRM_UPGRADE');
+    expect(result.validTargets).toEqual(['lee-1']);
+    expect(result.isOptional).toBe(true);
   });
 
   it('MAIN handler should be a no-op (continuous logged)', () => {
