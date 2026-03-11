@@ -27,7 +27,7 @@ interface MissionResult {
   rank: string;
   basePoints: number;
   rankBonus: number;
-  wonBy: 'player1' | 'player2' | null;
+  wonBy: 'player1' | 'player2' | 'draw' | null;
 }
 
 interface GameData {

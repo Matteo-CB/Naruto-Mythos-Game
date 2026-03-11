@@ -362,11 +362,13 @@ function ReplayMissionLane({
     (sum, c) => sum + calculateCharacterPower(state, c, c.controlledBy), 0
   );
 
-  const wonBorderColor = mission.wonBy === 'player1'
-    ? 'rgba(196, 163, 90, 0.5)'
-    : mission.wonBy === 'player2'
-      ? 'rgba(179, 62, 62, 0.5)'
-      : 'rgba(255, 255, 255, 0.08)';
+  const wonBorderColor = mission.wonBy === 'draw'
+    ? 'rgba(136, 136, 136, 0.4)'
+    : mission.wonBy === 'player1'
+      ? 'rgba(196, 163, 90, 0.5)'
+      : mission.wonBy === 'player2'
+        ? 'rgba(179, 62, 62, 0.5)'
+        : 'rgba(255, 255, 255, 0.08)';
 
   return (
     <div
@@ -439,11 +441,11 @@ function ReplayMissionLane({
               <span
                 className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"
                 style={{
-                  backgroundColor: mission.wonBy === 'player1' ? 'rgba(196,163,90,0.2)' : 'rgba(179,62,62,0.2)',
-                  color: mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e',
+                  backgroundColor: mission.wonBy === 'draw' ? 'rgba(136,136,136,0.2)' : mission.wonBy === 'player1' ? 'rgba(196,163,90,0.2)' : 'rgba(179,62,62,0.2)',
+                  color: mission.wonBy === 'draw' ? '#888' : mission.wonBy === 'player1' ? '#c4a35a' : '#b33e3e',
                 }}
               >
-                {mission.wonBy === 'player1' ? 'P1' : 'P2'}
+                {mission.wonBy === 'draw' ? '=' : mission.wonBy === 'player1' ? 'P1' : 'P2'}
               </span>
             )}
           </div>

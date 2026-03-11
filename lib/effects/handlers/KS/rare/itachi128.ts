@@ -56,16 +56,15 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
+  // CONFIRM popup before executing
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ITACHI128_MOVE_TO_THIS_MISSION',
-    validTargets,
-    description: JSON.stringify({
-      destMissionIndex: sourceMissionIndex,
-      text: `Itachi Uchiwa (128) UPGRADE: Choose a friendly character to move to Itachi's mission.`,
-    }),
-    descriptionKey: 'game.effect.desc.itachi128MoveFriendly',
+    targetSelectionType: 'ITACHI128_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    description: JSON.stringify({ destMissionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.itachi128ConfirmUpgrade',
+    isOptional: true,
   };
 }
 

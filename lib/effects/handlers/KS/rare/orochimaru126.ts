@@ -56,71 +56,30 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find the lowest power value
-  const minPower = Math.min(...candidates.map((c) => c.power));
-  const weakest = candidates.filter((c) => c.power === minPower);
-
-  // If only one weakest, auto-resolve
-  if (weakest.length === 1) {
-    const target = weakest[0];
-    let newState = defeatEnemyCharacter(state, target.missionIndex, target.char.instanceId, sourcePlayer);
-    newState = {
-      ...newState,
-      log: logAction(
-        newState.log, newState.turn, newState.phase, sourcePlayer,
-        'EFFECT_DEFEAT',
-        `Orochimaru (126) SCORE: Defeated weakest enemy ${target.char.card.name_fr} (Power ${target.power}).`,
-        'game.log.effect.defeat',
-        { card: 'OROCHIMARU', id: 'KS-126-R', target: target.char.card.name_fr },
-      ),
-    };
-    return { state: newState };
-  }
-
-  // Multiple tied weakest: requires target selection
+  // CONFIRM popup before executing
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'OROCHIMARU126_DEFEAT_WEAKEST',
-    validTargets: weakest.map((w) => w.char.instanceId),
-    description: `Orochimaru (126) SCORE: Multiple enemies tied for weakest (Power ${minPower}). Choose which to defeat.`,
-    descriptionKey: 'game.effect.desc.orochimaru126DefeatWeakest',
-    descriptionParams: { power: minPower },
+    targetSelectionType: 'OROCHIMARU126_CONFIRM_SCORE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: 'Orochimaru (126) SCORE: Defeat the weakest enemy character in play.',
+    descriptionKey: 'game.effect.desc.orochimaru126ConfirmScore',
+    isOptional: true,
   };
 }
 
 function orochimaru126UpgradeHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const { state, sourceCard } = ctx;
 
-  // POWERUP 3 on self
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[sourceMissionIndex] };
-  const chars = [...mission[friendlySide]];
-  const selfIdx = chars.findIndex((c) => c.instanceId === sourceCard.instanceId);
-
-  if (selfIdx === -1) return { state };
-
-  chars[selfIdx] = {
-    ...chars[selfIdx],
-    powerTokens: chars[selfIdx].powerTokens + 3,
-  };
-  mission[friendlySide] = chars;
-  missions[sourceMissionIndex] = mission;
-
+  // CONFIRM popup before applying POWERUP 3
   return {
-    state: {
-      ...state,
-      activeMissions: missions,
-      log: logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_POWERUP',
-        'Orochimaru (126) UPGRADE: POWERUP 3 on self.',
-        'game.log.effect.powerupSelf',
-        { card: 'OROCHIMARU', id: 'KS-126-R', amount: 3 },
-      ),
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'OROCHIMARU126_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    description: 'Orochimaru (126) UPGRADE: POWERUP 3 (self).',
+    descriptionKey: 'game.effect.desc.orochimaru126ConfirmUpgrade',
+    isOptional: true,
   };
 }
 

@@ -73,29 +73,14 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If only 1 card in hand, auto-discard and go straight to defeat target selection
-  if (playerState.hand.length === 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'KIMIMARO123_AUTO_DISCARD_DEFEAT',
-      validTargets: defeatTargets,
-      description: 'Kimimaro (123) UPGRADE: Your last card will be discarded. Choose a character with cost 5 or less to defeat.',
-      descriptionKey: 'game.effect.desc.kimimaro123AutoDiscardDefeat',
-      isOptional: true,
-    };
-  }
-
-  // Stage 1: Choose which card to discard from hand (2+ cards)
-  const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
-
+  // CONFIRM popup before executing the effect
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIMIMARO123_CHOOSE_DISCARD',
-    validTargets: handIndices,
-    description: 'Kimimaro (123) UPGRADE: Choose a card to discard. Then choose a character with cost 5 or less to defeat.',
-    descriptionKey: 'game.effect.desc.kimimaro123Discard',
+    targetSelectionType: 'KIMIMARO123_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    description: 'Kimimaro (123) UPGRADE: Discard a card to defeat a character with cost 5 or less.',
+    descriptionKey: 'game.effect.desc.kimimaro123ConfirmUpgrade',
     isOptional: true,
   };
 }

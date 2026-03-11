@@ -107,11 +107,11 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   );
 
   // Determine winner - a player must have at least 1 power to win
-  let winner: PlayerID | null = null;
+  let winner: PlayerID | 'draw' | null = null;
 
   if (p1Power === 0 && p2Power === 0) {
-    // Both have 0 power - neither wins
-    winner = null;
+    // Both have 0 power - neither wins (draw)
+    winner = 'draw';
     log = logSystem(log, state.turn, 'mission', 'NO_WINNER',
       `Mission ${missionIndex + 1}: Both players have 0 power - no winner.`,
       'game.log.noWinner',
@@ -137,7 +137,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
 
   let newState = { ...state, activeMissions: missions, log };
 
-  if (winner) {
+  if (winner && winner !== 'draw') {
     const points = mission.basePoints + mission.rankBonus;
     const ps = { ...newState[winner] };
     ps.missionPoints += points;
@@ -526,14 +526,14 @@ function resolveRemainingScoreEffects(
 /**
  * Orochimaru 051 (UC): [⧗] If you lost this mission during Mission Evaluation, move to another mission.
  */
-function handleOrochimaru051Move(state: GameState, missionIndex: number, winner: PlayerID | null): GameState {
+function handleOrochimaru051Move(state: GameState, missionIndex: number, winner: PlayerID | 'draw' | null): GameState {
   let newState = state;
   const mission = newState.activeMissions[missionIndex];
 
   for (const side of ['player1Characters', 'player2Characters'] as const) {
     const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
-    // Only trigger for the losing player
-    if (winner === player || winner === null) continue;
+    // Only trigger for the losing player (draw = no loser)
+    if (winner === player || winner === null || winner === 'draw') continue;
 
     const chars = mission[side];
     for (const char of chars) {

@@ -211,6 +211,7 @@ function processNextMove(
         isOptional: true,
         description: JSON.stringify({ movedCount, sasukeInstanceId, sourceMissionIndex }),
         descriptionKey: 'game.effect.desc.sasuke107ConfirmUpgrade',
+        descriptionParams: { count: String(movedCount) },
       };
     }
     return { state };

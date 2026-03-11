@@ -423,10 +423,10 @@ function MissionCardDisplay({
             className="text-sm font-bold px-3 py-1 rounded"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
-              color: mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
+              color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
             }}
           >
-            {mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
+            {mission.wonBy === 'draw' ? t('game.board.draw') : mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
           </span>
         </motion.div>
       )}
