@@ -164,6 +164,8 @@ export interface GameState {
    *  this records which player should receive the turn once all pendings clear.
    *  Cleared by GameEngine when the turn switch fires. */
   pendingForcedResolver?: PlayerID;
+  /** Instance ID of the character played by Hiruzen 002 MAIN effect, for UPGRADE to apply POWERUP 2 */
+  _hiruzen002PlayedCharId?: string;
 }
 
 export interface GameLogEntry {

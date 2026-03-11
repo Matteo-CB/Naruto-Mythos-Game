@@ -1556,7 +1556,7 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'POWERUP_2_LEAF_VILLAGE',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: h001Targets, isOptional: true, isMandatory: false,
+          validTargets: h001Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -1571,43 +1571,39 @@ export class EffectEngine {
       }
 
       case 'HIRUZEN002_CONFIRM_MAIN': {
-        let h002Data: { isUpgrade?: string } | null = null;
-        try { h002Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const h002IsUpgrade = h002Data?.isUpgrade === 'true';
-
-        if (h002IsUpgrade) {
-          // Queue UPGRADE confirmation popup
-          const h002uEffId = generateInstanceId();
-          const h002uActId = generateInstanceId();
-          newState.pendingEffects = [...newState.pendingEffects, {
-            id: h002uEffId, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex,
-            effectType: pendingEffect.effectType,
-            effectDescription: pendingEffect.effectDescription,
-            targetSelectionType: 'HIRUZEN002_CONFIRM_UPGRADE',
-            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-            validTargets: pendingEffect.validTargets, isOptional: true, isMandatory: false,
-            resolved: false, isUpgrade: true,
-          }];
-          newState.pendingActions = [...newState.pendingActions, {
-            id: h002uActId, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: pendingEffect.sourcePlayer,
-            description: 'Hiruzen (002) UPGRADE: Also POWERUP 2 the played character?',
-            descriptionKey: 'game.effect.desc.hiruzen002ConfirmUpgrade',
-            options: pendingEffect.validTargets, minSelections: 1, maxSelections: 1,
-            sourceEffectId: h002uEffId,
-          }];
-        } else {
-          // Queue HIRUZEN002_CHOOSE_CARD directly
-          newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, false);
-        }
+        // Always queue card choice — UPGRADE handled via remainingEffectTypes after MAIN completes
+        newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, pendingEffect.isUpgrade);
+        pendingEffect.remainingEffectTypes = undefined; // propagated into queueHiruzen002Choose
         break;
       }
 
       case 'HIRUZEN002_CONFIRM_UPGRADE': {
-        // Player confirmed UPGRADE — queue HIRUZEN002_CHOOSE_CARD with isUpgrade
-        newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, true);
+        // Player confirmed UPGRADE — apply POWERUP 2 to the character played by MAIN
+        let h002UpgMeta: { playedCharId?: string } = {};
+        try { h002UpgMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const h002PlayedId = h002UpgMeta.playedCharId;
+        if (!h002PlayedId) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Hiruzen Sarutobi (002): No character to POWERUP 2 (UPGRADE).',
+            'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC' });
+          break;
+        }
+        const h002Res = EffectEngine.findCharByInstanceId(newState, h002PlayedId);
+        if (h002Res) {
+          const missions_h002u = [...newState.activeMissions];
+          const m_h002u = { ...missions_h002u[h002Res.missionIndex] };
+          const side_h002u = h002Res.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          m_h002u[side_h002u] = m_h002u[side_h002u].map((c: CharacterInPlay) =>
+            c.instanceId === h002PlayedId ? { ...c, powerTokens: c.powerTokens + 2 } : c
+          );
+          missions_h002u[h002Res.missionIndex] = m_h002u;
+          newState = { ...newState, activeMissions: missions_h002u };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT', 'Hiruzen Sarutobi (002): POWERUP 2 applied to the played character (UPGRADE effect).',
+            'game.log.effect.powerup', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', amount: '2' });
+        }
+        // Clean up metadata
+        delete (newState as any)._hiruzen002PlayedCharId;
         break;
       }
 
@@ -1634,11 +1630,11 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'RECOVER_FROM_DISCARD',
           sourcePlayer: t004Player, requiresTargetSelection: true,
-          validTargets: t004Targets, isOptional: true, isMandatory: false,
+          validTargets: t004Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
         }];
         newState.pendingActions = [...newState.pendingActions, {
-          id: t004ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          id: t004ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
           player: t004Player,
           description: 'Choose a character from your discard pile to put into your hand.',
           descriptionKey: 'game.effect.desc.tsunade004RecoverFromDiscard',
@@ -1675,8 +1671,9 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'MOVE_ENEMY_POWER_3_OR_LESS',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: s006Targets, isOptional: true, isMandatory: false,
+          validTargets: s006Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
           id: s006ActId, type: 'SELECT_TARGET' as PendingAction['type'],
@@ -1686,6 +1683,7 @@ export class EffectEngine {
           options: s006Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: s006EffId,
         }];
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -1725,11 +1723,11 @@ export class EffectEngine {
           effectDescription: JSON.stringify({ hiddenChars: j007Hidden, costReduction: 1 }),
           targetSelectionType: 'JIRAIYA_CHOOSE_SUMMON',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: j007Targets, isOptional: true, isMandatory: false,
+          validTargets: j007Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         }];
         newState.pendingActions = [...newState.pendingActions, {
-          id: j007ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          id: j007ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
           description: JSON.stringify({
             text: 'Jiraiya (007): Choose a Summon character to play (paying 1 less).',
@@ -1766,11 +1764,12 @@ export class EffectEngine {
           effectDescription: JSON.stringify({ hiddenChars: j008Hidden, costReduction: 2 }),
           targetSelectionType: 'JIRAIYA008_CHOOSE_SUMMON',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: j008Targets, isOptional: true, isMandatory: false,
+          validTargets: j008Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
-          id: j008ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          id: j008ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
           description: JSON.stringify({
             text: 'Jiraiya (008): Choose a Summon character to play (paying 2 less).',
@@ -1780,6 +1779,7 @@ export class EffectEngine {
           options: j008Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: j008EffId,
         }];
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -1813,8 +1813,9 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'JIRAIYA_HIDE_ENEMY_COST_3',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: j008uTargets, isOptional: true, isMandatory: false,
+          validTargets: j008uTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
           id: j008uActId, type: 'SELECT_TARGET' as PendingAction['type'],
@@ -1824,6 +1825,7 @@ export class EffectEngine {
           options: j008uTargets, minSelections: 1, maxSelections: 1,
           sourceEffectId: j008uEffId,
         }];
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -1874,7 +1876,7 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'NARUTO_MOVE_SELF',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: n010Targets, isOptional: true, isMandatory: false,
+          validTargets: n010Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -2634,10 +2636,11 @@ export class EffectEngine {
               sourcePlayer: pendingEffect.sourcePlayer,
               requiresTargetSelection: true,
               validTargets: validMissions_sh,
-              isOptional: true,
-              isMandatory: false,
+              isOptional: false,
+              isMandatory: true,
               resolved: false,
               isUpgrade: false,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
             });
             newState.pendingActions.push({
               id: actionId_sh,
@@ -2650,6 +2653,7 @@ export class EffectEngine {
               maxSelections: 1,
               sourceEffectId: effectId_sh,
             });
+            pendingEffect.remainingEffectTypes = undefined;
           }
         }
         break;
@@ -3357,11 +3361,10 @@ export class EffectEngine {
 
       // --- Hiruzen 002: Player chose fresh play or upgrade target for the Leaf char ---
       case 'HIRUZEN002_UPGRADE_OR_FRESH': {
-        let meta_h002: { cardIndex?: number; missionIndex?: number; isHiruzenUpgrade?: boolean } = {};
+        let meta_h002: { cardIndex?: number; missionIndex?: number } = {};
         try { meta_h002 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const mi_h002 = meta_h002.missionIndex ?? pendingEffect.sourceMissionIndex;
         const ci_h002 = meta_h002.cardIndex ?? 0;
-        const isHiruzenUpg = meta_h002.isHiruzenUpgrade ?? false;
         const player_h002 = pendingEffect.sourcePlayer;
         const ps_h002 = newState[player_h002];
         if (ci_h002 < 0 || ci_h002 >= ps_h002.hand.length) break;
@@ -3381,7 +3384,7 @@ export class EffectEngine {
 
           const charInPlay_h002: CharacterInPlay = {
             instanceId: generateInstanceId(), card: card_h002, isHidden: false,
-            wasRevealedAtLeastOnce: true, powerTokens: isHiruzenUpg ? 2 : 0,
+            wasRevealedAtLeastOnce: true, powerTokens: 0,
             stack: [card_h002], controlledBy: player_h002, originalOwner: player_h002, missionIndex: mi_h002,
           };
           mission_h002[fSide_h002] = [...mission_h002[fSide_h002], charInPlay_h002];
@@ -3389,11 +3392,13 @@ export class EffectEngine {
           newState.activeMissions = missions_h002;
           ps_h002.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player_h002);
 
-          const upgradeNote_h002 = isHiruzenUpg ? ' with POWERUP 2 (upgrade)' : '';
           newState.log = logAction(newState.log, newState.turn, 'action', player_h002,
-            'EFFECT', `Hiruzen Sarutobi (002): Plays ${card_h002.name_fr} on mission ${mi_h002 + 1} (1 less)${upgradeNote_h002}.`,
+            'EFFECT', `Hiruzen Sarutobi (002): Plays ${card_h002.name_fr} on mission ${mi_h002 + 1} (1 less).`,
             'game.log.effect.playLeafReduced',
             { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr, mission: String(mi_h002 + 1), cost: String(freshCost_h002) });
+
+          // Track placed character for Hiruzen 002 UPGRADE (POWERUP 2)
+          (newState as any)._hiruzen002PlayedCharId = charInPlay_h002.instanceId;
 
           newState = EffectEngine.resolvePlayEffects(newState, player_h002, charInPlay_h002, mi_h002, false);
         } else {
@@ -3410,16 +3415,19 @@ export class EffectEngine {
           const updatedChars_h002 = [...mission_h002[fSide_h002]];
           updatedChars_h002[existIdx_h002] = {
             ...existing_h002, card: card_h002, stack: [...existing_h002.stack, card_h002],
-            powerTokens: existing_h002.powerTokens + (isHiruzenUpg ? 2 : 0),
+            powerTokens: existing_h002.powerTokens,
           };
           mission_h002[fSide_h002] = updatedChars_h002;
           missions_h002[mi_h002] = mission_h002;
           newState.activeMissions = missions_h002;
 
           newState.log = logAction(newState.log, newState.turn, 'action', player_h002,
-            'EFFECT_UPGRADE', `Hiruzen Sarutobi (002): Upgraded ${card_h002.name_fr} on mission ${mi_h002 + 1}${isHiruzenUpg ? ' with POWERUP 2' : ''}.`,
+            'EFFECT_UPGRADE', `Hiruzen Sarutobi (002): Upgraded ${card_h002.name_fr} on mission ${mi_h002 + 1}.`,
             'game.log.effect.upgradeLeafReduced',
             { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card_h002.name_fr, mission: String(mi_h002 + 1), cost: String(upgCost_h002) });
+
+          // Track placed character for Hiruzen 002 UPGRADE (POWERUP 2)
+          (newState as any)._hiruzen002PlayedCharId = updatedChars_h002[existIdx_h002].instanceId;
 
           newState = EffectEngine.resolvePlayEffects(newState, player_h002, updatedChars_h002[existIdx_h002], mi_h002, true);
         }
@@ -7268,7 +7276,7 @@ export class EffectEngine {
         sourceInstanceId: pending.sourceInstanceId,
         sourceMissionIndex: missionIndex,
         effectType: 'MAIN' as EffectType,
-        effectDescription: JSON.stringify({ cardIndex, missionIndex, isHiruzenUpgrade: !!pending.isUpgrade }),
+        effectDescription: JSON.stringify({ cardIndex, missionIndex }),
         targetSelectionType: 'HIRUZEN002_UPGRADE_OR_FRESH',
         sourcePlayer: player,
         requiresTargetSelection: true,
@@ -7301,7 +7309,6 @@ export class EffectEngine {
     ps.chakra -= actualCost;
     ps.hand.splice(cardIndex, 1);
 
-    const isHiruzenUpgrade = pending.isUpgrade;
     let placedChar: CharacterInPlay;
     let isCardUpgrade = false;
 
@@ -7313,7 +7320,7 @@ export class EffectEngine {
         ...existing,
         card,
         stack: [...existing.stack, card],
-        powerTokens: existing.powerTokens + (isHiruzenUpgrade ? 2 : 0),
+        powerTokens: existing.powerTokens,
       };
       mission[friendlySide_h002] = updatedChars;
       missions[missionIndex] = mission;
@@ -7324,7 +7331,7 @@ export class EffectEngine {
       newState.log = logAction(
         newState.log, newState.turn, 'action', player,
         'EFFECT_UPGRADE',
-        `Hiruzen Sarutobi (002): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (diff-1)${isHiruzenUpgrade ? ' with POWERUP 2' : ''}.`,
+        `Hiruzen Sarutobi (002): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (diff-1).`,
         'game.log.effect.upgradeLeafReduced',
         { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
@@ -7335,7 +7342,7 @@ export class EffectEngine {
         card,
         isHidden: false,
         wasRevealedAtLeastOnce: true,
-        powerTokens: isHiruzenUpgrade ? 2 : 0,
+        powerTokens: 0,
         stack: [card],
         controlledBy: player,
         originalOwner: player,
@@ -7350,15 +7357,17 @@ export class EffectEngine {
       // Update character count
       ps.charactersInPlay = EffectEngine.countCharsForPlayer(newState, player);
 
-      const upgradeNote = isHiruzenUpgrade ? ' with POWERUP 2 (upgrade)' : '';
       newState.log = logAction(
         newState.log, newState.turn, 'action', player,
         'EFFECT',
-        `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (1 less)${upgradeNote}.`,
+        `Hiruzen Sarutobi (002): Plays ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra (1 less).`,
         'game.log.effect.playLeafReduced',
         { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC', target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) },
       );
     }
+
+    // Track the placed character for Hiruzen 002 UPGRADE (POWERUP 2)
+    (newState as any)._hiruzen002PlayedCharId = placedChar.instanceId;
 
     // Resolve the played card's MAIN effects (and UPGRADE if it was a card-level upgrade)
     return EffectEngine.resolvePlayEffects(newState, player, placedChar, missionIndex, isCardUpgrade);
@@ -8837,25 +8846,20 @@ export class EffectEngine {
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
       effectDescription: JSON.stringify({
-        text: isUpgrade
-          ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1, + POWERUP 2).'
-          : 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
+        text: 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
         hiddenChars: hiddenTargets, costReduction, isUpgrade,
       }),
       targetSelectionType: 'HIRUZEN002_CHOOSE_CARD',
       sourcePlayer: player, requiresTargetSelection: true,
-      validTargets: allTargets, isOptional: true, isMandatory: false,
+      validTargets: allTargets, isOptional: false, isMandatory: true,
       resolved: false, isUpgrade,
+      remainingEffectTypes: pending.remainingEffectTypes,
     }];
     newState.pendingActions = [...newState.pendingActions, {
-      id: actId, type: 'SELECT_TARGET' as PendingAction['type'],
+      id: actId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
       player,
-      description: isUpgrade
-        ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1, + POWERUP 2).'
-        : 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
-      descriptionKey: isUpgrade
-        ? 'game.effect.desc.hiruzen002PlayLeafUpgrade'
-        : 'game.effect.desc.hiruzen002PlayLeaf',
+      description: 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
+      descriptionKey: 'game.effect.desc.hiruzen002PlayLeaf',
       options: allTargets, minSelections: 1, maxSelections: 1,
       sourceEffectId: effId,
     }];

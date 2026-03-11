@@ -18,7 +18,7 @@ import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
  */
 
 function handleHiruzen002Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
+  const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
   const costReduction = 1;
 
@@ -113,7 +113,6 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     isOptional: true,
     description: JSON.stringify({
       sourceCardInstanceId: ctx.sourceCard.instanceId,
-      isUpgrade: isUpgrade ? 'true' : 'false',
     }),
     descriptionKey: 'game.effect.desc.hiruzen002ConfirmMain',
   };
@@ -121,11 +120,39 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
 
 /**
  * UPGRADE: POWERUP 2 the character played with the MAIN effect.
- * This is a no-op handler because the POWERUP 2 is already applied
- * in hiruzen002PlaceCard when pending.isUpgrade is true.
+ * This is a SEPARATE effect that triggers after MAIN completes.
+ * It checks _hiruzen002PlayedCharId to find which character was played.
  */
 function handleHiruzen002Upgrade(ctx: EffectContext): EffectResult {
-  return { state: ctx.state };
+  const { state, sourcePlayer, sourceCard } = ctx;
+  const playedCharId = (state as any)._hiruzen002PlayedCharId as string | undefined;
+
+  if (!playedCharId) {
+    // MAIN was declined or no character was played — UPGRADE can't apply
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Hiruzen Sarutobi (002): No character was played by MAIN, UPGRADE POWERUP 2 skipped.',
+          'game.log.effect.noTarget',
+          { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC' },
+        ),
+      },
+    };
+  }
+
+  // Show confirmation before applying POWERUP 2
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'HIRUZEN002_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ playedCharId }),
+    descriptionKey: 'game.effect.desc.hiruzen002ConfirmUpgrade',
+  };
 }
 
 export function registerHandler(): void {

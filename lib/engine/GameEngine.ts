@@ -716,6 +716,11 @@ export class GameEngine {
         }
       }
 
+      // Clean up Hiruzen 002 metadata when declining UPGRADE confirmation
+      if (effect.targetSelectionType === 'HIRUZEN002_CONFIRM_UPGRADE') {
+        delete (newState as any)._hiruzen002PlayedCharId;
+      }
+
       // Remove the effect and its associated action
       newState.pendingEffects.splice(effectIdx, 1);
       newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
