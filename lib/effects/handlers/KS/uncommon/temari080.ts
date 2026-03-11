@@ -9,61 +9,64 @@ import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
  * Group: Sand Village | Keywords: Team Baki
  *
  * MAIN: Move another friendly Sand Village character to another mission.
- *   - Find friendly Sand Village characters across all missions (excluding self).
- *   - Requires target selection: which character to move and which mission to move them to.
- *   - Must check name uniqueness constraint at the destination mission.
  *
  * UPGRADE: Move this character to another mission.
- *   - Find valid destination missions for self (no same-name conflict at destination).
- *   - Requires target selection for which mission to move to.
  */
 
 function handleTemari080Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
+  // Need at least 2 missions
+  if (state.activeMissions.length < 2) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Temari (080): Only 1 mission in play, cannot move.',
+      'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
+  }
+
   // Find all friendly Sand Village characters across all missions (not self)
-  // Only include characters whose source mission is NOT blocked by Kurenai 035
+  // Filter by Kurenai blocking and valid destination
   const validTargets: string[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     const mission = state.activeMissions[mi];
     const friendlyChars = mission[friendlySide];
-    const kurenaiBlocked = isMovementBlockedByKurenai(state, mi, sourcePlayer);
+    if (isMovementBlockedByKurenai(state, mi, sourcePlayer)) continue;
     for (const char of friendlyChars) {
       if (char.instanceId === sourceCard.instanceId) continue;
-      if (kurenaiBlocked) continue; // Can't move chars from a Kurenai-blocked mission
-      if (char.isHidden) {
-        continue; // Hidden characters can't be identified by group
-      } else {
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-        if (topCard.group === 'Sand Village') {
-          validTargets.push(char.instanceId);
-        }
-      }
+      if (char.isHidden) continue; // Hidden characters can't be identified by group
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      if (topCard.group !== 'Sand Village') continue;
+
+      // Check valid destination (name uniqueness)
+      const charName = topCard.name_fr;
+      const hasValidDest = state.activeMissions.some((m, i) => {
+        if (i === mi) return false;
+        return !m[friendlySide].some((c) => {
+          if (c.instanceId === char.instanceId) return false;
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr === charName;
+        });
+      });
+      if (hasValidDest) validTargets.push(char.instanceId);
     }
   }
 
   if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Temari (080): No other friendly Sand Village character in play to move.',
-      'game.log.effect.noTarget',
-      { card: 'TEMARI', id: 'KS-080-UC' },
-    );
-    return { state: { ...state, log } };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Temari (080): No other friendly Sand Village character can be moved.',
+      'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_FRIENDLY_SAND_VILLAGE',
-    validTargets,
-    description: 'Temari (080): Select a friendly Sand Village character to move to another mission.',
-    descriptionKey: 'game.effect.desc.temari080MoveFriendly',
+    targetSelectionType: 'TEMARI080_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.temari080ConfirmMain',
   };
 }
 
@@ -73,14 +76,9 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
 
   // Kurenai 035: if enemy Kurenai blocks movement from this mission, fizzle
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
-    const log = logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_BLOCKED',
-      'Temari (080): Movement blocked by Yuhi Kurenai (035).',
-      'game.log.effect.moveBlockedKurenai',
-      { card: 'TEMARI', id: 'KS-080-UC' },
-    );
-    return { state: { ...state, log } };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_BLOCKED', 'Temari (080): Movement blocked by Yuhi Kurenai (035).',
+      'game.log.effect.moveBlockedKurenai', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
   // Find valid destination missions for self (must not have same-name conflict)
@@ -91,74 +89,32 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
 
   const validMissions: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
-    if (i === sourceMissionIndex) continue; // Can't move to same mission
+    if (i === sourceMissionIndex) continue;
     const mission = state.activeMissions[i];
     const friendlyChars = mission[friendlySide];
-
-    // Check name uniqueness at destination
     const hasConflict = friendlyChars.some((c) => {
       const cTopCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return !c.isHidden && cTopCard.name_fr === selfName;
     });
-
-    if (!hasConflict) {
-      validMissions.push(String(i));
-    }
+    if (!hasConflict) validMissions.push(String(i));
   }
 
   if (validMissions.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Temari (080): No valid mission to move this character to (upgrade).',
-      'game.log.effect.noTarget',
-      { card: 'TEMARI', id: 'KS-080-UC' },
-    );
-    return { state: { ...state, log } };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Temari (080): No valid mission to move this character to (upgrade).',
+      'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_SELF_TO_MISSION',
-    validTargets: validMissions,
-    description: 'Temari (080) UPGRADE: Select a mission to move this character to.',
-    descriptionKey: 'game.effect.desc.temari080MoveSelf',
+    targetSelectionType: 'TEMARI080_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.temari080ConfirmUpgrade',
   };
-}
-
-/**
- * Move a character from one mission to another.
- * Immutable state update.
- */
-function moveCharacter(
-  state: import('@/lib/effects/EffectTypes').EffectContext['state'],
-  instanceId: string,
-  fromMissionIdx: number,
-  toMissionIdx: number,
-  side: 'player1Characters' | 'player2Characters',
-): import('@/lib/effects/EffectTypes').EffectContext['state'] {
-  const missions = [...state.activeMissions];
-  const fromMission = { ...missions[fromMissionIdx] };
-  const toMission = { ...missions[toMissionIdx] };
-
-  const fromChars = [...fromMission[side]];
-  const charIndex = fromChars.findIndex((c) => c.instanceId === instanceId);
-  if (charIndex === -1) return state;
-
-  const movedChar = { ...fromChars[charIndex], missionIndex: toMissionIdx };
-  fromChars.splice(charIndex, 1);
-  fromMission[side] = fromChars;
-
-  toMission[side] = [...toMission[side], movedChar];
-
-  missions[fromMissionIdx] = fromMission;
-  missions[toMissionIdx] = toMission;
-
-  return { ...state, activeMissions: missions };
 }
 
 export function registerTemari080Handlers(): void {

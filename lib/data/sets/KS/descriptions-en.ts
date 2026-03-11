@@ -475,6 +475,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 069/130 - DOSU KINUTA (UC) - "Melody Arm"
   'KS-069-UC': [
+    'Look at a hidden character in play.',
     'Choose a hidden enemy character in play. Opponent must either play them paying 2 more, or defeat them.',
   ],
 

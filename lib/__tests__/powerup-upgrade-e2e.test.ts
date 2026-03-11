@@ -137,16 +137,31 @@ describe('POWERUP end-to-end', () => {
       }],
     });
 
-    const newState = GameEngine.applyAction(state, 'player1', {
+    const afterPlay = GameEngine.applyAction(state, 'player1', {
       type: 'PLAY_CHARACTER',
       cardIndex: 0,
       missionIndex: 0,
       hidden: false,
     });
 
+    // After playing, a CONFIRM popup should be pending
+    const confirmPending = afterPlay.pendingEffects.find(
+      (e: any) => e.targetSelectionType === 'GAARA074_CONFIRM_MAIN'
+    );
+    expect(confirmPending).toBeDefined();
+    expect(afterPlay.pendingActions.length).toBeGreaterThan(0);
+
+    // Player confirms the effect
+    const confirmAction = afterPlay.pendingActions[0];
+    const newState = GameEngine.applyAction(afterPlay, 'player1', {
+      type: 'SELECT_TARGET',
+      pendingActionId: confirmAction.id,
+      selectedTargets: [confirmAction.options[0]],
+    });
+
     // Gaara should have powerTokens = 2 (2 hidden allies)
     const playedGaara = newState.activeMissions[0].player1Characters.find(
-      c => c.card.id === 'KS-074-C'
+      (c: any) => c.card.id === 'KS-074-C'
     );
     expect(playedGaara).toBeDefined();
     expect(playedGaara!.powerTokens).toBe(2);

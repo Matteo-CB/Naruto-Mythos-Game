@@ -1010,7 +1010,7 @@ describe('072/130 - Kin Tsuchi', () => {
 // 074/130 - GAARA (C, first version): POWERUP X (X = friendly hidden in this mission)
 // ===================================================================
 describe('074/130 - Gaara (C)', () => {
-  it('should POWERUP based on friendly hidden characters in this mission', () => {
+  it('should return CONFIRM popup when friendly hidden characters exist in this mission', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-1', powerTokens: 0 }, {
       id: 'KS-074-C', number: 74, name_fr: 'Gaara', group: 'Sand Village',
     });
@@ -1026,8 +1026,10 @@ describe('074/130 - Gaara (C)', () => {
 
     const handler = getEffectHandler('KS-074-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
-    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'gaara-1');
-    expect(updated?.powerTokens).toBe(2);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('GAARA074_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['gaara-1']);
+    expect(result.isOptional).toBe(true);
   });
 
   it('should get 0 when no hidden friendlies', () => {

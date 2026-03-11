@@ -554,6 +554,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 069/130 - DOSU KINUTA (UC) - "Bras Melodieux"
   'KS-069-UC': [
+    'Regardez un personnage cache en jeu.',
     'Choisissez un personnage ennemi cache en jeu. L\'adversaire doit soit le jouer en payant 2 de plus, soit le vaincre.',
   ],
 
