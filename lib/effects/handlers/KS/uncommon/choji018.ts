@@ -3,7 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import type { PlayerID } from '@/lib/engine/types';
-import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
+import { canBeHiddenByEnemy, isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
@@ -43,6 +43,13 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     ? sourceCard.stack[sourceCard.stack.length - 1]
     : sourceCard.card;
   const charName = topCard.name_fr;
+
+  // Check if Kurenai 035 blocks movement from this mission
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Choji Akimichi (018): Cannot move — Kurenai blocks movement from this mission.',
+      'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
+  }
 
   // Find valid destination missions (not current mission, no same-name conflict)
   const validTargets: string[] = [];

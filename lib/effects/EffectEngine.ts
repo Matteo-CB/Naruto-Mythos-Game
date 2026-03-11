@@ -877,33 +877,35 @@ export class EffectEngine {
         break;
 
       case 'SASUKE014_UPGRADE_HAND_REVEAL': {
-        // UPGRADE includes AMBUSH effect â€' opponent's hand was shown, now chain to discard flow
-        const ps_sur = { ...newState[pendingEffect.sourcePlayer] };
+        // UPGRADE includes AMBUSH — hand was shown, now ask to confirm the UPGRADE discard chain
         const opp_sur = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        const oppHand_sur = newState[opp_sur].hand;
+        const canDiscard_sur = newState[pendingEffect.sourcePlayer].hand.length > 0 && newState[opp_sur].hand.length > 0;
 
-        if (ps_sur.hand.length > 0 && oppHand_sur.length > 0) {
-          // Chain to SASUKE_014_DISCARD_OWN (discard from own hand, optional)
-          const handIndices_sur = ps_sur.hand.map((_: unknown, i: number) => String(i));
-          const charResult_sur = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-          const step_sur: EffectResult = {
-            state: newState,
-            requiresTargetSelection: true,
-            targetSelectionType: 'SASUKE_014_DISCARD_OWN',
-            validTargets: handIndices_sur,
-            isOptional: true,
-            description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards to discard 1 from opponent\'s hand.',
-            descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
-          };
-          // Clean up old pending effect/action before chaining
-          newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
-          newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
-          return EffectEngine.createPendingTargetSelection(
-            newState, pendingEffect.sourcePlayer,
-            charResult_sur?.character ?? null,
-            pendingEffect.sourceMissionIndex,
-            'UPGRADE', true, step_sur, [],
-          );
+        if (canDiscard_sur) {
+          // Chain to SASUKE014_CONFIRM_UPGRADE popup
+          const s014ConfUpId = generateInstanceId();
+          const s014ConfUpActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: s014ConfUpId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE',
+            effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
+            targetSelectionType: 'SASUKE014_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: s014ConfUpActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Sasuke Uchiwa (014) UPGRADE: Discard 1 card to discard 1 from opponent's hand?`,
+            descriptionKey: 'game.effect.desc.sasuke014ConfirmUpgrade',
+            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: s014ConfUpId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
         }
         break;
       }
@@ -2025,10 +2027,9 @@ export class EffectEngine {
           'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
           'game.log.effect.sasuke014Reveal', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
 
+        // Use UPGRADE_HAND_REVEAL if upgrade (chains to UPGRADE confirm popup after), else just HAND_REVEAL
         const useUpgradeChain014 = !!s014Meta.isUpgrade;
-        // For upgrade: only chain to discard if player has cards in hand
-        const canUpgradeDiscard014 = useUpgradeChain014 && newState[pendingEffect.sourcePlayer].hand.length > 0;
-        const tst014 = canUpgradeDiscard014 ? 'SASUKE014_UPGRADE_HAND_REVEAL' : 'SASUKE014_HAND_REVEAL';
+        const tst014 = useUpgradeChain014 ? 'SASUKE014_UPGRADE_HAND_REVEAL' : 'SASUKE014_HAND_REVEAL';
 
         const s014EffId = generateInstanceId();
         const s014ActId = generateInstanceId();
@@ -2038,8 +2039,8 @@ export class EffectEngine {
           sourceMissionIndex: pendingEffect.sourceMissionIndex,
           effectType: pendingEffect.effectType,
           effectDescription: JSON.stringify({
-            text: canUpgradeDiscard014 ? 'Sasuke (014) UPGRADE: Opponent\'s hand revealed.' : 'Sasuke (014): Opponent\'s hand revealed.',
-            cards: allCards014, isUpgrade: canUpgradeDiscard014,
+            text: 'Sasuke (014): Opponent\'s hand revealed.',
+            cards: allCards014,
           }),
           targetSelectionType: tst014,
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
@@ -2051,7 +2052,7 @@ export class EffectEngine {
           id: s014ActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
           description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards014 }),
-          descriptionKey: canUpgradeDiscard014 ? 'game.effect.desc.sasuke014UpgradeReveal' : 'game.effect.desc.sasuke014Reveal',
+          descriptionKey: 'game.effect.desc.sasuke014Reveal',
           options: ['confirm'], minSelections: 1, maxSelections: 1,
           sourceEffectId: s014EffId,
         }];
@@ -2059,11 +2060,74 @@ export class EffectEngine {
         break;
       }
 
+      case 'SASUKE014_CONFIRM_UPGRADE': {
+        // Player confirmed the UPGRADE discard chain — create mandatory discard from own hand
+        const opp014u = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const ownHand014u = newState[pendingEffect.sourcePlayer].hand;
+        const oppHand014u = newState[opp014u].hand;
+
+        if (ownHand014u.length === 0 || oppHand014u.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard — empty hand.',
+            'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+          break;
+        }
+
+        const handIndices014u = ownHand014u.map((_: unknown, i: number) => String(i));
+        const charResult014u = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        const step014u: EffectResult = {
+          state: newState,
+          requiresTargetSelection: true,
+          targetSelectionType: 'SASUKE_014_DISCARD_OWN',
+          validTargets: handIndices014u,
+          isMandatory: true,
+          description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards.',
+          descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+        };
+        newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
+        return EffectEngine.createPendingTargetSelection(
+          newState, pendingEffect.sourcePlayer,
+          charResult014u?.character ?? null,
+          pendingEffect.sourceMissionIndex,
+          'UPGRADE', true, step014u, [],
+        );
+      }
+
       case 'KAKASHI016_CONFIRM_MAIN': {
-        // Re-compute valid copy targets
+        // If upgrade, chain to UPGRADE confirm popup first
         let k016Meta: { isUpgrade?: boolean } = {};
         try { k016Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const costLimit016 = k016Meta.isUpgrade ? Infinity : 4;
+
+        if (k016Meta.isUpgrade) {
+          // Show UPGRADE confirm popup before executing copy
+          const k016UpEffId = generateInstanceId();
+          const k016UpActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: k016UpEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE',
+            effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
+            targetSelectionType: 'KAKASHI016_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: k016UpActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: 'Kakashi (016) UPGRADE: Instead, there\'s no cost limit.',
+            descriptionKey: 'game.effect.desc.kakashi016ConfirmUpgrade',
+            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: k016UpEffId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        // Non-upgrade: compute targets with cost 4 limit and chain to copy
         const enemySide016: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const k016Targets: string[] = [];
@@ -2071,7 +2135,7 @@ export class EffectEngine {
           for (const char of mission[enemySide016]) {
             if (char.isHidden) continue;
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-            if (topCard.chakra > costLimit016) continue;
+            if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'UPGRADE') return false;
               if (eff.description.includes('[⧗]')) return false;
@@ -2089,7 +2153,6 @@ export class EffectEngine {
         }
         const k016EffId = generateInstanceId();
         const k016ActId = generateInstanceId();
-        const k016LimitStr = k016Meta.isUpgrade ? 'any cost' : 'cost 4 or less';
         newState.pendingEffects = [...newState.pendingEffects, {
           id: k016EffId, sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -2104,11 +2167,61 @@ export class EffectEngine {
         newState.pendingActions = [...newState.pendingActions, {
           id: k016ActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
-          description: `Select an enemy character (${k016LimitStr}) to copy their effect.`,
+          description: 'Select an enemy character (cost 4 or less) to copy their effect.',
           descriptionKey: 'game.effect.desc.kakashi016CopyEffect',
-          descriptionParams: { costLimit: k016LimitStr },
+          descriptionParams: { costLimit: 'cost 4 or less' },
           options: k016Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: k016EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KAKASHI016_CONFIRM_UPGRADE': {
+        // UPGRADE confirmed: compute targets with NO cost limit
+        const enemySide016u: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k016uTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[enemySide016u]) {
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
+              if (eff.type === 'UPGRADE') return false;
+              if (eff.description.includes('[⧗]')) return false;
+              if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+              return true;
+            });
+            if (hasInstant) k016uTargets.push(char.instanceId);
+          }
+        }
+        if (k016uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kakashi Hatake (016) UPGRADE: No valid copy target.',
+            'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'KS-016-UC' });
+          break;
+        }
+        const k016uEffId = generateInstanceId();
+        const k016uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k016uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'MAIN',
+          effectDescription: '', targetSelectionType: 'KAKASHI_COPY_EFFECT',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: k016uTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k016uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character (any cost) to copy their effect.',
+          descriptionKey: 'game.effect.desc.kakashi016CopyEffect',
+          descriptionParams: { costLimit: 'any cost' },
+          options: k016uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k016uEffId,
         }];
         pendingEffect.remainingEffectTypes = undefined;
         break;
@@ -2168,10 +2281,39 @@ export class EffectEngine {
       }
 
       case 'INO020_CONFIRM_MAIN': {
-        // Re-compute take-control targets
+        // If upgrade, chain to UPGRADE confirm popup first
         let i020Meta: { isUpgrade?: boolean } = {};
         try { i020Meta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const costLimit020 = i020Meta.isUpgrade ? 3 : 2;
+
+        if (i020Meta.isUpgrade) {
+          // Show UPGRADE confirm popup
+          const i020UpEffId = generateInstanceId();
+          const i020UpActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: i020UpEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE',
+            effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
+            targetSelectionType: 'INO020_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: i020UpActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: 'Ino (020) UPGRADE: Instead, the cost limit is 3 or less.',
+            descriptionKey: 'game.effect.desc.ino020ConfirmUpgrade',
+            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: i020UpEffId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        // Non-upgrade: compute targets with cost 2 limit
         const i020SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         const i020MIdx = i020SrcChar?.missionIndex ?? pendingEffect.sourceMissionIndex;
         const mission020 = newState.activeMissions[i020MIdx];
@@ -2188,7 +2330,7 @@ export class EffectEngine {
         for (const char of mission020[enemySide020]) {
           const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
-          if (effectiveCost <= costLimit020) {
+          if (effectiveCost <= 2) {
             if (!char.isHidden && friendlyNames020.has(char.card.name_fr.toUpperCase())) continue;
             i020Targets.push(char.instanceId);
           }
@@ -2209,17 +2351,71 @@ export class EffectEngine {
           effectDescription: '', targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: i020Targets, isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          resolved: false, isUpgrade: false,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
           id: i020ActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
-          description: `Select an enemy character with cost ${costLimit020} or less to take control of.`,
+          description: 'Select an enemy character with cost 2 or less to take control of.',
           descriptionKey: 'game.effect.desc.ino020TakeControl',
-          descriptionParams: { costLimit: String(costLimit020) },
+          descriptionParams: { costLimit: '2' },
           options: i020Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: i020EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'INO020_CONFIRM_UPGRADE': {
+        // UPGRADE confirmed: compute targets with cost 3 limit
+        const i020uSrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        const i020uMIdx = i020uSrcChar?.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const mission020u = newState.activeMissions[i020uMIdx];
+        if (!mission020u) break;
+        const enemySide020u: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const friendlySide020u: 'player1Characters' | 'player2Characters' =
+          pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const friendlyNames020u = new Set(
+          mission020u[friendlySide020u].filter((c: CharacterInPlay) => !c.isHidden).map((c: CharacterInPlay) => c.card.name_fr.toUpperCase())
+        );
+        const i020uTargets: string[] = [];
+        for (const char of mission020u[enemySide020u]) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+          if (effectiveCost <= 3) {
+            if (!char.isHidden && friendlyNames020u.has(char.card.name_fr.toUpperCase())) continue;
+            i020uTargets.push(char.instanceId);
+          }
+        }
+        if (i020uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Ino Yamanaka (020) UPGRADE: No valid take-control target (cost 3 or less).',
+            'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-020-UC' });
+          break;
+        }
+        const i020uEffId = generateInstanceId();
+        const i020uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: i020uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: i020uMIdx,
+          effectType: 'MAIN',
+          effectDescription: '', targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: i020uTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: i020uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character with cost 3 or less to take control of.',
+          descriptionKey: 'game.effect.desc.ino020TakeControl',
+          descriptionParams: { costLimit: '3' },
+          options: i020uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: i020uEffId,
         }];
         pendingEffect.remainingEffectTypes = undefined;
         break;
@@ -4181,6 +4377,7 @@ export class EffectEngine {
                 requiresTargetSelection: true,
                 targetSelectionType: 'SASUKE_014_DISCARD_OPPONENT',
                 validTargets: oppIndices_ss,
+                isMandatory: true,
                 description: JSON.stringify({
                   text: 'Sasuke (014) UPGRADE: Choose a card from opponent\'s hand to discard.',
                   cards: oppCards_ss,

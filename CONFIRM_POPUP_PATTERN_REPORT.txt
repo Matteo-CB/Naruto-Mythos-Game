@@ -287,4 +287,34 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - Bug fix: KS-018 postMoveHide SKIP button (isMandatory: true)
   - Regles R1-R7 respectees, aucun bug de batch 1 reproduit
 
+2026-03-11 - Batch 2 corrections (feedback Andy):
+  - Texte des popups de confirmation: copier/coller le texte de la carte
+    avec prefixe MAIN:/UPGRADE:/AMBUSH: au lieu de paraphrases
+  - KS-014 Sasuke: AMBUSH confirm dit "AMBUSH: Look at the opponent's hand."
+    + ajout SASUKE014_CONFIRM_UPGRADE popup APRES le reveal de main
+    + corrige texte "This card will be discarded. Opponent draws 1 card." -> supprime
+    + bouton SKIP supprime sur SASUKE_014_DISCARD_OWN et _OPPONENT (isMandatory)
+  - KS-016 Kakashi: ajout KAKASHI016_CONFIRM_UPGRADE popup separee
+    (confirmer = no cost limit, decliner = cost 4 limit, dans GameEngine decline)
+  - KS-020 Ino: ajout INO020_CONFIRM_UPGRADE popup separee
+    (confirmer = cost 3, decliner = cost 2, dans GameEngine decline)
+  - KS-010 Naruto: ajout check isMovementBlockedByKurenai() AVANT le popup
+    (si Kurenai 035 bloque le mouvement -> pas de popup)
+  - KS-006 Shizune: ajout check missions >= 2 + isMovementBlockedByKurenai()
+    (filtre les missions ou Kurenai bloque le deplacement des ennemis)
+  - KS-018 Choji: ajout check isMovementBlockedByKurenai() AVANT le popup
+
+  NOUVELLE REGLE R8: VERIFIER KURENAI 035 POUR LES EFFETS DE MOUVEMENT
+    Tout handler qui deplace un personnage doit verifier:
+    1. isMovementBlockedByKurenai(state, sourceMissionIndex, movedCharOwner)
+    2. state.activeMissions.length >= 2 (au moins 2 missions pour pouvoir deplacer)
+    Si bloque ou pas de destination -> log EFFECT_NO_TARGET, pas de popup
+
+  NOUVELLE REGLE R9: UPGRADE TYPE A -> POPUP UPGRADE SEPAREE
+    Pour les cartes Type A (UPGRADE modifie MAIN), quand jouee en upgrade:
+    1. CONFIRM_MAIN -> si isUpgrade, chainer vers CONFIRM_UPGRADE popup
+    2. CONFIRM_UPGRADE confirme -> executer MAIN avec comportement modifie
+    3. CONFIRM_UPGRADE decline -> executer MAIN avec comportement de base
+    Le decline est gere dans GameEngine.ts comme cas special de DECLINE_OPTIONAL_EFFECT
+
 ================================================================================

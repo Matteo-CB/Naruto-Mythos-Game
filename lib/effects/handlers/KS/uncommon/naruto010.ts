@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 010/130 - NARUTO UZUMAKI "Permutation" (UC)
@@ -15,6 +16,13 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+
+  // Check if Kurenai 035 blocks movement from this mission
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Naruto Uzumaki (010): Cannot move — Kurenai blocks movement from this mission.',
+      'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
+  }
 
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
