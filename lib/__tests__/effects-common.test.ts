@@ -48,11 +48,12 @@ describe('001/130 - Hiruzen Sarutobi', () => {
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
-    // Effect is optional - always routes to target selection even with 1 target
+    // Effect is optional - confirmation popup before target selection
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
-    expect(result.validTargets).toContain('ally-1');
-    // Token NOT applied yet (pending selection)
+    expect(result.targetSelectionType).toBe('HIRUZEN001_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('hiruzen-1'); // self as target for confirm
+    // Token NOT applied yet (pending confirmation)
     const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
     expect(ally?.powerTokens).toBe(0);
   });
@@ -94,9 +95,10 @@ describe('001/130 - Hiruzen Sarutobi', () => {
 
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
+    // Confirmation popup - self as target
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toContain('leaf-a');
-    expect(result.validTargets).toContain('leaf-b');
+    expect(result.targetSelectionType).toBe('HIRUZEN001_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('hiruzen-1');
   });
 });
 
@@ -135,11 +137,10 @@ describe('007/130 - Jiraiya', () => {
 
     const handler = getEffectHandler('KS-007-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jiraiya, 0));
-    // Now returns target selection: choose which Summon from hand
+    // Confirmation popup before summon selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('JIRAIYA_CHOOSE_SUMMON');
-    expect(result.validTargets).toContain('HAND_0'); // summonCard at index 0
-    expect(result.validTargets).not.toContain('HAND_1'); // Naruto is not a Summon
+    expect(result.targetSelectionType).toBe('JIRAIYA007_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('jiraiya-1'); // self as target for confirm
   });
 
   it('should fizzle when no Summon cards in hand', () => {

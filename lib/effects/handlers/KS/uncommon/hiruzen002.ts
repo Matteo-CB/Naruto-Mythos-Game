@@ -104,22 +104,18 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'HIRUZEN002_CHOOSE_CARD',
-    validTargets: allTargets,
+    targetSelectionType: 'HIRUZEN002_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
     description: JSON.stringify({
-      text: isUpgrade
-        ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1, + POWERUP 2).'
-        : 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
-      hiddenChars: hiddenTargets,
-      costReduction,
-      isUpgrade,
+      sourceCardInstanceId: ctx.sourceCard.instanceId,
+      isUpgrade: isUpgrade ? 'true' : 'false',
     }),
-    descriptionKey: isUpgrade
-      ? 'game.effect.desc.hiruzen002PlayLeafUpgrade'
-      : 'game.effect.desc.hiruzen002PlayLeaf',
+    descriptionKey: 'game.effect.desc.hiruzen002ConfirmMain',
   };
 }
 

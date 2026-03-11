@@ -18,11 +18,11 @@ export class HardAI implements AIStrategy {
   constructor() {
     this.evaluator = NeuralEvaluator.getInstance();
     this.mcts = new NeuralISMCTS({
-      simulations: 600,
-      maxDepth: 6,
+      simulations: 400,
+      maxDepth: 5,
       explorationC: 1.41,
       evaluator: this.evaluator,
-      maxBranching: 12,
+      maxBranching: 10,
       useBatchedEval: true,
     });
   }
@@ -44,10 +44,15 @@ export class HardAI implements AIStrategy {
       return this.decideMulligan(state, player, validActions);
     }
 
-    await this.evaluator.load();
+    // Try neural evaluation, fall back to heuristic MCTS on any failure
+    try {
+      await this.evaluator.load();
 
-    if (this.evaluator.isReady()) {
-      return this.mcts.chooseActionAsync(state, player, validActions);
+      if (this.evaluator.isReady()) {
+        return await this.mcts.chooseActionAsync(state, player, validActions);
+      }
+    } catch (err) {
+      console.warn('[HardAI] Neural evaluation failed, falling back to heuristic MCTS:', err);
     }
 
     return this.mcts.chooseActionSync(state, player, validActions);

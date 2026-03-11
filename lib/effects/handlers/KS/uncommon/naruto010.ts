@@ -24,8 +24,8 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Find valid destination missions (not the current mission, no same-name conflict)
-  const validTargets: string[] = [];
+  // Pre-check: any valid destination missions?
+  let hasDestination = false;
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     if (mIdx === sourceMissionIndex) continue;
 
@@ -39,24 +39,26 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
     });
 
     if (!hasSameName) {
-      validTargets.push(String(mIdx));
+      hasDestination = true;
+      break;
     }
   }
 
-  // If no valid destination, effect fizzles
-  if (validTargets.length === 0) {
+  if (!hasDestination) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Naruto Uzumaki (010): No valid mission to move to.',
       'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'NARUTO_MOVE_SELF',
-    validTargets,
-    description: 'Select a mission to move Naruto Uzumaki to.',
-    descriptionKey: 'game.effect.desc.naruto010MoveSelf',
+    targetSelectionType: 'NARUTO010_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.naruto010ConfirmAmbush',
   };
 }
 

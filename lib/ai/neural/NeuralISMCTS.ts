@@ -202,46 +202,64 @@ export class NeuralISMCTS {
         }
       }
 
+      if (leafStates.length === 0) continue;
+
       // Batch evaluate all leaf states
       const evaluator = this.config.evaluator!;
-      const featureBatch = leafStates.map(s => {
-        if (s.phase === 'gameOver') return null;
-        return FeatureExtractor.extract(s, aiPlayer);
-      });
-
-      const nonNullIndices = featureBatch
-        .map((f, i) => (f ? i : -1))
-        .filter(i => i >= 0);
-      const nonNullFeatures = nonNullIndices.map(i => featureBatch[i]!);
-
       let nnValues: number[] = [];
-      if (nonNullFeatures.length > 0) {
-        nnValues = await evaluator.evaluateBatch(nonNullFeatures);
-      }
 
-      // Assign values and backpropagate
-      for (let i = 0; i < batch; i++) {
-        const leafState = leafStates[i];
-        const path = leafPaths[i];
+      try {
+        const featureBatch = leafStates.map(s => {
+          if (s.phase === 'gameOver') return null;
+          return FeatureExtractor.extract(s, aiPlayer);
+        });
 
-        let value: number;
-        if (leafState.phase === 'gameOver') {
-          value = this.terminalValue(leafState, aiPlayer);
-        } else {
-          const nnIdx = nonNullIndices.indexOf(i);
-          if (nnIdx >= 0) {
-            // NN value: probability that player1 wins → convert to aiPlayer perspective
-            const p1WinProb = nnValues[nnIdx];
-            value = aiPlayer === 'player1' ? p1WinProb : (1 - p1WinProb);
-          } else {
-            value = this.heuristicValue(leafState, aiPlayer);
-          }
+        const nonNullIndices = featureBatch
+          .map((f, i) => (f ? i : -1))
+          .filter(i => i >= 0);
+        const nonNullFeatures = nonNullIndices.map(i => featureBatch[i]!);
+
+        if (nonNullFeatures.length > 0) {
+          nnValues = await evaluator.evaluateBatch(nonNullFeatures);
         }
 
-        // Backpropagate
-        for (const node of path) {
-          node.visits++;
-          node.totalValue += value;
+        // Assign values and backpropagate
+        for (let i = 0; i < leafStates.length; i++) {
+          const leafState = leafStates[i];
+          const path = leafPaths[i];
+
+          let value: number;
+          if (leafState.phase === 'gameOver') {
+            value = this.terminalValue(leafState, aiPlayer);
+          } else {
+            const nnIdx = nonNullIndices.indexOf(i);
+            if (nnIdx >= 0) {
+              // NN value: probability that player1 wins → convert to aiPlayer perspective
+              const p1WinProb = nnValues[nnIdx];
+              value = aiPlayer === 'player1' ? p1WinProb : (1 - p1WinProb);
+            } else {
+              value = this.heuristicValue(leafState, aiPlayer);
+            }
+          }
+
+          // Backpropagate
+          for (const node of path) {
+            node.visits++;
+            node.totalValue += value;
+          }
+        }
+      } catch {
+        // NN evaluation failed for this batch — fall back to heuristic for all leaves
+        for (let i = 0; i < leafStates.length; i++) {
+          const leafState = leafStates[i];
+          const path = leafPaths[i];
+          const value = leafState.phase === 'gameOver'
+            ? this.terminalValue(leafState, aiPlayer)
+            : this.heuristicValue(leafState, aiPlayer);
+          for (const node of path) {
+            node.visits++;
+            node.totalValue += value;
+          }
         }
       }
     }
@@ -576,6 +594,17 @@ export class NeuralISMCTS {
       if (child && child.visits > bestVisits) {
         bestVisits = child.visits;
         bestAction = action;
+      }
+    }
+
+    // If tree is empty (all simulations failed), pick a non-PASS action instead of defaulting to PASS
+    if (bestVisits <= 0 && validActions.length > 1) {
+      console.warn('[ISMCTS] Empty tree — all simulations failed. Picking first non-PASS action.');
+      for (const action of validActions) {
+        if (action.type !== 'PASS') {
+          bestAction = action;
+          break;
+        }
       }
     }
 

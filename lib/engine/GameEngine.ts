@@ -28,6 +28,7 @@ import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } f
 import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
+import { isRempartZeroed } from '../effects/ContinuousEffects';
 
 export class GameEngine {
   /**
@@ -824,7 +825,7 @@ export class GameEngine {
       charactersInPlay: oppState.charactersInPlay,
     };
 
-    const visibleMissions: VisibleMission[] = state.activeMissions.map((mission) => {
+    const visibleMissions: VisibleMission[] = state.activeMissions.map((mission, mIdx) => {
       const makeVisible = (chars: CharacterInPlay[], side: PlayerID): VisibleCharacter[] =>
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
@@ -832,6 +833,8 @@ export class GameEngine {
           const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
           const power = calculateCharacterPower(state, c, side);
           const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          // Rempart 067: the targeted character loses all Power tokens visually
+          const tokensZeroed = isRempartZeroed(state, mIdx, c, side);
           return {
             instanceId: c.instanceId,
             isHidden: c.isHidden,
@@ -839,7 +842,7 @@ export class GameEngine {
             isOwn,
             card: canSee ? c.card : undefined,
             topCard: canSee ? topCard : undefined,
-            powerTokens: c.powerTokens,
+            powerTokens: tokensZeroed ? 0 : c.powerTokens,
             controlledBy: c.controlledBy,
             originalOwner: c.originalOwner,
             missionIndex: c.missionIndex,

@@ -30,11 +30,11 @@ export class ImpossibleAI implements AIStrategy {
   constructor() {
     this.evaluator = NeuralEvaluator.getInstance();
     this.mcts = new NeuralISMCTS({
-      simulations: 2200,
-      maxDepth: 8,
-      explorationC: 1.2, // moins d'exploration, plus d'exploitation
+      simulations: 800,
+      maxDepth: 6,
+      explorationC: 1.2,
       evaluator: this.evaluator,
-      maxBranching: 15,
+      maxBranching: 12,
       useBatchedEval: true,
     });
   }
@@ -56,10 +56,15 @@ export class ImpossibleAI implements AIStrategy {
       return this.decideMulligan(state, player, validActions);
     }
 
-    await this.evaluator.load();
+    // Try neural evaluation, fall back to heuristic MCTS on any failure
+    try {
+      await this.evaluator.load();
 
-    if (this.evaluator.isReady()) {
-      return this.mcts.chooseActionAsync(state, player, validActions);
+      if (this.evaluator.isReady()) {
+        return await this.mcts.chooseActionAsync(state, player, validActions);
+      }
+    } catch (err) {
+      console.warn('[ImpossibleAI] Neural evaluation failed, falling back to heuristic MCTS:', err);
     }
 
     return this.mcts.chooseActionSync(state, player, validActions);

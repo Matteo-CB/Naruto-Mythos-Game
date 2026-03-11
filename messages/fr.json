@@ -21,7 +21,8 @@
     "play": "Jouer",
     "close": "Fermer",
     "all": "Tous",
-    "maintenanceBanner": "Maintenance imminente du serveur. Aucune nouvelle partie ne pourra etre lancee apres votre partie en cours. Le site sera de retour dans quelques minutes."
+    "maintenanceBanner": "Maintenance imminente du serveur. Aucune nouvelle partie ne pourra etre lancee apres votre partie en cours. Le site sera de retour dans quelques minutes.",
+    "home": "Accueil"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -394,7 +395,17 @@
         "dosu068Defeat": "Selectionnez un personnage cache en jeu a vaincre.",
         "orochimaru050LookSteal": "Selectionnez un personnage cache ennemi a regarder. Si cout 3 ou moins, prenez le controle.",
         "pakkun099Move": "Choisissez une mission pour y deplacer Pakkun.",
+        "hiruzen001ConfirmMain": "Hiruzen (001) : POWERUP 2 un personnage Village de Konoha allie ?",
         "hiruzen001Powerup": "Selectionnez un personnage allie Village de Konoha pour lui donner POWERUP 2.",
+        "hiruzen002ConfirmMain": "Hiruzen (002) : Jouer un personnage Village de Konoha en payant 1 de moins ?",
+        "hiruzen002ConfirmUpgrade": "Hiruzen (002) UPGRADE : Aussi POWERUP 2 le personnage joue ?",
+        "tsunade004ConfirmUpgrade": "Tsunade (004) UPGRADE : Recuperer un personnage de votre pile de defausse ?",
+        "shizune006ConfirmMain": "Shizune (006) : Deplacer un personnage ennemi avec Puissance 3 ou moins ?",
+        "shizune006ConfirmUpgrade": "Shizune (006) UPGRADE : Gagner 2 Chakra ?",
+        "jiraiya007ConfirmMain": "Jiraiya (007) : Jouer un personnage Invocation en payant 1 de moins ?",
+        "jiraiya008ConfirmMain": "Jiraiya (008) : Jouer un personnage Invocation en payant 2 de moins ?",
+        "jiraiya008ConfirmUpgrade": "Jiraiya (008) UPGRADE : Cacher un personnage ennemi de cout 3 ou moins ?",
+        "naruto010ConfirmAmbush": "Naruto (010) EMBUSCADE : Deplacer ce personnage vers une autre mission ?",
         "jiraiya007ChooseSummon": "Choisissez une Invocation de votre main a jouer (1 de moins).",
         "kabuto052PlaceHidden": "Choisissez une mission pour y placer la carte volee face cachee.",
         "neji036RemoveTokens": "Selectionnez un personnage ennemi pour retirer jusqu'a 2 jetons de Puissance.",
@@ -1756,17 +1767,6 @@
       "syncing": "Synchronisation...",
       "syncAll": "Synchroniser les Utilisateurs"
     },
-    "testers": {
-      "title": "Testeurs",
-      "description": "Gerer les comptes testeurs. Les testeurs obtiennent un badge special visible partout.",
-      "search": "Rechercher par pseudo...",
-      "add": "Ajouter testeur",
-      "remove": "Retirer",
-      "noTesters": "Aucun testeur pour le moment.",
-      "added": "Testeur ajoute",
-      "removed": "Testeur retire",
-      "notFound": "Utilisateur introuvable"
-    },
     "backgrounds": {
       "title": "Fonds de Jeu",
       "description": "Uploadez et gerez les fonds que les joueurs peuvent choisir pour leur plateau de jeu.",
@@ -1788,20 +1788,18 @@
     "actionLog": "Journal d'Actions",
     "sealed": {
       "title": "Mode Scellé",
-      "description": "Activer ou desactiver le mode Scelle pour tous les utilisateurs. Quand desactive, seuls les testeurs et admins peuvent acceder au mode Scelle.",
+      "description": "Activer ou desactiver le mode Scelle pour tous les utilisateurs. Quand desactive, seuls les admins peuvent acceder au mode Scelle.",
       "loading": "Chargement...",
       "toggling": "Changement...",
       "enabled": "ACTIVE",
       "disabled": "DESACTIVE",
       "enabledDesc": "Tous les utilisateurs peuvent acceder au mode Scelle",
-      "disabledDesc": "Seuls les testeurs et admins peuvent acceder au mode Scelle"
+      "disabledDesc": "Seuls les admins peuvent acceder au mode Scelle"
     }
   },
   "badges": {
     "admin": "ADMIN",
-    "tester": "TESTEUR",
     "showAdmin": "Afficher badge Admin",
-    "showTester": "Afficher badge Testeur",
     "showLeague": "Afficher badge Ligue",
     "badgePrefs": "Preferences de badges",
     "badgePrefsDesc": "Choisissez quels badges afficher a cote de votre nom."
