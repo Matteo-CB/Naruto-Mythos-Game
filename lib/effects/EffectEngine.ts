@@ -4197,7 +4197,7 @@ export class EffectEngine {
               effectType: pendingEffect.effectType,
               effectDescription: '', targetSelectionType: 'KIMIMARO056_CHOOSE_HIDE',
               sourcePlayer: km056Player, requiresTargetSelection: true,
-              validTargets: km056HideTargets, isOptional: true, isMandatory: false,
+              validTargets: km056HideTargets, isOptional: false, isMandatory: true,
               resolved: false, isUpgrade: pendingEffect.isUpgrade,
               remainingEffectTypes: pendingEffect.remainingEffectTypes,
             }];
@@ -4283,35 +4283,26 @@ export class EffectEngine {
       }
 
       case 'JIROBO058_CONFIRM_MAIN': {
+        // MAIN: POWERUP 1 to Sound Four chars in THIS mission only
         const j058Player = pendingEffect.sourcePlayer;
-        let j058IsUpgrade = false;
-        try {
-          const desc = JSON.parse(pendingEffect.effectDescription);
-          j058IsUpgrade = desc.isUpgrade ?? false;
-        } catch { /* ignore */ }
-
         const j058FriendlySide = j058Player === 'player1' ? 'player1Characters' : 'player2Characters';
-        const j058MissionIndices: number[] = j058IsUpgrade
-          ? newState.activeMissions.map((_: any, i: number) => i)
-          : [pendingEffect.sourceMissionIndex];
 
         const j058Targets: { missionIndex: number; instanceId: string }[] = [];
-        for (const mIdx of j058MissionIndices) {
-          const mission = newState.activeMissions[mIdx];
-          for (const char of (mission as any)[j058FriendlySide] as CharacterInPlay[]) {
+        const j058Mission = newState.activeMissions[pendingEffect.sourceMissionIndex];
+        if (j058Mission) {
+          for (const char of (j058Mission as any)[j058FriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
-              j058Targets.push({ missionIndex: mIdx, instanceId: char.instanceId });
+              j058Targets.push({ missionIndex: pendingEffect.sourceMissionIndex, instanceId: char.instanceId });
             }
           }
         }
 
         if (j058Targets.length === 0) {
-          const scope = j058IsUpgrade ? 'in play' : 'in this mission';
           newState.log = logAction(newState.log, newState.turn, newState.phase, j058Player,
-            'EFFECT_NO_TARGET', `Jirobo (058): No other friendly Sound Four characters ${scope} (state changed).`,
+            'EFFECT_NO_TARGET', 'Jirobo (058): No other friendly Sound Four characters in this mission (state changed).',
             'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' });
           break;
         }
@@ -4330,8 +4321,53 @@ export class EffectEngine {
         }
         newState = { ...newState, activeMissions: missions_j058 };
         newState.log = logAction(newState.log, newState.turn, newState.phase, j058Player,
-          'EFFECT_POWERUP', `Jirobo (058): POWERUP 1 on ${j058Targets.length} Sound Four character(s).`,
+          'EFFECT_POWERUP', `Jirobo (058) MAIN: POWERUP 1 on ${j058Targets.length} Sound Four character(s) in this mission.`,
           'game.log.effect.powerup', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058Targets.length });
+        break;
+      }
+
+      case 'JIROBO058_CONFIRM_UPGRADE': {
+        // UPGRADE: POWERUP 1 to Sound Four chars in OTHER missions (not the source mission)
+        const j058uPlayer = pendingEffect.sourcePlayer;
+        const j058uFriendlySide = j058uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const j058uTargets: { missionIndex: number; instanceId: string }[] = [];
+        for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+          if (mIdx === pendingEffect.sourceMissionIndex) continue; // Skip source mission
+          const mission = newState.activeMissions[mIdx];
+          for (const char of (mission as any)[j058uFriendlySide] as CharacterInPlay[]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+              j058uTargets.push({ missionIndex: mIdx, instanceId: char.instanceId });
+            }
+          }
+        }
+
+        if (j058uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j058uPlayer,
+            'EFFECT_NO_TARGET', 'Jirobo (058) UPGRADE: No friendly Sound Four characters in other missions (state changed).',
+            'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' });
+          break;
+        }
+
+        // POWERUP 1 on each target
+        const missions_j058u = [...newState.activeMissions];
+        for (const t of j058uTargets) {
+          const m = { ...missions_j058u[t.missionIndex] };
+          const chars = [...m[j058uFriendlySide]];
+          const idx = chars.findIndex((c: CharacterInPlay) => c.instanceId === t.instanceId);
+          if (idx !== -1) {
+            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 1 };
+            m[j058uFriendlySide] = chars;
+            missions_j058u[t.missionIndex] = m;
+          }
+        }
+        newState = { ...newState, activeMissions: missions_j058u };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j058uPlayer,
+          'EFFECT_POWERUP', `Jirobo (058) UPGRADE: POWERUP 1 on ${j058uTargets.length} Sound Four character(s) in other missions.`,
+          'game.log.effect.powerup', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058uTargets.length });
         break;
       }
 
@@ -4398,7 +4434,7 @@ export class EffectEngine {
           effectDescription: JSON.stringify({ movesRemaining: k059X }),
           targetSelectionType: 'KIDOMARU_CHOOSE_CHARACTER',
           sourcePlayer: k059Player, requiresTargetSelection: true,
-          validTargets: k059Targets, isOptional: true, isMandatory: false,
+          validTargets: k059Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -4474,8 +4510,9 @@ export class EffectEngine {
                 effectDescription: JSON.stringify({ charInstanceId: k060Targets[0] }),
                 targetSelectionType: 'KIDOMARU060_MOVE_DESTINATION',
                 sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-                validTargets: k060Dests, isOptional: true, isMandatory: false,
+                validTargets: k060Dests, isOptional: false, isMandatory: true,
                 resolved: false, isUpgrade: false,
+                remainingEffectTypes: pendingEffect.remainingEffectTypes,
               }];
               newState.pendingActions = [...newState.pendingActions, {
                 id: k060dActId, type: 'SELECT_TARGET' as PendingAction['type'],
@@ -4485,13 +4522,14 @@ export class EffectEngine {
                 options: k060Dests, minSelections: 1, maxSelections: 1,
                 sourceEffectId: k060dEffId,
               }];
+              pendingEffect.remainingEffectTypes = undefined;
               break;
             }
           }
           break;
         }
 
-        // Multiple targets: child with SKIP
+        // Multiple targets: mandatory child (no SKIP after CONFIRM)
         const k060EffId = generateInstanceId();
         const k060ActId = generateInstanceId();
         newState.pendingEffects = [...newState.pendingEffects, {
@@ -4501,8 +4539,9 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'KIDOMARU060_CHOOSE_CHARACTER',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: k060Targets, isOptional: true, isMandatory: false,
+          validTargets: k060Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
           id: k060ActId, type: 'SELECT_TARGET' as PendingAction['type'],
@@ -4512,6 +4551,7 @@ export class EffectEngine {
           options: k060Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: k060EffId,
         }];
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -7168,8 +7208,8 @@ export class EffectEngine {
               sourcePlayer: pendingEffect.sourcePlayer,
               requiresTargetSelection: true,
               validTargets: validHideTargets_km,
-              isOptional: true,
-              isMandatory: false,
+              isOptional: false,
+              isMandatory: true,
               resolved: false,
               isUpgrade: pendingEffect.isUpgrade,
             }];
@@ -7369,7 +7409,14 @@ export class EffectEngine {
           for (let i = 0; i < newState.activeMissions.length; i++) {
             if (i !== moveChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, moveChar.character, i, moveChar.player)) validDests_mv.push(String(i));
           }
-          if (validDests_mv.length >= 1) {
+          if (validDests_mv.length === 1) {
+            // Auto-move to only valid destination
+            newState = EffectEngine.moveCharToMissionDirectPublic(
+              newState, targetId, parseInt(validDests_mv[0], 10),
+              moveChar.player, pendingEffect.sourceCardId, pendingEffect.sourceCardId,
+              pendingEffect.sourcePlayer,
+            );
+          } else if (validDests_mv.length > 1) {
             const tst2 = pendingEffect.targetSelectionType === 'MOVE_CHARACTER_POWER_4_OR_LESS'
               ? 'KANKURO078_MOVE_DESTINATION'
               : pendingEffect.targetSelectionType === 'MOVE_FRIENDLY_SAND_VILLAGE'
@@ -7388,10 +7435,11 @@ export class EffectEngine {
               sourcePlayer: pendingEffect.sourcePlayer,
               requiresTargetSelection: true,
               validTargets: validDests_mv,
-              isOptional: true,
-              isMandatory: false,
+              isOptional: false,
+              isMandatory: true,
               resolved: false,
               isUpgrade: false,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
             });
             newState.pendingActions.push({
               id: actionId_mv,
@@ -7404,6 +7452,7 @@ export class EffectEngine {
               maxSelections: 1,
               sourceEffectId: effectId_mv,
             });
+            pendingEffect.remainingEffectTypes = undefined;
           }
         }
         break;
@@ -10014,8 +10063,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validHideTargets,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: pending.isUpgrade,
     });
@@ -11102,8 +11151,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });
@@ -11183,8 +11232,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });

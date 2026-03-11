@@ -425,8 +425,9 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - KS-055 AMBUSH: auto-discard si 1 carte, child mandatory si plusieurs
   - KS-056 UPGRADE: auto-discard si 1 carte, child mandatory si plusieurs + R4 propagation
   - KS-057 MAIN (no SKIP): POWERUP X self immediate apres CONFIRM
-  - KS-058 MAIN (no SKIP): POWERUP 1 batch sur tous Sound Four allies (isUpgrade -> all missions)
-  - KS-059 MAIN: chain to KIDOMARU_CHOOSE_CHARACTER avec movesRemaining: X (SKIP kept)
+  - KS-058 MAIN: POWERUP 1 batch sur Sound Four allies dans CETTE mission seulement
+  - KS-058 UPGRADE (separate effect): POWERUP 1 batch sur Sound Four allies dans les AUTRES missions
+  - KS-059 MAIN: chain to KIDOMARU_CHOOSE_CHARACTER avec movesRemaining: X (children: no SKIP)
   - KS-060 MAIN: auto-select si 1 char, child KIDOMARU060_CHOOSE_CHARACTER si plusieurs (SKIP kept)
   - KS-060 AMBUSH: auto-defeat si 1 target, child KIDOMARU060_DEFEAT_LOW_POWER si plusieurs (SKIP kept)
   - R4 propagation: OROCHIMARU051 UPGRADE, KABUTO053 UPGRADE, KIMIMARO056 UPGRADE
@@ -451,5 +452,29 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     child mandatory si plusieurs
   - R4 propagation: DOSU069 UPGRADE, TAYUYA065 UPGRADE
   - Regles R1-R10 respectees
+
+2026-03-11 - Bugfix KS-058 (Jirobo UC):
+  - Fix: UPGRADE etait un no-op qui modifiait le scope du MAIN (isUpgrade flag).
+    Corrige: UPGRADE est un effet SEPARE qui cible les Sound Four dans les AUTRES missions.
+  - Fix: description MAIN manquait "in this mission"
+  - Ajout cle i18n 'jirobo058ConfirmUpgrade' (EN + FR)
+
+2026-03-11 - Bugfix KS-059 (Kidomaru C):
+  - Fix: children KIDOMARU_CHOOSE_CHARACTER et KIDOMARU_CHOOSE_DESTINATION
+    passes de isOptional:true a isOptional:false, isMandatory:true (no SKIP apres CONFIRM)
+  - Affecte: KIDOMARU059_CONFIRM_MAIN case + kidomaruChooseCharacter() + createKidomaruNextMove()
+
+2026-03-11 - Bugfix Kimimaro 056 + i18n manquantes:
+  - Fix: KIMIMARO056_CHOOSE_DISCARD -> KIMIMARO056_CHOOSE_HIDE child passe de
+    isOptional:true a isOptional:false, isMandatory:true (no SKIP)
+  - Ajout 3 cles i18n manquantes (EN + FR): kimimaro055Discard, kimimaro056Discard, kabuto052ChooseMission
+
+2026-03-11 - Bugfix KS-060 (Kidômaru UC):
+  - Fix: cle i18n manquante 'kidomaru060ChooseChar' (EN + FR)
+  - Fix: children KIDOMARU060_CHOOSE_CHARACTER et KIDOMARU060_MOVE_DESTINATION
+    passes de isOptional:true a isOptional:false, isMandatory:true (no SKIP apres CONFIRM)
+  - Fix: R4 propagation remainingEffectTypes a travers toute la chaine
+    CONFIRM_MAIN -> CHOOSE_CHARACTER -> MOVE_DESTINATION (evite AMBUSH premature)
+  - Fix: auto-move si 1 seule destination dans KIDOMARU060_CHOOSE_CHARACTER
 
 ================================================================================
