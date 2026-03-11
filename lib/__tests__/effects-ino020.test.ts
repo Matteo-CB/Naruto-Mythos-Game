@@ -90,13 +90,18 @@ describe('Ino 020 (UC) - Take Control', () => {
     expect(afterUpgrade.pendingActions.length).toBeGreaterThan(0);
     const confirmPa = afterUpgrade.pendingActions[0];
     expect(confirmPa.player).toBe('player1');
-    // Confirm the effect
+    // Confirm the MAIN effect
     const afterConfirm = GameEngine.applyAction(afterUpgrade, 'player1', { type: 'SELECT_TARGET', pendingActionId: confirmPa.id, selectedTargets: [confirmPa.options[0]] });
-    // Now should have the actual target selection
+    // Now should have the UPGRADE confirm popup (Type A: cost 3 instead of 2)
     expect(afterConfirm.pendingActions.length).toBeGreaterThan(0);
-    const selectPa = afterConfirm.pendingActions[0];
+    const upgradePa = afterConfirm.pendingActions[0];
+    // Confirm the UPGRADE
+    const afterUpgradeConfirm = GameEngine.applyAction(afterConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: upgradePa.id, selectedTargets: [upgradePa.options[0]] });
+    // Now should have the actual target selection with cost 3 limit
+    expect(afterUpgradeConfirm.pendingActions.length).toBeGreaterThan(0);
+    const selectPa = afterUpgradeConfirm.pendingActions[0];
     expect(selectPa.options).toContain('e3');
-    const afterSelect = GameEngine.applyAction(afterConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: selectPa.id, selectedTargets: ['e3'] });
+    const afterSelect = GameEngine.applyAction(afterUpgradeConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: selectPa.id, selectedTargets: ['e3'] });
     expect(afterSelect.activeMissions[0].player2Characters.some(c => c.instanceId === 'e3')).toBe(false);
     expect(afterSelect.activeMissions[0].player1Characters.some(c => c.instanceId === 'e3')).toBe(true);
   });

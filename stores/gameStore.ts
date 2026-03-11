@@ -604,7 +604,7 @@ function buildPendingTargetSelectionUI(
         revealedCard = {
           name_fr: '', chakra: 0, power: 0, canSteal: false,
           revealTitleKey: 'game.effect.sasuke014RevealTitle',
-          revealResultKey: rd.isUpgrade ? 'game.effect.sasuke014DiscardResult' : 'game.effect.sasuke014RevealResult',
+          revealResultKey: 'game.effect.sasuke014RevealResult',
         };
         revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
           name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file,

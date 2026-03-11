@@ -721,6 +721,104 @@ export class GameEngine {
         delete (newState as any)._hiruzen002PlayedCharId;
       }
 
+      // Kakashi 016 UPGRADE declined: execute MAIN with base cost 4 limit
+      if (effect.targetSelectionType === 'KAKASHI016_CONFIRM_UPGRADE') {
+        const enemySide016d: 'player1Characters' | 'player2Characters' =
+          effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k016dTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[enemySide016d]) {
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.chakra > 4) continue;
+            const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
+              if (eff.type === 'UPGRADE') return false;
+              if (eff.description.includes('[⧗]')) return false;
+              if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+              return true;
+            });
+            if (hasInstant) k016dTargets.push(char.instanceId);
+          }
+        }
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        if (k016dTargets.length > 0) {
+          const k016dEffId = generateInstanceId();
+          const k016dActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: k016dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex,
+            effectType: 'MAIN',
+            effectDescription: '', targetSelectionType: 'KAKASHI_COPY_EFFECT',
+            sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: k016dTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: k016dActId, type: 'SELECT_TARGET' as const,
+            player: effect.sourcePlayer,
+            description: 'Select an enemy character (cost 4 or less) to copy their effect.',
+            descriptionKey: 'game.effect.desc.kakashi016CopyEffect',
+            descriptionParams: { costLimit: 'cost 4 or less' },
+            options: k016dTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k016dEffId,
+          }];
+        }
+        return newState;
+      }
+
+      // Ino 020 UPGRADE declined: execute MAIN with base cost 2 limit
+      if (effect.targetSelectionType === 'INO020_CONFIRM_UPGRADE') {
+        const i020dSrcChar = EffectEngine.findCharByInstanceId(newState, effect.sourceInstanceId ?? '');
+        const i020dMIdx = i020dSrcChar?.missionIndex ?? effect.sourceMissionIndex;
+        const mission020d = newState.activeMissions[i020dMIdx];
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        if (mission020d) {
+          const enemySide020d: 'player1Characters' | 'player2Characters' =
+            effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+          const friendlySide020d: 'player1Characters' | 'player2Characters' =
+            effect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+          const friendlyNames020d = new Set(
+            mission020d[friendlySide020d].filter((c: any) => !c.isHidden).map((c: any) => c.card.name_fr.toUpperCase())
+          );
+          const i020dTargets: string[] = [];
+          for (const char of mission020d[enemySide020d]) {
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+            if (effectiveCost <= 2) {
+              if (!char.isHidden && friendlyNames020d.has(char.card.name_fr.toUpperCase())) continue;
+              i020dTargets.push(char.instanceId);
+            }
+          }
+          if (i020dTargets.length > 0) {
+            const i020dEffId = generateInstanceId();
+            const i020dActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: i020dEffId, sourceCardId: effect.sourceCardId,
+              sourceInstanceId: effect.sourceInstanceId,
+              sourceMissionIndex: i020dMIdx,
+              effectType: 'MAIN',
+              effectDescription: '', targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
+              sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+              validTargets: i020dTargets, isOptional: false, isMandatory: true,
+              resolved: false, isUpgrade: false,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: i020dActId, type: 'SELECT_TARGET' as const,
+              player: effect.sourcePlayer,
+              description: 'Select an enemy character with cost 2 or less to take control of.',
+              descriptionKey: 'game.effect.desc.ino020TakeControl',
+              descriptionParams: { costLimit: '2' },
+              options: i020dTargets, minSelections: 1, maxSelections: 1,
+              sourceEffectId: i020dEffId,
+            }];
+          }
+        }
+        return newState;
+      }
+
       // Remove the effect and its associated action
       newState.pendingEffects.splice(effectIdx, 1);
       newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
