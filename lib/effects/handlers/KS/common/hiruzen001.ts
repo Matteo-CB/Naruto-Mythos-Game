@@ -14,7 +14,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleHiruzen001Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all valid targets: friendly non-self Leaf Village characters across all missions
+  // Pre-check: find all valid targets
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -22,9 +22,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
       sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
     for (const char of friendlyChars) {
-      // Must not be self, must be Leaf Village
       if (char.instanceId === sourceCard.instanceId) continue;
-      // Hidden characters have no visible keywords/group - skip
       if (char.isHidden) continue;
 
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -34,22 +32,21 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no valid targets, effect fizzles
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Hiruzen Sarutobi (001): No valid Leaf Village target for POWERUP 2.',
       'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' }) } };
   }
 
-  // Always require target selection (effect is optional - player can skip)
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'POWERUP_2_LEAF_VILLAGE',
-    validTargets,
+    targetSelectionType: 'HIRUZEN001_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: 'Select a friendly Leaf Village character to give POWERUP 2.',
-    descriptionKey: 'game.effect.desc.hiruzen001Powerup',
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.hiruzen001ConfirmMain',
   };
 }
 

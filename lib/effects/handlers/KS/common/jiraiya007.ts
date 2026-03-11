@@ -4,34 +4,28 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 
 function handleJiraiya007Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const costReduction = 1;
 
+  // Pre-check: any affordable summons?
   const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
   const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
 
-  const allTargets = [
-    ...handTargets.map(i => `HAND_${i}`),
-    ...hiddenTargets.map(h => `HIDDEN_${h.instanceId}`),
-  ];
-
-  if (allTargets.length === 0) {
+  if (handTargets.length === 0 && hiddenTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Jiraiya (007): No affordable Summon characters available.',
       'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-007-C' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'JIRAIYA_CHOOSE_SUMMON',
-    validTargets: allTargets,
-    description: JSON.stringify({
-      text: 'Jiraiya (007): Choose a Summon character to play (paying 1 less).',
-      hiddenChars: hiddenTargets,
-      costReduction,
-    }),
-    descriptionKey: 'game.effect.desc.jiraiya007ChooseSummon',
+    targetSelectionType: 'JIRAIYA007_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.jiraiya007ConfirmMain',
   };
 }
 

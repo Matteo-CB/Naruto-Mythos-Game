@@ -58,12 +58,11 @@ describe('POWERUP end-to-end', () => {
     const p1Chars = newState.activeMissions[0].player1Characters;
     expect(p1Chars.length).toBe(2);
 
-    // Effect is optional - pending target selection should be waiting
+    // Effect is optional - confirmation popup should be waiting
     expect(newState.pendingEffects.length).toBeGreaterThan(0);
-    const pendingEff = newState.pendingEffects.find(e => e.targetSelectionType === 'POWERUP_2_LEAF_VILLAGE');
+    const pendingEff = newState.pendingEffects.find(e => e.targetSelectionType === 'HIRUZEN001_CONFIRM_MAIN');
     expect(pendingEff).toBeDefined();
     expect(pendingEff!.isOptional).toBe(true);
-    expect(pendingEff!.validTargets).toContain('ally-leaf');
     // Token NOT yet applied (awaiting player confirmation)
     const updatedAlly = p1Chars.find(c => c.instanceId === 'ally-leaf');
     expect(updatedAlly!.powerTokens).toBe(0);

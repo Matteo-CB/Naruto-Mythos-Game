@@ -271,7 +271,10 @@ export function calculateContinuousPowerModifier(
   }
 
   // Rempart 067 special case: if enemy has Rempart in this mission, and this char
-  // is the strongest non-hidden character on our side, reduce power to 0
+  // is the strongest non-hidden character on our side, it loses all Power tokens
+  // and has effective Power = 0. Track via flag so mission effects (MSS-09) also
+  // see this character as having 0 power.
+  let rempartZeroed = false;
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
     const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
@@ -292,10 +295,11 @@ export function calculateContinuousPowerModifier(
             strongestId = f.instanceId;
           }
         }
-        // If this character is the strongest, reduce to 0
+        // If this character is the strongest, reduce to 0 (loses all tokens + power)
         if (strongestId === char.instanceId && maxPower > 0) {
           const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
           modifier -= (selfTop.power ?? 0) + char.powerTokens;
+          rempartZeroed = true;
         }
       }
     }
@@ -360,21 +364,69 @@ export function calculateContinuousPowerModifier(
 
     // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
     // Use base power + tokens only (NOT accumulated modifier) for the threshold check.
-    // Continuous [⧗] effects are passive and simultaneous - they should all evaluate against
-    // the character's inherent state (base + tokens), not against an intermediate value that
-    // depends on code ordering. This avoids non-commutative interactions with effects like
-    // Sasuke 013's self-penalty: both effects independently read base+tokens and contribute
-    // their modifier additively, so order never matters.
+    // Exception: if Rempart zeroed this character (loses all tokens + power = 0),
+    // it no longer qualifies for the >= 4 threshold.
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
-      const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      const basePlusTok = (selfTop.power ?? 0) + char.powerTokens;
-      if (basePlusTok >= 4) {
-        modifier += 1;
+      if (!rempartZeroed) {
+        const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const basePlusTok = (selfTop.power ?? 0) + char.powerTokens;
+        if (basePlusTok >= 4) {
+          modifier += 1;
+        }
       }
     }
   }
 
   return modifier;
+}
+
+// ---------------------
+// Rempart 067 Power Zeroing
+// ---------------------
+
+/**
+ * Check if a character is the strongest enemy being zeroed by Rempart 067.
+ * Used by getVisibleState to show power tokens as removed in the UI.
+ */
+export function isRempartZeroed(
+  state: GameState,
+  missionIndex: number,
+  char: CharacterInPlay,
+  player: PlayerID,
+): boolean {
+  if (char.isHidden) return false;
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return false;
+
+  const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
+  const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
+
+  for (const enemy of enemyChars) {
+    if (enemy.isHidden) continue;
+    const enemyTopCard = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+    if (enemyTopCard.number === 67) {
+      const hasRempartEffect = (enemyTopCard.effects ?? []).some(
+        (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+      );
+      if (hasRempartEffect) {
+        let maxPower = -1;
+        let strongestId = '';
+        for (const f of friendlyChars) {
+          if (f.isHidden) continue;
+          const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
+          const basePower = (fTop.power ?? 0) + f.powerTokens;
+          if (basePower > maxPower) {
+            maxPower = basePower;
+            strongestId = f.instanceId;
+          }
+        }
+        if (strongestId === char.instanceId && maxPower > 0) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 // ---------------------

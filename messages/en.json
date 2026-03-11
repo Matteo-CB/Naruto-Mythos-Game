@@ -21,7 +21,8 @@
     "play": "Play",
     "close": "Close",
     "all": "All",
-    "maintenanceBanner": "Server maintenance incoming. No new games can be started after your current game. The site will be back in a few minutes."
+    "maintenanceBanner": "Server maintenance incoming. No new games can be started after your current game. The site will be back in a few minutes.",
+    "home": "Home"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -394,7 +395,17 @@
         "dosu068Defeat": "Select a hidden character in play to defeat.",
         "orochimaru050LookSteal": "Select a hidden enemy character to look at. If cost 3 or less, take control.",
         "pakkun099Move": "Choose a mission to move Pakkun to.",
+        "hiruzen001ConfirmMain": "Hiruzen (001): POWERUP 2 a friendly Leaf Village character?",
         "hiruzen001Powerup": "Select a friendly Leaf Village character to give POWERUP 2.",
+        "hiruzen002ConfirmMain": "Hiruzen (002): Play a Leaf Village character paying 1 less?",
+        "hiruzen002ConfirmUpgrade": "Hiruzen (002) UPGRADE: Also POWERUP 2 the played character?",
+        "tsunade004ConfirmUpgrade": "Tsunade (004) UPGRADE: Recover a character from your discard pile?",
+        "shizune006ConfirmMain": "Shizune (006): Move an enemy character with Power 3 or less?",
+        "shizune006ConfirmUpgrade": "Shizune (006) UPGRADE: Gain 2 Chakra?",
+        "jiraiya007ConfirmMain": "Jiraiya (007): Play a Summon character paying 1 less?",
+        "jiraiya008ConfirmMain": "Jiraiya (008): Play a Summon character paying 2 less?",
+        "jiraiya008ConfirmUpgrade": "Jiraiya (008) UPGRADE: Hide an enemy character with cost 3 or less?",
+        "naruto010ConfirmAmbush": "Naruto (010) AMBUSH: Move this character to another mission?",
         "jiraiya007ChooseSummon": "Choose a Summon character from your hand to play (paying 1 less).",
         "kabuto052PlaceHidden": "Choose a mission to place the stolen card hidden.",
         "neji036RemoveTokens": "Select an enemy character to remove up to 2 Power tokens from.",
@@ -1756,17 +1767,6 @@
       "syncing": "Syncing...",
       "syncAll": "Sync All Users"
     },
-    "testers": {
-      "title": "Testers",
-      "description": "Manage tester accounts. Testers get a special badge visible everywhere.",
-      "search": "Search by username...",
-      "add": "Add tester",
-      "remove": "Remove",
-      "noTesters": "No testers yet.",
-      "added": "Tester added",
-      "removed": "Tester removed",
-      "notFound": "User not found"
-    },
     "backgrounds": {
       "title": "Game Backgrounds",
       "description": "Upload and manage backgrounds players can choose for their game board.",
@@ -1788,20 +1788,18 @@
     "actionLog": "Action Log",
     "sealed": {
       "title": "Sealed Mode",
-      "description": "Enable or disable Sealed mode for all users. When disabled, only testers and admins can access Sealed mode.",
+      "description": "Enable or disable Sealed mode for all users. When disabled, only admins can access Sealed mode.",
       "loading": "Loading...",
       "toggling": "Toggling...",
       "enabled": "ENABLED",
       "disabled": "DISABLED",
       "enabledDesc": "All users can access Sealed mode",
-      "disabledDesc": "Only testers and admins can access Sealed mode"
+      "disabledDesc": "Only admins can access Sealed mode"
     }
   },
   "badges": {
     "admin": "ADMIN",
-    "tester": "TESTER",
     "showAdmin": "Show Admin badge",
-    "showTester": "Show Tester badge",
     "showLeague": "Show League badge",
     "badgePrefs": "Badge Preferences",
     "badgePrefsDesc": "Choose which badges to display next to your name."

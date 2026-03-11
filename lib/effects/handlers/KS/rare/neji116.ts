@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { defeatEnemyCharacter, defeatFriendlyCharacter } from '@/lib/effects/defeatUtils';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 /**
@@ -22,8 +20,8 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 /**
- * Helper: find characters with exactly the given power in the source mission,
- * defeat one (auto if single target, prompt selection if multiple).
+ * Helper: find characters with exactly the given power in the source mission.
+ * Always prompts for target selection (effect is optional).
  */
 function defeatCharacterWithExactPower(
   ctx: EffectContext,
@@ -70,35 +68,7 @@ function defeatCharacterWithExactPower(
     };
   }
 
-  // If exactly one target, auto-resolve
-  if (validTargets.length === 1) {
-    const target = validTargets[0];
-    let newState: EffectContext['state'];
-    if (target.isEnemy) {
-      newState = defeatEnemyCharacter(state, sourceMissionIndex, target.instanceId, sourcePlayer);
-    } else {
-      newState = defeatFriendlyCharacter(state, sourceMissionIndex, target.instanceId, sourcePlayer);
-    }
-    // Find the target name for logging
-    const allChars = [...mission[friendlySide], ...mission[enemySide]];
-    const targetChar = allChars.find((c) => c.instanceId === target.instanceId);
-    const targetName = targetChar ? targetChar.card.name_fr : 'Unknown';
-
-    return {
-      state: {
-        ...newState,
-        log: logAction(
-          newState.log, newState.turn, newState.phase, sourcePlayer,
-          'EFFECT_DEFEAT',
-          `Neji Hyuga (116) ${label}: Defeated ${targetName} (exactly Power ${targetPower}).`,
-          'game.log.effect.defeat',
-          { card: 'NEJI HYUGA', id: 'KS-116-R', target: targetName },
-        ),
-      },
-    };
-  }
-
-  // Multiple targets: requires selection
+  // Always prompt for target selection (effect is optional — no "you must")
   return {
     state,
     requiresTargetSelection: true,

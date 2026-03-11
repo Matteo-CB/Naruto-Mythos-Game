@@ -13,6 +13,7 @@ import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEne
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
+import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard } from './handlers/KS/shared/summonSearch';
 
 /**
  * Find an upgrade target for a card on a mission. Checks both same-name and flexible (cross-name) upgrades.
@@ -819,11 +820,12 @@ export class EffectEngine {
         ps026.deck = [...putBack026, ...remainingDeck026];
         newState[pendingEffect.sourcePlayer] = ps026;
         if (drawnCards026.length > 0) {
+          const revealedNames026 = drawnCards026.join(', ');
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_DRAW',
-            `Kiba Inuzuka (026): Drew ${drawnCards026.length} Akamaru card(s) from top 3 (upgrade).`,
-            'game.log.effect.draw',
-            { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: drawnCards026.length });
+            `Kiba Inuzuka (026): Revealed and drew ${drawnCards026.length} Akamaru card(s) from top 3: ${revealedNames026} (upgrade).`,
+            'game.log.effect.revealDraw',
+            { card: 'KIBA INUZUKA', id: 'KS-026-UC', count: drawnCards026.length, revealed: revealedNames026 });
         } else {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
@@ -854,11 +856,12 @@ export class EffectEngine {
         ps065.deck = [...putBack065, ...remainingDeck065];
         newState[pendingEffect.sourcePlayer] = ps065;
         if (drawnCards065.length > 0) {
+          const revealedNames065 = drawnCards065.join(', ');
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_DRAW',
-            `Tayuya (065): Drew ${drawnCards065.length} Summon card(s) from top 3 (upgrade).`,
-            'game.log.effect.draw',
-            { card: 'TAYUYA', id: 'KS-065-UC', count: drawnCards065.length });
+            `Tayuya (065): Revealed and drew ${drawnCards065.length} Summon card(s) from top 3: ${revealedNames065} (upgrade).`,
+            'game.log.effect.revealDraw',
+            { card: 'TAYUYA', id: 'KS-065-UC', count: drawnCards065.length, revealed: revealedNames065 });
         } else {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
@@ -1520,6 +1523,368 @@ export class EffectEngine {
         } else {
           newState = EffectEngine.kiba113QueueAkamaruChoice(newState, pendingEffect, true);
         }
+        break;
+      }
+
+      // =============================================
+      // Confirmation popups for instant effects (batch 1: KS-001 to KS-010)
+      // =============================================
+      case 'HIRUZEN001_CONFIRM_MAIN': {
+        // Player confirmed — re-compute Leaf Village targets and queue POWERUP_2_LEAF_VILLAGE
+        const h001Targets: string[] = [];
+        const h001FriendlySide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[h001FriendlySide]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.group === 'Leaf Village') h001Targets.push(char.instanceId);
+          }
+        }
+        if (h001Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Hiruzen Sarutobi (001): No valid Leaf Village target for POWERUP 2.',
+            'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' });
+          break;
+        }
+        const h001EffId = generateInstanceId();
+        const h001ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: h001EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'POWERUP_2_LEAF_VILLAGE',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: h001Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: h001ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a friendly Leaf Village character to give POWERUP 2.',
+          descriptionKey: 'game.effect.desc.hiruzen001Powerup',
+          options: h001Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: h001EffId,
+        }];
+        break;
+      }
+
+      case 'HIRUZEN002_CONFIRM_MAIN': {
+        let h002Data: { isUpgrade?: string } | null = null;
+        try { h002Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const h002IsUpgrade = h002Data?.isUpgrade === 'true';
+
+        if (h002IsUpgrade) {
+          // Queue UPGRADE confirmation popup
+          const h002uEffId = generateInstanceId();
+          const h002uActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: h002uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: pendingEffect.effectDescription,
+            targetSelectionType: 'HIRUZEN002_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: pendingEffect.validTargets, isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: h002uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: 'Hiruzen (002) UPGRADE: Also POWERUP 2 the played character?',
+            descriptionKey: 'game.effect.desc.hiruzen002ConfirmUpgrade',
+            options: pendingEffect.validTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: h002uEffId,
+          }];
+        } else {
+          // Queue HIRUZEN002_CHOOSE_CARD directly
+          newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, false);
+        }
+        break;
+      }
+
+      case 'HIRUZEN002_CONFIRM_UPGRADE': {
+        // Player confirmed UPGRADE — queue HIRUZEN002_CHOOSE_CARD with isUpgrade
+        newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, true);
+        break;
+      }
+
+      case 'TSUNADE004_CONFIRM_UPGRADE': {
+        // Player confirmed — re-compute discard targets and queue RECOVER_FROM_DISCARD
+        const t004Player = pendingEffect.sourcePlayer;
+        const t004Discard = newState[t004Player].discardPile;
+        const t004Targets: string[] = [];
+        for (let idx = 0; idx < t004Discard.length; idx++) {
+          if (t004Discard[idx].card_type === 'character') t004Targets.push(String(idx));
+        }
+        if (t004Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t004Player,
+            'EFFECT_NO_TARGET', 'Tsunade (004): No characters in discard pile to recover.',
+            'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' });
+          break;
+        }
+        const t004EffId = generateInstanceId();
+        const t004ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: t004EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'RECOVER_FROM_DISCARD',
+          sourcePlayer: t004Player, requiresTargetSelection: true,
+          validTargets: t004Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: true,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: t004ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: t004Player,
+          description: 'Choose a character from your discard pile to put into your hand.',
+          descriptionKey: 'game.effect.desc.tsunade004RecoverFromDiscard',
+          options: t004Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: t004EffId,
+        }];
+        break;
+      }
+
+      case 'SHIZUNE006_CONFIRM_MAIN': {
+        // Player confirmed — re-compute enemy targets with power ≤ 3
+        const s006Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const s006EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const s006Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[s006EnemySide]) {
+            if (getEffectivePower(newState, char, s006Opponent) <= 3) {
+              s006Targets.push(char.instanceId);
+            }
+          }
+        }
+        if (s006Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Shizune (006): No enemy character with Power 3 or less in play to move.',
+            'game.log.effect.noTarget', { card: 'SHIZUNE', id: 'KS-006-UC' });
+          break;
+        }
+        const s006EffId = generateInstanceId();
+        const s006ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s006EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'MOVE_ENEMY_POWER_3_OR_LESS',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: s006Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s006ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select an enemy character with Power 3 or less to move to another mission.',
+          descriptionKey: 'game.effect.desc.shizune006MoveEnemy',
+          options: s006Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: s006EffId,
+        }];
+        break;
+      }
+
+      case 'SHIZUNE006_CONFIRM_UPGRADE': {
+        // Player confirmed — apply +2 chakra directly
+        const s006uPlayer = pendingEffect.sourcePlayer;
+        const s006uPs = { ...newState[s006uPlayer] };
+        s006uPs.chakra += 2;
+        newState = { ...newState, [s006uPlayer]: s006uPs };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, s006uPlayer,
+          'EFFECT_CHAKRA', 'Shizune (006): Gained 2 Chakra (upgrade effect).',
+          'game.log.effect.gainChakra', { card: 'SHIZUNE', id: 'KS-006-UC', amount: '2' });
+        break;
+      }
+
+      case 'JIRAIYA007_CONFIRM_MAIN': {
+        // Player confirmed — re-compute summon targets and queue JIRAIYA_CHOOSE_SUMMON
+        const j007Hand = findAffordableSummonsInHand(newState, pendingEffect.sourcePlayer, 1);
+        const j007Hidden = findHiddenSummonsOnBoard(newState, pendingEffect.sourcePlayer, 1);
+        const j007Targets = [
+          ...j007Hand.map(i => `HAND_${i}`),
+          ...j007Hidden.map(h => `HIDDEN_${h.instanceId}`),
+        ];
+        if (j007Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Jiraiya (007): No affordable Summon characters available.',
+            'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-007-C' });
+          break;
+        }
+        const j007EffId = generateInstanceId();
+        const j007ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: j007EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ hiddenChars: j007Hidden, costReduction: 1 }),
+          targetSelectionType: 'JIRAIYA_CHOOSE_SUMMON',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: j007Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: j007ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: JSON.stringify({
+            text: 'Jiraiya (007): Choose a Summon character to play (paying 1 less).',
+            hiddenChars: j007Hidden, costReduction: 1,
+          }),
+          descriptionKey: 'game.effect.desc.jiraiya007ChooseSummon',
+          options: j007Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: j007EffId,
+        }];
+        break;
+      }
+
+      case 'JIRAIYA008_CONFIRM_MAIN': {
+        // Player confirmed — re-compute summon targets and queue JIRAIYA008_CHOOSE_SUMMON
+        const j008Hand = findAffordableSummonsInHand(newState, pendingEffect.sourcePlayer, 2);
+        const j008Hidden = findHiddenSummonsOnBoard(newState, pendingEffect.sourcePlayer, 2);
+        const j008Targets = [
+          ...j008Hand.map(i => `HAND_${i}`),
+          ...j008Hidden.map(h => `HIDDEN_${h.instanceId}`),
+        ];
+        if (j008Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Jiraiya (008): No affordable Summon characters available.',
+            'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-008-UC' });
+          break;
+        }
+        const j008EffId = generateInstanceId();
+        const j008ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: j008EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ hiddenChars: j008Hidden, costReduction: 2 }),
+          targetSelectionType: 'JIRAIYA008_CHOOSE_SUMMON',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: j008Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: j008ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: JSON.stringify({
+            text: 'Jiraiya (008): Choose a Summon character to play (paying 2 less).',
+            hiddenChars: j008Hidden, costReduction: 2,
+          }),
+          descriptionKey: 'game.effect.desc.jiraiya008ChooseSummon',
+          options: j008Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: j008EffId,
+        }];
+        break;
+      }
+
+      case 'JIRAIYA008_CONFIRM_UPGRADE': {
+        // Player confirmed — re-compute hide targets and queue JIRAIYA_HIDE_ENEMY_COST_3
+        let j008uData: { sourceMissionIndex?: number } | null = null;
+        try { j008uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const j008uMIdx = j008uData?.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
+        const j008uEnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const j008uMission = newState.activeMissions[j008uMIdx];
+        const j008uTargets: string[] = [];
+        if (j008uMission) {
+          for (const char of (j008uMission as any)[j008uEnemySide]) {
+            if (char.isHidden) continue;
+            const tc = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (tc.chakra <= 3) j008uTargets.push(char.instanceId);
+          }
+        }
+        if (j008uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Jiraiya (008): No enemy character with cost 3 or less to hide (upgrade).',
+            'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' });
+          break;
+        }
+        const j008uEffId = generateInstanceId();
+        const j008uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: j008uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: j008uMIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'JIRAIYA_HIDE_ENEMY_COST_3',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: j008uTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: true,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: j008uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Jiraiya (008): Select an enemy character with cost 3 or less in this mission to hide (upgrade effect).',
+          descriptionKey: 'game.effect.desc.jiraiya008HideEnemy',
+          options: j008uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: j008uEffId,
+        }];
+        break;
+      }
+
+      case 'NARUTO010_CONFIRM_AMBUSH': {
+        // Player confirmed — re-compute valid destination missions and queue NARUTO_MOVE_SELF
+        let n010Data: { sourceMissionIndex?: number } | null = null;
+        try { n010Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const n010MIdx = n010Data?.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
+        const n010FriendlySide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        // Find the source character to get name
+        let n010CharName = 'NARUTO UZUMAKI';
+        const n010SrcMission = newState.activeMissions[n010MIdx];
+        if (n010SrcMission) {
+          for (const c of (n010SrcMission as any)[n010FriendlySide]) {
+            if (c.instanceId === pendingEffect.sourceInstanceId) {
+              const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              n010CharName = top.name_fr;
+              break;
+            }
+          }
+        }
+
+        const n010Targets: string[] = [];
+        for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+          if (mIdx === n010MIdx) continue;
+          const mission = newState.activeMissions[mIdx];
+          const friendlyChars = (mission as any)[n010FriendlySide];
+          const hasSameName = friendlyChars.some((c: CharacterInPlay) => {
+            if (c.instanceId === pendingEffect.sourceInstanceId) return false;
+            const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return top.name_fr === n010CharName;
+          });
+          if (!hasSameName) n010Targets.push(String(mIdx));
+        }
+        if (n010Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (010): No valid mission to move to.',
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' });
+          break;
+        }
+        const n010EffId = generateInstanceId();
+        const n010ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: n010EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: n010MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'NARUTO_MOVE_SELF',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: n010Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: n010ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a mission to move Naruto Uzumaki to.',
+          descriptionKey: 'game.effect.desc.naruto010MoveSelf',
+          options: n010Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: n010EffId,
+        }];
         break;
       }
 
@@ -8394,6 +8759,108 @@ export class EffectEngine {
     }
 
     return { replaced: false, replacement: 'hide' };
+  }
+
+  /**
+   * Hiruzen 002 (UC): Queue card choice after confirmation popup.
+   * Re-computes affordable Leaf Village targets and creates HIRUZEN002_CHOOSE_CARD pending effect.
+   */
+  static queueHiruzen002Choose(state: GameState, pending: PendingEffect, isUpgrade: boolean): GameState {
+    let newState = { ...state };
+    const player = pending.sourcePlayer;
+    const playerState = newState[player];
+    const costReduction = 1;
+    const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+    // Re-compute affordable Leaf Village characters in hand
+    const affordableLeafIndices: string[] = [];
+    for (let i = 0; i < playerState.hand.length; i++) {
+      const card = playerState.hand[i];
+      if (card.group !== 'Leaf Village') continue;
+      let canPlace = false;
+      for (const mission of newState.activeMissions) {
+        const chars = mission[friendlySide];
+        let upgradeTarget: CharacterInPlay | undefined;
+        for (const c of chars) {
+          if (c.isHidden) continue;
+          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          if (topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
+            upgradeTarget = c; break;
+          }
+        }
+        if (!upgradeTarget) {
+          for (const c of chars) {
+            if (c.isHidden) continue;
+            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            if (checkFlexibleUpgrade(card as any, topCard) && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
+              upgradeTarget = c; break;
+            }
+          }
+        }
+        if (upgradeTarget) {
+          const existingTop = upgradeTarget.stack.length > 0
+            ? upgradeTarget.stack[upgradeTarget.stack.length - 1] : upgradeTarget.card;
+          const upgradeCost = Math.max(0, (card.chakra - existingTop.chakra) - costReduction);
+          if (playerState.chakra >= upgradeCost) { canPlace = true; break; }
+        } else {
+          const hasNameConflict = chars.some((c) => {
+            if (c.isHidden) return false;
+            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+          });
+          if (!hasNameConflict) {
+            const freshCost = Math.max(0, card.chakra - costReduction);
+            if (playerState.chakra >= freshCost) { canPlace = true; break; }
+          }
+        }
+      }
+      if (canPlace) affordableLeafIndices.push(`HAND_${i}`);
+    }
+
+    // Find hidden Leaf Village characters on the board
+    const hiddenTargets = findHiddenLeafOnBoard(newState, player, costReduction);
+    const hiddenLeafIds = hiddenTargets.map(h => `HIDDEN_${h.instanceId}`);
+    const allTargets = [...affordableLeafIndices, ...hiddenLeafIds];
+
+    if (allTargets.length === 0) {
+      newState.log = logAction(newState.log, newState.turn, newState.phase, player,
+        'EFFECT_NO_TARGET', 'Hiruzen Sarutobi (002): No affordable Leaf Village character could be played.',
+        'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-002-UC' });
+      return newState;
+    }
+
+    const effId = generateInstanceId();
+    const actId = generateInstanceId();
+    newState.pendingEffects = [...newState.pendingEffects, {
+      id: effId, sourceCardId: pending.sourceCardId,
+      sourceInstanceId: pending.sourceInstanceId,
+      sourceMissionIndex: pending.sourceMissionIndex,
+      effectType: pending.effectType,
+      effectDescription: JSON.stringify({
+        text: isUpgrade
+          ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1, + POWERUP 2).'
+          : 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
+        hiddenChars: hiddenTargets, costReduction, isUpgrade,
+      }),
+      targetSelectionType: 'HIRUZEN002_CHOOSE_CARD',
+      sourcePlayer: player, requiresTargetSelection: true,
+      validTargets: allTargets, isOptional: true, isMandatory: false,
+      resolved: false, isUpgrade,
+    }];
+    newState.pendingActions = [...newState.pendingActions, {
+      id: actId, type: 'SELECT_TARGET' as PendingAction['type'],
+      player,
+      description: isUpgrade
+        ? 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1, + POWERUP 2).'
+        : 'Hiruzen Sarutobi (002): Choose a Leaf Village character to play (cost -1).',
+      descriptionKey: isUpgrade
+        ? 'game.effect.desc.hiruzen002PlayLeafUpgrade'
+        : 'game.effect.desc.hiruzen002PlayLeaf',
+      options: allTargets, minSelections: 1, maxSelections: 1,
+      sourceEffectId: effId,
+    }];
+
+    return newState;
   }
 
   /**

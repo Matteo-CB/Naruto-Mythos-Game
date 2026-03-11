@@ -36,32 +36,33 @@ function handleTsunade004Main(ctx: EffectContext): EffectResult {
 }
 
 function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
-  // Find character cards in the discard pile
+  // Pre-check: any characters in discard pile?
   const discardPile = playerState.discardPile;
-  // Build valid targets as string indices into the discard pile (characters only)
-  const validTargets: string[] = [];
+  let hasCharacter = false;
   for (let idx = 0; idx < discardPile.length; idx++) {
     if (discardPile[idx].card_type === 'character') {
-      validTargets.push(String(idx));
+      hasCharacter = true;
+      break;
     }
   }
-  if (validTargets.length === 0) {
+  if (!hasCharacter) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tsunade (004): No characters in discard pile to recover.',
       'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' }) } };
   }
 
-  // Always let player choose (optional effect)
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'RECOVER_FROM_DISCARD',
-    validTargets,
-    description: 'Choose a character from your discard pile to put into your hand.',
-    descriptionKey: 'game.effect.desc.tsunade004RecoverFromDiscard',
+    targetSelectionType: 'TSUNADE004_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.tsunade004ConfirmUpgrade',
   };
 }
 
