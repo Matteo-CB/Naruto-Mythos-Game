@@ -14,7 +14,7 @@ interface UserBadgesProps {
 /**
  * Displays all applicable badges for a user in a row.
  * Badges hidden via badgePrefs are not shown.
- * Order: Admin > Tester > League
+ * Order: Admin > League
  */
 export function UserBadges({
   role = 'user',
@@ -26,15 +26,13 @@ export function UserBadges({
   const hiddenBadges = new Set(badgePrefs);
 
   const showAdmin = role === 'admin' && !hiddenBadges.has('admin');
-  const showTester = role === 'tester' && !hiddenBadges.has('tester');
   const showLeague = leaguesEnabled && elo !== undefined && !hiddenBadges.has('league');
 
-  if (!showAdmin && !showTester && !showLeague) return null;
+  if (!showAdmin && !showLeague) return null;
 
   return (
     <span className="inline-flex items-center gap-1 flex-wrap">
       {showAdmin && <RoleBadge role="admin" size={size} />}
-      {showTester && <RoleBadge role="tester" size={size} />}
       {showLeague && <EloBadge elo={elo!} size={size} showElo={false} />}
     </span>
   );

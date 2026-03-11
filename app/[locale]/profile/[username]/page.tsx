@@ -241,7 +241,7 @@ export default function ProfilePage({
         )}
 
         {/* Badge Preferences (own profile only) */}
-        {session?.user?.id === profile.id && (profile.role === 'admin' || profile.role === 'tester' || leaguesEnabled) && (
+        {session?.user?.id === profile.id && (profile.role === 'admin' || leaguesEnabled) && (
           <div
             className="rounded-lg p-4 mb-4"
             style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -273,28 +273,6 @@ export default function ProfilePage({
                     className="accent-amber-500"
                   />
                   <span className="text-xs" style={{ color: '#e0e0e0' }}>{tb('showAdmin')}</span>
-                </label>
-              )}
-              {profile.role === 'tester' && (
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!badgePrefsLocal.includes('tester')}
-                    onChange={async (e) => {
-                      const newPrefs = e.target.checked
-                        ? badgePrefsLocal.filter((b) => b !== 'tester')
-                        : [...badgePrefsLocal, 'tester'];
-                      setBadgePrefsLocal(newPrefs);
-                      setProfile((prev) => prev ? { ...prev, badgePrefs: newPrefs } : prev);
-                      await fetch('/api/user/badge-prefs', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ badgePrefs: newPrefs }),
-                      });
-                    }}
-                    className="accent-cyan-500"
-                  />
-                  <span className="text-xs" style={{ color: '#e0e0e0' }}>{tb('showTester')}</span>
                 </label>
               )}
               {leaguesEnabled && (
