@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 059/130 - KIDOMARU (Common)
@@ -39,34 +40,52 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
-  // Find all movable friendly characters (excluding self)
-  const validTargets: string[] = [];
-  if (state.activeMissions.length > 1) {
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      for (const char of state.activeMissions[i][friendlySide]) {
-        if (char.instanceId === ctx.sourceCard.instanceId) continue; // Cannot move itself
-        validTargets.push(char.instanceId);
-      }
-    }
+  // Need at least 2 missions to move
+  if (state.activeMissions.length < 2) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Kidomaru (059): Only 1 mission in play, cannot move.',
+      'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
-  if (validTargets.length === 0) {
+  // Find all movable friendly characters (excluding self) with R8+R10
+  let hasMovable = false;
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    // R8: Check Kurenai block for this mission
+    if (isMovementBlockedByKurenai(state, i, sourcePlayer)) continue;
+    for (const char of state.activeMissions[i][friendlySide]) {
+      if (char.instanceId === ctx.sourceCard.instanceId) continue;
+      // R10: Check at least one valid destination (name uniqueness)
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const charName = topCard.name_fr;
+      const hasValidDest = state.activeMissions.some((m, di) => {
+        if (di === i) return false;
+        return !m[friendlySide].some((c) => {
+          if (c.instanceId === char.instanceId) return false;
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr === charName;
+        });
+      });
+      if (hasValidDest) { hasMovable = true; break; }
+    }
+    if (hasMovable) break;
+  }
+
+  if (!hasMovable) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Kidomaru (059): No friendly characters could be moved.',
       'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIDOMARU_CHOOSE_CHARACTER',
-    validTargets,
-    description: JSON.stringify({
-      text: `Kidomaru (059): Choose a friendly character to move (${soundFourMissionCount} move(s) available).`,
-      movesRemaining: soundFourMissionCount,
-    }),
-    descriptionKey: 'game.effect.desc.kidomaru059MoveCharacter',
-    descriptionParams: { moves: soundFourMissionCount },
+    targetSelectionType: 'KIDOMARU059_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kidomaru059ConfirmMain',
   };
 }
 

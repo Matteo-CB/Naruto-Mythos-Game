@@ -20,7 +20,7 @@ import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
  */
 
 function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
   if (playerState.hand.length === 0) {
@@ -38,42 +38,20 @@ function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Auto-discard if only 1 card in hand
-  if (playerState.hand.length === 1) {
-    const ps = { ...playerState };
-    const hand = [...ps.hand];
-    const discarded = hand.splice(0, 1)[0];
-    ps.hand = hand;
-    ps.discardPile = [...ps.discardPile, discarded];
-    return {
-      state: {
-        ...state,
-        [sourcePlayer]: ps,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_DISCARD',
-          `Kabuto Yakushi (053) UPGRADE: Discarded ${discarded.name_fr}.`,
-          'game.log.effect.discard',
-          { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: discarded.name_fr },
-        ),
-      },
-    };
-  }
-
-  // Multiple cards - player chooses which to discard
-  const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
+  // Confirmation popup (no SKIP per Andy)
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO053_CHOOSE_DISCARD',
-    validTargets: handIndices,
-    description: 'Kabuto Yakushi (053) UPGRADE: Choose a card from your hand to discard.',
-    descriptionKey: 'game.effect.desc.kabuto053ChooseDiscard',
+    targetSelectionType: 'KABUTO053_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: false,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kabuto053ConfirmUpgrade',
   };
 }
 
 function handleKabuto053Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
   if (playerState.discardPile.length === 0) {
@@ -92,8 +70,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
   }
 
   // Top of discard pile = last element in the array
-  const topCardIndex = playerState.discardPile.length - 1;
-  const topCard = playerState.discardPile[topCardIndex];
+  const topCard = playerState.discardPile[playerState.discardPile.length - 1];
 
   // Must be a character card
   if (topCard.card_type !== 'character') {
@@ -113,8 +90,8 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
 
   const reducedCost = Math.max(0, (topCard.chakra ?? 0) - 3);
   const canAffordFresh = playerState.chakra >= reducedCost;
-  const canUpgrade = canAffordAsUpgrade(state, sourcePlayer, topCard as { name_fr: string; chakra: number }, 3);
-  if (!canAffordFresh && !canUpgrade) {
+  const canUpgradeCheck = canAffordAsUpgrade(state, sourcePlayer, topCard as { name_fr: string; chakra: number }, 3);
+  if (!canAffordFresh && !canUpgradeCheck) {
     return {
       state: {
         ...state,
@@ -129,16 +106,15 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find valid missions (fresh play or upgrade over same-name/flexible with lower cost)
+  // Find valid missions (fresh play or upgrade)
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const validMissions: string[] = [];
+  let hasValidMission = false;
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     const mission = state.activeMissions[mi];
     const chars = mission[friendlySide];
 
-    // Check for upgrade targets (same-name or flexible cross-name)
     let hasUpgradeTarget = false;
     for (const c of chars) {
       if (c.isHidden) continue;
@@ -156,7 +132,6 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
       }
     }
 
-    // Check for fresh play (no same-name conflict)
     const hasNameConflict = chars.some((c) => {
       if (c.isHidden) return false;
       const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
@@ -164,11 +139,12 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     });
 
     if (hasUpgradeTarget || (!hasNameConflict && canAffordFresh)) {
-      validMissions.push(String(mi));
+      hasValidMission = true;
+      break;
     }
   }
 
-  if (validMissions.length === 0) {
+  if (!hasValidMission) {
     return {
       state: {
         ...state,
@@ -183,19 +159,15 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Always go through target selection so EffectEngine handles upgrade + MAIN effects
+  // Confirmation popup (no SKIP per Andy)
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
-    validTargets: validMissions,
-    description: JSON.stringify({
-      discardIndex: topCardIndex,
-      reducedCost,
-      text: `Kabuto Yakushi (053): Choose a mission to play ${topCard.name_fr} on (cost ${reducedCost}).`,
-    }),
-    descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
-    descriptionParams: { cardName: topCard.name_fr, cost: String(reducedCost) },
+    targetSelectionType: 'KABUTO053_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: false,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kabuto053ConfirmMain',
   };
 }
 

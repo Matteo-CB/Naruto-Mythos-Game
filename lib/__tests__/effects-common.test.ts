@@ -605,11 +605,11 @@ describe('055/130 - Kimimaro', () => {
     const handler = getEffectHandler('KS-055-C', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kimimaro, 0, 'AMBUSH'));
-    // Now returns requiresTargetSelection for hand card selection
+    // Now returns CONFIRM popup first
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KIMIMARO_CHOOSE_DISCARD');
-    expect(result.validTargets).toEqual(['0']); // 1 card in hand
-    // Hand unchanged until player selects
+    expect(result.targetSelectionType).toBe('KIMIMARO055_CONFIRM_AMBUSH');
+    expect(result.validTargets).toEqual(['kim-1']); // sourceCard instanceId
+    // Hand unchanged until player confirms
     expect(result.state.player1.hand.length).toBe(1);
   });
 
@@ -662,8 +662,11 @@ describe('057/130 - Jirobo', () => {
 
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
-    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
-    expect(updated?.powerTokens).toBe(1); // 1 mission with other Sound Four (self excluded)
+    // Now returns CONFIRM popup (no SKIP)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('JIROBO057_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['jirobo-1']);
+    expect(result.isOptional).toBe(false);
   });
 
   it('should get 0 POWERUP when no other Sound Four anywhere', () => {
@@ -704,8 +707,11 @@ describe('057/130 - Jirobo', () => {
 
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
-    const updated = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'jirobo-1');
-    expect(updated?.powerTokens).toBe(2); // 2 other missions with Sound Four (self excluded)
+    // Now returns CONFIRM popup (no SKIP)
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('JIROBO057_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['jirobo-1']);
+    expect(result.isOptional).toBe(false);
   });
 });
 
@@ -740,10 +746,10 @@ describe('059/130 - Kidomaru', () => {
 
     const handler = getEffectHandler('KS-059-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // X=1 (one other mission with Sound Four, self excluded), so 1 move available
+    // Now returns CONFIRM popup first
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KIDOMARU_CHOOSE_CHARACTER');
-    expect(result.validTargets!.length).toBe(2); // ally + sf2 (Kidomaru itself excluded from movable targets)
+    expect(result.targetSelectionType).toBe('KIDOMARU059_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['kid-1']);
   });
 });
 
@@ -806,8 +812,10 @@ describe('060/130 - Kidômaru UC', () => {
 
     const handler = getEffectHandler('KS-060-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
+    // Now returns CONFIRM popup first
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toContain('hidden-1'); // hidden = power 0 <= 1
+    expect(result.targetSelectionType).toBe('KIDOMARU060_CONFIRM_AMBUSH');
+    expect(result.validTargets).toEqual(['kid-1']); // sourceCard instanceId
   });
 
   it('AMBUSH should not target enemies with effective power > 1', () => {
@@ -852,10 +860,10 @@ describe('060/130 - Kidômaru UC', () => {
 
     const handler = getEffectHandler('KS-060-UC', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
+    // Now returns CONFIRM popup first
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KIDOMARU060_CHOOSE_CHARACTER');
-    expect(result.validTargets).toContain('ally-1');
-    expect(result.validTargets).toContain('kid-1'); // self included (can move itself)
+    expect(result.targetSelectionType).toBe('KIDOMARU060_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['kid-1']); // sourceCard instanceId
   });
 });
 
@@ -1448,12 +1456,12 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const jiroboTopCard = jirobo057.stack.length > 0 ? jirobo057.stack[jirobo057.stack.length - 1] : jirobo057.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jiroboTopCard, 'MAIN');
-    // Jirobo 057 MAIN: POWERUP X on self (Sakon as copier), X = missions with other Sound Four
-    // Mission 1 has Jirobo (Sound Four) → count = 1
-    const sakonAfter = resultState.activeMissions[0].player1Characters.find(
-      (c: CharacterInPlay) => c.instanceId === 'sakon062-1',
+    // Jirobo 057 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    const confirmPending = resultState.pendingEffects.find(
+      (pe: any) => pe.targetSelectionType === 'JIROBO057_CONFIRM_MAIN',
     );
-    expect(sakonAfter?.powerTokens).toBe(1); // 1 mission with other Sound Four
+    expect(confirmPending).toBeDefined();
+    expect(confirmPending!.sourceInstanceId).toBe('sakon062-1'); // copier is the source
   });
 
   it('copied Sakon 061 MAIN should draw cards for copier player', () => {
@@ -1547,18 +1555,12 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const jirobo058TopCard = jirobo058.stack.length > 0 ? jirobo058.stack[jirobo058.stack.length - 1] : jirobo058.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jirobo058TopCard, 'MAIN');
-    // Jirobo 058 MAIN: POWERUP 1 to other Sound Four in "this mission" (= Sakon's mission 0)
-    // isUpgrade is false for copy, so scope = this mission only
-    // Tayuya is in mission 0 with Sound Four → should get POWERUP 1
-    const tayuyaAfter = resultState.activeMissions[0].player1Characters.find(
-      (c: CharacterInPlay) => c.instanceId === 'tayuya-1',
+    // Jirobo 058 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    const confirmPending = resultState.pendingEffects.find(
+      (pe: any) => pe.targetSelectionType === 'JIROBO058_CONFIRM_MAIN',
     );
-    expect(tayuyaAfter?.powerTokens).toBe(1);
-    // Sakon is sourceCard (self) - excluded from the POWERUP target
-    const sakonAfter = resultState.activeMissions[0].player1Characters.find(
-      (c: CharacterInPlay) => c.instanceId === 'sakon062-1',
-    );
-    expect(sakonAfter?.powerTokens).toBe(0);
+    expect(confirmPending).toBeDefined();
+    expect(confirmPending!.sourceInstanceId).toBe('sakon062-1'); // copier is the source
   });
 });
 
