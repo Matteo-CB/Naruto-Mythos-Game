@@ -4976,7 +4976,9 @@ export class EffectEngine {
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: d068mTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
+        pendingEffect.remainingEffectTypes = undefined;
         newState.pendingActions = [...newState.pendingActions, {
           id: d068mActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
@@ -5173,6 +5175,672 @@ export class EffectEngine {
           options: d069mTargets, minSelections: 1, maxSelections: 1,
           sourceEffectId: d069mEffId,
         }];
+        break;
+      }
+
+      // =============================================
+      // Batch 8: CONFIRM popup cases (KS-071 to KS-080)
+      // =============================================
+
+      case 'ZAKU071_CONFIRM_MAIN': {
+        // Re-check: fewer friendly non-hidden than enemy, ≥2 missions, Kurenai, valid targets with destinations
+        const z071Player = pendingEffect.sourcePlayer;
+        const z071Opponent = z071Player === 'player1' ? 'player2' : 'player1';
+        const z071MI = pendingEffect.sourceMissionIndex;
+        const z071Mission = newState.activeMissions[z071MI];
+        if (!z071Mission) break;
+        const z071FriendlySide = z071Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const z071EnemySide = z071Player === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        const z071FriendlyNH = z071Mission[z071FriendlySide].filter((c: CharacterInPlay) => !c.isHidden).length;
+        const z071EnemyNH = z071Mission[z071EnemySide].filter((c: CharacterInPlay) => !c.isHidden).length;
+        if (z071FriendlyNH >= z071EnemyNH) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z071Player,
+            'EFFECT_NO_TARGET', 'Zaku Abumi (071): Condition no longer met (state changed).',
+            'game.log.effect.noTarget', { card: 'ZAKU ABUMI', id: 'KS-071-UC' });
+          break;
+        }
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z071Player,
+            'EFFECT_NO_TARGET', 'Zaku Abumi (071): Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'ZAKU ABUMI', id: 'KS-071-UC' });
+          break;
+        }
+        if (isMovementBlockedByKurenai(newState, z071MI, z071Opponent)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z071Player,
+            'EFFECT_BLOCKED', 'Zaku Abumi (071): Enemy movement blocked by Yuhi Kurenai (035).',
+            'game.log.effect.moveBlockedKurenai', { card: 'ZAKU ABUMI', id: 'KS-071-UC' });
+          break;
+        }
+
+        // Filter enemy chars with valid destinations (name uniqueness)
+        const z071EnemyControl = z071Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        const z071ValidTargets: string[] = [];
+        for (const char of z071Mission[z071EnemySide]) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const charName = topCard.name_fr;
+          const hasValidDest = char.isHidden || newState.activeMissions.some((m, i) => {
+            if (i === z071MI) return false;
+            return !m[z071EnemyControl].some((c: CharacterInPlay) => {
+              if (c.instanceId === char.instanceId) return false;
+              if (c.isHidden) return false;
+              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return cTop.name_fr === charName;
+            });
+          });
+          if (hasValidDest) z071ValidTargets.push(char.instanceId);
+        }
+
+        if (z071ValidTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z071Player,
+            'EFFECT_NO_TARGET', 'Zaku Abumi (071): No enemy characters can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'ZAKU ABUMI', id: 'KS-071-UC' });
+          break;
+        }
+
+        if (z071ValidTargets.length === 1) {
+          // Auto-select + check destinations
+          const z071AutoChar = EffectEngine.findCharByInstanceId(newState, z071ValidTargets[0]);
+          if (z071AutoChar) {
+            const z071AutoDests: string[] = [];
+            for (let i = 0; i < newState.activeMissions.length; i++) {
+              if (i !== z071AutoChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, z071AutoChar.character, i, z071AutoChar.player)) z071AutoDests.push(String(i));
+            }
+            if (z071AutoDests.length === 1) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(newState, z071ValidTargets[0], parseInt(z071AutoDests[0], 10), z071AutoChar.player, 'Zaku Abumi', 'KS-071-UC', z071Player);
+            } else if (z071AutoDests.length > 1) {
+              const z071dEffId = generateInstanceId();
+              const z071dActId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: z071dEffId, sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: z071ValidTargets[0] }),
+                targetSelectionType: 'ZAKU071_MOVE_DESTINATION',
+                sourcePlayer: z071Player, requiresTargetSelection: true,
+                validTargets: z071AutoDests, isOptional: false, isMandatory: true,
+                resolved: false, isUpgrade: false,
+                remainingEffectTypes: pendingEffect.remainingEffectTypes,
+              });
+              newState.pendingActions.push({
+                id: z071dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                player: z071Player,
+                description: 'Zaku Abumi (071): Choose a mission to move the enemy character to.',
+                descriptionKey: 'game.effect.desc.zaku071MoveDest',
+                options: z071AutoDests, minSelections: 1, maxSelections: 1,
+                sourceEffectId: z071dEffId,
+              });
+              pendingEffect.remainingEffectTypes = undefined;
+            }
+          }
+          break;
+        }
+
+        // Multiple targets: create child MOVE_ENEMY_FROM_THIS_MISSION with isOptional: true (SKIP 2)
+        const z071cEffId = generateInstanceId();
+        const z071cActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: z071cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'MOVE_ENEMY_FROM_THIS_MISSION',
+          sourcePlayer: z071Player, requiresTargetSelection: true,
+          validTargets: z071ValidTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: z071cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: z071Player,
+          description: 'Zaku Abumi (071): Choose an enemy character to move to another mission.',
+          descriptionKey: 'game.effect.desc.zaku071ChooseEnemy',
+          options: z071ValidTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: z071cEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'ZAKU071_CONFIRM_UPGRADE': {
+        // POWERUP 2 on self
+        const z071uPlayer = pendingEffect.sourcePlayer;
+        const z071uSide = z071uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const z071uMI = pendingEffect.sourceMissionIndex;
+        const missions_z071u = [...newState.activeMissions];
+        const m_z071u = { ...missions_z071u[z071uMI] };
+        const chars_z071u = [...m_z071u[z071uSide]];
+        const idx_z071u = chars_z071u.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_z071u !== -1) {
+          chars_z071u[idx_z071u] = { ...chars_z071u[idx_z071u], powerTokens: chars_z071u[idx_z071u].powerTokens + 2 };
+          m_z071u[z071uSide] = chars_z071u;
+          missions_z071u[z071uMI] = m_z071u;
+          newState = { ...newState, activeMissions: missions_z071u };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z071uPlayer,
+            'EFFECT_POWERUP', 'Zaku Abumi (071): POWERUP 2 on self.',
+            'game.log.effect.powerupSelf', { card: 'ZAKU ABUMI', id: 'KS-071-UC', amount: 2 });
+        }
+        break;
+      }
+
+      case 'KIN073_CONFIRM_MAIN': {
+        // Re-check hand not empty + valid enemy targets in this mission
+        const k073Player = pendingEffect.sourcePlayer;
+        const k073Opponent = k073Player === 'player1' ? 'player2' : 'player1';
+        const k073Ps = newState[k073Player];
+        let k073Data: { missionIndex?: number } = {};
+        try { k073Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const k073MI = k073Data.missionIndex ?? pendingEffect.sourceMissionIndex;
+
+        if (k073Ps.hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k073Player,
+            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No cards in hand (state changed).',
+            'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+          break;
+        }
+
+        const k073Mission = newState.activeMissions[k073MI];
+        if (!k073Mission) break;
+        const k073EnemySide = k073Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        const k073HasTarget = k073Mission[k073EnemySide].some(
+          (char: CharacterInPlay) => canBeHiddenByEnemy(newState, char, k073Opponent) && getEffectivePower(newState, char, k073Opponent) <= 4,
+        );
+
+        if (!k073HasTarget) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k073Player,
+            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No valid enemy target (state changed).',
+            'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+          break;
+        }
+
+        // Mandatory child: KIN073_CHOOSE_DISCARD (discard is mandatory after CONFIRM)
+        if (k073Ps.hand.length === 1) {
+          // Auto-discard the only card, then chain to hide target selection
+          const k073Hand = [...k073Ps.hand];
+          const k073Discarded = k073Hand.splice(0, 1)[0];
+          const k073NewPs = { ...k073Ps, hand: k073Hand, discardPile: [...k073Ps.discardPile, k073Discarded] };
+          newState = { ...newState, [k073Player]: k073NewPs };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k073Player,
+            'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${k073Discarded.name_fr} from hand.`,
+            'game.log.effect.discard', { card: 'KIN TSUCHI', id: 'KS-073-UC', target: k073Discarded.name_fr });
+
+          // Now find valid hide targets
+          const k073HideTargets: string[] = [];
+          const k073MissionNow = newState.activeMissions[k073MI];
+          if (k073MissionNow) {
+            for (const char of k073MissionNow[k073EnemySide]) {
+              if (canBeHiddenByEnemy(newState, char, k073Opponent) && getEffectivePower(newState, char, k073Opponent) <= 4) {
+                k073HideTargets.push(char.instanceId);
+              }
+            }
+          }
+
+          if (k073HideTargets.length === 0) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, k073Player,
+              'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No valid enemy to hide after discard.',
+              'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+          } else if (k073HideTargets.length === 1) {
+            newState = EffectEngine.hideCharacterWithLog(newState, k073HideTargets[0], k073Player);
+          } else {
+            // Multiple hide targets — isOptional: true (SKIP 2)
+            const k073hEffId = generateInstanceId();
+            const k073hActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: k073hEffId, sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: k073MI,
+              effectType: pendingEffect.effectType,
+              effectDescription: '', targetSelectionType: 'KIN073_CHOOSE_ENEMY',
+              sourcePlayer: k073Player, requiresTargetSelection: true,
+              validTargets: k073HideTargets, isOptional: true, isMandatory: false,
+              resolved: false, isUpgrade: false,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
+            });
+            newState.pendingActions.push({
+              id: k073hActId, type: 'SELECT_TARGET' as PendingAction['type'],
+              player: k073Player,
+              description: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
+              descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
+              options: k073HideTargets, minSelections: 1, maxSelections: 1,
+              sourceEffectId: k073hEffId,
+            });
+            pendingEffect.remainingEffectTypes = undefined;
+          }
+          break;
+        }
+
+        // Multiple cards in hand: mandatory child KIN073_CHOOSE_DISCARD
+        const k073Options = k073Ps.hand.map((_: any, i: number) => String(i));
+        const k073EffId = generateInstanceId();
+        const k073ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: k073EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: k073MI,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIN073_CHOOSE_DISCARD',
+          sourcePlayer: k073Player, requiresTargetSelection: true,
+          validTargets: k073Options, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: k073ActId, type: 'DISCARD_CARD' as PendingAction['type'],
+          player: k073Player,
+          description: 'Kin Tsuchi (073): Choose a card from your hand to discard.',
+          descriptionKey: 'game.effect.desc.kin073ChooseDiscard',
+          options: k073Options, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k073EffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KIN073_CONFIRM_UPGRADE': {
+        // Place top card of deck as hidden character in source mission
+        const k073uPlayer = pendingEffect.sourcePlayer;
+        const k073uPs = newState[k073uPlayer];
+
+        if (k073uPs.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k073uPlayer,
+            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): Deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+          break;
+        }
+
+        const k073uMI = pendingEffect.sourceMissionIndex;
+        const k073uDeck = [...k073uPs.deck];
+        const k073uCard = k073uDeck.shift()!;
+        const k073uNewPs = { ...k073uPs, deck: k073uDeck };
+        newState = { ...newState, [k073uPlayer]: k073uNewPs };
+
+        const k073uSide = k073uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const missions_k073u = [...newState.activeMissions];
+        const m_k073u = { ...missions_k073u[k073uMI] };
+        const chars_k073u = [...m_k073u[k073uSide]];
+        const newHidden: CharacterInPlay = {
+          card: k073uCard,
+          isHidden: true,
+          powerTokens: 0,
+          stack: [],
+          controlledBy: k073uPlayer,
+          originalOwner: k073uPlayer,
+          instanceId: generateInstanceId(),
+          wasRevealedAtLeastOnce: false,
+          missionIndex: k073uMI,
+        };
+        chars_k073u.push(newHidden);
+        m_k073u[k073uSide] = chars_k073u;
+        missions_k073u[k073uMI] = m_k073u;
+        newState = { ...newState, activeMissions: missions_k073u };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, k073uPlayer,
+          'EFFECT', 'Kin Tsuchi (073) UPGRADE: Placed top card of deck as hidden character.',
+          'game.log.effect.placeHidden', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
+        break;
+      }
+
+      case 'GAARA074_CONFIRM_MAIN': {
+        // Re-count friendly hidden characters in this mission (excluding self)
+        const g074Player = pendingEffect.sourcePlayer;
+        const g074MI = pendingEffect.sourceMissionIndex;
+        const g074Mission = newState.activeMissions[g074MI];
+        if (!g074Mission) break;
+        const g074FriendlySide = g074Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const g074HiddenCount = g074Mission[g074FriendlySide].filter(
+          (char: CharacterInPlay) => char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId,
+        ).length;
+
+        if (g074HiddenCount === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g074Player,
+            'EFFECT_NO_TARGET', 'Gaara (074): No friendly hidden characters in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-074-C' });
+          break;
+        }
+
+        // POWERUP X on self
+        const g074Side = g074Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const missions_g074 = [...newState.activeMissions];
+        const m_g074 = { ...missions_g074[g074MI] };
+        const chars_g074 = [...m_g074[g074Side]];
+        const idx_g074 = chars_g074.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_g074 !== -1) {
+          chars_g074[idx_g074] = { ...chars_g074[idx_g074], powerTokens: chars_g074[idx_g074].powerTokens + g074HiddenCount };
+          m_g074[g074Side] = chars_g074;
+          missions_g074[g074MI] = m_g074;
+          newState = { ...newState, activeMissions: missions_g074 };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g074Player,
+            'EFFECT_POWERUP', `Gaara (074): POWERUP ${g074HiddenCount} on self.`,
+            'game.log.effect.powerupSelf', { card: 'GAARA', id: 'KS-074-C', amount: g074HiddenCount });
+        }
+        break;
+      }
+
+      case 'KANKURO078_CONFIRM_AMBUSH': {
+        // Re-find characters with power ≤ 4 across ALL missions, with valid destinations
+        const k078Player = pendingEffect.sourcePlayer;
+
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k078Player,
+            'EFFECT_NO_TARGET', 'Kankuro (078): Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' });
+          break;
+        }
+
+        const k078ValidTargets: string[] = [];
+        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+          const mission_k78 = newState.activeMissions[mi];
+          for (const side of ['player1Characters', 'player2Characters'] as const) {
+            const charOwner = side === 'player1Characters' ? 'player1' : 'player2';
+            if (isMovementBlockedByKurenai(newState, mi, charOwner as PlayerID)) continue;
+            for (const char of mission_k78[side]) {
+              if (getEffectivePower(newState, char, charOwner as PlayerID) > 4) continue;
+              // Check valid destinations (name uniqueness)
+              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const charName = topCard.name_fr;
+              const charControlSide = (char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters') as 'player1Characters' | 'player2Characters';
+              const hasValidDest = char.isHidden || newState.activeMissions.some((m, i) => {
+                if (i === mi) return false;
+                return !m[charControlSide].some((c: CharacterInPlay) => {
+                  if (c.instanceId === char.instanceId) return false;
+                  if (c.isHidden) return false;
+                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  return cTop.name_fr === charName;
+                });
+              });
+              if (hasValidDest) k078ValidTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (k078ValidTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k078Player,
+            'EFFECT_NO_TARGET', 'Kankuro (078): No characters with Power 4 or less can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' });
+          break;
+        }
+
+        if (k078ValidTargets.length === 1) {
+          // Auto-select character, check destinations
+          const k078AutoChar = EffectEngine.findCharByInstanceId(newState, k078ValidTargets[0]);
+          if (k078AutoChar) {
+            const k078AutoDests: string[] = [];
+            for (let i = 0; i < newState.activeMissions.length; i++) {
+              if (i !== k078AutoChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, k078AutoChar.character, i, k078AutoChar.player)) k078AutoDests.push(String(i));
+            }
+            if (k078AutoDests.length === 1) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(newState, k078ValidTargets[0], parseInt(k078AutoDests[0], 10), k078AutoChar.player, 'Kankuro', 'KS-078-UC', k078Player);
+            } else if (k078AutoDests.length > 1) {
+              const k078dEffId = generateInstanceId();
+              const k078dActId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: k078dEffId, sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: k078ValidTargets[0] }),
+                targetSelectionType: 'KANKURO078_MOVE_DESTINATION',
+                sourcePlayer: k078Player, requiresTargetSelection: true,
+                validTargets: k078AutoDests, isOptional: false, isMandatory: true,
+                resolved: false, isUpgrade: false,
+                remainingEffectTypes: pendingEffect.remainingEffectTypes,
+              });
+              newState.pendingActions.push({
+                id: k078dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                player: k078Player,
+                description: 'Kankuro (078): Choose a mission to move the character to.',
+                descriptionKey: 'game.effect.desc.chooseMissionMove',
+                options: k078AutoDests, minSelections: 1, maxSelections: 1,
+                sourceEffectId: k078dEffId,
+              });
+              pendingEffect.remainingEffectTypes = undefined;
+            }
+          }
+          break;
+        }
+
+        // Multiple targets: child MOVE_CHARACTER_POWER_4_OR_LESS with isOptional: true (SKIP 2)
+        const k078cEffId = generateInstanceId();
+        const k078cActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: k078cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'MOVE_CHARACTER_POWER_4_OR_LESS',
+          sourcePlayer: k078Player, requiresTargetSelection: true,
+          validTargets: k078ValidTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: k078cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: k078Player,
+          description: 'Kankuro (078): Choose a character with Power 4 or less to move.',
+          descriptionKey: 'game.effect.desc.kankuro078ChooseChar',
+          options: k078ValidTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k078cEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KANKURO078_CONFIRM_UPGRADE': {
+        // Re-find hidden friendly characters
+        const k078uPlayer = pendingEffect.sourcePlayer;
+        const k078uSide = k078uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const k078uTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[k078uSide]) {
+            if (char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId) {
+              k078uTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (k078uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k078uPlayer,
+            'EFFECT_NO_TARGET', 'Kankuro (078): No hidden friendly characters (state changed).',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' });
+          break;
+        }
+
+        // Create mandatory child KANKURO078_REVEAL_HIDDEN_REDUCED (handles reveal logic, upgrade stacking, cost)
+        const k078uEffId = generateInstanceId();
+        const k078uActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: k078uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KANKURO078_REVEAL_HIDDEN_REDUCED',
+          sourcePlayer: k078uPlayer, requiresTargetSelection: true,
+          validTargets: k078uTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: k078uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: k078uPlayer,
+          description: 'Kankuro (078): Choose a hidden friendly character to reveal (paying 1 less).',
+          descriptionKey: 'game.effect.desc.kankuro078ChooseReveal',
+          options: k078uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k078uEffId,
+        });
+        break;
+      }
+
+      case 'TEMARI080_CONFIRM_MAIN': {
+        // Re-find friendly Sand Village chars with valid destinations
+        const t080Player = pendingEffect.sourcePlayer;
+        const t080Side = t080Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t080Player,
+            'EFFECT_NO_TARGET', 'Temari (080): Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' });
+          break;
+        }
+
+        const t080ValidTargets: string[] = [];
+        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+          if (isMovementBlockedByKurenai(newState, mi, t080Player)) continue;
+          const mission_t80 = newState.activeMissions[mi];
+          for (const char of mission_t80[t080Side]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.group !== 'Sand Village') continue;
+            // Check valid destinations (name uniqueness)
+            const charName = topCard.name_fr;
+            const hasValidDest = newState.activeMissions.some((m, i) => {
+              if (i === mi) return false;
+              return !m[t080Side].some((c: CharacterInPlay) => {
+                if (c.instanceId === char.instanceId) return false;
+                if (c.isHidden) return false;
+                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr === charName;
+              });
+            });
+            if (hasValidDest) t080ValidTargets.push(char.instanceId);
+          }
+        }
+
+        if (t080ValidTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t080Player,
+            'EFFECT_NO_TARGET', 'Temari (080): No movable Sand Village characters (state changed).',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' });
+          break;
+        }
+
+        if (t080ValidTargets.length === 1) {
+          // Auto-select character, check destinations
+          const t080AutoChar = EffectEngine.findCharByInstanceId(newState, t080ValidTargets[0]);
+          if (t080AutoChar) {
+            const t080AutoDests: string[] = [];
+            for (let i = 0; i < newState.activeMissions.length; i++) {
+              if (i !== t080AutoChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, t080AutoChar.character, i, t080AutoChar.player)) t080AutoDests.push(String(i));
+            }
+            if (t080AutoDests.length === 1) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(newState, t080ValidTargets[0], parseInt(t080AutoDests[0], 10), t080AutoChar.player, 'Temari', 'KS-080-UC', t080Player);
+            } else if (t080AutoDests.length > 1) {
+              const t080dEffId = generateInstanceId();
+              const t080dActId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: t080dEffId, sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: t080ValidTargets[0] }),
+                targetSelectionType: 'TEMARI080_MOVE_DESTINATION',
+                sourcePlayer: t080Player, requiresTargetSelection: true,
+                validTargets: t080AutoDests, isOptional: false, isMandatory: true,
+                resolved: false, isUpgrade: false,
+                remainingEffectTypes: pendingEffect.remainingEffectTypes,
+              });
+              newState.pendingActions.push({
+                id: t080dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                player: t080Player,
+                description: 'Temari (080): Choose a mission to move the character to.',
+                descriptionKey: 'game.effect.desc.chooseMissionMove',
+                options: t080AutoDests, minSelections: 1, maxSelections: 1,
+                sourceEffectId: t080dEffId,
+              });
+              pendingEffect.remainingEffectTypes = undefined;
+            }
+          }
+          break;
+        }
+
+        // Multiple targets: child MOVE_FRIENDLY_SAND_VILLAGE with isOptional: true (SKIP 2)
+        const t080cEffId = generateInstanceId();
+        const t080cActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: t080cEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'MOVE_FRIENDLY_SAND_VILLAGE',
+          sourcePlayer: t080Player, requiresTargetSelection: true,
+          validTargets: t080ValidTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: t080cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: t080Player,
+          description: 'Temari (080): Choose a friendly Sand Village character to move.',
+          descriptionKey: 'game.effect.desc.temari080ChooseChar',
+          options: t080ValidTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: t080cEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'TEMARI080_CONFIRM_UPGRADE': {
+        // Move self to another mission
+        const t080uPlayer = pendingEffect.sourcePlayer;
+        const t080uMI = pendingEffect.sourceMissionIndex;
+
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t080uPlayer,
+            'EFFECT_NO_TARGET', 'Temari (080): Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' });
+          break;
+        }
+
+        if (isMovementBlockedByKurenai(newState, t080uMI, t080uPlayer)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t080uPlayer,
+            'EFFECT_BLOCKED', 'Temari (080): Movement blocked by Yuhi Kurenai (035).',
+            'game.log.effect.moveBlockedKurenai', { card: 'TEMARI', id: 'KS-080-UC' });
+          break;
+        }
+
+        // Find self and check valid destinations
+        const t080uCharRes = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!t080uCharRes) break;
+        const t080uDests: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i !== t080uCharRes.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, t080uCharRes.character, i, t080uCharRes.player)) t080uDests.push(String(i));
+        }
+
+        if (t080uDests.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t080uPlayer,
+            'EFFECT_NO_TARGET', 'Temari (080): No valid destination for self (state changed).',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' });
+          break;
+        }
+
+        if (t080uDests.length === 1) {
+          // Auto-move self
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, pendingEffect.sourceInstanceId, parseInt(t080uDests[0], 10),
+            t080uCharRes.player, 'Temari', 'KS-080-UC', t080uPlayer);
+          break;
+        }
+
+        // Multiple destinations: child MOVE_SELF_TO_MISSION with isOptional: true (SKIP 2)
+        const t080uEffId = generateInstanceId();
+        const t080uActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: t080uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'MOVE_SELF_TO_MISSION',
+          sourcePlayer: t080uPlayer, requiresTargetSelection: true,
+          validTargets: t080uDests, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: t080uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: t080uPlayer,
+          description: 'Temari (080): Choose a mission to move to.',
+          descriptionKey: 'game.effect.desc.chooseMissionMove',
+          options: t080uDests, minSelections: 1, maxSelections: 1,
+          sourceEffectId: t080uEffId,
+        });
         break;
       }
 
@@ -5992,8 +6660,8 @@ export class EffectEngine {
               sourcePlayer: pendingEffect.sourcePlayer,
               requiresTargetSelection: true,
               validTargets: validMissions_z,
-              isOptional: true,
-              isMandatory: false,
+              isOptional: false,
+              isMandatory: true,
               resolved: false,
               isUpgrade: false,
             });
@@ -7289,6 +7957,7 @@ export class EffectEngine {
             requiresTargetSelection: true,
             targetSelectionType: 'KIN073_CHOOSE_ENEMY',
             validTargets: k73HideTargets,
+            isOptional: true,
             description: 'Kin Tsuchi (073): Choose an enemy character with Power 4 or less to hide.',
             descriptionKey: 'game.effect.desc.kin073ChooseEnemy',
           };

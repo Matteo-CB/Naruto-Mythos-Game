@@ -1,8 +1,8 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 078/130 - KANKURO "Puppet Master" (UC)
@@ -11,56 +11,67 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  *
  * AMBUSH: Move any character with Power 4 or less in play (any mission, any player)
  *   to another mission.
- *   - Find all non-hidden characters across all missions with effective power <= 4 (excluding self).
- *   - Requires target selection: which character to move, then which mission to move them to.
- *   - Triggered only when Kankuro is revealed from hidden (AMBUSH).
  *
  * UPGRADE: Reveal a friendly hidden character paying 1 less than its reveal cost.
- *   - When played as upgrade, scan all missions for hidden friendly characters.
- *   - Player selects which hidden character to reveal.
- *   - Cost = max(0, card.chakra - 1). The MAIN + AMBUSH effects of the revealed card fire.
  */
 
 function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all characters with effective power <= 4 across all missions (hidden = power 0, valid)
+  // Need at least 2 missions to move
+  if (state.activeMissions.length < 2) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Kankuro (078): Only 1 mission in play, cannot move.',
+      'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' }) } };
+  }
+
+  // Find all characters with effective power <= 4, filtering by Kurenai + valid destination
   const validTargets: string[] = [];
-  for (const mission of state.activeMissions) {
+  for (let mi = 0; mi < state.activeMissions.length; mi++) {
+    const mission = state.activeMissions[mi];
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-      // Self is a valid target (Power 4 = valid)
-      if (getEffectivePower(state, char, char.controlledBy) <= 4) {
-        validTargets.push(char.instanceId);
-      }
+      if (getEffectivePower(state, char, char.controlledBy) > 4) continue;
+
+      // Kurenai check: is movement blocked from this mission for this char's owner?
+      if (isMovementBlockedByKurenai(state, mi, char.controlledBy)) continue;
+
+      // Valid destination check (name uniqueness)
+      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const charName = topCard.name_fr;
+      const charSide = char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters';
+      const hasValidDest = char.isHidden || state.activeMissions.some((m, i) => {
+        if (i === mi) return false;
+        return !m[charSide].some((c) => {
+          if (c.instanceId === char.instanceId) return false;
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr === charName;
+        });
+      });
+      if (hasValidDest) validTargets.push(char.instanceId);
     }
   }
 
   if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Kankuro (078): No character with Power 4 or less in play to move.',
-      'game.log.effect.noTarget',
-      { card: 'KANKURO', id: 'KS-078-UC' },
-    );
-    return { state: { ...state, log } };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Kankuro (078): No character with Power 4 or less can be moved.',
+      'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MOVE_CHARACTER_POWER_4_OR_LESS',
-    validTargets,
-    description: 'Kankuro (078) AMBUSH: Select any character with Power 4 or less in play to move to another mission.',
-    descriptionKey: 'game.effect.desc.kankuro078MoveCharacter',
+    targetSelectionType: 'KANKURO078_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kankuro078ConfirmAmbush',
   };
 }
 
 function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
   // Find all hidden friendly characters across all missions
@@ -74,27 +85,20 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
   }
 
   if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Kankuro (078) UPGRADE: No hidden friendly characters in play to reveal.',
-      'game.log.effect.noTarget',
-      { card: 'KANKURO', id: 'KS-078-UC' },
-    );
-    return { state: { ...state, log } };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Kankuro (078) UPGRADE: No hidden friendly characters in play to reveal.',
+      'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' }) } };
   }
 
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KANKURO078_REVEAL_HIDDEN_REDUCED',
-    validTargets,
-    description: 'Kankuro (078) UPGRADE: Select a hidden friendly character to reveal, paying 1 less than its reveal cost.',
-    descriptionKey: 'game.effect.desc.kankuro078RevealHidden',
+    targetSelectionType: 'KANKURO078_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kankuro078ConfirmUpgrade',
   };
 }
 

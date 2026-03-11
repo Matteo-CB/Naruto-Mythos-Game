@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 4 (KS-031 a KS-040)
+BATCH ACTUEL: Batch 8 (KS-071 a KS-080)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -476,5 +476,47 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - Fix: R4 propagation remainingEffectTypes a travers toute la chaine
     CONFIRM_MAIN -> CHOOSE_CHARACTER -> MOVE_DESTINATION (evite AMBUSH premature)
   - Fix: auto-move si 1 seule destination dans KIDOMARU060_CHOOSE_CHARACTER
+
+2026-03-11 - Batch 8 (KS-071 a KS-080):
+  - 5 cartes traitees (5 skipped: KS-072 mandatory, KS-075/076/077 continu, KS-079 continu)
+  - KS-071 (MAIN move enemy + UPGRADE POWERUP 2), KS-073 (MAIN discard+hide + UPGRADE place hidden),
+    KS-074 (MAIN POWERUP X), KS-078 (AMBUSH move P<=4 + UPGRADE reveal -1),
+    KS-080 (MAIN move Sand Village + UPGRADE move self)
+  - Andy feedback: Move effects have 2 SKIPs each (CONFIRM + target selection).
+    Destination after character selection is mandatory (no SKIP).
+  - Andy feedback: KS-073 has 2 SKIPs on MAIN (CONFIRM + hide target). Discard after CONFIRM mandatory.
+  - Andy feedback: KS-080 has 4 SKIPs total (2 moves x 2 SKIPs each).
+  - KS-071 MAIN: re-check friendly<enemy, >=2 missions, Kurenai blocking, valid destinations.
+    Auto-select si 1 target. Child MOVE_ENEMY_FROM_THIS_MISSION (isOptional:true = SKIP 2). R4 propagation.
+  - KS-071 UPGRADE: POWERUP 2 directly after CONFIRM.
+  - KS-073 MAIN: re-check hand + valid enemy P<=4. Auto-discard si 1 carte.
+    Child KIN073_CHOOSE_DISCARD (isOptional:false mandatory). R4 propagation.
+    KIN073_CHOOSE_ENEMY child: isOptional:true (SKIP 2 = hide target).
+  - KS-073 UPGRADE: re-check deck, place top card hidden directly after CONFIRM.
+  - KS-074 MAIN: re-count hidden friendlies in mission, POWERUP X directly.
+  - KS-078 AMBUSH: re-find P<=4 targets avec Kurenai + destination check.
+    Auto-select si 1 target. Child MOVE_CHARACTER_POWER_4_OR_LESS (isOptional:true = SKIP 2). R4 propagation.
+  - KS-078 UPGRADE: re-find hidden friendlies.
+    Child KANKURO078_REVEAL_HIDDEN_REDUCED (isOptional:false mandatory).
+  - KS-080 MAIN: re-find Sand Village targets avec Kurenai + destination check.
+    Auto-select si 1 target. Child MOVE_FRIENDLY_SAND_VILLAGE (isOptional:true = SKIP 2). R4 propagation.
+  - KS-080 UPGRADE: re-find valid destinations for self, auto-move si 1.
+    Child MOVE_SELF_TO_MISSION (isOptional:true = SKIP 2).
+  - Fix: ZAKU071_MOVE_DESTINATION passe de isOptional:true a isOptional:false, isMandatory:true
+  - Fix: KIN073_CHOOSE_ENEMY child passe a isOptional:true (SKIP 2 per Andy)
+  - 15 cles i18n ajoutees (EN + FR): zaku071ConfirmMain, zaku071ConfirmUpgrade, zaku071ChooseEnemy,
+    kin073ConfirmMain, kin073ConfirmUpgrade, kin073ChooseDiscard, gaara074ConfirmMain,
+    kankuro078ConfirmAmbush, kankuro078ConfirmUpgrade, kankuro078ChooseChar, kankuro078ChooseReveal,
+    temari080ConfirmMain, temari080ConfirmUpgrade, temari080ChooseChar
+  - Regles R1-R10 respectees
+
+2026-03-11 - Bugfix KS-068 (Dosu Kinuta C):
+  - Fix: R4 propagation manquante sur DOSU068_CONFIRM_MAIN -> LOOK_AT_HIDDEN_CHARACTER child.
+    AMBUSH se declenchait avant que MAIN soit completement resolu.
+  - Ajout remainingEffectTypes au child + clear sur parent.
+
+2026-03-11 - Bugfix KS-069 (Dosu Kinuta UC):
+  - Fix: descriptions-en.ts et translations-fr.ts n'avaient que MAIN, UPGRADE manquant.
+  - Ajout description UPGRADE "Look at a hidden character in play." (EN + FR).
 
 ================================================================================

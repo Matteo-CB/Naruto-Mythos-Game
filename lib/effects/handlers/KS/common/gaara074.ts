@@ -7,9 +7,6 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Chakra: 2 | Power: 2
  * Group: Sand Village | Keywords: Team Baki
  * MAIN: POWERUP X where X is the number of friendly hidden characters in this mission.
- *
- * Counts the number of friendly hidden characters in the same mission and adds that many
- * power tokens to this character (self).
  */
 function handleGaara074Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -28,37 +25,16 @@ function handleGaara074Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-074-C' }) } };
   }
 
-  // POWERUP X on self
-  const newState = { ...state };
-  newState.activeMissions = state.activeMissions.map((m, idx) => {
-    if (idx !== sourceMissionIndex) return m;
-    return {
-      ...m,
-      player1Characters: m.player1Characters.map((char) =>
-        char.instanceId === sourceCard.instanceId
-          ? { ...char, powerTokens: char.powerTokens + hiddenCount }
-          : char,
-      ),
-      player2Characters: m.player2Characters.map((char) =>
-        char.instanceId === sourceCard.instanceId
-          ? { ...char, powerTokens: char.powerTokens + hiddenCount }
-          : char,
-      ),
-    };
-  });
-
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_POWERUP',
-    `Gaara (074): POWERUP ${hiddenCount} on self.`,
-    'game.log.effect.powerupSelf',
-    { card: 'Gaara', id: 'KS-074-C', amount: String(hiddenCount) },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'GAARA074_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.gaara074ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {
