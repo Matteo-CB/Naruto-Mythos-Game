@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 1 (KS-001 a KS-010)
+BATCH ACTUEL: Batch 2 (KS-011 a KS-020)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -72,6 +72,32 @@ KS-008-UC     | MAIN: Play Summon -2                | SEPARE          | CORRIGE
               | UPGRADE: Hide enemy cost <=3        |                 |
 KS-009-C      | (non traite - skip)                 | -               | -
 KS-010-C      | AMBUSH: Move self                   | N/A (pas d'UPG) | OK
+
+CARTES TRAITEES - BATCH 2
+================================================================================
+
+CARTE         | EFFETS                              | TYPE UPGRADE    | STATUS
+------------- | ----------------------------------- | --------------- | ------
+KS-011-C      | MAIN: Draw (Team 7 synergy)         | N/A (pas d'UPG) | SKIP (deja OK)
+KS-012-UC     | MAIN: Continu (CHAKRA +1)           | SEPARE          | OK
+              | UPGRADE: Draw 1 + Discard 1         |                 |
+KS-013-C      | MAIN: Continu (power -1/ally)       | -               | SKIP (continu)
+KS-014-UC     | AMBUSH: Reveal opponent hand        | MODIFIE AMBUSH  | OK
+              | UPGRADE: +discard chain             |                 |
+KS-015-C      | MAIN: Continu (+1 Team 7)           | -               | SKIP (continu)
+KS-016-UC     | MAIN: Copy enemy instant effect     | MODIFIE MAIN    | OK
+              | UPGRADE: No cost limit              |                 |
+KS-017-C      | MAIN: POWERUP 3 self                | N/A (pas d'UPG) | OK
+KS-018-UC     | MAIN: Continu (hide after move)     | MODIFIE MAIN    | OK + BUG FIX
+              | UPGRADE: Move self                  |                 |
+KS-019-C      | MAIN: POWERUP 1 (Team 10 synergy)   | N/A (pas d'UPG) | OK
+KS-020-UC     | MAIN: Take control enemy cost <=2   | MODIFIE MAIN    | OK
+              | UPGRADE: Cost limit 3 instead       |                 |
+
+BUG CORRIGE BATCH 2:
+  - KS-018: Apres le deplacement, si plusieurs ennemis a cacher, le popup de
+    selection avait un bouton SKIP. L'effet continu [hourglass] est MANDATORY,
+    donc isMandatory: true ajoute dans postMoveHide().
 
 ================================================================================
 4. BUGS RENCONTRES ET CAUSES RACINES
@@ -254,5 +280,11 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     bouton SKIP apres confirmation, Hiruzen 002 et Shizune 006 mauvais ordering
   - Corrections appliquees pour les 4 categories de bugs
   - Ajout de ce fichier de rapport
+
+2026-03-11 - Batch 2 (KS-011 a KS-020):
+  - 7 cartes traitees: KS-012, 014, 016, 017, 018, 019, 020
+  - 3 cartes skip: KS-011 (deja OK), KS-013 (continu), KS-015 (continu)
+  - Bug fix: KS-018 postMoveHide SKIP button (isMandatory: true)
+  - Regles R1-R7 respectees, aucun bug de batch 1 reproduit
 
 ================================================================================

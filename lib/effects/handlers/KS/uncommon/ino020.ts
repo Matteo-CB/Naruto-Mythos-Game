@@ -12,7 +12,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function handleIno020Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex, isUpgrade } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex, isUpgrade } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide = opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -51,14 +51,15 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
   };
   }
 
+  // Confirmation popup before take-control target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TAKE_CONTROL_ENEMY_THIS_MISSION',
-    validTargets,
+    targetSelectionType: 'INO020_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    descriptionKey: 'game.effect.desc.ino020TakeControl',
-    descriptionParams: { costLimit: String(costLimit) },
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, isUpgrade }),
+    descriptionKey: 'game.effect.desc.ino020ConfirmMain',
   };
 }
 

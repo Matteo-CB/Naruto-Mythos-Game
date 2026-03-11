@@ -29,34 +29,16 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-019-C' }) } };
   }
 
-  // POWERUP 1 on self
-  const newState = { ...state };
-  newState.activeMissions = state.activeMissions.map((m, idx) => {
-    if (idx !== sourceMissionIndex) return m;
-    return {
-      ...m,
-      player1Characters: m.player1Characters.map((char) =>
-        char.instanceId === sourceCard.instanceId
-          ? { ...char, powerTokens: char.powerTokens + 1 }
-          : char,
-      ),
-      player2Characters: m.player2Characters.map((char) =>
-        char.instanceId === sourceCard.instanceId
-          ? { ...char, powerTokens: char.powerTokens + 1 }
-          : char,
-      ),
-    };
-  });
-
-  newState.log = logAction(
-    state.log, state.turn, state.phase, sourcePlayer,
-    'EFFECT_POWERUP',
-    `Ino Yamanaka (019): POWERUP 1 (Team 10 synergy).`,
-    'game.log.effect.powerupSelf',
-    { card: 'Ino Yamanaka', id: 'KS-019-C', amount: 1 },
-  );
-
-  return { state: newState };
+  // Confirmation popup before applying POWERUP 1
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'INO019_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.ino019ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {
