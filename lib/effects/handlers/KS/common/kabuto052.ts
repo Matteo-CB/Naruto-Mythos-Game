@@ -19,7 +19,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * 5. If no valid mission exists (same-name conflict on all missions), effect fizzles.
  */
 function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
   // Check if opponent's deck is empty
@@ -30,54 +30,15 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
-  // Draw top card from opponent's deck
-  let newState = { ...state };
-  const ops = { ...newState[opponentPlayer] };
-  const newDeck = [...ops.deck];
-  const stolenCard = newDeck.shift()!;
-  ops.deck = newDeck;
-  newState[opponentPlayer] = ops;
-
-  // Find valid missions to place the hidden character
-  // The stolen card is placed HIDDEN - hidden characters have no visible name,
-  // so the same-name restriction does NOT apply. Any mission is valid.
-  // The name conflict will only be checked later if/when the hidden card is revealed.
-  const validMissionIndices: number[] = [];
-  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
-    validMissionIndices.push(mIdx);
-  }
-
-  if (validMissionIndices.length === 0) {
-    // No valid mission - effect fizzles, but the card was already drawn from opponent's deck
-    // Put it in the opponent's discard pile since it can't be placed
-    ops.discardPile = [...ops.discardPile, stolenCard];
-    newState[opponentPlayer] = ops;
-
-    return { state: { ...newState, log: logAction(newState.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Kabuto Yakushi (052): No valid mission for the stolen card, discarded.',
-      'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
-  }
-
-  // Let the player choose which mission
-  // Store the stolen card temporarily in the state for retrieval after selection
-  newState = {
-    ...newState,
-    log: logAction(newState.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT',
-      'Kabuto Yakushi (052): Drew top card from opponent\'s deck. Choose a mission to place it hidden.',
-      'game.log.effect.kabutoSteal',
-      { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }),
-    _pendingHiddenCard: stolenCard,
-    _pendingOriginalOwner: opponentPlayer,
-  } as typeof newState;
-
+  // Confirmation popup (no SKIP per Andy)
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KABUTO_CHOOSE_MISSION',
-    validTargets: validMissionIndices.map(String),
-    description: 'Kabuto Yakushi (052): Choose a mission to place the stolen card hidden.',
-    descriptionKey: 'game.effect.desc.kabuto052PlaceHidden',
+    targetSelectionType: 'KABUTO052_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: false,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kabuto052ConfirmAmbush',
   };
 }
 

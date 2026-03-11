@@ -403,4 +403,33 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - Bug: IRUKA_CHOOSE_DESTINATION avait isOptional: true -> SKIP button
   - Fix: isOptional: false, isMandatory: true sur les deux
 
+2026-03-11 - Bugfix: Tenten 041 UPGRADE ciblait friendly-only au lieu de all:
+  - Bug: le handler UPGRADE et le CONFIRM case filtraient mission[friendlySide] uniquement
+  - Card text: "POWERUP 1 another Leaf Village character in play" (pas "friendly")
+  - Fix: filtre change pour [...mission.player1Characters, ...mission.player2Characters]
+  - Affecte: tenten041.ts handler + EffectEngine TENTEN041_CONFIRM_UPGRADE case
+
+2026-03-11 - Batch 6 (KS-051 a KS-060):
+  - 10 cartes traitees: KS-051 (UPGRADE), KS-052 (AMBUSH), KS-053 (UPGRADE+MAIN),
+    KS-054 (UPGRADE+MAIN), KS-055 (AMBUSH), KS-056 (UPGRADE), KS-057 (MAIN),
+    KS-058 (MAIN, Type A UPGRADE no-op), KS-059 (MAIN), KS-060 (MAIN+AMBUSH)
+  - Andy feedback: NO SKIP on Kabuto 052/053, Jirobo 057/058 (isOptional: false)
+  - KS-059/060 mouvement: R8 (Kurenai) + R10 (destination pre-check) appliquees
+  - KS-059/060 mouvement: SKIP maintenu sur character selection + destination selection
+  - KS-051 UPGRADE: auto-defeat si 1 hidden enemy, child mandatory si plusieurs
+  - KS-052 AMBUSH (no SKIP): draw from opponent + auto-place si 1 mission, child si plusieurs
+  - KS-053 UPGRADE (no SKIP): auto-discard si 1 carte, child mandatory si plusieurs
+  - KS-053 MAIN (no SKIP): auto-play si 1 valid mission, child mandatory si plusieurs
+  - KS-054 UPGRADE: POWERUP 1 self immediate apres CONFIRM
+  - KS-054 MAIN: batch hide avec gestion Gemma 049 (pre-scan multi-LV + mid-loop)
+  - KS-055 AMBUSH: auto-discard si 1 carte, child mandatory si plusieurs
+  - KS-056 UPGRADE: auto-discard si 1 carte, child mandatory si plusieurs + R4 propagation
+  - KS-057 MAIN (no SKIP): POWERUP X self immediate apres CONFIRM
+  - KS-058 MAIN (no SKIP): POWERUP 1 batch sur tous Sound Four allies (isUpgrade -> all missions)
+  - KS-059 MAIN: chain to KIDOMARU_CHOOSE_CHARACTER avec movesRemaining: X (SKIP kept)
+  - KS-060 MAIN: auto-select si 1 char, child KIDOMARU060_CHOOSE_CHARACTER si plusieurs (SKIP kept)
+  - KS-060 AMBUSH: auto-defeat si 1 target, child KIDOMARU060_DEFEAT_LOW_POWER si plusieurs (SKIP kept)
+  - R4 propagation: OROCHIMARU051 UPGRADE, KABUTO053 UPGRADE, KIMIMARO056 UPGRADE
+  - Regles R1-R10 respectees
+
 ================================================================================

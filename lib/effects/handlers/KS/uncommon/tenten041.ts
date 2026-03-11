@@ -14,8 +14,8 @@ import { defeatCharacterInPlay } from '@/lib/effects/defeatUtils';
  *   - If multiple targets, require target selection.
  *   - Defeat the target (using defeatCharacterInPlay to respect replacements).
  *
- * UPGRADE: POWERUP 1 another friendly Leaf Village character in play (any mission).
- *   - Find all friendly non-hidden Leaf Village characters across all missions, excluding self.
+ * UPGRADE: POWERUP 1 another Leaf Village character in play (any mission).
+ *   - Find all non-hidden Leaf Village characters across all missions, excluding self.
  *   - If exactly one valid target, auto-apply POWERUP 1.
  *   - If multiple targets, require target selection.
  */
@@ -58,14 +58,11 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
 
 function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-  // Find all friendly non-hidden Leaf Village characters across all missions, excluding self
+  // Find all non-hidden Leaf Village characters across all missions, excluding self
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    for (const char of mission[friendlySide]) {
+    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -77,7 +74,7 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
 
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Tenten (041): No other friendly Leaf Village character in play to power up.',
+      'Tenten (041): No other Leaf Village character in play to power up.',
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 

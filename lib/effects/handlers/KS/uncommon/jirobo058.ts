@@ -21,59 +21,43 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const missions = [...state.activeMissions];
-  let poweredUpCount = 0;
-  const poweredUpNames: string[] = [];
-
-  // Determine which missions to scan
+  // Pre-check: any valid Sound Four targets?
   const missionIndices: number[] = isUpgrade
-    ? state.activeMissions.map((_, i) => i) // All missions
-    : [sourceMissionIndex]; // Only this mission
+    ? state.activeMissions.map((_, i) => i)
+    : [sourceMissionIndex];
 
+  let hasTarget = false;
   for (const mIdx of missionIndices) {
-    const mission = { ...missions[mIdx] };
-    const chars = [...mission[friendlySide]];
-    let changed = false;
-
-    for (let i = 0; i < chars.length; i++) {
-      const char = chars[i];
+    const mission = state.activeMissions[mIdx];
+    for (const char of mission[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
-        chars[i] = { ...char, powerTokens: char.powerTokens + 1 };
-        poweredUpCount++;
-        poweredUpNames.push(topCard.name_fr);
-        changed = true;
+        hasTarget = true;
+        break;
       }
     }
-
-    if (changed) {
-      mission[friendlySide] = chars;
-      missions[mIdx] = mission;
-    }
+    if (hasTarget) break;
   }
 
-  if (poweredUpCount === 0) {
+  if (!hasTarget) {
     const scope = isUpgrade ? 'in play' : 'in this mission';
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       `Jirobo (058): No other friendly Sound Four characters ${scope}.`,
       'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' }) } };
   }
 
-  const scope = isUpgrade ? 'across all missions (upgrade)' : 'in this mission';
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'EFFECT_POWERUP',
-    `Jirobo (058): POWERUP 1 on ${poweredUpCount} Sound Four character(s) ${scope}: ${poweredUpNames.join(', ')}.`,
-    'game.log.effect.powerup',
-    { card: 'JIROBO', id: 'KS-058-UC', amount: String(poweredUpCount), target: poweredUpNames.join(', ') },
-  );
-
-  return { state: { ...state, activeMissions: missions, log } };
+  // Confirmation popup (no SKIP per Andy)
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'JIROBO058_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: false,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, isUpgrade }),
+    descriptionKey: 'game.effect.desc.jirobo058ConfirmMain',
+  };
 }
 
 function handleJirobo058UpgradeNoop(ctx: EffectContext): EffectResult {

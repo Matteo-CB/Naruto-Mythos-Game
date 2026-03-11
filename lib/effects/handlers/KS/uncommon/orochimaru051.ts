@@ -63,13 +63,15 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-051-UC' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'OROCHIMARU051_DEFEAT_HIDDEN',
-    validTargets,
-    description: 'Select a hidden enemy character in play to defeat.',
-    descriptionKey: 'game.effect.desc.orochimaru051DefeatHidden',
+    targetSelectionType: 'OROCHIMARU051_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.orochimaru051ConfirmUpgrade',
   };
 }
 

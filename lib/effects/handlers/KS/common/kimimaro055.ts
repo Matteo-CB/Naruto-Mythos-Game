@@ -67,16 +67,15 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-055-C' }) } };
   }
 
-  // Step 1: Ask player to choose a card to discard from hand
-  const handIndices = playerState.hand.map((_, i) => String(i));
-
+  // Confirmation popup before discard + hide
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIMIMARO_CHOOSE_DISCARD',
-    validTargets: handIndices,
-    description: `Kimimaro (055): Choose a card to discard, then hide a character with cost 3 or less.`,
-    descriptionKey: 'game.effect.desc.kimimaro055DiscardAndHide',
+    targetSelectionType: 'KIMIMARO055_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kimimaro055ConfirmAmbush',
   };
 }
 

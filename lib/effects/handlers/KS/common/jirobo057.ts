@@ -39,34 +39,16 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-057-C' }) } };
   }
 
-  // POWERUP X on self
-  const newState = { ...state };
-  newState.activeMissions = state.activeMissions.map((m) => ({
-    ...m,
-    player1Characters: m.player1Characters.map((char) =>
-      char.instanceId === sourceCard.instanceId
-        ? { ...char, powerTokens: char.powerTokens + soundFourMissionCount }
-        : char,
-    ),
-    player2Characters: m.player2Characters.map((char) =>
-      char.instanceId === sourceCard.instanceId
-        ? { ...char, powerTokens: char.powerTokens + soundFourMissionCount }
-        : char,
-    ),
-  }));
-
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_POWERUP',
-    `Jirobo (057): POWERUP ${soundFourMissionCount} on self.`,
-    'game.log.effect.powerupSelf',
-    { card: 'Jirobo', id: 'KS-057-C', amount: String(soundFourMissionCount) },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup (no SKIP per Andy)
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'JIROBO057_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: false,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.jirobo057ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {

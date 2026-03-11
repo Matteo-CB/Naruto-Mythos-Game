@@ -69,16 +69,15 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' }) } };
   }
 
-  // Step 1: Ask player to choose a card to discard from hand
-  const handIndices = playerState.hand.map((_, i) => String(i));
-
+  // Confirmation popup before discard + hide
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KIMIMARO056_CHOOSE_DISCARD',
-    validTargets: handIndices,
-    description: 'Kimimaro (056): Choose a card to discard, then hide a character with cost 4 or less.',
-    descriptionKey: 'game.effect.desc.kimimaro056DiscardAndHide',
+    targetSelectionType: 'KIMIMARO056_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kimimaro056ConfirmUpgrade',
   };
 }
 

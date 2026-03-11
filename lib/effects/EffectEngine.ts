@@ -3351,11 +3351,10 @@ export class EffectEngine {
       }
 
       case 'TENTEN041_CONFIRM_UPGRADE': {
-        // Re-find friendly non-hidden Leaf Village chars (any mission, not self)
-        const tt041uSide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        // Re-find non-hidden Leaf Village chars (any mission, both sides, not self)
         const tt041uTargets: string[] = [];
         for (const mission of newState.activeMissions) {
-          for (const char of (mission as any)[tt041uSide]) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -3367,7 +3366,7 @@ export class EffectEngine {
 
         if (tt041uTargets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_NO_TARGET', 'Tenten (041): No friendly Leaf Village character in play (state changed).',
+            'EFFECT_NO_TARGET', 'Tenten (041): No Leaf Village character in play (state changed).',
             'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' });
           break;
         }
@@ -3408,7 +3407,7 @@ export class EffectEngine {
         newState.pendingActions = [...newState.pendingActions, {
           id: tt041uActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: pendingEffect.sourcePlayer,
-          description: 'Select a friendly Leaf Village character in play to give POWERUP 1.',
+          description: 'Select a Leaf Village character in play to give POWERUP 1.',
           descriptionKey: 'game.effect.desc.tenten041PowerupLeaf',
           options: tt041uTargets, minSelections: 1, maxSelections: 1,
           sourceEffectId: tt041uEffId,
@@ -3636,6 +3635,929 @@ export class EffectEngine {
           descriptionKey: 'game.effect.desc.orochimaru050LookSteal',
           options: o050Targets, minSelections: 1, maxSelections: 1,
           sourceEffectId: o050EffId,
+        }];
+        break;
+      }
+
+      // =============================================
+      // BATCH 6 CONFIRM CASES (KS-051 to KS-060)
+      // =============================================
+
+      case 'OROCHIMARU051_CONFIRM_UPGRADE': {
+        // Re-find hidden enemy chars across all missions
+        const o051EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const o051Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[o051EnemySide]) {
+            if (char.isHidden) o051Targets.push(char.instanceId);
+          }
+        }
+
+        if (o051Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Orochimaru (051): No hidden enemy character in play (state changed).',
+            'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-051-UC' });
+          break;
+        }
+
+        if (o051Targets.length === 1) {
+          newState = EffectEngine.defeatCharacter(newState, o051Targets[0], pendingEffect.sourcePlayer);
+          break;
+        }
+
+        const o051EffId = generateInstanceId();
+        const o051ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: o051EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'OROCHIMARU051_DEFEAT_HIDDEN',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: o051Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: o051ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a hidden enemy character in play to defeat.',
+          descriptionKey: 'game.effect.desc.orochimaru051DefeatHidden',
+          options: o051Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: o051EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KABUTO052_CONFIRM_AMBUSH': {
+        // Draw top card from opponent's deck, then place hidden on a mission
+        const kb052Player = pendingEffect.sourcePlayer;
+        const kb052Opponent = kb052Player === 'player1' ? 'player2' : 'player1';
+        const kb052OpPs = { ...newState[kb052Opponent] };
+
+        if (kb052OpPs.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb052Player,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (052): Opponent deck empty (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' });
+          break;
+        }
+
+        const kb052Deck = [...kb052OpPs.deck];
+        const kb052Drawn = kb052Deck.shift()!;
+        kb052OpPs.deck = kb052Deck;
+        newState = { ...newState, [kb052Opponent]: kb052OpPs };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, kb052Player,
+          'EFFECT_DRAW', 'Kabuto Yakushi (052): Drew top card from opponent deck.',
+          'game.log.effect.kabutoStealDraw', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' });
+
+        (newState as any)._pendingHiddenCard = kb052Drawn;
+        (newState as any)._pendingOriginalOwner = kb052Opponent;
+
+        const kb052Missions: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          kb052Missions.push(String(i));
+        }
+
+        if (kb052Missions.length === 1) {
+          const kb052FriendlySide: 'player1Characters' | 'player2Characters' =
+            kb052Player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const newChar_kb052: CharacterInPlay = {
+            instanceId: generateInstanceId(),
+            card: kb052Drawn,
+            isHidden: true,
+            wasRevealedAtLeastOnce: false,
+            powerTokens: 0,
+            stack: [kb052Drawn],
+            controlledBy: kb052Player,
+            originalOwner: kb052Opponent,
+            missionIndex: 0,
+          };
+          const missions_kb052 = [...newState.activeMissions];
+          const mission_kb052 = { ...missions_kb052[0] };
+          mission_kb052[kb052FriendlySide] = [...mission_kb052[kb052FriendlySide], newChar_kb052];
+          missions_kb052[0] = mission_kb052;
+          newState.activeMissions = missions_kb052;
+          newState[kb052Player] = { ...newState[kb052Player], charactersInPlay: EffectEngine.countCharsForPlayer(newState, kb052Player) };
+          delete (newState as any)._pendingHiddenCard;
+          delete (newState as any)._pendingOriginalOwner;
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb052Player,
+            'EFFECT', 'Kabuto Yakushi (052): Placed stolen card hidden on mission 1.',
+            'game.log.effect.kabutoSteal', { card: 'KABUTO YAKUSHI', id: 'KS-052-C', mission: '1' });
+          break;
+        }
+
+        const kb052EffId = generateInstanceId();
+        const kb052ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: kb052EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KABUTO_CHOOSE_MISSION',
+          sourcePlayer: kb052Player, requiresTargetSelection: true,
+          validTargets: kb052Missions, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: kb052ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: kb052Player,
+          description: 'Choose a mission to place the stolen card hidden.',
+          descriptionKey: 'game.effect.desc.kabuto052ChooseMission',
+          options: kb052Missions, minSelections: 1, maxSelections: 1,
+          sourceEffectId: kb052EffId,
+        }];
+        break;
+      }
+
+      case 'KABUTO053_CONFIRM_UPGRADE': {
+        const kb053uPlayer = pendingEffect.sourcePlayer;
+        const kb053uPs = newState[kb053uPlayer];
+
+        if (kb053uPs.hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053uPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (053): No cards in hand to discard (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
+          break;
+        }
+
+        if (kb053uPs.hand.length === 1) {
+          const kb053uHand = [...kb053uPs.hand];
+          const kb053uDiscarded = kb053uHand.splice(0, 1)[0];
+          const kb053uNewPs = { ...kb053uPs, hand: kb053uHand, discardPile: [...kb053uPs.discardPile, kb053uDiscarded] };
+          newState = { ...newState, [kb053uPlayer]: kb053uNewPs };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053uPlayer,
+            'EFFECT_DISCARD', `Kabuto Yakushi (053) UPGRADE: Discarded ${kb053uDiscarded.name_fr}.`,
+            'game.log.effect.discard', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC', target: kb053uDiscarded.name_fr });
+          break;
+        }
+
+        const kb053uOptions = kb053uPs.hand.map((_: any, i: number) => String(i));
+        const kb053uEffId = generateInstanceId();
+        const kb053uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: kb053uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KABUTO053_CHOOSE_DISCARD',
+          sourcePlayer: kb053uPlayer, requiresTargetSelection: true,
+          validTargets: kb053uOptions, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: kb053uActId, type: 'DISCARD_CARD' as PendingAction['type'],
+          player: kb053uPlayer,
+          description: 'Choose a card from your hand to discard.',
+          descriptionKey: 'game.effect.desc.kabuto053ChooseDiscard',
+          options: kb053uOptions, minSelections: 1, maxSelections: 1,
+          sourceEffectId: kb053uEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'KABUTO053_CONFIRM_MAIN': {
+        const kb053mPlayer = pendingEffect.sourcePlayer;
+        const kb053mPs = newState[kb053mPlayer];
+
+        if (kb053mPs.discardPile.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053mPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (053): Discard pile empty (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
+          break;
+        }
+
+        const kb053mTopCard = kb053mPs.discardPile[kb053mPs.discardPile.length - 1];
+        if (kb053mTopCard.card_type !== 'character') {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053mPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (053): Top of discard is not a character (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
+          break;
+        }
+
+        const kb053mReducedCost = Math.max(0, (kb053mTopCard.chakra ?? 0) - 3);
+        if (kb053mPs.chakra < kb053mReducedCost) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053mPlayer,
+            'EFFECT_NO_TARGET', `Kabuto Yakushi (053): Cannot afford ${kb053mTopCard.name_fr} (need ${kb053mReducedCost}, have ${kb053mPs.chakra}).`,
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
+          break;
+        }
+
+        const kb053mFriendlySide = kb053mPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const kb053mValidMissions: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          const mChars = newState.activeMissions[i][kb053mFriendlySide];
+          const hasSameName = mChars.some((c: CharacterInPlay) => {
+            if (c.isHidden) return false;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return cTop.name_fr === kb053mTopCard.name_fr;
+          });
+          const canUpgrade = mChars.some((c: CharacterInPlay) => {
+            if (c.isHidden) return false;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return cTop.name_fr === kb053mTopCard.name_fr && (cTop.chakra ?? 0) < (kb053mTopCard.chakra ?? 0);
+          });
+          if (!hasSameName || canUpgrade) {
+            kb053mValidMissions.push(String(i));
+          }
+        }
+
+        if (kb053mValidMissions.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053mPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (053): No valid mission to play from discard (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
+          break;
+        }
+
+        if (kb053mValidMissions.length === 1) {
+          const kb053mMIdx = parseInt(kb053mValidMissions[0], 10);
+          newState = EffectEngine.kabuto053PlayFromDiscard(newState, kb053mPlayer, kb053mMIdx, kb053mReducedCost, undefined);
+          break;
+        }
+
+        const kb053mEffId = generateInstanceId();
+        const kb053mActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: kb053mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ reducedCost: kb053mReducedCost }),
+          targetSelectionType: 'KABUTO053_CHOOSE_MISSION',
+          sourcePlayer: kb053mPlayer, requiresTargetSelection: true,
+          validTargets: kb053mValidMissions, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: kb053mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: kb053mPlayer,
+          description: 'Choose a mission to play the character from discard.',
+          descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
+          options: kb053mValidMissions, minSelections: 1, maxSelections: 1,
+          sourceEffectId: kb053mEffId,
+        }];
+        break;
+      }
+
+      case 'KABUTO054_CONFIRM_UPGRADE': {
+        // POWERUP 1 on self
+        const kb054uPlayer = pendingEffect.sourcePlayer;
+        const kb054uSide = kb054uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const kb054uMI = pendingEffect.sourceMissionIndex;
+        const missions_kb054u = [...newState.activeMissions];
+        const m_kb054u = { ...missions_kb054u[kb054uMI] };
+        const chars_kb054u = [...m_kb054u[kb054uSide]];
+        const idx_kb054u = chars_kb054u.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_kb054u !== -1) {
+          chars_kb054u[idx_kb054u] = { ...chars_kb054u[idx_kb054u], powerTokens: chars_kb054u[idx_kb054u].powerTokens + 1 };
+          m_kb054u[kb054uSide] = chars_kb054u;
+          missions_kb054u[kb054uMI] = m_kb054u;
+          newState = { ...newState, activeMissions: missions_kb054u };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, kb054uPlayer,
+          'EFFECT_POWERUP', 'Kabuto Yakushi (054): POWERUP 1 (upgrade effect).',
+          'game.log.effect.powerupSelf', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', amount: 1 });
+        break;
+      }
+
+      case 'KABUTO054_CONFIRM_MAIN': {
+        // Batch hide: all non-hidden chars in this mission with power < self power
+        const kb054mPlayer = pendingEffect.sourcePlayer;
+        const kb054mSrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!kb054mSrcChar) break;
+        const kb054mMI = kb054mSrcChar.missionIndex;
+        const kb054mMission = newState.activeMissions[kb054mMI];
+        if (!kb054mMission) break;
+        const kb054mSelfPower = getEffectivePower(newState, kb054mSrcChar.character, kb054mPlayer);
+
+        if (kb054mSelfPower <= 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb054mPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (054): Self has 0 power (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' });
+          break;
+        }
+
+        const kb054mTargets: { instanceId: string; char: CharacterInPlay; sidePlayer: PlayerID }[] = [];
+        for (const side of ['player1Characters', 'player2Characters'] as const) {
+          const sidePlayer = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+          for (const char of kb054mMission[side]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const charPower = getEffectivePower(newState, char, sidePlayer);
+            if (charPower < kb054mSelfPower) {
+              kb054mTargets.push({ instanceId: char.instanceId, char, sidePlayer });
+            }
+          }
+        }
+
+        if (kb054mTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, kb054mPlayer,
+            'EFFECT_NO_TARGET', 'Kabuto Yakushi (054): No characters with less power (state changed).',
+            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' });
+          break;
+        }
+
+        // Sort targets so Gemma 049 is processed last
+        const kb054mSorted = sortTargetsGemmaLast(kb054mTargets.map(t => t.char));
+        const kb054mSortedIds = kb054mSorted.map((c: CharacterInPlay) => c.instanceId);
+        const kb054mOrdered = kb054mSortedIds.map((id: string) => kb054mTargets.find(t => t.instanceId === id)!);
+
+        // Gemma 049 pre-scan: check for multi-LV targets on opponent side
+        const kb054mAlreadyGemma = newState.pendingEffects.some(
+          (pe: any) => (pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' || pe.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') && !pe.resolved,
+        );
+        let kb054mGemmaCreated = false;
+        if (!kb054mAlreadyGemma) {
+          for (const side of ['player1Characters', 'player2Characters'] as const) {
+            const sidePlayer = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+            if (sidePlayer === kb054mPlayer) continue;
+            const sideChars = kb054mMission[side];
+            let gemmaChar: CharacterInPlay | null = null;
+            for (const ch of sideChars) {
+              if (ch.isHidden) continue;
+              const fTopCard = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              if (fTopCard.number === 49) {
+                const hasSacrifice = (fTopCard.effects ?? []).some(
+                  (e: any) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+                    e.description.includes('Leaf Village') && e.description.includes('defeat this character instead'),
+                );
+                if (hasSacrifice) { gemmaChar = ch; break; }
+              }
+            }
+            if (!gemmaChar) continue;
+
+            const lvTargetIds = kb054mOrdered
+              .filter(t => t.sidePlayer === sidePlayer && t.char.card.group === 'Leaf Village')
+              .map(t => t.instanceId);
+
+            if (lvTargetIds.length >= 2) {
+              const effectId = generateInstanceId();
+              const actionId = generateInstanceId();
+              const allTargetIds = kb054mOrdered.map(t => t.instanceId);
+              newState.pendingEffects = [...newState.pendingEffects, {
+                id: effectId,
+                sourceCardId: 'KS-049-C',
+                sourceInstanceId: gemmaChar.instanceId,
+                sourceMissionIndex: kb054mMI,
+                effectType: 'MAIN' as const,
+                effectDescription: JSON.stringify({
+                  sacrificeInstanceId: gemmaChar.instanceId,
+                  effectSource: kb054mPlayer,
+                  batchAllTargets: allTargetIds,
+                  batchLVTargets: lvTargetIds,
+                  batchSourcePlayer: kb054mPlayer,
+                }),
+                targetSelectionType: 'GEMMA049_CHOOSE_PROTECT_HIDE',
+                sourcePlayer: sidePlayer,
+                requiresTargetSelection: true,
+                validTargets: lvTargetIds,
+                isOptional: true,
+                isMandatory: false,
+                resolved: false,
+                isUpgrade: false,
+              }];
+              newState.pendingActions = [...newState.pendingActions, {
+                id: actionId,
+                type: 'SELECT_TARGET' as PendingAction['type'],
+                player: sidePlayer,
+                description: 'Gemma Shiranui (049): Choose which Leaf Village character to protect from being hidden (or skip).',
+                descriptionKey: 'game.effect.desc.gemma049ChooseProtect',
+                options: lvTargetIds,
+                minSelections: 1,
+                maxSelections: 1,
+                sourceEffectId: effectId,
+              }];
+              kb054mGemmaCreated = true;
+              break;
+            }
+          }
+        }
+        if (kb054mGemmaCreated) break;
+
+        // Normal batch hide processing
+        let kb054mState = newState;
+        for (let ti = 0; ti < kb054mOrdered.length; ti++) {
+          const target = kb054mOrdered[ti];
+          const pendingCountBefore = kb054mState.pendingEffects.length;
+          kb054mState = EffectEngine.hideCharacterWithLog(kb054mState, target.instanceId, kb054mPlayer);
+
+          const gemmaHidePending = kb054mState.pendingEffects.find(
+            (pe: any) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
+              && kb054mState.pendingEffects.length > pendingCountBefore,
+          );
+          if (gemmaHidePending) {
+            const remainingIds = kb054mOrdered.slice(ti + 1).map(t => t.instanceId);
+            const existingDesc = JSON.parse(gemmaHidePending.effectDescription);
+            existingDesc.batchRemainingTargets = remainingIds;
+            existingDesc.batchSourcePlayer = kb054mPlayer;
+            gemmaHidePending.effectDescription = JSON.stringify(existingDesc);
+            break;
+          }
+        }
+        newState = kb054mState;
+        break;
+      }
+
+      case 'KIMIMARO055_CONFIRM_AMBUSH': {
+        const km055Player = pendingEffect.sourcePlayer;
+        const km055Ps = newState[km055Player];
+
+        if (km055Ps.hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, km055Player,
+            'EFFECT_NO_TARGET', 'Kimimaro (055): No cards in hand to discard (state changed).',
+            'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-055-C' });
+          break;
+        }
+
+        // Check valid hide targets exist (cost <= 3)
+        let km055HasHideTarget = false;
+        for (const mission of newState.activeMissions) {
+          for (const side of ['player1Characters', 'player2Characters'] as const) {
+            const sideOwner = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+            const isEnemy = sideOwner !== km055Player;
+            for (const char of mission[side]) {
+              if (char.isHidden) continue;
+              if (isEnemy && !canBeHiddenByEnemy(newState, char, sideOwner)) continue;
+              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              if ((topCard.chakra ?? 0) <= 3) { km055HasHideTarget = true; break; }
+            }
+            if (km055HasHideTarget) break;
+          }
+          if (km055HasHideTarget) break;
+        }
+
+        if (!km055HasHideTarget) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, km055Player,
+            'EFFECT_NO_TARGET', 'Kimimaro (055): No valid character to hide (state changed).',
+            'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-055-C' });
+          break;
+        }
+
+        if (km055Ps.hand.length === 1) {
+          // Auto-discard the only card, then chain to hide target selection
+          newState = EffectEngine.kimimaroChooseDiscard(newState, pendingEffect, '0');
+          break;
+        }
+
+        const km055Options = km055Ps.hand.map((_: any, i: number) => String(i));
+        const km055EffId = generateInstanceId();
+        const km055ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: km055EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIMIMARO_CHOOSE_DISCARD',
+          sourcePlayer: km055Player, requiresTargetSelection: true,
+          validTargets: km055Options, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: km055ActId, type: 'DISCARD_CARD' as PendingAction['type'],
+          player: km055Player,
+          description: 'Choose a card from your hand to discard.',
+          descriptionKey: 'game.effect.desc.kimimaro055Discard',
+          options: km055Options, minSelections: 1, maxSelections: 1,
+          sourceEffectId: km055EffId,
+        }];
+        break;
+      }
+
+      case 'KIMIMARO056_CONFIRM_UPGRADE': {
+        const km056Player = pendingEffect.sourcePlayer;
+        const km056Ps = newState[km056Player];
+
+        if (km056Ps.hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, km056Player,
+            'EFFECT_NO_TARGET', 'Kimimaro (056): No cards in hand to discard (state changed).',
+            'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' });
+          break;
+        }
+
+        // Check valid hide targets exist (cost <= 4)
+        let km056HasHideTarget = false;
+        for (const mission of newState.activeMissions) {
+          for (const side of ['player1Characters', 'player2Characters'] as const) {
+            const sideOwner = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+            const isEnemy = sideOwner !== km056Player;
+            for (const char of mission[side]) {
+              if (char.isHidden) continue;
+              if (isEnemy && !canBeHiddenByEnemy(newState, char, sideOwner)) continue;
+              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              if ((topCard.chakra ?? 0) <= 4) { km056HasHideTarget = true; break; }
+            }
+            if (km056HasHideTarget) break;
+          }
+          if (km056HasHideTarget) break;
+        }
+
+        if (!km056HasHideTarget) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, km056Player,
+            'EFFECT_NO_TARGET', 'Kimimaro (056): No valid character to hide (state changed).',
+            'game.log.effect.noTarget', { card: 'KIMIMARO', id: 'KS-056-UC' });
+          break;
+        }
+
+        if (km056Ps.hand.length === 1) {
+          // Auto-discard the only card
+          const km056Hand = [...km056Ps.hand];
+          const km056Discarded = km056Hand.splice(0, 1)[0];
+          const km056NewPs = { ...km056Ps, hand: km056Hand, discardPile: [...km056Ps.discardPile, km056Discarded] };
+          newState = { ...newState, [km056Player]: km056NewPs };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, km056Player,
+            'EFFECT_DISCARD', `Kimimaro (056) UPGRADE: Discarded ${km056Discarded.name_fr} from hand.`,
+            'game.log.effect.discard', { card: 'KIMIMARO', id: 'KS-056-UC', target: km056Discarded.name_fr });
+
+          // Find valid hide targets (cost <= 4)
+          const km056HideTargets: string[] = [];
+          for (const mission_km of newState.activeMissions) {
+            for (const side_km of ['player1Characters', 'player2Characters'] as const) {
+              const sideOwner_km = (side_km === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
+              const isEnemy_km = sideOwner_km !== km056Player;
+              for (const char_km of mission_km[side_km]) {
+                if (char_km.isHidden) continue;
+                if (isEnemy_km && !canBeHiddenByEnemy(newState, char_km, sideOwner_km)) continue;
+                const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
+                if ((topCard_km.chakra ?? 0) <= 4) km056HideTargets.push(char_km.instanceId);
+              }
+            }
+          }
+
+          if (km056HideTargets.length === 1) {
+            newState = EffectEngine.hideCharacterWithLog(newState, km056HideTargets[0], km056Player);
+          } else if (km056HideTargets.length > 1) {
+            const km056hEffId = generateInstanceId();
+            const km056hActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: km056hEffId, sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: '', targetSelectionType: 'KIMIMARO056_CHOOSE_HIDE',
+              sourcePlayer: km056Player, requiresTargetSelection: true,
+              validTargets: km056HideTargets, isOptional: true, isMandatory: false,
+              resolved: false, isUpgrade: pendingEffect.isUpgrade,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: km056hActId, type: 'SELECT_TARGET' as PendingAction['type'],
+              player: km056Player,
+              description: 'Kimimaro (056): Choose a character to hide (cost 4 or less).',
+              descriptionKey: 'game.effect.desc.kimimaro056ChooseHide',
+              options: km056HideTargets, minSelections: 1, maxSelections: 1,
+              sourceEffectId: km056hEffId,
+            }];
+            pendingEffect.remainingEffectTypes = undefined;
+          }
+          break;
+        }
+
+        // Multiple cards in hand: mandatory child
+        const km056Options = km056Ps.hand.map((_: any, i: number) => String(i));
+        const km056EffId = generateInstanceId();
+        const km056ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: km056EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIMIMARO056_CHOOSE_DISCARD',
+          sourcePlayer: km056Player, requiresTargetSelection: true,
+          validTargets: km056Options, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: km056ActId, type: 'DISCARD_CARD' as PendingAction['type'],
+          player: km056Player,
+          description: 'Choose a card from your hand to discard.',
+          descriptionKey: 'game.effect.desc.kimimaro056Discard',
+          options: km056Options, minSelections: 1, maxSelections: 1,
+          sourceEffectId: km056EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'JIROBO057_CONFIRM_MAIN': {
+        const j057Player = pendingEffect.sourcePlayer;
+        const j057FriendlySide = j057Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        let j057Count = 0;
+        for (const mission of newState.activeMissions) {
+          const hasSF = (mission as any)[j057FriendlySide].some((char: CharacterInPlay) => {
+            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
+            if (char.isHidden) return false;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            return topCard.keywords && topCard.keywords.includes('Sound Four');
+          });
+          if (hasSF) j057Count++;
+        }
+
+        if (j057Count === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j057Player,
+            'EFFECT_NO_TARGET', 'Jirobo (057): No missions with a friendly Sound Four character (state changed).',
+            'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-057-C' });
+          break;
+        }
+
+        // POWERUP X on self
+        const j057Side = j057Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const j057MI = pendingEffect.sourceMissionIndex;
+        const missions_j057 = [...newState.activeMissions];
+        const m_j057 = { ...missions_j057[j057MI] };
+        const chars_j057 = [...m_j057[j057Side]];
+        const idx_j057 = chars_j057.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_j057 !== -1) {
+          chars_j057[idx_j057] = { ...chars_j057[idx_j057], powerTokens: chars_j057[idx_j057].powerTokens + j057Count };
+          m_j057[j057Side] = chars_j057;
+          missions_j057[j057MI] = m_j057;
+          newState = { ...newState, activeMissions: missions_j057 };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j057Player,
+          'EFFECT_POWERUP', `Jirobo (057): POWERUP ${j057Count} on self.`,
+          'game.log.effect.powerupSelf', { card: 'JIROBO', id: 'KS-057-C', amount: j057Count });
+        break;
+      }
+
+      case 'JIROBO058_CONFIRM_MAIN': {
+        const j058Player = pendingEffect.sourcePlayer;
+        let j058IsUpgrade = false;
+        try {
+          const desc = JSON.parse(pendingEffect.effectDescription);
+          j058IsUpgrade = desc.isUpgrade ?? false;
+        } catch { /* ignore */ }
+
+        const j058FriendlySide = j058Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const j058MissionIndices: number[] = j058IsUpgrade
+          ? newState.activeMissions.map((_: any, i: number) => i)
+          : [pendingEffect.sourceMissionIndex];
+
+        const j058Targets: { missionIndex: number; instanceId: string }[] = [];
+        for (const mIdx of j058MissionIndices) {
+          const mission = newState.activeMissions[mIdx];
+          for (const char of (mission as any)[j058FriendlySide] as CharacterInPlay[]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+              j058Targets.push({ missionIndex: mIdx, instanceId: char.instanceId });
+            }
+          }
+        }
+
+        if (j058Targets.length === 0) {
+          const scope = j058IsUpgrade ? 'in play' : 'in this mission';
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j058Player,
+            'EFFECT_NO_TARGET', `Jirobo (058): No other friendly Sound Four characters ${scope} (state changed).`,
+            'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' });
+          break;
+        }
+
+        // POWERUP 1 on each target
+        const missions_j058 = [...newState.activeMissions];
+        for (const t of j058Targets) {
+          const m = { ...missions_j058[t.missionIndex] };
+          const chars = [...m[j058FriendlySide]];
+          const idx = chars.findIndex((c: CharacterInPlay) => c.instanceId === t.instanceId);
+          if (idx !== -1) {
+            chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 1 };
+            m[j058FriendlySide] = chars;
+            missions_j058[t.missionIndex] = m;
+          }
+        }
+        newState = { ...newState, activeMissions: missions_j058 };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, j058Player,
+          'EFFECT_POWERUP', `Jirobo (058): POWERUP 1 on ${j058Targets.length} Sound Four character(s).`,
+          'game.log.effect.powerup', { card: 'JIROBO', id: 'KS-058-UC', amount: '1', count: j058Targets.length });
+        break;
+      }
+
+      case 'KIDOMARU059_CONFIRM_MAIN': {
+        const k059Player = pendingEffect.sourcePlayer;
+        const k059FriendlySide: 'player1Characters' | 'player2Characters' =
+          k059Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        // Re-count X (Sound Four mission count)
+        let k059X = 0;
+        for (const mission of newState.activeMissions) {
+          const hasSF = (mission as any)[k059FriendlySide].some((char: CharacterInPlay) => {
+            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
+            if (char.isHidden) return false;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            return topCard.keywords && topCard.keywords.includes('Sound Four');
+          });
+          if (hasSF) k059X++;
+        }
+
+        if (k059X === 0 || newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k059Player,
+            'EFFECT_NO_TARGET', 'Kidomaru (059): Cannot move (state changed).',
+            'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' });
+          break;
+        }
+
+        // Find movable friendly chars (R8+R10)
+        const k059Targets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (isMovementBlockedByKurenai(newState, i, k059Player)) continue;
+          for (const char of newState.activeMissions[i][k059FriendlySide]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const charName = topCard.name_fr;
+            const hasValidDest = newState.activeMissions.some((m: any, di: number) => {
+              if (di === i) return false;
+              return !m[k059FriendlySide].some((c: any) => {
+                if (c.instanceId === char.instanceId) return false;
+                if (c.isHidden) return false;
+                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr === charName;
+              });
+            });
+            if (hasValidDest) k059Targets.push(char.instanceId);
+          }
+        }
+
+        if (k059Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k059Player,
+            'EFFECT_NO_TARGET', 'Kidomaru (059): No friendly characters can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'KIDOMARU', id: 'KS-059-C' });
+          break;
+        }
+
+        // Chain to KIDOMARU_CHOOSE_CHARACTER with movesRemaining: X
+        const k059EffId = generateInstanceId();
+        const k059ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k059EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ movesRemaining: k059X }),
+          targetSelectionType: 'KIDOMARU_CHOOSE_CHARACTER',
+          sourcePlayer: k059Player, requiresTargetSelection: true,
+          validTargets: k059Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k059ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: k059Player,
+          description: `Kidomaru (059): Choose a friendly character to move (${k059X} move(s) remaining).`,
+          descriptionKey: 'game.effect.desc.kidomaru059ChooseChar',
+          descriptionParams: { remaining: k059X },
+          options: k059Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k059EffId,
+        }];
+        break;
+      }
+
+      case 'KIDOMARU060_CONFIRM_MAIN': {
+        const k060SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!k060SrcChar) break;
+        const k060MIdx = k060SrcChar.missionIndex;
+        const k060Mission = newState.activeMissions[k060MIdx];
+        if (!k060Mission || newState.activeMissions.length < 2) break;
+
+        const k060Targets: string[] = [];
+        for (const char of [...k060Mission.player1Characters, ...k060Mission.player2Characters]) {
+          const charCtrl = k060Mission.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
+          if (isMovementBlockedByKurenai(newState, k060MIdx, charCtrl as PlayerID)) continue;
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const charName = topCard.name_fr;
+          const ctrlSide: 'player1Characters' | 'player2Characters' = charCtrl === 'player1' ? 'player1Characters' : 'player2Characters';
+          const hasValidDest = char.isHidden || newState.activeMissions.some((m: any, i: number) => {
+            if (i === k060MIdx) return false;
+            return !m[ctrlSide].some((c: any) => {
+              if (c.instanceId === char.instanceId) return false;
+              if (c.isHidden) return false;
+              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return cTop.name_fr === charName;
+            });
+          });
+          if (hasValidDest) k060Targets.push(char.instanceId);
+        }
+
+        if (k060Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kidômaru (060): No character can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'KIDÔMARU', id: 'KS-060-UC' });
+          break;
+        }
+
+        if (k060Targets.length === 1) {
+          const k060AutoChar = EffectEngine.findCharByInstanceId(newState, k060Targets[0]);
+          if (k060AutoChar) {
+            const k060Dests: string[] = [];
+            for (let i = 0; i < newState.activeMissions.length; i++) {
+              if (i !== k060AutoChar.missionIndex && EffectEngine.validateNameUniquenessForMove(newState, k060AutoChar.character, i, k060AutoChar.player)) {
+                k060Dests.push(String(i));
+              }
+            }
+            if (k060Dests.length === 1) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, k060Targets[0], parseInt(k060Dests[0], 10),
+                k060AutoChar.player, 'KS-060-UC', 'KS-060-UC',
+                pendingEffect.sourcePlayer,
+              );
+              break;
+            }
+            if (k060Dests.length > 1) {
+              const k060dEffId = generateInstanceId();
+              const k060dActId = generateInstanceId();
+              newState.pendingEffects = [...newState.pendingEffects, {
+                id: k060dEffId, sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: k060Targets[0] }),
+                targetSelectionType: 'KIDOMARU060_MOVE_DESTINATION',
+                sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+                validTargets: k060Dests, isOptional: true, isMandatory: false,
+                resolved: false, isUpgrade: false,
+              }];
+              newState.pendingActions = [...newState.pendingActions, {
+                id: k060dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                player: pendingEffect.sourcePlayer,
+                description: 'Choose a mission to move the character to.',
+                descriptionKey: 'game.effect.desc.chooseMissionMove',
+                options: k060Dests, minSelections: 1, maxSelections: 1,
+                sourceEffectId: k060dEffId,
+              }];
+              break;
+            }
+          }
+          break;
+        }
+
+        // Multiple targets: child with SKIP
+        const k060EffId = generateInstanceId();
+        const k060ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k060EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: k060MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIDOMARU060_CHOOSE_CHARACTER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: k060Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k060ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Kidômaru (060): Choose a character in this mission to move.',
+          descriptionKey: 'game.effect.desc.kidomaru060ChooseChar',
+          options: k060Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k060EffId,
+        }];
+        break;
+      }
+
+      case 'KIDOMARU060_CONFIRM_AMBUSH': {
+        const k060aEnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k060aEnemyPlayer = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const k060aTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[k060aEnemySide] as CharacterInPlay[]) {
+            if (getEffectivePower(newState, char, k060aEnemyPlayer as PlayerID) <= 1) {
+              k060aTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (k060aTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kidômaru (060) AMBUSH: No enemy character with Power 1 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'KIDÔMARU', id: 'KS-060-UC' });
+          break;
+        }
+
+        if (k060aTargets.length === 1) {
+          newState = EffectEngine.defeatCharacter(newState, k060aTargets[0], pendingEffect.sourcePlayer);
+          break;
+        }
+
+        const k060aEffId = generateInstanceId();
+        const k060aActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: k060aEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'KIDOMARU060_DEFEAT_LOW_POWER',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: k060aTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: k060aActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Kidômaru (060) AMBUSH: Select an enemy character with Power 1 or less to defeat.',
+          descriptionKey: 'game.effect.desc.kidomaru060DefeatLowPower',
+          options: k060aTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: k060aEffId,
         }];
         break;
       }
