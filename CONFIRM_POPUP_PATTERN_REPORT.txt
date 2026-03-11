@@ -1,0 +1,258 @@
+================================================================================
+RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
+================================================================================
+
+DERNIERE MISE A JOUR: 2026-03-11
+BATCH ACTUEL: Batch 1 (KS-001 a KS-010)
+
+================================================================================
+1. CONSIGNE DU PATTERN
+================================================================================
+
+Le pattern de confirmation popup (inspire de Kiba 113 R) ajoute une etape de
+confirmation avant l'execution de chaque effet instantane. Le joueur voit un
+popup "Voulez-vous activer cet effet ?" et peut accepter ou decliner.
+
+FLOW STANDARD:
+  1. Handler pre-verifie les cibles valides
+  2. Si cibles valides -> retourne confirmation popup:
+     {
+       targetSelectionType: 'XXX_CONFIRM_MAIN',
+       validTargets: [sourceCard.instanceId],  // self comme cible
+       isOptional: true,                        // le joueur peut decliner
+       description: JSON.stringify({metadata}),
+       descriptionKey: 'game.effect.desc.xxxConfirmMain'
+     }
+  3. Si pas de cible -> log EFFECT_NO_TARGET et retourne state
+  4. Joueur confirme -> resolution dans applyTargetedEffect:
+     - Re-calcule les cibles valides (l'etat a pu changer)
+     - Cree PendingEffect + PendingAction pour la selection reelle
+  5. Joueur selectionne la cible -> effet applique
+
+================================================================================
+2. DISTINCTION CRITIQUE: UPGRADE MODIFIE vs UPGRADE SEPARE
+================================================================================
+
+Il existe DEUX types de relations entre MAIN et UPGRADE:
+
+A) UPGRADE MODIFIE MAIN (pattern Kiba 113):
+   - Le texte UPGRADE dit "MAIN effect: Au lieu de..." ou modifie directement MAIN
+   - Les deux effets fonctionnent comme UNE SEULE ACTION
+   - Implementation: UPGRADE handler = no-op, logique integree dans MAIN via isUpgrade
+   - Exemple: Kiba 113 "UPGRADE: MAIN effect: Instead, defeat both of them."
+
+B) UPGRADE SEPARE (pattern Hiruzen 002, Shizune 006):
+   - Le texte UPGRADE decrit un EFFET INDEPENDANT qui se declenche APRES MAIN
+   - Les deux effets fonctionnent SEQUENTIELLEMENT
+   - Implementation: UPGRADE handler = handler reel, declenche via remainingEffectTypes
+   - Exemple: Hiruzen 002 "UPGRADE: POWERUP 2 the character played with the MAIN effect."
+   - Exemple: Shizune 006 "UPGRADE: Gain 2 Chakra."
+
+REGLE POUR IDENTIFIER:
+  - Si UPGRADE dit "MAIN effect:" ou "Instead" -> MODIFIE MAIN (type A)
+  - Si UPGRADE decrit une action separee -> SEPARE (type B)
+
+================================================================================
+3. CARTES TRAITEES - BATCH 1
+================================================================================
+
+CARTE         | EFFETS                              | TYPE UPGRADE    | STATUS
+------------- | ----------------------------------- | --------------- | ------
+KS-001-C      | MAIN: POWERUP 2 Leaf Village        | N/A (pas d'UPG) | OK
+KS-002-UC     | MAIN: Play Leaf -1                  | SEPARE          | CORRIGE
+              | UPGRADE: POWERUP 2 played char      |                 |
+KS-003-C      | (non traite - skip)                 | -               | -
+KS-004-UC     | MAIN: Continu (unchanged)           | SEPARE          | OK
+              | UPGRADE: Recover from discard        |                 |
+KS-005-C      | (non traite - skip)                 | -               | -
+KS-006-UC     | MAIN: Move enemy power <=3          | SEPARE          | CORRIGE
+              | UPGRADE: Gain 2 Chakra              |                 |
+KS-007-C      | MAIN: Play Summon -1                | N/A (pas d'UPG) | CORRIGE
+KS-008-UC     | MAIN: Play Summon -2                | SEPARE          | CORRIGE
+              | UPGRADE: Hide enemy cost <=3        |                 |
+KS-009-C      | (non traite - skip)                 | -               | -
+KS-010-C      | AMBUSH: Move self                   | N/A (pas d'UPG) | OK
+
+================================================================================
+4. BUGS RENCONTRES ET CAUSES RACINES
+================================================================================
+
+--- BUG 1: JIRAIYA 007/008 MAIN "NOT WORKING" ---
+
+SYMPTOME: Apres confirmation, l'UI ne montre pas les cartes de la main a choisir.
+Le joueur voit un popup de selection de cible vide ou mal forme.
+
+CAUSE RACINE: Les cases CONFIRM dans applyTargetedEffect() creent manuellement
+les PendingAction avec `type: 'SELECT_TARGET'`. Or, la fonction
+createPendingTargetSelection() (ligne 565-582) mappe automatiquement certains
+targetSelectionType vers le bon pendingAction.type:
+  - JIRAIYA_CHOOSE_SUMMON     -> 'CHOOSE_CARD_FROM_LIST'
+  - JIRAIYA008_CHOOSE_SUMMON  -> 'CHOOSE_CARD_FROM_LIST'
+  - HIRUZEN002_CHOOSE_CARD    -> 'CHOOSE_CARD_FROM_LIST'
+  - RECOVER_FROM_DISCARD      -> 'CHOOSE_CARD_FROM_LIST'
+
+Le buildPendingTargetSelectionUI() dans gameStore.ts verifie
+`pendingAction.type === 'CHOOSE_CARD_FROM_LIST'` pour afficher les cartes de la
+main. Avec 'SELECT_TARGET', l'UI essaie d'afficher une selection de cible sur le
+board, pas dans la main -> ca ne marche pas.
+
+CORRECTION: Changer le type des PendingAction dans les cases CONFIRM pour
+correspondre au mapping de createPendingTargetSelection().
+
+REGLE: Quand un case CONFIRM cree manuellement un PendingAction, verifier le
+targetSelectionType dans la liste a la ligne 565-582 de EffectEngine.ts pour
+utiliser le bon pendingAction.type.
+
+--- BUG 2: BOUTON SKIP APRES CONFIRMATION ---
+
+SYMPTOME: Apres avoir confirme un effet, le joueur voit encore un bouton "Skip"
+sur la selection de cible suivante. Exemple: Hiruzen 001 confirme POWERUP 2, mais
+le joueur peut encore skip la selection de la cible Leaf Village.
+
+CAUSE RACINE: Tous les PendingEffect enfants crees par les cases CONFIRM ont
+`isOptional: true, isMandatory: false`. Une fois que le joueur a confirme
+l'activation de l'effet, il DOIT le resoudre completement.
+
+CORRECTION: Tous les PendingEffect enfants crees apres confirmation doivent avoir
+`isOptional: false, isMandatory: true`.
+
+REGLE: Seul le popup de CONFIRMATION initial est isOptional: true. Tous les
+pendings enfants (selection de cible, choix de mission, etc.) sont
+isOptional: false, isMandatory: true.
+
+--- BUG 3: UPGRADE SE DECLENCHE TROP TOT (Hiruzen 002, Shizune 006, Jiraiya 008) ---
+
+SYMPTOME: L'UPGRADE apparait en meme temps que la selection de cible du MAIN,
+au lieu d'apparaitre APRES que MAIN soit completement resolu.
+
+CAUSE RACINE: Quand un case CONFIRM cree un nouveau PendingEffect enfant, les
+`remainingEffectTypes: ['UPGRADE']` restent sur l'ancien pending. Apres le switch,
+la ligne 5072 de applyTargetedEffect() detecte les remainingEffectTypes et appelle
+processRemainingEffects() IMMEDIATEMENT, ce qui declenche le handler UPGRADE
+avant que l'enfant (la vraie selection) soit resolu.
+
+CORRECTION: Dans chaque case CONFIRM qui cree des pendings enfants:
+  1. Transferer remainingEffectTypes de l'ancien pending vers le nouveau:
+     `remainingEffectTypes: pendingEffect.remainingEffectTypes`
+  2. Vider l'ancien pour empecher le declenchement premature:
+     `pendingEffect.remainingEffectTypes = undefined`
+
+REGLE: TOUJOURS propager remainingEffectTypes a travers TOUTE la chaine de
+pendings enfants. Le dernier pending de la chaine doit porter les remaining.
+
+--- BUG 4: HIRUZEN 002 UPGRADE = NO-OP (mauvais pattern) ---
+
+SYMPTOME: L'UPGRADE de Hiruzen 002 demande confirmation AVANT le choix de la
+carte Leaf Village, au lieu d'APRES que la carte soit jouee.
+
+CAUSE RACINE: On avait applique le pattern "UPGRADE modifie MAIN" (type A, comme
+Kiba 113) alors que Hiruzen 002 a un UPGRADE SEPARE (type B). Le handler UPGRADE
+etait un no-op et le POWERUP 2 etait integre dans hiruzen002PlaceCard via
+isUpgrade flag.
+
+CORRECTION:
+  - Supprimer le baking isUpgrade du flow MAIN (plus de POWERUP 2 dans PlaceCard)
+  - Creer un vrai handler UPGRADE qui verifie si MAIN a joue un perso
+  - Tracker le perso joue via state._hiruzen002PlayedCharId
+  - L'UPGRADE se declenche automatiquement via processRemainingEffects apres MAIN
+
+REGLE: TOUJOURS verifier si l'UPGRADE est de type A (modifie) ou B (separe)
+AVANT d'implementer. Type B = handler reel + remainingEffectTypes.
+
+================================================================================
+5. REGLES A RESPECTER POUR LES PROCHAINS BATCHES
+================================================================================
+
+R1. VERIFIER LE TYPE D'UPGRADE
+    Lire attentivement le texte de l'UPGRADE:
+    - "MAIN effect:" / "Instead" / "Also [modifie MAIN]" -> Type A (no-op handler)
+    - Action independante -> Type B (handler reel)
+
+R2. PENDINGACTION.TYPE CORRECT
+    Quand un case CONFIRM cree manuellement un PendingAction, verifier le
+    targetSelectionType dans la liste ligne 565-582 de EffectEngine.ts:
+    - JIRAIYA_CHOOSE_SUMMON, HIRUZEN002_CHOOSE_CARD, RECOVER_FROM_DISCARD, etc.
+      -> type: 'CHOOSE_CARD_FROM_LIST'
+    - POWERUP_2_LEAF_VILLAGE, MOVE_ENEMY_POWER_3_OR_LESS, etc.
+      -> type: 'SELECT_TARGET'
+    - Types DISCARD: -> type: 'DISCARD_CARD'
+
+R3. ISOPTIONAL: FALSE APRES CONFIRMATION
+    Seul le popup de confirmation initial est isOptional: true.
+    Tous les pendings enfants sont isOptional: false, isMandatory: true.
+
+R4. PROPAGER REMAININGEFFECTTYPES
+    Quand un case CONFIRM cree des pendings enfants:
+    1. Ajouter `remainingEffectTypes: pendingEffect.remainingEffectTypes` au nouveau
+    2. Ajouter `pendingEffect.remainingEffectTypes = undefined` avant le break
+    Ceci s'applique a CHAQUE etape intermediaire de la chaine.
+
+R5. CLE I18N OBLIGATOIRE
+    Chaque nouveau targetSelectionType de type CONFIRM doit avoir:
+    - descriptionKey dans en.json ET fr.json
+    - Les cles pour les popups enfants aussi (si nouveaux)
+
+R6. TESTER EN MODE TRAINING
+    Pour chaque carte modifiee, tester:
+    - Confirmer l'effet -> la suite fonctionne correctement
+    - Decliner l'effet -> l'effet est skip, pas de bug
+    - Pas de bouton SKIP apres confirmation
+    - Si UPGRADE separe: UPGRADE apparait APRES MAIN, pas en meme temps
+    - Si joue comme upgrade: les deux effets se declenchent sequentiellement
+
+R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
+    ```typescript
+    case 'XXX_CONFIRM_MAIN': {
+      // Re-compute valid targets
+      const targets = [...];
+      if (targets.length === 0) {
+        newState.log = logAction(...);
+        break; // remainingEffectTypes still fires via line 5072
+      }
+      const effId = generateInstanceId();
+      const actId = generateInstanceId();
+      newState.pendingEffects = [...newState.pendingEffects, {
+        id: effId,
+        sourceCardId: pendingEffect.sourceCardId,
+        sourceInstanceId: pendingEffect.sourceInstanceId,
+        sourceMissionIndex: pendingEffect.sourceMissionIndex,
+        effectType: pendingEffect.effectType,
+        effectDescription: '...',
+        targetSelectionType: 'XXX_ACTUAL_TYPE',
+        sourcePlayer: pendingEffect.sourcePlayer,
+        requiresTargetSelection: true,
+        validTargets: targets,
+        isOptional: false,        // <-- MANDATORY after confirm
+        isMandatory: true,        // <-- MANDATORY after confirm
+        resolved: false,
+        isUpgrade: pendingEffect.isUpgrade,
+        remainingEffectTypes: pendingEffect.remainingEffectTypes,  // <-- PROPAGATE
+      }];
+      newState.pendingActions = [...newState.pendingActions, {
+        id: actId,
+        type: 'CORRECT_TYPE' as PendingAction['type'],  // <-- CHECK LINE 565-582
+        player: pendingEffect.sourcePlayer,
+        description: '...',
+        descriptionKey: '...',
+        options: targets,
+        minSelections: 1,
+        maxSelections: 1,
+        sourceEffectId: effId,
+      }];
+      pendingEffect.remainingEffectTypes = undefined;  // <-- PREVENT PREMATURE FIRE
+      break;
+    }
+    ```
+
+================================================================================
+6. HISTORIQUE DES MODIFICATIONS
+================================================================================
+
+2026-03-11 - Batch 1 (KS-001 a KS-010):
+  - Implementation initiale du pattern de confirmation
+  - Bugs detectes par testeur Andy: Jiraiya 007/008 non fonctionnel,
+    bouton SKIP apres confirmation, Hiruzen 002 et Shizune 006 mauvais ordering
+  - Corrections appliquees pour les 4 categories de bugs
+  - Ajout de ce fichier de rapport
+
+================================================================================
