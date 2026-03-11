@@ -1892,6 +1892,17 @@
       "deleteError": "Delete failed",
       "default": "Default"
     },
+    "testers": {
+      "title": "Testers Management",
+      "description": "Add or remove users with tester role. Testers can access training mode and test features.",
+      "search": "Search username...",
+      "add": "Add",
+      "added": "Tester added",
+      "remove": "Remove",
+      "removed": "Tester removed",
+      "noTesters": "No testers yet.",
+      "notFound": "User not found."
+    },
     "actionLog": "Action Log",
     "sealed": {
       "title": "Sealed Mode",

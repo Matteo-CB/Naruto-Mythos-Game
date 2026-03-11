@@ -337,7 +337,7 @@ export default function Home() {
                   </Link>
                 </motion.div>
               )}
-              {session && ((userRole ?? (session.user as Record<string, unknown>)?.role) === 'admin') && (
+              {session && ['admin', 'tester'].includes((userRole ?? (session.user as Record<string, unknown>)?.role) as string) && (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
