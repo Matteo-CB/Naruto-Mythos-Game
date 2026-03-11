@@ -1892,6 +1892,17 @@
       "deleteError": "Echec de la suppression",
       "default": "Defaut"
     },
+    "testers": {
+      "title": "Gestion des Testeurs",
+      "description": "Ajoutez ou retirez des utilisateurs avec le role testeur. Les testeurs peuvent acceder au mode entrainement et aux fonctionnalites de test.",
+      "search": "Rechercher un pseudo...",
+      "add": "Ajouter",
+      "added": "Testeur ajoute",
+      "remove": "Retirer",
+      "removed": "Testeur retire",
+      "noTesters": "Aucun testeur pour le moment.",
+      "notFound": "Utilisateur introuvable."
+    },
     "actionLog": "Journal d'Actions",
     "sealed": {
       "title": "Mode Scellé",

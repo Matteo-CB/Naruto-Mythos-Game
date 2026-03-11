@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/lib/i18n/navigation';
 import { CloudBackground } from '@/components/CloudBackground';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion, useMotionValue, useAnimationFrame } from 'framer-motion';
@@ -127,6 +128,7 @@ function CardCarousel() {
 
 export default function MaintenancePage() {
   const t = useTranslations('maintenance');
+  const router = useRouter();
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -136,6 +138,22 @@ export default function MaintenancePage() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Poll the server to check if maintenance is over, redirect to home when it is
+  useEffect(() => {
+    const poll = setInterval(async () => {
+      try {
+        const res = await fetch('/api/health', { cache: 'no-store' });
+        if (res.ok) {
+          clearInterval(poll);
+          router.push('/');
+        }
+      } catch {
+        // Server still down, keep polling
+      }
+    }, 5000);
+    return () => clearInterval(poll);
+  }, [router]);
 
   const timerDisplay = useMemo(() => {
     const h = Math.floor(elapsed / 3600);
