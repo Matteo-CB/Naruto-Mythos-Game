@@ -5325,7 +5325,7 @@ export class EffectEngine {
       }
 
       case 'KIN073_CONFIRM_MAIN': {
-        // Re-check hand not empty + valid enemy targets in this mission
+        // Re-check hand not empty + valid enemy targets IN PLAY (any mission)
         const k073Player = pendingEffect.sourcePlayer;
         const k073Opponent = k073Player === 'player1' ? 'player2' : 'player1';
         const k073Ps = newState[k073Player];
@@ -5340,16 +5340,16 @@ export class EffectEngine {
           break;
         }
 
-        const k073Mission = newState.activeMissions[k073MI];
-        if (!k073Mission) break;
         const k073EnemySide = k073Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
-        const k073HasTarget = k073Mission[k073EnemySide].some(
-          (char: CharacterInPlay) => canBeHiddenByEnemy(newState, char, k073Opponent) && getEffectivePower(newState, char, k073Opponent) <= 4,
+        const k073HasTarget = newState.activeMissions.some((mission) =>
+          mission[k073EnemySide].some(
+            (char: CharacterInPlay) => canBeHiddenByEnemy(newState, char, k073Opponent) && getEffectivePower(newState, char, k073Opponent) <= 4,
+          ),
         );
 
         if (!k073HasTarget) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, k073Player,
-            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No valid enemy target (state changed).',
+            'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No valid enemy target in play (state changed).',
             'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' });
           break;
         }
@@ -5365,11 +5365,10 @@ export class EffectEngine {
             'EFFECT_DISCARD', `Kin Tsuchi (073): Discarded ${k073Discarded.name_fr} from hand.`,
             'game.log.effect.discard', { card: 'KIN TSUCHI', id: 'KS-073-UC', target: k073Discarded.name_fr });
 
-          // Now find valid hide targets
+          // Now find valid hide targets IN PLAY (all missions)
           const k073HideTargets: string[] = [];
-          const k073MissionNow = newState.activeMissions[k073MI];
-          if (k073MissionNow) {
-            for (const char of k073MissionNow[k073EnemySide]) {
+          for (const k073m of newState.activeMissions) {
+            for (const char of k073m[k073EnemySide]) {
               if (canBeHiddenByEnemy(newState, char, k073Opponent) && getEffectivePower(newState, char, k073Opponent) <= 4) {
                 k073HideTargets.push(char.instanceId);
               }
@@ -5841,6 +5840,317 @@ export class EffectEngine {
           options: t080uDests, minSelections: 1, maxSelections: 1,
           sourceEffectId: t080uEffId,
         });
+        break;
+      }
+
+      // =============================================
+      // BATCH 9 CONFIRM CASES (KS-081 to KS-090)
+      // =============================================
+
+      case 'BAKI081_CONFIRM_SCORE': {
+        // Re-check deck not empty, then draw 1 card directly
+        const b081Player = pendingEffect.sourcePlayer;
+        const b081Ps = newState[b081Player];
+        if (b081Ps.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, b081Player,
+            'SCORE_NO_TARGET', 'Baki (081): Deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: 'BAKI', id: 'KS-081-C' });
+          break;
+        }
+        const b081NewPs = { ...b081Ps, deck: [...b081Ps.deck], hand: [...b081Ps.hand] };
+        const b081Drawn = b081NewPs.deck.shift()!;
+        b081NewPs.hand.push(b081Drawn);
+        newState[b081Player] = b081NewPs;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, b081Player,
+          'SCORE_DRAW', 'Baki (081): [SCORE] Drew 1 card.',
+          'game.log.score.draw', { card: 'BAKI', count: 1 });
+        break;
+      }
+
+      case 'BAKI082_CONFIRM_SCORE': {
+        // Re-find all hidden characters in play, then defeat or create child selection
+        const b082sPlayer = pendingEffect.sourcePlayer;
+        const b082sTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.isHidden) b082sTargets.push(char.instanceId);
+          }
+        }
+
+        if (b082sTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, b082sPlayer,
+            'SCORE_NO_TARGET', 'Baki (082): [SCORE] No hidden characters in play (state changed).',
+            'game.log.effect.noTarget', { card: 'BAKI', id: 'KS-082-UC' });
+          break;
+        }
+
+        if (b082sTargets.length === 1) {
+          newState = EffectEngine.defeatCharacter(newState, b082sTargets[0], b082sPlayer);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, b082sPlayer,
+            'SCORE_DEFEAT', 'Baki (082): [SCORE] Defeated the only hidden character in play.',
+            'game.log.score.defeat', { card: 'BAKI', id: 'KS-082-UC' });
+          break;
+        }
+
+        // Multiple targets: child DEFEAT_HIDDEN_CHARACTER_ANY (isOptional: true = SKIP 2)
+        const b082sEffId = generateInstanceId();
+        const b082sActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: b082sEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER_ANY',
+          sourcePlayer: b082sPlayer, requiresTargetSelection: true,
+          validTargets: b082sTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: b082sActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: b082sPlayer,
+          description: 'Baki (082) SCORE: Choose a hidden character to defeat.',
+          descriptionKey: 'game.effect.desc.baki082ScoreChooseHidden',
+          options: b082sTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: b082sEffId,
+        });
+        break;
+      }
+
+      case 'BAKI082_CONFIRM_UPGRADE': {
+        // Re-find enemy P≤1 in source mission
+        const b082uPlayer = pendingEffect.sourcePlayer;
+        const b082uEnemy = b082uPlayer === 'player1' ? 'player2' : 'player1';
+        const b082uEnemySide = b082uEnemy === 'player1' ? 'player1Characters' : 'player2Characters';
+        let b082uData: { missionIndex?: number } = {};
+        try { b082uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const b082uMI = b082uData.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const b082uMission = newState.activeMissions[b082uMI];
+        if (!b082uMission) break;
+
+        const b082uTargets: string[] = [];
+        for (const char of b082uMission[b082uEnemySide]) {
+          if (getEffectivePower(newState, char, b082uEnemy as PlayerID) <= 1) {
+            b082uTargets.push(char.instanceId);
+          }
+        }
+
+        if (b082uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, b082uPlayer,
+            'EFFECT_NO_TARGET', 'Baki (082) UPGRADE: No enemy with Power 1 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'BAKI', id: 'KS-082-UC' });
+          break;
+        }
+
+        if (b082uTargets.length === 1) {
+          newState = EffectEngine.defeatCharacter(newState, b082uTargets[0], b082uPlayer);
+          const b082uChar = b082uMission[b082uEnemySide].find((c: CharacterInPlay) => c.instanceId === b082uTargets[0]);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, b082uPlayer,
+            'EFFECT_DEFEAT', `Baki (082) UPGRADE: Defeated enemy ${b082uChar?.card.name_fr ?? 'character'} with Power 1 or less.`,
+            'game.log.effect.defeat', { card: 'BAKI', id: 'KS-082-UC', target: b082uChar?.card.name_fr ?? '' });
+          break;
+        }
+
+        // Multiple targets: child BAKI082_DEFEAT_LOW_POWER (isOptional: true = SKIP 2)
+        const b082uEffId = generateInstanceId();
+        const b082uActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: b082uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: b082uMI,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'BAKI082_DEFEAT_LOW_POWER',
+          sourcePlayer: b082uPlayer, requiresTargetSelection: true,
+          validTargets: b082uTargets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: b082uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: b082uPlayer,
+          description: 'Baki (082) UPGRADE: Choose an enemy with Power 1 or less to defeat.',
+          descriptionKey: 'game.effect.desc.baki082UpgradeChooseLowPower',
+          options: b082uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: b082uEffId,
+        });
+        break;
+      }
+
+      case 'RASA083_CONFIRM_SCORE': {
+        // Re-check another Sand Village ally in mission, then add 1 point
+        const r083Player = pendingEffect.sourcePlayer;
+        let r083Data: { missionIndex?: number } = {};
+        try { r083Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const r083MI = r083Data.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const r083Mission = newState.activeMissions[r083MI];
+        if (!r083Mission) break;
+        const r083Side = r083Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const r083HasAlly = r083Mission[r083Side].some((char: CharacterInPlay) => {
+          if (char.instanceId === pendingEffect.sourceInstanceId) return false;
+          if (char.isHidden) return false;
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          return topCard.group === 'Sand Village';
+        });
+
+        if (!r083HasAlly) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, r083Player,
+            'SCORE_NO_TARGET', 'Rasa (083): No other Sand Village character (state changed).',
+            'game.log.effect.noTarget', { card: 'RASA', id: 'KS-083-UC' });
+          break;
+        }
+
+        const r083Ps = { ...newState[r083Player] };
+        r083Ps.missionPoints = r083Ps.missionPoints + 1;
+        newState[r083Player] = r083Ps;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, r083Player,
+          'SCORE_BONUS_POINT', 'Rasa (083): Another Sand Village character present - gained 1 bonus Mission point.',
+          'game.log.score.bonusPoint', { card: 'RASA', id: 'KS-083-UC', amount: 1 });
+        break;
+      }
+
+      case 'ZABUZA087_CONFIRM_MAIN': {
+        // Re-check exactly 1 non-hidden enemy. If isUpgrade → modifier popup, else hide.
+        const z087Player = pendingEffect.sourcePlayer;
+        const z087Opponent = z087Player === 'player1' ? 'player2' : 'player1';
+        let z087Data: { missionIndex?: number } = {};
+        try { z087Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const z087MI = z087Data.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const z087Mission = newState.activeMissions[z087MI];
+        if (!z087Mission) break;
+        const z087EnemySide = z087Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
+        const z087NonHidden = z087Mission[z087EnemySide].filter((c: CharacterInPlay) => !c.isHidden);
+
+        if (z087NonHidden.length !== 1) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z087Player,
+            'EFFECT_NO_TARGET', `Zabuza Momochi (087): ${z087NonHidden.length} non-hidden enemies (need exactly 1, state changed).`,
+            'game.log.effect.noTarget', { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC' });
+          break;
+        }
+
+        const z087Target = z087NonHidden[0];
+
+        if (pendingEffect.isUpgrade) {
+          // Modifier popup: ask if player wants to apply UPGRADE (defeat instead of hide)
+          const z087mEffId = generateInstanceId();
+          const z087mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: z087mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: z087MI,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ targetInstanceId: z087Target.instanceId, missionIndex: z087MI }),
+            targetSelectionType: 'ZABUZA087_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: z087Player, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId],
+            isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+          });
+          newState.pendingActions.push({
+            id: z087mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: z087Player,
+            description: 'Zabuza Momochi (087): Apply UPGRADE? Defeat the enemy instead of hiding them.',
+            descriptionKey: 'game.effect.desc.zabuza087ConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: z087mEffId,
+          });
+          break;
+        }
+
+        // Base MAIN: hide the enemy
+        if (!canBeHiddenByEnemy(newState, z087Target, z087Opponent as PlayerID)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, z087Player,
+            'EFFECT_NO_TARGET', `Zabuza Momochi (087): ${z087Target.card.name_fr} is immune to being hidden.`,
+            'game.log.effect.immune', { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: z087Target.card.name_fr });
+          break;
+        }
+        newState = EffectEngine.hideCharacterWithLog(newState, z087Target.instanceId, z087Player);
+        break;
+      }
+
+      case 'ZABUZA087_CONFIRM_UPGRADE_MODIFIER': {
+        // Player confirmed UPGRADE modifier: defeat the target instead of hiding
+        const z087mPlayer = pendingEffect.sourcePlayer;
+        let z087mData: { targetInstanceId?: string; missionIndex?: number } = {};
+        try { z087mData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const z087mTargetId = z087mData.targetInstanceId;
+        if (!z087mTargetId) break;
+
+        newState = EffectEngine.defeatCharacter(newState, z087mTargetId, z087mPlayer);
+        const z087mChar = EffectEngine.findCharByInstanceId(newState, z087mTargetId);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, z087mPlayer,
+          'EFFECT_DEFEAT', `Zabuza Momochi (087): Defeated ${z087mChar?.character.card.name_fr ?? 'enemy'} (upgrade - defeat instead of hide).`,
+          'game.log.effect.defeat', { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: z087mChar?.character.card.name_fr ?? '' });
+        break;
+      }
+
+      case 'HAKU089_CONFIRM_MAIN': {
+        // If isUpgrade → modifier popup. If not → discard from opponent deck + POWERUP X.
+        const h089Player = pendingEffect.sourcePlayer;
+        const h089Opponent = h089Player === 'player1' ? 'player2' : 'player1';
+        let h089Data: { missionIndex?: number } = {};
+        try { h089Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const h089MI = h089Data.missionIndex ?? pendingEffect.sourceMissionIndex;
+
+        if (pendingEffect.isUpgrade) {
+          // Check at least one deck has cards
+          if (newState[h089Opponent].deck.length === 0 && newState[h089Player].deck.length === 0) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, h089Player,
+              'EFFECT_NO_TARGET', 'Haku (089): Both decks empty (state changed).',
+              'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
+            break;
+          }
+          // Modifier popup
+          const h089mEffId = generateInstanceId();
+          const h089mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: h089mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: h089MI,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: h089MI }),
+            targetSelectionType: 'HAKU089_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: h089Player, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId],
+            isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+          });
+          newState.pendingActions.push({
+            id: h089mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: h089Player,
+            description: 'Haku (089): Apply UPGRADE? Discard from your own deck instead.',
+            descriptionKey: 'game.effect.desc.haku089ConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: h089mEffId,
+          });
+          break;
+        }
+
+        // Base MAIN: discard from opponent deck + POWERUP X
+        if (newState[h089Opponent].deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, h089Player,
+            'EFFECT_NO_TARGET', "Haku (089): Opponent's deck empty (state changed).",
+            'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
+          break;
+        }
+        newState = EffectEngine.haku089DiscardAndPowerup(newState, pendingEffect, h089Opponent, h089MI);
+        break;
+      }
+
+      case 'HAKU089_CONFIRM_UPGRADE_MODIFIER': {
+        // Player confirmed: discard from OWN deck + POWERUP X
+        const h089uPlayer = pendingEffect.sourcePlayer;
+        let h089uData: { missionIndex?: number } = {};
+        try { h089uData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const h089uMI = h089uData.missionIndex ?? pendingEffect.sourceMissionIndex;
+
+        if (newState[h089uPlayer].deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, h089uPlayer,
+            'EFFECT_NO_TARGET', 'Haku (089): Own deck empty (state changed).',
+            'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
+          break;
+        }
+        newState = EffectEngine.haku089DiscardAndPowerup(newState, pendingEffect, h089uPlayer, h089uMI);
         break;
       }
 
@@ -7924,14 +8234,13 @@ export class EffectEngine {
             { card: 'KIN TSUCHI', id: 'KS-073-UC', target: discarded_k73d.name_fr },
           );
         }
-        // Now find non-hidden enemies in Kin's mission with effective power <= 4
+        // Now find non-hidden enemies IN PLAY (all missions) with effective power <= 4
         const enemyPlayer_k73d: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const enemySide_k73d: 'player1Characters' | 'player2Characters' =
           enemyPlayer_k73d === 'player1' ? 'player1Characters' : 'player2Characters';
-        const k73Mission = newState.activeMissions[k73MissionIdx];
         const k73HideTargets: string[] = [];
-        if (k73Mission) {
-          for (const enemy of k73Mission[enemySide_k73d]) {
+        for (const k73m of newState.activeMissions) {
+          for (const enemy of k73m[enemySide_k73d]) {
             if (enemy.isHidden) continue;
             if (!canBeHiddenByEnemy(newState, enemy, enemyPlayer_k73d)) continue;
             const enemyPower_k73 = calculateCharacterPower(newState, enemy, enemyPlayer_k73d);
@@ -10820,8 +11129,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: handIndices,
-      isOptional: false,
-      isMandatory: true,
+      isOptional: true,
+      isMandatory: false,
       resolved: false,
       isUpgrade: pending.isUpgrade,
     });
@@ -10837,6 +11146,49 @@ export class EffectEngine {
       maxSelections: 1,
       sourceEffectId: effectId,
     });
+
+    return newState;
+  }
+
+  /**
+   * Haku 089: Discard top card from target player's deck, POWERUP X on self.
+   * Shared between base MAIN (opponent deck) and UPGRADE modifier (own deck).
+   */
+  static haku089DiscardAndPowerup(state: GameState, pending: PendingEffect, discardFromPlayer: PlayerID, missionIndex: number): GameState {
+    const newState = deepClone(state);
+    const sourcePlayer = pending.sourcePlayer;
+    const ps = newState[discardFromPlayer];
+
+    if (ps.deck.length === 0) return newState;
+
+    const discardedCard = ps.deck.shift()!;
+    ps.discardPile.push(discardedCard);
+
+    const powerupAmount = discardedCard.chakra || 0;
+
+    // POWERUP on self
+    const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+    const mission = newState.activeMissions[missionIndex];
+    if (mission && powerupAmount > 0) {
+      const charIdx = mission[friendlySide].findIndex((c: CharacterInPlay) => c.instanceId === pending.sourceInstanceId);
+      if (charIdx !== -1) {
+        mission[friendlySide] = [...mission[friendlySide]];
+        mission[friendlySide][charIdx] = {
+          ...mission[friendlySide][charIdx],
+          powerTokens: mission[friendlySide][charIdx].powerTokens + powerupAmount,
+        };
+        newState.activeMissions = [...newState.activeMissions];
+        newState.activeMissions[missionIndex] = { ...mission };
+      }
+    }
+
+    const deckOwner = discardFromPlayer === sourcePlayer ? 'own' : "opponent's";
+    const upgradeNote = discardFromPlayer === sourcePlayer ? ' (upgrade - own deck)' : '';
+    newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer,
+      'EFFECT_DISCARD_AND_POWERUP',
+      `Haku (089): Discarded ${discardedCard.name_fr} (cost ${discardedCard.chakra}) from ${deckOwner} deck. POWERUP ${powerupAmount}${upgradeNote}.`,
+      'game.log.effect.discardPowerup',
+      { card: 'HAKU', id: 'KS-089-UC', target: discardedCard.name_fr, amount: String(powerupAmount) });
 
     return newState;
   }

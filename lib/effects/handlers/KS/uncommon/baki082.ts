@@ -2,7 +2,6 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
-import { defeatCharacterInPlay } from '@/lib/effects/defeatUtils';
 
 /**
  * Card 082/130 - BAKI "Wind Blade" (UC)
@@ -10,159 +9,72 @@ import { defeatCharacterInPlay } from '@/lib/effects/defeatUtils';
  * Group: Sand Village | Keywords: Team Baki
  *
  * SCORE [arrow]: Defeat a hidden character in play (friendly or enemy, any mission).
- *   - When the player wins the mission where Baki is assigned, they may defeat
- *     any single hidden character in play.
- *   - If multiple hidden characters exist, requires target selection.
- *   - If exactly one hidden character, auto-apply.
- *
  * UPGRADE: Defeat an enemy character with Power 1 or less in this mission.
- *   - When played as upgrade, select and defeat an enemy character with
- *     effective Power <= 1 in this mission.
+ *
+ * Both effects get CONFIRM popups. Target selection after confirm is optional (SKIP).
  */
 
 function handleBaki082Score(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all hidden characters in play across all missions (friendly or enemy)
-  const validTargets: string[] = [];
+  // Pre-check: any hidden characters in play?
+  let hasHidden = false;
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-      if (char.isHidden) {
-        validTargets.push(char.instanceId);
-      }
+      if (char.isHidden) { hasHidden = true; break; }
     }
+    if (hasHidden) break;
   }
 
-  if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'SCORE_NO_TARGET',
-      'Baki (082): [SCORE] No hidden characters in play to defeat.',
-      'game.log.effect.noTarget',
-      { card: 'BAKI', id: 'KS-082-UC' },
-    );
+  if (!hasHidden) {
+    const log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'SCORE_NO_TARGET', 'Baki (082): [SCORE] No hidden characters in play to defeat.',
+      'game.log.effect.noTarget', { card: 'BAKI', id: 'KS-082-UC' });
     return { state: { ...state, log } };
   }
 
-  // If exactly one hidden target, auto-apply
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    let newState = defeatHiddenCharacter(state, targetId, sourcePlayer);
-    return { state: newState };
-  }
-
-  // Multiple targets: requires selection
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'DEFEAT_HIDDEN_CHARACTER_ANY',
-    validTargets,
-    description: 'Baki (082) SCORE: Select a hidden character in play to defeat.',
-    descriptionKey: 'game.effect.desc.baki082ScoreDefeatHidden',
+    targetSelectionType: 'BAKI082_CONFIRM_SCORE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Baki (082) SCORE: Defeat a hidden character in play.',
+    descriptionKey: 'game.effect.desc.baki082ConfirmScore',
   };
 }
 
 function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Defeat an enemy character with Power 1 or less in this mission
   const mission = state.activeMissions[sourceMissionIndex];
-  if (!mission) {
-    return { state };
-  }
+  if (!mission) return { state };
 
-  const validTargets: string[] = [];
-  for (const char of mission[enemySide]) {
-    if (getEffectivePower(state, char, enemyPlayer) <= 1) {
-      validTargets.push(char.instanceId);
-    }
-  }
+  // Pre-check: any enemy with P≤1?
+  const hasValidTarget = mission[enemySide].some(
+    (char) => getEffectivePower(state, char, enemyPlayer) <= 1,
+  );
 
-  if (validTargets.length === 0) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      'Baki (082) UPGRADE: No enemy character with Power 1 or less in this mission.',
-      'game.log.effect.noTarget',
-      { card: 'BAKI', id: 'KS-082-UC' },
-    );
+  if (!hasValidTarget) {
+    const log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Baki (082) UPGRADE: No enemy character with Power 1 or less in this mission.',
+      'game.log.effect.noTarget', { card: 'BAKI', id: 'KS-082-UC' });
     return { state: { ...state, log } };
   }
 
-  // If exactly one target, auto-apply
-  if (validTargets.length === 1) {
-    const targetId = validTargets[0];
-    const { defeatCharacterInPlay } = require('@/lib/effects/defeatUtils');
-    let newState = defeatCharacterInPlay(state, sourceMissionIndex, targetId, enemySide, true, sourcePlayer);
-    const targetChar = mission[enemySide].find((c) => c.instanceId === targetId);
-    const log = logAction(
-      newState.log,
-      newState.turn,
-      newState.phase,
-      sourcePlayer,
-      'EFFECT_DEFEAT',
-      `Baki (082) UPGRADE: Defeated enemy ${targetChar?.card.name_fr ?? 'character'} with Power 1 or less.`,
-      'game.log.effect.defeat',
-      { card: 'BAKI', id: 'KS-082-UC', target: targetChar?.card.name_fr ?? '' },
-    );
-    return { state: { ...newState, log } };
-  }
-
-  // Multiple targets: requires selection
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'BAKI082_DEFEAT_LOW_POWER',
-    validTargets,
-    description: 'Baki (082) UPGRADE: Select an enemy character with Power 1 or less in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.baki082UpgradeDefeatLowPower',
+    targetSelectionType: 'BAKI082_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.baki082ConfirmUpgrade',
   };
-}
-
-/**
- * Defeat a hidden character by instanceId. Can be from any player's side.
- * Determines the correct mission and side, then uses defeatEnemyCharacter or
- * defeatFriendlyCharacter as appropriate.
- */
-function defeatHiddenCharacter(
-  state: import('@/lib/effects/EffectTypes').EffectContext['state'],
-  instanceId: string,
-  sourcePlayer: import('@/lib/engine/types').PlayerID,
-): import('@/lib/effects/EffectTypes').EffectContext['state'] {
-  // Find the character across all missions
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    for (const side of ['player1Characters', 'player2Characters'] as const) {
-      const charIdx = mission[side].findIndex((c) => c.instanceId === instanceId);
-      if (charIdx !== -1) {
-        const targetChar = mission[side][charIdx];
-        const isEnemy = (side === 'player1Characters' && sourcePlayer === 'player2') ||
-                        (side === 'player2Characters' && sourcePlayer === 'player1');
-        let newState = defeatCharacterInPlay(state, i, instanceId, side, isEnemy, sourcePlayer);
-        const log = logAction(
-          newState.log,
-          newState.turn,
-          newState.phase,
-          sourcePlayer,
-          'SCORE_DEFEAT',
-          `Baki (082): [SCORE] Defeated hidden character ${targetChar.card.name_fr}.`,
-          'game.log.score.defeat',
-          { card: 'BAKI', id: 'KS-082-UC', target: targetChar.card.name_fr },
-        );
-        return { ...newState, log };
-      }
-    }
-  }
-  return state;
 }
 
 export function registerBaki082Handlers(): void {

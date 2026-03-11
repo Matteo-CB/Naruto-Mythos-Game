@@ -28,7 +28,7 @@ import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } f
 import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
-import { isRempartZeroed } from '../effects/ContinuousEffects';
+import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 
 export class GameEngine {
   /**
@@ -679,6 +679,58 @@ export class GameEngine {
             'game.log.effect.hide',
             { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(hiddenCount049) },
           );
+        }
+        return newState;
+      }
+
+      // Zabuza 087 UPGRADE modifier declined → execute base MAIN (hide instead of defeat)
+      if (effect.targetSelectionType === 'ZABUZA087_CONFIRM_UPGRADE_MODIFIER') {
+        let z087dData: { targetInstanceId?: string; missionIndex?: number } = {};
+        try { z087dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        if (z087dData.targetInstanceId) {
+          const z087dTarget = EffectEngine.findCharByInstanceId(newState, z087dData.targetInstanceId);
+          if (z087dTarget) {
+            const z087dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+            if (canBeHiddenByEnemy(newState, z087dTarget.character, z087dOpponent as import('./types').PlayerID)) {
+              newState = EffectEngine.hideCharacterWithLog(newState, z087dData.targetInstanceId, effect.sourcePlayer);
+            } else {
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, effect.sourcePlayer,
+                'EFFECT_NO_TARGET', `Zabuza Momochi (087): ${z087dTarget.character.card.name_fr} is immune to being hidden.`,
+                'game.log.effect.immune', { card: 'ZABUZA MOMOCHI', id: 'KS-087-UC', target: z087dTarget.character.card.name_fr });
+            }
+          }
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Haku 089 UPGRADE modifier declined → execute base MAIN (discard from opponent deck)
+      if (effect.targetSelectionType === 'HAKU089_CONFIRM_UPGRADE_MODIFIER') {
+        const h089dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        let h089dData: { missionIndex?: number } = {};
+        try { h089dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const h089dMI = h089dData.missionIndex ?? effect.sourceMissionIndex;
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        if (newState[h089dOpponent].deck.length === 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, effect.sourcePlayer,
+            'EFFECT_NO_TARGET', "Haku (089): Opponent's deck empty. Cannot discard.",
+            'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
+        } else {
+          newState = EffectEngine.haku089DiscardAndPowerup(newState, effect as any, h089dOpponent as import('./types').PlayerID, h089dMI);
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
         }
         return newState;
       }
