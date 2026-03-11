@@ -38,35 +38,16 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-061-C' }) } };
   }
 
-  // Draw X cards
-  const newState = { ...state };
-  const playerState = { ...newState[sourcePlayer] };
-  const newDeck = [...playerState.deck];
-  const newHand = [...playerState.hand];
-
-  for (let i = 0; i < soundFourMissionCount; i++) {
-    if (newDeck.length === 0) break;
-    const drawnCard = newDeck.shift()!;
-    newHand.push(drawnCard);
-  }
-
-  playerState.deck = newDeck;
-  playerState.hand = newHand;
-  newState[sourcePlayer] = playerState;
-
-  const drawnCount = newHand.length - state[sourcePlayer].hand.length;
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_DRAW',
-    `Sakon (061): Drew ${drawnCount} card(s).`,
-    'game.log.effect.draw',
-    { card: 'Sakon', id: 'KS-061-C', count: String(drawnCount) },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup before draw
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'SAKON061_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.sakon061ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {

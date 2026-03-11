@@ -777,7 +777,11 @@ describe('061/130 - Sakon', () => {
 
     const handler = getEffectHandler('KS-061-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakon, 0));
-    expect(result.state.player1.hand.length).toBe(1); // 1 other Sound Four mission (self excluded)
+    // Now returns CONFIRM popup instead of immediate draw
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('SAKON061_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('sakon-1');
+    expect(result.isOptional).toBe(true);
   });
 });
 
@@ -887,7 +891,9 @@ describe('068/130 - Dosu Kinuta', () => {
     const handler = getEffectHandler('KS-068-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', dosu, 0));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('LOOK_AT_HIDDEN_CHARACTER');
+    expect(result.targetSelectionType).toBe('DOSU068_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('dosu-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should request target selection for AMBUSH (defeat hidden)', () => {
@@ -907,7 +913,9 @@ describe('068/130 - Dosu Kinuta', () => {
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', dosu, 0, 'AMBUSH'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('DEFEAT_HIDDEN_CHARACTER');
+    expect(result.targetSelectionType).toBe('DOSU068_CONFIRM_AMBUSH');
+    expect(result.validTargets).toContain('dosu-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when no hidden characters exist', () => {
@@ -1342,9 +1350,9 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('SAKON062_COPY_EFFECT');
-    expect(result.validTargets).toContain('jirobo-1');
-    expect(result.validTargets).not.toContain('sakon062-1'); // self excluded
+    expect(result.targetSelectionType).toBe('SAKON062_CONFIRM_AMBUSH');
+    expect(result.validTargets).toContain('sakon062-1'); // CONFIRM popup targets self
+    expect(result.isOptional).toBe(true);
   });
 
   it('AMBUSH should exclude hidden Sound Four from valid targets', () => {
@@ -1415,7 +1423,8 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.validTargets).toContain('kid060-1');
+    expect(result.targetSelectionType).toBe('SAKON062_CONFIRM_AMBUSH');
+    expect(result.validTargets).toContain('sakon062-1'); // CONFIRM popup targets self
   });
 
   it('copied Jirobo 057 MAIN should POWERUP Sakon (copier)', () => {
@@ -1506,10 +1515,12 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const sakon061TopCard = sakon061.stack.length > 0 ? sakon061.stack[sakon061.stack.length - 1] : sakon061.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, sakon061TopCard, 'MAIN');
-    // Sakon 061 MAIN: Draw X, X = missions with Sound Four (excluding copier Sakon 062)
-    // Mission 1 has Sakon 061 (Sound Four) → count = 1, draw 1 card
-    expect(resultState.player1.hand.length).toBe(1);
-    expect(resultState.player1.deck.length).toBe(2);
+    // Sakon 061 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    const confirmPending = resultState.pendingEffects.find(
+      (pe: any) => pe.targetSelectionType === 'SAKON061_CONFIRM_MAIN',
+    );
+    expect(confirmPending).toBeDefined();
+    expect(confirmPending!.sourceInstanceId).toBe('sakon062-1'); // copier is the source
   });
 
   it('copied Jirobo 058 MAIN should POWERUP Sound Four in copier mission only', () => {
