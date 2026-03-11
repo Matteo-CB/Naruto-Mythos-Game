@@ -575,4 +575,124 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - 3 emplacements corriges: handler kin073.ts, KIN073_CONFIRM_MAIN case, KIN073_CHOOSE_DISCARD case.
   - Maintenant recherche les ennemis P<=4 dans TOUTES les missions.
 
+2026-03-11 - Bugfix Batch 10 (Andy testing KS-091 to KS-112):
+  BUGS FOUND & FIXED:
+
+  1. KS-091 (Itachi UC) - Game freeze on hand reveal:
+     - effectDescription contenait seulement { isUpgrade } mais le UI (gameStore.ts) lit rd.cards
+     - Fix: inclure cards: i091Cards dans effectDescription du ITACHI091_HAND_REVEAL child
+
+  2. KS-091/093/106/108/109/110 - UPGRADE modifier descriptions:
+     - Toutes les descriptions disaient "Apply UPGRADE? Also..." format
+     - Andy veut le texte exact de la carte: "UPGRADE MAIN effect: [card text]"
+     - Fix: 8 descriptions modifiees dans en.json et fr.json
+
+  3. KS-092/093 + all batch 10 cards - Missing desc i18n keys:
+     - 14 cles game.effect.desc.* manquantes pour les child pendings
+     - Fix: ajout de 14 cles dans en.json et fr.json
+
+  4. KS-104 (Tsunade R) - Chakra spending UI bugged:
+     - pendingAction.type etait 'SELECT_TARGET' mais HandCardSelector exige 'CHOOSE_CARD_FROM_LIST'
+     - Le code contournait createPendingTargetSelection qui fait le mapping correctement
+     - Fix: changer type a 'CHOOSE_CARD_FROM_LIST'
+
+  5. KS-102 (Manda UC) - SKIP button on target selection after confirm:
+     - Child DEFEAT_ENEMY_SUMMON_THIS_MISSION avait isOptional: true
+     - R3: apres confirmation, tous les children doivent etre mandatory
+     - Fix: isOptional: false, isMandatory: true
+
+  6. KS-106 (Kakashi R) - SKIP button on devolve target:
+     - KAKASHI106_DEVOLVE_TARGET children (both base and upgrade) had isOptional: true
+     - Fix: isOptional: false, isMandatory: true (2 emplacements)
+
+  7. KS-105 (Jiraiya R) - Multiple bugs:
+     a. Hand selection not rendering: pendingAction.type was 'SELECT_TARGET' instead of
+        'CHOOSE_CARD_FROM_LIST' for JIRAIYA105_CHOOSE_SUMMON
+     b. SKIP buttons on all child selections: isOptional: true on CHOOSE_SUMMON,
+        MOVE_ENEMY, and MOVE_ENEMY_DESTINATION children
+     c. Double moves / UPGRADE firing prematurely: remainingEffectTypes not propagated to
+        GENERIC_CHOOSE_PLAY_MISSION child. processRemainingEffects fired UPGRADE handler
+        before summon was placed on mission.
+     - Fix: (a) type: 'CHOOSE_CARD_FROM_LIST', (b) isOptional: false on all children,
+       (c) propagate remainingEffectTypes to GENERIC_CHOOSE_PLAY_MISSION + clear from parent
+
+  8. GENERIC_CHOOSE_PLAY_MISSION + shared move destination handler:
+     - Both had isOptional: true, which is incorrect: once a card is removed from hand
+       or a character is selected to move, the mission/destination selection must be mandatory
+     - Fix: isOptional: false, isMandatory: true (5 emplacements: shared handler,
+       playCharFromHandWithReduction, Sakura 109 inline, Sakura 135 inline)
+
+  NEW RULES ADDED:
+
+  R11: When bypassing createPendingTargetSelection to manually push pendingActions,
+       verify the action.type matches what the UI expects:
+       - Hand selections (choose from hand cards): 'CHOOSE_CARD_FROM_LIST'
+       - Board target selections: 'SELECT_TARGET'
+       - Discard choices: 'DISCARD_CARD'
+       The createPendingTargetSelection helper has a mapping for each targetSelectionType.
+       If bypassing it, replicate the correct type.
+
+  R12: For multi-stage effects (e.g. choose card → choose mission → trigger remaining),
+       propagate remainingEffectTypes through ALL intermediate children.
+       If a child pending is created (e.g. GENERIC_CHOOSE_PLAY_MISSION), move
+       remainingEffectTypes to it and clear from the parent to prevent premature firing.
+
+  R13: GENERIC_CHOOSE_PLAY_MISSION and shared move destination handlers must ALWAYS
+       be mandatory (isOptional: false, isMandatory: true). Once a card has been removed
+       from hand or a character selected to move, skipping would lose the card/break state.
+
+2026-03-11 - Bugfix Batch 10 (Andy testing KS-107, KS-108, KS-109):
+  BUGS FOUND & FIXED:
+
+  9. KS-107 (Sasuke R) - Text: {count} not interpolated in CONFIRM_UPGRADE popup:
+     - processNextMove() returned SASUKE107_CONFIRM_UPGRADE without descriptionParams
+     - i18n key uses {count} placeholder but no params were passed
+     - Fix: add descriptionParams: { count: String(movedCount) } to the return
+
+  10. KS-108 (Naruto R) - SKIP button on hide target selection (R3 violation):
+      - NARUTO108_CHOOSE_HIDE_TARGET children had isOptional: true in 3 locations:
+        EffectEngine CONFIRM_MAIN case, CONFIRM_UPGRADE_MODIFIER case, GameEngine DECLINE handler
+      - Fix: isOptional: false, isMandatory: true (3 emplacements)
+
+  11. KS-109 (Sakura R) - Discard pile selection not rendering (R11 violation):
+      - SAKURA109_CHOOSE_DISCARD children used type: 'SELECT_TARGET' in 3 locations:
+        EffectEngine CONFIRM_MAIN case, CONFIRM_UPGRADE_MODIFIER case, GameEngine DECLINE handler
+      - gameStore.ts requires type: 'CHOOSE_CARD_FROM_LIST' for isHandSelection=true
+      - Also had isOptional: true (R3 violation) in all 3 locations
+      - Fix: type: 'CHOOSE_CARD_FROM_LIST' + isOptional: false, isMandatory: true (3 emplacements)
+
+  NEW RULE:
+
+  R14: When a handler return or CONFIRM case creates a pending with descriptionParams
+       (i18n interpolation), always include the params object. Check the i18n key for
+       {placeholders} and ensure matching params are provided via descriptionParams.
+
+  COMPREHENSIVE I18N AUDIT:
+  - All 130 descriptionKey values used in EffectEngine.ts + GameEngine.ts verified
+  - All keys exist in both en.json and fr.json — no missing keys
+
+2026-03-11 - Bugfix Batch 11 (Andy testing KS-110, KS-111, KS-112):
+  BUGS FOUND & FIXED:
+
+  12. KS-110 (Ino R) - SKIP buttons on all child selections after CONFIRM (R3 violation):
+      - INO110_CHOOSE_ENEMY (multi targets, base MAIN): isOptional: true → false (EffectEngine)
+      - INO110_CHOOSE_ENEMY (after CONFIRM_UPGRADE_MODIFIER): isOptional: true → false (EffectEngine)
+      - INO110_CHOOSE_DESTINATION: isOptional: true → false (EffectEngine)
+      - INO110_CHOOSE_ENEMY (DECLINE handler): isOptional: true → false (GameEngine)
+
+  13. KS-111 (Shikamaru R) - SKIP button on HIDE_ENEMY after CONFIRM (R3 violation):
+      - SHIKAMARU111_HIDE_ENEMY: isOptional: true → false (EffectEngine)
+
+  14. KS-112 (Choji R) - Two bugs:
+      a) Discard selection not rendering (R11 violation):
+         - CHOJI112_CONFIRM_MAIN created action with type: 'SELECT_TARGET' instead of 'DISCARD_CARD'
+         - gameStore requires 'DISCARD_CARD' for hand card selector rendering
+         - Fix: type: 'DISCARD_CARD' (EffectEngine)
+      b) UPGRADE auto-fired without CONFIRM popup:
+         - chojiChooseDiscard directly created second CHOJI_CHOOSE_DISCARD with isOptional: true
+         - No CONFIRM popup before the UPGRADE repeat, violating the CONFIRM pattern
+         - Fix: replaced auto-fire with CHOJI112_CONFIRM_UPGRADE confirmation popup
+         - Added new CHOJI112_CONFIRM_UPGRADE case that creates mandatory CHOJI_CHOOSE_DISCARD child
+         - Added i18n key choji112ConfirmUpgrade in en.json + fr.json
+
 ================================================================================

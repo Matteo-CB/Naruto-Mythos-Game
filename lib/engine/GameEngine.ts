@@ -890,7 +890,7 @@ export class GameEngine {
               effectDescription: JSON.stringify({ isUpgrade: false }),
               targetSelectionType: 'NARUTO108_CHOOSE_HIDE_TARGET',
               sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-              validTargets: n108dValidTargets, isOptional: true, isMandatory: false,
+              validTargets: n108dValidTargets, isOptional: false, isMandatory: true,
               resolved: false, isUpgrade: false,
             });
             newState.pendingActions.push({
@@ -930,11 +930,11 @@ export class GameEngine {
             effectType: effect.effectType,
             effectDescription: '', targetSelectionType: 'SAKURA109_CHOOSE_DISCARD',
             sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-            validTargets: s109dValidTargets, isOptional: true, isMandatory: false,
+            validTargets: s109dValidTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: false,
           });
           newState.pendingActions.push({
-            id: s109dActId, type: 'SELECT_TARGET' as any,
+            id: s109dActId, type: 'CHOOSE_CARD_FROM_LIST' as any,
             player: effect.sourcePlayer,
             description: 'Sakura Haruno (109): Choose a Leaf Village character from your discard pile to play.',
             descriptionKey: 'game.effect.desc.sakura109ChooseDiscard',
@@ -988,7 +988,7 @@ export class GameEngine {
                   effectType: effect.effectType,
                   effectDescription: '', targetSelectionType: 'INO110_CHOOSE_ENEMY',
                   sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-                  validTargets: i110dWeakest, isOptional: true, isMandatory: false,
+                  validTargets: i110dWeakest, isOptional: false, isMandatory: true,
                   resolved: false, isUpgrade: false,
                 });
                 newState.pendingActions.push({
@@ -1002,6 +1002,58 @@ export class GameEngine {
               }
             }
           }
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Kidomaru 124 UPGRADE modifier declined → execute base AMBUSH with P<=3
+      if (effect.targetSelectionType === 'KIDOMARU124_CONFIRM_UPGRADE_MODIFIER') {
+        let k124dData: { sourceMissionIndex?: number } = {};
+        try { k124dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const k124dPlayer = effect.sourcePlayer;
+        const k124dLimit = 3;
+        const k124dEnemySide: 'player1Characters' | 'player2Characters' =
+          k124dPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k124dOpponent = k124dPlayer === 'player1' ? 'player2' as const : 'player1' as const;
+        const k124dSrcMission = k124dData.sourceMissionIndex ?? effect.sourceMissionIndex;
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a: any) => a.sourceEffectId !== effect.id);
+
+        const k124dTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === k124dSrcMission) continue;
+          for (const c of newState.activeMissions[i][k124dEnemySide]) {
+            if (getEffectivePower(newState, c, k124dOpponent) <= k124dLimit) {
+              k124dTargets.push(c.instanceId);
+            }
+          }
+        }
+        if (k124dTargets.length === 1) {
+          newState = EffectEngine.defeatCharacter(newState, k124dTargets[0], k124dPlayer);
+        } else if (k124dTargets.length > 1) {
+          const k124dEffId = generateInstanceId();
+          const k124dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: k124dEffId, sourceCardId: effect.sourceCardId,
+            sourceInstanceId: effect.sourceInstanceId,
+            sourceMissionIndex: effect.sourceMissionIndex, effectType: effect.effectType,
+            effectDescription: '', targetSelectionType: 'KIDOMARU124_DEFEAT_TARGET',
+            sourcePlayer: k124dPlayer, requiresTargetSelection: true,
+            validTargets: k124dTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: k124dActId, type: 'SELECT_TARGET' as any,
+            player: k124dPlayer,
+            description: 'Kidomaru (124) AMBUSH: Choose an enemy with Power 3 or less to defeat.',
+            descriptionKey: 'game.effect.desc.kidomaru124Defeat',
+            options: k124dTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k124dEffId,
+          });
         }
 
         if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {

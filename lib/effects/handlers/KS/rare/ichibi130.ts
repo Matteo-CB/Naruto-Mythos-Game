@@ -54,19 +54,15 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If exactly one mission has hidden enemies, auto-resolve
-  if (missionsWithHiddenEnemies.length === 1) {
-    const missionIdx = parseInt(missionsWithHiddenEnemies[0]);
-    return defeatAllHiddenEnemies(state, missionIdx, sourcePlayer, enemySide);
-  }
-
+  // CONFIRM popup before executing
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ICHIBI130_CHOOSE_MISSION',
-    validTargets: missionsWithHiddenEnemies,
-    description: 'Ichibi (130) UPGRADE: Choose a mission to defeat all hidden enemy characters there.',
-    descriptionKey: 'game.effect.desc.ichibi130ChooseMission',
+    targetSelectionType: 'ICHIBI130_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: 'Ichibi (130) UPGRADE: Choose a mission and defeat all hidden enemies there.',
+    descriptionKey: 'game.effect.desc.ichibi130ConfirmUpgrade',
+    isOptional: true,
   };
 }
 

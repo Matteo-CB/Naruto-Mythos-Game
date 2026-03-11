@@ -33,7 +33,7 @@ export interface MissionCardProps {
   card: MissionCard;
   rank: MissionRank;
   rankBonus: number;
-  wonBy?: PlayerID | null;
+  wonBy?: PlayerID | 'draw' | null;
   myPlayer?: PlayerID;
   className?: string;
   onClick?: () => void;
@@ -294,8 +294,9 @@ function MissionCardInner({
 
       {/* Won/Lost indicator overlay */}
       {wonBy && (() => {
-        const didWin = myPlayer ? wonBy === myPlayer : true;
-        const indicatorColor = didWin ? '#22c55e' : '#b33e3e';
+        const isDraw = wonBy === 'draw';
+        const didWin = !isDraw && (myPlayer ? wonBy === myPlayer : true);
+        const indicatorColor = isDraw ? '#888888' : didWin ? '#22c55e' : '#b33e3e';
         return (
           <div
             style={{
@@ -319,7 +320,7 @@ function MissionCardInner({
                 letterSpacing: '0.05em',
               }}
             >
-              {didWin ? t('game.board.won') : t('game.board.lost')}
+              {isDraw ? t('game.board.draw') : didWin ? t('game.board.won') : t('game.board.lost')}
             </span>
           </div>
         );

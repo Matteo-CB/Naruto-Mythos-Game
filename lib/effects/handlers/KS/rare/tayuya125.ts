@@ -97,16 +97,18 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     }
   }
 
+  // CONFIRM popup before executing
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TAYUYA125_CHOOSE_SOUND',
-    validTargets,
+    targetSelectionType: 'TAYUYA125_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
     description: JSON.stringify({
-      text: 'Tayuya (125) UPGRADE: Choose a Sound Village character from hand or hidden on board to play/reveal (paying 2 less).',
+      text: 'Tayuya (125) UPGRADE: Play a Sound Village character, paying 2 less.',
       hiddenChars: hiddenBoardChars,
     }),
-    descriptionKey: 'game.effect.desc.tayuya125PlaySound',
+    descriptionKey: 'game.effect.desc.tayuya125ConfirmUpgrade',
+    isOptional: true,
   };
 }
 

@@ -35,17 +35,15 @@ function jiraiya132MainHandler(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-132-S' }) } };
   }
 
+  // CONFIRM popup before executing
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'JIRAIYA132_CHOOSE_SUMMON',
-    validTargets: allTargets,
-    description: JSON.stringify({
-      text: 'Jiraya (132): Choose a Summon character to play (paying 5 less).',
-      hiddenChars: hiddenTargets,
-      costReduction,
-    }),
-    descriptionKey: 'game.effect.desc.jiraiya132ChooseSummon',
+    targetSelectionType: 'JIRAIYA132_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: 'Jiraya (132): Play a Summon character anywhere, paying 5 less.',
+    descriptionKey: 'game.effect.desc.jiraiya132ConfirmMain',
+    isOptional: true,
   };
 }
 
@@ -62,31 +60,21 @@ function jiraiya132UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const enemyChars = mission[enemySide];
 
-  if (enemyChars.length > 2) {
-    // Opponent must choose which to defeat (one at a time)
-    const validTargets = enemyChars.map((c) => c.instanceId);
-
-    // Track forced resolver so the turn goes to the opponent after resolution
-    state.pendingForcedResolver = opponent;
-
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
-      validTargets,
-      selectingPlayer: opponent,
-      description: JSON.stringify({
-        missionIndex,
-        sourcePlayer: ctx.sourcePlayer,
-        text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIndex + 1} (${enemyChars.length} > 2).`,
-      }),
-      descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
-      descriptionParams: { mission: String(missionIndex + 1), count: String(enemyChars.length) },
-    };
+  if (enemyChars.length <= 2) {
+    // Already <= 2 enemy characters in this mission
+    return { state };
   }
 
-  // Already <= 2 enemy characters in this mission
-  return { state };
+  // CONFIRM popup before executing
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'JIRAIYA132_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex, sourcePlayer: ctx.sourcePlayer }),
+    descriptionKey: 'game.effect.desc.jiraiya132ConfirmUpgrade',
+    isOptional: true,
+  };
 }
 
 export function registerJiraiya132Handlers(): void {

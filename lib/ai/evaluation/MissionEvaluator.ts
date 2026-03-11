@@ -35,6 +35,7 @@ export class MissionEvaluator {
   ): number {
     // Already scored - return the actual outcome
     if (mission.wonBy) {
+      if (mission.wonBy === 'draw') return 0;
       const missionValue = mission.basePoints + mission.rankBonus;
       return mission.wonBy === player ? missionValue * 1.5 : -missionValue * 1.0;
     }

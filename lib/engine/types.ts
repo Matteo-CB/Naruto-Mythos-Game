@@ -71,7 +71,7 @@ export interface ActiveMission {
   rankBonus: number; // D:1, C:2, B:3, A:4
   player1Characters: CharacterInPlay[];
   player2Characters: CharacterInPlay[];
-  wonBy?: PlayerID | null;
+  wonBy?: PlayerID | 'draw' | null;
 }
 
 // ---------------------
