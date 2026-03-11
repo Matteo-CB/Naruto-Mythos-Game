@@ -9,10 +9,8 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * SCORE [arrow]: Gain 1 Mission point if there's another friendly Sand Village character
  * in this mission.
- *   - Triggered when the player wins the mission where Rasa is assigned.
- *   - Checks if there is at least one OTHER friendly Sand Village character
- *     (not Rasa himself) in the same mission.
- *   - If yes, adds 1 to the player's missionPoints total.
+ *
+ * Confirmation popup before gaining the point (SCORE effects are optional).
  */
 
 function handleRasa083Score(ctx: EffectContext): EffectResult {
@@ -21,7 +19,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const friendlyChars = mission[friendlySide];
 
-  // Check for another Sand Village character in this mission (not self, not hidden for group check)
+  // Pre-check: another Sand Village character in this mission?
   const hasOtherSandVillage = friendlyChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
@@ -30,38 +28,22 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
   });
 
   if (!hasOtherSandVillage) {
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'SCORE_NO_TARGET',
-      'Rasa (083): No other friendly Sand Village character in this mission. No bonus point.',
-      'game.log.effect.noTarget',
-      { card: 'RASA', id: 'KS-083-UC' },
-    );
+    const log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'SCORE_NO_TARGET', 'Rasa (083): No other friendly Sand Village character in this mission. No bonus point.',
+      'game.log.effect.noTarget', { card: 'RASA', id: 'KS-083-UC' });
     return { state: { ...state, log } };
   }
 
-  // Grant 1 bonus mission point
-  const newState = { ...state };
-  const ps = { ...newState[sourcePlayer] };
-  ps.missionPoints = ps.missionPoints + 1;
-  newState[sourcePlayer] = ps;
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'SCORE_BONUS_POINT',
-    'Rasa (083): Another Sand Village character present - gained 1 bonus Mission point.',
-    'game.log.score.bonusPoint',
-    { card: 'RASA', id: 'KS-083-UC', amount: 1 },
-  );
-  newState.log = log;
-
-  return { state: newState };
+  // Confirmation popup
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'RASA083_CONFIRM_SCORE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.rasa083ConfirmScore',
+  };
 }
 
 export function registerHandler(): void {

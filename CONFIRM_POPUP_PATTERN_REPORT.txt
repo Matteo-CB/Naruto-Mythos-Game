@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 8 (KS-071 a KS-080)
+BATCH ACTUEL: Batch 9 (KS-081 a KS-090)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -518,5 +518,32 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
 2026-03-11 - Bugfix KS-069 (Dosu Kinuta UC):
   - Fix: descriptions-en.ts et translations-fr.ts n'avaient que MAIN, UPGRADE manquant.
   - Ajout description UPGRADE "Look at a hidden character in play." (EN + FR).
+
+2026-03-11 - Batch 9 (KS-081 a KS-090):
+  - 5 cartes traitees (3 skipped: KS-084 continu, KS-086 pas d'effet, KS-090 continu)
+  - KS-085 (Yashamaru UC SCORE): deja correctement implemente, verifie seulement.
+  - NOUVEAU PATTERN: Modifier Effect (UPGRADE "effect:" modifie MAIN):
+    - KS-087 (Zabuza UC): CONFIRM_MAIN -> si isUpgrade: CONFIRM_UPGRADE_MODIFIER popup.
+      Confirm modifier = defeat. Decline modifier = hide (base MAIN). DECLINE dans GameEngine.ts.
+    - KS-089 (Haku UC): CONFIRM_MAIN -> si isUpgrade: CONFIRM_UPGRADE_MODIFIER popup.
+      Confirm modifier = discard own deck. Decline modifier = discard opponent deck (base MAIN).
+  - NOUVEAU PATTERN: SCORE Effect CONFIRM:
+    - KS-081 (Baki C SCORE): CONFIRM popup -> draw 1 card directly.
+    - KS-082 (Baki UC SCORE): CONFIRM -> child DEFEAT_HIDDEN_CHARACTER_ANY (isOptional:true = SKIP 2).
+    - KS-082 (Baki UC UPGRADE): CONFIRM -> child BAKI082_DEFEAT_LOW_POWER (isOptional:true = SKIP 2).
+    - KS-083 (Rasa UC SCORE): CONFIRM -> add 1 mission point directly if Sand Village ally present.
+  - Fix: KS-088 (Haku C): PUT_CARD_ON_DECK passe de isOptional:false, isMandatory:true
+    a isOptional:true, isMandatory:false (SKIP per Andy sur selection de carte a remettre).
+  - 11 cles i18n ajoutees (EN + FR): baki081ConfirmScore, baki082ConfirmScore,
+    baki082ConfirmUpgrade, baki082ScoreChooseHidden, baki082UpgradeChooseLowPower,
+    rasa083ConfirmScore, zabuza087ConfirmMain, zabuza087ConfirmUpgradeModifier,
+    haku089ConfirmMain, haku089ConfirmUpgradeModifier
+  - Regles R1-R10 respectees
+
+2026-03-11 - Bugfix KS-073 (Kin Tsuchi UC):
+  - Fix: MAIN hide effect ciblait seulement "this mission" au lieu de "in play" (toute mission).
+    Andy a confirme: "Her MAIN is not limited to 'this mission'."
+  - 3 emplacements corriges: handler kin073.ts, KIN073_CONFIRM_MAIN case, KIN073_CHOOSE_DISCARD case.
+  - Maintenant recherche les ennemis P<=4 dans TOUTES les missions.
 
 ================================================================================

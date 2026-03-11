@@ -1104,8 +1104,11 @@ describe('081/130 - Baki', () => {
     const handler = getEffectHandler('KS-081-C', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', baki, 0, 'SCORE'));
-    expect(result.state.player1.hand.length).toBe(1);
-    expect(result.state.player1.hand[0].name_fr).toBe('BakiDraw');
+    // Now returns CONFIRM popup instead of direct draw
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('BAKI081_CONFIRM_SCORE');
+    expect(result.validTargets).toEqual(['baki-1']);
+    expect(result.isOptional).toBe(true);
   });
 });
 

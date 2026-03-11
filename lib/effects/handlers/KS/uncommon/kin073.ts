@@ -29,18 +29,17 @@ function handleKin073Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' }) } };
   }
 
-  // Check that there is at least one valid enemy target IN THIS MISSION ONLY
-  const thisMission = state.activeMissions[sourceMissionIndex];
-  const enemyCharsHere = opponentPlayer === 'player1'
-    ? thisMission.player1Characters
-    : thisMission.player2Characters;
-  const hasValidTarget = enemyCharsHere.some(
-    (char) => canBeHiddenByEnemy(state, char, opponentPlayer) && getEffectivePower(state, char, opponentPlayer) <= 4,
+  // Check that there is at least one valid enemy target IN PLAY (any mission)
+  const enemySide073 = opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const hasValidTarget = state.activeMissions.some((mission) =>
+    mission[enemySide073].some(
+      (char) => canBeHiddenByEnemy(state, char, opponentPlayer) && getEffectivePower(state, char, opponentPlayer) <= 4,
+    ),
   );
 
   if (!hasValidTarget) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No non-hidden enemy with Power 4 or less in this mission.',
+      'EFFECT_NO_TARGET', 'Kin Tsuchi (073): No non-hidden enemy with Power 4 or less in play.',
       'game.log.effect.noTarget', { card: 'KIN TSUCHI', id: 'KS-073-UC' }) } };
   }
 

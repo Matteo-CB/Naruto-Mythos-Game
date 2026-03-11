@@ -9,85 +9,50 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *
  * MAIN: Discard the top card of opponent's deck, then POWERUP X on self where
  *   X = the chakra cost of the discarded card.
- *   - Take opponent's deck[0], move to opponent's discard pile.
- *   - Read the discarded card's chakra cost and add that many power tokens to self.
- *   - If opponent's deck is empty, effect fizzles.
  *
- * UPGRADE: MAIN: Instead, discard the top card of YOUR OWN deck (and POWERUP X).
- *   - When triggered as upgrade, the discard is from the player's own deck
- *     instead of the opponent's. POWERUP X is the same (X = cost of discarded card).
+ * UPGRADE: MAIN effect: Instead, discard the top card of YOUR OWN deck (and POWERUP X).
+ *
+ * Modifier pattern: CONFIRM MAIN → if upgrade, CONFIRM UPGRADE MODIFIER (own deck vs opponent deck).
+ * The UPGRADE "effect:" is a Type A modifier — the engine skips it in orderedTypes.
  */
 
 function handleHaku089Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex, isUpgrade } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Determine whose deck to discard from
-  const discardFrom = isUpgrade ? sourcePlayer : opponentPlayer;
-  const targetPlayerState = state[discardFrom];
+  // Pre-check: target deck must have cards
+  // If not upgrade: opponent deck. If upgrade: at least one deck (opponent or own) must have cards.
+  const opponentDeckEmpty = state[opponentPlayer].deck.length === 0;
+  const ownDeckEmpty = state[sourcePlayer].deck.length === 0;
 
-  // If the target deck is empty, effect fizzles
-  if (targetPlayerState.deck.length === 0) {
-    const deckOwner = isUpgrade ? 'your' : "opponent's";
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_NO_TARGET',
-      `Haku (089): ${deckOwner} deck is empty. Cannot discard.`,
-      'game.log.effect.noTarget',
-      { card: 'HAKU', id: 'KS-089-UC' },
-    );
+  if (!isUpgrade && opponentDeckEmpty) {
+    const log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', "Haku (089): Opponent's deck is empty. Cannot discard.",
+      'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
     return { state: { ...state, log } };
   }
 
-  // Discard the top card
-  const newState = { ...state };
-  const ps = { ...newState[discardFrom] };
-  const newDeck = [...ps.deck];
-  const discardedCard = newDeck.shift()!;
-  ps.deck = newDeck;
-  ps.discardPile = [...ps.discardPile, discardedCard];
-  newState[discardFrom] = ps;
-
-  // POWERUP X on self, where X = discarded card's chakra cost
-  const powerupAmount = discardedCard.chakra || 0;
-
-  const missions = [...newState.activeMissions];
-  const mission = { ...missions[sourceMissionIndex] };
-  const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const chars = [...mission[friendlySide]];
-  const charIndex = chars.findIndex((c) => c.instanceId === sourceCard.instanceId);
-
-  if (charIndex !== -1 && powerupAmount > 0) {
-    chars[charIndex] = {
-      ...chars[charIndex],
-      powerTokens: chars[charIndex].powerTokens + powerupAmount,
-    };
-    mission[friendlySide] = chars;
-    missions[sourceMissionIndex] = mission;
-    newState.activeMissions = missions;
+  if (isUpgrade && opponentDeckEmpty && ownDeckEmpty) {
+    const log = logAction(state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT_NO_TARGET', 'Haku (089): Both decks are empty. Cannot discard.',
+      'game.log.effect.noTarget', { card: 'HAKU', id: 'KS-089-UC' });
+    return { state: { ...state, log } };
   }
 
-  const deckOwner = isUpgrade ? 'own' : "opponent's";
-  const upgradeNote = isUpgrade ? ' (upgrade - own deck)' : '';
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'EFFECT_DISCARD_AND_POWERUP',
-    `Haku (089): Discarded ${discardedCard.name_fr} (cost ${discardedCard.chakra}) from ${deckOwner} deck. POWERUP ${powerupAmount}${upgradeNote}.`,
-    'game.log.effect.discardPowerup',
-    { card: 'HAKU', id: 'KS-089-UC', target: discardedCard.name_fr, amount: String(powerupAmount) },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'HAKU089_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.haku089ConfirmMain',
+  };
 }
 
 function handleHaku089UpgradeNoop(ctx: EffectContext): EffectResult {
-  // No-op: MAIN handler already checks isUpgrade to discard from own deck instead.
+  // No-op: Type A modifier — handled by engine's HAKU089_CONFIRM_MAIN + UPGRADE_MODIFIER cases.
   return { state: ctx.state };
 }
 
