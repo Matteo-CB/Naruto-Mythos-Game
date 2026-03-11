@@ -375,7 +375,7 @@ describe('034/130 - Yuhi Kurenai', () => {
 // 036/130 - NEJI: Remove up to 2 Power tokens from enemy character
 // ===================================================================
 describe('036/130 - Neji Hyuga', () => {
-  it('should require target selection for the only valid enemy target with power tokens', () => {
+  it('should return CONFIRM popup when valid enemy target with power tokens exists', () => {
     const neji = mockCharInPlay({ instanceId: 'neji-1' }, {
       id: 'KS-036-C', number: 36, name_fr: 'Neji', keywords: ['Team Guy'], group: 'Leaf Village',
     });
@@ -393,8 +393,9 @@ describe('036/130 - Neji Hyuga', () => {
     const handler = getEffectHandler('KS-036-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', neji, 0));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('REMOVE_POWER_TOKENS_ENEMY');
-    expect(result.validTargets).toContain('enemy-1');
+    expect(result.targetSelectionType).toBe('NEJI036_CONFIRM_MAIN');
+    expect(result.validTargets).toEqual(['neji-1']);
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when no enemy has power tokens', () => {

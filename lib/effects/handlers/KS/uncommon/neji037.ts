@@ -59,14 +59,15 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-037-UC' }) } };
   }
 
-  // Always let player choose (optional effect)
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'NEJI037_REMOVE_ALL_TOKENS',
-    validTargets,
-    description: 'Select an enemy character in this mission to remove all Power tokens from.',
-    descriptionKey: 'game.effect.desc.neji037RemoveTokens',
+    targetSelectionType: 'NEJI037_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.neji037ConfirmUpgrade',
   };
 }
 

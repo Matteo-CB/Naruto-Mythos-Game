@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 3 (KS-021 a KS-030)
+BATCH ACTUEL: Batch 4 (KS-031 a KS-040)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -354,5 +354,16 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     2. CONFIRM_UPGRADE confirme -> executer MAIN avec comportement modifie
     3. CONFIRM_UPGRADE decline -> executer MAIN avec comportement de base
     Le decline est gere dans GameEngine.ts comme cas special de DECLINE_OPTIONAL_EFFECT
+
+2026-03-11 - Batch 4 (KS-031 a KS-040):
+  - 7 cartes traitees: KS-032, 033, 035, 036, 037, 038, 039
+  - 3 cartes skip: KS-031 (continu), KS-034 (continu), KS-040 (continu)
+  - KS-033: AMBUSH ignore (misprint per Andy, traite comme continu)
+  - KS-033 UPGRADE: R8 appliquee (move self, Kurenai check)
+  - KS-035 UPGRADE: auto-defeat si 1 cible, child mandatory si plusieurs (Andy: no SKIP)
+  - KS-036: meme pattern que KS-030 (REMOVE_POWER_TOKENS_ENEMY chain)
+  - KS-037 UPGRADE: auto-remove si 1 cible, child mandatory si plusieurs (Andy: no SKIP)
+  - KS-038/039: POWERUP self immediate apres CONFIRM (pas de child)
+  - Regles R1-R9 respectees
 
 ================================================================================

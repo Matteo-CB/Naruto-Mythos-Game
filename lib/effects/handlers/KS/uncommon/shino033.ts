@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 033/130 - SHINO ABURAME (UC)
@@ -47,6 +48,21 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
 
 function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+
+  // R8: Need at least 2 missions to move
+  if (state.activeMissions.length <= 1) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Shino Aburame (033): Only 1 mission in play — cannot move.',
+      'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
+  }
+
+  // R8: Check Kurenai block — Shino moves himself
+  if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_BLOCKED',
+      'Shino Aburame (033): Cannot move from this mission (Kurenai 035 block).',
+      'game.log.effect.moveBlockedKurenai', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
+  }
+
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
@@ -63,7 +79,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
     const friendlyChars = mission[friendlySide];
     const hasSameName = friendlyChars.some((c) => {
       if (c.instanceId === sourceCard.instanceId) return false;
-      if (c.isHidden) return false; // Hidden chars are anonymous - name not revealed
+      if (c.isHidden) return false;
       const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
       return top.name_fr === charName;
     });
@@ -73,24 +89,20 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   }
 
   if (validTargets.length === 0) {
-    return {
-      state: {
-        ...state,
-        log: logAction(state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_NO_TARGET',
-          'Shino Aburame (033): No valid mission to move to.',
-          'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }),
-      },
-    };
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Shino Aburame (033): No valid mission to move to.',
+      'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
+  // Confirmation popup before move
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SHINO_MOVE_SELF',
-    validTargets,
-    description: 'Select a mission to move Shino Aburame to.',
-    descriptionKey: 'game.effect.desc.shino033MoveSelf',
+    targetSelectionType: 'SHINO033_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.shino033ConfirmUpgrade',
   };
 }
 

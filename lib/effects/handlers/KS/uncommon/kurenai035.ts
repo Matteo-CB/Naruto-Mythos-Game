@@ -58,13 +58,15 @@ function handleKurenai035Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'YUHI KURENAI', id: 'KS-035-UC' }) } };
   }
 
+  // Confirmation popup before defeat
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KURENAI_DEFEAT_LOW_POWER',
-    validTargets,
-    description: 'Select an enemy character with Power 1 or less in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.kurenai035DefeatLowPower',
+    targetSelectionType: 'KURENAI035_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kurenai035ConfirmUpgrade',
   };
 }
 
