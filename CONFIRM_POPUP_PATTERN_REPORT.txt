@@ -366,4 +366,41 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   - KS-038/039: POWERUP self immediate apres CONFIRM (pas de child)
   - Regles R1-R9 respectees
 
+2026-03-11 - Bugfix: Asuma 023 + Shizune 006 name uniqueness pre-check:
+  - Bug: Asuma 023 CONFIRM popup triggers even when all Team 10 chars have
+    no valid destination (e.g., Shikamaru in all missions for both players)
+  - Bug: Shizune 006 CONFIRM popup triggers even when all enemies with Power ≤ 3
+    have no valid destination (same-name in all other missions)
+  - Fix: Added destination pre-check in both handlers AND CONFIRM cases:
+    For each candidate target, verify at least one other mission does NOT
+    already have a character with the same name (name uniqueness).
+    If no valid destination -> skip this candidate. If no candidates left -> fizzle.
+  - Also added missing Kurenai block check in Shizune 006 CONFIRM case.
+
+  NOUVELLE REGLE R10: PRE-VERIFIER LES DESTINATIONS AVANT LE POPUP DE MOUVEMENT
+    Tout handler qui deplace un personnage vers une autre mission doit verifier:
+    1. R8 (Kurenai block + activeMissions.length >= 2)
+    2. Pour chaque candidat, au moins une mission destination NE contient PAS
+       un personnage du meme nom (name_fr) du meme cote (controleur)
+    Si aucun candidat n'a de destination valide -> fizzle, pas de popup
+
+2026-03-11 - Batch 5 (KS-041 a KS-050):
+  - 7 cartes traitees: KS-041 (MAIN+UPGRADE), 043 (UPGRADE), 045, 046, 047, 050
+  - 4 cartes skip: KS-042 (continu), KS-044 (continu), KS-048 (continu), KS-049 (continu)
+  - KS-041 MAIN: auto-defeat si 1 cible, child mandatory si plusieurs (Andy: no SKIP)
+  - KS-041 UPGRADE: auto-POWERUP si 1 cible, child mandatory si plusieurs (Andy: no SKIP)
+    + fix: filtre corrige pour friendly-only (etait both sides)
+  - KS-043 UPGRADE: POWERUP 3 self immediate apres CONFIRM (pas de child)
+  - KS-045 AMBUSH: auto-defeat si 1 cible, child mandatory si plusieurs
+  - KS-046 MAIN: draw 1 immediate apres CONFIRM si condition toujours remplie
+  - KS-047 MAIN: R8+R10 appliquees (Kurenai check + destination pre-check pour chaque Naruto)
+    auto-select si 1 Naruto, child mandatory si plusieurs (Andy: no SKIP)
+  - KS-050 AMBUSH: auto-select si 1 cible, child mandatory si plusieurs (Andy: no SKIP)
+  - Regles R1-R10 respectees
+
+2026-03-11 - Bugfix: SKIP button sur destinations (Asuma 023 + Iruka 047):
+  - Bug: ASUMA_CHOOSE_DESTINATION avait isOptional: true -> SKIP button
+  - Bug: IRUKA_CHOOSE_DESTINATION avait isOptional: true -> SKIP button
+  - Fix: isOptional: false, isMandatory: true sur les deux
+
 ================================================================================

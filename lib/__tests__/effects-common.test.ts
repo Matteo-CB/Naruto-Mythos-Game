@@ -472,7 +472,10 @@ describe('046/130 - Ebisu', () => {
 
     const handler = getEffectHandler('KS-046-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ebisu, 0));
-    expect(result.state.player1.hand.length).toBe(1);
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('EBISU046_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('ebisu-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should not draw when no weaker friendly exists', () => {
@@ -552,8 +555,9 @@ describe('050/130 - Orochimaru', () => {
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', orochimaru, 0, 'AMBUSH'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('OROCHIMARU_LOOK_AND_STEAL');
-    expect(result.validTargets).toContain('hidden-e');
+    expect(result.targetSelectionType).toBe('OROCHIMARU050_CONFIRM_AMBUSH');
+    expect(result.validTargets).toContain('oro-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when no hidden enemies in this mission', () => {

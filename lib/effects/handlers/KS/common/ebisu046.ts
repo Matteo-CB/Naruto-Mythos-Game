@@ -35,29 +35,16 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'EBISU', id: 'KS-046-C' }) } };
   }
 
-  // Draw a card
-  const newState = { ...state };
-  const playerState = { ...newState[sourcePlayer] };
-  if (playerState.deck.length > 0) {
-    const newDeck = [...playerState.deck];
-    const drawnCard = newDeck.shift()!;
-    playerState.deck = newDeck;
-    playerState.hand = [...playerState.hand, drawnCard];
-  }
-  newState[sourcePlayer] = playerState;
-
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_DRAW',
-    `Ebisu (046): Drew 1 card.`,
-    'game.log.effect.draw',
-    { card: 'Ebisu', id: 'KS-046-C', count: '1' },
-  );
-
-  return { state: { ...newState, log } };
+  // Confirmation popup before drawing
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'EBISU046_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.ebisu046ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {

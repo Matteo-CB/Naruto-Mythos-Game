@@ -1651,9 +1651,25 @@ export class EffectEngine {
         const s006Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const s006EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const s006Targets: string[] = [];
-        for (const mission of newState.activeMissions) {
-          for (const char of (mission as any)[s006EnemySide]) {
+        for (let s006mIdx = 0; s006mIdx < newState.activeMissions.length; s006mIdx++) {
+          // Skip missions where Kurenai blocks enemy movement
+          if (isMovementBlockedByKurenai(newState, s006mIdx, s006Opponent)) continue;
+          const s006Mission = newState.activeMissions[s006mIdx];
+          for (const char of (s006Mission as any)[s006EnemySide]) {
             if (getEffectivePower(newState, char, s006Opponent) <= 3) {
+              // Pre-check: at least one destination must not have same-name conflict
+              const s006TopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const s006CharName = s006TopCard.name_fr;
+              const s006HasDest = newState.activeMissions.some((m: any, i: number) => {
+                if (i === s006mIdx) return false;
+                return !m[s006EnemySide].some((c: any) => {
+                  if (c.instanceId === char.instanceId) return false;
+                  if (c.isHidden) return false;
+                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  return cTop.name_fr === s006CharName;
+                });
+              });
+              if (!s006HasDest) continue;
               s006Targets.push(char.instanceId);
             }
           }
@@ -2541,6 +2557,20 @@ export class EffectEngine {
           if (char.isHidden) continue;
           const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
           if (topCard.keywords?.includes('Team 10')) {
+            // Pre-check: at least one destination must not have same-name conflict
+            const charController = a023Mission.player1Characters.some((c) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
+            const ctrlSide: 'player1Characters' | 'player2Characters' = charController === 'player1' ? 'player1Characters' : 'player2Characters';
+            const charName = topCard.name_fr;
+            const hasValidDest = newState.activeMissions.some((m, i) => {
+              if (i === a023MIdx) return false;
+              return !m[ctrlSide].some((c) => {
+                if (c.instanceId === char.instanceId) return false;
+                if (c.isHidden) return false;
+                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr === charName;
+              });
+            });
+            if (!hasValidDest) continue;
             a023Targets.push(char.instanceId);
           }
         }
@@ -3259,6 +3289,354 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, rl039Player,
           'EFFECT_POWERUP', 'Rock Lee (039): POWERUP 2 on self (upgrade).',
           'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: 'KS-039-UC', amount: 2 });
+        break;
+      }
+
+      // =============================================
+      // Batch 5 CONFIRM cases (KS-041 to KS-050)
+      // =============================================
+
+      case 'TENTEN041_CONFIRM_MAIN': {
+        // Re-find hidden chars (both sides, not self) in source mission
+        const tt041SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!tt041SrcChar) break;
+        const tt041MIdx = tt041SrcChar.missionIndex;
+        const tt041Mission = newState.activeMissions[tt041MIdx];
+        if (!tt041Mission) break;
+
+        const tt041Targets: string[] = [];
+        for (const char of [...tt041Mission.player1Characters, ...tt041Mission.player2Characters]) {
+          if (char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId) {
+            tt041Targets.push(char.instanceId);
+          }
+        }
+
+        if (tt041Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Tenten (041): No hidden character in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' });
+          break;
+        }
+
+        if (tt041Targets.length === 1) {
+          // Auto-defeat the single target
+          newState = EffectEngine.defeatCharacter(newState, tt041Targets[0], pendingEffect.sourcePlayer);
+          break;
+        }
+
+        // Multiple targets: mandatory child
+        const tt041mEffId = generateInstanceId();
+        const tt041mActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: tt041mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: tt041MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'TENTEN_DEFEAT_HIDDEN',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: tt041Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: tt041mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a hidden character in this mission to defeat.',
+          descriptionKey: 'game.effect.desc.tenten041DefeatHidden',
+          options: tt041Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: tt041mEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'TENTEN041_CONFIRM_UPGRADE': {
+        // Re-find friendly non-hidden Leaf Village chars (any mission, not self)
+        const tt041uSide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const tt041uTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[tt041uSide]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.group === 'Leaf Village') {
+              tt041uTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (tt041uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Tenten (041): No friendly Leaf Village character in play (state changed).',
+            'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' });
+          break;
+        }
+
+        if (tt041uTargets.length === 1) {
+          // Auto-POWERUP 1
+          const tt041uRes = EffectEngine.findCharByInstanceId(newState, tt041uTargets[0]);
+          if (tt041uRes) {
+            const tt041uMissions = [...newState.activeMissions];
+            const tt041uM = { ...tt041uMissions[tt041uRes.missionIndex] };
+            const tt041uKey = tt041uRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+            tt041uM[tt041uKey] = tt041uM[tt041uKey].map((c: CharacterInPlay) =>
+              c.instanceId === tt041uTargets[0] ? { ...c, powerTokens: c.powerTokens + 1 } : c
+            );
+            tt041uMissions[tt041uRes.missionIndex] = tt041uM;
+            newState = { ...newState, activeMissions: tt041uMissions };
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_POWERUP', `Tenten (041): POWERUP 1 on ${tt041uRes.character.card.name_fr} (upgrade).`,
+              'game.log.effect.powerup', { card: 'TENTEN', id: 'KS-041-UC', amount: '1', target: tt041uRes.character.card.name_fr });
+          }
+          break;
+        }
+
+        // Multiple targets: mandatory child
+        const tt041uEffId = generateInstanceId();
+        const tt041uActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: tt041uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'TENTEN_POWERUP_LEAF',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: tt041uTargets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: tt041uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a friendly Leaf Village character in play to give POWERUP 1.',
+          descriptionKey: 'game.effect.desc.tenten041PowerupLeaf',
+          options: tt041uTargets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: tt041uEffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'GAI043_CONFIRM_UPGRADE': {
+        // POWERUP 3 on self
+        const g043Player = pendingEffect.sourcePlayer;
+        const g043Side = g043Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const g043MI = pendingEffect.sourceMissionIndex;
+        const missions_g043 = [...newState.activeMissions];
+        const m_g043 = { ...missions_g043[g043MI] };
+        const chars_g043 = [...m_g043[g043Side]];
+        const idx_g043 = chars_g043.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+        if (idx_g043 !== -1) {
+          chars_g043[idx_g043] = { ...chars_g043[idx_g043], powerTokens: chars_g043[idx_g043].powerTokens + 3 };
+          m_g043[g043Side] = chars_g043;
+          missions_g043[g043MI] = m_g043;
+          newState = { ...newState, activeMissions: missions_g043 };
+        }
+        newState.log = logAction(newState.log, newState.turn, newState.phase, g043Player,
+          'EFFECT_POWERUP', 'Gai Maito (043): POWERUP 3 on self (upgrade).',
+          'game.log.effect.powerupSelf', { card: 'GAI MAITO', id: 'KS-043-UC', amount: 3 });
+        break;
+      }
+
+      case 'ANKO045_CONFIRM_AMBUSH': {
+        // Re-find hidden enemy chars across all missions
+        const a045Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const a045EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const a045Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of (mission as any)[a045EnemySide]) {
+            if (char.isHidden) {
+              a045Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (a045Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Anko Mitarashi (045): No hidden enemy character in play (state changed).',
+            'game.log.effect.noTarget', { card: 'ANKO MITARASHI', id: 'KS-045-UC' });
+          break;
+        }
+
+        if (a045Targets.length === 1) {
+          // Auto-defeat
+          newState = EffectEngine.defeatCharacter(newState, a045Targets[0], pendingEffect.sourcePlayer);
+          break;
+        }
+
+        // Multiple targets: mandatory child
+        const a045EffId = generateInstanceId();
+        const a045ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: a045EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'ANKO_DEFEAT_HIDDEN_ENEMY',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: a045Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: a045ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a hidden enemy character in play to defeat.',
+          descriptionKey: 'game.effect.desc.anko045DefeatHidden',
+          options: a045Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: a045EffId,
+        }];
+        break;
+      }
+
+      case 'EBISU046_CONFIRM_MAIN': {
+        // Re-check condition: friendly with less effective power in mission
+        const e046SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!e046SrcChar) break;
+        const e046Mission = newState.activeMissions[e046SrcChar.missionIndex];
+        if (!e046Mission) break;
+        const e046FriendlySide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const e046SourcePower = getEffectivePower(newState, e046SrcChar.character, pendingEffect.sourcePlayer);
+        const e046HasLesser = (e046Mission as any)[e046FriendlySide].some((c: CharacterInPlay) => {
+          if (c.instanceId === pendingEffect.sourceInstanceId) return false;
+          if (c.isHidden) return false;
+          return getEffectivePower(newState, c, pendingEffect.sourcePlayer) < e046SourcePower;
+        });
+
+        if (!e046HasLesser) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Ebisu (046): No friendly character with less Power (state changed).',
+            'game.log.effect.noTarget', { card: 'EBISU', id: 'KS-046-C' });
+          break;
+        }
+
+        // Draw 1 card
+        const e046Ps = { ...newState[pendingEffect.sourcePlayer] };
+        if (e046Ps.deck.length > 0) {
+          const e046Deck = [...e046Ps.deck];
+          const e046Drawn = e046Deck.shift()!;
+          e046Ps.deck = e046Deck;
+          e046Ps.hand = [...e046Ps.hand, e046Drawn];
+        }
+        newState = { ...newState, [pendingEffect.sourcePlayer]: e046Ps };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DRAW', 'Ebisu (046): Drew 1 card.',
+          'game.log.effect.draw', { card: 'EBISU', id: 'KS-046-C', count: '1' });
+        break;
+      }
+
+      case 'IRUKA047_CONFIRM_MAIN': {
+        // Re-find Naruto Uzumaki chars with R8+R10 filtering
+        const i047Targets: string[] = [];
+        for (let i047mIdx = 0; i047mIdx < newState.activeMissions.length; i047mIdx++) {
+          const i047Mission = newState.activeMissions[i047mIdx];
+          for (const char of [...i047Mission.player1Characters, ...i047Mission.player2Characters]) {
+            if (char.isHidden) continue;
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            if (topCard.name_fr === 'NARUTO UZUMAKI') {
+              const charCtrl = i047Mission.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
+              if (isMovementBlockedByKurenai(newState, i047mIdx, charCtrl)) continue;
+              const i047CtrlSide: 'player1Characters' | 'player2Characters' = charCtrl === 'player1' ? 'player1Characters' : 'player2Characters';
+              const i047HasDest = newState.activeMissions.some((m: any, i: number) => {
+                if (i === i047mIdx) return false;
+                return !m[i047CtrlSide].some((c: any) => {
+                  if (c.instanceId === char.instanceId) return false;
+                  if (c.isHidden) return false;
+                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  return cTop.name_fr === 'NARUTO UZUMAKI';
+                });
+              });
+              if (!i047HasDest) continue;
+              i047Targets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (i047Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Iruka Umino (047): No Naruto Uzumaki can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'IRUKA UMINO', id: 'KS-047-C' });
+          break;
+        }
+
+        if (i047Targets.length === 1) {
+          // Auto-select the single Naruto
+          newState = EffectEngine.irukaChooseNaruto(newState, pendingEffect, i047Targets[0]);
+          break;
+        }
+
+        // Multiple targets: mandatory child
+        const i047EffId = generateInstanceId();
+        const i047ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: i047EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'IRUKA_CHOOSE_NARUTO',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: i047Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: i047ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Iruka Umino (047): Choose a Naruto Uzumaki character to move.',
+          descriptionKey: 'game.effect.desc.iruka047MoveNaruto',
+          options: i047Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: i047EffId,
+        }];
+        break;
+      }
+
+      case 'OROCHIMARU050_CONFIRM_AMBUSH': {
+        // Re-find hidden enemy chars in this mission
+        const o050SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (!o050SrcChar) break;
+        const o050MIdx = o050SrcChar.missionIndex;
+        const o050Mission = newState.activeMissions[o050MIdx];
+        if (!o050Mission) break;
+        const o050EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const o050Targets: string[] = [];
+        for (const char of (o050Mission as any)[o050EnemySide]) {
+          if (char.isHidden) {
+            o050Targets.push(char.instanceId);
+          }
+        }
+
+        if (o050Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Orochimaru (050): No hidden enemy in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-050-C' });
+          break;
+        }
+
+        if (o050Targets.length === 1) {
+          // Auto-select
+          newState = EffectEngine.orochimaruLookAndSteal(newState, pendingEffect, o050Targets[0]);
+          break;
+        }
+
+        // Multiple targets: mandatory child
+        const o050EffId = generateInstanceId();
+        const o050ActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: o050EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: o050MIdx,
+          effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'OROCHIMARU_LOOK_AND_STEAL',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: o050Targets, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: o050ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: 'Select a hidden enemy character in this mission to look at.',
+          descriptionKey: 'game.effect.desc.orochimaru050LookSteal',
+          options: o050Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: o050EffId,
+        }];
         break;
       }
 
@@ -9066,8 +9444,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });
@@ -9139,8 +9517,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });

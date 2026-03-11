@@ -26,6 +26,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
 
   // R8: Check Kurenai block — the moved character's controller determines block
   // Find all Team 10 characters in this mission (not self, both sides)
+  // Also pre-check that each candidate has at least one valid destination (name uniqueness)
   const validTargets: string[] = [];
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
   for (const char of allChars) {
@@ -37,6 +38,20 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
       const charController = mission.player1Characters.includes(char) ? 'player1' : 'player2';
       // R8: Skip if Kurenai blocks movement from this mission for this character's controller
       if (isMovementBlockedByKurenai(state, sourceMissionIndex, charController)) continue;
+      // Pre-check: at least one destination mission must not already have a same-name character
+      const charName = topCard.name_fr;
+      const controllerSide: 'player1Characters' | 'player2Characters' =
+        charController === 'player1' ? 'player1Characters' : 'player2Characters';
+      const hasValidDest = state.activeMissions.some((m, i) => {
+        if (i === sourceMissionIndex) return false;
+        return !m[controllerSide].some((c) => {
+          if (c.instanceId === char.instanceId) return false;
+          if (c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr === charName;
+        });
+      });
+      if (!hasValidDest) continue;
       validTargets.push(char.instanceId);
     }
   }

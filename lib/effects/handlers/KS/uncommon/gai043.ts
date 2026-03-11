@@ -33,39 +33,18 @@ function handleGai043Main(ctx: EffectContext): EffectResult {
 }
 
 function handleGai043Upgrade(ctx: EffectContext): EffectResult {
-  // UPGRADE: POWERUP 3 - add 3 power tokens to self
-  const state = { ...ctx.state };
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[ctx.sourceMissionIndex] };
+  const { state, sourceCard } = ctx;
 
-  const side: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const chars = [...mission[side]];
-  const charIndex = chars.findIndex((c) => c.instanceId === ctx.sourceCard.instanceId);
-
-  if (charIndex !== -1) {
-    chars[charIndex] = {
-      ...chars[charIndex],
-      powerTokens: chars[charIndex].powerTokens + 3,
-    };
-    mission[side] = chars;
-    missions[ctx.sourceMissionIndex] = mission;
-
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_POWERUP',
-      'Gai Maito (043): POWERUP 3 (upgrade effect). Power tokens added: 3.',
-      'game.log.effect.powerupSelf',
-      { card: 'GAI MAITO', id: 'KS-043-UC', amount: 3 },
-    );
-
-    return { state: { ...state, activeMissions: missions, log } };
-  }
-
-  return { state };
+  // Confirmation popup before POWERUP
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'GAI043_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.gai043ConfirmUpgrade',
+  };
 }
 
 export function registerGai043Handlers(): void {

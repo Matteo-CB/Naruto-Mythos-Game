@@ -41,16 +41,15 @@ function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-050-C' }) } };
   }
 
-  // Requires target selection: which hidden enemy to look at
-  // The actual look + take-control logic is resolved by the game engine
-  // after the target is selected (it checks the actual card cost).
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'OROCHIMARU_LOOK_AND_STEAL',
-    validTargets,
-    description: 'Select a hidden enemy character in this mission to look at. If it costs 3 or less, take control of it.',
-    descriptionKey: 'game.effect.desc.orochimaru050LookSteal',
+    targetSelectionType: 'OROCHIMARU050_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.orochimaru050ConfirmAmbush',
   };
 }
 

@@ -44,13 +44,15 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TENTEN_DEFEAT_HIDDEN',
-    validTargets,
-    description: 'Select a hidden character in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.tenten041DefeatHidden',
+    targetSelectionType: 'TENTEN041_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.tenten041ConfirmMain',
   };
 }
 
@@ -59,11 +61,11 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all non-hidden Leaf Village characters across all missions (both sides), excluding self
+  // Find all friendly non-hidden Leaf Village characters across all missions, excluding self
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+    for (const char of mission[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -79,13 +81,15 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
+  // Confirmation popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TENTEN_POWERUP_LEAF',
-    validTargets,
-    description: 'Select a friendly Leaf Village character in play to give POWERUP 1.',
-    descriptionKey: 'game.effect.desc.tenten041PowerupLeaf',
+    targetSelectionType: 'TENTEN041_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.tenten041ConfirmUpgrade',
   };
 }
 
