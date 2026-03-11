@@ -1,0 +1,186 @@
+DIFFERENCES SHINOBUILDER vs NOTRE JSON
+
+
+GROUPES
+KS-066-UC Doki : nous = Sound Village, shino = Independent
+KS-130-R Ichibi : nous = Independent, shino = Sand Village
+KS-134-S Kyubi : nous = Independent, shino = Leaf Village
+
+
+KEYWORDS
+KS-016-UC Kakashi : nous = Team 7, shino = Kekkei Genkai, Team 7
+KS-046-C Ebisu : nous = Special Jonin, shino = rien
+KS-049-C Gemma : nous = Special Jonin, shino = rien
+KS-052-C Kabuto : nous = Sound Village, shino = rien
+KS-068-C Dosu : nous = Sound Ninja, shino = Team Dosu
+KS-069-UC Dosu : nous = Sound Ninja + Weapon, shino = Team Dosu + Weapon
+KS-070-C Zaku : nous = Sound Ninja, shino = Team Dosu
+KS-071-UC Zaku : nous = Sound Ninja, shino = Jutsu + Team Dosu
+KS-072-C Kin : nous = Sound Ninja, shino = Team Dosu
+KS-073-UC Kin : nous = Jutsu + Sound Ninja, shino = Jutsu + Team Dosu
+KS-080-UC Temari : nous = Jutsu + Team Baki, shino = Team Baki
+KS-083-UC Baki : nous = rien, shino = Sand Siblings
+KS-087-UC Zabuza : nous = Jutsu + Rogue Ninja, shino = Mercenary Ninja
+KS-088-C Haku : nous = Rogue Ninja, shino = Mercenary Ninja
+KS-089-UC Haku : nous = Jutsu + Rogue Ninja, shino = Jutsu + Mercenary Ninja
+KS-104-R Tsunade : nous = Jutsu + Sannin, shino = Sannin
+KS-104-MV Tsunade : nous = Jutsu + Sannin, shino = Sannin
+KS-112-R Choji : nous = Team 10, shino = Taijutsu + Team 10
+KS-113-MV Kiba : nous = Jutsu + Team 8, shino = Team 8
+KS-115-R Shino : nous = Jutsu + Equipe 8, shino = Jutsu + Team 8
+
+
+NOMS ANGLAIS
+KS-066-UC : nous = DOKI, shino = Rage Ogres
+KS-094-C : nous = GAMA BUNTA, shino = Gamabunta
+KS-096-C : nous = GAMAKITCHI, shino = Gamakichi
+KS-129-R : nous = NINE-TAILS, shino = Nine-Tailed Fox
+
+
+TITRES ANGLAIS
+KS-005-C Shizune : nous = Tsunade's Assistant, shino = Assistant to Tsunade
+KS-009-C Naruto : nous = Leaf Village Genin, shino = Genin of the Leaf Village
+KS-011-C Sakura : nous = Team 7 Genin, shino = Genin of Team 7
+KS-012-UC Sakura : nous = Chakra Mastery, shino = Chakra Prowess
+KS-015-C Kakashi : nous = Team 7 Sensei, shino = Teacher of Team 7
+KS-019-C Ino : nous = Team 10 Genin, shino = Genin of Team 10
+KS-021-C Shikamaru : nous = Team 10 Genin, shino = Genin of Team 10
+KS-022-UC Shikamaru : nous = Shadow Possession, shino = Shadow Possession Jutsu
+KS-023-C Asuma : nous = Team 10 Sensei, shino = Teacher of Team 10
+KS-025-C Kiba : nous = Team 8 Genin, shino = Genin of Team 8
+KS-026-UC Kiba : nous = All-Four Jutsu, shino = All-Fours Jutsu
+KS-028-UC Kiba : nous = Raging Man-Beast, shino = Man Beast Clone
+KS-032-C Shino : nous = Destruction Bugs, shino = Parasitic Insects
+KS-033-UC Shino : nous = Bug Clone Technique, shino = Insect Clones
+KS-034-C Kurenai : nous = Team 8 Sensei, shino = Teacher of Team 8
+KS-038-C Rock Lee : nous = Strong Fist Training, shino = Training in Ferocious Fist
+KS-040-C Tenten : nous = Team Guy Genin, shino = Genin of Team Guy
+KS-041-UC Tenten : nous = Weapons Specialist, shino = Weapon Specialist
+KS-042-C Gai : nous = Team Guy Sensei, shino = Teacher of Team Guy
+KS-043-UC Gai : nous = Cherry Blossom Impact, shino = Ferocious Fist
+KS-044-C Anko : nous = Chunin Exam Proctor, shino = Genin Exams Proctor
+KS-045-UC Anko : nous = Shadow Snake Hands, shino = Striking Shadow Snake
+KS-048-C Hayate : nous = Talented Shinobi, shino = Skilled Shinobi
+KS-050-C Orochimaru : nous = Infiltrator, shino = Undercover
+KS-051-UC Orochimaru : nous = Orochimaru Style: Substitution, shino = Orochimaru Style: Substitution Jutsu
+KS-052-C Kabuto : nous = The Mole, shino = Infiltrator
+KS-054-UC Kabuto : nous = Temple of Nirvana Technique, shino = Nirvana Temple Jutsu
+KS-055-C Kimimaro : nous = Dance of the Camellia, shino = Camelia Dance
+KS-056-UC Kimimaro : nous = Dance of the Larch, shino = Shikotsumyaku
+KS-057-C Jirobo : nous = Curse Mark Bearer, shino = Bearer of the Curse Mark
+KS-059-C Kidomaru : nous = Curse Mark Bearer, shino = Bearer of the Curse Mark
+KS-060-UC Kidomaru : nous = Spider Web Deploy, shino = Spiral Spider Web
+KS-061-C Sakon : nous = Curse Mark Bearer, shino = Bearer of the Curse Mark
+KS-062-UC Sakon : nous = Five Elements Seal, shino = Black Seal
+KS-064-C Tayuya : nous = Curse Mark Bearer, shino = Bearer of the Curse Mark
+KS-065-UC Tayuya : nous = Demonic Flute, shino = Demon Flute
+KS-071-UC Zaku : nous = Slicing Sound Waves, shino = Slicing Sound Wave
+KS-074-C Gaara : nous = Sand Village Genin, shino = Genin of the Sand Village
+KS-084-C Yashamaru : nous = Gaara's Guardian, shino = Gaara's Caretaker
+KS-086-C Zabuza : nous = Wind Blade, shino = Kubikiribochoo
+KS-087-UC Zabuza : nous = Water Prison, shino = Water Prison Jutsu
+KS-088-C Haku : nous = Orphan of the Land of Water, shino = Orphan from the Land of Water
+KS-089-UC Haku : nous = Demonic Mirroring Ice Crystals, shino = Crystal Ice Mirrors
+KS-090-C Itachi : nous = Akatsuki, shino = Akatsuki Investigator
+KS-091-UC Itachi : nous = Mangekyo Sharingan, shino = Mangekyoo Sharingan
+KS-092-C Kisame : nous = Rogue Ninja of the Mist, shino = Rogue Ninja of the Hidden Mist
+KS-096-C Gamakichi : nous = Gamabunta's Eldest Son, shino = Eldest Son of Gamabunta
+KS-097-C Gamatatsu : nous = Gamabunta's Youngest Son, shino = Youngest Son of Gamabunta
+KS-099-C Pakkun : nous = Kakashi's Ninja Dog, shino = Kakashi's Ninja Hound
+KS-103-UC Giant Spider : nous = Spider Rain, shino = Rain of Spiders
+KS-108-R Naruto : nous = Fury of the Rasengan, shino = Shadow Clone Jutsu
+KS-108-MV Naruto : nous = I won't run away!, shino = I won't run away!
+KS-115-R Shino : nous = Insect Wall Technique, shino = Wall of Insects Jutsu
+KS-117-R Rock Lee : nous = Drunken Fist, shino = Loopy Fist
+KS-119-R Kankuro : nous = Black Secret Technique: Iron Maiden, shino = Secret Black Move: Iron Maiden
+KS-121-R Temari : nous = Sickle Weasel Jutsu, shino = Wind Scythe Jutsu
+KS-122-R Jirobo : nous = Arhat Fist, shino = Slamming Palm
+KS-123-R Kimimaro : nous = Curse Mark of Earth, shino = Earth Curse Mark
+KS-124-R Kidomaru : nous = Spider Bow: Fierce Rip, shino = Gum Style Spider Thread
+KS-125-R Tayuya : nous = Demonic Flute: Phantom Sound Chains, shino = Demon Flute: Chains of Fantasia
+KS-126-R Orochimaru : nous = Get out of my way., shino = Stay out of my way
+KS-127-R Sakon : nous = Stone Fist, shino = Fists Barrage
+KS-129-R Kyubi : nous = Demon Fox Cloak, shino = You better be grateful to me...
+KS-133-MV Naruto : nous = I'm Going to Get a Bowl of Noodles at Ichiraku!, shino = Ready or not Ramen here I come!
+KS-133-MV Naruto (2e entree shino) : nous = meme, shino = Ninja Art! Summoning Jutsu!
+KS-134-S Kyubi : nous = The Beast Awakens, shino = Destruction
+KS-136-S Sasuke : nous = Curse Mark of Heaven, shino = Heaven Curse Mark
+KS-136-SV Sasuke : nous = Curse Mark of Heaven, shino = Heaven Curse Mark
+KS-136-MV Sasuke : nous = You're annoying., shino = You're annonying. (typo shino)
+KS-137-MV Kakashi : nous = Lightning Blade, shino = I won't be able to read Make-Out Paradise now.
+KS-138-S Orochimaru : nous = Summoning: Impure World Reincarnation, shino = Reanimation
+KS-141-M Naruto : nous = Defying Sasuke, shino = Challenging Sasuke
+KS-142-M Naruto : nous = Defying Naruto, shino = Challenging Naruto
+KS-144-M Kisame : nous = Chakra Absorption, shino = Chakra Absorb
+
+
+EFFETS IMPORTANTS (mecanique differente)
+
+KS-053-UC Kabuto
+nous : MAIN Play a character from your discard pile anywhere paying 3 less.
+shino : MAIN Play the character at the top of your discard pile paying 3 less.
+> choix libre dans la defausse vs uniquement la carte du dessus
+
+KS-063-UC Ukon
+nous : MAIN [⧗] You can play this character as an upgrade over any character with a printed cost of 4 or less.
+shino : MAIN [⧗] You can play this character as an upgrade over any Sound Village character.
+> condition completement differente
+
+KS-115-R Shino
+nous : AMBUSH Move a friendly character in this mission to another mission.
+shino : AMBUSH Move one friendly character in this mission.
+> nous on precise la destination
+
+KS-117-R Rock Lee
+nous : UPGRADE Discard the top card of your deck: POWERUP X where X is the cost of the discarded card.
+shino : UPGRADE Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card.
+> shino ajoute Reveal avant discard
+
+KS-127-R Sakon
+nous : MAIN [⧗] Each enemy character in this mission has -1 Power. UPGRADE Move a friendly character in play to another mission.
+shino : MAIN [⧗] You can play this character as an upgrade over any Sound Village character. AMBUSH Hide an enemy character in this mission with Power 5 or less.
+> effets completement differents
+
+KS-132-S Jiraiya
+nous : UPGRADE The opponent must choose characters to be defeated until they only have up to 2 assigned in this mission.
+shino : UPGRADE The opponent must choose characters to be defeated until they only have up to 2 assigned in each mission.
+> this mission vs each mission
+
+KS-148-M Kakashi
+nous : AMBUSH Copy a non-continuous instant effect of another friendly Team 7 character in play.
+shino : AMBUSH Copy a instant effect of another friendly Team 7 character in play.
+> nous on precise non-continuous
+
+
+EFFETS MINEURS (meme mecanique juste formulation)
+
+KS-033-UC Shino : there is vs there's
+KS-041-UC Tenten : a hidden vs an hidden
+KS-045-UC Anko : a hidden vs an hidden
+KS-051-UC Orochimaru : a hidden vs an hidden
+KS-062-UC Sakon : formatage des symboles
+KS-066-UC Doki : take back this character in hand vs return this character to your hand
+KS-085-UC Yashamaru : If you do so vs If you do
+KS-116-R Neji : in this mission repete 2 fois dans shino
+KS-125-R Tayuya : costs vs cost et casse Sound Village
+KS-128-R Itachi : ordre UPGRADE/MAIN inverse dans shino mais memes effets
+KS-141-M Naruto : shino a 4 of less au lieu de 4 or less (typo)
+KS-004-MMS Assassination : nous on a in play a la fin, shino non
+
+
+MISSIONS POWER (champ que nous n'avons pas)
+KS-001-MMS = 1
+KS-002-MMS = 2
+KS-003-MMS = 1
+KS-004-MMS = 1
+KS-005-MMS = 3
+KS-006-MMS = 1
+KS-007-MMS = 2
+KS-008-MMS = 2
+KS-009-MMS = 2
+KS-010-MMS = 2
+
+
+FORMAT ID RARE ART
+Shino utilise RART (KS-104-RART) et nous utilisons RA (KS-104-RA). 28 cartes de 104 a 130. Memes cartes juste format different.
+Shino a KS-111-M (Shikamaru) et nous avons KS-111-MV.

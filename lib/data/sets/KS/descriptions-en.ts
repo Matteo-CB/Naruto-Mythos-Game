@@ -1071,12 +1071,12 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 127 - Sakon (R/RA)
   'KS-127-R': [
-    '[⧗] Each enemy character in this mission has -1 Power.',
-    'UPGRADE: Move a friendly character in play to another mission.',
+    '[⧗] You can play this character as an upgrade over any Sound Village character.',
+    'Hide an enemy character in this mission with Power 5 or less.',
   ],
   'KS-127-RA': [
-    '[⧗] Each enemy character in this mission has -1 Power.',
-    'UPGRADE: Move a friendly character in play to another mission.',
+    '[⧗] You can play this character as an upgrade over any Sound Village character.',
+    'Hide an enemy character in this mission with Power 5 or less.',
   ],
 
   // =====================
@@ -1101,5 +1101,13 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   'KS-137-SV': [
     'Move this character to another mission.',
     'Hide an upgraded character in this mission.',
+  ],
+  'KS-137-MV': [
+    'Move this character to another mission.',
+    'Hide an upgraded character in this mission.',
+  ],
+  'KS-133_2-MV': [
+    'Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play.',
+    'MAIN effect: Instead, defeat both of them.',
   ],
 };

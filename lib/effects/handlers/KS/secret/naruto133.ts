@@ -110,4 +110,6 @@ function checkTarget2Only(ctx: EffectContext, state: EffectContext['state'], use
 
 export function registerNaruto133Handlers(): void {
   registerEffect('KS-133-S', 'MAIN', naruto133MainHandler);
+  registerEffect('KS-133-MV', 'MAIN', naruto133MainHandler);
+  registerEffect('KS-133_2-MV', 'MAIN', naruto133MainHandler);
 }

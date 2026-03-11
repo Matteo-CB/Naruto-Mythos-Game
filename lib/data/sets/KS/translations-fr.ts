@@ -1081,12 +1081,12 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 127 - Sakon (R/RA)
   'KS-127-R': [
-    '[⧗] Chaque personnage ennemi dans cette mission a -1 Power.',
-    'AMÉLIORATION : Déplacez un personnage allié en jeu vers une autre mission.',
+    '[⧗] Vous pouvez jouer ce personnage en tant qu\'upgrade sur n\'importe quel personnage du Village du Son.',
+    'Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins.',
   ],
   'KS-127-RA': [
-    '[⧗] Chaque personnage ennemi dans cette mission a -1 Power.',
-    'AMÉLIORATION : Déplacez un personnage allié en jeu vers une autre mission.',
+    '[⧗] Vous pouvez jouer ce personnage en tant qu\'upgrade sur n\'importe quel personnage du Village du Son.',
+    'Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins.',
   ],
 
   // =====================
@@ -1111,5 +1111,13 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   'KS-137-SV': [
     'Déplacez ce personnage vers une autre mission.',
     'Cachez un personnage amélioré dans cette mission.',
+  ],
+  'KS-137-MV': [
+    'Déplacez ce personnage vers une autre mission.',
+    'Cachez un personnage amélioré dans cette mission.',
+  ],
+  'KS-133_2-MV': [
+    'Cachez un personnage ennemi ayant une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi ayant une Puissance de 2 ou moins en jeu.',
+    'effet MAIN : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
   ],
 };

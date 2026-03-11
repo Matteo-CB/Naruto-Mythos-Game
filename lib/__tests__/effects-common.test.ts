@@ -1222,8 +1222,9 @@ describe('092/130 - Kisame Hoshigaki (C)', () => {
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kisame, 0, 'AMBUSH'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('STEAL_POWER_TOKENS_ENEMY_THIS_MISSION');
-    expect(result.validTargets).toContain('enemy-1');
+    expect(result.targetSelectionType).toBe('KISAME092_CONFIRM_AMBUSH');
+    expect(result.validTargets).toContain('kisame-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when no enemy has power tokens', () => {
@@ -1291,8 +1292,9 @@ describe('099/130 - Pakkun', () => {
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', pakkun, 0, 'SCORE'));
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('PAKKUN_MOVE_DESTINATION');
-    expect(result.validTargets).toContain('1'); // mission index 1 is a valid destination
+    expect(result.targetSelectionType).toBe('PAKKUN099_CONFIRM_SCORE');
+    expect(result.validTargets).toContain('pakkun-1');
+    expect(result.isOptional).toBe(true);
   });
 
   it('should fizzle when only one mission exists', () => {

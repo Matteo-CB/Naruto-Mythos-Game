@@ -1,7 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 /**
@@ -11,13 +10,14 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  *
  * MAIN: If there are 2 or more enemy characters in this mission,
  *   move the weakest non-hidden enemy character from this mission.
- *   The player chooses which mission to move the target to.
  *
  * UPGRADE: MAIN effect: After moving, hide the enemy character.
+ *
+ * Confirmation popup before target selection. Modifier pattern for UPGRADE.
  */
 
 function ino110MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex, isUpgrade } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const mission = state.activeMissions[sourceMissionIndex];
   const enemySide: 'player1Characters' | 'player2Characters' =
@@ -25,7 +25,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
 
   const enemies = mission[enemySide];
 
-  // Check if there are 2+ enemy characters in this mission
+  // Pre-check: 2+ enemy characters in this mission?
   if (enemies.length < 2) {
     return {
       state: {
@@ -41,7 +41,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Must have at least one other mission to move to
+  // Pre-check: at least one other mission to move to
   if (state.activeMissions.length <= 1) {
     return {
       state: {
@@ -57,7 +57,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find non-hidden enemies and their effective power
+  // Pre-check: non-hidden enemies exist
   const nonHiddenEnemies = enemies.filter((c) => !c.isHidden);
   if (nonHiddenEnemies.length === 0) {
     return {
@@ -74,53 +74,20 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find the minimum effective power among non-hidden enemies
-  let minPower = Infinity;
-  for (const c of nonHiddenEnemies) {
-    const ep = getEffectivePower(state, c, opponentPlayer);
-    if (ep < minPower) minPower = ep;
-  }
-
-  // Filter to weakest enemies (may be multiple tied)
-  const weakest = nonHiddenEnemies.filter((c) => getEffectivePower(state, c, opponentPlayer) === minPower);
-
-  // If exactly one weakest enemy, skip enemy selection step - go directly to destination choice.
-  // The INO110_CHOOSE_ENEMY handler in EffectEngine will handle destination selection + upgrade hide.
-  if (weakest.length === 1) {
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'INO110_CHOOSE_ENEMY',
-      validTargets: [weakest[0].instanceId],
-      description: isUpgrade
-        ? `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(state, weakest[0], opponentPlayer)}) to another mission, then hide them.`
-        : `Ino Yamanaka (110): Move ${weakest[0].card.name_fr} (Power ${getEffectivePower(state, weakest[0], opponentPlayer)}) to another mission.`,
-      descriptionKey: isUpgrade
-        ? 'game.effect.desc.ino110MoveAndHide'
-        : 'game.effect.desc.ino110Move',
-      descriptionParams: { target: weakest[0].card.name_fr, power: getEffectivePower(state, weakest[0], opponentPlayer) },
-    };
-  }
-
-  // Multiple tied for weakest - player must choose which one to move
-  const validTargets = weakest.map((c) => c.instanceId);
-
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'INO110_CHOOSE_ENEMY',
-    validTargets,
-    description: isUpgrade
-      ? 'Ino Yamanaka (110) MAIN+UPGRADE: Choose the weakest enemy character to move and hide.'
-      : 'Ino Yamanaka (110) MAIN: Choose the weakest enemy character to move from this mission.',
-    descriptionKey: isUpgrade
-      ? 'game.effect.desc.ino110ChooseMoveHide'
-      : 'game.effect.desc.ino110ChooseMove',
+    targetSelectionType: 'INO110_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ missionIndex: sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.ino110ConfirmMain',
   };
 }
 
 function ino110UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
+  // No-op: modifier handled via CONFIRM_MAIN → CONFIRM_UPGRADE_MODIFIER in engine.
   return { state: ctx.state };
 }
 

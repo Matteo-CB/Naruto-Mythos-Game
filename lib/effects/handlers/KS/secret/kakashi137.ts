@@ -154,4 +154,6 @@ function moveKakashi137(
 export function registerKakashi137Handlers(): void {
   registerEffect('KS-137-S', 'MAIN', kakashi137MainHandler);
   registerEffect('KS-137-S', 'UPGRADE', kakashi137UpgradeHandler);
+  registerEffect('KS-137-MV', 'MAIN', kakashi137MainHandler);
+  registerEffect('KS-137-MV', 'UPGRADE', kakashi137UpgradeHandler);
 }

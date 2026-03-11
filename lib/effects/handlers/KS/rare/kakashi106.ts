@@ -1,7 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import type { CharacterInPlay } from '@/lib/engine/types';
 
 /**
  * Card 106/130 - KAKASHI HATAKE (R)
@@ -10,31 +9,31 @@ import type { CharacterInPlay } from '@/lib/engine/types';
  *
  * MAIN: Discard the top card of an upgraded enemy character's stack
  *   (remove the top card, revealing the previous card underneath).
- *   Targets enemy characters that have stack.length > 1 (i.e., upgraded).
  *
- * UPGRADE: MAIN also copies any non-Upgrade instant effect of the discarded card.
- *   This is a complex effect-copy mechanism. Requires target selection.
+ * UPGRADE: MAIN effect: Also copy any non-Upgrade instant effect of the discarded card.
+ *
+ * Confirmation popup before target selection. Modifier pattern for UPGRADE.
  */
 
 function kakashi106MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find all upgraded enemy characters across all missions (stack.length > 1)
-  const validTargets: string[] = [];
-
+  // Pre-check: any upgraded enemy characters across all missions?
+  let hasUpgraded = false;
   for (const mission of state.activeMissions) {
     const enemyChars = mission[enemySide];
     for (const char of enemyChars) {
-      // A character is upgraded if its stack has more than 1 card
       if (char.stack.length > 1) {
-        validTargets.push(char.instanceId);
+        hasUpgraded = true;
+        break;
       }
     }
+    if (hasUpgraded) break;
   }
 
-  if (validTargets.length === 0) {
+  if (!hasUpgraded) {
     return {
       state: {
         ...state,
@@ -49,100 +48,20 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Always require target selection (effect is optional - player can skip)
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
-    validTargets,
+    targetSelectionType: 'KAKASHI106_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
     isOptional: true,
-    description: ctx.isUpgrade
-      ? 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (the discarded card\'s non-Upgrade effect will be copied).'
-      : 'Kakashi Hatake (106): Choose an upgraded enemy character to de-evolve (discard top card of stack).',
-    descriptionKey: ctx.isUpgrade
-      ? 'game.effect.desc.kakashi106DevolveUpgrade'
-      : 'game.effect.desc.kakashi106Devolve',
+    description: 'Kakashi Hatake (106) MAIN: De-evolve an upgraded enemy character.',
+    descriptionKey: 'game.effect.desc.kakashi106ConfirmMain',
   };
 }
 
-/**
- * Apply the de-evolve: remove the top card from the target's stack, add it to enemy's discard.
- */
-function applyDevolve(
-  state: EffectContext['state'],
-  targetInstanceId: string,
-  sourcePlayer: EffectContext['sourcePlayer'],
-  enemySide: 'player1Characters' | 'player2Characters',
-  isUpgrade: boolean,
-): EffectResult {
-  const enemyPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
-
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    const chars = mission[enemySide];
-    const charIdx = chars.findIndex((c: CharacterInPlay) => c.instanceId === targetInstanceId);
-
-    if (charIdx !== -1 && chars[charIdx].stack.length > 1) {
-      const missions = [...state.activeMissions];
-      const m = { ...missions[i] };
-      const cs = [...m[enemySide]];
-      const targetChar = { ...cs[charIdx] };
-
-      // Remove the top card from the stack
-      const newStack = [...targetChar.stack];
-      const discardedCard = newStack.pop()!;
-
-      // Update the character: the new top card is now the active card
-      const newTopCard = newStack[newStack.length - 1];
-      targetChar.stack = newStack;
-      targetChar.card = newTopCard;
-
-      cs[charIdx] = targetChar;
-      m[enemySide] = cs;
-      missions[i] = m;
-
-      // Add the discarded card to the enemy's discard pile
-      const enemyState = { ...state[enemyPlayer] };
-      enemyState.discardPile = [...enemyState.discardPile, discardedCard];
-
-      let newState = {
-        ...state,
-        activeMissions: missions,
-        [enemyPlayer]: enemyState,
-        log: logAction(
-          state.log, state.turn, state.phase, sourcePlayer,
-          'EFFECT_DEVOLVE',
-          `Kakashi Hatake (106): Discarded top card ${discardedCard.name_fr} from enemy ${newTopCard.name_fr}'s stack.`,
-          'game.log.effect.devolve',
-          { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
-        ),
-      };
-
-      // UPGRADE: copy the discarded card's non-Upgrade instant effect
-      // This is noted for the engine to handle; complex effect copying is deferred
-      // to the EffectEngine resolution layer.
-      if (isUpgrade) {
-        newState = {
-          ...newState,
-          log: logAction(
-            newState.log, newState.turn, newState.phase, sourcePlayer,
-            'EFFECT_COPY',
-            `Kakashi Hatake (106) UPGRADE: Copied non-Upgrade effect of ${discardedCard.name_fr}.`,
-            'game.log.effect.copy',
-            { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
-          ),
-        };
-      }
-
-      return { state: newState };
-    }
-  }
-
-  return { state };
-}
-
 function kakashi106UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
+  // No-op: modifier handled via CONFIRM_MAIN → CONFIRM_UPGRADE_MODIFIER in engine.
   return { state: ctx.state };
 }
 

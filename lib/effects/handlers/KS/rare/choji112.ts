@@ -9,14 +9,14 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Group: Leaf Village, Keywords: Team 10
  *
  * MAIN: Discard a card from your hand. POWERUP X where X is the cost of the discarded card.
- *   - Player chooses which card to discard.
  *
  * UPGRADE: Repeat the MAIN effect (discard a second card and POWERUP again).
- *   - When isUpgrade is true, after the first discard/POWERUP, a second choice is prompted.
+ *
+ * Confirmation popup before discard selection.
  */
 
 function choji112MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
   if (playerState.hand.length === 0) {
@@ -30,25 +30,20 @@ function choji112MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  const handIndices = playerState.hand.map((_, i) => String(i));
-
+  // Confirmation popup
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'CHOJI_CHOOSE_DISCARD',
-    validTargets: handIndices,
-    description: ctx.isUpgrade
-      ? 'Choji Akimichi (112): Choose a card to discard for POWERUP (1st of 2).'
-      : 'Choji Akimichi (112): Choose a card to discard for POWERUP.',
-    descriptionKey: ctx.isUpgrade
-      ? 'game.effect.desc.choji112DiscardUpgrade'
-      : 'game.effect.desc.choji112Discard',
+    targetSelectionType: 'CHOJI112_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Choji Akimichi (112) MAIN: Discard a card from hand. POWERUP X (X = cost).',
+    descriptionKey: 'game.effect.desc.choji112ConfirmMain',
   };
 }
 
 function choji112UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
-  // The EffectEngine's chojiChooseDiscard() creates the second pending when isUpgrade is true.
+  // UPGRADE repeat handled by EffectEngine's CHOJI_CHOOSE_DISCARD case.
   return { state: ctx.state };
 }
 

@@ -3,7 +3,7 @@ RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
 DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 9 (KS-081 a KS-090)
+BATCH ACTUEL: Batch 10 (KS-091 a KS-112)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -539,6 +539,35 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     rasa083ConfirmScore, zabuza087ConfirmMain, zabuza087ConfirmUpgradeModifier,
     haku089ConfirmMain, haku089ConfirmUpgradeModifier
   - Regles R1-R10 respectees
+
+2026-03-11 - Batch 10 (KS-091 a KS-112):
+  - 16 cartes traitees (6 skipped: KS-094, KS-096, KS-097, KS-100, KS-101, KS-103 — continu/pas d'instant)
+  - 6 cartes modifier pattern (UPGRADE "effect:" modifie MAIN):
+    - KS-091 (Itachi UC): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (discard 1 from opp hand)
+    - KS-093 (Kisame UC): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (steal ALL tokens)
+    - KS-106 (Kakashi R): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (copy discarded card effect)
+    - KS-108 (Naruto R): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (POWERUP X after hide)
+    - KS-109 (Sakura R): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (cost -2)
+    - KS-110 (Ino R): CONFIRM_MAIN -> CONFIRM_UPGRADE_MODIFIER (hide after move)
+  - 3 cartes Type B separate UPGRADE:
+    - KS-105 (Jiraiya R): CONFIRM_MAIN (play Summon -3) + CONFIRM_UPGRADE (move enemy)
+    - KS-111 (Shikamaru R): CONFIRM_UPGRADE (hide P<=3 enemy)
+    - KS-112 (Choji R): CONFIRM_MAIN (discard + POWERUP X, UPGRADE repeat in engine)
+  - 1 carte mandatory MAIN + optional UPGRADE:
+    - KS-107 (Sasuke R): MAIN stays mandatory, CONFIRM_UPGRADE popup for POWERUP X
+  - 6 cartes simple CONFIRM:
+    - KS-092 (Kisame C): CONFIRM_AMBUSH (steal tokens, no SKIP on char targeting per Andy)
+    - KS-095 (Gamahiro C): CONFIRM_MAIN (draw 1 card)
+    - KS-098 (Katsuyu C): CONFIRM_MAIN (POWERUP 2 if Tsunade)
+    - KS-099 (Pakkun C): CONFIRM_SCORE (move self)
+    - KS-102 (Manda UC): CONFIRM_AMBUSH (defeat enemy Summon)
+    - KS-104 (Tsunade R): CONFIRM_MAIN (spend chakra for POWERUP)
+  - Andy feedback: KS-092/093 no SKIP on character targeting (isMandatory:true),
+    SKIP stays on token amount selection.
+  - 6 DECLINE handlers in GameEngine.ts for modifier cards
+  - 24 cles i18n ajoutees (EN + FR)
+  - Tests mis a jour: Naruto 108, Ino 110, Kisame 092, Pakkun 099, Baki 081 SCORE
+  - 471 tests passing, build clean
 
 2026-03-11 - Bugfix KS-073 (Kin Tsuchi UC):
   - Fix: MAIN hide effect ciblait seulement "this mission" au lieu de "in play" (toute mission).

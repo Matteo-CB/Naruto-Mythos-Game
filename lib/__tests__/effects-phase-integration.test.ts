@@ -603,7 +603,7 @@ describe('defeatUtils - Normal defeat', () => {
 // SCORE EFFECTS via EffectEngine
 // ===================================================================
 describe('EffectEngine - resolveScoreEffects', () => {
-  it('should trigger character SCORE effects for the winner', () => {
+  it('should trigger character SCORE effects for the winner (returns CONFIRM popup)', () => {
     const baki = mockCharInPlay({ instanceId: 'baki-1' }, {
       id: 'KS-081-C', number: 81, name_fr: 'Baki',
       effects: [{ type: 'SCORE', description: '[↯] Draw a card.' }],
@@ -619,7 +619,8 @@ describe('EffectEngine - resolveScoreEffects', () => {
     };
 
     const result = EffectEngine.resolveScoreEffects(state, 'player1', 0);
-    expect(result.player1.hand.length).toBe(1);
-    expect(result.player1.hand[0].name_fr).toBe('BakiDrawn');
+    // Baki 081 SCORE now returns a CONFIRM popup instead of direct draw
+    const pending = result.pendingEffects?.find((e: any) => e.targetSelectionType === 'BAKI081_CONFIRM_SCORE');
+    expect(pending).toBeTruthy();
   });
 });

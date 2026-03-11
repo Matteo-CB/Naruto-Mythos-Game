@@ -1430,8 +1430,8 @@
       "name_en": "ANKO MITARASHI",
       "name_fr": "ANKO MITARASHI",
       "title_fr": "La Poigne du Serpent Spectral",
-      "title_en": "Shadow Snake Hands",
-      "has_visual": false,
+      "title_en": "Striking Shadow Snake",
+      "has_visual": true,
       "chakra": 3,
       "power": 4,
       "keywords": [
@@ -1448,7 +1448,7 @@
       ],
       "image_url": "",
       "rarity_display": "Uncommon",
-      "image_file": "",
+      "image_file": "images/cards/KS/uncommon/KS-045-UC.webp",
       "data_complete": true,
       "old_id": "045/130"
     },
@@ -3975,8 +3975,8 @@
       "name_en": "JIROBO",
       "name_fr": "JIRÔBÔ",
       "title_fr": "Poing d'Arhat",
-      "title_en": "Arhat Fist",
-      "has_visual": false,
+      "title_en": "Slamming Palm",
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -3998,7 +3998,7 @@
       ],
       "image_url": "",
       "rarity_display": "Rare",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-122-R.webp",
       "data_complete": true,
       "old_id": "122/130"
     },
@@ -4046,8 +4046,8 @@
       "name_en": "KIDOMARU",
       "name_fr": "KIDÔMARU",
       "title_fr": "Arc d'Araignée : Déchirure Féroce",
-      "title_en": "Spider Bow: Fierce Rip",
-      "has_visual": false,
+      "title_en": "Gum Style Spider Thread",
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -4069,7 +4069,7 @@
       ],
       "image_url": "",
       "rarity_display": "Rare",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-124-R.webp",
       "data_complete": true,
       "old_id": "124/130"
     },
@@ -4117,9 +4117,9 @@
       "card_type": "character",
       "name_en": "OROCHIMARU",
       "name_fr": "OROCHIMARU",
-      "title_fr": "Ôtez-vous de mon chemin.",
-      "title_en": "Get out of my way.",
-      "has_visual": false,
+      "title_fr": "Restez hors de mon chemin.",
+      "title_en": "Stay out of my way.",
+      "has_visual": true,
       "chakra": 7,
       "power": 7,
       "keywords": [
@@ -4140,7 +4140,7 @@
       ],
       "image_url": "",
       "rarity_display": "Rare",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-126-R.webp",
       "data_complete": true,
       "old_id": "126/130"
     },
@@ -4152,9 +4152,9 @@
       "card_type": "character",
       "name_en": "Sakon",
       "name_fr": "SAKON",
-      "title_fr": "Le Poing de Pierre",
-      "title_en": "Stone Fist",
-      "has_visual": false,
+      "title_fr": "Barrage de Poings",
+      "title_en": "Fists Barrage",
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -4165,18 +4165,18 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] Each enemy character in this mission has -1 Power.",
-          "description_fr": "[⧗] Chaque personnage ennemi dans cette mission a -1 Power."
+          "description": "[⧗] You can play this character as an upgrade over any Sound Village character.",
+          "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur n'importe quel personnage du Village du Son."
         },
         {
-          "type": "UPGRADE",
-          "description": "Move a friendly character in play to another mission.",
-          "description_fr": "Déplacez un personnage allié en jeu vers une autre mission."
+          "type": "AMBUSH",
+          "description": "Hide an enemy character in this mission with Power 5 or less.",
+          "description_fr": "Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins."
         }
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-127-R.webp",
       "data_complete": true,
       "old_id": "127/130"
     },
@@ -4224,15 +4224,15 @@
       "card_type": "character",
       "name_en": "NINE-TAILS",
       "name_fr": "KYÛBI",
-      "title_fr": "Manteau du Démon Renard",
-      "title_en": "Demon Fox Cloak",
-      "has_visual": false,
+      "title_fr": "Tu ferais mieux de me remercier...",
+      "title_en": "You better be grateful to me...",
+      "has_visual": true,
       "chakra": 7,
       "power": 10,
       "keywords": [
         "Tailed Beast"
       ],
-      "group": "Leaf Village",
+      "group": "Independent",
       "effects": [
         {
           "type": "MAIN",
@@ -4247,7 +4247,7 @@
       ],
       "image_url": "",
       "rarity_display": "Rare",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-129-R.webp",
       "data_complete": true,
       "old_id": "129/130"
     },
@@ -4261,7 +4261,7 @@
       "name_fr": "ICHIBI",
       "title_fr": "J'espère que tu es prêt à mourir !",
       "title_en": "I hope you're ready to die!",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 7,
       "power": 10,
       "keywords": [
@@ -4283,7 +4283,7 @@
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare/KS-130-R.webp",
       "data_complete": true,
       "old_id": "130/130"
     },
@@ -4399,8 +4399,8 @@
       "name_en": "NINE-TAILED FOX",
       "name_fr": "KYÛBI",
       "title_fr": "Destruction",
-      "title_en": "The Beast Awakens",
-      "has_visual": false,
+      "title_en": "Destruction",
+      "has_visual": true,
       "chakra": 8,
       "power": 12,
       "keywords": [
@@ -4419,7 +4419,7 @@
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/secret/KS-134-S.webp",
       "data_complete": true,
       "old_id": "134/130"
     },
@@ -6091,8 +6091,8 @@
       "name_en": "JIROBO",
       "name_fr": "JIRÔBÔ",
       "title_fr": "Poing d'Arhat",
-      "title_en": "Arhat Fist",
-      "has_visual": false,
+      "title_en": "Slamming Palm!",
+      "has_visual": true,
       "chakra": 5,
       "power": 6,
       "keywords": [
@@ -6114,7 +6114,7 @@
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-122-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "122/130 A"
@@ -6164,8 +6164,8 @@
       "name_en": "KIDOMARU",
       "name_fr": "KIDÔMARU",
       "title_fr": "Arc d'Araignée : Déchirure Féroce",
-      "title_en": "Spider Bow: Fierce Rip",
-      "has_visual": false,
+      "title_en": "I trapped you.",
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -6187,7 +6187,7 @@
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-124-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "124/130 A"
@@ -6273,9 +6273,9 @@
       "card_type": "character",
       "name_en": "Sakon",
       "name_fr": "SAKON",
-      "title_fr": "Le Poing de Pierre",
-      "title_en": "Stone Fist",
-      "has_visual": false,
+      "title_fr": "Ne me cherchez pas !",
+      "title_en": "Don't you mess with me!",
+      "has_visual": true,
       "chakra": 5,
       "power": 5,
       "keywords": [
@@ -6286,18 +6286,18 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "[⧗] Each enemy character in this mission has -1 Power.",
-          "description_fr": "[⧗] Chaque personnage ennemi dans cette mission a -1 Power."
+          "description": "[⧗] You can play this character as an upgrade over any Sound Village character.",
+          "description_fr": "[⧗] Vous pouvez jouer ce personnage en tant qu'upgrade sur n'importe quel personnage du Village du Son."
         },
         {
-          "type": "UPGRADE",
-          "description": "Move a friendly character in play to another mission.",
-          "description_fr": "Déplacez un personnage allié en jeu vers une autre mission."
+          "type": "AMBUSH",
+          "description": "Hide an enemy character in this mission with Power 5 or less.",
+          "description_fr": "Cachez un personnage ennemi dans cette mission avec une Puissance de 5 ou moins."
         }
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-127-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "127/130 A"
@@ -6347,15 +6347,15 @@
       "card_type": "character",
       "name_en": "NINE-TAILS",
       "name_fr": "KYÛBI",
-      "title_fr": "Manteau du Démon Renard",
-      "title_en": "Demon Fox Cloak",
-      "has_visual": false,
+      "title_fr": "Tu ferais mieux de me remercier...",
+      "title_en": "You better be grateful to me...",
+      "has_visual": true,
       "chakra": 7,
       "power": 10,
       "keywords": [
         "Tailed Beast"
       ],
-      "group": "Leaf Village",
+      "group": "Independent",
       "effects": [
         {
           "type": "MAIN",
@@ -6370,7 +6370,7 @@
       ],
       "image_url": "",
       "rarity_display": "",
-      "image_file": "",
+      "image_file": "images/cards/KS/rare_art/KS-129-RA.webp",
       "is_rare_art": true,
       "data_complete": true,
       "old_id": "129/130 A"
@@ -6595,7 +6595,7 @@
       "name_fr": "SAKURA HARUNO",
       "title_fr": "Sasuke est en train de me regarder !",
       "title_en": "He's looking... right at me!",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 5,
       "power": 4,
       "keywords": [
@@ -6616,7 +6616,7 @@
       ],
       "image_url": "",
       "rarity_display": "Mythos V",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos_v/KS-135-MV.webp",
       "data_complete": true,
       "old_id": ""
     },
@@ -6630,7 +6630,7 @@
       "name_fr": "SASUKE UCHIWA",
       "title_fr": "Tu m'énerves",
       "title_en": "You're annoying.",
-      "has_visual": false,
+      "has_visual": true,
       "chakra": 7,
       "power": 8,
       "keywords": [
@@ -6652,7 +6652,7 @@
       ],
       "image_url": "",
       "rarity_display": "Mythos V",
-      "image_file": "",
+      "image_file": "images/cards/KS/mythos_v/KS-136-MV.webp",
       "data_complete": true,
       "old_id": ""
     },
@@ -6691,6 +6691,77 @@
       "image_file": "images/cards/KS/mythos_v/KS-104-MV.webp",
       "data_complete": true,
       "old_id": ""
+    },
+    "KS-137-MV": {
+      "id": "KS-137-MV",
+      "rarity": "MV",
+      "number": "137",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "KAKASHI HATAKE",
+      "name_fr": "KAKASHI HATAKE",
+      "title_fr": "Je ne pourrai plus lire Icha Icha Paradis maintenant.",
+      "title_en": "I won't be able to read Make-Out Paradise now.",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "Move this character.",
+          "description_fr": ""
+        },
+        {
+          "type": "MAIN",
+          "description": "Hide an upgraded character in this mission.",
+          "description_fr": ""
+        }
+      ],
+      "image_url": "/images/cards/KS/secret/KS-137-S.webp",
+      "rarity_display": "MV",
+      "image_file": "images/cards/KS/mythos_v/KS-137-MV.webp",
+      "data_complete": true,
+      "old_id": "137/130",
+      "is_rare_art": false
+    },
+    "KS-133_2-MV": {
+      "id": "KS-133_2-MV",
+      "rarity": "MV",
+      "number": "133",
+      "set": "KS",
+      "card_type": "character",
+      "name_en": "NARUTO UZUMAKI",
+      "name_fr": "NARUTO UZUMAKI",
+      "title_fr": "Art Ninja ! Jutsu d'Invocation !",
+      "title_en": "Ninja Art! Summoning Jutsu!",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 7",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "Hide an enemy character with Power 5 or less in this mission and another enemy character with Power 2 or less in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: Instead, defeat both of them."
+        }
+      ],
+      "image_url": "/images/cards/KS/mythos_v/KS-133-MV.webp",
+      "rarity_display": "Mythos V",
+      "image_file": "images/cards/KS/mythos_v/KS-133_2-MV.webp",
+      "data_complete": true,
+      "old_id": "133/130"
     }
   }
 }
