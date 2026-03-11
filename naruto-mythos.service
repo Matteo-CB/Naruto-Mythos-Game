@@ -20,7 +20,8 @@ ExecStart=/usr/bin/docker run \
   -e NEXTAUTH_URL=https://narutomythosgame.com \
   -e NEXT_PUBLIC_SOCKET_URL= \
   naruto-game-app
-ExecStop=/usr/bin/docker stop -t 30 naruto-mythos
+TimeoutStopSec=330
+ExecStop=/usr/bin/docker stop -t 310 naruto-mythos
 ExecStopPost=/usr/bin/docker rm -f naruto-mythos
 
 [Install]
