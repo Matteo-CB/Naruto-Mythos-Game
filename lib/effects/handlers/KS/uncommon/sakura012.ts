@@ -23,68 +23,24 @@ function handleSakura012Main(ctx: EffectContext): EffectResult {
 }
 
 function handleSakura012Upgrade(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
-  let newState = { ...state };
-  const ps = { ...newState[sourcePlayer] };
-
-  // Draw 1 card
-  if (ps.deck.length === 0) {
-    // Cannot draw, effect fizzles (no discard required either since "if you do so")
-    return { state: { ...newState, log: logAction(newState.log, newState.turn, newState.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+  // Check deck is not empty before offering confirmation
+  if (state[sourcePlayer].deck.length === 0) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Sakura Haruno (012): Deck is empty, cannot draw (upgrade effect fizzles).',
       'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-012-UC' }) } };
   }
 
-  const newDeck = [...ps.deck];
-  const drawnCard = newDeck.shift()!;
-  ps.deck = newDeck;
-  ps.hand = [...ps.hand, drawnCard];
-  newState[sourcePlayer] = ps;
-
-  newState = { ...newState, log: logAction(
-    newState.log, newState.turn, newState.phase, sourcePlayer,
-    'EFFECT_DRAW',
-    'Sakura Haruno (012): Drew 1 card (upgrade effect). Must discard 1 card.',
-    'game.log.effect.draw',
-    { card: 'SAKURA HARUNO', id: 'KS-012-UC', count: 1 },
-  ) };
-
-  // Must discard 1 card from hand - requires target selection
-  if (ps.hand.length === 0) {
-    // Shouldn't happen since we just drew, but guard anyway
-    return { state: newState };
-  }
-
-  // Build valid targets: indices of cards in hand (plain numbers for parseInt compatibility)
-  const validTargets = ps.hand.map((_, idx) => String(idx));
-
-  if (validTargets.length === 1) {
-    // Only one card in hand, auto-discard
-    const discardedCard = ps.hand[0];
-    const ps2 = { ...newState[sourcePlayer] };
-    ps2.hand = [];
-    ps2.discardPile = [...ps2.discardPile, discardedCard];
-    newState[sourcePlayer] = ps2;
-
-    newState = { ...newState, log: logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT_DISCARD',
-      `Sakura Haruno (012): Discarded ${discardedCard.name_fr} (upgrade effect).`,
-      'game.log.effect.discard',
-      { card: 'SAKURA HARUNO', id: 'KS-012-UC', target: discardedCard.name_fr },
-    ) };
-
-    return { state: newState };
-  }
-
+  // Confirmation popup before draw+discard
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SAKURA_012_DISCARD',
-    validTargets,
-    description: 'You drew a card. You must discard 1 card from your hand.',
-    descriptionKey: 'game.effect.desc.sakura012Discard',
+    targetSelectionType: 'SAKURA012_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.sakura012ConfirmUpgrade',
   };
 }
 

@@ -17,7 +17,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *   - When triggered as upgrade, the cost filter is removed (any cost is valid).
  */
 function handleKakashi016Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
+  const { state, sourcePlayer, sourceCard, isUpgrade } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -56,16 +56,15 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KAKASHI HATAKE', id: 'KS-016-UC' }) } };
   }
 
-  // Requires target selection: which enemy character's effect to copy
-  const limitStr = isUpgrade ? 'any cost' : 'cost 4 or less';
+  // Confirmation popup before copy target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KAKASHI_COPY_EFFECT',
-    validTargets,
-    description: `Select an enemy character (${limitStr}) to copy their non-upgrade instant effect.`,
-    descriptionKey: 'game.effect.desc.kakashi016CopyEffect',
-    descriptionParams: { costLimit: limitStr },
+    targetSelectionType: 'KAKASHI016_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, isUpgrade }),
+    descriptionKey: 'game.effect.desc.kakashi016ConfirmMain',
   };
 }
 

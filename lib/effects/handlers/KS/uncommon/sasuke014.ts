@@ -16,7 +16,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, isUpgrade } = ctx;
+  const { state, sourcePlayer, sourceCard, isUpgrade } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const opponentHand = state[opponentPlayer].hand;
 
@@ -31,58 +31,15 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Show ALL opponent hand cards
-  const allCards = opponentHand.map((c, i) => ({
-    name_fr: c.name_fr,
-    chakra: c.chakra ?? 0,
-    power: c.power ?? 0,
-    image_file: c.image_file,
-    originalIndex: i,
-  }));
-
-  const newState = {
-    ...state,
-    log: logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT_LOOK_HAND',
-      'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
-      'game.log.effect.sasuke014Reveal',
-      { card: 'SASUKE UCHIWA', id: 'KS-014-UC' },
-    ),
-  };
-
-  // When played as upgrade, the AMBUSH is enhanced: after reveal, chain to discard flow
-  // Use SASUKE014_UPGRADE_HAND_REVEAL to trigger the discard chain
-  if (isUpgrade) {
-    const playerState = state[sourcePlayer];
-    if (playerState.hand.length > 0) {
-      return {
-        state: newState,
-        requiresTargetSelection: true,
-        targetSelectionType: 'SASUKE014_UPGRADE_HAND_REVEAL',
-        validTargets: ['confirm'],
-        description: JSON.stringify({
-          text: 'Sasuke (014) UPGRADE: Opponent\'s hand revealed.',
-          cards: allCards,
-          isUpgrade: true,
-        }),
-        descriptionKey: 'game.effect.desc.sasuke014UpgradeReveal',
-        isMandatory: true,
-      };
-    }
-  }
-
+  // Confirmation popup before revealing hand
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE014_HAND_REVEAL',
-    validTargets: ['confirm'],
-    description: JSON.stringify({
-      text: 'Sasuke (014): Opponent\'s hand revealed.',
-      cards: allCards,
-    }),
-    descriptionKey: 'game.effect.desc.sasuke014Reveal',
-    isMandatory: true,
+    targetSelectionType: 'SASUKE014_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId, isUpgrade }),
+    descriptionKey: 'game.effect.desc.sasuke014ConfirmAmbush',
   };
 }
 

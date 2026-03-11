@@ -296,8 +296,10 @@ describe('019/130 - Ino Yamanaka', () => {
 
     const handler = getEffectHandler('KS-019-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ino, 0));
-    const updatedIno = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ino-1');
-    expect(updatedIno?.powerTokens).toBe(1);
+    // Now returns a CONFIRM popup instead of applying POWERUP directly
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('INO019_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('ino-1');
   });
 
   it('should not POWERUP when no Team 10 ally present', () => {

@@ -11,36 +11,18 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * Adds 3 power tokens to this character (self).
  */
 function handleChoji017Main(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
-  // POWERUP 3 on self
-  const missions = [...state.activeMissions];
-  const mission = { ...missions[sourceMissionIndex] };
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const chars = [...mission[friendlySide]];
-  const idx = chars.findIndex(c => c.instanceId === sourceCard.instanceId);
-
-  if (idx !== -1) {
-    chars[idx] = { ...chars[idx], powerTokens: chars[idx].powerTokens + 3 };
-    mission[friendlySide] = chars;
-    missions[sourceMissionIndex] = mission;
-
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      sourcePlayer,
-      'EFFECT_POWERUP',
-      'Choji Akimichi (017): POWERUP 3 on self.',
-      'game.log.effect.powerupSelf',
-      { card: 'CHOJI AKIMICHI', id: 'KS-017-C', amount: 3 },
-    );
-
-    return { state: { ...state, activeMissions: missions, log } };
-  }
-
-  return { state };
+  // Confirmation popup before applying POWERUP 3
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'CHOJI017_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.choji017ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {

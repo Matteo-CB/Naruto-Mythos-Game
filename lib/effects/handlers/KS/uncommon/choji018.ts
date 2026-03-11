@@ -70,15 +70,15 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // Always require target selection so the player can skip (effect is optional per the rules)
-  // Post-move hide will be handled in EffectEngine's CHOJI_018_MOVE_SELF case
+  // Confirmation popup before move
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'CHOJI_018_MOVE_SELF',
-    validTargets,
-    description: 'Select a mission to move Choji Akimichi to (upgrade effect).',
-    descriptionKey: 'game.effect.desc.choji018MoveSelf',
+    targetSelectionType: 'CHOJI018_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.choji018ConfirmUpgrade',
   };
 }
 
@@ -134,12 +134,13 @@ export function postMoveHide(
     return { state: newState };
   }
 
-  // Multiple targets: player chooses
+  // Multiple targets: player chooses (mandatory — continuous effect)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'CHOJI018_HIDE_ENEMY',
     validTargets: hideTargets,
+    isMandatory: true,
     description: 'Choji Akimichi (018): Choose an enemy character with less Power to hide.',
     descriptionKey: 'game.effect.desc.choji018HideEnemy',
   };
