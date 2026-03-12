@@ -562,6 +562,7 @@
         "choji018HideEnemy": "Choose an enemy character with less Power to hide.",
         "gaara120ConfirmMain": "MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.",
         "gaara120ChooseDefeat": "Choose an enemy character with Power 1 or less to defeat in mission {mission}.",
+        "gaara120ConfirmUpgrade": "UPGRADE: POWERUP {count} on Gaara.",
         "dosu069LookAtHidden": "Select a hidden character in play to look at.",
         "dosu069ForceRevealOrDefeat": "Choose a hidden enemy character in this mission. Opponent must either play them paying 2 more, or defeat them.",
         "dosu069OpponentChoice": "Your hidden character was targeted. Click to play it (pay {cost} chakra) or skip to let it be defeated.",

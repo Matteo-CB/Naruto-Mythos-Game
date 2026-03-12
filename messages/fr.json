@@ -562,6 +562,7 @@
         "choji018HideEnemy": "Choisissez un personnage ennemi avec moins de Puissance a cacher.",
         "gaara120ConfirmMain": "MAIN : Vaincre jusqu'a 1 personnage ennemi avec Puissance 1 ou moins dans chaque mission.",
         "gaara120ChooseDefeat": "Choisissez un personnage ennemi avec Puissance 1 ou moins a vaincre dans la mission {mission}.",
+        "gaara120ConfirmUpgrade": "UPGRADE : POWERUP {count} sur Gaara.",
         "dosu069LookAtHidden": "Selectionnez un personnage cache en jeu a regarder.",
         "dosu069ForceRevealOrDefeat": "Choisissez un personnage ennemi cache dans cette mission. L'adversaire doit soit le jouer en payant 2 de plus, soit le vaincre.",
         "dosu069OpponentChoice": "Votre personnage cache a ete cible. Cliquez pour le jouer (payer {cost} chakra) ou passez pour le laisser se faire vaincre.",

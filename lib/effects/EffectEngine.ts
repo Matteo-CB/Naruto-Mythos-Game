@@ -7623,7 +7623,7 @@ export class EffectEngine {
             sourceMissionIndex: k119MI, effectType: pendingEffect.effectType,
             effectDescription: '', targetSelectionType: 'KANKURO119_DEFEAT_TARGET',
             sourcePlayer: k119Player, requiresTargetSelection: true,
-            validTargets: k119Targets, isOptional: true, isMandatory: false,
+            validTargets: k119Targets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -7652,7 +7652,6 @@ export class EffectEngine {
         for (let i = 0; i < newState.activeMissions.length; i++) {
           const mission = newState.activeMissions[i];
           for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
-            if (char.isHidden) continue;
             const charOwner = char.controlledBy ?? (mission.player1Characters.includes(char) ? 'player1' : 'player2');
             if (isMovementBlockedByKurenai(newState, i, charOwner as PlayerID)) continue;
             // Check at least one valid destination
@@ -7682,8 +7681,9 @@ export class EffectEngine {
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
             effectDescription: '', targetSelectionType: 'KANKURO119_MOVE_CHARACTER',
             sourcePlayer: k119uPlayer, requiresTargetSelection: true,
-            validTargets: k119uTargets, isOptional: true, isMandatory: false,
+            validTargets: k119uTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
             id: k119uActId, type: 'SELECT_TARGET' as PendingAction['type'],
@@ -7693,6 +7693,7 @@ export class EffectEngine {
             options: k119uTargets, minSelections: 1, maxSelections: 1,
             sourceEffectId: k119uEffId,
           });
+          pendingEffect.remainingEffectTypes = undefined;
         }
         break;
       }
@@ -7922,7 +7923,7 @@ export class EffectEngine {
             }),
             targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
             sourcePlayer: g120Player, requiresTargetSelection: true,
-            validTargets: g120FirstTargets, isOptional: true, isMandatory: false,
+            validTargets: g120FirstTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -12175,26 +12176,70 @@ export class EffectEngine {
           break;
         }
 
-        // If no more chained selections, apply UPGRADE powerup
+        // If no more chained selections, show UPGRADE CONFIRM popup
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
-          const friendlySide_g: 'player1Characters' | 'player2Characters' =
-            pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-          const upgMission = { ...newState.activeMissions[gaaraDesc.sourceMissionIndex] };
-          const upgChars = [...upgMission[friendlySide_g]];
-          const selfIdx_g = upgChars.findIndex((c: CharacterInPlay) => c.instanceId === gaaraDesc.sourceInstanceId);
-          if (selfIdx_g !== -1) {
-            upgChars[selfIdx_g] = { ...upgChars[selfIdx_g], powerTokens: upgChars[selfIdx_g].powerTokens + defeatedCount_g };
-            upgMission[friendlySide_g] = upgChars;
-            const missions_g = [...newState.activeMissions];
-            missions_g[gaaraDesc.sourceMissionIndex] = upgMission;
-            newState = { ...newState, activeMissions: missions_g };
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-              'EFFECT_POWERUP',
-              `Gaara (120): POWERUP ${defeatedCount_g} (upgrade).`,
-              'game.log.effect.powerupSelf',
-              { card: 'GAARA', id: 'KS-120-R', amount: defeatedCount_g },
-            );
+          const g120uEffId = generateInstanceId();
+          const g120uActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: g120uEffId,
+            sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: gaaraDesc.sourceInstanceId,
+            sourceMissionIndex: gaaraDesc.sourceMissionIndex ?? pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE' as EffectType,
+            effectDescription: JSON.stringify({ defeatedCount: defeatedCount_g }),
+            targetSelectionType: 'GAARA120_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer,
+            requiresTargetSelection: true,
+            validTargets: [gaaraDesc.sourceInstanceId],
+            isOptional: true,
+            isMandatory: false,
+            resolved: false,
+            isUpgrade: true,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: g120uActId,
+            type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Gaara (120) UPGRADE: POWERUP ${defeatedCount_g}?`,
+            descriptionKey: 'game.effect.desc.gaara120ConfirmUpgrade',
+            descriptionParams: { count: String(defeatedCount_g) },
+            options: [gaaraDesc.sourceInstanceId],
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: g120uEffId,
+          }];
+        }
+        break;
+      }
+
+      case 'GAARA120_CONFIRM_UPGRADE': {
+        // Apply POWERUP X on self (Gaara 120 UPGRADE effect)
+        let g120uDesc: { defeatedCount?: number } = {};
+        try { g120uDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const g120uCount = g120uDesc.defeatedCount ?? 0;
+        if (g120uCount > 0 && pendingEffect.sourceInstanceId) {
+          const g120uPlayer = pendingEffect.sourcePlayer;
+          const g120uFriendlySide: 'player1Characters' | 'player2Characters' =
+            g120uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+          const g120uMI = pendingEffect.sourceMissionIndex;
+          if (g120uMI != null && newState.activeMissions[g120uMI]) {
+            const g120uMission = { ...newState.activeMissions[g120uMI] };
+            const g120uChars = [...g120uMission[g120uFriendlySide]];
+            const g120uIdx = g120uChars.findIndex((c: CharacterInPlay) => c.instanceId === pendingEffect.sourceInstanceId);
+            if (g120uIdx !== -1) {
+              g120uChars[g120uIdx] = { ...g120uChars[g120uIdx], powerTokens: g120uChars[g120uIdx].powerTokens + g120uCount };
+              g120uMission[g120uFriendlySide] = g120uChars;
+              const g120uMissions = [...newState.activeMissions];
+              g120uMissions[g120uMI] = g120uMission;
+              newState = { ...newState, activeMissions: g120uMissions };
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, g120uPlayer,
+                'EFFECT_POWERUP',
+                `Gaara (120): POWERUP ${g120uCount} (upgrade).`,
+                'game.log.effect.powerupSelf',
+                { card: 'GAARA', id: 'KS-120-R', amount: g120uCount },
+              );
+            }
           }
         }
         break;
