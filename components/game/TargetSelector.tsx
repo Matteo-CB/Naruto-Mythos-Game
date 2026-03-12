@@ -51,13 +51,13 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         height: dims.targetCard.h + 'px',
         borderRadius: '5px',
         border: isValidTarget
-          ? '2px solid rgba(90, 160, 255, 0.9)'
+          ? '2px solid rgba(196, 163, 90, 0.9)'
           : '1px solid #262626',
         overflow: 'hidden',
         cursor: isValidTarget ? 'pointer' : 'default',
         opacity: isValidTarget ? 1 : 0.35,
         boxShadow: isValidTarget
-          ? '0 0 14px rgba(90, 160, 255, 0.4)'
+          ? '0 0 14px rgba(196, 163, 90, 0.4)'
           : 'none',
       }}
     >
@@ -66,14 +66,14 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         <motion.div
           className="absolute inset-0 rounded"
           style={{
-            border: '2px solid rgba(90, 160, 255, 0.9)',
+            border: '2px solid rgba(196, 163, 90, 0.9)',
             pointerEvents: 'none',
           }}
           animate={{
             boxShadow: [
-              '0 0 8px rgba(90, 160, 255, 0.3)',
-              '0 0 18px rgba(90, 160, 255, 0.6)',
-              '0 0 8px rgba(90, 160, 255, 0.3)',
+              '0 0 8px rgba(196, 163, 90, 0.3)',
+              '0 0 18px rgba(196, 163, 90, 0.6)',
+              '0 0 8px rgba(196, 163, 90, 0.3)',
             ],
           }}
           transition={{ repeat: Infinity, duration: 1.2 }}
@@ -231,8 +231,8 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         minWidth: '120px',
         cursor: isMissionTarget ? 'pointer' : 'default',
         borderRadius: '8px',
-        border: isMissionTarget ? '2px solid rgba(90, 160, 255, 0.9)' : '2px solid transparent',
-        boxShadow: isMissionTarget ? '0 0 14px rgba(90, 160, 255, 0.4)' : 'none',
+        border: isMissionTarget ? '2px solid rgba(196, 163, 90, 0.9)' : '2px solid transparent',
+        boxShadow: isMissionTarget ? '0 0 14px rgba(196, 163, 90, 0.4)' : 'none',
         padding: '8px',
       }}
     >
@@ -409,8 +409,8 @@ export function TargetSelector() {
               className="absolute inset-0 rounded-md overflow-hidden"
               style={{
                 borderRadius: '6px',
-                border: '2px solid rgba(90, 160, 255, 0.9)',
-                boxShadow: '0 0 18px rgba(90, 160, 255, 0.5)',
+                border: '2px solid rgba(196, 163, 90, 0.9)',
+                boxShadow: '0 0 18px rgba(196, 163, 90, 0.5)',
               }}
             >
               <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
@@ -696,7 +696,7 @@ export function TargetSelector() {
               const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
               const isSelectable = card.isSummon || card.isMatch;
               const isSelected = multiSelectChoices.has(String(idx));
-              const borderColor = isSelected ? '#4aff6b' : isSelectable ? 'rgba(90, 160, 255, 0.9)' : '#555555';
+              const borderColor = isSelected ? '#4aff6b' : isSelectable ? 'rgba(196, 163, 90, 0.9)' : '#555555';
               return (
                 <motion.div
                   key={idx}
@@ -1219,7 +1219,7 @@ export function TargetSelector() {
   }
 
   // ---- Generic CONFIRM popup for missions and character CONFIRMs ----
-  if (pendingTargetSelection.selectionType?.includes('_CONFIRM_')) {
+  if (pendingTargetSelection.selectionType === 'EFFECT_CONFIRM') {
     const confirmTarget = validTargets[0];
     let confirmImage: string | null = null;
     let confirmName = '';
