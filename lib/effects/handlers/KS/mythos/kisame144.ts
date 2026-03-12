@@ -14,12 +14,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function kisame144MainHandler(ctx: EffectContext): EffectResult {
-  const state = { ...ctx.state };
+  const state = ctx.state;
   const opponentId = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
-  const opponentState = { ...state[opponentId] };
-  const playerState = { ...state[ctx.sourcePlayer] };
 
-  if (opponentState.chakra <= 0) {
+  if (state[opponentId].chakra <= 0) {
     const log = logAction(
       state.log,
       state.turn,
@@ -33,28 +31,14 @@ function kisame144MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Steal 1 chakra
-  opponentState.chakra -= 1;
-  playerState.chakra += 1;
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'EFFECT_STEAL_CHAKRA',
-    `Kisame Hoshigaki (144): Stole 1 Chakra from opponent. Player: ${playerState.chakra}, Opponent: ${opponentState.chakra}.`,
-    'game.log.effect.stealChakra',
-    { card: 'KISAME HOSHIGAKI', id: 'KS-144-M', amount: 1 },
-  );
-
+  // Return CONFIRM popup first — EffectEngine will handle the actual steal
   return {
-    state: {
-      ...state,
-      [ctx.sourcePlayer]: playerState,
-      [opponentId]: opponentState,
-      log,
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KISAME144_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ opponentChakra: state[opponentId].chakra }),
+    descriptionKey: 'game.effect.desc.kisame144ConfirmMain',
   };
 }
 

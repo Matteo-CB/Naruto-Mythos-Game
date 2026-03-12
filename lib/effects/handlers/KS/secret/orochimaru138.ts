@@ -34,10 +34,8 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
 
   // Find the previous card in the stack (the one being upgraded over)
-  // The sourceCard's stack contains all cards; the second-to-last is the previous top
   const stack = ctx.sourceCard.stack;
   if (stack.length < 2) {
-    // No previous card in stack (shouldn't happen during upgrade, but guard)
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
@@ -48,41 +46,29 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // The previous top card is at index stack.length - 2
   const previousCard = stack[stack.length - 2];
 
-  if (previousCard.power >= 6) {
-    // Gain 2 mission points
-    const playerState = { ...state[ctx.sourcePlayer] };
-    playerState.missionPoints += 2;
-
+  if (previousCard.power < 6) {
+    // Previous card had Power < 6, no bonus
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
-      'EFFECT_SCORE',
-      `Orochimaru (138): Gained 2 Mission points (upgraded over ${previousCard.name_fr} with Power ${previousCard.power}).`,
-      'game.log.effect.gainPoints',
-      { card: 'OROCHIMARU', id: 'KS-138-S', points: 2, target: previousCard.name_fr },
+      'EFFECT_NO_TARGET',
+      `Orochimaru (138): Upgraded character ${previousCard.name_fr} had Power ${previousCard.power} (less than 6), no bonus points.`,
+      'game.log.effect.noTarget',
+      { card: 'OROCHIMARU', id: 'KS-138-S' },
     );
-
-    return {
-      state: {
-        ...state,
-        [ctx.sourcePlayer]: playerState,
-        log,
-      },
-    };
+    return { state: { ...state, log } };
   }
 
-  // Previous card had Power < 6, no bonus
-  const log = logAction(
-    state.log, state.turn, state.phase, ctx.sourcePlayer,
-    'EFFECT_NO_TARGET',
-    `Orochimaru (138): Upgraded character ${previousCard.name_fr} had Power ${previousCard.power} (less than 6), no bonus points.`,
-    'game.log.effect.noTarget',
-    { card: 'OROCHIMARU', id: 'KS-138-S' },
-  );
-
-  return { state: { ...state, log } };
+  // Previous card has Power >= 6, return CONFIRM popup
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'OROCHIMARU138_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ previousCardName: previousCard.name_fr, previousCardPower: previousCard.power }),
+    descriptionKey: 'game.effect.desc.orochimaru138ConfirmUpgrade',
+  };
 }
 
 export function registerOrochimaru138Handlers(): void {

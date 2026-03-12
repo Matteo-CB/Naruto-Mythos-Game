@@ -31,14 +31,14 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // "If you do" = optional. Always show target selection so player can skip.
+  // Return CONFIRM popup first — EffectEngine will handle the actual discard selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'NARUTO141_CHOOSE_DISCARD',
-    validTargets: playerState.hand.map((_, i) => String(i)),
-    description: 'Naruto Uzumaki (141): Choose a card from your hand to discard to hide an enemy.',
-    descriptionKey: 'game.effect.desc.naruto141Discard',
+    targetSelectionType: 'NARUTO141_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ handSize: playerState.hand.length }),
+    descriptionKey: 'game.effect.desc.naruto141ConfirmMain',
   };
 }
 

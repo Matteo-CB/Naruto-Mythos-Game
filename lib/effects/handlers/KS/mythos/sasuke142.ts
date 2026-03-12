@@ -32,14 +32,14 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // "If you do" = optional. Always show target selection so player can skip.
+  // Return CONFIRM popup first — EffectEngine will handle the actual discard selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE142_CHOOSE_DISCARD',
-    validTargets: playerState.hand.map((_, i) => String(i)),
-    description: 'Sasuke Uchiwa (142): Choose a card from your hand to discard for POWERUP.',
-    descriptionKey: 'game.effect.desc.sasuke142Discard',
+    targetSelectionType: 'SASUKE142_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ handSize: playerState.hand.length }),
+    descriptionKey: 'game.effect.desc.sasuke142ConfirmMain',
   };
 }
 

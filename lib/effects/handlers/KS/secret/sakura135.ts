@@ -1,7 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 
 /**
  * Card 135/130 - SAKURA HARUNO "Corps Medical du Village de la Feuille" (S)
@@ -24,7 +23,6 @@ import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeChec
 function sakura135MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
-  const costReduction = ctx.isUpgrade ? 4 : 0;
 
   if (playerState.deck.length === 0) {
     const log = logAction(
@@ -37,70 +35,17 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Draw top 3 cards from deck
-  const newState = { ...state };
-  const ps = { ...newState[sourcePlayer] };
-  const deck = [...ps.deck];
-  const topCards = deck.splice(0, Math.min(3, deck.length));
-  ps.deck = deck;
-  newState[sourcePlayer] = ps;
-
-  // Find character cards among them that the player can afford (fresh play OR upgrade)
-  const validIndices: string[] = [];
-  for (let i = 0; i < topCards.length; i++) {
-    if (topCards[i].card_type === 'character') {
-      const freshCost = Math.max(0, topCards[i].chakra - costReduction);
-      const canFresh = ps.chakra >= freshCost;
-      const canUpgrade = canAffordAsUpgrade(newState, sourcePlayer, topCards[i] as { name_fr: string; chakra: number }, costReduction);
-      if (canFresh || canUpgrade) {
-        validIndices.push(String(i));
-      }
-    }
-  }
-
-  if (validIndices.length === 0) {
-    // No affordable character cards - discard all
-    ps.discardPile = [...ps.discardPile, ...topCards];
-    newState[sourcePlayer] = ps;
-    const log = logAction(
-      newState.log, newState.turn, newState.phase, sourcePlayer,
-      'EFFECT_DISCARD',
-      `Sakura Haruno (135): No affordable character in top ${topCards.length} cards, all discarded.`,
-      'game.log.effect.discardCards',
-      { card: 'SAKURA HARUNO', id: 'KS-135-S', count: topCards.length },
-    );
-    return { state: { ...newState, log } };
-  }
-
-  // Store the drawn cards in the discard pile temporarily so the EffectEngine
-  // can recover them in the resolution stage. They are appended at the END of
-  // the discard pile, and the EffectEngine will splice them back out.
-  const cardInfo = topCards.map((c, i) => ({
-    index: i,
-    name: c.name_fr,
-    chakra: c.chakra,
-    power: c.card_type === 'character' ? c.power : 0,
-    isCharacter: c.card_type === 'character',
-  }));
-
-  ps.discardPile = [...ps.discardPile, ...topCards];
-  newState[sourcePlayer] = ps;
-
+  // Return CONFIRM popup instead of drawing cards and showing selection
+  // The deck draw and card selection will happen in the EffectEngine CONFIRM case
   return {
-    state: newState,
+    state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SAKURA135_CHOOSE_CARD',
-    validTargets: validIndices,
-    description: JSON.stringify({
-      text: ctx.isUpgrade
-        ? 'Sakura Haruno (135): Choose a character from the top cards to play (paying 4 less).'
-        : 'Sakura Haruno (135): Choose a character from the top cards to play.',
-      topCards: cardInfo,
-      costReduction,
-    }),
+    targetSelectionType: 'SAKURA135_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ costReduction: ctx.isUpgrade ? 4 : 0 }),
     descriptionKey: ctx.isUpgrade
-      ? 'game.effect.desc.sakura135ChooseCardUpgrade'
-      : 'game.effect.desc.sakura135ChooseCard',
+      ? 'game.effect.desc.sakura135ConfirmMainUpgrade'
+      : 'game.effect.desc.sakura135ConfirmMain',
   };
 }
 

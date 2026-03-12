@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
@@ -23,20 +22,17 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  */
 
 function kakashi148MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
+  const state = ctx.state;
 
-  // Gain the Edge token
-  state = { ...state, edgeHolder: ctx.sourcePlayer };
-
-  const log = logAction(
-    state.log, state.turn, state.phase, ctx.sourcePlayer,
-    'EFFECT_EDGE',
-    'Kakashi Hatake (148): Gained the Edge token.',
-    'game.log.effect.gainEdge',
-    { card: 'KAKASHI HATAKE', id: 'KS-148-M' },
-  );
-
-  return { state: { ...state, log } };
+  // Return CONFIRM popup first — EffectEngine will handle the actual edge gain
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KAKASHI148_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ sourceMissionIndex: ctx.sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kakashi148ConfirmMain',
+  };
 }
 
 function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
@@ -84,13 +80,14 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Return CONFIRM popup first — EffectEngine will handle the actual copy target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KAKASHI148_COPY_EFFECT',
-    validTargets,
-    description: 'Kakashi Hatake (148): Choose a friendly Team 7 character whose instant effect to copy.',
-    descriptionKey: 'game.effect.desc.kakashi148CopyEffect',
+    targetSelectionType: 'KAKASHI148_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ team7Count: validTargets.length }),
+    descriptionKey: 'game.effect.desc.kakashi148ConfirmAmbush',
   };
 }
 

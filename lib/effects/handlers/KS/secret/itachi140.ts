@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 
 /**
  * Card 140/130 - ITACHI UCHIWA "Tsukuyomi" (S)
@@ -27,10 +25,10 @@ import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
  */
 
 function itachi140MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
+  const state = ctx.state;
 
   const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
-  const opponentState = { ...state[opponentPlayer] };
+  const opponentState = state[opponentPlayer];
 
   const handSize = opponentState.hand.length;
 
@@ -45,106 +43,19 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget',
       { card: 'ITACHI UCHIWA', id: 'KS-140-S' },
     );
-
-    // Even with 0 discards, the upgrade cannot trigger meaningfully (X=0 means cost <= 0)
-    if (ctx.isUpgrade) {
-      return { state: { ...state, log } };
-    }
     return { state: { ...state, log } };
   }
 
-  // Move all cards from opponent's hand to their discard pile
-  const discardedCards = [...opponentState.hand];
-  opponentState.discardPile = [...opponentState.discardPile, ...discardedCards];
-  opponentState.hand = [];
-
-  state = {
-    ...state,
-    [opponentPlayer]: opponentState,
-    log: logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_DISCARD',
-      `Itachi Uchiwa (140): Opponent discarded ${handSize} card(s) from hand.`,
-      'game.log.effect.opponentDiscard',
-      { card: 'ITACHI UCHIWA', id: 'KS-140-S', amount: handSize },
-    ),
+  // Return CONFIRM popup instead of auto-applying discard+draw
+  // The actual discard+draw logic will be executed by the EffectEngine
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'ITACHI140_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ isUpgrade: ctx.isUpgrade }),
+    descriptionKey: 'game.effect.desc.itachi140ConfirmMain',
   };
-
-  // Draw that many cards from opponent's deck
-  const updatedOpponent = { ...state[opponentPlayer] };
-  const deck = [...updatedOpponent.deck];
-  const drawCount = Math.min(handSize, deck.length);
-  const drawnCards = deck.splice(0, drawCount);
-  updatedOpponent.deck = deck;
-  updatedOpponent.hand = [...updatedOpponent.hand, ...drawnCards];
-
-  state = {
-    ...state,
-    [opponentPlayer]: updatedOpponent,
-    log: logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'EFFECT_DRAW',
-      `Itachi Uchiwa (140): Opponent drew ${drawCount} card(s) (replaced discarded hand).`,
-      'game.log.effect.opponentDraw',
-      { card: 'ITACHI UCHIWA', id: 'KS-140-S', amount: drawCount },
-    ),
-  };
-
-  // UPGRADE: Defeat a character in play with cost X or less (friend or foe, excluding self)
-  if (ctx.isUpgrade) {
-    const x = handSize; // Number of cards discarded
-
-    // Find ALL characters in play with cost <= X (hidden = cost 0 when targeted by enemy effects)
-    const validTargets: { char: CharacterInPlay; missionIndex: number }[] = [];
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      for (const side of ['player1Characters', 'player2Characters'] as const) {
-        for (const char of state.activeMissions[i][side]) {
-          if (char.instanceId === ctx.sourceCard.instanceId) continue; // exclude self
-          const isEnemy = (side === 'player1Characters') !== (ctx.sourcePlayer === 'player1');
-          // Hidden characters have cost 0 when targeted by enemy effects
-          const topCard = (char.isHidden && isEnemy) ? { chakra: 0 } : (char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card);
-          if (topCard.chakra <= x) {
-            validTargets.push({ char, missionIndex: i });
-          }
-        }
-      }
-    }
-
-    if (validTargets.length === 0) {
-      state = {
-        ...state,
-        log: logAction(
-          state.log,
-          state.turn,
-          state.phase,
-          ctx.sourcePlayer,
-          'EFFECT_NO_TARGET',
-          `Itachi Uchiwa (140): No character with cost ${x} or less to defeat (upgrade).`,
-          'game.log.effect.noTarget',
-          { card: 'ITACHI UCHIWA', id: 'KS-140-S' },
-        ),
-      };
-      return { state };
-    }
-
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'DEFEAT_BY_COST_UPGRADE',
-      validTargets: validTargets.map((t) => t.char.instanceId),
-      description: `Itachi Uchiwa (140): Select a character with cost ${x} or less to defeat (upgrade).`,
-      descriptionKey: 'game.effect.desc.itachi140DefeatByCost',
-      descriptionParams: { cost: x },
-    };
-  }
-
-  return { state };
 }
 
 function itachi140UpgradeHandler(ctx: EffectContext): EffectResult {
