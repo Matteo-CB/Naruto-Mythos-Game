@@ -795,4 +795,31 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
     This prevents processRemainingEffects from firing at BOTH the move step AND the
     destination step (double-trigger bug).
 
+2026-03-12 - KS-119 SKIP Fixes + White Highlight Rework (Andy feedback):
+  BUGS FOUND & FIXED:
+
+  33. KS-119 (Kankuro R) MAIN - Missing SKIP on defeat target selection:
+      - KANKURO119_DEFEAT_TARGET child had isOptional: false, isMandatory: true
+      - Per Andy: defeat target selection should have SKIP (same as KS-082, KS-073 pattern)
+      - Fix: isOptional: true, isMandatory: false (EffectEngine)
+
+  34. KS-119 (Kankuro R) UPGRADE - Missing SKIP on character selection (move pattern):
+      - KANKURO119_MOVE_CHARACTER child had isOptional: false, isMandatory: true
+      - Per Andy: move effects have 2 SKIPs (CONFIRM + character selection), destination mandatory
+      - The 3 move rules: 1) CONFIRM=SKIP, 2) character selection=SKIP, 3) destination=MANDATORY
+      - Fix: isOptional: true, isMandatory: false on MOVE_CHARACTER (EffectEngine)
+      - MOVE_CHARACTER_DESTINATION remains isOptional: false, isMandatory: true (correct)
+
+  35. White Highlight Rework:
+      - Problem 1: tracked ALL cards played this turn (appended to array) instead of 1
+      - Problem 2: only showed opponent's last-played cards (not visible to card owner)
+      - Problem 3: showed current turn's cards instead of previous turn's last card
+      - Fix: types.ts: lastPlayedInstanceIds changed from string[] to string|null per player,
+        added previousTurnLastPlayed field
+      - Fix: ActionPhase.ts trackLastPlayed: replace instead of append (only keep latest)
+      - Fix: StartPhase.ts: snapshot lastPlayedInstanceIds to previousTurnLastPlayed before reset
+      - Fix: GameEngine.ts getVisibleState: use previousTurnLastPlayed for BOTH players
+      - Fix: MissionLane.tsx: removed !isOwn filter (highlight visible to both sides)
+      - Result: 1 white highlight per player, showing last card from previous turn, visible to all
+
 ================================================================================

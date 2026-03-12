@@ -710,12 +710,12 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
  * Only used for direct player actions (not effect-spawned plays).
  */
 function trackLastPlayed(state: GameState, player: PlayerID, instanceId: string): GameState {
-  const current = state.lastPlayedInstanceIds ?? { player1: [], player2: [] };
+  const current = state.lastPlayedInstanceIds ?? { player1: null, player2: null };
   return {
     ...state,
     lastPlayedInstanceIds: {
       ...current,
-      [player]: [...current[player], instanceId],
+      [player]: instanceId,  // Replace, not append — only keep the last card
     },
   };
 }

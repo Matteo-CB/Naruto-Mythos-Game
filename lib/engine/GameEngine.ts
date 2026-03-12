@@ -1295,9 +1295,11 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Collect opponent's last-played instanceIds for highlight
-    const lastPlayed = state.lastPlayedInstanceIds ?? { player1: [], player2: [] };
-    const opponentLastPlayedSet = new Set(lastPlayed[otherPlayer]);
+    // Collect previous turn's last-played instanceIds for highlight (both players)
+    const prevPlayed = state.previousTurnLastPlayed ?? { player1: null, player2: null };
+    const lastPlayedIds = new Set<string>();
+    if (prevPlayed.player1) lastPlayedIds.add(prevPlayed.player1);
+    if (prevPlayed.player2) lastPlayedIds.add(prevPlayed.player2);
 
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,
@@ -1334,7 +1336,7 @@ export class GameEngine {
             missionIndex: c.missionIndex,
             stackSize: c.stack.length,
             effectivePower: power,
-            isLastPlayed: opponentLastPlayedSet.has(c.instanceId),
+            isLastPlayed: lastPlayedIds.has(c.instanceId),
           };
         });
 
