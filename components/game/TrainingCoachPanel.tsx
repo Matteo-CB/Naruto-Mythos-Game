@@ -1,22 +1,15 @@
 'use client';
 
 /**
- * TrainingCoachPanel - Panneau de coaching en temps réel.
+ * TrainingCoachPanel - Real-time coaching panel.
  *
- * Affiché UNIQUEMENT en mode Entraînement (isTrainingMode = true).
- * Se place en overlay latéral sur le plateau de jeu.
- *
- * Contenu :
- *  - Indicateur de qualité du dernier coup (Excellent / Erreur / etc.)
- *  - Barre de probabilité de victoire (animée)
- *  - Statut par mission (domination / gagné / égalité / perdu)
- *  - Meilleure action recommandée
- *  - Notes des cartes en main (0-10)
- *  - Avertissements et conseils
+ * Shown ONLY in Training mode (isTrainingMode = true).
+ * Positioned as a side overlay on the game board.
  */
 
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import {
   useTrainingStore,
@@ -31,6 +24,7 @@ import { FeatureExtractor } from '@/lib/ai/neural/FeatureExtractor';
 import { NeuralEvaluator } from '@/lib/ai/neural/NeuralEvaluator';
 import { NeuralISMCTS } from '@/lib/ai/neural/NeuralISMCTS';
 import { GameEngine } from '@/lib/engine/GameEngine';
+import { getCardName } from '@/lib/utils/cardLocale';
 import type { CoachAdvice, MissionCoachAnalysis } from '@/lib/ai/coaching/CoachTypes';
 import type { GameState } from '@/lib/engine/types';
 
@@ -64,13 +58,15 @@ function estimateWinProbability(state: GameState, player: 'player1'): number {
 
 // ─── Build quick coach advice without full ISMCTS ────────────────────────────
 
-function buildQuickAdvice(state: GameState): CoachAdvice {
+type TranslateFn = (key: string, params?: Record<string, string | number>) => string;
+
+function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): CoachAdvice {
   const player = 'player1';
-  const opponent = 'player2';
   const sanitized = AIPlayer.sanitizeStateForAI(state, player);
   const validActions = GameEngine.getValidActions(sanitized, player);
 
   const winProb = estimateWinProbability(state, player);
+  const loc = locale as 'en' | 'fr';
 
   // Mission analysis
   const missionAnalysis: MissionCoachAnalysis[] = state.activeMissions.map((mission, idx) => {
@@ -87,26 +83,28 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
 
     if (myChars.length === 0 && oppChars.length === 0) {
       status = 'empty'; recommendation = 'attack';
-      note = `Mission ${mission.rank} libre - ${pointValue} pts à prendre`;
+      note = t('coach.mission.free', { rank: mission.rank, pts: pointValue });
     } else if (myPower === 0 && oppPower === 0) {
       status = 'tied'; recommendation = 'attack';
-      note = `Égalité à 0 - jeton Avantage décisif`;
+      note = t('coach.mission.tiedZero');
     } else if (myPower > oppPower * 1.4) {
       status = 'dominating'; recommendation = 'monitor'; myWinProbability = 0.88;
-      note = `Tu domines (${myPower} vs ${oppPower}) - ${pointValue} pts assurés`;
+      note = t('coach.mission.dominating', { my: myPower, opp: oppPower, pts: pointValue });
     } else if (myPower > oppPower) {
       status = 'winning'; recommendation = 'secure'; myWinProbability = 0.68;
-      note = `Tu mènes (${myPower} vs ${oppPower}) - consolide`;
+      note = t('coach.mission.winning', { my: myPower, opp: oppPower });
     } else if (myPower === oppPower && myPower > 0) {
       status = 'tied'; recommendation = 'attack'; myWinProbability = 0.5;
-      note = `Égalité (${myPower} chacun) - avantage au jeton`;
+      note = t('coach.mission.tied', { my: myPower });
     } else if (oppPower > myPower * 1.4 && oppChars.length >= 2) {
       status = 'losing'; recommendation = pointValue >= 5 ? 'defend' : 'abandon';
       myWinProbability = 0.15;
-      note = `Adversaire dominant (${oppPower} vs ${myPower})${pointValue < 5 ? ' - envisage d\'abandonner' : ''}`;
+      note = pointValue < 5
+        ? t('coach.mission.losingAbandon', { opp: oppPower, my: myPower })
+        : t('coach.mission.losing', { my: myPower, opp: oppPower, diff: oppPower - myPower + 1 });
     } else {
       status = 'losing'; recommendation = 'defend'; myWinProbability = 0.3;
-      note = `Tu es derrière (${myPower} vs ${oppPower}) - +${oppPower - myPower + 1} force nécessaire`;
+      note = t('coach.mission.losing', { my: myPower, opp: oppPower, diff: oppPower - myPower + 1 });
     }
 
     return { missionIndex: idx, rank: mission.rank, myWinProbability, myPower, opponentPower: oppPower, pointValue, status, recommendation, note };
@@ -122,8 +120,8 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
     .map(stat => ({
       action: stat.action,
       winRateGain: stat.winRate - winProb,
-      explanation: describeAction(stat.action, sanitized, stat.winRate),
-      advantage: `${stat.visits} simulations - ${(stat.winRate * 100).toFixed(0)}% victoire`,
+      explanation: describeAction(stat.action, sanitized, stat.winRate, t, locale),
+      advantage: t('coach.action.simulations', { visits: stat.visits, winRate: `${(stat.winRate * 100).toFixed(0)}%` }),
     }));
 
   // Hand ratings
@@ -142,12 +140,12 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
 
     return {
       cardIndex: i,
-      cardName: card.name_fr,
+      cardName: getCardName(card, loc),
       rating: Math.min(10, Math.max(0, Math.round(rating * 10) / 10)),
       bestMissionIndex: null as number | null,
       reason: !canAfford
-        ? `Pas assez de chakra (${chakra} requis)`
-        : `${power} force${hasAmbush ? ' + AMBUSH' : ''}${hasScore ? ' + SCORE' : ''}`,
+        ? t('coach.hand.notEnoughChakra', { cost: chakra })
+        : `${t('coach.hand.power', { power })}${hasAmbush ? ' + AMBUSH' : ''}${hasScore ? ' + SCORE' : ''}`,
     };
   });
 
@@ -156,17 +154,17 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
   const oppHidden = state.activeMissions.reduce(
     (s, m) => s + m.player2Characters.filter(c => c.isHidden).length, 0
   );
-  if (oppHidden > 0) warnings.push(`${oppHidden} personnage(s) caché(s) adverses - attention aux AMBUSH`);
-  if (state.player2.chakra >= 6) warnings.push(`Adversaire a ${state.player2.chakra} chakra - peut jouer une grosse carte`);
+  if (oppHidden > 0) warnings.push(t('coach.warn.hiddenEnemies', { count: oppHidden }));
+  if (state.player2.chakra >= 6) warnings.push(t('coach.warn.oppChakra', { chakra: state.player2.chakra }));
   if (myState.missionPoints < state.player2.missionPoints && state.turn >= 3)
-    warnings.push(`Retard de ${state.player2.missionPoints - myState.missionPoints} pts au tour ${state.turn}/4`);
+    warnings.push(t('coach.warn.behind', { diff: state.player2.missionPoints - myState.missionPoints, turn: state.turn }));
 
   // Tips
   const tips: string[] = [];
   const bestMission = missionAnalysis.find(m => m.status === 'empty' || m.status === 'tied');
-  if (bestMission) tips.push(`Mission ${bestMission.rank} (${bestMission.pointValue} pts) à saisir`);
+  if (bestMission) tips.push(t('coach.tip.missionOpen', { rank: bestMission.rank, pts: bestMission.pointValue }));
   const ambushCard = myState.hand.find(c => c.effects?.some(e => e.type === 'AMBUSH'));
-  if (ambushCard) tips.push(`${ambushCard.name_fr} a un effet AMBUSH - joue-la cachée`);
+  if (ambushCard) tips.push(t('coach.tip.ambushCard', { card: getCardName(ambushCard, loc) }));
 
   return {
     winProbability: winProb,
@@ -182,33 +180,52 @@ function buildQuickAdvice(state: GameState): CoachAdvice {
   };
 }
 
-function describeAction(action: any, state: GameState, winRate: number): string {
+function describeAction(action: any, state: GameState, winRate: number, t: TranslateFn, locale: string): string {
   const pct = `${(winRate * 100).toFixed(0)}%`;
+  const loc = locale as 'en' | 'fr';
   switch (action.type) {
     case 'PLAY_CHARACTER': {
       const card = state.player1.hand[action.cardIndex];
       const mission = state.activeMissions[action.missionIndex];
-      return `Jouer ${card?.name_fr ?? '?'} (${card?.power ?? 0} force) sur Mission ${mission?.rank ?? '?'} - ${pct}`;
+      return t('coach.action.play', { card: card ? getCardName(card, loc) : '?', power: card?.power ?? 0, rank: mission?.rank ?? '?', pct });
     }
     case 'PLAY_HIDDEN': {
       const card = state.player1.hand[action.cardIndex];
       const mission = state.activeMissions[action.missionIndex];
-      return `Cacher ${card?.name_fr ?? '?'} sur Mission ${mission?.rank ?? '?'} - ${pct}`;
+      return t('coach.action.hide', { card: card ? getCardName(card, loc) : '?', rank: mission?.rank ?? '?', pct });
     }
     case 'REVEAL_CHARACTER': {
       const mission = state.activeMissions[action.missionIndex];
-      return `Révéler personnage caché sur Mission ${mission?.rank ?? '?'} - ${pct}`;
+      return t('coach.action.reveal', { rank: mission?.rank ?? '?', pct });
     }
     case 'UPGRADE_CHARACTER': {
       const card = state.player1.hand[action.cardIndex];
-      return `Améliorer vers ${card?.name_fr ?? '?'} - ${pct}`;
+      return t('coach.action.upgrade', { card: card ? getCardName(card, loc) : '?', pct });
     }
     case 'PASS':
-      return `Passer - ${pct}`;
+      return t('coach.action.pass', { pct });
     default:
       return `${action.type} - ${pct}`;
   }
 }
+
+// ─── Board assessment colors ─────────────────────────────────────────────────
+
+const BOARD_KEYS: Record<CoachAdvice['boardAssessment'], string> = {
+  winning:         'coach.board.winning',
+  slightly_ahead:  'coach.board.slightlyAhead',
+  even:            'coach.board.even',
+  slightly_behind: 'coach.board.slightlyBehind',
+  losing:          'coach.board.losing',
+};
+
+const BOARD_COLORS: Record<CoachAdvice['boardAssessment'], string> = {
+  winning:         '#4ade80',
+  slightly_ahead:  '#86efac',
+  even:            '#c4a35a',
+  slightly_behind: '#f97316',
+  losing:          '#ef4444',
+};
 
 // ─── Status colors ────────────────────────────────────────────────────────────
 
@@ -220,17 +237,11 @@ const STATUS_COLORS: Record<MissionCoachAnalysis['status'], string> = {
   empty:      '#444444',
 };
 
-const BOARD_LABELS: Record<CoachAdvice['boardAssessment'], { fr: string; color: string }> = {
-  winning:         { fr: 'Position gagnante', color: '#4ade80' },
-  slightly_ahead:  { fr: 'Légèrement en avance', color: '#86efac' },
-  even:            { fr: 'Position équilibrée', color: '#c4a35a' },
-  slightly_behind: { fr: 'Légèrement derrière', color: '#f97316' },
-  losing:          { fr: 'Position difficile', color: '#ef4444' },
-};
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function TrainingCoachPanel() {
+  const t = useTranslations();
+  const locale = useLocale();
   const gameState = useGameStore((s) => s.gameState);
   const humanPlayer = useGameStore((s) => s.humanPlayer);
   const {
@@ -255,11 +266,10 @@ export function TrainingCoachPanel() {
     setAnalysing(true);
 
     try {
-      const advice = buildQuickAdvice(state);
+      const advice = buildQuickAdvice(state, t, locale);
 
       // Compare to previous win probability to assess last move quality
       if (prevWinProbRef.current !== null && prevStateRef.current !== null) {
-        // Was it the player's turn in the previous state?
         if (prevStateRef.current.activePlayer === humanPlayer) {
           const delta = advice.winProbability - prevWinProbRef.current;
           const quality = classifyMove(delta);
@@ -273,18 +283,14 @@ export function TrainingCoachPanel() {
       console.error('[TrainingCoach] Analysis error:', err);
       setAnalysing(false);
     }
-  }, [humanPlayer, isAnalysing, setAdvice, setAnalysing, setLastMoveQuality]);
+  }, [humanPlayer, isAnalysing, setAdvice, setAnalysing, setLastMoveQuality, t, locale]);
 
-  // Watch for game state changes and trigger analysis
   useEffect(() => {
     if (!isTrainingMode || !gameState) return;
     if (gameState.phase === 'gameOver') return;
 
-    // Save previous state for comparison
-    const prev = prevStateRef.current;
     prevStateRef.current = gameState;
 
-    // Debounce to avoid running mid-animation
     if (analyseTimeoutRef.current) clearTimeout(analyseTimeoutRef.current);
     analyseTimeoutRef.current = setTimeout(() => {
       runAnalysis(gameState);
@@ -296,6 +302,9 @@ export function TrainingCoachPanel() {
   }, [gameState, isTrainingMode, runAnalysis]);
 
   if (!isTrainingMode) return null;
+
+  const loc = locale as 'en' | 'fr';
+  const qualityLabel = lastMoveQuality ? MOVE_QUALITY_LABELS[lastMoveQuality][loc] : '';
 
   return (
     <>
@@ -316,9 +325,9 @@ export function TrainingCoachPanel() {
           writingMode: 'vertical-rl',
           letterSpacing: 1,
         }}
-        title={isPanelOpen ? 'Fermer le coach' : 'Ouvrir le coach'}
+        title={isPanelOpen ? t('coach.toggleClose') : t('coach.toggleOpen')}
       >
-        {isPanelOpen ? 'FERMER' : 'COACH'}
+        {isPanelOpen ? t('coach.close') : t('coach.open')}
       </button>
 
       {/* Sliding panel */}
@@ -343,10 +352,10 @@ export function TrainingCoachPanel() {
               style={{ backgroundColor: '#0d0d0d', borderBottom: '1px solid #1e1e1e' }}
             >
               <p className="text-xs font-medium uppercase tracking-widest text-[#c4a35a]">
-                Coach IA
+                {t('coach.title')}
               </p>
               {isAnalysing && (
-                <span className="text-[10px] text-[#555] animate-pulse">Analyse...</span>
+                <span className="text-[10px] text-[#555] animate-pulse">{t('coach.analysing')}</span>
               )}
             </div>
 
@@ -373,7 +382,7 @@ export function TrainingCoachPanel() {
                       className="text-sm font-semibold"
                       style={{ color: MOVE_QUALITY_COLORS[lastMoveQuality] }}
                     >
-                      {MOVE_QUALITY_LABELS[lastMoveQuality].fr}
+                      {qualityLabel}
                     </span>
                     <span className="text-xs text-[#555] ml-auto">
                       {lastMoveDelta >= 0 ? '+' : ''}{(lastMoveDelta * 100).toFixed(0)}%
@@ -394,7 +403,7 @@ export function TrainingCoachPanel() {
 
                 {/* Mission Status */}
                 <section>
-                  <SectionTitle>Missions</SectionTitle>
+                  <SectionTitle>{t('coach.missions')}</SectionTitle>
                   <div className="space-y-1.5">
                     {coachAdvice.missionAnalysis.map(m => (
                       <MissionRow key={m.missionIndex} mission={m} />
@@ -405,7 +414,7 @@ export function TrainingCoachPanel() {
                 {/* Best Recommended Action */}
                 {coachAdvice.bestAction && (
                   <section>
-                    <SectionTitle>Meilleur coup</SectionTitle>
+                    <SectionTitle>{t('coach.bestMove')}</SectionTitle>
                     <div
                       className="px-3 py-2.5 text-xs text-[#c0c0c0]"
                       style={{ backgroundColor: '#161616', border: '1px solid #2a2a2a' }}
@@ -418,7 +427,7 @@ export function TrainingCoachPanel() {
                 {/* Hand Card Ratings */}
                 {coachAdvice.handRatings.length > 0 && (
                   <section>
-                    <SectionTitle>Cartes en main</SectionTitle>
+                    <SectionTitle>{t('coach.handCards')}</SectionTitle>
                     <div className="space-y-1">
                       {coachAdvice.handRatings.map(r => (
                         <CardRatingRow key={r.cardIndex} rating={r} />
@@ -430,7 +439,7 @@ export function TrainingCoachPanel() {
                 {/* Warnings */}
                 {coachAdvice.warnings.length > 0 && (
                   <section>
-                    <SectionTitle>Attention</SectionTitle>
+                    <SectionTitle>{t('coach.warnings')}</SectionTitle>
                     <div className="space-y-1">
                       {coachAdvice.warnings.map((w, i) => (
                         <div
@@ -452,7 +461,7 @@ export function TrainingCoachPanel() {
                 {/* Tips */}
                 {coachAdvice.tips.length > 0 && (
                   <section>
-                    <SectionTitle>Conseils</SectionTitle>
+                    <SectionTitle>{t('coach.tips')}</SectionTitle>
                     <div className="space-y-1">
                       {coachAdvice.tips.map((tip, i) => (
                         <div
@@ -473,12 +482,12 @@ export function TrainingCoachPanel() {
 
                 {/* Footer */}
                 <p className="text-[10px] text-[#333] text-center pt-2">
-                  {coachAdvice.neuralNetUsed ? 'Réseau de neurones actif' : 'Mode heuristique'} - {coachAdvice.simulationsUsed} sims
+                  {coachAdvice.neuralNetUsed ? t('coach.neuralActive') : t('coach.heuristicMode')} - {t('coach.sims', { count: coachAdvice.simulationsUsed })}
                 </p>
               </div>
             ) : (
               <div className="flex items-center justify-center h-40">
-                <p className="text-xs text-[#444]">En attente d&apos;une partie...</p>
+                <p className="text-xs text-[#444]">{t('coach.waiting')}</p>
               </div>
             )}
           </motion.aside>
@@ -500,7 +509,9 @@ function WinProbBar({ probability, assessment }: {
   probability: number;
   assessment: CoachAdvice['boardAssessment'];
 }) {
-  const { fr: label, color } = BOARD_LABELS[assessment];
+  const t = useTranslations();
+  const color = BOARD_COLORS[assessment];
+  const label = t(BOARD_KEYS[assessment]);
   const pct = Math.round(probability * 100);
 
   return (
@@ -519,8 +530,8 @@ function WinProbBar({ probability, assessment }: {
         />
       </div>
       <div className="flex justify-between mt-0.5">
-        <span className="text-[10px] text-[#333]">Défaite</span>
-        <span className="text-[10px] text-[#333]">Victoire</span>
+        <span className="text-[10px] text-[#333]">{t('coach.defeat')}</span>
+        <span className="text-[10px] text-[#333]">{t('coach.victory')}</span>
       </div>
     </div>
   );
@@ -532,15 +543,12 @@ function MissionRow({ mission }: { mission: MissionCoachAnalysis }) {
 
   return (
     <div className="flex items-center gap-2">
-      {/* Rank badge */}
       <span
         className="text-[10px] font-bold w-5 h-5 flex items-center justify-center flex-shrink-0"
         style={{ backgroundColor: color + '22', color, border: `1px solid ${color}44` }}
       >
         {mission.rank}
       </span>
-
-      {/* Mini bar */}
       <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1e1e1e' }}>
         <motion.div
           className="h-full rounded-full"
@@ -549,13 +557,9 @@ function MissionRow({ mission }: { mission: MissionCoachAnalysis }) {
           transition={{ type: 'spring', stiffness: 120, damping: 20 }}
         />
       </div>
-
-      {/* Power */}
       <span className="text-[10px] font-mono text-[#555] w-10 text-right">
         {mission.myPower}v{mission.opponentPower}
       </span>
-
-      {/* Points */}
       <span className="text-[10px] text-[#444] w-6 text-right">{mission.pointValue}p</span>
     </div>
   );
@@ -567,7 +571,6 @@ function CardRatingRow({ rating }: { rating: { cardIndex: number; cardName: stri
 
   return (
     <div className="flex items-center gap-2">
-      {/* Rating bar (0-10) */}
       <div className="w-12 h-1 rounded-full overflow-hidden flex-shrink-0" style={{ backgroundColor: '#1e1e1e' }}>
         <div
           className="h-full rounded-full"

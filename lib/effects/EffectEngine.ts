@@ -6174,7 +6174,7 @@ export class EffectEngine {
             sourceMissionIndex: p099MI, effectType: pendingEffect.effectType,
             effectDescription: '', targetSelectionType: 'PAKKUN_MOVE_DESTINATION',
             sourcePlayer: p099Player, requiresTargetSelection: true,
-            validTargets: p099ValidDests, isOptional: true, isMandatory: false,
+            validTargets: p099ValidDests, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: false,
           });
           newState.pendingActions.push({
@@ -7167,6 +7167,7 @@ export class EffectEngine {
             player: n116Player,
             description: 'Neji Hyuga (116) MAIN: Choose a character with exactly Power 4 to defeat.',
             descriptionKey: 'game.effect.desc.neji116DefeatPower4',
+            descriptionParams: { power: '4' },
             options: n116Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: n116EffId,
           });
@@ -7217,6 +7218,7 @@ export class EffectEngine {
             player: n116uPlayer,
             description: 'Neji Hyuga (116) UPGRADE: Choose a character with exactly Power 6 to defeat.',
             descriptionKey: 'game.effect.desc.neji116DefeatPower6',
+            descriptionParams: { power: '6' },
             options: n116uTargets, minSelections: 1, maxSelections: 1,
             sourceEffectId: n116uEffId,
           });
@@ -7509,6 +7511,38 @@ export class EffectEngine {
         break;
       }
 
+      case 'JIROBO122_CONFIRM_MAIN': {
+        // Auto-execute POWERUP X where X = total characters in this mission
+        const j122mPlayer = pendingEffect.sourcePlayer;
+        const j122mMI = pendingEffect.sourceMissionIndex;
+        const j122mMission = newState.activeMissions[j122mMI];
+        if (!j122mMission) break;
+        const j122mTotal = j122mMission.player1Characters.length + j122mMission.player2Characters.length;
+        if (j122mTotal > 0) {
+          const j122mFriendly: 'player1Characters' | 'player2Characters' =
+            j122mPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+          const j122mMissions = [...newState.activeMissions];
+          const j122mM = { ...j122mMissions[j122mMI] };
+          const j122mChars = [...j122mM[j122mFriendly]];
+          const j122mSelfIdx = j122mChars.findIndex((c) => c.instanceId === pendingEffect.sourceInstanceId);
+          if (j122mSelfIdx !== -1) {
+            j122mChars[j122mSelfIdx] = {
+              ...j122mChars[j122mSelfIdx],
+              powerTokens: j122mChars[j122mSelfIdx].powerTokens + j122mTotal,
+            };
+            j122mM[j122mFriendly] = j122mChars;
+            j122mMissions[j122mMI] = j122mM;
+            newState.activeMissions = j122mMissions;
+            newState.log = logAction(newState.log, newState.turn, newState.phase, j122mPlayer,
+              'EFFECT_POWERUP',
+              `Jirobo (122): POWERUP ${j122mTotal} (total characters in this mission).`,
+              'game.log.effect.powerupSelf',
+              { card: 'JIROBO', id: 'KS-122-R', amount: j122mTotal });
+          }
+        }
+        break;
+      }
+
       case 'JIROBO122_CONFIRM_UPGRADE': {
         const j122Player = pendingEffect.sourcePlayer;
         const j122Opponent = j122Player === 'player1' ? 'player2' : 'player1';
@@ -7545,6 +7579,70 @@ export class EffectEngine {
             options: j122Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: j122EffId,
           });
+        }
+        break;
+      }
+
+      case 'GAARA120_CONFIRM_MAIN': {
+        // Start the mission-by-mission defeat flow
+        const g120Player = pendingEffect.sourcePlayer;
+        const g120Opponent = g120Player === 'player1' ? 'player2' : 'player1';
+        const g120EnemySide: 'player1Characters' | 'player2Characters' =
+          g120Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        let g120Desc: { isUpgrade?: boolean } = {};
+        try { g120Desc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        // Find first mission with valid targets
+        let g120FirstMission = -1;
+        let g120FirstTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          const targets = newState.activeMissions[i][g120EnemySide]
+            .filter((c: CharacterInPlay) => getEffectivePower(newState, c, g120Opponent as PlayerID) <= 1)
+            .map((c: CharacterInPlay) => c.instanceId);
+          if (targets.length > 0) {
+            g120FirstMission = i;
+            g120FirstTargets = targets;
+            break;
+          }
+        }
+        if (g120FirstMission === -1) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g120Player,
+            'EFFECT_NO_TARGET', 'Gaara (120): No enemy characters with Power 1 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-120-R' });
+          break;
+        }
+        {
+          const g120EffId = generateInstanceId();
+          const g120ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: g120EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({
+              defeatedCount: 0,
+              nextMissionIndex: g120FirstMission + 1,
+              isUpgrade: g120Desc.isUpgrade ?? false,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              missionIndex: g120FirstMission,
+            }),
+            targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
+            sourcePlayer: g120Player, requiresTargetSelection: true,
+            validTargets: g120FirstTargets, isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: g120ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: g120Player,
+            description: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${g120FirstMission + 1}.`,
+            descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
+            descriptionParams: { mission: String(g120FirstMission + 1) },
+            options: g120FirstTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: g120EffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
         }
         break;
       }
@@ -8910,6 +9008,9 @@ export class EffectEngine {
               isUpgrade: pendingEffect.isUpgrade,
               remainingEffectTypes: pendingEffect.remainingEffectTypes,
             });
+            // Clear remaining from parent so processRemainingEffects only fires
+            // once (from DESTINATION), not twice (from both MOVE and DESTINATION).
+            pendingEffect.remainingEffectTypes = undefined;
             newState.pendingActions.push({
               id: moveActionId,
               type: 'SELECT_TARGET',

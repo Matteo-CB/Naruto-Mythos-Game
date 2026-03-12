@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { getCardName } from '@/lib/utils/cardLocale';
 import type { CharacterCard } from '@/lib/engine/types';
 
 type SandboxModal = 'none' | 'draw' | 'viewDeck';
@@ -165,6 +166,7 @@ function DeckCardItem({
   onClick: () => void;
 }) {
   const t = useTranslations();
+  const locale = useLocale();
   const zoomCard = useUIStore((s) => s.zoomCard);
   const imagePath = normalizeImagePath(card.image_file);
 
@@ -189,7 +191,7 @@ function DeckCardItem({
       ) : (
         <div className="w-full h-full flex items-center justify-center">
           <span className="text-[8px] text-center px-1" style={{ color: '#666' }}>
-            {card.name_fr}
+            {getCardName(card, locale as 'en' | 'fr')}
           </span>
         </div>
       )}

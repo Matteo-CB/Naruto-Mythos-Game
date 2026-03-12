@@ -535,6 +535,7 @@
         "kankuro119ConfirmUpgrade": "UPGRADE: Move any character in play.",
         "temari121ConfirmMain": "MAIN: Move any friendly character in play.",
         "temari121ConfirmUpgrade": "UPGRADE: Move any character in play.",
+        "jirobo122ConfirmMain": "MAIN: POWERUP X where X is the number of characters in this mission.",
         "jirobo122ConfirmUpgrade": "UPGRADE: Defeat an enemy character with Power 1 or less in this mission.",
         "tsunade104ConfirmUpgrade": "UPGRADE: Spend any amount of additional Chakra. POWERUP X.",
         "jiraiya007ChooseSummon": "Choose a Summon character from your hand to play (paying 1 less).",
@@ -559,6 +560,7 @@
         "baki082UpgradePowerup": "POWERUP 1 on each friendly Sand Village character in this mission.",
         "choji018MoveSelf": "Select a mission to move Choji Akimichi to.",
         "choji018HideEnemy": "Choose an enemy character with less Power to hide.",
+        "gaara120ConfirmMain": "MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.",
         "gaara120ChooseDefeat": "Choose an enemy character with Power 1 or less to defeat in mission {mission}.",
         "dosu069LookAtHidden": "Select a hidden character in play to look at.",
         "dosu069ForceRevealOrDefeat": "Choose a hidden enemy character in this mission. Opponent must either play them paying 2 more, or defeat them.",
@@ -2283,6 +2285,62 @@
       "normal": "Normal",
       "high": "High",
       "critical": "Critical"
+    }
+  },
+  "coach": {
+    "title": "AI Coach",
+    "analysing": "Analysing...",
+    "toggleOpen": "Open coach",
+    "toggleClose": "Close coach",
+    "open": "COACH",
+    "close": "CLOSE",
+    "bestMove": "Best move",
+    "handCards": "Cards in hand",
+    "warnings": "Warning",
+    "tips": "Tips",
+    "missions": "Missions",
+    "neuralActive": "Neural network active",
+    "heuristicMode": "Heuristic mode",
+    "sims": "{count} sims",
+    "waiting": "Waiting for a game...",
+    "defeat": "Defeat",
+    "victory": "Victory",
+    "board": {
+      "winning": "Winning position",
+      "slightlyAhead": "Slightly ahead",
+      "even": "Even position",
+      "slightlyBehind": "Slightly behind",
+      "losing": "Difficult position"
+    },
+    "mission": {
+      "free": "Mission {rank} open - {pts} pts to take",
+      "tiedZero": "Tied at 0 - Edge token decisive",
+      "dominating": "Dominating ({my} vs {opp}) - {pts} pts secured",
+      "winning": "Leading ({my} vs {opp}) - consolidate",
+      "tied": "Tied ({my} each) - edge advantage",
+      "losingAbandon": "Opponent dominating ({opp} vs {my}) - consider abandoning",
+      "losing": "Behind ({my} vs {opp}) - +{diff} power needed"
+    },
+    "hand": {
+      "notEnoughChakra": "Not enough chakra ({cost} required)",
+      "power": "{power} power"
+    },
+    "warn": {
+      "hiddenEnemies": "{count} hidden opponent character(s) - watch for AMBUSH",
+      "oppChakra": "Opponent has {chakra} chakra - may play a big card",
+      "behind": "Behind by {diff} pts at turn {turn}/4"
+    },
+    "tip": {
+      "missionOpen": "Mission {rank} ({pts} pts) to seize",
+      "ambushCard": "{card} has an AMBUSH effect - play it hidden"
+    },
+    "action": {
+      "play": "Play {card} ({power} power) on Mission {rank} - {pct}",
+      "hide": "Hide {card} on Mission {rank} - {pct}",
+      "reveal": "Reveal hidden character on Mission {rank} - {pct}",
+      "upgrade": "Upgrade to {card} - {pct}",
+      "pass": "Pass - {pct}",
+      "simulations": "{visits} simulations - {winRate} win"
     }
   }
 }

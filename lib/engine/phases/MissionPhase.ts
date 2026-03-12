@@ -103,7 +103,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
     'SCORE_MISSION',
     `Mission ${missionIndex + 1} (${mission.rank}): "${mission.card.name_fr}" - Player1: ${p1Power} power vs Player2: ${p2Power} power.`,
     'game.log.scoreMission',
-    { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, p1Power, p2Power },
+    { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, name_en: mission.card.name_en || mission.card.name_fr, p1Power, p2Power },
   );
 
   // Determine winner - a player must have at least 1 power to win

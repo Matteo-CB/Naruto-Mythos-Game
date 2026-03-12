@@ -19,65 +19,46 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 function gaara120MainHandler(ctx: EffectContext): EffectResult {
-  let state = { ...ctx.state };
-  let defeatedCount = 0;
+  const { state, sourcePlayer, sourceCard } = ctx;
 
-  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Process missions sequentially. For each mission with valid targets, always prompt the player
-  // (effect is optional - "up to 1" means the player can skip defeating in any mission).
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const mission = state.activeMissions[i];
-    const enemyChars = mission[enemySide];
-    const validTargets = enemyChars.filter((c) => getEffectivePower(state, c, opponentPlayer) <= 1);
-
-    if (validTargets.length === 0) {
-      continue;
+  // Check if any mission has valid targets (power ≤ 1 enemies)
+  let hasAnyTarget = false;
+  for (const mission of state.activeMissions) {
+    if (mission[enemySide].some((c) => getEffectivePower(state, c, opponentPlayer) <= 1)) {
+      hasAnyTarget = true;
+      break;
     }
+  }
 
-    // Always show selection UI - player can skip this mission (optional "up to 1")
+  if (!hasAnyTarget) {
     return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
-      validTargets: validTargets.map((c) => c.instanceId),
-      isOptional: true,
-      description: JSON.stringify({
-        defeatedCount,
-        nextMissionIndex: i + 1,
-        isUpgrade: ctx.isUpgrade,
-        sourceInstanceId: ctx.sourceCard.instanceId,
-        sourceMissionIndex: ctx.sourceMissionIndex,
-        missionIndex: i,
-        text: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${i + 1}.`,
-      }),
-      descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
-      descriptionParams: { mission: String(i + 1) },
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Gaara (120): No enemy characters with Power 1 or less found in any mission.',
+          'game.log.effect.noTarget',
+          { card: 'GAARA', id: 'KS-120-R' },
+        ),
+      },
     };
   }
 
-  // All missions processed without needing selection
-  if (defeatedCount === 0) {
-    state = {
-      ...state,
-      log: logAction(
-        state.log, state.turn, state.phase, ctx.sourcePlayer,
-        'EFFECT_NO_TARGET',
-        'Gaara (120): No enemy characters with Power 1 or less found in any mission.',
-        'game.log.effect.noTarget',
-        { card: 'GAARA', id: 'KS-120-R' },
-      ),
-    };
-  }
-
-  // Apply UPGRADE POWERUP if applicable
-  if (ctx.isUpgrade && defeatedCount > 0) {
-    state = applyGaaraUpgradePowerup(state, ctx.sourcePlayer, ctx.sourceCard.instanceId, ctx.sourceMissionIndex, defeatedCount);
-  }
-
-  return { state };
+  // CONFIRM popup before starting mission-by-mission selection
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'GAARA120_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: JSON.stringify({ isUpgrade: ctx.isUpgrade }),
+    descriptionKey: 'game.effect.desc.gaara120ConfirmMain',
+  };
 }
 
 /**
