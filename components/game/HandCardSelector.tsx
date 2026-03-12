@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -166,6 +166,18 @@ export function HandCardSelector() {
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
   const declineTarget = useGameStore((s) => s.declineTarget);
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+  const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
+  const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
+
+  const prevPendingIdRef = useRef<string | null>(null);
+  const currentPendingId = pendingTargetSelection?.descriptionKey ?? pendingTargetSelection?.description ?? null;
+  useEffect(() => {
+    if (currentPendingId && currentPendingId !== prevPendingIdRef.current) {
+      restoreEffectPopup();
+    }
+    prevPendingIdRef.current = currentPendingId;
+  }, [currentPendingId, restoreEffectPopup]);
 
   const handleSelect = useCallback(
     (targetId: string) => {
@@ -188,6 +200,34 @@ export function HandCardSelector() {
 
   if (!handCards || handCards.length === 0) return null;
 
+  if (effectPopupMinimized) {
+    const effectDesc = descriptionKey
+      ? t(descriptionKey, descriptionParams as Record<string, string> | undefined)
+      : (description || t('game.board.restoreEffect'));
+    const pillText = effectDesc.length > 40 ? effectDesc.slice(0, 37) + '...' : effectDesc;
+    return (
+      <motion.button
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 40, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        onClick={restoreEffectPopup}
+        className="fixed z-50 flex items-center gap-2 no-select"
+        style={{
+          bottom: '12px', left: '50%', transform: 'translateX(-50%)',
+          padding: '8px 18px', background: 'rgba(196, 163, 90, 0.95)',
+          color: '#0a0a0a', borderRadius: '24px', fontSize: '13px',
+          fontWeight: 700, cursor: 'pointer',
+          border: '1px solid rgba(255, 215, 0, 0.4)',
+          boxShadow: '0 4px 20px rgba(196, 163, 90, 0.5)',
+        }}
+      >
+        <span style={{ fontSize: '16px', lineHeight: 1 }}>&#x25B2;</span>
+        {pillText}
+      </motion.button>
+    );
+  }
+
   return (
     <AnimatePresence>
       <motion.div
@@ -198,6 +238,19 @@ export function HandCardSelector() {
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
       >
+        <button
+          onClick={(e) => { e.stopPropagation(); minimizeEffectPopup(); }}
+          className="no-select"
+          style={{
+            position: 'absolute', top: '10px', right: '14px', zIndex: 60,
+            padding: '4px 14px', background: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '6px',
+            color: '#aaa', fontSize: '12px', cursor: 'pointer', fontWeight: 600,
+          }}
+          title={t('game.board.minimize')}
+        >
+          &#x25BC; {t('game.board.minimize')}
+        </button>
         {/* Player announcement banner */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}

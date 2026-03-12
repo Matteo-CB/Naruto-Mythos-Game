@@ -50,6 +50,11 @@ interface UIStore {
   turnOverlayText: string;
   showTurnTransition: (text: string) => void;
   hideTurnOverlay: () => void;
+
+  // Effect popup minimize
+  effectPopupMinimized: boolean;
+  minimizeEffectPopup: () => void;
+  restoreEffectPopup: () => void;
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -122,4 +127,8 @@ export const useUIStore = create<UIStore>((set) => ({
   turnOverlayText: '',
   showTurnTransition: (text) => set({ showTurnOverlay: true, turnOverlayText: text }),
   hideTurnOverlay: () => set({ showTurnOverlay: false }),
+
+  effectPopupMinimized: false,
+  minimizeEffectPopup: () => set({ effectPopupMinimized: true }),
+  restoreEffectPopup: () => set({ effectPopupMinimized: false }),
 }));
