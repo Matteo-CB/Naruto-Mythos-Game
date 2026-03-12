@@ -66,6 +66,7 @@ const menuButtons = [
   { key: 'play' as const, href: '/play', primary: true },
   { key: 'customization' as const, href: '/settings', primary: false },
   { key: 'deckBuilder' as const, href: '/deck-builder', primary: false },
+  { key: 'collection' as const, href: '/collection', primary: false },
   { key: 'learn' as const, href: '/learn', primary: false },
   { key: 'leaderboard' as const, href: '/leaderboard', primary: false },
   { key: 'tournaments' as const, href: '/tournaments', primary: false },
