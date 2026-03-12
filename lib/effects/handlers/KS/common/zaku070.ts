@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import { logAction } from '@/lib/engine/utils/gameLog';
 
 /**
  * Card 070/130 - ZAKU ABUMI (Common)
@@ -9,29 +8,23 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN: Opponent gains 1 Chakra.
  *
  * Gives the opponent 1 additional chakra. This is a drawback effect on an otherwise
- * high-power card. The effect is mandatory (implicit from wording - no "you can").
+ * high-power card. The opponent can choose to accept or decline the bonus.
  */
 function handleZaku070Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  const newState = { ...state };
-  const opponentState = { ...newState[opponentPlayer] };
-  opponentState.chakra = opponentState.chakra + 1;
-  newState[opponentPlayer] = opponentState;
-
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_CHAKRA',
-    `Zaku Abumi (070): Opponent gains 1 Chakra.`,
-    'game.log.effect.oppGainChakra',
-    { card: 'Zaku Abumi', id: 'KS-070-C', amount: '1' },
-  );
-
-  return { state: { ...newState, log } };
+  // CONFIRM popup shown to the OPPONENT asking if they want the chakra
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'ZAKU070_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    selectingPlayer: opponentPlayer,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.zaku070ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {
