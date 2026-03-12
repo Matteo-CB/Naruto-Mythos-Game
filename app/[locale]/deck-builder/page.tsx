@@ -183,15 +183,16 @@ export default function DeckBuilderPage() {
   const filteredChars = useMemo(() => {
     let chars = availableChars.filter((c) => !bannedIds.has(c.id));
 
-    // Text search
+    // Text search (accent-insensitive)
     if (searchQuery) {
-      const q = searchQuery.toLowerCase();
+      const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const q = normalize(searchQuery);
       chars = chars.filter(
         (c) =>
-          getCardName(c, locale as "en" | "fr").toLowerCase().includes(q) ||
-          getCardTitle(c, locale as "en" | "fr").toLowerCase().includes(q) ||
-          c.name_fr.toLowerCase().includes(q) ||
-          c.id.includes(q),
+          normalize(getCardName(c, locale as "en" | "fr")).includes(q) ||
+          normalize(getCardTitle(c, locale as "en" | "fr")).includes(q) ||
+          normalize(c.name_fr).includes(q) ||
+          c.id.toLowerCase().includes(q),
       );
     }
 

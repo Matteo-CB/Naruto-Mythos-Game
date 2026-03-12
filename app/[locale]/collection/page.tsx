@@ -62,13 +62,12 @@ export default function CollectionPage() {
       if (filterRarity !== 'all' && card.rarity !== filterRarity) return false;
       if (filterGroup !== 'all' && card.group !== filterGroup) return false;
       if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        const localeName = getCardName(card, locale as 'en' | 'fr').toLowerCase();
-        const localeTitle = getCardTitle(card, locale as 'en' | 'fr').toLowerCase();
+        const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const q = normalize(searchQuery);
         if (
-          !localeName.includes(q) &&
-          !localeTitle.includes(q) &&
-          !card.name_fr.toLowerCase().includes(q) &&
+          !normalize(getCardName(card, locale as 'en' | 'fr')).includes(q) &&
+          !normalize(getCardTitle(card, locale as 'en' | 'fr')).includes(q) &&
+          !normalize(card.name_fr).includes(q) &&
           !card.id.toLowerCase().includes(q)
         ) {
           return false;
