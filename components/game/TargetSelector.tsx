@@ -19,9 +19,9 @@ function MinimizeButton({ onClick }: { onClick: () => void }) {
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className="no-select"
       style={{
-        position: 'absolute',
-        top: '12px',
-        right: '12px',
+        alignSelf: 'flex-end',
+        marginRight: '16px',
+        marginBottom: '8px',
         zIndex: 60,
         padding: '8px 18px',
         background: 'rgba(196, 163, 90, 0.15)',
