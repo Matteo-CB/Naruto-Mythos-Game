@@ -12,8 +12,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 
 function mss06ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
-  const playerState = { ...state[ctx.sourcePlayer] };
-  const deck = [...playerState.deck];
+  const deck = state[ctx.sourcePlayer].deck;
 
   if (deck.length === 0) {
     const log = logAction(
@@ -29,23 +28,15 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Draw 1 card
-  const drawnCard = deck.shift()!;
-  playerState.deck = deck;
-  playerState.hand = [...playerState.hand, drawnCard];
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    ctx.sourcePlayer,
-    'SCORE_DRAW',
-    'MSS 06 (Rescue a Friend): Drew 1 card.',
-    'game.log.score.draw',
-    { card: 'Sauvetage d\'un ami', count: 1 },
-  );
-
-  return { state: { ...state, [ctx.sourcePlayer]: playerState, log } };
+  // CONFIRM popup before drawing
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'MSS06_CONFIRM_SCORE',
+    validTargets: ['KS-006-MMS'],
+    description: 'MSS 06 (Rescue a Friend): Draw a card.',
+    descriptionKey: 'game.effect.desc.mss06ConfirmScore',
+  };
 }
 
 export function registerMss06Handlers(): void {

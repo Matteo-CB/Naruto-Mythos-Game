@@ -1058,6 +1058,299 @@ export class EffectEngine {
         newState = EffectEngine.haku088ConfirmDraw(newState, pendingEffect);
         break;
 
+      // --- MSS 01: Call for Support CONFIRM ---
+      case 'MSS01_CONFIRM_SCORE': {
+        const m01Player = pendingEffect.sourcePlayer;
+        // Re-check: find all characters in play
+        const m01Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            m01Targets.push(char.instanceId);
+          }
+        }
+        if (m01Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m01Player,
+            'SCORE_NO_TARGET', 'MSS 01 (Call for Support): No characters in play (state changed).',
+            'game.log.effect.noTarget', { card: 'Appel de soutien', id: 'KS-001-MMS' });
+          break;
+        }
+        // Child: target selection with SKIP
+        const m01EffId = generateInstanceId();
+        const m01ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: m01EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'MSS01_POWERUP_TARGET',
+          sourcePlayer: m01Player, requiresTargetSelection: true,
+          validTargets: m01Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: m01ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: m01Player,
+          description: 'MSS 01 (Call for Support): Choose a character to give POWERUP 2.',
+          descriptionKey: 'game.effect.desc.mss01Powerup',
+          options: m01Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: m01EffId,
+        });
+        break;
+      }
+
+      // --- MSS 03: Find the Traitor CONFIRM ---
+      case 'MSS03_CONFIRM_SCORE': {
+        const m03Player = pendingEffect.sourcePlayer;
+        const m03OpponentId = m03Player === 'player1' ? 'player2' : 'player1';
+        const m03OpponentHand = newState[m03OpponentId].hand;
+
+        if (m03OpponentHand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m03Player,
+            'SCORE_NO_TARGET', 'MSS 03 (Find the Traitor): Opponent has no cards (state changed).',
+            'game.log.effect.noTarget', { card: 'Trouver le traitre', id: 'KS-003-MMS' });
+          break;
+        }
+
+        if (m03OpponentHand.length === 1) {
+          // Auto-discard the only card
+          const m03Ps = { ...newState[m03OpponentId], hand: [...m03OpponentHand], discardPile: [...newState[m03OpponentId].discardPile] };
+          const [m03Discarded] = m03Ps.hand.splice(0, 1);
+          m03Ps.discardPile.push(m03Discarded);
+          newState[m03OpponentId] = m03Ps;
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m03Player,
+            'SCORE_DISCARD', `MSS 03 (Find the Traitor): Opponent discarded ${m03Discarded.name_fr} from hand.`,
+            'game.log.score.discard', { card: 'Trouver le traitre', count: 1 });
+          break;
+        }
+
+        // Multiple cards: opponent must choose (mandatory)
+        const m03HandIndices = m03OpponentHand.map((_: unknown, i: number) => String(i));
+        const m03EffId = generateInstanceId();
+        const m03ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: m03EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'MSS03_OPPONENT_DISCARD',
+          sourcePlayer: m03Player, requiresTargetSelection: true,
+          validTargets: m03HandIndices, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: m03ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: m03OpponentId,
+          description: 'MSS 03 (Find the Traitor): Choose a card from your hand to discard.',
+          descriptionKey: 'game.effect.desc.mss03OpponentDiscard',
+          options: m03HandIndices, minSelections: 1, maxSelections: 1,
+          sourceEffectId: m03EffId,
+        });
+        break;
+      }
+
+      // --- MSS 04: Assassination CONFIRM ---
+      case 'MSS04_CONFIRM_SCORE': {
+        const m04Player = pendingEffect.sourcePlayer;
+        const m04EnemySide: 'player1Characters' | 'player2Characters' =
+          m04Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        const m04Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const c of mission[m04EnemySide]) {
+            if (c.isHidden) m04Targets.push(c.instanceId);
+          }
+        }
+
+        if (m04Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m04Player,
+            'SCORE_NO_TARGET', 'MSS 04 (Assassination): No hidden enemies (state changed).',
+            'game.log.effect.noTarget', { card: 'Assassinat', id: 'KS-004-MMS' });
+          break;
+        }
+
+        if (m04Targets.length === 1) {
+          // Auto-defeat the only hidden enemy
+          newState = EffectEngine.defeatCharacter(newState, m04Targets[0], m04Player);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m04Player,
+            'SCORE_DEFEAT', 'MSS 04 (Assassination): Defeated the only hidden enemy character.',
+            'game.log.score.defeat', { card: 'Assassinat', target: m04Targets[0] });
+          break;
+        }
+
+        // Multiple: child target selection with SKIP
+        const m04EffId = generateInstanceId();
+        const m04ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: m04EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'MSS04_DEFEAT_HIDDEN',
+          sourcePlayer: m04Player, requiresTargetSelection: true,
+          validTargets: m04Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: m04ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: m04Player,
+          description: 'MSS 04 (Assassination): Choose a hidden enemy character to defeat.',
+          descriptionKey: 'game.effect.desc.mss04DefeatHidden',
+          options: m04Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: m04EffId,
+        });
+        break;
+      }
+
+      // --- MSS 06: Rescue a Friend CONFIRM ---
+      case 'MSS06_CONFIRM_SCORE': {
+        const m06Player = pendingEffect.sourcePlayer;
+        const m06Ps = newState[m06Player];
+        if (m06Ps.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m06Player,
+            'SCORE_NO_DRAW', 'MSS 06 (Rescue a Friend): Deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: 'Sauvetage d\'un ami', id: 'KS-006-MMS' });
+          break;
+        }
+        const m06NewPs = { ...m06Ps, deck: [...m06Ps.deck], hand: [...m06Ps.hand] };
+        const m06Drawn = m06NewPs.deck.shift()!;
+        m06NewPs.hand.push(m06Drawn);
+        newState[m06Player] = m06NewPs;
+        newState.log = logAction(newState.log, newState.turn, newState.phase, m06Player,
+          'SCORE_DRAW', 'MSS 06 (Rescue a Friend): Drew 1 card.',
+          'game.log.score.draw', { card: 'Sauvetage d\'un ami', count: 1 });
+        break;
+      }
+
+      // --- MSS 07: I Have to Go CONFIRM ---
+      case 'MSS07_CONFIRM_SCORE': {
+        const m07Player = pendingEffect.sourcePlayer;
+        const m07FriendlySide: 'player1Characters' | 'player2Characters' =
+          m07Player === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const m07Targets: string[] = [];
+        const m07CharMissionMap: Record<string, number> = {};
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const c of newState.activeMissions[i][m07FriendlySide]) {
+            if (c.isHidden && newState.activeMissions.length > 1) {
+              m07Targets.push(c.instanceId);
+              m07CharMissionMap[c.instanceId] = i;
+            }
+          }
+        }
+
+        if (m07Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m07Player,
+            'SCORE_NO_TARGET', 'MSS 07 (I Have to Go): No hidden friendly characters (state changed).',
+            'game.log.effect.noTarget', { card: 'Je dois partir', id: 'KS-007-MMS' });
+          break;
+        }
+
+        if (m07Targets.length === 1) {
+          // Skip character selection, go straight to destination (SKIP on char, mandatory on dest)
+          const m07CharId = m07Targets[0];
+          const m07FromMI = m07CharMissionMap[m07CharId];
+          const m07OtherMissions: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            if (i !== m07FromMI) m07OtherMissions.push(String(i));
+          }
+
+          if (m07OtherMissions.length === 1) {
+            // Only one destination: auto-resolve
+            newState = EffectEngine.mss07ApplyMove(newState, m07CharId, m07FromMI, parseInt(m07OtherMissions[0], 10), m07Player);
+            break;
+          }
+
+          // Multiple destinations: mandatory destination selection
+          const m07dEffId = generateInstanceId();
+          const m07dActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: m07dEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'SCORE' as EffectType,
+            effectDescription: JSON.stringify({ charId: m07CharId, fromMissionIndex: m07FromMI }),
+            targetSelectionType: 'MSS07_CHOOSE_DESTINATION',
+            sourcePlayer: m07Player, requiresTargetSelection: true,
+            validTargets: m07OtherMissions, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: m07dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: m07Player,
+            description: 'MSS 07 (I Have to Go): Choose a mission to move the hidden character to.',
+            descriptionKey: 'game.effect.desc.mss07MoveDest',
+            options: m07OtherMissions, minSelections: 1, maxSelections: 1,
+            sourceEffectId: m07dEffId,
+          });
+          break;
+        }
+
+        // Multiple hidden chars: child character selection with SKIP
+        const m07EffId = generateInstanceId();
+        const m07ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: m07EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'MSS07_MOVE_HIDDEN',
+          sourcePlayer: m07Player, requiresTargetSelection: true,
+          validTargets: m07Targets, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: m07ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: m07Player,
+          description: 'MSS 07 (I Have to Go): Choose a hidden friendly character to move.',
+          descriptionKey: 'game.effect.desc.mss07MoveHidden',
+          options: m07Targets, minSelections: 1, maxSelections: 1,
+          sourceEffectId: m07EffId,
+        });
+        break;
+      }
+
+      // --- MSS 08: Set a Trap CONFIRM ---
+      case 'MSS08_CONFIRM_SCORE': {
+        const m08Player = pendingEffect.sourcePlayer;
+        const m08Hand = newState[m08Player].hand;
+
+        if (m08Hand.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m08Player,
+            'SCORE_NO_TARGET', 'MSS 08 (Set a Trap): No cards in hand (state changed).',
+            'game.log.effect.noTarget', { card: 'Tendre un piege', id: 'KS-008-MMS' });
+          break;
+        }
+        if (newState.activeMissions.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, m08Player,
+            'SCORE_NO_TARGET', 'MSS 08 (Set a Trap): No active missions (state changed).',
+            'game.log.effect.noTarget', { card: 'Tendre un piege', id: 'KS-008-MMS' });
+          break;
+        }
+
+        // Child: card selection with SKIP
+        const m08HandIndices = m08Hand.map((_: unknown, i: number) => String(i));
+        const m08EffId = generateInstanceId();
+        const m08ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: m08EffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: 'SCORE' as EffectType,
+          effectDescription: '', targetSelectionType: 'MSS08_CHOOSE_CARD',
+          sourcePlayer: m08Player, requiresTargetSelection: true,
+          validTargets: m08HandIndices, isOptional: true, isMandatory: false,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: m08ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: m08Player,
+          description: 'MSS 08 (Set a Trap): Choose a card from your hand to place as a hidden character.',
+          descriptionKey: 'game.effect.desc.mss08ChooseCard',
+          options: m08HandIndices, minSelections: 1, maxSelections: 1,
+          sourceEffectId: m08EffId,
+        });
+        break;
+      }
+
       // --- MSS 08: Set a Trap ---
       case 'MSS08_CHOOSE_CARD':
         newState = EffectEngine.mss08ChooseCard(newState, pendingEffect, targetId);
@@ -13890,8 +14183,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: missionIndices,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });
@@ -14443,8 +14736,8 @@ export class EffectEngine {
       sourcePlayer: pending.sourcePlayer,
       requiresTargetSelection: true,
       validTargets: otherMissions,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: false,
     });

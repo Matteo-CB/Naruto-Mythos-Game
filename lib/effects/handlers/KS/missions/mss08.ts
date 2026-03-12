@@ -41,16 +41,14 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Stage 1: choose which card from hand
-  const handIndices = playerState.hand.map((_, i) => String(i));
-
+  // CONFIRM popup before card selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MSS08_CHOOSE_CARD',
-    validTargets: handIndices,
-    description: 'MSS 08 (Set a Trap): Choose a card from your hand to place as a hidden character.',
-    descriptionKey: 'game.effect.desc.mss08ChooseCard',
+    targetSelectionType: 'MSS08_CONFIRM_SCORE',
+    validTargets: ['KS-008-MMS'],
+    description: 'MSS 08 (Set a Trap): Put a card from your hand as a hidden character to any mission.',
+    descriptionKey: 'game.effect.desc.mss08ConfirmScore',
   };
 }
 
