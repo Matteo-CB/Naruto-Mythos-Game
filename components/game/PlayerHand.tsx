@@ -197,14 +197,16 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
     visibleState?.phase === 'action' &&
     !isProcessing;
 
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+
   const handleSelect = useCallback((index: number) => {
-    if (!isMyTurn) return;
+    if (!isMyTurn || effectPopupMinimized) return;
     if (selectedCardIndex === index) {
       selectCard(null);
     } else {
       selectCard(index);
     }
-  }, [isMyTurn, selectedCardIndex, selectCard]);
+  }, [isMyTurn, effectPopupMinimized, selectedCardIndex, selectCard]);
 
   return (
     <div className="flex flex-col items-center gap-1.5">

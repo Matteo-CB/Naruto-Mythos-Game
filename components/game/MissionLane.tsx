@@ -50,8 +50,11 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   // AND re-hidden enemy cards (wasRevealedAtLeastOnce = public knowledge)
   const hasCardData = !!character.card;
 
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+
   // Determine if this is a revealable character (own hidden character)
-  const isRevealable = isOwn && isHidden && isMyTurn && hasCardData;
+  // Block reveal selection when an effect popup is minimized (view-only mode)
+  const isRevealable = isOwn && isHidden && isMyTurn && hasCardData && !effectPopupMinimized;
 
   // A re-hidden card: was revealed at least once, now face-down again
   const isReHidden = isHidden && character.wasRevealedAtLeastOnce;
@@ -465,8 +468,11 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     visibleState.phase === 'action' &&
     !isProcessing;
 
+  const effectPopupMinimized_ml = useUIStore((s) => s.effectPopupMinimized);
+
   // Determine if this lane is a valid drop target (card selected, ready to target mission)
-  const isTargetable = isMyTurn && selectedCardIndex !== null;
+  // Block mission selection when an effect popup is minimized (view-only mode)
+  const isTargetable = isMyTurn && selectedCardIndex !== null && !effectPopupMinimized_ml;
   const isSelected = selectedMissionIndex === missionIndex;
 
   // Separate characters by side (player's characters and opponent's characters)
