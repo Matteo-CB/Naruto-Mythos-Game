@@ -763,6 +763,7 @@ export class EffectEngine {
                 requiresTargetSelection: true,
                 targetSelectionType: 'ITACHI091_CHOOSE_DISCARD',
                 validTargets: oppIndices091,
+                isMandatory: true,
                 description: JSON.stringify({
                   text: 'Itachi (091) UPGRADE: Choose a card from opponent\'s hand to discard.',
                   cards: oppCards091,
@@ -2331,6 +2332,35 @@ export class EffectEngine {
           break;
         }
 
+        // If upgrade: prompt UPGRADE modifier BEFORE revealing the hand (like Itachi 091 pattern)
+        if (s014Meta.isUpgrade) {
+          const s014mEffId = generateInstanceId();
+          const s014mActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: s014mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE',
+            effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
+            targetSelectionType: 'SASUKE014_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: s014mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Sasuke Uchiwa (014) UPGRADE: In addition, discard 1 card to discard 1 from opponent's hand?`,
+            descriptionKey: 'game.effect.desc.sasuke014ConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            sourceEffectId: s014mEffId,
+          }];
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        // Non-upgrade: reveal hand directly
         const allCards014 = oppHand014.map((c: any, i: number) => ({
           name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
           image_file: c.image_file, originalIndex: i,
@@ -2339,10 +2369,6 @@ export class EffectEngine {
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
           'game.log.effect.sasuke014Reveal', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
-
-        // Use UPGRADE_HAND_REVEAL if upgrade (chains to UPGRADE confirm popup after), else just HAND_REVEAL
-        const useUpgradeChain014 = !!s014Meta.isUpgrade;
-        const tst014 = useUpgradeChain014 ? 'SASUKE014_UPGRADE_HAND_REVEAL' : 'SASUKE014_HAND_REVEAL';
 
         const s014EffId = generateInstanceId();
         const s014ActId = generateInstanceId();
@@ -2355,10 +2381,10 @@ export class EffectEngine {
             text: 'Sasuke (014): Opponent\'s hand revealed.',
             cards: allCards014,
           }),
-          targetSelectionType: tst014,
+          targetSelectionType: 'SASUKE014_HAND_REVEAL',
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: ['confirm'], isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          resolved: false, isUpgrade: false,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -2368,6 +2394,57 @@ export class EffectEngine {
           descriptionKey: 'game.effect.desc.sasuke014Reveal',
           options: ['confirm'], minSelections: 1, maxSelections: 1,
           sourceEffectId: s014EffId,
+        }];
+        pendingEffect.remainingEffectTypes = undefined;
+        break;
+      }
+
+      case 'SASUKE014_CONFIRM_UPGRADE_MODIFIER': {
+        // Player accepted the UPGRADE modifier — now reveal hand with upgrade flag, then chain to discard
+        const s014umOpponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const oppHand014um = newState[s014umOpponent].hand;
+
+        if (oppHand014um.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014): Opponent hand empty.',
+            'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+          break;
+        }
+
+        const allCards014um = oppHand014um.map((c: any, i: number) => ({
+          name_fr: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0,
+          image_file: c.image_file, originalIndex: i,
+        }));
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_LOOK_HAND', 'Sasuke Uchiwa (014): Revealed all cards in opponent\'s hand.',
+          'game.log.effect.sasuke014Reveal', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+
+        // Chain to UPGRADE_HAND_REVEAL (which will show the hand and then chain to discard flow)
+        const s014umEffId = generateInstanceId();
+        const s014umActId = generateInstanceId();
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: s014umEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({
+            text: 'Sasuke (014): Opponent\'s hand revealed.',
+            cards: allCards014um,
+          }),
+          targetSelectionType: 'SASUKE014_UPGRADE_HAND_REVEAL',
+          sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: ['confirm'], isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        }];
+        newState.pendingActions = [...newState.pendingActions, {
+          id: s014umActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: pendingEffect.sourcePlayer,
+          description: JSON.stringify({ text: 'Opponent hand revealed.', cards: allCards014um }),
+          descriptionKey: 'game.effect.desc.sasuke014Reveal',
+          options: ['confirm'], minSelections: 1, maxSelections: 1,
+          sourceEffectId: s014umEffId,
         }];
         pendingEffect.remainingEffectTypes = undefined;
         break;
