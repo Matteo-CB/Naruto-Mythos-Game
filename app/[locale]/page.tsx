@@ -377,54 +377,47 @@ export default function Home() {
               )}
             </motion.nav>
 
-            {/* Card Tracker (only visible to Andy/admin) */}
-            {session && ['Andy', 'Kutxyt', 'admin'].includes(session.user?.name ?? '') && (
+            {/* Card Tracker + Suggestions (grouped, only visible to authorized users) */}
+            {session && (
+              ['Andy', 'Kutxyt', 'admin', 'Daiki0'].includes(session.user?.name ?? '')
+            ) && (
               <motion.div
-                className="mt-2 w-full"
+                className="mt-2 flex w-full flex-col gap-2"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 1.37, ease: 'easeOut' }}
               >
-                <Link
-                  href="/admin/card-tracker"
-                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                  style={{
-                    backgroundColor: '#141414',
-                    border: '1px solid #9333ea',
-                    color: '#9333ea',
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1.03)';
-                    target.style.borderColor = '#9333ea';
-                    target.style.boxShadow = '0 0 20px rgba(147, 51, 234, 0.15)';
-                    target.style.backgroundColor = '#1a1a1a';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1)';
-                    target.style.borderColor = '#9333ea';
-                    target.style.boxShadow = 'none';
-                    target.style.backgroundColor = '#141414';
-                  }}
-                >
-                  <span
-                    className="absolute left-0 top-0 h-full w-1"
-                    style={{ backgroundColor: '#9333ea' }}
-                  />
-                  {t('cardTracker')}
-                </Link>
-              </motion.div>
-            )}
-
-            {/* Suggestion Tracker (only visible to Andy/admins) */}
-            {session && ['Andy', 'Kutxyt', 'admin', 'Daiki0'].includes(session.user?.name ?? '') && (
-              <motion.div
-                className="mt-2 w-full"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 1.4, ease: 'easeOut' }}
-              >
+                {['Andy', 'Kutxyt', 'admin'].includes(session.user?.name ?? '') && (
+                  <Link
+                    href="/admin/card-tracker"
+                    className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                    style={{
+                      backgroundColor: '#141414',
+                      border: '1px solid #9333ea',
+                      color: '#9333ea',
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1.03)';
+                      target.style.borderColor = '#9333ea';
+                      target.style.boxShadow = '0 0 20px rgba(147, 51, 234, 0.15)';
+                      target.style.backgroundColor = '#1a1a1a';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget as HTMLElement;
+                      target.style.transform = 'scale(1)';
+                      target.style.borderColor = '#9333ea';
+                      target.style.boxShadow = 'none';
+                      target.style.backgroundColor = '#141414';
+                    }}
+                  >
+                    <span
+                      className="absolute left-0 top-0 h-full w-1"
+                      style={{ backgroundColor: '#9333ea' }}
+                    />
+                    {t('cardTracker')}
+                  </Link>
+                )}
                 <Link
                   href="/admin/suggestions"
                   className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"

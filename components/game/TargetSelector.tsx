@@ -20,18 +20,19 @@ function MinimizeButton({ onClick }: { onClick: () => void }) {
       className="no-select"
       style={{
         position: 'absolute',
-        top: '10px',
-        right: '14px',
+        top: '12px',
+        right: '12px',
         zIndex: 60,
-        padding: '4px 14px',
-        background: 'rgba(255, 255, 255, 0.1)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
-        borderRadius: '6px',
-        color: '#aaa',
-        fontSize: '12px',
+        padding: '8px 18px',
+        background: 'rgba(196, 163, 90, 0.15)',
+        border: '2px solid rgba(196, 163, 90, 0.5)',
+        borderRadius: '8px',
+        color: '#c4a35a',
+        fontSize: '14px',
         cursor: 'pointer',
-        fontWeight: 600,
-        letterSpacing: '0.03em',
+        fontWeight: 700,
+        letterSpacing: '0.04em',
+        boxShadow: '0 2px 12px rgba(196, 163, 90, 0.2)',
       }}
       title={t('game.board.minimize')}
     >
