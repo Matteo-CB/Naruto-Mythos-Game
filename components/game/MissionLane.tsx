@@ -126,7 +126,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       onDoubleClick={handleDoubleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`relative no-select${isLastPlayed ? ' last-played-highlight' : ''}`}
+      className="relative no-select"
       style={{
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',

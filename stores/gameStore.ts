@@ -27,7 +27,7 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
@@ -561,6 +561,7 @@ function buildPendingTargetSelectionUI(
   // Detect dedicated confirm UIs
   const isSakura011Draw = tst === 'SAKURA011_DRAW' || tst === 'HAKU088_CONFIRM_DRAW';
   const isKiba113ConfirmHide = tst === 'KIBA113_CONFIRM_HIDE_AKAMARU' || tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
+  const isEffectConfirm = tst.includes('_CONFIRM_') && !isKiba113ConfirmHide && !isSakura011Draw;
 
   // Detect info reveal types
   const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';
@@ -680,6 +681,7 @@ function buildPendingTargetSelectionUI(
     : isSakura011Draw ? 'DRAW_CARD'
     : isKiba113ConfirmHide ? (tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU' ? 'CONFIRM_DEFEAT' : 'CONFIRM_HIDE')
     : (tst === 'EFFECT_PLAY_UPGRADE_OR_FRESH' || tst === 'HIRUZEN002_UPGRADE_OR_FRESH') ? 'EFFECT_PLAY_UPGRADE_OR_FRESH'
+    : isEffectConfirm ? 'EFFECT_CONFIRM'
     : 'TARGET_CHARACTER';
 
   // Build decline label key for specific effects
