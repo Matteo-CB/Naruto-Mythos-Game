@@ -1275,8 +1275,8 @@ export function TargetSelector() {
               transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
               className="relative mb-8"
               style={{
-                width: '120px',
-                height: '168px',
+                width: (confirmTarget?.includes('-MMS')) ? '200px' : '120px',
+                height: (confirmTarget?.includes('-MMS')) ? '143px' : '168px',
                 borderRadius: '8px',
                 overflow: 'hidden',
                 border: '2px solid #c4a35a',

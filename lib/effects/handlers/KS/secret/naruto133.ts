@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
@@ -33,39 +32,42 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
     .filter((c) => getEffectivePower(state, c, opponentPlayer) <= 5)
     .map((c) => c.instanceId);
 
-  if (validTarget1.length === 0) {
+  // Target 2: enemy with Power <= 2 in ANY mission
+  const validTarget2: string[] = [];
+  for (let i = 0; i < state.activeMissions.length; i++) {
+    for (const char of state.activeMissions[i][enemySideKey]) {
+      if (getEffectivePower(state, char, opponentPlayer) <= 2) {
+        validTarget2.push(char.instanceId);
+      }
+    }
+  }
+
+  if (validTarget1.length === 0 && validTarget2.length === 0) {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Naruto Uzumaki (133): No valid enemy with Power 5 or less in this mission.',
+      'Naruto Uzumaki (133): No valid enemy targets in play.',
       'game.log.effect.noTarget',
       { card: 'NARUTO UZUMAKI', id: 'KS-133-S' },
     );
-    // Still check for target 2
-    return checkTarget2Only(ctx, { ...state, log }, useDefeat);
+    return { state: { ...state, log } };
   }
 
-  // Stage 1: player chooses target 1
+  // Return CONFIRM popup instead of direct target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
-    validTargets: validTarget1,
-    description: JSON.stringify({
-      missionIndex: ctx.sourceMissionIndex,
-      useDefeat,
-      text: useDefeat
-        ? 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to defeat in this mission.'
-        : 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to hide in this mission.',
-    }),
+    targetSelectionType: 'NARUTO133_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex, useDefeat }),
     descriptionKey: useDefeat
-      ? 'game.effect.desc.naruto133ChooseDefeat1'
-      : 'game.effect.desc.naruto133ChooseHide1',
+      ? 'game.effect.desc.naruto133ConfirmMainUpgrade'
+      : 'game.effect.desc.naruto133ConfirmMain',
   };
 }
 
 /** When no target1 exists, check if target2 is available */
-function checkTarget2Only(ctx: EffectContext, state: EffectContext['state'], useDefeat: boolean): EffectResult {
+export function checkTarget2Only(ctx: EffectContext, state: EffectContext['state'], useDefeat: boolean): EffectResult {
   const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';

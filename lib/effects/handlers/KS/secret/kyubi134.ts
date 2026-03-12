@@ -1,6 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay, PlayerID } from '@/lib/engine/types';
+import type { PlayerID } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
@@ -65,19 +65,14 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Player chooses targets iteratively (one at a time, checking power budget)
+  // Return CONFIRM popup instead of direct target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KYUBI134_CHOOSE_HIDE_TARGETS',
-    validTargets,
-    description: JSON.stringify({
-      remainingPower: 6,
-      hiddenIds: [],
-      text: 'Kyubi (134) UPGRADE: Choose a character to hide (total power budget: 6).',
-    }),
-    descriptionKey: 'game.effect.desc.kyubi134ChooseHide',
-    descriptionParams: { remaining: '6' },
+    targetSelectionType: 'KYUBI134_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kyubi134ConfirmUpgrade',
   };
 }
 

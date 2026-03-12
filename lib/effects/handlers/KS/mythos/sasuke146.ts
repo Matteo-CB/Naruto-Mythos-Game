@@ -33,15 +33,14 @@ function sasuke146MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Effect is optional ("If you do") - route through pending action so player can skip.
-  // The "target" is Sasuke himself (confirms the player wants to activate the effect).
+  // Return CONFIRM popup first — EffectEngine will handle the actual edge transfer + POWERUP
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE146_GIVE_EDGE',
+    targetSelectionType: 'SASUKE146_CONFIRM_MAIN',
     validTargets: [ctx.sourceCard.instanceId],
     description: JSON.stringify({ sourceMissionIndex: ctx.sourceMissionIndex }),
-    descriptionKey: 'game.effect.desc.sasuke146GiveEdge',
+    descriptionKey: 'game.effect.desc.sasuke146ConfirmMain',
   };
 }
 

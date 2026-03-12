@@ -80,15 +80,14 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Always let player choose (optional effect)
+  // Return CONFIRM popup instead of direct target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'GAARA139_DEFEAT_BY_COST',
-    validTargets: validTargets.map((t) => t.char.instanceId),
-    description: `Gaara (139): Select an enemy character with cost less than ${hiddenCount} to defeat.`,
-    descriptionKey: 'game.effect.desc.gaara139Defeat',
-    descriptionParams: { hiddenCount },
+    targetSelectionType: 'GAARA139_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex, hiddenCount }),
+    descriptionKey: 'game.effect.desc.gaara139ConfirmMain',
   };
 }
 

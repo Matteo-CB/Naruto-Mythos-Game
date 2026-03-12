@@ -1,6 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
@@ -47,14 +46,14 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Always let player choose (optional effect)
+  // Return CONFIRM popup instead of direct target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KAKASHI137_HIDE_UPGRADED',
-    validTargets,
-    description: 'Kakashi Hatake (137): Choose an upgraded character in this mission to hide.',
-    descriptionKey: 'game.effect.desc.kakashi137HideUpgraded',
+    targetSelectionType: 'KAKASHI137_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kakashi137ConfirmMain',
   };
 }
 
@@ -106,14 +105,14 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Always let player choose (optional effect)
+  // Return CONFIRM popup instead of direct target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KAKASHI137_MOVE_SELF',
-    validTargets: validMissions,
-    description: 'Kakashi Hatake (137) UPGRADE: Select a mission to move this character to.',
-    descriptionKey: 'game.effect.desc.kakashi137MoveSelf',
+    targetSelectionType: 'KAKASHI137_CONFIRM_UPGRADE',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex }),
+    descriptionKey: 'game.effect.desc.kakashi137ConfirmUpgrade',
   };
 }
 

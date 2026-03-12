@@ -42,13 +42,14 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Return CONFIRM popup first — EffectEngine will handle the actual target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ITACHI143_CHOOSE_FRIENDLY',
-    validTargets,
-    description: 'Itachi Uchiwa (143): Choose a friendly character to move to this mission.',
-    descriptionKey: 'game.effect.desc.itachi143MoveFriendly',
+    targetSelectionType: 'ITACHI143_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ sourceMissionIndex, friendlyCount: validTargets.length }),
+    descriptionKey: 'game.effect.desc.itachi143ConfirmMain',
   };
 }
 
@@ -77,13 +78,14 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
+  // Return CONFIRM popup first — EffectEngine will handle the actual target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'ITACHI143_CHOOSE_ENEMY',
-    validTargets,
-    description: 'Itachi Uchiwa (143): Choose an enemy character to move to this mission.',
-    descriptionKey: 'game.effect.desc.itachi143MoveEnemy',
+    targetSelectionType: 'ITACHI143_CONFIRM_AMBUSH',
+    validTargets: [ctx.sourceCard.instanceId],
+    description: JSON.stringify({ sourceMissionIndex, enemyCount: validTargets.length }),
+    descriptionKey: 'game.effect.desc.itachi143ConfirmAmbush',
   };
 }
 
