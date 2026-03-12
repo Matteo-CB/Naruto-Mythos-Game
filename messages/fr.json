@@ -409,6 +409,7 @@
         "naruto010ConfirmAmbush": "EMBUSCADE : Deplacer ce personnage depuis cette mission.",
         "sakura012ConfirmUpgrade": "UPGRADE : Piocher 1 carte. Si vous le faites, vous devez defausser 1 carte.",
         "sasuke014ConfirmAmbush": "EMBUSCADE : Regarder la main de l'adversaire.",
+        "sasuke014ConfirmUpgradeModifier": "UPGRADE : En plus, defausser 1 carte pour defausser 1 carte de la main adverse ?",
         "sasuke014ConfirmUpgrade": "UPGRADE : Defausser 1 carte. Si vous le faites, choisissez 1 carte dans la main adverse et defaussez-la.",
         "kakashi016ConfirmMain": "MAIN : Copier un effet instantane non-upgrade d'un personnage ennemi de cout 4 ou moins en jeu.",
         "kakashi016ConfirmUpgrade": "UPGRADE : Effet MAIN : A la place, il n'y a pas de limite de cout.",

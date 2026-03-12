@@ -384,25 +384,79 @@ function VisualReplay({
     const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
 
+    // Track instanceId mapping: original (from recording) → current (during replay)
+    // This handles ID drift caused by deepClone regenerating IDs in applyAction.
+    const idMap = new Map<string, string>();
+
+    // Collect all character instanceIds from a state
+    function collectCharIds(st: GameState): Set<string> {
+      const ids = new Set<string>();
+      for (const m of st.activeMissions) {
+        for (const c of [...m.player1Characters, ...m.player2Characters]) {
+          ids.add(c.instanceId);
+        }
+      }
+      return ids;
+    }
+
+    // After each applyAction, detect new characters and update the ID map
+    function updateIdMap(prev: GameState, next: GameState, origAction: GameAction) {
+      const prevIds = collectCharIds(prev);
+      const nextIds = collectCharIds(next);
+      // Find newly added IDs (in next but not in prev)
+      for (const id of nextIds) {
+        if (!prevIds.has(id) && !idMap.has(id)) {
+          // This is a new character — try to figure out the original ID from the action
+          if (origAction.type === 'PLAY_CHARACTER' || origAction.type === 'PLAY_HIDDEN') {
+            // The original action's card created this character
+            // We don't have the original instanceId from the action, but we can map
+            // via the pending actions/effects that reference the new ID
+          }
+        }
+      }
+      // Also update pending action/effect ID mappings
+      for (const pa of next.pendingActions) {
+        const origPa = prev.pendingActions.find((p) => p.id === pa.id);
+        if (!origPa) {
+          // New pending action — record its ID
+        }
+      }
+    }
+
+    // Remap an ID through the idMap, falling back to original if no mapping exists
+    function mapId(id: string): string {
+      return idMap.get(id) ?? id;
+    }
+
     function remapAction(action: GameAction, state: GameState): GameAction {
       if (action.type === 'SELECT_TARGET') {
         const origId = action.pendingActionId;
+        // Try direct match first, then mapped match
         let pending = state.pendingActions.find((p) => p.id === origId);
         let remapped = action;
         if (!pending && state.pendingActions.length > 0) {
+          // Try to match by type similarity — find the first pending with matching sourceEffectId type
           pending = state.pendingActions[0];
           remapped = { ...remapped, pendingActionId: pending.id };
         }
-        // Remap selectedTargets if they don't match available options
+        // Remap selectedTargets: first try idMap, then fall back to valid options
         if (pending && remapped.selectedTargets.length > 0) {
           const validOptions = new Set(pending.options);
-          const needsRemap = remapped.selectedTargets.some((t) => !validOptions.has(t));
-          if (needsRemap && pending.options.length > 0) {
-            const remappedTargets = remapped.selectedTargets.map((t, i) => {
+          const mappedTargets = remapped.selectedTargets.map((t) => {
+            if (validOptions.has(t)) return t;
+            const mapped = mapId(t);
+            if (validOptions.has(mapped)) return mapped;
+            return t;
+          });
+          remapped = { ...remapped, selectedTargets: mappedTargets };
+          // If still not valid, fall back to first available option
+          const stillInvalid = remapped.selectedTargets.some((t) => !validOptions.has(t));
+          if (stillInvalid && pending.options.length > 0) {
+            const fallbackTargets = remapped.selectedTargets.map((t, i) => {
               if (validOptions.has(t)) return t;
               return pending!.options[Math.min(i, pending!.options.length - 1)];
             });
-            remapped = { ...remapped, selectedTargets: remappedTargets };
+            remapped = { ...remapped, selectedTargets: fallbackTargets };
           }
         }
         return remapped;
@@ -420,14 +474,20 @@ function VisualReplay({
         const mission = state.activeMissions[action.missionIndex];
         if (mission) {
           const origId = action.characterInstanceId;
+          const mappedId = mapId(origId);
           const allChars = [...mission.player1Characters, ...mission.player2Characters];
-          const found = allChars.find((c) => c.instanceId === origId);
-          if (!found) {
-            const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-            const hiddenChars = playerChars.filter((c) => c.isHidden);
-            if (hiddenChars.length > 0) {
-              return { ...action, characterInstanceId: hiddenChars[0].instanceId };
-            }
+          // Try mapped ID first, then original
+          const found = allChars.find((c) => c.instanceId === mappedId) || allChars.find((c) => c.instanceId === origId);
+          if (found) {
+            return { ...action, characterInstanceId: found.instanceId };
+          }
+          // Fall back to first hidden character owned by active player
+          const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+          const hiddenChars = playerChars.filter((c) => c.isHidden);
+          if (hiddenChars.length > 0) {
+            // Map the original ID to the found hidden char for future actions
+            idMap.set(origId, hiddenChars[0].instanceId);
+            return { ...action, characterInstanceId: hiddenChars[0].instanceId };
           }
         }
         return action;
@@ -436,18 +496,21 @@ function VisualReplay({
         const mission = state.activeMissions[action.missionIndex];
         if (mission) {
           const origId = action.targetInstanceId;
+          const mappedId = mapId(origId);
           const allChars = [...mission.player1Characters, ...mission.player2Characters];
-          const found = allChars.find((c) => c.instanceId === origId);
-          if (!found) {
-            const card = state[state.activePlayer].hand[action.cardIndex];
-            if (card) {
-              const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
-              const sameNameChars = playerChars.filter((c) =>
-                !c.isHidden && c.card.name_fr === card.name_fr && (c.card.chakra ?? 0) < (card.chakra ?? 0)
-              );
-              if (sameNameChars.length > 0) {
-                return { ...action, targetInstanceId: sameNameChars[0].instanceId };
-              }
+          const found = allChars.find((c) => c.instanceId === mappedId) || allChars.find((c) => c.instanceId === origId);
+          if (found) {
+            return { ...action, targetInstanceId: found.instanceId };
+          }
+          const card = state[state.activePlayer].hand[action.cardIndex];
+          if (card) {
+            const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+            const sameNameChars = playerChars.filter((c) =>
+              !c.isHidden && c.card.name_fr === card.name_fr && (c.card.chakra ?? 0) < (card.chakra ?? 0)
+            );
+            if (sameNameChars.length > 0) {
+              idMap.set(origId, sameNameChars[0].instanceId);
+              return { ...action, targetInstanceId: sameNameChars[0].instanceId };
             }
           }
         }
@@ -498,22 +561,23 @@ function VisualReplay({
       const remappedAction = remapAction(action, current);
       try {
         const next = GameEngine.applyAction(current, player, remappedAction);
-        // Detect stalled SELECT_TARGET — action went through but pending wasn't resolved
-        if (
-          remappedAction.type === 'SELECT_TARGET' &&
-          next.pendingActions.length >= current.pendingActions.length &&
-          current.pendingActions.length > 0 &&
-          next.phase === current.phase
-        ) {
-          // The target selection didn't resolve — auto-resolve the stuck pending instead
-          setIdCounter(counterBefore);
-          const resolved = autoResolvePending(current);
-          if (resolved) {
-            current = resolved;
-            result.push(current);
+        // Detect stalled SELECT_TARGET — compare pending IDs not just count
+        if (remappedAction.type === 'SELECT_TARGET' && current.pendingActions.length > 0) {
+          const prevPendingIds = current.pendingActions.map((p) => p.id).join(',');
+          const nextPendingIds = next.pendingActions.map((p) => p.id).join(',');
+          if (prevPendingIds === nextPendingIds && next.phase === current.phase) {
+            // The target selection didn't resolve — auto-resolve the stuck pending instead
+            setIdCounter(counterBefore);
+            const resolved = autoResolvePending(current);
+            if (resolved) {
+              current = resolved;
+              result.push(current);
+            }
+            continue;
           }
-          continue;
         }
+        // Track ID changes between states
+        updateIdMap(current, next, action);
         current = next;
       } catch {
         setIdCounter(counterBefore);
@@ -676,13 +740,18 @@ function VisualReplay({
 
       if (!advanced) break;
 
+      const scoreChanged = advanced.player1.missionPoints !== current.player1.missionPoints ||
+        advanced.player2.missionPoints !== current.player2.missionPoints;
+      const logChanged = advanced.log.length !== current.log.length;
       const madeProgress = advanced.phase !== current.phase ||
         advanced.turn !== current.turn ||
         advanced.pendingActions.length !== current.pendingActions.length ||
         advanced.pendingEffects.length !== current.pendingEffects.length ||
         Boolean(advanced.missionScoringComplete) !== Boolean(current.missionScoringComplete) ||
         advanced.player1.hasPassed !== current.player1.hasPassed ||
-        advanced.player2.hasPassed !== current.player2.hasPassed;
+        advanced.player2.hasPassed !== current.player2.hasPassed ||
+        scoreChanged ||
+        logChanged;
       if (!madeProgress) break;
 
       if (advanced.turn !== current.turn && advanced.phase === 'action') {

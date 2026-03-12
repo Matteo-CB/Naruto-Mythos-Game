@@ -409,6 +409,7 @@
         "naruto010ConfirmAmbush": "AMBUSH: Move this character from this mission.",
         "sakura012ConfirmUpgrade": "UPGRADE: Draw 1 card. If you do so, you must discard 1 card.",
         "sasuke014ConfirmAmbush": "AMBUSH: Look at the opponent's hand.",
+        "sasuke014ConfirmUpgradeModifier": "UPGRADE: In addition, discard 1 card to discard 1 from opponent's hand?",
         "sasuke014ConfirmUpgrade": "UPGRADE: Discard 1 card. If you do so, choose 1 card in the opponent's hand and discard it.",
         "kakashi016ConfirmMain": "MAIN: Copy a non-upgrade instant effect of an enemy character with cost 4 or less in play.",
         "kakashi016ConfirmUpgrade": "UPGRADE: MAIN effect: Instead, there's no cost limit.",

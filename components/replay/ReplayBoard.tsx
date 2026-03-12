@@ -408,11 +408,11 @@ function ReplayMissionLane({
               backgroundImage: `url(${missionImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: 0.2,
+              opacity: 0.45,
             }}
           />
         )}
-        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.35)' }} />
         <div className="relative z-10">
           <div className="flex items-center justify-center gap-1.5">
             <span
@@ -580,6 +580,9 @@ function PlayerBar({
           </span>
           <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
             {t('game.deck')}: {ps.deck.length}
+          </span>
+          <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
+            {t('game.discard')}: {ps.discardPile.length}
           </span>
         </div>
       </div>
