@@ -7330,7 +7330,7 @@ export class EffectEngine {
             sourceMissionIndex: k119MI, effectType: pendingEffect.effectType,
             effectDescription: '', targetSelectionType: 'KANKURO119_DEFEAT_TARGET',
             sourcePlayer: k119Player, requiresTargetSelection: true,
-            validTargets: k119Targets, isOptional: false, isMandatory: true,
+            validTargets: k119Targets, isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -7389,7 +7389,7 @@ export class EffectEngine {
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
             effectDescription: '', targetSelectionType: 'KANKURO119_MOVE_CHARACTER',
             sourcePlayer: k119uPlayer, requiresTargetSelection: true,
-            validTargets: k119uTargets, isOptional: false, isMandatory: true,
+            validTargets: k119uTargets, isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
           });
           newState.pendingActions.push({

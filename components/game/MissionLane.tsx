@@ -109,7 +109,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     hidePreview();
   };
 
-  const isLastPlayed = character.isLastPlayed && !isOwn;
+  const isLastPlayed = character.isLastPlayed;
 
   return (
     <motion.div

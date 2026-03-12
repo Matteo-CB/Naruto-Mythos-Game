@@ -15,8 +15,10 @@ export function executeStartPhase(state: GameState): GameState {
   // Reset turn-wide cost modifiers (Shino 033, etc.)
   newState.playCostIncrease = undefined;
 
-  // Clear last-played highlights from the previous turn
-  newState.lastPlayedInstanceIds = { player1: [], player2: [] };
+  // Snapshot previous turn's last played for display, then reset tracking
+  const prevLastPlayed = newState.lastPlayedInstanceIds ?? { player1: null, player2: null };
+  newState.previousTurnLastPlayed = { player1: prevLastPlayed.player1, player2: prevLastPlayed.player2 };
+  newState.lastPlayedInstanceIds = { player1: null, player2: null };
 
   // 1. Reveal mission card
   newState = revealMissionCard(newState);
