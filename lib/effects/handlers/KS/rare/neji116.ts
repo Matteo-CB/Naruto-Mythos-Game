@@ -80,14 +80,86 @@ function defeatCharacterWithExactPower(
   };
 }
 
+function hasCharacterWithExactPower(ctx: EffectContext, targetPower: number): boolean {
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
+  const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const friendlySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const enemySide: 'player1Characters' | 'player2Characters' =
+    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+  const mission = state.activeMissions[sourceMissionIndex];
+
+  for (const char of mission[friendlySide]) {
+    if (char.instanceId !== sourceCard.instanceId && !char.isHidden && getEffectivePower(state, char, sourcePlayer) === targetPower) {
+      return true;
+    }
+  }
+  for (const char of mission[enemySide]) {
+    if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) === targetPower) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function neji116MainHandler(ctx: EffectContext): EffectResult {
-  // MAIN always targets Power 4, regardless of whether this is an upgrade
-  return defeatCharacterWithExactPower(ctx, 4, 'NEJI116_DEFEAT_POWER4', 'MAIN');
+  const { state, sourcePlayer, sourceCard } = ctx;
+
+  // Pre-check: any character with exactly Power 4 in this mission?
+  if (!hasCharacterWithExactPower(ctx, 4)) {
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Neji Hyuga (116) MAIN: No character with exactly Power 4 in this mission.',
+          'game.log.effect.noTarget',
+          { card: 'NEJI HYUGA', id: 'KS-116-R' },
+        ),
+      },
+    };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'NEJI116_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Neji Hyuga (116) MAIN: Defeat a character with exactly Power 4 in this mission.',
+    descriptionKey: 'game.effect.desc.neji116ConfirmMain',
+  };
 }
 
 function neji116UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE is a standalone additional effect: defeat a character with exactly Power 6
-  return defeatCharacterWithExactPower(ctx, 6, 'NEJI116_DEFEAT_POWER6', 'UPGRADE');
+  const { state, sourcePlayer, sourceCard } = ctx;
+
+  // Pre-check: any character with exactly Power 6 in this mission?
+  if (!hasCharacterWithExactPower(ctx, 6)) {
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Neji Hyuga (116) UPGRADE: No character with exactly Power 6 in this mission.',
+          'game.log.effect.noTarget',
+          { card: 'NEJI HYUGA', id: 'KS-116-R' },
+        ),
+      },
+    };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'NEJI116_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Neji Hyuga (116) UPGRADE: Defeat a character with exactly Power 6 in this mission.',
+    descriptionKey: 'game.effect.desc.neji116ConfirmUpgrade',
+  };
 }
 
 export function registerNeji116Handlers(): void {

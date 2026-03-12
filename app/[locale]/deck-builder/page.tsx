@@ -18,6 +18,7 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel
 import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
+import type { EffectType } from "@/lib/engine/types";
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888',
@@ -29,6 +30,16 @@ const RARITY_COLORS: Record<string, string> = {
   Legendary: '#c4a35a',
   Mission: '#888888',
 };
+
+const RARITY_ORDER: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, S: 4, M: 5, Legendary: 6 };
+const EFFECT_TYPE_COLORS: Record<string, string> = {
+  MAIN: '#4a7ab5',
+  UPGRADE: '#3e8b3e',
+  AMBUSH: '#b33e3e',
+  SCORE: '#c4a35a',
+};
+
+type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
@@ -51,6 +62,19 @@ export default function DeckBuilderPage() {
   } | null>(null);
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [overwriteConflict, setOverwriteConflict] = useState<{ id: string; name: string } | null>(null);
+
+  // Filter & sort state
+  const [sortBy, setSortBy] = useState<SortField>('number');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [filterRarity, setFilterRarity] = useState<string[]>([]);
+  const [filterGroup, setFilterGroup] = useState<string[]>([]);
+  const [filterKeywords, setFilterKeywords] = useState<string[]>([]);
+  const [filterEffectType, setFilterEffectType] = useState<EffectType[]>([]);
+  const [filterChakraMin, setFilterChakraMin] = useState(0);
+  const [filterChakraMax, setFilterChakraMax] = useState(10);
+  const [filterPowerMin, setFilterPowerMin] = useState(0);
+  const [filterPowerMax, setFilterPowerMax] = useState(10);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Zustand store
   const deckName = useDeckBuilderStore((s) => s.deckName);
@@ -111,27 +135,116 @@ export default function DeckBuilderPage() {
     }
   }, [addError, clearAddError]);
 
-  const filteredChars = useMemo(() => {
+  // Derive available filter options from card data
+  const filterOptions = useMemo(() => {
     const chars = availableChars.filter((c) => !bannedIds.has(c.id));
-    if (!searchQuery) return chars;
-    const q = searchQuery.toLowerCase();
-    return chars.filter(
-      (c) =>
-        getCardName(c, locale as "en" | "fr")
-          .toLowerCase()
-          .includes(q) ||
-        getCardTitle(c, locale as "en" | "fr")
-          .toLowerCase()
-          .includes(q) ||
-        c.name_fr.toLowerCase().includes(q) ||
-        c.id.includes(q),
-    );
-  }, [availableChars, searchQuery, bannedIds, locale]);
+    const rarities = new Set<string>();
+    const groups = new Set<string>();
+    const keywords = new Set<string>();
+    let maxChakra = 0;
+    let maxPower = 0;
+    for (const c of chars) {
+      rarities.add(c.rarity);
+      if (c.group) groups.add(c.group);
+      for (const kw of c.keywords ?? []) keywords.add(kw);
+      if (c.chakra > maxChakra) maxChakra = c.chakra;
+      if (c.power > maxPower) maxPower = c.power;
+    }
+    const sortedRarities = Array.from(rarities).sort((a, b) => (RARITY_ORDER[a] ?? 99) - (RARITY_ORDER[b] ?? 99));
+    return {
+      rarities: sortedRarities,
+      groups: Array.from(groups).sort(),
+      keywords: Array.from(keywords).sort(),
+      maxChakra,
+      maxPower,
+    };
+  }, [availableChars, bannedIds]);
 
-  // Reset page when search changes
+  const hasActiveFilters = filterRarity.length > 0 || filterGroup.length > 0 || filterKeywords.length > 0 || filterEffectType.length > 0 || filterChakraMin > 0 || filterChakraMax < filterOptions.maxChakra || filterPowerMin > 0 || filterPowerMax < filterOptions.maxPower;
+
+  const activeFilterCount = filterRarity.length + filterGroup.length + filterKeywords.length + filterEffectType.length + (filterChakraMin > 0 || filterChakraMax < filterOptions.maxChakra ? 1 : 0) + (filterPowerMin > 0 || filterPowerMax < filterOptions.maxPower ? 1 : 0);
+
+  const clearAllFilters = useCallback(() => {
+    setSearchQuery('');
+    setFilterRarity([]);
+    setFilterGroup([]);
+    setFilterKeywords([]);
+    setFilterEffectType([]);
+    setFilterChakraMin(0);
+    setFilterChakraMax(filterOptions.maxChakra);
+    setFilterPowerMin(0);
+    setFilterPowerMax(filterOptions.maxPower);
+  }, [filterOptions.maxChakra, filterOptions.maxPower]);
+
+  const toggleArrayFilter = useCallback(<T extends string>(arr: T[], val: T, setter: (v: T[]) => void) => {
+    setter(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
+  }, []);
+
+  const filteredChars = useMemo(() => {
+    let chars = availableChars.filter((c) => !bannedIds.has(c.id));
+
+    // Text search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      chars = chars.filter(
+        (c) =>
+          getCardName(c, locale as "en" | "fr").toLowerCase().includes(q) ||
+          getCardTitle(c, locale as "en" | "fr").toLowerCase().includes(q) ||
+          c.name_fr.toLowerCase().includes(q) ||
+          c.id.includes(q),
+      );
+    }
+
+    // Rarity filter
+    if (filterRarity.length > 0) {
+      chars = chars.filter((c) => filterRarity.includes(c.rarity));
+    }
+
+    // Group filter
+    if (filterGroup.length > 0) {
+      chars = chars.filter((c) => c.group && filterGroup.includes(c.group));
+    }
+
+    // Keywords filter
+    if (filterKeywords.length > 0) {
+      chars = chars.filter((c) => c.keywords?.some((kw) => filterKeywords.includes(kw)));
+    }
+
+    // Effect type filter
+    if (filterEffectType.length > 0) {
+      chars = chars.filter((c) => c.effects?.some((e) => filterEffectType.includes(e.type)));
+    }
+
+    // Chakra range filter
+    if (filterChakraMin > 0 || filterChakraMax < filterOptions.maxChakra) {
+      chars = chars.filter((c) => c.chakra >= filterChakraMin && c.chakra <= filterChakraMax);
+    }
+
+    // Power range filter
+    if (filterPowerMin > 0 || filterPowerMax < filterOptions.maxPower) {
+      chars = chars.filter((c) => c.power >= filterPowerMin && c.power <= filterPowerMax);
+    }
+
+    // Sort
+    chars = [...chars].sort((a, b) => {
+      let cmp = 0;
+      switch (sortBy) {
+        case 'number': cmp = a.number - b.number; break;
+        case 'name': cmp = getCardName(a, locale as "en" | "fr").localeCompare(getCardName(b, locale as "en" | "fr")); break;
+        case 'chakra': cmp = (a.chakra ?? 0) - (b.chakra ?? 0); break;
+        case 'power': cmp = (a.power ?? 0) - (b.power ?? 0); break;
+        case 'rarity': cmp = (RARITY_ORDER[a.rarity] ?? 99) - (RARITY_ORDER[b.rarity] ?? 99); break;
+      }
+      return sortOrder === 'desc' ? -cmp : cmp;
+    });
+
+    return chars;
+  }, [availableChars, searchQuery, bannedIds, locale, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder, filterOptions.maxChakra, filterOptions.maxPower]);
+
+  // Reset page when search/filters change
   useEffect(() => {
     setCharPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder]);
 
   const totalCharPages = Math.max(1, Math.ceil(filteredChars.length / CHARS_PER_PAGE));
   const paginatedChars = useMemo(() => {
@@ -744,16 +857,225 @@ export default function DeckBuilderPage() {
             <div className="flex-1 h-px bg-[#262626]" />
           </div>
 
-          {/* Search bar */}
-          <div className="mb-3">
+          {/* Search bar + filter toggle + sort */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <input
               type="text"
               placeholder={t("collection.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
+              className="flex-1 min-w-[140px] max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
             />
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="px-3 py-1.5 text-xs transition-colors"
+              style={{
+                backgroundColor: showFilters ? '#1a1a2e' : '#141414',
+                border: `1px solid ${showFilters ? '#4a7ab5' : '#262626'}`,
+                color: showFilters ? '#4a7ab5' : '#888',
+              }}
+            >
+              {t("deckBuilder.filters.toggle")}
+              {activeFilterCount > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-bold" style={{ backgroundColor: '#4a7ab5', color: '#fff', borderRadius: '2px' }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            {/* Sort controls */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortField)}
+              className="px-2 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-xs focus:outline-none focus:border-[#444] cursor-pointer"
+            >
+              <option value="number">{t("deckBuilder.sort.byNumber")}</option>
+              <option value="name">{t("deckBuilder.sort.byName")}</option>
+              <option value="chakra">{t("deckBuilder.sort.byChakra")}</option>
+              <option value="power">{t("deckBuilder.sort.byPower")}</option>
+              <option value="rarity">{t("deckBuilder.sort.byRarity")}</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="px-2 py-1.5 bg-[#141414] border border-[#262626] text-[#888] text-xs hover:bg-[#1a1a1a] transition-colors cursor-pointer"
+              title={sortOrder === 'asc' ? t("deckBuilder.sort.ascending") : t("deckBuilder.sort.descending")}
+            >
+              {sortOrder === 'asc' ? '1-9' : '9-1'}
+            </button>
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="px-2 py-1.5 text-xs transition-colors"
+                style={{ backgroundColor: '#2a1a1a', border: '1px solid rgba(179, 62, 62, 0.3)', color: '#b33e3e' }}
+              >
+                {t("deckBuilder.filters.clear")}
+              </button>
+            )}
+            <span className="text-[10px] text-[#555]">
+              {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
+            </span>
           </div>
+
+          {/* Filter panel (collapsible) */}
+          {showFilters && (
+            <div className="mb-4 p-3 bg-[#0e0e0e] border border-[#262626]">
+              {/* Rarity */}
+              <div className="mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                  {t("deckBuilder.filters.rarity")}
+                </span>
+                <div className="flex gap-1.5 flex-wrap">
+                  {filterOptions.rarities.map((r) => {
+                    const active = filterRarity.includes(r);
+                    return (
+                      <button
+                        key={r}
+                        onClick={() => toggleArrayFilter(filterRarity, r, setFilterRarity)}
+                        className="px-2.5 py-1 text-[10px] font-bold uppercase transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: active ? (RARITY_COLORS[r] ?? '#888') + '25' : '#141414',
+                          border: `1px solid ${active ? RARITY_COLORS[r] ?? '#888' : '#262626'}`,
+                          color: active ? RARITY_COLORS[r] ?? '#888' : '#666',
+                        }}
+                      >
+                        {getRarityLabel(r, locale as "en" | "fr")}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Effect types */}
+              <div className="mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                  {t("deckBuilder.filters.effectType")}
+                </span>
+                <div className="flex gap-1.5 flex-wrap">
+                  {(['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'] as EffectType[]).map((et) => {
+                    const active = filterEffectType.includes(et);
+                    const color = EFFECT_TYPE_COLORS[et];
+                    return (
+                      <button
+                        key={et}
+                        onClick={() => toggleArrayFilter(filterEffectType, et, setFilterEffectType)}
+                        className="px-2.5 py-1 text-[10px] font-bold uppercase transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: active ? color + '25' : '#141414',
+                          border: `1px solid ${active ? color : '#262626'}`,
+                          color: active ? color : '#666',
+                        }}
+                      >
+                        {et}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Group */}
+              <div className="mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                  {t("deckBuilder.filters.group")}
+                </span>
+                <div className="flex gap-1.5 flex-wrap">
+                  {filterOptions.groups.map((g) => {
+                    const active = filterGroup.includes(g);
+                    return (
+                      <button
+                        key={g}
+                        onClick={() => toggleArrayFilter(filterGroup, g, setFilterGroup)}
+                        className="px-2.5 py-1 text-[10px] transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: active ? '#1a2a1a' : '#141414',
+                          border: `1px solid ${active ? '#3e8b3e' : '#262626'}`,
+                          color: active ? '#6b8a6b' : '#666',
+                        }}
+                      >
+                        {getCardGroup(g, locale as "en" | "fr")}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Keywords */}
+              <div className="mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                  {t("deckBuilder.filters.keywords")}
+                </span>
+                <div className="flex gap-1 flex-wrap max-h-[80px] overflow-y-auto">
+                  {filterOptions.keywords.map((kw) => {
+                    const active = filterKeywords.includes(kw);
+                    return (
+                      <button
+                        key={kw}
+                        onClick={() => toggleArrayFilter(filterKeywords, kw, setFilterKeywords)}
+                        className="px-2 py-0.5 text-[9px] transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: active ? '#1a1a2e' : '#141414',
+                          border: `1px solid ${active ? '#9999bb' : '#262626'}`,
+                          color: active ? '#9999bb' : '#555',
+                        }}
+                      >
+                        {getCardKeyword(kw, locale as "en" | "fr")}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Chakra & Power ranges */}
+              <div className="flex gap-6 flex-wrap">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                    {t("deckBuilder.filters.chakraCost")}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min={0}
+                      max={filterOptions.maxChakra}
+                      value={filterChakraMin}
+                      onChange={(e) => setFilterChakraMin(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
+                    />
+                    <span className="text-[10px] text-[#555]">-</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={filterOptions.maxChakra}
+                      value={filterChakraMax}
+                      onChange={(e) => setFilterChakraMax(Math.min(filterOptions.maxChakra, parseInt(e.target.value) || 0))}
+                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
+                    {t("deckBuilder.filters.power")}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min={0}
+                      max={filterOptions.maxPower}
+                      value={filterPowerMin}
+                      onChange={(e) => setFilterPowerMin(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
+                    />
+                    <span className="text-[10px] text-[#555]">-</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={filterOptions.maxPower}
+                      value={filterPowerMax}
+                      onChange={(e) => setFilterPowerMax(Math.min(filterOptions.maxPower, parseInt(e.target.value) || 0))}
+                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Missions */}
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
             {t("deckBuilder.missions", { count: availableMissions.length })}

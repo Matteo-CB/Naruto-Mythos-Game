@@ -109,6 +109,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     hidePreview();
   };
 
+  const isLastPlayed = character.isLastPlayed && !isOwn;
+
   return (
     <motion.div
       layout="position"
@@ -124,19 +126,23 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       onDoubleClick={handleDoubleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative no-select"
+      className={`relative no-select${isLastPlayed ? ' last-played-highlight' : ''}`}
       style={{
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',
         borderRadius: '5px',
         cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
-          ? '2px solid #c4a35a'
-          : '1px solid rgba(255, 255, 255, 0.08)',
+          ? '2px solid rgba(90, 160, 255, 0.9)'
+          : isLastPlayed
+            ? '1px solid rgba(90, 160, 255, 0.6)'
+            : '1px solid rgba(255, 255, 255, 0.08)',
         overflow: 'hidden',
         boxShadow: isSelected
-          ? '0 0 16px rgba(196, 163, 90, 0.4), 0 4px 12px rgba(0, 0, 0, 0.5)'
-          : '0 2px 8px rgba(0, 0, 0, 0.4)',
+          ? '0 0 16px rgba(90, 160, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.5)'
+          : isLastPlayed
+            ? '0 0 12px rgba(90, 160, 255, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4)'
+            : '0 2px 8px rgba(0, 0, 0, 0.4)',
         contain: 'layout style',
       }}
     >

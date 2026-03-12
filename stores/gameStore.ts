@@ -588,7 +588,7 @@ function buildPendingTargetSelectionUI(
         revealedCard = {
           name_fr: '', chakra: 0, power: 0, canSteal: false,
           revealTitleKey: 'game.effect.itachi091RevealTitle',
-          revealResultKey: rd.isUpgrade ? 'game.effect.itachi091DiscardResult' : 'game.effect.itachi091RevealResult',
+          revealResultKey: 'game.effect.itachi091RevealResult',
         };
         revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
           name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isDiscarded: c.isDiscarded ?? false,

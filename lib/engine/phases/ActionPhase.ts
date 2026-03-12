@@ -181,6 +181,9 @@ function handlePlayCharacter(
     log,
   };
 
+  // Track this direct play for last-played highlight
+  newState = trackLastPlayed(newState, player, charInPlay.instanceId);
+
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play continuous reactions from opponent's characters in this mission
   newState = triggerOnPlayReactions(newState, player, missionIndex);
@@ -260,12 +263,17 @@ function handlePlayHidden(
     { mission: missionIndex + 1 },
   );
 
-  return {
+  let newState: GameState = {
     ...state,
     [player]: ps,
     activeMissions: missions,
     log,
   };
+
+  // Track this direct play for last-played highlight
+  newState = trackLastPlayed(newState, player, charInPlay.instanceId);
+
+  return newState;
 }
 
 /**
@@ -384,6 +392,9 @@ function handleRevealCharacter(
       log,
     };
 
+    // Track this direct play for last-played highlight
+    newState = trackLastPlayed(newState, player, upgradeTarget.instanceId);
+
     // Existing cards' effects trigger BEFORE the newly played card's effects
     // Trigger on-play reactions (reveal counts as playing a character)
     newState = triggerOnPlayReactions(newState, player, missionIndex);
@@ -429,6 +440,9 @@ function handleRevealCharacter(
     activeMissions: missions,
     log,
   };
+
+  // Track this direct play for last-played highlight
+  newState = trackLastPlayed(newState, player, characterInstanceId);
 
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play reactions (reveal counts as playing a character)
@@ -536,6 +550,9 @@ function handleUpgradeCharacter(
     activeMissions: missions,
     log,
   };
+
+  // Track this direct play for last-played highlight
+  newState = trackLastPlayed(newState, player, targetInstanceId);
 
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play continuous reactions from opponent's characters in this mission
@@ -686,6 +703,21 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
     count += chars.length;
   }
   return count;
+}
+
+/**
+ * Track a directly-played character for last-played highlight.
+ * Only used for direct player actions (not effect-spawned plays).
+ */
+function trackLastPlayed(state: GameState, player: PlayerID, instanceId: string): GameState {
+  const current = state.lastPlayedInstanceIds ?? { player1: [], player2: [] };
+  return {
+    ...state,
+    lastPlayedInstanceIds: {
+      ...current,
+      [player]: [...current[player], instanceId],
+    },
+  };
 }
 
 // triggerOnPlayReactions is now imported from ContinuousEffects.ts

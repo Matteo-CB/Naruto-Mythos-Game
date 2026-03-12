@@ -760,7 +760,7 @@ export class GameEngine {
             effectDescription: JSON.stringify({ isUpgrade: false }),
             targetSelectionType: 'ITACHI091_HAND_REVEAL',
             sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-            validTargets: [effect.sourceInstanceId],
+            validTargets: ['confirm'],
             isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: false,
           });
@@ -769,7 +769,7 @@ export class GameEngine {
             player: effect.sourcePlayer,
             description: JSON.stringify({ text: 'Itachi Uchiwa (091) MAIN: Opponent hand revealed.', cards: i091dCards }),
             descriptionKey: 'game.effect.desc.itachi091HandReveal',
-            options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+            options: ['confirm'], minSelections: 1, maxSelections: 1,
             sourceEffectId: i091dEffId,
           });
         }
@@ -1295,6 +1295,10 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
+    // Collect opponent's last-played instanceIds for highlight
+    const lastPlayed = state.lastPlayedInstanceIds ?? { player1: [], player2: [] };
+    const opponentLastPlayedSet = new Set(lastPlayed[otherPlayer]);
+
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,
       handSize: oppState.hand.length,
@@ -1330,6 +1334,7 @@ export class GameEngine {
             missionIndex: c.missionIndex,
             stackSize: c.stack.length,
             effectivePower: power,
+            isLastPlayed: opponentLastPlayedSet.has(c.instanceId),
           };
         });
 

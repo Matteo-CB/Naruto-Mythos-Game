@@ -289,6 +289,12 @@ p, .font-body {
 .power-glow  { animation: powerGlow  1.8s ease-in-out infinite; }
 .stack-pulse { animation: stackPulse 2.5s ease-in-out infinite; }
 
+@keyframes lastPlayedPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(90, 160, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.4); }
+  50%      { box-shadow: 0 0 16px rgba(90, 160, 255, 0.45), 0 2px 8px rgba(0, 0, 0, 0.4); }
+}
+.last-played-highlight { animation: lastPlayedPulse 2s ease-in-out infinite; }
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

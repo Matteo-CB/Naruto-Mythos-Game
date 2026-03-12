@@ -23,34 +23,33 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * resolution system.
  */
 function handleTenten118Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Find all hidden characters in this mission (any player's)
-  const validTargets: string[] = [];
+  // Pre-check: find hidden characters in this mission (any player's)
+  let hasHiddenTarget = false;
   for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
     if (char.isHidden) {
-      validTargets.push(char.instanceId);
+      hasHiddenTarget = true;
+      break;
     }
   }
 
   // If no hidden characters in this mission, effect fizzles
-  if (validTargets.length === 0) {
+  if (!hasHiddenTarget) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Tenten (118): No hidden characters in this mission to defeat.',
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-118-R' }) } };
   }
 
-  // Requires target selection: which hidden character in this mission to defeat
-  // The follow-up (defeat another hidden if Power <= 3) will be handled
-  // by the target resolution system after this target is resolved.
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION',
-    validTargets,
-    description: 'Select a hidden character in this mission to defeat.',
-    descriptionKey: 'game.effect.desc.tenten118DefeatHidden',
+    targetSelectionType: 'TENTEN118_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Tenten (118) AMBUSH: Defeat a hidden character in this mission.',
+    descriptionKey: 'game.effect.desc.tenten118ConfirmAmbush',
   };
 }
 
