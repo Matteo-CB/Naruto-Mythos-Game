@@ -10359,8 +10359,8 @@ export class EffectEngine {
                 sourcePlayer: pendingEffect.sourcePlayer,
                 requiresTargetSelection: true,
                 validTargets: hideTargets_n,
-                isOptional: true,
-                isMandatory: false,
+                isOptional: false,
+                isMandatory: true,
                 resolved: false,
                 isUpgrade: false,
               });
