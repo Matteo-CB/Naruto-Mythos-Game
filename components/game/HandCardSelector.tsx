@@ -242,8 +242,8 @@ export function HandCardSelector() {
           onClick={(e) => { e.stopPropagation(); minimizeEffectPopup(); }}
           className="no-select"
           style={{
-            position: 'absolute', top: '12px', right: '12px', zIndex: 60,
-            padding: '8px 18px', background: 'rgba(196, 163, 90, 0.15)',
+            alignSelf: 'flex-end', marginRight: '16px', marginBottom: '8px',
+            zIndex: 60, padding: '8px 18px', background: 'rgba(196, 163, 90, 0.15)',
             border: '2px solid rgba(196, 163, 90, 0.5)', borderRadius: '8px',
             color: '#c4a35a', fontSize: '14px', cursor: 'pointer', fontWeight: 700,
             letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(196, 163, 90, 0.2)',
