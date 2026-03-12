@@ -1074,7 +1074,7 @@ export class EffectEngine {
             'game.log.effect.noTarget', { card: 'Appel de soutien', id: 'KS-001-MMS' });
           break;
         }
-        // Child: target selection with SKIP
+        // Child: target selection (mandatory after CONFIRM)
         const m01EffId = generateInstanceId();
         const m01ActId = generateInstanceId();
         newState.pendingEffects.push({
@@ -1084,7 +1084,7 @@ export class EffectEngine {
           effectType: 'SCORE' as EffectType,
           effectDescription: '', targetSelectionType: 'MSS01_POWERUP_TARGET',
           sourcePlayer: m01Player, requiresTargetSelection: true,
-          validTargets: m01Targets, isOptional: true, isMandatory: false,
+          validTargets: m01Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         });
         newState.pendingActions.push({
@@ -1176,7 +1176,7 @@ export class EffectEngine {
           break;
         }
 
-        // Multiple: child target selection with SKIP
+        // Multiple: child target selection (mandatory after CONFIRM)
         const m04EffId = generateInstanceId();
         const m04ActId = generateInstanceId();
         newState.pendingEffects.push({
@@ -1186,7 +1186,7 @@ export class EffectEngine {
           effectType: 'SCORE' as EffectType,
           effectDescription: '', targetSelectionType: 'MSS04_DEFEAT_HIDDEN',
           sourcePlayer: m04Player, requiresTargetSelection: true,
-          validTargets: m04Targets, isOptional: true, isMandatory: false,
+          validTargets: m04Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         });
         newState.pendingActions.push({
@@ -1284,7 +1284,7 @@ export class EffectEngine {
           break;
         }
 
-        // Multiple hidden chars: child character selection with SKIP
+        // Multiple hidden chars: child character selection (mandatory after CONFIRM)
         const m07EffId = generateInstanceId();
         const m07ActId = generateInstanceId();
         newState.pendingEffects.push({
@@ -1294,7 +1294,7 @@ export class EffectEngine {
           effectType: 'SCORE' as EffectType,
           effectDescription: '', targetSelectionType: 'MSS07_MOVE_HIDDEN',
           sourcePlayer: m07Player, requiresTargetSelection: true,
-          validTargets: m07Targets, isOptional: true, isMandatory: false,
+          validTargets: m07Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         });
         newState.pendingActions.push({
@@ -1326,7 +1326,7 @@ export class EffectEngine {
           break;
         }
 
-        // Child: card selection with SKIP
+        // Child: card selection (mandatory after CONFIRM)
         const m08HandIndices = m08Hand.map((_: unknown, i: number) => String(i));
         const m08EffId = generateInstanceId();
         const m08ActId = generateInstanceId();
@@ -1337,11 +1337,11 @@ export class EffectEngine {
           effectType: 'SCORE' as EffectType,
           effectDescription: '', targetSelectionType: 'MSS08_CHOOSE_CARD',
           sourcePlayer: m08Player, requiresTargetSelection: true,
-          validTargets: m08HandIndices, isOptional: true, isMandatory: false,
+          validTargets: m08HandIndices, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
         });
         newState.pendingActions.push({
-          id: m08ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          id: m08ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
           player: m08Player,
           description: 'MSS 08 (Set a Trap): Choose a card from your hand to place as a hidden character.',
           descriptionKey: 'game.effect.desc.mss08ChooseCard',
@@ -10850,7 +10850,7 @@ export class EffectEngine {
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
-            id: n141ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            id: n141ActId, type: 'DISCARD_CARD' as PendingAction['type'],
             player: n141Player,
             description: 'Naruto Uzumaki (141): Choose a card from hand to discard.',
             descriptionKey: 'game.effect.desc.naruto141ChooseDiscard',
@@ -10890,7 +10890,7 @@ export class EffectEngine {
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
-            id: s142ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            id: s142ActId, type: 'DISCARD_CARD' as PendingAction['type'],
             player: s142Player,
             description: 'Sasuke Uchiwa (142): Choose a card from hand to discard.',
             descriptionKey: 'game.effect.desc.sasuke142ChooseDiscard',
