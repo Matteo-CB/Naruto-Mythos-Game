@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 /**
  * Card 141/130 - NARUTO UZUMAKI (M)
@@ -25,6 +26,25 @@ function naruto141MainHandler(ctx: EffectContext): EffectResult {
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
       'Naruto Uzumaki (141): No cards in hand to discard, effect fizzles.',
+      'game.log.effect.noTarget',
+      { card: 'NARUTO UZUMAKI', id: 'KS-141-M' },
+    );
+    return { state: { ...state, log } };
+  }
+
+  // Check if there are enemies with Power <= 4 in this mission to hide
+  const enemySide = ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+  const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
+  const thisMission = state.activeMissions[ctx.sourceMissionIndex];
+  const hasHideTargets = thisMission?.[enemySide]?.some((c) => {
+    if (c.isHidden) return false;
+    return getEffectivePower(state, c, opponentPlayer) <= 4;
+  });
+  if (!hasHideTargets) {
+    const log = logAction(
+      state.log, state.turn, state.phase, ctx.sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Naruto Uzumaki (141): No enemy character with Power 4 or less in this mission to hide.',
       'game.log.effect.noTarget',
       { card: 'NARUTO UZUMAKI', id: 'KS-141-M' },
     );

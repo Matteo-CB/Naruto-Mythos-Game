@@ -1007,18 +1007,23 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
         const isTargetAction = data.action.type === 'SELECT_TARGET';
 
-        // SELECT_TARGET silent failure: only flag if truly nothing changed at all
-        // Compare log, pending effects/actions, phase, activePlayer, and board state
+        // SELECT_TARGET silent failure: only flag if truly nothing changed at all.
+        // Compare pending effect types/IDs (not just count) to avoid false positives when
+        // CONFIRM popups resolve to child selections (count stays same but content changes).
         if (isTargetAction && room.gameState.log.length === oldLogLength) {
-          const prevPendingCount = prevState.pendingEffects.length + prevState.pendingActions.length;
-          const newPendingCount = room.gameState.pendingEffects.length + room.gameState.pendingActions.length;
+          const prevPendingIds = prevState.pendingEffects.map((p) => p.targetSelectionType + ':' + p.id).join(',');
+          const newPendingIds = room.gameState.pendingEffects.map((p) => p.targetSelectionType + ':' + p.id).join(',');
+          const prevActionIds = prevState.pendingActions.map((p) => p.type + ':' + p.id).join(',');
+          const newActionIds = room.gameState.pendingActions.map((p) => p.type + ':' + p.id).join(',');
+          const pendingChanged = prevPendingIds !== newPendingIds || prevActionIds !== newActionIds;
           const phaseChanged = prevState.phase !== room.gameState.phase;
           const activePlayerChanged = prevState.activePlayer !== room.gameState.activePlayer;
           const chakraChanged = prevState.player1.chakra !== room.gameState.player1.chakra || prevState.player2.chakra !== room.gameState.player2.chakra;
           const boardChanged = JSON.stringify(prevState.activeMissions) !== JSON.stringify(room.gameState.activeMissions);
           const handChanged = prevState.player1.hand.length !== room.gameState.player1.hand.length || prevState.player2.hand.length !== room.gameState.player2.hand.length;
-          if (prevPendingCount === newPendingCount && !phaseChanged && !activePlayerChanged && !chakraChanged && !boardChanged && !handChanged) {
-            console.warn(`[Socket] SELECT_TARGET silently failed for ${player}: state truly unchanged (pending: ${prevPendingCount} -> ${newPendingCount})`);
+          const discardChanged = prevState.player1.discardPile.length !== room.gameState.player1.discardPile.length || prevState.player2.discardPile.length !== room.gameState.player2.discardPile.length;
+          if (!pendingChanged && !phaseChanged && !activePlayerChanged && !chakraChanged && !boardChanged && !handChanged && !discardChanged) {
+            console.warn(`[Socket] SELECT_TARGET silently failed for ${player}: state truly unchanged`);
             socket.emit('game:error', { message: 'Effect failed to apply. Please try again.', errorKey: 'game.error.effectFailed' });
             broadcastState(room, io);
             return;
