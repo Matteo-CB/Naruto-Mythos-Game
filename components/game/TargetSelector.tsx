@@ -19,24 +19,20 @@ function MinimizeButton({ onClick }: { onClick: () => void }) {
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className="no-select"
       style={{
-        alignSelf: 'flex-end',
-        marginRight: '16px',
-        marginBottom: '8px',
-        zIndex: 60,
-        padding: '8px 18px',
-        background: 'rgba(196, 163, 90, 0.15)',
-        border: '2px solid rgba(196, 163, 90, 0.5)',
-        borderRadius: '8px',
+        margin: '0 auto 12px',
+        padding: '6px 20px',
+        background: 'rgba(196, 163, 90, 0.12)',
+        border: '1px solid rgba(196, 163, 90, 0.35)',
+        borderRadius: '20px',
         color: '#c4a35a',
-        fontSize: '14px',
+        fontSize: '12px',
         cursor: 'pointer',
-        fontWeight: 700,
-        letterSpacing: '0.04em',
-        boxShadow: '0 2px 12px rgba(196, 163, 90, 0.2)',
+        fontWeight: 600,
+        letterSpacing: '0.05em',
       }}
       title={t('game.board.minimize')}
     >
-      &#x25BC; {t('game.board.minimize')}
+      {t('game.board.minimize')}
     </button>
   );
 }
