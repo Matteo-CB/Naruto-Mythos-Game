@@ -535,6 +535,7 @@
         "kankuro119ConfirmUpgrade": "UPGRADE : Deplacez n'importe quel personnage en jeu.",
         "temari121ConfirmMain": "MAIN : Deplacez un personnage allie en jeu.",
         "temari121ConfirmUpgrade": "UPGRADE : Deplacez n'importe quel personnage en jeu.",
+        "jirobo122ConfirmMain": "MAIN : POWERUP X ou X est le nombre de personnages dans cette mission.",
         "jirobo122ConfirmUpgrade": "UPGRADE : Vaincre un personnage ennemi avec Puissance 1 ou moins dans cette mission.",
         "tsunade104ConfirmUpgrade": "UPGRADE : Depensez un montant additionnel de Chakra. POWERUP X.",
         "jiraiya007ChooseSummon": "Choisissez une Invocation de votre main a jouer (1 de moins).",
@@ -559,6 +560,7 @@
         "baki082UpgradePowerup": "POWERUP 1 sur chaque personnage Village du Sable allie dans cette mission.",
         "choji018MoveSelf": "Selectionnez une mission pour y deplacer Choji Akimichi.",
         "choji018HideEnemy": "Choisissez un personnage ennemi avec moins de Puissance a cacher.",
+        "gaara120ConfirmMain": "MAIN : Vaincre jusqu'a 1 personnage ennemi avec Puissance 1 ou moins dans chaque mission.",
         "gaara120ChooseDefeat": "Choisissez un personnage ennemi avec Puissance 1 ou moins a vaincre dans la mission {mission}.",
         "dosu069LookAtHidden": "Selectionnez un personnage cache en jeu a regarder.",
         "dosu069ForceRevealOrDefeat": "Choisissez un personnage ennemi cache dans cette mission. L'adversaire doit soit le jouer en payant 2 de plus, soit le vaincre.",
@@ -2283,6 +2285,62 @@
       "normal": "Normale",
       "high": "Haute",
       "critical": "Critique"
+    }
+  },
+  "coach": {
+    "title": "Coach IA",
+    "analysing": "Analyse...",
+    "toggleOpen": "Ouvrir le coach",
+    "toggleClose": "Fermer le coach",
+    "open": "COACH",
+    "close": "FERMER",
+    "bestMove": "Meilleur coup",
+    "handCards": "Cartes en main",
+    "warnings": "Attention",
+    "tips": "Conseils",
+    "missions": "Missions",
+    "neuralActive": "Reseau de neurones actif",
+    "heuristicMode": "Mode heuristique",
+    "sims": "{count} sims",
+    "waiting": "En attente d'une partie...",
+    "defeat": "Defaite",
+    "victory": "Victoire",
+    "board": {
+      "winning": "Position gagnante",
+      "slightlyAhead": "Legerement en avance",
+      "even": "Position equilibree",
+      "slightlyBehind": "Legerement derriere",
+      "losing": "Position difficile"
+    },
+    "mission": {
+      "free": "Mission {rank} libre - {pts} pts a prendre",
+      "tiedZero": "Egalite a 0 - jeton Avantage decisif",
+      "dominating": "Tu domines ({my} vs {opp}) - {pts} pts assures",
+      "winning": "Tu menes ({my} vs {opp}) - consolide",
+      "tied": "Egalite ({my} chacun) - avantage au jeton",
+      "losingAbandon": "Adversaire dominant ({opp} vs {my}) - envisage d'abandonner",
+      "losing": "Tu es derriere ({my} vs {opp}) - +{diff} force necessaire"
+    },
+    "hand": {
+      "notEnoughChakra": "Pas assez de chakra ({cost} requis)",
+      "power": "{power} force"
+    },
+    "warn": {
+      "hiddenEnemies": "{count} personnage(s) cache(s) adverses - attention aux AMBUSH",
+      "oppChakra": "Adversaire a {chakra} chakra - peut jouer une grosse carte",
+      "behind": "Retard de {diff} pts au tour {turn}/4"
+    },
+    "tip": {
+      "missionOpen": "Mission {rank} ({pts} pts) a saisir",
+      "ambushCard": "{card} a un effet AMBUSH - joue-la cachee"
+    },
+    "action": {
+      "play": "Jouer {card} ({power} force) sur Mission {rank} - {pct}",
+      "hide": "Cacher {card} sur Mission {rank} - {pct}",
+      "reveal": "Reveler personnage cache sur Mission {rank} - {pct}",
+      "upgrade": "Ameliorer vers {card} - {pct}",
+      "pass": "Passer - {pct}",
+      "simulations": "{visits} simulations - {winRate} victoire"
     }
   }
 }

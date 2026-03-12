@@ -739,4 +739,60 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
   DECLINE: All 14 new CONFIRM types use generic fallback handler
   14 i18n keys added (EN + FR)
 
+2026-03-12 - Batch 12 Follow-up Fixes (Andy re-testing):
+  BUGS FOUND & FIXED:
+
+  28. KS-121 (Temari R) - UPGRADE double-move:
+      - Root cause: remainingEffectTypes: ['UPGRADE'] propagated through CONFIRM_MAIN →
+        MOVE_FRIENDLY → MOVE_FRIENDLY_DESTINATION. Both MOVE and DESTINATION fired
+        processRemainingEffects, causing UPGRADE to trigger TWICE.
+      - Fix: In generic move handler (line ~8912), after creating destination pending with
+        remainingEffectTypes, clear from parent: pendingEffect.remainingEffectTypes = undefined
+      - This fixes ALL move effects (JIRAIYA105, KANKURO119, TEMARI121, ITACHI152, ITACHI128, SHINO115)
+
+  29. KS-122 (Jirobo R) - MAIN auto-activates without CONFIRM popup:
+      - Fix: Handler now returns JIROBO122_CONFIRM_MAIN (isOptional: true)
+      - New EffectEngine case: re-counts chars in mission, applies POWERUP X directly after CONFIRM
+      - Added i18n key jirobo122ConfirmMain (EN + FR)
+
+  30. KS-120 (Gaara R) - MAIN had no initial CONFIRM popup:
+      - Fix: Handler now returns GAARA120_CONFIRM_MAIN (isOptional: true) before mission-by-mission loop
+      - New EffectEngine case: re-checks missions for valid targets, creates GAARA120_CHOOSE_DEFEAT
+      - Added i18n key gaara120ConfirmMain (EN + FR)
+
+  31. KS-116 (Neji R) - Missing descriptionParams (R14 violation):
+      - NEJI116_DEFEAT_POWER4 and NEJI116_DEFEAT_POWER6 pending actions had descriptionKey
+        with {power} placeholder but no descriptionParams
+      - Fix: Added descriptionParams: { power: '4' } and { power: '6' } respectively
+
+  32. KS-099 (Pakkun C) - SKIP button on PAKKUN_MOVE_DESTINATION after CONFIRM (R3 violation):
+      - Child PAKKUN_MOVE_DESTINATION had isOptional: true, isMandatory: false
+      - Fix: isOptional: false, isMandatory: true
+
+  UI HIGHLIGHT COLOR FIX:
+  - MissionLane.tsx isLastPlayed: cyan → white rgba(255, 255, 255, 0.6)
+  - MissionLane.tsx CharacterSlot isSelected: cyan → gold #c4a35a
+  - TargetSelector.tsx valid target borders: gold → blue rgba(90, 160, 255, 0.9)
+  - TargetSelector.tsx pulsing glow: gold → blue
+  - TargetSelector.tsx mission target borders: gold → blue
+  - TargetSelector.tsx card-back/selectable borders: gold → blue
+  - UI text/labels/buttons kept as gold #c4a35a (not effect targeting)
+
+  REPLAY SYSTEM FIX:
+  - Complete rewrite of replay reconstruction in app/[locale]/replay/[id]/page.tsx
+  - Added autoResolvePending() for stuck pending actions/effects
+  - Recovery loop increased from 120 to 500 iterations
+  - Forces gameOver as last resort if recovery can't reach it naturally
+
+  NOUVELLE REGLE R15: GENERIC MOVE HANDLER REMAININGEFFECTTYPES
+    The shared generic move handler (MOVE_FRIENDLY/MOVE_ENEMY → DESTINATION) must clear
+    remainingEffectTypes from parent after passing to destination child. Pattern:
+    ```typescript
+    remainingEffectTypes: pendingEffect.remainingEffectTypes,
+    });
+    pendingEffect.remainingEffectTypes = undefined;
+    ```
+    This prevents processRemainingEffects from firing at BOTH the move step AND the
+    destination step (double-trigger bug).
+
 ================================================================================

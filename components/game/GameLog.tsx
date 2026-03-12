@@ -1,12 +1,35 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
+
+/**
+ * When locale is 'en', swap _en variants into base keys for i18n interpolation.
+ * E.g. { card: 'NARUTO UZUMAKI', card_en: 'NARUTO UZUMAKI', title: 'Jeune Ninja', title_en: 'Young Ninja' }
+ * becomes { card: 'NARUTO UZUMAKI', title: 'Young Ninja', ... } in English.
+ */
+function localizeParams(
+  params: Record<string, string | number> | undefined,
+  locale: string,
+): Record<string, string | number> | undefined {
+  if (!params || locale !== 'en') return params;
+  const result = { ...params };
+  const enSuffix = '_en';
+  for (const key of Object.keys(result)) {
+    if (key.endsWith(enSuffix)) {
+      const baseKey = key.slice(0, -enSuffix.length);
+      if (baseKey in result) {
+        result[baseKey] = result[key];
+      }
+    }
+  }
+  return result;
+}
 
 const phaseTranslationKeys: Record<string, string> = {
   setup: 'game.phase.start',
@@ -25,10 +48,11 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames }: {
+const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDisplayNames, locale }: {
   entry: GameLogEntry;
   formatPhase: (phase: GamePhase) => string;
   playerDisplayNames: { player1: string; player2: string };
+  locale: string;
 }) {
   const t = useTranslations();
   const playerColor = entry.player === 'player1' ? '#c4a35a' : '#b33e3e';
@@ -60,7 +84,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
         </span>
       )}
       <span className="font-body" style={{ color: '#e0e0e0' }}>
-        {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
+        {entry.messageKey ? t(entry.messageKey, localizeParams(entry.messageParams, locale) ?? {}) : (entry.details || entry.action)}
       </span>
     </motion.div>
   );
@@ -68,6 +92,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
 
 export function GameLog() {
   const t = useTranslations();
+  const locale = useLocale();
   const visibleState = useGameStore((s) => s.visibleState);
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const showGameLog = useUIStore((s) => s.showGameLog);
@@ -159,7 +184,7 @@ export function GameLog() {
                 </div>
               ) : (
                 log.map((entry, i) => (
-                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} />
+                  <LogEntry key={`${entry.timestamp}-${i}`} entry={entry} formatPhase={formatPhase} playerDisplayNames={playerDisplayNames} locale={locale} />
                 ))
               )}
             </div>

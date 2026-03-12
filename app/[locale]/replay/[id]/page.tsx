@@ -387,19 +387,32 @@ function VisualReplay({
     function remapAction(action: GameAction, state: GameState): GameAction {
       if (action.type === 'SELECT_TARGET') {
         const origId = action.pendingActionId;
-        const found = state.pendingActions.find((p) => p.id === origId);
-        if (!found && state.pendingActions.length > 0) {
-          const remapped = state.pendingActions[0];
-          return { ...action, pendingActionId: remapped.id };
+        let pending = state.pendingActions.find((p) => p.id === origId);
+        let remapped = action;
+        if (!pending && state.pendingActions.length > 0) {
+          pending = state.pendingActions[0];
+          remapped = { ...remapped, pendingActionId: pending.id };
         }
-        return action;
+        // Remap selectedTargets if they don't match available options
+        if (pending && remapped.selectedTargets.length > 0) {
+          const validOptions = new Set(pending.options);
+          const needsRemap = remapped.selectedTargets.some((t) => !validOptions.has(t));
+          if (needsRemap && pending.options.length > 0) {
+            const remappedTargets = remapped.selectedTargets.map((t, i) => {
+              if (validOptions.has(t)) return t;
+              return pending!.options[Math.min(i, pending!.options.length - 1)];
+            });
+            remapped = { ...remapped, selectedTargets: remappedTargets };
+          }
+        }
+        return remapped;
       }
       if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
         const origId = action.pendingEffectId;
         const found = state.pendingEffects.find((e) => e.id === origId);
         if (!found && state.pendingEffects.length > 0) {
-          const remapped = state.pendingEffects.find((e) => e.isOptional || !e.isMandatory) ?? state.pendingEffects[0];
-          return { ...action, pendingEffectId: remapped.id };
+          const remappedEff = state.pendingEffects.find((e) => e.isOptional || !e.isMandatory) ?? state.pendingEffects[0];
+          return { ...action, pendingEffectId: remappedEff.id };
         }
         return action;
       }
@@ -443,15 +456,75 @@ function VisualReplay({
       return action;
     }
 
+    // Auto-resolve a single pending action/effect — returns new state or null if stuck
+    function autoResolvePending(st: GameState): GameState | null {
+      if (st.pendingActions.length > 0) {
+        const pa = st.pendingActions[0];
+        const pe = st.pendingEffects.find((e) => e.id === pa.sourceEffectId);
+        const isOpt = pe?.isOptional || pa.minSelections === 0 || pa.options.length === 0;
+        try {
+          if (isOpt && pe) {
+            return GameEngine.applyAction(st, pa.player, {
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pe.id,
+            });
+          } else if (pa.options.length > 0) {
+            return GameEngine.applyAction(st, pa.player, {
+              type: 'SELECT_TARGET',
+              pendingActionId: pa.id,
+              selectedTargets: [pa.options[0]],
+            });
+          }
+        } catch { /* fallthrough */ }
+        // Force-remove if engine can't handle it
+        return {
+          ...st,
+          pendingActions: st.pendingActions.filter((p) => p.id !== pa.id),
+          pendingEffects: pa.sourceEffectId
+            ? st.pendingEffects.filter((e) => e.id !== pa.sourceEffectId)
+            : st.pendingEffects,
+        };
+      }
+      if (st.pendingEffects.length > 0) {
+        return { ...st, pendingEffects: [] };
+      }
+      return null;
+    }
+
+    // Main replay loop
     for (const { player, action } of actionHistory) {
       const prevTurn = current.turn;
       const counterBefore = getIdCounter();
       const remappedAction = remapAction(action, current);
       try {
         const next = GameEngine.applyAction(current, player, remappedAction);
+        // Detect stalled SELECT_TARGET — action went through but pending wasn't resolved
+        if (
+          remappedAction.type === 'SELECT_TARGET' &&
+          next.pendingActions.length >= current.pendingActions.length &&
+          current.pendingActions.length > 0 &&
+          next.phase === current.phase
+        ) {
+          // The target selection didn't resolve — auto-resolve the stuck pending instead
+          setIdCounter(counterBefore);
+          const resolved = autoResolvePending(current);
+          if (resolved) {
+            current = resolved;
+            result.push(current);
+          }
+          continue;
+        }
         current = next;
       } catch {
         setIdCounter(counterBefore);
+        // If we have stuck pending state, auto-resolve it before continuing
+        if (current.pendingActions.length > 0 || current.pendingEffects.length > 0) {
+          const resolved = autoResolvePending(current);
+          if (resolved) {
+            current = resolved;
+            result.push(current);
+          }
+        }
         continue;
       }
 
@@ -461,17 +534,36 @@ function VisualReplay({
       result.push(current);
     }
 
-    // Recovery loop
+    // Recovery loop — advance state to gameOver after actionHistory is exhausted
     let recovery = 0;
-    while (current.phase !== 'gameOver' && recovery < 120) {
+    while (current.phase !== 'gameOver' && recovery < 500) {
       let advanced: GameState | null = null;
       try {
+        // Clear orphan pending effects (no matching pending actions)
         if (current.pendingEffects.length > 0 && current.pendingActions.length === 0) {
           current = { ...current, pendingEffects: [] };
         }
 
-        if (current.phase === 'action') {
-          if (current.player1.hasPassed && current.player2.hasPassed) {
+        // Handle pending actions in ANY phase
+        if (current.pendingActions.length > 0) {
+          advanced = autoResolvePending(current);
+        } else if (current.phase === 'action') {
+          // No pending actions — need to advance past action phase
+          if (!current.player1.hasPassed || !current.player2.hasPassed) {
+            // Force-pass whoever hasn't passed
+            let st = current;
+            for (const p of ['player1', 'player2'] as PlayerID[]) {
+              if (!st[p].hasPassed) {
+                try {
+                  st = GameEngine.applyAction(st, p, { type: 'PASS' });
+                } catch {
+                  st = { ...st, [p]: { ...st[p], hasPassed: true } };
+                }
+              }
+            }
+            advanced = st;
+          } else {
+            // Both passed — transition to mission phase
             for (const p of ['player1', 'player2'] as PlayerID[]) {
               try {
                 const attempt = GameEngine.applyAction(current, p, { type: 'PASS' });
@@ -485,54 +577,22 @@ function VisualReplay({
               try {
                 const forced: GameState = { ...current, phase: 'mission' as GamePhase, missionScoredThisTurn: false };
                 advanced = GameEngine.applyAction(forced, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-              } catch { /* fallthrough */ }
+              } catch {
+                // Force transition to mission phase
+                advanced = {
+                  ...current,
+                  phase: 'mission' as GamePhase,
+                  pendingActions: [],
+                  pendingEffects: [],
+                  missionScoredThisTurn: false,
+                };
+              }
             }
           }
-          if (!advanced) break;
-
-        } else if ((current.phase === 'mission' || current.phase === 'end') && current.pendingActions.length > 0) {
-          const pending = current.pendingActions[0];
-          const effect = current.pendingEffects.find((e) => e.id === pending.sourceEffectId);
-          const isOptional = effect?.isOptional || pending.minSelections === 0 || pending.options.length === 0;
-
-          if (isOptional) {
-            advanced = GameEngine.applyAction(current, pending.player, {
-              type: 'DECLINE_OPTIONAL_EFFECT',
-              pendingEffectId: pending.sourceEffectId ?? pending.id,
-            });
-          } else if (pending.options.length > 0) {
-            advanced = GameEngine.applyAction(current, pending.player, {
-              type: 'SELECT_TARGET',
-              pendingActionId: pending.id,
-              selectedTargets: [pending.options[0]],
-            });
-          }
-
-          if (!advanced || advanced.pendingActions.length === current.pendingActions.length) {
-            const cleaned = advanced ?? current;
-            advanced = {
-              ...cleaned,
-              pendingActions: cleaned.pendingActions.filter((p) => p.id !== pending.id),
-              pendingEffects: pending.sourceEffectId
-                ? cleaned.pendingEffects.filter((e) => e.id !== pending.sourceEffectId)
-                : cleaned.pendingEffects,
-            };
-          }
-
-        } else if (current.phase === 'mission' && current.pendingActions.length === 0) {
-          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-
-        } else if (current.phase === 'end' && current.pendingActions.length === 0) {
-          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-
-        } else {
-          break;
-        }
-      } catch {
-        try {
-          advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
-        } catch {
-          if (current.phase === 'mission') {
+        } else if (current.phase === 'mission') {
+          try {
+            advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+          } catch {
             advanced = {
               ...current,
               phase: 'end' as GamePhase,
@@ -540,8 +600,12 @@ function VisualReplay({
               pendingEffects: [],
               missionScoringComplete: undefined,
             };
-          } else if (current.phase === 'end') {
-            if (current.turn > 4) {
+          }
+        } else if (current.phase === 'end') {
+          try {
+            advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+          } catch {
+            if (current.turn >= 4) {
               advanced = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
             } else {
               advanced = {
@@ -554,9 +618,59 @@ function VisualReplay({
                 player2: { ...current.player2, hasPassed: false },
               };
             }
-          } else {
-            break;
           }
+        } else if (current.phase === 'start') {
+          try {
+            advanced = GameEngine.applyAction(current, current.edgeHolder, { type: 'ADVANCE_PHASE' });
+          } catch {
+            advanced = {
+              ...current,
+              phase: 'action' as GamePhase,
+              pendingActions: [],
+              pendingEffects: [],
+              player1: { ...current.player1, hasPassed: false },
+              player2: { ...current.player2, hasPassed: false },
+            };
+          }
+        } else {
+          break;
+        }
+      } catch {
+        // Last-resort force-advance
+        if (current.phase === 'action') {
+          advanced = {
+            ...current,
+            phase: 'mission' as GamePhase,
+            pendingActions: [],
+            pendingEffects: [],
+            missionScoredThisTurn: false,
+            player1: { ...current.player1, hasPassed: true },
+            player2: { ...current.player2, hasPassed: true },
+          };
+        } else if (current.phase === 'mission') {
+          advanced = {
+            ...current,
+            phase: 'end' as GamePhase,
+            pendingActions: [],
+            pendingEffects: [],
+            missionScoringComplete: undefined,
+          };
+        } else if (current.phase === 'end') {
+          if (current.turn >= 4) {
+            advanced = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
+          } else {
+            advanced = {
+              ...current,
+              phase: 'action' as GamePhase,
+              turn: (current.turn + 1) as 1 | 2 | 3 | 4,
+              pendingActions: [],
+              pendingEffects: [],
+              player1: { ...current.player1, hasPassed: false },
+              player2: { ...current.player2, hasPassed: false },
+            };
+          }
+        } else {
+          break;
         }
       }
 
@@ -566,7 +680,9 @@ function VisualReplay({
         advanced.turn !== current.turn ||
         advanced.pendingActions.length !== current.pendingActions.length ||
         advanced.pendingEffects.length !== current.pendingEffects.length ||
-        Boolean(advanced.missionScoringComplete) !== Boolean(current.missionScoringComplete);
+        Boolean(advanced.missionScoringComplete) !== Boolean(current.missionScoringComplete) ||
+        advanced.player1.hasPassed !== current.player1.hasPassed ||
+        advanced.player2.hasPassed !== current.player2.hasPassed;
       if (!madeProgress) break;
 
       if (advanced.turn !== current.turn && advanced.phase === 'action') {
@@ -578,14 +694,17 @@ function VisualReplay({
       recovery++;
     }
 
+    // Last resort: if still not at gameOver, force it
     if (current.phase !== 'gameOver') {
-      console.warn('[Replay] Could not reach gameOver. Final state:', {
+      console.warn('[Replay] Recovery could not reach gameOver naturally, forcing. Final state:', {
         turn: current.turn, phase: current.phase,
         pendingActions: current.pendingActions.length,
         pendingEffects: current.pendingEffects.length,
         p1Passed: current.player1.hasPassed,
         p2Passed: current.player2.hasPassed,
       });
+      const gameOverState: GameState = { ...current, phase: 'gameOver' as GamePhase, pendingActions: [], pendingEffects: [] };
+      result.push(gameOverState);
     }
 
     return result;

@@ -25,39 +25,19 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const totalChars = mission.player1Characters.length + mission.player2Characters.length;
 
   if (totalChars === 0) {
-    // Should not happen since at least Jirobo himself is there
     return { state };
   }
 
-  // POWERUP X on self where X = total characters
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const missions = [...state.activeMissions];
-  const m = { ...missions[sourceMissionIndex] };
-  const chars = [...m[friendlySide]];
-  const selfIdx = chars.findIndex((c) => c.instanceId === sourceCard.instanceId);
-
-  if (selfIdx === -1) return { state };
-
-  chars[selfIdx] = {
-    ...chars[selfIdx],
-    powerTokens: chars[selfIdx].powerTokens + totalChars,
-  };
-  m[friendlySide] = chars;
-  missions[sourceMissionIndex] = m;
-
+  // CONFIRM popup before applying POWERUP
   return {
-    state: {
-      ...state,
-      activeMissions: missions,
-      log: logAction(
-        state.log, state.turn, state.phase, sourcePlayer,
-        'EFFECT_POWERUP',
-        `Jirobo (122): POWERUP ${totalChars} (total characters in this mission).`,
-        'game.log.effect.powerupSelf',
-        { card: 'JIROBO', id: 'KS-122-R', amount: totalChars },
-      ),
-    },
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'JIROBO122_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: `Jirobo (122) MAIN: POWERUP ${totalChars} (${totalChars} characters in this mission).`,
+    descriptionKey: 'game.effect.desc.jirobo122ConfirmMain',
+    descriptionParams: { amount: String(totalChars) },
   };
 }
 

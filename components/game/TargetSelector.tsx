@@ -51,13 +51,13 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         height: dims.targetCard.h + 'px',
         borderRadius: '5px',
         border: isValidTarget
-          ? '2px solid #c4a35a'
+          ? '2px solid rgba(90, 160, 255, 0.9)'
           : '1px solid #262626',
         overflow: 'hidden',
         cursor: isValidTarget ? 'pointer' : 'default',
         opacity: isValidTarget ? 1 : 0.35,
         boxShadow: isValidTarget
-          ? '0 0 14px rgba(196, 163, 90, 0.4)'
+          ? '0 0 14px rgba(90, 160, 255, 0.4)'
           : 'none',
       }}
     >
@@ -66,14 +66,14 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         <motion.div
           className="absolute inset-0 rounded"
           style={{
-            border: '2px solid #c4a35a',
+            border: '2px solid rgba(90, 160, 255, 0.9)',
             pointerEvents: 'none',
           }}
           animate={{
             boxShadow: [
-              '0 0 8px rgba(196, 163, 90, 0.3)',
-              '0 0 18px rgba(196, 163, 90, 0.6)',
-              '0 0 8px rgba(196, 163, 90, 0.3)',
+              '0 0 8px rgba(90, 160, 255, 0.3)',
+              '0 0 18px rgba(90, 160, 255, 0.6)',
+              '0 0 8px rgba(90, 160, 255, 0.3)',
             ],
           }}
           transition={{ repeat: Infinity, duration: 1.2 }}
@@ -231,8 +231,8 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         minWidth: '120px',
         cursor: isMissionTarget ? 'pointer' : 'default',
         borderRadius: '8px',
-        border: isMissionTarget ? '2px solid #c4a35a' : '2px solid transparent',
-        boxShadow: isMissionTarget ? '0 0 14px rgba(196, 163, 90, 0.4)' : 'none',
+        border: isMissionTarget ? '2px solid rgba(90, 160, 255, 0.9)' : '2px solid transparent',
+        boxShadow: isMissionTarget ? '0 0 14px rgba(90, 160, 255, 0.4)' : 'none',
         padding: '8px',
       }}
     >
@@ -323,6 +323,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
 
 export function TargetSelector() {
   const t = useTranslations();
+  const locale = useLocale();
   const dims = useGameScale();
   const pendingTargetSelection = useGameStore((s) => s.pendingTargetSelection);
   const selectTarget = useGameStore((s) => s.selectTarget);
@@ -408,8 +409,8 @@ export function TargetSelector() {
               className="absolute inset-0 rounded-md overflow-hidden"
               style={{
                 borderRadius: '6px',
-                border: '2px solid #c4a35a',
-                boxShadow: '0 0 18px rgba(196, 163, 90, 0.5)',
+                border: '2px solid rgba(90, 160, 255, 0.9)',
+                boxShadow: '0 0 18px rgba(90, 160, 255, 0.5)',
               }}
             >
               <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
@@ -535,7 +536,7 @@ export function TargetSelector() {
             ) : (
               <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
                 <span className="text-[8px] text-center px-1" style={{ color: '#888888' }}>
-                  {cardData?.name_fr ?? '???'}
+                  {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
                 </span>
               </div>
             )}
@@ -559,7 +560,7 @@ export function TargetSelector() {
               style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
             >
               <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
-                {cardData?.name_fr ?? '???'}
+                {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
               </span>
             </div>
 
@@ -695,7 +696,7 @@ export function TargetSelector() {
               const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
               const isSelectable = card.isSummon || card.isMatch;
               const isSelected = multiSelectChoices.has(String(idx));
-              const borderColor = isSelected ? '#4aff6b' : isSelectable ? '#c4a35a' : '#555555';
+              const borderColor = isSelected ? '#4aff6b' : isSelectable ? 'rgba(90, 160, 255, 0.9)' : '#555555';
               return (
                 <motion.div
                   key={idx}
@@ -732,7 +733,7 @@ export function TargetSelector() {
                       style={{ backgroundColor: '#1a1a1a' }}
                     >
                       <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                        {card.name_fr}
+                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
                       </span>
                     </div>
                   )}
@@ -753,7 +754,7 @@ export function TargetSelector() {
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
                   >
                     <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
-                      {card.name_fr}
+                      {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
                     </div>
                     {isSelectable && (
                       <div className="text-[9px] mt-0.5" style={{ color: isSelected ? '#4aff6b' : '#c4a35a' }}>
@@ -889,7 +890,7 @@ export function TargetSelector() {
                       style={{ backgroundColor: '#1a1a1a' }}
                     >
                       <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                        {card.name_fr}
+                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
                       </span>
                     </div>
                   )}
@@ -900,7 +901,7 @@ export function TargetSelector() {
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
                   >
                     <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
-                      {card.name_fr}
+                      {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
                     </div>
                     {(isHighlight || card.isDiscarded) && (
                       <div className="text-[9px] mt-0.5" style={{ color: isHighlight ? '#4aff6b' : '#b33e3e' }}>
@@ -1033,7 +1034,7 @@ export function TargetSelector() {
                 style={{ backgroundColor: '#1a1a1a' }}
               >
                 <span className="text-sm text-center px-2" style={{ color: '#888888' }}>
-                  {revealedCard.name_fr}
+                  {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
                 </span>
               </div>
             )}
@@ -1044,7 +1045,7 @@ export function TargetSelector() {
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
             >
               <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>
-                {revealedCard.name_fr}
+                {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
               </div>
               <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>
                 {t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}

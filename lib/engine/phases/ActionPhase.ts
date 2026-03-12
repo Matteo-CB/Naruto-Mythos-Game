@@ -171,7 +171,7 @@ function handlePlayCharacter(
     'PLAY_CHARACTER',
     `${player} plays ${card.name_fr} (${card.title_fr}) on mission ${missionIndex + 1} for ${effectiveCost} chakra.`,
     'game.log.playCharacter',
-    { card: card.name_fr, title: card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
+    { card: card.name_fr, title: card.title_fr, card_en: card.name_en || card.name_fr, title_en: card.title_en || card.title_fr, mission: missionIndex + 1, cost: effectiveCost },
   );
 
   let newState: GameState = {
@@ -382,7 +382,7 @@ function handleRevealCharacter(
       'REVEAL_UPGRADE',
       `${player} reveals ${charTopCard.name_fr} (${charTopCard.title_fr}) to upgrade existing ${upgradeTarget.card.name_fr} on mission ${missionIndex + 1} for ${costToPay} chakra.`,
       'game.log.revealUpgrade',
-      { card: charTopCard.name_fr, title: charTopCard.title_fr, mission: missionIndex + 1, cost: costToPay },
+      { card: charTopCard.name_fr, title: charTopCard.title_fr, card_en: charTopCard.name_en || charTopCard.name_fr, title_en: charTopCard.title_en || charTopCard.title_fr, mission: missionIndex + 1, cost: costToPay },
     );
 
     let newState: GameState = {
@@ -431,7 +431,7 @@ function handleRevealCharacter(
     'REVEAL_CHARACTER',
     `${player} reveals ${char.card.name_fr} (${char.card.title_fr}) on mission ${missionIndex + 1} for ${costToPay} chakra.`,
     'game.log.revealCharacter',
-    { card: char.card.name_fr, title: char.card.title_fr, mission: missionIndex + 1, cost: costToPay },
+    { card: char.card.name_fr, title: char.card.title_fr, card_en: char.card.name_en || char.card.name_fr, title_en: char.card.title_en || char.card.title_fr, mission: missionIndex + 1, cost: costToPay },
   );
 
   let newState: GameState = {
@@ -541,7 +541,7 @@ function handleUpgradeCharacter(
     'UPGRADE_CHARACTER',
     `${player} upgrades ${existingTopCard.name_fr} to ${newCard.name_fr} (${newCard.title_fr}) on mission ${missionIndex + 1} for ${costDiff} chakra.`,
     'game.log.upgradeCharacter',
-    { oldCard: existingTopCard.name_fr, card: newCard.name_fr, title: newCard.title_fr, mission: missionIndex + 1, cost: costDiff },
+    { oldCard: existingTopCard.name_fr, card: newCard.name_fr, title: newCard.title_fr, oldCard_en: existingTopCard.name_en || existingTopCard.name_fr, card_en: newCard.name_en || newCard.name_fr, title_en: newCard.title_en || newCard.title_fr, mission: missionIndex + 1, cost: costDiff },
   );
 
   let newState: GameState = {
