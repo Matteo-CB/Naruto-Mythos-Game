@@ -33,6 +33,8 @@ export function ActionBar() {
   const socketForfeit = useSocketStore((s) => s.forfeit);
   const actionDeadline = useSocketStore((s) => s.actionDeadline);
 
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+
   if (!visibleState) return null;
 
   const {
@@ -45,6 +47,8 @@ export function ActionBar() {
   const isMyTurn = activePlayer === myPlayer && !isProcessing;
   const isActionPhase = phase === 'action';
   const hasPassed = myState.hasPassed;
+  // Block all game actions while an effect popup is minimized (view-only mode)
+  const actionsBlocked = effectPopupMinimized;
 
   // Determine available actions
   const hasCardSelected = selectedCardIndex !== null;
@@ -169,7 +173,7 @@ export function ActionBar() {
 
   // Handlers
   const handlePlayVisible = () => {
-    if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed) return;
+    if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed || actionsBlocked) return;
     clearActionError();
     performAction({
       type: 'PLAY_CHARACTER',
@@ -183,7 +187,7 @@ export function ActionBar() {
   };
 
   const handlePlayHidden = () => {
-    if (!cardAndMissionReady || !canAffordHidden || !isMyTurn || hasPassed) return;
+    if (!cardAndMissionReady || !canAffordHidden || !isMyTurn || hasPassed || actionsBlocked) return;
     clearActionError();
     performAction({
       type: 'PLAY_HIDDEN',
@@ -195,7 +199,7 @@ export function ActionBar() {
   };
 
   const handleReveal = (upgradeTargetInstanceId?: string) => {
-    if (!canReveal || !selectedTargetId) {
+    if (!canReveal || !selectedTargetId || actionsBlocked) {
       console.warn('[ActionBar] handleReveal blocked:', { canReveal, canAffordReveal, selectedTargetId });
       return;
     }
@@ -226,7 +230,7 @@ export function ActionBar() {
   };
 
   const handleUpgrade = (targetInstanceId: string) => {
-    if (!cardAndMissionReady || !isMyTurn || hasPassed || selectedMissionIndex === null) return;
+    if (!cardAndMissionReady || !isMyTurn || hasPassed || selectedMissionIndex === null || actionsBlocked) return;
     clearActionError();
     performAction({
       type: 'UPGRADE_CHARACTER',
@@ -239,7 +243,7 @@ export function ActionBar() {
   };
 
   const handlePass = () => {
-    if (!isMyTurn || !isActionPhase || hasPassed) return;
+    if (!isMyTurn || !isActionPhase || hasPassed || actionsBlocked) return;
     performAction({ type: 'PASS' });
     clearSelection();
   };
@@ -448,7 +452,7 @@ export function ActionBar() {
           <ActionButton
             label={t('game.pass')}
             onClick={handlePass}
-            disabled={false}
+            disabled={actionsBlocked}
             variant="muted"
           />
         </>
