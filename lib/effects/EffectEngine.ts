@@ -12893,7 +12893,28 @@ export class EffectEngine {
         // Handle hidden Leaf Village character reveal
         if (targetId.startsWith('HIDDEN_')) {
           const instanceId_h002 = targetId.slice(7);
-          newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, instanceId_h002, 1, pendingEffect.isUpgrade ? 2 : 0);
+
+          // Determine resulting instanceId (may merge into upgrade target)
+          let resultingInstanceId_h002 = instanceId_h002;
+          const charBeforeReveal = EffectEngine.findCharByInstanceId(newState, instanceId_h002);
+          if (charBeforeReveal) {
+            const topCard_h002r = charBeforeReveal.character.stack.length > 0
+              ? charBeforeReveal.character.stack[charBeforeReveal.character.stack.length - 1]
+              : charBeforeReveal.character.card;
+            const friendlySide_h002r: 'player1Characters' | 'player2Characters' =
+              player === 'player1' ? 'player1Characters' : 'player2Characters';
+            const mChars_h002r = newState.activeMissions[charBeforeReveal.missionIndex][friendlySide_h002r];
+            const upgradeIdx_h002r = findUpgradeTargetIdx(mChars_h002r, topCard_h002r, instanceId_h002);
+            if (upgradeIdx_h002r >= 0) {
+              resultingInstanceId_h002 = mChars_h002r[upgradeIdx_h002r].instanceId;
+            }
+          }
+
+          // Don't pass powerUpBonus — let UPGRADE handler prompt via processRemainingEffects
+          newState = EffectEngine.revealHiddenWithReduction(newState, pendingEffect, instanceId_h002, 1, 0);
+
+          // Track the played character so UPGRADE handler (POWERUP 2) can find it
+          (newState as any)._hiruzen002PlayedCharId = resultingInstanceId_h002;
           break;
         }
 
