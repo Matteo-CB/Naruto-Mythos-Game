@@ -325,7 +325,7 @@
       "up": "UP",
       "confirm": "OK",
       "details": "Details",
-      "minimize": "Minimize",
+      "minimize": "Inspect board",
       "restoreEffect": "Pending Effect"
     },
     "effect": {
