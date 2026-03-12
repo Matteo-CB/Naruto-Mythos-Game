@@ -30,42 +30,14 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If opponent has exactly 1 card, auto-resolve
-  if (opponentState.hand.length === 1) {
-    const hand = [...opponentState.hand];
-    const [discarded] = hand.splice(0, 1);
-    const updatedOpponent = {
-      ...opponentState,
-      hand,
-      discardPile: [...opponentState.discardPile, discarded],
-    };
-
-    const log = logAction(
-      state.log,
-      state.turn,
-      state.phase,
-      ctx.sourcePlayer,
-      'SCORE_DISCARD',
-      `MSS 03 (Find the Traitor): Opponent discarded ${discarded.name_fr} from hand.`,
-      'game.log.score.discard',
-      { card: 'Trouver le traitre', count: 1 },
-    );
-
-    return { state: { ...state, [opponentId]: updatedOpponent, log } };
-  }
-
-  // Multiple cards: opponent chooses which card to discard
-  const handIndices = opponentState.hand.map((_, i) => String(i));
-
+  // CONFIRM popup before forcing opponent discard
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MSS03_OPPONENT_DISCARD',
-    validTargets: handIndices,
-    selectingPlayer: opponentId,
-    isMandatory: true,
-    description: 'MSS 03 (Find the Traitor): Choose a card from your hand to discard.',
-    descriptionKey: 'game.effect.desc.mss03OpponentDiscard',
+    targetSelectionType: 'MSS03_CONFIRM_SCORE',
+    validTargets: ['KS-003-MMS'],
+    description: 'MSS 03 (Find the Traitor): Opponent discards a card from hand.',
+    descriptionKey: 'game.effect.desc.mss03ConfirmScore',
   };
 }
 

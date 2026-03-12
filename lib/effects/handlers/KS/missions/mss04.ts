@@ -1,8 +1,6 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
-import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 
 /**
  * MSS 04 - "Assassinat" / "Assassination"
@@ -18,14 +16,12 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
 
   // Collect all hidden enemy characters across all missions
   const validTargets: string[] = [];
-  const targetMap: Record<string, { char: CharacterInPlay; missionIndex: number }> = {};
 
   for (let i = 0; i < state.activeMissions.length; i++) {
     const chars = state.activeMissions[i][enemySide];
     for (const c of chars) {
       if (c.isHidden) {
         validTargets.push(c.instanceId);
-        targetMap[c.instanceId] = { char: c, missionIndex: i };
       }
     }
   }
@@ -41,30 +37,14 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If exactly one valid target, auto-resolve
-  if (validTargets.length === 1) {
-    const target = targetMap[validTargets[0]];
-    let newState = defeatEnemyCharacter(state, target.missionIndex, target.char.instanceId, ctx.sourcePlayer);
-
-    const log = logAction(
-      newState.log, newState.turn, newState.phase, ctx.sourcePlayer,
-      'SCORE_DEFEAT',
-      `MSS 04 (Assassination): Defeated hidden enemy ${target.char.card.name_fr} in mission ${target.missionIndex}.`,
-      'game.log.score.defeat',
-      { card: 'Assassinat', target: target.char.card.name_fr },
-    );
-
-    return { state: { ...newState, log } };
-  }
-
-  // Multiple valid targets: require player selection
+  // CONFIRM popup before defeat
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MSS04_DEFEAT_HIDDEN',
-    validTargets,
-    description: 'MSS 04 (Assassination): Choose a hidden enemy character to defeat.',
-    descriptionKey: 'game.effect.desc.mss04DefeatHidden',
+    targetSelectionType: 'MSS04_CONFIRM_SCORE',
+    validTargets: ['KS-004-MMS'],
+    description: 'MSS 04 (Assassination): Defeat an enemy hidden character.',
+    descriptionKey: 'game.effect.desc.mss04ConfirmScore',
   };
 }
 

@@ -14,19 +14,16 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function mss01ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
 
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-
-  // Collect all characters in play (both sides - hidden characters are valid POWERUP targets per rules)
-  const validTargets: string[] = [];
-
+  // Check if there are any characters in play to receive POWERUP
+  let hasChars = false;
   for (const mission of state.activeMissions) {
-    for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
-      validTargets.push(c.instanceId);
+    if (mission.player1Characters.length > 0 || mission.player2Characters.length > 0) {
+      hasChars = true;
+      break;
     }
   }
 
-  if (validTargets.length === 0) {
+  if (!hasChars) {
     const log = logAction(
       state.log,
       state.turn,
@@ -40,58 +37,15 @@ function mss01ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Always let player choose (optional effect)
+  // CONFIRM popup before target selection
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MSS01_POWERUP_TARGET',
-    validTargets,
-    description: 'MSS 01 (Call for Support): Choose a friendly character to give POWERUP 2.',
-    descriptionKey: 'game.effect.desc.mss01Powerup',
+    targetSelectionType: 'MSS01_CONFIRM_SCORE',
+    validTargets: ['KS-001-MMS'],
+    description: 'MSS 01 (Call for Support): POWERUP 2 a character in play.',
+    descriptionKey: 'game.effect.desc.mss01ConfirmScore',
   };
-}
-
-function applyMss01Powerup(
-  state: import('@/lib/effects/EffectTypes').EffectContext['state'],
-  targetInstanceId: string,
-  sourcePlayer: import('@/lib/engine/types').PlayerID,
-  friendlySide: 'player1Characters' | 'player2Characters',
-): EffectResult {
-  let targetName = '';
-  let targetMissionIndex = -1;
-
-  const missions = state.activeMissions.map((mission, mIdx) => ({
-    ...mission,
-    player1Characters: mission.player1Characters.map((char) => {
-      if (char.instanceId === targetInstanceId) {
-        targetName = char.card.name_fr;
-        targetMissionIndex = mIdx;
-        return { ...char, powerTokens: char.powerTokens + 2 };
-      }
-      return char;
-    }),
-    player2Characters: mission.player2Characters.map((char) => {
-      if (char.instanceId === targetInstanceId) {
-        targetName = char.card.name_fr;
-        targetMissionIndex = mIdx;
-        return { ...char, powerTokens: char.powerTokens + 2 };
-      }
-      return char;
-    }),
-  }));
-
-  const log = logAction(
-    state.log,
-    state.turn,
-    state.phase,
-    sourcePlayer,
-    'SCORE_POWERUP',
-    `MSS 01 (Call for Support): POWERUP 2 on ${targetName} in mission ${targetMissionIndex}.`,
-    'game.log.score.powerup',
-    { card: 'Appel de soutien', amount: 2, target: targetName },
-  );
-
-  return { state: { ...state, activeMissions: missions, log } };
 }
 
 export function registerMss01Handlers(): void {

@@ -20,25 +20,22 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Collect all hidden friendly characters across all missions
-  const validTargets: string[] = [];
-  const charMissionMap: Record<string, number> = {};
+  // Check for hidden friendly characters across all missions
+  let hasHiddenFriendly = false;
 
-  for (let i = 0; i < state.activeMissions.length; i++) {
-    const chars = state.activeMissions[i][friendlySide];
-    for (const c of chars) {
-      if (c.isHidden) {
-        // Check that there is at least one OTHER mission to move to
-        const hasOtherMission = state.activeMissions.length > 1;
-        if (hasOtherMission) {
-          validTargets.push(c.instanceId);
-          charMissionMap[c.instanceId] = i;
+  if (state.activeMissions.length > 1) {
+    for (let i = 0; i < state.activeMissions.length; i++) {
+      for (const c of state.activeMissions[i][friendlySide]) {
+        if (c.isHidden) {
+          hasHiddenFriendly = true;
+          break;
         }
       }
+      if (hasHiddenFriendly) break;
     }
   }
 
-  if (validTargets.length === 0) {
+  if (!hasHiddenFriendly) {
     const log = logAction(
       state.log,
       state.turn,
@@ -52,39 +49,14 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // If exactly one hidden friendly character, skip character selection
-  // but still ask for destination (player can always decline since effect is optional)
-  if (validTargets.length === 1) {
-    const charId = validTargets[0];
-    const fromMissionIndex = charMissionMap[charId];
-
-    const otherMissions: string[] = [];
-    for (let i = 0; i < state.activeMissions.length; i++) {
-      if (i !== fromMissionIndex) {
-        otherMissions.push(String(i));
-      }
-    }
-
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'MSS07_CHOOSE_DESTINATION',
-      validTargets: otherMissions,
-      description: JSON.stringify({ text: 'MSS 07 (I Have to Go): Choose a mission to move the hidden character to.', charId, fromMissionIndex }),
-      descriptionKey: 'game.effect.desc.mss07ChooseDestination',
-      isOptional: true,
-    };
-  }
-
-  // Multiple hidden friendly characters: require player to choose which one to move
+  // CONFIRM popup before move
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'MSS07_MOVE_HIDDEN',
-    validTargets,
-    description: 'MSS 07 (I Have to Go): Choose a hidden friendly character to move.',
-    descriptionKey: 'game.effect.desc.mss07MoveHidden',
-    isOptional: true,
+    targetSelectionType: 'MSS07_CONFIRM_SCORE',
+    validTargets: ['KS-007-MMS'],
+    description: 'MSS 07 (I Have to Go): Move a friendly hidden character in play.',
+    descriptionKey: 'game.effect.desc.mss07ConfirmScore',
   };
 }
 
