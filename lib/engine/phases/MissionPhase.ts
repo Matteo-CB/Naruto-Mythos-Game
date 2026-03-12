@@ -320,14 +320,17 @@ function resolveSingleScoreEffect(
 
   if (result.pending) {
     newState = result.state;
-    // Mark which effects have been processed
-    const processedCharIds: string[] = source.instanceId ? [source.instanceId] : [];
+    // Accumulate processedCharacterIds (don't overwrite)
+    const existingProcessed = newState.missionScoringProgress?.processedCharacterIds ?? [];
+    const processedCharIds: string[] = source.instanceId
+      ? [...existingProcessed, source.instanceId]
+      : existingProcessed;
     newState.missionScoringProgress = {
       currentRankIndex: rankIndex,
       missionCardScoreDone: !source.instanceId ? true : (newState.missionScoringProgress?.missionCardScoreDone ?? false),
       processedCharacterIds: processedCharIds,
       winner: player,
-      pendingScoreEffects: newState.missionScoringProgress?.pendingScoreEffects,
+      // Do NOT copy pendingScoreEffects here — caller manages remaining sources
     };
     return newState;
   }
@@ -420,6 +423,8 @@ export function resolveChosenScoreEffect(
             remainingSources[0].instanceId,
           ];
         }
+        // Clear pendingScoreEffects — this was the last source, prevent re-trigger
+        lastResult.missionScoringProgress.pendingScoreEffects = undefined;
       }
       return lastResult;
     }
@@ -481,6 +486,8 @@ function resolveRemainingScoreEffects(
               remaining[0].instanceId,
             ];
           }
+          // Clear pendingScoreEffects — this was the last source, prevent re-trigger
+          lastResult.missionScoringProgress.pendingScoreEffects = undefined;
         }
         return lastResult;
       }

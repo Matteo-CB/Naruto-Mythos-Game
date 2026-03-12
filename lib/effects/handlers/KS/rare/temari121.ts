@@ -51,10 +51,11 @@ function temari121MainHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TEMARI121_MOVE_FRIENDLY',
-    validTargets,
-    description: 'Temari (121) MAIN: Choose a friendly character in play to move to another mission.',
-    descriptionKey: 'game.effect.desc.temari121MoveFriendly',
+    targetSelectionType: 'TEMARI121_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Temari (121) MAIN: Move a friendly character in play to another mission?',
+    descriptionKey: 'game.effect.desc.temari121ConfirmMain',
   };
 }
 
@@ -69,17 +70,13 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    // Include friendly characters (including self, not hidden)
+    // Include friendly characters (including self, including hidden — card says "any character")
     for (const char of mission[friendlySide]) {
-      if (!char.isHidden) {
-        validTargets.push(char.instanceId);
-      }
+      validTargets.push(char.instanceId);
     }
-    // Include enemy characters (not hidden)
+    // Include enemy characters (including hidden — card says "any character")
     for (const char of mission[enemySide]) {
-      if (!char.isHidden) {
-        validTargets.push(char.instanceId);
-      }
+      validTargets.push(char.instanceId);
     }
   }
 
@@ -101,10 +98,11 @@ function temari121UpgradeHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'TEMARI121_MOVE_ANY',
-    validTargets,
-    description: 'Temari (121) UPGRADE: Choose any character in play to move to another mission.',
-    descriptionKey: 'game.effect.desc.temari121MoveAny',
+    targetSelectionType: 'TEMARI121_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Temari (121) UPGRADE: Move any character in play to another mission?',
+    descriptionKey: 'game.effect.desc.temari121ConfirmUpgrade',
   };
 }
 

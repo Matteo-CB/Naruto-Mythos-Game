@@ -17,7 +17,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
  */
 
 function kankuro119MainHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -47,10 +47,11 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KANKURO119_DEFEAT_TARGET',
-    validTargets,
-    description: 'Kankuro (119): Choose an enemy character with Power 3 or less to defeat.',
-    descriptionKey: 'game.effect.desc.kankuro119Defeat',
+    targetSelectionType: 'KANKURO119_CONFIRM_MAIN',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Kankuro (119): Defeat an enemy character with Power 3 or less in this mission?',
+    descriptionKey: 'game.effect.desc.kankuro119ConfirmMain',
   };
 }
 
@@ -83,10 +84,11 @@ function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'KANKURO119_MOVE_CHARACTER',
-    validTargets,
-    description: 'Kankuro (119) UPGRADE: Choose a character in play to move to another mission.',
-    descriptionKey: 'game.effect.desc.kankuro119MoveCharacter',
+    targetSelectionType: 'KANKURO119_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Kankuro (119) UPGRADE: Move a character in play to another mission?',
+    descriptionKey: 'game.effect.desc.kankuro119ConfirmUpgrade',
   };
 }
 

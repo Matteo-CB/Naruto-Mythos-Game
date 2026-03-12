@@ -6255,7 +6255,7 @@ export class EffectEngine {
           sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'TSUNADE104_CHOOSE_CHAKRA',
           sourcePlayer: t104Player, requiresTargetSelection: true,
-          validTargets: t104Options, isOptional: true, isMandatory: false,
+          validTargets: t104Options, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: pendingEffect.isUpgrade,
         });
         newState.pendingActions.push({
@@ -6263,8 +6263,44 @@ export class EffectEngine {
           player: t104Player,
           description: `Tsunade (104): Choose how much extra chakra to spend (0-${t104Chakra}) for POWERUP.`,
           descriptionKey: 'game.effect.desc.tsunade104ChooseChakra',
+          descriptionParams: { max: String(t104Chakra) },
           options: t104Options, minSelections: 1, maxSelections: 1,
           sourceEffectId: t104EffId,
+        });
+        break;
+      }
+
+      case 'TSUNADE104_CONFIRM_UPGRADE': {
+        // Same as CONFIRM_MAIN but for standalone UPGRADE
+        const t104uPlayer = pendingEffect.sourcePlayer;
+        const t104uChakra = newState[t104uPlayer].chakra;
+        if (t104uChakra <= 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, t104uPlayer,
+            'EFFECT_NO_TARGET', 'Tsunade (104) UPGRADE: No chakra remaining.',
+            'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-104-R' });
+          break;
+        }
+        const t104uOptions: string[] = [];
+        for (let i = 0; i <= t104uChakra; i++) t104uOptions.push(String(i));
+        const t104uEffId = generateInstanceId();
+        const t104uActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: t104uEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+          effectDescription: '', targetSelectionType: 'TSUNADE104_CHOOSE_CHAKRA',
+          sourcePlayer: t104uPlayer, requiresTargetSelection: true,
+          validTargets: t104uOptions, isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+        });
+        newState.pendingActions.push({
+          id: t104uActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
+          player: t104uPlayer,
+          description: `Tsunade (104) UPGRADE: Choose how much extra chakra to spend (0-${t104uChakra}) for POWERUP.`,
+          descriptionKey: 'game.effect.desc.tsunade104ChooseChakra',
+          descriptionParams: { max: String(t104uChakra) },
+          options: t104uOptions, minSelections: 1, maxSelections: 1,
+          sourceEffectId: t104uEffId,
         });
         break;
       }
@@ -6283,9 +6319,15 @@ export class EffectEngine {
             return j105Chakra >= Math.max(0, (c.chakra ?? 0) - 3);
           })
           .map(({ i }) => String(i));
-        if (j105ValidTargets.length === 0) {
+        // Also include hidden summons on board
+        const j105HiddenSummons = findHiddenSummonsOnBoard(newState, j105Player, 3);
+        const j105AllTargets = [
+          ...j105ValidTargets.map(i => `HAND_${i}`),
+          ...j105HiddenSummons.map(h => `HIDDEN_${h.instanceId}`),
+        ];
+        if (j105AllTargets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, j105Player,
-            'EFFECT_NO_TARGET', 'Jiraiya (105): No affordable Summon in hand (state changed).',
+            'EFFECT_NO_TARGET', 'Jiraiya (105): No affordable Summon in hand or hidden on board (state changed).',
             'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' });
           break;
         }
@@ -6297,7 +6339,7 @@ export class EffectEngine {
           sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
           sourcePlayer: j105Player, requiresTargetSelection: true,
-          validTargets: j105ValidTargets, isOptional: false, isMandatory: true,
+          validTargets: j105AllTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         });
@@ -6306,7 +6348,7 @@ export class EffectEngine {
           player: j105Player,
           description: 'Jiraiya (105): Choose a Summon character from your hand to play (cost -3).',
           descriptionKey: 'game.effect.desc.jiraiya105ChooseSummon',
-          options: j105ValidTargets, minSelections: 1, maxSelections: 1,
+          options: j105AllTargets, minSelections: 1, maxSelections: 1,
           sourceEffectId: j105EffId,
         });
         break;
@@ -6322,11 +6364,10 @@ export class EffectEngine {
         if (!j105uMission) break;
         const j105uEnemySide = j105uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const j105uValidTargets = j105uMission[j105uEnemySide]
-          .filter((c: CharacterInPlay) => !c.isHidden)
           .map((c: CharacterInPlay) => c.instanceId);
         if (j105uValidTargets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, j105uPlayer,
-            'EFFECT_NO_TARGET', 'Jiraiya (105) UPGRADE: No non-hidden enemy in this mission (state changed).',
+            'EFFECT_NO_TARGET', 'Jiraiya (105) UPGRADE: No enemy in this mission (state changed).',
             'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' });
           break;
         }
@@ -6930,30 +6971,606 @@ export class EffectEngine {
         break;
       }
 
+      case 'HINATA114_CONFIRM_MAIN': {
+        const h114Player = pendingEffect.sourcePlayer;
+        // Auto POWERUP 2 on self
+        const h114CharRes = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (h114CharRes) {
+          const h114Missions = [...newState.activeMissions];
+          const h114Mission = { ...h114Missions[h114CharRes.missionIndex] };
+          const h114Side: 'player1Characters' | 'player2Characters' =
+            h114CharRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          h114Mission[h114Side] = h114Mission[h114Side].map((c: CharacterInPlay) =>
+            c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, powerTokens: c.powerTokens + 2 }
+              : c,
+          );
+          h114Missions[h114CharRes.missionIndex] = h114Mission;
+          newState.activeMissions = h114Missions;
+          newState.log = logAction(newState.log, newState.turn, newState.phase, h114Player,
+            'EFFECT_POWERUP', 'Hinata Hyuga (114): POWERUP 2 on self.',
+            'game.log.effect.powerupSelf', { card: 'HINATA HYUGA', id: 'KS-114-R', amount: 2 });
+        }
+        // Find valid targets for POWERUP 1 (other friendly chars in play)
+        const h114Targets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.instanceId !== pendingEffect.sourceInstanceId) {
+              h114Targets.push(char.instanceId);
+            }
+          }
+        }
+        if (h114Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, h114Player,
+            'EFFECT_NO_TARGET', 'Hinata Hyuga (114): No other character in play for POWERUP 1.',
+            'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-114-R' });
+          break;
+        }
+        {
+          const h114EffId = generateInstanceId();
+          const h114ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: h114EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'HINATA114_POWERUP_TARGET',
+            sourcePlayer: h114Player, requiresTargetSelection: true,
+            validTargets: h114Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: h114ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: h114Player,
+            description: 'Hinata Hyuga (114): Choose a character to give POWERUP 1.',
+            descriptionKey: 'game.effect.desc.hinata114Powerup',
+            options: h114Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: h114EffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      case 'HINATA114_CONFIRM_UPGRADE': {
+        const h114uPlayer = pendingEffect.sourcePlayer;
+        const h114uEnemySide: 'player1Characters' | 'player2Characters' =
+          h114uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const h114uTargets: string[] = [];
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[h114uEnemySide]) {
+            if (char.powerTokens > 0) h114uTargets.push(char.instanceId);
+          }
+        }
+        if (h114uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, h114uPlayer,
+            'EFFECT_NO_TARGET', 'Hinata Hyuga (114) UPGRADE: No enemy character with Power tokens (state changed).',
+            'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-114-R' });
+          break;
+        }
+        {
+          const h114uEffId = generateInstanceId();
+          const h114uActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: h114uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'HINATA114_REMOVE_TOKENS',
+            sourcePlayer: h114uPlayer, requiresTargetSelection: true,
+            validTargets: h114uTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: h114uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: h114uPlayer,
+            description: 'Hinata Hyuga (114) UPGRADE: Choose an enemy character to remove all Power tokens from.',
+            descriptionKey: 'game.effect.desc.hinata114RemoveTokens',
+            options: h114uTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: h114uEffId,
+          });
+        }
+        break;
+      }
+
+      case 'SHINO115_CONFIRM_AMBUSH': {
+        const s115Player = pendingEffect.sourcePlayer;
+        const s115Side: 'player1Characters' | 'player2Characters' =
+          s115Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const s115MI = pendingEffect.sourceMissionIndex;
+        const s115Mission = newState.activeMissions[s115MI];
+        if (!s115Mission || newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
+            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: No valid targets (state changed).',
+            'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
+          break;
+        }
+        // Check Kurenai block
+        if (isMovementBlockedByKurenai(newState, s115MI, s115Player)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
+            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: Movement blocked by Kurenai.',
+            'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
+          break;
+        }
+        const s115Targets: string[] = s115Mission[s115Side]
+          .filter((c: CharacterInPlay) => c.instanceId !== pendingEffect.sourceInstanceId)
+          .map((c: CharacterInPlay) => c.instanceId);
+        if (s115Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
+            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: No friendly characters to move (state changed).',
+            'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
+          break;
+        }
+        {
+          const s115EffId = generateInstanceId();
+          const s115ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: s115EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: s115MI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'SHINO115_MOVE_FRIENDLY',
+            sourcePlayer: s115Player, requiresTargetSelection: true,
+            validTargets: s115Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: s115ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: s115Player,
+            description: 'Shino Aburame (115) AMBUSH: Choose a friendly character to move.',
+            descriptionKey: 'game.effect.desc.shino115MoveFriendly',
+            options: s115Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: s115EffId,
+          });
+        }
+        break;
+      }
+
+      case 'NEJI116_CONFIRM_MAIN': {
+        const n116Player = pendingEffect.sourcePlayer;
+        const n116Opponent = n116Player === 'player1' ? 'player2' : 'player1';
+        const n116Side: 'player1Characters' | 'player2Characters' = n116Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const n116EnemySide: 'player1Characters' | 'player2Characters' = n116Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        const n116MI = pendingEffect.sourceMissionIndex;
+        const n116Mission = newState.activeMissions[n116MI];
+        if (!n116Mission) break;
+        const n116Targets: string[] = [];
+        for (const char of n116Mission[n116Side]) {
+          if (char.instanceId !== pendingEffect.sourceInstanceId && !char.isHidden && getEffectivePower(newState, char, n116Player) === 4) {
+            n116Targets.push(char.instanceId);
+          }
+        }
+        for (const char of n116Mission[n116EnemySide]) {
+          if (!char.isHidden && getEffectivePower(newState, char, n116Opponent as PlayerID) === 4) {
+            n116Targets.push(char.instanceId);
+          }
+        }
+        if (n116Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, n116Player,
+            'EFFECT_NO_TARGET', 'Neji Hyuga (116) MAIN: No character with exactly Power 4 (state changed).',
+            'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-116-R' });
+          break;
+        }
+        {
+          const n116EffId = generateInstanceId();
+          const n116ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: n116EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: n116MI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'NEJI116_DEFEAT_POWER4',
+            sourcePlayer: n116Player, requiresTargetSelection: true,
+            validTargets: n116Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: n116ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: n116Player,
+            description: 'Neji Hyuga (116) MAIN: Choose a character with exactly Power 4 to defeat.',
+            descriptionKey: 'game.effect.desc.neji116DefeatPower4',
+            options: n116Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: n116EffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      case 'NEJI116_CONFIRM_UPGRADE': {
+        const n116uPlayer = pendingEffect.sourcePlayer;
+        const n116uOpponent = n116uPlayer === 'player1' ? 'player2' : 'player1';
+        const n116uSide: 'player1Characters' | 'player2Characters' = n116uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+        const n116uEnemySide: 'player1Characters' | 'player2Characters' = n116uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const n116uMI = pendingEffect.sourceMissionIndex;
+        const n116uMission = newState.activeMissions[n116uMI];
+        if (!n116uMission) break;
+        const n116uTargets: string[] = [];
+        for (const char of n116uMission[n116uSide]) {
+          if (char.instanceId !== pendingEffect.sourceInstanceId && !char.isHidden && getEffectivePower(newState, char, n116uPlayer) === 6) {
+            n116uTargets.push(char.instanceId);
+          }
+        }
+        for (const char of n116uMission[n116uEnemySide]) {
+          if (!char.isHidden && getEffectivePower(newState, char, n116uOpponent as PlayerID) === 6) {
+            n116uTargets.push(char.instanceId);
+          }
+        }
+        if (n116uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, n116uPlayer,
+            'EFFECT_NO_TARGET', 'Neji Hyuga (116) UPGRADE: No character with exactly Power 6 (state changed).',
+            'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-116-R' });
+          break;
+        }
+        {
+          const n116uEffId = generateInstanceId();
+          const n116uActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: n116uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: n116uMI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'NEJI116_DEFEAT_POWER6',
+            sourcePlayer: n116uPlayer, requiresTargetSelection: true,
+            validTargets: n116uTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: n116uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: n116uPlayer,
+            description: 'Neji Hyuga (116) UPGRADE: Choose a character with exactly Power 6 to defeat.',
+            descriptionKey: 'game.effect.desc.neji116DefeatPower6',
+            options: n116uTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: n116uEffId,
+          });
+        }
+        break;
+      }
+
+      case 'ROCKLEE117_CONFIRM_UPGRADE': {
+        const rl117Player = pendingEffect.sourcePlayer;
+        const rl117PS = { ...newState[rl117Player] };
+        if (rl117PS.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, rl117Player,
+            'EFFECT_NO_TARGET', 'Rock Lee (117) UPGRADE: Deck is empty (state changed).',
+            'game.log.effect.noTarget', { card: 'ROCK LEE', id: 'KS-117-R' });
+          break;
+        }
+        const rl117Deck = [...rl117PS.deck];
+        const rl117Discarded = rl117Deck.shift()!;
+        const rl117Cost = rl117Discarded.chakra || 0;
+        rl117PS.deck = rl117Deck;
+        rl117PS.discardPile = [...rl117PS.discardPile, rl117Discarded];
+        newState = { ...newState, [rl117Player]: rl117PS };
+        newState.log = logAction(newState.log, newState.turn, newState.phase, rl117Player,
+          'EFFECT_DISCARD', `Rock Lee (117) UPGRADE: Revealed and discarded ${rl117Discarded.name_fr} (cost ${rl117Cost}).`,
+          'game.log.effect.discard', { card: 'ROCK LEE', id: 'KS-117-R', target: rl117Discarded.name_fr });
+        if (rl117Cost > 0) {
+          const rl117CharRes = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          if (rl117CharRes) {
+            const rl117Missions = [...newState.activeMissions];
+            const rl117Mission = { ...rl117Missions[rl117CharRes.missionIndex] };
+            const rl117Side: 'player1Characters' | 'player2Characters' =
+              rl117CharRes.player === 'player1' ? 'player1Characters' : 'player2Characters';
+            rl117Mission[rl117Side] = rl117Mission[rl117Side].map((c: CharacterInPlay) =>
+              c.instanceId === pendingEffect.sourceInstanceId
+                ? { ...c, powerTokens: c.powerTokens + rl117Cost }
+                : c,
+            );
+            rl117Missions[rl117CharRes.missionIndex] = rl117Mission;
+            newState.activeMissions = rl117Missions;
+            newState.log = logAction(newState.log, newState.turn, newState.phase, rl117Player,
+              'EFFECT_POWERUP', `Rock Lee (117) UPGRADE: POWERUP ${rl117Cost} (cost of ${rl117Discarded.name_fr}).`,
+              'game.log.effect.powerupSelf', { card: 'ROCK LEE', id: 'KS-117-R', amount: rl117Cost });
+          }
+        }
+        break;
+      }
+
+      case 'TENTEN118_CONFIRM_AMBUSH': {
+        const tt118Player = pendingEffect.sourcePlayer;
+        const tt118MI = pendingEffect.sourceMissionIndex;
+        const tt118Mission = newState.activeMissions[tt118MI];
+        if (!tt118Mission) break;
+        const tt118Targets: string[] = [];
+        for (const char of [...tt118Mission.player1Characters, ...tt118Mission.player2Characters]) {
+          if (char.isHidden) tt118Targets.push(char.instanceId);
+        }
+        if (tt118Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, tt118Player,
+            'EFFECT_NO_TARGET', 'Tenten (118) AMBUSH: No hidden characters in this mission (state changed).',
+            'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-118-R' });
+          break;
+        }
+        {
+          const tt118EffId = generateInstanceId();
+          const tt118ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: tt118EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: tt118MI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'TENTEN_118_DEFEAT_HIDDEN_IN_MISSION',
+            sourcePlayer: tt118Player, requiresTargetSelection: true,
+            validTargets: tt118Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: tt118ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: tt118Player,
+            description: 'Tenten (118) AMBUSH: Choose a hidden character in this mission to defeat.',
+            descriptionKey: 'game.effect.desc.tenten118DefeatHidden',
+            options: tt118Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: tt118EffId,
+          });
+        }
+        break;
+      }
+
+      case 'KANKURO119_CONFIRM_MAIN': {
+        const k119Player = pendingEffect.sourcePlayer;
+        const k119Opponent = k119Player === 'player1' ? 'player2' : 'player1';
+        const k119EnemySide: 'player1Characters' | 'player2Characters' = k119Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k119MI = pendingEffect.sourceMissionIndex;
+        const k119Mission = newState.activeMissions[k119MI];
+        if (!k119Mission) break;
+        const k119Targets = k119Mission[k119EnemySide]
+          .filter((c: CharacterInPlay) => getEffectivePower(newState, c, k119Opponent as PlayerID) <= 3)
+          .map((c: CharacterInPlay) => c.instanceId);
+        if (k119Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k119Player,
+            'EFFECT_NO_TARGET', 'Kankuro (119) MAIN: No enemy with Power 3 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-119-R' });
+          break;
+        }
+        {
+          const k119EffId = generateInstanceId();
+          const k119ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: k119EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: k119MI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'KANKURO119_DEFEAT_TARGET',
+            sourcePlayer: k119Player, requiresTargetSelection: true,
+            validTargets: k119Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: k119ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: k119Player,
+            description: 'Kankuro (119) MAIN: Choose an enemy with Power 3 or less to defeat.',
+            descriptionKey: 'game.effect.desc.kankuro119Defeat',
+            options: k119Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k119EffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      case 'KANKURO119_CONFIRM_UPGRADE': {
+        const k119uPlayer = pendingEffect.sourcePlayer;
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k119uPlayer,
+            'EFFECT_NO_TARGET', 'Kankuro (119) UPGRADE: Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-119-R' });
+          break;
+        }
+        const k119uTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          const mission = newState.activeMissions[i];
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            if (char.isHidden) continue;
+            const charOwner = char.controlledBy ?? (mission.player1Characters.includes(char) ? 'player1' : 'player2');
+            if (isMovementBlockedByKurenai(newState, i, charOwner as PlayerID)) continue;
+            // Check at least one valid destination
+            let hasValidDest = false;
+            for (let d = 0; d < newState.activeMissions.length; d++) {
+              if (d === i) continue;
+              if (EffectEngine.validateNameUniquenessForMove(newState, char, d, charOwner as PlayerID)) {
+                hasValidDest = true;
+                break;
+              }
+            }
+            if (hasValidDest) k119uTargets.push(char.instanceId);
+          }
+        }
+        if (k119uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, k119uPlayer,
+            'EFFECT_NO_TARGET', 'Kankuro (119) UPGRADE: No characters can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-119-R' });
+          break;
+        }
+        {
+          const k119uEffId = generateInstanceId();
+          const k119uActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: k119uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'KANKURO119_MOVE_CHARACTER',
+            sourcePlayer: k119uPlayer, requiresTargetSelection: true,
+            validTargets: k119uTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: k119uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: k119uPlayer,
+            description: 'Kankuro (119) UPGRADE: Choose a character in play to move.',
+            descriptionKey: 'game.effect.desc.kankuro119MoveCharacter',
+            options: k119uTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: k119uEffId,
+          });
+        }
+        break;
+      }
+
+      case 'TEMARI121_CONFIRM_MAIN': {
+        const tm121Player = pendingEffect.sourcePlayer;
+        const tm121Side: 'player1Characters' | 'player2Characters' = tm121Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, tm121Player,
+            'EFFECT_NO_TARGET', 'Temari (121) MAIN: Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-121-R' });
+          break;
+        }
+        const tm121Targets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (isMovementBlockedByKurenai(newState, i, tm121Player)) continue;
+          for (const char of newState.activeMissions[i][tm121Side]) {
+            if (char.instanceId === pendingEffect.sourceInstanceId || char.isHidden) continue;
+            let hasValidDest = false;
+            for (let d = 0; d < newState.activeMissions.length; d++) {
+              if (d === i) continue;
+              if (EffectEngine.validateNameUniquenessForMove(newState, char, d, tm121Player)) { hasValidDest = true; break; }
+            }
+            if (hasValidDest) tm121Targets.push(char.instanceId);
+          }
+        }
+        if (tm121Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, tm121Player,
+            'EFFECT_NO_TARGET', 'Temari (121) MAIN: No friendly characters can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-121-R' });
+          break;
+        }
+        {
+          const tm121EffId = generateInstanceId();
+          const tm121ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: tm121EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'TEMARI121_MOVE_FRIENDLY',
+            sourcePlayer: tm121Player, requiresTargetSelection: true,
+            validTargets: tm121Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: tm121ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: tm121Player,
+            description: 'Temari (121) MAIN: Choose a friendly character to move.',
+            descriptionKey: 'game.effect.desc.temari121MoveFriendly',
+            options: tm121Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: tm121EffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      case 'TEMARI121_CONFIRM_UPGRADE': {
+        const tm121uPlayer = pendingEffect.sourcePlayer;
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, tm121uPlayer,
+            'EFFECT_NO_TARGET', 'Temari (121) UPGRADE: Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-121-R' });
+          break;
+        }
+        const tm121uTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          const mission = newState.activeMissions[i];
+          for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
+            // Card says "Move any character in play" — includes hidden characters
+            const charOwner = char.controlledBy ?? (mission.player1Characters.includes(char) ? 'player1' : 'player2');
+            if (isMovementBlockedByKurenai(newState, i, charOwner as PlayerID)) continue;
+            let hasValidDest = false;
+            for (let d = 0; d < newState.activeMissions.length; d++) {
+              if (d === i) continue;
+              if (EffectEngine.validateNameUniquenessForMove(newState, char, d, charOwner as PlayerID)) { hasValidDest = true; break; }
+            }
+            if (hasValidDest) tm121uTargets.push(char.instanceId);
+          }
+        }
+        if (tm121uTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, tm121uPlayer,
+            'EFFECT_NO_TARGET', 'Temari (121) UPGRADE: No characters can be moved (state changed).',
+            'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-121-R' });
+          break;
+        }
+        {
+          const tm121uEffId = generateInstanceId();
+          const tm121uActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: tm121uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'TEMARI121_MOVE_ANY',
+            sourcePlayer: tm121uPlayer, requiresTargetSelection: true,
+            validTargets: tm121uTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: tm121uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: tm121uPlayer,
+            description: 'Temari (121) UPGRADE: Choose any character to move.',
+            descriptionKey: 'game.effect.desc.temari121MoveAny',
+            options: tm121uTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: tm121uEffId,
+          });
+        }
+        break;
+      }
+
+      case 'JIROBO122_CONFIRM_UPGRADE': {
+        const j122Player = pendingEffect.sourcePlayer;
+        const j122Opponent = j122Player === 'player1' ? 'player2' : 'player1';
+        const j122EnemySide: 'player1Characters' | 'player2Characters' = j122Player === 'player1' ? 'player2Characters' : 'player1Characters';
+        const j122MI = pendingEffect.sourceMissionIndex;
+        const j122Mission = newState.activeMissions[j122MI];
+        if (!j122Mission) break;
+        const j122Targets = j122Mission[j122EnemySide]
+          .filter((c: CharacterInPlay) => getEffectivePower(newState, c, j122Opponent as PlayerID) <= 1)
+          .map((c: CharacterInPlay) => c.instanceId);
+        if (j122Targets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, j122Player,
+            'EFFECT_NO_TARGET', 'Jirobo (122) UPGRADE: No enemy with Power 1 or less (state changed).',
+            'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-122-R' });
+          break;
+        }
+        {
+          const j122EffId = generateInstanceId();
+          const j122ActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: j122EffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: j122MI, effectType: pendingEffect.effectType,
+            effectDescription: '', targetSelectionType: 'JIROBO122_DEFEAT_TARGET',
+            sourcePlayer: j122Player, requiresTargetSelection: true,
+            validTargets: j122Targets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: j122ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: j122Player,
+            description: 'Jirobo (122) UPGRADE: Choose an enemy with Power 1 or less to defeat.',
+            descriptionKey: 'game.effect.desc.jirobo122Defeat',
+            options: j122Targets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: j122EffId,
+          });
+        }
+        break;
+      }
+
       case 'ITACHI128_CONFIRM_UPGRADE': {
-        // Re-compute moveable friendly chars from other missions
+        // Reworked: move any friendly character in play (player chooses char + destination)
         const i128Player = pendingEffect.sourcePlayer;
         const i128FriendlySide: 'player1Characters' | 'player2Characters' =
           i128Player === 'player1' ? 'player1Characters' : 'player2Characters';
-        let i128Data: { destMissionIndex?: number } = {};
-        try { i128Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const i128Dest = i128Data.destMissionIndex ?? pendingEffect.sourceMissionIndex;
+        if (newState.activeMissions.length < 2) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, i128Player,
+            'EFFECT_NO_TARGET', 'Itachi Uchiwa (128) UPGRADE: Only 1 mission in play.',
+            'game.log.effect.noTarget', { card: 'ITACHI UCHIWA', id: 'KS-128-R' });
+          break;
+        }
         const i128Targets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
-          if (i === i128Dest) continue;
           if (isMovementBlockedByKurenai(newState, i, i128Player)) continue;
           for (const c of newState.activeMissions[i][i128FriendlySide]) {
-            // Name uniqueness check at destination
-            if (c.isHidden) {
-              i128Targets.push(c.instanceId);
-            } else {
-              const charName = c.card.name_fr.toUpperCase();
-              const destChars = newState.activeMissions[i128Dest][i128FriendlySide];
-              const hasConflict = destChars.some(
-                (e: CharacterInPlay) => !e.isHidden && e.card.name_fr.toUpperCase() === charName
-              );
-              if (!hasConflict) i128Targets.push(c.instanceId);
+            if (c.instanceId === pendingEffect.sourceInstanceId || c.isHidden) continue;
+            let hasValidDest = false;
+            for (let d = 0; d < newState.activeMissions.length; d++) {
+              if (d === i) continue;
+              if (EffectEngine.validateNameUniquenessForMove(newState, c, d, i128Player)) { hasValidDest = true; break; }
             }
+            if (hasValidDest) i128Targets.push(c.instanceId);
           }
         }
         if (i128Targets.length === 0) {
@@ -6963,12 +7580,46 @@ export class EffectEngine {
           break;
         }
         if (i128Targets.length === 1) {
-          const moveRes = EffectEngine.findCharByInstanceId(newState, i128Targets[0]);
-          if (moveRes) {
-            newState = EffectEngine.moveCharToMissionDirectPublic(
-              newState, i128Targets[0], i128Dest,
-              moveRes.player, 'ITACHI UCHIWA', pendingEffect.sourceCardId,
-            );
+          // Auto-select single target, go straight to destination selection
+          const i128CharRes = EffectEngine.findCharByInstanceId(newState, i128Targets[0]);
+          if (i128CharRes) {
+            const i128DestMissions: string[] = [];
+            for (let d = 0; d < newState.activeMissions.length; d++) {
+              if (d === i128CharRes.missionIndex) continue;
+              if (EffectEngine.validateNameUniquenessForMove(newState, i128CharRes.character, d, i128Player)) {
+                i128DestMissions.push(String(d));
+              }
+            }
+            if (i128DestMissions.length === 1) {
+              newState = EffectEngine.moveCharToMissionDirectPublic(
+                newState, i128Targets[0], parseInt(i128DestMissions[0], 10),
+                i128Player, 'ITACHI UCHIWA', 'KS-128-R', i128Player,
+              );
+              break;
+            }
+            if (i128DestMissions.length > 1) {
+              const i128dEffId = generateInstanceId();
+              const i128dActId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: i128dEffId, sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: i128Targets[0] }),
+                targetSelectionType: 'ITACHI128_MOVE_DESTINATION',
+                sourcePlayer: i128Player, requiresTargetSelection: true,
+                validTargets: i128DestMissions, isOptional: false, isMandatory: true,
+                resolved: false, isUpgrade: false,
+              });
+              newState.pendingActions.push({
+                id: i128dActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                player: i128Player,
+                description: `Itachi Uchiwa (128) UPGRADE: Choose a mission to move ${i128CharRes.character.card.name_fr} to.`,
+                descriptionKey: 'game.effect.desc.chooseMissionMove',
+                options: i128DestMissions, minSelections: 1, maxSelections: 1,
+                sourceEffectId: i128dEffId,
+              });
+              break;
+            }
           }
           break;
         }
@@ -6979,8 +7630,7 @@ export class EffectEngine {
             id: i128EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ destMissionIndex: i128Dest }),
-            targetSelectionType: 'ITACHI128_MOVE_TO_THIS_MISSION',
+            effectDescription: '', targetSelectionType: 'ITACHI128_MOVE_FRIENDLY',
             sourcePlayer: i128Player, requiresTargetSelection: true,
             validTargets: i128Targets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: false,
@@ -6988,7 +7638,7 @@ export class EffectEngine {
           newState.pendingActions.push({
             id: i128ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: i128Player,
-            description: `Itachi Uchiwa (128) UPGRADE: Choose a friendly character to move to mission ${i128Dest + 1}.`,
+            description: 'Itachi Uchiwa (128) UPGRADE: Choose a friendly character to move.',
             descriptionKey: 'game.effect.desc.itachi128MoveFriendly',
             options: i128Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: i128EffId,
@@ -7244,7 +7894,7 @@ export class EffectEngine {
             effectDescription: JSON.stringify({ isUpgrade: false, cards: i091Cards }),
             targetSelectionType: 'ITACHI091_HAND_REVEAL',
             sourcePlayer: i091Player, requiresTargetSelection: true,
-            validTargets: [pendingEffect.sourceInstanceId],
+            validTargets: ['confirm'],
             isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: false,
           });
@@ -7253,7 +7903,7 @@ export class EffectEngine {
             player: i091Player,
             description: JSON.stringify({ text: 'Itachi Uchiwa (091) MAIN: Opponent hand revealed.', cards: i091Cards }),
             descriptionKey: 'game.effect.desc.itachi091HandReveal',
-            options: [pendingEffect.sourceInstanceId],
+            options: ['confirm'],
             minSelections: 1, maxSelections: 1,
             sourceEffectId: i091EffId,
           });
@@ -7286,7 +7936,7 @@ export class EffectEngine {
           effectDescription: JSON.stringify({ isUpgrade: true, cards: i091uCards }),
           targetSelectionType: 'ITACHI091_HAND_REVEAL',
           sourcePlayer: i091uPlayer, requiresTargetSelection: true,
-          validTargets: [pendingEffect.sourceInstanceId],
+          validTargets: ['confirm'],
           isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
         });
@@ -7295,7 +7945,7 @@ export class EffectEngine {
           player: i091uPlayer,
           description: JSON.stringify({ text: 'Itachi Uchiwa (091) MAIN+UPGRADE: Opponent hand revealed. Choose a card to discard.', cards: i091uCards }),
           descriptionKey: 'game.effect.desc.itachi091HandReveal',
-          options: [pendingEffect.sourceInstanceId],
+          options: ['confirm'],
           minSelections: 1, maxSelections: 1,
           sourceEffectId: i091uEffId,
         });
@@ -8200,23 +8850,6 @@ export class EffectEngine {
       }
 
       // =============================================
-      // Itachi 128 â€' single-stage: move chosen friendly character to Itachi's mission
-      // =============================================
-      case 'ITACHI128_MOVE_TO_THIS_MISSION': {
-        let parsed128: { destMissionIndex?: number } = {};
-        try { parsed128 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const dest128 = parsed128.destMissionIndex ?? pendingEffect.sourceMissionIndex;
-        const moveRes128 = EffectEngine.findCharByInstanceId(newState, targetId);
-        if (moveRes128) {
-          newState = EffectEngine.moveCharToMissionDirectPublic(
-            newState, targetId, dest128,
-            moveRes128.player, 'ITACHI UCHIWA', pendingEffect.sourceCardId,
-          );
-        }
-        break;
-      }
-
-      // =============================================
       // MOVE types (two-stage: character selection â†' destination selection)
       // =============================================
       case 'JIRAIYA105_MOVE_ENEMY':
@@ -8224,6 +8857,7 @@ export class EffectEngine {
       case 'TEMARI121_MOVE_FRIENDLY':
       case 'TEMARI121_MOVE_ANY':
       case 'ITACHI152_CHOOSE_MOVE':
+      case 'ITACHI128_MOVE_FRIENDLY':
       case 'SHINO115_MOVE_FRIENDLY': {
         // Stage 1: player chose which character to move. Now prompt for destination mission.
         const moveCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -8297,6 +8931,8 @@ export class EffectEngine {
       case 'TEMARI121_MOVE_FRIENDLY_DESTINATION':
       case 'TEMARI121_MOVE_ANY_DESTINATION':
       case 'ITACHI152_CHOOSE_MOVE_DESTINATION':
+      case 'ITACHI128_MOVE_FRIENDLY_DESTINATION':
+      case 'ITACHI128_MOVE_DESTINATION':
       case 'SHINO115_MOVE_FRIENDLY_DESTINATION': {
         const destMissionIdx = parseInt(targetId, 10);
         if (!isNaN(destMissionIdx)) {
@@ -10982,14 +11618,16 @@ export class EffectEngine {
       case 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT': {
         // Jiraiya 132 UPGRADE: opponent chooses which of their characters to defeat
         // until <= 2 in THIS mission only. Chain more selections if needed.
-        let jirDesc: { missionIndex?: number; sourcePlayer?: string } = {};
+        let jirDesc: { missionIndex?: number; sourcePlayer?: string; defeatedIds?: string[] } = {};
         try { jirDesc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
 
         const missionIdx_j = jirDesc.missionIndex ?? pendingEffect.sourceMissionIndex;
         const jirSourcePlayer = (jirDesc.sourcePlayer ?? pendingEffect.sourcePlayer) as PlayerID;
+        const defeatedIds_j: string[] = jirDesc.defeatedIds ?? [];
 
         // Defeat the opponent's selected character
         newState = EffectEngine.defeatCharacter(newState, targetId, jirSourcePlayer);
+        defeatedIds_j.push(targetId);
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, jirSourcePlayer,
           'EFFECT_DEFEAT',
@@ -11008,13 +11646,16 @@ export class EffectEngine {
 
         const mission_j = newState.activeMissions[missionIdx_j];
         if (mission_j) {
-          const enemyChars_j = mission_j[enemySide_j];
+          const enemyChars_j = mission_j[enemySide_j]
+            .filter((c: CharacterInPlay) => !defeatedIds_j.includes(c.instanceId));
 
-          if (enemyChars_j.length > 2) {
+          // Safety guard: max 10 iterations to prevent infinite loops
+          if (enemyChars_j.length > 2 && defeatedIds_j.length < 10) {
             // Chain another selection for the opponent (same mission)
             const chainData_j = JSON.stringify({
               missionIndex: missionIdx_j,
               sourcePlayer: jirSourcePlayer,
+              defeatedIds: defeatedIds_j,
               text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${enemyChars_j.length} > 2).`,
             });
             const effectId_j = generateInstanceId();
@@ -11175,7 +11816,7 @@ export class EffectEngine {
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps104 };
 
           // POWERUP on self - double if this is an upgrade (UPGRADE repeats the MAIN POWERUP)
-          const powerupAmount = pendingEffect.isUpgrade ? chakraAmount * 2 : chakraAmount;
+          const powerupAmount = chakraAmount;
           const charResult104 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
           if (charResult104) {
             const missions104 = [...newState.activeMissions];
@@ -11194,9 +11835,7 @@ export class EffectEngine {
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_POWERUP',
-            pendingEffect.isUpgrade
-              ? `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount} (MAIN) + POWERUP ${chakraAmount} (UPGRADE) = POWERUP ${powerupAmount}.`
-              : `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount}.`,
+            `Tsunade (104): Spent ${chakraAmount} extra chakra for POWERUP ${chakraAmount}.`,
             'game.log.effect.powerupSelf',
             { card: 'TSUNADE', id: 'KS-104-R', amount: powerupAmount },
           );
@@ -13047,8 +13686,8 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: handIndices,
-      isOptional: true,
-      isMandatory: false,
+      isOptional: false,
+      isMandatory: true,
       resolved: false,
       isUpgrade: pending.isUpgrade,
     });

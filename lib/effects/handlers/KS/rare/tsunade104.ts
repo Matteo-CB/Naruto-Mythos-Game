@@ -48,7 +48,34 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
-  return { state: ctx.state };
+  const { state, sourcePlayer, sourceCard } = ctx;
+  const playerState = state[sourcePlayer];
+  const maxChakra = playerState.chakra;
+
+  if (maxChakra <= 0) {
+    return {
+      state: {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, sourcePlayer,
+          'EFFECT_NO_TARGET',
+          'Tsunade (104) UPGRADE: No extra chakra to spend for POWERUP.',
+          'game.log.effect.noTarget',
+          { card: 'TSUNADE', id: 'KS-104-R' },
+        ),
+      },
+    };
+  }
+
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'TSUNADE104_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: `Tsunade (104) UPGRADE: Spend extra chakra for POWERUP X (max ${maxChakra}).`,
+    descriptionKey: 'game.effect.desc.tsunade104ConfirmUpgrade',
+  };
 }
 
 export function registerTsunade104Handlers(): void {

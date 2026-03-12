@@ -166,6 +166,9 @@ export interface GameState {
   pendingForcedResolver?: PlayerID;
   /** Instance ID of the character played by Hiruzen 002 MAIN effect, for UPGRADE to apply POWERUP 2 */
   _hiruzen002PlayedCharId?: string;
+  /** Instance IDs of characters played directly (not via effects) by each player during the current turn.
+   *  Used to highlight recently played cards on the board. */
+  lastPlayedInstanceIds?: { player1: string[]; player2: string[] };
 }
 
 export interface GameLogEntry {
@@ -334,6 +337,7 @@ export interface VisibleCharacter {
   missionIndex: number;
   stackSize: number;
   effectivePower: number; // Includes base power + tokens + continuous modifiers
+  isLastPlayed: boolean; // Was this character played directly in the current turn by the opponent?
 }
 
 // ---------------------

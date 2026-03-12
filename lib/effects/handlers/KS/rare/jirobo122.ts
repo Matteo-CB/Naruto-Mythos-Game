@@ -21,9 +21,8 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Count total non-hidden characters in this mission (both sides)
-  const totalChars = mission.player1Characters.filter(c => !c.isHidden).length
-    + mission.player2Characters.filter(c => !c.isHidden).length;
+  // Count total characters in this mission (both sides, including hidden)
+  const totalChars = mission.player1Characters.length + mission.player2Characters.length;
 
   if (totalChars === 0) {
     // Should not happen since at least Jirobo himself is there
@@ -63,7 +62,7 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -93,10 +92,11 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'JIROBO122_DEFEAT_TARGET',
-    validTargets,
-    description: 'Jirobo (122) UPGRADE: Choose an enemy character with Power 1 or less to defeat.',
-    descriptionKey: 'game.effect.desc.jirobo122Defeat',
+    targetSelectionType: 'JIROBO122_CONFIRM_UPGRADE',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Jirobo (122) UPGRADE: Defeat an enemy character with Power 1 or less in this mission?',
+    descriptionKey: 'game.effect.desc.jirobo122ConfirmUpgrade',
   };
 }
 

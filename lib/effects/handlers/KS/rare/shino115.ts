@@ -22,12 +22,11 @@ function shino115AmbushHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   if (!mission) return { state };
 
-  // Valid targets: friendly characters in this mission (not self)
-  const validTargets: string[] = mission[friendlySide]
-    .filter((c) => c.instanceId !== sourceCard.instanceId)
-    .map((c) => c.instanceId);
+  // Pre-check: valid targets are friendly characters in this mission (not self)
+  const hasValidTarget = mission[friendlySide]
+    .some((c) => c.instanceId !== sourceCard.instanceId);
 
-  if (validTargets.length === 0) {
+  if (!hasValidTarget) {
     return {
       state: {
         ...state,
@@ -45,10 +44,11 @@ function shino115AmbushHandler(ctx: EffectContext): EffectResult {
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SHINO115_MOVE_FRIENDLY',
-    validTargets,
-    description: 'Shino Aburame (115) AMBUSH: Choose a friendly character in this mission to move to another mission.',
-    descriptionKey: 'game.effect.desc.shino115MoveFriendly',
+    targetSelectionType: 'SHINO115_CONFIRM_AMBUSH',
+    validTargets: [sourceCard.instanceId],
+    isOptional: true,
+    description: 'Shino Aburame (115) AMBUSH: Move a friendly character in this mission to another mission.',
+    descriptionKey: 'game.effect.desc.shino115ConfirmAmbush',
   };
 }
 

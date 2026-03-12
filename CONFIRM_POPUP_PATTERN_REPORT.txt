@@ -2,8 +2,8 @@
 RAPPORT: PATTERN DE CONFIRMATION POPUP POUR EFFETS INSTANTANES
 ================================================================================
 
-DERNIERE MISE A JOUR: 2026-03-11
-BATCH ACTUEL: Batch 10 (KS-091 a KS-112)
+DERNIERE MISE A JOUR: 2026-03-12
+BATCH ACTUEL: Batch 12 (KS-088 a KS-132)
 
 ================================================================================
 1. CONSIGNE DU PATTERN
@@ -694,5 +694,49 @@ R7. TEMPLATE POUR NOUVEAU CASE CONFIRM
          - Fix: replaced auto-fire with CHOJI112_CONFIRM_UPGRADE confirmation popup
          - Added new CHOJI112_CONFIRM_UPGRADE case that creates mandatory CHOJI_CHOOSE_DISCARD child
          - Added i18n key choji112ConfirmUpgrade in en.json + fr.json
+
+2026-03-12 - Batch 12 (KS-088, KS-104, KS-105, KS-114 to KS-122, KS-128, KS-132):
+  BUGS FOUND & FIXED:
+
+  15. KS-088 (Haku C) - SKIP button on PUT_CARD_ON_DECK after confirming draw (R3 violation):
+      - Fix: isOptional: false, isMandatory: true (EffectEngine haku088ConfirmDraw case)
+
+  16. KS-104 (Tsunade R) - Three bugs:
+      a) CHOOSE_CHAKRA child had isOptional: true (R3 violation)
+      b) Missing descriptionParams (R14 violation)
+      c) UPGRADE auto-doubled without CONFIRM popup
+      - Fix: isOptional: false + descriptionParams + TSUNADE104_CONFIRM_UPGRADE (Type B)
+
+  17. KS-105 (Jiraiya R) - Two bugs:
+      a) CONFIRM_MAIN re-validation missing hidden board summons
+      b) CONFIRM_UPGRADE filtered out hidden enemies
+      - Fix: added hidden summons + removed .filter(!c.isHidden)
+
+  18-25. KS-114 to KS-122 - Added CONFIRM popups (14 new CONFIRM cases):
+      - HINATA114: MAIN + UPGRADE CONFIRM
+      - SHINO115: AMBUSH CONFIRM
+      - NEJI116: MAIN + UPGRADE CONFIRM
+      - ROCKLEE117: UPGRADE CONFIRM (auto-execute)
+      - TENTEN118: AMBUSH CONFIRM
+      - KANKURO119: MAIN + UPGRADE CONFIRM
+      - TEMARI121: MAIN + UPGRADE CONFIRM (+ hidden chars fix)
+      - JIROBO122: UPGRADE CONFIRM (+ hidden count fix in MAIN)
+
+  26. KS-128 (Itachi R) - Reworked UPGRADE:
+      - Bug: hardcoded destination to Itachi's mission
+      - Fix: 2-step move (character → destination) with Kurenai + name uniqueness
+
+  27. KS-132 (Jiraiya S) - Fixed infinite defeat loop:
+      - Added defeatedIds tracking + max 10 iterations guard
+
+  SCORE EFFECTS INFINITE LOOP FIX (MissionPhase.ts):
+  - Root cause: processedCharacterIds overwritten instead of accumulated,
+    stale pendingScoreEffects copied, pendingScoreEffects not cleared for last source
+  - Fix: accumulate processedCharacterIds, don't copy stale pendingScoreEffects,
+    clear pendingScoreEffects when resolving last source
+
+  UI: Card highlight gold → blue (MissionLane.tsx)
+  DECLINE: All 14 new CONFIRM types use generic fallback handler
+  14 i18n keys added (EN + FR)
 
 ================================================================================
