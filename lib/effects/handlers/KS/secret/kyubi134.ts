@@ -47,7 +47,7 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
         if (char.isHidden) continue;
         if (char.instanceId === ctx.sourceCard.instanceId) continue;
         const power = getEffectivePower(state, char, sidePlayer as PlayerID);
-        if (power > 0 && power <= 6) {
+        if (power <= 6) {
           validTargets.push(char.instanceId);
         }
       }

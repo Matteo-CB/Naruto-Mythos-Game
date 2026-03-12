@@ -168,6 +168,9 @@ export class EffectEngine {
           triggerType: effectType,
           isUpgrade,
         };
+        if (isUpgrade) {
+          console.log(`[EffectEngine] resolvePlayEffects: ${topCard.id} ${effectType} isUpgrade=true orderedTypes=[${orderedTypes.join(',')}]`);
+        }
         const result = handler(ctx);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
@@ -1138,7 +1141,7 @@ export class EffectEngine {
           resolved: false, isUpgrade: false,
         });
         newState.pendingActions.push({
-          id: m03ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          id: m03ActId, type: 'DISCARD_CARD' as PendingAction['type'],
           player: m03OpponentId,
           description: 'MSS 03 (Find the Traitor): Choose a card from your hand to discard.',
           descriptionKey: 'game.effect.desc.mss03OpponentDiscard',
@@ -1543,6 +1546,7 @@ export class EffectEngine {
           : 0;
 
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        console.log(`[EffectEngine] GAARA139_DEFEAT_BY_COST: isUpgrade=${pendingEffect.isUpgrade} defeatedName=${gaara139DefeatedName} defeatedCost=${gaara139DefeatedCost}`);
 
         // If upgrade, chain hide effect for another enemy with same name and lower cost
         if (pendingEffect.isUpgrade && gaara139DefeatedName) {
@@ -2639,6 +2643,7 @@ export class EffectEngine {
         for (const char of mission020[enemySide020]) {
           const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+          console.log(`[EffectEngine] INO020_CONFIRM_MAIN: enemy ${char.instanceId} isHidden=${char.isHidden} cost=${effectiveCost} name=${char.card.name_fr}`);
           if (effectiveCost <= 2) {
             if (!char.isHidden && friendlyNames020.has(char.card.name_fr.toUpperCase())) continue;
             i020Targets.push(char.instanceId);
@@ -7923,7 +7928,7 @@ export class EffectEngine {
             }),
             targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
             sourcePlayer: g120Player, requiresTargetSelection: true,
-            validTargets: g120FirstTargets, isOptional: false, isMandatory: true,
+            validTargets: g120FirstTargets, isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -10303,6 +10308,7 @@ export class EffectEngine {
         try { n133Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const n133MI = n133Parsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n133UseDefeat = n133Parsed.useDefeat ?? false;
+        console.log(`[EffectEngine] NARUTO133_CONFIRM_MAIN: useDefeat=${n133UseDefeat} isUpgrade=${pendingEffect.isUpgrade} desc=${pendingEffect.effectDescription}`);
         const n133Mission = newState.activeMissions[n133MI];
         if (!n133Mission) break;
 
@@ -10399,7 +10405,7 @@ export class EffectEngine {
               if (char.isHidden) continue;
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
               const power = getEffectivePower(newState, char, sidePlayer);
-              if (power > 0 && power <= 6) {
+              if (power <= 6) {
                 k134ValidTargets.push(char.instanceId);
               }
             }
@@ -10420,10 +10426,10 @@ export class EffectEngine {
             id: k134EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-            effectDescription: pendingEffect.effectDescription,
+            effectDescription: JSON.stringify({ remainingPower: 6, hiddenIds: [] }),
             targetSelectionType: 'KYUBI134_CHOOSE_HIDE_TARGETS',
             sourcePlayer: k134Player, requiresTargetSelection: true,
-            validTargets: k134ValidTargets, isOptional: false, isMandatory: true,
+            validTargets: k134ValidTargets, isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: true,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -10490,35 +10496,47 @@ export class EffectEngine {
           break;
         }
 
-        // Store top 3 info in description for the child selection
+        // Store top 3 in discard pile as temporary storage (sakura135ChooseCard retrieves them)
+        newState = {
+          ...newState,
+          [s135Player]: {
+            ...newState[s135Player],
+            discardPile: [...newState[s135Player].discardPile, ...s135Top3],
+          },
+        };
+
+        // Build indices of affordable cards within the top3 array
         {
           const s135EffId = generateInstanceId();
           const s135ActId = generateInstanceId();
-          const s135CardIds = s135Top3.map((c) => c.id);
-          const s135ValidIds = s135Available.map((c) => c.id);
+          const s135ValidIndices = s135Top3
+            .map((c, i) => ({ card: c, index: i }))
+            .filter(({ card }) => s135Available.some((a) => a.id === card.id))
+            .map(({ index }) => String(index));
 
           newState.pendingEffects.push({
             id: s135EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
             effectDescription: JSON.stringify({
-              top3CardIds: s135CardIds,
+              topCards: s135Top3.map((c, i) => ({
+                index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
+              })),
               costReduction: s135CostReduction,
-              top3Cards: s135Top3,
             }),
             targetSelectionType: 'SAKURA135_CHOOSE_CARD',
             sourcePlayer: s135Player, requiresTargetSelection: true,
-            validTargets: s135ValidIds, isOptional: false, isMandatory: true,
+            validTargets: s135ValidIndices, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
-            id: s135ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            id: s135ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
             player: s135Player,
             description: `Sakura Haruno (135): Choose a character from top 3 to play${s135CostReduction > 0 ? ` (cost reduced by ${s135CostReduction})` : ''}.`,
             descriptionKey: s135CostReduction > 0 ? 'game.effect.desc.sakura135ChooseCardUpgrade' : 'game.effect.desc.sakura135ChooseCard',
             descriptionParams: s135CostReduction > 0 ? { reduction: String(s135CostReduction) } : undefined,
-            options: s135ValidIds, minSelections: 1, maxSelections: 1,
+            options: s135ValidIndices, minSelections: 1, maxSelections: 1,
             sourceEffectId: s135EffId,
           });
           pendingEffect.remainingEffectTypes = undefined;
@@ -10749,6 +10767,7 @@ export class EffectEngine {
         let i140Parsed: { isUpgrade?: boolean } = {};
         try { i140Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const i140IsUpgrade = i140Parsed.isUpgrade ?? false;
+        console.log(`[EffectEngine] ITACHI140_CONFIRM_MAIN: isUpgrade=${i140IsUpgrade} pendingEffect.isUpgrade=${pendingEffect.isUpgrade} desc=${pendingEffect.effectDescription}`);
 
         const i140HandSize = i140OpponentState.hand.length;
         if (i140HandSize === 0) {
@@ -13026,6 +13045,7 @@ export class EffectEngine {
         }
 
         // If no more chained selections, show UPGRADE CONFIRM popup
+        console.log(`[EffectEngine] GAARA120_CHOOSE_DEFEAT end: chainedToNext=${chainedToNext} isUpgrade=${gaaraDesc.isUpgrade} defeatedCount=${defeatedCount_g} sourceInstanceId=${gaaraDesc.sourceInstanceId}`);
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();

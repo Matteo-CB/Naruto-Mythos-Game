@@ -238,7 +238,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('room:error', (data: { message: string }) => {
         console.error('[Socket] Room error:', data.message);
-        set({ error: data.message });
+        // Only set error if game hasn't started yet (lobby phase).
+        // During an active game, room errors (e.g. stale rejoin "Room not found")
+        // should not show as in-game action errors.
+        if (!get().gameStarted) {
+          set({ error: data.message });
+        }
       });
 
       socket.on('room:deck-accepted', () => {
