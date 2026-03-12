@@ -9,34 +9,38 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN: Opponent draws a card.
  *
  * Makes the opponent draw 1 card from their deck. This is a drawback effect on an otherwise
- * efficient card. The effect is mandatory.
+ * efficient card. The opponent can choose to accept or decline the draw.
  */
 function handleKin072Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  const newState = { ...state };
-  const opponentState = { ...newState[opponentPlayer] };
-  if (opponentState.deck.length > 0) {
-    const newDeck = [...opponentState.deck];
-    const drawnCard = newDeck.shift()!;
-    opponentState.deck = newDeck;
-    opponentState.hand = [...opponentState.hand, drawnCard];
+  // Check if opponent has cards to draw
+  if (state[opponentPlayer].deck.length === 0) {
+    const log = logAction(
+      state.log,
+      state.turn,
+      state.phase,
+      sourcePlayer,
+      'EFFECT_NO_TARGET',
+      'Kin Tsuchi (072): Opponent has no cards to draw.',
+      'game.log.effect.noTarget',
+      { card: 'KIN TSUCHI', id: 'KS-072-C' },
+    );
+    return { state: { ...state, log } };
   }
-  newState[opponentPlayer] = opponentState;
 
-  const log = logAction(
-    newState.log,
-    newState.turn,
-    newState.phase,
-    sourcePlayer,
-    'EFFECT_DRAW',
-    `Kin Tsuchi (072): Opponent draws 1 card.`,
-    'game.log.effect.oppDraw',
-    { card: 'Kin Tsuchi', id: 'KS-072-C', count: '1' },
-  );
-
-  return { state: { ...newState, log } };
+  // CONFIRM popup shown to the OPPONENT asking if they want to draw
+  return {
+    state,
+    requiresTargetSelection: true,
+    targetSelectionType: 'KIN072_CONFIRM_MAIN',
+    validTargets: [ctx.sourceCard.instanceId],
+    isOptional: true,
+    selectingPlayer: opponentPlayer,
+    description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
+    descriptionKey: 'game.effect.desc.kin072ConfirmMain',
+  };
 }
 
 export function registerHandler(): void {
