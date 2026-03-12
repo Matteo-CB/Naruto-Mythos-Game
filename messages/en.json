@@ -324,7 +324,9 @@
       "base": "Base",
       "up": "UP",
       "confirm": "OK",
-      "details": "Details"
+      "details": "Details",
+      "minimize": "Minimize",
+      "restoreEffect": "Pending Effect"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",

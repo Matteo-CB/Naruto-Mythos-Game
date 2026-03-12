@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -9,6 +9,36 @@ import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, Miss
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
+
+// ----- Minimize Button (reused in every popup overlay) -----
+
+function MinimizeButton({ onClick }: { onClick: () => void }) {
+  const t = useTranslations();
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      className="no-select"
+      style={{
+        position: 'absolute',
+        top: '10px',
+        right: '14px',
+        zIndex: 60,
+        padding: '4px 14px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        borderRadius: '6px',
+        color: '#aaa',
+        fontSize: '12px',
+        cursor: 'pointer',
+        fontWeight: 600,
+        letterSpacing: '0.03em',
+      }}
+      title={t('game.board.minimize')}
+    >
+      &#x25BC; {t('game.board.minimize')}
+    </button>
+  );
+}
 
 // ----- Target Character Card -----
 
@@ -330,6 +360,20 @@ export function TargetSelector() {
   const declineTarget = useGameStore((s) => s.declineTarget);
   const visibleState = useGameStore((s) => s.visibleState);
 
+  const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+  const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
+  const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
+
+  // Auto-restore when pending selection changes (new effect arrives)
+  const prevPendingIdRef = useRef<string | null>(null);
+  const currentPendingId = pendingTargetSelection?.descriptionKey ?? pendingTargetSelection?.description ?? null;
+  useEffect(() => {
+    if (currentPendingId && currentPendingId !== prevPendingIdRef.current) {
+      restoreEffectPopup();
+    }
+    prevPendingIdRef.current = currentPendingId;
+  }, [currentPendingId, restoreEffectPopup]);
+
   const handleSelect = useCallback(
     (targetId: string) => {
       selectTarget(targetId);
@@ -349,6 +393,42 @@ export function TargetSelector() {
   // Hand selection is handled by HandCardSelector
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
+  // Minimized floating pill — user can click to restore the popup
+  if (effectPopupMinimized) {
+    const effectDesc = pendingTargetSelection.descriptionKey
+      ? t(pendingTargetSelection.descriptionKey, pendingTargetSelection.descriptionParams as Record<string, string> | undefined)
+      : (pendingTargetSelection.description || t('game.board.restoreEffect'));
+    // Truncate to 40 chars for the pill
+    const pillText = effectDesc.length > 40 ? effectDesc.slice(0, 37) + '...' : effectDesc;
+    return (
+      <motion.button
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 40, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        onClick={restoreEffectPopup}
+        className="fixed z-50 flex items-center gap-2 no-select"
+        style={{
+          bottom: '12px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '8px 18px',
+          background: 'rgba(196, 163, 90, 0.95)',
+          color: '#0a0a0a',
+          borderRadius: '24px',
+          fontSize: '13px',
+          fontWeight: 700,
+          cursor: 'pointer',
+          border: '1px solid rgba(255, 215, 0, 0.4)',
+          boxShadow: '0 4px 20px rgba(196, 163, 90, 0.5)',
+        }}
+      >
+        <span style={{ fontSize: '16px', lineHeight: 1 }}>&#x25B2;</span>
+        {pillText}
+      </motion.button>
+    );
+  }
+
   const { validTargets, description, descriptionKey, descriptionParams, onDecline, declineLabelKey, playerName, revealedCard } = pendingTargetSelection;
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
@@ -367,6 +447,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -499,6 +580,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -664,6 +746,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -839,6 +922,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -995,6 +1079,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -1144,6 +1229,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -1256,6 +1342,7 @@ export function TargetSelector() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
         >
+          <MinimizeButton onClick={minimizeEffectPopup} />
           {/* Title */}
           <motion.span
             initial={{ y: -20, opacity: 0 }}
@@ -1351,6 +1438,7 @@ export function TargetSelector() {
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
       >
+        <MinimizeButton onClick={minimizeEffectPopup} />
         {/* Player announcement banner */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
