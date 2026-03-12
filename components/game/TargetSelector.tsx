@@ -1218,6 +1218,129 @@ export function TargetSelector() {
     );
   }
 
+  // ---- Generic CONFIRM popup for missions and character CONFIRMs ----
+  if (pendingTargetSelection.selectionType?.includes('_CONFIRM_')) {
+    const confirmTarget = validTargets[0];
+    let confirmImage: string | null = null;
+    let confirmName = '';
+
+    // Mission CONFIRM: find mission card image
+    if (confirmTarget?.startsWith('KS-') && confirmTarget?.includes('-MMS')) {
+      for (const m of visibleState.activeMissions) {
+        if (m.card?.id === confirmTarget) {
+          confirmImage = normalizeImagePath(m.card.image_file);
+          confirmName = getCardName(m.card as MissionCard & { name_en?: string; name_fr: string }, locale as 'en' | 'fr');
+          break;
+        }
+      }
+    } else if (confirmTarget) {
+      // Character CONFIRM: find character on board
+      for (const m of visibleState.activeMissions) {
+        for (const c of [...m.player1Characters, ...m.player2Characters]) {
+          if (c.instanceId === confirmTarget && c.card) {
+            confirmImage = normalizeImagePath(c.card.image_file);
+            confirmName = getCardName(c.card, locale as 'en' | 'fr');
+            break;
+          }
+        }
+      }
+    }
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
+        >
+          {/* Title */}
+          <motion.span
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm font-bold uppercase tracking-widest mb-6 text-center px-4 font-body"
+            style={{ color: '#c4a35a', maxWidth: '500px' }}
+          >
+            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+          </motion.span>
+
+          {/* Card display */}
+          {confirmImage && (
+            <motion.div
+              initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
+              animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
+              className="relative mb-8"
+              style={{
+                width: '120px',
+                height: '168px',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                border: '2px solid #c4a35a',
+                boxShadow: '0 0 24px rgba(196, 163, 90, 0.3)',
+              }}
+            >
+              <div
+                className="w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url('${confirmImage}')` }}
+              />
+              {/* Name overlay */}
+              <div
+                className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
+                style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+              >
+                <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
+                  {confirmName}
+                </span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Action buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex gap-4"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleSelect(confirmTarget)}
+              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+              style={{
+                backgroundColor: '#c4a35a',
+                color: '#0a0a0a',
+                border: '1px solid #c4a35a',
+                boxShadow: '0 4px 16px rgba(196, 163, 90, 0.4)',
+              }}
+            >
+              {t('game.board.confirm')}
+            </motion.button>
+            {canDecline && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleDecline}
+                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#888888',
+                  border: '1px solid #333333',
+                }}
+              >
+                {t('game.board.skip')}
+              </motion.button>
+            )}
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   return (
     <AnimatePresence>
       <motion.div
