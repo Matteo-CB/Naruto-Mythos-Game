@@ -9,7 +9,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
-import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
@@ -886,37 +886,40 @@ export class EffectEngine {
         break;
 
       case 'SASUKE014_UPGRADE_HAND_REVEAL': {
-        // UPGRADE includes AMBUSH — hand was shown, now ask to confirm the UPGRADE discard chain
+        // UPGRADE includes AMBUSH — hand was shown, now proceed directly to mandatory discard
+        // (player already confirmed UPGRADE at SASUKE014_CONFIRM_UPGRADE_MODIFIER — no second confirm needed)
         const opp_sur = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        const canDiscard_sur = newState[pendingEffect.sourcePlayer].hand.length > 0 && newState[opp_sur].hand.length > 0;
+        const ownHand_sur = newState[pendingEffect.sourcePlayer].hand;
+        const oppHand_sur = newState[opp_sur].hand;
 
-        if (canDiscard_sur) {
-          // Chain to SASUKE014_CONFIRM_UPGRADE popup
-          const s014ConfUpId = generateInstanceId();
-          const s014ConfUpActId = generateInstanceId();
-          newState.pendingEffects = [...newState.pendingEffects, {
-            id: s014ConfUpId, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex,
-            effectType: 'UPGRADE',
-            effectDescription: JSON.stringify({ sourceCardInstanceId: pendingEffect.sourceInstanceId }),
-            targetSelectionType: 'SASUKE014_CONFIRM_UPGRADE',
-            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
-            validTargets: [pendingEffect.sourceInstanceId], isOptional: true, isMandatory: false,
-            resolved: false, isUpgrade: true,
-            remainingEffectTypes: pendingEffect.remainingEffectTypes,
-          }];
-          newState.pendingActions = [...newState.pendingActions, {
-            id: s014ConfUpActId, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: pendingEffect.sourcePlayer,
-            description: `Sasuke Uchiwa (014) UPGRADE: Discard 1 card to discard 1 from opponent's hand?`,
-            descriptionKey: 'game.effect.desc.sasuke014ConfirmUpgrade',
-            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
-            sourceEffectId: s014ConfUpId,
-          }];
-          pendingEffect.remainingEffectTypes = undefined;
+        if (ownHand_sur.length === 0 || oppHand_sur.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Sasuke Uchiwa (014) UPGRADE: Cannot discard — empty hand.',
+            'game.log.effect.noTarget', { card: 'SASUKE UCHIWA', id: 'KS-014-UC' });
+          break;
         }
-        break;
+
+        {
+          const handIndices_sur = ownHand_sur.map((_: unknown, i: number) => String(i));
+          const charResult_sur = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+          const step_sur: EffectResult = {
+            state: newState,
+            requiresTargetSelection: true,
+            targetSelectionType: 'SASUKE_014_DISCARD_OWN',
+            validTargets: handIndices_sur,
+            isMandatory: true,
+            description: 'Sasuke Uchiwa (014) UPGRADE: Discard 1 of your cards.',
+            descriptionKey: 'game.effect.desc.sasuke014DiscardOwn',
+          };
+          newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+          newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
+          return EffectEngine.createPendingTargetSelection(
+            newState, pendingEffect.sourcePlayer,
+            charResult_sur?.character ?? null,
+            pendingEffect.sourceMissionIndex,
+            'UPGRADE', true, step_sur, [],
+          );
+        }
       }
 
       case 'ITACHI091_CHOOSE_DISCARD': {
@@ -1554,7 +1557,7 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         console.log(`[EffectEngine] GAARA139_DEFEAT_BY_COST: isUpgrade=${pendingEffect.isUpgrade} defeatedName=${gaara139DefeatedName} defeatedCost=${gaara139DefeatedCost}`);
 
-        // If upgrade, chain hide effect for another enemy with same name and lower cost
+        // If upgrade, chain CONFIRM popup for the hide effect
         if (pendingEffect.isUpgrade && gaara139DefeatedName) {
           const opponentPlayer = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const gaara139EnemySide: 'player1Characters' | 'player2Characters' =
@@ -1573,40 +1576,39 @@ export class EffectEngine {
           }
 
           if (hideTargets.length > 0) {
-            // Chain hide effect
-            const charResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
-            if (charResult) {
-              const hideEffectId = generateInstanceId();
-              const hideActionId = generateInstanceId();
-              newState.pendingEffects = [...newState.pendingEffects, {
-                id: hideEffectId,
-                sourceCardId: pendingEffect.sourceCardId,
-                sourceInstanceId: pendingEffect.sourceInstanceId,
-                sourceMissionIndex: charResult.missionIndex,
-                effectType: 'UPGRADE' as const,
-                effectDescription: `Gaara (139) UPGRADE: Hide an enemy ${gaara139DefeatedName} with cost less than ${gaara139DefeatedCost}.`,
-                targetSelectionType: 'GAARA139_HIDE_SAME_NAME',
-                sourcePlayer: pendingEffect.sourcePlayer,
-                requiresTargetSelection: true,
-                validTargets: hideTargets,
-                isOptional: true,
-                isMandatory: false,
-                resolved: false,
-                isUpgrade: true,
-              }];
-              newState.pendingActions = [...newState.pendingActions, {
-                id: hideActionId,
-                type: 'SELECT_TARGET' as const,
-                player: pendingEffect.sourcePlayer,
-                description: `Gaara (139) UPGRADE: Hide an enemy ${gaara139DefeatedName} with cost less than ${gaara139DefeatedCost}.`,
-                descriptionKey: 'game.effect.desc.gaara139HideSameName',
-                descriptionParams: { target: gaara139DefeatedName, cost: String(gaara139DefeatedCost) },
-                options: hideTargets,
-                minSelections: 1,
-                maxSelections: 1,
-                sourceEffectId: hideEffectId,
-              }];
-            }
+            // Chain CONFIRM popup for UPGRADE hide
+            const g139ConfEffId = generateInstanceId();
+            const g139ConfActId = generateInstanceId();
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: g139ConfEffId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: 'UPGRADE' as const,
+              effectDescription: JSON.stringify({ defeatedName: gaara139DefeatedName, defeatedCost: gaara139DefeatedCost }),
+              targetSelectionType: 'GAARA139_CONFIRM_UPGRADE',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: [pendingEffect.sourceInstanceId],
+              isOptional: true,
+              isMandatory: false,
+              resolved: false,
+              isUpgrade: true,
+              remainingEffectTypes: pendingEffect.remainingEffectTypes,
+            }];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: g139ConfActId,
+              type: 'SELECT_TARGET' as const,
+              player: pendingEffect.sourcePlayer,
+              description: `Gaara (139) UPGRADE: Hide an enemy ${gaara139DefeatedName} with cost less than ${gaara139DefeatedCost}?`,
+              descriptionKey: 'game.effect.desc.gaara139ConfirmUpgrade',
+              descriptionParams: { target: gaara139DefeatedName, cost: String(gaara139DefeatedCost) },
+              options: [pendingEffect.sourceInstanceId],
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: g139ConfEffId,
+            }];
+            pendingEffect.remainingEffectTypes = undefined;
           }
         }
         break;
@@ -5046,6 +5048,7 @@ export class EffectEngine {
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
                 if (eff.type === 'SCORE') return false; // SCORE never copyable
+                if (eff.type === 'UPGRADE') return false; // UPGRADE never copyable
                 if (eff.description && eff.description.includes('[⧗]')) return false;
                 if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
                 return true;
@@ -5071,6 +5074,7 @@ export class EffectEngine {
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
             if (eff.type === 'SCORE') return false; // SCORE never copyable
+            if (eff.type === 'UPGRADE') return false; // UPGRADE never copyable
             if (eff.description.includes('[⧗]')) return false;
             if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
             return true;
@@ -9334,6 +9338,63 @@ export class EffectEngine {
       case 'NARUTO141_CHOOSE_HIDE_TARGET':
       case 'JIRAIYA_HIDE_ENEMY_COST_3':
       case 'CHOJI018_HIDE_ENEMY':
+      case 'GAARA139_CONFIRM_UPGRADE': {
+        // Player confirmed UPGRADE: create mandatory hide target selection
+        let g139cData: { defeatedName?: string; defeatedCost?: number } = {};
+        try { g139cData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const g139cName = g139cData.defeatedName ?? '';
+        const g139cCost = g139cData.defeatedCost ?? 0;
+        const g139cOpponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const g139cEnemySide: 'player1Characters' | 'player2Characters' =
+          g139cOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        const g139cHideTargets: string[] = [];
+        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+          for (const ch of newState.activeMissions[mi][g139cEnemySide]) {
+            if (ch.isHidden) continue;
+            const tc = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+            if (tc.name_fr === g139cName && tc.chakra < g139cCost) {
+              g139cHideTargets.push(ch.instanceId);
+            }
+          }
+        }
+
+        if (g139cHideTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', `Gaara (139) UPGRADE: No valid hide targets (state changed).`,
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-139-S' });
+          break;
+        }
+
+        {
+          const g139cEffId = generateInstanceId();
+          const g139cActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: g139cEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: 'UPGRADE' as const,
+            effectDescription: pendingEffect.effectDescription,
+            targetSelectionType: 'GAARA139_HIDE_SAME_NAME',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: g139cHideTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: g139cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Gaara (139) UPGRADE: Hide an enemy ${g139cName} with cost less than ${g139cCost}.`,
+            descriptionKey: 'game.effect.desc.gaara139HideSameName',
+            descriptionParams: { target: g139cName, cost: String(g139cCost) },
+            options: g139cHideTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: g139cEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
       case 'GAARA139_HIDE_SAME_NAME':
       case 'GAARA153_HIDE_SAME_NAME':
       case 'KIBA026_OPPONENT_CHOOSE_HIDE': // legacy â€' kept for backward compat with old saved states
@@ -10435,7 +10496,6 @@ export class EffectEngine {
         try { n133Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const n133MI = n133Parsed.missionIndex ?? pendingEffect.sourceMissionIndex;
         const n133UseDefeat = n133Parsed.useDefeat ?? false;
-        console.log(`[EffectEngine] NARUTO133_CONFIRM_MAIN: useDefeat=${n133UseDefeat} isUpgrade=${pendingEffect.isUpgrade} desc=${pendingEffect.effectDescription}`);
         const n133Mission = newState.activeMissions[n133MI];
         if (!n133Mission) break;
 
@@ -10458,6 +10518,36 @@ export class EffectEngine {
           newState.log = logAction(newState.log, newState.turn, newState.phase, n133Player,
             'EFFECT_NO_TARGET', 'Naruto Uzumaki (133): No valid targets (state changed).',
             'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-S' });
+          break;
+        }
+
+        // If isUpgrade and not already using defeat, chain to CONFIRM_UPGRADE_MODIFIER first
+        if (pendingEffect.isUpgrade && !n133UseDefeat) {
+          const n133mEffId = generateInstanceId();
+          const n133mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: n133mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: n133MI,
+            effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: n133MI }),
+            targetSelectionType: 'NARUTO133_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: n133Player, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId],
+            isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: n133mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: n133Player,
+            description: 'Naruto Uzumaki (133): Apply UPGRADE? Defeat both targets instead of hiding them.',
+            descriptionKey: 'game.effect.desc.naruto133ConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: n133mEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
           break;
         }
 
@@ -10511,6 +10601,89 @@ export class EffectEngine {
             descriptionKey: n133UseDefeat ? 'game.effect.desc.naruto133ChooseDefeat2' : 'game.effect.desc.naruto133ChooseHide2',
             options: n133ValidT2, minSelections: 1, maxSelections: 1,
             sourceEffectId: n133EffId2,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      // --- Naruto 133 (S) CONFIRM UPGRADE MODIFIER ---
+      case 'NARUTO133_CONFIRM_UPGRADE_MODIFIER': {
+        // Player confirmed UPGRADE modifier: defeat instead of hide
+        // Re-enter CONFIRM_MAIN logic with useDefeat: true
+        const n133mPlayer = pendingEffect.sourcePlayer;
+        const n133mOpponent: PlayerID = n133mPlayer === 'player1' ? 'player2' : 'player1';
+        const n133mEnemySide: 'player1Characters' | 'player2Characters' =
+          n133mPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        let n133mParsed: { missionIndex?: number } = {};
+        try { n133mParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const n133mMI = n133mParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const n133mMission = newState.activeMissions[n133mMI];
+        if (!n133mMission) break;
+
+        const n133mValidT1 = n133mMission[n133mEnemySide]
+          .filter((c: CharacterInPlay) => getEffectivePower(newState, c, n133mOpponent) <= 5)
+          .map((c: CharacterInPlay) => c.instanceId);
+        const n133mValidT2: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const ch of newState.activeMissions[i][n133mEnemySide]) {
+            if (getEffectivePower(newState, ch, n133mOpponent) <= 2) {
+              n133mValidT2.push(ch.instanceId);
+            }
+          }
+        }
+
+        if (n133mValidT1.length === 0 && n133mValidT2.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, n133mPlayer,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (133): No valid targets (state changed after modifier).',
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-133-S' });
+          break;
+        }
+
+        if (n133mValidT1.length > 0) {
+          const n133mEffId = generateInstanceId();
+          const n133mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: n133mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: n133mMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: n133mMI, useDefeat: true }),
+            targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
+            sourcePlayer: n133mPlayer, requiresTargetSelection: true,
+            validTargets: n133mValidT1, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: n133mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: n133mPlayer,
+            description: 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to defeat (this mission).',
+            descriptionKey: 'game.effect.desc.naruto133ChooseDefeat1',
+            options: n133mValidT1, minSelections: 1, maxSelections: 1,
+            sourceEffectId: n133mEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        } else {
+          const n133mEffId2 = generateInstanceId();
+          const n133mActId2 = generateInstanceId();
+          newState.pendingEffects.push({
+            id: n133mEffId2, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: n133mMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ useDefeat: true, target1Id: null }),
+            targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
+            sourcePlayer: n133mPlayer, requiresTargetSelection: true,
+            validTargets: n133mValidT2, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: n133mActId2, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: n133mPlayer,
+            description: 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to defeat (any mission).',
+            descriptionKey: 'game.effect.desc.naruto133ChooseDefeat2',
+            options: n133mValidT2, minSelections: 1, maxSelections: 1,
+            sourceEffectId: n133mEffId2,
           });
           pendingEffect.remainingEffectTypes = undefined;
         }
@@ -10581,6 +10754,36 @@ export class EffectEngine {
         let s135Parsed: { costReduction?: number } = {};
         try { s135Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const s135CostReduction = s135Parsed.costReduction ?? 0;
+
+        // If isUpgrade and costReduction is still 0, chain to CONFIRM_UPGRADE_MODIFIER first
+        if (pendingEffect.isUpgrade && s135CostReduction === 0) {
+          const s135mEffId = generateInstanceId();
+          const s135mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: s135mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex,
+            effectType: pendingEffect.effectType,
+            effectDescription: pendingEffect.effectDescription,
+            targetSelectionType: 'SAKURA135_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: s135Player, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId],
+            isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: s135mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: s135Player,
+            description: 'Sakura Haruno (135): Apply UPGRADE? Play the card paying 4 less chakra.',
+            descriptionKey: 'game.effect.desc.sakura135ConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: s135mEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
 
         if (s135PlayerState.deck.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, s135Player,
@@ -10669,6 +10872,38 @@ export class EffectEngine {
           });
           pendingEffect.remainingEffectTypes = undefined;
         }
+        break;
+      }
+
+      // --- Sakura 135 (S) CONFIRM UPGRADE MODIFIER ---
+      case 'SAKURA135_CONFIRM_UPGRADE_MODIFIER': {
+        // Player confirmed UPGRADE modifier: play paying 4 less
+        // Re-enter SAKURA135_CONFIRM_MAIN with costReduction: 4
+        const s135mPlayer = pendingEffect.sourcePlayer;
+        const s135mEffId = generateInstanceId();
+        const s135mActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: s135mEffId, sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          effectType: pendingEffect.effectType,
+          effectDescription: JSON.stringify({ costReduction: 4 }),
+          targetSelectionType: 'SAKURA135_CONFIRM_MAIN',
+          sourcePlayer: s135mPlayer, requiresTargetSelection: true,
+          validTargets: [pendingEffect.sourceInstanceId],
+          isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false, // isUpgrade false so it doesn't loop back to modifier
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: s135mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player: s135mPlayer,
+          description: 'Sakura Haruno (135): Look at top 3 cards, play one character (cost reduced by 4).',
+          descriptionKey: 'game.effect.desc.sakura135ConfirmMainUpgrade',
+          options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          sourceEffectId: s135mEffId,
+        });
+        pendingEffect.remainingEffectTypes = undefined;
         break;
       }
 
@@ -10923,7 +11158,7 @@ export class EffectEngine {
           'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${i140HandSize} cards, then drew ${i140DrawCount} new cards.`,
           'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: 'KS-140-S', discarded: String(i140HandSize), drawn: String(i140DrawCount) });
 
-        // If upgrade: defeat an enemy with cost <= X (X = number of cards discarded)
+        // If upgrade: chain to CONFIRM_UPGRADE popup for defeat
         if (i140IsUpgrade && i140HandSize > 0) {
           const i140EnemySide: 'player1Characters' | 'player2Characters' =
             i140Player === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -10939,30 +11174,88 @@ export class EffectEngine {
           }
 
           if (i140DefeatTargets.length > 0) {
-            const i140EffId = generateInstanceId();
-            const i140ActId = generateInstanceId();
+            const i140ConfEffId = generateInstanceId();
+            const i140ConfActId = generateInstanceId();
             newState.pendingEffects.push({
-              id: i140EffId, sourceCardId: pendingEffect.sourceCardId,
+              id: i140ConfEffId, sourceCardId: pendingEffect.sourceCardId,
               sourceInstanceId: pendingEffect.sourceInstanceId,
               sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'UPGRADE' as const,
-              effectDescription: `Itachi Uchiwa (140) UPGRADE: Defeat an enemy with cost ${i140HandSize} or less.`,
-              targetSelectionType: 'DEFEAT_BY_COST_UPGRADE',
+              effectDescription: JSON.stringify({ i140HandSize }),
+              targetSelectionType: 'ITACHI140_CONFIRM_UPGRADE',
               sourcePlayer: i140Player, requiresTargetSelection: true,
-              validTargets: i140DefeatTargets, isOptional: false, isMandatory: true,
+              validTargets: [pendingEffect.sourceInstanceId],
+              isOptional: true, isMandatory: false,
               resolved: false, isUpgrade: true,
               remainingEffectTypes: pendingEffect.remainingEffectTypes,
             });
             newState.pendingActions.push({
-              id: i140ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+              id: i140ConfActId, type: 'SELECT_TARGET' as PendingAction['type'],
               player: i140Player,
-              description: `Itachi Uchiwa (140) UPGRADE: Choose an enemy with cost ${i140HandSize} or less to defeat.`,
-              descriptionKey: 'game.effect.desc.itachi140DefeatByCost',
+              description: `Itachi Uchiwa (140) UPGRADE: Defeat an enemy with cost ${i140HandSize} or less?`,
+              descriptionKey: 'game.effect.desc.itachi140ConfirmUpgrade',
               descriptionParams: { cost: String(i140HandSize) },
-              options: i140DefeatTargets, minSelections: 1, maxSelections: 1,
-              sourceEffectId: i140EffId,
+              options: [pendingEffect.sourceInstanceId],
+              minSelections: 1, maxSelections: 1,
+              sourceEffectId: i140ConfEffId,
             });
             pendingEffect.remainingEffectTypes = undefined;
           }
+        }
+        break;
+      }
+
+      // --- Itachi 140 (S) CONFIRM UPGRADE ---
+      case 'ITACHI140_CONFIRM_UPGRADE': {
+        // Player confirmed UPGRADE: create mandatory defeat target selection
+        const i140cPlayer = pendingEffect.sourcePlayer;
+        let i140cData: { i140HandSize?: number } = {};
+        try { i140cData = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const i140cHandSize = i140cData.i140HandSize ?? 0;
+        const i140cEnemySide: 'player1Characters' | 'player2Characters' =
+          i140cPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        const i140cDefeatTargets: string[] = [];
+        for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+          for (const char of newState.activeMissions[mi][i140cEnemySide]) {
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+            if (effectiveCost <= i140cHandSize) {
+              i140cDefeatTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (i140cDefeatTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, i140cPlayer,
+            'EFFECT_NO_TARGET', 'Itachi Uchiwa (140) UPGRADE: No valid defeat targets (state changed).',
+            'game.log.effect.noTarget', { card: 'ITACHI UCHIWA', id: 'KS-140-S' });
+          break;
+        }
+
+        {
+          const i140cEffId = generateInstanceId();
+          const i140cActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: i140cEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'UPGRADE' as const,
+            effectDescription: `Itachi Uchiwa (140) UPGRADE: Defeat an enemy with cost ${i140cHandSize} or less.`,
+            targetSelectionType: 'DEFEAT_BY_COST_UPGRADE',
+            sourcePlayer: i140cPlayer, requiresTargetSelection: true,
+            validTargets: i140cDefeatTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: i140cActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: i140cPlayer,
+            description: `Itachi Uchiwa (140) UPGRADE: Choose an enemy with cost ${i140cHandSize} or less to defeat.`,
+            descriptionKey: 'game.effect.desc.itachi140DefeatByCost',
+            descriptionParams: { cost: String(i140cHandSize) },
+            options: i140cDefeatTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: i140cEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
         }
         break;
       }
@@ -11244,6 +11537,7 @@ export class EffectEngine {
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
               if (effect.type === 'SCORE') return false; // SCORE never copyable
+              if (effect.type === 'UPGRADE') return false; // UPGRADE never copyable
               if (effect.description.includes('[⧗]')) return false;
               if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
               return true;
@@ -11421,12 +11715,13 @@ export class EffectEngine {
           ? k148Target.character.stack[k148Target.character.stack.length - 1]
           : k148Target.character.card;
 
-        // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH, UPGRADE (not SCORE, not continuous)
+        // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH (not SCORE, not UPGRADE, not continuous)
         const k148Copyable = (k148TopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'SCORE') return false; // SCORE never copyable
+          if (eff.type === 'UPGRADE') return false; // UPGRADE never copyable
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
-          return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
+          return eff.type === 'MAIN' || eff.type === 'AMBUSH';
         });
 
         if (k148Copyable.length === 0) {
@@ -12782,14 +13077,13 @@ export class EffectEngine {
 
         // Copy effect filter:
         // - SCORE: never copyable
+        // - UPGRADE: never copyable (not instant effects)
         // - AMBUSH: only copyable if the copier was revealed from hidden
-        // - UPGRADE: only copyable by Sakon 062 (not Kakashi 016)
-        const isSakon062 = pendingEffect.targetSelectionType === 'SAKON062_COPY_EFFECT';
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'SCORE') return false;
+          if (eff.type === 'UPGRADE') return false;
           if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
-          if (!isSakon062 && eff.type === 'UPGRADE') return false;
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
           return true;
@@ -16849,6 +17143,9 @@ export class EffectEngine {
     // Check Choji 018 post-move hide trigger (only on friendly moves)
     // effectInitiator tracks who initiated the move; charResult.player is the character's controller
     state = checkChoji018PostMoveTrigger(state, movedChar, destMissionIndex, effectInitiator ?? charOwner, charResult.player);
+
+    // Re-apply Rashomon token removal — moving may change which character is strongest
+    state = applyRempartTokenRemoval(state);
 
     return state;
   }

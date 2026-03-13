@@ -20,7 +20,6 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 
 function naruto133MainHandler(ctx: EffectContext): EffectResult {
   const state = ctx.state;
-  const useDefeat = ctx.isUpgrade;
   const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
 
   const enemySideKey: 'player1Characters' | 'player2Characters' =
@@ -53,16 +52,14 @@ function naruto133MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup instead of direct target selection
+  // Always return base CONFIRM — upgrade modifier will be prompted separately
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'NARUTO133_CONFIRM_MAIN',
     validTargets: [ctx.sourceCard.instanceId],
-    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex, useDefeat }),
-    descriptionKey: useDefeat
-      ? 'game.effect.desc.naruto133ConfirmMainUpgrade'
-      : 'game.effect.desc.naruto133ConfirmMain',
+    description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex, useDefeat: false }),
+    descriptionKey: 'game.effect.desc.naruto133ConfirmMain',
   };
 }
 

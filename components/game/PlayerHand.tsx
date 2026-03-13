@@ -152,7 +152,7 @@ const HandCard = React.memo(function HandCard({
         onDragStart();
       }}
       onDrag={(_e, info) => {
-        if (Math.abs(info.offset.x) > 10) {
+        if (Math.abs(info.offset.x) > 30) {
           didDragRef.current = true;
         }
       }}
@@ -415,6 +415,51 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
     [isMyTurn, effectPopupMinimized, selectedCardIndex, selectCard],
   );
 
+  // ── Move selected card left/right ──
+
+  const moveCardLeft = useCallback(() => {
+    if (selectedCardIndex === null || hand.length <= 1) return;
+    const currentOrder =
+      handOrder && handOrder.length === hand.length
+        ? [...handOrder]
+        : hand.map((_, i) => i);
+    // Find display index of the selected card
+    const displayIdx = currentOrder.indexOf(selectedCardIndex);
+    if (displayIdx <= 0) return;
+    // Swap with the card to the left
+    [currentOrder[displayIdx], currentOrder[displayIdx - 1]] =
+      [currentOrder[displayIdx - 1], currentOrder[displayIdx]];
+    const isNatural = currentOrder.every((v, i) => v === i);
+    setHandOrder(isNatural ? null : currentOrder);
+  }, [selectedCardIndex, handOrder, hand, setHandOrder]);
+
+  const moveCardRight = useCallback(() => {
+    if (selectedCardIndex === null || hand.length <= 1) return;
+    const currentOrder =
+      handOrder && handOrder.length === hand.length
+        ? [...handOrder]
+        : hand.map((_, i) => i);
+    const displayIdx = currentOrder.indexOf(selectedCardIndex);
+    if (displayIdx < 0 || displayIdx >= currentOrder.length - 1) return;
+    [currentOrder[displayIdx], currentOrder[displayIdx + 1]] =
+      [currentOrder[displayIdx + 1], currentOrder[displayIdx]];
+    const isNatural = currentOrder.every((v, i) => v === i);
+    setHandOrder(isNatural ? null : currentOrder);
+  }, [selectedCardIndex, handOrder, hand, setHandOrder]);
+
+  // Check if selected card can move left/right
+  const selectedDisplayIdx = useMemo(() => {
+    if (selectedCardIndex === null) return -1;
+    const currentOrder =
+      handOrder && handOrder.length === hand.length
+        ? handOrder
+        : hand.map((_, i) => i);
+    return currentOrder.indexOf(selectedCardIndex);
+  }, [selectedCardIndex, handOrder, hand]);
+
+  const canMoveLeft = selectedCardIndex !== null && selectedDisplayIdx > 0;
+  const canMoveRight = selectedCardIndex !== null && selectedDisplayIdx >= 0 && selectedDisplayIdx < hand.length - 1;
+
   // ── Sort handlers ──
 
   const sortByCost = useCallback(() => {
@@ -485,8 +530,24 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
         })}
       </div>
 
-      {/* Hand count + sort controls */}
+      {/* Hand count + sort + move controls */}
       <div className="flex items-center gap-2">
+        {/* Move left/right arrows (only when a card is selected) */}
+        {selectedCardIndex !== null && hand.length > 1 && (
+          <div className="flex items-center gap-0.5">
+            <SortPill
+              label="\u25C0"
+              onClick={moveCardLeft}
+              accentColor={canMoveLeft ? 'rgba(196, 163, 90, 0.6)' : 'rgba(80,80,80,0.3)'}
+            />
+            <SortPill
+              label="\u25B6"
+              onClick={moveCardRight}
+              accentColor={canMoveRight ? 'rgba(196, 163, 90, 0.6)' : 'rgba(80,80,80,0.3)'}
+            />
+          </div>
+        )}
+
         {hand.length > 1 && (
           <div className="flex items-center gap-1">
             <SortPill

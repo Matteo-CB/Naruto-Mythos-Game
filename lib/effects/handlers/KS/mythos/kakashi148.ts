@@ -57,6 +57,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       // Kakashi 148 is AMBUSH (always revealed), so AMBUSH effects ARE copyable
       const hasCopyableEffect = topCard.effects.some((effect) => {
         if (effect.type === 'SCORE') return false; // SCORE never copyable
+        if (effect.type === 'UPGRADE') return false; // UPGRADE never copyable
         // Skip continuous effects (marked with [⧗] symbol)
         if (effect.description.includes('[⧗]')) return false;
         // Exclude effect modifiers

@@ -81,6 +81,7 @@ export function PopupCornerFrame({
   padding = '32px 28px',
   className = '',
   backgroundColor = 'rgba(8, 8, 14, 0.85)',
+  fitContent = false,
 }: {
   children: React.ReactNode;
   accentColor?: string;
@@ -88,6 +89,7 @@ export function PopupCornerFrame({
   padding?: string;
   className?: string;
   backgroundColor?: string;
+  fitContent?: boolean;
 }) {
   return (
     <motion.div
@@ -97,7 +99,8 @@ export function PopupCornerFrame({
       className={`relative ${className}`}
       style={{
         maxWidth,
-        width: '90vw',
+        width: fitContent ? 'fit-content' : '90vw',
+        minWidth: fitContent ? '220px' : undefined,
         padding,
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
@@ -352,27 +355,31 @@ export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
       width: '100%',
       display: 'flex',
       justifyContent: 'flex-end',
-      marginBottom: '8px',
+      marginBottom: '4px',
     }}>
       <motion.button
         onClick={(e) => { e.stopPropagation(); onClick(); }}
         className="no-select"
-        whileHover={{ opacity: 1, scale: 1.15 }}
-        whileTap={{ scale: 0.85 }}
+        whileHover={{ scale: 1.12, borderColor: 'rgba(196, 163, 90, 0.8)' }}
+        whileTap={{ scale: 0.88 }}
         style={{
-          background: 'none',
-          border: 'none',
-          color: '#666666',
-          fontSize: '16px',
+          background: 'rgba(196, 163, 90, 0.08)',
+          border: '1px solid rgba(196, 163, 90, 0.35)',
+          color: '#c4a35a',
+          fontSize: '13px',
           lineHeight: '1',
           cursor: 'pointer',
-          fontWeight: 300,
-          padding: '4px 8px',
-          opacity: 0.5,
+          fontWeight: 700,
+          width: '28px',
+          height: '28px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transform: 'rotate(45deg)',
         }}
         title={t('game.board.minimize')}
       >
-        &#x2715;
+        <span style={{ transform: 'rotate(-45deg)', display: 'block' }}>&#x2715;</span>
       </motion.button>
     </div>
   );

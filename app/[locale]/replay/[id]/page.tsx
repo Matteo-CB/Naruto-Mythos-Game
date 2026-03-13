@@ -411,14 +411,19 @@ function TextTimeline({
   log,
   playerNames,
   onClose,
+  currentStep,
+  states,
 }: {
   log: ReplayLogEntry[];
   playerNames: { player1: string; player2: string };
   onClose: () => void;
+  currentStep?: number;
+  states?: GameState[];
 }) {
   const t = useTranslations();
   const tr = useTranslations('replay');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
   const [selectedTurn, setSelectedTurn] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState<'slow' | 'normal' | 'fast'>('normal');
@@ -430,6 +435,25 @@ function TextTimeline({
   const filteredLog = selectedTurn === null ? log : log.filter((e) => e.turn === selectedTurn);
   const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
 
+  // When syncing with visual replay, determine which log entries correspond to currentStep
+  const syncedLogLength = useMemo(() => {
+    if (currentStep == null || !states || states.length === 0) return null;
+    const state = states[currentStep];
+    if (!state) return null;
+    return state.log?.length ?? 0;
+  }, [currentStep, states]);
+
+  // Newly highlighted entry indices (entries added in the current step)
+  const highlightedIndices = useMemo(() => {
+    if (currentStep == null || !states || states.length === 0 || syncedLogLength == null) return new Set<number>();
+    const prevLogLen = currentStep > 0 ? (states[currentStep - 1]?.log?.length ?? 0) : 0;
+    const indices = new Set<number>();
+    for (let i = prevLogLen; i < syncedLogLength; i++) {
+      indices.add(i);
+    }
+    return indices;
+  }, [currentStep, states, syncedLogLength]);
+
   const stopAutoPlay = useCallback(() => {
     setIsPlaying(false);
     if (intervalRef.current) {
@@ -437,6 +461,13 @@ function TextTimeline({
       intervalRef.current = null;
     }
   }, []);
+
+  // Sync visibleCount with currentStep when provided
+  useEffect(() => {
+    if (syncedLogLength != null) {
+      setVisibleCount(syncedLogLength);
+    }
+  }, [syncedLogLength]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -450,18 +481,31 @@ function TextTimeline({
     return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
   }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
 
+  // Auto-scroll to highlighted entries
   useEffect(() => {
-    if (scrollRef.current && isPlaying) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [visibleCount, isPlaying]);
+    if (highlightRef.current && scrollRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (scrollRef.current && isPlaying) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [visibleCount, isPlaying, highlightedIndices]);
 
-  useEffect(() => { setVisibleCount(filteredLog.length); stopAutoPlay(); }, [selectedTurn, filteredLog.length, stopAutoPlay]);
+  useEffect(() => {
+    if (syncedLogLength == null) {
+      // Only reset when NOT synced with visual replay
+      setVisibleCount(filteredLog.length);
+      stopAutoPlay();
+    }
+  }, [selectedTurn, filteredLog.length, stopAutoPlay, syncedLogLength]);
 
   const formatPhase = (phase: GamePhase): string => {
     const key = phaseTranslationKeys[phase];
     return key ? t(key) : phase;
   };
 
-  const displayEntries = filteredLog.slice(0, visibleCount);
+  // When synced with visual replay, show all entries but dim future ones.
+  // When not synced (standalone auto-play), slice as before.
+  const displayEntries = syncedLogLength != null ? filteredLog : filteredLog.slice(0, visibleCount);
 
   return (
     <div className="fixed inset-0 z-50" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -581,13 +625,26 @@ function TextTimeline({
             displayEntries.map((entry, i) => {
               const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
               const displayName = entry.player ? playerNames[entry.player] : null;
+              const isHighlighted = highlightedIndices.has(i);
+              // When synced, entries beyond the current step's log length are future entries
+              const isFuture = syncedLogLength != null && i >= syncedLogLength;
+              // Assign the highlightRef to the last highlighted entry for auto-scroll
+              const isLastHighlighted = isHighlighted && !highlightedIndices.has(i + 1);
               return (
                 <div
                   key={`${entry.timestamp}-${i}`}
+                  ref={isLastHighlighted ? highlightRef : undefined}
                   className="flex items-start gap-2 px-4 py-1.5 text-xs"
                   style={{
                     borderBottom: '1px solid rgba(255, 255, 255, 0.02)',
-                    backgroundColor: entry.player ? `${playerColor}05` : 'transparent',
+                    backgroundColor: isHighlighted
+                      ? 'rgba(196, 163, 90, 0.12)'
+                      : entry.player
+                        ? `${playerColor}05`
+                        : 'transparent',
+                    borderLeft: isHighlighted ? '3px solid rgba(196, 163, 90, 0.6)' : '3px solid transparent',
+                    opacity: isFuture ? 0.25 : 1,
+                    transition: 'background-color 0.3s ease, opacity 0.3s ease',
                   }}
                 >
                   <span className="shrink-0 tabular-nums text-[10px]" style={{ color: '#444', minWidth: '32px' }}>
@@ -604,7 +661,7 @@ function TextTimeline({
                       {displayName}
                     </span>
                   )}
-                  <span className="text-[11px]" style={{ color: '#c0c0c0' }}>
+                  <span className="text-[11px]" style={{ color: isHighlighted ? '#e0d0a0' : '#c0c0c0' }}>
                     {entry.messageKey ? t(entry.messageKey, entry.messageParams ?? {}) : (entry.details || entry.action)}
                   </span>
                 </div>
@@ -669,26 +726,49 @@ function VisualReplay({
       return ids;
     }
 
-    // After each applyAction, detect new characters and update the ID map
+    // After each applyAction, detect new characters and update the ID map.
+    // Compare previous and next mission characters to find newly added instanceIds.
     function updateIdMap(prev: GameState, next: GameState, origAction: GameAction) {
       const prevIds = collectCharIds(prev);
       const nextIds = collectCharIds(next);
-      // Find newly added IDs (in next but not in prev)
+
+      // Collect all new character instanceIds (in next but not in prev)
+      const newCharIds: string[] = [];
       for (const id of nextIds) {
-        if (!prevIds.has(id) && !idMap.has(id)) {
-          // This is a new character — try to figure out the original ID from the action
-          if (origAction.type === 'PLAY_CHARACTER' || origAction.type === 'PLAY_HIDDEN') {
-            // The original action's card created this character
-            // We don't have the original instanceId from the action, but we can map
-            // via the pending actions/effects that reference the new ID
-          }
+        if (!prevIds.has(id)) {
+          newCharIds.push(id);
         }
       }
-      // Also update pending action/effect ID mappings
-      for (const pa of next.pendingActions) {
-        const origPa = prev.pendingActions.find((p) => p.id === pa.id);
-        if (!origPa) {
-          // New pending action — record its ID
+
+      // For each new character, register it in the idMap so future actions can
+      // find characters by their current instanceId. This is critical for
+      // PLAY_HIDDEN characters whose IDs are generated by generateInstanceId()
+      // during applyAction — subsequent REVEAL_CHARACTER actions reference
+      // these IDs and need them to be tracked.
+      for (const newId of newCharIds) {
+        // Map newId -> newId (self-mapping) so mapId() recognizes it as valid
+        if (!idMap.has(newId)) {
+          idMap.set(newId, newId);
+        }
+      }
+
+      // Also map original action IDs to the new IDs when we can correlate them.
+      // For PLAY_CHARACTER/PLAY_HIDDEN, the action doesn't carry the resulting
+      // instanceId, but when there's exactly one new character we can confidently
+      // associate it with the action's intent.
+      if (
+        (origAction.type === 'PLAY_CHARACTER' || origAction.type === 'PLAY_HIDDEN') &&
+        newCharIds.length === 1
+      ) {
+        // Find the new character in the next state to get its details
+        for (const m of next.activeMissions) {
+          for (const c of [...m.player1Characters, ...m.player2Characters]) {
+            if (c.instanceId === newCharIds[0]) {
+              // Record mapping so future actions referencing this character work
+              idMap.set(c.instanceId, c.instanceId);
+              break;
+            }
+          }
         }
       }
     }
@@ -786,11 +866,33 @@ function VisualReplay({
         }
         return action;
       }
+      if (action.type === 'REORDER_EFFECTS') {
+        // Remap selectedEffectId to matching pending effect in replay state
+        const origId = action.selectedEffectId;
+        const found = state.pendingEffects.find((e) => e.id === origId);
+        if (!found && state.pendingEffects.length > 0) {
+          // Fall back to first unresolved pending effect
+          return { ...action, selectedEffectId: state.pendingEffects[0].id };
+        }
+        return action;
+      }
       return action;
     }
 
     // Auto-resolve a single pending action/effect — returns new state or null if stuck
     function autoResolvePending(st: GameState): GameState | null {
+      // Handle simultaneous effects from different source cards — auto-pick first
+      if (st.pendingEffects.length >= 2 && st.pendingActions.length >= 2) {
+        const uniqueSources = new Set(st.pendingEffects.filter((e) => !e.resolved).map((e) => e.sourceInstanceId));
+        if (uniqueSources.size >= 2) {
+          try {
+            return GameEngine.applyAction(st, st.activePlayer, {
+              type: 'REORDER_EFFECTS',
+              selectedEffectId: st.pendingEffects[0].id,
+            });
+          } catch { /* fallthrough */ }
+        }
+      }
       if (st.pendingActions.length > 0) {
         const pa = st.pendingActions[0];
         const pe = st.pendingEffects.find((e) => e.id === pa.sourceEffectId);
@@ -1187,7 +1289,7 @@ function VisualReplay({
 
       {/* Log side panel */}
       <AnimatePresence>
-        {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} />}
+        {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} currentStep={currentStep} states={states} />}
       </AnimatePresence>
     </div>
   );

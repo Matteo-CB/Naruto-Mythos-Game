@@ -349,8 +349,11 @@ export function calculateContinuousPowerModifier(
     if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;
 
     // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
+    // Exception: if Rempart zeroed this character, no bonus applies (power stays 0).
     if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
-      modifier += 1;
+      if (!rempartZeroed) {
+        modifier += 1;
+      }
     }
 
     // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power

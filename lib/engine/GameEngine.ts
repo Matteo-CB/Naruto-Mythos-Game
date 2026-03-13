@@ -154,6 +154,10 @@ export class GameEngine {
         break;
 
       case 'action':
+        if (action.type === 'REORDER_EFFECTS') {
+          newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
+          break;
+        }
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           // Handle pending effect target selections during action phase
           newState = GameEngine.handlePendingAction(newState, player, action);
@@ -213,6 +217,11 @@ export class GameEngine {
             newState.missionScoringComplete = true;
             break;
           }
+        }
+        // Handle effect reordering during mission phase
+        if (action.type === 'REORDER_EFFECTS') {
+          newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
+          break;
         }
         // Handle target selections for SCORE effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
@@ -445,6 +454,33 @@ export class GameEngine {
       'game.log.gameEnd',
       { winner, winnerPts, loserPts },
     );
+
+    return newState;
+  }
+
+  /**
+   * Handle REORDER_EFFECTS action: move the selected effect to the front of the queue.
+   * Used when multiple simultaneous effects trigger and the player chooses resolution order.
+   */
+  static handleReorderEffects(state: GameState, player: PlayerID, selectedEffectId: string): GameState {
+    const newState = deepClone(state);
+    const effectIdx = newState.pendingEffects.findIndex((e) => e.id === selectedEffectId);
+    if (effectIdx === -1) return state;
+
+    const effect = newState.pendingEffects[effectIdx];
+    if (effect.sourcePlayer !== player) return state;
+
+    // Move selected effect to front
+    newState.pendingEffects.splice(effectIdx, 1);
+    newState.pendingEffects.unshift(effect);
+
+    // Move corresponding action to front
+    const actionIdx = newState.pendingActions.findIndex((a) => a.sourceEffectId === selectedEffectId);
+    if (actionIdx > 0) {
+      const action = newState.pendingActions[actionIdx];
+      newState.pendingActions.splice(actionIdx, 1);
+      newState.pendingActions.unshift(action);
+    }
 
     return newState;
   }
@@ -1062,6 +1098,117 @@ export class GameEngine {
         return newState;
       }
 
+      // Naruto 133 UPGRADE modifier declined → execute base MAIN (hide instead of defeat)
+      if (effect.targetSelectionType === 'NARUTO133_CONFIRM_UPGRADE_MODIFIER') {
+        let n133dData: { missionIndex?: number } = {};
+        try { n133dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
+        const n133dPlayer = effect.sourcePlayer;
+        const n133dOpponent: import('./types').PlayerID = n133dPlayer === 'player1' ? 'player2' : 'player1';
+        const n133dEnemySide: 'player1Characters' | 'player2Characters' =
+          n133dPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const n133dMI = n133dData.missionIndex ?? effect.sourceMissionIndex;
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        const n133dMission = newState.activeMissions[n133dMI];
+        if (n133dMission) {
+          const n133dValidT1 = n133dMission[n133dEnemySide]
+            .filter((c: any) => getEffectivePower(newState, c, n133dOpponent) <= 5)
+            .map((c: any) => c.instanceId);
+          const n133dValidT2: string[] = [];
+          for (let i = 0; i < newState.activeMissions.length; i++) {
+            for (const ch of newState.activeMissions[i][n133dEnemySide]) {
+              if (getEffectivePower(newState, ch, n133dOpponent) <= 2) {
+                n133dValidT2.push(ch.instanceId);
+              }
+            }
+          }
+
+          if (n133dValidT1.length > 0) {
+            const n133dEffId = generateInstanceId();
+            const n133dActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: n133dEffId, sourceCardId: effect.sourceCardId,
+              sourceInstanceId: effect.sourceInstanceId,
+              sourceMissionIndex: n133dMI, effectType: effect.effectType,
+              effectDescription: JSON.stringify({ missionIndex: n133dMI, useDefeat: false }),
+              targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
+              sourcePlayer: n133dPlayer, requiresTargetSelection: true,
+              validTargets: n133dValidT1, isOptional: false, isMandatory: true,
+              resolved: false, isUpgrade: false,
+              remainingEffectTypes: effect.remainingEffectTypes,
+            });
+            newState.pendingActions.push({
+              id: n133dActId, type: 'SELECT_TARGET' as any,
+              player: n133dPlayer,
+              description: 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to hide (this mission).',
+              descriptionKey: 'game.effect.desc.naruto133ChooseHide1',
+              options: n133dValidT1, minSelections: 1, maxSelections: 1,
+              sourceEffectId: n133dEffId,
+            });
+          } else if (n133dValidT2.length > 0) {
+            const n133dEffId2 = generateInstanceId();
+            const n133dActId2 = generateInstanceId();
+            newState.pendingEffects.push({
+              id: n133dEffId2, sourceCardId: effect.sourceCardId,
+              sourceInstanceId: effect.sourceInstanceId,
+              sourceMissionIndex: n133dMI, effectType: effect.effectType,
+              effectDescription: JSON.stringify({ useDefeat: false, target1Id: null }),
+              targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
+              sourcePlayer: n133dPlayer, requiresTargetSelection: true,
+              validTargets: n133dValidT2, isOptional: false, isMandatory: true,
+              resolved: false, isUpgrade: false,
+              remainingEffectTypes: effect.remainingEffectTypes,
+            });
+            newState.pendingActions.push({
+              id: n133dActId2, type: 'SELECT_TARGET' as any,
+              player: n133dPlayer,
+              description: 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to hide (any mission).',
+              descriptionKey: 'game.effect.desc.naruto133ChooseHide2',
+              options: n133dValidT2, minSelections: 1, maxSelections: 1,
+              sourceEffectId: n133dEffId2,
+            });
+          }
+        }
+
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0 && !newState.pendingEffects.some((e) => e.remainingEffectTypes)) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
+      }
+
+      // Sakura 135 UPGRADE modifier declined → execute base MAIN (full cost, no reduction)
+      if (effect.targetSelectionType === 'SAKURA135_CONFIRM_UPGRADE_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        // Re-create SAKURA135_CONFIRM_MAIN with costReduction: 0, isUpgrade: false
+        const s135dEffId = generateInstanceId();
+        const s135dActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: s135dEffId, sourceCardId: effect.sourceCardId,
+          sourceInstanceId: effect.sourceInstanceId,
+          sourceMissionIndex: effect.sourceMissionIndex,
+          effectType: effect.effectType,
+          effectDescription: JSON.stringify({ costReduction: 0 }),
+          targetSelectionType: 'SAKURA135_CONFIRM_MAIN',
+          sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: [effect.sourceInstanceId],
+          isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: false,
+          remainingEffectTypes: effect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: s135dActId, type: 'SELECT_TARGET' as any,
+          player: effect.sourcePlayer,
+          description: 'Sakura Haruno (135): Look at top 3 cards, play one character.',
+          descriptionKey: 'game.effect.desc.sakura135ConfirmMain',
+          options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          sourceEffectId: s135dEffId,
+        });
+        return newState;
+      }
+
       // Special case: Kiba 113/149 UPGRADE confirmation declined → continue with hide mode
       if (effect.targetSelectionType === 'KIBA113_CONFIRM_UPGRADE' || effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
         newState.pendingEffects.splice(effectIdx, 1);
@@ -1295,11 +1442,13 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Only highlight the OPPONENT's last play from the previous turn
+    // Highlight both players' last play from the previous turn
     const prevPlayed = state.previousTurnLastPlayed ?? { player1: null, player2: null };
     const lastPlayedIds = new Set<string>();
     const opponentLastPlayed = prevPlayed[otherPlayer];
     if (opponentLastPlayed) lastPlayedIds.add(opponentLastPlayed);
+    const ownLastPlayed = prevPlayed[player];
+    if (ownLastPlayed) lastPlayedIds.add(ownLastPlayed);
 
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,

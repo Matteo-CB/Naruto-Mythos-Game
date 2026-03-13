@@ -659,11 +659,11 @@ function ReplayMissionLane({
               backgroundImage: `url(${missionImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              opacity: 0.45,
+              opacity: 0.7,
             }}
           />
         )}
-        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.35)' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }} />
         <div className="relative z-10 px-2 py-2 text-center">
           {/* Rank + name */}
           <div className="flex items-center justify-center gap-1.5">
