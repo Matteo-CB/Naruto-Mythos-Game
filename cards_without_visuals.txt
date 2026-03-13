@@ -1,0 +1,36 @@
+CARTES SANS VISUEL (has_visual: false)
+Source: lib/data/sets/KS/cards.json
+Total: 14 cartes
+========================================
+
+=== UC (1 cartes) ===
+KS-045-UC | #045 | ANKO MITARASHI "La Poigne du Serpent Spectral" | chakra:3 | power:4
+45_UC_Anko_Striking_Shadows.webp
+
+=== R (6 cartes) ===
+KS-122-R | #122 | JIRÔBÔ "Poing d'Arhat" | chakra:5 | power:6
+122_R_Jirobo_Slamming_Palm.webp
+KS-124-R | #124 | KIDÔMARU "Arc d'Araignée : Déchirure Féroce" | chakra:5 | power:5
+124_R_Kidomaru_Gum_Style.webp
+KS-126-R | #126 | OROCHIMARU "Ôtez-vous de mon chemin." | chakra:7 | power:7
+126_R_Orochimaru_Stay_Out.webp
+KS-127-R | #127 | SAKON "Le Poing de Pierre" | chakra:5 | power:5
+127_R_Sakon_Fists_barrage.webp
+KS-129-R | #129 | KYÛBI "Manteau du Démon Renard" | chakra:7 | power:10
+129_R_Nine-Tailed_Grateful.webp
+KS-130-R | #130 | ICHIBI "J'espère que tu es prêt à mourir !" | chakra:7 | power:10
+130_R_One_Tail_Reeady.webp
+
+=== RA (4 cartes) ===
+KS-122-RA | #122 | JIRÔBÔ "Poing d'Arhat" | chakra:5 | power:6
+122_R_ART_Jirobo_Slamming_Palm.webp
+KS-124-RA | #124 | KIDÔMARU "Arc d'Araignée : Déchirure Féroce" | chakra:5 | power:5
+124_R_ART_Kidomaru_Gum_Style.webp
+KS-127-RA | #127 | SAKON "Le Poing de Pierre" | chakra:5 | power:5
+127_R_ART_Sakon_Fists_barrage.webp
+KS-129-RA | #129 | KYÛBI "Manteau du Démon Renard" | chakra:7 | power:10
+129_R_ART_Nine-Tailed_Fox_Cloak.webp
+
+=== S (1 cartes) ===
+KS-134-S | #134 | KYÛBI "Destruction" | chakra:8 | power:12
+134_Secret_GOLD_Nine_Tail_Fox_Destruction.webp
