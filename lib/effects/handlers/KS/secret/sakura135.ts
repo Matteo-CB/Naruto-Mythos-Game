@@ -51,5 +51,6 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
 
 export function registerSakura135Handlers(): void {
   registerEffect('KS-135-S', 'MAIN', sakura135MainHandler);
+  registerEffect('KS-135-S', 'UPGRADE', (ctx) => ({ state: ctx.state })); // Handled by MAIN via isUpgrade
   registerEffect('KS-135-MV', 'MAIN', sakura135MainHandler);
 }

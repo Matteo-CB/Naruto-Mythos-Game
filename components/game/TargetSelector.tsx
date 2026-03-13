@@ -9,145 +9,17 @@ import type { VisibleCharacter, VisibleMission, MissionRank, CharacterCard, Miss
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
-
-// ----- Minimize Button (reused in every popup overlay) -----
-
-function MinimizeButton({ onClick }: { onClick: () => void }) {
-  const t = useTranslations();
-  return (
-    <div style={{
-      width: 'min(90vw, 520px)',
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginBottom: '14px',
-    }}>
-      <motion.button
-        onClick={(e) => { e.stopPropagation(); onClick(); }}
-        className="no-select"
-        whileHover={{ scale: 1.25, opacity: 1 }}
-        whileTap={{ scale: 0.85 }}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: '#d4b36a',
-          fontSize: '22px',
-          lineHeight: '1',
-          cursor: 'pointer',
-          fontWeight: 300,
-          padding: '4px 6px',
-          opacity: 0.7,
-          textShadow: '0 0 10px rgba(196, 163, 90, 0.5), 0 0 30px rgba(196, 163, 90, 0.15)',
-        }}
-        title={t('game.board.minimize')}
-      >
-        &#x2715;
-      </motion.button>
-    </div>
-  );
-}
-
-function PopupBanner({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-      className="mb-5 flex flex-col items-center gap-2"
-    >
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-        style={{ width: '60px', height: '1px', backgroundColor: 'rgba(196, 163, 90, 0.35)' }}
-      />
-      <div className="flex items-center gap-3 px-8 py-2">
-        <motion.div
-          className="rounded-full"
-          style={{ width: '8px', height: '8px', backgroundColor: '#c4a35a' }}
-          animate={{
-            boxShadow: [
-              '0 0 4px rgba(196, 163, 90, 0.3)',
-              '0 0 14px rgba(196, 163, 90, 0.8)',
-              '0 0 4px rgba(196, 163, 90, 0.3)',
-            ],
-          }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-        />
-        <span
-          className="text-sm font-bold uppercase"
-          style={{ color: '#c4a35a', letterSpacing: '0.2em', textShadow: '0 0 20px rgba(196, 163, 90, 0.2)' }}
-        >
-          {children}
-        </span>
-      </div>
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ delay: 0.25, duration: 0.4 }}
-        style={{ width: '140px', height: '1px', backgroundColor: 'rgba(196, 163, 90, 0.2)' }}
-      />
-    </motion.div>
-  );
-}
-
-function PopupDescription({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
-      className="mb-6 px-6 py-3 rounded"
-      style={{
-        backgroundColor: 'rgba(8, 8, 12, 0.8)',
-        borderLeft: '2px solid rgba(196, 163, 90, 0.4)',
-        maxWidth: '500px',
-      }}
-    >
-      <span className="font-body text-xs leading-relaxed" style={{ color: '#d0d0d0' }}>
-        {children}
-      </span>
-    </motion.div>
-  );
-}
-
-function PopupConfirmButton({ onClick, children, color = '#c4a35a' }: { onClick: () => void; children: React.ReactNode; color?: string }) {
-  return (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={onClick}
-      className="px-8 py-3 rounded-lg text-sm font-bold uppercase cursor-pointer"
-      style={{
-        backgroundColor: color,
-        color: '#0a0a0a',
-        border: `1px solid ${color === '#c4a35a' ? 'rgba(255, 215, 0, 0.4)' : color}`,
-        boxShadow: `0 0 16px ${color}4d, 0 4px 12px rgba(0, 0, 0, 0.4)`,
-        letterSpacing: '0.12em',
-      }}
-    >
-      {children}
-    </motion.button>
-  );
-}
-
-function PopupSkipButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={onClick}
-      className="px-6 py-2.5 rounded-lg text-xs font-medium uppercase cursor-pointer"
-      style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        color: '#777777',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        letterSpacing: '0.12em',
-      }}
-    >
-      {children}
-    </motion.button>
-  );
-}
+import {
+  PopupOverlay,
+  PopupCornerFrame,
+  PopupTitle,
+  PopupDescription,
+  PopupActionButton,
+  PopupDismissLink,
+  PopupMinimizePill,
+  PopupMinimizeX,
+  PopupTargetCount,
+} from './PopupPrimitives';
 
 // ----- Target Character Card -----
 
@@ -203,7 +75,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       {/* Pulsing glow for valid targets */}
       {isValidTarget && (
         <motion.div
-          className="absolute inset-0 rounded"
+          className="absolute inset-0"
           style={{
             border: '2px solid rgba(196, 163, 90, 0.9)',
             pointerEvents: 'none',
@@ -276,7 +148,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       {/* Power display */}
       {!isHidden && (
         <div
-          className="absolute bottom-0.5 right-0.5 rounded px-1 text-[9px] font-bold tabular-nums"
+          className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0',
@@ -303,7 +175,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       {character.card && !isHidden && (
         <button
           onClick={(e) => { e.stopPropagation(); zoomCard(character.card as CharacterCard | MissionCard); }}
-          className="absolute top-0.5 right-0.5 rounded px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+          className="absolute top-0.5 right-0.5 px-1 py-px text-[7px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
           style={{
             backgroundColor: 'rgba(0,0,0,0.85)',
             color: '#c4a35a',
@@ -369,7 +241,6 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         opacity: hasValidTargets ? 1 : 0.4,
         minWidth: '120px',
         cursor: isMissionTarget ? 'pointer' : 'default',
-        borderRadius: '8px',
         border: isMissionTarget ? '2px solid rgba(196, 163, 90, 0.9)' : '2px solid transparent',
         boxShadow: isMissionTarget ? '0 0 14px rgba(196, 163, 90, 0.4)' : 'none',
         padding: '8px',
@@ -377,7 +248,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
     >
       {/* Mission rank label */}
       <div
-        className="rounded px-2 py-0.5 text-[10px] font-bold text-center"
+        className="px-2 py-0.5 text-[10px] font-bold text-center"
         style={{
           backgroundColor: hasValidTargets ? rankColors[mission.rank] : '#1a1a1a',
           color: hasValidTargets ? '#0a0a0a' : '#333333',
@@ -399,7 +270,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
 
       {/* Power comparison bar */}
       <div
-        className="flex items-center justify-center gap-2 w-full rounded px-2 py-0.5"
+        className="flex items-center justify-center gap-2 w-full px-2 py-0.5"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
       >
         <span
@@ -507,38 +378,7 @@ export function TargetSelector() {
     const effectDesc = pendingTargetSelection.descriptionKey
       ? t(pendingTargetSelection.descriptionKey, pendingTargetSelection.descriptionParams as Record<string, string> | undefined)
       : (pendingTargetSelection.description || t('game.board.restoreEffect'));
-    // Truncate to 40 chars for the pill
-    const pillText = effectDesc.length > 40 ? effectDesc.slice(0, 37) + '...' : effectDesc;
-    return (
-      <motion.button
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        whileHover={{ scale: 1.05, y: -2 }}
-        whileTap={{ scale: 0.97 }}
-        onClick={restoreEffectPopup}
-        className="fixed z-50 flex items-center gap-2 no-select"
-        style={{
-          bottom: '14px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          padding: '8px 20px',
-          background: 'rgba(196, 163, 90, 0.92)',
-          color: '#0a0a0a',
-          borderRadius: '24px',
-          fontSize: '12px',
-          fontWeight: 700,
-          cursor: 'pointer',
-          border: '1px solid rgba(255, 215, 0, 0.4)',
-          boxShadow: '0 4px 24px rgba(196, 163, 90, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)',
-          letterSpacing: '0.04em',
-        }}
-      >
-        <span style={{ fontSize: '14px', lineHeight: 1 }}>&#x25B2;</span>
-        {pillText}
-      </motion.button>
-    );
+    return <PopupMinimizePill text={effectDesc} onRestore={restoreEffectPopup} />;
   }
 
   const { validTargets, description, descriptionKey, descriptionParams, onDecline, declineLabelKey, playerName, revealedCard } = pendingTargetSelection;
@@ -551,130 +391,88 @@ export function TargetSelector() {
     const deckCount = pendingTargetSelection.deckSize ?? 0;
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6"
-            style={{ color: '#c4a35a' }}
-          >
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.4)" maxWidth="420px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#c4a35a" size="lg">
+              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            </PopupTitle>
 
-          {/* Deck visual */}
-          <motion.div
-            initial={{ scale: 0.7, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 16, delay: 0.15 }}
-            className="relative mb-8"
-            style={{ width: '80px', height: '112px' }}
-          >
-            {/* Stack shadows */}
-            {[3, 2, 1].map((offset) => (
+            {/* Deck visual */}
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 180, damping: 16, delay: 0.15 }}
+              className="relative mb-6 mx-auto"
+              style={{ width: '80px', height: '112px' }}
+            >
+              {[3, 2, 1].map((offset) => (
+                <div
+                  key={offset}
+                  className="absolute"
+                  style={{
+                    top: `-${offset * 2}px`,
+                    left: `${offset * 1}px`,
+                    width: '80px',
+                    height: '112px',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" style={{ opacity: 0.5 - offset * 0.1 }} />
+                </div>
+              ))}
               <div
-                key={offset}
-                className="absolute"
+                className="absolute inset-0 overflow-hidden"
                 style={{
-                  top: `-${offset * 2}px`,
-                  left: `${offset * 1}px`,
-                  width: '80px',
-                  height: '112px',
                   borderRadius: '6px',
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                  border: '2px solid rgba(196, 163, 90, 0.7)',
+                  boxShadow: '0 0 18px rgba(196, 163, 90, 0.3)',
                 }}
               >
-                <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" style={{ opacity: 0.5 - offset * 0.1 }} />
+                <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
               </div>
-            ))}
-            {/* Top card */}
-            <div
-              className="absolute inset-0 rounded-md overflow-hidden"
-              style={{
-                borderRadius: '6px',
-                border: '2px solid rgba(196, 163, 90, 0.9)',
-                boxShadow: '0 0 18px rgba(196, 163, 90, 0.5)',
-              }}
-            >
-              <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
-            </div>
-            {/* Card count badge */}
-            <div
-              className="absolute -bottom-3 -right-3 rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold"
-              style={{
-                backgroundColor: '#c4a35a',
-                color: '#0a0a0a',
-                border: '2px solid #0a0a0a',
-              }}
-            >
-              {deckCount}
-            </div>
-          </motion.div>
-
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="font-body text-xs mb-8"
-            style={{ color: '#555555' }}
-          >
-            {t('game.effect.sakura011DrawDeck', { count: deckCount })}
-          </motion.span>
-
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex gap-4"
-          >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelect('confirm')}
-              disabled={deckCount === 0}
-              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-              style={{
-                backgroundColor: deckCount > 0 ? '#c4a35a' : '#2a2a2a',
-                color: deckCount > 0 ? '#0a0a0a' : '#555555',
-                border: `1px solid ${deckCount > 0 ? '#c4a35a' : '#333333'}`,
-                boxShadow: deckCount > 0 ? '0 4px 16px rgba(196, 163, 90, 0.4)' : 'none',
-              }}
-            >
-              {t('game.effect.sakura011DrawBtn')}
-            </motion.button>
-            {canDecline && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleDecline}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+              <div
+                className="absolute -bottom-3 -right-3 w-7 h-7 flex items-center justify-center text-[10px] font-bold"
                 style={{
-                  backgroundColor: 'transparent',
-                  color: '#888888',
-                  border: '1px solid #333333',
+                  backgroundColor: 'rgba(12,12,18,0.95)',
+                  color: '#c4a35a',
+                  border: '2px solid #c4a35a',
+                  transform: 'rotate(45deg)',
                 }}
               >
-                {t('game.board.skip')}
-              </motion.button>
-            )}
-          </motion.div>
-        </motion.div>
+                <span style={{ transform: 'rotate(-45deg)' }}>{deckCount}</span>
+              </div>
+            </motion.div>
+
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="font-body text-[11px] mb-6 block text-center"
+              style={{ color: '#555555' }}
+            >
+              {t('game.effect.sakura011DrawDeck', { count: deckCount })}
+            </motion.span>
+
+            <div className="flex items-center justify-center gap-6">
+              <PopupActionButton onClick={() => handleSelect('confirm')} accentColor="#c4a35a" disabled={deckCount === 0}>
+                {t('game.effect.sakura011DrawBtn')}
+              </PopupActionButton>
+              {canDecline && (
+                <PopupDismissLink onClick={handleDecline}>
+                  {t('game.board.skip')}
+                </PopupDismissLink>
+              )}
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
 
-  // ---- CONFIRM_HIDE / CONFIRM_DEFEAT UI (Kiba 113 step 2, future confirmations) ----
+  // ---- CONFIRM_HIDE / CONFIRM_DEFEAT UI ----
   if (pendingTargetSelection.selectionType === 'CONFIRM_HIDE' || pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT') {
     const isDefeat = pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT';
     const cardData = pendingTargetSelection.confirmCardData;
@@ -684,113 +482,90 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase mb-6"
-            style={{ color: accentColor, letterSpacing: '0.18em', textShadow: `0 0 20px ${accentColor}40` }}
-          >
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor={`${accentColor}66`} maxWidth="400px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor={accentColor} size="lg">
+              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            </PopupTitle>
 
-          {/* Card display */}
-          <motion.div
-            initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
-            animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
-            className="relative mb-8"
-            style={{
-              width: '100px',
-              height: '140px',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              border: `2px solid ${accentColor}`,
-              boxShadow: `0 0 28px ${accentColor}40, 0 8px 24px rgba(0, 0, 0, 0.5)`,
-            }}
-          >
-            {imagePath ? (
+            {/* Card display */}
+            <motion.div
+              initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
+              animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
+              className="relative mb-6 mx-auto"
+              style={{
+                width: '100px',
+                height: '140px',
+                overflow: 'hidden',
+                border: `2px solid ${accentColor}88`,
+                boxShadow: `0 0 24px ${accentColor}25, 0 8px 24px rgba(0, 0, 0, 0.5)`,
+              }}
+            >
+              {imagePath ? (
+                <div
+                  className="w-full h-full bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('${imagePath}')`,
+                    filter: isDefeat ? 'brightness(0.6) saturate(0.5)' : 'brightness(0.5)',
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                  <span className="text-[8px] text-center px-1" style={{ color: '#888888' }}>
+                    {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
+                  </span>
+                </div>
+              )}
+              {/* Action badge — skewed strip */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span
+                  className="text-[10px] font-bold uppercase px-3 py-1"
+                  style={{
+                    backgroundColor: `${accentColor}dd`,
+                    color: '#ffffff',
+                    letterSpacing: '0.12em',
+                    transform: 'skewX(-4deg)',
+                    boxShadow: `0 2px 12px ${accentColor}40`,
+                  }}
+                >
+                  <span style={{ display: 'inline-block', transform: 'skewX(4deg)' }}>
+                    {isDefeat ? t('game.effect.defeatBadge') : t('game.effect.hideBadge')}
+                  </span>
+                </span>
+              </div>
               <div
-                className="w-full h-full bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('${imagePath}')`,
-                  filter: isDefeat ? 'brightness(0.6) saturate(0.5)' : 'brightness(0.5)',
-                }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                <span className="text-[8px] text-center px-1" style={{ color: '#888888' }}>
+                className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
+                style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+              >
+                <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
                   {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
                 </span>
               </div>
-            )}
-            {/* Action overlay badge */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span
-                className="text-xs font-bold uppercase px-2 py-1 rounded"
-                style={{
-                  backgroundColor: `${accentColor}cc`,
-                  color: '#ffffff',
-                  letterSpacing: '0.1em',
-                  boxShadow: `0 2px 8px ${accentColor}40`,
-                }}
-              >
-                {isDefeat ? t('game.effect.defeatBadge') : t('game.effect.hideBadge')}
-              </span>
-            </div>
-            {/* Name overlay */}
-            <div
-              className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
-              style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
-            >
-              <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
-                {cardData ? (locale === 'en' && cardData.name_en ? cardData.name_en : cardData.name_fr) : '???'}
-              </span>
-            </div>
+              {cardData && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(cardData as CharacterCard); }}
+                  className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                  style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.3)' }}
+                >
+                  {t('game.board.details')}
+                </button>
+              )}
+            </motion.div>
 
-            {/* Details button */}
-            {cardData && (
-              <button
-                onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(cardData as CharacterCard); }}
-                className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer"
-                style={{
-                  backgroundColor: 'rgba(0,0,0,0.85)',
-                  color: '#c4a35a',
-                  border: '1px solid rgba(196,163,90,0.4)',
-                }}
-              >
-                {t('game.board.details')}
-              </button>
-            )}
-          </motion.div>
-
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex gap-4"
-          >
-            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={accentColor}>
-              {t(confirmLabelKey)}
-            </PopupConfirmButton>
-            {canDecline && (
-              <PopupSkipButton onClick={handleDecline}>
-                {t('game.board.skip')}
-              </PopupSkipButton>
-            )}
-          </motion.div>
-        </motion.div>
+            <div className="flex items-center justify-center gap-6">
+              <PopupActionButton onClick={() => handleSelect('confirm')} accentColor={accentColor}>
+                {t(confirmLabelKey)}
+              </PopupActionButton>
+              {canDecline && (
+                <PopupDismissLink onClick={handleDecline}>
+                  {t('game.board.skip')}
+                </PopupDismissLink>
+              )}
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
@@ -829,159 +604,107 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-4"
-            style={{ color: '#c4a35a' }}
-          >
-            {revealedCard?.revealTitleKey
-              ? t(revealedCard.revealTitleKey)
-              : t('game.board.chooseTarget')}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#8b5cf6" size="lg">
+              {revealedCard?.revealTitleKey
+                ? t(revealedCard.revealTitleKey)
+                : t('game.board.chooseTarget')}
+            </PopupTitle>
 
-          {/* Hint text */}
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="font-body text-xs mb-6 text-center"
-            style={{ color: '#a0a0a0' }}
-          >
-            {revealedCard?.revealResultKey
-              ? t(revealedCard.revealResultKey)
-              : ''}
-          </motion.span>
+            {revealedCard?.revealResultKey && (
+              <PopupDescription accentColor="rgba(138, 92, 246, 0.4)">
+                {t(revealedCard.revealResultKey)}
+              </PopupDescription>
+            )}
 
-          {/* Cards grid - clickable with selection indicator */}
-          <div className="flex flex-wrap gap-3 mb-6 justify-center" style={{ maxWidth: '720px' }}>
-            {cards.map((card, idx) => {
-              const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
-              const isSelectable = card.isSummon || card.isMatch;
-              const isSelected = multiSelectChoices.has(String(idx));
-              const borderColor = isSelected ? '#4aff6b' : isSelectable ? 'rgba(196, 163, 90, 0.9)' : '#555555';
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
-                  animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
-                  className="relative"
-                  onClick={() => isSelectable && toggleCard(idx)}
-                  style={{
-                    width: dims.previewMed.w + 'px',
-                    height: dims.previewMed.h + 'px',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: `3px solid ${borderColor}`,
-                    boxShadow: isSelected
-                      ? '0 0 24px rgba(74, 255, 107, 0.5), 0 4px 16px rgba(0, 0, 0, 0.6)'
-                      : isSelectable
-                        ? '0 0 12px rgba(196, 163, 90, 0.3), 0 4px 16px rgba(0, 0, 0, 0.6)'
-                        : '0 4px 16px rgba(0, 0, 0, 0.6)',
-                    opacity: isSelectable ? 1 : 0.5,
-                    cursor: isSelectable ? 'pointer' : 'default',
-                    transform: isSelected ? 'translateY(-4px)' : undefined,
-                    transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
-                  }}
-                >
-                  {imgPath ? (
-                    <div
-                      className="w-full h-full bg-cover bg-center"
-                      style={{ backgroundImage: `url('${imgPath}')` }}
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ backgroundColor: '#1a1a1a' }}
-                    >
-                      <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Selection check overlay */}
-                  {isSelected && (
-                    <div
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold"
-                      style={{ backgroundColor: '#4aff6b', color: '#0a0a0a' }}
-                    >
-                      ✓
-                    </div>
-                  )}
-
-                  {/* Card name overlay */}
-                  <div
-                    className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-                  >
-                    <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
-                      {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
-                    </div>
-                    {isSelectable && (
-                      <div className="text-[9px] mt-0.5" style={{ color: isSelected ? '#4aff6b' : '#c4a35a' }}>
-                        {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : ''}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Chakra badge */}
-                  <div
-                    className="absolute top-1 left-1 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-bold"
+            {/* Cards grid */}
+            <div className="flex flex-wrap gap-3 mb-6 justify-center">
+              {cards.map((card, idx) => {
+                const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
+                const isSelectable = card.isSummon || card.isMatch;
+                const isSelected = multiSelectChoices.has(String(idx));
+                const borderColor = isSelected ? '#4aff6b' : isSelectable ? '#8b5cf6' : '#333333';
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
+                    animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
+                    className="relative"
+                    onClick={() => isSelectable && toggleCard(idx)}
                     style={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                      color: '#4a9eff',
-                      border: '1px solid #4a9eff',
+                      width: dims.previewMed.w + 'px',
+                      height: dims.previewMed.h + 'px',
+                      overflow: 'hidden',
+                      border: `2px solid ${borderColor}`,
+                      boxShadow: isSelected
+                        ? '0 0 20px rgba(74, 255, 107, 0.4), 0 4px 16px rgba(0, 0, 0, 0.6)'
+                        : isSelectable
+                          ? '0 0 12px rgba(138, 92, 246, 0.3), 0 4px 16px rgba(0, 0, 0, 0.6)'
+                          : '0 4px 16px rgba(0, 0, 0, 0.6)',
+                      opacity: isSelectable ? 1 : 0.45,
+                      cursor: isSelectable ? 'pointer' : 'default',
+                      transform: isSelected ? 'translateY(-4px)' : undefined,
+                      transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.2s',
                     }}
                   >
-                    {card.chakra}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                    {imgPath ? (
+                      <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imgPath}')` }} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
+                          {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
+                        </span>
+                      </div>
+                    )}
 
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex gap-4"
-          >
-            <PopupSkipButton onClick={skipMultiSelect}>
-              {t('game.board.skip')}
-            </PopupSkipButton>
+                    {/* Selection indicator — animated border accent */}
+                    {isSelected && (
+                      <motion.div
+                        className="absolute inset-0"
+                        style={{ borderLeft: '3px solid #4aff6b', borderBottom: '3px solid #4aff6b', pointerEvents: 'none' }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      />
+                    )}
 
-            <motion.button
-              whileHover={multiSelectChoices.size > 0 ? { scale: 1.05 } : {}}
-              whileTap={multiSelectChoices.size > 0 ? { scale: 0.95 } : {}}
-              onClick={confirmMultiSelect}
-              disabled={multiSelectChoices.size === 0}
-              className="px-8 py-3 rounded-lg text-sm font-bold uppercase cursor-pointer"
-              style={{
-                backgroundColor: multiSelectChoices.size > 0 ? '#4aff6b' : '#333333',
-                color: multiSelectChoices.size > 0 ? '#0a0a0a' : '#666666',
-                border: `1px solid ${multiSelectChoices.size > 0 ? '#4aff6b' : '#444444'}`,
-                boxShadow: multiSelectChoices.size > 0 ? '0 0 16px rgba(74, 255, 107, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4)' : 'none',
-                letterSpacing: '0.12em',
-              }}
-            >
-              {t('game.board.confirm')} ({multiSelectChoices.size})
-            </motion.button>
-          </motion.div>
-        </motion.div>
+                    <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
+                      <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
+                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
+                      </div>
+                      {isSelectable && (
+                        <div className="text-[9px] mt-0.5" style={{ color: isSelected ? '#4aff6b' : '#8b5cf6' }}>
+                          {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : ''}
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}
+                    >
+                      {card.chakra}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-center gap-6">
+              <PopupDismissLink onClick={skipMultiSelect}>
+                {t('game.board.skip')}
+              </PopupDismissLink>
+              <PopupActionButton
+                onClick={confirmMultiSelect}
+                accentColor="#4aff6b"
+                disabled={multiSelectChoices.size === 0}
+              >
+                {t('game.board.confirm')} ({multiSelectChoices.size})
+              </PopupActionButton>
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
@@ -993,143 +716,83 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6"
-            style={{ color: '#c4a35a' }}
-          >
-            {revealedCard?.revealTitleKey
-              ? t(revealedCard.revealTitleKey)
-              : t('game.effect.tayuya065UpgradeRevealTitle')}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor="rgba(138, 92, 246, 0.4)" maxWidth="740px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#8b5cf6" size="lg">
+              {revealedCard?.revealTitleKey
+                ? t(revealedCard.revealTitleKey)
+                : t('game.effect.tayuya065UpgradeRevealTitle')}
+            </PopupTitle>
 
-          {/* Cards grid */}
-          <div className="flex flex-wrap gap-3 mb-6 justify-center" style={{ maxWidth: '720px' }}>
-            {cards.map((card, idx) => {
-              const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
-              const isHighlight = card.isSummon || card.isMatch;
-              const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#555555';
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
-                  animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
-                  className="relative"
-                  style={{
-                    width: dims.previewMed.w + 'px',
-                    height: dims.previewMed.h + 'px',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: `2px solid ${borderColor}`,
-                    boxShadow: isHighlight
-                      ? `0 0 20px ${borderColor}40, 0 4px 16px rgba(0, 0, 0, 0.6)`
-                      : card.isDiscarded
-                        ? `0 0 16px rgba(179, 62, 62, 0.4), 0 4px 16px rgba(0, 0, 0, 0.6)`
-                        : '0 4px 16px rgba(0, 0, 0, 0.6)',
-                    opacity: card.isDiscarded ? 0.6 : 1,
-                  }}
-                >
-                  {imgPath ? (
-                    <div
-                      className="w-full h-full bg-cover bg-center"
-                      style={{ backgroundImage: `url('${imgPath}')` }}
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ backgroundColor: '#1a1a1a' }}
-                    >
-                      <span className="text-xs text-center px-2" style={{ color: '#888888' }}>
-                        {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Card name overlay */}
-                  <div
-                    className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+            <div className="flex flex-wrap gap-3 mb-5 justify-center">
+              {cards.map((card, idx) => {
+                const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
+                const isHighlight = card.isSummon || card.isMatch;
+                const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#333333';
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
+                    animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
+                    className="relative"
+                    style={{
+                      width: dims.previewMed.w + 'px',
+                      height: dims.previewMed.h + 'px',
+                      overflow: 'hidden',
+                      border: `2px solid ${borderColor}`,
+                      boxShadow: isHighlight
+                        ? `0 0 16px ${borderColor}30, 0 4px 16px rgba(0, 0, 0, 0.6)`
+                        : card.isDiscarded
+                          ? '0 0 12px rgba(179, 62, 62, 0.3), 0 4px 16px rgba(0, 0, 0, 0.6)'
+                          : '0 4px 16px rgba(0, 0, 0, 0.6)',
+                      opacity: card.isDiscarded ? 0.55 : 1,
+                    }}
                   >
-                    <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>
-                      {locale === 'en' && card.name_en ? card.name_en : card.name_fr}
-                    </div>
-                    {(isHighlight || card.isDiscarded) && (
-                      <div className="text-[9px] mt-0.5" style={{ color: isHighlight ? '#4aff6b' : '#b33e3e' }}>
-                        {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : t('game.effect.cardDiscarded')}
+                    {imgPath ? (
+                      <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imgPath}')` }} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                        <span className="text-xs text-center px-2" style={{ color: '#888888' }}>{locale === 'en' && card.name_en ? card.name_en : card.name_fr}</span>
                       </div>
                     )}
-                  </div>
+                    <div className="absolute inset-x-0 bottom-0 px-2 py-1.5 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
+                      <div className="text-[10px] font-bold" style={{ color: '#e0e0e0' }}>{locale === 'en' && card.name_en ? card.name_en : card.name_fr}</div>
+                      {(isHighlight || card.isDiscarded) && (
+                        <div className="text-[9px] mt-0.5" style={{ color: isHighlight ? '#4aff6b' : '#b33e3e' }}>
+                          {card.isSummon ? t('game.effect.tayuya065Summon') : card.isMatch ? t('game.effect.kiba026Match') : t('game.effect.cardDiscarded')}
+                        </div>
+                      )}
+                    </div>
+                    <div className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
+                      {card.chakra}
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(card as unknown as CharacterCard); }}
+                      className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#8b5cf6', border: '1px solid rgba(138,92,246,0.4)' }}
+                    >
+                      {t('game.board.details')}
+                    </button>
+                  </motion.div>
+                );
+              })}
+            </div>
 
-                  {/* Chakra badge */}
-                  <div
-                    className="absolute top-1 left-1 rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-bold"
-                    style={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                      color: '#4a9eff',
-                      border: '1px solid #4a9eff',
-                    }}
-                  >
-                    {card.chakra}
-                  </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mb-5 text-center">
+              <span className="font-body text-sm" style={{ color: resultColor }}>
+                {revealedCard?.revealResultKey ? t(revealedCard.revealResultKey) : t('game.effect.tayuya065UpgradeRevealNone')}
+              </span>
+            </motion.div>
 
-                  {/* Details button */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(card as unknown as CharacterCard); }}
-                    className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
-                    style={{
-                      backgroundColor: 'rgba(0,0,0,0.85)',
-                      color: '#c4a35a',
-                      border: '1px solid rgba(196,163,90,0.4)',
-                    }}
-                  >
-                    {t('game.board.details')}
-                  </button>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Result text */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mb-6 text-center"
-          >
-            <span
-              className="font-body text-sm font-medium"
-              style={{ color: resultColor }}
-            >
-              {revealedCard?.revealResultKey
-                ? t(revealedCard.revealResultKey)
-                : t('game.effect.tayuya065UpgradeRevealNone')}
-            </span>
-          </motion.div>
-
-          {/* Confirm button */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={resultColor}>
-              {t('game.board.confirm')}
-            </PopupConfirmButton>
-          </motion.div>
-        </motion.div>
+            <div className="flex justify-center">
+              <PopupActionButton onClick={() => handleSelect('confirm')} accentColor={resultColor}>
+                {t('game.board.confirm')}
+              </PopupActionButton>
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
@@ -1142,128 +805,67 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6"
-            style={{ color: '#c4a35a' }}
-          >
-            {revealedCard.revealTitleKey
-              ? t(revealedCard.revealTitleKey)
-              : t('game.effect.orochimaruReveal')}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor={`${resultColor}55`} maxWidth="420px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#8b5cf6" size="lg">
+              {revealedCard.revealTitleKey
+                ? t(revealedCard.revealTitleKey)
+                : t('game.effect.orochimaruReveal')}
+            </PopupTitle>
 
-          {/* Card display */}
-          <motion.div
-            initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
-            animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 }}
-            className="relative mb-6"
-            style={{
-              width: dims.previewLg.w + 'px',
-              height: dims.previewLg.h + 'px',
-              borderRadius: '10px',
-              overflow: 'hidden',
-              border: `2px solid ${resultColor}`,
-              boxShadow: `0 0 30px ${resultColor}40, 0 8px 32px rgba(0, 0, 0, 0.6)`,
-            }}
-          >
-            {imagePath ? (
-              <div
-                className="w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: `url('${imagePath}')` }}
-              />
-            ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                style={{ backgroundColor: '#1a1a1a' }}
+            {/* Card display */}
+            <motion.div
+              initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
+              animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 }}
+              className="relative mb-5 mx-auto"
+              style={{
+                width: dims.previewLg.w + 'px',
+                height: dims.previewLg.h + 'px',
+                overflow: 'hidden',
+                border: `2px solid ${resultColor}88`,
+                boxShadow: `0 0 24px ${resultColor}20, 0 8px 32px rgba(0, 0, 0, 0.6)`,
+              }}
+            >
+              {imagePath ? (
+                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imagePath}')` }} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                  <span className="text-sm text-center px-2" style={{ color: '#888888' }}>{locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}</span>
+                </div>
+              )}
+              <div className="absolute inset-x-0 bottom-0 px-2 py-2 text-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}>
+                <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>{locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}</div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>{t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}</div>
+              </div>
+              <div className="absolute top-1.5 left-1.5 w-6 h-6 flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
+                {revealedCard.chakra}
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(revealedCard as unknown as CharacterCard); }}
+                className="absolute top-1.5 right-1.5 px-2 py-1 text-[9px] font-bold cursor-pointer"
+                style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#8b5cf6', border: '1px solid rgba(138,92,246,0.4)' }}
               >
-                <span className="text-sm text-center px-2" style={{ color: '#888888' }}>
-                  {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
-                </span>
-              </div>
-            )}
+                {t('game.board.details')}
+              </button>
+            </motion.div>
 
-            {/* Card name overlay */}
-            <div
-              className="absolute inset-x-0 bottom-0 px-2 py-2 text-center"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-            >
-              <div className="text-xs font-bold" style={{ color: '#e0e0e0' }}>
-                {locale === 'en' && revealedCard.name_en ? revealedCard.name_en : revealedCard.name_fr}
-              </div>
-              <div className="text-[10px] mt-0.5" style={{ color: '#888888' }}>
-                {t('collection.details.cost')}: {revealedCard.chakra} | {t('collection.details.power')}: {revealedCard.power}
-              </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mb-5 text-center">
+              <span className="font-body text-sm" style={{ color: resultColor }}>
+                {revealedCard.revealResultKey
+                  ? t(revealedCard.revealResultKey)
+                  : revealedCard.canSteal ? t('game.effect.orochimaruSteal') : t('game.effect.orochimaruTooExpensive')}
+              </span>
+            </motion.div>
+
+            <div className="flex justify-center">
+              <PopupActionButton onClick={() => handleSelect('confirm')} accentColor={resultColor}>
+                {t('game.board.confirm')}
+              </PopupActionButton>
             </div>
-
-            {/* Chakra badge */}
-            <div
-              className="absolute top-1.5 left-1.5 rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold"
-              style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                color: '#4a9eff',
-                border: '1px solid #4a9eff',
-              }}
-            >
-              {revealedCard.chakra}
-            </div>
-
-            {/* Details button */}
-            <button
-              onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(revealedCard as unknown as CharacterCard); }}
-              className="absolute top-1.5 right-1.5 rounded px-2 py-1 text-[9px] font-bold cursor-pointer"
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.85)',
-                color: '#c4a35a',
-                border: '1px solid rgba(196,163,90,0.4)',
-              }}
-            >
-              {t('game.board.details')}
-            </button>
-          </motion.div>
-
-          {/* Result text */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mb-6 text-center"
-          >
-            <span
-              className="font-body text-sm font-medium"
-              style={{ color: resultColor }}
-            >
-              {revealedCard.revealResultKey
-                ? t(revealedCard.revealResultKey)
-                : revealedCard.canSteal
-                  ? t('game.effect.orochimaruSteal')
-                  : t('game.effect.orochimaruTooExpensive')}
-            </span>
-          </motion.div>
-
-          {/* Confirm button */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={resultColor}>
-              {t('game.board.confirm')}
-            </PopupConfirmButton>
-          </motion.div>
-        </motion.div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
@@ -1284,96 +886,78 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6"
-            style={{ color: '#c4a35a' }}
-          >
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="520px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#c4a35a" size="lg">
+              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            </PopupTitle>
 
-          <div className="flex gap-6 items-start">
-            {/* Fresh play option */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 16 }}
-              className="flex flex-col items-center gap-3"
-            >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleSelect('FRESH')}
-                className="flex flex-col items-center gap-2 px-6 py-5 rounded-lg cursor-pointer"
-                style={{
-                  backgroundColor: 'rgba(74, 158, 255, 0.1)',
-                  border: '2px solid #4a9eff',
-                  boxShadow: '0 0 16px rgba(74, 158, 255, 0.3)',
-                  minWidth: '120px',
-                }}
+            <div className="flex gap-6 items-start justify-center">
+              {/* Fresh play option */}
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 16 }}
+                className="flex flex-col items-center gap-3"
               >
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#4a9eff' }}>
-                  {t('game.effect.freshPlay')}
-                </span>
-                <span className="text-[10px]" style={{ color: '#888888' }}>
-                  {t('game.effect.freshPlayDesc')}
-                </span>
-              </motion.button>
-            </motion.div>
+                <motion.button
+                  whileHover={{ scale: 1.05, borderColor: '#4a9eff' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleSelect('FRESH')}
+                  className="flex flex-col items-center gap-2 px-6 py-5 cursor-pointer"
+                  style={{
+                    backgroundColor: 'rgba(74, 158, 255, 0.06)',
+                    border: '1px solid rgba(74, 158, 255, 0.4)',
+                    borderLeft: '3px solid #4a9eff',
+                    minWidth: '120px',
+                  }}
+                >
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#4a9eff' }}>
+                    {t('game.effect.freshPlay')}
+                  </span>
+                  <span className="font-body text-[10px]" style={{ color: '#888888' }}>
+                    {t('game.effect.freshPlayDesc')}
+                  </span>
+                </motion.button>
+              </motion.div>
 
-            {/* Divider */}
-            <div className="flex flex-col items-center justify-center self-stretch">
-              <div className="w-px flex-1" style={{ backgroundColor: '#333333' }} />
-              <span className="text-[10px] py-2" style={{ color: '#555555' }}>{t('game.effect.or')}</span>
-              <div className="w-px flex-1" style={{ backgroundColor: '#333333' }} />
-            </div>
-
-            {/* Upgrade targets */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 16 }}
-              className="flex flex-col items-center gap-3"
-            >
-              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-                {t('game.effect.upgradeOver')}
-              </span>
-              <div className="flex gap-2 flex-wrap justify-center">
-                {upgradeChars.map(({ char }) => (
-                  <TargetCharacter
-                    key={char.instanceId}
-                    character={char}
-                    isValidTarget={true}
-                    onSelect={handleSelect}
-                  />
-                ))}
+              {/* Divider */}
+              <div className="flex flex-col items-center justify-center self-stretch">
+                <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
+                <span className="text-[10px] py-2" style={{ color: '#444444' }}>{t('game.effect.or')}</span>
+                <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
               </div>
-            </motion.div>
-          </div>
-        </motion.div>
+
+              {/* Upgrade targets */}
+              <motion.div
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 180, damping: 16 }}
+                className="flex flex-col items-center gap-3"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                  {t('game.effect.upgradeOver')}
+                </span>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {upgradeChars.map(({ char }) => (
+                    <TargetCharacter key={char.instanceId} character={char} isValidTarget={true} onSelect={handleSelect} />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
 
-  // ---- Generic CONFIRM popup for missions and character CONFIRMs ----
+  // ---- Generic CONFIRM popup ----
   if (pendingTargetSelection.selectionType === 'EFFECT_CONFIRM') {
     const confirmTarget = validTargets[0];
     let confirmImage: string | null = null;
     let confirmName = '';
 
-    // Mission CONFIRM: find mission card image
     if (confirmTarget?.startsWith('KS-') && confirmTarget?.includes('-MMS')) {
       for (const m of visibleState.activeMissions) {
         if (m.card?.id === confirmTarget) {
@@ -1383,7 +967,6 @@ export function TargetSelector() {
         }
       }
     } else if (confirmTarget) {
-      // Character CONFIRM: find character on board
       for (const m of visibleState.activeMissions) {
         for (const c of [...m.player1Characters, ...m.player2Characters]) {
           if (c.instanceId === confirmTarget && c.card) {
@@ -1397,160 +980,97 @@ export function TargetSelector() {
 
     return (
       <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.88)' }}
-        >
-          <MinimizeButton onClick={minimizeEffectPopup} />
-          {/* Title */}
-          <motion.span
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase mb-6 text-center px-4 font-body"
-            style={{ color: '#c4a35a', maxWidth: '500px', letterSpacing: '0.15em', textShadow: '0 0 20px rgba(196, 163, 90, 0.2)' }}
-          >
-            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </motion.span>
+        <PopupOverlay>
+          <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="440px">
+            <PopupMinimizeX onClick={minimizeEffectPopup} />
+            <PopupTitle accentColor="#c4a35a" size="md">
+              {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+            </PopupTitle>
 
-          {/* Card display */}
-          {confirmImage && (
-            <motion.div
-              initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
-              animate={{ scale: 1, rotateY: 0, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
-              className="relative mb-8"
-              style={{
-                width: (confirmTarget?.includes('-MMS')) ? '200px' : '120px',
-                height: (confirmTarget?.includes('-MMS')) ? '143px' : '168px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                border: '2px solid #c4a35a',
-                boxShadow: '0 0 28px rgba(196, 163, 90, 0.25), 0 8px 24px rgba(0, 0, 0, 0.5)',
-              }}
-            >
-              <div
-                className="w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: `url('${confirmImage}')` }}
-              />
-              {/* Name overlay */}
-              <div
-                className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
-                style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+            {confirmImage && (
+              <motion.div
+                initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
+                animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 150, damping: 14, delay: 0.15 }}
+                className="relative mb-6 mx-auto"
+                style={{
+                  width: (confirmTarget?.includes('-MMS')) ? '200px' : '120px',
+                  height: (confirmTarget?.includes('-MMS')) ? '143px' : '168px',
+                  overflow: 'hidden',
+                  border: '2px solid rgba(196, 163, 90, 0.5)',
+                  boxShadow: '0 0 20px rgba(196, 163, 90, 0.15), 0 8px 24px rgba(0, 0, 0, 0.5)',
+                }}
               >
-                <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>
-                  {confirmName}
-                </span>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex gap-4"
-          >
-            <PopupConfirmButton onClick={() => handleSelect(confirmTarget)}>
-              {t('game.board.confirm')}
-            </PopupConfirmButton>
-            {canDecline && (
-              <PopupSkipButton onClick={handleDecline}>
-                {t('game.board.skip')}
-              </PopupSkipButton>
+                <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${confirmImage}')` }} />
+                <div className="absolute inset-x-0 bottom-0 px-1 py-1 text-center" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
+                  <span className="text-[9px] font-bold truncate block" style={{ color: '#e0e0e0' }}>{confirmName}</span>
+                </div>
+              </motion.div>
             )}
-          </motion.div>
-        </motion.div>
+
+            <div className="flex items-center justify-center gap-6">
+              <PopupActionButton onClick={() => handleSelect(confirmTarget)}>
+                {t('game.board.confirm')}
+              </PopupActionButton>
+              {canDecline && (
+                <PopupDismissLink onClick={handleDecline}>
+                  {t('game.board.skip')}
+                </PopupDismissLink>
+              )}
+            </div>
+          </PopupCornerFrame>
+        </PopupOverlay>
       </AnimatePresence>
     );
   }
 
+  // ---- Default: Board target selection ----
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
-      >
-        <MinimizeButton onClick={minimizeEffectPopup} />
-        {/* Player announcement banner */}
-        <PopupBanner>
-          {t('game.mustChooseTarget', { player: displayName })}
-        </PopupBanner>
+      <PopupOverlay>
+        <PopupCornerFrame accentColor="rgba(74, 127, 255, 0.35)" maxWidth="90vw" padding="20px 16px">
+          <PopupMinimizeX onClick={minimizeEffectPopup} />
+          <PopupTitle accentColor="#4a7fff" size="lg">
+            {t('game.mustChooseTarget', { player: displayName })}
+          </PopupTitle>
 
-        {/* Description bar */}
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
-          className="mb-6 px-6 py-3 rounded flex flex-col items-center gap-2"
-          style={{
-            backgroundColor: 'rgba(8, 8, 12, 0.8)',
-            borderLeft: '2px solid rgba(196, 163, 90, 0.4)',
-            maxWidth: '600px',
-          }}
-        >
-          <span
-            className="font-body text-xs text-center leading-relaxed"
-            style={{ color: '#d0d0d0' }}
-          >
+          <PopupDescription accentColor="rgba(74, 127, 255, 0.4)">
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </span>
-          <span
-            className="text-[10px]"
-            style={{ color: '#555555' }}
-          >
-            {validTargets.length === 1 ? t('game.board.validTargetOne', { count: validTargets.length }) : t('game.board.validTargets', { count: validTargets.length })}
-          </span>
-        </motion.div>
+          </PopupDescription>
 
-        {/* Board view with targets highlighted */}
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 18 }}
-          className="flex gap-4 overflow-x-auto px-4 py-3 rounded-lg"
-          style={{
-            backgroundColor: 'rgba(6, 6, 10, 0.7)',
-            border: '1px solid rgba(196, 163, 90, 0.06)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(196, 163, 90, 0.04)',
-            maxWidth: '90vw',
-          }}
-        >
-          {visibleState.activeMissions.map((mission, index) => (
-            <TargetMissionLane
-              key={`target-mission-${index}`}
-              mission={mission}
-              missionIndex={index}
-              validTargets={validTargets}
-              onSelect={handleSelect}
-              myPlayer={visibleState.myPlayer}
-            />
-          ))}
-        </motion.div>
+          <div className="flex justify-center mb-2">
+            <PopupTargetCount count={validTargets.length} accentColor="#4a7fff" />
+          </div>
 
-        {/* Skip / Decline button for optional effects */}
-        {canDecline && (
+          {/* Board view with targets highlighted */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="mt-5"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 18 }}
+            className="flex gap-4 overflow-x-auto px-2 py-3 mb-4"
+            style={{ maxWidth: '100%' }}
           >
-            <PopupSkipButton onClick={handleDecline}>
-              {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
-            </PopupSkipButton>
+            {visibleState.activeMissions.map((mission, index) => (
+              <TargetMissionLane
+                key={`target-mission-${index}`}
+                mission={mission}
+                missionIndex={index}
+                validTargets={validTargets}
+                onSelect={handleSelect}
+                myPlayer={visibleState.myPlayer}
+              />
+            ))}
           </motion.div>
-        )}
-      </motion.div>
+
+          {canDecline && (
+            <div className="flex justify-center mt-2">
+              <PopupDismissLink onClick={handleDecline}>
+                {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
+              </PopupDismissLink>
+            </div>
+          )}
+        </PopupCornerFrame>
+      </PopupOverlay>
     </AnimatePresence>
   );
 }

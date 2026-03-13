@@ -1295,11 +1295,11 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Collect previous turn's last-played instanceIds for highlight (both players)
+    // Only highlight the OPPONENT's last play from the previous turn
     const prevPlayed = state.previousTurnLastPlayed ?? { player1: null, player2: null };
     const lastPlayedIds = new Set<string>();
-    if (prevPlayed.player1) lastPlayedIds.add(prevPlayed.player1);
-    if (prevPlayed.player2) lastPlayedIds.add(prevPlayed.player2);
+    const opponentLastPlayed = prevPlayed[otherPlayer];
+    if (opponentLastPlayed) lastPlayedIds.add(opponentLastPlayed);
 
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,

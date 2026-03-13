@@ -65,8 +65,8 @@ function getValidMissions(
     }
   }
 
-  // Prefer conflict-free; only allow conflict missions if no conflict-free ones exist
-  return conflictFree.length > 0 ? conflictFree : withConflict;
+  // Only return conflict-free missions — "if able" means skip chars that can't legally move
+  return conflictFree;
 }
 
 /**
@@ -240,45 +240,19 @@ function processNextMove(
   const validMissions = getValidMissions(state, charId, player, sourceMissionIndex);
 
   if (validMissions.length === 0) {
-    // No other missions exist - mandatory move means discard
-    let discardState = { ...state };
-    const friendlySide = side(player);
-
-    // Find and remove the character from its current mission
-    const missions = [...discardState.activeMissions];
-    let discardedChar: CharacterInPlay | null = null;
-    for (let i = 0; i < missions.length; i++) {
-      const chars = missions[i][friendlySide];
-      const cIdx = chars.findIndex((c) => c.instanceId === charId);
-      if (cIdx !== -1) {
-        missions[i] = { ...missions[i] };
-        const newChars = [...missions[i][friendlySide]];
-        [discardedChar] = newChars.splice(cIdx, 1);
-        missions[i][friendlySide] = newChars;
-        break;
-      }
-    }
-
-    if (discardedChar) {
-      const owner = discardedChar.originalOwner;
-      const ownerState = { ...discardState[owner] };
-      const cardsToDiscard = discardedChar.stack.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
-      ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-      ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
-      discardState = { ...discardState, activeMissions: missions, [owner]: ownerState };
-    }
-
-    discardState = {
-      ...discardState,
+    // "if able" — character can't legally move (name conflict at all destinations), skip it
+    const skipState = {
+      ...state,
       log: logAction(
-        discardState.log, discardState.turn, discardState.phase, player,
-        'EFFECT_DISCARD',
-        `Sasuke Uchiwa (107): ${charName} discarded - no valid destination mission (mandatory move).`,
-        'game.log.effect.sasuke107Discard',
+        state.log, state.turn, state.phase, player,
+        'EFFECT_SKIP',
+        `Sasuke Uchiwa (107): ${charName} cannot move (name conflict at all destinations), stays.`,
+        'game.log.effect.sasuke107Skip',
         { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName },
       ),
     };
-    return processNextMove(discardState, charIds, idx + 1, movedCount + 1, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
+    // movedCount NOT incremented — skipped chars don't count for UPGRADE POWERUP
+    return processNextMove(skipState, charIds, idx + 1, movedCount, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
   }
 
   if (validMissions.length === 1) {

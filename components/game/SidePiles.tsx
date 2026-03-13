@@ -8,8 +8,6 @@ import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
-// Card dimensions now come from useGameScale()
-
 // ---------------------
 // Deck pile visual
 // ---------------------
@@ -30,7 +28,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
         {Array.from({ length: stackLayers }).map((_, i) => (
           <div
             key={i}
-            className="absolute rounded"
+            className="absolute"
             style={{
               width: CARD_W,
               height: CARD_H,
@@ -46,7 +44,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
           key={count}
           initial={{ scale: 0.95, opacity: 0.8 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="absolute rounded overflow-hidden"
+          className="absolute overflow-hidden"
           style={{
             width: CARD_W,
             height: CARD_H,
@@ -124,7 +122,7 @@ function DiscardPile({
         {Array.from({ length: stackLayers }).map((_, i) => (
           <div
             key={i}
-            className="absolute rounded"
+            className="absolute"
             style={{
               width: CARD_W,
               height: CARD_H,
@@ -138,7 +136,7 @@ function DiscardPile({
         {/* Top card or empty slot */}
         {count > 0 ? (
           <div
-            className="absolute rounded overflow-hidden"
+            className="absolute overflow-hidden"
             style={{
               width: CARD_W,
               height: CARD_H,
@@ -158,7 +156,7 @@ function DiscardPile({
           </div>
         ) : (
           <div
-            className="absolute rounded flex items-center justify-center"
+            className="absolute flex items-center justify-center"
             style={{
               width: CARD_W,
               height: CARD_H,
@@ -210,9 +208,8 @@ export function OpponentSidePiles() {
         className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
         style={{
           width: dims.sidePileW + 'px',
-          backgroundColor: 'rgba(8, 8, 12, 0.5)',
-          backdropFilter: 'blur(4px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.04)',
+          backgroundColor: 'rgba(8, 8, 12, 0.6)',
+          borderRight: '1px solid rgba(179, 62, 62, 0.1)',
         }}
       >
         <DeckPile count={deckCount} accentColor="#b33e3e" />
@@ -261,9 +258,8 @@ export function PlayerSidePiles() {
         className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
         style={{
           width: dims.sidePileW + 'px',
-          backgroundColor: 'rgba(8, 8, 12, 0.5)',
-          backdropFilter: 'blur(4px)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
+          backgroundColor: 'rgba(8, 8, 12, 0.6)',
+          borderLeft: '1px solid rgba(196, 163, 90, 0.1)',
         }}
       >
         <DeckPile count={deckCount} accentColor="#c4a35a" />

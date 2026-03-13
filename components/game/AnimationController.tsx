@@ -87,7 +87,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
       <div className="flex flex-col items-center gap-3">
         {/* Physical card sliding up from bottom */}
         <motion.div
-          className="rounded-lg overflow-hidden"
+          className="overflow-hidden"
           style={{
             width: dims.animHand.w + 'px',
             height: dims.animHand.h + 'px',
@@ -136,7 +136,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
 
         {/* Card name label */}
         <motion.div
-          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
+          className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             border: '1px solid #333333',
@@ -186,7 +186,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
       <div className="flex flex-col items-center gap-3" style={{ perspective: '800px' }}>
         {/* 3D card flip: face-down -> face-up */}
         <motion.div
-          className="relative rounded-lg overflow-hidden"
+          className="relative overflow-hidden"
           style={{
             width: dims.animBoard.w + 'px',
             height: dims.animBoard.h + 'px',
@@ -198,7 +198,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
         >
           {/* Front face (card art) */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            className="absolute inset-0 overflow-hidden"
             style={{
               backfaceVisibility: 'hidden',
               boxShadow: '0 8px 40px rgba(179, 62, 62, 0.4), 0 0 20px rgba(179, 62, 62, 0.2)',
@@ -226,7 +226,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           </div>
           {/* Back face (face-down) */}
           <div
-            className="absolute inset-0 rounded-lg overflow-hidden"
+            className="absolute inset-0 overflow-hidden"
             style={{
               backfaceVisibility: 'hidden',
               transform: 'rotateY(180deg)',
@@ -245,7 +245,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
 
         {/* Glow pulse during flip */}
         <motion.div
-          className="absolute rounded-lg"
+          className="absolute"
           style={{
             width: dims.animBoard.w + 'px',
             height: dims.animBoard.h + 'px',
@@ -258,7 +258,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
 
         {/* Label */}
         <motion.div
-          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
+          className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             border: '1px solid rgba(179, 62, 62, 0.3)',
@@ -296,7 +296,7 @@ function CardDefeatAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <motion.div
-        className="px-10 py-6 rounded-lg flex flex-col items-center gap-2"
+        className="px-10 py-6 flex flex-col items-center gap-2"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
           border: '1px solid #b33e3e',
@@ -331,7 +331,7 @@ function CardDefeatAnimation({ data }: { data: Record<string, unknown> }) {
           {Array.from({ length: 6 }).map((_, i) => (
             <motion.div
               key={i}
-              className="absolute rounded-full"
+              className="absolute"
               style={{
                 width: '4px',
                 height: '4px',
@@ -363,7 +363,7 @@ function CardHideAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <motion.div
-        className="px-8 py-5 rounded-lg flex flex-col items-center gap-2"
+        className="px-8 py-5 flex flex-col items-center gap-2"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
           border: '1px solid #333333',
@@ -406,7 +406,7 @@ function CardMoveAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <motion.div
-        className="px-8 py-5 rounded-lg flex flex-col items-center gap-2"
+        className="px-8 py-5 flex flex-col items-center gap-2"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
           border: '1px solid #333333',
@@ -458,7 +458,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
       <div className="flex flex-col items-center gap-3">
         {/* Card image sliding in over the old card */}
         <motion.div
-          className="rounded-lg overflow-hidden"
+          className="overflow-hidden"
           style={{
             width: dims.animBoard.w + 'px',
             height: dims.animBoard.h + 'px',
@@ -500,7 +500,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
 
         {/* Label */}
         <motion.div
-          className="flex flex-col items-center gap-1 px-6 py-2 rounded-md"
+          className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             border: '1px solid rgba(62, 139, 62, 0.3)',
@@ -559,7 +559,7 @@ function PowerTokenAnimation({ data }: { data: Record<string, unknown> }) {
         transition={{ type: 'spring', stiffness: 250, damping: 18 }}
       >
         <motion.div
-          className="rounded-full px-7 py-3.5 flex items-center gap-3"
+          className="px-7 py-3.5 flex items-center gap-3"
           style={{
             backgroundColor: 'rgba(196, 163, 90, 0.12)',
             border: '2px solid #c4a35a',
@@ -668,7 +668,7 @@ function MissionScoreAnimation({ data }: { data: Record<string, unknown> }) {
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
     >
       <motion.div
-        className="flex flex-col items-center gap-3 px-10 py-8 rounded-lg"
+        className="flex flex-col items-center gap-3 px-10 py-8"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
           border: '2px solid #c4a35a',
@@ -745,7 +745,7 @@ function EdgeTransferAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <motion.div
-        className="flex flex-col items-center gap-2 px-8 py-5 rounded-lg"
+        className="flex flex-col items-center gap-2 px-8 py-5"
         style={{
           backgroundColor: 'rgba(10, 10, 10, 0.9)',
           border: '1px solid #c4a35a',
@@ -848,7 +848,7 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
           {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
             <motion.div
               key={i}
-              className="rounded"
+              className=""
               style={{
                 width: dims.animDeck.w + 'px',
                 height: dims.animDeck.h + 'px',
@@ -870,7 +870,7 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
 
         {/* Label */}
         <motion.div
-          className="flex items-center gap-2 px-4 py-1.5 rounded-md"
+          className="flex items-center gap-2 px-4 py-1.5"
           style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             border: '1px solid #333333',

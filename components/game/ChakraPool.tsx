@@ -35,10 +35,10 @@ export function ChakraPool({ amount, label, isOpponent = false }: ChakraPoolProp
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.7, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className="flex items-center justify-center rounded-lg px-3 py-1.5"
+          className="flex items-center justify-center px-3 py-1.5"
           style={{
             backgroundColor: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
             minWidth: '52px',
           }}
         >

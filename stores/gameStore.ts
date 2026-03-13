@@ -29,7 +29,7 @@ interface PendingTargetSelection {
   playerName?: string; // display name of the player who must choose
   selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
-  handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string }; targetId?: string }>; // for hand selection
+  handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
   revealedCards?: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
@@ -357,6 +357,16 @@ interface PendingEffectData {
   isOptional?: boolean;
 }
 
+/** Extract full card data for HandCardSelector so details/zoom work properly. */
+function fullCardData(card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }) {
+  return {
+    name_fr: card.name_fr, name_en: card.name_en, title_fr: card.title_fr, title_en: card.title_en,
+    chakra: card.chakra, power: card.power, image_file: card.image_file,
+    id: card.id, cardId: card.cardId, number: card.number, rarity: card.rarity,
+    keywords: card.keywords, group: card.group, effects: card.effects, card_type: card.card_type,
+  };
+}
+
 /**
  * Shared utility: builds PendingTargetSelection UI from pending action/effect data.
  * Replaces 4 duplicated code paths (updateOnlineState, confirmHotseatSwitch, performAction, processAITurn).
@@ -398,9 +408,7 @@ function buildPendingTargetSelectionUI(
         const card = dataSource.playerDiscard[idx];
         return {
           index: idx,
-          card: card ? {
-            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-          } : { name_fr: '???' },
+          card: card ? fullCardData(card) : { name_fr: '???' },
         };
       });
     } else if (tst === 'SAKURA135_CHOOSE_CARD') {
@@ -414,9 +422,7 @@ function buildPendingTargetSelectionUI(
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
         return {
           index: idx,
-          card: card ? {
-            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-          } : info ? {
+          card: card ? fullCardData(card) : info ? {
             name_fr: info.name, chakra: info.chakra, power: info.power,
           } : { name_fr: '???' },
         };
@@ -454,9 +460,7 @@ function buildPendingTargetSelectionUI(
         const card = oppCards[idx];
         return {
           index: idx,
-          card: card ? {
-            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-          } : { name_fr: '???' },
+          card: card ? fullCardData(card) : { name_fr: '???' },
         };
       });
     } else if (tst === 'ITACHI091_CHOOSE_DISCARD') {
@@ -467,9 +471,7 @@ function buildPendingTargetSelectionUI(
         const card = oppCards091[idx];
         return {
           index: idx,
-          card: card ? {
-            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-          } : { name_fr: '???' },
+          card: card ? fullCardData(card) : { name_fr: '???' },
         };
       });
     } else if (tst === 'SASUKE014_CHOOSE_HAND_CARD') {
@@ -504,9 +506,7 @@ function buildPendingTargetSelectionUI(
           return {
             index: optIdx,
             targetId: optStr,
-            card: card ? {
-              name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-            } : { name_fr: '???' },
+            card: card ? fullCardData(card) : { name_fr: '???' },
           };
         }
       });
@@ -538,9 +538,7 @@ function buildPendingTargetSelectionUI(
           return {
             index: optIdx,
             targetId: optStr,
-            card: card ? {
-              name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-            } : { name_fr: '???' },
+            card: card ? fullCardData(card) : { name_fr: '???' },
           };
         }
       });
@@ -550,9 +548,7 @@ function buildPendingTargetSelectionUI(
         const card = dataSource.playerHand[idx];
         return {
           index: idx,
-          card: card ? {
-            name_fr: card.name_fr, name_en: card.name_en, chakra: card.chakra, power: card.power, image_file: card.image_file,
-          } : { name_fr: '???' },
+          card: card ? fullCardData(card) : { name_fr: '???' },
         };
       });
     }

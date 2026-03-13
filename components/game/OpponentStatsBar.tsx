@@ -30,9 +30,8 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
     <div
       className="font-display flex items-center gap-2 px-3 py-1 w-full"
       style={{
-        backgroundColor: 'rgba(8, 8, 12, 0.8)',
-        backdropFilter: 'blur(8px)',
-        borderBottom: '1px solid rgba(179, 62, 62, 0.15)',
+        backgroundColor: 'rgba(8, 8, 12, 0.85)',
+        borderBottom: '2px solid rgba(179, 62, 62, 0.15)',
       }}
     >
       {/* Opponent name */}
@@ -40,13 +39,13 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
         {opponentName}
       </span>
 
-      {/* Edge token */}
+      {/* Edge token — diamond shape */}
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
-          className="rounded-full"
           style={{
             width: 8,
             height: 8,
+            transform: 'rotate(45deg)',
             backgroundColor: hasEdge ? '#b33e3e' : 'rgba(255, 255, 255, 0.1)',
             boxShadow: hasEdge ? '0 0 6px rgba(179, 62, 62, 0.6)' : 'none',
           }}
@@ -61,11 +60,11 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
         <motion.span
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
-          className="text-[10px] px-1.5 py-0.5 rounded shrink-0"
+          className="text-[10px] px-1.5 py-0.5 shrink-0"
           style={{
-            backgroundColor: 'rgba(179, 62, 62, 0.15)',
+            backgroundColor: 'rgba(179, 62, 62, 0.1)',
             color: '#b33e3e',
-            border: '1px solid rgba(179, 62, 62, 0.25)',
+            borderLeft: '2px solid rgba(179, 62, 62, 0.3)',
           }}
         >
           {t('game.opponentTurn')}
@@ -95,10 +94,10 @@ export const OpponentStatsBar = React.memo(function OpponentStatsBar() {
 function StatPill({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div
-      className="flex items-center gap-1 px-2 py-0.5 rounded"
+      className="flex items-center gap-1 px-2 py-0.5"
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
       }}
     >
       <span className="text-[10px]" style={{ color: '#666666' }}>{label}</span>

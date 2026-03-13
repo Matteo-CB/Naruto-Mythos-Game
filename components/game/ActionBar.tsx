@@ -89,6 +89,7 @@ export function ActionBar() {
     const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
+      if (c.isHidden) return false; // Hidden chars have no name — can't upgrade over them
       // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
@@ -267,11 +268,11 @@ export function ActionBar() {
     return (
       <>
         <div
-          className="flex items-center justify-center gap-2 py-1.5 px-4 rounded-full"
+          className="flex items-center justify-center gap-2 py-1.5 px-4"
           style={{
-            backgroundColor: 'rgba(10, 10, 14, 0.85)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-            backdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(10, 10, 14, 0.9)',
+            borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
+            borderRight: '3px solid rgba(196, 163, 90, 0.2)',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
           }}
         >
@@ -312,11 +313,11 @@ export function ActionBar() {
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="flex items-center justify-center gap-2 py-2 px-4 rounded-full"
+      className="flex items-center justify-center gap-2 py-2 px-4"
       style={{
-        backgroundColor: 'rgba(10, 10, 14, 0.85)',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(10, 10, 14, 0.9)',
+        borderLeft: '3px solid rgba(196, 163, 90, 0.2)',
+        borderRight: '3px solid rgba(196, 163, 90, 0.2)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
       }}
     >
@@ -340,7 +341,7 @@ export function ActionBar() {
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xs font-medium px-2 py-0.5 rounded"
+              className="text-xs font-medium px-2 py-0.5"
               style={{ color: '#ff6b6b', backgroundColor: 'rgba(179, 62, 62, 0.15)' }}
             >
               {actionErrorKey ? t(actionErrorKey, actionErrorParams ?? {}) : actionError}
@@ -542,21 +543,27 @@ function ActionButton({
 
   return (
     <motion.button
-      whileHover={disabled ? {} : { scale: 1.04 }}
-      whileTap={disabled ? {} : { scale: 0.96 }}
+      whileHover={disabled ? {} : { scale: 1.03 }}
+      whileTap={disabled ? {} : { scale: 0.97 }}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      className={`rounded-md font-medium cursor-pointer ${dims.isCompact ? 'px-2.5 py-1 text-[10px]' : 'px-4 py-1.5 text-xs'}`}
+      className={`font-medium cursor-pointer uppercase ${dims.isCompact ? 'px-2.5 py-1 text-[10px]' : 'px-4 py-1.5 text-xs'}`}
       style={{
         backgroundColor: disabled ? 'rgba(255, 255, 255, 0.02)' : styles.bg,
-        border: `1px solid ${disabled ? 'rgba(255, 255, 255, 0.05)' : styles.border}`,
+        border: 'none',
+        borderLeft: `3px solid ${disabled ? 'rgba(255, 255, 255, 0.08)' : styles.border}`,
         color: disabled ? styles.textDisabled : styles.text,
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
         boxShadow: disabled ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.3)',
+        transform: 'skewX(-3deg)',
+        letterSpacing: '0.08em',
+        fontWeight: 700,
       }}
     >
-      {label}
+      <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+        {label}
+      </span>
     </motion.button>
   );
 }
@@ -584,7 +591,7 @@ function ActionTimer({ deadline }: { deadline: number }) {
 
   return (
     <motion.span
-      className="text-xs font-bold tabular-nums px-2 py-0.5 rounded"
+      className="text-xs font-bold tabular-nums px-2 py-0.5"
       style={{
         color: isWarning ? '#b33e3e' : '#888888',
         backgroundColor: isWarning ? 'rgba(179, 62, 62, 0.12)' : 'transparent',
@@ -616,25 +623,30 @@ function AbandonConfirmDialog({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)', zIndex: 9999 }}
+      style={{ backgroundColor: 'rgba(4, 4, 8, 0.92)', zIndex: 9999 }}
       onClick={onCancel}
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col items-center gap-4 rounded-xl p-8 mx-4"
+        className="relative flex flex-col items-center gap-5 p-8 mx-4"
         style={{
-          backgroundColor: 'rgba(8, 8, 12, 0.97)',
-          border: '1px solid rgba(179, 62, 62, 0.3)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7)',
+          backgroundColor: 'rgba(8, 8, 14, 0.95)',
+          boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255,255,255,0.04)',
           minWidth: '280px',
           maxWidth: '400px',
         }}
       >
-        <span className="text-lg font-bold text-center" style={{ color: '#e0e0e0' }}>
+        {/* Corner brackets */}
+        <div style={{ position: 'absolute', top: -1, left: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -1, right: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderRight: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -1, left: -1, width: 20, height: 20, borderBottom: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -1, right: -1, width: 20, height: 20, borderBottom: '2px solid rgba(179, 62, 62, 0.5)', borderRight: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
+
+        <span className="text-lg font-bold text-center uppercase tracking-wider" style={{ color: '#b33e3e' }}>
           {t('game.actions.abandonConfirmTitle')}
         </span>
         <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
@@ -642,27 +654,38 @@ function AbandonConfirmDialog({
         </span>
         <div className="flex gap-3 mt-2">
           <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: 1.03, backgroundColor: 'rgba(179, 62, 62, 0.8)', color: '#ffffff' }}
+            whileTap={{ scale: 0.97 }}
             onClick={onConfirm}
-            className="px-6 py-2 rounded-md text-sm font-medium cursor-pointer"
+            className="px-6 py-2 text-sm font-bold cursor-pointer uppercase"
             style={{
-              backgroundColor: 'rgba(179, 62, 62, 0.2)',
-              border: '1px solid rgba(179, 62, 62, 0.5)',
+              backgroundColor: 'rgba(179, 62, 62, 0.15)',
+              border: 'none',
+              borderLeft: '3px solid #b33e3e',
               color: '#b33e3e',
+              transform: 'skewX(-3deg)',
+              letterSpacing: '0.1em',
             }}
           >
-            {t('game.actions.abandonConfirm')}
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+              {t('game.actions.abandonConfirm')}
+            </span>
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileHover={{ opacity: 1, color: '#999999' }}
+            whileTap={{ scale: 0.97 }}
             onClick={onCancel}
-            className="px-6 py-2 rounded-md text-sm font-medium cursor-pointer"
+            className="uppercase no-select cursor-pointer"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: '#888888',
+              background: 'none',
+              border: 'none',
+              color: '#555555',
+              fontSize: '11px',
+              letterSpacing: '0.14em',
+              fontWeight: 600,
+              padding: '8px 16px',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              cursor: 'pointer',
             }}
           >
             {t('game.actions.abandonCancel')}

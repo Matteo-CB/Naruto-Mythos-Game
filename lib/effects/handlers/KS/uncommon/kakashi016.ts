@@ -32,9 +32,11 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.chakra > costLimit) continue;
 
-      // Check if the character has any non-UPGRADE, non-continuous instant effects
+      // Check if the character has any copyable instant effects
       const hasInstantEffect = topCard.effects?.some(effect => {
-        if (effect.type === 'UPGRADE') return false;
+        if (effect.type === 'UPGRADE') return false; // Can't copy UPGRADE
+        if (effect.type === 'SCORE') return false;   // SCORE never copyable
+        if (effect.type === 'AMBUSH' && !ctx.wasRevealed) return false; // AMBUSH only if copier was revealed
         // Exclude continuous effects (marked with [hourglass] symbol)
         if (effect.description.includes('[⧗]')) return false;
         // Exclude effect modifiers

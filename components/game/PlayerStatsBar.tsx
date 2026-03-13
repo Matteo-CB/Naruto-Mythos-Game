@@ -39,9 +39,8 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
     <div
       className="font-display flex items-center gap-2 px-3 py-1 w-full"
       style={{
-        backgroundColor: 'rgba(8, 8, 12, 0.8)',
-        backdropFilter: 'blur(8px)',
-        borderTop: '1px solid rgba(196, 163, 90, 0.15)',
+        backgroundColor: 'rgba(8, 8, 12, 0.85)',
+        borderTop: '2px solid rgba(196, 163, 90, 0.15)',
       }}
     >
       {/* Player name */}
@@ -49,13 +48,13 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         {playerName}
       </span>
 
-      {/* Edge token */}
+      {/* Edge token — diamond shape */}
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
-          className="rounded-full"
           style={{
             width: 8,
             height: 8,
+            transform: 'rotate(45deg)',
             backgroundColor: hasEdge ? '#c4a35a' : 'rgba(255, 255, 255, 0.1)',
             boxShadow: hasEdge ? '0 0 6px rgba(196, 163, 90, 0.6)' : 'none',
           }}
@@ -75,11 +74,11 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         </span>
         <span className="text-[10px]" style={{ color: '#555555' }}>/4</span>
         <span
-          className="text-[10px] px-1.5 py-0.5 rounded"
+          className="text-[10px] px-1.5 py-0.5"
           style={{
-            backgroundColor: 'rgba(196, 163, 90, 0.1)',
+            backgroundColor: 'rgba(196, 163, 90, 0.08)',
             color: '#c4a35a',
-            border: '1px solid rgba(196, 163, 90, 0.2)',
+            borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
           }}
         >
           {phaseKeys[phase] ? t(phaseKeys[phase]) : phase}
@@ -109,10 +108,10 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
 function StatPill({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div
-      className="flex items-center gap-1 px-2 py-0.5 rounded"
+      className="flex items-center gap-1 px-2 py-0.5"
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
       }}
     >
       <span className="text-[10px]" style={{ color: '#666666' }}>{label}</span>

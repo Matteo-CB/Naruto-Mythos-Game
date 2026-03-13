@@ -6,9 +6,7 @@ import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
 import { CloudBackground } from "@/components/CloudBackground";
 import { DecorativeIcons } from "@/components/DecorativeIcons";
-import { CardBackgroundDecor } from "@/components/CardBackgroundDecor";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
-import { Footer } from "@/components/Footer";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
@@ -19,24 +17,33 @@ import { effectDescriptionsEn } from "@/lib/data/effectDescriptionsEn";
 import { effectDescriptionsFr } from "@/lib/data/effectTranslationsFr";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 import type { EffectType } from "@/lib/engine/types";
+import {
+  PopupOverlay,
+  PopupCornerFrame,
+  PopupTitle,
+  PopupActionButton,
+  PopupDismissLink,
+  SectionDivider,
+  AngularButton,
+} from "@/components/game/PopupPrimitives";
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888',
   UC: '#3e8b3e',
-  R: '#4a7ab5',
-  RA: '#4a7ab5',
-  S: '#9b59b6',
-  M: '#c4a35a',
+  R: '#c4a35a',
+  RA: '#c4a35a',
+  S: '#b33e3e',
+  M: '#6a6abb',
   Legendary: '#c4a35a',
-  Mission: '#888888',
+  Mission: '#c4a35a',
 };
 
 const RARITY_ORDER: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, S: 4, M: 5, Legendary: 6 };
 const EFFECT_TYPE_COLORS: Record<string, string> = {
-  MAIN: '#4a7ab5',
+  MAIN: '#c4a35a',
   UPGRADE: '#3e8b3e',
   AMBUSH: '#b33e3e',
-  SCORE: '#c4a35a',
+  SCORE: '#6a6abb',
 };
 
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
@@ -62,6 +69,10 @@ export default function DeckBuilderPage() {
   } | null>(null);
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [overwriteConflict, setOverwriteConflict] = useState<{ id: string; name: string } | null>(null);
+
+  // New state for redesigned layout
+  const [showDeckDrawer, setShowDeckDrawer] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   // Filter & sort state
   const [sortBy, setSortBy] = useState<SortField>('number');
@@ -135,6 +146,13 @@ export default function DeckBuilderPage() {
     }
   }, [addError, clearAddError]);
 
+  // Lock scroll on mount (full-viewport layout)
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   // Derive available filter options from card data
   const filterOptions = useMemo(() => {
     const chars = availableChars.filter((c) => !bannedIds.has(c.id));
@@ -182,8 +200,6 @@ export default function DeckBuilderPage() {
 
   const filteredChars = useMemo(() => {
     let chars = availableChars.filter((c) => !bannedIds.has(c.id));
-
-    // Text search (accent-insensitive)
     if (searchQuery) {
       const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       const q = normalize(searchQuery);
@@ -195,38 +211,12 @@ export default function DeckBuilderPage() {
           c.id.toLowerCase().includes(q),
       );
     }
-
-    // Rarity filter
-    if (filterRarity.length > 0) {
-      chars = chars.filter((c) => filterRarity.includes(c.rarity));
-    }
-
-    // Group filter
-    if (filterGroup.length > 0) {
-      chars = chars.filter((c) => c.group && filterGroup.includes(c.group));
-    }
-
-    // Keywords filter
-    if (filterKeywords.length > 0) {
-      chars = chars.filter((c) => c.keywords?.some((kw) => filterKeywords.includes(kw)));
-    }
-
-    // Effect type filter
-    if (filterEffectType.length > 0) {
-      chars = chars.filter((c) => c.effects?.some((e) => filterEffectType.includes(e.type)));
-    }
-
-    // Chakra range filter
-    if (filterChakraMin > 0 || filterChakraMax < filterOptions.maxChakra) {
-      chars = chars.filter((c) => c.chakra >= filterChakraMin && c.chakra <= filterChakraMax);
-    }
-
-    // Power range filter
-    if (filterPowerMin > 0 || filterPowerMax < filterOptions.maxPower) {
-      chars = chars.filter((c) => c.power >= filterPowerMin && c.power <= filterPowerMax);
-    }
-
-    // Sort
+    if (filterRarity.length > 0) chars = chars.filter((c) => filterRarity.includes(c.rarity));
+    if (filterGroup.length > 0) chars = chars.filter((c) => c.group && filterGroup.includes(c.group));
+    if (filterKeywords.length > 0) chars = chars.filter((c) => c.keywords?.some((kw) => filterKeywords.includes(kw)));
+    if (filterEffectType.length > 0) chars = chars.filter((c) => c.effects?.some((e) => filterEffectType.includes(e.type)));
+    if (filterChakraMin > 0 || filterChakraMax < filterOptions.maxChakra) chars = chars.filter((c) => c.chakra >= filterChakraMin && c.chakra <= filterChakraMax);
+    if (filterPowerMin > 0 || filterPowerMax < filterOptions.maxPower) chars = chars.filter((c) => c.power >= filterPowerMin && c.power <= filterPowerMax);
     chars = [...chars].sort((a, b) => {
       let cmp = 0;
       switch (sortBy) {
@@ -238,14 +228,10 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-
     return chars;
   }, [availableChars, searchQuery, bannedIds, locale, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder, filterOptions.maxChakra, filterOptions.maxPower]);
 
-  // Reset page when search/filters change
-  useEffect(() => {
-    setCharPage(1);
-  }, [searchQuery, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder]);
+  useEffect(() => { setCharPage(1); }, [searchQuery, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder]);
 
   const totalCharPages = Math.max(1, Math.ceil(filteredChars.length / CHARS_PER_PAGE));
   const paginatedChars = useMemo(() => {
@@ -253,165 +239,81 @@ export default function DeckBuilderPage() {
     return filteredChars.slice(start, start + CHARS_PER_PAGE);
   }, [filteredChars, charPage]);
 
-  const validation = useMemo(() => {
-    return validateDeck(deckChars, deckMissions);
-  }, [deckChars, deckMissions]);
+  const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
   const handleSave = useCallback(async () => {
     setSaveError(null);
     const trimmedName = (deckName || '').trim() || 'Untitled Deck';
-    // Check if another saved deck (not the one we're editing) has the same name
     const conflict = savedDecks.find(
       (d) => d.name.toLowerCase() === trimmedName.toLowerCase() && d.id !== loadedDeckId
     );
-    if (conflict) {
-      setOverwriteConflict({ id: conflict.id, name: conflict.name });
-      return;
-    }
-    try {
-      await saveDeck();
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("deckBuilder.failedToSave");
-      setSaveError(message);
+    if (conflict) { setOverwriteConflict({ id: conflict.id, name: conflict.name }); return; }
+    try { await saveDeck(); } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToSave"));
     }
   }, [saveDeck, t, deckName, savedDecks, loadedDeckId]);
 
   const handleOverwriteConfirm = useCallback(async () => {
     if (!overwriteConflict) return;
     setSaveError(null);
-    try {
-      await deleteDeck(overwriteConflict.id);
-      await saveDeck();
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("deckBuilder.failedToSave");
-      setSaveError(message);
-    } finally {
-      setOverwriteConflict(null);
-    }
+    try { await deleteDeck(overwriteConflict.id); await saveDeck(); } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToSave"));
+    } finally { setOverwriteConflict(null); }
   }, [overwriteConflict, deleteDeck, saveDeck, t]);
 
-  const handleLoadDeck = useCallback(
-    async (deckId: string) => {
-      setSaveError(null);
-      try {
-        await loadDeck(deckId, availableChars, availableMissions);
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : t("deckBuilder.failedToLoad");
-        setSaveError(message);
-      }
-    },
-    [loadDeck, availableChars, availableMissions, t],
-  );
+  const handleLoadDeck = useCallback(async (deckId: string) => {
+    setSaveError(null);
+    try { await loadDeck(deckId, availableChars, availableMissions); } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToLoad"));
+    }
+  }, [loadDeck, availableChars, availableMissions, t]);
 
-  const handleDeleteDeck = useCallback(
-    async (deckId: string) => {
-      setSaveError(null);
-      try {
-        await deleteDeck(deckId);
-      } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : t("deckBuilder.failedToDelete");
-        setSaveError(message);
-      }
-    },
-    [deleteDeck, t],
-  );
+  const handleDeleteDeck = useCallback(async (deckId: string) => {
+    setSaveError(null);
+    try { await deleteDeck(deckId); } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : t("deckBuilder.failedToDelete"));
+    }
+  }, [deleteDeck, t]);
 
-  const getImagePath = (card: CharacterCard | MissionCard): string | null =>
-    normalizeImagePath(card.image_file);
+  const getImagePath = (card: CharacterCard | MissionCard): string | null => normalizeImagePath(card.image_file);
 
   const handleImport = useCallback(() => {
     const code = importCode.trim();
     if (!code) return;
-
     const parts = code.split("|");
-    if (parts.length < 2) {
-      setImportMessage({ type: "error", text: t("deckBuilder.importError") });
-      return;
-    }
-
-    // Last part is the deck name (underscores = spaces) - only if it doesn't contain '--'
+    if (parts.length < 2) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
     const lastPart = parts[parts.length - 1];
     const hasDeckName = !lastPart.includes("--");
     const deckNameFromCode = hasDeckName ? lastPart.replace(/_/g, " ") : "";
     const cardParts = hasDeckName ? parts.slice(0, -1) : parts;
-
-    // Build lookup maps by cardId - use ALL cards (not just playable) so imports
-    // work for cards without visuals and banned cards too
     const charByCardId = new Map(allChars.map((c) => [c.cardId, c]));
     const missionByCardId = new Map(allMissions.map((m) => [m.cardId, m]));
-
-    // Fallback: lookup by card number (for external sites with wrong rarities)
     const charByNumber = new Map<number, CharacterCard[]>();
-    for (const c of allChars) {
-      const arr = charByNumber.get(c.number) || [];
-      arr.push(c);
-      charByNumber.set(c.number, arr);
-    }
+    for (const c of allChars) { const arr = charByNumber.get(c.number) || []; arr.push(c); charByNumber.set(c.number, arr); }
     const missionByNumber = new Map<number, MissionCard>();
-    for (const m of allMissions) {
-      missionByNumber.set(m.number, m);
-    }
-
-    // Normalize external rarity formats to our format
+    for (const m of allMissions) { missionByNumber.set(m.number, m); }
     const normalizeCardId = (raw: string): string => {
       let id = raw.trim();
-      // "R ART" -> "RA"
-      id = id.replace(/-R ART$/, '-RA');
-      // "SECRET" -> "S"
-      id = id.replace(/-SECRET$/, '-S');
-      // "SV" (Secret Variant) -> "S"
-      id = id.replace(/-SV$/, '-S');
-      // "MYTHOS" -> "M"
-      id = id.replace(/-MYTHOS$/, '-M');
+      id = id.replace(/-R ART$/, '-RA'); id = id.replace(/-SECRET$/, '-S');
+      id = id.replace(/-SV$/, '-S'); id = id.replace(/-MYTHOS$/, '-M');
       return id;
     };
-
-    const chars: CharacterCard[] = [];
-    const missions: MissionCard[] = [];
-    const notFound: string[] = [];
-
+    const chars: CharacterCard[] = []; const missions: MissionCard[] = []; const notFound: string[] = [];
     for (const part of cardParts) {
       const match = part.match(/^(.+)--(\d+)$/);
-      if (!match) {
-        setImportMessage({ type: "error", text: t("deckBuilder.importError") });
-        return;
-      }
-
-      const rawCardId = match[1];
-      const qty = parseInt(match[2], 10);
-      const cardId = normalizeCardId(rawCardId);
-
-      // Check missions first (MMS rarity)
+      if (!match) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
+      const rawCardId = match[1]; const qty = parseInt(match[2], 10); const cardId = normalizeCardId(rawCardId);
       const mission = missionByCardId.get(cardId);
-      if (mission) {
-        for (let i = 0; i < qty; i++) missions.push(mission);
-        continue;
-      }
-
+      if (mission) { for (let i = 0; i < qty; i++) missions.push(mission); continue; }
       const char = charByCardId.get(cardId);
-      if (char) {
-        for (let i = 0; i < qty; i++) chars.push(char);
-        continue;
-      }
-
-      // Fallback: extract number and find by number (handles wrong rarities)
+      if (char) { for (let i = 0; i < qty; i++) chars.push(char); continue; }
       const numMatch = cardId.match(/^KS-(\d+)/);
       if (numMatch) {
         const num = parseInt(numMatch[1], 10);
-        // Try mission by number
         const mByNum = missionByNumber.get(num);
-        if (mByNum) {
-          for (let i = 0; i < qty; i++) missions.push(mByNum);
-          continue;
-        }
-        // Try character by number (pick first match, prefer matching rarity)
+        if (mByNum) { for (let i = 0; i < qty; i++) missions.push(mByNum); continue; }
         const candidates = charByNumber.get(num);
         if (candidates && candidates.length > 0) {
-          // If the normalized ID has a rarity suffix, try to match it
           const rarityMatch = cardId.match(/^KS-\d+-(.*)/);
           const wantRarity = rarityMatch ? rarityMatch[1] : '';
           const exact = candidates.find((c) => c.cardId === cardId);
@@ -421,1125 +323,1273 @@ export default function DeckBuilderPage() {
           continue;
         }
       }
-
       notFound.push(rawCardId);
     }
-
-    // Apply the imported deck
     clearDeck();
     if (deckNameFromCode) setDeckName(deckNameFromCode);
     for (const c of chars) addChar(c);
     for (const m of missions) addMission(m);
-
     if (notFound.length > 0) {
-      setImportMessage({
-        type: "error",
-        text: t("deckBuilder.importNotFound", {
-          count: notFound.length,
-          ids: notFound.join(", "),
-        }),
-      });
+      setImportMessage({ type: "error", text: t("deckBuilder.importNotFound", { count: notFound.length, ids: notFound.join(", ") }) });
     } else {
-      setImportMessage({
-        type: "success",
-        text: t("deckBuilder.importSuccess", {
-          name: deckNameFromCode || "Deck",
-          chars: chars.length,
-          missions: missions.length,
-        }),
-      });
+      setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: deckNameFromCode || "Deck", chars: chars.length, missions: missions.length }) });
     }
-
     setImportCode("");
-  }, [
-    importCode,
-    allChars,
-    allMissions,
-    clearDeck,
-    setDeckName,
-    addChar,
-    addMission,
-    t,
-  ]);
+  }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
 
+  // Group deck characters by chakra cost for the deck panel
+  const deckCharsByCost = useMemo(() => {
+    const groups = new Map<number, { card: CharacterCard; originalIndex: number }[]>();
+    deckChars.forEach((card, i) => {
+      const cost = card.chakra ?? 0;
+      const arr = groups.get(cost) || [];
+      arr.push({ card, originalIndex: i });
+      groups.set(cost, arr);
+    });
+    return Array.from(groups.entries()).sort((a, b) => a[0] - b[0]);
+  }, [deckChars]);
+
+  // Count how many of each card is in the deck (for badges on catalog cards)
+  const deckCardCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of deckChars) {
+      counts.set(c.id, (counts.get(c.id) || 0) + 1);
+    }
+    return counts;
+  }, [deckChars]);
+
+  // ===== UNAUTHENTICATED =====
   if (!session?.user) {
     return (
-      <main
-        id="main-content"
-        className="flex min-h-screen relative flex-col"
-        style={{ backgroundColor: "#0a0a0a" }}
-      >
+      <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: "#0a0a0a" }}>
         <CloudBackground />
         <DecorativeIcons />
-        <CardBackgroundDecor variant="deck" />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
-            <h1
-              className="text-2xl font-bold tracking-wider uppercase"
-              style={{ color: "#c4a35a" }}
-            >
+            <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: "#c4a35a" }}>
               {t("deckBuilder.title")}
             </h1>
-            <p className="text-sm" style={{ color: "#888888" }}>
-              {t("online.signInRequired")}
-            </p>
+            <div className="w-16 h-px mx-auto" style={{ backgroundColor: 'rgba(196, 163, 90, 0.3)' }} />
+            <p className="text-sm" style={{ color: "#888888" }}>{t("online.signInRequired")}</p>
             <div className="flex gap-3">
-              <Link
-                href="/login"
-                className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider"
-                style={{ backgroundColor: "#c4a35a", color: "#0a0a0a" }}
-              >
-                {t("common.signIn")}
-              </Link>
-              <Link
-                href="/"
-                className="px-6 py-2.5 text-sm"
-                style={{
-                  backgroundColor: "#141414",
-                  border: "1px solid #262626",
-                  color: "#888888",
-                }}
-              >
-                {t("common.back")}
-              </Link>
+              <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "#c4a35a", color: "#0a0a0a", borderLeft: '3px solid #a88a3a' }}>{t("common.signIn")}</Link>
+              <Link href="/" className="px-6 py-2.5 text-sm" style={{ backgroundColor: "#141414", border: "1px solid #262626", borderLeft: '3px solid rgba(255,255,255,0.1)', color: "#888888" }}>{t("common.back")}</Link>
             </div>
           </div>
         </div>
-        <Footer />
       </main>
     );
   }
 
-  return (
-    <main
-      id="main-content"
-      className="min-h-screen relative bg-[#0a0a0a] flex flex-col"
-    >
-      <CloudBackground />
-      <DecorativeIcons />
-      <CardBackgroundDecor variant="deck" />
+  // ===== CARD DETAIL CONTENT (reused desktop + mobile) =====
+  const renderCardDetail = (card: CharacterCard | MissionCard, isMobile = false) => {
+    const isChar = card.card_type !== 'mission';
+    const charCard = card as CharacterCard;
+    const imgPath = normalizeImagePath(card.image_file);
+    const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+    const addCheck = isChar ? canAddChar(charCard) : canAddMission(card as MissionCard);
 
-      <div className="flex-1 flex flex-col relative z-10">
-        {/* Top bar: back + name + save/clear */}
-        <div className="flex flex-wrap items-center gap-2 px-4 pt-3 pb-2 border-b border-[#262626]">
-          <Link
-            href="/"
-            className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
-          >
-            {t("common.back")}
-          </Link>
-          <input
-            type="text"
-            placeholder={t("deckBuilder.deckName")}
-            value={deckName}
-            onChange={(e) => setDeckName(e.target.value)}
-            className="flex-1 min-w-[120px] max-w-xs px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
-          />
-          <button
-            onClick={handleSave}
-            disabled={isSaving || !validation.valid}
-            className="px-3 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
-          </button>
-          <button
-            onClick={clearDeck}
-            className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
-          >
-            {t("deckBuilder.clearDeck")}
-          </button>
-          <button
-            onClick={() => setShowSavedDecks(!showSavedDecks)}
-            className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors"
-          >
-            {t("deckBuilder.loadDeck")}
-          </button>
-          <Link
-            href="/deck-builder/manage"
-            className="px-3 py-1.5 bg-[#141414] border border-[#c4a35a]/30 text-[#c4a35a] text-xs hover:bg-[#1a1a1a] transition-colors"
-          >
-            {t("deckManager.manageButton")}
-          </Link>
-          <button
-            onClick={() => exportDeckAsImage(deckName, deckChars, deckMissions)}
-            disabled={deckChars.length === 0}
-            className="px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#888888] text-xs hover:bg-[#1a1a1a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {t("deckBuilder.exportImage")}
-          </button>
-        </div>
-
-        {/* Rules panel */}
-        <div className="px-4 py-2 border-b border-[#262626] flex items-center gap-4 flex-wrap">
-          <span
-            className={`text-xs ${deckChars.length >= 30 ? "text-[#3e8b3e]" : "text-[#b33e3e]"}`}
-          >
-            {t("deckBuilder.characters", { count: deckChars.length })} / 30 min
-          </span>
-          <span
-            className={`text-xs ${deckMissions.length === 3 ? "text-[#3e8b3e]" : "text-[#b33e3e]"}`}
-          >
-            {t("deckBuilder.missions", { count: deckMissions.length })} / 3
-          </span>
-          <span className="text-xs text-[#555]">
-            {t("deckBuilder.maxCopiesRule")}
-          </span>
-          {saveError && (
-            <span className="text-xs text-[#b33e3e]">{saveError}</span>
-          )}
-          {addError && (
-            <span className="text-xs text-[#b33e3e] animate-pulse">
-              {addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError}
-            </span>
-          )}
-          {validation.valid && (
-            <span className="text-xs text-[#3e8b3e]">
-              {t("deckBuilder.validation.valid")}
-            </span>
-          )}
-        </div>
-
-        {/* Saved decks panel (collapsible) */}
-        {showSavedDecks && (
-          <div className="px-4 py-3 border-b border-[#262626] bg-[#0e0e0e]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#888]">
-                {t("deckBuilder.myDecks")}
-              </span>
-              <button
-                onClick={() => { clearDeck(); setShowSavedDecks(false); }}
-                className="px-3 py-1 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-[10px] hover:bg-[#1f3a1f] transition-colors"
-              >
-                + {t("deckBuilder.newDeck")}
-              </button>
+    return (
+      <>
+        {/* Card image */}
+        <div className="relative overflow-hidden mx-auto mb-3" style={{
+          width: isMobile ? (isChar ? '90px' : '140px') : (isChar ? '160px' : '100%'),
+          aspectRatio: isChar ? '5/7' : '3.5/2.5',
+          backgroundColor: '#0a0a0c',
+          flexShrink: 0,
+        }}>
+          {imgPath ? (
+            <img src={imgPath} alt={getCardName(card, locale as "en" | "fr")} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#111' }}>
+              <span className="text-[10px]" style={{ color: '#555' }}>{getCardName(card, locale as "en" | "fr")}</span>
             </div>
+          )}
+        </div>
 
-            {isLoading && (
-              <p className="text-xs text-[#555] italic">
-                {t("common.loading")}
-              </p>
-            )}
-            {!isLoading && savedDecks.length === 0 && (
-              <p className="text-xs text-[#555] italic">
-                {t("deckBuilder.noSavedDecks")}
-              </p>
-            )}
-            <div className="flex flex-col gap-1.5">
-              {savedDecks.map((deck) => {
-                const isActive = loadedDeckId === deck.id;
-                const isConfirming = confirmDeleteId === deck.id;
-                return (
-                  <div
-                    key={deck.id}
-                    className={`flex items-center gap-3 px-3 py-2 bg-[#141414] border transition-colors ${
-                      isActive
-                        ? "border-[#3e8b3e]/50"
-                        : "border-[#262626]"
-                    }`}
-                  >
-                    {/* Deck info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#e0e0e0] font-medium truncate">
-                          {deck.name}
-                        </span>
-                        {isActive && (
-                          <span className="text-[9px] px-1.5 py-0.5 bg-[#3e8b3e]/15 text-[#3e8b3e] border border-[#3e8b3e]/25 shrink-0">
-                            {t("deckBuilder.currentlyEditing")}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[10px] text-[#555]">
-                        {t("deckBuilder.savedDeckInfo", {
-                          cards: deck.cardIds.length,
-                          missions: deck.missionIds.length,
-                        })}
-                      </span>
-                    </div>
+        {/* Type + Rarity badges */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
+            backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
+            borderLeft: `2px solid ${isChar ? 'rgba(255,255,255,0.15)' : '#c4a35a'}`,
+            color: isChar ? '#999' : '#c4a35a',
+          }}>
+            {isChar ? t("game.board.character") : 'Mission'}
+          </span>
+          <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
+            backgroundColor: `${rarColor}12`,
+            borderLeft: `2px solid ${rarColor}`,
+            color: rarColor,
+          }}>
+            {getRarityLabel(card.rarity, locale as "en" | "fr")}
+          </span>
+        </div>
 
-                    {/* Actions */}
-                    {isConfirming ? (
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-[10px] text-[#b33e3e]">
-                          {t("deckBuilder.confirmDelete", { name: deck.name })}
-                        </span>
-                        <button
-                          onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}
-                          className="px-2 py-0.5 bg-[#2a1a1a] border border-[#b33e3e]/40 text-[#b33e3e] text-[10px] hover:bg-[#3a1a1a] transition-colors"
-                        >
-                          {t("common.confirm")}
-                        </button>
-                        <button
-                          onClick={() => setConfirmDeleteId(null)}
-                          className="px-2 py-0.5 bg-[#141414] border border-[#262626] text-[#888] text-[10px] hover:bg-[#1a1a1a] transition-colors"
-                        >
-                          {t("common.cancel")}
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          onClick={() => handleLoadDeck(deck.id)}
-                          className={`px-2.5 py-1 border text-[10px] transition-colors ${
-                            isActive
-                              ? "bg-[#1a2a1a] border-[#3e8b3e]/30 text-[#3e8b3e]"
-                              : "bg-[#141414] border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444]"
-                          }`}
-                        >
-                          {t("deckBuilder.editDeck")}
-                        </button>
-                        <button
-                          onClick={() => setConfirmDeleteId(deck.id)}
-                          className="px-2.5 py-1 bg-[#141414] border border-[#262626] text-[#b33e3e] text-[10px] hover:bg-[#1a1414] hover:border-[#b33e3e]/30 transition-colors"
-                        >
-                          {t("deckBuilder.deleteDeck")}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+        {/* Name + Title */}
+        <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>
+          {getCardName(card, locale as "en" | "fr")}
+        </div>
+        {isChar && (
+          <div className="text-[11px] mb-2" style={{ color: '#777' }}>
+            {getCardTitle(charCard, locale as "en" | "fr")}
+          </div>
+        )}
+
+        {/* Stats panel */}
+        {isChar && (
+          <div className="flex items-center gap-0 my-2 py-2" style={{
+            backgroundColor: 'rgba(255,255,255,0.02)',
+            borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
+          }}>
+            <div className="flex-1 flex flex-col items-center">
+              <span className="text-[9px] uppercase" style={{ color: '#777', letterSpacing: '0.08em' }}>
+                {t("deckBuilder.chakra")}
+              </span>
+              <span className="text-lg font-bold tabular-nums" style={{ color: '#c4a35a' }}>
+                {charCard.chakra}
+              </span>
+            </div>
+            <div style={{ width: '1px', height: '24px', backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <div className="flex-1 flex flex-col items-center">
+              <span className="text-[9px] uppercase" style={{ color: '#777', letterSpacing: '0.08em' }}>
+                {t("deckBuilder.power")}
+              </span>
+              <span className="text-lg font-bold tabular-nums" style={{ color: '#e0e0e0' }}>
+                {charCard.power}
+              </span>
             </div>
           </div>
         )}
 
-        {/* Deck strip (missions + characters) */}
-        <div className="px-4 py-2 border-b border-[#262626] bg-[#0e0e0e]">
-          <div className="flex items-start gap-3 overflow-x-auto">
-            {/* Missions */}
-            <div className="flex gap-1 flex-shrink-0">
+        {/* Group */}
+        {isChar && charCard.group && (
+          <div className="text-[10px] mb-1" style={{ color: '#6b8a6b' }}>
+            {getCardGroup(charCard.group, locale as "en" | "fr")}
+          </div>
+        )}
+
+        {/* Keywords */}
+        {isChar && charCard.keywords && charCard.keywords.length > 0 && (
+          <div className="flex gap-1 mt-1 mb-2 flex-wrap">
+            {charCard.keywords.map((kw, i) => (
+              <span key={i} className="text-[9px] px-1.5 py-0.5" style={{
+                backgroundColor: 'rgba(255,255,255,0.04)',
+                borderLeft: '2px solid rgba(255,255,255,0.08)',
+                color: '#999',
+              }}>
+                {getCardKeyword(kw, locale as "en" | "fr")}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Effects */}
+        {card.effects && card.effects.length > 0 && (
+          <div className="flex flex-col gap-1.5 mt-2">
+            {card.effects.map((eff, i) => {
+              const raFallbackId = card.id.endsWith('-RA') ? card.id.replace('-RA', '-R') : undefined;
+              const frDescs = effectDescriptionsFr[card.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
+              const enDescs = effectDescriptionsEn[card.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
+              const description = locale === 'fr' ? (frDescs?.[i] ?? eff.description) : (enDescs?.[i] ?? eff.description);
+              const effColor = EFFECT_TYPE_COLORS[eff.type] ?? '#888';
+              return (
+                <div key={i} className="py-1.5 px-2" style={{
+                  borderLeft: `3px solid ${effColor}`,
+                  backgroundColor: `${effColor}08`,
+                }}>
+                  <span className="text-[10px] font-bold uppercase" style={{ color: effColor, letterSpacing: '0.06em' }}>{eff.type}</span>
+                  <div className="text-[10px] leading-snug mt-0.5" style={{ color: '#bbb' }}>{description}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Add to deck button */}
+        <div className="mt-3">
+          <AngularButton
+            onClick={() => isChar ? addChar(charCard) : addMission(card as MissionCard)}
+            accentColor="#3e8b3e"
+            variant={addCheck.allowed ? 'primary' : 'muted'}
+            disabled={!addCheck.allowed}
+            size="sm"
+          >
+            {t("deckBuilder.addToDeck")}
+          </AngularButton>
+        </div>
+      </>
+    );
+  };
+
+  // ===== MAIN LAYOUT =====
+  return (
+    <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
+      <CloudBackground />
+      <DecorativeIcons />
+
+      <div className="flex relative z-10" style={{ height: '100vh' }}>
+
+        {/* ===== LEFT: DECK PANEL (desktop) ===== */}
+        <div
+          className="hidden lg:flex flex-col flex-shrink-0 overflow-hidden"
+          style={{
+            width: '240px',
+            backgroundColor: 'rgba(8, 8, 12, 0.95)',
+            borderRight: '1px solid rgba(196, 163, 90, 0.12)',
+          }}
+        >
+          {/* Header */}
+          <div className="px-3 pt-3 pb-1 flex-shrink-0">
+            <div className="flex items-center justify-between mb-1">
+              <Link href="/" className="text-[10px] uppercase" style={{ color: '#555', letterSpacing: '0.08em' }}>
+                {t("common.back")}
+              </Link>
+              {loadedDeckId && (
+                <span className="text-[8px] uppercase px-1.5 py-0.5" style={{
+                  backgroundColor: 'rgba(62, 139, 62, 0.15)',
+                  borderLeft: '2px solid #3e8b3e',
+                  color: '#3e8b3e',
+                  letterSpacing: '0.06em',
+                }}>
+                  {t("deckBuilder.currentlyEditing")}
+                </span>
+              )}
+            </div>
+            <h1 className="text-sm font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.12em' }}>
+              {t("deckBuilder.title")}
+            </h1>
+            <SectionDivider width={80} showDiamond />
+          </div>
+
+          {/* Deck name */}
+          <div className="px-3 mb-2 flex-shrink-0">
+            <input
+              type="text"
+              placeholder={t("deckBuilder.deckName")}
+              value={deckName}
+              onChange={(e) => setDeckName(e.target.value)}
+              className="w-full px-2 py-1.5 text-xs focus:outline-none"
+              style={{
+                backgroundColor: '#0e0e0e',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
+                color: '#e0e0e0',
+              }}
+            />
+          </div>
+
+          {/* Validation */}
+          <div className="px-3 mb-2 flex flex-col gap-1 flex-shrink-0">
+            <div className="flex items-center gap-2 text-[10px]" style={{
+              borderLeft: `3px solid ${deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e'}`,
+              paddingLeft: '6px',
+            }}>
+              <span style={{ color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+                {t("deckBuilder.characters", { count: deckChars.length })} / 30
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[10px]" style={{
+              borderLeft: `3px solid ${deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e'}`,
+              paddingLeft: '6px',
+            }}>
+              <span style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
+                {t("deckBuilder.missions", { count: deckMissions.length })} / 3
+              </span>
+            </div>
+            {validation.valid && (
+              <div className="text-[10px]" style={{ borderLeft: '3px solid #3e8b3e', paddingLeft: '6px', color: '#3e8b3e' }}>
+                {t("deckBuilder.validation.valid")}
+              </div>
+            )}
+          </div>
+
+          {/* Error messages */}
+          {(saveError || addError) && (
+            <div className="px-3 mb-2 flex-shrink-0">
+              <div className="text-[10px] py-1 px-2" style={{ borderLeft: '3px solid #b33e3e', backgroundColor: 'rgba(179,62,62,0.08)', color: '#b33e3e' }}>
+                {addError ? (addErrorKey ? t(addErrorKey, addErrorParams ?? {}) : addError) : saveError}
+              </div>
+            </div>
+          )}
+
+          <SectionDivider width={60} />
+
+          {/* Mission slots */}
+          <div className="px-3 mb-1 flex-shrink-0">
+            <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>Missions</span>
+            <div className="flex gap-1.5 mt-1">
               {[0, 1, 2].map((i) => {
                 const m = deckMissions[i];
                 const mImg = m ? getImagePath(m) : null;
                 return (
-                  <div
-                    key={i}
-                    className="w-14 h-20 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0"
-                  >
+                  <div key={i} className="relative overflow-hidden flex-1" style={{
+                    aspectRatio: '3.5/2.5',
+                    backgroundColor: '#0e0e0e',
+                    border: m ? '1px solid rgba(196,163,90,0.2)' : '1px dashed rgba(255,255,255,0.08)',
+                  }}>
                     {m ? (
                       <>
                         {mImg && (
-                          <img
-                            src={mImg}
-                            alt={getCardName(m, locale as "en" | "fr")}
-                            className="w-full h-full object-cover cursor-pointer"
-                            onClick={() => setPreviewCard(m)}
-                          />
+                          <img src={mImg} alt={getCardName(m, locale as "en" | "fr")} className="w-full h-full object-cover cursor-pointer" onClick={() => setPreviewCard(m)} />
                         )}
                         <button
                           onClick={() => removeMission(i)}
-                          className="absolute top-0 right-0 w-4 h-4 bg-black/70 text-[#b33e3e] text-[8px] flex items-center justify-center hover:bg-black z-10"
-                        >
-                          X
-                        </button>
-                        <div className="absolute inset-x-0 bottom-0 bg-black/75 px-0.5 cursor-pointer" onClick={() => setPreviewCard(m)}>
-                          <span className="text-[7px] text-[#e0e0e0] leading-tight block truncate">
+                          className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center text-[8px] font-bold cursor-pointer"
+                          style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#b33e3e' }}
+                        >X</button>
+                        <div className="absolute inset-x-0 bottom-0 px-0.5 cursor-pointer" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }} onClick={() => setPreviewCard(m)}>
+                          <span className="text-[7px] leading-tight block truncate" style={{ color: '#e0e0e0' }}>
                             {getCardName(m, locale as "en" | "fr")}
                           </span>
                         </div>
                       </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[8px] text-[#555]">M{i + 1}</span>
+                        <span className="text-[8px]" style={{ color: '#333' }}>M{i + 1}</span>
                       </div>
                     )}
                   </div>
                 );
               })}
             </div>
+          </div>
 
-            <div className="w-px h-16 bg-[#262626] flex-shrink-0 self-center" />
+          <SectionDivider width={60} />
 
-            {/* Characters */}
-            <div className="flex gap-1 overflow-x-auto flex-1 min-w-0">
-              {deckChars.map((card, i) => {
-                const img = getImagePath(card);
-                return (
-                  <div
-                    key={`${card.id}-${i}`}
-                    className="w-10 h-14 bg-[#141414] border border-[#262626] overflow-hidden relative flex-shrink-0 group cursor-pointer"
-                    onClick={() => setPreviewCard(card)}
-                  >
-                    {img ? (
-                      <img
-                        src={img}
-                        alt={getCardName(card, locale as "en" | "fr")}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[6px] text-[#555]">
-                          {card.chakra}/{card.power}
+          {/* Character list grouped by cost */}
+          <div className="px-3 mb-1 flex-shrink-0">
+            <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>
+              {t("deckBuilder.characters", { count: deckChars.length })}
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto px-3 pb-2" style={{ minHeight: 0 }}>
+            {deckCharsByCost.length === 0 ? (
+              <p className="text-[10px] italic mt-2" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
+            ) : (
+              deckCharsByCost.map(([cost, cards]) => (
+                <div key={cost} className="mb-2">
+                  {/* Cost header */}
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <div style={{ width: '5px', height: '5px', backgroundColor: '#c4a35a', transform: 'rotate(45deg)' }} />
+                    <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>
+                      {t("deckBuilder.chakra")} {cost}
+                    </span>
+                    <span className="text-[9px]" style={{ color: '#555' }}>({cards.length})</span>
+                  </div>
+                  {/* Card rows */}
+                  {cards.map(({ card, originalIndex }) => {
+                    const img = getImagePath(card);
+                    const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+                    return (
+                      <div
+                        key={`${card.id}-${originalIndex}`}
+                        className="flex items-center gap-1.5 py-0.5 px-1 mb-0.5 group cursor-pointer"
+                        style={{
+                          borderLeft: `2px solid ${rarColor}`,
+                          backgroundColor: 'rgba(255,255,255,0.01)',
+                        }}
+                        onClick={() => setPreviewCard(card)}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.01)';
+                        }}
+                      >
+                        {/* Thumbnail */}
+                        <div className="w-5 h-7 overflow-hidden flex-shrink-0" style={{ backgroundColor: '#111' }}>
+                          {img ? (
+                            <img src={img} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full" />
+                          )}
+                        </div>
+                        {/* Name */}
+                        <span className="text-[9px] truncate flex-1 min-w-0" style={{ color: '#ccc' }}>
+                          {getCardName(card, locale as "en" | "fr")}
                         </span>
+                        {/* Power */}
+                        <span className="text-[9px] font-bold tabular-nums flex-shrink-0" style={{ color: '#888' }}>
+                          {card.power}
+                        </span>
+                        {/* Remove */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeChar(originalIndex); }}
+                          className="w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0"
+                          style={{ color: '#b33e3e' }}
+                        >X</button>
                       </div>
-                    )}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeChar(i); }}
-                      className="absolute inset-0 bg-black/60 text-[#b33e3e] text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      X
-                    </button>
-                  </div>
-                );
-              })}
-              {deckChars.length === 0 && (
-                <p className="text-xs text-[#555] italic self-center">
-                  {t("deckBuilder.clickToAdd")}
-                </p>
-              )}
+                    );
+                  })}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="px-3 py-2 flex flex-col gap-1.5 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+            <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+              {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
+            </AngularButton>
+            <div className="flex gap-1.5">
+              <div className="flex-1">
+                <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">
+                  {t("deckBuilder.loadDeck")}
+                </AngularButton>
+              </div>
+              <div className="flex-1">
+                <AngularButton onClick={() => setShowImportModal(true)} variant="secondary" size="sm">
+                  {t("deckBuilder.importButton")}
+                </AngularButton>
+              </div>
             </div>
+            <div className="flex gap-1.5">
+              <div className="flex-1">
+                <Link href="/deck-builder/manage" className="block text-center text-[10px] uppercase font-bold py-1.5 no-select" style={{
+                  backgroundColor: 'rgba(196,163,90,0.08)',
+                  borderLeft: '3px solid rgba(196,163,90,0.5)',
+                  color: '#c4a35a',
+                  letterSpacing: '0.1em',
+                  transform: 'skewX(-3deg)',
+                }}>
+                  <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{t("deckManager.manageButton")}</span>
+                </Link>
+              </div>
+              <div className="flex-1">
+                <AngularButton onClick={() => exportDeckAsImage(deckName, deckChars, deckMissions)} variant="muted" disabled={deckChars.length === 0} size="sm">
+                  {t("deckBuilder.exportImage")}
+                </AngularButton>
+              </div>
+            </div>
+            <AngularButton onClick={clearDeck} variant="danger" size="sm">
+              {t("deckBuilder.clearDeck")}
+            </AngularButton>
           </div>
         </div>
 
-        {/* Available cards */}
-        <div className="flex-1 overflow-y-auto px-4 py-3">
-          {/* Import section - prominent */}
-          <div className="mb-5 border border-[#262626] bg-[#0e0e0e]">
-            <div className="px-4 py-3">
-              <h2 className="text-sm font-bold text-[#e0e0e0] mb-1">
-                {t("deckBuilder.importTitle")}
-              </h2>
-              <p className="text-xs text-[#888888] mb-3">
-                {t("deckBuilder.importDesc")}
-              </p>
-
-              <div className="flex items-center gap-2 mb-3">
-                <a
-                  href="https://shinobuilder.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-[#1a1a2a] border border-[#4a7ab5]/40 text-[#4a7ab5] text-xs hover:bg-[#1f1f3a] transition-colors"
-                >
-                  {t("deckBuilder.importVisit")}
-                </a>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder={t("deckBuilder.importPlaceholder")}
-                  value={importCode}
-                  onChange={(e) => setImportCode(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleImport();
-                  }}
-                  className="flex-1 px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444] font-mono"
-                />
-                <button
-                  onClick={handleImport}
-                  disabled={!importCode.trim()}
-                  className="px-4 py-1.5 bg-[#1a2a1a] border border-[#3e8b3e]/30 text-[#3e8b3e] text-xs hover:bg-[#1f3a1f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  {t("deckBuilder.importButton")}
-                </button>
-              </div>
-
-              {/* Import feedback */}
-              {importMessage && (
-                <div
-                  className={`mt-2 text-xs ${
-                    importMessage.type === "success"
-                      ? "text-[#3e8b3e]"
-                      : "text-[#b33e3e]"
-                  }`}
-                >
-                  {importMessage.text}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Separator */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-[#262626]" />
-            <span className="text-xs text-[#555] uppercase tracking-wider">
-              {t("deckBuilder.orBuildManually")}
+        {/* ===== MOBILE: Deck summary bar (sm/md only) ===== */}
+        <div
+          className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center gap-2 px-3 py-2"
+          style={{
+            backgroundColor: 'rgba(8, 8, 12, 0.95)',
+            borderBottom: '1px solid rgba(196, 163, 90, 0.12)',
+          }}
+        >
+          <Link href="/" className="text-[10px] uppercase flex-shrink-0" style={{ color: '#555' }}>{t("common.back")}</Link>
+          <button
+            onClick={() => setShowDeckDrawer(true)}
+            className="flex items-center gap-2 px-2 py-1 cursor-pointer"
+            style={{ borderLeft: '3px solid rgba(196,163,90,0.4)', backgroundColor: 'rgba(255,255,255,0.02)' }}
+          >
+            <span className="text-[10px] font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>
+              {t("deckBuilder.title")}
             </span>
-            <div className="flex-1 h-px bg-[#262626]" />
-          </div>
+            <span className="text-[10px] tabular-nums" style={{ color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+              {deckChars.length}/30
+            </span>
+            <span className="text-[10px] tabular-nums" style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
+              M:{deckMissions.length}/3
+            </span>
+          </button>
+          <div className="flex-1" />
+          <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+            {isSaving ? '...' : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
+          </AngularButton>
+        </div>
 
-          {/* Search bar + filter toggle + sort */}
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <input
-              type="text"
-              placeholder={t("collection.search")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 min-w-[140px] max-w-md px-3 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-sm placeholder-[#555] focus:outline-none focus:border-[#444]"
-            />
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="px-3 py-1.5 text-xs transition-colors"
-              style={{
-                backgroundColor: showFilters ? '#1a1a2e' : '#141414',
-                border: `1px solid ${showFilters ? '#4a7ab5' : '#262626'}`,
-                color: showFilters ? '#4a7ab5' : '#888',
-              }}
-            >
-              {t("deckBuilder.filters.toggle")}
-              {activeFilterCount > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 text-[9px] font-bold" style={{ backgroundColor: '#4a7ab5', color: '#fff', borderRadius: '2px' }}>
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-            {/* Sort controls */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortField)}
-              className="px-2 py-1.5 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-xs focus:outline-none focus:border-[#444] cursor-pointer"
-            >
-              <option value="number">{t("deckBuilder.sort.byNumber")}</option>
-              <option value="name">{t("deckBuilder.sort.byName")}</option>
-              <option value="chakra">{t("deckBuilder.sort.byChakra")}</option>
-              <option value="power">{t("deckBuilder.sort.byPower")}</option>
-              <option value="rarity">{t("deckBuilder.sort.byRarity")}</option>
-            </select>
-            <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-2 py-1.5 bg-[#141414] border border-[#262626] text-[#888] text-xs hover:bg-[#1a1a1a] transition-colors cursor-pointer"
-              title={sortOrder === 'asc' ? t("deckBuilder.sort.ascending") : t("deckBuilder.sort.descending")}
-            >
-              {sortOrder === 'asc' ? '1-9' : '9-1'}
-            </button>
-            {hasActiveFilters && (
-              <button
-                onClick={clearAllFilters}
-                className="px-2 py-1.5 text-xs transition-colors"
-                style={{ backgroundColor: '#2a1a1a', border: '1px solid rgba(179, 62, 62, 0.3)', color: '#b33e3e' }}
+        {/* ===== CENTER: CARD CATALOG ===== */}
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
+          {/* Sticky header */}
+          <div className="flex-shrink-0 px-4 pt-3 lg:pt-3 pb-2" style={{
+            backgroundColor: 'rgba(8, 8, 12, 0.9)',
+            borderBottom: '1px solid rgba(255,255,255,0.04)',
+            paddingTop: 'env(safe-area-inset-top)',
+          }}>
+            {/* Mobile top spacer */}
+            <div className="lg:hidden h-8" />
+
+            {/* Row 1: Search + Sort */}
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="text"
+                placeholder={t("collection.search")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 min-w-[120px] max-w-md px-3 py-1.5 text-xs focus:outline-none"
+                style={{
+                  backgroundColor: '#0e0e0e',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderLeft: '3px solid rgba(196, 163, 90, 0.25)',
+                  color: '#e0e0e0',
+                }}
+              />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortField)}
+                className="px-2 py-1.5 text-[10px] focus:outline-none cursor-pointer"
+                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#999' }}
               >
-                {t("deckBuilder.filters.clear")}
+                <option value="number">{t("deckBuilder.sort.byNumber")}</option>
+                <option value="name">{t("deckBuilder.sort.byName")}</option>
+                <option value="chakra">{t("deckBuilder.sort.byChakra")}</option>
+                <option value="power">{t("deckBuilder.sort.byPower")}</option>
+                <option value="rarity">{t("deckBuilder.sort.byRarity")}</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="px-2 py-1.5 text-[10px] cursor-pointer"
+                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#888' }}
+              >
+                {sortOrder === 'asc' ? '1-9' : '9-1'}
               </button>
-            )}
-            <span className="text-[10px] text-[#555]">
-              {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
-            </span>
+              <span className="text-[10px] flex-shrink-0 hidden sm:inline" style={{ color: '#555' }}>
+                {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
+              </span>
+            </div>
+
+            {/* Row 2: Filter chips */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar">
+              {/* Rarity chips */}
+              {filterOptions.rarities.map((r) => {
+                const active = filterRarity.includes(r);
+                const color = RARITY_COLORS[r] ?? '#888';
+                return (
+                  <button
+                    key={`r-${r}`}
+                    onClick={() => toggleArrayFilter(filterRarity, r, setFilterRarity)}
+                    className="flex-shrink-0 text-[9px] font-bold uppercase px-2 py-1 cursor-pointer"
+                    style={{
+                      backgroundColor: active ? `${color}18` : 'rgba(255,255,255,0.02)',
+                      borderLeft: active ? `2px solid ${color}` : '2px solid transparent',
+                      color: active ? color : '#555',
+                      transform: 'skewX(-2deg)',
+                      letterSpacing: '0.06em',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <span style={{ display: 'inline-block', transform: 'skewX(2deg)' }}>
+                      {getRarityLabel(r, locale as "en" | "fr")}
+                    </span>
+                  </button>
+                );
+              })}
+
+              {/* Separator */}
+              <div className="w-px h-4 flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
+
+              {/* Effect type chips */}
+              {(['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'] as EffectType[]).map((et) => {
+                const active = filterEffectType.includes(et);
+                const color = EFFECT_TYPE_COLORS[et];
+                return (
+                  <button
+                    key={`e-${et}`}
+                    onClick={() => toggleArrayFilter(filterEffectType, et, setFilterEffectType)}
+                    className="flex-shrink-0 text-[9px] font-bold uppercase px-2 py-1 cursor-pointer"
+                    style={{
+                      backgroundColor: active ? `${color}18` : 'rgba(255,255,255,0.02)',
+                      borderLeft: active ? `2px solid ${color}` : '2px solid transparent',
+                      color: active ? color : '#555',
+                      transform: 'skewX(-2deg)',
+                      letterSpacing: '0.06em',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <span style={{ display: 'inline-block', transform: 'skewX(2deg)' }}>{et}</span>
+                  </button>
+                );
+              })}
+
+              {/* Separator */}
+              <div className="w-px h-4 flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }} />
+
+              {/* Group chips */}
+              {filterOptions.groups.map((g) => {
+                const active = filterGroup.includes(g);
+                return (
+                  <button
+                    key={`g-${g}`}
+                    onClick={() => toggleArrayFilter(filterGroup, g, setFilterGroup)}
+                    className="flex-shrink-0 text-[9px] px-2 py-1 cursor-pointer"
+                    style={{
+                      backgroundColor: active ? 'rgba(62,139,62,0.12)' : 'rgba(255,255,255,0.02)',
+                      borderLeft: active ? '2px solid #3e8b3e' : '2px solid transparent',
+                      color: active ? '#6b8a6b' : '#555',
+                      transform: 'skewX(-2deg)',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <span style={{ display: 'inline-block', transform: 'skewX(2deg)' }}>
+                      {getCardGroup(g, locale as "en" | "fr")}
+                    </span>
+                  </button>
+                );
+              })}
+
+              {/* Advanced filters toggle */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex-shrink-0 text-[9px] px-2 py-1 cursor-pointer"
+                style={{
+                  backgroundColor: showFilters ? 'rgba(74,122,181,0.12)' : 'rgba(255,255,255,0.02)',
+                  borderLeft: showFilters ? '2px solid #4a7ab5' : '2px solid transparent',
+                  color: showFilters ? '#4a7ab5' : '#555',
+                  transform: 'skewX(-2deg)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <span style={{ display: 'inline-block', transform: 'skewX(2deg)' }}>
+                  +{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+                </span>
+              </button>
+
+              {/* Clear all */}
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="flex-shrink-0 text-[9px] px-2 py-1 cursor-pointer"
+                  style={{
+                    backgroundColor: 'rgba(179,62,62,0.1)',
+                    borderLeft: '2px solid #b33e3e',
+                    color: '#b33e3e',
+                    transform: 'skewX(-2deg)',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <span style={{ display: 'inline-block', transform: 'skewX(2deg)' }}>{t("deckBuilder.filters.clear")}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Row 3: Advanced filters (expandable) */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2 flex flex-col gap-2">
+                    {/* Keywords */}
+                    <div>
+                      <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#666', letterSpacing: '0.08em' }}>
+                        {t("deckBuilder.filters.keywords")}
+                      </span>
+                      <div className="flex gap-1 flex-wrap max-h-[60px] overflow-y-auto">
+                        {filterOptions.keywords.map((kw) => {
+                          const active = filterKeywords.includes(kw);
+                          return (
+                            <button
+                              key={kw}
+                              onClick={() => toggleArrayFilter(filterKeywords, kw, setFilterKeywords)}
+                              className="px-1.5 py-0.5 text-[8px] cursor-pointer"
+                              style={{
+                                backgroundColor: active ? 'rgba(153,153,187,0.12)' : 'rgba(255,255,255,0.02)',
+                                borderLeft: active ? '2px solid #9999bb' : '2px solid transparent',
+                                color: active ? '#9999bb' : '#444',
+                                transition: 'all 0.15s',
+                              }}
+                            >
+                              {getCardKeyword(kw, locale as "en" | "fr")}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Chakra + Power ranges */}
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#666', letterSpacing: '0.08em' }}>
+                          {t("deckBuilder.filters.chakraCost")}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <input type="number" min={0} max={filterOptions.maxChakra} value={filterChakraMin}
+                            onChange={(e) => setFilterChakraMin(Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-10 px-1 py-0.5 text-[10px] text-center focus:outline-none"
+                            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                          />
+                          <span className="text-[10px]" style={{ color: '#444' }}>-</span>
+                          <input type="number" min={0} max={filterOptions.maxChakra} value={filterChakraMax}
+                            onChange={(e) => setFilterChakraMax(Math.min(filterOptions.maxChakra, parseInt(e.target.value) || 0))}
+                            className="w-10 px-1 py-0.5 text-[10px] text-center focus:outline-none"
+                            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#666', letterSpacing: '0.08em' }}>
+                          {t("deckBuilder.filters.power")}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <input type="number" min={0} max={filterOptions.maxPower} value={filterPowerMin}
+                            onChange={(e) => setFilterPowerMin(Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-10 px-1 py-0.5 text-[10px] text-center focus:outline-none"
+                            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                          />
+                          <span className="text-[10px]" style={{ color: '#444' }}>-</span>
+                          <input type="number" min={0} max={filterOptions.maxPower} value={filterPowerMax}
+                            onChange={(e) => setFilterPowerMax(Math.min(filterOptions.maxPower, parseInt(e.target.value) || 0))}
+                            className="w-10 px-1 py-0.5 text-[10px] text-center focus:outline-none"
+                            style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#e0e0e0' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Filter panel (collapsible) */}
-          {showFilters && (
-            <div className="mb-4 p-3 bg-[#0e0e0e] border border-[#262626]">
-              {/* Rarity */}
-              <div className="mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                  {t("deckBuilder.filters.rarity")}
-                </span>
-                <div className="flex gap-1.5 flex-wrap">
-                  {filterOptions.rarities.map((r) => {
-                    const active = filterRarity.includes(r);
-                    return (
-                      <button
-                        key={r}
-                        onClick={() => toggleArrayFilter(filterRarity, r, setFilterRarity)}
-                        className="px-2.5 py-1 text-[10px] font-bold uppercase transition-colors cursor-pointer"
-                        style={{
-                          backgroundColor: active ? (RARITY_COLORS[r] ?? '#888') + '25' : '#141414',
-                          border: `1px solid ${active ? RARITY_COLORS[r] ?? '#888' : '#262626'}`,
-                          color: active ? RARITY_COLORS[r] ?? '#888' : '#666',
-                        }}
-                      >
-                        {getRarityLabel(r, locale as "en" | "fr")}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Effect types */}
-              <div className="mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                  {t("deckBuilder.filters.effectType")}
-                </span>
-                <div className="flex gap-1.5 flex-wrap">
-                  {(['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'] as EffectType[]).map((et) => {
-                    const active = filterEffectType.includes(et);
-                    const color = EFFECT_TYPE_COLORS[et];
-                    return (
-                      <button
-                        key={et}
-                        onClick={() => toggleArrayFilter(filterEffectType, et, setFilterEffectType)}
-                        className="px-2.5 py-1 text-[10px] font-bold uppercase transition-colors cursor-pointer"
-                        style={{
-                          backgroundColor: active ? color + '25' : '#141414',
-                          border: `1px solid ${active ? color : '#262626'}`,
-                          color: active ? color : '#666',
-                        }}
-                      >
-                        {et}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Group */}
-              <div className="mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                  {t("deckBuilder.filters.group")}
-                </span>
-                <div className="flex gap-1.5 flex-wrap">
-                  {filterOptions.groups.map((g) => {
-                    const active = filterGroup.includes(g);
-                    return (
-                      <button
-                        key={g}
-                        onClick={() => toggleArrayFilter(filterGroup, g, setFilterGroup)}
-                        className="px-2.5 py-1 text-[10px] transition-colors cursor-pointer"
-                        style={{
-                          backgroundColor: active ? '#1a2a1a' : '#141414',
-                          border: `1px solid ${active ? '#3e8b3e' : '#262626'}`,
-                          color: active ? '#6b8a6b' : '#666',
-                        }}
-                      >
-                        {getCardGroup(g, locale as "en" | "fr")}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Keywords */}
-              <div className="mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                  {t("deckBuilder.filters.keywords")}
-                </span>
-                <div className="flex gap-1 flex-wrap max-h-[80px] overflow-y-auto">
-                  {filterOptions.keywords.map((kw) => {
-                    const active = filterKeywords.includes(kw);
-                    return (
-                      <button
-                        key={kw}
-                        onClick={() => toggleArrayFilter(filterKeywords, kw, setFilterKeywords)}
-                        className="px-2 py-0.5 text-[9px] transition-colors cursor-pointer"
-                        style={{
-                          backgroundColor: active ? '#1a1a2e' : '#141414',
-                          border: `1px solid ${active ? '#9999bb' : '#262626'}`,
-                          color: active ? '#9999bb' : '#555',
-                        }}
-                      >
-                        {getCardKeyword(kw, locale as "en" | "fr")}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Chakra & Power ranges */}
-              <div className="flex gap-6 flex-wrap">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                    {t("deckBuilder.filters.chakraCost")}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="number"
-                      min={0}
-                      max={filterOptions.maxChakra}
-                      value={filterChakraMin}
-                      onChange={(e) => setFilterChakraMin(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
-                    />
-                    <span className="text-[10px] text-[#555]">-</span>
-                    <input
-                      type="number"
-                      min={0}
-                      max={filterOptions.maxChakra}
-                      value={filterChakraMax}
-                      onChange={(e) => setFilterChakraMax(Math.min(filterOptions.maxChakra, parseInt(e.target.value) || 0))}
-                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#888] block mb-1.5">
-                    {t("deckBuilder.filters.power")}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="number"
-                      min={0}
-                      max={filterOptions.maxPower}
-                      value={filterPowerMin}
-                      onChange={(e) => setFilterPowerMin(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
-                    />
-                    <span className="text-[10px] text-[#555]">-</span>
-                    <input
-                      type="number"
-                      min={0}
-                      max={filterOptions.maxPower}
-                      value={filterPowerMax}
-                      onChange={(e) => setFilterPowerMax(Math.min(filterOptions.maxPower, parseInt(e.target.value) || 0))}
-                      className="w-12 px-1.5 py-1 bg-[#141414] border border-[#262626] text-[#e0e0e0] text-[10px] text-center focus:outline-none focus:border-[#444]"
-                    />
-                  </div>
-                </div>
-              </div>
+          {/* Scrollable card grid area */}
+          <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
+            {/* Missions section */}
+            <div className="flex items-center gap-2 mb-2">
+              <div style={{ width: '5px', height: '5px', backgroundColor: '#c4a35a', transform: 'rotate(45deg)' }} />
+              <span className="text-[10px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
+                Missions
+              </span>
+              <span className="text-[10px]" style={{ color: '#555' }}>({availableMissions.filter(m => !bannedIds.has(m.id)).length})</span>
             </div>
-          )}
-          {/* Missions */}
-          <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
-            {t("deckBuilder.missions", { count: availableMissions.length })}
-          </p>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 mb-4">
-            {availableMissions
-              .filter((m) => !bannedIds.has(m.id))
-              .map((m) => {
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-4">
+              {availableMissions.filter((m) => !bannedIds.has(m.id)).map((m) => {
                 const mImgPath = getImagePath(m);
                 const check = canAddMission(m);
                 return (
                   <button
                     key={m.id}
                     onClick={() => addMission(m)}
-                    className="relative w-full mission-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
+                    className="relative w-full mission-aspect overflow-hidden group cursor-pointer"
+                    style={{
+                      backgroundColor: '#0e0e0e',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderBottom: '3px solid rgba(196,163,90,0.25)',
+                      opacity: check.allowed ? 1 : 0.5,
+                    }}
                     title={getCardName(m, locale as "en" | "fr")}
                   >
                     {mImgPath ? (
-                      <img
-                        src={mImgPath}
-                        alt={getCardName(m, locale as "en" | "fr")}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                        style={{ opacity: check.allowed ? 1 : 0.3 }}
-                      />
+                      <img src={mImgPath} alt={getCardName(m, locale as "en" | "fr")} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[9px] text-[#555]">
-                          {getCardName(m, locale as "en" | "fr")}
-                        </span>
+                        <span className="text-[9px]" style={{ color: '#555' }}>{getCardName(m, locale as "en" | "fr")}</span>
                       </div>
                     )}
-                    {/* Detail button */}
-                    <button
-                      className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer z-10"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
-                      onClick={(e) => { e.stopPropagation(); setPreviewCard(m); }}
-                    >
-                      <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t("deckBuilder.detailBtn")}</span>
-                    </button>
                     {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.65)' }}>
                       {check.allowed ? (
-                        <span className="text-[#3e8b3e] text-xl font-bold">
-                          +
-                        </span>
+                        <span className="text-xl font-bold" style={{ color: '#3e8b3e' }}>+</span>
                       ) : (
-                        <span className="text-[10px] text-[#b33e3e] text-center px-1">
-                          {check.reason}
-                        </span>
+                        <span className="text-[9px] text-center px-1" style={{ color: '#b33e3e' }}>{check.reason}</span>
                       )}
                     </div>
-                    <div
-                      className="absolute inset-x-0 bottom-0 px-1 py-0.5"
-                      style={{ backgroundColor: "rgba(0,0,0,0.75)" }}
-                    >
-                      <span className="text-[9px] text-[#e0e0e0] leading-tight block truncate">
+                    {/* Name label */}
+                    <div className="absolute inset-x-0 bottom-0 px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+                      <span className="text-[8px] leading-tight block truncate" style={{ color: '#e0e0e0' }}>
                         {getCardName(m, locale as "en" | "fr")}
                       </span>
+                    </div>
+                    {/* Detail button */}
+                    <button
+                      className="absolute top-0.5 right-0.5 px-1 py-0.5 text-[7px] font-bold uppercase opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#c4a35a', borderLeft: '2px solid rgba(196,163,90,0.4)' }}
+                      onClick={(e) => { e.stopPropagation(); setPreviewCard(m); }}
+                    >
+                      {t("deckBuilder.detailBtn")}
+                    </button>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-2 mb-2 mt-1">
+              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
+              <div style={{ width: '4px', height: '4px', backgroundColor: 'rgba(196,163,90,0.3)', transform: 'rotate(45deg)' }} />
+              <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
+            </div>
+
+            {/* Characters section */}
+            <div className="flex items-center gap-2 mb-2">
+              <div style={{ width: '5px', height: '5px', backgroundColor: '#888', transform: 'rotate(45deg)' }} />
+              <span className="text-[10px] uppercase font-bold" style={{ color: '#999', letterSpacing: '0.1em' }}>
+                {t("deckBuilder.characters", { count: filteredChars.length })}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2">
+              {paginatedChars.map((card) => {
+                const imgPath = getImagePath(card);
+                const check = canAddChar(card);
+                const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+                const inDeckCount = deckCardCounts.get(card.id) || 0;
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => addChar(card)}
+                    onMouseEnter={() => setPreviewCard(card)}
+                    className="relative w-full card-aspect overflow-hidden group cursor-pointer"
+                    style={{
+                      backgroundColor: '#0e0e0e',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderLeft: `3px solid ${rarColor}`,
+                    }}
+                    title={`${getCardName(card, locale as "en" | "fr")} - ${getCardTitle(card, locale as "en" | "fr")} (${card.chakra}/${card.power})`}
+                  >
+                    {imgPath ? (
+                      <img src={imgPath} alt={getCardName(card, locale as "en" | "fr")} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[8px]" style={{ color: '#555' }}>{getCardName(card, locale as "en" | "fr")}</span>
+                      </div>
+                    )}
+
+                    {/* Chakra badge */}
+                    <div className="absolute top-1 left-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold" style={{
+                      backgroundColor: 'rgba(196,163,90,0.9)',
+                      color: '#0a0a0a',
+                    }}>
+                      {card.chakra}
+                    </div>
+
+                    {/* In-deck count badge */}
+                    {inDeckCount > 0 && (
+                      <div className="absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold" style={{
+                        backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)',
+                        color: '#fff',
+                      }}>
+                        x{inDeckCount}
+                      </div>
+                    )}
+
+                    {/* Bottom info */}
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+                      <span className="text-[7px] truncate" style={{ color: '#e0e0e0', maxWidth: '70%' }}>
+                        {getCardName(card, locale as "en" | "fr")}
+                      </span>
+                      <span className="text-[8px] font-bold tabular-nums" style={{ color: '#e0e0e0' }}>
+                        {card.power}
+                      </span>
+                    </div>
+
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.65)' }}>
+                      {check.allowed ? (
+                        <>
+                          <span className="text-xl font-bold leading-none" style={{ color: '#3e8b3e' }}>+</span>
+                          <span className="text-[10px]" style={{ color: '#e0e0e0' }}>{card.chakra}/{card.power}</span>
+                        </>
+                      ) : (
+                        <span className="text-[8px] text-center px-1 leading-tight" style={{ color: '#b33e3e' }}>{check.reason}</span>
+                      )}
                     </div>
                   </button>
                 );
               })}
-          </div>
-
-          {/* Characters */}
-          <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">
-            {t("deckBuilder.characters", { count: filteredChars.length })}
-          </p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
-            {paginatedChars.map((card) => {
-              const imgPath = getImagePath(card);
-              const check = canAddChar(card);
-              return (
-                <button
-                  key={card.id}
-                  onClick={() => addChar(card)}
-                  className="relative w-full card-aspect bg-[#141414] border border-[#262626] overflow-hidden hover:border-[#444] transition-colors group"
-                  title={`${getCardName(card, locale as "en" | "fr")} - ${getCardTitle(card, locale as "en" | "fr")} (${card.chakra}/${card.power})`}
-                >
-                  {imgPath ? (
-                    <img
-                      src={imgPath}
-                      alt={getCardName(card, locale as "en" | "fr")}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[9px] text-[#555]">
-                        {getCardName(card, locale as "en" | "fr")}
-                      </span>
-                    </div>
-                  )}
-                  {/* Detail button */}
-                  <button
-                    className="absolute top-1 left-1 px-1.5 py-0.5 rounded cursor-pointer z-10"
-                    style={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #666' }}
-                    onClick={(e) => { e.stopPropagation(); setPreviewCard(card); }}
-                  >
-                    <span className="text-[7px] font-bold uppercase" style={{ color: '#e0e0e0' }}>{t("deckBuilder.detailBtn")}</span>
-                  </button>
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
-                    {check.allowed ? (
-                      <>
-                        <span className="text-[#3e8b3e] text-xl font-bold leading-none">
-                          +
-                        </span>
-                        <span className="text-[10px] text-[#e0e0e0]">
-                          {card.chakra}/{card.power}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-[9px] text-[#b33e3e] text-center px-1 leading-tight">
-                        {check.reason}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Pagination */}
-          {totalCharPages > 1 && (
-            <div className="flex items-center justify-center gap-3 mt-3">
-              <button
-                onClick={() => setCharPage((p) => Math.max(1, p - 1))}
-                disabled={charPage <= 1}
-                className="px-2 py-1 text-[10px] transition-colors disabled:opacity-30"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
-              >
-                {t('common.previous')}
-              </button>
-              <span className="text-[10px]" style={{ color: '#888888' }}>
-                {charPage} / {totalCharPages}
-              </span>
-              <button
-                onClick={() => setCharPage((p) => Math.min(totalCharPages, p + 1))}
-                disabled={charPage >= totalCharPages}
-                className="px-2 py-1 text-[10px] transition-colors disabled:opacity-30"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
-              >
-                {t('common.next')}
-              </button>
             </div>
-          )}
+
+            {/* Pagination */}
+            {totalCharPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-4 mb-2">
+                <button
+                  onClick={() => setCharPage((p) => Math.max(1, p - 1))}
+                  disabled={charPage <= 1}
+                  className="px-2.5 py-1 text-[10px] uppercase font-bold cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '2px solid rgba(255,255,255,0.1)', color: '#888' }}
+                >
+                  {t('common.previous')}
+                </button>
+                {/* Page numbers */}
+                {Array.from({ length: Math.min(5, totalCharPages) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalCharPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (charPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (charPage >= totalCharPages - 2) {
+                    pageNum = totalCharPages - 4 + i;
+                  } else {
+                    pageNum = charPage - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCharPage(pageNum)}
+                      className="w-7 h-7 text-[10px] font-bold tabular-nums cursor-pointer"
+                      style={{
+                        backgroundColor: charPage === pageNum ? 'rgba(196,163,90,0.15)' : 'rgba(255,255,255,0.02)',
+                        borderLeft: charPage === pageNum ? '2px solid #c4a35a' : '2px solid transparent',
+                        color: charPage === pageNum ? '#c4a35a' : '#555',
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setCharPage((p) => Math.min(totalCharPages, p + 1))}
+                  disabled={charPage >= totalCharPages}
+                  className="px-2.5 py-1 text-[10px] uppercase font-bold cursor-pointer disabled:opacity-30 disabled:cursor-default"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderLeft: '2px solid rgba(255,255,255,0.1)', color: '#888' }}
+                >
+                  {t('common.next')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        <Footer />
+        {/* ===== RIGHT: CARD DETAIL PANEL (desktop) ===== */}
+        <AnimatePresence>
+          {previewCard && (
+            <motion.div
+              key="detail-panel"
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 280, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="hidden lg:flex flex-col overflow-hidden flex-shrink-0"
+              style={{
+                backgroundColor: 'rgba(8, 8, 12, 0.95)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderLeft: '3px solid rgba(196, 163, 90, 0.25)',
+              }}
+            >
+              <div className="flex-1 overflow-y-auto px-3 py-3" style={{ minHeight: 0 }}>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
+                    {t("deckBuilder.detailBtn")}
+                  </span>
+                  <button
+                    onClick={() => setPreviewCard(null)}
+                    className="w-5 h-5 flex items-center justify-center cursor-pointer"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderLeft: '2px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '10px', fontWeight: 700 }}
+                  >x</button>
+                </div>
+                {renderCardDetail(previewCard)}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Desktop card detail panel (fixed right sidebar) */}
+      {/* ===== MOBILE: Deck drawer ===== */}
       <AnimatePresence>
-        {previewCard && (
-          <motion.div
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 320, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="hidden lg:flex flex-col overflow-hidden shrink-0 fixed top-0 right-0 h-full z-30"
-            style={{ backgroundColor: '#0d0d0d', borderLeft: '1px solid #262626' }}
-          >
-            <div className="flex-1 overflow-y-auto px-3 py-3">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
-                  {t("deckBuilder.detailBtn")}
-                </span>
-                <button
-                  onClick={() => setPreviewCard(null)}
-                  className="w-5 h-5 flex items-center justify-center rounded cursor-pointer"
-                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                >
-                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>x</span>
-                </button>
+        {showDeckDrawer && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="lg:hidden fixed inset-0 z-50"
+              style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+              onClick={() => setShowDeckDrawer(false)}
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 flex flex-col overflow-hidden"
+              style={{
+                width: '280px',
+                maxWidth: '85vw',
+                backgroundColor: 'rgba(8, 8, 12, 0.98)',
+                borderRight: '1px solid rgba(196,163,90,0.15)',
+              }}
+            >
+              {/* Close */}
+              <div className="flex items-center justify-between px-3 pt-3 pb-1 flex-shrink-0">
+                <h1 className="text-sm font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.12em' }}>
+                  {t("deckBuilder.title")}
+                </h1>
+                <button onClick={() => setShowDeckDrawer(false)} className="text-[10px] font-bold cursor-pointer" style={{ color: '#888' }}>X</button>
               </div>
 
-              {/* Card image */}
-              <div
-                className="relative rounded overflow-hidden mb-3 mx-auto"
-                style={{
-                  width: previewCard.card_type === 'mission' ? '100%' : '140px',
-                  aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
-                }}
-              >
-                {normalizeImagePath(previewCard.image_file) ? (
-                  <img
-                    src={normalizeImagePath(previewCard.image_file)!}
-                    alt={getCardName(previewCard, locale as "en" | "fr")}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                    <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale as "en" | "fr")}</span>
-                  </div>
-                )}
+              <SectionDivider width={80} showDiamond />
+
+              {/* Deck name */}
+              <div className="px-3 mb-2 flex-shrink-0">
+                <input
+                  type="text"
+                  placeholder={t("deckBuilder.deckName")}
+                  value={deckName}
+                  onChange={(e) => setDeckName(e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs focus:outline-none"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196, 163, 90, 0.3)', color: '#e0e0e0' }}
+                />
               </div>
 
-              {/* Card info */}
-              <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale as "en" | "fr")}</div>
-              {(previewCard.card_type !== 'mission') && (
-                <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard as CharacterCard, locale as "en" | "fr")}</div>
-              )}
-
-              {/* Stats row */}
-              <div className="flex gap-2 mt-1 flex-wrap">
-                {previewCard.card_type !== 'mission' && (
-                  <>
-                    <span className="text-[11px]" style={{ color: '#5865F2' }}>{t("deckBuilder.chakra")}: {(previewCard as CharacterCard).chakra}</span>
-                    <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.power")}: {(previewCard as CharacterCard).power}</span>
-                  </>
-                )}
-                <span className="text-[11px] font-bold" style={{ color: RARITY_COLORS[previewCard.rarity] ?? '#888' }}>
-                  {getRarityLabel(previewCard.rarity, locale as "en" | "fr")}
-                </span>
-                {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).group && (
-                  <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup((previewCard as CharacterCard).group!, locale as "en" | "fr")}</span>
-                )}
-              </div>
-
-              {/* Keywords */}
-              {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).keywords && (previewCard as CharacterCard).keywords!.length > 0 && (
-                <div className="flex gap-1 mt-1 flex-wrap">
-                  {(previewCard as CharacterCard).keywords!.map((kw, i) => (
-                    <span
-                      key={i}
-                      className="text-[9px] px-1.5 py-0.5 rounded"
-                      style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}
-                    >
-                      {getCardKeyword(kw, locale as "en" | "fr")}
-                    </span>
-                  ))}
+              {/* Validation */}
+              <div className="px-3 mb-2 flex flex-col gap-1 flex-shrink-0">
+                <div className="text-[10px]" style={{ borderLeft: `3px solid ${deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e'}`, paddingLeft: '6px', color: deckChars.length >= 30 ? '#3e8b3e' : '#b33e3e' }}>
+                  {t("deckBuilder.characters", { count: deckChars.length })} / 30
                 </div>
-              )}
+                <div className="text-[10px]" style={{ borderLeft: `3px solid ${deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e'}`, paddingLeft: '6px', color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
+                  {t("deckBuilder.missions", { count: deckMissions.length })} / 3
+                </div>
+              </div>
 
-              {/* Effects */}
-              {previewCard.effects && previewCard.effects.length > 0 && (
-                <div className="mt-2 flex flex-col gap-1.5">
-                  {previewCard.effects.map((eff, i) => {
-                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
-                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                    const description = locale === 'fr'
-                      ? (frDescs?.[i] ?? eff.description)
-                      : (enDescs?.[i] ?? eff.description);
+              <SectionDivider width={60} />
+
+              {/* Missions */}
+              <div className="px-3 mb-1 flex-shrink-0">
+                <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>Missions</span>
+                <div className="flex gap-1.5 mt-1">
+                  {[0, 1, 2].map((i) => {
+                    const m = deckMissions[i];
+                    const mImg = m ? getImagePath(m) : null;
                     return (
-                      <div key={i}>
-                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
-                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
+                      <div key={i} className="relative overflow-hidden flex-1" style={{
+                        aspectRatio: '3.5/2.5',
+                        backgroundColor: '#0e0e0e',
+                        border: m ? '1px solid rgba(196,163,90,0.2)' : '1px dashed rgba(255,255,255,0.08)',
+                      }}>
+                        {m ? (
+                          <>
+                            {mImg && <img src={mImg} alt={getCardName(m, locale as "en" | "fr")} className="w-full h-full object-cover" />}
+                            <button onClick={() => removeMission(i)} className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center text-[8px] font-bold cursor-pointer" style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#b33e3e' }}>X</button>
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"><span className="text-[8px]" style={{ color: '#333' }}>M{i + 1}</span></div>
+                        )}
                       </div>
                     );
                   })}
                 </div>
-              )}
+              </div>
 
-              {/* Add button */}
-              {previewCard.card_type === 'mission' ? (
-                <button
-                  onClick={() => addMission(previewCard as MissionCard)}
-                  disabled={!canAddMission(previewCard as MissionCard).allowed}
-                  className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
-                  style={{
-                    backgroundColor: canAddMission(previewCard as MissionCard).allowed ? '#1a2a1a' : '#1a1a1a',
-                    color: canAddMission(previewCard as MissionCard).allowed ? '#3e8b3e' : '#555',
-                    border: `1px solid ${canAddMission(previewCard as MissionCard).allowed ? '#2a4a2a' : '#333'}`,
-                  }}
-                >
-                  {t("deckBuilder.addToDeck")}
-                </button>
-              ) : (
-                <button
-                  onClick={() => addChar(previewCard as CharacterCard)}
-                  disabled={!canAddChar(previewCard as CharacterCard).allowed}
-                  className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
-                  style={{
-                    backgroundColor: canAddChar(previewCard as CharacterCard).allowed ? '#1a2a1a' : '#1a1a1a',
-                    color: canAddChar(previewCard as CharacterCard).allowed ? '#3e8b3e' : '#555',
-                    border: `1px solid ${canAddChar(previewCard as CharacterCard).allowed ? '#2a4a2a' : '#333'}`,
-                  }}
-                >
-                  {t("deckBuilder.addToDeck")}
-                </button>
-              )}
-            </div>
-          </motion.div>
+              <SectionDivider width={60} />
+
+              {/* Character list */}
+              <div className="px-3 mb-1 flex-shrink-0">
+                <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>
+                  {t("deckBuilder.characters", { count: deckChars.length })}
+                </span>
+              </div>
+              <div className="flex-1 overflow-y-auto px-3 pb-2" style={{ minHeight: 0 }}>
+                {deckCharsByCost.length === 0 ? (
+                  <p className="text-[10px] italic mt-2" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
+                ) : (
+                  deckCharsByCost.map(([cost, cards]) => (
+                    <div key={cost} className="mb-2">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <div style={{ width: '5px', height: '5px', backgroundColor: '#c4a35a', transform: 'rotate(45deg)' }} />
+                        <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>{t("deckBuilder.chakra")} {cost}</span>
+                        <span className="text-[9px]" style={{ color: '#555' }}>({cards.length})</span>
+                      </div>
+                      {cards.map(({ card, originalIndex }) => {
+                        const img = getImagePath(card);
+                        const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+                        return (
+                          <div key={`${card.id}-${originalIndex}`} className="flex items-center gap-1.5 py-0.5 px-1 mb-0.5 group" style={{ borderLeft: `2px solid ${rarColor}`, backgroundColor: 'rgba(255,255,255,0.01)' }}>
+                            <div className="w-5 h-7 overflow-hidden flex-shrink-0" style={{ backgroundColor: '#111' }}>
+                              {img ? <img src={img} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full" />}
+                            </div>
+                            <span className="text-[9px] truncate flex-1 min-w-0" style={{ color: '#ccc' }}>{getCardName(card, locale as "en" | "fr")}</span>
+                            <span className="text-[9px] font-bold tabular-nums flex-shrink-0" style={{ color: '#888' }}>{card.power}</span>
+                            <button onClick={() => removeChar(originalIndex)} className="w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0" style={{ color: '#b33e3e' }}>X</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="px-3 py-2 flex flex-col gap-1.5 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+                  {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
+                </AngularButton>
+                <div className="flex gap-1.5">
+                  <div className="flex-1"><AngularButton onClick={() => { setShowDeckDrawer(false); setShowSavedDecks(true); }} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton></div>
+                  <div className="flex-1"><AngularButton onClick={() => { setShowDeckDrawer(false); setShowImportModal(true); }} variant="secondary" size="sm">{t("deckBuilder.importButton")}</AngularButton></div>
+                </div>
+                <AngularButton onClick={clearDeck} variant="danger" size="sm">{t("deckBuilder.clearDeck")}</AngularButton>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      {/* Mobile card detail drawer */}
+      {/* ===== MOBILE: Card detail bottom sheet ===== */}
       <AnimatePresence>
         {previewCard && (
           <motion.div
+            key="mobile-detail"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 overflow-y-auto"
-            style={{ backgroundColor: '#0d0d0d', borderTop: '2px solid #c4a35a', maxHeight: '60vh' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 32 }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-40 overflow-y-auto"
+            style={{
+              backgroundColor: 'rgba(8, 8, 12, 0.98)',
+              borderTop: '2px solid rgba(196, 163, 90, 0.25)',
+              maxHeight: '70vh',
+            }}
           >
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                <span className="text-[10px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
                   {t("deckBuilder.detailBtn")}
                 </span>
                 <button
                   onClick={() => setPreviewCard(null)}
-                  className="px-3 py-1 rounded cursor-pointer"
-                  style={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }}
-                >
-                  <span className="text-xs font-bold" style={{ color: '#888' }}>x</span>
-                </button>
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderLeft: '2px solid rgba(255,255,255,0.1)', color: '#888' }}
+                >X</button>
               </div>
-
               <div className="flex gap-3">
-                {/* Image */}
-                <div
-                  className="relative rounded overflow-hidden shrink-0"
-                  style={{
-                    width: previewCard.card_type === 'mission' ? '140px' : '90px',
-                    aspectRatio: previewCard.card_type === 'mission' ? '3.5/2.5' : '5/7',
-                  }}
-                >
-                  {normalizeImagePath(previewCard.image_file) ? (
-                    <img
-                      src={normalizeImagePath(previewCard.image_file)!}
-                      alt={getCardName(previewCard, locale as "en" | "fr")}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
-                      <span className="text-xs" style={{ color: '#888' }}>{getCardName(previewCard, locale as "en" | "fr")}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(previewCard, locale as "en" | "fr")}</div>
-                  {previewCard.card_type !== 'mission' && (
-                    <div className="text-[11px]" style={{ color: '#888' }}>{getCardTitle(previewCard as CharacterCard, locale as "en" | "fr")}</div>
-                  )}
-                  <div className="flex gap-2 mt-1 flex-wrap">
-                    {previewCard.card_type !== 'mission' && (
-                      <>
-                        <span className="text-[11px]" style={{ color: '#5865F2' }}>{t("deckBuilder.chakra")}: {(previewCard as CharacterCard).chakra}</span>
-                        <span className="text-[11px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.power")}: {(previewCard as CharacterCard).power}</span>
-                      </>
-                    )}
-                    <span className="text-[11px] font-bold" style={{ color: RARITY_COLORS[previewCard.rarity] ?? '#888' }}>
-                      {getRarityLabel(previewCard.rarity, locale as "en" | "fr")}
-                    </span>
-                    {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).group && (
-                      <span className="text-[11px]" style={{ color: '#6b8a6b' }}>{getCardGroup((previewCard as CharacterCard).group!, locale as "en" | "fr")}</span>
-                    )}
-                  </div>
-                  {previewCard.card_type !== 'mission' && (previewCard as CharacterCard).keywords && (previewCard as CharacterCard).keywords!.length > 0 && (
-                    <div className="flex gap-1 mt-1 flex-wrap">
-                      {(previewCard as CharacterCard).keywords!.map((kw, i) => (
-                        <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a2e', color: '#9999bb', border: '1px solid #2a2a3e' }}>
-                          {getCardKeyword(kw, locale as "en" | "fr")}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                <div className="flex-shrink-0">
+                  {renderCardDetail(previewCard, true)}
                 </div>
               </div>
-
-              {/* Effects */}
-              {previewCard.effects && previewCard.effects.length > 0 && (
-                <div className="mt-2 flex flex-col gap-1.5">
-                  {previewCard.effects.map((eff, i) => {
-                    const raFallbackId = previewCard.id.endsWith('-RA') ? previewCard.id.replace('-RA', '-R') : undefined;
-                    const frDescs = effectDescriptionsFr[previewCard.id] ?? (raFallbackId ? effectDescriptionsFr[raFallbackId] : undefined);
-                    const enDescs = effectDescriptionsEn[previewCard.id] ?? (raFallbackId ? effectDescriptionsEn[raFallbackId] : undefined);
-                    const description = locale === 'fr'
-                      ? (frDescs?.[i] ?? eff.description)
-                      : (enDescs?.[i] ?? eff.description);
-                    return (
-                      <div key={i}>
-                        <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{eff.type}</span>
-                        <div className="text-[10px] leading-snug" style={{ color: '#ccc' }}>{description}</div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Add button */}
-              {previewCard.card_type === 'mission' ? (
-                <button
-                  onClick={() => addMission(previewCard as MissionCard)}
-                  disabled={!canAddMission(previewCard as MissionCard).allowed}
-                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
-                  style={{
-                    backgroundColor: canAddMission(previewCard as MissionCard).allowed ? '#1a2a1a' : '#1a1a1a',
-                    color: canAddMission(previewCard as MissionCard).allowed ? '#3e8b3e' : '#555',
-                    border: `1px solid ${canAddMission(previewCard as MissionCard).allowed ? '#2a4a2a' : '#333'}`,
-                  }}
-                >
-                  {t("deckBuilder.addToDeck")}
-                </button>
-              ) : (
-                <button
-                  onClick={() => addChar(previewCard as CharacterCard)}
-                  disabled={!canAddChar(previewCard as CharacterCard).allowed}
-                  className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
-                  style={{
-                    backgroundColor: canAddChar(previewCard as CharacterCard).allowed ? '#1a2a1a' : '#1a1a1a',
-                    color: canAddChar(previewCard as CharacterCard).allowed ? '#3e8b3e' : '#555',
-                    border: `1px solid ${canAddChar(previewCard as CharacterCard).allowed ? '#2a4a2a' : '#333'}`,
-                  }}
-                >
-                  {t("deckBuilder.addToDeck")}
-                </button>
-              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Overwrite confirmation modal */}
+      {/* ===== MODAL: Saved Decks ===== */}
+      <AnimatePresence>
+        {showSavedDecks && (
+          <PopupOverlay>
+            <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
+              <PopupTitle accentColor="#c4a35a" size="lg">{t("deckBuilder.myDecks")}</PopupTitle>
+
+              {isLoading && <p className="text-xs italic text-center" style={{ color: '#555' }}>{t("common.loading")}</p>}
+              {!isLoading && savedDecks.length === 0 && <p className="text-xs italic text-center" style={{ color: '#555' }}>{t("deckBuilder.noSavedDecks")}</p>}
+
+              <div className="flex flex-col gap-2 my-4 max-h-[50vh] overflow-y-auto">
+                {savedDecks.map((deck) => {
+                  const isActive = loadedDeckId === deck.id;
+                  const isConfirming = confirmDeleteId === deck.id;
+                  return (
+                    <div key={deck.id} className="flex items-center gap-3 px-3 py-2" style={{
+                      backgroundColor: 'rgba(255,255,255,0.02)',
+                      borderLeft: `3px solid ${isActive ? '#3e8b3e' : 'rgba(196,163,90,0.2)'}`,
+                    }}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium truncate" style={{ color: '#e0e0e0' }}>{deck.name}</span>
+                          {isActive && (
+                            <span className="text-[8px] uppercase px-1 py-0.5 flex-shrink-0" style={{ backgroundColor: 'rgba(62,139,62,0.15)', borderLeft: '2px solid #3e8b3e', color: '#3e8b3e' }}>
+                              {t("deckBuilder.currentlyEditing")}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px]" style={{ color: '#555' }}>
+                          {t("deckBuilder.savedDeckInfo", { cards: deck.cardIds.length, missions: deck.missionIds.length })}
+                        </span>
+                      </div>
+                      {isConfirming ? (
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="text-[10px]" style={{ color: '#b33e3e' }}>{t("deckBuilder.confirmDelete", { name: deck.name })}</span>
+                          <PopupActionButton accentColor="#b33e3e" onClick={() => { handleDeleteDeck(deck.id); setConfirmDeleteId(null); }}>
+                            {t("common.confirm")}
+                          </PopupActionButton>
+                          <PopupDismissLink onClick={() => setConfirmDeleteId(null)}>{t("common.cancel")}</PopupDismissLink>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <AngularButton onClick={() => { handleLoadDeck(deck.id); setShowSavedDecks(false); }} variant={isActive ? 'primary' : 'secondary'} accentColor="#3e8b3e" size="sm">
+                            {t("deckBuilder.editDeck")}
+                          </AngularButton>
+                          <AngularButton onClick={() => setConfirmDeleteId(deck.id)} variant="danger" size="sm">
+                            {t("deckBuilder.deleteDeck")}
+                          </AngularButton>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <AngularButton onClick={() => { clearDeck(); setShowSavedDecks(false); }} accentColor="#3e8b3e" variant="primary" size="sm">
+                  + {t("deckBuilder.newDeck")}
+                </AngularButton>
+                <PopupDismissLink onClick={() => setShowSavedDecks(false)}>{t("common.close")}</PopupDismissLink>
+              </div>
+            </PopupCornerFrame>
+          </PopupOverlay>
+        )}
+      </AnimatePresence>
+
+      {/* ===== MODAL: Import ===== */}
+      <AnimatePresence>
+        {showImportModal && (
+          <PopupOverlay>
+            <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="480px">
+              <PopupTitle accentColor="#4a7ab5" size="lg">{t("deckBuilder.importTitle")}</PopupTitle>
+
+              <p className="text-xs mb-3" style={{ color: '#888', borderLeft: '3px solid rgba(74,122,181,0.3)', paddingLeft: '8px' }}>
+                {t("deckBuilder.importDesc")}
+              </p>
+
+              <div className="mb-3">
+                <a
+                  href="https://shinobuilder.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-[10px] uppercase font-bold px-3 py-1.5"
+                  style={{ backgroundColor: 'rgba(74,122,181,0.12)', borderLeft: '3px solid #4a7ab5', color: '#4a7ab5', letterSpacing: '0.08em' }}
+                >
+                  {t("deckBuilder.importVisit")}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <input
+                  type="text"
+                  placeholder={t("deckBuilder.importPlaceholder")}
+                  value={importCode}
+                  onChange={(e) => setImportCode(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleImport(); }}
+                  className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(74,122,181,0.3)', color: '#e0e0e0' }}
+                />
+                <PopupActionButton accentColor="#3e8b3e" onClick={handleImport} disabled={!importCode.trim()}>
+                  {t("deckBuilder.importButton")}
+                </PopupActionButton>
+              </div>
+
+              {importMessage && (
+                <div className="text-xs mb-3 py-1 px-2" style={{
+                  borderLeft: `3px solid ${importMessage.type === 'success' ? '#3e8b3e' : '#b33e3e'}`,
+                  backgroundColor: importMessage.type === 'success' ? 'rgba(62,139,62,0.08)' : 'rgba(179,62,62,0.08)',
+                  color: importMessage.type === 'success' ? '#3e8b3e' : '#b33e3e',
+                }}>
+                  {importMessage.text}
+                </div>
+              )}
+
+              <PopupDismissLink onClick={() => { setShowImportModal(false); setImportMessage(null); }}>{t("common.close")}</PopupDismissLink>
+            </PopupCornerFrame>
+          </PopupOverlay>
+        )}
+      </AnimatePresence>
+
+      {/* ===== MODAL: Overwrite Confirm ===== */}
       <AnimatePresence>
         {overwriteConflict && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-200 flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(4px)' }}
-            onClick={() => setOverwriteConflict(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#141414] border border-[#333] p-6 max-w-sm w-full mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p className="text-[#e0e0e0] text-sm mb-1 font-medium">
-                {t('deckBuilder.overwriteTitle')}
-              </p>
-              <p className="text-[#888] text-xs mb-5">
+          <PopupOverlay>
+            <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.35)" maxWidth="400px">
+              <PopupTitle accentColor="#b33e3e" size="md">{t('deckBuilder.overwriteTitle')}</PopupTitle>
+              <p className="text-xs mb-4" style={{ color: '#888' }}>
                 {t('deckBuilder.overwriteDesc', { name: overwriteConflict.name })}
               </p>
               <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setOverwriteConflict(null)}
-                  className="px-3 py-1.5 bg-[#1a1a1a] border border-[#333] text-[#888] text-xs hover:bg-[#222] transition-colors"
-                >
-                  {t('deckBuilder.overwriteCancel')}
-                </button>
-                <button
-                  onClick={handleOverwriteConfirm}
-                  className="px-3 py-1.5 bg-[#2a1a1a] border border-[#b33e3e]/30 text-[#b33e3e] text-xs hover:bg-[#3a1a1a] transition-colors"
-                >
+                <PopupDismissLink onClick={() => setOverwriteConflict(null)}>{t('deckBuilder.overwriteCancel')}</PopupDismissLink>
+                <PopupActionButton accentColor="#b33e3e" onClick={handleOverwriteConfirm}>
                   {t('deckBuilder.overwriteConfirm')}
-                </button>
+                </PopupActionButton>
               </div>
-            </motion.div>
-          </motion.div>
+            </PopupCornerFrame>
+          </PopupOverlay>
         )}
       </AnimatePresence>
     </main>

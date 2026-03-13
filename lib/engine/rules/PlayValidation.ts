@@ -212,6 +212,11 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
+  // Hidden characters have no visible name — cannot be upgrade targets
+  if (target.isHidden) {
+    return { valid: false, reason: 'Hidden' };
+  }
+
   const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
 
   // Check special upgrade rules
@@ -240,29 +245,8 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: `Upgrade must have strictly higher chakra cost. New: ${newCard.chakra}, Current: ${topCard.chakra}.`, reasonKey: 'game.error.upgradeHigherCost', reasonParams: { newCost: newCard.chakra, currentCost: topCard.chakra } };
   }
 
-  // When upgrading over a hidden character, cost = full effective cost of newCard
-  // (combines the reveal cost + upgrade diff in one action)
-  const ps = state[player];
-  if (target.isHidden) {
-    // When upgrading a hidden character, it will be revealed - check no visible same-name exists
-    const newCardName = newCard.name_fr;
-    const friendlyCharsInMission = player === 'player1' ? mission.player1Characters : mission.player2Characters;
-    const sameNameVisible = friendlyCharsInMission.some(
-      c => c.instanceId !== target.instanceId && !c.isHidden &&
-      (c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr === newCardName
-    );
-    if (sameNameVisible) {
-      return { valid: false, reason: 'Cannot upgrade: a visible character with the same name already exists in this mission.', reasonKey: 'game.error.upgradeHiddenDuplicateName', reasonParams: { name: newCardName } };
-    }
-
-    const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
-    if (ps.chakra < effectiveCost) {
-      return { valid: false, reason: `Not enough chakra. Need ${effectiveCost} (reveal + upgrade), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakra', reasonParams: { need: effectiveCost, have: ps.chakra } };
-    }
-    return { valid: true };
-  }
-
   // Pay only the difference for visible characters (using effective cost with reductions)
+  const ps = state[player];
   const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
   const rawDiff = Math.max(0, effectiveCost - topCard.chakra);
   // Kurenai 034: minimum cost 1 applies to the final upgrade cost too

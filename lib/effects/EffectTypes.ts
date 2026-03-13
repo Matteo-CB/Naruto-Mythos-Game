@@ -10,6 +10,7 @@ export interface EffectContext {
   sourceMissionIndex: number;
   triggerType: EffectType;
   isUpgrade: boolean; // Whether this is being triggered by an upgrade
+  wasRevealed?: boolean; // Whether the card was just revealed from hidden
   // For sub-play effects (e.g., Jiraiya playing a Summon)
   subPlayCostReduction?: number;
 }

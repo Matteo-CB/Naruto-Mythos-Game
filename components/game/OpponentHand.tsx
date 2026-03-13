@@ -37,7 +37,6 @@ function CardBack({ index, total }: { index: number; total: number }) {
       style={{
         width: dims.opponentCard.w + 'px',
         height: dims.opponentCard.h + 'px',
-        borderRadius: '5px',
         border: '1px solid rgba(255, 255, 255, 0.08)',
         transform: `translateY(${translateY}px)`,
         zIndex: index,

@@ -112,6 +112,7 @@ export function checkTarget2Only(ctx: EffectContext, state: EffectContext['state
 
 export function registerNaruto133Handlers(): void {
   registerEffect('KS-133-S', 'MAIN', naruto133MainHandler);
+  registerEffect('KS-133-S', 'UPGRADE', (ctx) => ({ state: ctx.state })); // Handled by MAIN via isUpgrade
   registerEffect('KS-133-MV', 'MAIN', naruto133MainHandler);
   registerEffect('KS-133_2-MV', 'MAIN', naruto133MainHandler);
 }

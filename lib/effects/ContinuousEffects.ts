@@ -627,3 +627,76 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
 
   return newState;
 }
+
+/**
+ * Rashomon (067) permanently removes power tokens from the strongest enemy.
+ * Called at the start of MissionPhase before scoring.
+ * For each mission with a face-visible Rashomon, find the strongest non-hidden
+ * enemy character and set their powerTokens to 0.
+ */
+export function applyRempartTokenRemoval(state: GameState): GameState {
+  let newState = state;
+  const missions = [...newState.activeMissions];
+  let changed = false;
+
+  for (let mIdx = 0; mIdx < missions.length; mIdx++) {
+    for (const playerSide of ['player1', 'player2'] as const) {
+      const friendlySide = playerSide === 'player1' ? 'player1Characters' : 'player2Characters';
+      const enemySide = playerSide === 'player1' ? 'player2Characters' : 'player1Characters';
+      const enemyPlayer = playerSide === 'player1' ? 'player2' : 'player1';
+
+      // Check if this player has Rashomon face-visible in this mission
+      const hasRempart = missions[mIdx][friendlySide].some((c) => {
+        if (c.isHidden) return false;
+        const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return top.number === 67 && (top.effects ?? []).some(
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+        );
+      });
+      if (!hasRempart) continue;
+
+      // Find strongest non-hidden enemy in this mission
+      let maxPower = -1;
+      let strongestIdx = -1;
+      const enemyChars = missions[mIdx][enemySide];
+      for (let i = 0; i < enemyChars.length; i++) {
+        if (enemyChars[i].isHidden) continue;
+        const top = enemyChars[i].stack.length > 0
+          ? enemyChars[i].stack[enemyChars[i].stack.length - 1]
+          : enemyChars[i].card;
+        const basePower = (top.power ?? 0) + enemyChars[i].powerTokens;
+        if (basePower > maxPower) {
+          maxPower = basePower;
+          strongestIdx = i;
+        }
+      }
+
+      if (strongestIdx !== -1 && enemyChars[strongestIdx].powerTokens > 0) {
+        // Permanently remove tokens
+        if (!changed) {
+          newState = { ...newState, activeMissions: [...newState.activeMissions] };
+          changed = true;
+        }
+        const mission = { ...newState.activeMissions[mIdx] };
+        const chars = [...mission[enemySide]];
+        const removedTokens = chars[strongestIdx].powerTokens;
+        chars[strongestIdx] = { ...chars[strongestIdx], powerTokens: 0 };
+        mission[enemySide] = chars;
+        newState.activeMissions[mIdx] = mission;
+
+        newState = {
+          ...newState,
+          log: logAction(
+            newState.log, newState.turn, newState.phase, playerSide as PlayerID,
+            'EFFECT_CONTINUOUS',
+            `Rashomon (067): Permanently removed ${removedTokens} Power token(s) from ${chars[strongestIdx].card.name_fr}.`,
+            'game.log.effect.rempartTokenRemoval',
+            { card: 'RASHOMON', id: 'KS-067-UC', target: chars[strongestIdx].card.name_fr, amount: removedTokens },
+          ),
+        };
+      }
+    }
+  }
+
+  return newState;
+}

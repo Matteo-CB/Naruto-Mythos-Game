@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { PanelFrame } from './PopupPrimitives';
 
 interface ScoreDisplayProps {
   playerScore: number;
@@ -18,22 +19,27 @@ export function ScoreDisplay({
 }: ScoreDisplayProps) {
   const t = useTranslations();
   return (
-    <div
-      className="flex flex-col gap-2 rounded-lg p-3"
-      style={{ backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.06)' }}
-    >
-      <span
-        className="text-xs uppercase tracking-wider text-center"
-        style={{ color: '#888888' }}
-      >
-        {t('game.board.missionPoints')}
-      </span>
-      <div className="flex items-center justify-between gap-4">
-        <ScoreEntry label={playerLabel} score={playerScore} color="#c4a35a" />
-        <span style={{ color: '#888888' }} className="text-sm">{t('game.board.vs')}</span>
-        <ScoreEntry label={opponentLabel} score={opponentScore} color="#b33e3e" />
+    <PanelFrame accentColor="rgba(196, 163, 90, 0.25)" padding="10px 12px">
+      <div className="flex flex-col gap-2">
+        <span
+          className="text-xs uppercase tracking-wider text-center"
+          style={{ color: '#888888' }}
+        >
+          {t('game.board.missionPoints')}
+        </span>
+        <div className="flex items-center justify-between gap-4">
+          <ScoreEntry label={playerLabel} score={playerScore} color="#c4a35a" />
+          <div
+            style={{
+              width: '1px',
+              height: '28px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            }}
+          />
+          <ScoreEntry label={opponentLabel} score={opponentScore} color="#b33e3e" />
+        </div>
       </div>
-    </div>
+    </PanelFrame>
   );
 }
 
