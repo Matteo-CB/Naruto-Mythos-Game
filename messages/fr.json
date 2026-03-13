@@ -195,6 +195,7 @@
         "ambush": "{card} ({id}) : Effet AMBUSH declenche.",
         "bothDraw": "{card} ({id}) : Chaque joueur pioche {count} carte(s).",
         "lookAtDeck": "{card} ({id}) : Regarde le dessus du deck.",
+        "revealDraw": "{card} ({id}) : Revele le dessus du deck et pioche {count} carte(s) correspondante(s) ({revealed}).",
         "recoverFromDiscard": "{card} ({id}) : Recupere {target} de la defausse en main.",
         "kabutoSteal": "{card} ({id}) : Vole une carte et la place cachee sur mission {mission}.",
         "playSummonReduced": "{card} ({id}) : Joue {target} comme Invocation sur mission {mission} pour {cost} chakra (cout reduit).",
@@ -329,6 +330,10 @@
       "details": "Détails",
       "minimize": "Réduire",
       "restoreEffect": "Effet en attente"
+    },
+    "hand": {
+      "sortCost": "COUT",
+      "sortPower": "PUISSANCE"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",

@@ -154,13 +154,11 @@ export function PlaybackControls({
     window.addEventListener('mouseup', onMouseUp);
   };
 
-  const btnBase = "flex items-center justify-center rounded transition-colors cursor-pointer";
-
   return (
     <div
       className="w-full overflow-hidden"
       style={{
-        backgroundColor: 'rgba(10, 10, 18, 0.92)',
+        backgroundColor: 'rgba(8, 8, 14, 0.95)',
         backdropFilter: 'blur(12px)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
@@ -168,8 +166,8 @@ export function PlaybackControls({
       {/* Action label */}
       {actionLabel && (
         <div
-          className="text-center px-4 py-1"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+          className="px-4 py-1"
+          style={{ borderLeft: '3px solid rgba(196, 163, 90, 0.15)', margin: '0 16px' }}
         >
           <span className="text-[11px] leading-relaxed" style={{ color: '#c0c0c0' }}>
             {actionLabel}
@@ -181,7 +179,7 @@ export function PlaybackControls({
       <div className="px-4 pt-2 pb-0.5">
         <div
           ref={progressBarRef}
-          className="relative w-full h-1.5 rounded-full cursor-pointer group"
+          className="relative w-full h-1.5 cursor-pointer group"
           style={{ backgroundColor: '#1a1a24' }}
           onMouseDown={handleMouseDown}
         >
@@ -190,7 +188,7 @@ export function PlaybackControls({
             return (
               <div
                 key={turn}
-                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5 rounded-full"
+                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-2.5"
                 style={{
                   left: `${pct}%`,
                   backgroundColor: 'rgba(255,255,255,0.15)',
@@ -199,21 +197,26 @@ export function PlaybackControls({
               />
             );
           })}
+          {/* Filled bar */}
           <div
-            className="absolute left-0 top-0 h-full rounded-full"
+            className="absolute left-0 top-0 h-full"
             style={{
               width: `${progressPct}%`,
               backgroundColor: '#c4a35a',
               transition: isPlaying ? 'none' : 'width 0.15s ease-out',
             }}
           />
+          {/* Diamond handle */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full transition-all group-hover:scale-125"
+            className="absolute top-1/2 -translate-y-1/2 transition-all group-hover:scale-125"
             style={{
-              left: `calc(${progressPct}% - 6px)`,
+              left: `calc(${progressPct}% - 5px)`,
+              width: '10px',
+              height: '10px',
               backgroundColor: '#c4a35a',
               border: '2px solid #0a0a0a',
               boxShadow: '0 0 6px rgba(196,163,90,0.4)',
+              transform: 'translateY(-50%) rotate(45deg)',
               zIndex: 2,
             }}
           />
@@ -228,15 +231,16 @@ export function PlaybackControls({
             <button
               key={turn}
               onClick={() => { stopPlay(); onStepChange(step); }}
-              className={`${btnBase} px-2 py-0.5 text-[10px] font-bold`}
+              className="flex items-center justify-center px-2 py-0.5 text-[10px] font-bold cursor-pointer transition-colors"
               style={{
-                backgroundColor: currentTurn === turn ? '#c4a35a' : '#16161e',
-                color: currentTurn === turn ? '#0a0a0a' : '#666',
-                border: currentTurn === turn ? '1px solid #c4a35a' : '1px solid #2a2a34',
+                transform: 'skewX(-3deg)',
+                backgroundColor: currentTurn === turn ? 'rgba(196, 163, 90, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                color: currentTurn === turn ? '#c4a35a' : '#666',
+                borderLeft: currentTurn === turn ? '3px solid #c4a35a' : '3px solid rgba(255, 255, 255, 0.08)',
                 fontFamily: "'NJNaruto', Arial, sans-serif",
               }}
             >
-              T{turn}
+              <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>T{turn}</span>
             </button>
           ))}
         </div>
@@ -245,46 +249,69 @@ export function PlaybackControls({
         <div className="flex items-center gap-1">
           <button
             onClick={goToStart}
-            className={`${btnBase} w-7 h-7 text-[10px]`}
-            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
+            className="flex items-center justify-center w-7 h-7 text-[10px] cursor-pointer transition-colors"
+            style={{
+              transform: 'skewX(-3deg)',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
+              color: '#777',
+            }}
             title={t('start')}
           >
-            |&lt;
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>|&lt;</span>
           </button>
           <button
             onClick={stepBack}
-            className={`${btnBase} w-7 h-7 text-xs`}
-            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
+            className="flex items-center justify-center w-7 h-7 text-xs cursor-pointer transition-colors"
+            style={{
+              transform: 'skewX(-3deg)',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
+              color: '#777',
+            }}
             title={t('stepBack')}
           >
-            &lt;
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&lt;</span>
           </button>
           <button
             onClick={isPlaying ? stopPlay : startPlay}
-            className={`${btnBase} w-9 h-7 text-xs font-bold`}
+            className="flex items-center justify-center w-9 h-7 text-xs font-bold cursor-pointer transition-colors"
             style={{
+              transform: 'skewX(-3deg)',
               backgroundColor: isPlaying ? 'rgba(179,62,62,0.12)' : 'rgba(62,139,62,0.12)',
-              border: `1px solid ${isPlaying ? 'rgba(179,62,62,0.4)' : 'rgba(62,139,62,0.4)'}`,
+              borderLeft: isPlaying ? '3px solid rgba(179,62,62,0.6)' : '3px solid rgba(62,139,62,0.6)',
               color: isPlaying ? '#b33e3e' : '#4a9e4a',
             }}
           >
-            {isPlaying ? '||' : '|>'}
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+              {isPlaying ? '||' : '|>'}
+            </span>
           </button>
           <button
             onClick={stepForward}
-            className={`${btnBase} w-7 h-7 text-xs`}
-            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
+            className="flex items-center justify-center w-7 h-7 text-xs cursor-pointer transition-colors"
+            style={{
+              transform: 'skewX(-3deg)',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
+              color: '#777',
+            }}
             title={t('stepForward')}
           >
-            &gt;
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&gt;</span>
           </button>
           <button
             onClick={goToEnd}
-            className={`${btnBase} w-7 h-7 text-[10px]`}
-            style={{ backgroundColor: '#16161e', border: '1px solid #2a2a34', color: '#777' }}
+            className="flex items-center justify-center w-7 h-7 text-[10px] cursor-pointer transition-colors"
+            style={{
+              transform: 'skewX(-3deg)',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              borderLeft: '2px solid rgba(255, 255, 255, 0.08)',
+              color: '#777',
+            }}
             title={t('end')}
           >
-            &gt;|
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>&gt;|</span>
           </button>
         </div>
 
@@ -292,15 +319,18 @@ export function PlaybackControls({
         <div className="flex items-center gap-3">
           <button
             onClick={cycleSpeed}
-            className={`${btnBase} px-2 py-0.5 text-[10px] font-medium`}
+            className="flex items-center justify-center px-2 py-0.5 text-[10px] font-medium cursor-pointer transition-colors"
             style={{
-              backgroundColor: '#16161e',
-              border: '1px solid #2a2a34',
+              transform: 'skewX(-3deg)',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              borderLeft: `2px solid ${speed === 'fast' ? 'rgba(196,163,90,0.5)' : speed === 'slow' ? 'rgba(90,122,187,0.5)' : 'rgba(255,255,255,0.08)'}`,
               color: speed === 'fast' ? '#c4a35a' : speed === 'slow' ? '#5A7ABB' : '#888',
             }}
             title={`${t('speed')}: ${t(speed)}`}
           >
-            {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+            <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+              {speed === 'slow' ? '0.5x' : speed === 'normal' ? '1x' : '2x'}
+            </span>
           </button>
           <span className="text-[10px] tabular-nums" style={{ color: '#555' }}>
             {currentStep + 1}/{totalSteps}
