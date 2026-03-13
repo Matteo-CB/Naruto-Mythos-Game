@@ -181,6 +181,7 @@ const HandCard = React.memo(function HandCard({
       style={{
         width: dims.handCard.w + 'px',
         height: dims.handCard.h + 'px',
+        borderRadius: '6px',
         border: isSelected
           ? '2px solid #c4a35a'
           : canAfford
