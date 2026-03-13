@@ -55,6 +55,15 @@ interface UIStore {
   effectPopupMinimized: boolean;
   minimizeEffectPopup: () => void;
   restoreEffectPopup: () => void;
+
+  // Edge coin flip → mulligan sequencing
+  coinFlipComplete: boolean;
+  setCoinFlipComplete: (done: boolean) => void;
+
+  // Hand reorder (UI-only, does not affect game state)
+  handOrder: number[] | null; // null = natural order; array maps displayIndex → originalIndex
+  setHandOrder: (order: number[] | null) => void;
+  resetHandOrder: () => void;
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -131,4 +140,11 @@ export const useUIStore = create<UIStore>((set) => ({
   effectPopupMinimized: false,
   minimizeEffectPopup: () => set({ effectPopupMinimized: true }),
   restoreEffectPopup: () => set({ effectPopupMinimized: false }),
+
+  coinFlipComplete: false,
+  setCoinFlipComplete: (done) => set({ coinFlipComplete: done }),
+
+  handOrder: null,
+  setHandOrder: (order) => set({ handOrder: order }),
+  resetHandOrder: () => set({ handOrder: null }),
 }));

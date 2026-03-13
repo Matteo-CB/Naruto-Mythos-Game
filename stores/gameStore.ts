@@ -11,6 +11,7 @@ import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
+import { useUIStore } from '@/stores/uiStore';
 
 interface AnimationEvent {
   id: string;
@@ -1661,6 +1662,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (get().isOnlineGame) {
       useSocketStore.getState().disconnect();
     }
+    // Reset UI state for new game
+    useUIStore.getState().resetHandOrder();
+    useUIStore.getState().setCoinFlipComplete(false);
     set({
       gameState: null,
       visibleState: null,

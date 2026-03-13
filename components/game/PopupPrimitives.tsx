@@ -80,12 +80,14 @@ export function PopupCornerFrame({
   maxWidth = '560px',
   padding = '32px 28px',
   className = '',
+  backgroundColor = 'rgba(8, 8, 14, 0.85)',
 }: {
   children: React.ReactNode;
   accentColor?: string;
   maxWidth?: string;
   padding?: string;
   className?: string;
+  backgroundColor?: string;
 }) {
   return (
     <motion.div
@@ -97,7 +99,7 @@ export function PopupCornerFrame({
         maxWidth,
         width: '90vw',
         padding,
-        backgroundColor: 'rgba(8, 8, 14, 0.85)',
+        backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
       }}
     >

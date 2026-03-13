@@ -195,6 +195,7 @@
         "ambush": "{card} ({id}): Ambush effect triggered.",
         "bothDraw": "{card} ({id}): Each player draws {count} card(s).",
         "lookAtDeck": "{card} ({id}): Looked at top cards of deck.",
+        "revealDraw": "{card} ({id}): Revealed top cards and drew {count} matching card(s) ({revealed}).",
         "recoverFromDiscard": "{card} ({id}): Recovered {target} from discard pile to hand.",
         "kabutoSteal": "{card} ({id}): Stole a card and placed it hidden on mission {mission}.",
         "playSummonReduced": "{card} ({id}): Played {target} as Summon on mission {mission} for {cost} chakra (reduced cost).",
@@ -329,6 +330,10 @@
       "details": "Details",
       "minimize": "Minimize",
       "restoreEffect": "Pending Effect"
+    },
+    "hand": {
+      "sortCost": "COST",
+      "sortPower": "POWER"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",

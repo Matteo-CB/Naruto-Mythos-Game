@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTrainingStore } from '@/stores/trainingStore';
 
@@ -172,6 +173,15 @@ export function EdgeCoinFlip() {
     }
   }, [totalDeg]);
 
+  const setCoinFlipComplete = useUIStore((s) => s.setCoinFlipComplete);
+
+  // For modes that skip the coin flip, signal complete immediately
+  useEffect(() => {
+    if (isMulliganPhase && (isSandboxMode || isHotseatGame || isTrainingMode)) {
+      setCoinFlipComplete(true);
+    }
+  }, [isMulliganPhase, isSandboxMode, isHotseatGame, isTrainingMode, setCoinFlipComplete]);
+
   // Trigger
   useEffect(() => {
     if (!isMulliganPhase || hasTriggered || isSandboxMode || isHotseatGame || isTrainingMode) return;
@@ -194,17 +204,21 @@ export function EdgeCoinFlip() {
     };
   }, [phase, animate]);
 
-  // Result -> done
+  // Result -> done: signal coin flip complete
   useEffect(() => {
     if (phase !== 'result') return;
-    const timer = setTimeout(() => setPhase('done'), RESULT_HOLD_MS);
+    const timer = setTimeout(() => {
+      setPhase('done');
+      setCoinFlipComplete(true);
+    }, RESULT_HOLD_MS);
     return () => clearTimeout(timer);
-  }, [phase]);
+  }, [phase, setCoinFlipComplete]);
 
   const handleSkip = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setPhase('done');
-  }, []);
+    setCoinFlipComplete(true);
+  }, [setCoinFlipComplete]);
 
   if (phase === 'idle' || phase === 'done' || isSandboxMode || isHotseatGame || isTrainingMode) return null;
 

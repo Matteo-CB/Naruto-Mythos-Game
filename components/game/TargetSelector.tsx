@@ -1025,21 +1025,29 @@ export function TargetSelector() {
   }
 
   // ---- Default: Board target selection ----
+  // Detect mission-only targeting (all valid targets are mission indices like '0','1','2','3')
+  const isMissionOnlyTargeting = validTargets.length > 0 && validTargets.every(t => /^\d+$/.test(t));
+  const missionCount = visibleState.activeMissions.length;
+  // Adaptive width: snug for mission-only (especially with few missions), wider for character targeting
+  const popupMaxWidth = isMissionOnlyTargeting
+    ? `${Math.max(200, missionCount * 160 + 60)}px`
+    : '85vw';
+
   return (
     <AnimatePresence>
       <PopupOverlay>
-        <PopupCornerFrame accentColor="rgba(74, 127, 255, 0.35)" maxWidth="90vw" padding="20px 16px">
+        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)">
           <PopupMinimizeX onClick={minimizeEffectPopup} />
-          <PopupTitle accentColor="#4a7fff" size="lg">
+          <PopupTitle accentColor="#c4a35a" size="lg">
             {t('game.mustChooseTarget', { player: displayName })}
           </PopupTitle>
 
-          <PopupDescription accentColor="rgba(74, 127, 255, 0.4)">
+          <PopupDescription accentColor="rgba(196, 163, 90, 0.3)">
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupDescription>
 
           <div className="flex justify-center mb-2">
-            <PopupTargetCount count={validTargets.length} accentColor="#4a7fff" />
+            <PopupTargetCount count={validTargets.length} accentColor="#c4a35a" />
           </div>
 
           {/* Board view with targets highlighted */}
@@ -1047,7 +1055,7 @@ export function TargetSelector() {
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 18 }}
-            className="flex gap-4 overflow-x-auto px-2 py-3 mb-4"
+            className="flex justify-center gap-4 overflow-x-auto px-2 py-3 mb-4"
             style={{ maxWidth: '100%' }}
           >
             {visibleState.activeMissions.map((mission, index) => (

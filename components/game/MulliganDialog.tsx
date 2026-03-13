@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
+import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
@@ -294,9 +295,11 @@ export function MulliganDialog() {
   const visibleState = useGameStore((s) => s.visibleState);
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
+  const coinFlipComplete = useUIStore((s) => s.coinFlipComplete);
   const [selectedCard, setSelectedCard] = useState<CharacterCard | null>(null);
 
-  if (!visibleState || visibleState.phase !== 'mulligan') return null;
+  // Wait for coin flip animation to finish before showing mulligan
+  if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete) return null;
 
   const hand = visibleState.myState.hand;
   const hasMulliganed = visibleState.myState.hasMulliganed;
@@ -338,66 +341,69 @@ export function MulliganDialog() {
         padding="28px 24px"
       >
         <div
-          className="flex flex-col items-center gap-5 overflow-y-auto"
+          className="flex flex-col items-center gap-5"
           style={{ maxHeight: '85vh' }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Title */}
-          <PopupTitle accentColor="#c4a35a" size="lg">
-            {t('game.mulligan.title')}
-          </PopupTitle>
+          {/* Scrollable content */}
+          <div className="flex flex-col items-center gap-5 overflow-y-auto w-full shrink min-h-0">
+            {/* Title */}
+            <PopupTitle accentColor="#c4a35a" size="lg">
+              {t('game.mulligan.title')}
+            </PopupTitle>
 
-          <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
-            {t('game.mulligan.description')}
-          </span>
+            <span className="font-body text-sm text-center" style={{ color: '#888888' }}>
+              {t('game.mulligan.description')}
+            </span>
 
-          {/* Edge badge */}
-          <span
-            className="font-body text-xs text-center px-3 py-1.5"
-            style={{
-              color: visibleState.edgeHolder === visibleState.myPlayer ? '#c4a35a' : '#b33e3e',
-              backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
-                ? 'rgba(196, 163, 90, 0.08)'
-                : 'rgba(179, 62, 62, 0.08)',
-              borderLeft: `3px solid ${visibleState.edgeHolder === visibleState.myPlayer
-                ? 'rgba(196, 163, 90, 0.4)'
-                : 'rgba(179, 62, 62, 0.4)'}`,
-            }}
-          >
-            {visibleState.edgeHolder === visibleState.myPlayer
-              ? t('game.mulligan.youHaveEdge')
-              : t('game.mulligan.opponentHasEdge')}
-          </span>
+            {/* Edge badge */}
+            <span
+              className="font-body text-xs text-center px-3 py-1.5"
+              style={{
+                color: visibleState.edgeHolder === visibleState.myPlayer ? '#c4a35a' : '#b33e3e',
+                backgroundColor: visibleState.edgeHolder === visibleState.myPlayer
+                  ? 'rgba(196, 163, 90, 0.08)'
+                  : 'rgba(179, 62, 62, 0.08)',
+                borderLeft: `3px solid ${visibleState.edgeHolder === visibleState.myPlayer
+                  ? 'rgba(196, 163, 90, 0.4)'
+                  : 'rgba(179, 62, 62, 0.4)'}`,
+              }}
+            >
+              {visibleState.edgeHolder === visibleState.myPlayer
+                ? t('game.mulligan.youHaveEdge')
+                : t('game.mulligan.opponentHasEdge')}
+            </span>
 
-          {/* Cards */}
-          <div className="flex gap-3 justify-center flex-wrap">
-            {hand.map((card, i) => (
-              <MulliganCard
-                key={`${card.id}-${i}`}
-                card={card}
-                index={i}
-                isSelected={selectedCard?.id === card.id}
-                onSelect={() => toggleSelect(card)}
-              />
-            ))}
+            {/* Cards */}
+            <div className="flex gap-3 justify-center flex-wrap">
+              {hand.map((card, i) => (
+                <MulliganCard
+                  key={`${card.id}-${i}`}
+                  card={card}
+                  index={i}
+                  isSelected={selectedCard?.id === card.id}
+                  onSelect={() => toggleSelect(card)}
+                />
+              ))}
+            </div>
+
+            {/* Click hint */}
+            {!selectedCard && (
+              <span className="font-body text-[11px]" style={{ color: '#555555' }}>
+                {t('game.mulligan.clickHint')}
+              </span>
+            )}
+
+            {/* Inline card detail */}
+            <AnimatePresence mode="wait">
+              {selectedCard && (
+                <MulliganCardDetail key={selectedCard.id} card={selectedCard} />
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Click hint */}
-          {!selectedCard && (
-            <span className="font-body text-[11px]" style={{ color: '#555555' }}>
-              {t('game.mulligan.clickHint')}
-            </span>
-          )}
-
-          {/* Inline card detail */}
-          <AnimatePresence mode="wait">
-            {selectedCard && (
-              <MulliganCardDetail key={selectedCard.id} card={selectedCard} />
-            )}
-          </AnimatePresence>
-
-          {/* Buttons */}
-          <div className="flex gap-4 items-center">
+          {/* Buttons — pinned outside scroll area */}
+          <div className="flex gap-4 items-center shrink-0">
             <PopupActionButton onClick={handleKeep} disabled={isProcessing} accentColor="#c4a35a">
               {t('game.mulligan.keep')}
             </PopupActionButton>
