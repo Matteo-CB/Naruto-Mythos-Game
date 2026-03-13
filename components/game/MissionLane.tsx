@@ -133,6 +133,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       style={{
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',
+        borderRadius: '6px',
         cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
           ? '2px solid #c4a35a'

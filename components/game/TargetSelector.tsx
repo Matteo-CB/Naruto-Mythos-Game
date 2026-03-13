@@ -60,7 +60,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
       style={{
         width: dims.targetCard.w + 'px',
         height: dims.targetCard.h + 'px',
-        borderRadius: '5px',
+        borderRadius: '8px',
         border: isValidTarget
           ? '2px solid rgba(196, 163, 90, 0.9)'
           : '1px solid #262626',
@@ -77,6 +77,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         <motion.div
           className="absolute inset-0"
           style={{
+            borderRadius: '8px',
             border: '2px solid rgba(196, 163, 90, 0.9)',
             pointerEvents: 'none',
           }}
@@ -241,6 +242,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         opacity: hasValidTargets ? 1 : 0.4,
         minWidth: '120px',
         cursor: isMissionTarget ? 'pointer' : 'default',
+        borderRadius: '10px',
         border: isMissionTarget ? '2px solid rgba(196, 163, 90, 0.9)' : '2px solid transparent',
         boxShadow: isMissionTarget ? '0 0 14px rgba(196, 163, 90, 0.4)' : 'none',
         padding: '8px',
@@ -1171,8 +1173,6 @@ export function TargetSelector() {
             transition={{ delay: 0.12, duration: 0.35 }}
             className="mb-5 py-3 text-center mx-auto"
             style={{
-              borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
-              borderRight: '3px solid rgba(196, 163, 90, 0.3)',
               color: '#aaaaaa',
               fontSize: '12px',
               maxWidth: '420px',
