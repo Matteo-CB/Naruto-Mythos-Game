@@ -371,6 +371,62 @@ function fullCardData(card: { name_fr: string; name_en?: string; title_fr?: stri
 }
 
 /**
+ * Detect multiple simultaneous effects from DIFFERENT source cards.
+ * When 2+ pending effects exist with different sourceInstanceIds, the player should choose order.
+ * Returns a CHOOSE_EFFECT_ORDER selection, or null if not applicable.
+ */
+function buildEffectOrderSelection(
+  pendingActions: PendingActionData[],
+  pendingEffects: Array<{ id: string; sourceInstanceId: string; sourceCardId: string; effectType?: string }>,
+  activeMissions: GameState['activeMissions'],
+  playerName: string,
+  onReorder: (effectId: string) => void,
+): PendingTargetSelection | null {
+  if (pendingActions.length < 2) return null;
+
+  const pendingEffectsForPlayer = pendingActions
+    .map((pa) => pendingEffects.find((e) => e.id === pa.sourceEffectId))
+    .filter((e): e is NonNullable<typeof e> => !!e);
+  const uniqueSourceIds = new Set(pendingEffectsForPlayer.map((e) => e.sourceInstanceId));
+  if (uniqueSourceIds.size < 2) return null;
+
+  const effectOrderChoices = pendingActions.map((pa) => {
+    const pe = pendingEffects.find((e) => e.id === pa.sourceEffectId);
+    const charResult = pe?.sourceInstanceId
+      ? (() => {
+          for (const m of activeMissions) {
+            for (const c of [...m.player1Characters, ...m.player2Characters]) {
+              if (c.instanceId === pe.sourceInstanceId) {
+                const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return top;
+              }
+            }
+          }
+          return null;
+        })()
+      : null;
+    return {
+      effectId: pe?.id ?? pa.id,
+      sourceCardName: charResult?.name_fr ?? pe?.sourceCardId ?? '???',
+      sourceCardImage: charResult?.image_file ?? undefined,
+      effectType: pe?.effectType ?? 'MAIN',
+      description: pa.description,
+      descriptionKey: pa.descriptionKey,
+    };
+  });
+
+  return {
+    validTargets: effectOrderChoices.map((c) => c.effectId),
+    description: 'Multiple effects triggered simultaneously. Choose which to resolve first.',
+    descriptionKey: 'game.effect.desc.chooseEffectOrder',
+    playerName,
+    selectionType: 'CHOOSE_EFFECT_ORDER',
+    effectOrderChoices,
+    onSelect: onReorder,
+  };
+}
+
+/**
  * Shared utility: builds PendingTargetSelection UI from pending action/effect data.
  * Replaces 4 duplicated code paths (updateOnlineState, confirmHotseatSwitch, performAction, processAITurn).
  */
@@ -773,41 +829,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const pendingForMe = visibleState.pendingActions.filter((a) => a.player === humanPlayer);
 
     if (pendingForMe.length > 0) {
-      const pendingAction = pendingForMe[0];
-      const pendingEffect = visibleState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
-
-      const dataSource: PendingSelectionDataSource = {
-        playerHand: visibleState.myState.hand ?? [],
-        playerDiscard: visibleState.myState.discardPile ?? [],
-        playerDeckSize: visibleState.myState.deck?.length ?? 0,
-        activeMissions: (visibleState.activeMissions ?? []).map((m: any) => ({ rank: m.rank })),
-      };
-
-      const pendingSelection = buildPendingTargetSelectionUI(
-        pendingAction, pendingEffect, dataSource,
+      // Detect multiple simultaneous effects from DIFFERENT source cards
+      const orderSelOnline = buildEffectOrderSelection(
+        pendingForMe, visibleState.pendingEffects, visibleState.activeMissions as unknown as GameState['activeMissions'],
         get().playerDisplayNames[humanPlayer],
-        (targetId: string) => {
-          get().performAction({
-            type: 'SELECT_TARGET',
-            pendingActionId: pendingAction.id,
-            selectedTargets: [targetId],
-          });
-        },
-        () => {
-          if (pendingEffect) {
-            get().performAction({
-              type: 'DECLINE_OPTIONAL_EFFECT',
-              pendingEffectId: pendingEffect.id,
-            });
-          }
-        },
+        (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
       );
+      if (orderSelOnline) {
+        set({ visibleState, isProcessing: false, pendingTargetSelection: orderSelOnline });
+      } else {
+        const pendingAction = pendingForMe[0];
+        const pendingEffect = visibleState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
-      set({
-        visibleState,
-        isProcessing: false,
-        pendingTargetSelection: pendingSelection,
-      });
+        const dataSource: PendingSelectionDataSource = {
+          playerHand: visibleState.myState.hand ?? [],
+          playerDiscard: visibleState.myState.discardPile ?? [],
+          playerDeckSize: visibleState.myState.deck?.length ?? 0,
+          activeMissions: (visibleState.activeMissions ?? []).map((m: any) => ({ rank: m.rank })),
+        };
+
+        const pendingSelection = buildPendingTargetSelectionUI(
+          pendingAction, pendingEffect, dataSource,
+          get().playerDisplayNames[humanPlayer],
+          (targetId: string) => {
+            get().performAction({
+              type: 'SELECT_TARGET',
+              pendingActionId: pendingAction.id,
+              selectedTargets: [targetId],
+            });
+          },
+          () => {
+            if (pendingEffect) {
+              get().performAction({
+                type: 'DECLINE_OPTIONAL_EFFECT',
+                pendingEffectId: pendingEffect.id,
+              });
+            }
+          },
+        );
+
+        set({
+          visibleState,
+          isProcessing: false,
+          pendingTargetSelection: pendingSelection,
+        });
+      }
     } else {
       set({ visibleState, isProcessing: false, pendingTargetSelection: null });
     }
@@ -921,57 +987,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const pendingActions = gameState.pendingActions.filter((p) => p.player === newPlayer);
     if (pendingActions.length > 0) {
       // Detect multiple simultaneous effects from DIFFERENT source cards
-      // When 2+ pending effects exist with different sourceInstanceIds, the player should choose order
-      if (pendingActions.length >= 2) {
-        const pendingEffectsForPlayer = pendingActions
-          .map((pa) => gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId))
-          .filter((e): e is NonNullable<typeof e> => !!e);
-        const uniqueSourceIds = new Set(pendingEffectsForPlayer.map((e) => e.sourceInstanceId));
-        if (uniqueSourceIds.size >= 2) {
-          // Multiple effects from different cards — show effect order choice
-          const effectOrderChoices = pendingActions.map((pa) => {
-            const pe = gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
-            const charResult = pe?.sourceInstanceId
-              ? (() => {
-                  for (const m of gameState.activeMissions) {
-                    for (const c of [...m.player1Characters, ...m.player2Characters]) {
-                      if (c.instanceId === pe.sourceInstanceId) {
-                        const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                        return top;
-                      }
-                    }
-                  }
-                  return null;
-                })()
-              : null;
-            return {
-              effectId: pe?.id ?? pa.id,
-              sourceCardName: charResult?.name_fr ?? pe?.sourceCardId ?? '???',
-              sourceCardImage: charResult?.image_file ?? undefined,
-              effectType: pe?.effectType ?? 'MAIN',
-              description: pa.description,
-              descriptionKey: pa.descriptionKey,
-            };
-          });
-
-          const orderSelection: PendingTargetSelection = {
-            validTargets: effectOrderChoices.map((c) => c.effectId),
-            description: 'Multiple effects triggered simultaneously. Choose which to resolve first.',
-            descriptionKey: 'game.effect.desc.chooseEffectOrder',
-            playerName: playerDisplayNames[newPlayer],
-            selectionType: 'CHOOSE_EFFECT_ORDER',
-            effectOrderChoices,
-            onSelect: (effectId: string) => {
-              get().performAction({
-                type: 'REORDER_EFFECTS',
-                selectedEffectId: effectId,
-              });
-            },
-          };
-
-          set({ isProcessing: false, pendingTargetSelection: orderSelection });
-          return;
-        }
+      const orderSelection = buildEffectOrderSelection(
+        pendingActions, gameState.pendingEffects, gameState.activeMissions,
+        playerDisplayNames[newPlayer],
+        (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+      );
+      if (orderSelection) {
+        set({ isProcessing: false, pendingTargetSelection: orderSelection });
+        return;
       }
 
       const pa = pendingActions[0];
@@ -1171,6 +1194,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Check for pending actions (e.g., Rock Lee 117 end-phase move with multiple destinations)
           const humanPendingEndPhase = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
           if (humanPendingEndPhase.length > 0) {
+            // Detect multiple simultaneous effects from DIFFERENT source cards
+            const orderSelEnd = buildEffectOrderSelection(
+              humanPendingEndPhase, advanced.pendingEffects, advanced.activeMissions,
+              get().playerDisplayNames[hp],
+              (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+            );
+            if (orderSelEnd) {
+              set({ isProcessing: false, pendingTargetSelection: orderSelEnd });
+              return;
+            }
             const pa = humanPendingEndPhase[0];
             const pe = advanced.pendingEffects.find((e: { id: string }) => e.id === pa.sourceEffectId);
             const ds: PendingSelectionDataSource = {
@@ -1221,6 +1254,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Check if there are pending target selections for the human player
     const humanPending = newState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPending.length > 0) {
+      // Detect multiple simultaneous effects from DIFFERENT source cards
+      const orderSel = buildEffectOrderSelection(
+        humanPending, newState.pendingEffects, newState.activeMissions,
+        get().playerDisplayNames[humanPlayer],
+        (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+      );
+      if (orderSel) {
+        set({ isProcessing: false, pendingTargetSelection: orderSel });
+        return;
+      }
+
       const pendingAction = humanPending[0];
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 
@@ -1537,6 +1581,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Check for pending actions (e.g., Rock Lee 117 end-phase move)
           const humanPendingEnd = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
           if (humanPendingEnd.length > 0) {
+            // Detect multiple simultaneous effects from DIFFERENT source cards
+            const orderSelEnd2 = buildEffectOrderSelection(
+              humanPendingEnd, advanced.pendingEffects, advanced.activeMissions,
+              get().playerDisplayNames[hp],
+              (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+            );
+            if (orderSelEnd2) {
+              set({ isProcessing: false, pendingTargetSelection: orderSelEnd2 });
+              return;
+            }
             const pa2 = humanPendingEnd[0];
             const pe2 = advanced.pendingEffects.find((e: { id: string }) => e.id === pa2.sourceEffectId);
             const ds2: PendingSelectionDataSource = {
@@ -1580,6 +1634,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (e.g. SCORE effects from mission phase that need human input)
     const humanPendingAfterAI = currentState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPendingAfterAI.length > 0) {
+      // Detect multiple simultaneous effects from DIFFERENT source cards
+      const orderSelAI = buildEffectOrderSelection(
+        humanPendingAfterAI, currentState.pendingEffects, currentState.activeMissions,
+        get().playerDisplayNames[humanPlayer],
+        (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+      );
+      if (orderSelAI) {
+        set({ gameState: currentState, visibleState: visible, isProcessing: false, pendingTargetSelection: orderSelAI });
+        return;
+      }
+
       const pendingAction = humanPendingAfterAI[0];
       const pendingEffect = currentState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
 

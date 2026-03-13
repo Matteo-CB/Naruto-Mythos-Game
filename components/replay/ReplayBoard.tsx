@@ -581,31 +581,37 @@ function ReplayMissionLane({
   mission,
   state,
   locale,
+  bottomPlayer,
   onCardClick,
 }: {
   mission: ActiveMission;
   state: GameState;
   locale: 'en' | 'fr';
+  bottomPlayer: PlayerID;
   onCardClick?: (card: CharacterCard | MissionCard, missionCtx?: { rank: string; basePoints: number; rankBonus: number }) => void;
 }) {
   const t = useTranslations();
+  const topPlayer: PlayerID = bottomPlayer === 'player1' ? 'player2' : 'player1';
   const missionName = getCardName(mission.card, locale);
   const rankColor = rankColorMap[mission.rank] ?? '#888';
   const totalPoints = mission.basePoints + mission.rankBonus;
   const missionImage = mission.card.image_file ? normalizeImagePath(mission.card.image_file) : null;
 
-  const p1Power = mission.player1Characters.reduce(
+  const topChars = bottomPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
+  const bottomChars = bottomPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+
+  const topPower = topChars.reduce(
     (sum, c) => sum + calculateCharacterPower(state, c, c.controlledBy), 0
   );
-  const p2Power = mission.player2Characters.reduce(
+  const bottomPower = bottomChars.reduce(
     (sum, c) => sum + calculateCharacterPower(state, c, c.controlledBy), 0
   );
 
   const wonBorderColor = mission.wonBy === 'draw'
     ? 'rgba(136, 136, 136, 0.4)'
-    : mission.wonBy === 'player1'
+    : mission.wonBy === bottomPlayer
       ? 'rgba(196, 163, 90, 0.5)'
-      : mission.wonBy === 'player2'
+      : mission.wonBy === topPlayer
         ? 'rgba(179, 62, 62, 0.5)'
         : 'rgba(255, 255, 255, 0.04)';
 
@@ -626,17 +632,17 @@ function ReplayMissionLane({
         minWidth: 0,
       }}
     >
-      {/* Player 2 characters (top) */}
-      <CharacterArea chars={mission.player2Characters} state={state} locale={locale} player="player2" isTop={true} onCardClick={cardClick} />
+      {/* Top player characters */}
+      <CharacterArea chars={topChars} state={state} locale={locale} player={topPlayer} isTop={true} onCardClick={cardClick} />
 
-      {/* P2 power total */}
-      {(mission.player2Characters.length > 0 || mission.player1Characters.length > 0) && (
+      {/* Top power total */}
+      {(topChars.length > 0 || bottomChars.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5 w-full shrink-0">
           <span
             className="text-[10px] font-bold tabular-nums"
             style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
           >
-            {p2Power}
+            {topPower}
           </span>
         </div>
       )}
@@ -696,44 +702,44 @@ function ReplayMissionLane({
                 style={{
                   backgroundColor: mission.wonBy === 'draw'
                     ? 'rgba(136,136,136,0.2)'
-                    : mission.wonBy === 'player1'
+                    : mission.wonBy === bottomPlayer
                       ? 'rgba(196,163,90,0.2)'
                       : 'rgba(179,62,62,0.2)',
                   color: mission.wonBy === 'draw'
                     ? '#888'
-                    : mission.wonBy === 'player1'
+                    : mission.wonBy === bottomPlayer
                       ? '#c4a35a'
                       : '#b33e3e',
                   borderLeft: `3px solid ${
                     mission.wonBy === 'draw'
                       ? 'rgba(136,136,136,0.5)'
-                      : mission.wonBy === 'player1'
+                      : mission.wonBy === bottomPlayer
                         ? 'rgba(196,163,90,0.6)'
                         : 'rgba(179,62,62,0.6)'
                   }`,
                 }}
               >
-                {mission.wonBy === 'draw' ? 'DRAW' : mission.wonBy === 'player1' ? 'P1' : 'P2'}
+                {mission.wonBy === 'draw' ? 'DRAW' : mission.wonBy === bottomPlayer ? 'P1' : 'P2'}
               </span>
             )}
           </div>
         </div>
       </div>
 
-      {/* P1 power total */}
-      {(mission.player2Characters.length > 0 || mission.player1Characters.length > 0) && (
+      {/* Bottom power total */}
+      {(topChars.length > 0 || bottomChars.length > 0) && (
         <div className="flex items-center justify-center px-2 py-0.5 w-full shrink-0">
           <span
             className="text-[10px] font-bold tabular-nums"
             style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
           >
-            {p1Power}
+            {bottomPower}
           </span>
         </div>
       )}
 
-      {/* Player 1 characters (bottom) */}
-      <CharacterArea chars={mission.player1Characters} state={state} locale={locale} player="player1" isTop={false} onCardClick={cardClick} />
+      {/* Bottom player characters */}
+      <CharacterArea chars={bottomChars} state={state} locale={locale} player={bottomPlayer} isTop={false} onCardClick={cardClick} />
 
       {/* Score strip */}
       <div
@@ -802,15 +808,16 @@ function PlayerBar({
   const ps = state[player];
   const isEdgeHolder = state.edgeHolder === player;
   const isActive = state.activePlayer === player;
-  const color = player === 'player1' ? '#c4a35a' : '#b33e3e';
+  // Color based on position (bottom = gold, top = red) not player ID
+  const color = isTop ? '#b33e3e' : '#c4a35a';
 
   return (
     <div
       className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5 shrink-0"
       style={{
         backgroundColor: 'rgba(8, 8, 12, 0.85)',
-        borderTop: !isTop ? `2px solid ${player === 'player1' ? 'rgba(196, 163, 90, 0.15)' : 'rgba(179, 62, 62, 0.15)'}` : 'none',
-        borderBottom: isTop ? `2px solid ${player === 'player1' ? 'rgba(196, 163, 90, 0.15)' : 'rgba(179, 62, 62, 0.15)'}` : 'none',
+        borderTop: !isTop ? `2px solid ${!isTop ? 'rgba(196, 163, 90, 0.15)' : 'rgba(179, 62, 62, 0.15)'}` : 'none',
+        borderBottom: isTop ? `2px solid ${isTop ? 'rgba(179, 62, 62, 0.15)' : 'rgba(196, 163, 90, 0.15)'}` : 'none',
       }}
     >
       {/* Left: name + badges */}
@@ -920,12 +927,17 @@ interface ReplayBoardProps {
   playerNames: { player1: string; player2: string };
   locale: 'en' | 'fr';
   backgroundUrl?: string;
+  viewAs?: PlayerID;
   onCardClick?: (card: CharacterCard | MissionCard, missionCtx?: { rank: string; basePoints: number; rankBonus: number }) => void;
 }
 
-export function ReplayBoard({ state, playerNames, locale, backgroundUrl, onCardClick }: ReplayBoardProps) {
+export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs, onCardClick }: ReplayBoardProps) {
   const t = useTranslations();
   const phaseColor = phaseColorMap[state.phase] ?? '#888';
+
+  // Determine which player is at the bottom (viewer) and which is at the top (opponent)
+  const bottomPlayer: PlayerID = viewAs ?? 'player1';
+  const topPlayer: PlayerID = bottomPlayer === 'player1' ? 'player2' : 'player1';
 
   return (
     <div className="w-full h-full flex flex-col overflow-hidden">
@@ -956,11 +968,11 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, onCardC
         </span>
       </div>
 
-      {/* Player 2 stats */}
-      <PlayerBar player="player2" state={state} playerNames={playerNames} isTop={true} />
+      {/* Top player stats */}
+      <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} />
 
-      {/* Player 2 hand (fanned card-backs showing hand count) */}
-      <OpponentHandRow handSize={state.player2.hand.length} />
+      {/* Top player hand (fanned card-backs) */}
+      <OpponentHandRow handSize={state[topPlayer].hand.length} />
 
       {/* Mission area - fills remaining space */}
       <div className="flex-1 flex items-stretch gap-1.5 px-3 py-1 min-h-0 overflow-hidden">
@@ -973,6 +985,7 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, onCardC
                 mission={mission}
                 state={state}
                 locale={locale}
+                bottomPlayer={bottomPlayer}
                 onCardClick={onCardClick}
               />
             );
@@ -981,11 +994,11 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, onCardC
         })}
       </div>
 
-      {/* Player 1 hand (fanned face-up) */}
-      <PlayerHandRow cards={state.player1.hand} locale={locale} player="player1" onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
+      {/* Bottom player hand (fanned face-up) */}
+      <PlayerHandRow cards={state[bottomPlayer].hand} locale={locale} player={bottomPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
-      {/* Player 1 stats */}
-      <PlayerBar player="player1" state={state} playerNames={playerNames} isTop={false} />
+      {/* Bottom player stats */}
+      <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} />
     </div>
   );
 }

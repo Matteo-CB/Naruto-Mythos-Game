@@ -88,6 +88,7 @@ function gaara139MainHandler(ctx: EffectContext): EffectResult {
     validTargets: [ctx.sourceCard.instanceId],
     description: JSON.stringify({ missionIndex: ctx.sourceMissionIndex, hiddenCount }),
     descriptionKey: 'game.effect.desc.gaara139ConfirmMain',
+    descriptionParams: { hiddenCount: String(hiddenCount) },
   };
 }
 

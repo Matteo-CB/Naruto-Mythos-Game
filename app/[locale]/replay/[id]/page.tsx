@@ -15,6 +15,7 @@ import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { PanelFrame } from '@/components/game/PopupPrimitives';
+import { useSession } from 'next-auth/react';
 import type { GameState, GamePhase, GameAction, PlayerID, CharacterCard, MissionCard } from '@/lib/engine/types';
 
 interface ReplayLogEntry {
@@ -683,6 +684,7 @@ function VisualReplay({
   playerNames,
   backgroundUrl,
   game,
+  defaultViewAs,
 }: {
   initialState: GameState;
   actionHistory: Array<{ player: PlayerID; action: GameAction }>;
@@ -690,12 +692,14 @@ function VisualReplay({
   playerNames: { player1: string; player2: string };
   backgroundUrl?: string;
   game: GameData;
+  defaultViewAs?: PlayerID;
 }) {
   const tr = useTranslations('replay');
   const t = useTranslations();
   const locale = useLocale() as 'en' | 'fr';
   const [currentStep, setCurrentStep] = useState(0);
   const [showLog, setShowLog] = useState(false);
+  const [viewAs, setViewAs] = useState<PlayerID>(defaultViewAs ?? 'player1');
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [previewMissionContext, setPreviewMissionContext] = useState<{ rank: string; basePoints: number; rankBonus: number } | null>(null);
 
@@ -896,18 +900,36 @@ function VisualReplay({
       if (st.pendingActions.length > 0) {
         const pa = st.pendingActions[0];
         const pe = st.pendingEffects.find((e) => e.id === pa.sourceEffectId);
-        const isOpt = pe?.isOptional || pa.minSelections === 0 || pa.options.length === 0;
-        try {
-          if (isOpt && pe) {
-            return GameEngine.applyAction(st, pa.player, {
-              type: 'DECLINE_OPTIONAL_EFFECT',
-              pendingEffectId: pe.id,
-            });
-          } else if (pa.options.length > 0) {
+
+        // Detect CONFIRM popups: optional effects with exactly 1 valid target.
+        // In the real game, players almost always confirm these.
+        // Auto-CONFIRM (select the single target) instead of declining to preserve effects.
+        const isConfirmPopup = pe?.isOptional && pa.options.length === 1 &&
+          pe.targetSelectionType?.includes('CONFIRM');
+
+        if (isConfirmPopup) {
+          try {
             return GameEngine.applyAction(st, pa.player, {
               type: 'SELECT_TARGET',
               pendingActionId: pa.id,
               selectedTargets: [pa.options[0]],
+            });
+          } catch { /* fallthrough to decline */ }
+        }
+
+        const isOpt = pe?.isOptional || pa.minSelections === 0 || pa.options.length === 0;
+        try {
+          if (pa.options.length > 0) {
+            // Try selecting first valid option (covers both mandatory and optional with targets)
+            return GameEngine.applyAction(st, pa.player, {
+              type: 'SELECT_TARGET',
+              pendingActionId: pa.id,
+              selectedTargets: [pa.options[0]],
+            });
+          } else if (isOpt && pe) {
+            return GameEngine.applyAction(st, pa.player, {
+              type: 'DECLINE_OPTIONAL_EFFECT',
+              pendingEffectId: pe.id,
             });
           }
         } catch { /* fallthrough */ }
@@ -1242,16 +1264,33 @@ function VisualReplay({
         >
           <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>{tr('eventTimeline')}</span>
         </button>
+        <button
+          onClick={() => setViewAs(viewAs === 'player1' ? 'player2' : 'player1')}
+          className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+          style={{
+            transform: 'skewX(-3deg)',
+            backgroundColor: 'rgba(10, 10, 18, 0.88)',
+            backdropFilter: 'blur(12px)',
+            color: '#888',
+            borderLeft: '3px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+            {tr('switchPerspective', { player: playerNames[viewAs === 'player1' ? 'player2' : 'player1'] })}
+          </span>
+        </button>
       </div>
 
-      {/* Top-right: score overlay */}
-      <div className="absolute top-2 right-2 z-30">
-        <ScoreOverlay game={game} playerNames={playerNames} />
-      </div>
+      {/* Top-right: score overlay — only show at end of replay */}
+      {currentStep >= states.length - 1 && (
+        <div className="absolute top-2 right-2 z-30">
+          <ScoreOverlay game={game} playerNames={playerNames} />
+        </div>
+      )}
 
       {/* Board fills everything above controls */}
       <div className="flex-1 min-h-0 relative z-10">
-        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} onCardClick={handleCardClick} />
+        <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} />
       </div>
 
       {/* Playback controls docked at bottom */}
@@ -1507,6 +1546,7 @@ export default function ReplayPage({
   const t = useTranslations();
   const tr = useTranslations('replay');
 
+  const { data: session } = useSession();
   const [game, setGame] = useState<GameData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -1596,6 +1636,12 @@ export default function ReplayPage({
   const log = game.gameState.log ?? [];
   const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
+  // Auto-detect which player the viewer is
+  const userId = session?.user?.id;
+  const defaultViewAs: PlayerID | undefined = userId
+    ? userId === game.player2Id ? 'player2' : 'player1'
+    : undefined;
+
   if (hasVisualReplay) {
     return (
       <VisualReplay
@@ -1605,6 +1651,7 @@ export default function ReplayPage({
         playerNames={playerNames}
         backgroundUrl={gameBackgroundUrl}
         game={game}
+        defaultViewAs={defaultViewAs}
       />
     );
   }
