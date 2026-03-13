@@ -777,6 +777,7 @@
         "orochimaru138ConfirmUpgrade": "UPGRADE: Gain 2 Mission Points (upgraded character had Power 6+).",
         "gaara139ConfirmMain": "MAIN: Defeat an enemy with cost less than {hiddenCount} (friendly hidden characters).",
         "gaara139ConfirmUpgrade": "UPGRADE: In addition, hide an enemy {target} with cost less than {cost}?",
+        "gaara139ConfirmUpgradeModifier": "Apply UPGRADE? In addition, hide an enemy with same name and lower cost after defeating.",
         "itachi140ConfirmMain": "MAIN: Opponent discards their hand and redraws the same number of cards.",
         "itachi140ConfirmUpgrade": "UPGRADE: Defeat an enemy character with cost {cost} or less?",
         "naruto141ConfirmMain": "MAIN: Discard a card from hand to hide an enemy with Power 4 or less in this mission.",
@@ -1137,7 +1138,8 @@
     "textLog": "Text Log",
     "share": "Share",
     "linkCopied": "Link Copied",
-    "winner": "Winner"
+    "winner": "Winner",
+    "switchPerspective": "View as {player}"
   },
   "auth": {
     "signIn": "Sign In",

@@ -1,18 +1,18 @@
 ================================================================================
 NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT REPORT
 ================================================================================
-Generated: 2026-03-11T23:42:58.930Z
-Total Issues Found: 17
+Generated: 2026-03-13T06:45:52.468Z
+Total Issues Found: 12
 
 --- SUMMARY BY SEVERITY ---
-CRITICAL: 12 issues
+CRITICAL: 7 issues
 HIGH: 3 issues
 MEDIUM: 2 issues
 LOW: 0 issues
 INFO: 0 issues
 
 --- SUMMARY BY CATEGORY ---
-Missing Handler: 12 issues
+Missing Handler: 7 issues
 FAQ Compliance: 4 issues
 Rule Discrepancy: 1 issues
 
@@ -20,7 +20,7 @@ Rule Discrepancy: 1 issues
 DETAILED ISSUES
 ================================================================================
 
---- CRITICAL ISSUES (12) ---
+--- CRITICAL ISSUES (7) ---
 
 [CRITICAL] Missing Handler
   Card: KS-108-R NARUTO UZUMAKI
@@ -33,20 +33,6 @@ DETAILED ISSUES
   Card: KS-109-R SAKURA HARUNO
   Description: No UPGRADE handler for KS-109-R (SAKURA HARUNO)
   Expected: Handler implementing: MAIN effect: Instead, play the card paying 2 less.
-  Actual: No handler registered
-  Rule Reference: Every card effect must be individually coded
-
-[CRITICAL] Missing Handler
-  Card: KS-133-S NARUTO UZUMAKI
-  Description: No UPGRADE handler for KS-133-S (NARUTO UZUMAKI)
-  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
-  Actual: No handler registered
-  Rule Reference: Every card effect must be individually coded
-
-[CRITICAL] Missing Handler
-  Card: KS-135-S SAKURA HARUNO
-  Description: No UPGRADE handler for KS-135-S (SAKURA HARUNO)
-  Expected: Handler implementing: MAIN effect: Instead, play the card paying 4 less.
   Actual: No handler registered
   Rule Reference: Every card effect must be individually coded
 
@@ -75,27 +61,6 @@ DETAILED ISSUES
   Card: KS-109-RA SAKURA HARUNO
   Description: No UPGRADE handler for KS-109-RA (SAKURA HARUNO)
   Expected: Handler implementing: MAIN effect: Instead, play the card paying 2 less.
-  Actual: No handler registered
-  Rule Reference: Every card effect must be individually coded
-
-[CRITICAL] Missing Handler
-  Card: KS-133-SV NARUTO UZUMAKI
-  Description: No UPGRADE handler for KS-133-SV (NARUTO UZUMAKI)
-  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
-  Actual: No handler registered
-  Rule Reference: Every card effect must be individually coded
-
-[CRITICAL] Missing Handler
-  Card: KS-133-MV NARUTO UZUMAKI
-  Description: No UPGRADE handler for KS-133-MV (NARUTO UZUMAKI)
-  Expected: Handler implementing: MAIN effect: Instead, defeat both of them.
-  Actual: No handler registered
-  Rule Reference: Every card effect must be individually coded
-
-[CRITICAL] Missing Handler
-  Card: KS-135-MV SAKURA HARUNO
-  Description: No UPGRADE handler for KS-135-MV (SAKURA HARUNO)
-  Expected: Handler implementing: MAIN effect: Instead, play the card paying 4 less.
   Actual: No handler registered
   Rule Reference: Every card effect must be individually coded
 

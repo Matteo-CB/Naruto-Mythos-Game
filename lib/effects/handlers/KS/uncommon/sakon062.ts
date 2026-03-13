@@ -38,7 +38,6 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
         // Check if this card has at least one copyable instant effect
         const hasInstantEffect = topCard.effects?.some((eff) => {
           if (eff.type === 'SCORE') return false; // SCORE never copyable
-          if (eff.type === 'UPGRADE') return false; // UPGRADE never copyable
           if (eff.description && eff.description.includes('[⧗]')) return false;
           if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
           return true;

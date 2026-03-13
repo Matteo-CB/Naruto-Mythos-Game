@@ -273,8 +273,7 @@ function handlePlayHidden(
     log,
   };
 
-  // Track this direct play for last-played highlight
-  newState = trackLastPlayed(newState, player, charInPlay.instanceId);
+  // Don't track hidden plays for last-played highlight (would leak info to opponent)
 
   return newState;
 }

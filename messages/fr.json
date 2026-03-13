@@ -777,6 +777,7 @@
         "orochimaru138ConfirmUpgrade": "UPGRADE : Gagnez 2 Points de Mission (personnage ameliore avait Puissance 6+).",
         "gaara139ConfirmMain": "MAIN : Vaincre un ennemi avec un cout inferieur a {hiddenCount} (personnages caches allies).",
         "gaara139ConfirmUpgrade": "UPGRADE : En plus, cacher un ennemi {target} avec un cout inferieur a {cost} ?",
+        "gaara139ConfirmUpgradeModifier": "Appliquer UPGRADE ? En plus, cacher un ennemi de meme nom et cout inferieur apres la defaite.",
         "itachi140ConfirmMain": "MAIN : L'adversaire defausse sa main et repioche le meme nombre de cartes.",
         "itachi140ConfirmUpgrade": "UPGRADE : Vaincre un personnage ennemi avec un cout de {cost} ou moins ?",
         "naruto141ConfirmMain": "MAIN : Defaussez une carte pour cacher un ennemi avec Puissance 4 ou moins dans cette mission.",
@@ -1074,7 +1075,7 @@
     "leagues": "Ligues",
     "league": "Ligue",
     "games": "Matchs",
-    "eloRange": "{{min}} - {{max}}",
+    "eloRange": "{min} - {max}",
     "eloRangeTop": "{min}+",
     "unranked": "Non classe",
     "placementProgress": "Placement : {current}/{total}"
@@ -1137,7 +1138,8 @@
     "textLog": "Journal Texte",
     "share": "Partager",
     "linkCopied": "Lien copie",
-    "winner": "Vainqueur"
+    "winner": "Vainqueur",
+    "switchPerspective": "Voir comme {player}"
   },
   "auth": {
     "signIn": "Se Connecter",

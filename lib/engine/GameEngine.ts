@@ -1209,6 +1209,39 @@ export class GameEngine {
         return newState;
       }
 
+      // Gaara 139 UPGRADE modifier declined → execute base MAIN (defeat only, no hide same-name)
+      if (effect.targetSelectionType === 'GAARA139_CONFIRM_UPGRADE_MODIFIER') {
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+
+        // Re-create GAARA139_CONFIRM_MAIN with useHideSameName: false
+        const g139dEffId = generateInstanceId();
+        const g139dActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: g139dEffId, sourceCardId: effect.sourceCardId,
+          sourceInstanceId: effect.sourceInstanceId,
+          sourceMissionIndex: effect.sourceMissionIndex,
+          effectType: effect.effectType,
+          effectDescription: JSON.stringify({ useHideSameName: false }),
+          targetSelectionType: 'GAARA139_CONFIRM_MAIN',
+          sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
+          validTargets: [effect.sourceInstanceId],
+          isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true,
+          remainingEffectTypes: effect.remainingEffectTypes,
+        });
+        newState.pendingActions.push({
+          id: g139dActId, type: 'SELECT_TARGET' as any,
+          player: effect.sourcePlayer,
+          description: 'Gaara (139): Choose an enemy to defeat.',
+          descriptionKey: 'game.effect.desc.gaara139ConfirmMain',
+          descriptionParams: { hiddenCount: '' },
+          options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          sourceEffectId: g139dEffId,
+        });
+        return newState;
+      }
+
       // Special case: Kiba 113/149 UPGRADE confirmation declined → continue with hide mode
       if (effect.targetSelectionType === 'KIBA113_CONFIRM_UPGRADE' || effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
         newState.pendingEffects.splice(effectIdx, 1);
