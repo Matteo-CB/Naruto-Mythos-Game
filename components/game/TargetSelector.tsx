@@ -952,6 +952,131 @@ export function TargetSelector() {
     );
   }
 
+  // ---- Effect Order Choice — floating bottom bar with card thumbnails ----
+  if (pendingTargetSelection.selectionType === 'CHOOSE_EFFECT_ORDER' && pendingTargetSelection.effectOrderChoices) {
+    const choices = pendingTargetSelection.effectOrderChoices;
+    return (
+      <AnimatePresence>
+        <motion.div
+          key="effect-order-bar"
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+          className="fixed z-50 flex flex-col items-center gap-2"
+          style={{
+            bottom: '120px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'auto',
+          }}
+        >
+          {/* Title */}
+          <div
+            className="px-4 py-1.5 text-center uppercase tracking-widest"
+            style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              color: '#c4a35a',
+              backgroundColor: 'rgba(4, 4, 8, 0.85)',
+              border: '1px solid rgba(196, 163, 90, 0.25)',
+              letterSpacing: '0.2em',
+            }}
+          >
+            {t('game.effect.chooseEffectOrder')}
+          </div>
+
+          {/* Card choices side by side */}
+          <div className="flex items-stretch gap-3">
+            {choices.map((choice, idx) => {
+              const imgPath = choice.sourceCardImage ? normalizeImagePath(choice.sourceCardImage) : null;
+              const effectLabel = choice.effectType === 'UPGRADE' ? 'UPGRADE'
+                : choice.effectType === 'AMBUSH' ? 'AMBUSH'
+                : choice.effectType === 'MAIN' ? 'MAIN'
+                : choice.effectType === 'SCORE' ? 'SCORE' : choice.effectType;
+              const accentColors = ['#c4a35a', '#4a9eff', '#e06050', '#50c878'];
+              const accent = accentColors[idx % accentColors.length];
+
+              return (
+                <motion.button
+                  key={choice.effectId}
+                  whileHover={{ scale: 1.04, y: -4 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => pendingTargetSelection.onSelect(choice.effectId)}
+                  className="relative flex flex-col items-center cursor-pointer no-select"
+                  style={{
+                    width: '140px',
+                    backgroundColor: 'rgba(4, 4, 8, 0.92)',
+                    border: `2px solid ${accent}`,
+                    overflow: 'hidden',
+                    boxShadow: `0 0 20px ${accent}30, 0 4px 24px rgba(0,0,0,0.6)`,
+                  }}
+                >
+                  {/* Pulsing border glow */}
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ border: `2px solid ${accent}` }}
+                    animate={{
+                      boxShadow: [
+                        `inset 0 0 8px ${accent}20`,
+                        `inset 0 0 16px ${accent}40`,
+                        `inset 0 0 8px ${accent}20`,
+                      ],
+                    }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  />
+
+                  {/* Card image */}
+                  <div className="relative w-full" style={{ height: '100px' }}>
+                    {imgPath ? (
+                      <img
+                        src={imgPath}
+                        alt={choice.sourceCardName}
+                        draggable={false}
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"
+                        style={{ backgroundColor: 'rgba(30,30,30,0.8)' }}>
+                        <span style={{ color: '#555', fontSize: '11px' }}>?</span>
+                      </div>
+                    )}
+                    {/* Darkening at bottom for text readability */}
+                    <div className="absolute bottom-0 left-0 right-0 h-8"
+                      style={{ background: 'linear-gradient(transparent, rgba(4,4,8,0.95))' }} />
+                  </div>
+
+                  {/* Effect type badge */}
+                  <div
+                    className="w-full px-2 py-1.5 text-center"
+                    style={{ backgroundColor: `${accent}15` }}
+                  >
+                    <span
+                      className="uppercase tracking-wider font-bold"
+                      style={{ fontSize: '11px', color: accent, letterSpacing: '0.15em' }}
+                    >
+                      {effectLabel}
+                    </span>
+                  </div>
+
+                  {/* Card name */}
+                  <div className="w-full px-2 py-2 text-center" style={{ minHeight: '36px' }}>
+                    <span
+                      className="font-bold leading-tight"
+                      style={{ fontSize: '11px', color: '#d0d0d0' }}
+                    >
+                      {choice.sourceCardName}
+                    </span>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
   // ---- Generic CONFIRM popup ----
   if (pendingTargetSelection.selectionType === 'EFFECT_CONFIRM') {
     const confirmTarget = validTargets[0];
@@ -1028,23 +1153,33 @@ export function TargetSelector() {
   // Detect mission-only targeting (all valid targets are mission indices like '0','1','2','3')
   const isMissionOnlyTargeting = validTargets.length > 0 && validTargets.every(t => /^\d+$/.test(t));
   const missionCount = visibleState.activeMissions.length;
-  // Adaptive width: snug for mission-only (especially with few missions), wider for character targeting
-  const popupMaxWidth = isMissionOnlyTargeting
-    ? `${Math.max(200, missionCount * 160 + 60)}px`
-    : '85vw';
+  // Adaptive width: fit content for mission-only, wider for character targeting
+  const popupMaxWidth = isMissionOnlyTargeting ? '90vw' : '85vw';
 
   return (
     <AnimatePresence>
       <PopupOverlay>
-        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)">
+        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth={popupMaxWidth} padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent={isMissionOnlyTargeting}>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
             {t('game.mustChooseTarget', { player: displayName })}
           </PopupTitle>
 
-          <PopupDescription accentColor="rgba(196, 163, 90, 0.3)">
+          <motion.div
+            initial={{ x: -12, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.12, duration: 0.35 }}
+            className="mb-5 py-3 text-center mx-auto"
+            style={{
+              borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
+              borderRight: '3px solid rgba(196, 163, 90, 0.3)',
+              color: '#aaaaaa',
+              fontSize: '12px',
+              maxWidth: '420px',
+            }}
+          >
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
-          </PopupDescription>
+          </motion.div>
 
           <div className="flex justify-center mb-2">
             <PopupTargetCount count={validTargets.length} accentColor="#c4a35a" />

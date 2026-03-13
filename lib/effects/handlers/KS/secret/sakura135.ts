@@ -35,17 +35,14 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup instead of drawing cards and showing selection
-  // The deck draw and card selection will happen in the EffectEngine CONFIRM case
+  // Always return base CONFIRM — upgrade modifier will be prompted separately
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'SAKURA135_CONFIRM_MAIN',
     validTargets: [ctx.sourceCard.instanceId],
-    description: JSON.stringify({ costReduction: ctx.isUpgrade ? 4 : 0 }),
-    descriptionKey: ctx.isUpgrade
-      ? 'game.effect.desc.sakura135ConfirmMainUpgrade'
-      : 'game.effect.desc.sakura135ConfirmMain',
+    description: JSON.stringify({ costReduction: 0 }),
+    descriptionKey: 'game.effect.desc.sakura135ConfirmMain',
   };
 }
 

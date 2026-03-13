@@ -6,7 +6,7 @@ import { logAction } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
-import { triggerOnPlayReactions } from '../../effects/ContinuousEffects';
+import { triggerOnPlayReactions, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 
 /**
  * Execute a player action during the Action Phase.
@@ -196,6 +196,9 @@ function handlePlayCharacter(
   if (playedChar) {
     newState = EffectEngine.resolvePlayEffects(newState, player, playedChar, missionIndex, false);
   }
+
+  // Re-apply Rashomon token removal in case this play changes the strongest enemy
+  newState = applyRempartTokenRemoval(newState);
 
   return newState;
 }
@@ -456,6 +459,9 @@ function handleRevealCharacter(
     newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
 
+  // Re-apply Rashomon token removal in case this reveal changes the strongest enemy
+  newState = applyRempartTokenRemoval(newState);
+
   return newState;
 }
 
@@ -565,6 +571,9 @@ function handleUpgradeCharacter(
   if (upgradedChar) {
     newState = EffectEngine.resolvePlayEffects(newState, player, upgradedChar, missionIndex, true);
   }
+
+  // Re-apply Rashomon token removal in case this upgrade changes the strongest enemy
+  newState = applyRempartTokenRemoval(newState);
 
   return newState;
 }

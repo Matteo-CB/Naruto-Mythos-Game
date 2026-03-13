@@ -28,7 +28,7 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
@@ -36,6 +36,8 @@ interface PendingTargetSelection {
   // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
+  // Effect ordering choice (multiple simultaneous effects)
+  effectOrderChoices?: Array<{ effectId: string; sourceCardName: string; sourceCardImage?: string; effectType: string; description: string; descriptionKey?: string }>;
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
@@ -918,6 +920,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Check for pending actions for the new player
     const pendingActions = gameState.pendingActions.filter((p) => p.player === newPlayer);
     if (pendingActions.length > 0) {
+      // Detect multiple simultaneous effects from DIFFERENT source cards
+      // When 2+ pending effects exist with different sourceInstanceIds, the player should choose order
+      if (pendingActions.length >= 2) {
+        const pendingEffectsForPlayer = pendingActions
+          .map((pa) => gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId))
+          .filter((e): e is NonNullable<typeof e> => !!e);
+        const uniqueSourceIds = new Set(pendingEffectsForPlayer.map((e) => e.sourceInstanceId));
+        if (uniqueSourceIds.size >= 2) {
+          // Multiple effects from different cards — show effect order choice
+          const effectOrderChoices = pendingActions.map((pa) => {
+            const pe = gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
+            const charResult = pe?.sourceInstanceId
+              ? (() => {
+                  for (const m of gameState.activeMissions) {
+                    for (const c of [...m.player1Characters, ...m.player2Characters]) {
+                      if (c.instanceId === pe.sourceInstanceId) {
+                        const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                        return top;
+                      }
+                    }
+                  }
+                  return null;
+                })()
+              : null;
+            return {
+              effectId: pe?.id ?? pa.id,
+              sourceCardName: charResult?.name_fr ?? pe?.sourceCardId ?? '???',
+              sourceCardImage: charResult?.image_file ?? undefined,
+              effectType: pe?.effectType ?? 'MAIN',
+              description: pa.description,
+              descriptionKey: pa.descriptionKey,
+            };
+          });
+
+          const orderSelection: PendingTargetSelection = {
+            validTargets: effectOrderChoices.map((c) => c.effectId),
+            description: 'Multiple effects triggered simultaneously. Choose which to resolve first.',
+            descriptionKey: 'game.effect.desc.chooseEffectOrder',
+            playerName: playerDisplayNames[newPlayer],
+            selectionType: 'CHOOSE_EFFECT_ORDER',
+            effectOrderChoices,
+            onSelect: (effectId: string) => {
+              get().performAction({
+                type: 'REORDER_EFFECTS',
+                selectedEffectId: effectId,
+              });
+            },
+          };
+
+          set({ isProcessing: false, pendingTargetSelection: orderSelection });
+          return;
+        }
+      }
+
       const pa = pendingActions[0];
       const pe = gameState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
 
@@ -1268,6 +1324,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Check if AI has pending target selections to resolve first
         const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
         if (aiPending.length > 0) {
+          // Handle simultaneous effects from different source cards — AI just picks first
+          if (aiPending.length >= 2) {
+            const aiPendingEffects = aiPending
+              .map((pa) => currentState.pendingEffects.find((e) => e.id === pa.sourceEffectId))
+              .filter((e): e is NonNullable<typeof e> => !!e);
+            const uniqueSources = new Set(aiPendingEffects.map((e) => e.sourceInstanceId));
+            if (uniqueSources.size >= 2) {
+              // AI auto-selects first effect (FIFO order)
+              currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
+                type: 'REORDER_EFFECTS',
+                selectedEffectId: aiPendingEffects[0].id,
+              });
+              iterations++;
+              continue;
+            }
+          }
           const pendingAction = aiPending[0];
           if (pendingAction.options.length > 0) {
             // Check if this is an optional effect the Easy AI might decline

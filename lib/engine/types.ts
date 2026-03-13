@@ -265,6 +265,7 @@ export type GameAction =
   | { type: 'MULLIGAN'; doMulligan: boolean }
   | { type: 'SELECT_TARGET'; pendingActionId: string; selectedTargets: string[] }
   | { type: 'DECLINE_OPTIONAL_EFFECT'; pendingEffectId: string }
+  | { type: 'REORDER_EFFECTS'; selectedEffectId: string }
   | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' }
   | { type: 'ADVANCE_PHASE' };
 
