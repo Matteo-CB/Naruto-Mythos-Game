@@ -1,0 +1,29 @@
+Shinobuilder | Simulateur
+
+mot cle
+
+016 Kakashi: Kekkei Genkai, Team 7 | Team 7
+046 Ebisu: (none) | Special Jonin
+049 Genma: (none) | Special Jonin
+052 Kabuto: (none) | Sound Village
+068 Dosu: Team Dosu | Sound Ninja
+069 Dosu: Team Dosu, Weapon | Sound Ninja, Weapon
+070 Zaku: Team Dosu | Sound Ninja
+071 Zaku: Jutsu, Team Dosu | Sound Ninja
+072 Kin: Team Dosu | Sound Ninja
+073 Kin: Jutsu, Team Dosu | Jutsu, Sound Ninja
+080 Temari: Team Baki | Jutsu, Team Baki
+083 Rasa: Sand Siblings | (none)
+087 Zabuza: Mercenary Ninja | Jutsu, Rogue Ninja
+088 Haku: Mercenary Ninja | Rogue Ninja
+089 Haku: Jutsu, Mercenary Ninja | Jutsu, Rogue Ninja
+104 Tsunade: Sannin | Jutsu, Sannin
+112 Choji: Taijutsu, Team 10 | Team 10
+113 Kiba: Team 8 | Jutsu, Team 8
+
+GROUPES
+
+066 Rage Ogres: Independent | Sound Village
+129 Nine-Tailed Fox: Leaf Village | Independent
+130 One-tail: Sand Village | Independent
+134 Nine-Tailed Fox: Leaf Village | Independent
