@@ -325,7 +325,7 @@
       "up": "AME",
       "confirm": "OK",
       "details": "Détails",
-      "minimize": "Inspecter le plateau",
+      "minimize": "Masquer pour voir le plateau",
       "restoreEffect": "Effet en attente"
     },
     "effect": {

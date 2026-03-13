@@ -325,7 +325,7 @@
       "up": "UP",
       "confirm": "OK",
       "details": "Details",
-      "minimize": "Inspect board",
+      "minimize": "Hide this popup to view the board",
       "restoreEffect": "Pending Effect"
     },
     "effect": {
