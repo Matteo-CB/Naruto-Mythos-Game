@@ -238,24 +238,24 @@ export function HandCardSelector() {
         className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
       >
-        <button
-          onClick={(e) => { e.stopPropagation(); minimizeEffectPopup(); }}
-          className="no-select"
-          style={{
-            alignSelf: 'flex-end', marginBottom: '-8px',
-            marginRight: 'clamp(12px, 8vw, 80px)',
-            width: '32px', height: '32px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(196, 163, 90, 0.15)',
-            border: '2px solid rgba(196, 163, 90, 0.5)', borderRadius: '50%',
-            color: '#c4a35a', fontSize: '18px', lineHeight: '1',
-            cursor: 'pointer', fontWeight: 700,
-            boxShadow: '0 0 12px rgba(196, 163, 90, 0.25)', zIndex: 60,
-          }}
-          title={t('game.board.minimize')}
-        >
-          &#x2715;
-        </button>
+        <div style={{ width: 'min(90vw, 500px)', display: 'flex', justifyContent: 'flex-end', marginBottom: '-4px' }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); minimizeEffectPopup(); }}
+            className="no-select"
+            style={{
+              width: '30px', height: '30px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(196, 163, 90, 0.15)',
+              border: '2px solid rgba(196, 163, 90, 0.5)', borderRadius: '50%',
+              color: '#c4a35a', fontSize: '16px', lineHeight: '1',
+              cursor: 'pointer', fontWeight: 700,
+              boxShadow: '0 0 12px rgba(196, 163, 90, 0.25)',
+            }}
+            title={t('game.board.minimize')}
+          >
+            &#x2715;
+          </button>
+        </div>
         {/* Player announcement banner */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
