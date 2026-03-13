@@ -191,6 +191,7 @@
         "itachi091Discard": "{card} ({id}): Discarded {target} from opponent's hand.",
         "itachi091Draw": "{card} ({id}): Opponent draws 1 replacement card.",
         "continuous": "{card} ({id}): Continuous effect active.",
+        "rempartTokenRemoval": "{card} ({id}): Permanently removed {amount} Power token(s) from {target}.",
         "ambush": "{card} ({id}): Ambush effect triggered.",
         "bothDraw": "{card} ({id}): Each player draws {count} card(s).",
         "lookAtDeck": "{card} ({id}): Looked at top cards of deck.",
@@ -241,6 +242,7 @@
         "upgradeLeafReduced": "{card} ({id}): Upgraded {target} (Leaf Village reduced cost) on mission {mission} for {cost} chakra.",
         "upgradeSummon": "{card} ({id}): Upgraded summon {target} on mission {mission} for {cost} chakra.",
         "sasuke107Discard": "{card} ({id}): {target} discarded, name conflict (mandatory move).",
+        "sasuke107Skip": "{card} ({id}): {target} cannot move (name conflict at all destinations), stays.",
         "kimimaro056ProtectionBlocked": "{card} ({id}): Cannot pay 1 Chakra. Effect fails."
       },
       "score": {

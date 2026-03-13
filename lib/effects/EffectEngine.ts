@@ -239,6 +239,7 @@ export class EffectEngine {
           sourceMissionIndex: missionIndex,
           triggerType: effectType,
           isUpgrade: true,
+          wasRevealed: true,
         };
         const result = handler(ctx);
 
@@ -250,7 +251,7 @@ export class EffectEngine {
 
           newState = EffectEngine.createPendingTargetSelection(
             result.state, player, character, missionIndex, effectType, true,
-            result, remainingEffectTypes,
+            result, remainingEffectTypes, true,
           );
           return newState;
         }
@@ -294,6 +295,7 @@ export class EffectEngine {
             sourceMissionIndex: missionIndex,
             triggerType: 'MAIN',
             isUpgrade: wasUpgraded,
+            wasRevealed: true,
           };
           const result = handler(ctx);
 
@@ -306,7 +308,7 @@ export class EffectEngine {
             // Use result.state to preserve any state changes the handler already made
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'MAIN', wasUpgraded,
-              result, remainingEffectTypes,
+              result, remainingEffectTypes, true,
             );
             return newState;
           }
@@ -330,6 +332,7 @@ export class EffectEngine {
             sourceMissionIndex: missionIndex,
             triggerType: 'AMBUSH',
             isUpgrade: wasUpgraded,
+            wasRevealed: true,
           };
           const result = handler(ctx);
 
@@ -337,7 +340,7 @@ export class EffectEngine {
             // Use result.state to preserve any state changes the handler already made
             newState = EffectEngine.createPendingTargetSelection(
               result.state, player, character, missionIndex, 'AMBUSH', wasUpgraded,
-              result, [],
+              result, [], true,
             );
             return newState;
           }
@@ -488,6 +491,7 @@ export class EffectEngine {
     isUpgrade: boolean,
     result: EffectResult,
     remainingEffectTypes: EffectType[],
+    wasRevealed?: boolean,
   ): GameState {
     // Safeguard: if validTargets is empty, skip creating the pending effect entirely
     // This prevents stuck UI when a handler returns requiresTargetSelection with no valid targets
@@ -540,6 +544,7 @@ export class EffectEngine {
       isMandatory: result.isMandatory ?? false,
       resolved: false,
       isUpgrade,
+      wasRevealed: wasRevealed ?? false,
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
     };
 
@@ -2526,8 +2531,11 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
+            const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'UPGRADE') return false;
+              if (eff.type === 'SCORE') return false;
+              if (eff.type === 'AMBUSH' && !k016WasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
               return true;
@@ -2552,6 +2560,7 @@ export class EffectEngine {
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: k016Targets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          wasRevealed: pendingEffect.wasRevealed,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -2571,6 +2580,7 @@ export class EffectEngine {
         // UPGRADE confirmed: compute targets with NO cost limit
         const enemySide016u: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const k016uWasRevealed = pendingEffect.wasRevealed ?? false;
         const k016uTargets: string[] = [];
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016u]) {
@@ -2578,6 +2588,8 @@ export class EffectEngine {
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'UPGRADE') return false;
+              if (eff.type === 'SCORE') return false;
+              if (eff.type === 'AMBUSH' && !k016uWasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
               return true;
@@ -2602,6 +2614,7 @@ export class EffectEngine {
           sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
           validTargets: k016uTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
+          wasRevealed: k016uWasRevealed,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -5032,6 +5045,7 @@ export class EffectEngine {
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
+                if (eff.type === 'SCORE') return false; // SCORE never copyable
                 if (eff.description && eff.description.includes('[⧗]')) return false;
                 if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
                 return true;
@@ -5056,6 +5070,7 @@ export class EffectEngine {
             ? s062AutoResult.character.stack[s062AutoResult.character.stack.length - 1]
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
+            if (eff.type === 'SCORE') return false; // SCORE never copyable
             if (eff.description.includes('[⧗]')) return false;
             if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
             return true;
@@ -10550,6 +10565,7 @@ export class EffectEngine {
             player: k134Player,
             description: 'Kyubi (134) UPGRADE: Choose characters to hide (total Power 6 or less).',
             descriptionKey: 'game.effect.desc.kyubi134ChooseHide',
+            descriptionParams: { remaining: '6' },
             options: k134ValidTargets, minSelections: 1, maxSelections: 1,
             sourceEffectId: k134EffId,
           });
@@ -10876,10 +10892,8 @@ export class EffectEngine {
         const i140Player = pendingEffect.sourcePlayer;
         const i140Opponent: PlayerID = i140Player === 'player1' ? 'player2' : 'player1';
         const i140OpponentState = newState[i140Opponent];
-        let i140Parsed: { isUpgrade?: boolean } = {};
-        try { i140Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const i140IsUpgrade = i140Parsed.isUpgrade ?? false;
-        console.log(`[EffectEngine] ITACHI140_CONFIRM_MAIN: isUpgrade=${i140IsUpgrade} pendingEffect.isUpgrade=${pendingEffect.isUpgrade} desc=${pendingEffect.effectDescription}`);
+        const i140IsUpgrade = pendingEffect.isUpgrade;
+        console.log(`[EffectEngine] ITACHI140_CONFIRM_MAIN: isUpgrade=${i140IsUpgrade} desc=${pendingEffect.effectDescription}`);
 
         const i140HandSize = i140OpponentState.hand.length;
         if (i140HandSize === 0) {
@@ -11228,7 +11242,8 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
-            const hasCopyableEffect = topCard.effects.some((effect: { description: string }) => {
+            const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
+              if (effect.type === 'SCORE') return false; // SCORE never copyable
               if (effect.description.includes('[⧗]')) return false;
               if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
               return true;
@@ -11406,11 +11421,12 @@ export class EffectEngine {
           ? k148Target.character.stack[k148Target.character.stack.length - 1]
           : k148Target.character.card;
 
-        // Kakashi 148 can copy MAIN, AMBUSH, SCORE, and UPGRADE (not continuous)
+        // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH, UPGRADE (not SCORE, not continuous)
         const k148Copyable = (k148TopCard.effects ?? []).filter((eff) => {
+          if (eff.type === 'SCORE') return false; // SCORE never copyable
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
-          return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE' || eff.type === 'SCORE';
+          return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
         });
 
         if (k148Copyable.length === 0) {
@@ -12764,11 +12780,15 @@ export class EffectEngine {
           ? copyTargetResult.character.stack[copyTargetResult.character.stack.length - 1]
           : copyTargetResult.character.card;
 
-        // Kakashi 016: non-UPGRADE, non-continuous
-        // Sakon 062 / Kakashi 148: CAN include UPGRADE (handled by their own resolution paths)
-        // For this shared path (Kakashi 016 / Sakon 062), allow UPGRADE for Sakon 062
+        // Copy effect filter:
+        // - SCORE: never copyable
+        // - AMBUSH: only copyable if the copier was revealed from hidden
+        // - UPGRADE: only copyable by Sakon 062 (not Kakashi 016)
         const isSakon062 = pendingEffect.targetSelectionType === 'SAKON062_COPY_EFFECT';
+        const copierWasRevealed = pendingEffect.wasRevealed ?? false;
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
+          if (eff.type === 'SCORE') return false;
+          if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
           if (!isSakon062 && eff.type === 'UPGRADE') return false;
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
@@ -15726,18 +15746,20 @@ export class EffectEngine {
     newState.activeMissions = [...newState.activeMissions];
     newState.activeMissions[targetMissionIdx] = mission;
 
-    // Return entire stack to player's hand
+    // Return only the top card to hand; discard underlying stack cards
     const ps = newState[player];
-    const allCards = target.stack.length > 0 ? [...target.stack] : [target.card];
-    ps.hand = [...ps.hand, ...allCards];
+    const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
+    const underCards = target.stack.length > 1 ? target.stack.slice(0, -1) : [];
+    ps.hand = [...ps.hand, topCard];
+    ps.discardPile = [...ps.discardPile, ...underCards];
     ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
 
     newState.log = logAction(
       newState.log, newState.turn, newState.phase, player,
       'SCORE_RETURN',
-      `MSS 05 (Bring it Back): Returned ${target.card.name_fr} to hand (mandatory).`,
+      `MSS 05 (Bring it Back): Returned ${topCard.name_fr} to hand (mandatory).`,
       'game.log.score.returnToHand',
-      { card: 'Ramener', target: target.card.name_fr },
+      { card: 'Ramener', target: topCard.name_fr },
     );
 
     return newState;

@@ -133,7 +133,6 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       style={{
         width: dims.missionCard.w + 'px',
         height: dims.missionCard.h + 'px',
-        borderRadius: '5px',
         cursor: isRevealable ? 'pointer' : (!isUnknownHiddenEnemy && character.card ? 'pointer' : 'default'),
         border: isSelected
           ? '2px solid #c4a35a'
@@ -205,7 +204,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       {/* Power display (bottom-right) - CSS animation replaces Framer Motion repeat:Infinity */}
       {!isHidden && (
         <div
-          className={`absolute bottom-0.5 right-0.5 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
+          className={`absolute bottom-0.5 right-0.5 flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
           style={{
             minWidth: '22px',
             height: '18px',
@@ -238,13 +237,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
                 stiffness: 400,
                 damping: 15,
               }}
-              className="rounded-full"
               style={{
-                width: '13px',
-                height: '13px',
-                background: 'radial-gradient(circle at 35% 35%, #f0d890, #c4a35a 50%, #a8893a)',
+                width: '11px',
+                height: '11px',
+                backgroundColor: '#c4a35a',
                 border: '1px solid #a8893a',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.3), 0 0 4px rgba(196, 163, 90, 0.3)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.6), 0 0 4px rgba(196, 163, 90, 0.3)',
+                transform: 'rotate(45deg)',
               }}
             />
           ))}
@@ -265,7 +264,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       {/* Chakra cost (top-left) for visible cards */}
       {!isHidden && character.card && (
         <div
-          className="absolute top-0.5 left-0.5 rounded-full w-5 h-5 flex items-center justify-center text-[9px] font-bold"
+          className="absolute top-0.5 left-0.5 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
           style={{
             backgroundColor: 'rgba(196, 163, 90, 0.9)',
             color: '#0a0a0a',
@@ -283,7 +282,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-          className="absolute bottom-0.5 left-0.5 rounded-md px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
+          className="absolute bottom-0.5 left-0.5 px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
           style={{
             backgroundColor: 'rgba(62, 139, 62, 0.25)',
             color: '#5cb85c',
@@ -344,7 +343,6 @@ function MissionCardDisplay({
       style={{
         width: '100%',
         maxWidth: dims.missionMaxW + 'px',
-        borderRadius: '8px',
         border: `2px solid ${rankColors[mission.rank]}`,
         overflow: 'hidden',
         cursor: 'pointer',
@@ -397,7 +395,7 @@ function MissionCardDisplay({
 
       {/* Rank badge */}
       <div
-        className="absolute top-1 left-1 rounded px-1.5 py-0.5 text-[10px] font-bold"
+        className="absolute top-1 left-1 px-1.5 py-0.5 text-[10px] font-bold"
         style={{
           backgroundColor: rankColors[mission.rank],
           color: '#0a0a0a',
@@ -410,7 +408,7 @@ function MissionCardDisplay({
 
       {/* Points badge */}
       <div
-        className="absolute top-1 right-1 rounded px-1 py-0.5 text-[9px] font-bold tabular-nums"
+        className="absolute top-1 right-1 px-1 py-0.5 text-[9px] font-bold tabular-nums"
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           color: '#c4a35a',
@@ -429,10 +427,11 @@ function MissionCardDisplay({
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
         >
           <span
-            className="text-sm font-bold px-3 py-1 rounded"
+            className="text-sm font-bold px-3 py-1"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.85)',
               color: mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e',
+              borderLeft: `3px solid ${mission.wonBy === 'draw' ? '#888888' : mission.wonBy === myPlayer ? '#c4a35a' : '#b33e3e'}`,
             }}
           >
             {mission.wonBy === 'draw' ? t('game.board.draw') : mission.wonBy === myPlayer ? t('game.board.won') : t('game.board.lost')}
@@ -520,14 +519,13 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: missionIndex * 0.1 }}
       onClick={handleClick}
-      className="flex flex-col items-center gap-0.5 rounded-xl px-1 py-0.5 h-full"
+      className="flex flex-col items-center gap-0.5 px-1 py-0.5 h-full"
       style={{
         minWidth: dims.emptyLaneMinW + 'px',
         maxWidth: dims.emptyLaneMaxW + 'px',
         flex: '1 1 0',
         cursor: isTargetable ? 'pointer' : 'default',
         backgroundColor: 'rgba(10, 10, 10, 0.35)',
-        backdropFilter: 'blur(4px)',
         border: '1px solid rgba(255, 255, 255, 0.04)',
       }}
     >
@@ -569,7 +567,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         {/* Drop zone highlight - only when this mission is selected */}
         {isSelected && (
           <div
-            className="absolute inset-0 rounded-lg -m-1.5"
+            className="absolute inset-0 -m-1.5"
             style={{
               border: '2px solid #c4a35a',
               boxShadow: '0 0 16px rgba(196, 163, 90, 0.4)',
@@ -615,14 +613,14 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
       {/* Score badge - absolute bottom, always visible */}
       <div
-        className="shrink-0 flex items-center justify-center gap-1 w-full rounded-md px-1.5 py-0.5"
+        className="shrink-0 flex items-center justify-center gap-1 w-full px-1.5 py-0.5"
         style={{
           backgroundColor: `${rc}15`,
           fontFamily: "'NJNaruto', Arial, sans-serif",
         }}
       >
         <span
-          className="text-[10px] font-bold px-1 rounded"
+          className="text-[10px] font-bold px-1"
           style={{ backgroundColor: rc, color: '#0a0a0a' }}
         >
           {mission.rank}

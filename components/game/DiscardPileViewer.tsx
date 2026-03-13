@@ -7,6 +7,7 @@ import type { CardData, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useUIStore } from '@/stores/uiStore';
+import { PopupOverlay, PopupCornerFrame, PopupMinimizeX } from './PopupPrimitives';
 
 interface DiscardPileViewerProps {
   cards: CardData[];
@@ -25,138 +26,115 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
 
   return (
     <AnimatePresence>
-      <motion.div
-        key="discard-overlay"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-        className="fixed inset-0 z-250 flex items-center justify-center"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="relative rounded-xl overflow-hidden flex flex-col"
-          style={{
-            maxWidth: '720px',
-            width: '90vw',
-            maxHeight: '80vh',
-            backgroundColor: 'rgba(10, 10, 14, 0.98)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.9)',
-          }}
-          onClick={(e) => e.stopPropagation()}
+      <PopupOverlay onClickBg={onClose}>
+        <PopupCornerFrame
+          accentColor="rgba(196, 163, 90, 0.3)"
+          maxWidth="720px"
+          padding="0"
         >
-          {/* Header */}
           <div
-            className="flex items-center justify-between px-5 py-3 shrink-0"
-            style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
+            className="flex flex-col"
+            style={{ maxHeight: '80vh' }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-bold" style={{ color: '#e0e0e0' }}>
-                {title}
-              </span>
-              <span
-                className="text-xs px-2 py-0.5 rounded tabular-nums"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  color: '#888888',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
-                }}
-              >
-                {cards.length}
-              </span>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer"
-              style={{
-                backgroundColor: 'rgba(179, 62, 62, 0.12)',
-                color: '#b33e3e',
-                border: '1px solid rgba(179, 62, 62, 0.3)',
-              }}
+            {/* Header */}
+            <div
+              className="flex items-center justify-between px-5 py-3 shrink-0"
+              style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
             >
-              X
-            </button>
-          </div>
-
-          {/* Card grid */}
-          <div className="p-4 overflow-y-auto flex-1">
-            {cards.length === 0 ? (
-              <div className="flex items-center justify-center py-12">
-                <span className="text-sm" style={{ color: '#555555' }}>
-                  --
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                  {title}
+                </span>
+                <span
+                  className="text-xs px-2 py-0.5 tabular-nums"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    color: '#888888',
+                    borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
+                  }}
+                >
+                  {cards.length}
                 </span>
               </div>
-            ) : (
-              <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
-                {cards.map((card, i) => {
-                  const imagePath = normalizeImagePath(card.image_file);
+              <PopupMinimizeX onClick={onClose} />
+            </div>
 
-                  return (
-                    <motion.div
-                      key={`${card.id}-${i}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.03, duration: 0.15 }}
-                      className="group relative flex flex-col items-center gap-1 p-1.5 rounded-lg"
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                      }}
-                    >
-                      <div className="relative w-full">
-                        {imagePath ? (
-                          <img
-                            src={imagePath}
-                            alt={getCardName(card, locale as 'en' | 'fr')}
-                            draggable={false}
-                            className="w-full rounded"
-                            style={{ aspectRatio: '5/7', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <div
-                            className="w-full rounded flex items-center justify-center"
+            {/* Card grid */}
+            <div className="p-4 overflow-y-auto flex-1">
+              {cards.length === 0 ? (
+                <div className="flex items-center justify-center py-12">
+                  <span className="text-sm" style={{ color: '#555555' }}>
+                    --
+                  </span>
+                </div>
+              ) : (
+                <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
+                  {cards.map((card, i) => {
+                    const imagePath = normalizeImagePath(card.image_file);
+
+                    return (
+                      <motion.div
+                        key={`${card.id}-${i}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03, duration: 0.15 }}
+                        className="group relative flex flex-col items-center gap-1 p-1.5"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                          border: '1px solid rgba(255, 255, 255, 0.05)',
+                        }}
+                      >
+                        <div className="relative w-full">
+                          {imagePath ? (
+                            <img
+                              src={imagePath}
+                              alt={getCardName(card, locale as 'en' | 'fr')}
+                              draggable={false}
+                              className="w-full"
+                              style={{ aspectRatio: '5/7', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            <div
+                              className="w-full flex items-center justify-center"
+                              style={{
+                                aspectRatio: '5/7',
+                                backgroundColor: '#1a1a1a',
+                              }}
+                            >
+                              <span className="text-[9px]" style={{ color: '#555' }}>?</span>
+                            </div>
+                          )}
+                          {/* Details button */}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDetails(card); }}
+                            className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
                             style={{
-                              aspectRatio: '5/7',
-                              backgroundColor: '#1a1a1a',
+                              backgroundColor: 'rgba(0,0,0,0.85)',
+                              color: '#c4a35a',
+                              border: 'none',
+                              borderLeft: '2px solid rgba(196,163,90,0.4)',
                             }}
                           >
-                            <span className="text-[9px]" style={{ color: '#555' }}>?</span>
-                          </div>
-                        )}
-                        {/* Details button */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDetails(card); }}
-                          className="absolute top-1 right-1 rounded px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                          style={{
-                            backgroundColor: 'rgba(0,0,0,0.85)',
-                            color: '#c4a35a',
-                            border: '1px solid rgba(196,163,90,0.4)',
-                          }}
+                            {t('game.board.details')}
+                          </button>
+                        </div>
+                        <span
+                          className="text-[9px] text-center leading-tight w-full truncate"
+                          style={{ color: '#999999' }}
+                          title={getCardName(card, locale as 'en' | 'fr')}
                         >
-                          {t('game.board.details')}
-                        </button>
-                      </div>
-                      <span
-                        className="text-[9px] text-center leading-tight w-full truncate"
-                        style={{ color: '#999999' }}
-                        title={getCardName(card, locale as 'en' | 'fr')}
-                      >
-                        {getCardName(card, locale as 'en' | 'fr')}
-                      </span>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
+                          {getCardName(card, locale as 'en' | 'fr')}
+                        </span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </PopupCornerFrame>
+      </PopupOverlay>
     </AnimatePresence>
   );
 }

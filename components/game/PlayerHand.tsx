@@ -101,7 +101,6 @@ const HandCard = React.memo(function HandCard({
       style={{
         width: dims.handCard.w + 'px',
         height: dims.handCard.h + 'px',
-        borderRadius: '7px',
         border: isSelected
           ? '2px solid #c4a35a'
           : canAfford
@@ -156,7 +155,7 @@ const HandCard = React.memo(function HandCard({
 
       {/* Chakra cost badge */}
       <div
-        className="absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+        className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
         style={{
           backgroundColor: canAfford
             ? 'rgba(196, 163, 90, 0.9)'

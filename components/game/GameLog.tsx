@@ -70,10 +70,11 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
         {formatTimestamp(entry.timestamp)}
       </span>
       <span
-        className="shrink-0 rounded px-1 py-0.5 text-[10px] uppercase font-medium"
+        className="shrink-0 px-1 py-0.5 text-[10px] uppercase font-medium"
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.04)',
           color: '#777777',
+          borderLeft: '2px solid rgba(196, 163, 90, 0.2)',
         }}
       >
         T{entry.turn} {formatPhase(entry.phase)}
@@ -114,15 +115,14 @@ export function GameLog() {
 
   return (
     <>
-      {/* Toggle button - positioned above the right side piles (only visible when log is closed) */}
+      {/* Toggle button */}
       {!showGameLog && (
         <button
           onClick={toggleGameLog}
-          className="fixed top-10 right-4 z-40 rounded-lg px-3 py-2 text-xs font-medium cursor-pointer"
+          className="fixed top-10 right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider"
           style={{
-            backgroundColor: 'rgba(10, 10, 14, 0.8)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(10, 10, 14, 0.9)',
+            borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
             color: '#888888',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
           }}
@@ -142,9 +142,8 @@ export function GameLog() {
             className="fixed top-0 right-0 z-30 h-full flex flex-col"
             style={{
               width: '340px',
-              backgroundColor: 'rgba(8, 8, 12, 0.92)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
-              backdropFilter: 'blur(16px)',
+              backgroundColor: 'rgba(8, 8, 12, 0.95)',
+              borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
             }}
           >
             {/* Header */}
@@ -154,16 +153,17 @@ export function GameLog() {
             >
               <span
                 className="text-sm font-medium uppercase tracking-wider"
-                style={{ color: '#e0e0e0' }}
+                style={{ color: '#c4a35a' }}
               >
                 {t('game.log.title')}
               </span>
               <button
                 onClick={toggleGameLog}
-                className="text-xs px-2 py-1 rounded-md cursor-pointer"
+                className="text-xs px-2 py-1 cursor-pointer uppercase tracking-wider"
                 style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  border: 'none',
+                  borderLeft: '2px solid rgba(255, 255, 255, 0.1)',
                   color: '#888888',
                 }}
               >

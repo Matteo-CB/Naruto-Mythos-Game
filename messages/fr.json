@@ -191,6 +191,7 @@
         "itachi091Discard": "{card} ({id}) : {target} defaussee de la main adverse.",
         "itachi091Draw": "{card} ({id}) : L'adversaire pioche 1 carte de remplacement.",
         "continuous": "{card} ({id}) : Effet continu actif.",
+        "rempartTokenRemoval": "{card} ({id}) : {amount} jeton(s) de Puissance retire(s) definitivement de {target}.",
         "ambush": "{card} ({id}) : Effet AMBUSH declenche.",
         "bothDraw": "{card} ({id}) : Chaque joueur pioche {count} carte(s).",
         "lookAtDeck": "{card} ({id}) : Regarde le dessus du deck.",
@@ -241,6 +242,7 @@
         "upgradeLeafReduced": "{card} ({id}) : UPGRADE de {target} (cout Feuille reduit) sur mission {mission} pour {cost} chakra.",
         "upgradeSummon": "{card} ({id}) : UPGRADE de l'invocation {target} sur mission {mission} pour {cost} chakra.",
         "sasuke107Discard": "{card} ({id}) : {target} defausse, conflit de nom (deplacement obligatoire).",
+        "sasuke107Skip": "{card} ({id}) : {target} ne peut pas se deplacer (conflit de nom a toutes les destinations), reste sur place.",
         "kimimaro056ProtectionBlocked": "{card} ({id}) : Ne peut pas payer 1 Chakra. L'effet echoue."
       },
       "score": {

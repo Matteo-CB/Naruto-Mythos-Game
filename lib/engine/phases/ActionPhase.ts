@@ -660,6 +660,7 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
         : state.activeMissions[mIdx].player2Characters;
 
       for (const existingChar of chars) {
+        if (existingChar.isHidden) continue; // Hidden chars have no name — can't be upgrade targets
         const upgradeValidation = validateUpgradeCharacter(state, player, card, mIdx, existingChar.instanceId);
         if (upgradeValidation.valid) {
           actions.push({

@@ -203,6 +203,7 @@ export interface PendingEffect {
   isMandatory: boolean;
   resolved: boolean;
   isUpgrade: boolean;
+  wasRevealed?: boolean; // Whether the source card was revealed from hidden
   // Continuation: remaining effect types to process after this pending is resolved
   remainingEffectTypes?: EffectType[];
   // When the selecting player differs from the source player (e.g., opponent choices)

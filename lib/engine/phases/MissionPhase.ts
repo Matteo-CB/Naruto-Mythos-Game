@@ -3,7 +3,7 @@ import { logSystem, logAction } from '../utils/gameLog';
 import { calculateCharacterPower } from './PowerCalculation';
 import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
-import { isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
+import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
@@ -22,6 +22,9 @@ const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
  */
 export function executeMissionPhase(state: GameState): GameState {
   let newState: GameState = { ...state, missionScoringProgress: undefined };
+
+  // Rashomon (067): permanently remove power tokens from strongest enemy before scoring
+  newState = applyRempartTokenRemoval(newState);
 
   // Score missions by rank order: D, C, B, A
   for (let rankIdx = 0; rankIdx < RANK_ORDER.length; rankIdx++) {

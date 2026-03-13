@@ -35,9 +35,9 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (char.isHidden) continue;
       const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
-        // Check if this card has at least one non-continuous instant effect
-        // Sakon 062 CAN copy UPGRADE instant effects (card text doesn't say "non-upgrade")
+        // Check if this card has at least one copyable instant effect
         const hasInstantEffect = topCard.effects?.some((eff) => {
+          if (eff.type === 'SCORE') return false; // SCORE never copyable
           if (eff.description && eff.description.includes('[⧗]')) return false;
           if (eff.description && (eff.description.startsWith('effect:') || eff.description.startsWith('effect.'))) return false;
           return true;

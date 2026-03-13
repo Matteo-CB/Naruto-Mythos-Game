@@ -382,7 +382,7 @@ export default function Home() {
               ['Andy', 'Kutxyt', 'admin', 'Daiki0'].includes(session.user?.name ?? '')
             ) && (
               <motion.div
-                className="mt-2 flex w-full flex-col gap-2"
+                className="mt-2 flex w-full flex-row gap-2"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 1.37, ease: 'easeOut' }}
@@ -390,7 +390,7 @@ export default function Home() {
                 {['Andy', 'Kutxyt', 'admin'].includes(session.user?.name ?? '') && (
                   <Link
                     href="/admin/card-tracker"
-                    className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                    className="group relative flex flex-1 h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                     style={{
                       backgroundColor: '#141414',
                       border: '1px solid #9333ea',
@@ -420,7 +420,7 @@ export default function Home() {
                 )}
                 <Link
                   href="/admin/suggestions"
-                  className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
+                  className="group relative flex flex-1 h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
                   style={{
                     backgroundColor: '#141414',
                     border: '1px solid #3b82f6',

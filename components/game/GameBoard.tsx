@@ -86,15 +86,17 @@ function CardPreviewContent({
 
   return (
     <div
-      className="rounded-lg overflow-hidden flex flex-col"
+      className="overflow-hidden flex flex-col"
       style={{
         backgroundColor: "rgba(8, 8, 12, 0.95)",
         border: isMission
-          ? `1px solid ${rankColorMap[missionContext?.rank ?? ""] ?? "rgba(196, 163, 90, 0.3)"}`
-          : "1px solid rgba(255, 255, 255, 0.1)",
+          ? `1px solid ${rankColorMap[missionContext?.rank ?? ""] ?? "rgba(196, 163, 90, 0.15)"}40`
+          : "1px solid rgba(255, 255, 255, 0.08)",
+        borderLeft: isMission
+          ? `3px solid ${rankColorMap[missionContext?.rank ?? ""] ?? "rgba(196, 163, 90, 0.3)"}`
+          : "3px solid rgba(196, 163, 90, 0.25)",
         boxShadow:
-          "0 8px 40px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.1)",
-        backdropFilter: "blur(16px)",
+          "0 8px 40px rgba(0, 0, 0, 0.8)",
         maxHeight: "calc(100vh - 32px)",
       }}
     >
@@ -137,22 +139,22 @@ function CardPreviewContent({
         {/* Type badge + Rarity */}
         <div className="flex items-center justify-between">
           <span
-            className="text-[10px] rounded px-1.5 py-0.5 font-bold uppercase tracking-wider"
+            className="text-[10px] px-1.5 py-0.5 font-bold uppercase tracking-wider"
             style={{
               backgroundColor: isMission
                 ? "rgba(196, 163, 90, 0.12)"
                 : "rgba(255, 255, 255, 0.04)",
               color: isMission ? "#c4a35a" : "#888888",
-              border: `1px solid ${isMission ? "rgba(196, 163, 90, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
+              borderLeft: `2px solid ${isMission ? "rgba(196, 163, 90, 0.4)" : "rgba(255, 255, 255, 0.1)"}`,
             }}
           >
             {isMission ? t("card.mission") : t("card.character")}
           </span>
           <span
-            className="text-[10px] rounded px-1.5 py-0.5 shrink-0 font-bold"
+            className="text-[10px] px-1.5 py-0.5 shrink-0 font-bold"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.04)",
-              border: `1px solid ${rarityColor}`,
+              borderLeft: `2px solid ${rarityColor}`,
               color: rarityColor,
             }}
           >
@@ -185,10 +187,10 @@ function CardPreviewContent({
         {/* Mission rank + points info */}
         {isMission && missionContext && (
           <div
-            className="flex flex-col gap-1.5 p-2.5 rounded-md mt-0.5"
+            className="flex flex-col gap-1.5 p-2.5 mt-0.5"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.03)",
-              border: `1px solid ${rankColorMap[missionContext.rank] ?? "#555"}40`,
+              borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? "#555"}`,
             }}
           >
             <div className="flex items-center justify-between">
@@ -199,7 +201,7 @@ function CardPreviewContent({
                 {t("card.rank")}
               </span>
               <span
-                className="text-sm font-bold px-2 py-0.5 rounded"
+                className="text-sm font-bold px-2 py-0.5"
                 style={{
                   color: rankColorMap[missionContext.rank] ?? "#888",
                   backgroundColor: `${rankColorMap[missionContext.rank] ?? "#888"}15`,
@@ -264,10 +266,10 @@ function CardPreviewContent({
         {/* Chakra + Power (character cards) */}
         {isCharacter && (
           <div
-            className="flex items-center gap-4 p-2 rounded-md mt-0.5"
+            className="flex items-center gap-4 p-2 mt-0.5"
             style={{
               backgroundColor: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.05)",
+              borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
             }}
           >
             <div className="flex flex-col items-center gap-0.5">
@@ -311,11 +313,11 @@ function CardPreviewContent({
             {card.keywords.map((kw) => (
               <span
                 key={kw}
-                className="text-[10px] rounded px-1.5 py-0.5"
+                className="text-[10px] px-1.5 py-0.5"
                 style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  backgroundColor: "rgba(255, 255, 255, 0.04)",
                   color: "#999999",
-                  border: "1px solid rgba(255, 255, 255, 0.04)",
+                  borderLeft: "2px solid rgba(255, 255, 255, 0.08)",
                 }}
               >
                 {getCardKeyword(kw, locale as 'en' | 'fr')}
@@ -361,10 +363,10 @@ function CardPreviewContent({
               return (
                 <div
                   key={i}
-                  className="flex flex-col gap-0.5 p-2 rounded"
+                  className="flex flex-col gap-0.5 p-2"
                   style={{
                     backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
-                    border: `1px solid ${effectTypeColorMap[effect.type] ?? "#888888"}15`,
+                    borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? "#888888"}`,
                   }}
                 >
                   <span
@@ -412,25 +414,26 @@ function CardPreviewContent({
               e.stopPropagation();
               toggleFullscreenCard();
             }}
-            className="text-[11px] font-medium px-3 py-1 rounded cursor-pointer"
+            className="text-[11px] font-medium px-3 py-1 cursor-pointer"
             style={{
               backgroundColor: "rgba(196, 163, 90, 0.12)",
               color: "#c4a35a",
-              border: "1px solid rgba(196, 163, 90, 0.3)",
+              borderLeft: "3px solid rgba(196, 163, 90, 0.5)",
+              transform: "skewX(-3deg)",
             }}
           >
-            {t("card.fullscreen")}
+            <span style={{ display: "inline-block", transform: "skewX(3deg)" }}>{t("card.fullscreen")}</span>
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               unpinCard();
             }}
-            className="text-[11px] font-bold px-2.5 py-1 rounded cursor-pointer"
+            className="text-[11px] font-bold px-2.5 py-1 cursor-pointer"
             style={{
               backgroundColor: "rgba(179, 62, 62, 0.12)",
               color: "#b33e3e",
-              border: "1px solid rgba(179, 62, 62, 0.3)",
+              borderLeft: "2px solid rgba(179, 62, 62, 0.5)",
             }}
           >
             X
@@ -541,22 +544,22 @@ function FullscreenCardDetail() {
       {/* Type badge + Rarity */}
       <div className="flex items-center justify-between">
         <span
-          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} rounded font-bold uppercase tracking-wider`}
+          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} font-bold uppercase tracking-wider`}
           style={{
             backgroundColor: isMission
               ? "rgba(196, 163, 90, 0.12)"
               : "rgba(255, 255, 255, 0.04)",
             color: isMission ? "#c4a35a" : "#888888",
-            border: `1px solid ${isMission ? "rgba(196, 163, 90, 0.2)" : "rgba(255, 255, 255, 0.06)"}`,
+            borderLeft: `2px solid ${isMission ? "rgba(196, 163, 90, 0.4)" : "rgba(255, 255, 255, 0.1)"}`,
           }}
         >
           {isMission ? t("card.mission") : t("card.character")}
         </span>
         <span
-          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} rounded shrink-0 font-bold`}
+          className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} shrink-0 font-bold`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.04)",
-            border: `1px solid ${rarityColor}`,
+            borderLeft: `2px solid ${rarityColor}`,
             color: rarityColor,
           }}
         >
@@ -582,10 +585,10 @@ function FullscreenCardDetail() {
       {/* Chakra + Power (character cards) */}
       {isCharacter && (
         <div
-          className={`flex items-center ${dims.isMobile ? 'gap-3 p-1.5' : 'gap-6 p-3'} rounded-lg`}
+          className={`flex items-center ${dims.isMobile ? 'gap-3 p-1.5' : 'gap-6 p-3'}`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
-            border: "1px solid rgba(255, 255, 255, 0.05)",
+            borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
           }}
         >
           <div className="flex flex-col items-center gap-0.5">
@@ -626,10 +629,10 @@ function FullscreenCardDetail() {
       {/* Mission rank + points (compact on mobile) */}
       {isMission && missionContext && (
         <div
-          className={`flex flex-col gap-1 ${dims.isMobile ? 'p-1.5' : 'p-3'} rounded-lg`}
+          className={`flex flex-col gap-1 ${dims.isMobile ? 'p-1.5' : 'p-3'}`}
           style={{
             backgroundColor: "rgba(255, 255, 255, 0.03)",
-            border: `1px solid ${rankColorMap[missionContext.rank] ?? "#555"}40`,
+            borderLeft: `3px solid ${rankColorMap[missionContext.rank] ?? "#555"}`,
           }}
         >
           <div className="flex items-center justify-between">
@@ -637,7 +640,7 @@ function FullscreenCardDetail() {
               {t("card.rank")}
             </span>
             <span
-              className={`${dims.isMobile ? 'text-xs px-2 py-0.5' : 'text-base px-3 py-1'} font-bold rounded`}
+              className={`${dims.isMobile ? 'text-xs px-2 py-0.5' : 'text-base px-3 py-1'} font-bold`}
               style={{
                 color: rankColorMap[missionContext.rank] ?? "#888",
                 backgroundColor: `${rankColorMap[missionContext.rank] ?? "#888"}15`,
@@ -670,11 +673,11 @@ function FullscreenCardDetail() {
           {card.keywords.map((kw) => (
             <span
               key={kw}
-              className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-0.5'} rounded`}
+              className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-0.5'}`}
               style={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                backgroundColor: "rgba(255, 255, 255, 0.04)",
                 color: "#999999",
-                border: "1px solid rgba(255, 255, 255, 0.04)",
+                borderLeft: "2px solid rgba(255, 255, 255, 0.08)",
               }}
             >
               {getCardKeyword(kw, locale as 'en' | 'fr')}
@@ -715,10 +718,10 @@ function FullscreenCardDetail() {
             return (
               <div
                 key={i}
-                className={`flex flex-col gap-0.5 ${dims.isMobile ? 'p-1.5' : 'p-3'} rounded-lg`}
+                className={`flex flex-col gap-0.5 ${dims.isMobile ? 'p-1.5' : 'p-3'}`}
                 style={{
                   backgroundColor: `${effectTypeColorMap[effect.type] ?? "#888888"}08`,
-                  border: `1px solid ${effectTypeColorMap[effect.type] ?? "#888888"}15`,
+                  borderLeft: `3px solid ${effectTypeColorMap[effect.type] ?? "#888888"}`,
                 }}
               >
                 <span
@@ -772,20 +775,18 @@ function FullscreenCardDetail() {
             zIndex: 300,
             maxHeight: "80vh",
             backgroundColor: "rgba(10, 10, 14, 0.98)",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            borderTopLeftRadius: "12px",
-            borderTopRightRadius: "12px",
+            borderTop: "2px solid rgba(196, 163, 90, 0.25)",
             boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.7)",
           }}
         >
           {/* Close button - only toggles fullscreen, keeps card pinned so Details btn reappears */}
           <button
             onClick={() => toggleFullscreenCard()}
-            className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold cursor-pointer"
+            className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center text-[11px] font-bold cursor-pointer"
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.7)",
               color: "#888888",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderLeft: "2px solid rgba(255, 255, 255, 0.15)",
             }}
           >
             X
@@ -843,25 +844,31 @@ function FullscreenCardDetail() {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="relative flex flex-col rounded-xl overflow-hidden"
+          className="relative flex flex-col overflow-hidden"
           style={{
             maxWidth: isMission ? "500px" : "400px",
             width: "90vw",
             maxHeight: "90vh",
             backgroundColor: "rgba(10, 10, 14, 0.98)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.06)",
             boxShadow: "0 20px 80px rgba(0, 0, 0, 0.9)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Corner brackets */}
+          <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
+          <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
+          <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
+          <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
+
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold cursor-pointer"
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center text-sm font-bold cursor-pointer"
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.7)",
               color: "#888888",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderLeft: "2px solid rgba(255, 255, 255, 0.15)",
             }}
           >
             X
@@ -934,13 +941,12 @@ function MaintenanceNotification() {
       initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-14 right-3 z-300 flex items-start gap-2 px-4 py-3 rounded-lg"
+      className="fixed top-14 right-3 z-300 flex items-start gap-2 px-4 py-3"
       style={{
         maxWidth: '340px',
         backgroundColor: 'rgba(40, 30, 10, 0.92)',
-        border: '1px solid rgba(196, 163, 90, 0.25)',
+        borderLeft: '3px solid rgba(196, 163, 90, 0.4)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(12px)',
       }}
     >
       <span className="text-[9px] leading-relaxed" style={{ color: '#c4a35a', fontFamily: 'Inter, sans-serif' }}>
@@ -974,13 +980,12 @@ function BetaNotification() {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 40 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-3 right-3 z-300 flex items-start gap-2 px-4 py-3 rounded-lg"
+      className="fixed top-3 right-3 z-300 flex items-start gap-2 px-4 py-3"
       style={{
         maxWidth: '340px',
         backgroundColor: 'rgba(12, 12, 18, 0.92)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderLeft: '3px solid rgba(255, 255, 255, 0.12)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(12px)',
       }}
     >
       <span className="text-[9px] leading-relaxed" style={{ color: '#cccccc', fontFamily: 'Inter, sans-serif' }}>
@@ -991,11 +996,11 @@ function BetaNotification() {
           setVisible(false);
           try { localStorage.setItem(BETA_DISMISSED_KEY, '1'); } catch { /* noop */ }
         }}
-        className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer mt-0.5"
+        className="shrink-0 w-5 h-5 flex items-center justify-center text-[10px] font-bold cursor-pointer mt-0.5"
         style={{
           backgroundColor: 'rgba(179, 62, 62, 0.15)',
           color: '#b33e3e',
-          border: '1px solid rgba(179, 62, 62, 0.3)',
+          borderLeft: '2px solid rgba(179, 62, 62, 0.4)',
         }}
       >
         X
@@ -1127,10 +1132,9 @@ function GameBoardInner() {
         <section
           className="shrink-0 flex items-center justify-center py-1"
           style={{
-            borderBottom: "1px solid rgba(255, 255, 255, 0.03)",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.opponentHandH + "px",
-            backgroundColor: "rgba(8, 8, 12, 0.45)",
-            backdropFilter: "blur(6px)",
+            backgroundColor: "rgba(8, 8, 12, 0.5)",
           }}
         >
           <OpponentHand handSize={opponentState.handSize} />
@@ -1152,7 +1156,7 @@ function GameBoardInner() {
                 (_, i) => (
                   <div
                     key={`empty-${i}`}
-                    className="flex flex-col items-center justify-center rounded-xl"
+                    className="flex flex-col items-center justify-center"
                     style={{
                       minWidth: dims.emptyLaneMinW + "px",
                       maxWidth: dims.emptyLaneMaxW + "px",
@@ -1162,7 +1166,7 @@ function GameBoardInner() {
                     }}
                   >
                     <div
-                      className="rounded-lg mission-aspect flex items-center justify-center"
+                      className="mission-aspect flex items-center justify-center"
                       style={{
                         width: "100%",
                         maxWidth: dims.missionMaxW + "px",
@@ -1193,10 +1197,9 @@ function GameBoardInner() {
         <section
           className="shrink-0 flex items-center justify-center"
           style={{
-            borderTop: "1px solid rgba(255, 255, 255, 0.03)",
+            borderTop: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.playerHandH + "px",
-            backgroundColor: "rgba(8, 8, 12, 0.45)",
-            backdropFilter: "blur(6px)",
+            backgroundColor: "rgba(8, 8, 12, 0.5)",
           }}
         >
           <PlayerHand hand={myState.hand} chakra={myState.chakra} />
@@ -1229,11 +1232,10 @@ function GameBoardInner() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed top-3 left-1/2 -translate-x-1/2 z-30 rounded-md py-1.5 px-4"
+            className="fixed top-3 left-1/2 -translate-x-1/2 z-30 py-1.5 px-4"
             style={{
               backgroundColor: "rgba(10, 10, 14, 0.85)",
-              border: "1px solid rgba(255, 255, 255, 0.08)",
-              backdropFilter: "blur(12px)",
+              borderLeft: "3px solid rgba(196, 163, 90, 0.3)",
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
             }}
           >

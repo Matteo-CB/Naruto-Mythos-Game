@@ -8,6 +8,14 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import {
+  PopupOverlay,
+  PopupCornerFrame,
+  PopupTitle,
+  PopupActionButton,
+  PopupDismissLink,
+  SectionDivider,
+} from './PopupPrimitives';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -59,7 +67,6 @@ export function GameEndScreen() {
 
     try {
       if (isAIGame && gameState) {
-        // AI game: create game record + save replay data
         const replayData = {
           log: gameState.log,
           playerNames: playerDisplayNames,
@@ -70,7 +77,6 @@ export function GameEndScreen() {
             rankBonus: m.rankBonus,
             wonBy: m.wonBy ?? null,
           })),
-          // Visual replay data
           initialState: replayInitialState,
           actionHistory: gameState.actionHistory ?? [],
         };
@@ -79,7 +85,6 @@ export function GameEndScreen() {
           ? gameState.player2.aiDifficulty
           : gameState.player1.aiDifficulty;
 
-        // Step 1: Create game record
         const createRes = await fetch('/api/game', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -88,7 +93,6 @@ export function GameEndScreen() {
         if (!createRes.ok) throw new Error('Failed to create game');
         const game = await createRes.json();
 
-        // Step 2: Complete with replay data
         const completeRes = await fetch('/api/game', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -105,7 +109,6 @@ export function GameEndScreen() {
         setSavedGameId(game.id);
         setSaveState('saved');
       } else if (isOnlineGame && gameResult?.gameId && gameResult?.replayData) {
-        // Online game: PATCH existing game record with replay data
         const res = await fetch(`/api/game/${gameResult.gameId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -123,7 +126,6 @@ export function GameEndScreen() {
     }
   }, [saveState, isAIGame, isOnlineGame, gameState, gameResult, playerDisplayNames, winner, session?.user?.id, replayInitialState]);
 
-  // Auto-save when the end screen appears (if logged in and has replay data)
   useEffect(() => {
     if (!gameOver || autoSaveAttempted.current) return;
     const isLoggedIn = !!session?.user?.id;
@@ -182,7 +184,6 @@ export function GameEndScreen() {
   const myScore = visibleState.myState.missionPoints;
   const oppScore = visibleState.opponentState.missionPoints;
 
-  // Check if the forfeit was by the viewing player or the opponent
   const forfeitedByMe = isForfeit && visibleState.forfeitedBy === myPlayer;
 
   let headingText: string;
@@ -208,68 +209,23 @@ export function GameEndScreen() {
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-        className="fixed inset-0 z-50 flex items-center justify-center"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
-      >
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{
-            type: 'spring',
-            stiffness: 150,
-            damping: 15,
-            delay: 0.2,
-          }}
-          className="flex flex-col items-center gap-8 rounded-xl p-12"
-          style={{
-            backgroundColor: 'rgba(8, 8, 12, 0.92)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7)',
-            minWidth: '420px',
-          }}
+      <PopupOverlay>
+        <PopupCornerFrame
+          accentColor={`${headingColor}60`}
+          maxWidth="520px"
+          padding="40px 32px"
         >
           {/* Dramatic heading */}
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="flex flex-col items-center gap-2"
-          >
-            <motion.span
-              className="font-display text-5xl font-bold tracking-widest uppercase"
-              style={{ color: headingColor }}
-              animate={{
-                textShadow: [
-                  `0 0 20px ${headingColor}40`,
-                  `0 0 40px ${headingColor}60`,
-                  `0 0 20px ${headingColor}40`,
-                ],
-              }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              {headingText}
-            </motion.span>
-            <motion.div
-              className="h-px w-32"
-              style={{ backgroundColor: headingColor }}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.6, duration: 0.4 }}
-            />
-          </motion.div>
+          <PopupTitle accentColor={headingColor} size="xl">
+            {headingText}
+          </PopupTitle>
 
           {/* Score comparison */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="font-display flex items-center gap-8"
+            className="flex items-center justify-center gap-8 mb-6"
           >
             {/* Player score */}
             <div className="flex flex-col items-center gap-1">
@@ -290,15 +246,14 @@ export function GameEndScreen() {
               </span>
             </div>
 
-            {/* Separator */}
-            <div className="flex flex-col items-center gap-1">
-              <span
-                className="text-2xl font-bold"
-                style={{ color: '#333333' }}
-              >
-                -
-              </span>
-            </div>
+            {/* Vertical divider */}
+            <div
+              style={{
+                width: '1px',
+                height: '48px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              }}
+            />
 
             {/* Opponent score */}
             <div className="flex flex-col items-center gap-1">
@@ -326,7 +281,7 @@ export function GameEndScreen() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.4 }}
-              className="text-xs"
+              className="text-xs text-center block mb-4"
               style={{ color: '#888888' }}
             >
               {t('game.end.tieBreaker')}
@@ -339,7 +294,7 @@ export function GameEndScreen() {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4 }}
-              className="flex flex-col items-center gap-2"
+              className="flex flex-col items-center gap-2 mb-4"
             >
               <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                 {t('game.end.rankedMatch')}
@@ -351,25 +306,23 @@ export function GameEndScreen() {
                 {eloDelta >= 0 ? '+' : ''}{eloDelta} ELO
               </span>
 
-              {/* New ELO + League badge - only when leagues enabled */}
               {leaguesEnabled && newElo !== undefined && (
                 <div className="flex flex-col items-center gap-2 mt-1">
                   <EloBadge elo={newElo} size="md" showElo totalGames={totalGames} />
                 </div>
               )}
 
-              {/* Placement progress - only when leagues enabled */}
               {leaguesEnabled && isPlacement && totalGames !== undefined && (
                 <div className="flex flex-col items-center gap-1 mt-1">
                   <span className="text-xs" style={{ color: '#999' }}>
                     {t('game.end.placementMatch', { current: totalGames, total: PLACEMENT_MATCHES_REQUIRED })}
                   </span>
                   <div
-                    className="rounded-full overflow-hidden"
+                    className="overflow-hidden"
                     style={{ width: '120px', height: '4px', backgroundColor: 'rgba(255,255,255,0.08)' }}
                   >
                     <div
-                      className="h-full rounded-full"
+                      className="h-full"
                       style={{
                         width: `${(totalGames / PLACEMENT_MATCHES_REQUIRED) * 100}%`,
                         backgroundColor: '#666',
@@ -380,7 +333,6 @@ export function GameEndScreen() {
                 </div>
               )}
 
-              {/* Just became ranked - only when leagues enabled */}
               {leaguesEnabled && justBecameRanked && (
                 <motion.span
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -395,12 +347,14 @@ export function GameEndScreen() {
             </motion.div>
           )}
 
+          <SectionDivider color="rgba(255, 255, 255, 0.06)" width={100} />
+
           {/* Action buttons */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
-            className="flex flex-col items-center gap-3"
+            className="flex flex-col items-center gap-3 mt-4"
           >
             {/* Auto-save status */}
             {saveState === 'saving' && (
@@ -414,7 +368,7 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* Watch Replay button (after auto-save) */}
+            {/* Watch Replay button */}
             {saveState === 'saved' && savedGameId && (
               <>
                 <span className="text-xs" style={{ color: '#4a9e4a' }}>
@@ -422,14 +376,20 @@ export function GameEndScreen() {
                 </span>
                 <Link
                   href={`/replay/${savedGameId}`}
-                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider text-center"
+                  className="uppercase tracking-wider text-center text-sm font-bold no-underline"
                   style={{
-                    backgroundColor: '#1a1a2e',
+                    padding: '10px 28px',
+                    backgroundColor: 'rgba(74, 158, 74, 0.12)',
                     color: '#4a9e4a',
-                    border: '1px solid #4a9e4a',
+                    borderLeft: '3px solid #4a9e4a',
+                    transform: 'skewX(-3deg)',
+                    display: 'inline-block',
+                    letterSpacing: '0.12em',
                   }}
                 >
-                  {t('game.end.watchReplay')}
+                  <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
+                    {t('game.end.watchReplay')}
+                  </span>
                 </Link>
               </>
             )}
@@ -446,39 +406,31 @@ export function GameEndScreen() {
                     value={sealedDeckName}
                     onChange={(e) => setSealedDeckName(e.target.value)}
                     placeholder={t('sealed.saveDeckPlaceholder')}
-                    className="px-3 py-2 text-sm rounded"
+                    className="px-3 py-2 text-sm"
                     style={{
-                      backgroundColor: '#1a1a1a',
-                      border: '1px solid #333',
+                      backgroundColor: '#0a0a0f',
+                      border: '1px solid rgba(196, 163, 90, 0.2)',
+                      borderLeft: '3px solid rgba(196, 163, 90, 0.4)',
                       color: '#e0e0e0',
                       outline: 'none',
                       width: '200px',
                     }}
                   />
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <PopupActionButton
                     onClick={handleSaveSealedDeck}
                     disabled={sealedSaveState === 'saving'}
-                    className="px-4 py-2 rounded text-sm font-medium uppercase tracking-wider cursor-pointer"
-                    style={{
-                      backgroundColor: sealedSaveState === 'error' ? '#b33e3e' : '#1a1a2e',
-                      color: sealedSaveState === 'error' ? '#ffffff' : '#c4a35a',
-                      border: `1px solid ${sealedSaveState === 'error' ? '#b33e3e' : '#c4a35a'}`,
-                      opacity: sealedSaveState === 'saving' ? 0.6 : 1,
-                    }}
+                    accentColor={sealedSaveState === 'error' ? '#b33e3e' : '#c4a35a'}
                   >
                     {sealedSaveState === 'saving'
                       ? t('common.loading')
                       : sealedSaveState === 'error'
                         ? t('sealed.deckSaveError')
                         : t('common.save')}
-                  </motion.button>
+                  </PopupActionButton>
                 </div>
               </div>
             )}
 
-            {/*/* Sealed deck saved confirmation */}
             {sealedSaveState === 'saved' && (
               <span className="text-xs" style={{ color: '#4a9e4a' }}>
                 {t('sealed.deckSaved')}
@@ -488,50 +440,20 @@ export function GameEndScreen() {
             {/* AI Replay buttons */}
             {isAIGame && lastAIGameConfig && (
               <div className="flex gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={replayAIGame}
-                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                  style={{
-                    backgroundColor: '#1a1a2e',
-                    color: '#c4a35a',
-                    border: '1px solid #c4a35a',
-                  }}
-                >
+                <PopupActionButton onClick={replayAIGame} accentColor="#c4a35a">
                   {t('game.end.replay')}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleChangeDeck}
-                  className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                  style={{
-                    backgroundColor: '#1a1a2e',
-                    color: '#888',
-                    border: '1px solid #333',
-                  }}
-                >
+                </PopupActionButton>
+                <PopupDismissLink onClick={handleChangeDeck}>
                   {t('game.end.changeDeck')}
-                </motion.button>
+                </PopupDismissLink>
               </div>
             )}
 
             {/* Online Rematch button */}
             {isOnlineGame && rematchState === 'none' && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={offerRematch}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                style={{
-                  backgroundColor: '#1a1a2e',
-                  color: '#c4a35a',
-                  border: '1px solid #c4a35a',
-                }}
-              >
+              <PopupActionButton onClick={offerRematch} accentColor="#c4a35a">
                 {t('game.end.rematch')}
-              </motion.button>
+              </PopupActionButton>
             )}
 
             {isOnlineGame && rematchState === 'offered' && (
@@ -542,32 +464,12 @@ export function GameEndScreen() {
 
             {isOnlineGame && rematchState === 'received' && (
               <div className="flex gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={acceptRematch}
-                  className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                  style={{
-                    backgroundColor: '#4a9e4a',
-                    color: '#0a0a0a',
-                    border: '1px solid #4a9e4a',
-                  }}
-                >
+                <PopupActionButton onClick={acceptRematch} accentColor="#4a9e4a">
                   {t('game.end.rematchAccept')}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={declineRematch}
-                  className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                  style={{
-                    backgroundColor: '#1a1a2e',
-                    color: '#b33e3e',
-                    border: '1px solid #b33e3e',
-                  }}
-                >
+                </PopupActionButton>
+                <PopupActionButton onClick={declineRematch} accentColor="#b33e3e">
                   {t('game.end.rematchDecline')}
-                </motion.button>
+                </PopupActionButton>
               </div>
             )}
 
@@ -578,23 +480,12 @@ export function GameEndScreen() {
             )}
 
             {/* Back to Menu button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={resetGame}
-              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-              style={{
-                backgroundColor: '#c4a35a',
-                color: '#0a0a0a',
-                border: '1px solid #c4a35a',
-                boxShadow: '0 4px 16px rgba(196, 163, 90, 0.3)',
-              }}
-            >
+            <PopupActionButton onClick={resetGame} accentColor="#c4a35a">
               {t('game.end.backToMenu')}
-            </motion.button>
+            </PopupActionButton>
           </motion.div>
-        </motion.div>
-      </motion.div>
+        </PopupCornerFrame>
+      </PopupOverlay>
     </AnimatePresence>
   );
 }

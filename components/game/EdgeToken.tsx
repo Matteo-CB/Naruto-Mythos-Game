@@ -12,6 +12,7 @@ interface EdgeTokenProps {
 export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
   const t = useTranslations();
   const isPlayerHolding = holder === myPlayer;
+  const accentColor = isPlayerHolding ? '#c4a35a' : '#b33e3e';
 
   return (
     <div className="flex flex-col items-center gap-1">
@@ -23,25 +24,27 @@ export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
       </span>
       <motion.div
         layout
-        className="flex items-center justify-center rounded-full"
+        className="flex items-center justify-center"
         style={{
-          width: '42px',
-          height: '42px',
-          backgroundColor: isPlayerHolding ? '#c4a35a' : '#b33e3e',
+          width: '36px',
+          height: '36px',
+          transform: 'rotate(45deg)',
+          backgroundColor: accentColor,
           border: '2px solid rgba(255, 255, 255, 0.1)',
         }}
         animate={{
-          boxShadow: isPlayerHolding
-            ? '0 0 16px rgba(196, 163, 90, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3)'
-            : '0 0 16px rgba(179, 62, 62, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3)',
+          boxShadow: `0 0 16px ${accentColor}80, 0 2px 8px rgba(0, 0, 0, 0.3)`,
         }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       >
         <motion.span
           className="text-xs font-bold"
-          style={{ color: '#0a0a0a' }}
-          animate={{ rotate: isPlayerHolding ? 0 : 180 }}
-          transition={{ duration: 0.6 }}
+          style={{
+            color: '#0a0a0a',
+            transform: 'rotate(-45deg)',
+          }}
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ repeat: Infinity, duration: 2 }}
         >
           E
         </motion.span>
@@ -51,7 +54,7 @@ export function EdgeToken({ holder, myPlayer }: EdgeTokenProps) {
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-xs"
-        style={{ color: isPlayerHolding ? '#c4a35a' : '#b33e3e' }}
+        style={{ color: accentColor }}
       >
         {isPlayerHolding ? t('game.you') : t('game.opponent')}
       </motion.span>

@@ -5,6 +5,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { ChakraPool } from './ChakraPool';
 import { ScoreDisplay } from './ScoreDisplay';
 import { EdgeToken } from './EdgeToken';
+import { PanelFrame, SectionDivider, StatValue } from './PopupPrimitives';
 import type { GamePhase } from '@/lib/engine/types';
 
 const phaseTranslationKeys: Record<string, string> = {
@@ -16,12 +17,6 @@ const phaseTranslationKeys: Record<string, string> = {
   end: 'game.phase.end',
   gameOver: 'game.phase.gameOver',
 };
-
-function Divider() {
-  return (
-    <div className="my-0.5 h-px" style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }} />
-  );
-}
 
 function InfoRow({ label, value, valueColor = '#e0e0e0' }: { label: string; value: string | number; valueColor?: string }) {
   return (
@@ -58,65 +53,63 @@ export function GameInfo() {
   return (
     <div className="flex flex-col gap-2.5 p-3 h-full overflow-y-auto">
       {/* Turn + Phase + Active - combined card */}
-      <div
-        className="flex flex-col gap-2 p-2.5 rounded-lg"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <span
-            className="text-[10px] uppercase tracking-wider font-medium"
-            style={{ color: '#888888' }}
-          >
-            {t('game.turnLabel')}
-          </span>
-          <div className="flex items-baseline gap-1">
+      <PanelFrame accentColor="rgba(196, 163, 90, 0.3)" padding="10px 12px">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
             <span
-              className="text-xl font-bold tabular-nums"
-              style={{ color: '#c4a35a' }}
+              className="text-[10px] uppercase tracking-wider font-medium"
+              style={{ color: '#888888' }}
             >
-              {turn}
+              {t('game.turnLabel')}
             </span>
-            <span className="text-[10px]" style={{ color: '#555555' }}>
-              / 4
+            <div className="flex items-baseline gap-1">
+              <StatValue value={turn} color="#c4a35a" size="md" />
+              <span className="text-[10px]" style={{ color: '#555555' }}>
+                / 4
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span
+              className="text-[10px] uppercase tracking-wider font-medium"
+              style={{ color: '#888888' }}
+            >
+              {t('game.board.phaseLabel')}
+            </span>
+            <span
+              className="text-xs font-semibold px-1.5 py-0.5"
+              style={{
+                color: '#e0e0e0',
+                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                borderLeft: '2px solid rgba(196, 163, 90, 0.3)',
+              }}
+            >
+              {translatedPhase}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span
+              className="text-[10px] uppercase tracking-wider font-medium"
+              style={{ color: '#888888' }}
+            >
+              {t('game.board.activeLabel')}
+            </span>
+            <span
+              className="text-xs font-semibold"
+              style={{ color: isMyTurn ? '#c4a35a' : '#b33e3e' }}
+            >
+              {isMyTurn ? t('game.yourTurn') : t('game.opponentTurn')}
             </span>
           </div>
         </div>
-
-        <div className="flex items-center justify-between">
-          <span
-            className="text-[10px] uppercase tracking-wider font-medium"
-            style={{ color: '#888888' }}
-          >
-            {t('game.board.phaseLabel')}
-          </span>
-          <span className="text-xs font-semibold" style={{ color: '#e0e0e0' }}>
-            {translatedPhase}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span
-            className="text-[10px] uppercase tracking-wider font-medium"
-            style={{ color: '#888888' }}
-          >
-            {t('game.board.activeLabel')}
-          </span>
-          <span
-            className="text-xs font-semibold"
-            style={{ color: isMyTurn ? '#c4a35a' : '#b33e3e' }}
-          >
-            {isMyTurn ? t('game.yourTurn') : t('game.opponentTurn')}
-          </span>
-        </div>
-      </div>
+      </PanelFrame>
 
       {/* Edge Token */}
       <EdgeToken holder={edgeHolder} myPlayer={myPlayer} />
 
-      <Divider />
+      <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} showDiamond />
 
       {/* Score Display */}
       <ScoreDisplay
@@ -126,21 +119,23 @@ export function GameInfo() {
         opponentLabel={t('game.opponent')}
       />
 
-      <Divider />
+      <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} />
 
       {/* Chakra */}
-      <div className="flex flex-col gap-1.5">
-        <span
-          className="text-[10px] uppercase tracking-wider font-medium"
-          style={{ color: '#888888' }}
-        >
-          {t('game.chakra')}
-        </span>
-        <InfoRow label={t('game.you')} value={myState.chakra} valueColor="#c4a35a" />
-        <InfoRow label={t('game.opponent')} value={opponentState.chakra} valueColor="#b33e3e" />
-      </div>
+      <PanelFrame accentColor="rgba(196, 163, 90, 0.2)" padding="8px 10px">
+        <div className="flex flex-col gap-1.5">
+          <span
+            className="text-[10px] uppercase tracking-wider font-medium"
+            style={{ color: '#888888' }}
+          >
+            {t('game.chakra')}
+          </span>
+          <InfoRow label={t('game.you')} value={myState.chakra} valueColor="#c4a35a" />
+          <InfoRow label={t('game.opponent')} value={opponentState.chakra} valueColor="#b33e3e" />
+        </div>
+      </PanelFrame>
 
-      <Divider />
+      <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
       {/* Decks */}
       <div className="flex flex-col gap-1.5">
@@ -155,7 +150,7 @@ export function GameInfo() {
         <InfoRow label={t('game.board.missionDeck')} value={missionDeckSize} valueColor="#888888" />
       </div>
 
-      <Divider />
+      <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
       {/* Discard piles */}
       <div className="flex flex-col gap-1.5">
@@ -172,7 +167,7 @@ export function GameInfo() {
       {/* Pass status */}
       {phase === 'action' && (
         <>
-          <Divider />
+          <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
           <div className="flex flex-col gap-1.5">
             <span
               className="text-[10px] uppercase tracking-wider font-medium"
