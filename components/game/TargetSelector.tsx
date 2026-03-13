@@ -15,25 +15,137 @@ import { useGameScale } from './GameScaleContext';
 function MinimizeButton({ onClick }: { onClick: () => void }) {
   const t = useTranslations();
   return (
-    <div style={{ width: 'min(90vw, 500px)', display: 'flex', justifyContent: 'flex-end', marginBottom: '6px' }}>
-      <button
+    <div style={{
+      width: 'min(90vw, 520px)',
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginBottom: '14px',
+    }}>
+      <motion.button
         onClick={(e) => { e.stopPropagation(); onClick(); }}
         className="no-select"
+        whileHover={{ scale: 1.25, opacity: 1 }}
+        whileTap={{ scale: 0.85 }}
         style={{
           background: 'none',
           border: 'none',
-          color: '#c4a35a',
+          color: '#d4b36a',
           fontSize: '22px',
           lineHeight: '1',
           cursor: 'pointer',
-          fontWeight: 400,
-          padding: '4px',
+          fontWeight: 300,
+          padding: '4px 6px',
+          opacity: 0.7,
+          textShadow: '0 0 10px rgba(196, 163, 90, 0.5), 0 0 30px rgba(196, 163, 90, 0.15)',
         }}
         title={t('game.board.minimize')}
       >
         &#x2715;
-      </button>
+      </motion.button>
     </div>
+  );
+}
+
+function PopupBanner({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+      className="mb-5 flex flex-col items-center gap-2"
+    >
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        style={{ width: '60px', height: '1px', backgroundColor: 'rgba(196, 163, 90, 0.35)' }}
+      />
+      <div className="flex items-center gap-3 px-8 py-2">
+        <motion.div
+          className="rounded-full"
+          style={{ width: '8px', height: '8px', backgroundColor: '#c4a35a' }}
+          animate={{
+            boxShadow: [
+              '0 0 4px rgba(196, 163, 90, 0.3)',
+              '0 0 14px rgba(196, 163, 90, 0.8)',
+              '0 0 4px rgba(196, 163, 90, 0.3)',
+            ],
+          }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+        />
+        <span
+          className="text-sm font-bold uppercase"
+          style={{ color: '#c4a35a', letterSpacing: '0.2em', textShadow: '0 0 20px rgba(196, 163, 90, 0.2)' }}
+        >
+          {children}
+        </span>
+      </div>
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.25, duration: 0.4 }}
+        style={{ width: '140px', height: '1px', backgroundColor: 'rgba(196, 163, 90, 0.2)' }}
+      />
+    </motion.div>
+  );
+}
+
+function PopupDescription({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+      className="mb-6 px-6 py-3 rounded"
+      style={{
+        backgroundColor: 'rgba(8, 8, 12, 0.8)',
+        borderLeft: '2px solid rgba(196, 163, 90, 0.4)',
+        maxWidth: '500px',
+      }}
+    >
+      <span className="font-body text-xs leading-relaxed" style={{ color: '#d0d0d0' }}>
+        {children}
+      </span>
+    </motion.div>
+  );
+}
+
+function PopupConfirmButton({ onClick, children, color = '#c4a35a' }: { onClick: () => void; children: React.ReactNode; color?: string }) {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+      className="px-8 py-3 rounded-lg text-sm font-bold uppercase cursor-pointer"
+      style={{
+        backgroundColor: color,
+        color: '#0a0a0a',
+        border: `1px solid ${color === '#c4a35a' ? 'rgba(255, 215, 0, 0.4)' : color}`,
+        boxShadow: `0 0 16px ${color}4d, 0 4px 12px rgba(0, 0, 0, 0.4)`,
+        letterSpacing: '0.12em',
+      }}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+function PopupSkipButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+      className="px-6 py-2.5 rounded-lg text-xs font-medium uppercase cursor-pointer"
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        color: '#777777',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        letterSpacing: '0.12em',
+      }}
+    >
+      {children}
+    </motion.button>
   );
 }
 
@@ -403,24 +515,27 @@ export function TargetSelector() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 40, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.97 }}
         onClick={restoreEffectPopup}
         className="fixed z-50 flex items-center gap-2 no-select"
         style={{
-          bottom: '12px',
+          bottom: '14px',
           left: '50%',
           transform: 'translateX(-50%)',
-          padding: '8px 18px',
-          background: 'rgba(196, 163, 90, 0.95)',
+          padding: '8px 20px',
+          background: 'rgba(196, 163, 90, 0.92)',
           color: '#0a0a0a',
           borderRadius: '24px',
-          fontSize: '13px',
+          fontSize: '12px',
           fontWeight: 700,
           cursor: 'pointer',
           border: '1px solid rgba(255, 215, 0, 0.4)',
-          boxShadow: '0 4px 20px rgba(196, 163, 90, 0.5)',
+          boxShadow: '0 4px 24px rgba(196, 163, 90, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3)',
+          letterSpacing: '0.04em',
         }}
       >
-        <span style={{ fontSize: '16px', lineHeight: 1 }}>&#x25B2;</span>
+        <span style={{ fontSize: '14px', lineHeight: 1 }}>&#x25B2;</span>
         {pillText}
       </motion.button>
     );
@@ -583,8 +698,8 @@ export function TargetSelector() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6"
-            style={{ color: accentColor }}
+            className="text-sm font-bold uppercase mb-6"
+            style={{ color: accentColor, letterSpacing: '0.18em', textShadow: `0 0 20px ${accentColor}40` }}
           >
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </motion.span>
@@ -601,7 +716,7 @@ export function TargetSelector() {
               borderRadius: '8px',
               overflow: 'hidden',
               border: `2px solid ${accentColor}`,
-              boxShadow: `0 0 24px ${accentColor}50`,
+              boxShadow: `0 0 28px ${accentColor}40, 0 8px 24px rgba(0, 0, 0, 0.5)`,
             }}
           >
             {imagePath ? (
@@ -620,14 +735,14 @@ export function TargetSelector() {
               </div>
             )}
             {/* Action overlay badge */}
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-            >
+            <div className="absolute inset-0 flex items-center justify-center">
               <span
-                className="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded"
+                className="text-xs font-bold uppercase px-2 py-1 rounded"
                 style={{
                   backgroundColor: `${accentColor}cc`,
                   color: '#ffffff',
+                  letterSpacing: '0.1em',
+                  boxShadow: `0 2px 8px ${accentColor}40`,
                 }}
               >
                 {isDefeat ? t('game.effect.defeatBadge') : t('game.effect.hideBadge')}
@@ -666,34 +781,13 @@ export function TargetSelector() {
             transition={{ delay: 0.4 }}
             className="flex gap-4"
           >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelect('confirm')}
-              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-              style={{
-                backgroundColor: accentColor,
-                color: '#ffffff',
-                border: `1px solid ${accentColor}`,
-                boxShadow: `0 4px 16px ${accentColor}40`,
-              }}
-            >
+            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={accentColor}>
               {t(confirmLabelKey)}
-            </motion.button>
+            </PopupConfirmButton>
             {canDecline && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleDecline}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: '#888888',
-                  border: '1px solid #333333',
-                }}
-              >
+              <PopupSkipButton onClick={handleDecline}>
                 {t('game.board.skip')}
-              </motion.button>
+              </PopupSkipButton>
             )}
           </motion.div>
         </motion.div>
@@ -860,45 +954,33 @@ export function TargetSelector() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-4">
-            {/* Skip / Draw none button */}
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={skipMultiSelect}
-              className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-              style={{
-                backgroundColor: 'transparent',
-                color: '#888888',
-                border: '1px solid #555555',
-              }}
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="flex gap-4"
+          >
+            <PopupSkipButton onClick={skipMultiSelect}>
               {t('game.board.skip')}
-            </motion.button>
+            </PopupSkipButton>
 
-            {/* Confirm selection button */}
             <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={multiSelectChoices.size > 0 ? { scale: 1.05 } : {}}
+              whileTap={multiSelectChoices.size > 0 ? { scale: 0.95 } : {}}
               onClick={confirmMultiSelect}
               disabled={multiSelectChoices.size === 0}
-              className="px-6 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
+              className="px-8 py-3 rounded-lg text-sm font-bold uppercase cursor-pointer"
               style={{
                 backgroundColor: multiSelectChoices.size > 0 ? '#4aff6b' : '#333333',
                 color: multiSelectChoices.size > 0 ? '#0a0a0a' : '#666666',
                 border: `1px solid ${multiSelectChoices.size > 0 ? '#4aff6b' : '#444444'}`,
-                boxShadow: multiSelectChoices.size > 0 ? '0 4px 16px rgba(74, 255, 107, 0.3)' : 'none',
+                boxShadow: multiSelectChoices.size > 0 ? '0 0 16px rgba(74, 255, 107, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4)' : 'none',
+                letterSpacing: '0.12em',
               }}
             >
               {t('game.board.confirm')} ({multiSelectChoices.size})
             </motion.button>
-          </div>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
     );
@@ -1038,23 +1120,15 @@ export function TargetSelector() {
           </motion.div>
 
           {/* Confirm button */}
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleSelect('confirm')}
-            className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-            style={{
-              backgroundColor: resultColor,
-              color: '#0a0a0a',
-              border: `1px solid ${resultColor}`,
-              boxShadow: `0 4px 16px ${resultColor}40`,
-            }}
           >
-            {t('game.board.confirm')}
-          </motion.button>
+            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={resultColor}>
+              {t('game.board.confirm')}
+            </PopupConfirmButton>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
     );
@@ -1180,23 +1254,15 @@ export function TargetSelector() {
           </motion.div>
 
           {/* Confirm button */}
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleSelect('confirm')}
-            className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-            style={{
-              backgroundColor: resultColor,
-              color: '#0a0a0a',
-              border: `1px solid ${resultColor}`,
-              boxShadow: `0 4px 16px ${resultColor}40`,
-            }}
           >
-            {t('game.board.confirm')}
-          </motion.button>
+            <PopupConfirmButton onClick={() => handleSelect('confirm')} color={resultColor}>
+              {t('game.board.confirm')}
+            </PopupConfirmButton>
+          </motion.div>
         </motion.div>
       </AnimatePresence>
     );
@@ -1345,8 +1411,8 @@ export function TargetSelector() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="text-sm font-bold uppercase tracking-widest mb-6 text-center px-4 font-body"
-            style={{ color: '#c4a35a', maxWidth: '500px' }}
+            className="text-sm font-bold uppercase mb-6 text-center px-4 font-body"
+            style={{ color: '#c4a35a', maxWidth: '500px', letterSpacing: '0.15em', textShadow: '0 0 20px rgba(196, 163, 90, 0.2)' }}
           >
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </motion.span>
@@ -1364,7 +1430,7 @@ export function TargetSelector() {
                 borderRadius: '8px',
                 overflow: 'hidden',
                 border: '2px solid #c4a35a',
-                boxShadow: '0 0 24px rgba(196, 163, 90, 0.3)',
+                boxShadow: '0 0 28px rgba(196, 163, 90, 0.25), 0 8px 24px rgba(0, 0, 0, 0.5)',
               }}
             >
               <div
@@ -1390,34 +1456,13 @@ export function TargetSelector() {
             transition={{ delay: 0.4 }}
             className="flex gap-4"
           >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelect(confirmTarget)}
-              className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-              style={{
-                backgroundColor: '#c4a35a',
-                color: '#0a0a0a',
-                border: '1px solid #c4a35a',
-                boxShadow: '0 4px 16px rgba(196, 163, 90, 0.4)',
-              }}
-            >
+            <PopupConfirmButton onClick={() => handleSelect(confirmTarget)}>
               {t('game.board.confirm')}
-            </motion.button>
+            </PopupConfirmButton>
             {canDecline && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleDecline}
-                className="px-8 py-3 rounded-lg text-sm font-medium uppercase tracking-wider cursor-pointer"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: '#888888',
-                  border: '1px solid #333333',
-                }}
-              >
+              <PopupSkipButton onClick={handleDecline}>
                 {t('game.board.skip')}
-              </motion.button>
+              </PopupSkipButton>
             )}
           </motion.div>
         </motion.div>
@@ -1437,56 +1482,25 @@ export function TargetSelector() {
       >
         <MinimizeButton onClick={minimizeEffectPopup} />
         {/* Player announcement banner */}
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-          className="mb-4 px-10 py-3 rounded-lg flex items-center gap-3"
-          style={{
-            backgroundColor: 'rgba(196, 163, 90, 0.08)',
-            border: '2px solid rgba(196, 163, 90, 0.3)',
-            boxShadow: '0 0 24px rgba(196, 163, 90, 0.15)',
-          }}
-        >
-          <motion.div
-            className="rounded-full"
-            style={{
-              width: '10px',
-              height: '10px',
-              backgroundColor: '#c4a35a',
-            }}
-            animate={{
-              boxShadow: [
-                '0 0 4px rgba(196, 163, 90, 0.4)',
-                '0 0 12px rgba(196, 163, 90, 0.8)',
-                '0 0 4px rgba(196, 163, 90, 0.4)',
-              ],
-            }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-          />
-          <span
-            className="text-lg font-bold uppercase tracking-wider"
-            style={{ color: '#c4a35a' }}
-          >
-            {t('game.mustChooseTarget', { player: displayName })}
-          </span>
-        </motion.div>
+        <PopupBanner>
+          {t('game.mustChooseTarget', { player: displayName })}
+        </PopupBanner>
 
         {/* Description bar */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
-          className="mb-6 px-8 py-4 rounded-lg flex flex-col items-center gap-2"
+          className="mb-6 px-6 py-3 rounded flex flex-col items-center gap-2"
           style={{
-            backgroundColor: '#0a0a0a',
-            border: '1px solid #333333',
+            backgroundColor: 'rgba(8, 8, 12, 0.8)',
+            borderLeft: '2px solid rgba(196, 163, 90, 0.4)',
             maxWidth: '600px',
           }}
         >
           <span
             className="font-body text-xs text-center leading-relaxed"
-            style={{ color: '#e0e0e0' }}
+            style={{ color: '#d0d0d0' }}
           >
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </span>
@@ -1505,8 +1519,9 @@ export function TargetSelector() {
           transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 18 }}
           className="flex gap-4 overflow-x-auto px-4 py-3 rounded-lg"
           style={{
-            backgroundColor: '#0a0a0a',
-            border: '1px solid #1a1a1a',
+            backgroundColor: 'rgba(6, 6, 10, 0.7)',
+            border: '1px solid rgba(196, 163, 90, 0.06)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(196, 163, 90, 0.04)',
             maxWidth: '90vw',
           }}
         >
@@ -1524,22 +1539,16 @@ export function TargetSelector() {
 
         {/* Skip / Decline button for optional effects */}
         {canDecline && (
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleDecline}
-            className="mt-6 px-6 py-2.5 rounded-md text-sm font-medium uppercase tracking-wider cursor-pointer"
-            style={{
-              backgroundColor: 'transparent',
-              color: '#888888',
-              border: '1px solid #333333',
-            }}
+            className="mt-5"
           >
-            {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
-          </motion.button>
+            <PopupSkipButton onClick={handleDecline}>
+              {declineLabelKey ? t(declineLabelKey) : t('game.board.skip')}
+            </PopupSkipButton>
+          </motion.div>
         )}
       </motion.div>
     </AnimatePresence>
