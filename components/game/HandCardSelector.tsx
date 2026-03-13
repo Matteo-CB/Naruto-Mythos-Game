@@ -242,14 +242,15 @@ export function HandCardSelector() {
           onClick={(e) => { e.stopPropagation(); minimizeEffectPopup(); }}
           className="no-select"
           style={{
-            margin: '0 auto 12px', padding: '6px 20px',
-            background: 'rgba(196, 163, 90, 0.12)',
-            border: '1px solid rgba(196, 163, 90, 0.35)', borderRadius: '20px',
-            color: '#c4a35a', fontSize: '12px', cursor: 'pointer', fontWeight: 600,
-            letterSpacing: '0.05em',
+            position: 'absolute', top: '10px', right: '10px', zIndex: 60,
+            display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '5px 12px', background: 'rgba(255, 255, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '6px',
+            color: '#999', fontSize: '11px', cursor: 'pointer', fontWeight: 500,
           }}
           title={t('game.board.minimize')}
         >
+          <span style={{ fontSize: '14px', lineHeight: '1', marginTop: '-1px' }}>&#x2014;</span>
           {t('game.board.minimize')}
         </button>
         {/* Player announcement banner */}
