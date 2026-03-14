@@ -31,6 +31,16 @@ import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 import { getEffectivePower } from '../effects/powerUtils';
 
+/** Collect all character instanceIds from a game state (for replay ID tracking). */
+function collectCharInstanceIds(state: GameState): Set<string> {
+  const ids = new Set<string>();
+  for (const mission of state.activeMissions) {
+    for (const c of mission.player1Characters) ids.add(c.instanceId);
+    for (const c of mission.player2Characters) ids.add(c.instanceId);
+  }
+  return ids;
+}
+
 export class GameEngine {
   /**
    * Create a new game from two player configurations.
@@ -132,6 +142,9 @@ export class GameEngine {
    * This is the main reducer - validates the action, applies it, handles phase transitions.
    */
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
+    // Snapshot character IDs before the action for replay tracking
+    const prevCharIds = collectCharInstanceIds(state);
+
     let newState = deepClone(state);
 
     // Track action for replay
@@ -339,6 +352,18 @@ export class GameEngine {
       case 'gameOver':
         // Game is over - no actions accepted
         break;
+    }
+
+    // Record instanceIds of characters created by this action (for accurate replay ID mapping)
+    if (newState.actionHistory && newState.actionHistory.length > 0) {
+      const newCharIds = collectCharInstanceIds(newState);
+      const created: string[] = [];
+      for (const id of newCharIds) {
+        if (!prevCharIds.has(id)) created.push(id);
+      }
+      if (created.length > 0) {
+        newState.actionHistory[newState.actionHistory.length - 1].createdIds = created;
+      }
     }
 
     return newState;

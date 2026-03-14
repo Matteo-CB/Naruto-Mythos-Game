@@ -166,8 +166,9 @@ export interface GameState {
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).
    *  Key = player who pays MORE. Reset at start of each turn. */
   playCostIncrease?: { player1: number; player2: number };
-  /** Ordered history of all actions applied during the game (for replay). */
-  actionHistory?: Array<{ player: PlayerID; action: GameAction }>;
+  /** Ordered history of all actions applied during the game (for replay).
+   *  createdIds: instanceIds of characters created by this action (for accurate replay ID mapping). */
+  actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
   /** When a forced-choice pending (e.g. Dosu069) is created for a player,
    *  this records which player should receive the turn once all pendings clear.
    *  Cleared by GameEngine when the turn switch fires. */
