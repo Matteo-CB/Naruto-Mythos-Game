@@ -925,6 +925,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (training page will re-enable it explicitly after calling startAIGame)
     useTrainingStore.getState().disable();
 
+    // Reset ID counter before creating game — safe on client (single game, no concurrency).
+    // Server does NOT reset to avoid ID collisions between concurrent games.
+    resetIdCounter();
     const state = GameEngine.createGame(config);
     const humanPlayer: PlayerID = config.player1.isAI ? 'player2' : 'player1';
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
@@ -978,6 +981,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => {
     useUIStore.getState().setCoinFlipComplete(false);
     useTrainingStore.getState().disable();
+    resetIdCounter();
     const state = GameEngine.createGame(config);
     const visible = GameEngine.getVisibleState(state, 'player1');
 

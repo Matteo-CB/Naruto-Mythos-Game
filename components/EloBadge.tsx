@@ -66,7 +66,7 @@ export const RANK_TIERS: RankTier[] = [
     borderColor: 'rgba(90, 122, 187, 0.3)',
     glowColor: 'rgba(90, 122, 187, 0.15)',
     symbol: '\u2726',
-    image: '/images/leagues/special-jonin.webp',
+    image: '/images/leagues/elite-jonin.webp',
   },
   {
     key: 'eliteJonin',
@@ -76,7 +76,7 @@ export const RANK_TIERS: RankTier[] = [
     borderColor: 'rgba(88, 101, 242, 0.3)',
     glowColor: 'rgba(88, 101, 242, 0.2)',
     symbol: '\u2726\u2726',
-    image: '/images/leagues/elite-jonin.webp',
+    image: '/images/leagues/special-jonin.webp',
   },
   {
     key: 'legendarySannin',

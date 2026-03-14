@@ -349,6 +349,7 @@ function startActionTimer(
   }
 
   room.actionTimer = setTimeout(async () => {
+    if (!rooms.has(code)) return; // Room was deleted (disconnect/cleanup)
     if (!room.gameState || room.gameState.phase !== 'action') return;
 
     const player = room.gameState.activePlayer;
@@ -385,6 +386,7 @@ function startActionTimer(
       } else if (room.gameState.missionScoringComplete) {
         // Mission scoring done - auto-advance after brief pause
         setTimeout(async () => {
+          if (!rooms.has(code)) return; // Room was deleted
           if (!room.gameState || !room.gameState.missionScoringComplete) return;
           room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
           broadcastState(room, io);
@@ -435,6 +437,7 @@ function startForcedResolverTimer(
   }
 
   room.actionTimer = setTimeout(async () => {
+    if (!rooms.has(code)) return; // Room was deleted
     if (!room.gameState || !room.gameState.pendingForcedResolver) return;
 
     const resolver = room.gameState.pendingForcedResolver;
@@ -488,6 +491,10 @@ function startForcedResolverTimer(
  */
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
+  const playerNames = {
+    player1: room.hostName ?? 'Player 1',
+    player2: room.guestName ?? 'Player 2',
+  };
   try {
     const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
     const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
@@ -496,16 +503,25 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
       io.to(room.hostSocket).emit('game:state-update', {
         visibleState: p1State,
         playerRole: 'player1',
+        playerNames,
       });
     }
     if (room.guestSocket) {
       io.to(room.guestSocket).emit('game:state-update', {
         visibleState: p2State,
         playerRole: 'player2',
+        playerNames,
       });
     }
   } catch (err) {
     console.error('[Socket] broadcastState error:', err instanceof Error ? err.message : err);
+    // Notify both players so UI doesn't freeze
+    if (room.hostSocket) {
+      io.to(room.hostSocket).emit('game:error', { message: 'State sync error', errorKey: 'game.error.syncError' });
+    }
+    if (room.guestSocket) {
+      io.to(room.guestSocket).emit('game:error', { message: 'State sync error', errorKey: 'game.error.syncError' });
+    }
   }
 }
 
@@ -955,7 +971,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!room || !room.gameState) return;
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       const visibleState = GameEngine.getVisibleState(room.gameState, player);
-      socket.emit('game:state-update', { visibleState, playerRole: player });
+      const playerNames = {
+        player1: room.hostName ?? 'Player 1',
+        player2: room.guestName ?? 'Player 2',
+      };
+      socket.emit('game:state-update', { visibleState, playerRole: player, playerNames });
       console.log(`[Socket] Resync state sent to ${player} in room ${code}`);
     });
 
@@ -1115,6 +1135,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           clearActionTimer(room);
           setTimeout(async () => {
             try {
+              if (!rooms.has(code)) return; // Room was deleted
               if (!room.gameState || !room.gameState.missionScoringComplete) return;
               room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'ADVANCE_PHASE' });
               broadcastState(room, io);
@@ -1140,6 +1161,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           clearActionTimer(room);
         }
       } catch (err) {
+        // applyAction uses deepClone internally, so original state is NOT mutated on failure.
+        // Broadcast unchanged state to both players so they stay in sync and isProcessing clears.
+        broadcastState(room, io);
         socket.emit('game:error', {
           message: err instanceof Error ? err.message : 'Invalid action',
         });
@@ -1216,6 +1240,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       room.gameState = GameEngine.createGame(config);
       room.replayInitialState = null;
+      room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
       // Broadcast fresh state

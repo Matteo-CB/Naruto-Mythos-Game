@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import type { CardData, CharacterCard, MissionCard } from '@/lib/engine/types';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
@@ -17,7 +17,6 @@ interface DiscardPileViewerProps {
 
 export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerProps) {
   const locale = useLocale();
-  const t = useTranslations();
   const zoomCard = useUIStore((s) => s.zoomCard);
 
   const handleDetails = useCallback((card: CardData) => {
@@ -106,19 +105,6 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                               <span className="text-[9px]" style={{ color: '#555' }}>?</span>
                             </div>
                           )}
-                          {/* Details button */}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDetails(card); }}
-                            className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                            style={{
-                              backgroundColor: 'rgba(0,0,0,0.85)',
-                              color: '#c4a35a',
-                              border: 'none',
-                              borderLeft: '2px solid rgba(196,163,90,0.4)',
-                            }}
-                          >
-                            {t('game.board.details')}
-                          </button>
                         </div>
                         <span
                           className="text-[9px] text-center leading-tight w-full truncate"
