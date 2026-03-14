@@ -62,6 +62,9 @@ export interface CharacterInPlay {
   controlledBy: PlayerID;
   originalOwner: PlayerID;
   missionIndex: number;
+  /** instanceId of the character that took control (Ino 020, Orochimaru 050).
+   *  Used to return control when the controller is hidden or defeated. */
+  controllerInstanceId?: string;
 }
 
 export interface ActiveMission {
@@ -121,6 +124,9 @@ export interface MissionScoringProgress {
   /** When multiple SCORE effects are available, this lists all unresolved ones.
    *  The player picks which to resolve next via a CHOOSE_SCORE_ORDER pending. */
   pendingScoreEffects?: ScoreEffectSource[];
+  /** When loser has edge token + Orochimaru 051, the move runs first.
+   *  This tracks that SCORE effects still need to run after the move resolves. */
+  pendingScoreAfterOrochimaru?: { winner: PlayerID; missionIndex: number; rankIndex: number };
 }
 
 export interface GameState {
@@ -173,6 +179,9 @@ export interface GameState {
   lastPlayedInstanceIds?: { player1: string | null; player2: string | null };
   /** Snapshot of lastPlayedInstanceIds from the previous turn, used for display highlight. */
   previousTurnLastPlayed?: { player1: string | null; player2: string | null };
+  /** The single most recent instanceId played by any player — used for the white highlight.
+   *  Only one card should be highlighted at a time. Cleared on pass. */
+  lastPlayedGlobal?: string;
 }
 
 export interface GameLogEntry {

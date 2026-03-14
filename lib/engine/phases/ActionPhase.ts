@@ -616,6 +616,7 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     firstPasser,
     activePlayer,
     log,
+    lastPlayedGlobal: undefined,  // Pass clears the highlight — no card was played
   };
 }
 
@@ -727,6 +728,7 @@ function trackLastPlayed(state: GameState, player: PlayerID, instanceId: string)
       ...current,
       [player]: instanceId,  // Replace, not append — only keep the last card
     },
+    lastPlayedGlobal: instanceId,  // Single global highlight — only the most recent card
   };
 }
 

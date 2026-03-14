@@ -5550,7 +5550,24 @@ export class EffectEngine {
           const d069mTopCard = d069mCharResult.character.stack.length > 0
             ? d069mCharResult.character.stack[d069mCharResult.character.stack.length - 1]
             : d069mCharResult.character.card;
-          const d069mRevealCost = (d069mTopCard.chakra ?? 0) + 2;
+          const d069mFullRevealCost = (d069mTopCard.chakra ?? 0) + 2;
+          // Check for upgrade target — if upgrade exists, minimum cost is (new - old) + 2
+          const d069mOppSide: 'player1Characters' | 'player2Characters' =
+            d069mOpponent === 'player1' ? 'player1Characters' : 'player2Characters';
+          const d069mFriendly = newState.activeMissions[d069mCharResult.missionIndex][d069mOppSide];
+          const d069mUpgradeTarget = d069mFriendly.find((c) => {
+            if (c.instanceId === d069mAutoTargetId || c.isHidden) return false;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            if ((d069mTopCard.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
+            return cTop.name_fr.toUpperCase() === d069mTopCard.name_fr.toUpperCase();
+          });
+          let d069mRevealCost = d069mFullRevealCost;
+          if (d069mUpgradeTarget) {
+            const d069mOldTop = d069mUpgradeTarget.stack.length > 0
+              ? d069mUpgradeTarget.stack[d069mUpgradeTarget.stack.length - 1]
+              : d069mUpgradeTarget.card;
+            d069mRevealCost = Math.max(0, (d069mTopCard.chakra ?? 0) - (d069mOldTop.chakra ?? 0)) + 2;
+          }
           const d069mCanAfford = newState[d069mOpponent].chakra >= d069mRevealCost;
 
           if (!d069mCanAfford) {
@@ -5561,7 +5578,7 @@ export class EffectEngine {
             break;
           }
 
-          // Create DOSU069_OPPONENT_CHOICE pending
+          // Create DOSU069_OPPONENT_CHOICE pending (store full cost — actual cost recalculated at resolution)
           const d069mOcEffId = generateInstanceId();
           const d069mOcActId = generateInstanceId();
           newState.pendingEffects = [...newState.pendingEffects, {
@@ -5569,7 +5586,7 @@ export class EffectEngine {
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: d069mCharResult.missionIndex,
             effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ targetInstanceId: d069mAutoTargetId, revealCost: d069mRevealCost, sourcePlayer: d069mPlayer }),
+            effectDescription: JSON.stringify({ targetInstanceId: d069mAutoTargetId, revealCost: d069mFullRevealCost, sourcePlayer: d069mPlayer }),
             targetSelectionType: 'DOSU069_OPPONENT_CHOICE',
             sourcePlayer: d069mPlayer, requiresTargetSelection: true,
             validTargets: [d069mAutoTargetId], isOptional: true, isMandatory: false,
@@ -13019,7 +13036,7 @@ export class EffectEngine {
       // =============================================
       case 'FORCE_REVEAL_OR_DEFEAT': {
         // Dosu 069: Source player selected a hidden enemy character.
-        // The OPPONENT must choose: reveal (pay printed cost + 2) or defeat.
+        // The OPPONENT must choose: reveal (pay printed cost + 2, or upgrade cost + 2) or defeat.
         const opponentPlayer_dosu = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         const charResult_dosu = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!charResult_dosu) {
@@ -13029,11 +13046,28 @@ export class EffectEngine {
         const topCard_dosu = charResult_dosu.character.stack.length > 0
           ? charResult_dosu.character.stack[charResult_dosu.character.stack.length - 1]
           : charResult_dosu.character.card;
-        const revealCost_dosu = (topCard_dosu.chakra ?? 0) + 2;
+        const fullRevealCost_dosu = (topCard_dosu.chakra ?? 0) + 2;
+        // Check for upgrade target — minimum cost may be lower
+        const dosuOppSide: 'player1Characters' | 'player2Characters' =
+          opponentPlayer_dosu === 'player1' ? 'player1Characters' : 'player2Characters';
+        const dosuFriendly = newState.activeMissions[charResult_dosu.missionIndex][dosuOppSide];
+        const dosuUpgradeTarget = dosuFriendly.find((c) => {
+          if (c.instanceId === targetId || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          if ((topCard_dosu.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
+          return cTop.name_fr.toUpperCase() === topCard_dosu.name_fr.toUpperCase();
+        });
+        let revealCost_dosu = fullRevealCost_dosu;
+        if (dosuUpgradeTarget) {
+          const dosuOldTop = dosuUpgradeTarget.stack.length > 0
+            ? dosuUpgradeTarget.stack[dosuUpgradeTarget.stack.length - 1]
+            : dosuUpgradeTarget.card;
+          revealCost_dosu = Math.max(0, (topCard_dosu.chakra ?? 0) - (dosuOldTop.chakra ?? 0)) + 2;
+        }
         const canAfford_dosu = newState[opponentPlayer_dosu].chakra >= revealCost_dosu;
 
         if (!canAfford_dosu) {
-          // Opponent can't afford to reveal â€' auto-defeat
+          // Opponent can't afford to reveal — auto-defeat
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost_dosu}), character defeated.`,
@@ -13042,6 +13076,7 @@ export class EffectEngine {
         }
 
         // Create pending for opponent to choose: click character to reveal+pay, or skip to defeat
+        // Store full cost — actual cost recalculated at resolution time (upgrade may appear/disappear)
         const effectId_dosu = generateInstanceId();
         const actionId_dosu = generateInstanceId();
         newState.pendingEffects = [...newState.pendingEffects, {
@@ -13050,7 +13085,7 @@ export class EffectEngine {
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: charResult_dosu.missionIndex,
           effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ targetInstanceId: targetId, revealCost: revealCost_dosu, sourcePlayer: pendingEffect.sourcePlayer }),
+          effectDescription: JSON.stringify({ targetInstanceId: targetId, revealCost: fullRevealCost_dosu, sourcePlayer: pendingEffect.sourcePlayer }),
           targetSelectionType: 'DOSU069_OPPONENT_CHOICE',
           sourcePlayer: pendingEffect.sourcePlayer,
           requiresTargetSelection: true,
@@ -13087,12 +13122,7 @@ export class EffectEngine {
         const revCost_dosu69 = parsed_dosu69.revealCost ?? 0;
         const opponent_dosu69 = pendingEffect.selectingPlayer ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
 
-        // Pay reveal cost
-        const ps_dosu69 = { ...newState[opponent_dosu69] };
-        ps_dosu69.chakra -= revCost_dosu69;
-        newState = { ...newState, [opponent_dosu69]: ps_dosu69 };
-
-        // Find the character and its mission
+        // Find the character and its mission BEFORE paying cost (need to check for upgrade)
         const charResult_dosu69 = EffectEngine.findCharByInstanceId(newState, targetInst_dosu69);
         if (!charResult_dosu69) break;
         const mIdx_dosu69 = charResult_dosu69.missionIndex;
@@ -13110,6 +13140,21 @@ export class EffectEngine {
           if ((charTopCard_dosu69.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
           return cTop.name_fr.toUpperCase() === charTopCard_dosu69.name_fr.toUpperCase();
         });
+
+        // Calculate actual cost: if upgrading, use (new - old) + 2 instead of full + 2
+        let actualCost_dosu69 = revCost_dosu69;
+        if (upgradeTarget_dosu69) {
+          const oldTop_dosu69 = upgradeTarget_dosu69.stack.length > 0
+            ? upgradeTarget_dosu69.stack[upgradeTarget_dosu69.stack.length - 1]
+            : upgradeTarget_dosu69.card;
+          const upgradeDiff = Math.max(0, (charTopCard_dosu69.chakra ?? 0) - (oldTop_dosu69.chakra ?? 0));
+          actualCost_dosu69 = upgradeDiff + 2; // Dosu penalty (+2) applies on top of upgrade cost difference
+        }
+
+        // Pay the (possibly reduced) reveal cost
+        const ps_dosu69 = { ...newState[opponent_dosu69] };
+        ps_dosu69.chakra -= actualCost_dosu69;
+        newState = { ...newState, [opponent_dosu69]: ps_dosu69 };
 
         if (upgradeTarget_dosu69) {
           // Reveal-for-upgrade: merge stacks
@@ -13137,9 +13182,9 @@ export class EffectEngine {
 
             newState.log = logAction(newState.log, newState.turn, newState.phase, opponent_dosu69,
               'REVEAL_UPGRADE',
-              `Dosu Kinuta (069): ${charTopCard_dosu69.name_fr} revealed as upgrade, paying ${revCost_dosu69} chakra.`,
+              `Dosu Kinuta (069): ${charTopCard_dosu69.name_fr} revealed as upgrade, paying ${actualCost_dosu69} chakra.`,
               'game.log.effect.dosu069RevealUpgrade',
-              { card: 'DOSU KINUTA', id: 'KS-069-UC', target: charTopCard_dosu69.name_fr, cost: String(revCost_dosu69) });
+              { card: 'DOSU KINUTA', id: 'KS-069-UC', target: charTopCard_dosu69.name_fr, cost: String(actualCost_dosu69) });
 
             // Trigger MAIN + UPGRADE + AMBUSH effects
             const upgradedChar_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69].find(
@@ -13150,7 +13195,7 @@ export class EffectEngine {
             }
           }
         } else {
-          // Normal reveal (no upgrade) â€' reveal and trigger MAIN + AMBUSH
+          // Normal reveal (no upgrade) — reveal and trigger MAIN + AMBUSH
           const missions_dosu69 = [...newState.activeMissions];
           const m_dosu69 = { ...missions_dosu69[mIdx_dosu69] };
           const chars_dosu69 = [...m_dosu69[side_dosu69]];
@@ -13163,8 +13208,8 @@ export class EffectEngine {
             newState = { ...newState, activeMissions: missions_dosu69 };
 
             newState.log = logAction(newState.log, newState.turn, newState.phase, opponent_dosu69,
-              'EFFECT', `Dosu Kinuta (069): ${chars_dosu69[cidx_dosu69].card.name_fr} was revealed, paying ${revCost_dosu69} chakra.`,
-              'game.log.effect.dosu069Reveal', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: chars_dosu69[cidx_dosu69].card.name_fr, cost: String(revCost_dosu69) });
+              'EFFECT', `Dosu Kinuta (069): ${chars_dosu69[cidx_dosu69].card.name_fr} was revealed, paying ${actualCost_dosu69} chakra.`,
+              'game.log.effect.dosu069Reveal', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: chars_dosu69[cidx_dosu69].card.name_fr, cost: String(actualCost_dosu69) });
 
             // Trigger MAIN + AMBUSH effects of the revealed character
             const revealedChar_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69].find(
@@ -14211,6 +14256,7 @@ export class EffectEngine {
     const targetChar = mission[enemyKey][targetCharIdx];
     mission[enemyKey].splice(targetCharIdx, 1);
     targetChar.controlledBy = pending.sourcePlayer;
+    targetChar.controllerInstanceId = pending.sourceInstanceId;
     mission[friendlyKey].push(targetChar);
 
     newState.log = logAction(
@@ -14506,9 +14552,14 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) return state;
 
-    const newState = deepClone(state);
-    const mission = newState.activeMissions[charResult.missionIndex];
-    const key = charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
+    // Before removing, return any characters this one was controlling
+    let preState = EffectEngine.restoreControlOnLeave(state, targetId);
+
+    const newState = deepClone(preState);
+    const charResult2 = EffectEngine.findCharByInstanceId(newState, targetId);
+    if (!charResult2) return newState;
+    const mission = newState.activeMissions[charResult2.missionIndex];
+    const key = charResult2.player === 'player1' ? 'player1Characters' : 'player2Characters';
 
     const idx = mission[key].findIndex((c: CharacterInPlay) => c.instanceId === targetId);
     if (idx === -1) return state;
@@ -14517,8 +14568,8 @@ export class EffectEngine {
 
     // Tsunade 004 UC: [⧗] Defeated friendly characters go to hand instead of discard pile
     const owner = defeated.originalOwner;
-    const hasTsunade004 = EffectEngine.hasTsunade004Active(newState, charResult.player);
-    if (hasTsunade004 && charResult.player === owner) {
+    const hasTsunade004 = EffectEngine.hasTsunade004Active(newState, charResult2.player);
+    if (hasTsunade004 && charResult2.player === owner) {
       // Only TOP card goes to hand; cards underneath go to discard pile
       const topCard = defeated.stack.length > 0 ? defeated.stack[defeated.stack.length - 1] : null;
       const underCards = defeated.stack.length > 1 ? defeated.stack.slice(0, -1) : [];
@@ -14547,11 +14598,83 @@ export class EffectEngine {
       for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
         if (char.instanceId === targetId) {
           char.isHidden = true;
-          return newState;
+          // When a controller is hidden, return any characters it took control of
+          return EffectEngine.restoreControlOnLeave(newState, targetId);
         }
       }
     }
     return state;
+  }
+
+  /**
+   * When a character leaves play (hidden or defeated), return any characters
+   * it was controlling back to their original owner.
+   */
+  static restoreControlOnLeave(state: GameState, controllerInstanceId: string): GameState {
+    let newState = state;
+    let changed = false;
+
+    for (const mission of newState.activeMissions) {
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        for (const char of mission[side]) {
+          if (char.controllerInstanceId === controllerInstanceId && char.controlledBy !== char.originalOwner) {
+            if (!changed) {
+              newState = deepClone(newState);
+              changed = true;
+            }
+            // Move character back to original owner's side
+            const currentMission = newState.activeMissions[char.missionIndex] ?? newState.activeMissions.find(
+              (m) => m.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ||
+                     m.player2Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId)
+            );
+            if (!currentMission) continue;
+
+            const fromSide = char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters';
+            const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
+            const idx = currentMission[fromSide].findIndex((c: CharacterInPlay) => c.instanceId === char.instanceId);
+            if (idx === -1) continue;
+
+            // Check same-name conflict on the destination side
+            const charName = char.card.name_fr.toUpperCase();
+            const hasSameName = currentMission[toSide].some(
+              (c: CharacterInPlay) => !c.isHidden && c.card.name_fr.toUpperCase() === charName && c.instanceId !== char.instanceId
+            );
+            if (hasSameName && !char.isHidden) {
+              // Same-name conflict — defeat the character instead of returning
+              const removed = currentMission[fromSide].splice(idx, 1)[0];
+              for (const card of removed.stack) {
+                newState[removed.originalOwner].discardPile.push(card);
+              }
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, char.originalOwner,
+                'EFFECT', `${char.card.name_fr} returned to owner but conflicts with existing character — defeated.`,
+                'game.log.effect.controlReturnedConflict',
+                { card: char.card.name_fr, target: char.card.name_fr },
+              );
+            } else {
+              // Move to original owner's side
+              const removed = currentMission[fromSide].splice(idx, 1)[0];
+              removed.controlledBy = removed.originalOwner;
+              removed.controllerInstanceId = undefined;
+              currentMission[toSide].push(removed);
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, char.originalOwner,
+                'EFFECT', `${char.card.name_fr} returned to original owner (controller was hidden/defeated).`,
+                'game.log.effect.controlReturned',
+                { card: char.card.name_fr },
+              );
+            }
+          }
+        }
+      }
+    }
+
+    if (changed) {
+      newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
+      newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
+    }
+
+    return newState;
   }
 
   /** Sasuke 136 Stage 1: defeat the chosen friendly, then prompt for enemy target */
@@ -17082,7 +17205,7 @@ export class EffectEngine {
     const targetIdx = mission[enemySide].findIndex((c: CharacterInPlay) => c.instanceId === targetId);
     if (targetIdx === -1) return state;
 
-    const targetChar = { ...mission[enemySide][targetIdx], controlledBy: player };
+    const targetChar = { ...mission[enemySide][targetIdx], controlledBy: player, controllerInstanceId: pending.sourceInstanceId };
     const targetName = targetChar.card.name_fr;
 
     mission[enemySide] = mission[enemySide].filter((_: CharacterInPlay, i: number) => i !== targetIdx);
