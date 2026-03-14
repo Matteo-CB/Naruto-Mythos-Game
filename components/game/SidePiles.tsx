@@ -205,7 +205,7 @@ export function OpponentSidePiles() {
   return (
     <>
       <aside
-        className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
+        className="flex flex-col items-center justify-start gap-4 shrink-0 py-2 pt-4"
         style={{
           width: dims.sidePileW + 'px',
           backgroundColor: 'rgba(8, 8, 12, 0.6)',
@@ -255,7 +255,7 @@ export function PlayerSidePiles() {
   return (
     <>
       <aside
-        className="flex flex-col items-center justify-center gap-4 shrink-0 py-2"
+        className="flex flex-col items-center justify-end gap-4 shrink-0 py-2 pb-4"
         style={{
           width: dims.sidePileW + 'px',
           backgroundColor: 'rgba(8, 8, 12, 0.6)',

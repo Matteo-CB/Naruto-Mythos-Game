@@ -238,6 +238,8 @@
         "kimimaro123SelfDefeat": "Kimimaro (123): No cards in hand at end of round. Kimimaro is defeated.",
         "kin073Discard": "{card} ({id}): {target} discarded from hand.",
         "nameConflictBlocked": "{card} ({id}): Cannot play {target}, same name already present on this mission.",
+        "controlReturned": "{card} returned to original owner (controller was hidden/defeated).",
+        "controlReturnedConflict": "{card} returned to owner but conflicts with existing character — defeated.",
         "orochimaru051Pending": "Orochimaru (051): Lost this mission. Choose a destination mission.",
         "revealHiddenReduced": "Revealed {card} on mission {mission} for {cost} chakra (cost reduced by {reduction}).",
         "shino033CostReduction": "{card} ({id}): Next character costs {reduction} less chakra.",

@@ -61,16 +61,34 @@ export function resumeMissionScoring(state: GameState): GameState {
   const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
 
   if (missionIdx !== -1) {
-    // Resume character SCORE effects on the current mission
-    newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
+    // Check if we need to run SCORE effects after Orochimaru 051 moved (edge token ordering)
+    if (progress.pendingScoreAfterOrochimaru) {
+      const { winner: scoreWinner, missionIndex: scoreMissionIdx, rankIndex: scoreRankIdx } = progress.pendingScoreAfterOrochimaru;
+      newState = { ...newState, missionScoringProgress: undefined };
+      newState = resolveScoreEffectsWithProgress(newState, scoreWinner, scoreMissionIdx, scoreRankIdx);
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+      // Continue to remaining missions below
+    } else {
+      // Resume character SCORE effects on the current mission
+      newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
 
-    if (newState.pendingActions.length > 0) {
-      return newState;
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+
+      // Handle Orochimaru 051 move for the current mission (if not done yet)
+      const mission = newState.activeMissions[missionIdx];
+      const missionWinner = mission.wonBy ?? null;
+      if (missionWinner && missionWinner !== 'draw') {
+        const missionLoser: PlayerID = missionWinner === 'player1' ? 'player2' : 'player1';
+        // Only run Orochimaru 051 if it wasn't already handled before SCORE (edge token case)
+        if (!(newState.edgeHolder === missionLoser && checkOrochimaru051OnMission(newState, missionIdx, missionLoser))) {
+          newState = handleOrochimaru051Move(newState, missionIdx, missionWinner);
+        }
+      }
     }
-
-    // Handle Orochimaru 051 move for the current mission (if not done yet)
-    const mission = newState.activeMissions[missionIdx];
-    newState = handleOrochimaru051Move(newState, missionIdx, mission.wonBy ?? null);
   }
 
   // Clear progress for this mission - continue to remaining missions
@@ -90,6 +108,25 @@ export function resumeMissionScoring(state: GameState): GameState {
   }
 
   return newState;
+}
+
+/**
+ * Check if a player has a face-visible Orochimaru 051 with the continuous loss-move effect
+ * on the specified mission.
+ */
+function checkOrochimaru051OnMission(state: GameState, missionIndex: number, player: PlayerID): boolean {
+  const mission = state.activeMissions[missionIndex];
+  const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  for (const char of mission[side]) {
+    if (char.isHidden) continue;
+    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    if (topCard.number !== 51) continue;
+    const hasMove = (topCard.effects ?? []).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
+    );
+    if (hasMove) return true;
+  }
+  return false;
 }
 
 function scoreMission(state: GameState, missionIndex: number, rankIndex: number): GameState {
@@ -158,17 +195,47 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
 
     newState = { ...newState, [winner]: ps, log };
 
-    // Trigger SCORE effects via EffectEngine
-    newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
+    // Edge token ordering: when both SCORE (winner) and Orochimaru 051 loss effect (loser)
+    // trigger simultaneously, the edge token holder resolves first.
+    const loser: PlayerID = winner === 'player1' ? 'player2' : 'player1';
+    const loserHasOro051 = checkOrochimaru051OnMission(newState, missionIndex, loser);
 
-    // If a SCORE effect needs target selection, return with progress saved
-    if (newState.pendingActions.length > 0) {
-      return newState;
+    if (loserHasOro051 && newState.edgeHolder === loser) {
+      // Loser has edge token — Orochimaru 051 moves BEFORE winner's SCORE effects
+      newState = handleOrochimaru051Move(newState, missionIndex, winner);
+
+      if (newState.pendingActions.length > 0) {
+        // Orochimaru move needs target selection — save that SCORE effects still need to run
+        newState.missionScoringProgress = {
+          currentRankIndex: rankIndex,
+          missionCardScoreDone: false,
+          processedCharacterIds: [],
+          winner,
+          pendingScoreAfterOrochimaru: { winner, missionIndex, rankIndex },
+        };
+        return newState;
+      }
+
+      // Orochimaru moved (or had only 1 destination). Now run SCORE effects.
+      newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+    } else {
+      // Default order: winner SCORE first, then Orochimaru 051 move
+      newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
+
+      if (newState.pendingActions.length > 0) {
+        return newState;
+      }
+
+      // Orochimaru 051 (UC): If you lost this mission, move Orochimaru to another mission
+      newState = handleOrochimaru051Move(newState, missionIndex, winner);
     }
+  } else {
+    // No winner or draw — still check Orochimaru 051 (won't trigger on draw, but safe to call)
+    newState = handleOrochimaru051Move(newState, missionIndex, winner);
   }
-
-  // Orochimaru 051 (UC): If you lost this mission, move Orochimaru to another mission
-  newState = handleOrochimaru051Move(newState, missionIndex, winner);
 
   return newState;
 }

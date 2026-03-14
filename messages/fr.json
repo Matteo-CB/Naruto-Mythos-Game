@@ -238,6 +238,8 @@
         "kimimaro123SelfDefeat": "Kimimaro (123) : Aucune carte en main en fin de tour. Kimimaro est vaincu.",
         "kin073Discard": "{card} ({id}) : {target} defausse de la main.",
         "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {target}, meme nom deja present sur cette mission.",
+        "controlReturned": "{card} retourne au proprietaire d'origine (controleur cache/vaincu).",
+        "controlReturnedConflict": "{card} retourne au proprietaire mais conflit avec personnage existant — vaincu.",
         "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
         "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
         "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",

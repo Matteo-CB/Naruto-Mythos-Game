@@ -19,6 +19,7 @@ export function executeStartPhase(state: GameState): GameState {
   const prevLastPlayed = newState.lastPlayedInstanceIds ?? { player1: null, player2: null };
   newState.previousTurnLastPlayed = { player1: prevLastPlayed.player1, player2: prevLastPlayed.player2 };
   newState.lastPlayedInstanceIds = { player1: null, player2: null };
+  newState.lastPlayedGlobal = undefined;
 
   // 1. Reveal mission card
   newState = revealMissionCard(newState);

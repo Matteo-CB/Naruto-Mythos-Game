@@ -1588,11 +1588,9 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Highlight only the most recent card played in the current turn (per player)
-    const currPlayed = state.lastPlayedInstanceIds ?? { player1: null, player2: null };
+    // Highlight only the single most recent card played (by either player)
     const lastPlayedIds = new Set<string>();
-    if (currPlayed[otherPlayer]) lastPlayedIds.add(currPlayed[otherPlayer]!);
-    if (currPlayed[player]) lastPlayedIds.add(currPlayed[player]!);
+    if (state.lastPlayedGlobal) lastPlayedIds.add(state.lastPlayedGlobal);
 
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,
