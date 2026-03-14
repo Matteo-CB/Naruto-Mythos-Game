@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
@@ -9,6 +9,7 @@ import { DecorativeIcons } from "@/components/DecorativeIcons";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
+import type { AddCheckResult } from "@/stores/deckBuilderStore";
 import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { AnimatePresence, motion } from "framer-motion";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
@@ -48,6 +49,108 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
 
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 
+// ===== NORMALIZE HELPER (hoisted, not recreated per render) =====
+const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// ===== MEMOIZED CARD GRID ITEM =====
+const CatalogCardItem = memo(function CatalogCardItem({
+  card, addCheck, inDeckCount, locale, onAdd, onClick,
+}: {
+  card: CharacterCard;
+  addCheck: AddCheckResult;
+  inDeckCount: number;
+  locale: string;
+  onAdd: () => void;
+  onClick: () => void;
+}) {
+  const imgPath = normalizeImagePath(card.image_file);
+  const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+  return (
+    <button
+      onClick={onAdd}
+      className="relative w-full card-aspect overflow-hidden group cursor-pointer"
+      style={{
+        backgroundColor: '#0e0e0e',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderLeft: `3px solid ${rarColor}`,
+      }}
+      title={`${getCardName(card, locale as "en" | "fr")} - ${getCardTitle(card, locale as "en" | "fr")} (${card.chakra}/${card.power})`}
+    >
+      {imgPath ? (
+        <img src={imgPath} alt={getCardName(card, locale as "en" | "fr")} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="text-[8px]" style={{ color: '#555' }}>{getCardName(card, locale as "en" | "fr")}</span>
+        </div>
+      )}
+      {/* Chakra badge */}
+      <div className="absolute top-1 left-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold" style={{
+        backgroundColor: 'rgba(196,163,90,0.9)', color: '#0a0a0a',
+      }}>{card.chakra}</div>
+      {/* In-deck count badge */}
+      {inDeckCount > 0 && (
+        <div className="absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold" style={{
+          backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)', color: '#fff',
+        }}>x{inDeckCount}</div>
+      )}
+      {/* Bottom info */}
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
+        <span className="text-[7px] truncate" style={{ color: '#e0e0e0', maxWidth: '70%' }}>{getCardName(card, locale as "en" | "fr")}</span>
+        <span className="text-[8px] font-bold tabular-nums" style={{ color: '#e0e0e0' }}>{card.power}</span>
+      </div>
+      {/* Hover overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.65)' }}>
+        {addCheck.allowed ? (
+          <>
+            <span className="text-xl font-bold leading-none" style={{ color: '#3e8b3e' }}>+</span>
+            <span className="text-[10px]" style={{ color: '#e0e0e0' }}>{card.chakra}/{card.power}</span>
+          </>
+        ) : (
+          <span className="text-[8px] text-center px-1 leading-tight" style={{ color: '#b33e3e' }}>{addCheck.reason}</span>
+        )}
+      </div>
+      {/* Detail button — hover only */}
+      <div
+        className="absolute top-0.5 right-0.5 px-1 py-0.5 text-[7px] font-bold uppercase opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+        style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#c4a35a', borderLeft: '2px solid rgba(196,163,90,0.4)' }}
+        onClick={(e) => { e.stopPropagation(); onClick(); }}
+      >Detail</div>
+    </button>
+  );
+});
+
+// ===== MEMOIZED DECK CHARACTER ROW =====
+const DeckCharRow = memo(function DeckCharRow({
+  card, originalIndex, locale, onRemove, onClick,
+}: {
+  card: CharacterCard;
+  originalIndex: number;
+  locale: string;
+  onRemove: () => void;
+  onClick: () => void;
+}) {
+  const img = normalizeImagePath(card.image_file);
+  const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
+  return (
+    <div
+      className="flex items-center gap-1.5 py-0.5 px-1 mb-0.5 group cursor-pointer deck-char-row"
+      style={{ borderLeft: `2px solid ${rarColor}`, backgroundColor: 'rgba(255,255,255,0.01)' }}
+      onClick={onClick}
+    >
+      <div className="w-5 h-7 overflow-hidden flex-shrink-0" style={{ backgroundColor: '#111' }}>
+        {img ? <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" /> : <div className="w-full h-full" />}
+      </div>
+      <span className="text-[9px] truncate flex-1 min-w-0" style={{ color: '#ccc' }}>{getCardName(card, locale as "en" | "fr")}</span>
+      <span className="text-[9px] font-bold tabular-nums flex-shrink-0" style={{ color: '#888' }}>{card.power}</span>
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        className="w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0"
+        style={{ color: '#b33e3e' }}
+      >X</button>
+    </div>
+  );
+});
+
 export default function DeckBuilderPage() {
   const t = useTranslations();
   const locale = useLocale();
@@ -57,6 +160,7 @@ export default function DeckBuilderPage() {
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [charPage, setCharPage] = useState(1);
   const CHARS_PER_PAGE = 40;
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -138,6 +242,12 @@ export default function DeckBuilderPage() {
     } catch { /* SSR / privacy */ }
   }, [availableChars, availableMissions, loadDeck]);
 
+  // Debounce search query (250ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Auto-clear add error after 3 seconds
   useEffect(() => {
     if (addError) {
@@ -200,14 +310,13 @@ export default function DeckBuilderPage() {
 
   const filteredChars = useMemo(() => {
     let chars = availableChars.filter((c) => !bannedIds.has(c.id));
-    if (searchQuery) {
-      const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const q = normalize(searchQuery);
+    if (debouncedSearch) {
+      const q = normalizeStr(debouncedSearch);
       chars = chars.filter(
         (c) =>
-          normalize(getCardName(c, locale as "en" | "fr")).includes(q) ||
-          normalize(getCardTitle(c, locale as "en" | "fr")).includes(q) ||
-          normalize(c.name_fr).includes(q) ||
+          normalizeStr(getCardName(c, locale as "en" | "fr")).includes(q) ||
+          normalizeStr(getCardTitle(c, locale as "en" | "fr")).includes(q) ||
+          normalizeStr(c.name_fr).includes(q) ||
           c.id.toLowerCase().includes(q),
       );
     }
@@ -229,9 +338,9 @@ export default function DeckBuilderPage() {
       return sortOrder === 'desc' ? -cmp : cmp;
     });
     return chars;
-  }, [availableChars, searchQuery, bannedIds, locale, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder, filterOptions.maxChakra, filterOptions.maxPower]);
+  }, [availableChars, debouncedSearch, bannedIds, locale, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder, filterOptions.maxChakra, filterOptions.maxPower]);
 
-  useEffect(() => { setCharPage(1); }, [searchQuery, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder]);
+  useEffect(() => { setCharPage(1); }, [debouncedSearch, filterRarity, filterGroup, filterKeywords, filterEffectType, filterChakraMin, filterChakraMax, filterPowerMin, filterPowerMax, sortBy, sortOrder]);
 
   const totalCharPages = Math.max(1, Math.ceil(filteredChars.length / CHARS_PER_PAGE));
   const paginatedChars = useMemo(() => {
@@ -357,6 +466,20 @@ export default function DeckBuilderPage() {
     }
     return counts;
   }, [deckChars]);
+
+  // Pre-compute addCheck for all paginated cards (avoids 40x linear scans per render)
+  const addCheckMap = useMemo(() => {
+    const map = new Map<string, AddCheckResult>();
+    for (const c of paginatedChars) {
+      map.set(c.id, canAddChar(c));
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginatedChars, deckChars]);
+
+  // Stable callbacks for memoized card items
+  const handleAddChar = useCallback((card: CharacterCard) => addChar(card), [addChar]);
+  const handlePreviewCard = useCallback((card: CharacterCard | MissionCard) => setPreviewCard(card), []);
 
   // ===== UNAUTHENTICATED =====
   if (!session?.user) {
@@ -677,50 +800,16 @@ export default function DeckBuilderPage() {
                     <span className="text-[9px]" style={{ color: '#555' }}>({cards.length})</span>
                   </div>
                   {/* Card rows */}
-                  {cards.map(({ card, originalIndex }) => {
-                    const img = getImagePath(card);
-                    const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
-                    return (
-                      <div
-                        key={`${card.id}-${originalIndex}`}
-                        className="flex items-center gap-1.5 py-0.5 px-1 mb-0.5 group cursor-pointer"
-                        style={{
-                          borderLeft: `2px solid ${rarColor}`,
-                          backgroundColor: 'rgba(255,255,255,0.01)',
-                        }}
-                        onClick={() => setPreviewCard(card)}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.04)';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.01)';
-                        }}
-                      >
-                        {/* Thumbnail */}
-                        <div className="w-5 h-7 overflow-hidden flex-shrink-0" style={{ backgroundColor: '#111' }}>
-                          {img ? (
-                            <img src={img} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full" />
-                          )}
-                        </div>
-                        {/* Name */}
-                        <span className="text-[9px] truncate flex-1 min-w-0" style={{ color: '#ccc' }}>
-                          {getCardName(card, locale as "en" | "fr")}
-                        </span>
-                        {/* Power */}
-                        <span className="text-[9px] font-bold tabular-nums flex-shrink-0" style={{ color: '#888' }}>
-                          {card.power}
-                        </span>
-                        {/* Remove */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); removeChar(originalIndex); }}
-                          className="w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex-shrink-0"
-                          style={{ color: '#b33e3e' }}
-                        >X</button>
-                      </div>
-                    );
-                  })}
+                  {cards.map(({ card, originalIndex }) => (
+                    <DeckCharRow
+                      key={`${card.id}-${originalIndex}`}
+                      card={card}
+                      originalIndex={originalIndex}
+                      locale={locale}
+                      onRemove={() => removeChar(originalIndex)}
+                      onClick={() => setPreviewCard(card)}
+                    />
+                  ))}
                 </div>
               ))
             )}
@@ -1120,74 +1209,17 @@ export default function DeckBuilderPage() {
               </span>
             </div>
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2">
-              {paginatedChars.map((card) => {
-                const imgPath = getImagePath(card);
-                const check = canAddChar(card);
-                const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
-                const inDeckCount = deckCardCounts.get(card.id) || 0;
-                return (
-                  <button
-                    key={card.id}
-                    onClick={() => addChar(card)}
-                    onMouseEnter={() => setPreviewCard(card)}
-                    className="relative w-full card-aspect overflow-hidden group cursor-pointer"
-                    style={{
-                      backgroundColor: '#0e0e0e',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      borderLeft: `3px solid ${rarColor}`,
-                    }}
-                    title={`${getCardName(card, locale as "en" | "fr")} - ${getCardTitle(card, locale as "en" | "fr")} (${card.chakra}/${card.power})`}
-                  >
-                    {imgPath ? (
-                      <img src={imgPath} alt={getCardName(card, locale as "en" | "fr")} className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[8px]" style={{ color: '#555' }}>{getCardName(card, locale as "en" | "fr")}</span>
-                      </div>
-                    )}
-
-                    {/* Chakra badge */}
-                    <div className="absolute top-1 left-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold" style={{
-                      backgroundColor: 'rgba(196,163,90,0.9)',
-                      color: '#0a0a0a',
-                    }}>
-                      {card.chakra}
-                    </div>
-
-                    {/* In-deck count badge */}
-                    {inDeckCount > 0 && (
-                      <div className="absolute top-1 right-1 px-1 py-0.5 text-[8px] font-bold" style={{
-                        backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)',
-                        color: '#fff',
-                      }}>
-                        x{inDeckCount}
-                      </div>
-                    )}
-
-                    {/* Bottom info */}
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-1 py-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
-                      <span className="text-[7px] truncate" style={{ color: '#e0e0e0', maxWidth: '70%' }}>
-                        {getCardName(card, locale as "en" | "fr")}
-                      </span>
-                      <span className="text-[8px] font-bold tabular-nums" style={{ color: '#e0e0e0' }}>
-                        {card.power}
-                      </span>
-                    </div>
-
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-0.5" style={{ backgroundColor: 'rgba(0,0,0,0.65)' }}>
-                      {check.allowed ? (
-                        <>
-                          <span className="text-xl font-bold leading-none" style={{ color: '#3e8b3e' }}>+</span>
-                          <span className="text-[10px]" style={{ color: '#e0e0e0' }}>{card.chakra}/{card.power}</span>
-                        </>
-                      ) : (
-                        <span className="text-[8px] text-center px-1 leading-tight" style={{ color: '#b33e3e' }}>{check.reason}</span>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
+              {paginatedChars.map((card) => (
+                <CatalogCardItem
+                  key={card.id}
+                  card={card}
+                  addCheck={addCheckMap.get(card.id) ?? { allowed: true }}
+                  inDeckCount={deckCardCounts.get(card.id) || 0}
+                  locale={locale}
+                  onAdd={() => handleAddChar(card)}
+                  onClick={() => handlePreviewCard(card)}
+                />
+              ))}
             </div>
 
             {/* Pagination */}
@@ -1381,20 +1413,16 @@ export default function DeckBuilderPage() {
                         <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>{t("deckBuilder.chakra")} {cost}</span>
                         <span className="text-[9px]" style={{ color: '#555' }}>({cards.length})</span>
                       </div>
-                      {cards.map(({ card, originalIndex }) => {
-                        const img = getImagePath(card);
-                        const rarColor = RARITY_COLORS[card.rarity] ?? '#888';
-                        return (
-                          <div key={`${card.id}-${originalIndex}`} className="flex items-center gap-1.5 py-0.5 px-1 mb-0.5 group" style={{ borderLeft: `2px solid ${rarColor}`, backgroundColor: 'rgba(255,255,255,0.01)' }}>
-                            <div className="w-5 h-7 overflow-hidden flex-shrink-0" style={{ backgroundColor: '#111' }}>
-                              {img ? <img src={img} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full" />}
-                            </div>
-                            <span className="text-[9px] truncate flex-1 min-w-0" style={{ color: '#ccc' }}>{getCardName(card, locale as "en" | "fr")}</span>
-                            <span className="text-[9px] font-bold tabular-nums flex-shrink-0" style={{ color: '#888' }}>{card.power}</span>
-                            <button onClick={() => removeChar(originalIndex)} className="w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0" style={{ color: '#b33e3e' }}>X</button>
-                          </div>
-                        );
-                      })}
+                      {cards.map(({ card, originalIndex }) => (
+                        <DeckCharRow
+                          key={`${card.id}-${originalIndex}`}
+                          card={card}
+                          originalIndex={originalIndex}
+                          locale={locale}
+                          onRemove={() => removeChar(originalIndex)}
+                          onClick={() => setPreviewCard(card)}
+                        />
+                      ))}
                     </div>
                   ))
                 )}
