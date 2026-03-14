@@ -616,7 +616,9 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     firstPasser,
     activePlayer,
     log,
-    lastPlayedGlobal: undefined,  // Pass clears the highlight — no card was played
+    // Keep lastPlayedGlobal — the highlight persists until the next card is played
+    // or the turn changes (StartPhase clears it). Clearing on PASS caused the
+    // highlight to vanish in AI mode (batch processing) and online mode.
   };
 }
 
