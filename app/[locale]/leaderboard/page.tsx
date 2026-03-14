@@ -226,9 +226,7 @@ export default function LeaderboardPage() {
                       </Link>
                       <UserBadges
                         role={user.role}
-                        elo={user.elo}
                         badgePrefs={user.badgePrefs}
-                        leaguesEnabled={leaguesEnabled}
                         size="sm"
                       />
                     </span>

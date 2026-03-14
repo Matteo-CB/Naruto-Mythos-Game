@@ -37,9 +37,11 @@ export class GameEngine {
    * Handles: random starting player, mission deck construction, initial draw, mulligan setup.
    */
   static createGame(config: GameConfig): GameState {
-    // Reset instance ID counter so IDs are deterministic from game start.
-    // This ensures replay reconstruction generates the same IDs.
-    resetIdCounter();
+    // NOTE: resetIdCounter() is NOT called here — callers must reset if needed.
+    // On the server, concurrent games share the global counter; resetting here
+    // would cause ID collisions between simultaneous games (e.g., inst_1 reused
+    // in Game A after Game B resets the counter). Client-side callers (gameStore)
+    // reset the counter themselves before calling createGame.
     const gameId = generateGameId();
 
     // Randomly determine starting player (Edge token holder)

@@ -105,6 +105,9 @@ export default function GamePage() {
         isProcessing: false,
       });
       socketClearError();
+      // Force state resync after error so board shows correct state
+      const sock = useSocketStore.getState().socket;
+      if (sock) sock.emit('game:request-state');
       // Auto-clear error after 4 seconds (same as AI mode)
       const timer = setTimeout(() => {
         const store = useGameStore.getState();

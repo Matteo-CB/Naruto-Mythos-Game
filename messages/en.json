@@ -845,7 +845,8 @@
       "reconnectFailed": "Unable to reconnect to server.",
       "notConnected": "Not connected to server.",
       "maintenance": "The server is under maintenance. Please wait...",
-      "maintenanceNoNewGames": "Server entering maintenance. No new games can be started. The site will be back in a few minutes."
+      "maintenanceNoNewGames": "Server entering maintenance. No new games can be started. The site will be back in a few minutes.",
+      "syncError": "State sync error. Reconnecting..."
     }
   },
   "collection": {
