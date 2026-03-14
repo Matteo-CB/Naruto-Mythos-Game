@@ -2,12 +2,235 @@ import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { shouldRetainPowerTokens, isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
 
+// ---------------------
+// End-of-round effect ordering
+// ---------------------
+
+interface EndOfRoundEffectInfo {
+  instanceId: string;
+  type: 'GIANT_SPIDER_103' | 'ROCK_LEE_117' | 'AKAMARU_028';
+  player: PlayerID;
+  missionIndex: number;
+  cardId: string;
+  cardName: string;
+  cardImage?: string;
+}
+
+/**
+ * Scan for ALL interactive end-of-round effects (presence check only, not validity).
+ * Used to detect when 2+ effects from different source cards exist, requiring player ordering.
+ */
+export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEffectInfo[] {
+  const effects: EndOfRoundEffectInfo[] = [];
+  const processedGS = new Set<string>(state.endPhaseGiantSpider103Ids ?? []);
+  const processedRL = new Set<string>(state.endPhaseMovedIds ?? []);
+  const processedAK = new Set<string>(state.endPhaseAkamaru028Ids ?? []);
+
+  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
+    const mission = state.activeMissions[mIdx];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const char of mission[side]) {
+        if (char.isHidden) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
+        // Giant Spider 103
+        if (topCard.number === 103 && !processedGS.has(char.instanceId)) {
+          const hasEffect = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+              e.description.toLowerCase().includes('hide a character'),
+          );
+          if (hasEffect) {
+            effects.push({
+              instanceId: char.instanceId, type: 'GIANT_SPIDER_103', player,
+              missionIndex: mIdx, cardId: topCard.id, cardName: topCard.name_fr,
+              cardImage: topCard.image_file,
+            });
+          }
+        }
+
+        // Rock Lee 117 / 151
+        if ((topCard.number === 117 || topCard.number === 151) && !processedRL.has(char.instanceId)) {
+          const hasEffect = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+              (e.description.includes('move this character') || e.description.includes('must move')),
+          );
+          if (hasEffect) {
+            effects.push({
+              instanceId: char.instanceId, type: 'ROCK_LEE_117', player,
+              missionIndex: mIdx, cardId: topCard.id, cardName: topCard.name_fr,
+              cardImage: topCard.image_file,
+            });
+          }
+        }
+
+        // Akamaru 028
+        if (topCard.number === 28 && !processedAK.has(char.instanceId)) {
+          const hasEffect = (topCard.effects ?? []).some(
+            (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
+          );
+          if (hasEffect) {
+            effects.push({
+              instanceId: char.instanceId, type: 'AKAMARU_028', player,
+              missionIndex: mIdx, cardId: topCard.id, cardName: topCard.name_fr,
+              cardImage: topCard.image_file,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return effects;
+}
+
+/**
+ * Create an END_OF_ROUND_EFFECT_ORDER pending action for the player to choose ordering.
+ * Used when 2+ interactive end-of-round effects from different source cards exist.
+ */
+export function createEndOfRoundOrderChoice(state: GameState, effects: EndOfRoundEffectInfo[]): GameState {
+  let newState = { ...state };
+  const player = effects[0].player;
+  const effectId = `end-round-order-${effects.map((e) => e.instanceId).join('-')}`;
+  const actionId = `end-round-order-action-${effects.map((e) => e.instanceId).join('-')}`;
+
+  newState.pendingEffects = [...newState.pendingEffects, {
+    id: effectId,
+    sourceCardId: effects[0].cardId,
+    sourceInstanceId: effects[0].instanceId,
+    sourceMissionIndex: effects[0].missionIndex,
+    effectType: 'MAIN' as const,
+    effectDescription: JSON.stringify(effects.map((e) => ({
+      instanceId: e.instanceId, type: e.type, cardName: e.cardName,
+      cardImage: e.cardImage, cardId: e.cardId,
+    }))),
+    targetSelectionType: 'END_OF_ROUND_EFFECT_ORDER',
+    sourcePlayer: player,
+    requiresTargetSelection: true,
+    validTargets: effects.map((e) => e.instanceId),
+    isOptional: false,
+    isMandatory: true,
+    resolved: false,
+    isUpgrade: false,
+  }];
+
+  newState.pendingActions = [...newState.pendingActions, {
+    id: actionId,
+    type: 'SELECT_TARGET' as const,
+    player,
+    description: 'Choose which end-of-round effect to resolve first.',
+    descriptionKey: 'game.effect.desc.endOfRoundEffectOrder',
+    options: effects.map((e) => e.instanceId),
+    minSelections: 1,
+    maxSelections: 1,
+    sourceEffectId: effectId,
+  }];
+
+  return newState;
+}
+
+/**
+ * Process a single chosen end-of-round effect by instanceId.
+ * Called after the player selects which effect to resolve first in the ordering UI.
+ */
+export function processChosenEndOfRoundEffect(state: GameState, chosenInstanceId: string): GameState {
+  let newState = { ...state };
+
+  for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
+    const mission = newState.activeMissions[mIdx];
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+      for (const char of mission[side]) {
+        if (char.instanceId !== chosenInstanceId) continue;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+
+        if (topCard.number === 103) {
+          return handleGiantSpider103EndOfRound(newState, chosenInstanceId);
+        }
+        if (topCard.number === 117 || topCard.number === 151) {
+          newState = handleRockLee117Move(newState, chosenInstanceId);
+          // If no pending created (blocked/no destinations), mark processed + log
+          const movedIds = new Set<string>(newState.endPhaseMovedIds ?? []);
+          if (!movedIds.has(chosenInstanceId)) {
+            movedIds.add(chosenInstanceId);
+            newState.endPhaseMovedIds = [...movedIds];
+            newState.log = logAction(
+              newState.log, newState.turn, 'end', player,
+              'EFFECT_BLOCKED',
+              `Rock Lee (${topCard.number}): Cannot move at end of round (blocked or no valid destination).`,
+              'game.log.effect.rockLeeBlocked',
+              { card: topCard.name_fr, id: topCard.id },
+            );
+          }
+          return newState;
+        }
+        if (topCard.number === 28) {
+          return handleAkamaru028Return(newState, chosenInstanceId);
+        }
+      }
+    }
+  }
+
+  return newState;
+}
+
+/**
+ * Process remaining end-of-round effects after one has been resolved.
+ * If 2+ still remain from different sources, creates another ordering choice.
+ * Otherwise processes remaining in default order.
+ */
+export function processRemainingEndOfRoundEffects(state: GameState): GameState {
+  let newState = { ...state };
+
+  const remaining = scanEndOfRoundInteractiveEffects(newState);
+
+  // Group by player — check if any player has 2+ effects from different sources
+  const byPlayer = new Map<PlayerID, EndOfRoundEffectInfo[]>();
+  for (const e of remaining) {
+    if (!byPlayer.has(e.player)) byPlayer.set(e.player, []);
+    byPlayer.get(e.player)!.push(e);
+  }
+
+  for (const [, playerEffects] of byPlayer) {
+    if (playerEffects.length >= 2) {
+      return createEndOfRoundOrderChoice(newState, playerEffects);
+    }
+  }
+
+  // 0 or 1 remaining — process in default order
+  newState = handleGiantSpider103EndOfRound(newState);
+  if (newState.pendingActions.length > 0) return newState;
+
+  newState = handleRockLee117Move(newState);
+  if (newState.pendingActions.length > 0) return newState;
+
+  newState = handleAkamaru028Return(newState);
+  return newState;
+}
+
+/**
+ * Finalize end phase: remove tokens (if not yet done), run automatic triggers.
+ */
+export function finalizeEndPhase(state: GameState): GameState {
+  let newState = { ...state };
+
+  if (!newState.endPhaseTokensRemoved) {
+    newState = removeAllPowerTokens(newState);
+    newState.endPhaseTokensRemoved = true;
+  }
+
+  // Run automatic end-of-round triggers (Summon returns, Akamaru 027, Kimimaro 123)
+  newState = handleEndOfRoundAutoTriggers(newState);
+
+  return newState;
+}
+
 /**
  * Execute the End Phase:
  * 1. Discard all remaining chakra from both players' pools to 0
- * 2. Giant Spider 103 hide trigger (before token removal so tokens count)
- * 3. Remove ALL Power tokens from all characters in play
- * 4. Handle end-of-round triggers (Summon returns, Akamaru check)
+ * 2. Scan for interactive end-of-round effects (Giant Spider 103, Rock Lee 117, Akamaru 028)
+ * 3. If 2+ effects from different sources: create ordering choice for the player
+ * 4. Otherwise: process in default order (Giant Spider → tokens → Rock Lee → Akamaru)
  */
 export function executeEndPhase(state: GameState): GameState {
   let newState = { ...state };
@@ -25,15 +248,40 @@ export function executeEndPhase(state: GameState): GameState {
     'game.log.resetChakra',
   );
 
-  // 2. Handle Giant Spider 103 BEFORE removing tokens (needs power tokens for threshold)
+  // 2. Scan for interactive end-of-round effects
+  const interactiveEffects = scanEndOfRoundInteractiveEffects(newState);
+
+  // 3. Group by player — check if any player has 2+ effects from different sources
+  const byPlayer = new Map<PlayerID, EndOfRoundEffectInfo[]>();
+  for (const e of interactiveEffects) {
+    if (!byPlayer.has(e.player)) byPlayer.set(e.player, []);
+    byPlayer.get(e.player)!.push(e);
+  }
+
+  for (const [, playerEffects] of byPlayer) {
+    if (playerEffects.length >= 2) {
+      // Create ordering choice — tokens NOT removed yet (Giant Spider needs them)
+      return createEndOfRoundOrderChoice(newState, playerEffects);
+    }
+  }
+
+  // 4. No multi-effect ordering needed — process in default order
+  // Giant Spider BEFORE token removal (needs tokens for power threshold)
   newState = handleGiantSpider103EndOfRound(newState);
+  if (newState.pendingActions.length > 0) return newState;
 
-  // 3. Remove power tokens (with Rock Lee exception)
+  // Remove tokens
   newState = removeAllPowerTokens(newState);
+  newState.endPhaseTokensRemoved = true;
 
-  // 4. Handle remaining end-of-round triggers (Summon returns, Akamaru check, etc.)
-  newState = handleEndOfRoundTriggers(newState);
+  // Automatic triggers (Summon returns, Akamaru 027, Kimimaro 123)
+  newState = handleEndOfRoundAutoTriggers(newState);
 
+  // Rock Lee + Akamaru 028 (after token removal)
+  newState = handleRockLee117Move(newState);
+  if (newState.pendingActions.length > 0) return newState;
+
+  newState = handleAkamaru028Return(newState);
   return newState;
 }
 
@@ -81,9 +329,23 @@ function removeAllPowerTokens(state: GameState): GameState {
  * - Akamaru check: if no Kiba in same mission, return to hand
  */
 function handleEndOfRoundTriggers(state: GameState): GameState {
+  let newState = handleEndOfRoundAutoTriggers(state);
+
+  // Rock Lee 117 (R): At end of round, must move to another mission, if able
+  newState = handleRockLee117Move(newState);
+
+  return newState;
+}
+
+/**
+ * Automatic end-of-round triggers only (non-interactive).
+ * Summon returns, Akamaru 027, Kimimaro 123 self-defeat.
+ * Separated from handleEndOfRoundTriggers so it can be called independently
+ * when end-of-round effect ordering is active.
+ */
+function handleEndOfRoundAutoTriggers(state: GameState): GameState {
   let newState = { ...state };
   const charsToReturn: { instanceId: string; player: PlayerID; reason: string; cardName: string; isAkamaru: boolean }[] = [];
-  // Track which instanceIds are already queued for return (avoid duplicates)
   const returnQueued = new Set<string>();
 
   for (const mission of newState.activeMissions) {
@@ -99,8 +361,6 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
         const isSummon = (topCard.keywords ?? []).includes('Summon');
 
         // --- Summon keyword return ---
-        // All Summon cards return to hand at end of round.
-        // Exception: Giant Spider 103 has a "hide then return" flow handled separately.
         if (isSummon) {
           const isGiantSpider103 = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
@@ -117,11 +377,10 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
             });
             returnQueued.add(char.instanceId);
           }
-          continue; // Summon cards don't need further effect checking
+          continue;
         }
 
         // --- Akamaru 027: Conditional return if no friendly Kiba in mission ---
-        // Match by effect text (not card number) for robustness against type mismatch.
         const hasAkamaruReturn = (topCard.effects ?? []).some(
           (e) => e.type === 'MAIN' &&
             e.description.includes('[⧗]') &&
@@ -130,7 +389,6 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
             e.description.toLowerCase().includes('return'),
         );
         if (hasAkamaruReturn) {
-          // Check ALL characters in this mission (both sides) for Kiba
           const allMissionChars = [...mission.player1Characters, ...mission.player2Characters];
           const hasKiba = allMissionChars.some(
             (c) => {
@@ -171,9 +429,6 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
 
   // Kimimaro 123 (R): At end of round, defeat self if controlling player has no cards in hand
   newState = handleKimimaro123SelfDefeat(newState);
-
-  // Rock Lee 117 (R): At end of round, must move to another mission, if able
-  newState = handleRockLee117Move(newState);
 
   return newState;
 }
@@ -242,9 +497,12 @@ function handleKimimaro123SelfDefeat(state: GameState): GameState {
  *
  * Uses state.endPhaseMovedIds to track which Rock Lees have already been moved
  * this End Phase, preventing infinite re-processing across multiple calls.
+ *
+ * @param targetInstanceId - If provided, only process this specific instance (for ordered resolution).
  */
 export function handleRockLee117Move(
   state: GameState,
+  targetInstanceId?: string,
 ): GameState {
   let newState = { ...state };
   const alreadyMoved = new Set<string>(newState.endPhaseMovedIds ?? []);
@@ -256,6 +514,7 @@ export function handleRockLee117Move(
       const chars = mission[side];
 
       for (const char of chars) {
+        if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyMoved.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -360,8 +619,10 @@ export function handleRockLee117Move(
  * Akamaru 028 (UC): At end of round, the player may OPTIONALLY return this card to their hand.
  * Creates pending actions for each Akamaru 028 in play (non-hidden).
  * Uses state.endPhaseAkamaru028Ids to track which have been processed.
+ *
+ * @param targetInstanceId - If provided, only process this specific instance (for ordered resolution).
  */
-export function handleAkamaru028Return(state: GameState): GameState {
+export function handleAkamaru028Return(state: GameState, targetInstanceId?: string): GameState {
   let newState = { ...state };
   const alreadyProcessed = new Set<string>(newState.endPhaseAkamaru028Ids ?? []);
 
@@ -372,6 +633,7 @@ export function handleAkamaru028Return(state: GameState): GameState {
       const chars = mission[side];
 
       for (const char of chars) {
+        if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -428,8 +690,10 @@ export function handleAkamaru028Return(state: GameState): GameState {
  * Giant Spider 103 (UC): [⧗] At end of round, player may hide a character with Power ≤ Giant Spider's power.
  * Giant Spider always returns to hand. If it hides itself, it does NOT return (continuous effect gone).
  * Uses state.endPhaseGiantSpider103Ids to avoid processing the same card twice across resumptions.
+ *
+ * @param targetInstanceId - If provided, only process this specific instance (for ordered resolution).
  */
-export function handleGiantSpider103EndOfRound(state: GameState): GameState {
+export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceId?: string): GameState {
   let newState = { ...state };
   const alreadyProcessed = new Set<string>(newState.endPhaseGiantSpider103Ids ?? []);
 
@@ -440,6 +704,7 @@ export function handleGiantSpider103EndOfRound(state: GameState): GameState {
       const chars = mission[side];
 
       for (const char of chars) {
+        if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
         const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
