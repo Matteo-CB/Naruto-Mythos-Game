@@ -84,6 +84,7 @@
     "opponentDiscard": "Opponent Discard Pile",
     "hand": "Hand",
     "pass": "Pass",
+    "passConfirm": "Pass with {chakra} chakra?",
     "play": "Play",
     "playHidden": "Play Hidden",
     "reveal": "Reveal",
@@ -99,7 +100,8 @@
     },
     "edgeCoinFlip": {
       "youWin": "You have the Edge",
-      "opponentWins": "Opponent has the Edge"
+      "opponentWins": "Opponent has the Edge",
+      "waitingForOpponent": "Waiting for opponent..."
     },
     "actions": {
       "playCharacter": "Play character on mission",
@@ -1139,7 +1141,8 @@
     "share": "Share",
     "linkCopied": "Link Copied",
     "winner": "Winner",
-    "switchPerspective": "View as {player}"
+    "switchPerspective": "View as {player}",
+    "replayComplete": "Replay Complete"
   },
   "auth": {
     "signIn": "Sign In",

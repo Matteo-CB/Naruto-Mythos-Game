@@ -4293,6 +4293,7 @@ export class EffectEngine {
           player: kb053mPlayer,
           description: 'Choose a mission to play the character from discard.',
           descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
+          descriptionParams: { cardName: kb053mTopCard.name_fr, cost: String(kb053mReducedCost) },
           options: kb053mValidMissions, minSelections: 1, maxSelections: 1,
           sourceEffectId: kb053mEffId,
         }];
@@ -11166,34 +11167,72 @@ export class EffectEngine {
       // --- Gaara 139 (S) CONFIRM UPGRADE MODIFIER ---
       case 'GAARA139_CONFIRM_UPGRADE_MODIFIER': {
         // Player confirmed UPGRADE modifier: also hide same-name enemy after defeat
-        // Re-enter GAARA139_CONFIRM_MAIN with useHideSameName: true
+        // Go DIRECTLY to target selection (no re-prompt)
         const g139mPlayer = pendingEffect.sourcePlayer;
-        const g139mEffId = generateInstanceId();
-        const g139mActId = generateInstanceId();
-        newState.pendingEffects.push({
-          id: g139mEffId, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex,
-          effectType: pendingEffect.effectType,
-          effectDescription: JSON.stringify({ useHideSameName: true }),
-          targetSelectionType: 'GAARA139_CONFIRM_MAIN',
-          sourcePlayer: g139mPlayer, requiresTargetSelection: true,
-          validTargets: [pendingEffect.sourceInstanceId],
-          isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: true,
-          remainingEffectTypes: pendingEffect.remainingEffectTypes,
-        });
-        newState.pendingActions.push({
-          id: g139mActId, type: 'SELECT_TARGET' as PendingAction['type'],
-          player: g139mPlayer,
-          description: 'Gaara (139): Choose an enemy to defeat (UPGRADE: will also hide same-name enemy).',
-          descriptionKey: 'game.effect.desc.gaara139ConfirmMain',
-          descriptionParams: { hiddenCount: '' },
-          options: [pendingEffect.sourceInstanceId],
-          minSelections: 1, maxSelections: 1,
-          sourceEffectId: g139mEffId,
-        });
-        pendingEffect.remainingEffectTypes = undefined;
+        const g139mEnemySide: 'player1Characters' | 'player2Characters' =
+          g139mPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const g139mFriendlySide: 'player1Characters' | 'player2Characters' =
+          g139mPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+
+        // Re-count friendly hidden characters
+        let g139mHiddenCount = 0;
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[g139mFriendlySide]) {
+            if (char.isHidden) g139mHiddenCount++;
+          }
+        }
+
+        if (g139mHiddenCount === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g139mPlayer,
+            'EFFECT_NO_TARGET', 'Gaara (139): No friendly hidden characters (state changed).',
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-139-S' });
+          break;
+        }
+
+        // Re-validate targets: enemy with cost < hiddenCount
+        const g139mValidTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const char of newState.activeMissions[i][g139mEnemySide]) {
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+            if (effectiveCost < g139mHiddenCount) {
+              g139mValidTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (g139mValidTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g139mPlayer,
+            'EFFECT_NO_TARGET', `Gaara (139): No enemy with cost less than ${g139mHiddenCount} (state changed).`,
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-139-S' });
+          break;
+        }
+
+        {
+          const g139mEffId = generateInstanceId();
+          const g139mActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: g139mEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ useHideSameName: true }),
+            targetSelectionType: 'GAARA139_DEFEAT_BY_COST',
+            sourcePlayer: g139mPlayer, requiresTargetSelection: true,
+            validTargets: g139mValidTargets, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: g139mActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: g139mPlayer,
+            description: `Gaara (139) MAIN: Choose an enemy with cost less than ${g139mHiddenCount} to defeat (UPGRADE: will also hide same-name).`,
+            descriptionKey: 'game.effect.desc.gaara139DefeatByCost',
+            descriptionParams: { count: String(g139mHiddenCount) },
+            options: g139mValidTargets, minSelections: 1, maxSelections: 1,
+            sourceEffectId: g139mEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
         break;
       }
 
@@ -11556,30 +11595,41 @@ export class EffectEngine {
           break;
         }
 
-        // Create child SASUKE146_GIVE_EDGE (mandatory)
+        // Directly apply: give Edge to opponent + POWERUP 3 on self (no second popup)
         {
-          const s146EffId = generateInstanceId();
-          const s146ActId = generateInstanceId();
-          newState.pendingEffects.push({
-            id: s146EffId, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ sourceMissionIndex: pendingEffect.sourceMissionIndex }),
-            targetSelectionType: 'SASUKE146_GIVE_EDGE',
-            sourcePlayer: s146Player, requiresTargetSelection: true,
-            validTargets: [pendingEffect.sourceInstanceId], isOptional: false, isMandatory: true,
-            resolved: false, isUpgrade: pendingEffect.isUpgrade,
-            remainingEffectTypes: pendingEffect.remainingEffectTypes,
-          });
-          newState.pendingActions.push({
-            id: s146ActId, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: s146Player,
-            description: 'Sasuke Uchiwa (146): Confirm giving the Edge token to opponent for POWERUP 3.',
-            descriptionKey: 'game.effect.desc.sasuke146GiveEdge',
-            options: [pendingEffect.sourceInstanceId], minSelections: 1, maxSelections: 1,
-            sourceEffectId: s146EffId,
-          });
-          pendingEffect.remainingEffectTypes = undefined;
+          const s146Opponent: PlayerID = s146Player === 'player1' ? 'player2' : 'player1';
+          newState = { ...newState, edgeHolder: s146Opponent };
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, s146Player,
+            'EFFECT_EDGE',
+            'Sasuke Uchiwa (146): Gave the Edge token to opponent.',
+            'game.log.effect.giveEdge',
+            { card: 'SASUKE UCHIWA', id: 'KS-146-M' },
+          );
+          // POWERUP 3 on Sasuke 146
+          const s146MI = pendingEffect.sourceMissionIndex;
+          const s146Side: 'player1Characters' | 'player2Characters' =
+            s146Player === 'player1' ? 'player1Characters' : 'player2Characters';
+          const s146Missions = [...newState.activeMissions];
+          const s146Mission = { ...s146Missions[s146MI] };
+          const s146Chars = [...s146Mission[s146Side]];
+          const s146SelfIdx = s146Chars.findIndex((c) => c.instanceId === pendingEffect.sourceInstanceId);
+          if (s146SelfIdx !== -1) {
+            s146Chars[s146SelfIdx] = { ...s146Chars[s146SelfIdx], powerTokens: s146Chars[s146SelfIdx].powerTokens + 3 };
+            s146Mission[s146Side] = s146Chars;
+            s146Missions[s146MI] = s146Mission;
+            newState = {
+              ...newState,
+              activeMissions: s146Missions,
+              log: logAction(
+                newState.log, newState.turn, newState.phase, s146Player,
+                'EFFECT_POWERUP',
+                'Sasuke Uchiwa (146): POWERUP 3 on self.',
+                'game.log.effect.powerupSelf',
+                { card: 'SASUKE UCHIWA', id: 'KS-146-M', amount: 3 },
+              ),
+            };
+          }
         }
         break;
       }
@@ -13483,6 +13533,17 @@ export class EffectEngine {
         const missionIdx_g = gaaraDesc.missionIndex ?? 0;
         let defeatedCount_g = gaaraDesc.defeatedCount ?? 0;
 
+        // Log chosen target details before defeating
+        {
+          const chosenChar = EffectEngine.findCharByInstanceId(newState, targetId);
+          if (chosenChar) {
+            const chosenTop = chosenChar.character.stack.length > 0 ? chosenChar.character.stack[chosenChar.character.stack.length - 1] : chosenChar.character.card;
+            console.log(`[GAARA120_CHOOSE_DEFEAT] Player chose targetId=${targetId} name=${chosenTop.name_fr} id=${chosenTop.id} hidden=${chosenChar.character.isHidden} mission=${chosenChar.missionIndex} validTargets=[${pendingEffect.validTargets?.join(', ')}]`);
+          } else {
+            console.warn(`[GAARA120_CHOOSE_DEFEAT] Chosen targetId=${targetId} NOT FOUND in state! validTargets=[${pendingEffect.validTargets?.join(', ')}]`);
+          }
+        }
+
         // Defeat selected target
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         defeatedCount_g++;
@@ -14351,6 +14412,11 @@ export class EffectEngine {
       console.warn(`[EffectEngine] defeatCharacter: character ${targetId} not found in any mission. Cannot defeat.`);
       return state;
     }
+
+    const charTopCard = charResult.character.stack.length > 0
+      ? charResult.character.stack[charResult.character.stack.length - 1]
+      : charResult.character.card;
+    console.log(`[EffectEngine] defeatCharacter: defeating ${charTopCard.name_fr} (${charTopCard.id}) instanceId=${targetId} hidden=${charResult.character.isHidden} mission=${charResult.missionIndex} player=${charResult.player}`);
 
     const effectSource = sourcePlayer ?? (charResult.player === 'player1' ? 'player2' : 'player1');
     const isEnemyEffect = effectSource !== charResult.player;

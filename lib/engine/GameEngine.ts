@@ -176,7 +176,20 @@ export class GameEngine {
               newState.activePlayer = newState.pendingForcedResolver;
               newState.pendingForcedResolver = undefined;
             } else {
-              const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
+              // Check if this was an opponent-facing effect (e.g. Zaku 070, Kin 072)
+              // by looking at the resolved action's originPlayer. If the resolver (player)
+              // differs from the origin (card owner), the turn should alternate from the
+              // card owner's perspective, not the resolver's.
+              const resolvedAction = state.pendingActions.find((p) => {
+                if (action.type === 'SELECT_TARGET') return p.id === action.pendingActionId;
+                if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
+                  const eff = state.pendingEffects.find((e) => e.id === action.pendingEffectId);
+                  return eff && p.sourceEffectId === eff.id;
+                }
+                return false;
+              });
+              const turnOwner = resolvedAction?.originPlayer ?? player;
+              const otherPlayer: PlayerID = turnOwner === 'player1' ? 'player2' : 'player1';
               newState.activePlayer = otherPlayer;
             }
           }
@@ -1113,12 +1126,12 @@ export class GameEngine {
         const n133dMission = newState.activeMissions[n133dMI];
         if (n133dMission) {
           const n133dValidT1 = n133dMission[n133dEnemySide]
-            .filter((c: any) => getEffectivePower(newState, c, n133dOpponent) <= 5)
+            .filter((c: any) => !c.isHidden && getEffectivePower(newState, c, n133dOpponent) <= 5)
             .map((c: any) => c.instanceId);
           const n133dValidT2: string[] = [];
           for (let i = 0; i < newState.activeMissions.length; i++) {
             for (const ch of newState.activeMissions[i][n133dEnemySide]) {
-              if (getEffectivePower(newState, ch, n133dOpponent) <= 2) {
+              if (!ch.isHidden && getEffectivePower(newState, ch, n133dOpponent) <= 2) {
                 n133dValidT2.push(ch.instanceId);
               }
             }
@@ -1179,64 +1192,139 @@ export class GameEngine {
 
       // Sakura 135 UPGRADE modifier declined → execute base MAIN (full cost, no reduction)
       if (effect.targetSelectionType === 'SAKURA135_CONFIRM_UPGRADE_MODIFIER') {
+        // Declined UPGRADE → go directly to draw logic (base MAIN, no cost reduction, no re-prompt)
+        const s135dPlayer = effect.sourcePlayer;
+        const s135dPs = newState[s135dPlayer];
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
 
-        // Re-create SAKURA135_CONFIRM_MAIN with costReduction: 0, isUpgrade: false
+        if (s135dPs.deck.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s135dPlayer,
+            'EFFECT_NO_TARGET', 'Sakura Haruno (135): Deck is empty.',
+            'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+          return newState;
+        }
+
+        // Draw top 3 cards from deck
+        const s135dDeck = [...s135dPs.deck];
+        const s135dTop3 = s135dDeck.splice(0, Math.min(3, s135dDeck.length));
+        newState = { ...newState, [s135dPlayer]: { ...s135dPs, deck: s135dDeck } };
+
+        // Find affordable character cards (no cost reduction)
+        const s135dAvailable = s135dTop3.filter((card) => {
+          if (card.card_type !== 'character') return false;
+          return (card.chakra ?? 0) <= newState[s135dPlayer].chakra;
+        });
+
+        if (s135dAvailable.length === 0) {
+          newState = { ...newState, [s135dPlayer]: { ...newState[s135dPlayer], discardPile: [...newState[s135dPlayer].discardPile, ...s135dTop3] } };
+          newState.log = logAction(newState.log, newState.turn, newState.phase, s135dPlayer,
+            'EFFECT_NO_TARGET', 'Sakura Haruno (135): No affordable characters in top 3, all discarded.',
+            'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-135-S' });
+          return newState;
+        }
+
+        // Store top 3 in discard pile as temporary storage
+        newState = { ...newState, [s135dPlayer]: { ...newState[s135dPlayer], discardPile: [...newState[s135dPlayer].discardPile, ...s135dTop3] } };
+
         const s135dEffId = generateInstanceId();
         const s135dActId = generateInstanceId();
+        const s135dValidIndices = s135dTop3
+          .map((c, i) => ({ card: c, index: i }))
+          .filter(({ card }) => s135dAvailable.some((a) => a.id === card.id))
+          .map(({ index }) => String(index));
+
         newState.pendingEffects.push({
           id: s135dEffId, sourceCardId: effect.sourceCardId,
           sourceInstanceId: effect.sourceInstanceId,
-          sourceMissionIndex: effect.sourceMissionIndex,
-          effectType: effect.effectType,
-          effectDescription: JSON.stringify({ costReduction: 0 }),
-          targetSelectionType: 'SAKURA135_CONFIRM_MAIN',
-          sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: [effect.sourceInstanceId],
-          isOptional: false, isMandatory: true,
+          sourceMissionIndex: effect.sourceMissionIndex, effectType: effect.effectType,
+          effectDescription: JSON.stringify({
+            topCards: s135dTop3.map((c, i) => ({
+              index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
+            })),
+            costReduction: 0,
+          }),
+          targetSelectionType: 'SAKURA135_CHOOSE_CARD',
+          sourcePlayer: s135dPlayer, requiresTargetSelection: true,
+          validTargets: s135dValidIndices, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
           remainingEffectTypes: effect.remainingEffectTypes,
         });
         newState.pendingActions.push({
-          id: s135dActId, type: 'SELECT_TARGET' as any,
-          player: effect.sourcePlayer,
-          description: 'Sakura Haruno (135): Look at top 3 cards, play one character.',
-          descriptionKey: 'game.effect.desc.sakura135ConfirmMain',
-          options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          id: s135dActId, type: 'CHOOSE_CARD_FROM_LIST' as any,
+          player: s135dPlayer,
+          description: 'Sakura Haruno (135): Choose a character from top 3 to play.',
+          descriptionKey: 'game.effect.desc.sakura135ChooseCard',
+          options: s135dValidIndices, minSelections: 1, maxSelections: 1,
           sourceEffectId: s135dEffId,
         });
         return newState;
       }
 
-      // Gaara 139 UPGRADE modifier declined → execute base MAIN (defeat only, no hide same-name)
+      // Gaara 139 UPGRADE modifier declined → go directly to target selection (no re-prompt)
       if (effect.targetSelectionType === 'GAARA139_CONFIRM_UPGRADE_MODIFIER') {
+        const g139dPlayer = effect.sourcePlayer;
+        const g139dEnemySide: 'player1Characters' | 'player2Characters' =
+          g139dPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        const g139dFriendlySide: 'player1Characters' | 'player2Characters' =
+          g139dPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
 
-        // Re-create GAARA139_CONFIRM_MAIN with useHideSameName: false
+        // Re-count friendly hidden characters
+        let g139dHiddenCount = 0;
+        for (const mission of newState.activeMissions) {
+          for (const char of mission[g139dFriendlySide]) {
+            if (char.isHidden) g139dHiddenCount++;
+          }
+        }
+
+        if (g139dHiddenCount === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g139dPlayer,
+            'EFFECT_NO_TARGET', 'Gaara (139): No friendly hidden characters (state changed).',
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-139-S' });
+          return newState;
+        }
+
+        // Re-validate targets: enemy with cost < hiddenCount
+        const g139dValidTargets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const char of newState.activeMissions[i][g139dEnemySide]) {
+            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const effectiveCost = char.isHidden ? 0 : topCard.chakra;
+            if (effectiveCost < g139dHiddenCount) {
+              g139dValidTargets.push(char.instanceId);
+            }
+          }
+        }
+
+        if (g139dValidTargets.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, g139dPlayer,
+            'EFFECT_NO_TARGET', `Gaara (139): No enemy with cost less than ${g139dHiddenCount} (state changed).`,
+            'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-139-S' });
+          return newState;
+        }
+
         const g139dEffId = generateInstanceId();
         const g139dActId = generateInstanceId();
         newState.pendingEffects.push({
           id: g139dEffId, sourceCardId: effect.sourceCardId,
           sourceInstanceId: effect.sourceInstanceId,
-          sourceMissionIndex: effect.sourceMissionIndex,
-          effectType: effect.effectType,
+          sourceMissionIndex: effect.sourceMissionIndex, effectType: effect.effectType,
           effectDescription: JSON.stringify({ useHideSameName: false }),
-          targetSelectionType: 'GAARA139_CONFIRM_MAIN',
-          sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
-          validTargets: [effect.sourceInstanceId],
-          isOptional: false, isMandatory: true,
+          targetSelectionType: 'GAARA139_DEFEAT_BY_COST',
+          sourcePlayer: g139dPlayer, requiresTargetSelection: true,
+          validTargets: g139dValidTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true,
           remainingEffectTypes: effect.remainingEffectTypes,
         });
         newState.pendingActions.push({
           id: g139dActId, type: 'SELECT_TARGET' as any,
-          player: effect.sourcePlayer,
-          description: 'Gaara (139): Choose an enemy to defeat.',
-          descriptionKey: 'game.effect.desc.gaara139ConfirmMain',
-          descriptionParams: { hiddenCount: '' },
-          options: [effect.sourceInstanceId], minSelections: 1, maxSelections: 1,
+          player: g139dPlayer,
+          description: `Gaara (139) MAIN: Choose an enemy with cost less than ${g139dHiddenCount} to defeat.`,
+          descriptionKey: 'game.effect.desc.gaara139DefeatByCost',
+          descriptionParams: { count: String(g139dHiddenCount) },
+          options: g139dValidTargets, minSelections: 1, maxSelections: 1,
           sourceEffectId: g139dEffId,
         });
         return newState;
@@ -1475,13 +1563,16 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Highlight both players' last play from the previous turn
+    // Highlight both players' last play from the previous turn AND current turn
     const prevPlayed = state.previousTurnLastPlayed ?? { player1: null, player2: null };
+    const currPlayed = state.lastPlayedInstanceIds ?? { player1: null, player2: null };
     const lastPlayedIds = new Set<string>();
-    const opponentLastPlayed = prevPlayed[otherPlayer];
-    if (opponentLastPlayed) lastPlayedIds.add(opponentLastPlayed);
-    const ownLastPlayed = prevPlayed[player];
-    if (ownLastPlayed) lastPlayedIds.add(ownLastPlayed);
+    // Previous turn highlights
+    if (prevPlayed[otherPlayer]) lastPlayedIds.add(prevPlayed[otherPlayer]!);
+    if (prevPlayed[player]) lastPlayedIds.add(prevPlayed[player]!);
+    // Current turn highlights
+    if (currPlayed[otherPlayer]) lastPlayedIds.add(currPlayed[otherPlayer]!);
+    if (currPlayed[player]) lastPlayedIds.add(currPlayed[player]!);
 
     const opponentVisible: VisibleOpponentState = {
       id: otherPlayer,

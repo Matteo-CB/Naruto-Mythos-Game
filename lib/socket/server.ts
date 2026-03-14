@@ -44,6 +44,8 @@ interface RoomData {
   // Tournament
   tournamentId?: string;
   tournamentMatchId?: string;
+  // Coin flip sync: track which players finished their coin flip animation
+  coinFlipDone: { player1: boolean; player2: boolean };
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -696,6 +698,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         sealedTimer: null,
         sealedDeadline: null,
         timerEnabled: gameMode === 'ranked' ? true : (data.timerEnabled ?? true),
+        coinFlipDone: { player1: false, player2: false },
       };
 
       rooms.set(code, room);
@@ -954,6 +957,23 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const visibleState = GameEngine.getVisibleState(room.gameState, player);
       socket.emit('game:state-update', { visibleState, playerRole: player });
       console.log(`[Socket] Resync state sent to ${player} in room ${code}`);
+    });
+
+    // Coin flip synchronization — both players must finish the animation before mulligan appears
+    socket.on('coin-flip-done', () => {
+      const code = playerRooms.get(socket.id);
+      if (!code) return;
+      const room = rooms.get(code);
+      if (!room) return;
+      const player = socket.id === room.hostSocket ? 'player1' : 'player2';
+      room.coinFlipDone[player] = true;
+      console.log(`[Socket] coin-flip-done from ${player} in room ${code}`, room.coinFlipDone);
+      if (room.coinFlipDone.player1 && room.coinFlipDone.player2) {
+        console.log(`[Socket] Both players done with coin flip in room ${code}, broadcasting sync`);
+        io.to(code).emit('coin-flip-sync');
+        // Reset for potential rematch
+        room.coinFlipDone = { player1: false, player2: false };
+      }
     });
 
     // Game action
@@ -1322,6 +1342,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           sealedTimer: null,
           sealedDeadline: null,
           timerEnabled: true,
+          coinFlipDone: { player1: false, player2: false },
         };
 
         rooms.set(code, room);

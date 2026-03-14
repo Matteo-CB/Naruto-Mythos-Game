@@ -30,10 +30,16 @@ export function ActionBar() {
   const clearSelection = useUIStore((s) => s.clearSelection);
 
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
+  const [confirmingPass, setConfirmingPass] = useState(false);
   const socketForfeit = useSocketStore((s) => s.forfeit);
   const actionDeadline = useSocketStore((s) => s.actionDeadline);
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
+
+  // Reset pass confirmation when turn/phase changes
+  useEffect(() => {
+    setConfirmingPass(false);
+  }, [visibleState?.phase, visibleState?.activePlayer]);
 
   if (!visibleState) return null;
 
@@ -245,6 +251,12 @@ export function ActionBar() {
 
   const handlePass = () => {
     if (!isMyTurn || !isActionPhase || hasPassed || actionsBlocked) return;
+    // If player has chakra remaining, ask for confirmation first
+    if (myState.chakra >= 1 && !confirmingPass) {
+      setConfirmingPass(true);
+      return;
+    }
+    setConfirmingPass(false);
     performAction({ type: 'PASS' });
     clearSelection();
   };
@@ -450,12 +462,32 @@ export function ActionBar() {
           )}
 
           {/* Pass button */}
-          <ActionButton
-            label={t('game.pass')}
-            onClick={handlePass}
-            disabled={actionsBlocked}
-            variant="muted"
-          />
+          {confirmingPass ? (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] whitespace-nowrap" style={{ color: '#c4a35a' }}>
+                {t('game.passConfirm', { chakra: myState.chakra })}
+              </span>
+              <ActionButton
+                label={t('common.confirm')}
+                onClick={handlePass}
+                disabled={actionsBlocked}
+                variant="primary"
+              />
+              <ActionButton
+                label={t('common.cancel')}
+                onClick={() => setConfirmingPass(false)}
+                disabled={false}
+                variant="muted"
+              />
+            </div>
+          ) : (
+            <ActionButton
+              label={t('game.pass')}
+              onClick={handlePass}
+              disabled={actionsBlocked}
+              variant="muted"
+            />
+          )}
         </>
       )}
 

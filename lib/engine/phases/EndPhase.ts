@@ -107,6 +107,7 @@ function handleEndOfRoundTriggers(state: GameState): GameState {
               e.description.toLowerCase().includes('hide a character'),
           );
           if (!isGiantSpider103) {
+            console.log(`[EndPhase] Summon return queued: ${topCard.name_fr} (${topCard.id}) instanceId=${char.instanceId} hidden=${char.isHidden} controlledBy=${char.controlledBy}`);
             charsToReturn.push({
               instanceId: char.instanceId,
               player: char.controlledBy,
@@ -533,6 +534,8 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
       const idx = chars.findIndex((c) => c.instanceId === instanceId);
       if (idx !== -1) {
         const char = chars[idx];
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        console.log(`[returnCharacterToHand] Returning ${topCard.name_fr} (${topCard.id}) instanceId=${instanceId} hidden=${char.isHidden} mission=${i} side=${side}`);
         chars.splice(idx, 1);
         mission[side] = chars;
         missions[i] = mission;

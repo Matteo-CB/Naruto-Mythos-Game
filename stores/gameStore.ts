@@ -1254,15 +1254,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Check if there are pending target selections for the human player
     const humanPending = newState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPending.length > 0) {
-      // Detect multiple simultaneous effects from DIFFERENT source cards
-      const orderSel = buildEffectOrderSelection(
-        humanPending, newState.pendingEffects, newState.activeMissions,
-        get().playerDisplayNames[humanPlayer],
-        (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
-      );
-      if (orderSel) {
-        set({ isProcessing: false, pendingTargetSelection: orderSel });
-        return;
+      // After REORDER_EFFECTS, skip the order selection check — the player already chose
+      if (action.type !== 'REORDER_EFFECTS') {
+        // Detect multiple simultaneous effects from DIFFERENT source cards
+        const orderSel = buildEffectOrderSelection(
+          humanPending, newState.pendingEffects, newState.activeMissions,
+          get().playerDisplayNames[humanPlayer],
+          (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },
+        );
+        if (orderSel) {
+          set({ isProcessing: false, pendingTargetSelection: orderSel });
+          return;
+        }
       }
 
       const pendingAction = humanPending[0];
