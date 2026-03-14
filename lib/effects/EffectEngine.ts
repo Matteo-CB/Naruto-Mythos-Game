@@ -8343,7 +8343,15 @@ export class EffectEngine {
         {
           const j132uEffId = generateInstanceId();
           const j132uActId = generateInstanceId();
-          const j132uEnemyChars = j132uMission[j132uEnemySide];
+          // Exclude immune characters (Kyubi/Ichibi) from valid targets
+          const j132uEnemyChars = j132uMission[j132uEnemySide]
+            .filter((c: CharacterInPlay) => !isImmuneToEnemyHideOrDefeat(c));
+          if (j132uEnemyChars.length === 0) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, j132uSourcePlayer,
+              'EFFECT', 'Jiraya (132) UPGRADE: All enemy characters are immune to defeat.',
+              'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-132-S' });
+            break;
+          }
           const j132uChainData = JSON.stringify({
             missionIndex: j132uMIdx, sourcePlayer: j132uSourcePlayer,
             text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${j132uMIdx + 1} (${j132uEnemyChars.length} > 2).`,
@@ -13478,17 +13486,20 @@ export class EffectEngine {
 
         const mission_j = newState.activeMissions[missionIdx_j];
         if (mission_j) {
-          const enemyChars_j = mission_j[enemySide_j]
-            .filter((c: CharacterInPlay) => !defeatedIds_j.includes(c.instanceId));
+          // Count ACTUAL enemy characters still in this mission (not using defeatedIds)
+          const allEnemyChars_j = mission_j[enemySide_j];
+          // Valid targets: exclude immune characters (Kyubi/Ichibi)
+          const defeatableChars_j = allEnemyChars_j
+            .filter((c: CharacterInPlay) => !isImmuneToEnemyHideOrDefeat(c));
 
           // Safety guard: max 10 iterations to prevent infinite loops
-          if (enemyChars_j.length > 2 && defeatedIds_j.length < 10) {
+          if (allEnemyChars_j.length > 2 && defeatableChars_j.length > 0 && defeatedIds_j.length < 10) {
             // Chain another selection for the opponent (same mission)
             const chainData_j = JSON.stringify({
               missionIndex: missionIdx_j,
               sourcePlayer: jirSourcePlayer,
               defeatedIds: defeatedIds_j,
-              text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${enemyChars_j.length} > 2).`,
+              text: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${allEnemyChars_j.length} > 2).`,
             });
             const effectId_j = generateInstanceId();
             const actionId_j = generateInstanceId();
@@ -13502,7 +13513,7 @@ export class EffectEngine {
               targetSelectionType: 'JIRAIYA132_OPPONENT_CHOOSE_DEFEAT',
               sourcePlayer: jirSourcePlayer,
               requiresTargetSelection: true,
-              validTargets: enemyChars_j.map((c: CharacterInPlay) => c.instanceId),
+              validTargets: defeatableChars_j.map((c: CharacterInPlay) => c.instanceId),
               isOptional: false,
               isMandatory: true,
               resolved: false,
@@ -13512,10 +13523,10 @@ export class EffectEngine {
               id: actionId_j,
               type: 'SELECT_TARGET' as PendingAction['type'],
               player: opponent_j,
-              description: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${enemyChars_j.length} > 2).`,
+              description: `Jiraya (132) UPGRADE: Choose one of your characters to defeat in mission ${missionIdx_j + 1} (${allEnemyChars_j.length} > 2).`,
               descriptionKey: 'game.effect.desc.jiraiya132OpponentChooseDefeat',
-              descriptionParams: { mission: String(missionIdx_j + 1), count: String(enemyChars_j.length) },
-              options: enemyChars_j.map((c: CharacterInPlay) => c.instanceId),
+              descriptionParams: { mission: String(missionIdx_j + 1), count: String(allEnemyChars_j.length) },
+              options: defeatableChars_j.map((c: CharacterInPlay) => c.instanceId),
               minSelections: 1,
               maxSelections: 1,
               sourceEffectId: effectId_j,
