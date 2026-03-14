@@ -1080,7 +1080,8 @@
     "eloRange": "{min} - {max}",
     "eloRangeTop": "{min}+",
     "unranked": "Non classe",
-    "placementProgress": "Placement : {current}/{total}"
+    "placementProgress": "Placement : {current}/{total}",
+    "searchPlaceholder": "Rechercher un joueur..."
   },
   "profile": {
     "title": "Profil du Joueur",

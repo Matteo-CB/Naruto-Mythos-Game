@@ -6,8 +6,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const search = searchParams.get('search')?.trim() || '';
+
+    const where = search
+      ? { username: { contains: search, mode: 'insensitive' as const } }
+      : {};
 
     const users = await prisma.user.findMany({
+      where,
       select: {
         id: true,
         username: true,
@@ -23,7 +29,7 @@ export async function GET(request: NextRequest) {
       skip: offset,
     });
 
-    const total = await prisma.user.count();
+    const total = await prisma.user.count({ where });
 
     return NextResponse.json({ users, total, limit, offset });
   } catch {
