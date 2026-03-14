@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { create } from 'zustand';
 import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
+import { useUIStore } from '@/stores/uiStore';
 
 const CONNECT_TIMEOUT_MS = 8000;
 
@@ -78,6 +79,7 @@ interface SocketStore {
   offerRematch: () => void;
   acceptRematch: () => void;
   declineRematch: () => void;
+  coinFlipDone: () => void;
   clearError: () => void;
   forfeit: (reason: 'abandon' | 'timeout') => void;
 }
@@ -419,6 +421,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
+      // --- Coin flip sync ---
+
+      socket.on('coin-flip-sync', () => {
+        console.log('[Socket] Both players completed coin flip — showing mulligan');
+        useUIStore.getState().setCoinFlipComplete(true);
+      });
+
       // --- Social events (delegated to socialStore) ---
 
       socket.on('friend:request-received', (data) => {
@@ -615,6 +624,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket && connected) {
       set({ rematchState: 'none' });
       socket.emit('game:rematch-decline');
+    }
+  },
+
+  coinFlipDone: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      console.log('[Socket] Emitting coin-flip-done');
+      socket.emit('coin-flip-done');
     }
   },
 

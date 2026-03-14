@@ -70,7 +70,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                 </div>
               ) : (
                 <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}>
-                  {cards.map((card, i) => {
+                  {[...cards].reverse().map((card, i) => {
                     const imagePath = normalizeImagePath(card.image_file);
 
                     return (
@@ -79,7 +79,8 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.03, duration: 0.15 }}
-                        className="group relative flex flex-col items-center gap-1 p-1.5"
+                        className="group relative flex flex-col items-center gap-1 p-1.5 cursor-pointer"
+                        onClick={() => handleDetails(card)}
                         style={{
                           backgroundColor: 'rgba(255, 255, 255, 0.02)',
                           border: '1px solid rgba(255, 255, 255, 0.05)',

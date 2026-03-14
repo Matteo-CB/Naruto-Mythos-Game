@@ -7,6 +7,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useTrainingStore } from '@/stores/trainingStore';
+import { useSocketStore } from '@/lib/socket/client';
 
 /**
  * Edge Token coin-flip driven by requestAnimationFrame for absolute
@@ -91,7 +92,7 @@ function shadowScale(t: number): { scale: number; opacity: number } {
   };
 }
 
-type Phase = 'idle' | 'animating' | 'result' | 'done';
+type Phase = 'idle' | 'animating' | 'result' | 'waiting' | 'done';
 
 export function EdgeCoinFlip() {
   const t = useTranslations();
@@ -100,6 +101,9 @@ export function EdgeCoinFlip() {
   const isHotseatGame = useGameStore((s) => s.isHotseatGame);
   const isTrainingMode = useTrainingStore((s) => s.isTrainingMode);
   const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
+  const isOnlineGame = useGameStore((s) => s.isOnlineGame);
+  const coinFlipDoneSocket = useSocketStore((s) => s.coinFlipDone);
+  const coinFlipComplete = useUIStore((s) => s.coinFlipComplete);
 
   const [phase, setPhase] = useState<Phase>('idle');
   const [hasTriggered, setHasTriggered] = useState(false);
@@ -187,9 +191,10 @@ export function EdgeCoinFlip() {
     if (!isMulliganPhase || hasTriggered || isSandboxMode || isHotseatGame || isTrainingMode) return;
     setHasTriggered(true);
     if (!animationsEnabled) {
+      // Go straight to result phase — the result→done effect handles
+      // both online sync (waiting) and offline (immediate done) paths
       setPhase('result');
-      const timer = setTimeout(() => setPhase('done'), 800);
-      return () => clearTimeout(timer);
+      return;
     }
     setPhase('animating');
   }, [isMulliganPhase, hasTriggered, isSandboxMode, isHotseatGame, isTrainingMode, animationsEnabled]);
@@ -208,21 +213,42 @@ export function EdgeCoinFlip() {
   useEffect(() => {
     if (phase !== 'result') return;
     const timer = setTimeout(() => {
-      setPhase('done');
-      setCoinFlipComplete(true);
+      if (isOnlineGame) {
+        // Online: emit to server and wait for both players to finish
+        setPhase('waiting');
+        coinFlipDoneSocket();
+      } else {
+        setPhase('done');
+        setCoinFlipComplete(true);
+      }
     }, RESULT_HOLD_MS);
     return () => clearTimeout(timer);
-  }, [phase, setCoinFlipComplete]);
+  }, [phase, setCoinFlipComplete, isOnlineGame, coinFlipDoneSocket]);
+
+  // Waiting phase: transition to done once coin-flip-sync arrives (sets coinFlipComplete)
+  useEffect(() => {
+    if (phase !== 'waiting') return;
+    if (coinFlipComplete) {
+      setPhase('done');
+    }
+  }, [phase, coinFlipComplete]);
 
   const handleSkip = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    setPhase('done');
-    setCoinFlipComplete(true);
-  }, [setCoinFlipComplete]);
+    if (isOnlineGame) {
+      setPhase('waiting');
+      coinFlipDoneSocket();
+    } else {
+      setPhase('done');
+      setCoinFlipComplete(true);
+    }
+  }, [setCoinFlipComplete, isOnlineGame, coinFlipDoneSocket]);
 
   if (phase === 'idle' || phase === 'done' || isSandboxMode || isHotseatGame || isTrainingMode) return null;
 
   const isResult = phase === 'result';
+  const isWaiting = phase === 'waiting';
+  const showResultText = isResult || isWaiting;
 
   return (
     <AnimatePresence>
@@ -234,10 +260,10 @@ export function EdgeCoinFlip() {
         transition={{ duration: 0.4 }}
         className="fixed inset-0 z-50 flex flex-col items-center justify-center cursor-pointer"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)', overflow: 'hidden' }}
-        onClick={handleSkip}
+        onClick={isWaiting ? undefined : handleSkip}
       >
         {/* Soft ambient on result */}
-        {isResult && (
+        {showResultText && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -388,7 +414,7 @@ export function EdgeCoinFlip() {
 
         {/* Result text */}
         <AnimatePresence>
-          {isResult && (
+          {showResultText && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -419,6 +445,18 @@ export function EdgeCoinFlip() {
                   ? t('game.mulligan.youHaveEdge')
                   : t('game.mulligan.opponentHasEdge')}
               </motion.span>
+
+              {isWaiting && (
+                <motion.span
+                  className="font-body text-xs text-center mt-2"
+                  style={{ color: '#666' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {t('game.edgeCoinFlip.waitingForOpponent')}
+                </motion.span>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

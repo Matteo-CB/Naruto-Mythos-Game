@@ -84,6 +84,7 @@
     "opponentDiscard": "Defausse adversaire",
     "hand": "Main",
     "pass": "Passer",
+    "passConfirm": "Passer avec {chakra} chakra ?",
     "play": "Jouer",
     "playHidden": "Jouer face cachee",
     "reveal": "Reveler",
@@ -99,7 +100,8 @@
     },
     "edgeCoinFlip": {
       "youWin": "Vous avez l'Edge",
-      "opponentWins": "L'adversaire a l'Edge"
+      "opponentWins": "L'adversaire a l'Edge",
+      "waitingForOpponent": "En attente de l'adversaire..."
     },
     "actions": {
       "playCharacter": "Jouer un personnage sur une mission",
@@ -199,18 +201,18 @@
         "recoverFromDiscard": "{card} ({id}) : Recupere {target} de la defausse en main.",
         "kabutoSteal": "{card} ({id}) : Vole une carte et la place cachee sur mission {mission}.",
         "playSummonReduced": "{card} ({id}) : Joue {target} comme Invocation sur mission {mission} pour {cost} chakra (cout reduit).",
-        "moveBlocked": "{card} ({id}) : Deplacement bloque. {{target}} ne peut pas etre deplace.",
+        "moveBlocked": "{card} ({id}) : Deplacement bloque. {target} ne peut pas etre deplace.",
         "copyEffect": "{card} ({id}) : Copie l'effet de {target}.",
         "copy": "{card} ({id}) : Copie l'effet de {target}.",
         "devolve": "{card} ({id}) : Devolution de {target} (carte du dessus retiree).",
-        "orochimaruCannotSteal": "{card} ({id}) : Impossible de prendre le controle de {{target}}, cout trop eleve.",
+        "orochimaruCannotSteal": "{card} ({id}) : Impossible de prendre le controle de {target}, cout trop eleve.",
         "discardPowerup": "{card} ({id}) : Defausse {target} du deck. POWERUP {amount}.",
         "discardSelf": "{card} ({id}) : Defausse {target} de la main.",
         "kimimaro056Protection": "{card} ({id}) : L'adversaire paie 1 Chakra pour cibler ce personnage.",
         "playLeafReduced": "{card} ({id}) : Joue {target} sur mission {mission} pour {cost} chakra (cout reduit).",
         "upgradeFromDiscard": "{card} ({id}) : Evolue {target} depuis la defausse sur {mission} (paye {cost}).",
         "upgradeFromDeck": "{card} ({id}) : Evolue {target} depuis le deck sur {mission} (paye {cost}).",
-        "takeControlBlocked": "{card} ({id}) : Impossible de prendre le controle de {{target}}, conflit de nom.",
+        "takeControlBlocked": "{card} ({id}) : Impossible de prendre le controle de {target}, conflit de nom.",
         "moveNameConflictDiscard": "{card} ({id}) : {target} defausse pour conflit de nom apres deplacement.",
         "powerupMultiple": "{card} ({id}) : POWERUP {amount} sur {count} personnage(s).",
         "opponentDiscard": "{card} ({id}) : L'adversaire defausse {amount} carte(s) de sa main.",
@@ -234,7 +236,7 @@
         "itachi091DiscardOpponent": "{card} ({id}) : L'adversaire defausse {target}.",
         "kimimaro123SelfDefeat": "Kimimaro (123) : Aucune carte en main en fin de tour. Kimimaro est vaincu.",
         "kin073Discard": "{card} ({id}) : {target} defausse de la main.",
-        "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {{target}}, meme nom deja present sur cette mission.",
+        "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {target}, meme nom deja present sur cette mission.",
         "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
         "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
         "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",
@@ -1139,7 +1141,8 @@
     "share": "Partager",
     "linkCopied": "Lien copie",
     "winner": "Vainqueur",
-    "switchPerspective": "Voir comme {player}"
+    "switchPerspective": "Voir comme {player}",
+    "replayComplete": "Replay termine"
   },
   "auth": {
     "signIn": "Se Connecter",

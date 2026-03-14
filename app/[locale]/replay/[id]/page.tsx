@@ -360,13 +360,60 @@ function ShareButton({ gameId }: { gameId: string }) {
 function ScoreOverlay({
   game,
   playerNames,
+  isEndOfReplay = false,
 }: {
   game: GameData;
   playerNames: { player1: string; player2: string };
+  isEndOfReplay?: boolean;
 }) {
   const t = useTranslations('replay');
   const p1Won = game.winnerId === game.player1Id;
   const p2Won = game.winnerId === game.player2Id;
+
+  if (isEndOfReplay) {
+    return (
+      <PanelFrame accentColor="rgba(196, 163, 90, 0.4)" padding="24px 40px">
+        <div className="flex flex-col items-center gap-3">
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.3em]"
+            style={{ color: '#666' }}
+          >
+            {t('replayComplete')}
+          </span>
+          <div
+            className="flex items-center gap-6"
+            style={{ backgroundColor: 'rgba(10, 10, 18, 0.88)' }}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }}>
+                {playerNames.player1}
+              </span>
+              <span
+                className="text-3xl font-bold tabular-nums"
+                style={{ color: '#c4a35a', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              >
+                {game.player1Score}
+              </span>
+            </div>
+
+            <span className="text-sm" style={{ color: '#444' }}>-</span>
+
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-bold uppercase tracking-wider" style={{ color: p2Won ? '#b33e3e' : '#777' }}>
+                {playerNames.player2}
+              </span>
+              <span
+                className="text-3xl font-bold tabular-nums"
+                style={{ color: '#b33e3e', fontFamily: "'NJNaruto', Arial, sans-serif" }}
+              >
+                {game.player2Score}
+              </span>
+            </div>
+          </div>
+        </div>
+      </PanelFrame>
+    );
+  }
 
   return (
     <PanelFrame accentColor="rgba(196, 163, 90, 0.3)" padding="10px 16px">
@@ -1281,10 +1328,12 @@ function VisualReplay({
         </button>
       </div>
 
-      {/* Top-right: score overlay — only show at end of replay */}
+      {/* Centered: final score overlay — only show at end of replay */}
       {currentStep >= states.length - 1 && (
-        <div className="absolute top-2 right-2 z-30">
-          <ScoreOverlay game={game} playerNames={playerNames} />
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+          <div className="pointer-events-auto">
+            <ScoreOverlay game={game} playerNames={playerNames} isEndOfReplay />
+          </div>
         </div>
       )}
 

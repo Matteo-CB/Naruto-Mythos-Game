@@ -967,9 +967,9 @@ export function TargetSelector() {
           transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           className="fixed z-50 flex flex-col items-center gap-2"
           style={{
-            bottom: '120px',
+            top: '50%',
             left: '50%',
-            transform: 'translateX(-50%)',
+            transform: 'translate(-50%, -50%)',
             pointerEvents: 'auto',
           }}
         >

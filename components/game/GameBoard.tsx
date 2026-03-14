@@ -861,14 +861,14 @@ function FullscreenCardDetail() {
           <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
           <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
 
-          {/* Close button */}
+          {/* Close button — centered at top for easy access */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center text-sm font-bold cursor-pointer"
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-5 h-8 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
               color: "#888888",
-              borderLeft: "2px solid rgba(255, 255, 255, 0.15)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
             }}
           >
             X
