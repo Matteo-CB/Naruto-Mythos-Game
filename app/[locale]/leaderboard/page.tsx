@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -32,7 +32,21 @@ export default function LeaderboardPage() {
   const [totalPlayers, setTotalPlayers] = useState(0);
   const [leaguesEnabled, setLeaguesEnabled] = useState(false);
   const [leaguesModalOpen, setLeaguesModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const PLAYERS_PER_PAGE = 20;
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -44,7 +58,8 @@ export default function LeaderboardPage() {
   useEffect(() => {
     setLoading(true);
     const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
-    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}`)
+    const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
+    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.users || []);
@@ -52,7 +67,12 @@ export default function LeaderboardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [currentPage]);
+  }, [currentPage, debouncedSearch]);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchQuery('');
+    searchRef.current?.focus();
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil(totalPlayers / PLAYERS_PER_PAGE));
 
@@ -109,6 +129,35 @@ export default function LeaderboardPage() {
             {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
           </p>
         )}
+
+        {/* Search */}
+        <div className="relative mb-4">
+          <input
+            ref={searchRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('searchPlaceholder')}
+            className="w-full px-4 py-2.5 text-sm"
+            style={{
+              backgroundColor: '#141414',
+              border: '1px solid #262626',
+              color: '#e0e0e0',
+              outline: 'none',
+            }}
+            onFocus={(e) => (e.target.style.borderColor = '#c4a35a')}
+            onBlur={(e) => (e.target.style.borderColor = '#262626')}
+          />
+          {searchQuery && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs cursor-pointer"
+              style={{ color: '#888888' }}
+            >
+              X
+            </button>
+          )}
+        </div>
 
         {/* Rankings Table */}
         <section>

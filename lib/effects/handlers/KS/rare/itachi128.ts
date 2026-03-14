@@ -28,10 +28,10 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find friendly characters (not self, not hidden) that have at least one valid destination
+  // Find friendly characters (not self) that have at least one valid destination
   const hasMovableChar = state.activeMissions.length >= 2 && state.activeMissions.some((mission, mIdx) => {
     for (const char of mission[friendlySide]) {
-      if (char.instanceId === sourceCard.instanceId || char.isHidden) continue;
+      if (char.instanceId === sourceCard.instanceId) continue;
       // Check Kurenai block on source mission
       if (isMovementBlockedByKurenai(state, mIdx, sourcePlayer)) continue;
       // Check if there's at least one other mission where name doesn't conflict

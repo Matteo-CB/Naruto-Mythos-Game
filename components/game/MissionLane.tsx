@@ -345,6 +345,7 @@ function MissionCardDisplay({
         width: '100%',
         maxWidth: dims.missionMaxW + 'px',
         border: `2px solid ${rankColors[mission.rank]}`,
+        borderRadius: '6px',
         overflow: 'hidden',
         cursor: 'pointer',
         boxShadow: `0 0 12px ${rankColors[mission.rank]}30, 0 4px 12px rgba(0, 0, 0, 0.5)`,
@@ -571,6 +572,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
             className="absolute inset-0 -m-1.5"
             style={{
               border: '2px solid #c4a35a',
+              borderRadius: '8px',
               boxShadow: '0 0 16px rgba(196, 163, 90, 0.4)',
               pointerEvents: 'none',
             }}

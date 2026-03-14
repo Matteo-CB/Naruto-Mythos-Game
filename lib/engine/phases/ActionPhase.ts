@@ -273,7 +273,8 @@ function handlePlayHidden(
     log,
   };
 
-  // Don't track hidden plays for last-played highlight (would leak info to opponent)
+  // Track hidden plays for last-played highlight (opponent can see a card was placed)
+  newState = trackLastPlayed(newState, player, charInPlay.instanceId);
 
   return newState;
 }

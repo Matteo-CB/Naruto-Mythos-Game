@@ -8099,7 +8099,7 @@ export class EffectEngine {
         for (let i = 0; i < newState.activeMissions.length; i++) {
           if (isMovementBlockedByKurenai(newState, i, i128Player)) continue;
           for (const c of newState.activeMissions[i][i128FriendlySide]) {
-            if (c.instanceId === pendingEffect.sourceInstanceId || c.isHidden) continue;
+            if (c.instanceId === pendingEffect.sourceInstanceId) continue;
             let hasValidDest = false;
             for (let d = 0; d < newState.activeMissions.length; d++) {
               if (d === i) continue;

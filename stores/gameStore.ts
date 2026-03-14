@@ -802,6 +802,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lastAIGameConfig: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
+    useUIStore.getState().setCoinFlipComplete(false);
     const humanName = playerName || 'Player';
     const oppName = opponentName || 'Opponent';
     const playerDisplayNames = {
@@ -887,6 +888,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
+    // Reset coin flip flag so the animation plays before mulligan
+    useUIStore.getState().setCoinFlipComplete(false);
     // Disable training mode when starting a normal AI game
     // (training page will re-enable it explicitly after calling startAIGame)
     useTrainingStore.getState().disable();
@@ -942,6 +945,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => {
+    useUIStore.getState().setCoinFlipComplete(false);
     useTrainingStore.getState().disable();
     const state = GameEngine.createGame(config);
     const visible = GameEngine.getVisibleState(state, 'player1');
