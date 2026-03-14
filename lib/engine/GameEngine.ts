@@ -1563,14 +1563,9 @@ export class GameEngine {
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Highlight both players' last play from the previous turn AND current turn
-    const prevPlayed = state.previousTurnLastPlayed ?? { player1: null, player2: null };
+    // Highlight only the most recent card played in the current turn (per player)
     const currPlayed = state.lastPlayedInstanceIds ?? { player1: null, player2: null };
     const lastPlayedIds = new Set<string>();
-    // Previous turn highlights
-    if (prevPlayed[otherPlayer]) lastPlayedIds.add(prevPlayed[otherPlayer]!);
-    if (prevPlayed[player]) lastPlayedIds.add(prevPlayed[player]!);
-    // Current turn highlights
     if (currPlayed[otherPlayer]) lastPlayedIds.add(currPlayed[otherPlayer]!);
     if (currPlayed[player]) lastPlayedIds.add(currPlayed[player]!);
 

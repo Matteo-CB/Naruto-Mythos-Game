@@ -78,6 +78,11 @@ p, .font-body {
   aspect-ratio: 88/63;
 }
 
+/* Deck builder: hover highlight for character rows */
+.deck-char-row:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
 /* Prevent text selection on game elements */
 .no-select {
   user-select: none;
