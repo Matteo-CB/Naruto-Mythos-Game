@@ -440,6 +440,37 @@ function buildPendingTargetSelectionUI(
 ): PendingTargetSelection {
   const tst = pendingEffect?.targetSelectionType ?? '';
 
+  // END_OF_ROUND_EFFECT_ORDER: render as CHOOSE_EFFECT_ORDER with card thumbnails
+  if (tst === 'END_OF_ROUND_EFFECT_ORDER' && pendingEffect) {
+    let effectsInfo: Array<{ instanceId: string; type: string; cardName: string; cardImage?: string; cardId: string }> = [];
+    try { effectsInfo = JSON.parse(pendingEffect.effectDescription ?? '[]'); } catch { /* ignore */ }
+
+    const effectOrderChoices = effectsInfo.map((info) => ({
+      effectId: info.instanceId,
+      sourceCardName: info.cardName,
+      sourceCardImage: info.cardImage,
+      effectType: 'MAIN' as string,
+      description: info.type === 'GIANT_SPIDER_103' ? 'Hide a character'
+        : info.type === 'ROCK_LEE_117' ? 'Move to another mission'
+        : info.type === 'AKAMARU_028' ? 'Return to hand'
+        : info.type,
+      descriptionKey: info.type === 'GIANT_SPIDER_103' ? 'game.effect.desc.giantSpider103EndHideShort'
+        : info.type === 'ROCK_LEE_117' ? 'game.effect.desc.rockLeeEndMoveShort'
+        : info.type === 'AKAMARU_028' ? 'game.effect.desc.akamaru028ReturnShort'
+        : undefined,
+    }));
+
+    return {
+      validTargets: effectsInfo.map((i) => i.instanceId),
+      description: 'Multiple end-of-round effects triggered. Choose which to resolve first.',
+      descriptionKey: 'game.effect.desc.chooseEffectOrder',
+      playerName,
+      selectionType: 'CHOOSE_EFFECT_ORDER',
+      effectOrderChoices,
+      onSelect,
+    };
+  }
+
   // Determine selection type flags
   const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
   const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||

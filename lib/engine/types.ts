@@ -148,6 +148,8 @@ export interface GameState {
   endPhaseAkamaru028Ids?: string[];
   /** Instance IDs of Giant Spider 103 characters already processed for optional hide during this End Phase */
   endPhaseGiantSpider103Ids?: string[];
+  /** Whether power tokens have been removed during this End Phase (deferred when multi-effect ordering is active) */
+  endPhaseTokensRemoved?: boolean;
   /** Set when all mission scoring is complete but End Phase hasn't run yet.
    * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
   missionScoringComplete?: boolean;

@@ -25,7 +25,7 @@ import { logSystem, logAction } from './utils/gameLog';
 import { executeStartPhase } from './phases/StartPhase';
 import { executeAction, getValidActionsForPlayer } from './phases/ActionPhase';
 import { executeMissionPhase, resumeMissionScoring, resolveChosenScoreEffect } from './phases/MissionPhase';
-import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand } from './phases/EndPhase';
+import { executeEndPhase, handleRockLee117Move, handleAkamaru028Return, handleGiantSpider103EndOfRound, returnCharacterToHand, processChosenEndOfRoundEffect, processRemainingEndOfRoundEffects, finalizeEndPhase } from './phases/EndPhase';
 import { EffectEngine } from '../effects/EffectEngine';
 import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
@@ -254,27 +254,62 @@ export class GameEngine {
         break;
 
       case 'end':
-        // Handle pending actions from end-of-round effects (Rock Lee 117/151 move, Akamaru 028 return, Kidômaru 060)
+        // Handle REORDER_EFFECTS for end-of-round effect ordering
+        if (action.type === 'REORDER_EFFECTS') {
+          newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
+          break;
+        }
+
+        // Handle pending actions from end-of-round effects
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
+          // Check if this is an END_OF_ROUND_EFFECT_ORDER selection
+          if (action.type === 'SELECT_TARGET') {
+            const pa = newState.pendingActions.find((p) => p.id === action.pendingActionId);
+            const pe = pa ? newState.pendingEffects.find((e) => e.id === pa.sourceEffectId) : null;
+            if (pe?.targetSelectionType === 'END_OF_ROUND_EFFECT_ORDER') {
+              const chosenInstanceId = action.selectedTargets[0];
+              newState = deepClone(newState);
+              // Remove the ordering pending effect + action
+              newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pe.id);
+              newState.pendingActions = newState.pendingActions.filter((a) => a.id !== pa!.id);
+              // Process the chosen effect
+              newState = processChosenEndOfRoundEffect(newState, chosenInstanceId);
+              if (newState.pendingActions.length > 0) break;
+              // Process remaining effects
+              newState = processRemainingEndOfRoundEffects(newState);
+              if (newState.pendingActions.length > 0) break;
+              // All interactive effects done — finalize (tokens + auto triggers)
+              newState = finalizeEndPhase(newState);
+              // Transition to next turn
+              newState.endPhaseMovedIds = undefined;
+              newState.endPhaseAkamaru028Ids = undefined;
+              newState.endPhaseGiantSpider103Ids = undefined;
+              newState.endPhaseTokensRemoved = undefined;
+              if (newState.turn >= TOTAL_TURNS) {
+                newState = GameEngine.endGame(newState);
+              } else {
+                newState.turn = (newState.turn + 1) as TurnNumber;
+                newState = GameEngine.transitionToStartPhase(newState);
+              }
+              break;
+            }
+          }
+
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving, check if more end-phase effects need processing
           if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
-            // Continue processing remaining Rock Lee moves
-            newState = handleRockLee117Move(newState);
-            if (newState.pendingActions.length > 0) break; // More choices needed
+            // Check for remaining interactive end-of-round effects (may create ordering choice)
+            newState = processRemainingEndOfRoundEffects(newState);
+            if (newState.pendingActions.length > 0) break;
 
-            // Continue processing Akamaru 028 optional returns
-            newState = handleAkamaru028Return(newState);
-            if (newState.pendingActions.length > 0) break; // More choices needed
-
-            // Continue processing Giant Spider 103 optional end-of-round hides
-            newState = handleGiantSpider103EndOfRound(newState);
-            if (newState.pendingActions.length > 0) break; // More choices needed
+            // All interactive effects done — finalize (tokens + auto triggers)
+            newState = finalizeEndPhase(newState);
 
             // All end-of-round effects resolved - finish end phase transition
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
             newState.endPhaseGiantSpider103Ids = undefined;
+            newState.endPhaseTokensRemoved = undefined;
             if (newState.turn >= TOTAL_TURNS) {
               newState = GameEngine.endGame(newState);
             } else {
@@ -289,6 +324,7 @@ export class GameEngine {
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
           newState.endPhaseGiantSpider103Ids = undefined;
+          newState.endPhaseTokensRemoved = undefined;
           if (newState.turn >= TOTAL_TURNS) {
             newState = GameEngine.endGame(newState);
           } else {
@@ -399,30 +435,19 @@ export class GameEngine {
     newState.phase = 'end';
     newState.missionScoringProgress = undefined;
 
-    // Execute end phase logic
+    // Execute end phase logic (may create ordering choice or individual effect pending)
     newState = executeEndPhase(newState);
 
-    // If there are pending actions from end-of-round effects (Rock Lee 117/151 move), wait
+    // If there are pending actions (ordering choice or individual effect), wait
     if (newState.pendingActions.length > 0) {
       return newState;
     }
 
-    // Process Akamaru 028 optional returns
-    newState = handleAkamaru028Return(newState);
-    if (newState.pendingActions.length > 0) {
-      return newState;
-    }
-
-    // Process Giant Spider 103 optional end-of-round hides
-    newState = handleGiantSpider103EndOfRound(newState);
-    if (newState.pendingActions.length > 0) {
-      return newState;
-    }
-
-    // Clean up end phase tracking
+    // No interactive effects — clean up and transition
     newState.endPhaseMovedIds = undefined;
     newState.endPhaseAkamaru028Ids = undefined;
     newState.endPhaseGiantSpider103Ids = undefined;
+    newState.endPhaseTokensRemoved = undefined;
 
     // Check if game is over
     if (newState.turn >= TOTAL_TURNS) {
