@@ -1,6 +1,7 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
 import { shouldRetainPowerTokens, isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
+import { EffectEngine } from '../../effects/EffectEngine';
 
 // ---------------------
 // End-of-round effect ordering
@@ -788,7 +789,9 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
  * Remove a character from play and return to owner's hand.
  */
 export function returnCharacterToHand(state: GameState, instanceId: string, player: PlayerID): GameState {
-  const newState = { ...state };
+  // Before removing, return any characters this one was controlling
+  const preState = EffectEngine.restoreControlOnLeave(state, instanceId);
+  const newState = { ...preState };
   const missions = [...newState.activeMissions];
 
   for (let i = 0; i < missions.length; i++) {

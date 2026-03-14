@@ -195,6 +195,8 @@ function removeCharacterFromPlay(
   charInstanceId: string,
   side: 'player1Characters' | 'player2Characters',
 ): GameState {
+  // Before removing, return any characters this one was controlling
+  state = EffectEngine.restoreControlOnLeave(state, charInstanceId);
   const missions = [...state.activeMissions];
   const mission = { ...missions[missionIndex] };
   const chars = [...mission[side]];

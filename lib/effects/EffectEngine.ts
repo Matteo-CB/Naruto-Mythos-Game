@@ -17302,6 +17302,8 @@ export class EffectEngine {
 
     // Enforce same-name-per-mission rule (FAQ: if forced by an effect, discard the moved character)
     if (!EffectEngine.validateNameUniquenessForMove(state, charResult.character, destMissionIndex, charResult.player)) {
+      // Before discarding, return any characters this one was controlling
+      state = EffectEngine.restoreControlOnLeave(state, charInstanceId);
       // Remove character from source mission and discard it (FAQ Rule: "discard the new one without applying effects")
       const friendlySideDiscard: 'player1Characters' | 'player2Characters' =
         charResult.player === 'player1' ? 'player1Characters' : 'player2Characters';
