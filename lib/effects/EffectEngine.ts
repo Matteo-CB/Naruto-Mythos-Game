@@ -954,95 +954,276 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
-      // --- Naruto Legendary: Two-stage hide/defeat ---
-      case 'NARUTO_LEGENDARY_TARGET1': {
-        const useDefeat_nl = pendingEffect.isUpgrade;
-        const sourcePlayer_nl = pendingEffect.sourcePlayer;
-        const enemySideKey_nl = sourcePlayer_nl === 'player1' ? 'player2Characters' : 'player1Characters';
+      // --- Naruto Legendary: CONFIRM → UPGRADE_MODIFIER → TARGET1 → TARGET2 ---
+      // Mirrors Naruto 133 (S) flow exactly.
+      case 'NARUTO_LEGENDARY_CONFIRM_MAIN': {
+        const nlPlayer = pendingEffect.sourcePlayer;
+        const nlOpponent: PlayerID = nlPlayer === 'player1' ? 'player2' : 'player1';
+        const nlEnemySide: 'player1Characters' | 'player2Characters' =
+          nlPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        let nlParsed: { missionIndex?: number; useDefeat?: boolean } = {};
+        try { nlParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const nlMI = nlParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const nlUseDefeat = nlParsed.useDefeat ?? false;
+        const nlMission = newState.activeMissions[nlMI];
+        if (!nlMission) break;
 
-        // Apply to target 1
-        if (useDefeat_nl) {
-          newState = EffectEngine.defeatCharacter(newState, targetId, sourcePlayer_nl);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer_nl, 'EFFECT_DEFEAT',
-            'Naruto Uzumaki (Legendary): Defeated enemy in this mission (upgrade).',
-            'game.log.effect.defeat', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
-        } else {
-          newState = EffectEngine.hideCharacter(newState, targetId);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer_nl, 'EFFECT_HIDE',
-            'Naruto Uzumaki (Legendary): Hid enemy in this mission.',
-            'game.log.effect.hide', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
-        }
-
-        // Now find candidates for target 2: enemy Power <= 2 in any mission (excluding target 1)
-        const target2Candidates_nl: string[] = [];
-        for (const mission of newState.activeMissions) {
-          const enemyPlayer_nl = sourcePlayer_nl === 'player1' ? 'player2' : 'player1';
-          for (const char of mission[enemySideKey_nl]) {
-            if (char.instanceId === targetId) continue;
-            if (char.isHidden) continue;
-            if (getEffectivePower(newState, char, enemyPlayer_nl as PlayerID) <= 2) {
-              target2Candidates_nl.push(char.instanceId);
+        const nlValidT1 = nlMission[nlEnemySide]
+          .filter((c: CharacterInPlay) => (nlUseDefeat || !c.isHidden) && getEffectivePower(newState, c, nlOpponent) <= 5)
+          .map((c: CharacterInPlay) => c.instanceId);
+        const nlValidT2: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const ch of newState.activeMissions[i][nlEnemySide]) {
+            if ((nlUseDefeat || !ch.isHidden) && getEffectivePower(newState, ch, nlOpponent) <= 2) {
+              nlValidT2.push(ch.instanceId);
             }
           }
         }
 
-        if (target2Candidates_nl.length === 0) {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer_nl, 'EFFECT_NO_TARGET',
-            'Naruto Uzumaki (Legendary): No valid second enemy with Power 2 or less in play.',
+        if (nlValidT1.length === 0 && nlValidT2.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, nlPlayer,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid targets (state changed).',
             'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
-        } else {
-          // Create second pending for target 2
-          const effectId_nl = generateInstanceId();
-          const actionId_nl = generateInstanceId();
-          newState.pendingEffects = [...newState.pendingEffects, {
-            id: effectId_nl,
-            sourceCardId: pendingEffect.sourceCardId,
+          break;
+        }
+
+        // If isUpgrade and not already using defeat, chain to CONFIRM_UPGRADE_MODIFIER first
+        if (pendingEffect.isUpgrade && !nlUseDefeat) {
+          const nlmEffId = generateInstanceId();
+          const nlmActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlmEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex,
-            effectType: pendingEffect.effectType,
-            effectDescription: '',
-            targetSelectionType: 'NARUTO_LEGENDARY_TARGET2',
-            sourcePlayer: sourcePlayer_nl,
-            requiresTargetSelection: true,
-            validTargets: target2Candidates_nl,
-            isOptional: true,
-            isMandatory: false,
-            resolved: false,
-            isUpgrade: pendingEffect.isUpgrade,
-          }];
-          newState.pendingActions = [...newState.pendingActions, {
-            id: actionId_nl,
-            type: 'SELECT_TARGET' as PendingAction['type'],
-            player: sourcePlayer_nl,
-            description: useDefeat_nl
-              ? 'Naruto Uzumaki (Legendary): Choose another enemy with Power 2 or less in play to defeat.'
-              : 'Naruto Uzumaki (Legendary): Choose another enemy with Power 2 or less in play to hide.',
-            descriptionKey: useDefeat_nl
-              ? 'game.effect.desc.narutoLegendaryDefeatTarget2'
-              : 'game.effect.desc.narutoLegendaryHideTarget2',
-            options: target2Candidates_nl,
-            minSelections: 1,
-            maxSelections: 1,
-            sourceEffectId: effectId_nl,
-          }];
+            sourceMissionIndex: nlMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: nlMI }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CONFIRM_UPGRADE_MODIFIER',
+            sourcePlayer: nlPlayer, requiresTargetSelection: true,
+            validTargets: [pendingEffect.sourceInstanceId],
+            isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: nlmActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlPlayer,
+            description: 'Naruto Uzumaki (Legendary): Apply UPGRADE? Defeat both targets instead of hiding them.',
+            descriptionKey: 'game.effect.desc.narutoLegendaryConfirmUpgradeModifier',
+            options: [pendingEffect.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlmEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+          break;
+        }
+
+        if (nlValidT1.length > 0) {
+          const nlEffId = generateInstanceId();
+          const nlActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: nlMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: nlMI, useDefeat: nlUseDefeat }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CHOOSE_TARGET1',
+            sourcePlayer: nlPlayer, requiresTargetSelection: true,
+            validTargets: nlValidT1, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: nlActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlPlayer,
+            description: nlUseDefeat
+              ? 'Naruto Uzumaki (Legendary): Choose an enemy with Power 5 or less to defeat (this mission).'
+              : 'Naruto Uzumaki (Legendary): Choose an enemy with Power 5 or less to hide (this mission).',
+            descriptionKey: nlUseDefeat ? 'game.effect.desc.narutoLegendaryDefeatTarget1' : 'game.effect.desc.narutoLegendaryHideTarget1',
+            options: nlValidT1, minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        } else {
+          // No target1, skip to target2 only
+          const nlEffId2 = generateInstanceId();
+          const nlActId2 = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlEffId2, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: nlMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ useDefeat: nlUseDefeat, target1Id: null }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CHOOSE_TARGET2',
+            sourcePlayer: nlPlayer, requiresTargetSelection: true,
+            validTargets: nlValidT2, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: nlActId2, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlPlayer,
+            description: nlUseDefeat
+              ? 'Naruto Uzumaki (Legendary): Choose an enemy with Power 2 or less to defeat (any mission).'
+              : 'Naruto Uzumaki (Legendary): Choose an enemy with Power 2 or less to hide (any mission).',
+            descriptionKey: nlUseDefeat ? 'game.effect.desc.narutoLegendaryDefeatTarget2' : 'game.effect.desc.narutoLegendaryHideTarget2',
+            options: nlValidT2, minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlEffId2,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
         }
         break;
       }
 
-      case 'NARUTO_LEGENDARY_TARGET2': {
-        const useDefeat_nl2 = pendingEffect.isUpgrade;
-        const sourcePlayer_nl2 = pendingEffect.sourcePlayer;
+      case 'NARUTO_LEGENDARY_CONFIRM_UPGRADE_MODIFIER': {
+        // Player confirmed UPGRADE modifier: defeat instead of hide — re-enter CONFIRM_MAIN with useDefeat: true
+        const nlmPlayer = pendingEffect.sourcePlayer;
+        const nlmOpponent: PlayerID = nlmPlayer === 'player1' ? 'player2' : 'player1';
+        const nlmEnemySide: 'player1Characters' | 'player2Characters' =
+          nlmPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+        let nlmParsed: { missionIndex?: number } = {};
+        try { nlmParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const nlmMI = nlmParsed.missionIndex ?? pendingEffect.sourceMissionIndex;
+        const nlmMission = newState.activeMissions[nlmMI];
+        if (!nlmMission) break;
 
-        if (useDefeat_nl2) {
-          newState = EffectEngine.defeatCharacter(newState, targetId, sourcePlayer_nl2);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer_nl2, 'EFFECT_DEFEAT',
-            'Naruto Uzumaki (Legendary): Defeated second enemy in play (upgrade).',
-            'game.log.effect.defeat', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+        // UPGRADE modifier = defeat mode: include hidden chars (power 0 qualifies)
+        const nlmValidT1 = nlmMission[nlmEnemySide]
+          .filter((c: CharacterInPlay) => getEffectivePower(newState, c, nlmOpponent) <= 5)
+          .map((c: CharacterInPlay) => c.instanceId);
+        const nlmValidT2: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const ch of newState.activeMissions[i][nlmEnemySide]) {
+            if (getEffectivePower(newState, ch, nlmOpponent) <= 2) {
+              nlmValidT2.push(ch.instanceId);
+            }
+          }
+        }
+
+        if (nlmValidT1.length === 0 && nlmValidT2.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, nlmPlayer,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid targets (state changed after modifier).',
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+          break;
+        }
+
+        if (nlmValidT1.length > 0) {
+          const nlmEffId = generateInstanceId();
+          const nlmActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlmEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: nlmMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ missionIndex: nlmMI, useDefeat: true }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CHOOSE_TARGET1',
+            sourcePlayer: nlmPlayer, requiresTargetSelection: true,
+            validTargets: nlmValidT1, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: nlmActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlmPlayer,
+            description: 'Naruto Uzumaki (Legendary): Choose an enemy with Power 5 or less to defeat (this mission).',
+            descriptionKey: 'game.effect.desc.narutoLegendaryDefeatTarget1',
+            options: nlmValidT1, minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlmEffId,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
         } else {
-          newState = EffectEngine.hideCharacter(newState, targetId);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, sourcePlayer_nl2, 'EFFECT_HIDE',
-            'Naruto Uzumaki (Legendary): Hid second enemy in play.',
-            'game.log.effect.hide', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+          const nlmEffId2 = generateInstanceId();
+          const nlmActId2 = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlmEffId2, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: nlmMI, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ useDefeat: true, target1Id: null }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CHOOSE_TARGET2',
+            sourcePlayer: nlmPlayer, requiresTargetSelection: true,
+            validTargets: nlmValidT2, isOptional: false, isMandatory: true,
+            resolved: false, isUpgrade: true,
+            remainingEffectTypes: pendingEffect.remainingEffectTypes,
+          });
+          newState.pendingActions.push({
+            id: nlmActId2, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlmPlayer,
+            description: 'Naruto Uzumaki (Legendary): Choose an enemy with Power 2 or less to defeat (any mission).',
+            descriptionKey: 'game.effect.desc.narutoLegendaryDefeatTarget2',
+            options: nlmValidT2, minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlmEffId2,
+          });
+          pendingEffect.remainingEffectTypes = undefined;
+        }
+        break;
+      }
+
+      case 'NARUTO_LEGENDARY_CHOOSE_TARGET1': {
+        // Stage 1: hide or defeat the chosen enemy (Power ≤5 in this mission), then prompt for target 2
+        let nlParsedT1: { missionIndex?: number; useDefeat?: boolean } = {};
+        try { nlParsedT1 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const nlUseDefeatT1 = nlParsedT1.useDefeat ?? false;
+        const nlPlayerT1 = pendingEffect.sourcePlayer;
+        const nlOpponentT1: PlayerID = nlPlayerT1 === 'player1' ? 'player2' : 'player1';
+        const nlEnemySideT1 = nlPlayerT1 === 'player1' ? 'player2Characters' : 'player1Characters';
+
+        if (nlUseDefeatT1) {
+          newState = EffectEngine.defeatCharacter(newState, targetId, nlPlayerT1);
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, nlPlayerT1);
+        }
+
+        // Find valid targets for target 2: enemy Power ≤2 in ANY mission
+        const nlValidT2a: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          for (const ch of newState.activeMissions[i][nlEnemySideT1]) {
+            if (!nlUseDefeatT1 && ch.isHidden) continue;
+            const power = calculateCharacterPower(newState, ch, nlOpponentT1);
+            if (power <= 2) {
+              nlValidT2a.push(ch.instanceId);
+            }
+          }
+        }
+
+        if (nlValidT2a.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, nlPlayerT1,
+            'EFFECT_NO_TARGET', 'Naruto Uzumaki (Legendary): No valid second enemy with Power 2 or less in play.',
+            'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-000-L' });
+        } else if (nlValidT2a.length === 1) {
+          if (nlUseDefeatT1) {
+            newState = EffectEngine.defeatCharacter(newState, nlValidT2a[0], nlPlayerT1);
+          } else {
+            newState = EffectEngine.hideCharacterWithLog(newState, nlValidT2a[0], nlPlayerT1);
+          }
+        } else {
+          const nlEffId2a = generateInstanceId();
+          const nlActId2a = generateInstanceId();
+          newState.pendingEffects.push({
+            id: nlEffId2a, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ useDefeat: nlUseDefeatT1, target1Id: targetId }),
+            targetSelectionType: 'NARUTO_LEGENDARY_CHOOSE_TARGET2',
+            sourcePlayer: nlPlayerT1, requiresTargetSelection: true,
+            validTargets: nlValidT2a, isOptional: true, isMandatory: false,
+            resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          });
+          newState.pendingActions.push({
+            id: nlActId2a, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: nlPlayerT1,
+            description: nlUseDefeatT1
+              ? 'Naruto Uzumaki (Legendary): Choose an enemy with Power 2 or less to defeat (any mission).'
+              : 'Naruto Uzumaki (Legendary): Choose an enemy with Power 2 or less to hide (any mission).',
+            descriptionKey: nlUseDefeatT1 ? 'game.effect.desc.narutoLegendaryDefeatTarget2' : 'game.effect.desc.narutoLegendaryHideTarget2',
+            options: nlValidT2a, minSelections: 1, maxSelections: 1,
+            sourceEffectId: nlEffId2a,
+          });
+        }
+        break;
+      }
+
+      case 'NARUTO_LEGENDARY_CHOOSE_TARGET2': {
+        let nlParsedT2: { useDefeat?: boolean } = {};
+        try { nlParsedT2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (nlParsedT2.useDefeat) {
+          newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
+        } else {
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         }
         break;
       }
@@ -4236,12 +4417,7 @@ export class EffectEngine {
         }
 
         const kb053mReducedCost = Math.max(0, (kb053mTopCard.chakra ?? 0) - 3);
-        if (kb053mPs.chakra < kb053mReducedCost) {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, kb053mPlayer,
-            'EFFECT_NO_TARGET', `Kabuto Yakushi (053): Cannot afford ${kb053mTopCard.name_fr} (need ${kb053mReducedCost}, have ${kb053mPs.chakra}).`,
-            'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-053-UC' });
-          break;
-        }
+        const kb053mCanAffordFresh = kb053mPs.chakra >= kb053mReducedCost;
 
         const kb053mFriendlySide = kb053mPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         const kb053mValidMissions: string[] = [];
@@ -4250,14 +4426,22 @@ export class EffectEngine {
           const hasSameName = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
             const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            return cTop.name_fr === kb053mTopCard.name_fr;
+            return cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase();
           });
+          // Check same-name upgrade AND flexible cross-name upgrade (e.g. Orochimaru 138)
           const canUpgrade = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
             const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            return cTop.name_fr === kb053mTopCard.name_fr && (cTop.chakra ?? 0) < (kb053mTopCard.chakra ?? 0);
+            const isSameName = cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase()
+              && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
+            const isFlex = checkFlexibleUpgrade(kb053mTopCard as any, cTop)
+              && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
+            if (!isSameName && !isFlex) return false;
+            // Check if player can afford the upgrade cost with 3 reduction
+            const upgCost = Math.max(0, ((kb053mTopCard.chakra ?? 0) - (cTop.chakra ?? 0)) - 3);
+            return kb053mPs.chakra >= upgCost;
           });
-          if (!hasSameName || canUpgrade) {
+          if (canUpgrade || (!hasSameName && kb053mCanAffordFresh)) {
             kb053mValidMissions.push(String(i));
           }
         }

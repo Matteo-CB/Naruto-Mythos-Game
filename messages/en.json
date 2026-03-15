@@ -757,6 +757,8 @@
         "sasuke146GiveEdge": "Sasuke (146): Gain the Edge token.",
         "akamaru029ChooseHide": "Akamaru (029): Choose which enemy character (cost {cost}) to hide.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE: Your last card will be discarded. Choose a character with cost 5 or less to defeat.",
+        "narutoLegendaryConfirmMain": "Naruto (Legendary) MAIN: Hide an enemy with Power 5 or less in this mission AND another with Power 2 or less in play.",
+        "narutoLegendaryConfirmUpgradeModifier": "Naruto (Legendary): Apply UPGRADE? Defeat both targets instead of hiding them.",
         "narutoLegendaryDefeatTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to defeat in this mission.",
         "narutoLegendaryHideTarget1": "Naruto (Legendary): Choose an enemy character with Power 5 or less to hide in this mission.",
         "orochimaru051ChooseDestination": "Orochimaru (051): Choose a mission to move this character to.",

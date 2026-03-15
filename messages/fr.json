@@ -757,6 +757,8 @@
         "sasuke146GiveEdge": "Sasuke (146) : Prenez le jeton Edge.",
         "akamaru029ChooseHide": "Akamaru (029) : Choisissez quel personnage ennemi (cout {cost}) cacher.",
         "kimimaro123AutoDiscardDefeat": "Kimimaro (123) UPGRADE : Votre derniere carte sera defaussee. Choisissez un personnage de cout 5 ou moins a vaincre.",
+        "narutoLegendaryConfirmMain": "Naruto (Legendaire) MAIN : Cache un ennemi de Puissance 5 ou moins dans cette mission ET un autre de Puissance 2 ou moins en jeu.",
+        "narutoLegendaryConfirmUpgradeModifier": "Naruto (Legendaire) : Appliquer l'UPGRADE ? Vaincre les deux cibles au lieu de les cacher.",
         "narutoLegendaryDefeatTarget1": "Naruto (Legendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins a vaincre sur cette mission.",
         "narutoLegendaryHideTarget1": "Naruto (Legendaire) : Choisissez un personnage ennemi de Puissance 5 ou moins a cacher sur cette mission.",
         "orochimaru051ChooseDestination": "Orochimaru (051) : Choisissez une mission ou deplacer ce personnage.",
