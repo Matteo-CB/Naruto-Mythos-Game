@@ -14659,7 +14659,7 @@ export class EffectEngine {
               currentMission[toSide].push(removed);
               newState.log = logAction(
                 newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${char.card.name_fr} returned to original owner (controller was hidden/defeated).`,
+                'EFFECT', `${char.card.name_fr} returned to original owner (controller left play).`,
                 'game.log.effect.controlReturned',
                 { card: char.card.name_fr },
               );
@@ -17334,25 +17334,26 @@ export class EffectEngine {
       return state;
     }
 
-    // Check Gaara 075 continuous protection: cannot be moved by enemy effects
-    if (charResult.player !== charOwner) {
+    // Check Gaara 075 continuous protection: if moved by enemy effects, hide instead
+    const moveInitiator = effectInitiator ?? charOwner;
+    if (moveInitiator !== charResult.player) {
       // This is an enemy effect moving the character
       const topCard = charResult.character.stack.length > 0
         ? charResult.character.stack[charResult.character.stack.length - 1]
         : charResult.character.card;
       if (topCard.number === 75 && !charResult.character.isHidden) {
         const hasMoveProtection = (topCard.effects ?? []).some(
-          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated by enemy'),
+          (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moved or defeated'),
         );
         if (hasMoveProtection) {
           state.log = logAction(
             state.log, state.turn, state.phase, charOwner,
-            'EFFECT_BLOCKED',
-            `${effectCardName} (${effectCardId}): Cannot move ${charResult.character.card.name_fr} â€' Gaara's continuous effect protects against enemy effects.`,
-            'game.log.effect.moveBlocked',
+            'EFFECT',
+            `Gaara (075): Would be moved by ${effectCardName} (${effectCardId}) — hidden instead.`,
+            'game.log.effect.gaara075HideOnMove',
             { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr },
           );
-          return state;
+          return EffectEngine.hideCharacter(state, charInstanceId);
         }
       }
     }

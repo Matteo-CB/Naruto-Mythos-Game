@@ -399,8 +399,8 @@ function handleRevealCharacter(
     newState = trackLastPlayed(newState, player, upgradeTarget.instanceId);
 
     // Existing cards' effects trigger BEFORE the newly played card's effects
-    // Trigger on-play reactions (reveal counts as playing a character)
-    newState = triggerOnPlayReactions(newState, player, missionIndex);
+    // Trigger on-play reactions (isReveal: character was already on the mission)
+    newState = triggerOnPlayReactions(newState, player, missionIndex, true);
 
     // Trigger MAIN + UPGRADE + AMBUSH effects via EffectEngine
     const updatedMission = newState.activeMissions[missionIndex];
@@ -448,8 +448,9 @@ function handleRevealCharacter(
   newState = trackLastPlayed(newState, player, characterInstanceId);
 
   // Existing cards' effects trigger BEFORE the newly played card's effects
-  // Trigger on-play reactions (reveal counts as playing a character)
-  newState = triggerOnPlayReactions(newState, player, missionIndex);
+  // Trigger on-play reactions (isReveal: character was already on the mission,
+  // so Hinata/Neji "when played in this mission" doesn't fire)
+  newState = triggerOnPlayReactions(newState, player, missionIndex, true);
 
   // Trigger MAIN + AMBUSH effects via EffectEngine
   const revealedMission = newState.activeMissions[missionIndex];
@@ -556,6 +557,10 @@ function handleUpgradeCharacter(
     activeMissions: missions,
     log,
   };
+
+  // When a controller (e.g. Ino 020) is upgraded, the old card's "take control"
+  // effect no longer applies — return any controlled characters to their owner.
+  newState = EffectEngine.restoreControlOnLeave(newState, targetInstanceId);
 
   // Track this direct play for last-played highlight
   newState = trackLastPlayed(newState, player, targetInstanceId);

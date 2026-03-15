@@ -25,9 +25,10 @@ function temari121MainHandler(ctx: EffectContext): EffectResult {
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
-    // MAIN always targets only friendly characters (not self, not hidden)
+    // MAIN targets any friendly character (not self). No group/keyword check,
+    // so hidden characters ARE valid targets (they can be moved while hidden).
     for (const char of mission[friendlySide]) {
-      if (char.instanceId !== sourceCard.instanceId && !char.isHidden) {
+      if (char.instanceId !== sourceCard.instanceId) {
         validTargets.push(char.instanceId);
       }
     }
