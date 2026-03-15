@@ -6793,9 +6793,10 @@ export class EffectEngine {
           effectDescription: '', targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
           sourcePlayer: j105Player, requiresTargetSelection: true,
           validTargets: j105AllTargets, isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: false,
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         });
+        pendingEffect.remainingEffectTypes = undefined; // Prevent duplicate from parent
         newState.pendingActions.push({
           id: j105ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
           player: j105Player,
@@ -10474,16 +10475,18 @@ export class EffectEngine {
         const n133Mission = newState.activeMissions[n133MI];
         if (!n133Mission) break;
 
-        // Re-validate target1: Power <= 5 in this mission (exclude hidden — redundant to hide)
+        // Re-validate target1: Power <= 5 in this mission
+        // When useDefeat=false (hide), exclude hidden chars (redundant to hide a hidden char)
+        // When useDefeat=true (defeat/upgrade), include hidden chars (power 0 qualifies)
         const n133ValidT1 = n133Mission[n133EnemySide]
-          .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(newState, c, n133Opponent) <= 5)
+          .filter((c: CharacterInPlay) => (n133UseDefeat || !c.isHidden) && getEffectivePower(newState, c, n133Opponent) <= 5)
           .map((c: CharacterInPlay) => c.instanceId);
 
-        // Re-validate target2: Power <= 2 in ANY mission (exclude hidden)
+        // Re-validate target2: Power <= 2 in ANY mission (same hidden logic)
         const n133ValidT2: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const ch of newState.activeMissions[i][n133EnemySide]) {
-            if (!ch.isHidden && getEffectivePower(newState, ch, n133Opponent) <= 2) {
+            if ((n133UseDefeat || !ch.isHidden) && getEffectivePower(newState, ch, n133Opponent) <= 2) {
               n133ValidT2.push(ch.instanceId);
             }
           }
@@ -10596,13 +10599,14 @@ export class EffectEngine {
         const n133mMission = newState.activeMissions[n133mMI];
         if (!n133mMission) break;
 
+        // UPGRADE modifier = defeat mode: include hidden chars (power 0 qualifies)
         const n133mValidT1 = n133mMission[n133mEnemySide]
-          .filter((c: CharacterInPlay) => !c.isHidden && getEffectivePower(newState, c, n133mOpponent) <= 5)
+          .filter((c: CharacterInPlay) => getEffectivePower(newState, c, n133mOpponent) <= 5)
           .map((c: CharacterInPlay) => c.instanceId);
         const n133mValidT2: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const ch of newState.activeMissions[i][n133mEnemySide]) {
-            if (!ch.isHidden && getEffectivePower(newState, ch, n133mOpponent) <= 2) {
+            if (getEffectivePower(newState, ch, n133mOpponent) <= 2) {
               n133mValidT2.push(ch.instanceId);
             }
           }
@@ -11798,24 +11802,101 @@ export class EffectEngine {
         newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 2);
         break;
 
-      case 'JIRAIYA105_CHOOSE_SUMMON':
+      case 'JIRAIYA105_CHOOSE_SUMMON': {
+        // Clear remainingEffectTypes BEFORE the summon play so they don't propagate
+        // to child pending effects (GENERIC_CHOOSE_PLAY_MISSION, etc.)
+        const j105Remaining = pendingEffect.remainingEffectTypes;
+        pendingEffect.remainingEffectTypes = undefined;
+
         newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 3);
-        // If GENERIC_CHOOSE_PLAY_MISSION was created (multi-mission), remainingEffectTypes
-        // was already propagated to the child via playCharFromHandWithReduction.
-        // Clear from parent so cleanup doesn't fire UPGRADE prematurely.
-        if (pendingEffect.remainingEffectTypes?.length) {
-          const hasChildMissionPending = newState.pendingEffects.some(
-            (e) => e.targetSelectionType === 'GENERIC_CHOOSE_PLAY_MISSION'
-          );
-          if (hasChildMissionPending) {
-            pendingEffect.remainingEffectTypes = undefined;
+
+        // Queue Jiraiya 105 UPGRADE as a separate CONFIRM pending effect.
+        // This correctly decouples it from the summon play chain.
+        if (j105Remaining?.length) {
+          for (const remainingType of j105Remaining) {
+            if (remainingType === 'UPGRADE') {
+              const charResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+              if (charResult) {
+                const actualMI = charResult.missionIndex;
+                const enemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+                const mission = newState.activeMissions[actualMI];
+                if (mission && mission[enemySide].length > 0) {
+                  const j105uEffId = generateInstanceId();
+                  const j105uActId = generateInstanceId();
+                  newState.pendingEffects.push({
+                    id: j105uEffId, sourceCardId: pendingEffect.sourceCardId,
+                    sourceInstanceId: pendingEffect.sourceInstanceId,
+                    sourceMissionIndex: actualMI, effectType: 'UPGRADE' as EffectType,
+                    effectDescription: JSON.stringify({ missionIndex: actualMI }),
+                    targetSelectionType: 'JIRAIYA105_CONFIRM_UPGRADE',
+                    sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+                    validTargets: [pendingEffect.sourceInstanceId],
+                    isOptional: true, isMandatory: false,
+                    resolved: false, isUpgrade: true,
+                  });
+                  newState.pendingActions.push({
+                    id: j105uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                    player: pendingEffect.sourcePlayer,
+                    description: 'Jiraiya (105) UPGRADE: Move an enemy character from this mission to another.',
+                    descriptionKey: 'game.effect.desc.jiraiya105ConfirmUpgrade',
+                    options: [pendingEffect.sourceInstanceId],
+                    minSelections: 1, maxSelections: 1,
+                    sourceEffectId: j105uEffId,
+                  });
+                }
+              }
+            }
           }
         }
         break;
+      }
 
-      case 'JIRAIYA132_CHOOSE_SUMMON':
+      case 'JIRAIYA132_CHOOSE_SUMMON': {
+        // Same pattern as JIRAIYA105: clear remaining and queue UPGRADE separately
+        const j132Remaining = pendingEffect.remainingEffectTypes;
+        pendingEffect.remainingEffectTypes = undefined;
+
         newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 5);
+
+        // Queue Jiraiya 132 UPGRADE as a separate CONFIRM pending effect
+        if (j132Remaining?.length) {
+          for (const remainingType of j132Remaining) {
+            if (remainingType === 'UPGRADE') {
+              const charResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+              if (charResult) {
+                const actualMI = charResult.missionIndex;
+                const enemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+                const mission = newState.activeMissions[actualMI];
+                if (mission && mission[enemySide].length > 2) {
+                  const j132uEffId = generateInstanceId();
+                  const j132uActId = generateInstanceId();
+                  newState.pendingEffects.push({
+                    id: j132uEffId, sourceCardId: pendingEffect.sourceCardId,
+                    sourceInstanceId: pendingEffect.sourceInstanceId,
+                    sourceMissionIndex: actualMI, effectType: 'UPGRADE' as EffectType,
+                    effectDescription: JSON.stringify({ missionIndex: actualMI, sourcePlayer: pendingEffect.sourcePlayer }),
+                    targetSelectionType: 'JIRAIYA132_CONFIRM_UPGRADE',
+                    sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+                    validTargets: [pendingEffect.sourceInstanceId],
+                    isOptional: true, isMandatory: false,
+                    resolved: false, isUpgrade: true,
+                  });
+                  newState.pendingActions.push({
+                    id: j132uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                    player: pendingEffect.sourcePlayer,
+                    description: 'Jiraya (132) UPGRADE: Opponent must defeat characters until 2 remain in this mission.',
+                    descriptionKey: 'game.effect.desc.jiraiya132ConfirmUpgrade',
+                    options: [pendingEffect.sourceInstanceId],
+                    minSelections: 1, maxSelections: 1,
+                    sourceEffectId: j132uEffId,
+                  });
+                }
+              }
+            }
+          }
+        }
         break;
+      }
 
       // =============================================
       // SPECIAL types
@@ -14770,7 +14851,8 @@ export class EffectEngine {
     const validTarget2: string[] = [];
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][enemySideKey]) {
-        if (char.isHidden) continue; // Hiding a hidden char is redundant
+        // When useDefeat (upgrade), include hidden chars (power 0 qualifies); otherwise exclude (hiding hidden is redundant)
+        if (!useDefeat && char.isHidden) continue;
         // Use effective power (includes continuous effects like MSS02 +1) â€' not just base+tokens
         const power = calculateCharacterPower(newState, char, enemyPlayer);
         if (power <= 2) {
