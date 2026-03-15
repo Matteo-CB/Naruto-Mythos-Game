@@ -69,10 +69,11 @@ export function checkTarget2Only(ctx: EffectContext, state: EffectContext['state
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
+  // When useDefeat (upgrade), include hidden chars (power 0 qualifies); otherwise exclude (hiding hidden is redundant)
   const validTarget2: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][enemySideKey]) {
-      if (!char.isHidden && getEffectivePower(state, char, opponentPlayer) <= 2) {
+      if ((useDefeat || !char.isHidden) && getEffectivePower(state, char, opponentPlayer) <= 2) {
         validTarget2.push(char.instanceId);
       }
     }
