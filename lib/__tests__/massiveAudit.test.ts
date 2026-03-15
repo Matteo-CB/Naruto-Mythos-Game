@@ -836,9 +836,13 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
           isUpgrade: false,
         });
 
-        // Should steal 1 chakra: opponent -1, player +1
-        expect(result.state.player2.chakra).toBe(4);
-        expect(result.state.player1.chakra).toBe(state.player1.chakra + 1);
+        // Handler uses CONFIRM popup pattern before the actual steal
+        // Actual steal happens in EffectEngine when KISAME144_CONFIRM_MAIN is resolved
+        expect(result.requiresTargetSelection).toBe(true);
+        expect(result.targetSelectionType).toBe('KISAME144_CONFIRM_MAIN');
+        // Chakra unchanged at this step
+        expect(result.state.player2.chakra).toBe(5);
+        expect(result.state.player1.chakra).toBe(state.player1.chakra);
       }
     });
 

@@ -955,7 +955,11 @@ describe('070/130 - Zaku Abumi', () => {
 
     const handler = getEffectHandler('KS-070-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', zaku, 0));
-    expect(result.state.player2.chakra).toBe(6);
+    // Handler now uses CONFIRM popup pattern — opponent must confirm before gaining chakra
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('ZAKU070_CONFIRM_MAIN');
+    // Chakra not changed yet (pending confirmation by opponent)
+    expect(result.state.player2.chakra).toBe(5);
   });
 });
 
@@ -981,8 +985,11 @@ describe('072/130 - Kin Tsuchi', () => {
 
     const handler = getEffectHandler('KS-072-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kin, 0));
-    expect(result.state.player2.hand.length).toBe(1);
-    expect(result.state.player2.hand[0].name_fr).toBe('OppDeck');
+    // Handler now uses CONFIRM popup pattern — opponent must confirm before drawing
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KIN072_CONFIRM_MAIN');
+    // Hand not changed yet (pending confirmation by opponent)
+    expect(result.state.player2.hand.length).toBe(0);
   });
 
   it('should not crash when opponent deck is empty', () => {
