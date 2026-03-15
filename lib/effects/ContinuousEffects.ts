@@ -579,8 +579,15 @@ export function isMovementBlockedByKurenai(
  *
  * - Neji 037 (UC): POWERUP 1 when a non-hidden enemy character is played in this mission
  * - Hinata 031 (UC): Gain 1 Chakra when a non-hidden enemy character is played in this mission
+ *
+ * isReveal: true when a hidden character is revealed (already on the mission).
+ * Hinata/Neji only trigger for NEW characters arriving at the mission, not reveals.
  */
-export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number): GameState {
+export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, isReveal?: boolean): GameState {
+  // Reveals don't count as "a character is played in this mission" for Hinata/Neji —
+  // the character was already on the mission while hidden.
+  if (isReveal) return state;
+
   let newState = { ...state };
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
   const mission = newState.activeMissions[missionIndex];
