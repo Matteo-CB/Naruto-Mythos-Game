@@ -38,7 +38,7 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
       'EFFECT',
       'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
       'game.log.effect.shino033CostReduction',
-      { card: 'SHINO ABURAME', id: 'KS-033-UC' },
+      { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
     );
     return { state: { ...state, log } };
   }
