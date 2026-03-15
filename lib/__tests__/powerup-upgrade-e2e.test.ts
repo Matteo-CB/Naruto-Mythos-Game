@@ -334,12 +334,12 @@ describe('UPGRADE end-to-end', () => {
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-120-R');
 
-    // MAIN effect is optional ("up to 1" per mission) - should create pending selection
-    const gaara120Pending = newState.pendingEffects.find(e => e.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT');
+    // MAIN effect uses CONFIRM popup pattern — first creates GAARA120_CONFIRM_MAIN pending
+    // Player must confirm before per-mission defeat selection (GAARA120_CHOOSE_DEFEAT) is shown
+    const gaara120Pending = newState.pendingEffects.find(e => e.targetSelectionType === 'GAARA120_CONFIRM_MAIN');
     expect(gaara120Pending).toBeDefined();
     expect(gaara120Pending!.isOptional).toBe(true);
-    expect(gaara120Pending!.validTargets).toContain('weak1');
-    // Enemies NOT yet defeated (awaiting player choice)
+    // Enemies NOT yet defeated (awaiting player confirmation)
     const m0Enemies = newState.activeMissions[0].player2Characters;
     expect(m0Enemies.find(c => c.instanceId === 'weak1')).toBeDefined();
   });

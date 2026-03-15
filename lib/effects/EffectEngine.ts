@@ -91,10 +91,11 @@ function isMissionValidForPlay(
     const existing = chars[upgradeIdx];
     const existingTopCard = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
     const upgradeCost = Math.max(0, ((card.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
-    return availableChakra >= upgradeCost;
+    if (availableChakra >= upgradeCost) return true;
+    // Upgrade unaffordable — fall through to check fresh play (possible for cross-name flex upgrades)
   }
 
-  // No upgrade target - check for name conflict
+  // No upgrade target (or upgrade unaffordable) — check for name conflict
   if (hasSameNameConflict(chars, card, excludeInstanceId)) {
     return false; // Same name exists but can't upgrade (lower or equal cost)
   }
@@ -13690,6 +13691,7 @@ export class EffectEngine {
           const chars_h002 = mission[friendlySide];
           const upgradeIdx_h002 = findUpgradeTargetIdx(chars_h002, card);
 
+          let h002MissionAdded = false;
           if (upgradeIdx_h002 >= 0) {
             const existingTop = chars_h002[upgradeIdx_h002].stack.length > 0
               ? chars_h002[upgradeIdx_h002].stack[chars_h002[upgradeIdx_h002].stack.length - 1]
@@ -13698,8 +13700,11 @@ export class EffectEngine {
             if (ps.chakra >= upgradeCost) {
               validMissions.push(String(mIdx));
               minCost = Math.min(minCost, upgradeCost);
+              h002MissionAdded = true;
             }
-          } else if (!hasSameNameConflict(chars_h002, card)) {
+            // If upgrade unaffordable, fall through to check fresh play (for cross-name flex upgrades)
+          }
+          if (!h002MissionAdded && !hasSameNameConflict(chars_h002, card)) {
             const freshCost = Math.max(0, card.chakra - 1);
             if (ps.chakra >= freshCost) {
               validMissions.push(String(mIdx));
@@ -15555,7 +15560,7 @@ export class EffectEngine {
 
     // If upgrade AND fresh play are both possible, let the player choose
     if (existingIdx >= 0 && !hasNameConflict) {
-      // Find ALL upgrade targets (there could be multiple)
+      // Find ALL affordable upgrade targets (there could be multiple)
       const upgradeTargetIds: string[] = [];
       for (let i = 0; i < mission[friendlySide].length; i++) {
         const c = mission[friendlySide][i];
@@ -15563,34 +15568,42 @@ export class EffectEngine {
         const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        if (isSameName || isFlex) upgradeTargetIds.push(c.instanceId);
+        if (isSameName || isFlex) {
+          // Only include if the upgrade is affordable
+          const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - costReduction);
+          if (ps.chakra >= upgCost) upgradeTargetIds.push(c.instanceId);
+        }
       }
 
-      // Push card back to discard (will be re-popped when choice is resolved)
-      ps.discardPile.push(card);
+      // If there are affordable upgrade targets, offer the choice
+      if (upgradeTargetIds.length > 0) {
+        // Push card back to discard (will be re-popped when choice is resolved)
+        ps.discardPile.push(card);
 
-      // Create pending effect for the choice
-      const effectId = `generic-upgrade-choice-${generateInstanceId()}`;
-      state.pendingEffects = [...state.pendingEffects, {
-        id: effectId,
-        sourceCardId: cardId,
-        sourceInstanceId: '',
-        sourceMissionIndex: missionIndex,
-        effectType: 'MAIN' as EffectType,
-        effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
-        targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
-        sourcePlayer: player,
-        requiresTargetSelection: true,
-        validTargets: ['FRESH', ...upgradeTargetIds],
-        isOptional: false,
-        isMandatory: true,
-        resolved: false,
-        isUpgrade: false,
-        description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
-        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
-        descriptionParams: { card: card.name_fr },
-      } as PendingEffect];
-      return state;
+        // Create pending effect for the choice
+        const effectId = `generic-upgrade-choice-${generateInstanceId()}`;
+        state.pendingEffects = [...state.pendingEffects, {
+          id: effectId,
+          sourceCardId: cardId,
+          sourceInstanceId: '',
+          sourceMissionIndex: missionIndex,
+          effectType: 'MAIN' as EffectType,
+          effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
+          targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: ['FRESH', ...upgradeTargetIds],
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: false,
+          description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+          descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+          descriptionParams: { card: card.name_fr },
+        } as PendingEffect];
+        return state;
+      }
+      // No affordable upgrades — fall through to fresh play
     }
 
     let placedChar: CharacterInPlay;
@@ -16277,7 +16290,7 @@ export class EffectEngine {
 
     // If upgrade AND fresh play are both possible, let the player choose
     if (existingIdx >= 0 && !hasNameConflict_k053) {
-      // Find ALL upgrade targets (there could be multiple)
+      // Find ALL affordable upgrade targets (there could be multiple)
       const upgradeTargetIds_k053: string[] = [];
       for (let i = 0; i < mission[friendlySide].length; i++) {
         const c = mission[friendlySide][i];
@@ -16285,23 +16298,29 @@ export class EffectEngine {
         const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        if (isSameName || isFlex) upgradeTargetIds_k053.push(c.instanceId);
+        if (isSameName || isFlex) {
+          // Only include if the upgrade is affordable
+          const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - 3);
+          if (ps.chakra >= upgCost) upgradeTargetIds_k053.push(c.instanceId);
+        }
       }
 
-      // Push card back to discard (will be re-popped when choice is resolved)
-      ps.discardPile.push(card);
+      // If there are affordable upgrade targets, offer the choice
+      if (upgradeTargetIds_k053.length > 0) {
+        // Push card back to discard (will be re-popped when choice is resolved)
+        ps.discardPile.push(card);
 
-      // Create pending effect for the choice
-      const effectId_k053 = `kabuto053-upgrade-choice-${generateInstanceId()}`;
-      newState.pendingEffects = [...newState.pendingEffects, {
-        id: effectId_k053,
-        sourceCardId: 'KS-053-UC',
-        sourceInstanceId: '',
-        sourceMissionIndex: missionIdx,
-        effectType: 'MAIN' as EffectType,
-        effectDescription: JSON.stringify({ cardName: 'KABUTO YAKUSHI', cardId: 'KS-053-UC', costReduction: 3, missionIndex: missionIdx }),
-        targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
-        sourcePlayer: player,
+        // Create pending effect for the choice
+        const effectId_k053 = `kabuto053-upgrade-choice-${generateInstanceId()}`;
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId_k053,
+          sourceCardId: 'KS-053-UC',
+          sourceInstanceId: '',
+          sourceMissionIndex: missionIdx,
+          effectType: 'MAIN' as EffectType,
+          effectDescription: JSON.stringify({ cardName: 'KABUTO YAKUSHI', cardId: 'KS-053-UC', costReduction: 3, missionIndex: missionIdx }),
+          targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
+          sourcePlayer: player,
         requiresTargetSelection: true,
         validTargets: ['FRESH', ...upgradeTargetIds_k053],
         isOptional: false,
@@ -16312,7 +16331,9 @@ export class EffectEngine {
         descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
         descriptionParams: { card: card.name_fr },
       } as PendingEffect];
-      return newState;
+        return newState;
+      }
+      // No affordable upgrades — fall through to fresh play
     }
 
     let placedChar: CharacterInPlay;
@@ -16423,7 +16444,7 @@ export class EffectEngine {
 
     // If upgrade AND fresh play are both possible, let the player choose
     if (existingIdx >= 0 && !hasNameConflict_h002) {
-      // Find ALL upgrade targets (there could be multiple)
+      // Find ALL affordable upgrade targets (there could be multiple)
       const upgradeTargetIds_h002: string[] = [];
       for (let i = 0; i < mission[friendlySide_h002].length; i++) {
         const c = mission[friendlySide_h002][i];
@@ -16431,33 +16452,41 @@ export class EffectEngine {
         const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        if (isSameName || isFlex) upgradeTargetIds_h002.push(c.instanceId);
+        if (isSameName || isFlex) {
+          // Only include if the upgrade is affordable (Hiruzen gives -1 reduction)
+          const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - 1);
+          if (ps.chakra >= upgCost) upgradeTargetIds_h002.push(c.instanceId);
+        }
       }
 
-      // Card is still in hand (splice hasn't happened yet) - it will be removed when the choice resolves.
+      // If there are affordable upgrade targets, offer the choice
+      if (upgradeTargetIds_h002.length > 0) {
+        // Card is still in hand (splice hasn't happened yet) - it will be removed when the choice resolves.
 
-      // Create pending effect for the choice
-      const effectId_h002 = `hiruzen002-upgrade-choice-${generateInstanceId()}`;
-      newState.pendingEffects = [...newState.pendingEffects, {
-        id: effectId_h002,
-        sourceCardId: 'KS-002-UC',
-        sourceInstanceId: pending.sourceInstanceId,
-        sourceMissionIndex: missionIndex,
-        effectType: 'MAIN' as EffectType,
-        effectDescription: JSON.stringify({ cardIndex, missionIndex }),
-        targetSelectionType: 'HIRUZEN002_UPGRADE_OR_FRESH',
-        sourcePlayer: player,
-        requiresTargetSelection: true,
-        validTargets: ['FRESH', ...upgradeTargetIds_h002],
-        isOptional: false,
-        isMandatory: true,
-        resolved: false,
-        isUpgrade: pending.isUpgrade,
-        description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
-        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
-        descriptionParams: { card: card.name_fr },
-      } as PendingEffect];
-      return newState;
+        // Create pending effect for the choice
+        const effectId_h002 = `hiruzen002-upgrade-choice-${generateInstanceId()}`;
+        newState.pendingEffects = [...newState.pendingEffects, {
+          id: effectId_h002,
+          sourceCardId: 'KS-002-UC',
+          sourceInstanceId: pending.sourceInstanceId,
+          sourceMissionIndex: missionIndex,
+          effectType: 'MAIN' as EffectType,
+          effectDescription: JSON.stringify({ cardIndex, missionIndex }),
+          targetSelectionType: 'HIRUZEN002_UPGRADE_OR_FRESH',
+          sourcePlayer: player,
+          requiresTargetSelection: true,
+          validTargets: ['FRESH', ...upgradeTargetIds_h002],
+          isOptional: false,
+          isMandatory: true,
+          resolved: false,
+          isUpgrade: pending.isUpgrade,
+          description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+          descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+          descriptionParams: { card: card.name_fr },
+        } as PendingEffect];
+        return newState;
+      }
+      // No affordable upgrades — fall through to fresh play
     }
 
     // Compute actual cost: for upgrades pay (diff - 1), for fresh play pay (cost - 1)

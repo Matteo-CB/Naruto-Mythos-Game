@@ -45,9 +45,10 @@ describe('MSS 01 - Call for Support', () => {
     const handler = getEffectHandler('KS-001-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
+    // Handler uses CONFIRM popup pattern before actual target selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('MSS01_POWERUP_TARGET');
-    expect(result.validTargets).toContain('ally-1');
+    expect(result.targetSelectionType).toBe('MSS01_CONFIRM_SCORE');
+    expect(result.validTargets).toContain('KS-001-MMS');
   });
 
   it('should fizzle when no friendly characters exist', () => {
@@ -92,8 +93,12 @@ describe('MSS 03 - Find the Traitor', () => {
     const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    expect(result.state.player2.hand.length).toBe(0);
-    expect(result.state.player2.discardPile.length).toBe(1);
+    // Handler uses CONFIRM popup pattern — shows MSS03_CONFIRM_SCORE regardless of hand size
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS03_CONFIRM_SCORE');
+    // State is unchanged at this step (awaiting confirm)
+    expect(result.state.player2.hand.length).toBe(1);
+    expect(result.state.player2.discardPile.length).toBe(0);
   });
 
   it('should require target selection when opponent has multiple cards', () => {
@@ -109,10 +114,10 @@ describe('MSS 03 - Find the Traitor', () => {
     const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
+    // Handler uses CONFIRM popup pattern before actual discard selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('MSS03_OPPONENT_DISCARD');
-    expect(result.validTargets).toEqual(['0', '1']);
-    expect(result.selectingPlayer).toBe('player2');
+    expect(result.targetSelectionType).toBe('MSS03_CONFIRM_SCORE');
+    expect(result.validTargets).toContain('KS-003-MMS');
     // State should be unchanged (no discard yet)
     expect(result.state.player2.hand.length).toBe(2);
     expect(result.state.player2.discardPile.length).toBe(0);
@@ -151,8 +156,11 @@ describe('MSS 04 - Assassination', () => {
     const handler = getEffectHandler('KS-004-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Hidden enemy should be defeated (removed)
-    expect(result.state.activeMissions[0].player2Characters.length).toBe(0);
+    // Handler uses CONFIRM popup pattern before actual defeat
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS04_CONFIRM_SCORE');
+    // Hidden enemy NOT yet defeated (awaiting confirm)
+    expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
 
   it('should fizzle when no hidden enemy exists', () => {
@@ -220,8 +228,11 @@ describe('MSS 06 - Rescue a Friend', () => {
     const handler = getEffectHandler('KS-006-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    expect(result.state.player1.hand.length).toBe(1);
-    expect(result.state.player1.hand[0].name_fr).toBe('DrawnCard');
+    // Handler uses CONFIRM popup pattern before drawing
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS06_CONFIRM_SCORE');
+    // Hand not changed yet (awaiting confirm)
+    expect(result.state.player1.hand.length).toBe(0);
   });
 
   it('should not crash when deck is empty', () => {
@@ -254,9 +265,9 @@ describe('MSS 07 - I Have to Go', () => {
     const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Effect is optional - always asks the player (no auto-move)
+    // Handler uses CONFIRM popup pattern — MSS07_CONFIRM_SCORE before actual move selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.isOptional).toBe(true);
+    expect(result.targetSelectionType).toBe('MSS07_CONFIRM_SCORE');
     expect(result.validTargets).toBeDefined();
     expect(result.validTargets!.length).toBeGreaterThan(0);
   });
@@ -292,10 +303,10 @@ describe('MSS 08 - Set a Trap', () => {
     const handler = getEffectHandler('KS-008-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Now returns target selection: choose which card from hand
+    // Handler uses CONFIRM popup pattern before card selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('MSS08_CHOOSE_CARD');
-    expect(result.validTargets).toContain('0'); // handCard at index 0
+    expect(result.targetSelectionType).toBe('MSS08_CONFIRM_SCORE');
+    expect(result.validTargets).toContain('KS-008-MMS');
   });
 
   it('should fizzle when hand is empty', () => {

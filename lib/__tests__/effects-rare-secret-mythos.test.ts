@@ -163,12 +163,13 @@ describe('120/130 - Gaara (R)', () => {
 
     const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0));
-    // Effect is optional ("up to 1") - always prompts player, never auto-defeats
+    // Handler uses CONFIRM popup pattern before per-mission defeat selection
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
-    expect(result.targetSelectionType).toBe('GAARA120_CHOOSE_DEFEAT');
-    expect(result.validTargets).toContain('we1');
-    // Enemies NOT defeated yet (pending selection)
+    expect(result.targetSelectionType).toBe('GAARA120_CONFIRM_MAIN');
+    // sourceCard is used as validTarget for confirm (not the weak enemies)
+    expect(result.validTargets).toContain('gaara-r');
+    // Enemies NOT defeated yet (pending confirmation)
     expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
 
@@ -194,12 +195,12 @@ describe('120/130 - Gaara (R)', () => {
 
     const handler = getEffectHandler('KS-120-R', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', gaara, 0, 'MAIN', true));
-    // Should prompt for first mission (mission 0 has weakE1)
+    // Handler returns CONFIRM popup (GAARA120_CONFIRM_MAIN), not direct per-mission selection
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
+    expect(result.targetSelectionType).toBe('GAARA120_CONFIRM_MAIN');
     const desc = JSON.parse(result.description ?? '{}');
-    expect(desc.defeatedCount).toBe(0); // nothing defeated yet
-    expect(desc.nextMissionIndex).toBe(1); // next to check is mission 1
+    // Description encodes isUpgrade flag for post-confirm processing
     expect(desc.isUpgrade).toBe(true);
   });
 
@@ -248,10 +249,11 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
     const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0));
-    // Stage 1: choose target with Power<=5 in this mission
+    // Handler uses CONFIRM popup pattern before actual target selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('NARUTO133_CHOOSE_TARGET1');
-    expect(result.validTargets).toContain('t1');
+    expect(result.targetSelectionType).toBe('NARUTO133_CONFIRM_MAIN');
+    // sourceCard is used as validTarget for the confirm step
+    expect(result.validTargets).toContain('naruto-s');
     const desc = JSON.parse(result.description!);
     expect(desc.useDefeat).toBe(false);
   });
@@ -278,12 +280,13 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
 
     const handler = getEffectHandler('KS-133-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', naruto, 0, 'MAIN', true));
-    // Stage 1: choose target with Power<=5 in this mission (defeat mode)
+    // Handler uses CONFIRM popup pattern (upgrade defeat mode encoded in description)
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('NARUTO133_CHOOSE_TARGET1');
-    expect(result.validTargets).toContain('t1');
+    expect(result.targetSelectionType).toBe('NARUTO133_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('naruto-s');
+    // Note: useDefeat is false in this step; upgrade detection happens in EffectEngine
     const desc = JSON.parse(result.description!);
-    expect(desc.useDefeat).toBe(true);
+    expect(typeof desc.missionIndex).toBe('number');
   });
 
   it('should not target Power > 5 in this mission', () => {
@@ -323,15 +326,13 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
     const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
-    // Now returns target selection: choose which character from top 3
+    // Handler uses CONFIRM popup pattern before revealing top 3 cards
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('SAKURA135_CHOOSE_CARD');
-    // All 3 are characters, all affordable with 10 chakra
-    expect(result.validTargets!.length).toBe(3);
-    // Deck should be empty (cards were drawn)
-    expect(result.state.player1.deck.length).toBe(0);
-    // Drawn cards stored at end of discard pile
-    expect(result.state.player1.discardPile.length).toBe(3);
+    expect(result.targetSelectionType).toBe('SAKURA135_CONFIRM_MAIN');
+    // sourceCard is used as validTarget for the confirm step
+    expect(result.validTargets).toContain('sakura-s');
+    // Deck not yet drawn (awaiting confirm)
+    expect(result.state.player1.deck.length).toBe(3);
   });
 
   it('should offer only affordable cards on upgrade (cost reduction 4)', () => {
@@ -348,10 +349,10 @@ describe('135/130 - Sakura Haruno (S)', () => {
 
     const handler = getEffectHandler('KS-135-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0, 'MAIN', true));
-    // Cost = 6 - 4 = 2, player has 5 chakra - affordable
+    // Handler uses CONFIRM popup pattern (upgrade cost reduction applied in EffectEngine)
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('SAKURA135_CHOOSE_CARD');
-    expect(result.validTargets).toContain('0');
+    expect(result.targetSelectionType).toBe('SAKURA135_CONFIRM_MAIN');
+    expect(result.validTargets).toContain('sakura-s');
   });
 
   it('should handle empty deck', () => {
@@ -456,9 +457,11 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
     const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
+    // Handler uses CONFIRM popup pattern before actual target selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KAKASHI137_HIDE_UPGRADED');
-    expect(result.validTargets).toContain('e1');
+    expect(result.targetSelectionType).toBe('KAKASHI137_CONFIRM_MAIN');
+    // sourceCard is used as validTarget for the confirm step (not the target)
+    expect(result.validTargets).toContain('kakashi-s');
   });
 
   it('MAIN should fizzle when no upgraded character in this mission', () => {
@@ -498,9 +501,11 @@ describe('137/130 - Kakashi Hatake (S)', () => {
 
     const handler = getEffectHandler('KS-137-S', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kakashi, 0));
+    // Handler uses CONFIRM popup pattern when valid targets exist
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KAKASHI137_HIDE_UPGRADED');
-    expect(result.validTargets).toContain('ally-1');
+    expect(result.targetSelectionType).toBe('KAKASHI137_CONFIRM_MAIN');
+    // Kakashi itself is used as validTarget for the confirm step
+    expect(result.validTargets).toContain('kakashi-s');
   });
 
   it('UPGRADE should require target selection to choose destination mission', () => {
@@ -517,9 +522,11 @@ describe('137/130 - Kakashi Hatake (S)', () => {
     const handler = getEffectHandler('KS-137-S', 'UPGRADE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kakashi, 0, 'UPGRADE', true));
+    // Handler uses CONFIRM popup pattern before mission selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('KAKASHI137_MOVE_SELF');
-    expect(result.validTargets).toContain('1'); // mission index 1
+    expect(result.targetSelectionType).toBe('KAKASHI137_CONFIRM_UPGRADE');
+    // sourceCard is used as validTarget for the confirm step
+    expect(result.validTargets).toContain('kakashi-s');
   });
 });
 
@@ -543,11 +550,11 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
 
     const handler = getEffectHandler('KS-143-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', itachi, 0));
-    // Now returns target selection: choose which friendly char to move
+    // Handler uses CONFIRM popup pattern before actual target selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('ITACHI143_CHOOSE_FRIENDLY');
-    expect(result.validTargets).toContain('fe-1');
-    expect(result.validTargets).not.toContain('itachi-m'); // Itachi is in this mission, not a valid target
+    expect(result.targetSelectionType).toBe('ITACHI143_CONFIRM_MAIN');
+    // sourceCard is used as validTarget for the confirm step (itachi)
+    expect(result.validTargets).toContain('itachi-m');
   });
 
   it('MAIN should fizzle when no friendly in another mission', () => {
@@ -580,10 +587,11 @@ describe('143/130 - Itachi Uchiwa (M)', () => {
     const handler = getEffectHandler('KS-143-M', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', itachi, 0, 'AMBUSH'));
-    // Now returns target selection: choose which enemy char to move
+    // Handler uses CONFIRM popup pattern before actual enemy selection
     expect(result.requiresTargetSelection).toBe(true);
-    expect(result.targetSelectionType).toBe('ITACHI143_CHOOSE_ENEMY');
-    expect(result.validTargets).toContain('ee-1');
+    expect(result.targetSelectionType).toBe('ITACHI143_CONFIRM_AMBUSH');
+    // sourceCard is used as validTarget for the confirm step (itachi)
+    expect(result.validTargets).toContain('itachi-m');
   });
 });
 
@@ -603,8 +611,12 @@ describe('144/130 - Kisame Hoshigaki (M)', () => {
 
     const handler = getEffectHandler('KS-144-M', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kisame, 0));
-    expect(result.state.player1.chakra).toBe(6); // 5 + 1
-    expect(result.state.player2.chakra).toBe(2); // 3 - 1
+    // Handler uses CONFIRM popup pattern before the actual steal
+    expect(result.requiresTargetSelection).toBe(true);
+    expect(result.targetSelectionType).toBe('KISAME144_CONFIRM_MAIN');
+    // Chakra not changed yet (awaiting confirm)
+    expect(result.state.player1.chakra).toBe(5); // unchanged
+    expect(result.state.player2.chakra).toBe(3); // unchanged
   });
 
   it('should not steal when opponent has 0 chakra', () => {
