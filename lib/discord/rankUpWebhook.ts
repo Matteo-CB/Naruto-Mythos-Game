@@ -10,6 +10,22 @@ import { getRoleForElo, getRankLabel } from './roles';
 const PLACEMENT_MATCHES_REQUIRED = 5;
 
 const WEBHOOK_URL = process.env.DISCORD_RANKUP_WEBHOOK_URL;
+const DISCORD_API = 'https://discord.com/api/v10';
+const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
+const GUILD_ID = process.env.SERVER_DISCORD_ID;
+
+/** Check if a Discord user is actually a member of the guild */
+async function isGuildMember(discordId: string): Promise<boolean> {
+  if (!BOT_TOKEN || !GUILD_ID) return false;
+  try {
+    const res = await fetch(`${DISCORD_API}/guilds/${GUILD_ID}/members/${discordId}`, {
+      headers: { Authorization: `Bot ${BOT_TOKEN}` },
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 const TIER_COLORS: Record<string, number> = {
   'Academy Student': 0x888888,
@@ -120,8 +136,9 @@ async function sendWebhook(params: {
   const { username, discordId, oldRank, newRank, newElo, color, isFirstPlacement } = params;
   const symbol = TIER_SYMBOLS[newRank] ?? '';
 
-  // Player mention: @tag if Discord linked, **bold name** if not
-  const playerMention = discordId ? `<@${discordId}>` : `**${username}**`;
+  // Player mention: @tag if Discord linked AND in the server, **bold name** otherwise
+  const inGuild = discordId ? await isGuildMember(discordId) : false;
+  const playerMention = (discordId && inGuild) ? `<@${discordId}>` : `**${username}**`;
 
   // Content message (visible above the embed, triggers the @mention notification)
   let content: string;
