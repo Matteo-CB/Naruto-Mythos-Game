@@ -964,7 +964,10 @@
       "maxCopies": "Max {max} copies de {name}",
       "maxMissions": "Max {max} missions",
       "alreadyInDeck": "{name} deja dans le deck"
-    }
+    },
+    "hoverToPreview": "Survolez une carte pour voir ses details",
+    "sortByCost": "Trier par cout",
+    "dragToReorder": "Glissez les cartes pour les reorganiser"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
@@ -1042,7 +1045,17 @@
     "setChakra": "Chakra",
     "searchCards": "Rechercher...",
     "allCards": "Toutes les cartes",
-    "discardHand": "Defausser"
+    "discardHand": "Defausser",
+    "swapMission": "Changer la Mission",
+    "clearMission": "Retirer tous les persos",
+    "currentMission": "Actuelle",
+    "selectCharToReturn": "Cliquez sur un personnage pour le remettre en main",
+    "selectCharToMove": "Cliquez sur un personnage pour le deplacer",
+    "moveTo": "Deplacer vers",
+    "noCharsOnBoard": "Aucun personnage sur le plateau",
+    "phaseAction": "Action",
+    "phaseMission": "Mission",
+    "resetTokens": "Reset Jetons"
   },
   "online": {
     "title": "Jouer en Ligne",

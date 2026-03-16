@@ -37,6 +37,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
     targetSelectionType: 'KABUTO052_CONFIRM_AMBUSH',
     validTargets: [sourceCard.instanceId],
     isOptional: false,
+    isMandatory: true,
     description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.kabuto052ConfirmAmbush',
   };

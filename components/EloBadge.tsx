@@ -60,7 +60,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'specialJonin',
-    minElo: 650,
+    minElo: 800,
     color: '#5A7ABB',
     bgColor: 'rgba(90, 122, 187, 0.08)',
     borderColor: 'rgba(90, 122, 187, 0.3)',
@@ -70,7 +70,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'eliteJonin',
-    minElo: 750,
+    minElo: 1000,
     color: '#5865F2',
     bgColor: 'rgba(88, 101, 242, 0.08)',
     borderColor: 'rgba(88, 101, 242, 0.3)',
@@ -80,7 +80,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'legendarySannin',
-    minElo: 900,
+    minElo: 1200,
     color: '#9B59B6',
     bgColor: 'rgba(155, 89, 182, 0.1)',
     borderColor: 'rgba(155, 89, 182, 0.35)',
@@ -90,7 +90,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'kage',
-    minElo: 1050,
+    minElo: 1600,
     color: '#C4A35A',
     bgColor: 'rgba(196, 163, 90, 0.1)',
     borderColor: 'rgba(196, 163, 90, 0.4)',
@@ -100,7 +100,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'sageOfSixPaths',
-    minElo: 1200,
+    minElo: 2000,
     color: '#FFD700',
     bgColor: 'rgba(255, 215, 0, 0.1)',
     borderColor: 'rgba(255, 215, 0, 0.5)',

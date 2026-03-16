@@ -17,11 +17,11 @@ export const ELO_ROLES: EloRole[] = [
   { name: '\u257C Academy Student \u257E', color: 0x888888, colorHex: '#888888', minElo: 0, hoist: true },
   { name: '\u257C Genin \u257E',           color: 0x3E8B3E, colorHex: '#3E8B3E', minElo: 450, hoist: true },
   { name: '\u257C Chunin \u257E',          color: 0xB37E3E, colorHex: '#B37E3E', minElo: 550, hoist: true },
-  { name: '\u257C Special Jonin \u257E',   color: 0x5A7ABB, colorHex: '#5A7ABB', minElo: 650, hoist: true },
-  { name: '\u257C Elite Jonin \u257E',     color: 0x5865F2, colorHex: '#5865F2', minElo: 750, hoist: true },
-  { name: '\u257C Legendary Sannin \u257E', color: 0x9B59B6, colorHex: '#9B59B6', minElo: 900, hoist: true },
-  { name: '\u257C Kage \u257E',            color: 0xC4A35A, colorHex: '#C4A35A', minElo: 1050, hoist: true },
-  { name: '\u257C Sage of Six Paths \u257E', color: 0xFFD700, colorHex: '#FFD700', minElo: 1200, hoist: true },
+  { name: '\u257C Special Jonin \u257E',   color: 0x5A7ABB, colorHex: '#5A7ABB', minElo: 800, hoist: true },
+  { name: '\u257C Elite Jonin \u257E',     color: 0x5865F2, colorHex: '#5865F2', minElo: 1000, hoist: true },
+  { name: '\u257C Legendary Sannin \u257E', color: 0x9B59B6, colorHex: '#9B59B6', minElo: 1200, hoist: true },
+  { name: '\u257C Kage \u257E',            color: 0xC4A35A, colorHex: '#C4A35A', minElo: 1600, hoist: true },
+  { name: '\u257C Sage of Six Paths \u257E', color: 0xFFD700, colorHex: '#FFD700', minElo: 2000, hoist: true },
 ];
 
 /**

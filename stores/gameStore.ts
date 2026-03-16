@@ -120,6 +120,11 @@ interface GameStore {
   sandboxRevealCharacter: (missionIndex: number, instanceId: string) => void;
   sandboxAddPowerToken: (missionIndex: number, instanceId: string, amount: number) => void;
   sandboxSetChakra: (amount: number) => void;
+  sandboxSwapMission: (missionIndex: number, newMissionCardId: string) => void;
+  sandboxSetTurn: (turn: number) => void;
+  sandboxSetPhase: (phase: string) => void;
+  sandboxResetAllPowerTokens: () => void;
+  sandboxReturnAllFromMission: (missionIndex: number) => void;
 }
 
 let animationIdCounter = 0;
@@ -2041,6 +2046,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!isSandboxMode || !gameState) return;
     const s = JSON.parse(JSON.stringify(gameState)) as GameState;
     s[humanPlayer].chakra = Math.max(0, amount);
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxSwapMission: (missionIndex: number, newMissionCardId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const { getMissionById } = require('@/lib/data/cardIndex');
+    const newMissionCard = getMissionById(newMissionCardId);
+    if (!newMissionCard) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    // Keep the same rank/bonus but replace the card
+    mission.card = JSON.parse(JSON.stringify(newMissionCard));
+    mission.basePoints = newMissionCard.points ?? newMissionCard.basePoints ?? 0;
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxSetTurn: (turn: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    s.turn = Math.max(1, Math.min(4, turn)) as 1 | 2 | 3 | 4;
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxSetPhase: (phase: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    s.phase = phase as GameState['phase'];
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxResetAllPowerTokens: () => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    for (const mission of s.activeMissions) {
+      for (const side of ['player1Characters', 'player2Characters'] as const) {
+        for (const char of mission[side]) {
+          char.powerTokens = 0;
+        }
+      }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxReturnAllFromMission: (missionIndex: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const owner = side === 'player1Characters' ? 'player1' : 'player2';
+      while (mission[side].length > 0) {
+        const char = mission[side].pop()!;
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const actualOwner = char.originalOwner || owner;
+        s[actualOwner].hand.push(topCard);
+      }
+    }
     set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
   },
 }));

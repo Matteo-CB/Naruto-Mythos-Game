@@ -8462,11 +8462,12 @@ export class EffectEngine {
         for (let i = 0; i < newState.activeMissions.length; i++) {
           if (isMovementBlockedByKurenai(newState, i, tm121Player)) continue;
           for (const char of newState.activeMissions[i][tm121Side]) {
-            if (char.instanceId === pendingEffect.sourceInstanceId || char.isHidden) continue;
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             let hasValidDest = false;
             for (let d = 0; d < newState.activeMissions.length; d++) {
               if (d === i) continue;
-              if (EffectEngine.validateNameUniquenessForMove(newState, char, d, tm121Player)) { hasValidDest = true; break; }
+              // Hidden chars have no visible name, so name uniqueness can't block them
+              if (char.isHidden || EffectEngine.validateNameUniquenessForMove(newState, char, d, tm121Player)) { hasValidDest = true; break; }
             }
             if (hasValidDest) tm121Targets.push(char.instanceId);
           }
@@ -16537,13 +16538,9 @@ export class EffectEngine {
 
     if (handIndex < 0 || handIndex >= ps.hand.length) return state;
 
-    // Remove card from hand
+    // Remove card from hand — store it directly in pending effect description
+    // (NOT in discard pile, to prevent information leak)
     const chosenCard = ps.hand.splice(handIndex, 1)[0];
-
-    // Store the card temporarily in the discard pile (we'll move it in stage 2)
-    // Actually, store it in a pending way â€' push to discard pile temporarily
-    // and record the card id for stage 2
-    ps.discardPile.push(chosenCard);
 
     // Create stage 2: choose mission
     const missionIndices = newState.activeMissions.map((_, i) => String(i));
@@ -16556,7 +16553,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cardName: chosenCard.name_fr, cardId: chosenCard.id }),
+      effectDescription: JSON.stringify({ cardName: chosenCard.name_fr, cardId: chosenCard.id, storedCard: chosenCard }),
       targetSelectionType: 'MSS08_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -16594,8 +16591,12 @@ export class EffectEngine {
 
     if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) return state;
 
-    // Recover the card from the discard pile (it was the last card pushed)
-    const chosenCard = ps.discardPile.pop();
+    // Recover the card stored in the pending effect description (not in discard pile)
+    let chosenCard: any = null;
+    try {
+      const parsed = JSON.parse(pending.effectDescription || '{}');
+      chosenCard = parsed.storedCard || null;
+    } catch { /* fallback */ }
     if (!chosenCard) return state;
 
     ps.charactersInPlay += 1;
@@ -16959,6 +16960,7 @@ export class EffectEngine {
           isMandatory: true,
           resolved: false,
           isUpgrade: pending.isUpgrade,
+          remainingEffectTypes: pending.remainingEffectTypes,
           description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
           descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
           descriptionParams: { card: card.name_fr },
@@ -18193,12 +18195,14 @@ export class EffectEngine {
     missions[destMissionIndex] = destMission;
 
     state.activeMissions = missions;
+    // If the moved character is hidden, don't reveal its name in the log
+    const movedCharName = charResult.character.isHidden ? '???' : charResult.character.card.name_fr;
     state.log = logAction(
       state.log, state.turn, state.phase, charOwner,
       'EFFECT_MOVE',
-      `${effectCardName} (${effectCardId}): Moved ${charResult.character.card.name_fr} from mission ${charResult.missionIndex + 1} to mission ${destMissionIndex + 1}.`,
+      `${effectCardName} (${effectCardId}): Moved ${movedCharName} from mission ${charResult.missionIndex + 1} to mission ${destMissionIndex + 1}.`,
       'game.log.effect.move',
-      { card: effectCardName, id: effectCardId, target: charResult.character.card.name_fr, mission: `mission ${destMissionIndex + 1}` },
+      { card: effectCardName, id: effectCardId, target: movedCharName, mission: `mission ${destMissionIndex + 1}` },
     );
 
     // Check Ninja Hounds 100 trigger
