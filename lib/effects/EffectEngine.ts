@@ -13,6 +13,7 @@ import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEne
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
+import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard } from './handlers/KS/shared/summonSearch';
 
 /**
@@ -50,7 +51,16 @@ function findUpgradeTargetIdx(
     if (c.isHidden) return false;
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
     const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    return checkFlexibleUpgrade(card as any, topCard) && (card.chakra ?? 0) > (topCard.chakra ?? 0);
+    if (!checkFlexibleUpgrade(card as any, topCard) || (card.chakra ?? 0) <= (topCard.chakra ?? 0)) return false;
+    // Exclude targets where upgrading would create a post-upgrade name conflict
+    // E.g., Orochimaru 138 upgrading over Naruto when another Orochimaru is already present
+    const wouldConflict = chars.some(other => {
+      if (other.instanceId === c.instanceId || other.isHidden) return false;
+      if (excludeInstanceId && other.instanceId === excludeInstanceId) return false;
+      const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+      return oTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+    });
+    return !wouldConflict;
   });
   return flexIdx;
 }
@@ -7203,6 +7213,401 @@ export class EffectEngine {
         break;
       }
 
+      // --- Sasuke 107: Player chose which character to move next ---
+      case 'SASUKE107_CHOOSE_CHAR_TO_MOVE': {
+        const ctm107Player = pendingEffect.sourcePlayer;
+        const ctm107Side: 'player1Characters' | 'player2Characters' =
+          ctm107Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        let ctm107Data: {
+          remainingCharIds?: string[];
+          movedCount?: number;
+          isUpgrade?: boolean;
+          sasukeInstanceId?: string;
+          sourceMissionIndex?: number;
+        } = {};
+        try { ctm107Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        const ctm107Remaining = (ctm107Data.remainingCharIds ?? []).filter(id => id !== targetId);
+        const ctm107MovedCount = ctm107Data.movedCount ?? 0;
+        const ctm107IsUpgrade = ctm107Data.isUpgrade ?? false;
+        const ctm107SasukeId = ctm107Data.sasukeInstanceId ?? '';
+        const ctm107SrcMission = ctm107Data.sourceMissionIndex ?? 0;
+
+        // Find the chosen character
+        let ctm107CharName = '';
+        for (const m of newState.activeMissions) {
+          const c = m[ctm107Side].find((ch) => ch.instanceId === targetId);
+          if (c) { ctm107CharName = c.card.name_fr; break; }
+        }
+
+        if (!ctm107CharName) {
+          // Character no longer exists - continue with remaining
+          break;
+        }
+
+        // Check Kurenai movement block
+        let ctm107CharMission = -1;
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (newState.activeMissions[i][ctm107Side].some(c => c.instanceId === targetId)) {
+            ctm107CharMission = i;
+            break;
+          }
+        }
+        if (ctm107CharMission >= 0 && isMovementBlockedByKurenai(newState, ctm107CharMission, ctm107Player)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
+            'EFFECT_BLOCKED', `Sasuke Uchiwa (107): Movement of ${ctm107CharName} blocked by Kurenai Yuhi (035).`,
+            'game.log.effect.moveBlocked', { card: 'SASUKE UCHIWA', id: 'KS-107-R' });
+          // Continue with remaining chars
+          // Fall through to create next pending below
+        } else {
+          const ctm107ValidMissions = getValidMissions(newState, targetId, ctm107Player, ctm107SrcMission);
+
+          if (ctm107ValidMissions.length === 0) {
+            // Can't move - skip
+            newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
+              'EFFECT_SKIP', `Sasuke Uchiwa (107): ${ctm107CharName} cannot move (no valid destination).`,
+              'game.log.effect.sasuke107Skip', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: ctm107CharName });
+          } else if (ctm107ValidMissions.length === 1) {
+            // Auto-move to single destination
+            const ctm107Dest = ctm107ValidMissions[0];
+            // Find the character before move for trigger calls
+            let ctm107MovedChar: CharacterInPlay | null = null;
+            for (const m of newState.activeMissions) {
+              const c = m[ctm107Side].find((ch) => ch.instanceId === targetId);
+              if (c) { ctm107MovedChar = c; break; }
+            }
+
+            newState = moveCharTo(newState, targetId, ctm107Dest, ctm107Player);
+            newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
+              'EFFECT_MOVE', `Sasuke Uchiwa (107): Moved ${ctm107CharName} to mission ${ctm107Dest + 1}.`,
+              'game.log.effect.move', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: ctm107CharName, from: ctm107SrcMission, to: ctm107Dest });
+
+            // Call move triggers (character placed at destination)
+            if (ctm107MovedChar) {
+              const ctm107CharAtDest = newState.activeMissions[ctm107Dest]?.[ctm107Side]
+                ?.find((c) => c.instanceId === targetId);
+              if (ctm107CharAtDest) {
+                newState = checkNinjaHoundsTrigger(newState, ctm107CharAtDest, ctm107Dest, ctm107Player);
+                newState = checkChoji018PostMoveTrigger(newState, ctm107CharAtDest, ctm107Dest, ctm107Player, ctm107Player);
+              }
+            }
+
+            // Create next pending for remaining chars AFTER triggers
+            const ctm107NewMovedCount = ctm107MovedCount + 1;
+
+            // Filter remaining to those that still exist and can move
+            const ctm107StillMoveable: string[] = [];
+            for (const rid of ctm107Remaining) {
+              let exists = false;
+              for (const m of newState.activeMissions) {
+                if (m[ctm107Side].some(c => c.instanceId === rid)) { exists = true; break; }
+              }
+              if (!exists) continue;
+              const vm = getValidMissions(newState, rid, ctm107Player, ctm107SrcMission);
+              if (vm.length > 0) ctm107StillMoveable.push(rid);
+            }
+
+            if (ctm107StillMoveable.length === 0) {
+              // All done - apply UPGRADE POWERUP if applicable
+              if (ctm107IsUpgrade && ctm107NewMovedCount > 0) {
+                newState = applyUpgradePowerup(newState, ctm107SasukeId, ctm107NewMovedCount, ctm107Player, ctm107SrcMission);
+              }
+            } else if (ctm107StillMoveable.length === 1) {
+              // One left - create destination choice directly
+              const lastCharId = ctm107StillMoveable[0];
+              let lastName = '';
+              for (const m of newState.activeMissions) {
+                const c = m[ctm107Side].find((ch) => ch.instanceId === lastCharId);
+                if (c) { lastName = c.card.name_fr; break; }
+              }
+              const lastValidMissions = getValidMissions(newState, lastCharId, ctm107Player, ctm107SrcMission);
+              if (lastValidMissions.length === 1) {
+                // Auto-move the last one too
+                let lastMovedChar: CharacterInPlay | null = null;
+                for (const m of newState.activeMissions) {
+                  const c = m[ctm107Side].find((ch) => ch.instanceId === lastCharId);
+                  if (c) { lastMovedChar = c; break; }
+                }
+                newState = moveCharTo(newState, lastCharId, lastValidMissions[0], ctm107Player);
+                newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
+                  'EFFECT_MOVE', `Sasuke Uchiwa (107): Moved ${lastName} to mission ${lastValidMissions[0] + 1}.`,
+                  'game.log.effect.move', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: lastName, from: ctm107SrcMission, to: lastValidMissions[0] });
+                if (lastMovedChar) {
+                  const lastCharAtDest = newState.activeMissions[lastValidMissions[0]]?.[ctm107Side]
+                    ?.find((c) => c.instanceId === lastCharId);
+                  if (lastCharAtDest) {
+                    newState = checkNinjaHoundsTrigger(newState, lastCharAtDest, lastValidMissions[0], ctm107Player);
+                    newState = checkChoji018PostMoveTrigger(newState, lastCharAtDest, lastValidMissions[0], ctm107Player, ctm107Player);
+                  }
+                }
+                const finalMovedCount = ctm107NewMovedCount + 1;
+                if (ctm107IsUpgrade && finalMovedCount > 0) {
+                  newState = applyUpgradePowerup(newState, ctm107SasukeId, finalMovedCount, ctm107Player, ctm107SrcMission);
+                }
+              } else {
+                // Multiple destinations for last char - create choice
+                const lastEffectId = generateInstanceId();
+                const lastActionId = generateInstanceId();
+                newState.pendingEffects.push({
+                  id: lastEffectId,
+                  sourceCardId: pendingEffect.sourceCardId,
+                  sourceInstanceId: pendingEffect.sourceInstanceId,
+                  sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                  effectType: pendingEffect.effectType,
+                  effectDescription: JSON.stringify({
+                    charInstanceId: lastCharId,
+                    remainingCharIds: [],
+                    movedCount: ctm107NewMovedCount,
+                    isUpgrade: ctm107IsUpgrade,
+                    sasukeInstanceId: ctm107SasukeId,
+                    sourceMissionIndex: ctm107SrcMission,
+                  }),
+                  targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION',
+                  sourcePlayer: ctm107Player,
+                  requiresTargetSelection: true,
+                  validTargets: lastValidMissions.map(String),
+                  isOptional: false,
+                  isMandatory: true,
+                  resolved: false,
+                  isUpgrade: ctm107IsUpgrade,
+                });
+                newState.pendingActions.push({
+                  id: lastActionId,
+                  type: 'SELECT_TARGET',
+                  player: ctm107Player,
+                  description: `Sasuke Uchiwa (107): Choose a mission to move ${lastName} to.`,
+                  descriptionKey: 'game.effect.desc.sasuke107ChooseDestination',
+                  descriptionParams: { target: lastName },
+                  options: lastValidMissions.map(String),
+                  minSelections: 1,
+                  maxSelections: 1,
+                  sourceEffectId: lastEffectId,
+                });
+              }
+            } else {
+              // 2+ remaining - create char choice pending
+              const nextEffectId = generateInstanceId();
+              const nextActionId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: nextEffectId,
+                sourceCardId: pendingEffect.sourceCardId,
+                sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex,
+                effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({
+                  remainingCharIds: ctm107StillMoveable,
+                  movedCount: ctm107NewMovedCount,
+                  isUpgrade: ctm107IsUpgrade,
+                  sasukeInstanceId: ctm107SasukeId,
+                  sourceMissionIndex: ctm107SrcMission,
+                }),
+                targetSelectionType: 'SASUKE107_CHOOSE_CHAR_TO_MOVE',
+                sourcePlayer: ctm107Player,
+                requiresTargetSelection: true,
+                validTargets: ctm107StillMoveable,
+                isOptional: false,
+                isMandatory: true,
+                resolved: false,
+                isUpgrade: ctm107IsUpgrade,
+              });
+              newState.pendingActions.push({
+                id: nextActionId,
+                type: 'SELECT_TARGET',
+                player: ctm107Player,
+                description: 'Sasuke Uchiwa (107): Choose which character to move next.',
+                descriptionKey: 'game.effect.desc.sasuke107ChooseCharToMove',
+                options: ctm107StillMoveable,
+                minSelections: 1,
+                maxSelections: 1,
+                sourceEffectId: nextEffectId,
+              });
+            }
+            break;
+          } else {
+            // Multiple valid destinations - create CHOOSE_DESTINATION pending
+            const ctm107DestEffectId = generateInstanceId();
+            const ctm107DestActionId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: ctm107DestEffectId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({
+                charInstanceId: targetId,
+                remainingCharIds: ctm107Remaining,
+                movedCount: ctm107MovedCount,
+                isUpgrade: ctm107IsUpgrade,
+                sasukeInstanceId: ctm107SasukeId,
+                sourceMissionIndex: ctm107SrcMission,
+              }),
+              targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION',
+              sourcePlayer: ctm107Player,
+              requiresTargetSelection: true,
+              validTargets: ctm107ValidMissions.map(String),
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: ctm107IsUpgrade,
+            });
+            newState.pendingActions.push({
+              id: ctm107DestActionId,
+              type: 'SELECT_TARGET',
+              player: ctm107Player,
+              description: `Sasuke Uchiwa (107): Choose a mission to move ${ctm107CharName} to.`,
+              descriptionKey: 'game.effect.desc.sasuke107ChooseDestination',
+              descriptionParams: { target: ctm107CharName },
+              options: ctm107ValidMissions.map(String),
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: ctm107DestEffectId,
+            });
+            break;
+          }
+        }
+
+        // If we got here via blocked/skip path, continue with remaining
+        if (ctm107CharMission >= 0 && isMovementBlockedByKurenai(newState, ctm107CharMission, ctm107Player)) {
+          // Filter remaining chars
+          const ctm107BlockedRemaining: string[] = [];
+          for (const rid of ctm107Remaining) {
+            let exists = false;
+            for (const m of newState.activeMissions) {
+              if (m[ctm107Side].some(c => c.instanceId === rid)) { exists = true; break; }
+            }
+            if (!exists) continue;
+            const vm = getValidMissions(newState, rid, ctm107Player, ctm107SrcMission);
+            if (vm.length > 0) ctm107BlockedRemaining.push(rid);
+          }
+          if (ctm107BlockedRemaining.length === 0) {
+            if (ctm107IsUpgrade && ctm107MovedCount > 0) {
+              newState = applyUpgradePowerup(newState, ctm107SasukeId, ctm107MovedCount, ctm107Player, ctm107SrcMission);
+            }
+          } else if (ctm107BlockedRemaining.length >= 2) {
+            const nextEffectId = generateInstanceId();
+            const nextActionId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: nextEffectId,
+              sourceCardId: pendingEffect.sourceCardId,
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({
+                remainingCharIds: ctm107BlockedRemaining,
+                movedCount: ctm107MovedCount,
+                isUpgrade: ctm107IsUpgrade,
+                sasukeInstanceId: ctm107SasukeId,
+                sourceMissionIndex: ctm107SrcMission,
+              }),
+              targetSelectionType: 'SASUKE107_CHOOSE_CHAR_TO_MOVE',
+              sourcePlayer: ctm107Player,
+              requiresTargetSelection: true,
+              validTargets: ctm107BlockedRemaining,
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: ctm107IsUpgrade,
+            });
+            newState.pendingActions.push({
+              id: nextActionId,
+              type: 'SELECT_TARGET',
+              player: ctm107Player,
+              description: 'Sasuke Uchiwa (107): Choose which character to move next.',
+              descriptionKey: 'game.effect.desc.sasuke107ChooseCharToMove',
+              options: ctm107BlockedRemaining,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: nextEffectId,
+            });
+          } else {
+            // 1 remaining - process directly via CHOOSE_DESTINATION or auto-move
+            const lastId = ctm107BlockedRemaining[0];
+            let lastN = '';
+            for (const m of newState.activeMissions) {
+              const c = m[ctm107Side].find((ch) => ch.instanceId === lastId);
+              if (c) { lastN = c.card.name_fr; break; }
+            }
+            const lastVm = getValidMissions(newState, lastId, ctm107Player, ctm107SrcMission);
+            if (lastVm.length === 1) {
+              let lastMC: CharacterInPlay | null = null;
+              for (const m of newState.activeMissions) {
+                const c = m[ctm107Side].find((ch) => ch.instanceId === lastId);
+                if (c) { lastMC = c; break; }
+              }
+              newState = moveCharTo(newState, lastId, lastVm[0], ctm107Player);
+              newState.log = logAction(newState.log, newState.turn, newState.phase, ctm107Player,
+                'EFFECT_MOVE', `Sasuke Uchiwa (107): Moved ${lastN} to mission ${lastVm[0] + 1}.`,
+                'game.log.effect.move', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: lastN, from: ctm107SrcMission, to: lastVm[0] });
+              if (lastMC) {
+                const lastAtDest = newState.activeMissions[lastVm[0]]?.[ctm107Side]?.find((c) => c.instanceId === lastId);
+                if (lastAtDest) {
+                  newState = checkNinjaHoundsTrigger(newState, lastAtDest, lastVm[0], ctm107Player);
+                  newState = checkChoji018PostMoveTrigger(newState, lastAtDest, lastVm[0], ctm107Player, ctm107Player);
+                }
+              }
+              if (ctm107IsUpgrade && (ctm107MovedCount + 1) > 0) {
+                newState = applyUpgradePowerup(newState, ctm107SasukeId, ctm107MovedCount + 1, ctm107Player, ctm107SrcMission);
+              }
+            } else {
+              const eId = generateInstanceId();
+              const aId = generateInstanceId();
+              newState.pendingEffects.push({
+                id: eId, sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId,
+                sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+                effectDescription: JSON.stringify({ charInstanceId: lastId, remainingCharIds: [], movedCount: ctm107MovedCount, isUpgrade: ctm107IsUpgrade, sasukeInstanceId: ctm107SasukeId, sourceMissionIndex: ctm107SrcMission }),
+                targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION', sourcePlayer: ctm107Player,
+                requiresTargetSelection: true, validTargets: lastVm.map(String), isOptional: false, isMandatory: true, resolved: false, isUpgrade: ctm107IsUpgrade,
+              });
+              newState.pendingActions.push({
+                id: aId, type: 'SELECT_TARGET', player: ctm107Player,
+                description: `Sasuke Uchiwa (107): Choose a mission to move ${lastN} to.`,
+                descriptionKey: 'game.effect.desc.sasuke107ChooseDestination', descriptionParams: { target: lastN },
+                options: lastVm.map(String), minSelections: 1, maxSelections: 1, sourceEffectId: eId,
+              });
+            }
+          }
+        }
+        break;
+      }
+
+      // --- Sasuke 107: Auto-moved character (single char, auto destination) — resolve triggers ---
+      case 'SASUKE107_AUTO_MOVED': {
+        const am107Player = pendingEffect.sourcePlayer;
+        const am107Side: 'player1Characters' | 'player2Characters' =
+          am107Player === 'player1' ? 'player1Characters' : 'player2Characters';
+        let am107Data: {
+          movedCharInstanceId?: string;
+          destMissionIndex?: number;
+          movedCount?: number;
+          isUpgrade?: boolean;
+          sasukeInstanceId?: string;
+          sourceMissionIndex?: number;
+          remainingCharIds?: string[];
+        } = {};
+        try { am107Data = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+
+        const am107CharId = am107Data.movedCharInstanceId ?? '';
+        const am107Dest = am107Data.destMissionIndex ?? 0;
+        const am107MovedCount = am107Data.movedCount ?? 0;
+        const am107IsUpgrade = am107Data.isUpgrade ?? false;
+        const am107SasukeId = am107Data.sasukeInstanceId ?? '';
+        const am107SrcMission = am107Data.sourceMissionIndex ?? 0;
+
+        // Call move triggers for the auto-moved character
+        const am107CharAtDest = newState.activeMissions[am107Dest]?.[am107Side]
+          ?.find((c) => c.instanceId === am107CharId);
+        if (am107CharAtDest) {
+          newState = checkNinjaHoundsTrigger(newState, am107CharAtDest, am107Dest, am107Player);
+          newState = checkChoji018PostMoveTrigger(newState, am107CharAtDest, am107Dest, am107Player, am107Player);
+        }
+
+        // Apply UPGRADE POWERUP if this was the last character and upgrade is active
+        if (am107IsUpgrade && am107MovedCount > 0) {
+          newState = applyUpgradePowerup(newState, am107SasukeId, am107MovedCount, am107Player, am107SrcMission);
+        }
+        break;
+      }
+
       // --- Batch 12: KS-123 to KS-132 CONFIRM cases ---
 
       case 'KIMIMARO123_CONFIRM_UPGRADE': {
@@ -9777,7 +10182,9 @@ export class EffectEngine {
         const friendlySide107: 'player1Characters' | 'player2Characters' =
           player107 === 'player1' ? 'player1Characters' : 'player2Characters';
 
-        // Move the character to the chosen mission (with upgrade support)
+        let charMoved107 = false;
+
+        // Move the character to the chosen mission
         if (charId107) {
           // Check Kurenai 035 movement block before moving
           let charSourceMission107 = -1;
@@ -9788,7 +10195,6 @@ export class EffectEngine {
             }
           }
           if (charSourceMission107 >= 0 && isMovementBlockedByKurenai(newState, charSourceMission107, player107)) {
-            // Movement blocked by Kurenai - skip this char, process remaining
             newState.log = logAction(
               newState.log, newState.turn, newState.phase, player107,
               'EFFECT_BLOCKED',
@@ -9796,291 +10202,122 @@ export class EffectEngine {
               'game.log.effect.moveBlocked',
               { card: 'SASUKE UCHIWA', id: 'KS-107-R' },
             );
-            // Fall through to process remaining chars below
           } else {
-          // Find and remove from source mission
-          let movedChar107: CharacterInPlay | null = null;
-          for (let i = 0; i < newState.activeMissions.length; i++) {
-            const chars = newState.activeMissions[i][friendlySide107];
-            const idx = chars.findIndex((c) => c.instanceId === charId107);
-            if (idx !== -1) {
-              movedChar107 = chars[idx];
-              chars.splice(idx, 1);
-              break;
+            // Find char before move for trigger calls
+            let preMovedChar107: CharacterInPlay | null = null;
+            for (const m of newState.activeMissions) {
+              const c = m[friendlySide107].find((ch) => ch.instanceId === charId107);
+              if (c) { preMovedChar107 = c; break; }
             }
-          }
 
-          if (movedChar107) {
-            const movedTopCard107 = movedChar107.stack.length > 0
-              ? movedChar107.stack[movedChar107.stack.length - 1]
-              : movedChar107.card;
-            const movedName107 = movedTopCard107.name_fr.toUpperCase();
-            const destChars107 = newState.activeMissions[destMission107][friendlySide107];
+            newState = moveCharTo(newState, charId107, destMission107, player107);
 
-            // Check for upgrade at destination
-            const upgradeIdx107 = destChars107.findIndex((c) => {
-              if (c.isHidden) return false;
-              const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-              return ct.name_fr.toUpperCase() === movedName107
-                && (movedTopCard107.chakra ?? 0) > (ct.chakra ?? 0);
-            });
-
-            if (upgradeIdx107 !== -1) {
-              // Merge stacks (upgrade at destination)
-              const existing = destChars107[upgradeIdx107];
-              const movedStack = movedChar107.stack.length > 0 ? movedChar107.stack : [movedChar107.card];
-              destChars107[upgradeIdx107] = {
-                ...existing,
-                card: movedTopCard107,
-                stack: [...existing.stack, ...movedStack],
-                powerTokens: existing.powerTokens + movedChar107.powerTokens,
-              };
+            if (preMovedChar107) {
+              const charName107 = preMovedChar107.card.name_fr;
               newState.log = logAction(
                 newState.log, newState.turn, newState.phase, player107,
                 'EFFECT_MOVE',
-                `Sasuke Uchiwa (107): Moved and upgraded ${movedChar107.card.name_fr} on mission ${destMission107 + 1}.`,
+                `Sasuke Uchiwa (107): Moved ${charName107} to mission ${destMission107 + 1}.`,
                 'game.log.effect.move',
-                { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr, from: srcMission107, to: destMission107 },
+                { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName107, from: srcMission107, to: destMission107 },
               );
-            } else {
-              // Check for name conflict that can't be resolved by upgrade
-              const conflictIdx107 = destChars107.findIndex((c) => {
-                if (c.isHidden) return false;
-                const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                return ct.name_fr.toUpperCase() === movedName107;
-              });
 
-              if (conflictIdx107 !== -1) {
-                // Name conflict, can't upgrade -> discard the moved character
-                const owner107 = movedChar107.originalOwner;
-                const ownerState107 = newState[owner107];
-                const cardsToDiscard107 = movedChar107.stack.length > 0 ? [...movedChar107.stack] : [movedChar107.card];
-                ownerState107.discardPile = [...ownerState107.discardPile, ...cardsToDiscard107];
-                ownerState107.charactersInPlay = Math.max(0, ownerState107.charactersInPlay - 1);
-                newState.log = logAction(
-                  newState.log, newState.turn, newState.phase, player107,
-                  'EFFECT_DISCARD',
-                  `Sasuke Uchiwa (107): ${movedChar107.card.name_fr} discarded - name conflict at mission ${destMission107 + 1} (mandatory move).`,
-                  'game.log.effect.sasuke107Discard',
-                  { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr },
-                );
-              } else {
-                // Place as new character
-                movedChar107.missionIndex = destMission107;
-                destChars107.push(movedChar107);
-                newState.log = logAction(
-                  newState.log, newState.turn, newState.phase, player107,
-                  'EFFECT_MOVE',
-                  `Sasuke Uchiwa (107): Moved ${movedChar107.card.name_fr} to mission ${destMission107 + 1}.`,
-                  'game.log.effect.move',
-                  { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: movedChar107.card.name_fr, from: srcMission107, to: destMission107 },
-                );
+              // Call move triggers
+              const charAtDest107 = newState.activeMissions[destMission107]?.[friendlySide107]
+                ?.find((c) => c.instanceId === charId107);
+              if (charAtDest107) {
+                newState = checkNinjaHoundsTrigger(newState, charAtDest107, destMission107, player107);
+                newState = checkChoji018PostMoveTrigger(newState, charAtDest107, destMission107, player107, player107);
               }
-            }
 
-            movedCount107++;
+              movedCount107++;
+              charMoved107 = true;
+            }
           }
-        } // end else (not blocked by Kurenai)
         }
 
-        // Process remaining characters
-        let nextIdx107 = 0;
-        while (nextIdx107 < remaining107.length) {
-          const nextCharId = remaining107[nextIdx107];
-          // Check if char still exists
-          let nextCharExists = false;
-          let nextCharName = '';
+        // Process remaining characters — delegate to CHOOSE_CHAR_TO_MOVE or handle directly
+        const rem107StillMoveable: string[] = [];
+        for (const rid of remaining107) {
+          let exists = false;
           for (const m of newState.activeMissions) {
-            const c = m[friendlySide107].find((ch) => ch.instanceId === nextCharId);
-            if (c) { nextCharExists = true; nextCharName = c.card.name_fr; break; }
+            if (m[friendlySide107].some(c => c.instanceId === rid)) { exists = true; break; }
           }
-          if (!nextCharExists) { nextIdx107++; continue; }
+          if (!exists) continue;
+          const vm = getValidMissions(newState, rid, player107, srcMission107);
+          if (vm.length > 0) rem107StillMoveable.push(rid);
+        }
 
-          // Check Kurenai 035 movement block for this remaining char
-          let nextCharMission107 = -1;
-          for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (newState.activeMissions[i][friendlySide107].some(c => c.instanceId === nextCharId)) {
-              nextCharMission107 = i; break;
+        if (rem107StillMoveable.length === 0) {
+          // All done — apply UPGRADE POWERUP if applicable
+          if (isUpgrade107 && movedCount107 > 0) {
+            newState = applyUpgradePowerup(newState, sasukeId107, movedCount107, player107, srcMission107);
+          }
+        } else if (rem107StillMoveable.length === 1) {
+          // One remaining — create destination choice or auto-move
+          const lastCharId107 = rem107StillMoveable[0];
+          let lastName107 = '';
+          for (const m of newState.activeMissions) {
+            const c = m[friendlySide107].find((ch) => ch.instanceId === lastCharId107);
+            if (c) { lastName107 = c.card.name_fr; break; }
+          }
+          const lastVm107 = getValidMissions(newState, lastCharId107, player107, srcMission107);
+          if (lastVm107.length === 1) {
+            // Auto-move last char
+            let lastPreMoved: CharacterInPlay | null = null;
+            for (const m of newState.activeMissions) {
+              const c = m[friendlySide107].find((ch) => ch.instanceId === lastCharId107);
+              if (c) { lastPreMoved = c; break; }
             }
-          }
-          if (nextCharMission107 >= 0 && isMovementBlockedByKurenai(newState, nextCharMission107, player107)) {
-            // Blocked by Kurenai - skip this char
-            nextIdx107++;
-            continue;
-          }
-
-          // Get valid missions for this char - all non-source missions (mandatory move)
-          const nextValidMissions: string[] = [];
-          for (let i = 0; i < newState.activeMissions.length; i++) {
-            if (i === srcMission107) continue;
-            nextValidMissions.push(String(i));
-          }
-
-          if (nextValidMissions.length === 0) {
-            // No other missions exist - mandatory move means discard
-            let discardedNextChar: CharacterInPlay | null = null;
-            for (let i = 0; i < newState.activeMissions.length; i++) {
-              const chars = newState.activeMissions[i][friendlySide107];
-              const cIdx = chars.findIndex((c) => c.instanceId === nextCharId);
-              if (cIdx !== -1) {
-                discardedNextChar = chars[cIdx];
-                chars.splice(cIdx, 1);
-                break;
+            newState = moveCharTo(newState, lastCharId107, lastVm107[0], player107);
+            newState.log = logAction(newState.log, newState.turn, newState.phase, player107,
+              'EFFECT_MOVE', `Sasuke Uchiwa (107): Moved ${lastName107} to mission ${lastVm107[0] + 1}.`,
+              'game.log.effect.move', { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: lastName107, from: srcMission107, to: lastVm107[0] });
+            if (lastPreMoved) {
+              const lastAtDest = newState.activeMissions[lastVm107[0]]?.[friendlySide107]?.find((c) => c.instanceId === lastCharId107);
+              if (lastAtDest) {
+                newState = checkNinjaHoundsTrigger(newState, lastAtDest, lastVm107[0], player107);
+                newState = checkChoji018PostMoveTrigger(newState, lastAtDest, lastVm107[0], player107, player107);
               }
             }
-            if (discardedNextChar) {
-              const discOwner = discardedNextChar.originalOwner;
-              const discOwnerState = newState[discOwner];
-              const discCards = discardedNextChar.stack.length > 0 ? [...discardedNextChar.stack] : [discardedNextChar.card];
-              discOwnerState.discardPile = [...discOwnerState.discardPile, ...discCards];
-              discOwnerState.charactersInPlay = Math.max(0, discOwnerState.charactersInPlay - 1);
-              movedCount107++;
+            if (isUpgrade107 && (movedCount107 + 1) > 0) {
+              newState = applyUpgradePowerup(newState, sasukeId107, movedCount107 + 1, player107, srcMission107);
             }
-            newState.log = logAction(
-              newState.log, newState.turn, newState.phase, player107,
-              'EFFECT_DISCARD',
-              `Sasuke Uchiwa (107): ${nextCharName} discarded - no valid destination mission (mandatory move).`,
-              'game.log.effect.sasuke107Discard',
-              { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName },
-            );
-            nextIdx107++;
-            continue;
+          } else {
+            // Multiple destinations — create CHOOSE_DESTINATION pending
+            const eId107 = generateInstanceId();
+            const aId107 = generateInstanceId();
+            newState.pendingEffects.push({
+              id: eId107, sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+              effectDescription: JSON.stringify({ charInstanceId: lastCharId107, remainingCharIds: [], movedCount: movedCount107, isUpgrade: isUpgrade107, sasukeInstanceId: sasukeId107, sourceMissionIndex: srcMission107 }),
+              targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION', sourcePlayer: player107,
+              requiresTargetSelection: true, validTargets: lastVm107.map(String), isOptional: false, isMandatory: true, resolved: false, isUpgrade: isUpgrade107,
+            });
+            newState.pendingActions.push({
+              id: aId107, type: 'SELECT_TARGET', player: player107,
+              description: `Sasuke Uchiwa (107): Choose a mission to move ${lastName107} to.`,
+              descriptionKey: 'game.effect.desc.sasuke107ChooseDestination', descriptionParams: { target: lastName107 },
+              options: lastVm107.map(String), minSelections: 1, maxSelections: 1, sourceEffectId: eId107,
+            });
           }
-
-          if (nextValidMissions.length === 1) {
-            // Auto-move
-            const autoDestIdx = parseInt(nextValidMissions[0], 10);
-            let autoMovedChar: CharacterInPlay | null = null;
-            for (let i = 0; i < newState.activeMissions.length; i++) {
-              const chars = newState.activeMissions[i][friendlySide107];
-              const cIdx = chars.findIndex((c) => c.instanceId === nextCharId);
-              if (cIdx !== -1) {
-                autoMovedChar = chars[cIdx];
-                chars.splice(cIdx, 1);
-                break;
-              }
-            }
-            if (autoMovedChar) {
-              const autoTopCard = autoMovedChar.stack.length > 0
-                ? autoMovedChar.stack[autoMovedChar.stack.length - 1] : autoMovedChar.card;
-              const autoName = autoTopCard.name_fr.toUpperCase();
-              const autoDestChars = newState.activeMissions[autoDestIdx][friendlySide107];
-              const autoUpIdx = autoDestChars.findIndex((c) => {
-                if (c.isHidden) return false;
-                const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                return ct.name_fr.toUpperCase() === autoName && (autoTopCard.chakra ?? 0) > (ct.chakra ?? 0);
-              });
-              if (autoUpIdx !== -1) {
-                const existing = autoDestChars[autoUpIdx];
-                const movedStack = autoMovedChar.stack.length > 0 ? autoMovedChar.stack : [autoMovedChar.card];
-                autoDestChars[autoUpIdx] = {
-                  ...existing,
-                  card: autoTopCard,
-                  stack: [...existing.stack, ...movedStack],
-                  powerTokens: existing.powerTokens + autoMovedChar.powerTokens,
-                };
-              } else {
-                // Check for name conflict that can't be resolved by upgrade
-                const autoConflictIdx = autoDestChars.findIndex((c) => {
-                  if (c.isHidden) return false;
-                  const ct = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-                  return ct.name_fr.toUpperCase() === autoName;
-                });
-                if (autoConflictIdx !== -1) {
-                  // Name conflict, can't upgrade -> discard
-                  const discOwner = autoMovedChar.originalOwner;
-                  const discOwnerState = newState[discOwner];
-                  const discCards = autoMovedChar.stack.length > 0 ? [...autoMovedChar.stack] : [autoMovedChar.card];
-                  discOwnerState.discardPile = [...discOwnerState.discardPile, ...discCards];
-                  discOwnerState.charactersInPlay = Math.max(0, discOwnerState.charactersInPlay - 1);
-                  newState.log = logAction(
-                    newState.log, newState.turn, newState.phase, player107,
-                    'EFFECT_DISCARD',
-                    `Sasuke Uchiwa (107): ${nextCharName} discarded - name conflict at mission ${autoDestIdx + 1} (mandatory move).`,
-                    'game.log.effect.sasuke107Discard',
-                    { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName },
-                  );
-                } else {
-                  autoMovedChar.missionIndex = autoDestIdx;
-                  autoDestChars.push(autoMovedChar);
-                  newState.log = logAction(
-                    newState.log, newState.turn, newState.phase, player107,
-                    'EFFECT_MOVE',
-                    `Sasuke Uchiwa (107): Moved ${nextCharName} to mission ${autoDestIdx + 1}.`,
-                    'game.log.effect.move',
-                    { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: nextCharName, from: srcMission107, to: autoDestIdx },
-                  );
-                }
-              }
-              movedCount107++;
-            }
-            nextIdx107++;
-            continue;
-          }
-
-          // Multiple valid missions â€' create new pending for player choice
-          const nextEffectId = generateInstanceId();
-          const nextActionId = generateInstanceId();
+        } else {
+          // 2+ remaining — create CHOOSE_CHAR_TO_MOVE pending
+          const nextEId107 = generateInstanceId();
+          const nextAId107 = generateInstanceId();
           newState.pendingEffects.push({
-            id: nextEffectId,
-            sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex,
-            effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({
-              charInstanceId: nextCharId,
-              remainingCharIds: remaining107.slice(nextIdx107 + 1),
-              movedCount: movedCount107,
-              isUpgrade: isUpgrade107,
-              sasukeInstanceId: sasukeId107,
-              sourceMissionIndex: srcMission107,
-            }),
-            targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION',
-            sourcePlayer: player107,
-            requiresTargetSelection: true,
-            validTargets: nextValidMissions,
-            isOptional: false,
-            isMandatory: true,
-            resolved: false,
-            isUpgrade: isUpgrade107,
+            id: nextEId107, sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
+            effectDescription: JSON.stringify({ remainingCharIds: rem107StillMoveable, movedCount: movedCount107, isUpgrade: isUpgrade107, sasukeInstanceId: sasukeId107, sourceMissionIndex: srcMission107 }),
+            targetSelectionType: 'SASUKE107_CHOOSE_CHAR_TO_MOVE', sourcePlayer: player107,
+            requiresTargetSelection: true, validTargets: rem107StillMoveable, isOptional: false, isMandatory: true, resolved: false, isUpgrade: isUpgrade107,
           });
           newState.pendingActions.push({
-            id: nextActionId,
-            type: 'SELECT_TARGET',
-            player: player107,
-            description: `Sasuke Uchiwa (107): Choose a mission to move ${nextCharName} to.`,
-            descriptionKey: 'game.effect.desc.sasuke107ChooseDestination',
-            descriptionParams: { target: nextCharName },
-            options: nextValidMissions,
-            minSelections: 1,
-            maxSelections: 1,
-            sourceEffectId: nextEffectId,
+            id: nextAId107, type: 'SELECT_TARGET', player: player107,
+            description: 'Sasuke Uchiwa (107): Choose which character to move next.',
+            descriptionKey: 'game.effect.desc.sasuke107ChooseCharToMove',
+            options: rem107StillMoveable, minSelections: 1, maxSelections: 1, sourceEffectId: nextEId107,
           });
-          break; // Stop processing â€' wait for player choice
-        }
-
-        // If we got through all remaining chars (or there were none left), apply POWERUP
-        if (nextIdx107 >= remaining107.length && isUpgrade107 && movedCount107 > 0 && sasukeId107) {
-          // Find Sasuke in source mission and add power tokens
-          const sasukeMissions = newState.activeMissions;
-          for (let i = 0; i < sasukeMissions.length; i++) {
-            const chars = sasukeMissions[i][friendlySide107];
-            const sIdx = chars.findIndex((c) => c.instanceId === sasukeId107);
-            if (sIdx !== -1) {
-              chars[sIdx] = {
-                ...chars[sIdx],
-                powerTokens: chars[sIdx].powerTokens + movedCount107,
-              };
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, player107,
-                'EFFECT_POWERUP',
-                `Sasuke Uchiwa (107) UPGRADE: POWERUP ${movedCount107} (characters moved).`,
-                'game.log.effect.powerupSelf',
-                { card: 'SASUKE UCHIWA', id: 'KS-107-R', amount: movedCount107 },
-              );
-              break;
-            }
-          }
         }
         break;
       }
@@ -15558,9 +15795,8 @@ export class EffectEngine {
       return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
     });
 
-    // If upgrade AND fresh play are both possible, let the player choose
-    if (existingIdx >= 0 && !hasNameConflict) {
-      // Find ALL affordable upgrade targets (there could be multiple)
+    // Find ALL affordable upgrade targets (same-name + flex, filtering out name-conflicting flex targets)
+    if (existingIdx >= 0) {
       const upgradeTargetIds: string[] = [];
       for (let i = 0; i < mission[friendlySide].length; i++) {
         const c = mission[friendlySide][i];
@@ -15569,41 +15805,58 @@ export class EffectEngine {
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
+          // For flex upgrades, skip targets that would create a post-upgrade name conflict
+          if (isFlex) {
+            const wouldConflict = mission[friendlySide].some((other: CharacterInPlay) => {
+              if (other.instanceId === c.instanceId || other.isHidden) return false;
+              const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+              return oTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+            });
+            if (wouldConflict) continue;
+          }
           // Only include if the upgrade is affordable
           const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - costReduction);
           if (ps.chakra >= upgCost) upgradeTargetIds.push(c.instanceId);
         }
       }
 
-      // If there are affordable upgrade targets, offer the choice
       if (upgradeTargetIds.length > 0) {
-        // Push card back to discard (will be re-popped when choice is resolved)
-        ps.discardPile.push(card);
+        const canFreshPlay = !hasNameConflict;
+        const validTargets = canFreshPlay ? ['FRESH', ...upgradeTargetIds] : [...upgradeTargetIds];
 
-        // Create pending effect for the choice
-        const effectId = `generic-upgrade-choice-${generateInstanceId()}`;
-        state.pendingEffects = [...state.pendingEffects, {
-          id: effectId,
-          sourceCardId: cardId,
-          sourceInstanceId: '',
-          sourceMissionIndex: missionIndex,
-          effectType: 'MAIN' as EffectType,
-          effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
-          targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
-          sourcePlayer: player,
-          requiresTargetSelection: true,
-          validTargets: ['FRESH', ...upgradeTargetIds],
-          isOptional: false,
-          isMandatory: true,
-          resolved: false,
-          isUpgrade: false,
-          description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
-          descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
-          descriptionParams: { card: card.name_fr },
-        } as PendingEffect];
-        return state;
+        // If there's only one option total (single upgrade, no fresh play), auto-upgrade (fall through)
+        if (validTargets.length === 1 && !canFreshPlay) {
+          // Single upgrade target with name conflict — fall through to auto-upgrade below
+        } else {
+          // Multiple options — offer choice to player
+          ps.discardPile.push(card);
+
+          const effectId = `generic-upgrade-choice-${generateInstanceId()}`;
+          state.pendingEffects = [...state.pendingEffects, {
+            id: effectId,
+            sourceCardId: cardId,
+            sourceInstanceId: '',
+            sourceMissionIndex: missionIndex,
+            effectType: 'MAIN' as EffectType,
+            effectDescription: JSON.stringify({ cardName, cardId, costReduction, missionIndex }),
+            targetSelectionType: 'EFFECT_PLAY_UPGRADE_OR_FRESH',
+            sourcePlayer: player,
+            requiresTargetSelection: true,
+            validTargets,
+            isOptional: false,
+            isMandatory: true,
+            resolved: false,
+            isUpgrade: false,
+            description: canFreshPlay
+              ? `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`
+              : `Choose which character to upgrade ${card.name_fr} over.`,
+            descriptionKey: canFreshPlay ? 'game.effect.desc.effectPlayUpgradeChoice' : 'game.effect.desc.effectUpgradeChoice',
+            descriptionParams: { card: card.name_fr },
+          } as PendingEffect];
+          return state;
+        }
       }
-      // No affordable upgrades — fall through to fresh play
+      // No affordable upgrades (or single forced upgrade) — fall through
     }
 
     let placedChar: CharacterInPlay;
@@ -15725,6 +15978,18 @@ export class EffectEngine {
       if (existingIdx === -1) { ps.discardPile.push(card); return state; }
       const existing = mission[friendlySide][existingIdx];
       const eTop = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+
+      // Safety: check post-upgrade name conflict for flex upgrades
+      const isSameNameUpgrade = eTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      if (!isSameNameUpgrade) {
+        const wouldConflict = mission[friendlySide].some((c: CharacterInPlay) => {
+          if (c.instanceId === upgradeTargetId || c.isHidden) return false;
+          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+        });
+        if (wouldConflict) { ps.discardPile.push(card); return state; }
+      }
+
       const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTop.chakra ?? 0)) - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
@@ -15741,7 +16006,14 @@ export class EffectEngine {
         'EFFECT_UPGRADE', `${cardName} (${cardId}): Upgraded ${card.name_fr} on mission ${missionIndex + 1} for ${actualCost} chakra.`,
         'game.log.effect.upgradeFromHand', { card: cardName, id: cardId, target: card.name_fr, mission: String(missionIndex + 1), cost: String(actualCost) });
     } else {
-      // Fresh play
+      // Fresh play — verify no name conflict
+      const hasNameConflictFresh = mission[friendlySide].some((c: CharacterInPlay) => {
+        if (c.isHidden) return false;
+        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
+      });
+      if (hasNameConflictFresh) { ps.discardPile.push(card); return state; }
+
       const actualCost = Math.max(0, (card.chakra ?? 0) - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;

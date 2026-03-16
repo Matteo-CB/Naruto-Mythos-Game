@@ -760,8 +760,8 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
           sourcePlayer: player,
           requiresTargetSelection: true,
           validTargets,
-          isOptional: true,
-          isMandatory: false,
+          isOptional: false,
+          isMandatory: true,
           resolved: false,
           isUpgrade: false,
         }];
@@ -769,14 +769,14 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
           id: actionId,
           type: 'SELECT_TARGET' as const,
           player,
-          description: `Giant Spider (103): You may hide a character with Power ≤ ${powerThreshold}. If you do, Giant Spider must return to your hand.`,
+          description: `Giant Spider (103): Hide a character with Power ≤ ${powerThreshold}. Then, Giant Spider returns to your hand.`,
           descriptionKey: 'game.effect.desc.giantSpider103EndHide',
           options: validTargets,
           minSelections: 1,
           maxSelections: 1,
           sourceEffectId: effectId,
         }];
-        // Return immediately - wait for player to choose (or decline)
+        // Return immediately - wait for player to choose target
         return newState;
       }
     }

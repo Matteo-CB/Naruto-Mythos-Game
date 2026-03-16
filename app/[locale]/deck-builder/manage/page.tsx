@@ -28,6 +28,7 @@ export default function ManageDecksPage() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [exportingId, setExportingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const fetchDecks = useCallback(async () => {
     try {
@@ -110,6 +111,20 @@ export default function ManageDecksPage() {
     } finally {
       setExportingId(null);
     }
+  };
+
+  const handleExportText = (deck: DeckItem) => {
+    const counts = new Map<string, number>();
+    for (const id of deck.cardIds) counts.set(id, (counts.get(id) || 0) + 1);
+    for (const id of deck.missionIds) counts.set(id, (counts.get(id) || 0) + 1);
+    const parts: string[] = [];
+    for (const [id, qty] of counts) parts.push(`${id}--${qty}`);
+    parts.push((deck.name || 'Deck').replace(/\s+/g, '_'));
+    const code = parts.join('|');
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedId(deck.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
   };
 
   const moveUp = (index: number) => {
@@ -333,7 +348,13 @@ export default function ManageDecksPage() {
                               disabled={exportingId === deck.id}
                               className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors disabled:opacity-40"
                             >
-                              {exportingId === deck.id ? '...' : t('deckBuilder.exportImage')}
+                              {exportingId === deck.id ? '...' : t('deckBuilder.exportAsImage')}
+                            </button>
+                            <button
+                              onClick={() => handleExportText(deck)}
+                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
+                            >
+                              {copiedId === deck.id ? t('deckBuilder.exportCopied') : t('deckBuilder.exportAsText')}
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(deck.id)}
