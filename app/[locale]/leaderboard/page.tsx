@@ -184,6 +184,18 @@ export default function LeaderboardPage() {
                 </button>
               );
             })}
+            <div className="w-px h-4 shrink-0" style={{ backgroundColor: '#262626' }} />
+            <button
+              onClick={() => setLeagueFilter(leagueFilter === 'unranked' ? '' : 'unranked')}
+              className="shrink-0 px-2 py-1 text-[9px] uppercase font-bold cursor-pointer"
+              style={{
+                backgroundColor: leagueFilter === 'unranked' ? 'rgba(102,102,102,0.15)' : 'transparent',
+                border: `1px solid ${leagueFilter === 'unranked' ? '#666' : '#262626'}`,
+                color: leagueFilter === 'unranked' ? '#999' : '#444',
+              }}
+            >
+              {tp('rankNames.unranked')}
+            </button>
           </div>
         )}
 
