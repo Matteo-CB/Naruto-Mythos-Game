@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { LEAGUE_TIERS } from '@/lib/tournament/leagueUtils';
 
+const PLACEMENT_MATCHES = 5;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,8 +19,14 @@ export async function GET(request: NextRequest) {
       conditions.push({ username: { contains: search, mode: 'insensitive' as const } });
     }
 
-    // League filter: find the tier's ELO range
-    if (league) {
+    // League filter
+    if (league === 'unranked') {
+      // Unranked = fewer than PLACEMENT_MATCHES total games
+      // MongoDB doesn't support computed fields in where, so we use a raw approach:
+      // wins + losses + draws < PLACEMENT_MATCHES
+      // Prisma MongoDB doesn't support OR on aggregated fields easily,
+      // so we fetch with a generous limit and filter in JS
+    } else if (league) {
       const tierIdx = LEAGUE_TIERS.findIndex((t) => t.key === league);
       if (tierIdx >= 0) {
         const tier = LEAGUE_TIERS[tierIdx];
@@ -33,7 +41,10 @@ export async function GET(request: NextRequest) {
       ? conditions.length === 1 ? conditions[0] : { AND: conditions }
       : {};
 
-    const users = await prisma.user.findMany({
+    const fetchLimit = league ? 500 : limit;
+    const fetchSkip = league ? 0 : offset;
+
+    let users = await prisma.user.findMany({
       where,
       select: {
         id: true,
@@ -46,11 +57,24 @@ export async function GET(request: NextRequest) {
         badgePrefs: true,
       },
       orderBy: { elo: 'desc' },
-      take: limit,
-      skip: offset,
+      take: fetchLimit,
+      skip: fetchSkip,
     });
 
-    const total = await prisma.user.count({ where });
+    // Post-filter: exclude unranked from league filters, or only show unranked
+    if (league === 'unranked') {
+      users = users.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
+    } else if (league) {
+      // Exclude unranked players from league results
+      users = users.filter((u) => u.wins + u.losses + u.draws >= PLACEMENT_MATCHES);
+    }
+
+    const total = league ? users.length : await prisma.user.count({ where });
+
+    // Apply pagination for league-filtered results (post-filter pagination)
+    if (league) {
+      users = users.slice(offset, offset + limit);
+    }
 
     return NextResponse.json({ users, total, limit, offset });
   } catch {
