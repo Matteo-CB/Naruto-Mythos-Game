@@ -5,6 +5,7 @@ import { registerUserSocket, removeSocketFromAll } from '@/lib/socket/io';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 import { registerTournamentHandlers, handleTournamentMatchEnd } from '@/lib/socket/tournamentHandlers';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
@@ -222,6 +223,12 @@ async function finalizeGameEnd(
         // Sync Discord roles (fire-and-forget)
         syncDiscordRole(room.hostId).catch(() => {});
         syncDiscordRole(room.guestId!).catch(() => {});
+
+        // Rank-up webhook notifications (fire-and-forget)
+        const p1OldTotal = player1.wins + player1.losses + player1.draws;
+        const p2OldTotal = player2.wins + player2.losses + player2.draws;
+        sendRankUpNotification(player1.username, player1.elo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
+        sendRankUpNotification(player2.username, player2.elo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
       }
     }
 

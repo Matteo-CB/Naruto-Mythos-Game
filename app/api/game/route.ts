@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { calculateEloChanges } from '@/lib/elo/elo';
 import { syncDiscordRole } from '@/lib/discord/roleSync';
+import { sendRankUpNotification } from '@/lib/discord/rankUpWebhook';
 
 export async function POST(request: NextRequest) {
   try {
@@ -114,6 +115,12 @@ export async function PUT(request: NextRequest) {
         // Sync Discord roles (fire-and-forget)
         syncDiscordRole(game.player1Id).catch(() => {});
         syncDiscordRole(game.player2Id).catch(() => {});
+
+        // Rank-up webhook notifications (fire-and-forget)
+        const p1OldTotal = player1.wins + player1.losses + player1.draws;
+        const p2OldTotal = player2.wins + player2.losses + player2.draws;
+        sendRankUpNotification(player1.username, player1.elo, eloChanges.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
+        sendRankUpNotification(player2.username, player2.elo, eloChanges.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
       }
     }
 
