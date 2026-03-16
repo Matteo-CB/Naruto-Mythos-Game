@@ -13,7 +13,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-type Tab = 'settings' | 'cards' | 'backgrounds';
+type Tab = 'settings' | 'cards' | 'backgrounds' | 'players';
 
 interface ActionResult {
   success: boolean;
@@ -55,6 +55,24 @@ export default function AdminPage() {
   const [bgFile, setBgFile] = useState<File | null>(null);
   const [bgConfirmDeleteId, setBgConfirmDeleteId] = useState<string | null>(null);
 
+  // ---- Players state ----
+  const [playerSearch, setPlayerSearch] = useState('');
+  const [players, setPlayers] = useState<Array<{ id: string; username: string; elo: number; wins: number; losses: number; draws: number; role: string; discordUsername: string | null }>>([]);
+  const [playersLoading, setPlayersLoading] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerGames, setPlayerGames] = useState<Array<{
+    id: string; player1: { id: string; username: string } | null; player2: { id: string; username: string } | null;
+    isAiGame: boolean; aiDifficulty: string | null; winnerId: string | null;
+    player1Score: number; player2Score: number; eloChange: number | null;
+    status: string; completedAt: string | null; createdAt: string;
+  }>>([]);
+  const [gamesLoading, setGamesLoading] = useState(false);
+  const [playerActionLoading, setPlayerActionLoading] = useState(false);
+  const [confirmResetId, setConfirmResetId] = useState<string | null>(null);
+  const [confirmDeleteGameId, setConfirmDeleteGameId] = useState<string | null>(null);
+  const [eloEditId, setEloEditId] = useState<string | null>(null);
+  const [eloEditValue, setEloEditValue] = useState('');
+
   const isAdmin = session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
 
   const allCards = useMemo(() => {
@@ -80,6 +98,69 @@ export default function AdminPage() {
     } catch { /* ignore */ } finally {
       setBgLoading(false);
     }
+  };
+
+  const fetchPlayers = async (search: string) => {
+    setPlayersLoading(true);
+    try {
+      const res = await fetch(`/api/admin/players?search=${encodeURIComponent(search)}`);
+      const data = await res.json();
+      if (res.ok) setPlayers(data.users ?? []);
+    } catch { /* ignore */ } finally { setPlayersLoading(false); }
+  };
+
+  const fetchPlayerGames = async (userId: string) => {
+    setGamesLoading(true);
+    try {
+      const res = await fetch(`/api/admin/games?userId=${userId}`);
+      const data = await res.json();
+      if (res.ok) setPlayerGames(data.games ?? []);
+    } catch { /* ignore */ } finally { setGamesLoading(false); }
+  };
+
+  const handleResetPlayer = async (userId: string) => {
+    setPlayerActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset-player', userId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        addResult({ success: true, message: `Player reset. ${data.gamesDeleted} games deleted.` });
+        fetchPlayers(playerSearch);
+        if (selectedPlayerId === userId) { setPlayerGames([]); }
+      }
+    } catch { /* ignore */ } finally { setPlayerActionLoading(false); setConfirmResetId(null); }
+  };
+
+  const handleSetElo = async (userId: string, elo: number) => {
+    setPlayerActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/players', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set-elo', userId, elo }),
+      });
+      if (res.ok) {
+        addResult({ success: true, message: `ELO set to ${elo}.` });
+        fetchPlayers(playerSearch);
+      }
+    } catch { /* ignore */ } finally { setPlayerActionLoading(false); setEloEditId(null); }
+  };
+
+  const handleDeleteGame = async (gameId: string) => {
+    setPlayerActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/games?id=${gameId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        addResult({ success: true, message: `Game deleted.${data.eloRestored ? ' ELO restored.' : ''}` });
+        if (selectedPlayerId) fetchPlayerGames(selectedPlayerId);
+        fetchPlayers(playerSearch);
+      }
+    } catch { /* ignore */ } finally { setPlayerActionLoading(false); setConfirmDeleteGameId(null); }
   };
 
   const handleBgUpload = async () => {
@@ -314,6 +395,7 @@ export default function AdminPage() {
     { key: 'settings', label: t('tabSettings') },
     { key: 'cards', label: t('tabCards') },
     { key: 'backgrounds', label: t('tabBackgrounds') },
+    { key: 'players', label: 'Players' },
   ];
 
   return (
@@ -572,6 +654,185 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ============ PLAYERS TAB ============ */}
+        {tab === 'players' && (
+          <div className="max-w-4xl">
+            {/* Search */}
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={playerSearch}
+                onChange={(e) => setPlayerSearch(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') fetchPlayers(playerSearch); }}
+                placeholder="Search by username..."
+                className="flex-1 px-3 py-2 text-sm"
+                style={{ backgroundColor: '#111', border: '1px solid #262626', color: '#e0e0e0', outline: 'none' }}
+              />
+              <button
+                onClick={() => fetchPlayers(playerSearch)}
+                disabled={playersLoading}
+                className="px-4 py-2 text-xs font-bold uppercase cursor-pointer"
+                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+              >
+                {playersLoading ? '...' : 'Search'}
+              </button>
+            </div>
+
+            {/* Player list */}
+            {players.length > 0 && (
+              <div className="flex flex-col gap-1.5 mb-6">
+                {players.map((p) => (
+                  <div
+                    key={p.id}
+                    className="rounded-lg px-4 py-3 flex flex-wrap items-center gap-3"
+                    style={{
+                      backgroundColor: selectedPlayerId === p.id ? '#1a1a0e' : '#111',
+                      border: `1px solid ${selectedPlayerId === p.id ? '#c4a35a44' : '#1e1e1e'}`,
+                    }}
+                  >
+                    <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>{p.username}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a1a', color: '#888' }}>{p.role}</span>
+
+                    {/* ELO - click to edit */}
+                    {eloEditId === p.id ? (
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={eloEditValue}
+                          onChange={(e) => setEloEditValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { const v = parseInt(eloEditValue); if (!isNaN(v)) handleSetElo(p.id, v); }
+                            if (e.key === 'Escape') setEloEditId(null);
+                          }}
+                          autoFocus
+                          className="w-16 px-1 py-0.5 text-xs text-center"
+                          style={{ backgroundColor: '#0a0a0a', border: '1px solid #c4a35a', color: '#e0e0e0', outline: 'none' }}
+                        />
+                        <button onClick={() => { const v = parseInt(eloEditValue); if (!isNaN(v)) handleSetElo(p.id, v); }}
+                          className="text-[10px] px-1.5 py-0.5" style={{ backgroundColor: '#1a2a1a', color: '#3e8b3e', border: '1px solid #3e8b3e44' }}>OK</button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => { setEloEditId(p.id); setEloEditValue(String(p.elo)); }}
+                        className="text-xs font-bold tabular-nums cursor-pointer"
+                        style={{ color: '#c4a35a' }}
+                        title="Click to edit ELO"
+                      >
+                        ELO {p.elo}
+                      </button>
+                    )}
+
+                    <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{p.wins}W {p.losses}L {p.draws}D</span>
+                    {p.discordUsername && <span className="text-[10px]" style={{ color: '#5865F2' }}>{p.discordUsername}</span>}
+
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <button
+                        onClick={() => { setSelectedPlayerId(p.id); fetchPlayerGames(p.id); }}
+                        className="px-2 py-1 text-[10px] cursor-pointer"
+                        style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
+                      >
+                        Games
+                      </button>
+
+                      {confirmResetId === p.id ? (
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px]" style={{ color: '#b33e3e' }}>Reset all?</span>
+                          <button onClick={() => handleResetPlayer(p.id)} disabled={playerActionLoading}
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>Yes</button>
+                          <button onClick={() => setConfirmResetId(null)}
+                            className="px-2 py-0.5 text-[10px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>No</button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmResetId(p.id)}
+                          className="px-2 py-1 text-[10px] cursor-pointer"
+                          style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e33', color: '#b33e3e' }}
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Selected player's games */}
+            {selectedPlayerId && (
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
+                    Match History
+                  </h3>
+                  <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
+                  <button onClick={() => { setSelectedPlayerId(null); setPlayerGames([]); }}
+                    className="text-[10px] px-2 py-0.5" style={{ color: '#888', border: '1px solid #262626' }}>Close</button>
+                </div>
+
+                {gamesLoading ? (
+                  <p className="text-xs py-4" style={{ color: '#555' }}>Loading...</p>
+                ) : playerGames.length === 0 ? (
+                  <p className="text-xs py-4" style={{ color: '#555' }}>No games found.</p>
+                ) : (
+                  <div className="flex flex-col gap-1">
+                    {playerGames.map((game) => {
+                      const isP1 = game.player1?.id === selectedPlayerId;
+                      const won = game.winnerId === selectedPlayerId;
+                      const opponent = game.isAiGame
+                        ? `AI (${game.aiDifficulty})`
+                        : isP1
+                          ? game.player2?.username || '?'
+                          : game.player1?.username || '?';
+                      const myScore = isP1 ? game.player1Score : game.player2Score;
+                      const oppScore = isP1 ? game.player2Score : game.player1Score;
+                      const eloVal = game.eloChange !== null ? (isP1 ? game.eloChange : -game.eloChange) : null;
+                      const resultColor = won ? '#3e8b3e' : '#b33e3e';
+
+                      return (
+                        <div
+                          key={game.id}
+                          className="rounded flex items-center gap-2 px-3 py-2"
+                          style={{ backgroundColor: '#111', borderLeft: `2px solid ${resultColor}` }}
+                        >
+                          <span className="text-[10px] font-bold w-4 shrink-0" style={{ color: resultColor }}>{won ? 'W' : 'L'}</span>
+                          <span className="text-xs truncate flex-1" style={{ color: '#ccc' }}>{opponent}</span>
+                          <span className="text-[10px] tabular-nums" style={{ color: '#888' }}>{myScore}-{oppScore}</span>
+                          {eloVal !== null && eloVal !== 0 && (
+                            <span className="text-[10px] tabular-nums w-8 text-right" style={{ color: eloVal > 0 ? '#3e8b3e' : '#b33e3e' }}>
+                              {eloVal > 0 ? '+' : ''}{eloVal}
+                            </span>
+                          )}
+                          <span className="text-[9px] shrink-0" style={{ color: '#444' }}>
+                            {game.completedAt ? new Date(game.completedAt).toLocaleDateString() : ''}
+                          </span>
+
+                          {confirmDeleteGameId === game.id ? (
+                            <div className="flex items-center gap-1 shrink-0">
+                              <span className="text-[9px]" style={{ color: '#b33e3e' }}>Delete + restore ELO?</span>
+                              <button onClick={() => handleDeleteGame(game.id)} disabled={playerActionLoading}
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#2a1a1a', color: '#b33e3e', border: '1px solid #b33e3e44' }}>Yes</button>
+                              <button onClick={() => setConfirmDeleteGameId(null)}
+                                className="px-1.5 py-0.5 text-[9px]" style={{ backgroundColor: '#141414', color: '#888', border: '1px solid #262626' }}>No</button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDeleteGameId(game.id)}
+                              className="px-2 py-0.5 text-[9px] shrink-0 cursor-pointer"
+                              style={{ backgroundColor: '#1a1414', border: '1px solid #b33e3e22', color: '#b33e3e' }}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
