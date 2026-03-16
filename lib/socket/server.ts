@@ -227,8 +227,8 @@ async function finalizeGameEnd(
         // Rank-up webhook notifications (fire-and-forget)
         const p1OldTotal = player1.wins + player1.losses + player1.draws;
         const p2OldTotal = player2.wins + player2.losses + player2.draws;
-        sendRankUpNotification(player1.username, player1.elo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
-        sendRankUpNotification(player2.username, player2.elo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
+        sendRankUpNotification(player1.username, player1.discordId, player1.elo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
+        sendRankUpNotification(player2.username, player2.discordId, player2.elo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
       }
     }
 

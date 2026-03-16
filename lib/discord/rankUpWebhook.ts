@@ -1,8 +1,8 @@
 /**
  * Discord webhook notification for rank-up events.
  *
- * Sends a rich embed to a Discord channel when a player reaches a new league tier
- * (including going from unranked to their first league).
+ * Sends a message + rich embed to a Discord channel when a player reaches a new league tier.
+ * Tags the player with @mention if they have linked Discord, otherwise uses **bold** username.
  */
 
 import { getRoleForElo, getRankLabel } from './roles';
@@ -11,7 +11,6 @@ const PLACEMENT_MATCHES_REQUIRED = 5;
 
 const WEBHOOK_URL = process.env.DISCORD_RANKUP_WEBHOOK_URL;
 
-// Tier color map for embeds (Discord uses decimal color integers)
 const TIER_COLORS: Record<string, number> = {
   'Academy Student': 0x888888,
   'Genin': 0x3E8B3E,
@@ -23,7 +22,6 @@ const TIER_COLORS: Record<string, number> = {
   'Sage of Six Paths': 0xFFD700,
 };
 
-// Tier symbols for visual flair
 const TIER_SYMBOLS: Record<string, string> = {
   'Academy Student': '\u2022',
   'Genin': '\u25C6',
@@ -36,10 +34,18 @@ const TIER_SYMBOLS: Record<string, string> = {
 };
 
 /**
- * Detect rank-up and send a Discord webhook notification if the player moved to a higher tier.
+ * Detect rank-up and send a Discord webhook notification.
+ *
+ * @param username - Player display name
+ * @param discordId - Discord user ID (null if not linked)
+ * @param oldElo - ELO before game
+ * @param newElo - ELO after game
+ * @param oldTotalGames - Games before
+ * @param newTotalGames - Games after
  */
 export async function sendRankUpNotification(
   username: string,
+  discordId: string | null,
   oldElo: number,
   newElo: number,
   oldTotalGames: number,
@@ -55,34 +61,24 @@ export async function sendRankUpNotification(
     const newRole = getRoleForElo(newElo);
     const oldRank = getRankLabel(oldElo);
     const newRank = getRankLabel(newElo);
-    const symbol = TIER_SYMBOLS[newRank] ?? '';
 
-    // Case 1: Player just became ranked (placement completed)
+    // Case 1: placement completed
     if (wasUnranked && isNowRanked) {
       await sendWebhook({
-        username,
-        oldRank: null,
-        newRank,
-        newElo,
-        symbol,
+        username, discordId, oldRank: null, newRank, newElo,
         color: TIER_COLORS[newRank] ?? 0x888888,
         isFirstPlacement: true,
       });
       return;
     }
 
-    // Case 2: Ranked player moved to a higher tier
+    // Case 2: ranked player promoted
     if (!wasUnranked && newRole.minElo > oldRole.minElo) {
       await sendWebhook({
-        username,
-        oldRank,
-        newRank,
-        newElo,
-        symbol,
+        username, discordId, oldRank, newRank, newElo,
         color: TIER_COLORS[newRank] ?? 0xC4A35A,
         isFirstPlacement: false,
       });
-      return;
     }
   } catch (error) {
     console.error('[Discord] Rank-up webhook error:', error);
@@ -90,28 +86,21 @@ export async function sendRankUpNotification(
 }
 
 /**
- * Send a rank-up notification for a specific user (for testing / manual triggers).
- * Uses the user's current ELO and total games from the database.
+ * Send a rank-up notification for a specific user (testing / manual).
  */
 export async function sendRankUpForUser(
   username: string,
+  discordId: string | null,
   elo: number,
   totalGames: number,
 ): Promise<void> {
   if (!WEBHOOK_URL) return;
+  if (totalGames < PLACEMENT_MATCHES_REQUIRED) return;
 
   const rank = getRankLabel(elo);
-  const symbol = TIER_SYMBOLS[rank] ?? '';
-  const isUnranked = totalGames < PLACEMENT_MATCHES_REQUIRED;
-
-  if (isUnranked) return; // Don't notify for unranked players
 
   await sendWebhook({
-    username,
-    oldRank: null,
-    newRank: rank,
-    newElo: elo,
-    symbol,
+    username, discordId, oldRank: null, newRank: rank, newElo: elo,
     color: TIER_COLORS[rank] ?? 0x888888,
     isFirstPlacement: false,
   });
@@ -119,37 +108,47 @@ export async function sendRankUpForUser(
 
 async function sendWebhook(params: {
   username: string;
+  discordId: string | null;
   oldRank: string | null;
   newRank: string;
   newElo: number;
-  symbol: string;
   color: number;
   isFirstPlacement: boolean;
 }): Promise<void> {
   if (!WEBHOOK_URL) return;
 
-  const { username, oldRank, newRank, newElo, symbol, color, isFirstPlacement } = params;
+  const { username, discordId, oldRank, newRank, newElo, color, isFirstPlacement } = params;
+  const symbol = TIER_SYMBOLS[newRank] ?? '';
 
-  const title = isFirstPlacement
-    ? `${symbol}  New Ranked Player  ${symbol}`
-    : `${symbol}  Rank Up  ${symbol}`;
+  // Player mention: @tag if Discord linked, **bold name** if not
+  const playerMention = discordId ? `<@${discordId}>` : `**${username}**`;
 
-  const description = isFirstPlacement
-    ? `**${username}** completed placement and joined **${newRank}**`
-    : oldRank
-      ? `**${username}** promoted from **${oldRank}** to **${newRank}**`
-      : `**${username}** reached **${newRank}**`;
+  // Content message (visible above the embed, triggers the @mention notification)
+  let content: string;
+  if (isFirstPlacement) {
+    content = `${playerMention} has completed placement and entered **${newRank}** ${symbol}`;
+  } else if (oldRank) {
+    content = `${playerMention} ranked up from **${oldRank}** to **${newRank}** ${symbol}`;
+  } else {
+    content = `${playerMention} reached **${newRank}** ${symbol}`;
+  }
+
+  // Decorative separator for the embed description
+  const bar = '\u2500'.repeat(20);
 
   const embed = {
-    title,
-    description,
+    description: [
+      `${bar}`,
+      '',
+      `${symbol}  **${newRank}**  ${symbol}`,
+      '',
+      `ELO: **${newElo}**`,
+      '',
+      `${bar}`,
+    ].join('\n'),
     color,
-    fields: [
-      { name: 'League', value: `${symbol} ${newRank}`, inline: true },
-      { name: 'ELO', value: `**${newElo}**`, inline: true },
-    ],
     footer: {
-      text: 'Naruto Mythos TCG',
+      text: 'Naruto Mythos TCG Simulator',
     },
     timestamp: new Date().toISOString(),
   };
@@ -157,6 +156,9 @@ async function sendWebhook(params: {
   await fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ embeds: [embed] }),
+    body: JSON.stringify({
+      content,
+      embeds: [embed],
+    }),
   });
 }
