@@ -6,6 +6,7 @@ import { EloBadge } from '@/components/EloBadge';
 interface UserBadgesProps {
   role?: string;
   elo?: number;
+  totalGames?: number;
   badgePrefs?: string[];
   leaguesEnabled?: boolean;
   size?: 'sm' | 'md';
@@ -19,6 +20,7 @@ interface UserBadgesProps {
 export function UserBadges({
   role = 'user',
   elo,
+  totalGames,
   badgePrefs = [],
   leaguesEnabled = false,
   size = 'sm',
@@ -33,7 +35,7 @@ export function UserBadges({
   return (
     <span className="inline-flex items-center gap-1 flex-wrap">
       {showAdmin && <RoleBadge role="admin" size={size} />}
-      {showLeague && <EloBadge elo={elo!} size={size} showElo={false} />}
+      {showLeague && <EloBadge elo={elo!} size={size} showElo={false} totalGames={totalGames} />}
     </span>
   );
 }
