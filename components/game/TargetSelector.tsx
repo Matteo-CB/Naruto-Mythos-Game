@@ -896,7 +896,8 @@ export function TargetSelector() {
             </PopupTitle>
 
             <div className="flex gap-6 items-start justify-center">
-              {/* Fresh play option */}
+              {/* Fresh play option — only shown when FRESH is a valid choice */}
+              {validTargets.includes('FRESH') && (
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -923,13 +924,16 @@ export function TargetSelector() {
                   </span>
                 </motion.button>
               </motion.div>
+              )}
 
-              {/* Divider */}
+              {/* Divider — only shown when both fresh and upgrade are available */}
+              {validTargets.includes('FRESH') && upgradeChars.length > 0 && (
               <div className="flex flex-col items-center justify-center self-stretch">
                 <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
                 <span className="text-[10px] py-2" style={{ color: '#444444' }}>{t('game.effect.or')}</span>
                 <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
               </div>
+              )}
 
               {/* Upgrade targets */}
               <motion.div

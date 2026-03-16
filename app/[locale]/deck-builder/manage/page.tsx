@@ -29,6 +29,7 @@ export default function ManageDecksPage() {
   const [saving, setSaving] = useState(false);
   const [exportingId, setExportingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [exportMenuId, setExportMenuId] = useState<string | null>(null);
 
   const fetchDecks = useCallback(async () => {
     try {
@@ -343,19 +344,37 @@ export default function ManageDecksPage() {
                             >
                               {t('deckBuilder.editDeck')}
                             </Link>
-                            <button
-                              onClick={() => handleExport(deck)}
-                              disabled={exportingId === deck.id}
-                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors disabled:opacity-40"
-                            >
-                              {exportingId === deck.id ? '...' : t('deckBuilder.exportAsImage')}
-                            </button>
-                            <button
-                              onClick={() => handleExportText(deck)}
-                              className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
-                            >
-                              {copiedId === deck.id ? t('deckBuilder.exportCopied') : t('deckBuilder.exportAsText')}
-                            </button>
+                            <div className="relative">
+                              <button
+                                onClick={() => setExportMenuId(exportMenuId === deck.id ? null : deck.id)}
+                                className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"
+                              >
+                                {exportingId === deck.id ? '...' : copiedId === deck.id ? t('deckBuilder.exportCopied') : t('deckBuilder.exportButton')}
+                              </button>
+                              {exportMenuId === deck.id && (
+                                <>
+                                  <div className="fixed inset-0 z-10" onClick={() => setExportMenuId(null)} />
+                                  <div
+                                    className="absolute right-0 top-full mt-1 z-20 flex flex-col rounded overflow-hidden"
+                                    style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '140px' }}
+                                  >
+                                    <button
+                                      onClick={() => { setExportMenuId(null); handleExport(deck); }}
+                                      disabled={exportingId === deck.id}
+                                      className="px-3 py-2 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors disabled:opacity-40"
+                                    >
+                                      {t('deckBuilder.exportAsImage')}
+                                    </button>
+                                    <button
+                                      onClick={() => { setExportMenuId(null); handleExportText(deck); }}
+                                      className="px-3 py-2 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors"
+                                    >
+                                      {t('deckBuilder.exportAsText')}
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
                             <button
                               onClick={() => setConfirmDeleteId(deck.id)}
                               className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#b33e3e] hover:bg-[#1a1414] hover:border-[#b33e3e]/30 transition-colors"

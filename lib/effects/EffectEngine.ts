@@ -15141,34 +15141,68 @@ export class EffectEngine {
             const idx = currentMission[fromSide].findIndex((c: CharacterInPlay) => c.instanceId === char.instanceId);
             if (idx === -1) continue;
 
-            // Check same-name conflict on the destination side
-            const charName = char.card.name_fr.toUpperCase();
+            // Check same-name conflict on the destination side (use top-of-stack name for upgraded chars)
+            const topCardCtrl = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const charName = topCardCtrl.name_fr.toUpperCase();
             const hasSameName = currentMission[toSide].some(
-              (c: CharacterInPlay) => !c.isHidden && c.card.name_fr.toUpperCase() === charName && c.instanceId !== char.instanceId
+              (c: CharacterInPlay) => {
+                if (c.isHidden || c.instanceId === char.instanceId) return false;
+                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr.toUpperCase() === charName;
+              }
             );
             if (hasSameName && !char.isHidden) {
-              // Same-name conflict — defeat the character instead of returning
-              const removed = currentMission[fromSide].splice(idx, 1)[0];
-              for (const card of removed.stack) {
-                newState[removed.originalOwner].discardPile.push(card);
+              // Same-name conflict on current mission — try other missions first
+              let altMissionIdx = -1;
+              for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+                const altMission = newState.activeMissions[mi];
+                if (altMission === currentMission) continue;
+                const altChars = altMission[toSide];
+                const hasConflict = altChars.some((c: CharacterInPlay) => {
+                  if (c.isHidden || c.instanceId === char.instanceId) return false;
+                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  return cTop.name_fr.toUpperCase() === charName;
+                });
+                if (!hasConflict) { altMissionIdx = mi; break; }
               }
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${char.card.name_fr} returned to owner but conflicts with existing character — defeated.`,
-                'game.log.effect.controlReturnedConflict',
-                { card: char.card.name_fr, target: char.card.name_fr },
-              );
+
+              if (altMissionIdx >= 0) {
+                // Move to alternative mission without name conflict
+                const removed = currentMission[fromSide].splice(idx, 1)[0];
+                removed.controlledBy = removed.originalOwner;
+                removed.controllerInstanceId = undefined;
+                removed.missionIndex = altMissionIdx;
+                newState.activeMissions[altMissionIdx][toSide].push(removed);
+                newState.log = logAction(
+                  newState.log, newState.turn, newState.phase, char.originalOwner,
+                  'EFFECT', `${topCardCtrl.name_fr} returned to original owner on mission ${altMissionIdx + 1} (name conflict on original mission).`,
+                  'game.log.effect.controlReturnedAltMission',
+                  { card: topCardCtrl.name_fr, mission: String(altMissionIdx + 1) },
+                );
+              } else {
+                // No valid mission — defeat the character
+                const removed = currentMission[fromSide].splice(idx, 1)[0];
+                for (const card of removed.stack) {
+                  newState[removed.originalOwner].discardPile.push(card);
+                }
+                newState.log = logAction(
+                  newState.log, newState.turn, newState.phase, char.originalOwner,
+                  'EFFECT', `${topCardCtrl.name_fr} returned to owner but conflicts with existing character on all missions — defeated.`,
+                  'game.log.effect.controlReturnedConflict',
+                  { card: topCardCtrl.name_fr, target: topCardCtrl.name_fr },
+                );
+              }
             } else {
-              // Move to original owner's side
+              // No conflict — move to original owner's side on same mission
               const removed = currentMission[fromSide].splice(idx, 1)[0];
               removed.controlledBy = removed.originalOwner;
               removed.controllerInstanceId = undefined;
               currentMission[toSide].push(removed);
               newState.log = logAction(
                 newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${char.card.name_fr} returned to original owner (controller left play).`,
+                'EFFECT', `${topCardCtrl.name_fr} returned to original owner (controller left play).`,
                 'game.log.effect.controlReturned',
-                { card: char.card.name_fr },
+                { card: topCardCtrl.name_fr },
               );
             }
           }
@@ -15853,6 +15887,21 @@ export class EffectEngine {
             descriptionKey: canFreshPlay ? 'game.effect.desc.effectPlayUpgradeChoice' : 'game.effect.desc.effectUpgradeChoice',
             descriptionParams: { card: card.name_fr },
           } as PendingEffect];
+
+          state.pendingActions = [...state.pendingActions, {
+            id: generateInstanceId(),
+            type: 'SELECT_TARGET',
+            player,
+            description: canFreshPlay
+              ? `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`
+              : `Choose which character to upgrade ${card.name_fr} over.`,
+            descriptionKey: canFreshPlay ? 'game.effect.desc.effectPlayUpgradeChoice' : 'game.effect.desc.effectUpgradeChoice',
+            descriptionParams: { card: card.name_fr },
+            options: validTargets,
+            minSelections: 1,
+            maxSelections: 1,
+            sourceEffectId: effectId,
+          }];
           return state;
         }
       }
@@ -16603,6 +16652,19 @@ export class EffectEngine {
         descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
         descriptionParams: { card: card.name_fr },
       } as PendingEffect];
+
+        newState.pendingActions = [...newState.pendingActions, {
+          id: generateInstanceId(),
+          type: 'SELECT_TARGET',
+          player,
+          description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+          descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+          descriptionParams: { card: card.name_fr },
+          options: ['FRESH', ...upgradeTargetIds_k053],
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId_k053,
+        }];
         return newState;
       }
       // No affordable upgrades — fall through to fresh play
@@ -16756,6 +16818,19 @@ export class EffectEngine {
           descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
           descriptionParams: { card: card.name_fr },
         } as PendingEffect];
+
+        newState.pendingActions = [...newState.pendingActions, {
+          id: generateInstanceId(),
+          type: 'SELECT_TARGET',
+          player,
+          description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
+          descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+          descriptionParams: { card: card.name_fr },
+          options: ['FRESH', ...upgradeTargetIds_h002],
+          minSelections: 1,
+          maxSelections: 1,
+          sourceEffectId: effectId_h002,
+        }];
         return newState;
       }
       // No affordable upgrades — fall through to fresh play
