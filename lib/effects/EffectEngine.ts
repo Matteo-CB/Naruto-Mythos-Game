@@ -13462,6 +13462,7 @@ export class EffectEngine {
                 card: revealedCharData.card,
                 stack: [...chars_k78[upgradeCharIdx_k78].stack, ...revealedCharData.stack],
                 powerTokens: chars_k78[upgradeCharIdx_k78].powerTokens + revealedCharData.powerTokens,
+                controllerInstanceId: chars_k78[upgradeCharIdx_k78].controllerInstanceId && chars_k78[upgradeCharIdx_k78].controlledBy === pendingEffect.sourcePlayer ? undefined : chars_k78[upgradeCharIdx_k78].controllerInstanceId,
               };
               chars_k78.splice(cidx_k78, 1);
             }
@@ -13541,6 +13542,7 @@ export class EffectEngine {
               card: revealedData_k78r.card,
               stack: [...chars_k78r[upgradeCharIdx_k78r].stack, ...revealedData_k78r.stack],
               powerTokens: chars_k78r[upgradeCharIdx_k78r].powerTokens + revealedData_k78r.powerTokens,
+              controllerInstanceId: chars_k78r[upgradeCharIdx_k78r].controllerInstanceId && chars_k78r[upgradeCharIdx_k78r].controlledBy === pendingEffect.sourcePlayer ? undefined : chars_k78r[upgradeCharIdx_k78r].controllerInstanceId,
             };
             chars_k78r.splice(cidx_k78r, 1);
             isCardUpgrade_k78r = true;
@@ -16055,6 +16057,8 @@ export class EffectEngine {
         ...existing,
         card: card as any,
         stack: [...existing.stack, card as any],
+        // Upgrading a controlled character locks control permanently (Ino rule)
+        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
       };
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
@@ -16181,7 +16185,10 @@ export class EffectEngine {
       ps.chakra -= actualCost;
 
       const updatedChars = [...mission[friendlySide]];
-      updatedChars[existingIdx] = { ...existing, card: card as any, stack: [...existing.stack, card as any] };
+      updatedChars[existingIdx] = {
+        ...existing, card: card as any, stack: [...existing.stack, card as any],
+        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
+      };
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
       state.activeMissions = missions;
@@ -16817,6 +16824,7 @@ export class EffectEngine {
         ...existing,
         card,
         stack: [...existing.stack, card],
+        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
       };
       mission[friendlySide] = updatedChars;
       missions[missionIdx] = mission;
@@ -17002,6 +17010,7 @@ export class EffectEngine {
         card,
         stack: [...existing.stack, card],
         powerTokens: existing.powerTokens,
+        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
       };
       mission[friendlySide_h002] = updatedChars;
       missions[missionIndex] = mission;
@@ -18334,6 +18343,7 @@ export class EffectEngine {
           card: revealedCharData.card,
           stack: [...chars_rhr[upgradeIdx_rhr].stack, ...revealedCharData.stack],
           powerTokens: chars_rhr[upgradeIdx_rhr].powerTokens + revealedCharData.powerTokens,
+          controllerInstanceId: chars_rhr[upgradeIdx_rhr].controllerInstanceId && chars_rhr[upgradeIdx_rhr].controlledBy === player ? undefined : chars_rhr[upgradeIdx_rhr].controllerInstanceId,
         };
         // Remove the revealed character slot (it's now merged)
         chars_rhr.splice(revealedIdx, 1);

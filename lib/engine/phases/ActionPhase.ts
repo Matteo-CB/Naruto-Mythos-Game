@@ -358,6 +358,10 @@ function handleRevealCharacter(
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
     upgraded.isHidden = false;
     upgraded.wasRevealedAtLeastOnce = true;
+    // Lock control on upgrade (Ino rule)
+    if (upgraded.controllerInstanceId && upgraded.controlledBy === player) {
+      upgraded.controllerInstanceId = undefined;
+    }
 
     // Remove the revealed hidden character and update the upgrade target
     const updatedChars = chars.filter((c) => c.instanceId !== characterInstanceId);
@@ -522,6 +526,12 @@ function handleUpgradeCharacter(
   existingChar.stack = [...existingChar.stack, newCard];
   // Power tokens transfer
   // Character retains hidden/visible status
+
+  // If a controlled character is upgraded by its new controller, lock control permanently.
+  // Ino/Orochimaru leaving play will no longer cause this character to return.
+  if (existingChar.controllerInstanceId && existingChar.controlledBy === player) {
+    existingChar.controllerInstanceId = undefined;
+  }
 
   chars[charIdx] = existingChar;
 
