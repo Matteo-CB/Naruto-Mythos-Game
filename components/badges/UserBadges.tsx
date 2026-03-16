@@ -1,7 +1,7 @@
 'use client';
 
 import { RoleBadge } from './RoleBadge';
-import { EloBadge } from '@/components/EloBadge';
+import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 
 interface UserBadgesProps {
   role?: string;
@@ -15,6 +15,7 @@ interface UserBadgesProps {
 /**
  * Displays all applicable badges for a user in a row.
  * Badges hidden via badgePrefs are not shown.
+ * Unranked players (< 5 games) don't get a league badge at all.
  * Order: Admin > League
  */
 export function UserBadges({
@@ -28,7 +29,9 @@ export function UserBadges({
   const hiddenBadges = new Set(badgePrefs);
 
   const showAdmin = role === 'admin' && !hiddenBadges.has('admin');
-  const showLeague = leaguesEnabled && elo !== undefined && !hiddenBadges.has('league');
+  // Hide league badge entirely for unranked players (< PLACEMENT_MATCHES_REQUIRED games)
+  const isUnranked = totalGames !== undefined && totalGames < PLACEMENT_MATCHES_REQUIRED;
+  const showLeague = leaguesEnabled && elo !== undefined && !hiddenBadges.has('league') && !isUnranked;
 
   if (!showAdmin && !showLeague) return null;
 
