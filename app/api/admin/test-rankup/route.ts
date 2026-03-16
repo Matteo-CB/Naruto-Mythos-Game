@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { sendRankUpForUser } from '@/lib/discord/rankUpWebhook';
-import { PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+
+const PLACEMENT_MATCHES_REQUIRED = 5;
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 

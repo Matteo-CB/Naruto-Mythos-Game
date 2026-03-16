@@ -6,7 +6,8 @@
  */
 
 import { getRoleForElo, getRankLabel } from './roles';
-import { PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+
+const PLACEMENT_MATCHES_REQUIRED = 5;
 
 const WEBHOOK_URL = process.env.DISCORD_RANKUP_WEBHOOK_URL;
 
