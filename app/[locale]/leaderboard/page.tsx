@@ -8,9 +8,10 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { CardBackgroundDecor } from '@/components/CardBackgroundDecor';
 import { Footer } from '@/components/Footer';
-import { EloBadge, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import { EloBadge, RANK_TIERS, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { LeaguesModal } from '@/components/LeaguesModal';
+import Image from 'next/image';
 
 interface LeaderboardUser {
   id: string;
@@ -26,6 +27,7 @@ interface LeaderboardUser {
 export default function LeaderboardPage() {
   const t = useTranslations('leaderboard');
   const tc = useTranslations('common');
+  const tp = useTranslations('profile');
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,6 +36,7 @@ export default function LeaderboardPage() {
   const [leaguesModalOpen, setLeaguesModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [leagueFilter, setLeagueFilter] = useState('');
   const PLAYERS_PER_PAGE = 20;
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -44,7 +47,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, leagueFilter]);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -57,7 +60,8 @@ export default function LeaderboardPage() {
     setLoading(true);
     const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
     const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
-    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}`)
+    const leagueParam = leagueFilter ? `&league=${encodeURIComponent(leagueFilter)}` : '';
+    fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.users || []);
@@ -65,7 +69,7 @@ export default function LeaderboardPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [currentPage, debouncedSearch]);
+  }, [currentPage, debouncedSearch, leagueFilter]);
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery('');
@@ -147,6 +151,41 @@ export default function LeaderboardPage() {
             </button>
           )}
         </div>
+
+        {/* ──── League filter ──── */}
+        {leaguesEnabled && (
+          <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-1 no-scrollbar">
+            <button
+              onClick={() => setLeagueFilter('')}
+              className="shrink-0 px-2 py-1 text-[10px] uppercase font-bold cursor-pointer"
+              style={{
+                backgroundColor: !leagueFilter ? 'rgba(196,163,90,0.15)' : 'transparent',
+                border: `1px solid ${!leagueFilter ? '#c4a35a' : '#262626'}`,
+                color: !leagueFilter ? '#c4a35a' : '#555',
+              }}
+            >{tc('all')}</button>
+            {RANK_TIERS.map((tier) => {
+              const active = leagueFilter === tier.key;
+              return (
+                <button
+                  key={tier.key}
+                  onClick={() => setLeagueFilter(active ? '' : tier.key)}
+                  className="shrink-0 flex items-center gap-1 px-2 py-1 cursor-pointer"
+                  style={{
+                    backgroundColor: active ? `${tier.color}15` : 'transparent',
+                    border: `1px solid ${active ? tier.color : '#262626'}`,
+                  }}
+                >
+                  <Image src={tier.image} alt="" width={14} height={14} unoptimized
+                    style={{ filter: active ? 'none' : 'grayscale(0.8) opacity(0.5)' }} />
+                  <span className="text-[9px] uppercase font-bold" style={{ color: active ? tier.color : '#555' }}>
+                    {tp(`rankNames.${tier.key}`)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* ──── Player count ──── */}
         {!loading && totalPlayers > 0 && (

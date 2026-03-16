@@ -394,6 +394,12 @@ function MissionCardDisplay({
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
   const zoomCard = useUIStore((s) => s.zoomCard);
+  const isSandboxMode = useGameStore((s) => s.isSandboxMode);
+  const sandboxSwapMission = useGameStore((s) => s.sandboxSwapMission);
+  const sandboxReturnAllFromMission = useGameStore((s) => s.sandboxReturnAllFromMission);
+  const [showMissionMenu, setShowMissionMenu] = useState(false);
+  const [missionMenuPos, setMissionMenuPos] = useState({ x: 0, y: 0 });
+  const [showSwapModal, setShowSwapModal] = useState(false);
   const rankColors: Record<MissionRank, string> = {
     D: '#3e8b3e',
     C: '#c4a35a',
@@ -405,7 +411,53 @@ function MissionCardDisplay({
 
   const totalPoints = mission.basePoints + mission.rankBonus;
 
+  const handleMissionContextMenu = (e: React.MouseEvent) => {
+    if (!isSandboxMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMissionMenuPos({ x: e.clientX, y: e.clientY });
+    setShowMissionMenu(true);
+  };
+
   return (
+    <>
+    {/* Mission sandbox context menu */}
+    {showMissionMenu && isSandboxMode && (
+      <>
+        <div className="fixed inset-0 z-[80]" onClick={() => setShowMissionMenu(false)} />
+        <div
+          className="fixed z-[81] flex flex-col py-1 rounded"
+          style={{
+            left: missionMenuPos.x,
+            top: missionMenuPos.y,
+            backgroundColor: '#1a1a1a',
+            border: '1px solid #333',
+            minWidth: '140px',
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <button onClick={() => { setShowMissionMenu(false); setShowSwapModal(true); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#c4a35a] hover:bg-[#262626] transition-colors">
+            {t('sandbox.swapMission')}
+          </button>
+          <button onClick={() => { sandboxReturnAllFromMission(index); setShowMissionMenu(false); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors">
+            {t('sandbox.clearMission')}
+          </button>
+        </div>
+      </>
+    )}
+
+    {/* Mission swap modal */}
+    {showSwapModal && isSandboxMode && (
+      <MissionSwapModal
+        missionIndex={index}
+        currentMissionId={mission.card.id}
+        onSwap={(newId) => { sandboxSwapMission(index, newId); setShowSwapModal(false); }}
+        onClose={() => setShowSwapModal(false)}
+      />
+    )}
+
     <div
       className="relative mission-aspect no-select"
       style={{
@@ -433,6 +485,7 @@ function MissionCardDisplay({
           rankBonus: mission.rankBonus,
         });
       }}
+      onContextMenu={handleMissionContextMenu}
       onMouseEnter={(e) => {
         showPreview(mission.card, { x: e.clientX, y: e.clientY }, {
           rank: mission.rank,
@@ -507,6 +560,95 @@ function MissionCardDisplay({
           </span>
         </motion.div>
       )}
+    </div>
+    </>
+  );
+}
+
+/** Modal for selecting a replacement mission card */
+function MissionSwapModal({
+  missionIndex,
+  currentMissionId,
+  onSwap,
+  onClose,
+}: {
+  missionIndex: number;
+  currentMissionId: string;
+  onSwap: (newMissionCardId: string) => void;
+  onClose: () => void;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const allMissions = useMemo(() => {
+    try {
+      const { getAllMissions } = require('@/lib/data/cardIndex');
+      return getAllMissions() as import('@/lib/engine/types').MissionCard[];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-xl max-h-[80vh] mx-4 overflow-hidden flex flex-col rounded-lg"
+        style={{ backgroundColor: '#111', border: '1px solid #333' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #262626' }}>
+          <span className="text-xs uppercase tracking-wider font-bold" style={{ color: '#c4a35a' }}>
+            {t('sandbox.swapMission')}
+          </span>
+          <button onClick={onClose} className="text-xs px-2 py-1" style={{ color: '#888', border: '1px solid #333' }}>
+            {t('sandbox.close')}
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {allMissions.map((m) => {
+              const imgPath = normalizeImagePath(m.image_file);
+              const isCurrent = m.id === currentMissionId;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => { if (!isCurrent) onSwap(m.cardId || m.id); }}
+                  className="relative w-full overflow-hidden group"
+                  style={{
+                    aspectRatio: '7/5',
+                    backgroundColor: '#1a1a1a',
+                    border: isCurrent ? '2px solid #c4a35a' : '1px solid #333',
+                    opacity: isCurrent ? 0.5 : 1,
+                    cursor: isCurrent ? 'default' : 'pointer',
+                  }}
+                >
+                  {imgPath ? (
+                    <img src={imgPath} alt={getCardName(m, locale as 'en' | 'fr')} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-[9px] text-center px-1" style={{ color: '#666' }}>
+                        {getCardName(m, locale as 'en' | 'fr')}
+                      </span>
+                    </div>
+                  )}
+                  <span className="absolute bottom-0 left-0 right-0 text-[8px] text-center truncate px-1 py-0.5"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#ccc' }}>
+                    {getCardName(m, locale as 'en' | 'fr')}
+                  </span>
+                  {isCurrent && (
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                      <span className="text-[10px] font-bold" style={{ color: '#c4a35a' }}>{t('sandbox.currentMission')}</span>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

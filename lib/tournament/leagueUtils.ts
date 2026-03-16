@@ -13,11 +13,11 @@ export const LEAGUE_TIERS: LeagueTier[] = [
   { key: 'academyStudent', minElo: 0 },
   { key: 'genin', minElo: 450 },
   { key: 'chunin', minElo: 550 },
-  { key: 'specialJonin', minElo: 650 },
-  { key: 'eliteJonin', minElo: 750 },
-  { key: 'legendarySannin', minElo: 900 },
-  { key: 'kage', minElo: 1050 },
-  { key: 'sageOfSixPaths', minElo: 1200 },
+  { key: 'specialJonin', minElo: 800 },
+  { key: 'eliteJonin', minElo: 1000 },
+  { key: 'legendarySannin', minElo: 1200 },
+  { key: 'kage', minElo: 1600 },
+  { key: 'sageOfSixPaths', minElo: 2000 },
 ];
 
 export const VALID_LEAGUE_KEYS = LEAGUE_TIERS.map(t => t.key);

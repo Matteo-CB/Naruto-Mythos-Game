@@ -46,6 +46,8 @@ interface DeckBuilderStore {
   removeMission: (index: number) => void;
   clearDeck: () => void;
   clearAddError: () => void;
+  reorderChars: (fromIndex: number, toIndex: number) => void;
+  sortCharsByCost: () => void;
 
   // Validation helpers
   canAddChar: (card: CharacterCard) => AddCheckResult;
@@ -153,6 +155,27 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
   clearAddError: () => {
     set({ addError: null, addErrorKey: null, addErrorParams: null });
+  },
+
+  reorderChars: (fromIndex: number, toIndex: number) => {
+    const { deckChars } = get();
+    if (fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= deckChars.length) return;
+    if (toIndex < 0 || toIndex >= deckChars.length) return;
+    const updated = [...deckChars];
+    const [moved] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, moved);
+    set({ deckChars: updated });
+  },
+
+  sortCharsByCost: () => {
+    const { deckChars } = get();
+    const sorted = [...deckChars].sort((a, b) => {
+      const costDiff = (a.chakra ?? 0) - (b.chakra ?? 0);
+      if (costDiff !== 0) return costDiff;
+      return a.name_fr.localeCompare(b.name_fr);
+    });
+    set({ deckChars: sorted });
   },
 
   saveDeck: async () => {
