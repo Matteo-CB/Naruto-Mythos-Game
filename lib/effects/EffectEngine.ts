@@ -13368,6 +13368,70 @@ export class EffectEngine {
         const upgradeTargetIdx_k78 = findUpgradeTargetIdx(m_k78_check[friendlySide_k78], topCard_k78, targetId);
         const upgradeTarget_k78 = upgradeTargetIdx_k78 >= 0 ? m_k78_check[friendlySide_k78][upgradeTargetIdx_k78] : null;
 
+        // If there's a flex upgrade target, check if fresh reveal is also possible and offer choice
+        if (upgradeTarget_k78) {
+          const existingTC_k78 = upgradeTarget_k78.stack.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack.length - 1] : upgradeTarget_k78.card;
+          const isFlexUpgrade_k78 = checkFlexibleUpgrade(topCard_k78 as any, existingTC_k78);
+          const hasNameConflict_k78 = m_k78_check[friendlySide_k78].some((c: CharacterInPlay) => {
+            if (c.instanceId === targetId || c.isHidden) return false;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            return cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase();
+          });
+          const canFreshReveal_k78 = !hasNameConflict_k78;
+
+          // Find ALL affordable upgrade targets (same-name + flex)
+          const upgradeTargetIds_k78: string[] = [];
+          for (const c of m_k78_check[friendlySide_k78]) {
+            if (c.isHidden || c.instanceId === targetId) continue;
+            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const isSameName = cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase() && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
+            const isFlex = checkFlexibleUpgrade(topCard_k78 as any, cTop) && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
+            if (isSameName || isFlex) {
+              const upgCost = Math.max(0, ((topCard_k78.chakra ?? 0) - (cTop.chakra ?? 0)) - 1);
+              if (newState[pendingEffect.sourcePlayer].chakra >= upgCost) upgradeTargetIds_k78.push(c.instanceId);
+            }
+          }
+
+          if (isFlexUpgrade_k78 && canFreshReveal_k78 && upgradeTargetIds_k78.length > 0) {
+            // Offer choice: fresh reveal vs upgrade
+            const effectId_k78r = `kankuro078-reveal-choice-${generateInstanceId()}`;
+            const validTargets_k78r = ['FRESH', ...upgradeTargetIds_k78];
+            newState.pendingEffects = [...newState.pendingEffects, {
+              id: effectId_k78r,
+              sourceCardId: 'KS-078-UC',
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: mIdx_k78,
+              effectType: 'UPGRADE' as EffectType,
+              effectDescription: JSON.stringify({ hiddenInstanceId: targetId, missionIndex: mIdx_k78 }),
+              targetSelectionType: 'KANKURO078_REVEAL_UPGRADE_OR_FRESH',
+              sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true,
+              validTargets: validTargets_k78r,
+              isOptional: false,
+              isMandatory: true,
+              resolved: false,
+              isUpgrade: true,
+              description: `Choose: reveal ${topCard_k78.name_fr} as a new character, or upgrade over an existing one?`,
+              descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+              descriptionParams: { card: topCard_k78.name_fr },
+            } as PendingEffect];
+            newState.pendingActions = [...newState.pendingActions, {
+              id: generateInstanceId(),
+              type: 'SELECT_TARGET',
+              player: pendingEffect.sourcePlayer,
+              description: `Choose: reveal ${topCard_k78.name_fr} as a new character, or upgrade over an existing one?`,
+              descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+              descriptionParams: { card: topCard_k78.name_fr },
+              options: validTargets_k78r,
+              minSelections: 1,
+              maxSelections: 1,
+              sourceEffectId: effectId_k78r,
+            }];
+            break;
+          }
+        }
+
+        // No choice needed — proceed with auto-reveal (possibly auto-upgrade)
         let revealCost_k78: number;
         if (upgradeTarget_k78) {
           const existingTC = upgradeTarget_k78.stack.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack.length - 1] : upgradeTarget_k78.card;
@@ -13393,14 +13457,12 @@ export class EffectEngine {
             const upgradeCharIdx_k78 = chars_k78.findIndex(c => c.instanceId === upgradeTarget_k78.instanceId);
             if (upgradeCharIdx_k78 >= 0) {
               const revealedCharData = chars_k78[cidx_k78];
-              // Stack the revealed card's top card onto the upgrade target
               chars_k78[upgradeCharIdx_k78] = {
                 ...chars_k78[upgradeCharIdx_k78],
                 card: revealedCharData.card,
                 stack: [...chars_k78[upgradeCharIdx_k78].stack, ...revealedCharData.stack],
                 powerTokens: chars_k78[upgradeCharIdx_k78].powerTokens + revealedCharData.powerTokens,
               };
-              // Remove the revealed character (it's now merged into the upgrade target)
               chars_k78.splice(cidx_k78, 1);
             }
           }
@@ -13417,15 +13479,90 @@ export class EffectEngine {
             { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78.name_fr, cost: String(revealCost_k78) },
           );
 
-          // Find the resulting character for effect resolution (may be the upgrade target now)
           const resultCharId_k78 = upgradeTarget_k78 ? upgradeTarget_k78.instanceId : targetId;
           const revealedChar_k78 = newState.activeMissions[mIdx_k78][side_k78].find(
             c => c.instanceId === resultCharId_k78,
           );
           if (revealedChar_k78) {
-            // resolveRevealEffects fires MAIN + AMBUSH; if it was an upgrade, UPGRADE effects also fire
             newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, revealedChar_k78, mIdx_k78);
           }
+        }
+        break;
+      }
+
+      // KANKURO078_REVEAL_UPGRADE_OR_FRESH: player chose to reveal as fresh or upgrade
+      case 'KANKURO078_REVEAL_UPGRADE_OR_FRESH': {
+        let meta_k78r: { hiddenInstanceId?: string; missionIndex?: number } = {};
+        try { meta_k78r = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const hiddenId_k78r = meta_k78r.hiddenInstanceId;
+        const mIdx_k78r = meta_k78r.missionIndex ?? pendingEffect.sourceMissionIndex;
+        if (!hiddenId_k78r) break;
+
+        const charResult_k78r = EffectEngine.findCharByInstanceId(newState, hiddenId_k78r);
+        if (!charResult_k78r || !charResult_k78r.character.isHidden) break;
+        const topCard_k78r = charResult_k78r.character.stack.length > 0
+          ? charResult_k78r.character.stack[charResult_k78r.character.stack.length - 1]
+          : charResult_k78r.character.card;
+        const side_k78r = charResult_k78r.player === 'player1' ? 'player1Characters' : 'player2Characters';
+        const doUpgrade_k78r = targetId !== 'FRESH';
+
+        let revealCost_k78r: number;
+        if (doUpgrade_k78r) {
+          const upgradeTarget_k78r = newState.activeMissions[mIdx_k78r][side_k78r].find(
+            (c: CharacterInPlay) => c.instanceId === targetId,
+          );
+          if (!upgradeTarget_k78r) break;
+          const existingTC_k78r = upgradeTarget_k78r.stack.length > 0 ? upgradeTarget_k78r.stack[upgradeTarget_k78r.stack.length - 1] : upgradeTarget_k78r.card;
+          revealCost_k78r = Math.max(0, ((topCard_k78r.chakra ?? 0) - (existingTC_k78r.chakra ?? 0)) - 1);
+        } else {
+          revealCost_k78r = Math.max(0, (topCard_k78r.chakra ?? 0) - 1);
+        }
+
+        const ps_k78r = { ...newState[pendingEffect.sourcePlayer] };
+        if (ps_k78r.chakra < revealCost_k78r) break;
+        ps_k78r.chakra -= revealCost_k78r;
+        newState = { ...newState, [pendingEffect.sourcePlayer]: ps_k78r };
+
+        // Reveal
+        const missions_k78r = [...newState.activeMissions];
+        const m_k78r = { ...missions_k78r[mIdx_k78r] };
+        const chars_k78r = [...m_k78r[side_k78r]];
+        const cidx_k78r = chars_k78r.findIndex(c => c.instanceId === hiddenId_k78r);
+        if (cidx_k78r === -1) break;
+        chars_k78r[cidx_k78r] = { ...chars_k78r[cidx_k78r], isHidden: false, wasRevealedAtLeastOnce: true };
+
+        let isCardUpgrade_k78r = false;
+        if (doUpgrade_k78r) {
+          const upgradeCharIdx_k78r = chars_k78r.findIndex(c => c.instanceId === targetId);
+          if (upgradeCharIdx_k78r >= 0) {
+            const revealedData_k78r = chars_k78r[cidx_k78r];
+            chars_k78r[upgradeCharIdx_k78r] = {
+              ...chars_k78r[upgradeCharIdx_k78r],
+              card: revealedData_k78r.card,
+              stack: [...chars_k78r[upgradeCharIdx_k78r].stack, ...revealedData_k78r.stack],
+              powerTokens: chars_k78r[upgradeCharIdx_k78r].powerTokens + revealedData_k78r.powerTokens,
+            };
+            chars_k78r.splice(cidx_k78r, 1);
+            isCardUpgrade_k78r = true;
+          }
+        }
+
+        m_k78r[side_k78r] = chars_k78r;
+        missions_k78r[mIdx_k78r] = m_k78r;
+        newState = { ...newState, activeMissions: missions_k78r };
+
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT',
+          `Kankuro (078) UPGRADE: Revealed ${topCard_k78r.name_fr}, paying ${revealCost_k78r} chakra${isCardUpgrade_k78r ? ' (upgrade)' : ''}.`,
+          'game.log.effect.kankuro078RevealHidden',
+          { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78r.name_fr, cost: String(revealCost_k78r) },
+        );
+
+        const resultId_k78r = isCardUpgrade_k78r ? targetId : hiddenId_k78r;
+        const resultChar_k78r = newState.activeMissions[mIdx_k78r][side_k78r].find(c => c.instanceId === resultId_k78r);
+        if (resultChar_k78r) {
+          newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, resultChar_k78r, mIdx_k78r);
         }
         break;
       }
