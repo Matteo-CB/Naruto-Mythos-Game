@@ -7,7 +7,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
-import { getRoleForElo, getAllEloRoleNames } from './roles';
+import { getRoleForElo, getAllEloRoleNames, UNRANKED_ROLE, PLACEMENT_MATCHES_REQUIRED } from './roles';
 
 const DISCORD_API = 'https://discord.com/api/v10';
 const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
@@ -74,12 +74,16 @@ export async function syncDiscordRole(userId: string): Promise<void> {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { elo: true, discordId: true },
+      select: { elo: true, discordId: true, wins: true, losses: true, draws: true },
     });
 
     if (!user?.discordId) return;
 
-    const targetRole = getRoleForElo(user.elo);
+    const totalGames = (user.wins ?? 0) + (user.losses ?? 0) + (user.draws ?? 0);
+    const isPlaced = totalGames >= PLACEMENT_MATCHES_REQUIRED;
+
+    // Unranked players get the Unranked role, placed players get their ELO role
+    const targetRole = isPlaced ? getRoleForElo(user.elo) : UNRANKED_ROLE;
     const allEloRoleNames = getAllEloRoleNames();
 
     // Get guild roles
