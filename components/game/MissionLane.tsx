@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -36,6 +36,16 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const pinCard = useUIStore((s) => s.pinCard);
   const zoomCard = useUIStore((s) => s.zoomCard);
   const { bannedIds } = useBannedCards();
+
+  // Sandbox context menu
+  const isSandboxMode = useGameStore((s) => s.isSandboxMode);
+  const sandboxDefeatCharacter = useGameStore((s) => s.sandboxDefeatCharacter);
+  const sandboxReturnToHand = useGameStore((s) => s.sandboxReturnToHand);
+  const sandboxHideCharacter = useGameStore((s) => s.sandboxHideCharacter);
+  const sandboxRevealCharacter = useGameStore((s) => s.sandboxRevealCharacter);
+  const sandboxAddPowerToken = useGameStore((s) => s.sandboxAddPowerToken);
+  const [showSandboxMenu, setShowSandboxMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
   // Granular selector - only re-renders when turn ownership actually changes
   const isMyTurn = useGameStore((s) =>
@@ -114,7 +124,62 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   const isLastPlayed = character.isLastPlayed;
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (!isSandboxMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMenuPos({ x: e.clientX, y: e.clientY });
+    setShowSandboxMenu(true);
+  };
+
   return (
+    <>
+    {/* Sandbox context menu */}
+    {showSandboxMenu && isSandboxMode && (
+      <>
+        <div className="fixed inset-0 z-[80]" onClick={() => setShowSandboxMenu(false)} />
+        <div
+          className="fixed z-[81] flex flex-col py-1 rounded"
+          style={{
+            left: menuPos.x,
+            top: menuPos.y,
+            backgroundColor: '#1a1a1a',
+            border: '1px solid #333',
+            minWidth: '120px',
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <button onClick={() => { sandboxReturnToHand(missionIndex, character.instanceId); setShowSandboxMenu(false); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors">
+            {t('sandbox.returnToHand')}
+          </button>
+          <button onClick={() => { sandboxDefeatCharacter(missionIndex, character.instanceId); setShowSandboxMenu(false); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#b33e3e] hover:bg-[#262626] transition-colors">
+            {t('sandbox.defeat')}
+          </button>
+          {!character.isHidden && (
+            <button onClick={() => { sandboxHideCharacter(missionIndex, character.instanceId); setShowSandboxMenu(false); }}
+              className="px-3 py-1.5 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors">
+              {t('sandbox.hide')}
+            </button>
+          )}
+          {character.isHidden && (
+            <button onClick={() => { sandboxRevealCharacter(missionIndex, character.instanceId); setShowSandboxMenu(false); }}
+              className="px-3 py-1.5 text-[10px] text-left text-[#ccc] hover:bg-[#262626] transition-colors">
+              {t('sandbox.reveal')}
+            </button>
+          )}
+          <button onClick={() => { sandboxAddPowerToken(missionIndex, character.instanceId, 1); setShowSandboxMenu(false); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#c4a35a] hover:bg-[#262626] transition-colors">
+            +1 {t('sandbox.powerToken')}
+          </button>
+          <button onClick={() => { sandboxAddPowerToken(missionIndex, character.instanceId, -1); setShowSandboxMenu(false); }}
+            className="px-3 py-1.5 text-[10px] text-left text-[#888] hover:bg-[#262626] transition-colors">
+            -1 {t('sandbox.powerToken')}
+          </button>
+        </div>
+      </>
+    )}
     <motion.div
       layout="position"
       initial={{ scale: 0.8, opacity: 0 }}
@@ -127,6 +192,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
+      onContextMenu={handleContextMenu}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className="relative no-select"
@@ -296,6 +362,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </motion.div>
       )}
     </motion.div>
+    </>
   );
 },
   (prev, next) =>

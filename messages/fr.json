@@ -1033,7 +1033,16 @@
     "deckOrder": "Ordre du Deck (haut en bas)",
     "clickToMoveTop": "Cliquez sur une carte pour la mettre en haut du deck",
     "close": "Fermer",
-    "emptyDeck": "Le deck est vide"
+    "emptyDeck": "Le deck est vide",
+    "addAnyCard": "Ajouter",
+    "returnToHand": "En main",
+    "hide": "Cacher",
+    "reveal": "Reveler",
+    "powerToken": "Puissance",
+    "setChakra": "Chakra",
+    "searchCards": "Rechercher...",
+    "allCards": "Toutes les cartes",
+    "discardHand": "Defausser"
   },
   "online": {
     "title": "Jouer en Ligne",

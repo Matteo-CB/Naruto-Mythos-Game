@@ -37,13 +37,11 @@ export default function LeaderboardPage() {
   const PLAYERS_PER_PAGE = 20;
   const searchRef = useRef<HTMLInputElement>(null);
 
-  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Reset to page 1 when search changes
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearch]);
@@ -81,24 +79,29 @@ export default function LeaderboardPage() {
       <CloudBackground />
       <DecorativeIcons />
       <CardBackgroundDecor variant="leaderboard" />
-      <div className="max-w-3xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <h1
-            className="text-2xl font-bold tracking-wider uppercase"
-            style={{ color: '#c4a35a' }}
-          >
-            {t('title')}
-          </h1>
-          <div className="flex items-center gap-3">
-            {/* View Leagues button - only when leagues enabled */}
+
+      <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-6 py-6 sm:py-10">
+
+        {/* ──── Header ──── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
+              {t('title')}
+            </h1>
+            {leaguesEnabled && (
+              <p className="text-[11px] mt-1" style={{ color: '#555' }}>
+                {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
             {leaguesEnabled && (
               <button
                 onClick={() => setLeaguesModalOpen(true)}
-                className="px-4 py-2 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors"
+                className="px-3 py-1.5 text-[10px] sm:text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
                 style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
-                  border: '1px solid rgba(196, 163, 90, 0.3)',
+                  backgroundColor: 'rgba(196, 163, 90, 0.06)',
+                  border: '1px solid rgba(196, 163, 90, 0.25)',
                   color: '#c4a35a',
                 }}
               >
@@ -108,148 +111,132 @@ export default function LeaderboardPage() {
             <LanguageSwitcher />
             <Link
               href="/"
-              className="px-4 py-2 text-sm transition-colors"
-              style={{
-                backgroundColor: '#141414',
-                border: '1px solid #262626',
-                color: '#888888',
-              }}
+              className="px-3 py-1.5 text-xs transition-colors"
+              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888' }}
             >
               {tc('back')}
             </Link>
           </div>
         </div>
 
-        {/* Subtitle - only when leagues enabled */}
-        {leaguesEnabled && (
-          <p
-            className="text-xs mb-4"
-            style={{ color: '#666666' }}
-          >
-            {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
-          </p>
-        )}
-
-        {/* Search */}
-        <div className="relative mb-4">
+        {/* ──── Search ──── */}
+        <div className="relative mb-5">
           <input
             ref={searchRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full px-4 py-2.5 text-sm"
+            className="w-full px-4 py-2.5 text-sm rounded-lg"
             style={{
-              backgroundColor: '#141414',
-              border: '1px solid #262626',
+              backgroundColor: '#111',
+              border: '1px solid #1e1e1e',
               color: '#e0e0e0',
               outline: 'none',
             }}
-            onFocus={(e) => (e.target.style.borderColor = '#c4a35a')}
-            onBlur={(e) => (e.target.style.borderColor = '#262626')}
+            onFocus={(e) => (e.target.style.borderColor = '#c4a35a55')}
+            onBlur={(e) => (e.target.style.borderColor = '#1e1e1e')}
           />
           {searchQuery && (
             <button
               onClick={handleClearSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-xs cursor-pointer"
-              style={{ color: '#888888' }}
+              style={{ color: '#888' }}
             >
               X
             </button>
           )}
         </div>
 
-        {/* Rankings Table */}
+        {/* ──── Player count ──── */}
+        {!loading && totalPlayers > 0 && (
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
+            <span className="text-[10px] uppercase tracking-wider tabular-nums" style={{ color: '#444' }}>
+              {totalPlayers} {t('player')}{totalPlayers > 1 ? 's' : ''}
+            </span>
+            <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
+          </div>
+        )}
+
+        {/* ──── Rankings ──── */}
         <section>
           {loading ? (
-            <p className="text-sm" style={{ color: '#888888' }}>
-              {tc('loading')}
-            </p>
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm" style={{ color: '#555' }}>{tc('loading')}</p>
+            </div>
           ) : users.length === 0 ? (
-            <p className="text-sm" style={{ color: '#888888' }}>
-              {t('noPlayers')}
-            </p>
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm" style={{ color: '#555' }}>{t('noPlayers')}</p>
+            </div>
           ) : (
-            <div className="overflow-x-auto" style={{ border: '1px solid #262626' }}>
-              {/* Table Header */}
-              <div
-                className="grid gap-2 px-4 py-3 text-xs uppercase tracking-wider"
-                style={{
-                  backgroundColor: '#141414',
-                  color: '#888888',
-                  gridTemplateColumns: leaguesEnabled
-                    ? '40px 1fr auto auto auto auto'
-                    : '40px 1fr auto auto auto',
-                }}
-              >
-                <span>#</span>
-                <span>{t('player')}</span>
-                {leaguesEnabled && <span>{t('league')}</span>}
-                <span>{t('elo')}</span>
-                <span className="hidden sm:block">{t('wins')}/{t('losses')}/{t('draws')}</span>
-                <span className="hidden sm:block">{t('winRate')}</span>
-              </div>
-
-              {/* Table Rows */}
+            <div className="flex flex-col gap-1.5">
               {users.map((user, index) => {
                 const total = user.wins + user.losses + user.draws;
                 const winRate = total > 0 ? Math.round((user.wins / total) * 100) : 0;
                 const globalRank = (currentPage - 1) * PLAYERS_PER_PAGE + index + 1;
+                const isTop3 = globalRank <= 3;
+                const borderAccent = isTop3 ? '#c4a35a' : '#1e1e1e';
 
                 return (
                   <div
                     key={user.id}
-                    className="grid gap-2 px-4 py-3 text-sm items-center"
+                    className="rounded-lg flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 transition-colors"
                     style={{
-                      borderTop: '1px solid #262626',
-                      gridTemplateColumns: leaguesEnabled
-                        ? '40px 1fr auto auto auto auto'
-                        : '40px 1fr auto auto auto',
+                      backgroundColor: isTop3 ? '#13110e' : '#111',
+                      borderLeft: `2px solid ${borderAccent}`,
                     }}
                   >
                     {/* Rank */}
                     <span
-                      className="font-bold tabular-nums"
-                      style={{ color: globalRank <= 3 ? '#c4a35a' : '#888888' }}
+                      className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
+                      style={{ color: isTop3 ? '#c4a35a' : '#555' }}
                     >
                       {globalRank}
                     </span>
 
-                    {/* Player */}
-                    <span className="flex items-center gap-1.5 truncate min-w-0">
+                    {/* Player name + badges */}
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       <Link
                         href={`/profile/${user.username}` as '/'}
-                        className="underline truncate"
+                        className="text-sm truncate transition-colors"
                         style={{ color: '#e0e0e0' }}
                       >
                         {user.username}
                       </Link>
-                      <UserBadges
-                        role={user.role}
-                        badgePrefs={user.badgePrefs}
-                        size="sm"
-                      />
-                    </span>
+                      <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
+                    </div>
 
-                    {/* League Badge - only when leagues enabled */}
+                    {/* League badge */}
                     {leaguesEnabled && (
-                      <span className="flex items-center">
+                      <div className="shrink-0">
                         <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
-                      </span>
+                      </div>
                     )}
 
                     {/* ELO */}
-                    <span className="tabular-nums font-semibold" style={{ color: '#e0e0e0' }}>
+                    <span
+                      className="text-sm font-semibold tabular-nums shrink-0 w-10 text-right"
+                      style={{ color: '#e0e0e0' }}
+                    >
                       {user.elo}
                     </span>
 
-                    {/* W/L/D */}
-                    <span className="hidden sm:block tabular-nums" style={{ color: '#888888' }}>
-                      {user.wins}/{user.losses}/{user.draws}
-                    </span>
+                    {/* W/L/D — desktop only */}
+                    <div className="hidden sm:flex items-center gap-1 shrink-0">
+                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
+                        {user.wins}W
+                      </span>
+                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e' }}>
+                        {user.losses}L
+                      </span>
+                      <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(136,136,136,0.08)', color: '#888' }}>
+                        {user.draws}D
+                      </span>
+                    </div>
 
-                    {/* Win Rate */}
-                    <span className="hidden sm:block tabular-nums" style={{ color: '#888888' }}>
+                    {/* Win rate — desktop only */}
+                    <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888' }}>
                       {winRate}%
                     </span>
                   </div>
@@ -258,25 +245,25 @@ export default function LeaderboardPage() {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* ──── Pagination ──── */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 mt-4">
+            <div className="flex items-center justify-center gap-3 mt-5">
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-25 cursor-pointer"
+                style={{ backgroundColor: '#141414', border: '1px solid #1e1e1e', color: '#888' }}
               >
                 {tc('previous')}
               </button>
-              <span className="text-xs tabular-nums" style={{ color: '#888888' }}>
+              <span className="text-xs tabular-nums" style={{ color: '#555' }}>
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
-                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-30"
-                style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#888888' }}
+                className="px-3 py-1.5 text-xs transition-colors disabled:opacity-25 cursor-pointer"
+                style={{ backgroundColor: '#141414', border: '1px solid #1e1e1e', color: '#888' }}
               >
                 {tc('next')}
               </button>
@@ -286,7 +273,6 @@ export default function LeaderboardPage() {
       </div>
       <Footer />
 
-      {/* Leagues Modal - only rendered when leagues enabled */}
       {leaguesEnabled && (
         <LeaguesModal open={leaguesModalOpen} onClose={() => setLeaguesModalOpen(false)} />
       )}
