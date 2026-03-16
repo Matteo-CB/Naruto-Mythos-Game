@@ -205,6 +205,7 @@ export default function ProfilePage({
                 <UserBadges
                   role={profile.role}
                   elo={profile.elo}
+                  totalGames={total}
                   badgePrefs={profile.badgePrefs}
                   leaguesEnabled={leaguesEnabled}
                   size="md"
