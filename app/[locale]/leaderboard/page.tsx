@@ -184,7 +184,7 @@ export default function LeaderboardPage() {
               >
                 <span>#</span>
                 <span>{t('player')}</span>
-                {leaguesEnabled && <span className="hidden sm:block">{t('league')}</span>}
+                {leaguesEnabled && <span>{t('league')}</span>}
                 <span>{t('elo')}</span>
                 <span className="hidden sm:block">{t('wins')}/{t('losses')}/{t('draws')}</span>
                 <span className="hidden sm:block">{t('winRate')}</span>
@@ -233,7 +233,7 @@ export default function LeaderboardPage() {
 
                     {/* League Badge - only when leagues enabled */}
                     {leaguesEnabled && (
-                      <span className="hidden sm:flex items-center">
+                      <span className="flex items-center">
                         <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
                       </span>
                     )}
