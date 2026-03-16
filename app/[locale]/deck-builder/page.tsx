@@ -177,6 +177,8 @@ export default function DeckBuilderPage() {
   // New state for redesigned layout
   const [showDeckDrawer, setShowDeckDrawer] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportCopied, setExportCopied] = useState(false);
 
   // Filter & sort state
   const [sortBy, setSortBy] = useState<SortField>('number');
@@ -445,6 +447,33 @@ export default function DeckBuilderPage() {
     }
     setImportCode("");
   }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
+
+  // Generate export code in ShinobiBuilder-compatible format: CARD_ID--QTY|...|DECK_NAME
+  const exportCode = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const c of deckChars) {
+      const id = c.cardId || c.id;
+      counts.set(id, (counts.get(id) || 0) + 1);
+    }
+    for (const m of deckMissions) {
+      const id = m.cardId || m.id;
+      counts.set(id, (counts.get(id) || 0) + 1);
+    }
+    const parts: string[] = [];
+    for (const [id, qty] of counts) {
+      parts.push(`${id}--${qty}`);
+    }
+    const safeName = (deckName || 'Deck').replace(/\s+/g, '_');
+    parts.push(safeName);
+    return parts.join('|');
+  }, [deckChars, deckMissions, deckName]);
+
+  const handleCopyExportCode = useCallback(() => {
+    navigator.clipboard.writeText(exportCode).then(() => {
+      setExportCopied(true);
+      setTimeout(() => setExportCopied(false), 2000);
+    });
+  }, [exportCode]);
 
   // Group deck characters by chakra cost for the deck panel
   const deckCharsByCost = useMemo(() => {
@@ -845,8 +874,8 @@ export default function DeckBuilderPage() {
                 </Link>
               </div>
               <div className="flex-1">
-                <AngularButton onClick={() => exportDeckAsImage(deckName, deckChars, deckMissions)} variant="muted" disabled={deckChars.length === 0} size="sm">
-                  {t("deckBuilder.exportImage")}
+                <AngularButton onClick={() => setShowExportModal(true)} variant="muted" disabled={deckChars.length === 0} size="sm">
+                  {t("deckBuilder.exportButton")}
                 </AngularButton>
               </div>
             </div>
@@ -1437,6 +1466,7 @@ export default function DeckBuilderPage() {
                   <div className="flex-1"><AngularButton onClick={() => { setShowDeckDrawer(false); setShowSavedDecks(true); }} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton></div>
                   <div className="flex-1"><AngularButton onClick={() => { setShowDeckDrawer(false); setShowImportModal(true); }} variant="secondary" size="sm">{t("deckBuilder.importButton")}</AngularButton></div>
                 </div>
+                <AngularButton onClick={() => { setShowDeckDrawer(false); setShowExportModal(true); }} variant="muted" disabled={deckChars.length === 0} size="sm">{t("deckBuilder.exportButton")}</AngularButton>
                 <AngularButton onClick={clearDeck} variant="danger" size="sm">{t("deckBuilder.clearDeck")}</AngularButton>
               </div>
             </motion.div>
@@ -1596,6 +1626,43 @@ export default function DeckBuilderPage() {
               )}
 
               <PopupDismissLink onClick={() => { setShowImportModal(false); setImportMessage(null); }}>{t("common.close")}</PopupDismissLink>
+            </PopupCornerFrame>
+          </PopupOverlay>
+        )}
+      </AnimatePresence>
+
+      {/* ===== MODAL: Export ===== */}
+      <AnimatePresence>
+        {showExportModal && (
+          <PopupOverlay>
+            <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
+              <PopupTitle accentColor="#c4a35a" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
+
+              <div className="flex gap-2 mb-4">
+                <PopupActionButton accentColor="#c4a35a" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); setShowExportModal(false); }}>
+                  {t("deckBuilder.exportAsImage")}
+                </PopupActionButton>
+              </div>
+
+              <p className="text-xs mb-2" style={{ color: '#888', borderLeft: '3px solid rgba(196,163,90,0.3)', paddingLeft: '8px' }}>
+                {t("deckBuilder.exportTextDesc")}
+              </p>
+
+              <div className="flex items-center gap-2 mb-3">
+                <input
+                  type="text"
+                  readOnly
+                  value={exportCode}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                  className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.3)', color: '#e0e0e0' }}
+                />
+                <PopupActionButton accentColor={exportCopied ? '#3e8b3e' : '#c4a35a'} onClick={handleCopyExportCode}>
+                  {exportCopied ? t("deckBuilder.exportCopied") : t("deckBuilder.exportCopy")}
+                </PopupActionButton>
+              </div>
+
+              <PopupDismissLink onClick={() => { setShowExportModal(false); setExportCopied(false); }}>{t("common.close")}</PopupDismissLink>
             </PopupCornerFrame>
           </PopupOverlay>
         )}

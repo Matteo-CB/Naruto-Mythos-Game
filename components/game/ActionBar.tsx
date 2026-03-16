@@ -127,9 +127,27 @@ export function ActionBar() {
       // Kyubi 129 can upgrade over any Naruto Uzumaki
       const isKyubiUpgrade = selectedCard.number === 129
         && charCard.name_fr.toUpperCase().includes('NARUTO');
+      // Sakon 127 can upgrade over any Sound Village character
+      const isSakonUpgrade = selectedCard.number === 127
+        && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
+        && (charCard.group ?? '').toLowerCase().includes('sound');
 
-      const nameOk = sameNameMatch || isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade || isKyubiUpgrade;
-      return nameOk && charCard.chakra < selectedCard.chakra;
+      const isFlexUpgrade = isFlexible || isAkamaruUpgrade || isIchibiUpgrade || isUkonUpgrade || isKyubiUpgrade || isSakonUpgrade;
+      const nameOk = sameNameMatch || isFlexUpgrade;
+      if (!nameOk || charCard.chakra >= selectedCard.chakra) return false;
+
+      // For flex upgrades (not same-name), check post-upgrade name conflict:
+      // would placing selectedCard's name on this mission create a duplicate?
+      if (!sameNameMatch && isFlexUpgrade) {
+        const wouldConflict = myChars.some(other => {
+          if (other.instanceId === c.instanceId || other.isHidden) return false;
+          const oCard = other.topCard ?? other.card;
+          if (!oCard) return false;
+          return oCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
+        });
+        if (wouldConflict) return false;
+      }
+      return true;
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
 
@@ -156,6 +174,16 @@ export function ActionBar() {
           const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
           const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
           if (isSameName || isFlexible) {
+            // For flex upgrades, check post-upgrade name conflict
+            if (isFlexible && !isSameName) {
+              const wouldConflict = myChars.some(other => {
+                if (other.instanceId === selectedTargetId || other.instanceId === c.instanceId || other.isHidden) return false;
+                const oCard = other.topCard ?? other.card;
+                if (!oCard) return false;
+                return oCard.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
+              });
+              if (wouldConflict) continue;
+            }
             const rawRevUpgCost = Math.max(0, revealBaseCost - (cTop.chakra ?? 0));
             // Kurenai 034: minimum cost 1 on upgrade display
             const upgradeCost = hasKurenai034CostReduction(visibleState, myPlayer, hiddenTopCard, mi)

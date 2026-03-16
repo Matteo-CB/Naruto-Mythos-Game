@@ -189,6 +189,55 @@ function applyUpgradePowerup(
  * Process chars to move one at a time. Auto-moves chars with 0-1 valid destinations,
  * returns target selection for the first char that needs a player choice.
  */
+/**
+ * Filter charIds to only those that still exist on the board and can move.
+ * Returns { moveable: instanceIds that have valid destinations, unmoveable: those with no valid dest }
+ */
+function filterMoveableChars(
+  state: GameState,
+  charIds: string[],
+  player: PlayerID,
+  sourceMissionIndex: number,
+): { moveable: string[]; state: GameState } {
+  const friendlySide = side(player);
+  const moveable: string[] = [];
+  let s = state;
+
+  for (const charId of charIds) {
+    // Check if char still exists
+    let charExists = false;
+    let charName = '';
+    for (const m of s.activeMissions) {
+      const c = m[friendlySide].find((ch) => ch.instanceId === charId);
+      if (c) {
+        charExists = true;
+        charName = c.card.name_fr;
+        break;
+      }
+    }
+    if (!charExists) continue;
+
+    const validMissions = getValidMissions(s, charId, player, sourceMissionIndex);
+    if (validMissions.length === 0) {
+      // "if able" — character can't legally move, skip it
+      s = {
+        ...s,
+        log: logAction(
+          s.log, s.turn, s.phase, player,
+          'EFFECT_SKIP',
+          `Sasuke Uchiwa (107): ${charName} cannot move (name conflict at all destinations), stays.`,
+          'game.log.effect.sasuke107Skip',
+          { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName },
+        ),
+      };
+      continue;
+    }
+    moveable.push(charId);
+  }
+
+  return { moveable, state: s };
+}
+
 function processNextMove(
   state: GameState,
   charIds: string[],
@@ -199,12 +248,16 @@ function processNextMove(
   sasukeInstanceId: string,
   sourceMissionIndex: number,
 ): EffectResult {
-  // All chars processed
-  if (idx >= charIds.length) {
+  // Filter remaining chars to only those that exist and can move
+  const remaining = charIds.slice(idx);
+  const { moveable, state: filteredState } = filterMoveableChars(state, remaining, player, sourceMissionIndex);
+
+  // All chars processed or none can move
+  if (moveable.length === 0) {
     // UPGRADE: POWERUP X is optional — show CONFIRM popup instead of auto-applying
     if (isUpgrade && movedCount > 0) {
       return {
-        state,
+        state: filteredState,
         requiresTargetSelection: true,
         targetSelectionType: 'SASUKE107_CONFIRM_UPGRADE',
         validTargets: [sasukeInstanceId],
@@ -214,50 +267,42 @@ function processNextMove(
         descriptionParams: { count: String(movedCount) },
       };
     }
-    return { state };
+    return { state: filteredState };
   }
 
-  const charId = charIds[idx];
-
-  // Find this char - it might have been removed by a previous move
-  const friendlySide = side(player);
-  let charExists = false;
-  let charName = '';
-  for (const m of state.activeMissions) {
-    const c = m[friendlySide].find((ch) => ch.instanceId === charId);
-    if (c) {
-      charExists = true;
-      charName = c.card.name_fr;
-      break;
-    }
-  }
-
-  if (!charExists) {
-    // Char already gone (e.g., merged via upgrade) - skip
-    return processNextMove(state, charIds, idx + 1, movedCount, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
-  }
-
-  const validMissions = getValidMissions(state, charId, player, sourceMissionIndex);
-
-  if (validMissions.length === 0) {
-    // "if able" — character can't legally move (name conflict at all destinations), skip it
-    const skipState = {
-      ...state,
-      log: logAction(
-        state.log, state.turn, state.phase, player,
-        'EFFECT_SKIP',
-        `Sasuke Uchiwa (107): ${charName} cannot move (name conflict at all destinations), stays.`,
-        'game.log.effect.sasuke107Skip',
-        { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName },
-      ),
+  // 2+ characters remaining: let the player choose which to move next
+  if (moveable.length >= 2) {
+    return {
+      state: filteredState,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SASUKE107_CHOOSE_CHAR_TO_MOVE',
+      validTargets: moveable,
+      description: JSON.stringify({
+        remainingCharIds: moveable,
+        movedCount,
+        isUpgrade,
+        sasukeInstanceId,
+        sourceMissionIndex,
+      }),
+      descriptionKey: 'game.effect.desc.sasuke107ChooseCharToMove',
+      isMandatory: true,
     };
-    // movedCount NOT incremented — skipped chars don't count for UPGRADE POWERUP
-    return processNextMove(skipState, charIds, idx + 1, movedCount, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
   }
+
+  // Exactly 1 character remaining: proceed directly
+  const charId = moveable[0];
+  const friendlySide = side(player);
+  let charName = '';
+  for (const m of filteredState.activeMissions) {
+    const c = m[friendlySide].find((ch) => ch.instanceId === charId);
+    if (c) { charName = c.card.name_fr; break; }
+  }
+
+  const validMissions = getValidMissions(filteredState, charId, player, sourceMissionIndex);
 
   if (validMissions.length === 1) {
     // Auto-move
-    let moved = moveCharTo(state, charId, validMissions[0], player);
+    let moved = moveCharTo(filteredState, charId, validMissions[0], player);
     moved = {
       ...moved,
       log: logAction(
@@ -268,19 +313,40 @@ function processNextMove(
         { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName, from: sourceMissionIndex, to: validMissions[0] },
       ),
     };
-    return processNextMove(moved, charIds, idx + 1, movedCount + 1, isUpgrade, player, sasukeInstanceId, sourceMissionIndex);
+    // Note: move triggers will be called in EffectEngine after resolving this auto-move.
+    // We store the auto-move info so EffectEngine can call triggers.
+    // For auto-moves from the handler, we return a special result that EffectEngine processes.
+    return {
+      state: moved,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SASUKE107_AUTO_MOVED',
+      validTargets: ['confirm'],
+      description: JSON.stringify({
+        movedCharInstanceId: charId,
+        destMissionIndex: validMissions[0],
+        movedCount: movedCount + 1,
+        isUpgrade,
+        sasukeInstanceId,
+        sourceMissionIndex,
+        remainingCharIds: [],
+      }),
+      descriptionKey: 'game.effect.desc.sasuke107AutoMoved',
+      descriptionParams: { target: charName, mission: String(validMissions[0] + 1) },
+      isMandatory: true,
+      isOptional: false,
+    };
   }
 
-  // Multiple valid missions - need player choice
+  // Multiple valid missions - need player choice for destination
   return {
-    state,
+    state: filteredState,
     requiresTargetSelection: true,
     targetSelectionType: 'SASUKE107_CHOOSE_DESTINATION',
     validTargets: validMissions.map(String),
     description: JSON.stringify({
       text: `Sasuke Uchiwa (107): Choose a mission to move ${charName} to.`,
       charInstanceId: charId,
-      remainingCharIds: charIds.slice(idx + 1),
+      remainingCharIds: [],
       movedCount,
       isUpgrade,
       sasukeInstanceId,

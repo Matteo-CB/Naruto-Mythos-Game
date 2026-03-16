@@ -147,10 +147,19 @@ export function validateRevealCharacter(
   });
 
   // Also check flexible upgrade targets (Orochimaru 138, Akamaru 029, Ichibi 076, etc.)
+  // Exclude targets where upgrading would create a post-upgrade name conflict
   const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
     if (c.instanceId === characterInstanceId || c.isHidden) return false;
     const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    return checkFlexibleUpgrade(charTopCard, cTop) && charTopCard.chakra > cTop.chakra;
+    if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
+    // Check post-upgrade name conflict
+    const wouldConflict = chars.some((other) => {
+      if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
+      if (other.isHidden) return false;
+      const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+      return oTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
+    });
+    return !wouldConflict;
   }) : null;
 
   const upgradeTarget = sameNameChar ?? flexibleUpgradeTarget;
@@ -226,6 +235,21 @@ export function validateUpgradeCharacter(
     // Standard upgrade: must be same name
     if (newCard.name_fr.toUpperCase() !== topCard.name_fr.toUpperCase()) {
       return { valid: false, reason: 'Upgrade must be same character name.', reasonKey: 'game.error.upgradeSameName' };
+    }
+  }
+
+  // For flexible (cross-name) upgrades: check that the new card's name
+  // doesn't conflict with another visible character on the same mission.
+  // E.g., Orochimaru 138 upgrading over Naruto when another Orochimaru is already present.
+  if (isFlexibleUpgrade) {
+    const wouldConflict = chars.some((c) => {
+      if (c.instanceId === targetInstanceId) return false; // Skip the target being upgraded
+      if (c.isHidden) return false;
+      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      return cTop.name_fr.toUpperCase() === newCard.name_fr.toUpperCase();
+    });
+    if (wouldConflict) {
+      return { valid: false, reason: `Cannot upgrade: would create duplicate ${newCard.name_fr} on this mission.`, reasonKey: 'game.error.upgradeNameConflict', reasonParams: { name: newCard.name_fr } };
     }
   }
 

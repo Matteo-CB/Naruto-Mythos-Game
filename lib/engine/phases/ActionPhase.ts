@@ -111,17 +111,9 @@ function handlePlayCharacter(
     return handleUpgradeCharacter(state, player, cardIndex, missionIndex, autoUpgradeTarget.instanceId);
   }
 
-  // Also auto-detect flexible (cross-name) upgrades (e.g. Ichibi→Gaara, Akamaru→Kiba, Orochimaru→any)
-  const flexUpgradeTarget = chars.find((c) => {
-    if (c.isHidden || c.controlledBy !== player) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-    if (card.chakra <= topCard.chakra) return false;
-    return checkFlexibleUpgrade(card, topCard);
-  });
-
-  if (flexUpgradeTarget) {
-    return handleUpgradeCharacter(state, player, cardIndex, missionIndex, flexUpgradeTarget.instanceId);
-  }
+  // Flexible (cross-name) upgrades are NOT auto-detected here.
+  // The player must explicitly choose "Upgrade" via UPGRADE_CHARACTER action.
+  // The UI (ActionBar) already shows separate "Play" and "Upgrade [target]" buttons.
 
   const effectiveCost = calculateEffectiveCost(state, player, card, missionIndex, false);
 
@@ -558,9 +550,8 @@ function handleUpgradeCharacter(
     log,
   };
 
-  // When a controller (e.g. Ino 020) is upgraded, the old card's "take control"
-  // effect no longer applies — return any controlled characters to their owner.
-  newState = EffectEngine.restoreControlOnLeave(newState, targetInstanceId);
+  // Upgrading does NOT count as "leaving the field" — controlled characters persist
+  // through upgrade. Control only ends on defeat, hide, or leaving play.
 
   // Track this direct play for last-played highlight
   newState = trackLastPlayed(newState, player, targetInstanceId);
