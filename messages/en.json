@@ -1033,7 +1033,16 @@
     "deckOrder": "Deck Order (top to bottom)",
     "clickToMoveTop": "Click a card to move it to the top of the deck",
     "close": "Close",
-    "emptyDeck": "Deck is empty"
+    "emptyDeck": "Deck is empty",
+    "addAnyCard": "Add Card",
+    "returnToHand": "To Hand",
+    "hide": "Hide",
+    "reveal": "Reveal",
+    "powerToken": "Power",
+    "setChakra": "Set Chakra",
+    "searchCards": "Search cards...",
+    "allCards": "All Cards",
+    "discardHand": "Discard"
   },
   "online": {
     "title": "Play Online",

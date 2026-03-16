@@ -114,6 +114,12 @@ interface GameStore {
   sandboxDefeatCharacter: (missionIndex: number, instanceId: string) => void;
   sandboxMoveCharacter: (fromMission: number, instanceId: string, toMission: number) => void;
   sandboxMoveToTopDeck: (deckIndex: number) => void;
+  sandboxAddAnyCard: (cardId: string) => void;
+  sandboxReturnToHand: (missionIndex: number, instanceId: string) => void;
+  sandboxHideCharacter: (missionIndex: number, instanceId: string) => void;
+  sandboxRevealCharacter: (missionIndex: number, instanceId: string) => void;
+  sandboxAddPowerToken: (missionIndex: number, instanceId: string, amount: number) => void;
+  sandboxSetChakra: (amount: number) => void;
 }
 
 let animationIdCounter = 0;
@@ -1958,6 +1964,83 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (deckIndex < 0 || deckIndex >= ps.deck.length) return;
     const [card] = ps.deck.splice(deckIndex, 1);
     ps.deck.unshift(card);
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxAddAnyCard: (cardId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const { getCharacterById } = require('@/lib/data/cardIndex');
+    const card = getCharacterById(cardId);
+    if (!card) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    s[humanPlayer].hand.push(JSON.parse(JSON.stringify(card)));
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxReturnToHand: (missionIndex: number, instanceId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const idx = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (idx !== -1) {
+        const [char] = mission[side].splice(idx, 1);
+        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const owner = char.originalOwner || char.controlledBy;
+        s[owner].hand.push(topCard);
+        break;
+      }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxHideCharacter: (missionIndex: number, instanceId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const char = mission[side].find((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (char) { char.isHidden = true; break; }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxRevealCharacter: (missionIndex: number, instanceId: string) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const char = mission[side].find((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (char) { char.isHidden = false; char.wasRevealedAtLeastOnce = true; break; }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxAddPowerToken: (missionIndex: number, instanceId: string, amount: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const mission = s.activeMissions[missionIndex];
+    if (!mission) return;
+    for (const side of ['player1Characters', 'player2Characters'] as const) {
+      const char = mission[side].find((c: CharacterInPlay) => c.instanceId === instanceId);
+      if (char) { char.powerTokens = Math.max(0, char.powerTokens + amount); break; }
+    }
+    set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxSetChakra: (amount: number) => {
+    const { isSandboxMode, gameState, humanPlayer } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    s[humanPlayer].chakra = Math.max(0, amount);
     set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
   },
 }));
