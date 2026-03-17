@@ -36,6 +36,10 @@ model User {
   matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
   accounts          Account[]
   tournamentWins    Int          @default(0)
+  chatBanned        Boolean      @default(false)
+  chatBanUntil      DateTime?
+  gameBanned        Boolean      @default(false)
+  gameBanUntil      DateTime?
 }
 
 model Account {
@@ -238,6 +242,48 @@ model CardIssue {
   updatedBy   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomCode  String
+  userId    String   @db.ObjectId
+  username  String
+  message   String
+  isEmote   Boolean  @default(false)
+  isSpectator Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ChatReport {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  messageId       String
+  reporterId      String    @db.ObjectId
+  reporterName    String
+  targetId        String    @db.ObjectId
+  targetName      String
+  messageText     String
+  roomCode        String
+  reason          String    @default("")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  action          String?
+  reporterNotified Boolean  @default(false)
+  reporterReward   Int?
+}
+
+model UserBan {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  username    String
+  type        String
+  permanent   Boolean   @default(false)
+  expiresAt   DateTime?
+  reason      String    @default("")
+  issuedBy    String    @db.ObjectId
+  createdAt   DateTime  @default(now())
 }
 
 model Suggestion {
