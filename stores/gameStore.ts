@@ -1535,7 +1535,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
         // Check if it's the AI's turn
         const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
-        if (aiActions.length === 0) break;
+        if (aiActions.length === 0) {
+          // No valid actions but AI hasn't passed yet — force PASS
+          if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
+            console.warn('[gameStore] AI has no valid actions, forcing PASS');
+            currentState = GameEngine.applyAction(currentState, aiPlayer.player, { type: 'PASS' });
+            iterations++;
+            continue;
+          }
+          break;
+        }
 
         // Check if human also needs to act (during mulligan both can act)
         if (currentState.phase !== 'mulligan') {
@@ -1544,7 +1553,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
 
         const aiAction = await aiPlayer.getActionAsync(currentState);
-        if (!aiAction) break;
+        if (!aiAction) {
+          // AI couldn't decide — force PASS to prevent game freeze
+          if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
+            console.warn('[gameStore] AI returned null action, forcing PASS');
+            currentState = GameEngine.applyAction(currentState, aiPlayer.player, { type: 'PASS' });
+            iterations++;
+            continue;
+          }
+          break;
+        }
 
         // Capture animation for this AI action
         const animEvent = getAnimationForAIAction(aiAction, currentState, aiPlayer.player);
