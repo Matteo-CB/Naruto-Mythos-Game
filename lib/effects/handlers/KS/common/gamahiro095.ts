@@ -14,6 +14,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleGamahiro095Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Gamahiro (095): Mission not found.', 'game.log.effect.noTarget', { card: 'GAMAHIRO', id: 'KS-095-C' }) } };
+  }
   const friendlyChars =
     sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
