@@ -3062,13 +3062,14 @@ export class EffectEngine {
           'EFFECT', 'EFFECT_UPGRADE', 'EFFECT_PLAY',
         ]);
 
-        const s022PlayedChars: { name: string; mission: number }[] = [];
+        const s022PlayedChars: { name?: string; instanceId?: string; mission: number }[] = [];
         let s022PrimaryIdx = -1;
         for (let i = newState.log.length - 1; i >= 0; i--) {
           const entry = newState.log[i];
           if (entry.turn !== s022Turn || entry.phase !== 'action') continue;
           if (entry.player !== s022Opponent) continue;
-          if (entry.action === 'PASS' || entry.action === 'PLAY_HIDDEN') break;
+          if (entry.action === 'PASS') break;
+          if (entry.action === 'PLAY_HIDDEN') { s022PrimaryIdx = i; break; }
           if (PLAY_ACTIONS_022.has(entry.action)) { s022PrimaryIdx = i; break; }
         }
         if (s022PrimaryIdx >= 0) {
@@ -3077,7 +3078,10 @@ export class EffectEngine {
             if (entry.turn !== s022Turn || entry.phase !== 'action') break;
             if (entry.player !== s022Opponent) break;
             const missionNum = entry.messageParams?.mission != null ? Number(entry.messageParams.mission) - 1 : null;
-            if (PLAY_ACTIONS_022.has(entry.action)) {
+            if (entry.action === 'PLAY_HIDDEN') {
+              const instId = entry.messageParams?.instanceId as string | undefined;
+              if (missionNum !== null) s022PlayedChars.push({ instanceId: instId, mission: missionNum });
+            } else if (PLAY_ACTIONS_022.has(entry.action)) {
               const charName = (entry.messageParams?.card as string) ?? null;
               if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
             } else if (EFFECT_PLAY_ACTIONS_022.has(entry.action)) {
@@ -3092,11 +3096,20 @@ export class EffectEngine {
           const mission = newState.activeMissions[played.mission];
           if (!mission) continue;
           for (const char of mission[s022EnemySide]) {
-            if (char.isHidden) continue;
             if (s022Targets.includes(char.instanceId)) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-            if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
-              s022Targets.push(char.instanceId);
+            if (played.instanceId) {
+              // Hidden play: match by instanceId
+              if (char.instanceId === played.instanceId) {
+                s022Targets.push(char.instanceId);
+              }
+            } else if (played.name) {
+              // Visible play: match by name
+              if (!char.isHidden) {
+                const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+                if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
+                  s022Targets.push(char.instanceId);
+                }
+              }
             }
           }
         }
@@ -7923,7 +7936,9 @@ export class EffectEngine {
           const card = t125State.hand[i];
           if (card.group === 'Sound Village') {
             const freshCost = Math.max(0, card.chakra - 2);
-            if (t125State.chakra >= freshCost) {
+            const canFresh = t125State.chakra >= freshCost;
+            const canUpgrade = canAffordAsUpgrade(newState, t125Player, card as { name_fr: string; chakra: number }, 2);
+            if (canFresh || canUpgrade) {
               t125Targets.push(String(i));
             }
           }
@@ -11393,7 +11408,8 @@ export class EffectEngine {
         const s135mAvailable = s135mTop3.filter((card) => {
           if (card.card_type !== 'character') return false;
           const effectiveCost = Math.max(0, (card.chakra ?? 0) - s135mCostReduction);
-          return effectiveCost <= newState[s135mPlayer].chakra;
+          if (effectiveCost <= newState[s135mPlayer].chakra) return true;
+          return canAffordAsUpgrade(newState, s135mPlayer, card as any, s135mCostReduction);
         });
 
         if (s135mAvailable.length === 0) {

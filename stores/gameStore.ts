@@ -28,7 +28,7 @@ interface PendingTargetSelection {
   descriptionKey?: string; // i18n key for translated description
   descriptionParams?: Record<string, string | number>; // interpolation params
   playerName?: string; // display name of the player who must choose
-  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER'; // type of selection
+  selectionType?: 'TARGET_CHARACTER' | 'CHOOSE_FROM_HAND' | 'INFO_REVEAL' | 'CHOOSE_EFFECT' | 'DRAW_CARD' | 'CONFIRM_HIDE' | 'CONFIRM_DEFEAT' | 'EFFECT_PLAY_UPGRADE_OR_FRESH' | 'EFFECT_CONFIRM' | 'CHOOSE_EFFECT_ORDER' | 'ORDER_DEFEAT_TARGETS' | 'ORDER_HIDE_TARGETS'; // type of selection
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
@@ -38,6 +38,11 @@ interface PendingTargetSelection {
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
   // Effect ordering choice (multiple simultaneous effects)
   effectOrderChoices?: Array<{ effectId: string; sourceCardName: string; sourceCardImage?: string; effectType: string; description: string; descriptionKey?: string }>;
+  // Defeat/hide ordering (multiple targets — player chooses order)
+  orderTargets?: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }>;
+  sourceCardName?: string;
+  // Raw engine target selection type (for TargetSelector to detect special cases)
+  engineTargetSelectionType?: string;
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
@@ -808,6 +813,7 @@ function buildPendingTargetSelectionUI(
     deckSize,
     confirmCardData,
     playerName,
+    engineTargetSelectionType: tst || undefined,
     onSelect,
     onDecline: isMultiSelectChoose ? onDecline : (pendingEffect?.isOptional ? onDecline : undefined),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,

@@ -20,6 +20,7 @@ import {
   PopupMinimizeX,
   PopupTargetCount,
 } from './PopupPrimitives';
+import { TargetOrderPopup } from './TargetOrderPopup';
 
 // ----- Target Character Card -----
 
@@ -370,6 +371,38 @@ export function TargetSelector() {
   // Multi-select state for Kiba 026 / Tayuya 065 UPGRADE CHOOSE
   const [multiSelectChoices, setMultiSelectChoices] = useState<Set<string>>(new Set());
 
+  // Queued order for sequential defeat/hide (player chose full order in popup)
+  const queuedOrderRef = useRef<string[]>([]);
+
+  // Auto-submit queued targets when a new sequential prompt arrives
+  useEffect(() => {
+    if (!pendingTargetSelection || queuedOrderRef.current.length === 0) return;
+    const eTstQ = pendingTargetSelection.engineTargetSelectionType ?? '';
+    const isSeqHide = eTstQ.includes('CHOOSE_HIDE_TARGET') || eTstQ === 'KYUBI134_CHOOSE_HIDE_TARGETS';
+    const isSeqDefeat = eTstQ.includes('CHOOSE_DEFEAT_TARGET') || eTstQ === 'GAARA120_CHOOSE_DEFEAT';
+    if (!isSeqHide && !isSeqDefeat) {
+      queuedOrderRef.current = [];
+      return;
+    }
+    // Find the next queued target that's still valid
+    const vt = new Set(pendingTargetSelection.validTargets);
+    let nextTarget: string | null = null;
+    while (queuedOrderRef.current.length > 0) {
+      const candidate = queuedOrderRef.current.shift()!;
+      if (vt.has(candidate)) {
+        nextTarget = candidate;
+        break;
+      }
+    }
+    if (nextTarget) {
+      // Small delay to let state propagate
+      const timer = setTimeout(() => selectTarget(nextTarget!), 80);
+      return () => clearTimeout(timer);
+    }
+    // No valid queued target found — clear queue, user will see popup
+    queuedOrderRef.current = [];
+  }, [pendingTargetSelection, selectTarget]);
+
   if (!pendingTargetSelection || !visibleState) return null;
 
   // Hand selection is handled by HandCardSelector
@@ -387,6 +420,55 @@ export function TargetSelector() {
   const canDecline = !!onDecline;
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
+
+  // ---- Detect multi-target hide/defeat and render ORDER popup ----
+  const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
+  const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
+  const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET') || eTst === 'GAARA120_CHOOSE_DEFEAT';
+  if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && visibleState && queuedOrderRef.current.length === 0) {
+    // Build order targets from visible state characters
+    const orderTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }> = [];
+    for (const targetId of validTargets) {
+      for (let mIdx = 0; mIdx < visibleState.activeMissions.length; mIdx++) {
+        const mission = visibleState.activeMissions[mIdx];
+        for (const c of [...mission.player1Characters, ...mission.player2Characters]) {
+          if (c.instanceId === targetId && c.card) {
+            orderTargets.push({
+              instanceId: c.instanceId,
+              name_fr: c.card.name_fr,
+              name_en: (c.card as any).name_en,
+              image_file: c.card.image_file,
+              chakra: c.card.chakra,
+              power: c.effectivePower,
+              missionIndex: mIdx,
+              missionRank: mission.rank,
+              isHidden: c.isHidden,
+              isOwn: c.isOwn,
+            });
+            break;
+          }
+        }
+      }
+    }
+    if (orderTargets.length > 1) {
+      return (
+        <TargetOrderPopup
+          mode={isDefeatOrder ? 'defeat' : 'hide'}
+          targets={orderTargets}
+          description={description}
+          descriptionKey={descriptionKey}
+          descriptionParams={descriptionParams}
+          onConfirm={(orderedIds) => {
+            // Store remaining targets in queue, submit the first
+            queuedOrderRef.current = orderedIds.slice(1);
+            handleSelect(orderedIds[0]);
+          }}
+          onDecline={canDecline ? handleDecline : undefined}
+          canDecline={canDecline}
+        />
+      );
+    }
+  }
 
   // ---- DRAW_CARD UI (Sakura 011 and future draw effects) ----
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
@@ -955,6 +1037,32 @@ export function TargetSelector() {
           </PopupCornerFrame>
         </PopupOverlay>
       </AnimatePresence>
+    );
+  }
+
+  // ---- Defeat / Hide order choice — new ordering popup ----
+  if (
+    (pendingTargetSelection.selectionType === 'ORDER_DEFEAT_TARGETS' ||
+     pendingTargetSelection.selectionType === 'ORDER_HIDE_TARGETS') &&
+    pendingTargetSelection.orderTargets &&
+    pendingTargetSelection.orderTargets.length > 0
+  ) {
+    const orderMode = pendingTargetSelection.selectionType === 'ORDER_DEFEAT_TARGETS' ? 'defeat' as const : 'hide' as const;
+    return (
+      <TargetOrderPopup
+        mode={orderMode}
+        targets={pendingTargetSelection.orderTargets}
+        description={description}
+        descriptionKey={descriptionKey}
+        descriptionParams={descriptionParams}
+        sourceCardName={pendingTargetSelection.sourceCardName}
+        onConfirm={(orderedIds) => {
+          // Submit ordered targets as comma-separated string
+          handleSelect(orderedIds.join(','));
+        }}
+        onDecline={canDecline ? handleDecline : undefined}
+        canDecline={canDecline}
+      />
     );
   }
 

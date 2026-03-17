@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission, CharacterCard, MissionCard } from '@/lib/engine/types';
@@ -798,16 +798,21 @@ function PlayerBar({
   state,
   playerNames,
   isTop,
+  locale,
+  onCardClick,
 }: {
   player: PlayerID;
   state: GameState;
   playerNames: { player1: string; player2: string };
   isTop: boolean;
+  locale?: 'en' | 'fr';
+  onCardClick?: (card: CharacterCard | MissionCard) => void;
 }) {
   const t = useTranslations();
   const ps = state[player];
   const isEdgeHolder = state.edgeHolder === player;
   const isActive = state.activePlayer === player;
+  const [showDiscard, setShowDiscard] = useState(false);
   // Color based on position (bottom = gold, top = red) not player ID
   const color = isTop ? '#b33e3e' : '#c4a35a';
 
@@ -911,11 +916,72 @@ function PlayerBar({
           <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
             {t('game.deck')}: {ps.deck.length}
           </span>
-          <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
+          <span
+            className="text-[8px] tabular-nums"
+            style={{
+              color: ps.discardPile.length > 0 ? '#888' : '#444',
+              cursor: ps.discardPile.length > 0 ? 'pointer' : 'default',
+              textDecoration: ps.discardPile.length > 0 ? 'underline' : 'none',
+              textDecorationColor: 'rgba(136, 136, 136, 0.3)',
+              textUnderlineOffset: '2px',
+            }}
+            onClick={() => { if (ps.discardPile.length > 0) setShowDiscard(!showDiscard); }}
+          >
             {t('game.discard')}: {ps.discardPile.length}
           </span>
         </div>
       </div>
+
+      {/* Discard pile popup */}
+      <AnimatePresence>
+        {showDiscard && ps.discardPile.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(8, 8, 12, 0.95)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            }}
+          >
+            <div className="flex flex-wrap gap-1.5 px-3 py-2 max-h-35 overflow-y-auto">
+              {ps.discardPile.map((card, i) => {
+                const imgPath = normalizeImagePath(card.image_file);
+                const cardName = getCardName(card, locale ?? 'en');
+                return (
+                  <div
+                    key={`${card.id}-${i}`}
+                    className="shrink-0"
+                    style={{
+                      width: '52px',
+                      height: '72px',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      cursor: onCardClick ? 'pointer' : 'default',
+                    }}
+                    title={cardName}
+                    onClick={() => onCardClick?.(card)}
+                  >
+                    {imgPath ? (
+                      <div
+                        className="w-full h-full bg-cover bg-center"
+                        style={{ backgroundImage: `url('${imgPath}')` }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+                        <span className="text-[7px] text-center px-0.5" style={{ color: '#555' }}>{cardName}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -969,7 +1035,7 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
       </div>
 
       {/* Top player stats */}
-      <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} />
+      <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
       {/* Top player hand (fanned card-backs) */}
       <OpponentHandRow handSize={state[topPlayer].hand.length} />
@@ -998,7 +1064,7 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
       <PlayerHandRow cards={state[bottomPlayer].hand} locale={locale} player={bottomPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
       {/* Bottom player stats */}
-      <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} />
+      <PlayerBar player={bottomPlayer} state={state} playerNames={playerNames} isTop={false} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
     </div>
   );
 }

@@ -226,12 +226,20 @@ export function EdgeCoinFlip() {
   }, [phase, setCoinFlipComplete, isOnlineGame, coinFlipDoneSocket]);
 
   // Waiting phase: transition to done once coin-flip-sync arrives (sets coinFlipComplete)
+  // Fallback: if sync never arrives after 5s, force complete to avoid permanent block
   useEffect(() => {
     if (phase !== 'waiting') return;
     if (coinFlipComplete) {
       setPhase('done');
+      return;
     }
-  }, [phase, coinFlipComplete]);
+    const fallback = setTimeout(() => {
+      console.warn('[EdgeCoinFlip] coin-flip-sync timeout — forcing complete');
+      setCoinFlipComplete(true);
+      setPhase('done');
+    }, 5000);
+    return () => clearTimeout(fallback);
+  }, [phase, coinFlipComplete, setCoinFlipComplete]);
 
   const handleSkip = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);

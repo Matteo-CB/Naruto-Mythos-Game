@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback, useRef, useEffect } from 'react';
-import { motion, PanInfo } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -23,10 +23,7 @@ interface HandCardProps {
   total: number;
   isSelected: boolean;
   canAfford: boolean;
-  isDragging: boolean;
   onSelect: (originalIndex: number) => void;
-  onDragStart: () => void;
-  onDragEnd: (displayIndex: number, info: PanInfo) => void;
   onPreview: (card: CharacterCard, position: { x: number; y: number }) => void;
   onPreviewHide: () => void;
   onPin: (card: CharacterCard) => void;
@@ -83,10 +80,7 @@ const HandCard = React.memo(function HandCard({
   total,
   isSelected,
   canAfford,
-  isDragging,
   onSelect,
-  onDragStart,
-  onDragEnd,
   onPreview,
   onPreviewHide,
   onPin,
@@ -95,7 +89,6 @@ const HandCard = React.memo(function HandCard({
 }: HandCardProps) {
   const locale = useLocale();
   const dims = useGameScale();
-  const didDragRef = useRef(false);
 
   // Fan effect based on display index
   const midpoint = (total - 1) / 2;
@@ -141,29 +134,9 @@ const HandCard = React.memo(function HandCard({
     <motion.div
       initial={{ y: 100, opacity: 0, rotate: 0 }}
       animate={animateProps}
-      whileHover={isDragging ? undefined : hoverProps}
+      whileHover={hoverProps}
       transition={transitionProps}
-      drag="x"
-      dragMomentum={false}
-      dragElastic={0.15}
-      dragConstraints={{ left: 0, right: 0 }}
-      onDragStart={() => {
-        didDragRef.current = false;
-        onDragStart();
-      }}
-      onDrag={(_e, info) => {
-        if (Math.abs(info.offset.x) > 30) {
-          didDragRef.current = true;
-        }
-      }}
-      onDragEnd={(_e, info) => {
-        if (didDragRef.current) {
-          onDragEnd(displayIndex, info);
-        }
-        didDragRef.current = false;
-      }}
       onClick={(e) => {
-        if (didDragRef.current) return;
         e.stopPropagation();
         onSelect(originalIndex);
         onPin(card);
@@ -188,15 +161,13 @@ const HandCard = React.memo(function HandCard({
             ? '1px solid rgba(255, 255, 255, 0.1)'
             : '1px solid rgba(179, 62, 62, 0.3)',
         overflow: 'hidden',
-        zIndex: isDragging ? 200 : isSelected ? 50 : displayIndex,
+        zIndex: isSelected ? 50 : displayIndex,
         transform: `translateY(${arcY}px)`,
         opacity: canAfford ? 1 : 0.55,
-        boxShadow: isDragging
-          ? '0 0 30px rgba(196, 163, 90, 0.5), 0 12px 40px rgba(0, 0, 0, 0.7)'
-          : isSelected
-            ? '0 0 20px rgba(196, 163, 90, 0.4), 0 8px 24px rgba(0, 0, 0, 0.6)'
-            : '0 4px 16px rgba(0, 0, 0, 0.5)',
-        cursor: isDragging ? 'grabbing' : 'pointer',
+        boxShadow: isSelected
+          ? '0 0 20px rgba(196, 163, 90, 0.4), 0 8px 24px rgba(0, 0, 0, 0.6)'
+          : '0 4px 16px rgba(0, 0, 0, 0.5)',
+        cursor: 'pointer',
       }}
     >
       {/* Card image background */}
@@ -366,42 +337,6 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
 
   // ── Drag state ──
 
-  const [draggingIdx, setDraggingIdx] = React.useState<number | null>(null);
-
-  const handleDragStart = useCallback(() => {
-    // We set dragging state in onDragStart of the card
-  }, []);
-
-  const handleDragEnd = useCallback(
-    (displayIdx: number, info: PanInfo) => {
-      setDraggingIdx(null);
-
-      const spacing = dims.handFanSpacing;
-      if (spacing === 0) return;
-
-      const slotsShifted = Math.round(info.offset.x / spacing);
-      if (slotsShifted === 0) return;
-
-      const targetIdx = Math.max(0, Math.min(hand.length - 1, displayIdx + slotsShifted));
-      if (targetIdx === displayIdx) return;
-
-      // Build current order (or natural if none)
-      const currentOrder =
-        handOrder && handOrder.length === hand.length
-          ? [...handOrder]
-          : hand.map((_, i) => i);
-
-      // Move the card from displayIdx to targetIdx
-      const [moved] = currentOrder.splice(displayIdx, 1);
-      currentOrder.splice(targetIdx, 0, moved);
-
-      // Check if result is natural order
-      const isNatural = currentOrder.every((v, i) => v === i);
-      setHandOrder(isNatural ? null : currentOrder);
-    },
-    [handOrder, hand, dims.handFanSpacing, setHandOrder],
-  );
-
   // ── Selection handler (converts display click to original index) ──
 
   const handleSelect = useCallback(
@@ -517,10 +452,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
               total={hand.length}
               isSelected={selectedCardIndex === originalIndex}
               canAfford={isMyTurn ? canAfford : true}
-              isDragging={draggingIdx === displayIdx}
               onSelect={handleSelect}
-              onDragStart={() => setDraggingIdx(displayIdx)}
-              onDragEnd={handleDragEnd}
               onPreview={showPreview}
               onPreviewHide={hidePreview}
               onPin={pinCard}

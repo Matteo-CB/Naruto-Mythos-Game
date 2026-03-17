@@ -16,10 +16,11 @@ import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
  * This means: only characters played during the opponent's MOST RECENT action
  * (the action immediately before the current one) are valid targets.
  * This includes characters played via effects (e.g. Jiraiya playing a Summon).
- * If the opponent's last action was PASS or PLAY_HIDDEN, there are no valid targets.
+ * This also includes characters played face-down (hidden) — they can be moved too.
+ * If the opponent's last action was PASS, there are no valid targets.
  */
 
-// Log action types that indicate a character was played/entered play
+// Log action types that indicate a character was played/entered play (visible)
 const PLAY_ACTIONS = new Set([
   'PLAY_CHARACTER', 'REVEAL_CHARACTER', 'REVEAL_UPGRADE', 'UPGRADE_CHARACTER',
 ]);
@@ -27,6 +28,13 @@ const PLAY_ACTIONS = new Set([
 const EFFECT_PLAY_ACTIONS = new Set([
   'EFFECT', 'EFFECT_UPGRADE', 'EFFECT_PLAY',
 ]);
+
+/** Tracks a character that was played — either by name (visible) or instanceId (hidden). */
+interface PlayedChar {
+  name?: string;        // character name (for visible plays)
+  instanceId?: string;  // instanceId (for hidden plays)
+  mission: number;      // mission index (0-based)
+}
 
 function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -36,9 +44,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   const currentTurn = state.turn;
 
   // Collect all characters played during the opponent's last action (including effect-triggered plays).
-  // Strategy: scan backwards to find the opponent's primary action, then collect all opponent entries
-  // from that point forward (effects triggered by that action) until the next non-opponent entry.
-  const playedChars: { name: string; mission: number }[] = [];
+  const playedChars: PlayedChar[] = [];
 
   // Step 1: Find the index of the opponent's last primary action
   let primaryActionIdx = -1;
@@ -47,8 +53,14 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
     if (entry.player !== opponent) continue;
 
-    // If opponent's last action was PASS or PLAY_HIDDEN → no valid targets
-    if (entry.action === 'PASS' || entry.action === 'PLAY_HIDDEN') {
+    // If opponent's last action was PASS → no valid targets
+    if (entry.action === 'PASS') {
+      break;
+    }
+
+    // PLAY_HIDDEN is now a valid primary action
+    if (entry.action === 'PLAY_HIDDEN') {
+      primaryActionIdx = i;
       break;
     }
 
@@ -70,13 +82,18 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
         ? Number(entry.messageParams.mission) - 1
         : null;
 
-      if (PLAY_ACTIONS.has(entry.action)) {
+      if (entry.action === 'PLAY_HIDDEN') {
+        // Hidden play — track by instanceId if available, otherwise by mission
+        const instId = entry.messageParams?.instanceId as string | undefined;
+        if (missionNum !== null) {
+          playedChars.push({ instanceId: instId, mission: missionNum });
+        }
+      } else if (PLAY_ACTIONS.has(entry.action)) {
         const charName = (entry.messageParams?.card as string) ?? null;
         if (charName && missionNum !== null) {
           playedChars.push({ name: charName, mission: missionNum });
         }
       } else if (EFFECT_PLAY_ACTIONS.has(entry.action)) {
-        // Effect-triggered plays store the placed character name in 'target'
         const charName = (entry.messageParams?.target as string) ?? null;
         if (charName && missionNum !== null) {
           playedChars.push({ name: charName, mission: missionNum });
@@ -87,7 +104,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
 
   if (playedChars.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-      'Shikamaru Nara (022): Opponent did not play a visible character on their last turn.',
+      'Shikamaru Nara (022): Opponent did not play a character on their last turn.',
       'game.log.effect.noTarget', { card: 'SHIKAMARU NARA', id: 'KS-022-UC' }) } };
   }
 
@@ -106,12 +123,22 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     // R8: Skip missions where Kurenai blocks enemy movement
     if (isMovementBlockedByKurenai(state, played.mission, opponent)) continue;
     for (const char of mission[enemySide]) {
-      if (char.isHidden) continue;
       // Avoid duplicates (same instanceId already added)
       if (validTargets.includes(char.instanceId)) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-      if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
-        validTargets.push(char.instanceId);
+
+      if (played.instanceId) {
+        // Hidden play: match by instanceId directly
+        if (char.instanceId === played.instanceId) {
+          validTargets.push(char.instanceId);
+        }
+      } else if (played.name) {
+        // Visible play: match by name (hidden chars won't match by name since they were played visible)
+        if (!char.isHidden) {
+          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
+            validTargets.push(char.instanceId);
+          }
+        }
       }
     }
   }
