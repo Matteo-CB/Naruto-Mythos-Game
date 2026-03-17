@@ -465,6 +465,7 @@
         "kabuto053ConfirmMain": "MAIN: Play the top character from your discard pile paying 3 less chakra.",
         "kabuto054ConfirmUpgrade": "UPGRADE: POWERUP 1.",
         "kabuto054ConfirmMain": "MAIN: Hide all characters in this mission with less Power.",
+        "kabuto054ChooseHideTarget": "Choose which character to hide next.",
         "kimimaro055ConfirmAmbush": "AMBUSH: Discard a card to hide a character in play with cost 3 or less.",
         "kimimaro056ConfirmUpgrade": "UPGRADE: Discard a card to hide a character in play with cost 4 or less.",
         "jirobo057ConfirmMain": "MAIN: POWERUP X. X = number of missions with a friendly Sound Four character.",
