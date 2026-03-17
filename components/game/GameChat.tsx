@@ -112,18 +112,19 @@ export function GameChat() {
     }
   }, [chatMessages.length, chatOpen]);
 
-  // Toggle button (always visible)
+  // Toggle button (always visible) — LEFT side, more prominent
   if (!chatOpen) {
     return (
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed z-40 flex items-center gap-1 px-2.5 py-1.5 text-[10px] uppercase font-bold tracking-wider cursor-pointer"
+        className="fixed z-40 flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase font-bold tracking-wider cursor-pointer"
         style={{
           bottom: dims.isMobile ? '8px' : '16px',
-          right: dims.isMobile ? '8px' : '16px',
-          backgroundColor: 'rgba(10, 10, 14, 0.9)',
-          border: '1px solid #333',
-          color: '#ccc',
+          left: dims.isMobile ? '8px' : '16px',
+          backgroundColor: 'rgba(196, 163, 90, 0.1)',
+          border: '1px solid rgba(196, 163, 90, 0.3)',
+          color: '#c4a35a',
+          boxShadow: unreadCount > 0 ? '0 0 12px rgba(179,62,62,0.4)' : '0 2px 8px rgba(0,0,0,0.3)',
         }}
       >
         {t('chat.title')}
@@ -143,12 +144,12 @@ export function GameChat() {
       className="fixed z-40 flex flex-col"
       style={{
         bottom: 0,
-        right: 0,
+        left: 0,
         width: dims.isMobile ? '260px' : '320px',
         height: dims.isMobile ? '55vh' : '400px',
         maxHeight: '80vh',
         backgroundColor: 'rgba(10, 10, 14, 0.95)',
-        borderLeft: '1px solid #262626',
+        borderRight: '1px solid #262626',
         borderTop: '1px solid #262626',
         fontFamily: "'Inter', sans-serif",
       }}

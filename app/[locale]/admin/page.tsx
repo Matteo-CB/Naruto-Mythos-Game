@@ -396,7 +396,7 @@ export default function AdminPage() {
     { key: 'cards', label: t('tabCards') },
     { key: 'backgrounds', label: t('tabBackgrounds') },
     { key: 'players', label: 'Players' },
-    { key: 'reports', label: t('moderation.reports') },
+    { key: 'reports', label: tc('moderation.reports') },
   ];
 
   return (
@@ -859,11 +859,16 @@ function ReportsPanel() {
   const [eloAmount, setEloAmount] = useState('50');
   const [rewardAmount, setRewardAmount] = useState('');
 
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   useEffect(() => {
     fetch('/api/admin/reports', { credentials: 'include' })
-      .then((r) => r.ok ? r.json() : { reports: [] })
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data) => { setReports(data.reports ?? []); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch((err) => { setFetchError(err.message); setLoading(false); });
   }, []);
 
   const handleResolve = async (reportId: string) => {
@@ -896,7 +901,11 @@ function ReportsPanel() {
 
       {loading && <p className="text-xs" style={{ color: '#555' }}>Loading...</p>}
 
-      {!loading && pendingReports.length === 0 && (
+      {fetchError && (
+        <p className="text-xs py-2" style={{ color: '#b33e3e' }}>Error: {fetchError}</p>
+      )}
+
+      {!loading && !fetchError && pendingReports.length === 0 && (
         <p className="text-xs py-4" style={{ color: '#555' }}>{t('moderation.noReports')}</p>
       )}
 
