@@ -461,11 +461,36 @@ export default function DeckBuilderPage() {
       id = id.replace(/-SV$/, '-S'); id = id.replace(/-MYTHOS$/, '-M');
       return id;
     };
+    // Resolve variant formats: "133|2", "133_2", "KS-133|2" → { number, variantIdx }
+    const parseVariantFormat = (raw: string): { num: number; variantIdx: number } | null => {
+      const m = raw.trim().match(/^(?:KS-)?(\d+)[|_](\d+)$/);
+      if (!m) return null;
+      return { num: parseInt(m[1], 10), variantIdx: parseInt(m[2], 10) };
+    };
     const chars: CharacterCard[] = []; const missions: MissionCard[] = []; const notFound: string[] = [];
     for (const part of cardParts) {
       const match = part.match(/^(.+)--(\d+)$/);
       if (!match) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
-      const rawCardId = match[1]; const qty = parseInt(match[2], 10); const cardId = normalizeCardId(rawCardId);
+      const rawCardId = match[1]; const qty = parseInt(match[2], 10);
+
+      // Try variant format first (133|2, 133_2)
+      const variantParsed = parseVariantFormat(rawCardId);
+      if (variantParsed) {
+        const candidates = charByNumber.get(variantParsed.num);
+        const mByNum = missionByNumber.get(variantParsed.num);
+        if (candidates && candidates.length > 0) {
+          // variantIdx 1 = first variant, 2 = second, etc.
+          const idx = Math.max(0, variantParsed.variantIdx - 1);
+          const pick = idx < candidates.length ? candidates[idx] : candidates[0];
+          for (let i = 0; i < qty; i++) chars.push(pick);
+          continue;
+        }
+        if (mByNum) { for (let i = 0; i < qty; i++) missions.push(mByNum); continue; }
+        notFound.push(rawCardId);
+        continue;
+      }
+
+      const cardId = normalizeCardId(rawCardId);
       const mission = missionByCardId.get(cardId);
       if (mission) { for (let i = 0; i < qty; i++) missions.push(mission); continue; }
       const char = charByCardId.get(cardId);
