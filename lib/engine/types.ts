@@ -65,6 +65,9 @@ export interface CharacterInPlay {
   /** instanceId of the character that took control (Ino 020, Orochimaru 050).
    *  Used to return control when the controller is hidden or defeated. */
   controllerInstanceId?: string;
+  /** Rashomon (067): locked enemy target instanceId. Only retargets when
+   *  Rashomon moves, or the locked target moves/leaves play. */
+  rempartLockedTargetId?: string;
 }
 
 export interface ActiveMission {
