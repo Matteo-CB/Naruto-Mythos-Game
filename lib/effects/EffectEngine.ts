@@ -13,6 +13,7 @@ import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEne
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
+import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard } from './handlers/KS/shared/summonSearch';
 
@@ -9517,16 +9518,18 @@ export class EffectEngine {
         const s109Player = pendingEffect.sourcePlayer;
         const s109PS = newState[s109Player];
         if (pendingEffect.isUpgrade) {
-          // Check if there's at least one affordable card (cost-2) before showing modifier popup
+          // Check if there's at least one affordable card (cost-2 fresh OR upgrade) before showing modifier popup
           const s109HasAffordable = s109PS.discardPile.some((c) => {
             if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-            return s109PS.chakra >= Math.max(0, (c.chakra ?? 0) - 2);
+            if (s109PS.chakra >= Math.max(0, (c.chakra ?? 0) - 2)) return true;
+            return canAffordAsUpgrade(newState, s109Player, c as any, 2);
           });
           if (!s109HasAffordable) {
-            // Fall back to base (no cost reduction)
+            // Fall back to base (no cost reduction) — check fresh OR upgrade
             const s109HasBase = s109PS.discardPile.some((c) => {
               if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-              return s109PS.chakra >= (c.chakra ?? 0);
+              if (s109PS.chakra >= (c.chakra ?? 0)) return true;
+              return canAffordAsUpgrade(newState, s109Player, c as any, 0);
             });
             if (!s109HasBase) {
               newState.log = logAction(newState.log, newState.turn, newState.phase, s109Player,
@@ -9561,10 +9564,17 @@ export class EffectEngine {
           break;
         }
         // Base MAIN: choose from discard (costReduction: 0)
+        // Include cards affordable as fresh play OR as upgrade (same-name or flex)
         {
           const s109ValidTargets = s109PS.discardPile
             .map((c, i) => ({ c, i }))
-            .filter(({ c }) => c.card_type === 'character' && c.group === 'Leaf Village' && s109PS.chakra >= (c.chakra ?? 0))
+            .filter(({ c }) => {
+              if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
+              // Can afford fresh play?
+              if (s109PS.chakra >= (c.chakra ?? 0)) return true;
+              // Can afford as upgrade on any mission?
+              return canAffordAsUpgrade(newState, s109Player, c as any, 0);
+            })
             .map(({ i }) => String(i));
           if (s109ValidTargets.length === 0) {
             newState.log = logAction(newState.log, newState.turn, newState.phase, s109Player,
@@ -11285,11 +11295,12 @@ export class EffectEngine {
           },
         };
 
-        // Find which of the top 3 are character cards the player can afford
+        // Find which of the top 3 are character cards the player can afford (fresh OR upgrade)
         const s135Available = s135Top3.filter((card) => {
           if (card.card_type !== 'character') return false;
           const effectiveCost = Math.max(0, (card.chakra ?? 0) - s135CostReduction);
-          return effectiveCost <= newState[s135Player].chakra;
+          if (effectiveCost <= newState[s135Player].chakra) return true;
+          return canAffordAsUpgrade(newState, s135Player, card as any, s135CostReduction);
         });
 
         if (s135Available.length === 0) {
