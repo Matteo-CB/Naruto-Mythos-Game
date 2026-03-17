@@ -139,10 +139,9 @@ const DeckCard = memo(function DeckCard({
       onDrop={() => onDrop(idx)}
       onClick={() => onRemove(idx)}
       onMouseEnter={() => onHover(card)}
-      className="relative overflow-hidden group cursor-grab flex-shrink-0"
+      className="relative overflow-hidden group cursor-grab w-full"
       style={{
-        width: '96px',
-        height: '134px',
+        aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
         borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
         borderLeft: isDragOver ? '2px solid #c4a35a' : '2px solid transparent',
@@ -154,10 +153,6 @@ const DeckCard = memo(function DeckCard({
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
-      <div className="absolute top-0 left-0 px-1 text-[6px] font-bold leading-tight"
-        style={{ backgroundColor: 'rgba(196,163,90,0.85)', color: '#0a0a0a' }}>{card.chakra}</div>
-      <div className="absolute bottom-0.5 right-0.5 px-0.5 text-[6px] font-bold"
-        style={{ backgroundColor: 'rgba(0,0,0,0.75)', color: '#ddd' }}>{card.power}</div>
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none"
         style={{ backgroundColor: 'rgba(179,62,62,0.4)', transition: 'opacity 80ms' }}>
         <span className="text-sm font-bold" style={{ color: '#fff' }}>x</span>
@@ -864,7 +859,7 @@ export default function DeckBuilderPage() {
       {deckChars.length === 0 ? (
         <p className="text-[11px] italic mt-4" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
       ) : (
-        <div className="flex flex-wrap gap-0.5" onDragEnd={() => { setDragFromIdx(null); setDragOverIdx(null); }}>
+        <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }} onDragEnd={() => { setDragFromIdx(null); setDragOverIdx(null); }}>
           {deckChars.map((card, idx) => (
             <DeckCard
               key={`${card.id}-${idx}`}
