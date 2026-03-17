@@ -2,19 +2,16 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
+const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
+
+async function isAdmin(): Promise<boolean> {
+  const session = await auth();
+  return !!session?.user?.name && ADMIN_USERNAMES.includes(session.user.name);
+}
+
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check admin role
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { role: true },
-    });
-    if (user?.role !== 'admin') {
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -32,15 +29,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const admin = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { role: true },
-    });
-    if (admin?.role !== 'admin') {
+    if (!session?.user?.id || !ADMIN_USERNAMES.includes(session.user.name ?? '')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
