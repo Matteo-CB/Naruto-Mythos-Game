@@ -23,9 +23,10 @@ interface SealedDeckBuilderProps {
 
 type FilterRarity = 'all' | 'C' | 'UC' | 'R' | 'RA' | 'S' | 'M' | 'MMS';
 
-/** Normalize card ID for version comparison (RA variants = same version) */
+/** Normalize card ID for version comparison — all variants (RA, MV, SV) = same version */
 function getVersionKey(card: BoosterCard): string {
-  return card.id.replace(/\s*A$/, '').trim();
+  const match = card.id.match(/^(KS-\d+)/);
+  return match ? match[1] : card.id.replace(/\s*A$/, '').trim();
 }
 
 export function SealedDeckBuilder({
