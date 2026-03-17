@@ -1,0 +1,57 @@
+'use client';
+
+import { useEffect } from 'react';
+
+export default function GameError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error('[Game Error]', error);
+  }, [error]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+      <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-4">
+        <div className="w-12 h-px" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
+        <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
+          Game Error
+        </h2>
+        <p className="text-xs" style={{ color: '#666' }}>
+          {error?.message || 'The game encountered an error.'}
+        </p>
+        <div className="flex gap-3 mt-2">
+          <button
+            onClick={reset}
+            className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
+            style={{
+              backgroundColor: 'rgba(196, 163, 90, 0.1)',
+              border: '1px solid rgba(196, 163, 90, 0.3)',
+              color: '#c4a35a',
+            }}
+          >
+            Reload Game
+          </button>
+          <a
+            href="/"
+            className="px-5 py-2 text-xs uppercase tracking-wider"
+            style={{
+              backgroundColor: '#141414',
+              border: '1px solid #262626',
+              color: '#888',
+            }}
+          >
+            Home
+          </a>
+        </div>
+        <p className="text-[10px] mt-2" style={{ color: '#444' }}>
+          If this keeps happening, try clearing your browser cache.
+        </p>
+        <div className="w-12 h-px mt-1" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
+      </div>
+    </div>
+  );
+}
