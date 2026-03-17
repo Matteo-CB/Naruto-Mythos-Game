@@ -64,10 +64,15 @@ export type { AddCheckResult };
 
 /**
  * Normalize a card ID for version comparison.
- * Rare Art variants (suffix " A") are treated as the same version
- * as the base card, per deck construction rules.
+ * All variants of the same card number count as the same version:
+ * KS-108-R, KS-108-RA, KS-108-MV, KS-108-SV → all normalize to "KS-108"
+ * Max 2 copies total across ALL variants of the same card number.
  */
 function normalizeVersionId(id: string): string {
+  // Extract set + number: "KS-108-R" → "KS-108", "KS-108-RA" → "KS-108"
+  const match = id.match(/^(KS-\d+)/);
+  if (match) return match[1];
+  // Legacy format fallback: strip suffix
   return id.replace(/\s*A$/, '').trim();
 }
 

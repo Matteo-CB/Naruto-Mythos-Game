@@ -30,10 +30,12 @@ export function validateDeck(
   }
 
   // Check max copies per version
+  // All variants of the same card number count as the same version:
+  // KS-108-R, KS-108-RA, KS-108-MV, KS-108-SV → max 2 total
   const versionCounts = new Map<string, number>();
   for (const card of characterCards) {
-    // Normalize version: strip " A" suffix (RA variants are same version)
-    const baseVersion = card.id.replace(/\s*A$/, '').trim();
+    const match = card.id.match(/^(KS-\d+)/);
+    const baseVersion = match ? match[1] : card.id.replace(/\s*A$/, '').trim();
     const count = (versionCounts.get(baseVersion) ?? 0) + 1;
     versionCounts.set(baseVersion, count);
   }

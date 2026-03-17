@@ -140,7 +140,7 @@ export function buildAISealedDeck(pool: SealedPool): {
   for (const sc of scoredChars) {
     if (selectedChars.length >= MIN_DECK_SIZE + 3) break; // Pick a few extra for robustness
 
-    const baseVersion = sc.card.id.replace(/\s*A$/, '').trim();
+    const baseVersion = sc.card.id.replace(/^(KS-\d+).*$/, '$1');
     const count = versionCounts.get(baseVersion) ?? 0;
     if (count >= 2) continue; // Max 2 copies
 
@@ -155,7 +155,7 @@ export function buildAISealedDeck(pool: SealedPool): {
       const alreadyIn = selectedChars.some(c => (c as unknown as BoosterCard).sealedInstanceId === sc.card.sealedInstanceId);
       if (alreadyIn) continue;
 
-      const baseVersion = sc.card.id.replace(/\s*A$/, '').trim();
+      const baseVersion = sc.card.id.replace(/^(KS-\d+).*$/, '$1');
       const count = versionCounts.get(baseVersion) ?? 0;
       if (count >= 2) continue;
 
@@ -172,7 +172,7 @@ export function buildAISealedDeck(pool: SealedPool): {
     const fbVersions = new Map<string, number>();
     for (const c of characters) {
       if (fallbackChars.length >= MIN_DECK_SIZE) break;
-      const bv = c.id.replace(/\s*A$/, '').trim();
+      const bv = c.id.replace(/^(KS-\d+).*$/, '$1');
       const cnt = fbVersions.get(bv) ?? 0;
       if (cnt >= 2) continue;
       fbVersions.set(bv, cnt + 1);
