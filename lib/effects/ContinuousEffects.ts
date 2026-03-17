@@ -261,10 +261,10 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  // Rempart 067 special case: if enemy has Rempart in this mission, and this char
-  // is the strongest non-hidden character on our side, it loses all Power tokens
-  // and has effective Power = 0. Track via flag so mission effects (MSS-09) also
-  // see this character as having 0 power.
+  // Rempart 067 special case: if enemy has Rempart in this mission and this char
+  // is the LOCKED target, it loses all Power tokens and has effective Power = 0.
+  // Per FAQ: Rashomon locks to the strongest enemy when played. Only retargets when
+  // Rashomon moves, or the locked target moves/leaves play.
   let rempartZeroed = false;
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
@@ -274,20 +274,19 @@ export function calculateContinuousPowerModifier(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
       if (hasRempartEffect) {
-        // Find the strongest non-hidden friendly character
-        let maxPower = -1;
-        let strongestId = '';
-        for (const f of friendlyChars) {
-          if (f.isHidden) continue;
-          const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
-          const basePower = (fTop.power ?? 0) + f.powerTokens;
-          if (basePower > maxPower) {
-            maxPower = basePower;
-            strongestId = f.instanceId;
+        // Use locked target if available, otherwise find strongest (fallback for legacy/migration)
+        let targetId = enemy.rempartLockedTargetId;
+        if (!targetId || !friendlyChars.some(f => f.instanceId === targetId && !f.isHidden)) {
+          // Locked target missing or no longer valid — retarget to current strongest
+          let maxPower = -1;
+          for (const f of friendlyChars) {
+            if (f.isHidden) continue;
+            const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
+            const basePower = (fTop.power ?? 0) + f.powerTokens;
+            if (basePower > maxPower) { maxPower = basePower; targetId = f.instanceId; }
           }
         }
-        // If this character is the strongest, reduce to 0 (loses all tokens + power)
-        if (strongestId === char.instanceId && maxPower > 0) {
+        if (targetId === char.instanceId) {
           const selfTop = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
           modifier -= (selfTop.power ?? 0) + char.powerTokens;
           rempartZeroed = true;
@@ -403,18 +402,19 @@ export function isRempartZeroed(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
       if (hasRempartEffect) {
-        let maxPower = -1;
-        let strongestId = '';
-        for (const f of friendlyChars) {
-          if (f.isHidden) continue;
-          const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
-          const basePower = (fTop.power ?? 0) + f.powerTokens;
-          if (basePower > maxPower) {
-            maxPower = basePower;
-            strongestId = f.instanceId;
+        // Use locked target if available
+        let targetId = enemy.rempartLockedTargetId;
+        if (!targetId || !friendlyChars.some(f => f.instanceId === targetId && !f.isHidden)) {
+          // Fallback: find strongest
+          let maxPower = -1;
+          for (const f of friendlyChars) {
+            if (f.isHidden) continue;
+            const fTop = f.stack.length > 0 ? f.stack[f.stack.length - 1] : f.card;
+            const basePower = (fTop.power ?? 0) + f.powerTokens;
+            if (basePower > maxPower) { maxPower = basePower; targetId = f.instanceId; }
           }
         }
-        if (strongestId === char.instanceId && maxPower > 0) {
+        if (targetId === char.instanceId) {
           return true;
         }
       }
@@ -655,42 +655,58 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
       const enemySide = playerSide === 'player1' ? 'player2Characters' : 'player1Characters';
       const enemyPlayer = playerSide === 'player1' ? 'player2' : 'player1';
 
-      // Check if this player has Rashomon face-visible in this mission
-      const hasRempart = missions[mIdx][friendlySide].some((c) => {
+      // Find Rashomon face-visible in this mission
+      const rempartChar = missions[mIdx][friendlySide].find((c) => {
         if (c.isHidden) return false;
         const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
         return top.number === 67 && (top.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
       });
-      if (!hasRempart) continue;
+      if (!rempartChar) continue;
 
-      // Find strongest non-hidden enemy in this mission
-      let maxPower = -1;
-      let strongestIdx = -1;
       const enemyChars = missions[mIdx][enemySide];
-      for (let i = 0; i < enemyChars.length; i++) {
-        if (enemyChars[i].isHidden) continue;
-        const top = enemyChars[i].stack.length > 0
-          ? enemyChars[i].stack[enemyChars[i].stack.length - 1]
-          : enemyChars[i].card;
-        const basePower = (top.power ?? 0) + enemyChars[i].powerTokens;
-        if (basePower > maxPower) {
-          maxPower = basePower;
-          strongestIdx = i;
+
+      // Use locked target, or find strongest if lock is invalid
+      let targetId = rempartChar.rempartLockedTargetId;
+      if (!targetId || !enemyChars.some(c => c.instanceId === targetId && !c.isHidden)) {
+        // Retarget: find strongest non-hidden enemy
+        let maxPower = -1;
+        targetId = undefined;
+        for (const ec of enemyChars) {
+          if (ec.isHidden) continue;
+          const top = ec.stack.length > 0 ? ec.stack[ec.stack.length - 1] : ec.card;
+          const power = (top.power ?? 0) + ec.powerTokens;
+          if (power > maxPower) { maxPower = power; targetId = ec.instanceId; }
+        }
+
+        // Update the lock on the Rashomon character
+        if (targetId && targetId !== rempartChar.rempartLockedTargetId) {
+          if (!changed) {
+            newState = { ...newState, activeMissions: [...newState.activeMissions] };
+            changed = true;
+          }
+          const m = { ...newState.activeMissions[mIdx] };
+          m[friendlySide] = m[friendlySide].map(c =>
+            c.instanceId === rempartChar.instanceId ? { ...c, rempartLockedTargetId: targetId } : c
+          );
+          newState.activeMissions[mIdx] = m;
         }
       }
 
-      if (strongestIdx !== -1 && enemyChars[strongestIdx].powerTokens > 0) {
-        // Permanently remove tokens
+      if (!targetId) continue;
+      const targetIdx = enemyChars.findIndex(c => c.instanceId === targetId);
+      if (targetIdx === -1) continue;
+
+      if (enemyChars[targetIdx].powerTokens > 0) {
         if (!changed) {
           newState = { ...newState, activeMissions: [...newState.activeMissions] };
           changed = true;
         }
         const mission = { ...newState.activeMissions[mIdx] };
         const chars = [...mission[enemySide]];
-        const removedTokens = chars[strongestIdx].powerTokens;
-        chars[strongestIdx] = { ...chars[strongestIdx], powerTokens: 0 };
+        const removedTokens = chars[targetIdx].powerTokens;
+        chars[targetIdx] = { ...chars[targetIdx], powerTokens: 0 };
         mission[enemySide] = chars;
         newState.activeMissions[mIdx] = mission;
 
@@ -699,9 +715,9 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
           log: logAction(
             newState.log, newState.turn, newState.phase, playerSide as PlayerID,
             'EFFECT_CONTINUOUS',
-            `Rashomon (067): Permanently removed ${removedTokens} Power token(s) from ${chars[strongestIdx].card.name_fr}.`,
+            `Rashomon (067): Permanently removed ${removedTokens} Power token(s) from ${chars[targetIdx].card.name_fr}.`,
             'game.log.effect.rempartTokenRemoval',
-            { card: 'RASHOMON', id: 'KS-067-UC', target: chars[strongestIdx].card.name_fr, amount: removedTokens },
+            { card: 'RASHOMON', id: 'KS-067-UC', target: chars[targetIdx].card.name_fr, amount: removedTokens },
           ),
         };
       }

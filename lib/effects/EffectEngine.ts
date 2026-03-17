@@ -18190,7 +18190,12 @@ export class EffectEngine {
 
     // Add to destination mission
     const destMission = { ...missions[destMissionIndex] };
+    // If Rashomon moves, clear its locked target so it retargets in the new mission
     const movedChar = { ...charResult.character, missionIndex: destMissionIndex };
+    const movedTop = movedChar.stack.length > 0 ? movedChar.stack[movedChar.stack.length - 1] : movedChar.card;
+    if (movedTop.number === 67 && movedChar.rempartLockedTargetId) {
+      movedChar.rempartLockedTargetId = undefined;
+    }
     destMission[friendlySide] = [...destMission[friendlySide], movedChar];
     missions[destMissionIndex] = destMission;
 
