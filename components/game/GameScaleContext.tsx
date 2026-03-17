@@ -84,13 +84,12 @@ export interface GameDimensions {
 
 function computeScale(vw: number, vh: number): number {
   const isMobile = vh < 500;
-  // On phones (landscape, vh < 500), use a tighter reference viewport so cards
-  // appear ~20% larger without changing the overall layout proportions.
-  // Desktop reference viewport increased to account for larger base card sizes.
-  const refW = isMobile ? 1200 : 1600;
-  const refH = isMobile ? 750 : 1000;
+  // On phones (landscape, vh < 500), use a much tighter reference viewport
+  // so cards are significantly larger and the game is actually playable.
+  const refW = isMobile ? 1000 : 1600;
+  const refH = isMobile ? 600 : 1000;
   const raw = Math.min(vw / refW, vh / refH);
-  const minScale = isMobile ? 0.38 : 0.55;
+  const minScale = isMobile ? 0.45 : 0.55;
   return Math.max(minScale, Math.min(raw, 1.15));
 }
 
@@ -101,31 +100,44 @@ function s(base: number, scale: number): number {
 function buildDimensions(scale: number, vw: number, vh: number): GameDimensions {
   const isMobile = vh < 500;
 
-  // On mobile, use tighter spacing and smaller lane widths
-  const emptyLaneMinW = isMobile ? Math.round(120 * scale) : s(BASE.emptyLaneMinW, scale);
-  const emptyLaneMaxW = isMobile ? Math.round(180 * scale) : s(BASE.emptyLaneMaxW, scale);
-  const missionMaxW = isMobile ? Math.round(110 * scale) : s(BASE.missionMaxW, scale);
-  const sidePileW = isMobile ? Math.round(50 * scale) : s(BASE.sidePileW, scale);
-  const handMinW = isMobile ? Math.round(280 * scale) : s(BASE.handMinW, scale);
-  const opponentMinW = isMobile ? Math.round(180 * scale) : s(BASE.opponentMinW, scale);
+  // On mobile, use tighter spacing to maximize mission/card area
+  const emptyLaneMinW = isMobile ? Math.round(100 * scale) : s(BASE.emptyLaneMinW, scale);
+  const emptyLaneMaxW = isMobile ? Math.round(160 * scale) : s(BASE.emptyLaneMaxW, scale);
+  const missionMaxW = isMobile ? Math.round(100 * scale) : s(BASE.missionMaxW, scale);
+  const sidePileW = isMobile ? Math.round(40 * scale) : s(BASE.sidePileW, scale);
+  const handMinW = isMobile ? Math.round(240 * scale) : s(BASE.handMinW, scale);
+  const opponentMinW = isMobile ? Math.round(150 * scale) : s(BASE.opponentMinW, scale);
+
+  // Mobile: smaller opponent hand, compact player hand, larger mission cards
+  const opponentHandH = isMobile ? Math.round(50 * scale) : s(BASE.opponentHandH, scale);
+  const playerHandH = isMobile ? Math.round(130 * scale) : s(BASE.playerHandH, scale);
+  const handFanSpacing = isMobile ? Math.round(42 * scale) : s(BASE.handFanSpacing, scale);
+  const opponentFanSpacing = isMobile ? Math.round(14 * scale) : s(BASE.opponentFanSpacing, scale);
+  const opponentContainerH = isMobile ? Math.round(40 * scale) : s(BASE.opponentContainerH, scale);
+
+  // Mobile: slightly larger hand cards for better touch targets
+  const handCardW = isMobile ? Math.round(85 * scale) : s(BASE.handCardW, scale);
+  const handCardH = isMobile ? Math.round(119 * scale) : s(BASE.handCardH, scale);
+  const opponentCardW = isMobile ? Math.round(36 * scale) : s(BASE.opponentCardW, scale);
+  const opponentCardH = isMobile ? Math.round(50 * scale) : s(BASE.opponentCardH, scale);
 
   return {
     scale,
     isCompact: scale < 0.8,
     isMobile,
-    handCard: { w: s(BASE.handCardW, scale), h: s(BASE.handCardH, scale) },
+    handCard: { w: handCardW, h: handCardH },
     missionCard: { w: s(BASE.missionCardW, scale), h: s(BASE.missionCardH, scale) },
     sideCard: { w: s(BASE.sideCardW, scale), h: s(BASE.sideCardH, scale) },
-    opponentCard: { w: s(BASE.opponentCardW, scale), h: s(BASE.opponentCardH, scale) },
-    opponentHandH: s(BASE.opponentHandH, scale),
-    playerHandH: s(BASE.playerHandH, scale),
+    opponentCard: { w: opponentCardW, h: opponentCardH },
+    opponentHandH,
+    playerHandH,
     sidePileW,
-    handFanSpacing: s(BASE.handFanSpacing, scale),
-    handFanArc: s(BASE.handFanArc, scale),
-    handContainerH: s(BASE.handContainerH, scale),
+    handFanSpacing,
+    handFanArc: isMobile ? Math.round(2 * scale) : s(BASE.handFanArc, scale),
+    handContainerH: isMobile ? Math.round(100 * scale) : s(BASE.handContainerH, scale),
     handMinW,
-    opponentFanSpacing: s(BASE.opponentFanSpacing, scale),
-    opponentContainerH: s(BASE.opponentContainerH, scale),
+    opponentFanSpacing,
+    opponentContainerH,
     opponentMinW,
     missionMaxW,
     emptyLaneMinW,
@@ -133,9 +145,9 @@ function buildDimensions(scale: number, vw: number, vh: number): GameDimensions 
     animHand: { w: s(BASE.animHandW, scale), h: s(BASE.animHandH, scale) },
     animBoard: { w: s(BASE.animBoardW, scale), h: s(BASE.animBoardH, scale) },
     animDeck: { w: s(BASE.animDeckW, scale), h: s(BASE.animDeckH, scale) },
-    targetCard: { w: s(BASE.targetCardW, scale), h: s(BASE.targetCardH, scale) },
-    mulliganCard: { w: s(BASE.mulliganCardW, scale), h: s(BASE.mulliganCardH, scale) },
-    handSelectorCard: { w: s(BASE.handSelectorCardW, scale), h: s(BASE.handSelectorCardH, scale) },
+    targetCard: { w: isMobile ? Math.round(60 * scale) : s(BASE.targetCardW, scale), h: isMobile ? Math.round(84 * scale) : s(BASE.targetCardH, scale) },
+    mulliganCard: { w: isMobile ? Math.round(90 * scale) : s(BASE.mulliganCardW, scale), h: isMobile ? Math.round(126 * scale) : s(BASE.mulliganCardH, scale) },
+    handSelectorCard: { w: isMobile ? Math.round(80 * scale) : s(BASE.handSelectorCardW, scale), h: isMobile ? Math.round(112 * scale) : s(BASE.handSelectorCardH, scale) },
     previewMed: { w: s(BASE.previewMedW, scale), h: s(BASE.previewMedH, scale) },
     previewLg: { w: s(BASE.previewLgW, scale), h: s(BASE.previewLgH, scale) },
   };

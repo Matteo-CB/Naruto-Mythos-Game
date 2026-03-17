@@ -1130,11 +1130,12 @@ function GameBoardInner() {
 
         {/* Opponent hand */}
         <section
-          className="shrink-0 flex items-center justify-center py-1"
+          className="shrink-0 flex items-center justify-center"
           style={{
             borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.opponentHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.5)",
+            padding: dims.isMobile ? '0' : '4px 0',
           }}
         >
           <OpponentHand handSize={opponentState.handSize} />
@@ -1142,8 +1143,8 @@ function GameBoardInner() {
 
         {/* Mission area with ActionBar */}
         <section className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 flex items-stretch justify-center px-3 py-0.5 min-h-0 overflow-hidden">
-            <div className="flex gap-1.5 items-stretch justify-center w-full">
+          <div className={`flex-1 flex items-stretch justify-center ${dims.isMobile ? 'px-1 py-0' : 'px-3 py-0.5'} min-h-0 overflow-hidden`}>
+            <div className={`flex ${dims.isMobile ? 'gap-0.5' : 'gap-1.5'} items-stretch justify-center w-full`}>
               {activeMissions.map((mission, index) => (
                 <MissionLane
                   key={`mission-${index}`}
@@ -1195,11 +1196,12 @@ function GameBoardInner() {
 
         {/* Player hand */}
         <section
-          className="shrink-0 flex items-center justify-center"
+          className="shrink-0 flex items-end justify-center"
           style={{
             borderTop: "1px solid rgba(255, 255, 255, 0.04)",
             height: dims.playerHandH + "px",
             backgroundColor: "rgba(8, 8, 12, 0.5)",
+            paddingBottom: dims.isMobile ? '2px' : '0',
           }}
         >
           <PlayerHand hand={myState.hand} chakra={myState.chakra} />
