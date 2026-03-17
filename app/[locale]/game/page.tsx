@@ -56,7 +56,7 @@ export default function GamePage() {
         if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState && !useSocketStore.getState().isSpectating) {
           router.push('/');
         }
-      }, 1000);
+      }, 5000);
     }
     return () => {
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);

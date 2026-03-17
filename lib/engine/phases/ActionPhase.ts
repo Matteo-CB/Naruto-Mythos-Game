@@ -255,7 +255,7 @@ function handlePlayHidden(
     'PLAY_HIDDEN',
     `${player} plays a hidden character on mission ${missionIndex + 1}.`,
     'game.log.playHidden',
-    { mission: missionIndex + 1 },
+    { mission: missionIndex + 1, instanceId: charInPlay.instanceId },
   );
 
   let newState: GameState = {
