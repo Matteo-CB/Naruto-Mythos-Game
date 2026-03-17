@@ -30,6 +30,8 @@ import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from "@/lib/u
 import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
 import { useSocketStore } from "@/lib/socket/client";
+import { GameChat } from "./GameChat";
+import { SpectatorBanner } from "./SpectatorBanner";
 
 // ----- Shared color maps -----
 
@@ -1219,8 +1221,10 @@ function GameBoardInner() {
       <MobileDetailsButton />
 
       <EdgeCoinFlip />
+      <SpectatorBanner />
       <MulliganDialog />
       <GameLog />
+      <GameChat />
       <AnimationController />
       <TargetSelector />
       <HandCardSelector />
