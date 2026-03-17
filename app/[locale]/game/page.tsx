@@ -8,6 +8,7 @@ import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
 import { TrainingCoachPanel } from '@/components/game/TrainingCoachPanel';
+import { BanNotification } from '@/components/BanNotification';
 
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion
 const GameBoard = dynamic(
@@ -135,6 +136,7 @@ export default function GamePage() {
       <GameBoard />
       <TrainingCoachPanel />
       <LandscapeBlocker />
+      <BanNotification />
       {showConnectionLost && (
         <div
           className="fixed top-0 left-0 right-0 z-50 text-center py-2 text-xs font-medium"
