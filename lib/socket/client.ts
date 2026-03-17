@@ -82,6 +82,24 @@ interface SocketStore {
   coinFlipDone: () => void;
   clearError: () => void;
   forfeit: (reason: 'abandon' | 'timeout') => void;
+
+  // Spectator
+  isSpectating: boolean;
+  spectatingRoomCode: string | null;
+  spectatorCount: number;
+  spectateGame: (roomCode: string, userId: string, username: string) => void;
+  leaveSpectating: () => void;
+
+  // Chat
+  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
+  unreadChatCount: number;
+  chatOpen: boolean;
+  sendChatMessage: (message: string, isEmote: boolean) => void;
+  setChatOpen: (open: boolean) => void;
+
+  // Active games
+  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }>;
+  requestActiveGames: () => void;
 }
 
 export const useSocketStore = create<SocketStore>((set, get) => ({
@@ -113,6 +131,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   opponentChangingDeck: false,
   _lastStateUpdate: 0,
   _resyncTimer: null as ReturnType<typeof setInterval> | null,
+  isSpectating: false,
+  spectatingRoomCode: null,
+  spectatorCount: 0,
+  chatMessages: [],
+  unreadChatCount: 0,
+  chatOpen: false,
+  activeGames: [],
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -470,6 +495,56 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ maintenanceWarning: true });
       });
 
+      // ═══════ SPECTATOR LISTENERS ═══════
+
+      socket.on('spectate:state-update', (data: {
+        visibleState: VisibleGameState;
+        playerNames: { player1: string; player2: string };
+        spectatorCount: number;
+      }) => {
+        set({
+          visibleState: data.visibleState,
+          playerNames: data.playerNames,
+          spectatorCount: data.spectatorCount,
+          isSpectating: true,
+          gameStarted: true,
+        });
+      });
+
+      socket.on('spectate:count-update', (data: { count: number }) => {
+        set({ spectatorCount: data.count });
+      });
+
+      socket.on('spectate:error', (data: { message: string }) => {
+        set({ error: data.message });
+      });
+
+      // ═══════ CHAT LISTENERS ═══════
+
+      socket.on('chat:message', (msg: { id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }) => {
+        set((state) => {
+          const newMessages = [...state.chatMessages, msg].slice(-100);
+          return {
+            chatMessages: newMessages,
+            unreadChatCount: state.chatOpen ? 0 : state.unreadChatCount + 1,
+          };
+        });
+      });
+
+      socket.on('chat:history', (data: { messages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }> }) => {
+        set({ chatMessages: data.messages ?? [] });
+      });
+
+      socket.on('chat:error', (data: { message: string; errorKey?: string }) => {
+        set({ error: data.message, errorKey: data.errorKey ?? null });
+      });
+
+      // ═══════ ACTIVE GAMES ═══════
+
+      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
+        set({ activeGames: data.games ?? [] });
+      });
+
       set({ socket });
     });
   },
@@ -642,6 +717,50 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket && connected) {
       console.log('[Socket] Emitting action:forfeit, reason:', reason);
       socket.emit('action:forfeit', { reason });
+    }
+  },
+
+  // ═══════ SPECTATOR METHODS ═══════
+
+  spectateGame: (roomCode: string, userId: string, username: string) => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('spectate:join', { roomCode, userId, username });
+      set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
+    }
+  },
+
+  leaveSpectating: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('spectate:leave');
+    }
+    set({
+      isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
+      visibleState: null, playerNames: null, gameStarted: false,
+      chatMessages: [], unreadChatCount: 0,
+    });
+  },
+
+  // ═══════ CHAT METHODS ═══════
+
+  sendChatMessage: (message: string, isEmote: boolean) => {
+    const { socket, connected } = get();
+    if (socket && connected && message.trim()) {
+      socket.emit('chat:send', { message: message.trim(), isEmote });
+    }
+  },
+
+  setChatOpen: (open: boolean) => {
+    set({ chatOpen: open, unreadChatCount: open ? 0 : get().unreadChatCount });
+  },
+
+  // ═══════ ACTIVE GAMES ═══════
+
+  requestActiveGames: () => {
+    const { socket, connected } = get();
+    if (socket && connected) {
+      socket.emit('games:list');
     }
   },
 }));

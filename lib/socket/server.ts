@@ -47,6 +47,11 @@ interface RoomData {
   tournamentMatchId?: string;
   // Coin flip sync: track which players finished their coin flip animation
   coinFlipDone: { player1: boolean; player2: boolean };
+  // Spectators
+  spectators: Map<string, { socketId: string; userId: string; username: string }>;
+  // Chat
+  chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
+  chatLastCleanup: number;
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -520,6 +525,26 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
         playerNames,
       });
     }
+
+    // Broadcast to spectators — they see both hands
+    if (room.spectators.size > 0) {
+      const spectatorState = {
+        ...p1State,
+        // Merge player2's hand into the spectator view
+        opponentState: {
+          ...p1State.opponentState,
+          hand: room.gameState.player2.hand,
+          handSize: room.gameState.player2.hand.length,
+        },
+      };
+      for (const [, spec] of room.spectators) {
+        io.to(spec.socketId).emit('spectate:state-update', {
+          visibleState: spectatorState,
+          playerNames,
+          spectatorCount: room.spectators.size,
+        });
+      }
+    }
   } catch (err) {
     console.error('[Socket] broadcastState error:', err instanceof Error ? err.message : err);
     // Notify both players so UI doesn't freeze
@@ -722,6 +747,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         sealedDeadline: null,
         timerEnabled: gameMode === 'ranked' ? true : (data.timerEnabled ?? true),
         coinFlipDone: { player1: false, player2: false },
+        spectators: new Map(),
+        chatMessages: [],
+        chatLastCleanup: 0,
       };
 
       rooms.set(code, room);
@@ -1375,6 +1403,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           sealedDeadline: null,
           timerEnabled: true,
           coinFlipDone: { player1: false, player2: false },
+          spectators: new Map(),
+          chatMessages: [],
+          chatLastCleanup: 0,
         };
 
         rooms.set(code, room);
@@ -1404,8 +1435,221 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Disconnect
+    // ═══════ SPECTATOR EVENTS ═══════
+
+    socket.on('spectate:join', (data: { roomCode: string; userId: string; username: string }) => {
+      const room = rooms.get(data.roomCode);
+      if (!room || !room.gameState) {
+        socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        return;
+      }
+      // Add spectator
+      room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: data.username });
+      socket.join(data.roomCode);
+      // Track spectator socket for cleanup
+      playerRooms.set(socket.id, `spec:${data.roomCode}`);
+
+      // Send current state (spectators see both hands)
+      try {
+        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const spectatorState = {
+          ...p1State,
+          opponentState: {
+            ...p1State.opponentState,
+            hand: room.gameState.player2.hand,
+            handSize: room.gameState.player2.hand.length,
+          },
+        };
+        const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
+        socket.emit('spectate:state-update', {
+          visibleState: spectatorState,
+          playerNames,
+          spectatorCount: room.spectators.size,
+        });
+        // Send chat history
+        socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
+      } catch (err) {
+        console.error('[Socket] Spectator state error:', err);
+      }
+
+      // Notify room
+      const count = room.spectators.size;
+      io.to(data.roomCode).emit('spectate:count-update', { count });
+
+      // Broadcast system chat message
+      const joinMsg = {
+        id: `sys-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        userId: 'system', username: 'System',
+        message: `${data.username} joined as spectator`,
+        isEmote: false, isSpectator: false, timestamp: Date.now(),
+      };
+      room.chatMessages.push(joinMsg);
+      io.to(data.roomCode).emit('chat:message', joinMsg);
+    });
+
+    socket.on('spectate:leave', () => {
+      const specKey = playerRooms.get(socket.id);
+      if (!specKey?.startsWith('spec:')) return;
+      const roomCode = specKey.slice(5);
+      const room = rooms.get(roomCode);
+      if (room) {
+        const spec = room.spectators.get(socket.id);
+        room.spectators.delete(socket.id);
+        socket.leave(roomCode);
+        io.to(roomCode).emit('spectate:count-update', { count: room.spectators.size });
+        if (spec) {
+          const leaveMsg = {
+            id: `sys-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            userId: 'system', username: 'System',
+            message: `${spec.username} left`,
+            isEmote: false, isSpectator: false, timestamp: Date.now(),
+          };
+          room.chatMessages.push(leaveMsg);
+          io.to(roomCode).emit('chat:message', leaveMsg);
+        }
+      }
+      playerRooms.delete(socket.id);
+    });
+
+    // ═══════ CHAT EVENTS ═══════
+
+    socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
+      if (!data.message || data.message.length > 200) return;
+
+      // Find room — player or spectator
+      let roomCode = playerRooms.get(socket.id);
+      let isSpectator = false;
+      if (roomCode?.startsWith('spec:')) {
+        roomCode = roomCode.slice(5);
+        isSpectator = true;
+      }
+      if (!roomCode) return;
+      const room = rooms.get(roomCode);
+      if (!room) return;
+
+      // Determine user info
+      let userId = '';
+      let username = '';
+      if (isSpectator) {
+        const spec = room.spectators.get(socket.id);
+        if (!spec) return;
+        userId = spec.userId;
+        username = spec.username;
+      } else {
+        const isHost = room.hostSocket === socket.id;
+        userId = isHost ? room.hostId : (room.guestId ?? '');
+        username = isHost ? (room.hostName ?? 'Player 1') : (room.guestName ?? 'Player 2');
+      }
+      if (!userId) return;
+
+      // Check chat ban
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { chatBanned: true, chatBanUntil: true },
+        });
+        if (user?.chatBanned) {
+          if (!user.chatBanUntil || user.chatBanUntil > new Date()) {
+            socket.emit('chat:error', { message: 'You are banned from chat', errorKey: 'chat.chatBanned' });
+            return;
+          }
+          // Ban expired — clear it
+          await prisma.user.update({ where: { id: userId }, data: { chatBanned: false, chatBanUntil: null } });
+        }
+      } catch { /* ignore ban check errors */ }
+
+      const chatMsg = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        userId, username,
+        message: data.message.trim(),
+        isEmote: data.isEmote,
+        isSpectator,
+        timestamp: Date.now(),
+      };
+
+      room.chatMessages.push(chatMsg);
+      // Keep only last 100 messages in memory
+      if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
+
+      // Persist to DB (fire-and-forget)
+      prisma.chatMessage.create({
+        data: {
+          roomCode, userId, username,
+          message: chatMsg.message,
+          isEmote: chatMsg.isEmote,
+          isSpectator,
+        },
+      }).catch(() => {});
+
+      // Trigger cleanup (rate-limited to 1x/hour)
+      import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
+
+      // Broadcast rules:
+      // - Player messages → everyone (players + spectators)
+      // - Spectator messages → spectators only (players don't see)
+      if (isSpectator) {
+        for (const [, spec] of room.spectators) {
+          io.to(spec.socketId).emit('chat:message', chatMsg);
+        }
+      } else {
+        // Send to players
+        if (room.hostSocket) io.to(room.hostSocket).emit('chat:message', chatMsg);
+        if (room.guestSocket) io.to(room.guestSocket).emit('chat:message', chatMsg);
+        // Send to spectators too
+        for (const [, spec] of room.spectators) {
+          io.to(spec.socketId).emit('chat:message', chatMsg);
+        }
+      }
+    });
+
+    // ═══════ ACTIVE GAMES LIST ═══════
+
+    socket.on('games:list', () => {
+      const activeGames: Array<{
+        roomCode: string;
+        player1Name: string;
+        player2Name: string;
+        spectatorCount: number;
+        turn: number;
+        isRanked: boolean;
+        isPrivate: boolean;
+      }> = [];
+
+      for (const [code, room] of rooms) {
+        if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+        activeGames.push({
+          roomCode: code,
+          player1Name: room.hostName ?? 'Player 1',
+          player2Name: room.guestName ?? 'Player 2',
+          spectatorCount: room.spectators.size,
+          turn: room.gameState.turn,
+          isRanked: room.isRanked,
+          isPrivate: room.isPrivate,
+        });
+      }
+
+      socket.emit('games:list-update', { games: activeGames });
+    });
+
+    // ═══════ DISCONNECT ═══════
+
     socket.on('disconnect', () => {
       console.log(`[Socket] Player disconnecting: ${socket.id}`);
+
+      // Handle spectator disconnect
+      const specKey = playerRooms.get(socket.id);
+      if (specKey?.startsWith('spec:')) {
+        const roomCode = specKey.slice(5);
+        const room = rooms.get(roomCode);
+        if (room) {
+          room.spectators.delete(socket.id);
+          io.to(roomCode).emit('spectate:count-update', { count: room.spectators.size });
+        }
+        playerRooms.delete(socket.id);
+        removeSocketFromAll(socket.id);
+        console.log(`[Socket] Spectator disconnected: ${socket.id}`);
+        return;
+      }
 
       const code = playerRooms.get(socket.id);
       if (code) {
