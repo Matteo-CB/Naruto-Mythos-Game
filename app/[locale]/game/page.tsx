@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from '@/lib/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -63,23 +63,43 @@ export default function GamePage() {
     };
   }, [hasActiveGame, router]);
 
-  // Sync spectator state to gameStore
-  useEffect(() => {
-    if (isSpectating && socketVisibleState) {
-      const socketNames = useSocketStore.getState().playerNames;
+  // Sync spectator state to gameStore — runs on mount AND on every socket update
+  const syncSpectatorState = useCallback(() => {
+    const socketState = useSocketStore.getState();
+    if (socketState.isSpectating && socketState.visibleState) {
       useGameStore.setState({
-        visibleState: socketVisibleState,
+        gameState: null,
+        visibleState: socketState.visibleState,
+        humanPlayer: 'player1',
         isOnlineGame: false,
         isAIGame: false,
+        isHotseatGame: false,
         isSandboxMode: false,
         gameOver: false,
-        playerDisplayNames: socketNames ? {
-          player1: socketNames.player1,
-          player2: socketNames.player2,
-        } : undefined,
+        isProcessing: false,
+        playerDisplayNames: socketState.playerNames ? {
+          player1: socketState.playerNames.player1,
+          player2: socketState.playerNames.player2,
+        } : { player1: 'Player 1', player2: 'Player 2' },
       });
     }
-  }, [isSpectating, socketVisibleState]);
+  }, []);
+
+  // Sync on reactive state change
+  useEffect(() => {
+    syncSpectatorState();
+  }, [isSpectating, socketVisibleState, syncSpectatorState]);
+
+  // Also subscribe to socket store for spectator updates (catches state that arrived before mount)
+  useEffect(() => {
+    if (!isSpectating) return;
+    const unsub = useSocketStore.subscribe((state) => {
+      if (state.isSpectating && state.visibleState) {
+        syncSpectatorState();
+      }
+    });
+    return unsub;
+  }, [isSpectating, syncSpectatorState]);
 
   // Sync socket state updates to gameStore for online games
   useEffect(() => {
