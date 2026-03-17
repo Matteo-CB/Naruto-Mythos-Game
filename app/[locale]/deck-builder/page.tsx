@@ -119,33 +119,23 @@ const CatalogMission = memo(function CatalogMission({
 // ───────────────────── DECK CHARACTER CARD ─────────────────────
 
 const DeckCard = memo(function DeckCard({
-  card, idx, onRemove, onHover, onDragStart, onDragOver, onDrop, isDragOver,
+  card, idx, onRemove, onHover,
 }: {
   card: CharacterCard;
   idx: number;
   onRemove: (idx: number) => void;
   onHover: (card: CharacterCard | MissionCard) => void;
-  onDragStart: (idx: number) => void;
-  onDragOver: (e: React.DragEvent, idx: number) => void;
-  onDrop: (idx: number) => void;
-  isDragOver: boolean;
 }) {
   const imgPath = normalizeImagePath(card.image_file);
   return (
     <div
-      draggable
-      onDragStart={() => onDragStart(idx)}
-      onDragOver={(e) => onDragOver(e, idx)}
-      onDrop={() => onDrop(idx)}
       onClick={() => onRemove(idx)}
       onMouseEnter={() => onHover(card)}
-      className="relative overflow-hidden group cursor-grab w-full"
+      className="relative overflow-hidden group cursor-pointer w-full"
       style={{
         aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
         borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
-        borderLeft: isDragOver ? '2px solid #c4a35a' : '2px solid transparent',
-        opacity: isDragOver ? 0.7 : 1,
       }}
     >
       {imgPath ? (
@@ -229,11 +219,8 @@ export default function DeckBuilderPage() {
   const canAddChar = useDeckBuilderStore((s) => s.canAddChar);
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
-  const reorderChars = useDeckBuilderStore((s) => s.reorderChars);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
   const { bannedIds } = useBannedCards();
-  const [dragFromIdx, setDragFromIdx] = useState<number | null>(null);
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   // ───── DATA LOADING ─────
   useEffect(() => {
@@ -392,13 +379,6 @@ export default function DeckBuilderPage() {
   const handleAddMission = useCallback((card: MissionCard) => addMission(card), [addMission]);
   const handleRemoveChar = useCallback((idx: number) => removeChar(idx), [removeChar]);
   const handlePreview = useCallback((card: CharacterCard | MissionCard) => setPreviewCard(card), []);
-  const handleDragStart = useCallback((idx: number) => setDragFromIdx(idx), []);
-  const handleDragOver = useCallback((e: React.DragEvent, idx: number) => { e.preventDefault(); setDragOverIdx(idx); }, []);
-  const handleDrop = useCallback((toIdx: number) => {
-    if (dragFromIdx !== null && dragFromIdx !== toIdx) reorderChars(dragFromIdx, toIdx);
-    setDragFromIdx(null); setDragOverIdx(null);
-  }, [dragFromIdx, reorderChars]);
-
   // ───── SAVE / LOAD / DELETE ─────
   const handleSave = useCallback(async () => {
     setSaveError(null);
@@ -851,15 +831,14 @@ export default function DeckBuilderPage() {
             style={{ backgroundColor: 'rgba(196,163,90,0.08)', borderLeft: '2px solid rgba(196,163,90,0.4)', color: '#c4a35a' }}>
             {t("deckBuilder.sortByCost")}
           </button>
-          <span className="text-[8px]" style={{ color: '#444' }}>{t("deckBuilder.dragToReorder")}</span>
         </div>
       )}
 
-      {/* Character grid (flat, drag to reorder) */}
+      {/* Character grid */}
       {deckChars.length === 0 ? (
         <p className="text-[11px] italic mt-4" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
       ) : (
-        <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }} onDragEnd={() => { setDragFromIdx(null); setDragOverIdx(null); }}>
+        <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
           {deckChars.map((card, idx) => (
             <DeckCard
               key={`${card.id}-${idx}`}
@@ -867,10 +846,6 @@ export default function DeckBuilderPage() {
               idx={idx}
               onRemove={handleRemoveChar}
               onHover={handlePreview}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              isDragOver={dragOverIdx === idx}
             />
           ))}
         </div>
