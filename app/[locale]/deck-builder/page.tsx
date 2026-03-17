@@ -548,7 +548,12 @@ export default function DeckBuilderPage() {
   const renderInfoContent = () => {
     if (!previewCard || !previewAddCheck) {
       return (
-        <div className="flex-1 flex items-center justify-center px-4">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 gap-3">
+          <div className="relative overflow-hidden mx-auto" style={{
+            width: '160px', aspectRatio: '5/7', backgroundColor: '#0a0a0c',
+          }}>
+            <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.6 }} />
+          </div>
           <p className="text-[11px] text-center" style={{ color: '#444' }}>{t("deckBuilder.hoverToPreview")}</p>
         </div>
       );
@@ -834,7 +839,7 @@ export default function DeckBuilderPage() {
       {deckChars.length === 0 ? (
         <p className="text-[11px] italic mt-4" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
       ) : (
-        <div className="flex flex-wrap gap-1" onDragEnd={() => { setDragFromIdx(null); setDragOverIdx(null); }}>
+        <div className="flex flex-wrap gap-0.5" onDragEnd={() => { setDragFromIdx(null); setDragOverIdx(null); }}>
           {deckChars.map((card, idx) => (
             <DeckCard
               key={`${card.id}-${idx}`}
@@ -870,10 +875,11 @@ export default function DeckBuilderPage() {
           backgroundColor: 'rgba(8, 8, 12, 0.95)',
           borderRight: '1px solid rgba(196, 163, 90, 0.12)',
         }}>
-          <div className="px-3 pt-2 pb-1 flex-shrink-0">
-            <span className="text-[9px] uppercase font-bold" style={{ color: '#666', letterSpacing: '0.1em' }}>
-              {t("deckBuilder.detailBtn")}
-            </span>
+          <div className="px-3 pt-2 pb-1 flex-shrink-0 flex items-center gap-2">
+            <Link href="/" className="text-[10px] uppercase" style={{ color: '#555' }}>{t("common.back")}</Link>
+            <h1 className="text-xs font-bold uppercase" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
+              {t("deckBuilder.title")}
+            </h1>
           </div>
           {renderInfoContent()}
         </div>
@@ -885,10 +891,6 @@ export default function DeckBuilderPage() {
             backgroundColor: 'rgba(8, 8, 12, 0.9)',
             borderBottom: '1px solid rgba(255,255,255,0.04)',
           }}>
-            <Link href="/" className="text-[10px] uppercase flex-shrink-0" style={{ color: '#555' }}>{t("common.back")}</Link>
-            <h1 className="text-sm font-bold uppercase flex-shrink-0" style={{ color: '#c4a35a', letterSpacing: '0.1em' }}>
-              {t("deckBuilder.title")}
-            </h1>
             <input
               type="text"
               placeholder={t("deckBuilder.deckName")}
@@ -954,7 +956,7 @@ export default function DeckBuilderPage() {
 
         {/* ── RIGHT: Card Catalog ── */}
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
-          width: '340px',
+          width: '400px',
           backgroundColor: 'rgba(8, 8, 12, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
@@ -1016,7 +1018,7 @@ export default function DeckBuilderPage() {
             <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
             {/* Characters section */}
-            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(54px, 1fr))' }}>
+            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(62px, 1fr))' }}>
               {filteredChars.map((card) => (
                 <CatalogCard
                   key={card.id}
