@@ -48,25 +48,27 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const previousCard = stack[stack.length - 2];
 
-  if (previousCard.power < 6) {
-    // Previous card had Power < 6, no bonus
+  // Effective power = base power + power tokens (tokens transfer through upgrades)
+  const effectivePower = (previousCard.power ?? 0) + (ctx.sourceCard.powerTokens ?? 0);
+
+  if (effectivePower < 6) {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
-      `Orochimaru (138): Upgraded character ${previousCard.name_fr} had Power ${previousCard.power} (less than 6), no bonus points.`,
+      `Orochimaru (138): Upgraded character ${previousCard.name_fr} had Power ${effectivePower} (less than 6), no bonus points.`,
       'game.log.effect.noTarget',
       { card: 'OROCHIMARU', id: 'KS-138-S' },
     );
     return { state: { ...state, log } };
   }
 
-  // Previous card has Power >= 6, return CONFIRM popup
+  // Previous card has effective Power >= 6, return CONFIRM popup
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'OROCHIMARU138_CONFIRM_UPGRADE',
     validTargets: [ctx.sourceCard.instanceId],
-    description: JSON.stringify({ previousCardName: previousCard.name_fr, previousCardPower: previousCard.power }),
+    description: JSON.stringify({ previousCardName: previousCard.name_fr, previousCardPower: effectivePower }),
     descriptionKey: 'game.effect.desc.orochimaru138ConfirmUpgrade',
   };
 }
