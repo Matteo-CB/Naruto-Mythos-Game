@@ -16126,13 +16126,17 @@ export class EffectEngine {
           return state;
         }
       }
-      // No affordable upgrades (or single forced upgrade) — fall through
+      // No affordable upgrades (or single forced upgrade with name conflict) — fall through
     }
 
     let placedChar: CharacterInPlay;
     let isCardUpgrade = false;
 
-    if (existingIdx >= 0) {
+    // Auto-upgrade only if: upgrade target exists AND it's affordable AND there's a name conflict
+    // (meaning fresh play is impossible, so upgrade is the only option).
+    // If no name conflict exists, the upgrade-or-fresh popup should have been shown above.
+    // If upgrade is unaffordable, fall through to fresh play.
+    if (existingIdx >= 0 && hasNameConflict) {
       const existing = mission[friendlySide][existingIdx];
       const updatedChars = [...mission[friendlySide]];
       updatedChars[existingIdx] = {
