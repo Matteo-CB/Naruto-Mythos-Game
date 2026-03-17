@@ -13,7 +13,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-type Tab = 'settings' | 'cards' | 'backgrounds' | 'players';
+type Tab = 'settings' | 'cards' | 'backgrounds' | 'players' | 'reports';
 
 interface ActionResult {
   success: boolean;
@@ -396,6 +396,7 @@ export default function AdminPage() {
     { key: 'cards', label: t('tabCards') },
     { key: 'backgrounds', label: t('tabBackgrounds') },
     { key: 'players', label: 'Players' },
+    { key: 'reports', label: t('moderation.reports') },
   ];
 
   return (
@@ -836,8 +837,150 @@ export default function AdminPage() {
           </div>
         )}
 
+        {tab === 'reports' && <ReportsPanel />}
+
       </div>
       <Footer />
     </main>
+  );
+}
+
+function ReportsPanel() {
+  const t = useTranslations();
+  const [reports, setReports] = useState<Array<{
+    id: string; reporterName: string; targetName: string; messageText: string;
+    roomCode: string; reason: string; status: string; action: string | null;
+    createdAt: string; resolvedAt: string | null;
+  }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionReport, setActionReport] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] = useState('');
+  const [duration, setDuration] = useState('24');
+  const [eloAmount, setEloAmount] = useState('50');
+  const [rewardAmount, setRewardAmount] = useState('');
+
+  useEffect(() => {
+    fetch('/api/admin/reports', { credentials: 'include' })
+      .then((r) => r.ok ? r.json() : { reports: [] })
+      .then((data) => { setReports(data.reports ?? []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleResolve = async (reportId: string) => {
+    if (!selectedAction) return;
+    const res = await fetch('/api/admin/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reportId, action: selectedAction,
+        duration: ['chatBanTemp', 'gameBanTemp'].includes(selectedAction) ? duration : undefined,
+        eloAmount: selectedAction === 'eloDeduct' ? eloAmount : undefined,
+        reporterReward: rewardAmount || undefined,
+      }),
+      credentials: 'include',
+    });
+    if (res.ok) {
+      setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: selectedAction === 'dismiss' ? 'dismissed' : 'resolved', action: selectedAction } : r));
+      setActionReport(null); setSelectedAction(''); setRewardAmount('');
+    }
+  };
+
+  const pendingReports = reports.filter((r) => r.status === 'pending');
+  const resolvedReports = reports.filter((r) => r.status !== 'pending');
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+        {t('moderation.pendingReports')} ({pendingReports.length})
+      </h3>
+
+      {loading && <p className="text-xs" style={{ color: '#555' }}>Loading...</p>}
+
+      {!loading && pendingReports.length === 0 && (
+        <p className="text-xs py-4" style={{ color: '#555' }}>{t('moderation.noReports')}</p>
+      )}
+
+      {pendingReports.map((report) => (
+        <div key={report.id} className="rounded-lg p-4" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+          <div className="flex flex-wrap gap-3 text-xs mb-2">
+            <span style={{ color: '#888' }}>{t('moderation.reporter')}: <span style={{ color: '#e0e0e0' }}>{report.reporterName}</span></span>
+            <span style={{ color: '#888' }}>{t('moderation.target')}: <span style={{ color: '#b33e3e' }}>{report.targetName}</span></span>
+            <span style={{ color: '#555' }}>{new Date(report.createdAt).toLocaleString()}</span>
+          </div>
+          <div className="text-xs px-3 py-2 rounded mb-3" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1e1e1e', color: '#ccc', fontFamily: "'Inter', sans-serif" }}>
+            {report.messageText}
+          </div>
+          {report.reason && <p className="text-[10px] mb-2" style={{ color: '#888' }}>{t('moderation.reporter')}: {report.reason}</p>}
+
+          {actionReport === report.id ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <select value={selectedAction} onChange={(e) => setSelectedAction(e.target.value)}
+                className="text-xs px-2 py-1 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#e0e0e0' }}>
+                <option value="">{t('moderation.action')}</option>
+                <option value="dismiss">{t('moderation.dismiss')}</option>
+                <option value="warn">{t('moderation.warn')}</option>
+                <option value="chatBanTemp">{t('moderation.chatBanTemp')}</option>
+                <option value="chatBanPerm">{t('moderation.chatBanPerm')}</option>
+                <option value="gameBanTemp">{t('moderation.gameBanTemp')}</option>
+                <option value="gameBanPerm">{t('moderation.gameBanPerm')}</option>
+                <option value="eloDeduct">{t('moderation.deductElo')}</option>
+              </select>
+              {['chatBanTemp', 'gameBanTemp'].includes(selectedAction) && (
+                <select value={duration} onChange={(e) => setDuration(e.target.value)}
+                  className="text-xs px-2 py-1 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#e0e0e0' }}>
+                  <option value="24">{t('moderation.hours24')}</option>
+                  <option value="168">{t('moderation.days7')}</option>
+                  <option value="720">{t('moderation.days30')}</option>
+                </select>
+              )}
+              {selectedAction === 'eloDeduct' && (
+                <input type="number" value={eloAmount} onChange={(e) => setEloAmount(e.target.value)}
+                  className="w-16 text-xs px-2 py-1 rounded" placeholder="ELO"
+                  style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#e0e0e0' }} />
+              )}
+              {selectedAction && selectedAction !== 'dismiss' && (
+                <input type="number" value={rewardAmount} onChange={(e) => setRewardAmount(e.target.value)}
+                  className="w-16 text-xs px-2 py-1 rounded" placeholder="+ELO"
+                  title={t('moderation.rewardReporter')}
+                  style={{ backgroundColor: '#0a0a0a', border: '1px solid #3e8b3e33', color: '#3e8b3e' }} />
+              )}
+              <button onClick={() => handleResolve(report.id)} disabled={!selectedAction}
+                className="text-xs px-3 py-1 rounded cursor-pointer disabled:opacity-30"
+                style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
+                {t('common.confirm')}
+              </button>
+              <button onClick={() => setActionReport(null)}
+                className="text-xs px-2 py-1 cursor-pointer" style={{ color: '#888' }}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => { setActionReport(report.id); setSelectedAction(''); }}
+              className="text-xs px-3 py-1 cursor-pointer"
+              style={{ backgroundColor: 'rgba(179,62,62,0.1)', border: '1px solid rgba(179,62,62,0.3)', color: '#b33e3e' }}>
+              {t('moderation.action')}
+            </button>
+          )}
+        </div>
+      ))}
+
+      {resolvedReports.length > 0 && (
+        <>
+          <h3 className="text-sm font-bold uppercase tracking-wider mt-6" style={{ color: '#888' }}>
+            {t('moderation.resolved')} ({resolvedReports.length})
+          </h3>
+          {resolvedReports.slice(0, 20).map((report) => (
+            <div key={report.id} className="rounded-lg p-3 flex items-center gap-3" style={{ backgroundColor: '#111', border: '1px solid #1e1e1e' }}>
+              <span className="text-[10px]" style={{ color: '#555' }}>{report.targetName}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded" style={{
+                backgroundColor: report.status === 'dismissed' ? 'rgba(136,136,136,0.1)' : 'rgba(62,139,62,0.1)',
+                color: report.status === 'dismissed' ? '#888' : '#3e8b3e',
+              }}>{report.action ?? report.status}</span>
+              <span className="text-[10px]" style={{ color: '#444' }}>{new Date(report.createdAt).toLocaleDateString()}</span>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
   );
 }
