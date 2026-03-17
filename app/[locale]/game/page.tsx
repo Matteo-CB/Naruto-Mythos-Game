@@ -42,9 +42,10 @@ export default function GamePage() {
   const socketErrorKey = useSocketStore((s) => s.errorKey);
   const socketErrorParams = useSocketStore((s) => s.errorParams);
   const socketClearError = useSocketStore((s) => s.clearError);
+  const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  // For AI games, gameState must exist; for online games, visibleState must exist
-  const hasActiveGame = gameState || (isOnlineGame && visibleState);
+  // For AI games, gameState must exist; for online/spectator, visibleState must exist
+  const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
 
   // Delay redirect to give Zustand time to propagate state from startOnlineGame
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -52,15 +53,33 @@ export default function GamePage() {
     if (!hasActiveGame) {
       // Give a brief delay before redirecting - state may be propagating
       redirectTimerRef.current = setTimeout(() => {
-        if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState) {
+        if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState && !useSocketStore.getState().isSpectating) {
           router.push('/');
         }
-      }, 500);
+      }, 1000);
     }
     return () => {
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
   }, [hasActiveGame, router]);
+
+  // Sync spectator state to gameStore
+  useEffect(() => {
+    if (isSpectating && socketVisibleState) {
+      const socketNames = useSocketStore.getState().playerNames;
+      useGameStore.setState({
+        visibleState: socketVisibleState,
+        isOnlineGame: false,
+        isAIGame: false,
+        isSandboxMode: false,
+        gameOver: false,
+        playerDisplayNames: socketNames ? {
+          player1: socketNames.player1,
+          player2: socketNames.player2,
+        } : undefined,
+      });
+    }
+  }, [isSpectating, socketVisibleState]);
 
   // Sync socket state updates to gameStore for online games
   useEffect(() => {
