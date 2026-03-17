@@ -28,11 +28,14 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
-  // Block all game actions (play, pass, etc.) while there are unresolved pending effects.
-  // Only SELECT_TARGET and DECLINE_OPTIONAL_EFFECT are allowed during pending resolution.
-  // This prevents passing while the opponent is resolving an effect (Kin 072, Zaku 070, etc.)
-  if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT') {
-    if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
+  // Block game actions only when the OPPONENT has pending effects to resolve.
+  // This prevents passing while the opponent is choosing (Kin 072, Zaku 070, etc.)
+  // but still allows the current player to act when THEIR own effects are pending.
+  if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT' && action.type !== 'REORDER_EFFECTS') {
+    const opponentHasPending = newState.pendingActions.some(
+      (pa: { player: string }) => pa.player !== player
+    );
+    if (opponentHasPending) {
       return state;
     }
   }
