@@ -41,12 +41,13 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before card selection
+  // CONFIRM popup before card selection (optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'MSS08_CONFIRM_SCORE',
     validTargets: ['KS-008-MMS'],
+    isOptional: true,
     description: 'MSS 08 (Set a Trap): Put a card from your hand as a hidden character to any mission.',
     descriptionKey: 'game.effect.desc.mss08ConfirmScore',
   };
