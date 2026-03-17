@@ -1637,10 +1637,12 @@ export class GameEngine {
           const isOwn = c.controlledBy === player;
           // Can see if: own card, OR not hidden, OR was revealed at least once (public info).
           const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
-          const power = calculateCharacterPower(state, c, side);
-          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          let power = 0;
+          try { power = calculateCharacterPower(state, c, side); } catch { /* prevent crash */ }
+          const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
           // Rempart 067: the targeted character loses all Power tokens visually
-          const tokensZeroed = isRempartZeroed(state, mIdx, c, side);
+          let tokensZeroed = false;
+          try { tokensZeroed = isRempartZeroed(state, mIdx, c, side); } catch { /* prevent crash */ }
           return {
             instanceId: c.instanceId,
             isHidden: c.isHidden,
