@@ -613,7 +613,7 @@ export default function DeckBuilderPage() {
             backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
             borderLeft: `2px solid ${isChar ? 'rgba(255,255,255,0.15)' : '#c4a35a'}`,
             color: isChar ? '#999' : '#c4a35a',
-          }}>{isChar ? t("game.board.character") : t("game.board.mission")}</span>
+          }}>{isChar ? t("deckBuilder.characterCards") : t("deckBuilder.missionCards")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: `${rarColor}12`, borderLeft: `2px solid ${rarColor}`, color: rarColor,
           }}>{getRarityLabel(card.rarity, loc)}</span>
