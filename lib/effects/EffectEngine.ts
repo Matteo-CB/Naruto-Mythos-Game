@@ -4630,27 +4630,105 @@ export class EffectEngine {
         }
         if (kb054mGemmaCreated) break;
 
-        // Normal batch hide processing
-        let kb054mState = newState;
-        for (let ti = 0; ti < kb054mOrdered.length; ti++) {
-          const target = kb054mOrdered[ti];
-          const pendingCountBefore = kb054mState.pendingEffects.length;
-          kb054mState = EffectEngine.hideCharacterWithLog(kb054mState, target.instanceId, kb054mPlayer);
+        // Sequential hide: player chooses order, one target at a time
+        const kb054mAllTargetIds = kb054mOrdered.map(t => t.instanceId);
 
-          const gemmaHidePending = kb054mState.pendingEffects.find(
-            (pe: any) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
-              && kb054mState.pendingEffects.length > pendingCountBefore,
-          );
-          if (gemmaHidePending) {
-            const remainingIds = kb054mOrdered.slice(ti + 1).map(t => t.instanceId);
-            const existingDesc = JSON.parse(gemmaHidePending.effectDescription);
-            existingDesc.batchRemainingTargets = remainingIds;
-            existingDesc.batchSourcePlayer = kb054mPlayer;
-            gemmaHidePending.effectDescription = JSON.stringify(existingDesc);
-            break;
+        if (kb054mAllTargetIds.length === 1) {
+          // Only one target — auto-hide it
+          newState = EffectEngine.hideCharacterWithLog(newState, kb054mAllTargetIds[0], kb054mPlayer);
+        } else {
+          // Multiple targets — let player choose order
+          const kb054mSeqEffId = generateInstanceId();
+          const kb054mSeqActId = generateInstanceId();
+          newState.pendingEffects.push({
+            id: kb054mSeqEffId, sourceCardId: 'KS-054-UC',
+            sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: kb054mMI, effectType: 'MAIN' as EffectType,
+            effectDescription: JSON.stringify({
+              remainingTargets: kb054mAllTargetIds,
+              sourcePlayer: kb054mPlayer,
+              selfPower: kb054mSelfPower,
+            }),
+            targetSelectionType: 'KABUTO054_CHOOSE_HIDE_TARGET',
+            sourcePlayer: kb054mPlayer, requiresTargetSelection: true,
+            validTargets: kb054mAllTargetIds,
+            isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+          });
+          newState.pendingActions.push({
+            id: kb054mSeqActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: kb054mPlayer,
+            description: 'Kabuto Yakushi (054): Choose which character to hide first.',
+            descriptionKey: 'game.effect.desc.kabuto054ChooseHideTarget',
+            options: kb054mAllTargetIds,
+            minSelections: 1, maxSelections: 1, sourceEffectId: kb054mSeqEffId,
+          });
+        }
+        break;
+      }
+
+      case 'KABUTO054_CHOOSE_HIDE_TARGET': {
+        // Sequential hide: player chose a target to hide
+        const kb054sPlayer = pendingEffect.sourcePlayer;
+        let kb054sMeta: { remainingTargets?: string[]; sourcePlayer?: string; selfPower?: number } = {};
+        try { kb054sMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const kb054sRemaining = (kb054sMeta.remainingTargets ?? []).filter((id: string) => id !== targetId);
+
+        // Hide the chosen target
+        const pendingCountBefore054 = newState.pendingEffects.length;
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer);
+
+        // Check if Gemma 049 intercepted
+        const gemma054Pending = newState.pendingEffects.find(
+          (pe: any) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
+            && newState.pendingEffects.length > pendingCountBefore054,
+        );
+        if (gemma054Pending && kb054sRemaining.length > 0) {
+          // Store remaining targets for Gemma to continue after
+          const existingDesc054 = JSON.parse(gemma054Pending.effectDescription);
+          existingDesc054.batchRemainingTargets = kb054sRemaining;
+          existingDesc054.batchSourcePlayer = kb054sPlayer;
+          gemma054Pending.effectDescription = JSON.stringify(existingDesc054);
+          break;
+        }
+
+        // Continue with remaining targets
+        if (kb054sRemaining.length > 0) {
+          // Re-validate remaining targets still exist and are non-hidden
+          const kb054sValidRemaining = kb054sRemaining.filter((id: string) => {
+            const res = EffectEngine.findCharByInstanceId(newState, id);
+            return res && !res.character.isHidden;
+          });
+
+          if (kb054sValidRemaining.length === 1) {
+            // Auto-hide last remaining
+            newState = EffectEngine.hideCharacterWithLog(newState, kb054sValidRemaining[0], kb054sPlayer);
+          } else if (kb054sValidRemaining.length > 1) {
+            // More targets — create next choice
+            const kb054sNextEffId = generateInstanceId();
+            const kb054sNextActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: kb054sNextEffId, sourceCardId: 'KS-054-UC',
+              sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'MAIN' as EffectType,
+              effectDescription: JSON.stringify({
+                remainingTargets: kb054sValidRemaining,
+                sourcePlayer: kb054sPlayer,
+              }),
+              targetSelectionType: 'KABUTO054_CHOOSE_HIDE_TARGET',
+              sourcePlayer: kb054sPlayer, requiresTargetSelection: true,
+              validTargets: kb054sValidRemaining,
+              isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
+            });
+            newState.pendingActions.push({
+              id: kb054sNextActId, type: 'SELECT_TARGET' as PendingAction['type'],
+              player: kb054sPlayer,
+              description: 'Kabuto Yakushi (054): Choose next character to hide.',
+              descriptionKey: 'game.effect.desc.kabuto054ChooseHideTarget',
+              options: kb054sValidRemaining,
+              minSelections: 1, maxSelections: 1, sourceEffectId: kb054sNextEffId,
+            });
           }
         }
-        newState = kb054mState;
         break;
       }
 
@@ -6919,37 +6997,37 @@ export class EffectEngine {
       }
 
       case 'TSUNADE104_CONFIRM_UPGRADE': {
-        // Same as CONFIRM_MAIN but for standalone UPGRADE
+        // UPGRADE: Apply POWERUP X where X = amount spent on the MAIN effect (no double payment)
         const t104uPlayer = pendingEffect.sourcePlayer;
-        const t104uChakra = newState[t104uPlayer].chakra;
-        if (t104uChakra <= 0) {
+        const mainSpent = (newState as any)._tsunade104ChakraSpent ?? 0;
+        delete (newState as any)._tsunade104ChakraSpent;
+
+        if (mainSpent <= 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, t104uPlayer,
-            'EFFECT_NO_TARGET', 'Tsunade (104) UPGRADE: No chakra remaining.',
-            'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-104-R' });
+            'EFFECT', 'Tsunade (104) UPGRADE: No chakra was spent on MAIN, no bonus POWERUP.',
+            'game.log.effect.tsunade104Decline', { card: 'TSUNADE', id: 'KS-104-R' });
           break;
         }
-        const t104uOptions: string[] = [];
-        for (let i = 0; i <= t104uChakra; i++) t104uOptions.push(String(i));
-        const t104uEffId = generateInstanceId();
-        const t104uActId = generateInstanceId();
-        newState.pendingEffects.push({
-          id: t104uEffId, sourceCardId: pendingEffect.sourceCardId,
-          sourceInstanceId: pendingEffect.sourceInstanceId,
-          sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-          effectDescription: '', targetSelectionType: 'TSUNADE104_CHOOSE_CHAKRA',
-          sourcePlayer: t104uPlayer, requiresTargetSelection: true,
-          validTargets: t104uOptions, isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: false,
-        });
-        newState.pendingActions.push({
-          id: t104uActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
-          player: t104uPlayer,
-          description: `Tsunade (104) UPGRADE: Choose how much extra chakra to spend (0-${t104uChakra}) for POWERUP.`,
-          descriptionKey: 'game.effect.desc.tsunade104ChooseChakra',
-          descriptionParams: { max: String(t104uChakra) },
-          options: t104uOptions, minSelections: 1, maxSelections: 1,
-          sourceEffectId: t104uEffId,
-        });
+
+        // Apply POWERUP = mainSpent (free, no additional chakra cost)
+        const charResult104u = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+        if (charResult104u) {
+          const missions104u = [...newState.activeMissions];
+          const mission104u = { ...missions104u[charResult104u.missionIndex] };
+          const side104u: 'player1Characters' | 'player2Characters' =
+            charResult104u.player === 'player1' ? 'player1Characters' : 'player2Characters';
+          mission104u[side104u] = mission104u[side104u].map((c: CharacterInPlay) =>
+            c.instanceId === pendingEffect.sourceInstanceId
+              ? { ...c, powerTokens: c.powerTokens + mainSpent }
+              : c,
+          );
+          missions104u[charResult104u.missionIndex] = mission104u;
+          newState.activeMissions = missions104u;
+        }
+
+        newState.log = logAction(newState.log, newState.turn, newState.phase, t104uPlayer,
+          'EFFECT_POWERUP', `Tsunade (104) UPGRADE: POWERUP ${mainSpent} (matching MAIN chakra spent).`,
+          'game.log.effect.powerupSelf', { card: 'TSUNADE', id: 'KS-104-R', amount: mainSpent });
         break;
       }
 
@@ -14406,7 +14484,6 @@ export class EffectEngine {
           ps104.chakra -= chakraAmount;
           newState = { ...newState, [pendingEffect.sourcePlayer]: ps104 };
 
-          // POWERUP on self - double if this is an upgrade (UPGRADE repeats the MAIN POWERUP)
           const powerupAmount = chakraAmount;
           const charResult104 = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
           if (charResult104) {
@@ -14423,6 +14500,9 @@ export class EffectEngine {
             newState.activeMissions = missions104;
           }
 
+          // Store the amount spent so UPGRADE can reference it
+          (newState as any)._tsunade104ChakraSpent = chakraAmount;
+
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_POWERUP',
@@ -14431,6 +14511,7 @@ export class EffectEngine {
             { card: 'TSUNADE', id: 'KS-104-R', amount: powerupAmount },
           );
         } else {
+          (newState as any)._tsunade104ChakraSpent = 0;
           newState.log = logAction(
             newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
