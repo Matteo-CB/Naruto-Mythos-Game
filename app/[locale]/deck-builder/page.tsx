@@ -141,8 +141,8 @@ const DeckCard = memo(function DeckCard({
       onMouseEnter={() => onHover(card)}
       className="relative overflow-hidden group cursor-grab flex-shrink-0"
       style={{
-        width: '64px',
-        height: '90px',
+        width: '80px',
+        height: '112px',
         backgroundColor: '#0e0e0e',
         borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
         borderLeft: isDragOver ? '2px solid #c4a35a' : '2px solid transparent',
