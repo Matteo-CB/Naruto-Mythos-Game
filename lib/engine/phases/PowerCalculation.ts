@@ -12,14 +12,12 @@ export function calculateCharacterPower(
   player: PlayerID,
 ): number {
   // Hidden characters have 0 BASE power, but power tokens still contribute.
-  // Continuous effects (Kurenai 035, Naruto 145) can also grant bonus power.
-  // Negative power is allowed per game rules (e.g., Itachi 128 gives -1 to enemies,
-  // a hidden char with 0 tokens and -1 debuff = -1 total power contribution).
+  // Power can never go below 0 for hidden characters.
   if (char.isHidden) {
     const mission = state.activeMissions[char.missionIndex];
     if (!mission) return char.powerTokens;
     const hiddenBonus = calculateContinuousPowerModifier(state, player, char.missionIndex, char);
-    return char.powerTokens + hiddenBonus;
+    return Math.max(0, char.powerTokens + hiddenBonus);
   }
 
   const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -33,5 +31,5 @@ export function calculateCharacterPower(
   // Delegates to centralized ContinuousEffects module
   power += calculateContinuousPowerModifier(state, player, char.missionIndex, char);
 
-  return power;
+  return Math.max(0, power);
 }

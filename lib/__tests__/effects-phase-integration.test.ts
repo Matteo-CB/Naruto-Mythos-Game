@@ -363,7 +363,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
     });
 
     const power = calculateCharacterPower(state, sasuke, 'player1');
-    expect(power).toBe(-1); // 2 base - 3 allies = -1 (negative power allowed per game rules)
+    expect(power).toBe(0); // 2 base - 3 allies = -1 → clamped to 0 (power never negative)
   });
 });
 
