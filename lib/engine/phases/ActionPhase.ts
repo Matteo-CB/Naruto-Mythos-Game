@@ -28,18 +28,6 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
-  // Block game actions only when the OPPONENT has pending effects to resolve.
-  // This prevents passing while the opponent is choosing (Kin 072, Zaku 070, etc.)
-  // but still allows the current player to act when THEIR own effects are pending.
-  if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT' && action.type !== 'REORDER_EFFECTS') {
-    const opponentHasPending = newState.pendingActions.some(
-      (pa: { player: string }) => pa.player !== player
-    );
-    if (opponentHasPending) {
-      return state;
-    }
-  }
-
   // Track the pre-action state to detect if the action actually succeeded.
   // Handlers return the SAME object reference on validation failure.
   const beforeAction = newState;
