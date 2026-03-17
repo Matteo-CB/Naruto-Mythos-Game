@@ -141,8 +141,8 @@ const DeckCard = memo(function DeckCard({
       onMouseEnter={() => onHover(card)}
       className="relative overflow-hidden group cursor-grab flex-shrink-0"
       style={{
-        width: '80px',
-        height: '112px',
+        width: '96px',
+        height: '134px',
         backgroundColor: '#0e0e0e',
         borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
         borderLeft: isDragOver ? '2px solid #c4a35a' : '2px solid transparent',
@@ -588,7 +588,7 @@ export default function DeckBuilderPage() {
             backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
             borderLeft: `2px solid ${isChar ? 'rgba(255,255,255,0.15)' : '#c4a35a'}`,
             color: isChar ? '#999' : '#c4a35a',
-          }}>{isChar ? t("game.board.character") : 'Mission'}</span>
+          }}>{isChar ? t("game.board.character") : t("game.board.mission")}</span>
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: `${rarColor}12`, borderLeft: `2px solid ${rarColor}`, color: rarColor,
           }}>{getRarityLabel(card.rarity, loc)}</span>
@@ -787,7 +787,7 @@ export default function DeckBuilderPage() {
     <>
       {/* Missions row */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>Missions</span>
+        <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>{t("deckBuilder.missionCards")}</span>
         <div className="flex gap-2">
           {[0, 1, 2].map((i) => {
             const m = deckMissions[i];
@@ -1001,7 +1001,7 @@ export default function DeckBuilderPage() {
           <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>
             {/* Missions section */}
             <div className="mb-2">
-              <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>Missions</span>
+              <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
               <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                 {filteredMissions.map((m) => (
                   <CatalogMission
@@ -1097,7 +1097,7 @@ export default function DeckBuilderPage() {
               </div>
 
               {/* Missions */}
-              <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>Missions</span>
+              <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
               <div className="grid grid-cols-3 gap-1.5 mb-3">
                 {filteredMissions.map((m) => (
                   <CatalogMission key={m.id} card={m} allowed={missionAllowedMap.get(m.id) ?? true}
