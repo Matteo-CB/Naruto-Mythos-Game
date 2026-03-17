@@ -16132,11 +16132,15 @@ export class EffectEngine {
     let placedChar: CharacterInPlay;
     let isCardUpgrade = false;
 
-    // Auto-upgrade only if: upgrade target exists AND it's affordable AND there's a name conflict
-    // (meaning fresh play is impossible, so upgrade is the only option).
-    // If no name conflict exists, the upgrade-or-fresh popup should have been shown above.
-    // If upgrade is unaffordable, fall through to fresh play.
-    if (existingIdx >= 0 && hasNameConflict) {
+    // Auto-upgrade: only when upgrade target exists, is affordable, AND no popup was shown.
+    // The popup block above (lines 16078-16127) handles all cases where choices exist.
+    // This fallthrough handles the forced single-option case.
+    const autoUpgradeAffordable = existingIdx >= 0 && (() => {
+      const ex = mission[friendlySide][existingIdx];
+      const exTop = ex.stack.length > 0 ? ex.stack[ex.stack.length - 1] : ex.card;
+      return ps.chakra >= Math.max(0, ((card.chakra ?? 0) - (exTop.chakra ?? 0)) - costReduction);
+    })();
+    if (existingIdx >= 0 && autoUpgradeAffordable) {
       const existing = mission[friendlySide][existingIdx];
       const updatedChars = [...mission[friendlySide]];
       updatedChars[existingIdx] = {
