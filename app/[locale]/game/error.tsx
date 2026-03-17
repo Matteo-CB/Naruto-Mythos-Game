@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function GameError({
   error,
@@ -9,9 +9,30 @@ export default function GameError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [retryCount, setRetryCount] = useState(0);
+
   useEffect(() => {
     console.error('[Game Error]', error);
-  }, [error]);
+
+    // Auto-retry immediately — game state lives in Zustand store (not in the crashed component tree).
+    // reset() re-renders the component tree which will read from the intact store.
+    if (retryCount < 3) {
+      const timer = setTimeout(() => {
+        setRetryCount((c) => c + 1);
+        reset();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [error, reset, retryCount]);
+
+  // Only show error UI if auto-retry failed 3 times
+  if (retryCount < 3) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+        <p className="text-sm" style={{ color: '#888' }}>Recovering...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -25,7 +46,7 @@ export default function GameError({
         </p>
         <div className="flex gap-3 mt-2">
           <button
-            onClick={reset}
+            onClick={() => { setRetryCount(0); reset(); }}
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'rgba(196, 163, 90, 0.1)',
@@ -33,7 +54,7 @@ export default function GameError({
               color: '#c4a35a',
             }}
           >
-            Reload Game
+            Retry
           </button>
           <a
             href="/"
@@ -47,9 +68,6 @@ export default function GameError({
             Home
           </a>
         </div>
-        <p className="text-[10px] mt-2" style={{ color: '#444' }}>
-          If this keeps happening, try clearing your browser cache.
-        </p>
         <div className="w-12 h-px mt-1" style={{ backgroundColor: 'rgba(179, 62, 62, 0.4)' }} />
       </div>
     </div>
