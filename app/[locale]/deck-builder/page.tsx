@@ -191,9 +191,9 @@ export default function DeckBuilderPage() {
   const [filterKeywords, setFilterKeywords] = useState<string[]>([]);
   const [filterEffectType, setFilterEffectType] = useState<EffectType[]>([]);
   const [filterChakraMin, setFilterChakraMin] = useState(0);
-  const [filterChakraMax, setFilterChakraMax] = useState(10);
+  const [filterChakraMax, setFilterChakraMax] = useState(99);
   const [filterPowerMin, setFilterPowerMin] = useState(0);
-  const [filterPowerMax, setFilterPowerMax] = useState(10);
+  const [filterPowerMax, setFilterPowerMax] = useState(99);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
   const [mobileView, setMobileView] = useState<'catalog' | 'deck'>('catalog');
