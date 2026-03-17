@@ -55,6 +55,7 @@ interface RoomData {
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
+const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
 const DISCONNECT_GRACE_MS = 30_000; // 30 seconds before disconnect = forfeit
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
@@ -496,6 +497,101 @@ function startForcedResolverTimer(
       startActionTimer(room, code, io);
     }
   }, ACTION_TIMEOUT_MS);
+}
+
+/**
+ * Start a timer for pending effect resolution (60 seconds).
+ * On timeout:
+ * - Optional effects → auto-decline
+ * - Mandatory effects → auto-select a random valid target
+ */
+function startEffectTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  clearActionTimer(room);
+
+  if (!room.gameState) return;
+  if (!room.timerEnabled) return;
+
+  // Find the pending action that needs resolution
+  const pendingAction = room.gameState.pendingActions[0];
+  if (!pendingAction) return;
+
+  const resolverPlayer = pendingAction.player;
+  const resolverSocket = resolverPlayer === 'player1' ? room.hostSocket : room.guestSocket;
+
+  const deadline = Date.now() + EFFECT_TIMEOUT_MS;
+  room.timerDeadline = deadline;
+
+  if (resolverSocket) {
+    io.to(resolverSocket).emit('game:action-deadline', { deadline, durationMs: EFFECT_TIMEOUT_MS });
+  }
+
+  // Pause the other player's perspective
+  const otherSocket = resolverPlayer === 'player1' ? room.guestSocket : room.hostSocket;
+  if (otherSocket) {
+    io.to(otherSocket).emit('game:action-deadline-pause');
+  }
+
+  room.actionTimer = setTimeout(async () => {
+    if (!rooms.has(code)) return;
+    if (!room.gameState) return;
+
+    const pendingEffect = room.gameState.pendingEffects.find(
+      (e: { selectingPlayer?: string; sourcePlayer: string }) =>
+        e.selectingPlayer === resolverPlayer || e.sourcePlayer === resolverPlayer,
+    );
+    const currentPendingAction = room.gameState.pendingActions.find(
+      (a: { player: string }) => a.player === resolverPlayer,
+    );
+
+    if (!pendingEffect && !currentPendingAction) return;
+
+    console.log(`[Socket] Effect timer expired for ${resolverPlayer} in room ${code}`);
+
+    const isOptional = pendingEffect?.isOptional ?? true;
+
+    if (isOptional && pendingEffect) {
+      // Auto-decline optional effect
+      console.log(`[Socket] Auto-declining optional effect for ${resolverPlayer}`);
+      room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, {
+        type: 'DECLINE_OPTIONAL_EFFECT',
+        pendingEffectId: pendingEffect.id,
+      });
+    } else if (pendingEffect && currentPendingAction) {
+      // Mandatory effect — pick a random valid target
+      const validTargets = pendingEffect.validTargets ?? currentPendingAction.options ?? [];
+      if (validTargets.length > 0) {
+        const randomTarget = validTargets[Math.floor(Math.random() * validTargets.length)];
+        console.log(`[Socket] Auto-selecting random target "${randomTarget}" for mandatory effect (${resolverPlayer})`);
+        room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, {
+          type: 'SELECT_TARGET',
+          pendingActionId: currentPendingAction.id,
+          selectedTargets: [randomTarget],
+        });
+      }
+    }
+
+    if (resolverSocket) {
+      io.to(resolverSocket).emit('game:auto-declined');
+    }
+
+    broadcastState(room, io);
+
+    const winner = GameEngine.getWinner(room.gameState);
+    if (winner) {
+      await finalizeGameEnd(room, code, io, 'score');
+    } else if (room.gameState.phase === 'action') {
+      // Check if more effects pending
+      if (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0) {
+        startEffectTimer(room, code, io);
+      } else {
+        startActionTimer(room, code, io);
+      }
+    }
+  }, EFFECT_TIMEOUT_MS);
 }
 
 /**
@@ -1188,6 +1284,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
         } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
           // Opponent must respond to a forced choice - start their timer, pause active player's
           startForcedResolverTimer(room, code, io);
+        } else if (room.gameState.phase === 'action' && (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0)) {
+          // Pending effect resolution — 60 second timer
+          startEffectTimer(room, code, io);
         } else if (room.gameState.phase === 'action') {
           // Restart timer for next active player
           startActionTimer(room, code, io);
