@@ -19,14 +19,8 @@ export async function GET(request: NextRequest) {
       conditions.push({ username: { contains: search, mode: 'insensitive' as const } });
     }
 
-    // League filter
-    if (league === 'unranked') {
-      // Unranked = fewer than PLACEMENT_MATCHES total games
-      // MongoDB doesn't support computed fields in where, so we use a raw approach:
-      // wins + losses + draws < PLACEMENT_MATCHES
-      // Prisma MongoDB doesn't support OR on aggregated fields easily,
-      // so we fetch with a generous limit and filter in JS
-    } else if (league) {
+    // League ELO filter
+    if (league && league !== 'unranked') {
       const tierIdx = LEAGUE_TIERS.findIndex((t) => t.key === league);
       if (tierIdx >= 0) {
         const tier = LEAGUE_TIERS[tierIdx];
@@ -41,8 +35,11 @@ export async function GET(request: NextRequest) {
       ? conditions.length === 1 ? conditions[0] : { AND: conditions }
       : {};
 
-    const fetchLimit = league ? 500 : limit;
-    const fetchSkip = league ? 0 : offset;
+    // For league filters: fetch a bounded set and post-filter by placement matches
+    // For unranked: same approach but inverted filter
+    const needsPostFilter = !!league;
+    const fetchLimit = needsPostFilter ? Math.min(limit * 3, 150) : limit;
+    const fetchSkip = needsPostFilter ? 0 : offset;
 
     let users = await prisma.user.findMany({
       where,
@@ -65,18 +62,19 @@ export async function GET(request: NextRequest) {
     if (league === 'unranked') {
       users = users.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
     } else if (league) {
-      // Exclude unranked players from league results
       users = users.filter((u) => u.wins + u.losses + u.draws >= PLACEMENT_MATCHES);
     }
 
-    const total = league ? users.length : await prisma.user.count({ where });
+    const total = needsPostFilter ? users.length : await prisma.user.count({ where });
 
     // Apply pagination for league-filtered results (post-filter pagination)
-    if (league) {
+    if (needsPostFilter) {
       users = users.slice(offset, offset + limit);
     }
 
-    return NextResponse.json({ users, total, limit, offset });
+    const response = NextResponse.json({ users, total, limit, offset });
+    response.headers.set('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
+    return response;
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },

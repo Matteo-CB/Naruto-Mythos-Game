@@ -7,9 +7,11 @@ export async function GET() {
       where: { key: 'global' },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       leaguesEnabled: settings?.leaguesEnabled ?? false,
     });
+    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return response;
   } catch {
     return NextResponse.json({ leaguesEnabled: false });
   }

@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     const issues = await prisma.cardIssue.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 200,
     });
 
     return NextResponse.json({ issues });

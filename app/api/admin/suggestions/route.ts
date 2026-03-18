@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     const suggestions = await prisma.suggestion.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 200,
     });
 
     return NextResponse.json({ suggestions });

@@ -21,6 +21,7 @@ export async function GET() {
 
   const backgrounds = await prisma.gameBackground.findMany({
     orderBy: { sortOrder: 'asc' },
+    take: 50,
   });
 
   return NextResponse.json({ backgrounds });
