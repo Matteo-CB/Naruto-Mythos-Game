@@ -338,8 +338,8 @@
       "restoreEffect": "Pending Effect"
     },
     "hand": {
-      "sortCost": "COST",
-      "sortPower": "POWER"
+      "sortCost": "Sort by Cost",
+      "sortPower": "Sort by Power"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",

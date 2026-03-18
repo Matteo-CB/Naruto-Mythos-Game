@@ -255,25 +255,22 @@ function SortPill({
         e.stopPropagation();
         onClick();
       }}
-      className="cursor-pointer uppercase"
+      className="cursor-pointer"
       style={{
-        fontSize: '9px',
-        fontWeight: 700,
-        letterSpacing: '0.08em',
-        padding: '2px 6px',
+        fontSize: '10px',
+        fontWeight: 600,
+        letterSpacing: '0.04em',
+        padding: '4px 10px',
         border: 'none',
         borderLeft: `2px solid ${active ? accentColor : 'rgba(255, 255, 255, 0.08)'}`,
         backgroundColor: active
-          ? 'rgba(196, 163, 90, 0.1)'
-          : 'rgba(255, 255, 255, 0.03)',
-        color: active ? '#c4a35a' : '#666666',
-        transform: 'skewX(-3deg)',
-        lineHeight: 1.2,
+          ? 'rgba(196, 163, 90, 0.12)'
+          : 'rgba(255, 255, 255, 0.04)',
+        color: active ? '#c4a35a' : '#888888',
+        lineHeight: 1.3,
       }}
     >
-      <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
-        {label}
-      </span>
+      {label}
     </motion.button>
   );
 }
@@ -464,10 +461,10 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
       </div>
 
       {/* Hand count + sort + move controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-3 py-1">
         {/* Move left/right arrows (only when a card is selected) */}
         {selectedCardIndex !== null && hand.length > 1 && (
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
             <SortPill
               label="\u25C0"
               onClick={moveCardLeft}
@@ -482,7 +479,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: Playe
         )}
 
         {hand.length > 1 && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <SortPill
               label={t('game.hand.sortCost')}
               active={activeSortType === 'cost'}
