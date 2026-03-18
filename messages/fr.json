@@ -956,6 +956,25 @@
       "clear": "Effacer les filtres",
       "resultsCount": "{count} cartes"
     },
+    "search": {
+      "helpButton": "? Recherche avancee",
+      "helpTitle": "Syntaxe de recherche",
+      "nameLabel": "Nom / ID",
+      "nameDesc": "Tapez directement un nom de personnage ou un ID de carte",
+      "chakraLabel": "Cout Chakra (c)",
+      "chakraDesc": "Filtrer par cout de chakra avec operateurs",
+      "powerLabel": "Puissance (p)",
+      "powerDesc": "Filtrer par puissance avec operateurs",
+      "keywordLabel": "Mot-cle (k)",
+      "keywordDesc": "Filtrer par mot-cle de carte (correspondance partielle)",
+      "groupLabel": "Groupe (g)",
+      "groupDesc": "Filtrer par village/groupe (correspondance partielle)",
+      "rarityLabel": "Rarete (r)",
+      "rarityDesc": "C, UC, R, RA, S, M",
+      "effectLabel": "Effet (e)",
+      "effectDesc": "MAIN, UPGRADE, AMBUSH, SCORE",
+      "combineTitle": "Combiner les filtres :"
+    },
     "sort": {
       "byNumber": "Trier par numero",
       "byName": "Trier par nom",
