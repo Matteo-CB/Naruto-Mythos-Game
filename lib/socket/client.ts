@@ -6,7 +6,7 @@ import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
 
-const CONNECT_TIMEOUT_MS = 8000;
+const CONNECT_TIMEOUT_MS = 20000;
 
 interface PublicRoom {
   code: string;
@@ -168,13 +168,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         timeout: CONNECT_TIMEOUT_MS,
       });
 
-      // Timeout for initial connection
+      let resolved = false;
+
+      // Timeout for initial connection — don't reject, just warn
+      // Socket.io will keep retrying via reconnection
       const timeoutId = setTimeout(() => {
         if (!socket.connected) {
-          console.error('[Socket] Connection timed out after', CONNECT_TIMEOUT_MS, 'ms');
-          socket.disconnect();
-          set({ error: 'Connection timed out. Server may be unavailable.', errorKey: 'game.error.connectionTimeout' });
-          reject(new Error('Socket connection timed out'));
+          console.warn('[Socket] Initial connection slow, still retrying...');
+          // Resolve so callers don't hang
+          if (!resolved) { resolved = true; resolve(); }
         }
       }, CONNECT_TIMEOUT_MS);
 
@@ -191,7 +193,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         // Auto-fetch active games list on connect
         socket.emit('games:list');
 
-        resolve();
+        if (!resolved) { resolved = true; resolve(); }
       });
 
       socket.on('disconnect', (reason) => {
@@ -229,10 +231,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       socket.on('connect_error', (err) => {
-        clearTimeout(timeoutId);
-        console.error('[Socket] Connection error:', err.message);
-        set({ error: `Connection failed: ${err.message}`, errorKey: 'game.error.connectionLost' });
-        reject(new Error(`Socket connection failed: ${err.message}`));
+        console.warn('[Socket] Connection error:', err.message, '— will retry');
+        // Don't set error state on initial failures — socket.io will reconnect
+        // Resolve the promise so callers don't hang
+        if (!resolved) { resolved = true; resolve(); }
       });
 
       // --- Room events ---
