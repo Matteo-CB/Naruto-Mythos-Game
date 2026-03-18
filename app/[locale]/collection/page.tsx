@@ -182,11 +182,6 @@ export default function CollectionPage() {
                     </span>
                   </div>
                 )}
-                {/* Rarity bar */}
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-0.5"
-                  style={{ backgroundColor: RARITY_COLORS[card.rarity] ?? '#555' }}
-                />
               </button>
             );
           })}
@@ -258,11 +253,6 @@ export default function CollectionPage() {
                         </span>
                       </div>
                     )}
-                    {/* Rarity bar */}
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-0.5"
-                      style={{ backgroundColor: RARITY_COLORS[card.rarity] ?? '#555' }}
-                    />
                   </button>
                 );
               })}

@@ -189,7 +189,6 @@ const CatalogCard = memo(function CatalogCard({
       style={{
         aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
-        borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
         opacity: allowed ? 1 : 0.35,
       }}
     >
@@ -269,7 +268,6 @@ const DeckCard = memo(function DeckCard({
       style={{
         aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
-        borderBottom: `2px solid ${RARITY_COLORS[card.rarity] ?? '#888'}`,
       }}
     >
       {imgPath ? (
@@ -1094,7 +1092,7 @@ export default function DeckBuilderPage() {
 
         {/* ── RIGHT: Card Catalog ── */}
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
-          width: '480px',
+          width: '540px',
           backgroundColor: 'rgba(8, 8, 12, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
@@ -1114,10 +1112,10 @@ export default function DeckBuilderPage() {
               />
               <button
                 onClick={() => setShowSearchHelp(true)}
-                className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
+                className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                 style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
               >
-                ?
+                {t('deckBuilder.search.helpButton')}
               </button>
             </div>
             <div className="text-[8px] mt-1" style={{ color: '#444' }}>
