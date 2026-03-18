@@ -6,7 +6,7 @@ import type { VisibleGameState, GameAction } from '@/lib/engine/types';
 import { useSocialStore } from '@/stores/socialStore';
 import { useUIStore } from '@/stores/uiStore';
 
-const CONNECT_TIMEOUT_MS = 20000;
+const CONNECT_TIMEOUT_MS = 10000;
 
 interface PublicRoom {
   code: string;
@@ -172,21 +172,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       const socket = io(socketUrl, {
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: 10,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: CONNECT_TIMEOUT_MS,
       });
 
-      let resolved = false;
-
-      // Timeout for initial connection — don't reject, just warn
-      // Socket.io will keep retrying via reconnection
+      // Timeout for initial connection
       const timeoutId = setTimeout(() => {
         if (!socket.connected) {
-          console.warn('[Socket] Initial connection slow, still retrying...');
-          // Resolve so callers don't hang
-          if (!resolved) { resolved = true; resolve(); }
+          console.error('[Socket] Connection timed out after', CONNECT_TIMEOUT_MS, 'ms');
+          socket.disconnect();
+          set({ error: 'Connection timed out. Server may be unavailable.', errorKey: 'game.error.connectionTimeout' });
+          reject(new Error('Socket connection timed out'));
         }
       }, CONNECT_TIMEOUT_MS);
 
@@ -203,17 +201,16 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         // Auto-fetch active games list on connect
         socket.emit('games:list');
 
-        if (!resolved) { resolved = true; resolve(); }
+        resolve();
       });
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
         set({ connected: false });
-        // Only show error if the SERVER explicitly kicked us (not temporary transport issues)
+        // Only show error for server-initiated disconnect, not temporary transport issues
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
         }
-        // For 'transport close', 'ping timeout', etc. — socket.io auto-reconnects, no error shown
       });
 
       socket.on('reconnect', (attemptNumber: number) => {
@@ -227,7 +224,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }
 
         // Rejoin active room so server updates our socket ID
-        // This handles both active games AND sealed pre-game (deck-building) phase
         const rc = get().roomCode;
         if (rc && uid) {
           console.log('[Socket] Rejoining room', rc, 'after reconnect');
@@ -241,10 +237,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       socket.on('connect_error', (err) => {
-        console.warn('[Socket] Connection error:', err.message, '— will retry');
-        // Don't set error state on initial failures — socket.io will reconnect
-        // Resolve the promise so callers don't hang
-        if (!resolved) { resolved = true; resolve(); }
+        clearTimeout(timeoutId);
+        console.error('[Socket] Connection error:', err.message);
+        set({ error: `Connection failed: ${err.message}`, errorKey: 'game.error.connectionLost' });
+        reject(new Error(`Socket connection failed: ${err.message}`));
       });
 
       // --- Room events ---
