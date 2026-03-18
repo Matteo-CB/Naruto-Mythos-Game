@@ -1143,8 +1143,26 @@ export default function DeckBuilderPage() {
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
-          {/* Search */}
-          <div className="px-3 pt-3 pb-2 flex-shrink-0">
+          {/* Missions section (above search) */}
+          <div className="px-3 pt-3 pb-1 flex-shrink-0">
+            <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
+            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+              {filteredMissions.map((m) => (
+                <CatalogMission
+                  key={m.id}
+                  card={m}
+                  allowed={missionAllowedMap.get(m.id) ?? true}
+                  onAdd={handleAddMission}
+                  onHover={handlePreview}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="h-px mx-3" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
+
+          {/* Search (below missions) */}
+          <div className="px-3 pt-2 pb-2 flex-shrink-0">
             <div className="flex items-center gap-1.5">
               <input
                 type="text"
@@ -1172,23 +1190,6 @@ export default function DeckBuilderPage() {
 
           {/* Scrollable card grid */}
           <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>
-            {/* Missions section */}
-            <div className="mb-2">
-              <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
-              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
-                {filteredMissions.map((m) => (
-                  <CatalogMission
-                    key={m.id}
-                    card={m}
-                    allowed={missionAllowedMap.get(m.id) ?? true}
-                    onAdd={handleAddMission}
-                    onHover={handlePreview}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
             {/* Characters section */}
             <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))' }}>
