@@ -716,42 +716,114 @@ export default function DeckBuilderPage() {
   // ═════════════════════════════════════════════════════
   const [showSearchHelp, setShowSearchHelp] = useState(false);
 
+  const searchFilters = [
+    { key: 'c', label: t('deckBuilder.search.chakraLabel'), desc: t('deckBuilder.search.chakraDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['c:4', 'c>3', 'c<=5'] },
+    { key: 'p', label: t('deckBuilder.search.powerLabel'), desc: t('deckBuilder.search.powerDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['p:5', 'p>=3', 'p<2'] },
+    { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin', 'k:Team 7'] },
+    { key: 'g', label: t('deckBuilder.search.groupLabel'), desc: t('deckBuilder.search.groupDesc'), ops: [':'], examples: ['g:Leaf', 'g:Akatsuki', 'g:Sand'] },
+    { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M', 'r:C'] },
+    { key: 'e', label: t('deckBuilder.search.effectLabel'), desc: t('deckBuilder.search.effectDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE', 'e:UPGRADE'] },
+  ];
+
   const renderSearchHelp = () => showSearchHelp ? (
     <PopupOverlay onClickBg={() => setShowSearchHelp(false)}>
-      <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.3)" maxWidth="520px" padding="24px 20px">
+      <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.3)" maxWidth="580px" padding="28px 24px">
         <PopupTitle accentColor="#c4a35a" size="lg">{t('deckBuilder.search.helpTitle')}</PopupTitle>
-        <div className="flex flex-col gap-3 mt-3">
-          {[
-            { label: t('deckBuilder.search.nameLabel'), example: 'naruto, KS-133', desc: t('deckBuilder.search.nameDesc') },
-            { label: t('deckBuilder.search.chakraLabel'), example: 'c:4  c>3  c<=5', desc: t('deckBuilder.search.chakraDesc') },
-            { label: t('deckBuilder.search.powerLabel'), example: 'p:5  p>=3  p<2', desc: t('deckBuilder.search.powerDesc') },
-            { label: t('deckBuilder.search.keywordLabel'), example: 'k:Jutsu  k:Sannin', desc: t('deckBuilder.search.keywordDesc') },
-            { label: t('deckBuilder.search.groupLabel'), example: 'g:Leaf  g:Akatsuki', desc: t('deckBuilder.search.groupDesc') },
-            { label: t('deckBuilder.search.rarityLabel'), example: 'r:S  r:UC  r:M', desc: t('deckBuilder.search.rarityDesc') },
-            { label: t('deckBuilder.search.effectLabel'), example: 'e:AMBUSH  e:SCORE', desc: t('deckBuilder.search.effectDesc') },
-          ].map(({ label, example, desc }) => (
-            <div key={label} style={{ borderLeft: '2px solid rgba(196, 163, 90, 0.3)', paddingLeft: '10px' }}>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[11px] font-bold" style={{ color: '#c4a35a' }}>{label}</span>
-                <span className="text-[10px] font-mono" style={{ color: '#888' }}>{example}</span>
-              </div>
-              <span className="text-[10px]" style={{ color: '#666' }}>{desc}</span>
-            </div>
-          ))}
-          <SectionDivider />
-          <div>
-            <span className="text-[10px] font-bold block mb-1" style={{ color: '#999' }}>{t('deckBuilder.search.combineTitle')}</span>
-            <div className="flex flex-col gap-1">
-              <code className="text-[10px] font-mono px-2 py-1" style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(255,255,255,0.06)' }}>
-                naruto c&gt;=3 k:Jutsu
-              </code>
-              <code className="text-[10px] font-mono px-2 py-1" style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(255,255,255,0.06)' }}>
-                g:Leaf p&gt;4 e:AMBUSH
-              </code>
-            </div>
+
+        {/* Intro */}
+        <p className="font-body text-[12px] leading-relaxed mt-3 mb-5" style={{ color: '#999' }}>
+          {t('deckBuilder.search.helpIntro')}
+        </p>
+
+        {/* Name / ID — special section */}
+        <div className="mb-4 px-4 py-3" style={{ backgroundColor: 'rgba(196, 163, 90, 0.04)', border: '1px solid rgba(196, 163, 90, 0.12)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-body text-[13px] font-bold" style={{ color: '#c4a35a' }}>{t('deckBuilder.search.nameLabel')}</span>
+          </div>
+          <p className="font-body text-[11px]" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
+          <div className="flex gap-2 mt-2">
+            {['naruto', 'KS-133', 'sakura'].map((ex) => (
+              <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
+                className="font-mono text-[11px] px-2.5 py-1 cursor-pointer"
+                style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
+                {ex}
+              </button>
+            ))}
           </div>
         </div>
-        <div className="flex justify-center mt-4">
+
+        {/* Filter table */}
+        <div className="flex flex-col gap-0.5 mb-5">
+          {/* Header */}
+          <div className="grid gap-2 px-3 py-2" style={{ gridTemplateColumns: '50px 1fr 80px 1fr', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colKey')}</span>
+            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colFilter')}</span>
+            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colOps')}</span>
+            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colExamples')}</span>
+          </div>
+
+          {searchFilters.map(({ key, label, desc, ops, examples }) => (
+            <div key={key} className="grid gap-2 px-3 py-2.5 items-start" style={{
+              gridTemplateColumns: '50px 1fr 80px 1fr',
+              borderBottom: '1px solid rgba(255,255,255,0.04)',
+            }}>
+              {/* Key */}
+              <div>
+                <span className="font-mono text-[14px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
+              </div>
+              {/* Label + desc */}
+              <div>
+                <span className="font-body text-[12px] font-semibold block" style={{ color: '#ddd' }}>{label}</span>
+                <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
+              </div>
+              {/* Operators */}
+              <div className="flex flex-wrap gap-1">
+                {ops.map((op) => (
+                  <span key={op} className="font-mono text-[10px] px-1.5 py-0.5" style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#999' }}>
+                    {op}
+                  </span>
+                ))}
+              </div>
+              {/* Examples — clickable */}
+              <div className="flex flex-wrap gap-1">
+                {examples.map((ex) => (
+                  <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
+                    className="font-mono text-[10px] px-2 py-0.5 cursor-pointer transition-colors"
+                    style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.15)' }}
+                    onMouseEnter={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.5)'; }}
+                    onMouseLeave={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.15)'; }}
+                  >
+                    {ex}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Combine section */}
+        <div className="px-4 py-3 mb-4" style={{ backgroundColor: 'rgba(62, 139, 62, 0.04)', border: '1px solid rgba(62, 139, 62, 0.12)' }}>
+          <span className="font-body text-[12px] font-bold block mb-2" style={{ color: '#5cb85c' }}>{t('deckBuilder.search.combineTitle')}</span>
+          <p className="font-body text-[10px] mb-2" style={{ color: '#777' }}>{t('deckBuilder.search.combineDesc')}</p>
+          <div className="flex flex-col gap-1.5">
+            {[
+              { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
+              { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
+              { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
+            ].map(({ query, desc }) => (
+              <div key={query} className="flex items-center gap-3">
+                <button onClick={() => { setSearchQuery(query); setShowSearchHelp(false); }}
+                  className="font-mono text-[11px] px-3 py-1 cursor-pointer shrink-0"
+                  style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
+                  {query}
+                </button>
+                <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center">
           <PopupDismissLink onClick={() => setShowSearchHelp(false)}>{t('common.close')}</PopupDismissLink>
         </div>
       </PopupCornerFrame>
