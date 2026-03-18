@@ -799,7 +799,7 @@ export default function DeckBuilderPage() {
           </div>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,12,0.3), rgba(8,8,12,1))' }} />
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
-            <span className="font-body text-lg font-bold tracking-widest uppercase" style={{ color: '#c4a35a' }}>
+            <span className="text-2xl tracking-widest" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif" }}>
               {t('deckBuilder.search.helpTitle')}
             </span>
             <p className="font-body text-[11px] mt-1 max-w-md text-center px-4" style={{ color: '#777' }}>
@@ -823,7 +823,7 @@ export default function DeckBuilderPage() {
 
             {/* Left column — Basic */}
             <div>
-              <span className="font-body text-[10px] font-bold uppercase tracking-widest block mb-3" style={{ color: '#555' }}>
+              <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                 {t('deckBuilder.search.nameLabel')} / {t('deckBuilder.search.chakraLabel')} / {t('deckBuilder.search.powerLabel')}
               </span>
 
@@ -864,7 +864,7 @@ export default function DeckBuilderPage() {
 
             {/* Right column — Effects */}
             <div>
-              <span className="font-body text-[10px] font-bold uppercase tracking-widest block mb-3" style={{ color: '#555' }}>
+              <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                 {t('deckBuilder.search.effectTypeLabel')} / {t('deckBuilder.search.effectTextLabel')}
               </span>
 
@@ -895,7 +895,7 @@ export default function DeckBuilderPage() {
 
           {/* Combine examples — full width */}
           <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <span className="font-body text-[11px] font-bold uppercase tracking-widest block mb-1" style={{ color: '#555' }}>
+            <span className="text-sm tracking-wider block mb-1" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
               {t('deckBuilder.search.combineTitle')}
             </span>
             <p className="font-body text-[10px] mb-4" style={{ color: '#444' }}>
