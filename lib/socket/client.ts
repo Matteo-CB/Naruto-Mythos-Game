@@ -603,7 +603,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected } = get();
     if (socket && connected) {
       console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${timerEnabled === false ? ' (no timer)' : ''}`);
-      set({ isSealedRoom: isSealed, rematchState: 'none' });
+      set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0 });
       socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, timerEnabled });
     } else {
       console.error('[Socket] Cannot create room: not connected');
@@ -616,7 +616,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket && connected) {
       console.log('[Socket] Emitting room:join', code);
       socket.emit('room:join', { code, userId });
-      set({ roomCode: code, playerRole: 'player2' });
+      set({ roomCode: code, playerRole: 'player2', chatMessages: [], unreadChatCount: 0 });
     } else {
       console.error('[Socket] Cannot join room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
