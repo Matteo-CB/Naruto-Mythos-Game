@@ -6,23 +6,17 @@ import { useTranslations } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { useEffect, useState } from 'react';
-
-interface BackgroundOption {
-  id: string;
-  name: string;
-  url: string;
-}
+import { useEffect } from 'react';
 
 export default function SettingsPage() {
   const { status } = useSession();
   const router = useRouter();
   const t = useTranslations('settings');
   const {
-    animationsEnabled, gameBackground, isLoaded,
+    animationsEnabled, gameBackground, isLoaded, availableBackgrounds,
     fetchFromServer, setAnimationsEnabled, setGameBackground,
   } = useSettingsStore();
-  const [backgrounds, setBackgrounds] = useState<BackgroundOption[]>([]);
+  const backgrounds = availableBackgrounds;
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -31,20 +25,12 @@ export default function SettingsPage() {
     }
   }, [status, router]);
 
-  // Load preferences from server once authenticated
+  // Load preferences + backgrounds from server once authenticated
   useEffect(() => {
     if (status === 'authenticated') {
       fetchFromServer();
     }
   }, [status, fetchFromServer]);
-
-  // Fetch available backgrounds
-  useEffect(() => {
-    fetch('/api/backgrounds')
-      .then((r) => r.ok ? r.json() : { backgrounds: [] })
-      .then((data) => setBackgrounds(data.backgrounds || []))
-      .catch(() => {});
-  }, []);
 
   if (status === 'loading' || status === 'unauthenticated') {
     return <div style={{ backgroundColor: '#0a0a0a', minHeight: '100vh' }} />;
