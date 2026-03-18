@@ -969,28 +969,28 @@ export default function DeckBuilderPage() {
         </div>
       )}
 
-      {/* Character grid */}
-      {deckChars.length === 0 ? (
-        <div className="grid gap-0.5 mt-2" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
-          {Array.from({ length: 30 }).map((_, i) => (
-            <div key={i} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
+      {/* Character grid — always shows 30 slots minimum */}
+      <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+        {Array.from({ length: Math.max(30, deckChars.length) }).map((_, i) => {
+          const card = deckChars[i];
+          if (card) {
+            return (
+              <DeckCard
+                key={`${card.id}-${i}`}
+                card={card}
+                idx={i}
+                onRemove={handleRemoveChar}
+                onHover={handlePreview}
+              />
+            );
+          }
+          return (
+            <div key={`empty-${i}`} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
               <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.12 }} draggable={false} />
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
-          {deckChars.map((card, idx) => (
-            <DeckCard
-              key={`${card.id}-${idx}`}
-              card={card}
-              idx={idx}
-              onRemove={handleRemoveChar}
-              onHover={handlePreview}
-            />
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </>
   );
 
