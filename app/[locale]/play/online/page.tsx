@@ -602,8 +602,6 @@ function LiveGamesSection() {
 
   const publicGames = activeGames.filter((g) => !g.isPrivate);
 
-  if (publicGames.length === 0) return null;
-
   const handleSpectate = (game: typeof publicGames[0]) => {
     if (!session?.user?.id) return;
     spectateGame(game.roomCode, session.user.id, session.user.name ?? 'Spectator');
@@ -621,36 +619,44 @@ function LiveGamesSection() {
         <span className="text-[10px]" style={{ color: '#555' }}>({publicGames.length})</span>
       </div>
       <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
-        <div className="max-h-48 overflow-y-auto">
-          {publicGames.map((game) => (
-            <div key={game.roomCode} className="flex items-center justify-between px-4 py-2.5"
-              style={{ borderBottom: '1px solid #1e1e1e' }}>
-              <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
-                  {game.player1Name} <span style={{ color: '#555' }}>{t('spectator.vs')}</span> {game.player2Name}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px]" style={{ color: '#888' }}>
-                    {t('spectator.turn', { turn: game.turn })}
+        {publicGames.length === 0 ? (
+          <div className="px-4 py-4 text-center">
+            <span className="text-[11px]" style={{ color: '#555' }}>
+              {t('spectator.noLiveGames')}
+            </span>
+          </div>
+        ) : (
+          <div className="max-h-48 overflow-y-auto">
+            {publicGames.map((game) => (
+              <div key={game.roomCode} className="flex items-center justify-between px-4 py-2.5"
+                style={{ borderBottom: '1px solid #1e1e1e' }}>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium" style={{ color: '#e0e0e0' }}>
+                    {game.player1Name} <span style={{ color: '#555' }}>{t('spectator.vs')}</span> {game.player2Name}
                   </span>
-                  <span className="text-[9px]" style={{ color: game.isRanked ? '#c4a35a' : '#666' }}>
-                    {game.isRanked ? t('spectator.ranked') : t('spectator.casual')}
-                  </span>
-                  {game.spectatorCount > 0 && (
-                    <span className="text-[9px]" style={{ color: '#666' }}>
-                      {t('spectator.spectators', { count: game.spectatorCount })}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px]" style={{ color: '#888' }}>
+                      {t('spectator.turn', { turn: game.turn })}
                     </span>
-                  )}
+                    <span className="text-[9px]" style={{ color: game.isRanked ? '#c4a35a' : '#666' }}>
+                      {game.isRanked ? t('spectator.ranked') : t('spectator.casual')}
+                    </span>
+                    {game.spectatorCount > 0 && (
+                      <span className="text-[9px]" style={{ color: '#666' }}>
+                        {t('spectator.spectators', { count: game.spectatorCount })}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <button onClick={() => handleSpectate(game)}
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                  style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
+                  {t('spectator.joinSpectate')}
+                </button>
               </div>
-              <button onClick={() => handleSpectate(game)}
-                className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
-                style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
-                {t('spectator.joinSpectate')}
-              </button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
