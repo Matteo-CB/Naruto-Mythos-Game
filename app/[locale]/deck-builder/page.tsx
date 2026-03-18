@@ -948,7 +948,20 @@ export default function DeckBuilderPage() {
                     </div>
                   </>
                 ) : (
-                  <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.25, transform: 'rotate(90deg) scale(1.4)' }} draggable={false} />
+                  <div className="w-full h-full" style={{
+                    opacity: 0.25,
+                    backgroundImage: 'url(/images/card-back.webp)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    transform: 'rotate(90deg)',
+                    width: '64px',
+                    height: '90px',
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-45px',
+                    marginLeft: '-32px',
+                  }} />
                 )}
               </div>
             );
