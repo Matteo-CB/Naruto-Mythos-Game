@@ -232,7 +232,6 @@ const CatalogMission = memo(function CatalogMission({
       style={{
         aspectRatio: '7/5',
         backgroundColor: '#0e0e0e',
-        borderBottom: '2px solid rgba(196,163,90,0.4)',
         opacity: allowed ? 1 : 0.35,
       }}
     >
