@@ -805,16 +805,40 @@ export default function DeckBuilderPage() {
 
   const heroCards = ['/images/cards/KS/secret/KS-133-S.webp', '/images/cards/KS/mythos/KS-143-M.webp', '/images/cards/KS/secret/KS-136-S.webp', '/images/cards/KS/secret/KS-137-S.webp', '/images/cards/KS/mythos/KS-144-M.webp'];
 
+  // Group filters for display: Stats | Card Properties | Effects
+  const statsFilters = searchFilters.slice(0, 2);   // c, p
+  const cardFilters = searchFilters.slice(2, 8);     // k, k+, k!, g, r, s
+  const effectFilters = searchFilters.slice(8);       // e, e text, em, eup, ea, es
+
+  const renderFilterRow = ({ key, label, desc, examples }: typeof searchFilters[0], i: number, color = '#c4a35a') => (
+    <div key={`${key}-${i}`} className="mb-2.5">
+      <div className="flex items-baseline gap-2 mb-1">
+        <span className="font-body text-[13px] font-bold" style={{ color }}>{key}</span>
+        <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
+        <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {examples.map((ex) => (
+          <button key={ex} onClick={() => tryExample(ex)}
+            className="font-body text-[11px] px-3 py-1 cursor-pointer"
+            style={{ backgroundColor: '#111111', color, borderBottom: `2px solid ${color}25` }}>
+            {ex}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderSearchHelp = () => showSearchHelp ? (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.92)' }}
       onClick={() => setShowSearchHelp(false)}
     >
       <div
         className="w-full overflow-hidden flex flex-col"
         style={{
-          maxWidth: '900px',
+          maxWidth: '1050px',
           maxHeight: 'calc(100vh - 24px)',
           backgroundColor: '#0a0a0a',
           border: '1px solid rgba(196, 163, 90, 0.08)',
@@ -822,133 +846,103 @@ export default function DeckBuilderPage() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Hero header with card art */}
-        <div className="relative shrink-0 overflow-hidden" style={{ height: '120px' }}>
-          <div className="absolute inset-0 flex justify-center gap-2" style={{ opacity: 0.25, filter: 'blur(1px)' }}>
+        {/* Hero header */}
+        <div className="relative shrink-0 overflow-hidden" style={{ height: '110px' }}>
+          <div className="absolute inset-0 flex justify-center gap-2" style={{ opacity: 0.2, filter: 'blur(1px)' }}>
             {heroCards.map((src, i) => (
-              <img key={i} src={src} alt="" className="h-full object-cover" style={{ width: '180px' }} draggable={false} />
+              <img key={i} src={src} alt="" className="h-full object-cover" style={{ width: '210px' }} draggable={false} />
             ))}
           </div>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.3), rgba(10,10,10,1))' }} />
-          <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.2), rgba(10,10,10,1))' }} />
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-3">
             <span className="text-2xl tracking-widest" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif" }}>
               {t('deckBuilder.search.helpTitle')}
             </span>
-            <p className="font-body text-[11px] mt-1 max-w-md text-center px-4" style={{ color: '#777' }}>
+            <p className="font-body text-[11px] mt-1 max-w-lg text-center px-4" style={{ color: '#666' }}>
               {t('deckBuilder.search.helpIntro')}
             </p>
           </div>
-          <button
-            onClick={() => setShowSearchHelp(false)}
+          <button onClick={() => setShowSearchHelp(false)}
             className="absolute top-3 right-4 font-body text-[11px] cursor-pointer px-2 py-1"
-            style={{ color: '#555', backgroundColor: 'rgba(0,0,0,0.5)' }}
-          >
+            style={{ color: '#555', backgroundColor: 'rgba(0,0,0,0.5)' }}>
             ESC
           </button>
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-5">
+        <div className="flex-1 overflow-y-auto py-5">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8">
 
-          {/* Two-column grid: left = basic filters, right = effect filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+            {/* Name search */}
+            <div className="mb-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <p className="font-body text-[11px] mb-2" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {['naruto', 'KS-133', 'sakura', 'orochimaru'].map((ex) => (
+                  <button key={ex} onClick={() => tryExample(ex)}
+                    className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
+                    style={{ backgroundColor: '#111111', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
+                    {ex}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            {/* Left column — Basic */}
-            <div>
-              <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-                {t('deckBuilder.search.nameLabel')} / {t('deckBuilder.search.chakraLabel')} / {t('deckBuilder.search.powerLabel')}
-              </span>
+            {/* Three-column grid centered */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
-              {/* Name */}
-              <div className="mb-4">
-                <p className="font-body text-[11px] mb-1.5" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {['naruto', 'KS-133', 'sakura'].map((ex) => (
-                    <button key={ex} onClick={() => tryExample(ex)}
-                      className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
-                      style={{ backgroundColor: '#111111', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
-                      {ex}
-                    </button>
-                  ))}
-                </div>
+              {/* Col 1 — Stats */}
+              <div>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                  Stats
+                </span>
+                {statsFilters.map((f, i) => renderFilterRow(f, i, '#c4a35a'))}
               </div>
 
-              {/* c / p / k / g / r */}
-              {searchFilters.slice(0, 5).map(({ key, label, desc, examples }, i) => (
-                <div key={`${key}-${i}`} className="mb-3">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="font-body text-[14px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
-                    <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
-                    <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {examples.map((ex) => (
-                      <button key={ex} onClick={() => tryExample(ex)}
-                        className="font-body text-[11px] px-3 py-1 cursor-pointer"
-                        style={{ backgroundColor: '#111111', color: '#c4a35a', borderBottom: '2px solid rgba(196,163,90,0.15)' }}>
-                        {ex}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              {/* Col 2 — Card Properties */}
+              <div>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                  Properties
+                </span>
+                {cardFilters.map((f, i) => renderFilterRow(f, i, '#3e8b3e'))}
+              </div>
+
+              {/* Col 3 — Effects */}
+              <div>
+                <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                  Effects
+                </span>
+                {effectFilters.map((f, i) => {
+                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
+                  return renderFilterRow(f, i, keyColors[f.key] ?? '#b33e3e');
+                })}
+              </div>
             </div>
 
-            {/* Right column — Effects */}
-            <div>
-              <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-                {t('deckBuilder.search.effectTypeLabel')} / {t('deckBuilder.search.effectTextLabel')}
+            {/* Combine examples */}
+            <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+              <span className="text-sm tracking-wider block mb-1" style={{ color: '#6a6abb', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
+                {t('deckBuilder.search.combineTitle')}
               </span>
-
-              {searchFilters.slice(5).map(({ key, label, desc, examples }, i) => {
-                const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
-                const color = keyColors[key] ?? '#c4a35a';
-                return (
-                  <div key={`${key}-${i}`} className="mb-3">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-body text-[14px] font-bold" style={{ color }}>{key}</span>
-                      <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
-                      <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {examples.map((ex) => (
-                        <button key={ex} onClick={() => tryExample(ex)}
-                          className="font-body text-[11px] px-3 py-1 cursor-pointer"
-                          style={{ backgroundColor: '#111111', color, borderBottom: `2px solid ${color}30` }}>
-                          {ex}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Combine examples — full width */}
-          <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <span className="text-sm tracking-wider block mb-1" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
-              {t('deckBuilder.search.combineTitle')}
-            </span>
-            <p className="font-body text-[10px] mb-4" style={{ color: '#444' }}>
-              {t('deckBuilder.search.combineDesc')}
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {[
-                { query: 'naruto c>=3, k:Jutsu', desc: t('deckBuilder.search.example1') },
-                { query: 'g:Leaf p>4, e:AMBUSH', desc: t('deckBuilder.search.example2') },
-                { query: 'k:Jutsu+Team 7', desc: t('deckBuilder.search.example5') },
-                { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
-                { query: 'k:!Summon', desc: t('deckBuilder.search.example6') },
-                { query: 'c<=2 r:UC s:KS', desc: t('deckBuilder.search.example3') },
-              ].map(({ query, desc }) => (
-                <button key={query} onClick={() => tryExample(query)}
-                  className="flex flex-col items-start text-left px-4 py-2.5 cursor-pointer"
-                  style={{ backgroundColor: '#0e0e0e', borderLeft: '3px solid rgba(196,163,90,0.25)' }}>
-                  <span className="font-body text-[12px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
-                  <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
-                </button>
-              ))}
+              <p className="font-body text-[10px] mb-3" style={{ color: '#444' }}>
+                {t('deckBuilder.search.combineDesc')}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {[
+                  { query: 'naruto c>=3, k:Jutsu', desc: t('deckBuilder.search.example1') },
+                  { query: 'g:Leaf p>4, e:AMBUSH', desc: t('deckBuilder.search.example2') },
+                  { query: 'k:Jutsu+Team 7', desc: t('deckBuilder.search.example5') },
+                  { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
+                  { query: 'k:!Summon', desc: t('deckBuilder.search.example6') },
+                  { query: 'c<=2 r:UC s:KS', desc: t('deckBuilder.search.example3') },
+                ].map(({ query, desc }) => (
+                  <button key={query} onClick={() => tryExample(query)}
+                    className="flex flex-col items-start text-left px-4 py-2 cursor-pointer"
+                    style={{ backgroundColor: '#0e0e0e', borderLeft: '3px solid rgba(106,106,187,0.3)' }}>
+                    <span className="font-body text-[11px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
+                    <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
