@@ -229,8 +229,6 @@ const CatalogCard = memo(function CatalogCard({
       ) : (
         <div className="w-full h-full" style={{ backgroundColor: '#111' }} />
       )}
-      <div className="absolute top-0 left-0 px-1 text-[7px] font-bold leading-tight"
-        style={{ backgroundColor: 'rgba(196,163,90,0.9)', color: '#0a0a0a' }}>{card.chakra}</div>
       {inDeckCount > 0 && (
         <div className="absolute top-0 right-0 px-1 text-[7px] font-bold"
           style={{ backgroundColor: inDeckCount >= 2 ? 'rgba(179,62,62,0.9)' : 'rgba(62,139,62,0.9)', color: '#fff' }}>
