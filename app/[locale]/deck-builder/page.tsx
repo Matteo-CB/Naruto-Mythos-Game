@@ -771,108 +771,149 @@ export default function DeckBuilderPage() {
 
   const tryExample = (q: string) => { setSearchQuery(q); setShowSearchHelp(false); };
 
+  const heroCards = ['/images/cards/KS/secret/KS-133-S.webp', '/images/cards/KS/mythos/KS-143-M.webp', '/images/cards/KS/secret/KS-136-S.webp', '/images/cards/KS/secret/KS-137-S.webp', '/images/cards/KS/mythos/KS-144-M.webp'];
+
   const renderSearchHelp = () => showSearchHelp ? (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-6 pb-6 px-4"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
       onClick={() => setShowSearchHelp(false)}
     >
       <div
-        className="w-full overflow-y-auto"
+        className="w-full overflow-hidden flex flex-col"
         style={{
-          maxWidth: '720px',
-          maxHeight: 'calc(100vh - 48px)',
-          backgroundColor: '#0c0c10',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
+          maxWidth: '900px',
+          maxHeight: 'calc(100vh - 24px)',
+          backgroundColor: '#08080c',
+          border: '1px solid rgba(196, 163, 90, 0.08)',
+          boxShadow: '0 0 80px rgba(0,0,0,0.6)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header bar */}
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-body text-sm font-semibold tracking-wide" style={{ color: '#e0e0e0' }}>
-            {t('deckBuilder.search.helpTitle')}
-          </span>
-          <button onClick={() => setShowSearchHelp(false)} className="font-body text-xs cursor-pointer px-2 py-1" style={{ color: '#666' }}>
+        {/* Hero header with card art */}
+        <div className="relative shrink-0 overflow-hidden" style={{ height: '120px' }}>
+          <div className="absolute inset-0 flex justify-center gap-2" style={{ opacity: 0.25, filter: 'blur(1px)' }}>
+            {heroCards.map((src, i) => (
+              <img key={i} src={src} alt="" className="h-full object-cover" style={{ width: '180px' }} draggable={false} />
+            ))}
+          </div>
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,12,0.3), rgba(8,8,12,1))' }} />
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
+            <span className="font-body text-lg font-bold tracking-widest uppercase" style={{ color: '#c4a35a' }}>
+              {t('deckBuilder.search.helpTitle')}
+            </span>
+            <p className="font-body text-[11px] mt-1 max-w-md text-center px-4" style={{ color: '#777' }}>
+              {t('deckBuilder.search.helpIntro')}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSearchHelp(false)}
+            className="absolute top-3 right-4 font-body text-[11px] cursor-pointer px-2 py-1"
+            style={{ color: '#555', backgroundColor: 'rgba(0,0,0,0.5)' }}
+          >
             ESC
           </button>
         </div>
 
-        <div className="px-6 py-5">
-          <p className="font-body text-[13px] leading-relaxed mb-6" style={{ color: '#888' }}>
-            {t('deckBuilder.search.helpIntro')}
-          </p>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-5">
 
-          {/* Name / ID row */}
-          <div className="flex items-start gap-4 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-            <div className="shrink-0 w-20">
-              <span className="font-body text-[11px] font-medium uppercase tracking-wider" style={{ color: '#555' }}>
-                {t('deckBuilder.search.nameLabel')}
+          {/* Two-column grid: left = basic filters, right = effect filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+
+            {/* Left column — Basic */}
+            <div>
+              <span className="font-body text-[10px] font-bold uppercase tracking-widest block mb-3" style={{ color: '#555' }}>
+                {t('deckBuilder.search.nameLabel')} / {t('deckBuilder.search.chakraLabel')} / {t('deckBuilder.search.powerLabel')}
               </span>
-            </div>
-            <div className="flex-1">
-              <p className="font-body text-[12px] mb-2" style={{ color: '#aaa' }}>{t('deckBuilder.search.nameDesc')}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {['naruto', 'KS-133', 'sakura', 'orochimaru'].map((ex) => (
-                  <button key={ex} onClick={() => tryExample(ex)}
-                    className="font-body text-[11px] px-3 py-1 cursor-pointer"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#ccc', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {ex}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Filter rows */}
-          {searchFilters.map(({ key, label, desc, examples }, i) => (
-            <div key={`${key}-${i}`} className="flex items-start gap-4 mb-1 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-              <div className="shrink-0 w-20 pt-0.5">
-                <span
-                  className="font-body text-[13px] font-semibold inline-block px-2 py-0.5"
-                  style={{ color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.06)' }}
-                >
-                  {key}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="font-body text-[12px] font-medium" style={{ color: '#ccc' }}>{label}</span>
-                <span className="font-body text-[11px] ml-2" style={{ color: '#555' }}>{desc}</span>
-                <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  {examples.map((ex) => (
+              {/* Name */}
+              <div className="mb-4">
+                <p className="font-body text-[11px] mb-1.5" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {['naruto', 'KS-133', 'sakura'].map((ex) => (
                     <button key={ex} onClick={() => tryExample(ex)}
-                      className="font-body text-[11px] px-2.5 py-0.5 cursor-pointer"
-                      style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.1)' }}>
+                      className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
+                      style={{ backgroundColor: '#111116', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
                       {ex}
                     </button>
                   ))}
                 </div>
               </div>
-            </div>
-          ))}
 
-          {/* Combine examples */}
-          <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="font-body text-[12px] font-semibold block mb-1" style={{ color: '#e0e0e0' }}>
+              {/* c / p / k / g / r */}
+              {searchFilters.slice(0, 5).map(({ key, label, desc, examples }, i) => (
+                <div key={`${key}-${i}`} className="mb-3">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="font-body text-[14px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
+                    <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
+                    <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {examples.map((ex) => (
+                      <button key={ex} onClick={() => tryExample(ex)}
+                        className="font-body text-[11px] px-3 py-1 cursor-pointer"
+                        style={{ backgroundColor: '#111116', color: '#c4a35a', borderBottom: '2px solid rgba(196,163,90,0.15)' }}>
+                        {ex}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right column — Effects */}
+            <div>
+              <span className="font-body text-[10px] font-bold uppercase tracking-widest block mb-3" style={{ color: '#555' }}>
+                {t('deckBuilder.search.effectTypeLabel')} / {t('deckBuilder.search.effectTextLabel')}
+              </span>
+
+              {searchFilters.slice(5).map(({ key, label, desc, examples }, i) => {
+                const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
+                const color = keyColors[key] ?? '#c4a35a';
+                return (
+                  <div key={`${key}-${i}`} className="mb-3">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-body text-[14px] font-bold" style={{ color }}>{key}</span>
+                      <span className="font-body text-[11px] font-medium" style={{ color: '#aaa' }}>{label}</span>
+                      <span className="font-body text-[10px]" style={{ color: '#444' }}>{desc}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {examples.map((ex) => (
+                        <button key={ex} onClick={() => tryExample(ex)}
+                          className="font-body text-[11px] px-3 py-1 cursor-pointer"
+                          style={{ backgroundColor: '#111116', color, borderBottom: `2px solid ${color}30` }}>
+                          {ex}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Combine examples — full width */}
+          <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <span className="font-body text-[11px] font-bold uppercase tracking-widest block mb-1" style={{ color: '#555' }}>
               {t('deckBuilder.search.combineTitle')}
             </span>
-            <p className="font-body text-[11px] mb-4" style={{ color: '#666' }}>
+            <p className="font-body text-[10px] mb-4" style={{ color: '#444' }}>
               {t('deckBuilder.search.combineDesc')}
             </p>
-            <div className="flex flex-col gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
                 { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
                 { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
                 { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
               ].map(({ query, desc }) => (
-                <div key={query} className="flex items-center gap-4">
-                  <button onClick={() => tryExample(query)}
-                    className="font-body text-[12px] px-4 py-1.5 cursor-pointer shrink-0"
-                    style={{ backgroundColor: 'rgba(196,163,90,0.05)', color: '#c4a35a', borderLeft: '3px solid rgba(196,163,90,0.4)' }}>
-                    {query}
-                  </button>
-                  <span className="font-body text-[11px]" style={{ color: '#666' }}>{desc}</span>
-                </div>
+                <button key={query} onClick={() => tryExample(query)}
+                  className="flex flex-col items-start text-left px-4 py-2.5 cursor-pointer"
+                  style={{ backgroundColor: '#0e0e12', borderLeft: '3px solid rgba(196,163,90,0.25)' }}>
+                  <span className="font-body text-[12px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
+                  <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
+                </button>
               ))}
             </div>
           </div>
