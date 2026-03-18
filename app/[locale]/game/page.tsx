@@ -54,6 +54,10 @@ export default function GamePage() {
       // Give a brief delay before redirecting - state may be propagating
       redirectTimerRef.current = setTimeout(() => {
         if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState && !useSocketStore.getState().isSpectating) {
+          // Clean up any lingering spectator state before redirect
+          if (useSocketStore.getState().isSpectating) {
+            useSocketStore.getState().leaveSpectating();
+          }
           router.push('/');
         }
       }, 5000);
@@ -101,27 +105,30 @@ export default function GamePage() {
     return unsub;
   }, [isSpectating, syncSpectatorState]);
 
-  // Spectator error or timeout — redirect home if state never arrives
+  // Spectator error — clean up and redirect home
   useEffect(() => {
     if (!isSpectating) return;
-    // If spectator has an error, redirect after brief delay
     const socketState = useSocketStore.getState();
     if (socketState.error) {
-      const timer = setTimeout(() => router.push('/'), 1500);
+      useSocketStore.getState().leaveSpectating();
+      const timer = setTimeout(() => router.push('/'), 1000);
       return () => clearTimeout(timer);
     }
-    // If still no visibleState after 8s, redirect
-    if (!visibleState && !socketVisibleState) {
-      const timer = setTimeout(() => {
-        const ss = useSocketStore.getState();
-        const gs = useGameStore.getState();
-        if (!ss.visibleState && !gs.visibleState) {
-          router.push('/');
-        }
-      }, 8000);
-      return () => clearTimeout(timer);
-    }
-  }, [isSpectating, visibleState, socketVisibleState, socketError, router]);
+  }, [isSpectating, socketError, router]);
+
+  // Spectator timeout — if state never arrives after 10s, clean up and redirect
+  useEffect(() => {
+    if (!isSpectating || visibleState || socketVisibleState) return;
+    const timer = setTimeout(() => {
+      const ss = useSocketStore.getState();
+      const gs = useGameStore.getState();
+      if (!ss.visibleState && !gs.visibleState) {
+        useSocketStore.getState().leaveSpectating();
+        router.push('/');
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [isSpectating, visibleState, socketVisibleState, router]);
 
   // Sync socket state updates to gameStore for online games
   useEffect(() => {
