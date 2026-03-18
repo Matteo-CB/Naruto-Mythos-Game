@@ -1175,7 +1175,7 @@ export default function DeckBuilderPage() {
             {/* Missions section */}
             <div className="mb-2">
               <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
-              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
                 {filteredMissions.map((m) => (
                   <CatalogMission
                     key={m.id}
@@ -1277,7 +1277,7 @@ export default function DeckBuilderPage() {
 
               {/* Missions */}
               <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
-              <div className="grid grid-cols-3 gap-1.5 mb-3">
+              <div className="grid grid-cols-5 gap-1 mb-3">
                 {filteredMissions.map((m) => (
                   <CatalogMission key={m.id} card={m} allowed={missionAllowedMap.get(m.id) ?? true}
                     onAdd={handleAddMission} onHover={handlePreview} />
