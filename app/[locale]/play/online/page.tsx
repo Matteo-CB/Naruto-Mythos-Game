@@ -604,11 +604,28 @@ function LiveGamesSection() {
 
   if (publicGames.length === 0) return null;
 
+  const [spectateLoading, setSpectateLoading] = useState<string | null>(null);
+
   const handleSpectate = (game: typeof publicGames[0]) => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || spectateLoading) return;
+    setSpectateLoading(game.roomCode);
     spectateGame(game.roomCode, session.user.id, session.user.name ?? 'Spectator');
-    // Navigate to game page — spectator state will trigger spectator mode
-    router.push('/game' as '/');
+    // Wait for spectate:state-update to arrive before navigating
+    const unsub = useSocketStore.subscribe((state) => {
+      if (state.isSpectating && state.visibleState) {
+        unsub();
+        router.push('/game' as '/');
+      }
+    });
+    // Fallback: navigate after 3s even if state hasn't arrived
+    setTimeout(() => {
+      unsub();
+      if (useSocketStore.getState().isSpectating) {
+        router.push('/game' as '/');
+      } else {
+        setSpectateLoading(null);
+      }
+    }, 3000);
   };
 
   return (
@@ -644,9 +661,10 @@ function LiveGamesSection() {
                 </div>
               </div>
               <button onClick={() => handleSpectate(game)}
-                className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                disabled={!!spectateLoading}
+                className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                 style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
-                {t('spectator.joinSpectate')}
+                {spectateLoading === game.roomCode ? '...' : t('spectator.joinSpectate')}
               </button>
             </div>
           ))}
