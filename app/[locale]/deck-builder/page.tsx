@@ -220,9 +220,7 @@ const CatalogCard = memo(function CatalogCard({
         aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
         opacity: allowed ? 1 : 0.35,
-        contentVisibility: 'auto',
-        containIntrinsicSize: '72px 101px',
-      } as React.CSSProperties}
+      }}
     >
       {imgPath ? (
         <img src={imgPath} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -320,7 +318,7 @@ export default function DeckBuilderPage() {
   const t = useTranslations();
   const locale = useLocale();
   const loc = locale as "en" | "fr";
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   // ───── DATA STATE ─────
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
@@ -628,6 +626,14 @@ export default function DeckBuilderPage() {
   // ═════════════════════════════════════════════════════
   //  UNAUTHENTICATED
   // ═════════════════════════════════════════════════════
+
+  if (status === 'loading') {
+    return (
+      <main id="main-content" className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
+        <span className="text-sm" style={{ color: '#555' }}>...</span>
+      </main>
+    );
+  }
 
   if (!session?.user) {
     return (
