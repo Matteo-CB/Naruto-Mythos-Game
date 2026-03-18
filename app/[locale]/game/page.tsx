@@ -26,6 +26,7 @@ const GameBoard = dynamic(
 export default function GamePage() {
   const router = useRouter();
   const t = useTranslations('common');
+  const tGame = useTranslations('game');
   const gameState = useGameStore((s) => s.gameState);
   const visibleState = useGameStore((s) => s.visibleState);
   const isOnlineGame = useGameStore((s) => s.isOnlineGame);
@@ -223,7 +224,7 @@ export default function GamePage() {
             color: '#e0e0e0',
           }}
         >
-          {socketErrorKey ? t(socketErrorKey) : socketError || t('game.error.connectionLost')}
+          {socketErrorKey ? tGame(socketErrorKey.replace('game.', '')) : socketError || tGame('error.connectionLost')}
         </div>
       )}
     </>

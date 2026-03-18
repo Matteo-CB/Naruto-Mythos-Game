@@ -209,8 +209,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
         set({ connected: false });
-        // Don't show error here — socket.io will auto-reconnect.
-        // Errors are only shown on reconnect_failed (all retries exhausted).
+        // Only show error if the SERVER explicitly kicked us (not temporary transport issues)
+        if (reason === 'io server disconnect') {
+          set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
+        }
+        // For 'transport close', 'ping timeout', etc. — socket.io auto-reconnects, no error shown
       });
 
       socket.on('reconnect', (attemptNumber: number) => {
