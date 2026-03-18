@@ -850,7 +850,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lastAIGameConfig: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
-    useSocketStore.getState().leaveSpectating();
+    // Only clear spectator flags — don't call leaveSpectating() which wipes visibleState/gameStarted
+    useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
     const humanName = playerName || 'Player';
     const oppName = opponentName || 'Opponent';
@@ -939,8 +940,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
-    // Clean up any lingering spectator state
-    useSocketStore.getState().leaveSpectating();
+    // Only clear spectator flags — don't call leaveSpectating() which wipes socket state
+    useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     // Reset coin flip flag so the animation plays before mulligan
     useUIStore.getState().setCoinFlipComplete(false);
     // Disable training mode when starting a normal AI game
@@ -1003,7 +1004,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => {
-    useSocketStore.getState().leaveSpectating();
+    // Only clear spectator flags
+    useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
     useTrainingStore.getState().disable();
     resetIdCounter();
