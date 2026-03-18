@@ -46,7 +46,7 @@ function ReplayCard({
   const power = calculateCharacterPower(state, char, char.controlledBy);
   const hasPowerTokens = char.powerTokens > 0;
   const isReHidden = char.isHidden && char.wasRevealedAtLeastOnce;
-  const stackSize = char.stack.length + 1;
+  const stackSize = char.stack.length;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
