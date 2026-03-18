@@ -138,7 +138,17 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   chatMessages: [],
   unreadChatCount: 0,
   chatOpen: false,
-  activeGames: [],
+  activeGames: (() => {
+    try {
+      const cached = typeof window !== 'undefined' ? localStorage.getItem('nmtcg-active-games') : null;
+      if (cached) {
+        const { games, ts } = JSON.parse(cached);
+        // Use cache if less than 30s old
+        if (Date.now() - ts < 30000 && Array.isArray(games)) return games;
+      }
+    } catch { /* ignore */ }
+    return [];
+  })(),
 
   connect: (userId?: string) => {
     return new Promise((resolve, reject) => {
@@ -548,7 +558,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       // ═══════ ACTIVE GAMES ═══════
 
       socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
-        set({ activeGames: data.games ?? [] });
+        const games = data.games ?? [];
+        set({ activeGames: games });
+        // Cache for instant display on next page load
+        try { localStorage.setItem('nmtcg-active-games', JSON.stringify({ games, ts: Date.now() })); } catch { /* ignore */ }
       });
 
       set({ socket });
