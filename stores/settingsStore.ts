@@ -1,9 +1,16 @@
 import { create } from 'zustand';
 
+interface BackgroundOption {
+  id: string;
+  name: string;
+  url: string;
+}
+
 interface SettingsState {
   animationsEnabled: boolean;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
+  availableBackgrounds: BackgroundOption[];
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
   setAnimationsEnabled: (v: boolean) => Promise<void>;
@@ -16,6 +23,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
+  availableBackgrounds: [],
   isLoaded: false,
 
   fetchFromServer: async () => {
@@ -38,6 +46,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         animationsEnabled: prefs.animationsEnabled ?? true,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
+        availableBackgrounds: backgrounds,
         isLoaded: true,
       });
     } catch {

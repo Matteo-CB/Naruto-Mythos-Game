@@ -187,6 +187,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           socket.emit('auth:register', { userId });
         }
 
+        // Auto-fetch active games list on connect
+        socket.emit('games:list');
+
         resolve();
       });
 

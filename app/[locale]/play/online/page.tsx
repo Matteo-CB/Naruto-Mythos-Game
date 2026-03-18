@@ -596,7 +596,7 @@ function LiveGamesSection() {
 
   useEffect(() => {
     requestActiveGames();
-    const interval = setInterval(requestActiveGames, 10000);
+    const interval = setInterval(requestActiveGames, 5000);
     return () => clearInterval(interval);
   }, [requestActiveGames]);
 
