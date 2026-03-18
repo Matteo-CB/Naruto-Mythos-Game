@@ -948,7 +948,7 @@ export default function DeckBuilderPage() {
                     </div>
                   </>
                 ) : (
-                  <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.25 }} draggable={false} />
+                  <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.25, transform: 'rotate(90deg) scale(1.4)' }} draggable={false} />
                 )}
               </div>
             );
@@ -958,16 +958,19 @@ export default function DeckBuilderPage() {
 
       <SectionDivider width={100} />
 
-      {/* Sort button */}
-      {deckChars.length > 1 && (
-        <div className="flex items-center gap-2 mb-2">
-          <button onClick={sortCharsByCost}
-            className="px-2 py-0.5 text-[9px] uppercase font-bold cursor-pointer"
-            style={{ backgroundColor: 'rgba(196,163,90,0.08)', borderLeft: '2px solid rgba(196,163,90,0.4)', color: '#c4a35a' }}>
-            {t("deckBuilder.sortByCost")}
-          </button>
-        </div>
-      )}
+      {/* Sort button — always visible, greyed out when deck empty */}
+      <div className="flex items-center gap-2 mb-2">
+        <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
+          className="px-2 py-0.5 text-[9px] uppercase font-bold"
+          style={{
+            backgroundColor: deckChars.length > 1 ? 'rgba(196,163,90,0.08)' : 'rgba(255,255,255,0.02)',
+            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid rgba(255,255,255,0.06)',
+            color: deckChars.length > 1 ? '#c4a35a' : '#333',
+            cursor: deckChars.length > 1 ? 'pointer' : 'default',
+          }}>
+          {t("deckBuilder.sortByCost")}
+        </button>
+      </div>
 
       {/* Character grid — always shows 30 slots minimum */}
       <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
