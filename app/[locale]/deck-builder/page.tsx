@@ -769,97 +769,116 @@ export default function DeckBuilderPage() {
     { key: 'es', label: t('deckBuilder.search.esLabel'), desc: t('deckBuilder.search.esDesc'), ops: [':'], examples: ['es:draw', 'es:chakra'] },
   ];
 
-  const renderSearchHelp = () => showSearchHelp ? (
-    <PopupOverlay onClickBg={() => setShowSearchHelp(false)}>
-      <div
-        className="w-full mx-4 overflow-y-auto"
-        style={{
-          maxWidth: '560px',
-          maxHeight: 'calc(100vh - 40px)',
-          backgroundColor: 'rgba(12, 12, 16, 0.97)',
-          border: '1px solid rgba(196, 163, 90, 0.15)',
-          boxShadow: '0 12px 60px rgba(0, 0, 0, 0.8)',
-        }}
-      >
-        <div className="px-5 py-5 sm:px-6">
-          <PopupTitle accentColor="#c4a35a" size="lg">{t('deckBuilder.search.helpTitle')}</PopupTitle>
+  const tryExample = (q: string) => { setSearchQuery(q); setShowSearchHelp(false); };
 
-          <p className="font-body text-[12px] leading-relaxed mt-3 mb-5" style={{ color: '#999' }}>
+  const renderSearchHelp = () => showSearchHelp ? (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-6 pb-6 px-4"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
+      onClick={() => setShowSearchHelp(false)}
+    >
+      <div
+        className="w-full overflow-y-auto"
+        style={{
+          maxWidth: '720px',
+          maxHeight: 'calc(100vh - 48px)',
+          backgroundColor: '#0c0c10',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header bar */}
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-body text-sm font-semibold tracking-wide" style={{ color: '#e0e0e0' }}>
+            {t('deckBuilder.search.helpTitle')}
+          </span>
+          <button onClick={() => setShowSearchHelp(false)} className="font-body text-xs cursor-pointer px-2 py-1" style={{ color: '#666' }}>
+            ESC
+          </button>
+        </div>
+
+        <div className="px-6 py-5">
+          <p className="font-body text-[13px] leading-relaxed mb-6" style={{ color: '#888' }}>
             {t('deckBuilder.search.helpIntro')}
           </p>
 
-          {/* Name / ID */}
-          <div className="mb-4 px-3 py-3 sm:px-4" style={{ backgroundColor: 'rgba(196, 163, 90, 0.04)', border: '1px solid rgba(196, 163, 90, 0.12)' }}>
-            <span className="font-body text-[13px] font-bold" style={{ color: '#c4a35a' }}>{t('deckBuilder.search.nameLabel')}</span>
-            <p className="font-body text-[11px] mt-1" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {['naruto', 'KS-133', 'sakura'].map((ex) => (
-                <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
-                  className="font-mono text-[11px] px-2.5 py-1 cursor-pointer"
-                  style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
-                  {ex}
-                </button>
-              ))}
+          {/* Name / ID row */}
+          <div className="flex items-start gap-4 mb-5 pb-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div className="shrink-0 w-20">
+              <span className="font-body text-[11px] font-medium uppercase tracking-wider" style={{ color: '#555' }}>
+                {t('deckBuilder.search.nameLabel')}
+              </span>
+            </div>
+            <div className="flex-1">
+              <p className="font-body text-[12px] mb-2" style={{ color: '#aaa' }}>{t('deckBuilder.search.nameDesc')}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {['naruto', 'KS-133', 'sakura', 'orochimaru'].map((ex) => (
+                  <button key={ex} onClick={() => tryExample(ex)}
+                    className="font-body text-[11px] px-3 py-1 cursor-pointer"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#ccc', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {ex}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Filters list — mobile-friendly stacked layout */}
-          <div className="flex flex-col gap-0.5 mb-5">
-            {searchFilters.map(({ key, label, desc, examples }, i) => (
-              <div key={`${key}-${i}`} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3 px-3 py-2.5"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                <div className="flex items-center gap-2 sm:w-[55px] shrink-0">
-                  <span className="font-mono text-[13px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="font-body text-[11px] font-semibold" style={{ color: '#ddd' }}>{label}</span>
-                  <span className="font-body text-[10px] ml-2" style={{ color: '#666' }}>{desc}</span>
-                </div>
-                <div className="flex flex-wrap gap-1 shrink-0">
+          {/* Filter rows */}
+          {searchFilters.map(({ key, label, desc, examples }, i) => (
+            <div key={`${key}-${i}`} className="flex items-start gap-4 mb-1 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+              <div className="shrink-0 w-20 pt-0.5">
+                <span
+                  className="font-body text-[13px] font-semibold inline-block px-2 py-0.5"
+                  style={{ color: '#c4a35a', backgroundColor: 'rgba(196,163,90,0.06)' }}
+                >
+                  {key}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="font-body text-[12px] font-medium" style={{ color: '#ccc' }}>{label}</span>
+                <span className="font-body text-[11px] ml-2" style={{ color: '#555' }}>{desc}</span>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {examples.map((ex) => (
-                    <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
-                      className="font-mono text-[10px] px-2 py-0.5 cursor-pointer"
-                      style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.15)' }}
-                      onMouseEnter={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.5)'; }}
-                      onMouseLeave={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.15)'; }}
-                    >
+                    <button key={ex} onClick={() => tryExample(ex)}
+                      className="font-body text-[11px] px-2.5 py-0.5 cursor-pointer"
+                      style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.1)' }}>
                       {ex}
                     </button>
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
 
-          {/* Combine section */}
-          <div className="px-3 py-3 sm:px-4 mb-4" style={{ backgroundColor: 'rgba(62, 139, 62, 0.04)', border: '1px solid rgba(62, 139, 62, 0.12)' }}>
-            <span className="font-body text-[12px] font-bold block mb-2" style={{ color: '#5cb85c' }}>{t('deckBuilder.search.combineTitle')}</span>
-            <p className="font-body text-[10px] mb-3" style={{ color: '#777' }}>{t('deckBuilder.search.combineDesc')}</p>
-            <div className="flex flex-col gap-2">
+          {/* Combine examples */}
+          <div className="mt-6 pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="font-body text-[12px] font-semibold block mb-1" style={{ color: '#e0e0e0' }}>
+              {t('deckBuilder.search.combineTitle')}
+            </span>
+            <p className="font-body text-[11px] mb-4" style={{ color: '#666' }}>
+              {t('deckBuilder.search.combineDesc')}
+            </p>
+            <div className="flex flex-col gap-2.5">
               {[
                 { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
                 { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
                 { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
                 { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
               ].map(({ query, desc }) => (
-                <div key={query} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                  <button onClick={() => { setSearchQuery(query); setShowSearchHelp(false); }}
-                    className="font-mono text-[11px] px-3 py-1 cursor-pointer shrink-0 text-left"
-                    style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
+                <div key={query} className="flex items-center gap-4">
+                  <button onClick={() => tryExample(query)}
+                    className="font-body text-[12px] px-4 py-1.5 cursor-pointer shrink-0"
+                    style={{ backgroundColor: 'rgba(196,163,90,0.05)', color: '#c4a35a', borderLeft: '3px solid rgba(196,163,90,0.4)' }}>
                     {query}
                   </button>
-                  <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
+                  <span className="font-body text-[11px]" style={{ color: '#666' }}>{desc}</span>
                 </div>
               ))}
             </div>
           </div>
-
-          <div className="flex justify-center">
-            <PopupDismissLink onClick={() => setShowSearchHelp(false)}>{t('common.close')}</PopupDismissLink>
-          </div>
         </div>
       </div>
-    </PopupOverlay>
+    </div>
   ) : null;
 
   // ═════════════════════════════════════════════════════
