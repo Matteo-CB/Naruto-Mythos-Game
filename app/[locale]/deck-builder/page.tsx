@@ -35,34 +35,42 @@ const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\
 
 // ───────────────────── ADVANCED SEARCH PARSER ─────────────────────
 
+interface KeywordFilter {
+  terms: string[];  // all must match (AND)
+  exclusive: boolean; // true = card must have ONLY these keywords
+}
+
 interface SearchFilter {
   nameQuery: string;
   chakra: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
   power: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
-  keywords: string[];
+  keywords: KeywordFilter[];
   groups: string[];
   rarities: string[];
-  effects: string[]; // effect types: MAIN, UPGRADE, AMBUSH, SCORE
-  effectText: string[]; // search in any effect text: e:move
-  effectMainText: string[]; // em:hide — search in MAIN effect text
-  effectUpgradeText: string[]; // eup:move — search in UPGRADE effect text
-  effectAmbushText: string[]; // ea:defeat — search in AMBUSH effect text
-  effectScoreText: string[]; // es:draw — search in SCORE effect text
+  sets: string[];
+  effects: string[];
+  effectText: string[];
+  effectMainText: string[];
+  effectUpgradeText: string[];
+  effectAmbushText: string[];
+  effectScoreText: string[];
 }
 
 function parseSearchQuery(raw: string): SearchFilter {
   const filter: SearchFilter = {
     nameQuery: '', chakra: [], power: [], keywords: [], groups: [],
-    rarities: [], effects: [], effectText: [],
+    rarities: [], sets: [], effects: [], effectText: [],
     effectMainText: [], effectUpgradeText: [], effectAmbushText: [], effectScoreText: [],
   };
+  // Normalize commas to spaces so "c:4, k:Jutsu" works like "c:4 k:Jutsu"
+  const normalized = raw.replace(/,\s*/g, ' ');
   // Match typed effect tokens: em:, eup:, ea:, es:, e:
-  // Match other tokens: c, p, k, g, r
-  const tokenRegex = /(eup|em|ea|es|[cpkgre])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
-  let remaining = raw;
+  // Match other tokens: c, p, k, g, r, s
+  const tokenRegex = /(eup|em|ea|es|[cpkgres])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
+  let remaining = normalized;
 
   let match: RegExpExecArray | null;
-  while ((match = tokenRegex.exec(raw)) !== null) {
+  while ((match = tokenRegex.exec(normalized)) !== null) {
     const key = match[1].toLowerCase();
     const op = match[2] === ':' ? '=' : match[2];
     const value = match[4] ?? match[5];
@@ -79,9 +87,18 @@ function parseSearchQuery(raw: string): SearchFilter {
         if (!isNaN(num)) filter.power.push({ op: op as '=' | '>' | '>=' | '<' | '<=', val: num });
         break;
       }
-      case 'k': filter.keywords.push(normalizeStr(value)); break;
+      case 'k': {
+        // k:!Jutsu = exclusive (ONLY Jutsu)
+        // k:Jutsu+Team 7 = AND (must have both — "Team 7" contains space but + joins)
+        const exclusive = value.startsWith('!');
+        const cleanVal = exclusive ? value.slice(1) : value;
+        const terms = cleanVal.split('+').map((t) => normalizeStr(t.trim())).filter(Boolean);
+        if (terms.length > 0) filter.keywords.push({ terms, exclusive });
+        break;
+      }
       case 'g': filter.groups.push(normalizeStr(value)); break;
       case 'r': filter.rarities.push(value.toUpperCase()); break;
+      case 's': filter.sets.push(value.toUpperCase()); break;
       case 'e': {
         const upper = value.toUpperCase();
         if (['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'].includes(upper)) {
@@ -132,8 +149,23 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
     if (!compareOp(card.power ?? 0, p.op, p.val)) return false;
   }
   // Keywords
-  for (const k of filter.keywords) {
-    if (!card.keywords?.some((kw) => normalizeStr(kw).includes(k))) return false;
+  for (const kf of filter.keywords) {
+    const cardKws = (card.keywords ?? []).map((kw) => normalizeStr(kw));
+    // All terms must match
+    for (const term of kf.terms) {
+      if (!cardKws.some((kw) => kw.includes(term))) return false;
+    }
+    // Exclusive: card must ONLY have these keywords (no others)
+    if (kf.exclusive) {
+      if (cardKws.length !== kf.terms.length) return false;
+      for (const kw of cardKws) {
+        if (!kf.terms.some((t) => kw.includes(t))) return false;
+      }
+    }
+  }
+  // Set
+  for (const s of filter.sets) {
+    if (!card.id.toUpperCase().startsWith(s + '-')) return false;
   }
   // Group
   for (const g of filter.groups) {
@@ -756,8 +788,11 @@ export default function DeckBuilderPage() {
     { key: 'c', label: t('deckBuilder.search.chakraLabel'), desc: t('deckBuilder.search.chakraDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['c:4', 'c>3', 'c<=5'] },
     { key: 'p', label: t('deckBuilder.search.powerLabel'), desc: t('deckBuilder.search.powerDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['p:5', 'p>=3', 'p<2'] },
     { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin'] },
+    { key: 'k', label: t('deckBuilder.search.keywordAndLabel'), desc: t('deckBuilder.search.keywordAndDesc'), ops: [':'], examples: ['k:Jutsu+Team 7'] },
+    { key: 'k', label: t('deckBuilder.search.keywordOnlyLabel'), desc: t('deckBuilder.search.keywordOnlyDesc'), ops: [':'], examples: ['k:!Jutsu', 'k:!Summon'] },
     { key: 'g', label: t('deckBuilder.search.groupLabel'), desc: t('deckBuilder.search.groupDesc'), ops: [':'], examples: ['g:Leaf', 'g:Akatsuki'] },
     { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M'] },
+    { key: 's', label: t('deckBuilder.search.setLabel'), desc: t('deckBuilder.search.setDesc'), ops: [':'], examples: ['s:KS'] },
     { key: 'e', label: t('deckBuilder.search.effectTypeLabel'), desc: t('deckBuilder.search.effectTypeDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE'] },
     { key: 'e', label: t('deckBuilder.search.effectTextLabel'), desc: t('deckBuilder.search.effectTextDesc'), ops: [':'], examples: ['e:move', 'e:hide', 'e:defeat'] },
     { key: 'em', label: t('deckBuilder.search.emLabel'), desc: t('deckBuilder.search.emDesc'), ops: [':'], examples: ['em:hide', 'em:defeat'] },
@@ -900,10 +935,12 @@ export default function DeckBuilderPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
-                { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
-                { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
+                { query: 'naruto c>=3, k:Jutsu', desc: t('deckBuilder.search.example1') },
+                { query: 'g:Leaf p>4, e:AMBUSH', desc: t('deckBuilder.search.example2') },
+                { query: 'k:Jutsu+Team 7', desc: t('deckBuilder.search.example5') },
                 { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
-                { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
+                { query: 'k:!Summon', desc: t('deckBuilder.search.example6') },
+                { query: 'c<=2 r:UC s:KS', desc: t('deckBuilder.search.example3') },
               ].map(({ query, desc }) => (
                 <button key={query} onClick={() => tryExample(query)}
                   className="flex flex-col items-start text-left px-4 py-2.5 cursor-pointer"
