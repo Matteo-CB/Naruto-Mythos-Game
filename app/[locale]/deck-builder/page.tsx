@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, memo } from "react";
+import { useState, useEffect, useMemo, useCallback, memo, useDeferredValue } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
@@ -188,7 +188,9 @@ const CatalogCard = memo(function CatalogCard({
         aspectRatio: '5/7',
         backgroundColor: '#0e0e0e',
         opacity: allowed ? 1 : 0.35,
-      }}
+        contentVisibility: 'auto',
+        containIntrinsicSize: '72px 101px',
+      } as React.CSSProperties}
     >
       {imgPath ? (
         <img src={imgPath} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -298,6 +300,7 @@ export default function DeckBuilderPage() {
 
   // ───── UI STATE ─────
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery);
   const [sortBy, setSortBy] = useState<SortField>('number');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [previewCard, setPreviewCard] = useState<CharacterCard | MissionCard | null>(null);
@@ -382,11 +385,11 @@ export default function DeckBuilderPage() {
 
 
   // ───── FILTERED DATA ─────
-  const parsedSearch = useMemo(() => parseSearchQuery(searchQuery), [searchQuery]);
+  const parsedSearch = useMemo(() => parseSearchQuery(deferredSearch), [deferredSearch]);
 
   const filteredChars = useMemo(() => {
     let chars = availableChars.filter((c) => !bannedIds.has(c.id));
-    if (searchQuery) {
+    if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }
     return [...chars].sort((a, b) => {
@@ -400,7 +403,7 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, searchQuery, parsedSearch, bannedIds, loc, sortBy, sortOrder]);
+  }, [availableChars, deferredSearch, parsedSearch, bannedIds, loc, sortBy, sortOrder]);
 
   const filteredMissions = useMemo(() => availableMissions.filter((m) => !bannedIds.has(m.id)), [availableMissions, bannedIds]);
 
