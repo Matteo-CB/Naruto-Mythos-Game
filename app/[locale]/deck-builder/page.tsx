@@ -38,26 +38,36 @@ const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\
 // ───────────────────── ADVANCED SEARCH PARSER ─────────────────────
 
 interface SearchFilter {
-  nameQuery: string; // free text (name / title / ID)
+  nameQuery: string;
   chakra: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
   power: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
   keywords: string[];
   groups: string[];
   rarities: string[];
-  effects: string[];
+  effects: string[]; // effect types: MAIN, UPGRADE, AMBUSH, SCORE
+  effectText: string[]; // search in any effect text: e:move
+  effectMainText: string[]; // em:hide — search in MAIN effect text
+  effectUpgradeText: string[]; // eup:move — search in UPGRADE effect text
+  effectAmbushText: string[]; // ea:defeat — search in AMBUSH effect text
+  effectScoreText: string[]; // es:draw — search in SCORE effect text
 }
 
 function parseSearchQuery(raw: string): SearchFilter {
-  const filter: SearchFilter = { nameQuery: '', chakra: [], power: [], keywords: [], groups: [], rarities: [], effects: [] };
-  // Match tokens like c:4 c>3 c>=2 p<=5 k:Jutsu g:Leaf Village r:S e:MAIN
-  const tokenRegex = /([cpkgre])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
+  const filter: SearchFilter = {
+    nameQuery: '', chakra: [], power: [], keywords: [], groups: [],
+    rarities: [], effects: [], effectText: [],
+    effectMainText: [], effectUpgradeText: [], effectAmbushText: [], effectScoreText: [],
+  };
+  // Match typed effect tokens: em:, eup:, ea:, es:, e:
+  // Match other tokens: c, p, k, g, r
+  const tokenRegex = /(eup|em|ea|es|[cpkgre])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
   let remaining = raw;
 
   let match: RegExpExecArray | null;
   while ((match = tokenRegex.exec(raw)) !== null) {
     const key = match[1].toLowerCase();
     const op = match[2] === ':' ? '=' : match[2];
-    const value = match[4] ?? match[5]; // quoted or unquoted
+    const value = match[4] ?? match[5];
     remaining = remaining.replace(match[0], '');
 
     switch (key) {
@@ -74,7 +84,19 @@ function parseSearchQuery(raw: string): SearchFilter {
       case 'k': filter.keywords.push(normalizeStr(value)); break;
       case 'g': filter.groups.push(normalizeStr(value)); break;
       case 'r': filter.rarities.push(value.toUpperCase()); break;
-      case 'e': filter.effects.push(value.toUpperCase()); break;
+      case 'e': {
+        const upper = value.toUpperCase();
+        if (['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'].includes(upper)) {
+          filter.effects.push(upper);
+        } else {
+          filter.effectText.push(normalizeStr(value));
+        }
+        break;
+      }
+      case 'em': filter.effectMainText.push(normalizeStr(value)); break;
+      case 'eup': filter.effectUpgradeText.push(normalizeStr(value)); break;
+      case 'ea': filter.effectAmbushText.push(normalizeStr(value)); break;
+      case 'es': filter.effectScoreText.push(normalizeStr(value)); break;
     }
   }
 
@@ -126,6 +148,23 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   // Effect type
   if (filter.effects.length > 0) {
     if (!card.effects?.some((e) => filter.effects.includes(e.type))) return false;
+  }
+  // Effect text search (any effect)
+  for (const t of filter.effectText) {
+    if (!card.effects?.some((e) => normalizeStr(e.description).includes(t))) return false;
+  }
+  // Typed effect text: em: (MAIN), eup: (UPGRADE), ea: (AMBUSH), es: (SCORE)
+  for (const t of filter.effectMainText) {
+    if (!card.effects?.some((e) => e.type === 'MAIN' && normalizeStr(e.description).includes(t))) return false;
+  }
+  for (const t of filter.effectUpgradeText) {
+    if (!card.effects?.some((e) => e.type === 'UPGRADE' && normalizeStr(e.description).includes(t))) return false;
+  }
+  for (const t of filter.effectAmbushText) {
+    if (!card.effects?.some((e) => e.type === 'AMBUSH' && normalizeStr(e.description).includes(t))) return false;
+  }
+  for (const t of filter.effectScoreText) {
+    if (!card.effects?.some((e) => e.type === 'SCORE' && normalizeStr(e.description).includes(t))) return false;
   }
   return true;
 }
@@ -719,114 +758,107 @@ export default function DeckBuilderPage() {
   const searchFilters = [
     { key: 'c', label: t('deckBuilder.search.chakraLabel'), desc: t('deckBuilder.search.chakraDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['c:4', 'c>3', 'c<=5'] },
     { key: 'p', label: t('deckBuilder.search.powerLabel'), desc: t('deckBuilder.search.powerDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['p:5', 'p>=3', 'p<2'] },
-    { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin', 'k:Team 7'] },
-    { key: 'g', label: t('deckBuilder.search.groupLabel'), desc: t('deckBuilder.search.groupDesc'), ops: [':'], examples: ['g:Leaf', 'g:Akatsuki', 'g:Sand'] },
-    { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M', 'r:C'] },
-    { key: 'e', label: t('deckBuilder.search.effectLabel'), desc: t('deckBuilder.search.effectDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE', 'e:UPGRADE'] },
+    { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin'] },
+    { key: 'g', label: t('deckBuilder.search.groupLabel'), desc: t('deckBuilder.search.groupDesc'), ops: [':'], examples: ['g:Leaf', 'g:Akatsuki'] },
+    { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M'] },
+    { key: 'e', label: t('deckBuilder.search.effectTypeLabel'), desc: t('deckBuilder.search.effectTypeDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE'] },
+    { key: 'e', label: t('deckBuilder.search.effectTextLabel'), desc: t('deckBuilder.search.effectTextDesc'), ops: [':'], examples: ['e:move', 'e:hide', 'e:defeat'] },
+    { key: 'em', label: t('deckBuilder.search.emLabel'), desc: t('deckBuilder.search.emDesc'), ops: [':'], examples: ['em:hide', 'em:defeat'] },
+    { key: 'eup', label: t('deckBuilder.search.eupLabel'), desc: t('deckBuilder.search.eupDesc'), ops: [':'], examples: ['eup:move', 'eup:play'] },
+    { key: 'ea', label: t('deckBuilder.search.eaLabel'), desc: t('deckBuilder.search.eaDesc'), ops: [':'], examples: ['ea:move', 'ea:look'] },
+    { key: 'es', label: t('deckBuilder.search.esLabel'), desc: t('deckBuilder.search.esDesc'), ops: [':'], examples: ['es:draw', 'es:chakra'] },
   ];
 
   const renderSearchHelp = () => showSearchHelp ? (
     <PopupOverlay onClickBg={() => setShowSearchHelp(false)}>
-      <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.3)" maxWidth="580px" padding="28px 24px">
-        <PopupTitle accentColor="#c4a35a" size="lg">{t('deckBuilder.search.helpTitle')}</PopupTitle>
+      <div
+        className="w-full mx-4 overflow-y-auto"
+        style={{
+          maxWidth: '560px',
+          maxHeight: 'calc(100vh - 40px)',
+          backgroundColor: 'rgba(12, 12, 16, 0.97)',
+          border: '1px solid rgba(196, 163, 90, 0.15)',
+          boxShadow: '0 12px 60px rgba(0, 0, 0, 0.8)',
+        }}
+      >
+        <div className="px-5 py-5 sm:px-6">
+          <PopupTitle accentColor="#c4a35a" size="lg">{t('deckBuilder.search.helpTitle')}</PopupTitle>
 
-        {/* Intro */}
-        <p className="font-body text-[12px] leading-relaxed mt-3 mb-5" style={{ color: '#999' }}>
-          {t('deckBuilder.search.helpIntro')}
-        </p>
+          <p className="font-body text-[12px] leading-relaxed mt-3 mb-5" style={{ color: '#999' }}>
+            {t('deckBuilder.search.helpIntro')}
+          </p>
 
-        {/* Name / ID — special section */}
-        <div className="mb-4 px-4 py-3" style={{ backgroundColor: 'rgba(196, 163, 90, 0.04)', border: '1px solid rgba(196, 163, 90, 0.12)' }}>
-          <div className="flex items-center gap-2 mb-1">
+          {/* Name / ID */}
+          <div className="mb-4 px-3 py-3 sm:px-4" style={{ backgroundColor: 'rgba(196, 163, 90, 0.04)', border: '1px solid rgba(196, 163, 90, 0.12)' }}>
             <span className="font-body text-[13px] font-bold" style={{ color: '#c4a35a' }}>{t('deckBuilder.search.nameLabel')}</span>
-          </div>
-          <p className="font-body text-[11px]" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
-          <div className="flex gap-2 mt-2">
-            {['naruto', 'KS-133', 'sakura'].map((ex) => (
-              <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
-                className="font-mono text-[11px] px-2.5 py-1 cursor-pointer"
-                style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
-                {ex}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Filter table */}
-        <div className="flex flex-col gap-0.5 mb-5">
-          {/* Header */}
-          <div className="grid gap-2 px-3 py-2" style={{ gridTemplateColumns: '50px 1fr 80px 1fr', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colKey')}</span>
-            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colFilter')}</span>
-            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colOps')}</span>
-            <span className="font-body text-[10px] font-bold uppercase" style={{ color: '#666' }}>{t('deckBuilder.search.colExamples')}</span>
-          </div>
-
-          {searchFilters.map(({ key, label, desc, ops, examples }) => (
-            <div key={key} className="grid gap-2 px-3 py-2.5 items-start" style={{
-              gridTemplateColumns: '50px 1fr 80px 1fr',
-              borderBottom: '1px solid rgba(255,255,255,0.04)',
-            }}>
-              {/* Key */}
-              <div>
-                <span className="font-mono text-[14px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
-              </div>
-              {/* Label + desc */}
-              <div>
-                <span className="font-body text-[12px] font-semibold block" style={{ color: '#ddd' }}>{label}</span>
-                <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
-              </div>
-              {/* Operators */}
-              <div className="flex flex-wrap gap-1">
-                {ops.map((op) => (
-                  <span key={op} className="font-mono text-[10px] px-1.5 py-0.5" style={{ backgroundColor: 'rgba(255,255,255,0.04)', color: '#999' }}>
-                    {op}
-                  </span>
-                ))}
-              </div>
-              {/* Examples — clickable */}
-              <div className="flex flex-wrap gap-1">
-                {examples.map((ex) => (
-                  <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
-                    className="font-mono text-[10px] px-2 py-0.5 cursor-pointer transition-colors"
-                    style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.15)' }}
-                    onMouseEnter={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.5)'; }}
-                    onMouseLeave={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.15)'; }}
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Combine section */}
-        <div className="px-4 py-3 mb-4" style={{ backgroundColor: 'rgba(62, 139, 62, 0.04)', border: '1px solid rgba(62, 139, 62, 0.12)' }}>
-          <span className="font-body text-[12px] font-bold block mb-2" style={{ color: '#5cb85c' }}>{t('deckBuilder.search.combineTitle')}</span>
-          <p className="font-body text-[10px] mb-2" style={{ color: '#777' }}>{t('deckBuilder.search.combineDesc')}</p>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
-              { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
-              { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
-            ].map(({ query, desc }) => (
-              <div key={query} className="flex items-center gap-3">
-                <button onClick={() => { setSearchQuery(query); setShowSearchHelp(false); }}
-                  className="font-mono text-[11px] px-3 py-1 cursor-pointer shrink-0"
+            <p className="font-body text-[11px] mt-1" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {['naruto', 'KS-133', 'sakura'].map((ex) => (
+                <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
+                  className="font-mono text-[11px] px-2.5 py-1 cursor-pointer"
                   style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
-                  {query}
+                  {ex}
                 </button>
-                <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Filters list — mobile-friendly stacked layout */}
+          <div className="flex flex-col gap-0.5 mb-5">
+            {searchFilters.map(({ key, label, desc, examples }, i) => (
+              <div key={`${key}-${i}`} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3 px-3 py-2.5"
+                style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="flex items-center gap-2 sm:w-[55px] shrink-0">
+                  <span className="font-mono text-[13px] font-bold" style={{ color: '#c4a35a' }}>{key}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="font-body text-[11px] font-semibold" style={{ color: '#ddd' }}>{label}</span>
+                  <span className="font-body text-[10px] ml-2" style={{ color: '#666' }}>{desc}</span>
+                </div>
+                <div className="flex flex-wrap gap-1 shrink-0">
+                  {examples.map((ex) => (
+                    <button key={ex} onClick={() => { setSearchQuery(ex); setShowSearchHelp(false); }}
+                      className="font-mono text-[10px] px-2 py-0.5 cursor-pointer"
+                      style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.15)' }}
+                      onMouseEnter={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.5)'; }}
+                      onMouseLeave={(e) => { (e.target as HTMLElement).style.borderColor = 'rgba(196,163,90,0.15)'; }}
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
-        </div>
 
-        <div className="flex justify-center">
-          <PopupDismissLink onClick={() => setShowSearchHelp(false)}>{t('common.close')}</PopupDismissLink>
+          {/* Combine section */}
+          <div className="px-3 py-3 sm:px-4 mb-4" style={{ backgroundColor: 'rgba(62, 139, 62, 0.04)', border: '1px solid rgba(62, 139, 62, 0.12)' }}>
+            <span className="font-body text-[12px] font-bold block mb-2" style={{ color: '#5cb85c' }}>{t('deckBuilder.search.combineTitle')}</span>
+            <p className="font-body text-[10px] mb-3" style={{ color: '#777' }}>{t('deckBuilder.search.combineDesc')}</p>
+            <div className="flex flex-col gap-2">
+              {[
+                { query: 'naruto c>=3 k:Jutsu', desc: t('deckBuilder.search.example1') },
+                { query: 'g:Leaf p>4 e:AMBUSH', desc: t('deckBuilder.search.example2') },
+                { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
+                { query: 'c<=2 r:UC', desc: t('deckBuilder.search.example3') },
+              ].map(({ query, desc }) => (
+                <div key={query} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <button onClick={() => { setSearchQuery(query); setShowSearchHelp(false); }}
+                    className="font-mono text-[11px] px-3 py-1 cursor-pointer shrink-0 text-left"
+                    style={{ backgroundColor: '#0e0e0e', color: '#c4a35a', border: '1px solid rgba(196,163,90,0.2)' }}>
+                    {query}
+                  </button>
+                  <span className="font-body text-[10px]" style={{ color: '#666' }}>{desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <PopupDismissLink onClick={() => setShowSearchHelp(false)}>{t('common.close')}</PopupDismissLink>
+          </div>
         </div>
-      </PopupCornerFrame>
+      </div>
     </PopupOverlay>
   ) : null;
 
