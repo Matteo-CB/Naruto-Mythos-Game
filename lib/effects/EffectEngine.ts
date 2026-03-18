@@ -15366,28 +15366,47 @@ export class EffectEngine {
    * it was controlling back to their original owner.
    */
   static restoreControlOnLeave(state: GameState, controllerInstanceId: string): GameState {
-    let newState = state;
-    let changed = false;
-
-    for (const mission of newState.activeMissions) {
+    // First pass: find all characters controlled by the leaving controller
+    const controlledChars: { instanceId: string; missionIndex: number }[] = [];
+    for (let mi = 0; mi < state.activeMissions.length; mi++) {
+      const mission = state.activeMissions[mi];
       for (const side of ['player1Characters', 'player2Characters'] as const) {
         for (const char of mission[side]) {
           if (char.controllerInstanceId === controllerInstanceId && char.controlledBy !== char.originalOwner) {
-            if (!changed) {
-              newState = deepClone(newState);
-              changed = true;
-            }
-            // Move character back to original owner's side
-            const currentMission = newState.activeMissions[char.missionIndex] ?? newState.activeMissions.find(
-              (m) => m.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ||
-                     m.player2Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId)
-            );
-            if (!currentMission) continue;
+            controlledChars.push({ instanceId: char.instanceId, missionIndex: mi });
+          }
+        }
+      }
+    }
 
-            const fromSide = char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters';
+    if (controlledChars.length === 0) return state;
+
+    let newState = deepClone(state);
+
+    for (const { instanceId } of controlledChars) {
+      // Re-find the character in the cloned state (indices may shift after each move)
+      let currentMission: (typeof newState.activeMissions)[number] | null = null;
+      let char: CharacterInPlay | null = null;
+      let fromSide: 'player1Characters' | 'player2Characters' | null = null;
+      let idx = -1;
+
+      for (const mission of newState.activeMissions) {
+        for (const side of ['player1Characters', 'player2Characters'] as const) {
+          const i = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
+          if (i >= 0) {
+            currentMission = mission;
+            char = mission[side][i];
+            fromSide = side;
+            idx = i;
+            break;
+          }
+        }
+        if (char) break;
+      }
+
+      if (!currentMission || !char || !fromSide || idx === -1) continue;
+
             const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
-            const idx = currentMission[fromSide].findIndex((c: CharacterInPlay) => c.instanceId === char.instanceId);
-            if (idx === -1) continue;
 
             // Check same-name conflict on the destination side (use top-of-stack name for upgraded chars)
             const topCardCtrl = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -15453,15 +15472,10 @@ export class EffectEngine {
                 { card: topCardCtrl.name_fr },
               );
             }
-          }
-        }
-      }
     }
 
-    if (changed) {
-      newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
-      newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
-    }
+    newState.player1.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player1');
+    newState.player2.charactersInPlay = EffectEngine.countCharsForPlayer(newState, 'player2');
 
     return newState;
   }
