@@ -1112,20 +1112,6 @@ export default function DeckBuilderPage() {
                   borderLeft: '3px solid rgba(196, 163, 90, 0.25)', color: '#e0e0e0',
                 }}
               />
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortField)}
-                className="px-1.5 py-1 text-[9px] focus:outline-none cursor-pointer"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#999' }}>
-                <option value="number">{t("deckBuilder.sort.byNumber")}</option>
-                <option value="name">{t("deckBuilder.sort.byName")}</option>
-                <option value="chakra">{t("deckBuilder.sort.byChakra")}</option>
-                <option value="power">{t("deckBuilder.sort.byPower")}</option>
-                <option value="rarity">{t("deckBuilder.sort.byRarity")}</option>
-              </select>
-              <button onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="px-1.5 py-1 text-[9px] cursor-pointer"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', color: '#888' }}>
-                {sortOrder === 'asc' ? '1-9' : '9-1'}
-              </button>
             </div>
 
                         <button
