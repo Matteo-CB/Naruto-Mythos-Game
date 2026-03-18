@@ -1611,6 +1611,34 @@ export function setupSocketHandlers(io: SocketIOServer) {
       io.to(data.roomCode).emit('chat:message', joinMsg);
     });
 
+    // Spectator can re-request state (e.g. after page navigation)
+    socket.on('spectate:request-state', (data: { roomCode: string }) => {
+      const room = rooms.get(data.roomCode);
+      if (!room || !room.gameState) {
+        socket.emit('spectate:error', { message: 'Game not found or not in progress' });
+        return;
+      }
+      try {
+        const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const spectatorState = {
+          ...p1State,
+          opponentState: {
+            ...p1State.opponentState,
+            hand: room.gameState.player2.hand,
+            handSize: room.gameState.player2.hand.length,
+          },
+        };
+        const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
+        socket.emit('spectate:state-update', {
+          visibleState: spectatorState,
+          playerNames,
+          spectatorCount: room.spectators.size,
+        });
+      } catch (err) {
+        console.error('[Socket] Spectator request-state error:', err);
+      }
+    });
+
     socket.on('spectate:leave', () => {
       const specKey = playerRooms.get(socket.id);
       if (!specKey?.startsWith('spec:')) return;

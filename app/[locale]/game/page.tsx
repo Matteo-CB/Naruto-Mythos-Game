@@ -107,28 +107,38 @@ export default function GamePage() {
 
   // Spectator error — clean up and redirect home
   useEffect(() => {
-    if (!isSpectating) return;
-    const socketState = useSocketStore.getState();
-    if (socketState.error) {
-      useSocketStore.getState().leaveSpectating();
-      const timer = setTimeout(() => router.push('/'), 1000);
-      return () => clearTimeout(timer);
-    }
+    if (!isSpectating || !socketError) return;
+    useSocketStore.getState().leaveSpectating();
+    const timer = setTimeout(() => router.push('/'), 1000);
+    return () => clearTimeout(timer);
   }, [isSpectating, socketError, router]);
 
-  // Spectator timeout — if state never arrives after 10s, clean up and redirect
+  // Spectator: if no state in gameStore after mount, request it from server
+  // Retries every 2s up to 3 times, then gives up and redirects home
+  const spectateRetryRef = useRef(0);
   useEffect(() => {
-    if (!isSpectating || visibleState || socketVisibleState) return;
+    if (!isSpectating || visibleState) {
+      spectateRetryRef.current = 0;
+      return;
+    }
+    // Already have socket state but not synced yet — sync immediately
+    if (socketVisibleState) {
+      syncSpectatorState();
+      return;
+    }
+    // No state anywhere — request from server
     const timer = setTimeout(() => {
-      const ss = useSocketStore.getState();
-      const gs = useGameStore.getState();
-      if (!ss.visibleState && !gs.visibleState) {
+      if (spectateRetryRef.current >= 3) {
+        // Give up after 3 retries (6s total)
         useSocketStore.getState().leaveSpectating();
         router.push('/');
+        return;
       }
-    }, 10000);
+      spectateRetryRef.current += 1;
+      useSocketStore.getState().requestSpectateState();
+    }, 2000);
     return () => clearTimeout(timer);
-  }, [isSpectating, visibleState, socketVisibleState, router]);
+  }, [isSpectating, visibleState, socketVisibleState, router, syncSpectatorState]);
 
   // Sync socket state updates to gameStore for online games
   useEffect(() => {

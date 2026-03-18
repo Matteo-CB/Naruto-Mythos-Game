@@ -88,6 +88,7 @@ interface SocketStore {
   spectatingRoomCode: string | null;
   spectatorCount: number;
   spectateGame: (roomCode: string, userId: string, username: string) => void;
+  requestSpectateState: () => void;
   leaveSpectating: () => void;
 
   // Chat
@@ -730,6 +731,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket && connected) {
       socket.emit('spectate:join', { roomCode, userId, username });
       set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
+    }
+  },
+
+  requestSpectateState: () => {
+    const { socket, connected, spectatingRoomCode } = get();
+    if (socket && connected && spectatingRoomCode) {
+      socket.emit('spectate:request-state', { roomCode: spectatingRoomCode });
     }
   },
 
