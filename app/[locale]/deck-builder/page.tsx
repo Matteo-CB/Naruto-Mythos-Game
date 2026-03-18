@@ -1094,38 +1094,32 @@ export default function DeckBuilderPage() {
 
         {/* ── RIGHT: Card Catalog ── */}
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
-          width: '400px',
+          width: '480px',
           backgroundColor: 'rgba(8, 8, 12, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
-          {/* Search + Sort */}
+          {/* Search */}
           <div className="px-3 pt-3 pb-2 flex-shrink-0">
-            <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-1.5">
               <input
                 type="text"
                 placeholder={t("collection.search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1 text-[11px] focus:outline-none"
+                className="flex-1 min-w-0 px-2.5 py-1.5 text-xs focus:outline-none"
                 style={{
                   backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)',
                   borderLeft: '3px solid rgba(196, 163, 90, 0.25)', color: '#e0e0e0',
                 }}
               />
+              <button
+                onClick={() => setShowSearchHelp(true)}
+                className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
+                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+              >
+                ?
+              </button>
             </div>
-
-                        <button
-              onClick={() => setShowSearchHelp(true)}
-              className="text-[10px] font-bold px-3 py-1.5 cursor-pointer"
-              style={{
-                backgroundColor: 'rgba(196, 163, 90, 0.08)',
-                border: '1px solid rgba(196, 163, 90, 0.3)',
-                color: '#c4a35a',
-              }}
-            >
-              {t('deckBuilder.search.helpButton')}
-            </button>
-
             <div className="text-[8px] mt-1" style={{ color: '#444' }}>
               {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
             </div>
@@ -1152,7 +1146,7 @@ export default function DeckBuilderPage() {
             <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
             {/* Characters section */}
-            <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(62px, 1fr))' }}>
+            <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))' }}>
               {filteredChars.map((card) => (
                 <CatalogCard
                   key={card.id}
@@ -1218,25 +1212,21 @@ export default function DeckBuilderPage() {
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
               {/* Search */}
-              <input type="text" placeholder={t("collection.search")} value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-2 py-1.5 text-xs mb-2 focus:outline-none"
-                style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.25)', color: '#e0e0e0' }}
-              />
-
-                            <button
-                onClick={() => setShowSearchHelp(true)}
-                className="text-[10px] font-bold px-3 py-1.5 cursor-pointer"
-                style={{
-                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
-                  border: '1px solid rgba(196, 163, 90, 0.3)',
-                  color: '#c4a35a',
-                }}
-              >
-                {t('deckBuilder.search.helpButton')}
-              </button>
-
-              <div className="text-[8px] mt-1 mb-2" style={{ color: '#444' }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <input type="text" placeholder={t("collection.search")} value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 min-w-0 px-2.5 py-1.5 text-xs focus:outline-none"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid rgba(255,255,255,0.06)', borderLeft: '3px solid rgba(196,163,90,0.25)', color: '#e0e0e0' }}
+                />
+                <button
+                  onClick={() => setShowSearchHelp(true)}
+                  className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
+                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+                >
+                  ?
+                </button>
+              </div>
+              <div className="text-[8px] mb-2" style={{ color: '#444' }}>
                 {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
               </div>
 
