@@ -583,10 +583,9 @@ export function isMovementBlockedByKurenai(
  * isReveal: true when a hidden character is revealed (already on the mission).
  * Hinata/Neji only trigger for NEW characters arriving at the mission, not reveals.
  */
-export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, isReveal?: boolean): GameState {
-  // Reveals don't count as "a character is played in this mission" for Hinata/Neji —
-  // the character was already on the mission while hidden.
-  if (isReveal) return state;
+export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, _isReveal?: boolean): GameState {
+  // Revealing a hidden character counts as "playing a character" per rules.
+  // Hinata 031 and Neji 037 trigger on reveals too.
 
   let newState = { ...state };
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
