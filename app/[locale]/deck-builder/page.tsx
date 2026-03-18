@@ -4,8 +4,6 @@ import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Link } from "@/lib/i18n/navigation";
-import { CloudBackground } from "@/components/CloudBackground";
-import { DecorativeIcons } from "@/components/DecorativeIcons";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
@@ -998,7 +996,6 @@ export default function DeckBuilderPage() {
 
   return (
     <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
-      <CloudBackground /><DecorativeIcons />
 
       {/* ═══════ DESKTOP 3-PANEL ═══════ */}
       <div className="hidden lg:flex relative z-10" style={{ height: '100vh' }}>
