@@ -1128,7 +1128,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }, 10000);
         }
       } else {
-        console.error('[gameStore] Cannot perform online action: socket not connected');
+        console.warn('[gameStore] Socket not connected, retrying action in 1s...');
+        // Retry once after a short delay (socket may be reconnecting)
+        setTimeout(() => {
+          const ss = useSocketStore.getState();
+          if (ss.socket && ss.connected) {
+            const skipBlock = action.type === 'MULLIGAN';
+            if (!skipBlock) set({ isProcessing: true });
+            ss.performAction(action);
+            if (!skipBlock) {
+              setTimeout(() => {
+                if (get().isProcessing && get().isOnlineGame) set({ isProcessing: false });
+              }, 10000);
+            }
+          } else {
+            console.error('[gameStore] Socket still not connected after retry');
+            set({
+              actionError: 'Connection lost. Please wait for reconnection.',
+              actionErrorKey: 'game.error.connectionLost',
+              isProcessing: false,
+            });
+            // Auto-clear
+            setTimeout(() => {
+              if (get().actionError) {
+                set({ actionError: null, actionErrorKey: null, actionErrorParams: null });
+              }
+            }, 4000);
+          }
+        }, 1000);
       }
       return;
     }
