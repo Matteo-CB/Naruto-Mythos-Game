@@ -601,7 +601,6 @@ export default function DeckBuilderPage() {
   if (!session?.user) {
     return (
       <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: "#0a0a0a" }}>
-        <CloudBackground /><DecorativeIcons />
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
             <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: "#c4a35a" }}>{t("deckBuilder.title")}</h1>
@@ -626,7 +625,7 @@ export default function DeckBuilderPage() {
       return (
         <div className="flex-1 flex flex-col items-center justify-center px-4 gap-3">
           <div className="relative overflow-hidden mx-auto" style={{
-            width: '160px', aspectRatio: '5/7', backgroundColor: '#0a0a0c',
+            width: '160px', aspectRatio: '5/7', backgroundColor: '#0a0a0a',
           }}>
             <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.6 }} />
           </div>
@@ -647,7 +646,7 @@ export default function DeckBuilderPage() {
           width: '100%',
           maxWidth: isChar ? '180px' : '100%',
           aspectRatio: isChar ? '5/7' : '7/5',
-          backgroundColor: '#0a0a0c',
+          backgroundColor: '#0a0a0a',
         }}>
           {imgPath ? (
             <img src={imgPath} alt={getCardName(card, loc)} className="w-full h-full object-cover" />
@@ -781,7 +780,7 @@ export default function DeckBuilderPage() {
         style={{
           maxWidth: '900px',
           maxHeight: 'calc(100vh - 24px)',
-          backgroundColor: '#08080c',
+          backgroundColor: '#0a0a0a',
           border: '1px solid rgba(196, 163, 90, 0.08)',
           boxShadow: '0 0 80px rgba(0,0,0,0.6)',
         }}
@@ -794,7 +793,7 @@ export default function DeckBuilderPage() {
               <img key={i} src={src} alt="" className="h-full object-cover" style={{ width: '180px' }} draggable={false} />
             ))}
           </div>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(8,8,12,0.3), rgba(8,8,12,1))' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.3), rgba(10,10,10,1))' }} />
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
             <span className="text-2xl tracking-widest" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif" }}>
               {t('deckBuilder.search.helpTitle')}
@@ -831,7 +830,7 @@ export default function DeckBuilderPage() {
                   {['naruto', 'KS-133', 'sakura'].map((ex) => (
                     <button key={ex} onClick={() => tryExample(ex)}
                       className="font-body text-[11px] px-3 py-1.5 cursor-pointer"
-                      style={{ backgroundColor: '#111116', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
+                      style={{ backgroundColor: '#111111', color: '#bbb', borderBottom: '2px solid rgba(255,255,255,0.06)' }}>
                       {ex}
                     </button>
                   ))}
@@ -850,7 +849,7 @@ export default function DeckBuilderPage() {
                     {examples.map((ex) => (
                       <button key={ex} onClick={() => tryExample(ex)}
                         className="font-body text-[11px] px-3 py-1 cursor-pointer"
-                        style={{ backgroundColor: '#111116', color: '#c4a35a', borderBottom: '2px solid rgba(196,163,90,0.15)' }}>
+                        style={{ backgroundColor: '#111111', color: '#c4a35a', borderBottom: '2px solid rgba(196,163,90,0.15)' }}>
                         {ex}
                       </button>
                     ))}
@@ -879,7 +878,7 @@ export default function DeckBuilderPage() {
                       {examples.map((ex) => (
                         <button key={ex} onClick={() => tryExample(ex)}
                           className="font-body text-[11px] px-3 py-1 cursor-pointer"
-                          style={{ backgroundColor: '#111116', color, borderBottom: `2px solid ${color}30` }}>
+                          style={{ backgroundColor: '#111111', color, borderBottom: `2px solid ${color}30` }}>
                           {ex}
                         </button>
                       ))}
@@ -907,7 +906,7 @@ export default function DeckBuilderPage() {
               ].map(({ query, desc }) => (
                 <button key={query} onClick={() => tryExample(query)}
                   className="flex flex-col items-start text-left px-4 py-2.5 cursor-pointer"
-                  style={{ backgroundColor: '#0e0e12', borderLeft: '3px solid rgba(196,163,90,0.25)' }}>
+                  style={{ backgroundColor: '#0e0e0e', borderLeft: '3px solid rgba(196,163,90,0.25)' }}>
                   <span className="font-body text-[12px] font-medium" style={{ color: '#c4a35a' }}>{query}</span>
                   <span className="font-body text-[10px] mt-0.5" style={{ color: '#555' }}>{desc}</span>
                 </button>
@@ -1007,7 +1006,7 @@ export default function DeckBuilderPage() {
         {/* ── LEFT: Card Info Panel (always visible) ── */}
         <div className="flex flex-col flex-shrink-0" style={{
           width: '250px',
-          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderRight: '1px solid rgba(196, 163, 90, 0.12)',
         }}>
           <div className="px-3 pt-2 pb-1 flex-shrink-0 flex items-center gap-2">
@@ -1023,7 +1022,7 @@ export default function DeckBuilderPage() {
         <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
           {/* Header bar */}
           <div className="flex items-center gap-3 px-4 py-2 flex-shrink-0" style={{
-            backgroundColor: 'rgba(8, 8, 12, 0.9)',
+            backgroundColor: 'rgba(10, 10, 10, 0.9)',
             borderBottom: '1px solid rgba(255,255,255,0.04)',
           }}>
             <input
@@ -1069,7 +1068,7 @@ export default function DeckBuilderPage() {
 
           {/* Action bar */}
           <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
-            borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(8, 8, 12, 0.9)',
+            borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
           }}>
             <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
               {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
@@ -1092,7 +1091,7 @@ export default function DeckBuilderPage() {
         {/* ── RIGHT: Card Catalog ── */}
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
           width: '540px',
-          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
           {/* Search */}
@@ -1163,7 +1162,7 @@ export default function DeckBuilderPage() {
       <div className="lg:hidden flex flex-col relative z-10" style={{ height: '100vh' }}>
         {/* Top bar */}
         <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{
-          backgroundColor: 'rgba(8, 8, 12, 0.95)',
+          backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderBottom: '1px solid rgba(196, 163, 90, 0.12)',
         }}>
           <Link href="/" className="text-[10px] uppercase flex-shrink-0" style={{ color: '#555' }}>{t("common.back")}</Link>
@@ -1282,7 +1281,7 @@ export default function DeckBuilderPage() {
         {/* Mobile info strip */}
         {previewCard && (
           <div className="flex-shrink-0 cursor-pointer" style={{
-            backgroundColor: 'rgba(8, 8, 12, 0.98)',
+            backgroundColor: 'rgba(10, 10, 10, 0.98)',
             borderTop: '1px solid rgba(196,163,90,0.15)',
           }} onClick={() => setMobileInfoOpen(!mobileInfoOpen)}>
             <div className="flex items-center gap-2 px-3 py-2">
