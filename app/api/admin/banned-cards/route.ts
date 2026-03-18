@@ -12,9 +12,11 @@ export async function GET() {
       select: { cardId: true },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       bannedCardIds: bannedCards.map((b: { cardId: string }) => b.cardId),
     });
+    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return response;
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

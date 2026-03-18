@@ -140,6 +140,26 @@ function broadcastRoomList(io: SocketIOServer): void {
   io.emit('room:list-update', getPublicRoomList());
 }
 
+function broadcastActiveGames(io: SocketIOServer): void {
+  const activeGames: Array<{
+    roomCode: string; player1Name: string; player2Name: string;
+    spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
+  }> = [];
+  for (const [code, room] of rooms) {
+    if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+    activeGames.push({
+      roomCode: code,
+      player1Name: room.hostName ?? 'Player 1',
+      player2Name: room.guestName ?? 'Player 2',
+      spectatorCount: room.spectators.size,
+      turn: room.gameState.turn,
+      isRanked: room.isRanked,
+      isPrivate: room.isPrivate,
+    });
+  }
+  io.emit('games:list-update', { games: activeGames });
+}
+
 /**
  * Periodically clean stale public matchmaking rooms (no guest, no game, TTL expired).
  */
@@ -331,6 +351,9 @@ async function finalizeGameEnd(
       replayData,
     });
   }
+
+  // Update live games list for spectators
+  broadcastActiveGames(io);
 }
 
 /**
@@ -1076,6 +1099,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         io.to(code).emit('game:started');
         console.log(`[Socket] Game started event emitted to room ${code}`);
+        broadcastActiveGames(io);
 
         // Start action timer once game reaches action phase
         // (mulligan phase doesn't use the timer - timer starts on first action phase)
@@ -1391,6 +1415,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         io.to(room.guestSocket).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
       }
       io.to(code).emit('game:started');
+      broadcastActiveGames(io);
 
       if (room.gameState.phase === 'action') {
         startActionTimer(room, code, io);

@@ -12,6 +12,7 @@ export async function GET() {
     const decks = await prisma.deck.findMany({
       where: { userId: session.user.id },
       orderBy: [{ sortOrder: 'asc' }, { updatedAt: 'desc' }],
+      take: 50,
     });
 
     return NextResponse.json(decks);

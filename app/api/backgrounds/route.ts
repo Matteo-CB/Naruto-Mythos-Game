@@ -12,7 +12,9 @@ export async function GET() {
       select: { id: true, name: true, url: true },
     });
 
-    return NextResponse.json({ backgrounds });
+    const response = NextResponse.json({ backgrounds });
+    response.headers.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=600');
+    return response;
   } catch {
     return NextResponse.json({ backgrounds: [] });
   }

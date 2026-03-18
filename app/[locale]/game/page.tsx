@@ -101,6 +101,28 @@ export default function GamePage() {
     return unsub;
   }, [isSpectating, syncSpectatorState]);
 
+  // Spectator error or timeout — redirect home if state never arrives
+  useEffect(() => {
+    if (!isSpectating) return;
+    // If spectator has an error, redirect after brief delay
+    const socketState = useSocketStore.getState();
+    if (socketState.error) {
+      const timer = setTimeout(() => router.push('/'), 1500);
+      return () => clearTimeout(timer);
+    }
+    // If still no visibleState after 8s, redirect
+    if (!visibleState && !socketVisibleState) {
+      const timer = setTimeout(() => {
+        const ss = useSocketStore.getState();
+        const gs = useGameStore.getState();
+        if (!ss.visibleState && !gs.visibleState) {
+          router.push('/');
+        }
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSpectating, visibleState, socketVisibleState, socketError, router]);
+
   // Sync socket state updates to gameStore for online games
   useEffect(() => {
     if (isOnlineGame && socketGameStarted && socketVisibleState) {

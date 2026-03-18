@@ -48,8 +48,9 @@ export async function GET(
       status: 'completed' as const,
     };
 
-    // Get total game count + paginated games
-    const [totalGames, games] = await Promise.all([
+    // Get total game count + paginated games + replay IDs in parallel
+    // Don't load gameState (can be hundreds of KB per game) — only check existence
+    const [totalGames, games, gamesWithReplay] = await Promise.all([
       prisma.game.count({ where: gameFilter }),
       prisma.game.findMany({
         where: gameFilter,
@@ -64,17 +65,22 @@ export async function GET(
           player2Score: true,
           eloChange: true,
           completedAt: true,
-          gameState: true,
         },
         orderBy: { completedAt: 'desc' },
         skip: (page - 1) * perPage,
         take: perPage,
       }),
+      prisma.game.findMany({
+        where: { ...gameFilter, gameState: { not: null } },
+        select: { id: true },
+      }),
     ]);
 
-    const recentGames = games.map(({ gameState, ...rest }: { gameState: unknown; [key: string]: unknown }) => ({
-      ...rest,
-      hasReplay: gameState !== null,
+    const replayIds = new Set(gamesWithReplay.map((g) => g.id));
+
+    const recentGames = games.map((game) => ({
+      ...game,
+      hasReplay: replayIds.has(game.id),
     }));
 
     return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });
