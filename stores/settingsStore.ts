@@ -19,11 +19,31 @@ interface SettingsState {
 
 const DEFAULT_BG_URL = '/images/backgrounds/bg-game.webp';
 
+// Load cached backgrounds from localStorage for instant display
+function getCachedBackgrounds(): BackgroundOption[] {
+  try {
+    if (typeof window === 'undefined') return [];
+    const cached = localStorage.getItem('nmtcg-backgrounds');
+    if (cached) {
+      const { backgrounds, ts } = JSON.parse(cached);
+      // Use cache if less than 5 minutes old
+      if (Date.now() - ts < 300000 && Array.isArray(backgrounds)) return backgrounds;
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
+function cacheBackgrounds(backgrounds: BackgroundOption[]): void {
+  try {
+    localStorage.setItem('nmtcg-backgrounds', JSON.stringify({ backgrounds, ts: Date.now() }));
+  } catch { /* ignore */ }
+}
+
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
-  availableBackgrounds: [],
+  availableBackgrounds: getCachedBackgrounds(),
   isLoaded: false,
 
   fetchFromServer: async () => {
@@ -41,6 +61,9 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       // Resolve URL from backgrounds list
       const match = backgrounds.find((bg: { id: string }) => bg.id === bgId);
       const bgUrl = match?.url || DEFAULT_BG_URL;
+
+      // Cache for instant display on next page load
+      cacheBackgrounds(backgrounds);
 
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
