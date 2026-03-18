@@ -933,8 +933,8 @@ export default function DeckBuilderPage() {
               <div key={i} className="relative overflow-hidden cursor-pointer group"
                 style={{
                   width: '90px', height: '64px',
-                  backgroundColor: '#0e0e0e',
-                  border: m ? '1px solid rgba(196,163,90,0.2)' : '1px dashed rgba(255,255,255,0.08)',
+                  backgroundColor: '#0a0a0a',
+                  border: m ? '1px solid rgba(196,163,90,0.2)' : '1px solid rgba(255,255,255,0.04)',
                 }}
                 onClick={() => m && removeMission(i)}
                 onMouseEnter={() => m && setPreviewCard(m)}
@@ -948,9 +948,7 @@ export default function DeckBuilderPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-[9px]" style={{ color: '#333' }}>M{i + 1}</span>
-                  </div>
+                  <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.25 }} draggable={false} />
                 )}
               </div>
             );
@@ -973,7 +971,13 @@ export default function DeckBuilderPage() {
 
       {/* Character grid */}
       {deckChars.length === 0 ? (
-        <p className="text-[11px] italic mt-4" style={{ color: '#444' }}>{t("deckBuilder.clickToAdd")}</p>
+        <div className="grid gap-0.5 mt-2" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div key={i} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
+              <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.12 }} draggable={false} />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
           {deckChars.map((card, idx) => (
