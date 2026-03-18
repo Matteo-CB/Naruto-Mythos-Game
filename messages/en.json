@@ -956,6 +956,25 @@
       "clear": "Clear Filters",
       "resultsCount": "{count} cards"
     },
+    "search": {
+      "helpButton": "? Advanced Search",
+      "helpTitle": "Search Syntax",
+      "nameLabel": "Name / ID",
+      "nameDesc": "Type a character name or card ID directly",
+      "chakraLabel": "Chakra Cost (c)",
+      "chakraDesc": "Filter by chakra cost with operators",
+      "powerLabel": "Power (p)",
+      "powerDesc": "Filter by power with operators",
+      "keywordLabel": "Keyword (k)",
+      "keywordDesc": "Filter by card keyword (partial match)",
+      "groupLabel": "Group (g)",
+      "groupDesc": "Filter by village/group (partial match)",
+      "rarityLabel": "Rarity (r)",
+      "rarityDesc": "C, UC, R, RA, S, M",
+      "effectLabel": "Effect (e)",
+      "effectDesc": "MAIN, UPGRADE, AMBUSH, SCORE",
+      "combineTitle": "Combine filters:"
+    },
     "sort": {
       "byNumber": "Sort by Number",
       "byName": "Sort by Name",
