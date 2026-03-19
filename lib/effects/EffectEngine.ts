@@ -562,6 +562,7 @@ export class EffectEngine {
       isUpgrade,
       wasRevealed: wasRevealed ?? false,
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
+      selectingPlayer: result.selectingPlayer,
     };
 
     // Determine PendingAction type based on targetSelectionType
