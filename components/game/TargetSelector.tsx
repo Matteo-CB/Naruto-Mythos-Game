@@ -425,7 +425,9 @@ export function TargetSelector() {
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
   const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET') || eTst === 'GAARA120_CHOOSE_DEFEAT';
-  if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && visibleState && queuedOrderRef.current.length === 0) {
+  const maxSel = pendingTargetSelection.maxSelections;
+  const isMultiTargetEffect = maxSel === undefined || maxSel >= validTargets.length;
+  if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && isMultiTargetEffect && visibleState && queuedOrderRef.current.length === 0) {
     // Build order targets from visible state characters
     const orderTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }> = [];
     for (const targetId of validTargets) {

@@ -2739,6 +2739,7 @@ export class EffectEngine {
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'SCORE') return false;
+              if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
               if (eff.type === 'AMBUSH' && !k016WasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
@@ -2792,6 +2793,7 @@ export class EffectEngine {
             const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'SCORE') return false;
+              if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
               if (eff.type === 'AMBUSH' && !k016uWasRevealed) return false;
               if (eff.description.includes('[⧗]')) return false;
               if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
@@ -12473,7 +12475,7 @@ export class EffectEngine {
           ? k148Target.character.stack[k148Target.character.stack.length - 1]
           : k148Target.character.card;
 
-        // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH (not SCORE, not UPGRADE, not continuous)
+        // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH, UPGRADE (not SCORE, not continuous)
         const k148Copyable = (k148TopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'SCORE') return false; // SCORE never copyable
           if (eff.description.includes('[⧗]')) return false;
@@ -14001,11 +14003,13 @@ export class EffectEngine {
 
         // Copy effect filter:
         // - SCORE: never copyable
-        // - UPGRADE: never copyable (not instant effects)
+        // - UPGRADE: Kakashi 016 CANNOT copy, Sakon 062 CAN copy
         // - AMBUSH: only copyable if the copier was revealed from hidden
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
+        const isSakon062 = pendingEffect.sourceCardId === 'KS-062-UC';
         const copyableEffects = (copyTargetTopCard.effects ?? []).filter((eff) => {
           if (eff.type === 'SCORE') return false;
+          if (eff.type === 'UPGRADE' && !isSakon062) return false;
           if (eff.type === 'AMBUSH' && !copierWasRevealed) return false;
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
