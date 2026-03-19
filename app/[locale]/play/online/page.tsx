@@ -614,7 +614,7 @@ function LiveGamesSection() {
 
   const publicGames = activeGames.filter((g) => !g.isPrivate);
 
-  const handleSpectate = (game: typeof publicGames[0]) => {
+  const handleSpectate = async (game: typeof publicGames[0]) => {
     if (!session?.user?.id) return;
     // Clean up any previous spectating session first
     const ss = useSocketStore.getState();
@@ -623,11 +623,22 @@ function LiveGamesSection() {
     }
     // Also clear any stale game state from a previous spectate/game
     useGameStore.setState({ visibleState: null, gameState: null, gameOver: false, isOnlineGame: false });
+
+    // Ensure socket is connected before attempting to spectate
+    const { connected, connect } = useSocketStore.getState();
+    if (!connected) {
+      try {
+        await connect(session.user.id);
+      } catch {
+        return; // Connection failed
+      }
+    }
+
     // Small delay to let the leave propagate before joining new room
     setTimeout(() => {
       spectateGame(game.roomCode, session!.user!.id!, session!.user!.name ?? 'Spectator');
       router.push('/game' as '/');
-    }, 100);
+    }, 150);
   };
 
   return (

@@ -744,10 +744,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
   spectateGame: (roomCode: string, userId: string, username: string) => {
     const { socket, connected } = get();
-    if (socket && connected) {
-      socket.emit('spectate:join', { roomCode, userId, username });
-      set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
+    if (!socket || !connected) {
+      console.warn('[Socket] Cannot spectate: not connected');
+      set({ error: 'Not connected to server' });
+      return;
     }
+    console.log(`[Socket] Joining spectate for room ${roomCode}`);
+    socket.emit('spectate:join', { roomCode, userId, username });
+    set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
   },
 
   requestSpectateState: () => {
