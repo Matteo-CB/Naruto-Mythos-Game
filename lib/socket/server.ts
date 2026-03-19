@@ -865,7 +865,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         sealedBoosterCount: data.sealedBoosterCount ?? 6,
         sealedTimer: null,
         sealedDeadline: null,
-        timerEnabled: gameMode === 'ranked',
+        timerEnabled: gameMode === 'ranked' || (data.timerEnabled ?? false),
         coinFlipDone: { player1: false, player2: false },
         spectators: new Map(),
         chatMessages: [],
