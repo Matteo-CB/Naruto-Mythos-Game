@@ -189,13 +189,14 @@ export default function PlayOnlinePage() {
     );
   }
 
-  const handleCreatePublicRoom = async () => {
+  const handleCreatePublicRoom = async (mode?: GameMode) => {
     try {
       if (!connected) {
         await connect(session.user.id);
       }
-      const isRanked = selectedMode === 'ranked';
-      createRoom(session.user.id, false, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
+      const actualMode = mode ?? selectedMode;
+      const isRanked = actualMode === 'ranked';
+      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
       setIsPrivateRoom(false);
     } catch {
       // Error set in socket store
@@ -371,7 +372,7 @@ export default function PlayOnlinePage() {
                         </div>
                       )}
                     </div>
-                    <button onClick={() => { setSelectedMode('casual'); handleCreatePublicRoom(); }}
+                    <button onClick={() => { setSelectedMode('casual'); handleCreatePublicRoom('casual'); }}
                       className="w-full py-2.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
                       style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
                       {t('online.createPublicRoom')}
@@ -408,7 +409,7 @@ export default function PlayOnlinePage() {
                         </div>
                       )}
                     </div>
-                    <button onClick={() => { setSelectedMode('ranked'); handleCreatePublicRoom(); }}
+                    <button onClick={() => { setSelectedMode('ranked'); handleCreatePublicRoom('ranked'); }}
                       className="w-full py-2.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
                       style={{ backgroundColor: '#b33e3e', color: '#e0e0e0' }}>
                       {t('online.createPublicRoom')}
