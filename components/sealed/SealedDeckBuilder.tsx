@@ -157,11 +157,7 @@ export function SealedDeckBuilder({
     if (deckMissions.length !== MISSION_CARDS_PER_PLAYER) {
       errs.push(t('validation.missions', { count: deckMissions.length, required: MISSION_CARDS_PER_PLAYER }));
     }
-    for (const [version, count] of deckVersionCounts) {
-      if (count > MAX_COPIES_PER_VERSION) {
-        errs.push(t('validation.maxCopies', { version, count, max: MAX_COPIES_PER_VERSION }));
-      }
-    }
+    // In sealed mode, no copy limit — players use whatever they pulled from boosters
     return errs;
   }, [deckChars, deckMissions, deckVersionCounts, t]);
 
@@ -173,7 +169,7 @@ export function SealedDeckBuilder({
       const key = getVersionKey(card);
       const inDeck = deckVersionCounts.get(key) ?? 0;
       const inPool = poolAvailability.get(key) ?? 0;
-      return inDeck < MAX_COPIES_PER_VERSION && inDeck < inPool;
+      return inDeck < inPool; // No copy limit in sealed — can use all pulled copies
     },
     [deckVersionCounts, poolAvailability],
   );
@@ -230,10 +226,9 @@ export function SealedDeckBuilder({
     for (const c of characters) {
       const key = getVersionKey(c);
       const count = counts.get(key) ?? 0;
-      if (count < MAX_COPIES_PER_VERSION) {
-        chars.push(c);
-        counts.set(key, count + 1);
-      }
+      // No copy limit in sealed — add all available cards
+      chars.push(c);
+      counts.set(key, count + 1);
     }
     setDeckChars(chars);
 

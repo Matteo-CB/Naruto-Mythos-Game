@@ -75,8 +75,8 @@ function parseSearchQuery(raw: string): SearchFilter {
   const filter = emptyFilter();
   // Normalize commas to spaces so "c:4, k:Jutsu" works like "c:4 k:Jutsu"
   let normalized = raw.replace(/,\s*/g, ' ');
-  // Pre-process bracket syntax: e:[discard pile] → e:"discard pile"
-  normalized = normalized.replace(/(\w+):?\[([^\]]+)\]/g, '$1:"$2"');
+  // Pre-process bracket syntax: e:[discard pile] → e:"discard pile", k:[Team 7]+Jutsu → k:"Team 7+Jutsu"
+  normalized = normalized.replace(/(\w+):?\[([^\]]+)\](\+\S+)?/g, (_, key, content, suffix) => `${key}:"${content}${suffix ?? ''}"`);
 
   // Match tokens: optional - prefix, key, operator, value (quoted, bracketed, or word)
   const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgres])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
@@ -195,26 +195,36 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   const powerNeg = filter.power.filter((p) => p.negated);
   if (powerPos.length > 0 && !powerPos.some((p) => compareOp(card.power ?? 0, p.op, p.val))) return false;
   for (const p of powerNeg) { if (compareOp(card.power ?? 0, p.op, p.val)) return false; }
-  // Keywords
-  for (const kf of filter.keywords) {
+  // Keywords — OR for positives (from / split), AND for negatives
+  const kwPos = filter.keywords.filter((kf) => !kf.negated);
+  const kwNeg = filter.keywords.filter((kf) => kf.negated);
+  if (kwPos.length > 0) {
+    const cardKws = (card.keywords ?? []).map((kw) => normalizeStr(kw));
+    const anyMatch = kwPos.some((kf) => {
+      const allTerms = kf.terms.every((term) => cardKws.some((kw) => kw.includes(term)));
+      if (kf.exclusive) return cardKws.length === kf.terms.length && cardKws.every((kw) => kf.terms.some((t) => kw.includes(t)));
+      return allTerms;
+    });
+    if (!anyMatch) return false;
+  }
+  for (const kf of kwNeg) {
     const cardKws = (card.keywords ?? []).map((kw) => normalizeStr(kw));
     const allMatch = kf.terms.every((term) => cardKws.some((kw) => kw.includes(term)));
-    const exclusiveMatch = kf.exclusive
+    const matches = kf.exclusive
       ? cardKws.length === kf.terms.length && cardKws.every((kw) => kf.terms.some((t) => kw.includes(t)))
       : allMatch;
-    const matches = kf.exclusive ? exclusiveMatch : allMatch;
-    if (kf.negated ? matches : !matches) return false;
+    if (matches) return false;
   }
   // Set
   for (const s of filter.sets) {
     const has = card.id.toUpperCase().startsWith(s.value + '-');
     if (s.negated ? has : !has) return false;
   }
-  // Group
-  for (const g of filter.groups) {
-    const has = card.group && normalizeStr(card.group).includes(g.value);
-    if (g.negated ? has : !has) return false;
-  }
+  // Group — OR for positives, AND for negatives
+  const groupPos = filter.groups.filter((g) => !g.negated);
+  const groupNeg = filter.groups.filter((g) => g.negated);
+  if (groupPos.length > 0 && !groupPos.some((g) => card.group && normalizeStr(card.group).includes(g.value))) return false;
+  for (const g of groupNeg) { if (card.group && normalizeStr(card.group).includes(g.value)) return false; }
   // Rarity — OR within positives
   const rarPos = filter.rarities.filter((r) => !r.negated);
   const rarNeg = filter.rarities.filter((r) => r.negated);
@@ -225,41 +235,21 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   const effNeg = filter.effects.filter((e) => e.negated);
   if (effPos.length > 0 && !card.effects?.some((e) => effPos.some((f) => f.value === e.type))) return false;
   for (const e of effNeg) { if (card.effects?.some((ef) => ef.type === e.value)) return false; }
-  // Effect text search (any effect)
-  for (const t of filter.effectText) {
-    const has = card.effects?.some((e) => normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // em: MAIN text
-  for (const t of filter.effectMainText) {
-    const has = card.effects?.some((e) => e.type === 'MAIN' && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // emi: MAIN instant (no [⧗])
-  for (const t of filter.effectMainInstantText) {
-    const has = card.effects?.some((e) => e.type === 'MAIN' && !e.description.includes('[⧗]') && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // emc: MAIN continuous (with [⧗])
-  for (const t of filter.effectMainContinuousText) {
-    const has = card.effects?.some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // eup: UPGRADE text
-  for (const t of filter.effectUpgradeText) {
-    const has = card.effects?.some((e) => e.type === 'UPGRADE' && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // ea: AMBUSH text
-  for (const t of filter.effectAmbushText) {
-    const has = card.effects?.some((e) => e.type === 'AMBUSH' && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
-  // es: SCORE text
-  for (const t of filter.effectScoreText) {
-    const has = card.effects?.some((e) => e.type === 'SCORE' && normalizeStr(e.description).includes(t.value));
-    if (t.negated ? has : !has) return false;
-  }
+  // Effect text search — OR for positives, AND for negatives (applies to all effect text filters)
+  const matchEffText = (entries: typeof filter.effectText, predicate: (e: { type: string; description: string }) => boolean) => {
+    const pos = entries.filter((t) => !t.negated);
+    const neg = entries.filter((t) => t.negated);
+    if (pos.length > 0 && !pos.some((t) => card.effects?.some((e) => predicate(e) && normalizeStr(e.description).includes(t.value)))) return false;
+    for (const t of neg) { if (card.effects?.some((e) => predicate(e) && normalizeStr(e.description).includes(t.value))) return false; }
+    return true;
+  };
+  if (!matchEffText(filter.effectText, () => true)) return false;
+  if (!matchEffText(filter.effectMainText, (e) => e.type === 'MAIN')) return false;
+  if (!matchEffText(filter.effectMainInstantText, (e) => e.type === 'MAIN' && !e.description.includes('[⧗]'))) return false;
+  if (!matchEffText(filter.effectMainContinuousText, (e) => e.type === 'MAIN' && e.description.includes('[⧗]'))) return false;
+  if (!matchEffText(filter.effectUpgradeText, (e) => e.type === 'UPGRADE')) return false;
+  if (!matchEffText(filter.effectAmbushText, (e) => e.type === 'AMBUSH')) return false;
+  if (!matchEffText(filter.effectScoreText, (e) => e.type === 'SCORE')) return false;
   return true;
 }
 
@@ -851,6 +841,7 @@ export default function DeckBuilderPage() {
   //  SEARCH HELP POPUP
   // ═════════════════════════════════════════════════════
   const [showSearchHelp, setShowSearchHelp] = useState(false);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const searchFilters = [
     // Stats (0-1)
@@ -1261,6 +1252,45 @@ export default function DeckBuilderPage() {
               >
                 ?
               </button>
+              {/* Sort dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortDropdown((v) => !v)}
+                  className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+                  style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+                >
+                  {'\u21C5'}
+                </button>
+                {showSortDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
+                      style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '130px' }}>
+                      {([
+                        { key: 'number' as SortField, label: '#' },
+                        { key: 'name' as SortField, label: 'Name' },
+                        { key: 'chakra' as SortField, label: 'Chakra' },
+                        { key: 'power' as SortField, label: 'Power' },
+                        { key: 'rarity' as SortField, label: 'Rarity' },
+                      ]).map((opt) => (
+                        <button
+                          key={opt.key}
+                          onClick={() => {
+                            if (sortBy === opt.key) setSortOrder((o) => o === 'asc' ? 'desc' : 'asc');
+                            else { setSortBy(opt.key); setSortOrder('asc'); }
+                            setShowSortDropdown(false);
+                          }}
+                          className="px-3 py-1.5 text-[10px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
+                          style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}
+                        >
+                          <span>{opt.label}</span>
+                          {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             <div className="text-[8px] mt-1" style={{ color: '#444' }}>
               {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
@@ -1350,6 +1380,40 @@ export default function DeckBuilderPage() {
                 >
                   ?
                 </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSortDropdown((v) => !v)}
+                    className="font-body text-[10px] font-bold px-2.5 py-1.5 cursor-pointer shrink-0"
+                    style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+                  >{'\u21C5'}</button>
+                  {showSortDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setShowSortDropdown(false)} />
+                      <div className="absolute right-0 top-full mt-1 z-40 flex flex-col rounded overflow-hidden"
+                        style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', minWidth: '120px' }}>
+                        {([
+                          { key: 'number' as SortField, label: '#' },
+                          { key: 'name' as SortField, label: 'Name' },
+                          { key: 'chakra' as SortField, label: 'Chakra' },
+                          { key: 'power' as SortField, label: 'Power' },
+                          { key: 'rarity' as SortField, label: 'Rarity' },
+                        ]).map((opt) => (
+                          <button key={opt.key}
+                            onClick={() => {
+                              if (sortBy === opt.key) setSortOrder((o) => o === 'asc' ? 'desc' : 'asc');
+                              else { setSortBy(opt.key); setSortOrder('asc'); }
+                              setShowSortDropdown(false);
+                            }}
+                            className="px-3 py-1.5 text-[10px] text-left hover:bg-[#262626] transition-colors flex items-center justify-between"
+                            style={{ color: sortBy === opt.key ? '#c4a35a' : '#ccc' }}>
+                            <span>{opt.label}</span>
+                            {sortBy === opt.key && <span>{sortOrder === 'asc' ? '\u2191' : '\u2193'}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="text-[8px] mb-2" style={{ color: '#444' }}>
                 {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}

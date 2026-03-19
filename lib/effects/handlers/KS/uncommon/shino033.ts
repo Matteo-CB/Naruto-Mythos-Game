@@ -15,7 +15,7 @@ import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
  */
 
 function handleShino033Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex } = ctx;
+  const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -33,14 +33,17 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
   });
 
   if (hasEnemyJutsu) {
-    const log = logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT',
-      'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
-      'game.log.effect.shino033CostReduction',
-      { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
-    );
-    return { state: { ...state, log } };
+    // Show CONFIRM popup like other instant AMBUSH effects
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SHINO033_CONFIRM_AMBUSH',
+      validTargets: [sourceCard.instanceId],
+      isOptional: false,
+      isMandatory: true,
+      description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
+      descriptionKey: 'game.effect.desc.shino033ConfirmAmbush',
+    };
   }
 
   return { state };

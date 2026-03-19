@@ -3626,6 +3626,18 @@ export class EffectEngine {
         break;
       }
 
+      case 'SHINO033_CONFIRM_AMBUSH': {
+        // Shino 033 AMBUSH confirmed — log the cost reduction (already applied by ChakraValidation)
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT',
+          'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
+          'game.log.effect.shino033CostReduction',
+          { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
+        );
+        break;
+      }
+
       case 'SHINO033_CONFIRM_UPGRADE': {
         // Re-find valid destination missions (not current, no same-name, R8 Kurenai)
         const s033SrcMI = pendingEffect.sourceMissionIndex;
