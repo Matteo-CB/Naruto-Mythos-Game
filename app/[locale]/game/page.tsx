@@ -54,11 +54,9 @@ export default function GamePage() {
     if (!hasActiveGame) {
       // Give a brief delay before redirecting - state may be propagating
       redirectTimerRef.current = setTimeout(() => {
-        if (!useGameStore.getState().visibleState && !useGameStore.getState().gameState && !useSocketStore.getState().isSpectating) {
-          // Clean up any lingering spectator state before redirect
-          if (useSocketStore.getState().isSpectating) {
-            useSocketStore.getState().leaveSpectating();
-          }
+        const gs = useGameStore.getState();
+        const ss = useSocketStore.getState();
+        if (!gs.visibleState && !gs.gameState && !ss.isSpectating) {
           router.push('/');
         }
       }, 5000);
@@ -129,26 +127,26 @@ export default function GamePage() {
     }
     // No state anywhere — request from server
     const timer = setTimeout(() => {
-      if (spectateRetryRef.current >= 3) {
-        // Give up after 3 retries (6s total)
+      if (spectateRetryRef.current >= 5) {
+        // Give up after 5 retries (15s total)
         useSocketStore.getState().leaveSpectating();
         router.push('/');
         return;
       }
       spectateRetryRef.current += 1;
       useSocketStore.getState().requestSpectateState();
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [isSpectating, visibleState, socketVisibleState, router, syncSpectatorState]);
 
-  // Sync socket state updates to gameStore for online games
+  // Sync socket state updates to gameStore for online games (NOT spectators)
   useEffect(() => {
-    if (isOnlineGame && socketGameStarted && socketVisibleState) {
+    if (isOnlineGame && socketGameStarted && socketVisibleState && !isSpectating) {
       console.log('[GamePage] Syncing socket state to gameStore, phase:', socketVisibleState.phase,
         'hand:', socketVisibleState.myState?.hand?.length ?? 0);
       updateOnlineState(socketVisibleState);
     }
-  }, [isOnlineGame, socketGameStarted, socketVisibleState, updateOnlineState]);
+  }, [isOnlineGame, socketGameStarted, socketVisibleState, updateOnlineState, isSpectating]);
 
   // Handle game ended for online games
   useEffect(() => {
@@ -203,6 +201,15 @@ export default function GamePage() {
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
 
   if (!hasActiveGame) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <p className="text-[#888888]">{t('loading')}</p>
+      </div>
+    );
+  }
+
+  // Spectator joined but state hasn't synced to gameStore yet — show loading
+  if (isSpectating && !visibleState) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
         <p className="text-[#888888]">{t('loading')}</p>

@@ -38,84 +38,118 @@ const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\
 interface KeywordFilter {
   terms: string[];  // all must match (AND)
   exclusive: boolean; // true = card must have ONLY these keywords
+  negated: boolean;
 }
 
+interface NumFilter { op: '=' | '>' | '>=' | '<' | '<='; val: number; negated: boolean }
+
 interface SearchFilter {
-  nameQuery: string;
-  chakra: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
-  power: Array<{ op: '=' | '>' | '>=' | '<' | '<='; val: number }>;
+  nameQueries: Array<{ text: string; negated: boolean }>; // OR segments via /
+  chakra: NumFilter[];
+  power: NumFilter[];
   keywords: KeywordFilter[];
-  groups: string[];
-  rarities: string[];
-  sets: string[];
-  effects: string[];
-  effectText: string[];
-  effectMainText: string[];
-  effectUpgradeText: string[];
-  effectAmbushText: string[];
-  effectScoreText: string[];
+  groups: Array<{ value: string; negated: boolean }>;
+  rarities: Array<{ value: string; negated: boolean }>;
+  sets: Array<{ value: string; negated: boolean }>;
+  effects: Array<{ value: string; negated: boolean }>;
+  effectText: Array<{ value: string; negated: boolean }>;
+  effectMainText: Array<{ value: string; negated: boolean }>;
+  effectMainInstantText: Array<{ value: string; negated: boolean }>;
+  effectMainContinuousText: Array<{ value: string; negated: boolean }>;
+  effectUpgradeText: Array<{ value: string; negated: boolean }>;
+  effectAmbushText: Array<{ value: string; negated: boolean }>;
+  effectScoreText: Array<{ value: string; negated: boolean }>;
+  nameVersions: Array<{ value: string; negated: boolean }>;
+}
+
+function emptyFilter(): SearchFilter {
+  return {
+    nameQueries: [], chakra: [], power: [], keywords: [], groups: [],
+    rarities: [], sets: [], effects: [], effectText: [],
+    effectMainText: [], effectMainInstantText: [], effectMainContinuousText: [],
+    effectUpgradeText: [], effectAmbushText: [], effectScoreText: [], nameVersions: [],
+  };
 }
 
 function parseSearchQuery(raw: string): SearchFilter {
-  const filter: SearchFilter = {
-    nameQuery: '', chakra: [], power: [], keywords: [], groups: [],
-    rarities: [], sets: [], effects: [], effectText: [],
-    effectMainText: [], effectUpgradeText: [], effectAmbushText: [], effectScoreText: [],
-  };
+  const filter = emptyFilter();
   // Normalize commas to spaces so "c:4, k:Jutsu" works like "c:4 k:Jutsu"
-  const normalized = raw.replace(/,\s*/g, ' ');
-  // Match typed effect tokens: em:, eup:, ea:, es:, e:
-  // Match other tokens: c, p, k, g, r, s
-  const tokenRegex = /(eup|em|ea|es|[cpkgres])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
+  let normalized = raw.replace(/,\s*/g, ' ');
+  // Pre-process bracket syntax: e:[discard pile] → e:"discard pile"
+  normalized = normalized.replace(/(\w+):?\[([^\]]+)\]/g, '$1:"$2"');
+
+  // Match tokens: optional - prefix, key, operator, value (quoted, bracketed, or word)
+  const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgres])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
   let remaining = normalized;
 
   let match: RegExpExecArray | null;
   while ((match = tokenRegex.exec(normalized)) !== null) {
-    const key = match[1].toLowerCase();
-    const op = match[2] === ':' ? '=' : match[2];
-    const value = match[4] ?? match[5];
+    const negated = match[1] === '-';
+    const key = match[2].toLowerCase();
+    const op = match[3] === ':' ? '=' : match[3];
+    const value = match[5] ?? match[6];
     remaining = remaining.replace(match[0], '');
 
-    switch (key) {
-      case 'c': {
-        const num = parseInt(value, 10);
-        if (!isNaN(num)) filter.chakra.push({ op: op as '=' | '>' | '>=' | '<' | '<=', val: num });
-        break;
-      }
-      case 'p': {
-        const num = parseInt(value, 10);
-        if (!isNaN(num)) filter.power.push({ op: op as '=' | '>' | '>=' | '<' | '<=', val: num });
-        break;
-      }
-      case 'k': {
-        // k:!Jutsu = exclusive (ONLY Jutsu)
-        // k:Jutsu+Team 7 = AND (must have both — "Team 7" contains space but + joins)
-        const exclusive = value.startsWith('!');
-        const cleanVal = exclusive ? value.slice(1) : value;
-        const terms = cleanVal.split('+').map((t) => normalizeStr(t.trim())).filter(Boolean);
-        if (terms.length > 0) filter.keywords.push({ terms, exclusive });
-        break;
-      }
-      case 'g': filter.groups.push(normalizeStr(value)); break;
-      case 'r': filter.rarities.push(value.toUpperCase()); break;
-      case 's': filter.sets.push(value.toUpperCase()); break;
-      case 'e': {
-        const upper = value.toUpperCase();
-        if (['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'].includes(upper)) {
-          filter.effects.push(upper);
-        } else {
-          filter.effectText.push(normalizeStr(value));
+    // Handle / (OR) within value — split into multiple entries
+    const values = value.split('/').map((v) => v.trim()).filter(Boolean);
+
+    for (const val of values) {
+      switch (key) {
+        case 'c': {
+          const num = parseInt(val, 10);
+          if (!isNaN(num)) filter.chakra.push({ op: op as NumFilter['op'], val: num, negated });
+          break;
         }
-        break;
+        case 'p': {
+          const num = parseInt(val, 10);
+          if (!isNaN(num)) filter.power.push({ op: op as NumFilter['op'], val: num, negated });
+          break;
+        }
+        case 'k': {
+          const exclusive = val.startsWith('!');
+          const cleanVal = exclusive ? val.slice(1) : val;
+          const terms = cleanVal.split('+').map((t) => normalizeStr(t.trim())).filter(Boolean);
+          if (terms.length > 0) filter.keywords.push({ terms, exclusive, negated });
+          break;
+        }
+        case 'g': filter.groups.push({ value: normalizeStr(val), negated }); break;
+        case 'r': filter.rarities.push({ value: val.toUpperCase(), negated }); break;
+        case 's': filter.sets.push({ value: val.toUpperCase(), negated }); break;
+        case 'nv': filter.nameVersions.push({ value: normalizeStr(val), negated }); break;
+        case 'e': {
+          const upper = val.toUpperCase();
+          if (['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'].includes(upper)) {
+            filter.effects.push({ value: upper, negated });
+          } else {
+            filter.effectText.push({ value: normalizeStr(val), negated });
+          }
+          break;
+        }
+        case 'em': filter.effectMainText.push({ value: normalizeStr(val), negated }); break;
+        case 'emi': filter.effectMainInstantText.push({ value: normalizeStr(val), negated }); break;
+        case 'emc': filter.effectMainContinuousText.push({ value: normalizeStr(val), negated }); break;
+        case 'eup': filter.effectUpgradeText.push({ value: normalizeStr(val), negated }); break;
+        case 'ea': filter.effectAmbushText.push({ value: normalizeStr(val), negated }); break;
+        case 'es': filter.effectScoreText.push({ value: normalizeStr(val), negated }); break;
       }
-      case 'em': filter.effectMainText.push(normalizeStr(value)); break;
-      case 'eup': filter.effectUpgradeText.push(normalizeStr(value)); break;
-      case 'ea': filter.effectAmbushText.push(normalizeStr(value)); break;
-      case 'es': filter.effectScoreText.push(normalizeStr(value)); break;
     }
   }
 
-  filter.nameQuery = normalizeStr(remaining.trim());
+  // Parse remaining text for name queries — support / (OR) and - (negate)
+  const leftover = remaining.trim();
+  if (leftover) {
+    // Split by / for OR segments
+    const segments = leftover.split(/\s*\/\s*/);
+    for (const seg of segments) {
+      const trimmed = seg.trim();
+      if (!trimmed) continue;
+      if (trimmed.startsWith('-') && trimmed.length > 1) {
+        filter.nameQueries.push({ text: normalizeStr(trimmed.slice(1)), negated: true });
+      } else {
+        filter.nameQueries.push({ text: normalizeStr(trimmed), negated: false });
+      }
+    }
+  }
   return filter;
 }
 
@@ -131,70 +165,100 @@ function compareOp(actual: number, op: string, target: number): boolean {
 }
 
 function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: string): boolean {
-  // Name / title / ID
-  if (filter.nameQuery) {
-    const q = filter.nameQuery;
-    const matchesName = normalizeStr(getCardName(card, locale as 'en' | 'fr')).includes(q) ||
-      normalizeStr(getCardTitle(card, locale as 'en' | 'fr')).includes(q) ||
-      normalizeStr(card.name_fr).includes(q) ||
-      card.id.toLowerCase().includes(q);
-    if (!matchesName) return false;
+  // Name / ID (NOT title — title is via nv: only)
+  if (filter.nameQueries.length > 0) {
+    const positives = filter.nameQueries.filter((q) => !q.negated);
+    const negatives = filter.nameQueries.filter((q) => q.negated);
+    const nameStr = normalizeStr(getCardName(card, locale as 'en' | 'fr'));
+    const nameFr = normalizeStr(card.name_fr);
+    const idStr = card.id.toLowerCase();
+    const matchesAny = (q: string) => nameStr.includes(q) || nameFr.includes(q) || idStr.includes(q);
+    // Positives: at least one must match (OR via /)
+    if (positives.length > 0 && !positives.some((q) => matchesAny(q.text))) return false;
+    // Negatives: none must match
+    for (const q of negatives) { if (matchesAny(q.text)) return false; }
   }
-  // Chakra
-  for (const c of filter.chakra) {
-    if (!compareOp(card.chakra ?? 0, c.op, c.val)) return false;
+  // Name version (nv:)
+  for (const nv of filter.nameVersions) {
+    const titleStr = normalizeStr(getCardTitle(card, locale as 'en' | 'fr'));
+    const titleFr = normalizeStr(card.title_fr ?? '');
+    const has = titleStr.includes(nv.value) || titleFr.includes(nv.value);
+    if (nv.negated ? has : !has) return false;
   }
+  // Chakra — OR within same / group, AND between groups
+  const chakraPos = filter.chakra.filter((c) => !c.negated);
+  const chakraNeg = filter.chakra.filter((c) => c.negated);
+  if (chakraPos.length > 0 && !chakraPos.some((c) => compareOp(card.chakra ?? 0, c.op, c.val))) return false;
+  for (const c of chakraNeg) { if (compareOp(card.chakra ?? 0, c.op, c.val)) return false; }
   // Power
-  for (const p of filter.power) {
-    if (!compareOp(card.power ?? 0, p.op, p.val)) return false;
-  }
+  const powerPos = filter.power.filter((p) => !p.negated);
+  const powerNeg = filter.power.filter((p) => p.negated);
+  if (powerPos.length > 0 && !powerPos.some((p) => compareOp(card.power ?? 0, p.op, p.val))) return false;
+  for (const p of powerNeg) { if (compareOp(card.power ?? 0, p.op, p.val)) return false; }
   // Keywords
   for (const kf of filter.keywords) {
     const cardKws = (card.keywords ?? []).map((kw) => normalizeStr(kw));
-    // All terms must match
-    for (const term of kf.terms) {
-      if (!cardKws.some((kw) => kw.includes(term))) return false;
-    }
-    // Exclusive: card must ONLY have these keywords (no others)
-    if (kf.exclusive) {
-      if (cardKws.length !== kf.terms.length) return false;
-      for (const kw of cardKws) {
-        if (!kf.terms.some((t) => kw.includes(t))) return false;
-      }
-    }
+    const allMatch = kf.terms.every((term) => cardKws.some((kw) => kw.includes(term)));
+    const exclusiveMatch = kf.exclusive
+      ? cardKws.length === kf.terms.length && cardKws.every((kw) => kf.terms.some((t) => kw.includes(t)))
+      : allMatch;
+    const matches = kf.exclusive ? exclusiveMatch : allMatch;
+    if (kf.negated ? matches : !matches) return false;
   }
   // Set
   for (const s of filter.sets) {
-    if (!card.id.toUpperCase().startsWith(s + '-')) return false;
+    const has = card.id.toUpperCase().startsWith(s.value + '-');
+    if (s.negated ? has : !has) return false;
   }
   // Group
   for (const g of filter.groups) {
-    if (!card.group || !normalizeStr(card.group).includes(g)) return false;
+    const has = card.group && normalizeStr(card.group).includes(g.value);
+    if (g.negated ? has : !has) return false;
   }
-  // Rarity
-  if (filter.rarities.length > 0) {
-    if (!filter.rarities.includes(card.rarity)) return false;
-  }
-  // Effect type
-  if (filter.effects.length > 0) {
-    if (!card.effects?.some((e) => filter.effects.includes(e.type))) return false;
-  }
+  // Rarity — OR within positives
+  const rarPos = filter.rarities.filter((r) => !r.negated);
+  const rarNeg = filter.rarities.filter((r) => r.negated);
+  if (rarPos.length > 0 && !rarPos.some((r) => card.rarity === r.value)) return false;
+  for (const r of rarNeg) { if (card.rarity === r.value) return false; }
+  // Effect type — OR within positives
+  const effPos = filter.effects.filter((e) => !e.negated);
+  const effNeg = filter.effects.filter((e) => e.negated);
+  if (effPos.length > 0 && !card.effects?.some((e) => effPos.some((f) => f.value === e.type))) return false;
+  for (const e of effNeg) { if (card.effects?.some((ef) => ef.type === e.value)) return false; }
   // Effect text search (any effect)
   for (const t of filter.effectText) {
-    if (!card.effects?.some((e) => normalizeStr(e.description).includes(t))) return false;
+    const has = card.effects?.some((e) => normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
   }
-  // Typed effect text: em: (MAIN), eup: (UPGRADE), ea: (AMBUSH), es: (SCORE)
+  // em: MAIN text
   for (const t of filter.effectMainText) {
-    if (!card.effects?.some((e) => e.type === 'MAIN' && normalizeStr(e.description).includes(t))) return false;
+    const has = card.effects?.some((e) => e.type === 'MAIN' && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
   }
+  // emi: MAIN instant (no [⧗])
+  for (const t of filter.effectMainInstantText) {
+    const has = card.effects?.some((e) => e.type === 'MAIN' && !e.description.includes('[⧗]') && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
+  }
+  // emc: MAIN continuous (with [⧗])
+  for (const t of filter.effectMainContinuousText) {
+    const has = card.effects?.some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
+  }
+  // eup: UPGRADE text
   for (const t of filter.effectUpgradeText) {
-    if (!card.effects?.some((e) => e.type === 'UPGRADE' && normalizeStr(e.description).includes(t))) return false;
+    const has = card.effects?.some((e) => e.type === 'UPGRADE' && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
   }
+  // ea: AMBUSH text
   for (const t of filter.effectAmbushText) {
-    if (!card.effects?.some((e) => e.type === 'AMBUSH' && normalizeStr(e.description).includes(t))) return false;
+    const has = card.effects?.some((e) => e.type === 'AMBUSH' && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
   }
+  // es: SCORE text
   for (const t of filter.effectScoreText) {
-    if (!card.effects?.some((e) => e.type === 'SCORE' && normalizeStr(e.description).includes(t))) return false;
+    const has = card.effects?.some((e) => e.type === 'SCORE' && normalizeStr(e.description).includes(t.value));
+    if (t.negated ? has : !has) return false;
   }
   return true;
 }
@@ -789,17 +853,23 @@ export default function DeckBuilderPage() {
   const [showSearchHelp, setShowSearchHelp] = useState(false);
 
   const searchFilters = [
+    // Stats (0-1)
     { key: 'c', label: t('deckBuilder.search.chakraLabel'), desc: t('deckBuilder.search.chakraDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['c:4', 'c>3', 'c<=5'] },
     { key: 'p', label: t('deckBuilder.search.powerLabel'), desc: t('deckBuilder.search.powerDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['p:5', 'p>=3', 'p<2'] },
+    // Card Properties (2-8)
     { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin'] },
     { key: 'k', label: t('deckBuilder.search.keywordAndLabel'), desc: t('deckBuilder.search.keywordAndDesc'), ops: [':'], examples: ['k:Jutsu+Team 7'] },
     { key: 'k', label: t('deckBuilder.search.keywordOnlyLabel'), desc: t('deckBuilder.search.keywordOnlyDesc'), ops: [':'], examples: ['k:!Jutsu', 'k:!Summon'] },
     { key: 'g', label: t('deckBuilder.search.groupLabel'), desc: t('deckBuilder.search.groupDesc'), ops: [':'], examples: ['g:Leaf', 'g:Akatsuki'] },
-    { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M'] },
+    { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M', 'r:SV', 'r:MV'] },
     { key: 's', label: t('deckBuilder.search.setLabel'), desc: t('deckBuilder.search.setDesc'), ops: [':'], examples: ['s:KS'] },
+    { key: 'nv', label: t('deckBuilder.search.nvLabel'), desc: t('deckBuilder.search.nvDesc'), ops: [':'], examples: ['nv:Hokage', 'nv:Rasengan'] },
+    // Effects (9+)
     { key: 'e', label: t('deckBuilder.search.effectTypeLabel'), desc: t('deckBuilder.search.effectTypeDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE'] },
-    { key: 'e', label: t('deckBuilder.search.effectTextLabel'), desc: t('deckBuilder.search.effectTextDesc'), ops: [':'], examples: ['e:move', 'e:hide', 'e:defeat'] },
+    { key: 'e', label: t('deckBuilder.search.effectTextLabel'), desc: t('deckBuilder.search.effectTextDesc'), ops: [':'], examples: ['e:move', 'e:[discard pile]'] },
     { key: 'em', label: t('deckBuilder.search.emLabel'), desc: t('deckBuilder.search.emDesc'), ops: [':'], examples: ['em:hide', 'em:defeat'] },
+    { key: 'emi', label: t('deckBuilder.search.emiLabel'), desc: t('deckBuilder.search.emiDesc'), ops: [':'], examples: ['emi:hide', 'emi:defeat'] },
+    { key: 'emc', label: t('deckBuilder.search.emcLabel'), desc: t('deckBuilder.search.emcDesc'), ops: [':'], examples: ['emc:power', 'emc:chakra'] },
     { key: 'eup', label: t('deckBuilder.search.eupLabel'), desc: t('deckBuilder.search.eupDesc'), ops: [':'], examples: ['eup:move', 'eup:play'] },
     { key: 'ea', label: t('deckBuilder.search.eaLabel'), desc: t('deckBuilder.search.eaDesc'), ops: [':'], examples: ['ea:move', 'ea:look'] },
     { key: 'es', label: t('deckBuilder.search.esLabel'), desc: t('deckBuilder.search.esDesc'), ops: [':'], examples: ['es:draw', 'es:chakra'] },
@@ -811,8 +881,8 @@ export default function DeckBuilderPage() {
 
   // Group filters for display: Stats | Card Properties | Effects
   const statsFilters = searchFilters.slice(0, 2);   // c, p
-  const cardFilters = searchFilters.slice(2, 8);     // k, k+, k!, g, r, s
-  const effectFilters = searchFilters.slice(8);       // e, e text, em, eup, ea, es
+  const cardFilters = searchFilters.slice(2, 9);     // k, k+, k!, g, r, s, nv
+  const effectFilters = searchFilters.slice(9);       // e, e text, em, emi, emc, eup, ea, es
 
   const renderFilterRow = ({ key, label, desc, examples }: typeof searchFilters[0], i: number, color = '#c4a35a') => (
     <div key={`${key}-${i}`} className="mb-2.5">
@@ -916,7 +986,7 @@ export default function DeckBuilderPage() {
                   Effects
                 </span>
                 {effectFilters.map((f, i) => {
-                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
+                  const keyColors: Record<string, string> = { e: '#c4a35a', em: '#c4a35a', emi: '#c4a35a', emc: '#888', eup: '#3e8b3e', ea: '#b33e3e', es: '#6a6abb' };
                   return renderFilterRow(f, i, keyColors[f.key] ?? '#b33e3e');
                 })}
               </div>
@@ -932,12 +1002,15 @@ export default function DeckBuilderPage() {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {[
-                  { query: 'naruto c>=3, k:Jutsu', desc: t('deckBuilder.search.example1') },
-                  { query: 'g:Leaf p>4, e:AMBUSH', desc: t('deckBuilder.search.example2') },
+                  { query: 'naruto / sasuke', desc: t('deckBuilder.search.exampleOr') },
+                  { query: 'c<=4, -g:Leaf', desc: t('deckBuilder.search.exampleNegate') },
+                  { query: 'c:2/5 k:Jutsu', desc: t('deckBuilder.search.exampleOrCost') },
+                  { query: 'nv:Hokage', desc: t('deckBuilder.search.exampleNv') },
+                  { query: 'emi:defeat', desc: t('deckBuilder.search.exampleEmi') },
+                  { query: 'e:[discard pile]', desc: t('deckBuilder.search.exampleBracket') },
                   { query: 'k:Jutsu+Team 7', desc: t('deckBuilder.search.example5') },
                   { query: 'eup:move g:Leaf', desc: t('deckBuilder.search.example4') },
                   { query: 'k:!Summon', desc: t('deckBuilder.search.example6') },
-                  { query: 'c<=2 r:UC s:KS', desc: t('deckBuilder.search.example3') },
                 ].map(({ query, desc }) => (
                   <button key={query} onClick={() => tryExample(query)}
                     className="flex flex-col items-start text-left px-4 py-2 cursor-pointer"
@@ -1186,7 +1259,18 @@ export default function DeckBuilderPage() {
                 className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
                 style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
               >
-                {t('deckBuilder.search.helpButton')}
+                ?
+              </button>
+              <button
+                onClick={() => {
+                  const fields: SortField[] = ['number', 'name', 'chakra', 'power', 'rarity'];
+                  const idx = fields.indexOf(sortBy);
+                  setSortBy(fields[(idx + 1) % fields.length]);
+                }}
+                className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
+              >
+                {t("deckBuilder.sort")}
               </button>
             </div>
             <div className="text-[8px] mt-1" style={{ color: '#444' }}>

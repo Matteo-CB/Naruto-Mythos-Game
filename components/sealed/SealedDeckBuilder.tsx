@@ -143,9 +143,9 @@ export function SealedDeckBuilder({
     return counts;
   }, [deckChars]);
 
-  // Count missions in deck by ID
-  const deckMissionIds = useMemo(() => {
-    return new Set(deckMissions.map((m) => m.id));
+  // Track missions in deck by sealedInstanceId (allows duplicates of same mission card)
+  const deckMissionInstanceIds = useMemo(() => {
+    return new Set(deckMissions.map((m) => m.sealedInstanceId));
   }, [deckMissions]);
 
   // Validation
@@ -178,13 +178,13 @@ export function SealedDeckBuilder({
     [deckVersionCounts, poolAvailability],
   );
 
-  // Can add this mission to the deck?
+  // Can add this mission to the deck? (sealed allows duplicate mission cards)
   const canAddMission = useCallback(
     (card: BoosterCard) => {
       if (deckMissions.length >= MISSION_CARDS_PER_PLAYER) return false;
-      return !deckMissionIds.has(card.id);
+      return !deckMissionInstanceIds.has(card.sealedInstanceId);
     },
-    [deckMissions.length, deckMissionIds],
+    [deckMissions.length, deckMissionInstanceIds],
   );
 
   // Add character to deck
@@ -237,17 +237,8 @@ export function SealedDeckBuilder({
     }
     setDeckChars(chars);
 
-    // Select first 3 unique missions
-    const miss: BoosterCard[] = [];
-    const mIds = new Set<string>();
-    for (const m of missions) {
-      if (miss.length >= MISSION_CARDS_PER_PLAYER) break;
-      if (!mIds.has(m.id)) {
-        miss.push(m);
-        mIds.add(m.id);
-      }
-    }
-    setDeckMissions(miss);
+    // Select first 3 missions (duplicates allowed in sealed)
+    setDeckMissions(missions.slice(0, MISSION_CARDS_PER_PLAYER));
   }, [characters, missions]);
 
   const clearAll = useCallback(() => {
@@ -461,7 +452,7 @@ export function SealedDeckBuilder({
             </h3>
             <div className="flex gap-2 flex-wrap">
               {catalogMissions.map((m) => {
-                const inDeck = deckMissionIds.has(m.id);
+                const inDeck = deckMissionInstanceIds.has(m.sealedInstanceId);
                 const canAdd = canAddMission(m);
                 const imgPath = normalizeImagePath(m.image_file);
                 return (
@@ -692,8 +683,8 @@ export function SealedDeckBuilder({
                 {previewCard.card_type === 'mission' ? (
                   <button
                     onClick={() => {
-                      if (deckMissionIds.has(previewCard.id)) {
-                        const idx = deckMissions.findIndex((m) => m.id === previewCard.id);
+                      if (deckMissionInstanceIds.has(previewCard.sealedInstanceId)) {
+                        const idx = deckMissions.findIndex((m) => m.sealedInstanceId === previewCard.sealedInstanceId);
                         if (idx >= 0) removeMission(idx);
                       } else {
                         addMission(previewCard);
@@ -701,12 +692,12 @@ export function SealedDeckBuilder({
                     }}
                     className="mt-3 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
                     style={{
-                      backgroundColor: deckMissionIds.has(previewCard.id) ? '#2a1a1a' : '#1a2a1a',
-                      color: deckMissionIds.has(previewCard.id) ? '#b33e3e' : '#3e8b3e',
-                      border: `1px solid ${deckMissionIds.has(previewCard.id) ? '#4a2a2a' : '#2a4a2a'}`,
+                      backgroundColor: deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#2a1a1a' : '#1a2a1a',
+                      color: deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#b33e3e' : '#3e8b3e',
+                      border: `1px solid ${deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#4a2a2a' : '#2a4a2a'}`,
                     }}
                   >
-                    {deckMissionIds.has(previewCard.id) ? t('removeFromDeck') : t('addToDeck')}
+                    {deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? t('removeFromDeck') : t('addToDeck')}
                   </button>
                 ) : (
                   <button
@@ -831,8 +822,8 @@ export function SealedDeckBuilder({
               {previewCard.card_type === 'mission' ? (
                 <button
                   onClick={() => {
-                    if (deckMissionIds.has(previewCard.id)) {
-                      const idx = deckMissions.findIndex((m) => m.id === previewCard.id);
+                    if (deckMissionInstanceIds.has(previewCard.sealedInstanceId)) {
+                      const idx = deckMissions.findIndex((m) => m.sealedInstanceId === previewCard.sealedInstanceId);
                       if (idx >= 0) removeMission(idx);
                     } else {
                       addMission(previewCard);
@@ -840,12 +831,12 @@ export function SealedDeckBuilder({
                   }}
                   className="mt-2 w-full py-1.5 text-xs font-bold uppercase rounded cursor-pointer"
                   style={{
-                    backgroundColor: deckMissionIds.has(previewCard.id) ? '#2a1a1a' : '#1a2a1a',
-                    color: deckMissionIds.has(previewCard.id) ? '#b33e3e' : '#3e8b3e',
-                    border: `1px solid ${deckMissionIds.has(previewCard.id) ? '#4a2a2a' : '#2a4a2a'}`,
+                    backgroundColor: deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#2a1a1a' : '#1a2a1a',
+                    color: deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#b33e3e' : '#3e8b3e',
+                    border: `1px solid ${deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? '#4a2a2a' : '#2a4a2a'}`,
                   }}
                 >
-                  {deckMissionIds.has(previewCard.id) ? t('removeFromDeck') : t('addToDeck')}
+                  {deckMissionInstanceIds.has(previewCard.sealedInstanceId) ? t('removeFromDeck') : t('addToDeck')}
                 </button>
               ) : (
                 <button
