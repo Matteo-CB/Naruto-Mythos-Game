@@ -1261,17 +1261,6 @@ export default function DeckBuilderPage() {
               >
                 ?
               </button>
-              <button
-                onClick={() => {
-                  const fields: SortField[] = ['number', 'name', 'chakra', 'power', 'rarity'];
-                  const idx = fields.indexOf(sortBy);
-                  setSortBy(fields[(idx + 1) % fields.length]);
-                }}
-                className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
-                style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}
-              >
-                {t("deckBuilder.sort")}
-              </button>
             </div>
             <div className="text-[8px] mt-1" style={{ color: '#444' }}>
               {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
