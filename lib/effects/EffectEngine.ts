@@ -135,7 +135,9 @@ export class EffectEngine {
     isUpgrade: boolean,
   ): GameState {
     let newState = deepClone(state);
-    const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    const charStack = character.stack ?? [character.card];
+    const topCard = charStack.length > 0 ? charStack[charStack.length - 1] : character.card;
+    if (!topCard) return state;
 
     // Build the ordered list of effect types from the card definition (top-to-bottom).
     // When played as upgrade, both MAIN and UPGRADE trigger in card-printed order.
@@ -12669,15 +12671,16 @@ export class EffectEngine {
           const existIdx_h002 = mission_h002[fSide_h002].findIndex(c => c.instanceId === targetId);
           if (existIdx_h002 === -1) break;
           const existing_h002 = mission_h002[fSide_h002][existIdx_h002];
-          const eTop_h002 = existing_h002.stack.length > 0 ? existing_h002.stack[existing_h002.stack.length - 1] : existing_h002.card;
-          const upgCost_h002 = Math.max(0, (card_h002.chakra - eTop_h002.chakra) - 1);
+          const existStack_h002 = existing_h002.stack ?? [existing_h002.card];
+          const eTop_h002 = existStack_h002.length > 0 ? existStack_h002[existStack_h002.length - 1] : existing_h002.card;
+          const upgCost_h002 = Math.max(0, (card_h002.chakra - (eTop_h002?.chakra ?? 0)) - 1);
           if (ps_h002.chakra < upgCost_h002) break;
           ps_h002.chakra -= upgCost_h002;
           ps_h002.hand.splice(ci_h002, 1);
 
           const updatedChars_h002 = [...mission_h002[fSide_h002]];
           updatedChars_h002[existIdx_h002] = {
-            ...existing_h002, card: card_h002, stack: [...existing_h002.stack, card_h002],
+            ...existing_h002, card: card_h002, stack: [...existStack_h002, card_h002],
             powerTokens: existing_h002.powerTokens,
           };
           mission_h002[fSide_h002] = updatedChars_h002;
@@ -17119,10 +17122,11 @@ export class EffectEngine {
     let actualCost: number;
     if (existingIdx >= 0) {
       const existing_h002 = mission[friendlySide_h002][existingIdx];
-      const existingTop_h002 = existing_h002.stack.length > 0
-        ? existing_h002.stack[existing_h002.stack.length - 1]
+      const existStack_h002p = existing_h002.stack ?? [existing_h002.card];
+      const existingTop_h002 = existStack_h002p.length > 0
+        ? existStack_h002p[existStack_h002p.length - 1]
         : existing_h002.card;
-      actualCost = Math.max(0, (card.chakra - existingTop_h002.chakra) - 1);
+      actualCost = Math.max(0, (card.chakra - (existingTop_h002?.chakra ?? 0)) - 1);
     } else {
       actualCost = Math.max(0, card.chakra - 1);
     }
@@ -17138,11 +17142,12 @@ export class EffectEngine {
     if (existingIdx >= 0) {
       // Upgrade the existing character (stack new card on top)
       const existing = mission[friendlySide_h002][existingIdx];
+      const existStackPlace = existing.stack ?? [existing.card];
       const updatedChars = [...mission[friendlySide_h002]];
       updatedChars[existingIdx] = {
         ...existing,
         card,
-        stack: [...existing.stack, card],
+        stack: [...existStackPlace, card],
         powerTokens: existing.powerTokens,
         controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
       };
