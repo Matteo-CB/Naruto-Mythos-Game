@@ -679,6 +679,7 @@ export class EffectEngine {
       return EffectEngine.processRemainingEffects(newState, pendingEffect);
     }
 
+    try {
     switch (pendingEffect.targetSelectionType) {
       case 'POWERUP_2_LEAF_VILLAGE':
         newState = EffectEngine.applyPowerupToTarget(newState, targetId, 2);
@@ -14605,8 +14606,13 @@ export class EffectEngine {
         break;
     }
 
-    // Remove the resolved pending effect and action
-    newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pendingEffect.id);
+    } catch (err) {
+      console.error(`[EffectEngine] Error in applyTargetedEffect for ${pendingEffect.targetSelectionType}:`, err);
+      // Recover gracefully — remove the broken pending effect and continue the game
+      newState = deepClone(state);
+    }
+
+    newState.pendingEffects = newState.pendingEffects.filter((pe) => pe.id !== pendingEffect.id);
     newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== pendingEffect.id);
 
     // Process remaining effects (continuation) if any
