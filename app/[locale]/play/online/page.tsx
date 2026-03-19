@@ -233,8 +233,9 @@ export default function PlayOnlinePage() {
     setDeckSelected(true);
   };
 
-  // Filter rooms by selected mode
-  const filteredRooms = publicRooms.filter((r) => r.gameMode === selectedMode);
+  // Split rooms by mode
+  const casualRooms = publicRooms.filter((r) => r.gameMode === 'casual');
+  const rankedRooms = publicRooms.filter((r) => r.gameMode === 'ranked');
 
   // Show deck selector once in a room and opponent has joined
   const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards;
@@ -255,7 +256,7 @@ export default function PlayOnlinePage() {
       <DecorativeIcons />
       <CardBackgroundDecor variant="playOnline" />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-      <div className="flex flex-col items-center gap-6 max-w-lg w-full relative z-10">
+      <div className="flex flex-col items-center gap-6 max-w-2xl w-full relative z-10">
         <h1
           className="text-2xl font-bold tracking-wider uppercase"
           style={{ color: '#c4a35a' }}
@@ -338,72 +339,82 @@ export default function PlayOnlinePage() {
 
             {view === 'browse' && !roomCode && (
               <>
-                {/* Game mode tabs */}
-                <div className="flex w-full">
-                  {(['casual', 'ranked'] as GameMode[]).map((mode) => (
-                    <button
-                      key={mode}
-                      onClick={() => setSelectedMode(mode)}
-                      className="flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors"
-                      style={modeStyle(mode)}
-                    >
-                      {t(`online.mode.${mode}`)}
-                    </button>
-                  ))}
-                </div>
-
-                <p className="text-xs" style={{ color: '#555555' }}>
-                  {t(`online.modeDesc.${selectedMode}`)}
-                </p>
-
-                {/* Room list */}
-                <div
-                  className="w-full rounded-lg overflow-hidden"
-                  style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
-                >
-                  {filteredRooms.length === 0 ? (
-                    <div className="p-8 text-center">
-                      <p className="text-xs" style={{ color: '#555555' }}>
-                        {t('online.noRooms')}
-                      </p>
+                {/* Dual room lists — casual + ranked side by side */}
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Casual column */}
+                  <div className="flex flex-col">
+                    <div className="px-3 py-2" style={{ backgroundColor: '#111', borderBottom: '2px solid #c4a35a' }}>
+                      <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
+                        {t('online.mode.casual')}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="max-h-64 overflow-y-auto">
-                      {filteredRooms.map((room) => (
-                        <div
-                          key={room.code}
-                          className="flex items-center justify-between px-4 py-3"
-                          style={{ borderBottom: '1px solid #1e1e1e' }}
-                        >
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>
-                              {room.hostName}
-                            </span>
-                            <span className="text-xs" style={{ color: '#555555' }}>
-                              {formatTimeAgo(room.createdAt, t)}
-                            </span>
-                          </div>
-                          <button
-                            onClick={() => handleJoinRoom(room.code)}
-                            className="px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
-                            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
-                          >
-                            {t('online.join')}
-                          </button>
+                    <div className="flex-1" style={{ backgroundColor: '#111', minHeight: '80px' }}>
+                      {casualRooms.length === 0 ? (
+                        <div className="px-3 py-5 text-center">
+                          <span className="text-[10px]" style={{ color: '#444' }}>{t('online.noRooms')}</span>
                         </div>
-                      ))}
+                      ) : (
+                        <div className="max-h-40 overflow-y-auto">
+                          {casualRooms.map((room) => (
+                            <div key={room.code} className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium" style={{ color: '#ddd' }}>{room.hostName}</span>
+                                <span className="text-[9px]" style={{ color: '#555' }}>{formatTimeAgo(room.createdAt, t)}</span>
+                              </div>
+                              <button onClick={() => { setSelectedMode('casual'); handleJoinRoom(room.code); }}
+                                className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                                style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
+                                {t('online.join')}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                    <button onClick={() => { setSelectedMode('casual'); handleCreatePublicRoom(); }}
+                      className="w-full py-2.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                      style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}>
+                      {t('online.createPublicRoom')}
+                    </button>
+                  </div>
 
-                {/* Create public room button */}
-                <button
-                  onClick={handleCreatePublicRoom}
-                  className="w-full py-3 text-sm font-bold uppercase tracking-wider transition-colors"
-                  style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
-                >
-                  {t('online.createPublicRoom')}
-                </button>
+                  {/* Ranked column */}
+                  <div className="flex flex-col">
+                    <div className="px-3 py-2" style={{ backgroundColor: '#111', borderBottom: '2px solid #b33e3e' }}>
+                      <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
+                        {t('online.mode.ranked')}
+                      </span>
+                    </div>
+                    <div className="flex-1" style={{ backgroundColor: '#111', minHeight: '80px' }}>
+                      {rankedRooms.length === 0 ? (
+                        <div className="px-3 py-5 text-center">
+                          <span className="text-[10px]" style={{ color: '#444' }}>{t('online.noRooms')}</span>
+                        </div>
+                      ) : (
+                        <div className="max-h-40 overflow-y-auto">
+                          {rankedRooms.map((room) => (
+                            <div key={room.code} className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium" style={{ color: '#ddd' }}>{room.hostName}</span>
+                                <span className="text-[9px]" style={{ color: '#555' }}>{formatTimeAgo(room.createdAt, t)}</span>
+                              </div>
+                              <button onClick={() => { setSelectedMode('ranked'); handleJoinRoom(room.code); }}
+                                className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                                style={{ backgroundColor: '#b33e3e', color: '#e0e0e0' }}>
+                                {t('online.join')}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <button onClick={() => { setSelectedMode('ranked'); handleCreatePublicRoom(); }}
+                      className="w-full py-2.5 text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+                      style={{ backgroundColor: '#b33e3e', color: '#e0e0e0' }}>
+                      {t('online.createPublicRoom')}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Live Games — spectate */}
                 <LiveGamesSection />
