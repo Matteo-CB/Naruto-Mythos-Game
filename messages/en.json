@@ -450,6 +450,7 @@
         "akamaru029ConfirmUpgrade": "UPGRADE: Hide the non-hidden enemy character with the lowest cost in this mission.",
         "hinata030ConfirmMain": "MAIN: Remove up to 2 Power tokens from an enemy character in play.",
         "shino032ConfirmMain": "MAIN: Each player draws a card.",
+        "shino033ConfirmAmbush": "AMBUSH: Play this character paying 4 less (enemy Jutsu character present).",
         "shino033ConfirmUpgrade": "UPGRADE: Move this character to another mission.",
         "kurenai035ConfirmUpgrade": "UPGRADE: Defeat an enemy character with Power 1 or less in this mission.",
         "neji036ConfirmMain": "MAIN: Remove up to 2 Power tokens from an enemy character in play.",
