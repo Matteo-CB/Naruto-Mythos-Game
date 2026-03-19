@@ -513,7 +513,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         visibleState: VisibleGameState;
         playerNames: { player1: string; player2: string };
         spectatorCount: number;
+        roomCode?: string;
       }) => {
+        const current = get();
+        // Ignore spectator updates if we're not spectating or if it's for a different room
+        if (!current.isSpectating && !current.spectatingRoomCode) return;
+        if (data.roomCode && current.spectatingRoomCode && data.roomCode !== current.spectatingRoomCode) return;
         set({
           visibleState: data.visibleState,
           playerNames: data.playerNames,

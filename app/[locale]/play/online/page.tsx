@@ -604,9 +604,18 @@ function LiveGamesSection() {
 
   const handleSpectate = (game: typeof publicGames[0]) => {
     if (!session?.user?.id) return;
-    spectateGame(game.roomCode, session.user.id, session.user.name ?? 'Spectator');
-    // Navigate immediately — game page will retry fetching state if needed
-    router.push('/game' as '/');
+    // Clean up any previous spectating session first
+    const ss = useSocketStore.getState();
+    if (ss.isSpectating || ss.spectatingRoomCode) {
+      ss.leaveSpectating();
+    }
+    // Also clear any stale game state from a previous spectate/game
+    useGameStore.setState({ visibleState: null, gameState: null, gameOver: false, isOnlineGame: false });
+    // Small delay to let the leave propagate before joining new room
+    setTimeout(() => {
+      spectateGame(game.roomCode, session!.user!.id!, session!.user!.name ?? 'Spectator');
+      router.push('/game' as '/');
+    }, 100);
   };
 
   return (
