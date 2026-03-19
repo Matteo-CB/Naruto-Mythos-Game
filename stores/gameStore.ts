@@ -819,7 +819,7 @@ function buildPendingTargetSelectionUI(
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
     minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : undefined,
-    maxSelections: isMultiSelectChoose ? (pendingAction.maxSelections ?? 1) : undefined,
+    maxSelections: isMultiSelectChoose ? (pendingAction.maxSelections ?? 1) : pendingAction.maxSelections,
   };
 }
 
