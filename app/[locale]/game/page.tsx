@@ -66,6 +66,17 @@ export default function GamePage() {
     };
   }, [hasActiveGame, router]);
 
+  // Clean up spectator state when unmounting (e.g., navigating back to lobby)
+  useEffect(() => {
+    return () => {
+      const ss = useSocketStore.getState();
+      if (ss.isSpectating) {
+        ss.leaveSpectating();
+        useGameStore.setState({ visibleState: null, gameState: null });
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Sync spectator state to gameStore — runs on mount AND on every socket update
   const syncSpectatorState = useCallback(() => {
     const socketState = useSocketStore.getState();

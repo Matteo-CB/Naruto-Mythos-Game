@@ -661,6 +661,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
           visibleState: spectatorState,
           playerNames,
           spectatorCount: room.spectators.size,
+          roomCode: room.code,
         });
       }
     }
@@ -1589,6 +1590,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           visibleState: spectatorState,
           playerNames,
           spectatorCount: room.spectators.size,
+          roomCode: data.roomCode,
         });
         // Send chat history
         socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
@@ -1633,6 +1635,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           visibleState: spectatorState,
           playerNames,
           spectatorCount: room.spectators.size,
+          roomCode: data.roomCode,
         });
       } catch (err) {
         console.error('[Socket] Spectator request-state error:', err);
