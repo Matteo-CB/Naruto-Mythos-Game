@@ -15765,7 +15765,7 @@ export class EffectEngine {
           if (hiddenIds.includes(char.instanceId)) continue;
           const charOwner3 = newState.activeMissions[i].player1Characters.includes(char) ? 'player1' : 'player2';
           const pw = getEffectivePower(newState, char, charOwner3 as PlayerID);
-          if (pw <= remainingPower && pw > 0) {
+          if (pw <= remainingPower) {
             validNext.push(char.instanceId);
           }
         }

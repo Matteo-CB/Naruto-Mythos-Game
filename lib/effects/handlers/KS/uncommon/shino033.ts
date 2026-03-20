@@ -33,16 +33,15 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
   });
 
   if (hasEnemyJutsu) {
-    // Show CONFIRM popup like other instant AMBUSH effects (optional — player can skip)
-    return {
-      state,
-      requiresTargetSelection: true,
-      targetSelectionType: 'SHINO033_CONFIRM_AMBUSH',
-      validTargets: [sourceCard.instanceId],
-      isOptional: true,
-      description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
-      descriptionKey: 'game.effect.desc.shino033ConfirmAmbush',
-    };
+    // Cost reduction already applied in ChakraValidation.ts — just log it
+    const log = logAction(
+      state.log, state.turn, state.phase, sourcePlayer,
+      'EFFECT',
+      'Shino Aburame (033) AMBUSH: Played for 4 less chakra (enemy Jutsu present).',
+      'game.log.effect.shino033CostReduction',
+      { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
+    );
+    return { state: { ...state, log } };
   }
 
   return { state };
