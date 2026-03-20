@@ -9665,7 +9665,13 @@ export class EffectEngine {
         const s109uPS = newState[s109uPlayer];
         const s109uValidTargets = s109uPS.discardPile
           .map((c, i) => ({ c, i }))
-          .filter(({ c }) => c.card_type === 'character' && c.group === 'Leaf Village' && s109uPS.chakra >= Math.max(0, (c.chakra ?? 0) - 2))
+          .filter(({ c }) => {
+            if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
+            // Can afford as fresh play with -2 reduction?
+            if (s109uPS.chakra >= Math.max(0, (c.chakra ?? 0) - 2)) return true;
+            // Can afford as upgrade on any mission with -2 reduction?
+            return canAffordAsUpgrade(newState, s109uPlayer, c as any, 2);
+          })
           .map(({ i }) => String(i));
         if (s109uValidTargets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, s109uPlayer,
