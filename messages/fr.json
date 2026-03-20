@@ -1144,6 +1144,11 @@
       "label": "Timer d'action",
       "description": "2 min par action, passe automatique si le temps expire"
     },
+    "anonymous": {
+      "label": "Salon Anonyme",
+      "description": "Votre nom est cache jusqu'a ce que les deux joueurs aient choisi leur deck",
+      "name": "Anonyme"
+    },
     "findMatchDesc": "Trouver un adversaire aleatoire pres de votre niveau",
     "cancel": "Annuler",
     "join": "Rejoindre",

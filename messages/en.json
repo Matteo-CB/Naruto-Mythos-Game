@@ -1144,6 +1144,11 @@
       "label": "Action Timer",
       "description": "2 min per action, auto-pass on timeout"
     },
+    "anonymous": {
+      "label": "Anonymous Room",
+      "description": "Your name is hidden until both players have chosen their deck",
+      "name": "Anonymous"
+    },
     "findMatchDesc": "Find a random opponent near your skill level",
     "cancel": "Cancel",
     "join": "Join",

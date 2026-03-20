@@ -35,6 +35,7 @@ export default function PlayOnlinePage() {
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [timerEnabled, setTimerEnabled] = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const {
     connected,
@@ -196,7 +197,7 @@ export default function PlayOnlinePage() {
       }
       const actualMode = mode ?? selectedMode;
       const isRanked = actualMode === 'ranked';
-      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
+      createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled, isAnonymous);
       setIsPrivateRoom(false);
     } catch {
       // Error set in socket store
@@ -340,6 +341,31 @@ export default function PlayOnlinePage() {
 
             {view === 'browse' && !roomCode && (
               <>
+                {/* Anonymous toggle */}
+                <div
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg mb-2"
+                  style={{ backgroundColor: '#0e0e0e', border: '1px solid #1a1a1a' }}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] font-medium" style={{ color: '#c0c0c0' }}>
+                      {t('online.anonymous.label')}
+                    </span>
+                    <span className="text-[9px]" style={{ color: '#555' }}>
+                      {t('online.anonymous.description')}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsAnonymous(!isAnonymous)}
+                    className="relative w-10 h-5 rounded-full transition-colors cursor-pointer"
+                    style={{ backgroundColor: isAnonymous ? '#c4a35a' : '#333333' }}
+                  >
+                    <span
+                      className="absolute top-0.5 w-4 h-4 rounded-full transition-all"
+                      style={{ backgroundColor: '#0a0a0a', left: isAnonymous ? '22px' : '2px' }}
+                    />
+                  </button>
+                </div>
+
                 {/* Dual room lists — casual + ranked side by side */}
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Casual column */}
@@ -359,7 +385,7 @@ export default function PlayOnlinePage() {
                           {casualRooms.map((room) => (
                             <div key={room.code} className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
                               <div className="flex flex-col">
-                                <span className="text-xs font-medium" style={{ color: '#ddd' }}>{room.hostName}</span>
+                                <span className="text-xs font-medium" style={{ color: room.hostName === '__anonymous__' ? '#888' : '#ddd', fontStyle: room.hostName === '__anonymous__' ? 'italic' : 'normal' }}>{room.hostName === '__anonymous__' ? t('online.anonymous.name') : room.hostName}</span>
                                 <span className="text-[9px]" style={{ color: '#555' }}>{formatTimeAgo(room.createdAt, t)}</span>
                               </div>
                               <button onClick={() => { setSelectedMode('casual'); handleJoinRoom(room.code); }}
@@ -396,7 +422,7 @@ export default function PlayOnlinePage() {
                           {rankedRooms.map((room) => (
                             <div key={room.code} className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid #1a1a1a' }}>
                               <div className="flex flex-col">
-                                <span className="text-xs font-medium" style={{ color: '#ddd' }}>{room.hostName}</span>
+                                <span className="text-xs font-medium" style={{ color: room.hostName === '__anonymous__' ? '#888' : '#ddd', fontStyle: room.hostName === '__anonymous__' ? 'italic' : 'normal' }}>{room.hostName === '__anonymous__' ? t('online.anonymous.name') : room.hostName}</span>
                                 <span className="text-[9px]" style={{ color: '#555' }}>{formatTimeAgo(room.createdAt, t)}</span>
                               </div>
                               <button onClick={() => { setSelectedMode('ranked'); handleJoinRoom(room.code); }}
