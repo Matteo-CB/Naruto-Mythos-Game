@@ -99,6 +99,15 @@ interface SocketStore {
   sendChatMessage: (message: string, isEmote: boolean) => void;
   setChatOpen: (open: boolean) => void;
 
+  // Opponent disconnect/reconnect
+  opponentDisconnected: boolean;
+  opponentDisconnectDeadline: number | null;
+
+  // Active game reconnect prompt (shown when user returns to site with active game)
+  pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2' } | null;
+  dismissReconnect: () => void;
+  acceptReconnect: () => void;
+
   // Active games
   activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }>;
   requestActiveGames: () => void;
@@ -140,6 +149,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   chatMessages: [],
   unreadChatCount: 0,
   chatOpen: false,
+  opponentDisconnected: false,
+  opponentDisconnectDeadline: null,
+  pendingReconnect: null,
   activeGames: (() => {
     try {
       const cached = typeof window !== 'undefined' ? localStorage.getItem('nmtcg-active-games') : null;
@@ -442,6 +454,25 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('game:opponent-left', () => {
         console.log('[Socket] Opponent left the game');
         set({ rematchState: 'declined' });
+      });
+
+      socket.on('game:opponent-disconnected', (data: { deadline: number; durationMs: number }) => {
+        console.log('[Socket] Opponent disconnected, deadline:', new Date(data.deadline).toLocaleTimeString());
+        set({ opponentDisconnected: true, opponentDisconnectDeadline: data.deadline });
+      });
+
+      socket.on('game:opponent-reconnected', () => {
+        console.log('[Socket] Opponent reconnected');
+        set({ opponentDisconnected: false, opponentDisconnectDeadline: null });
+      });
+
+      socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
+        console.log('[Socket] Active game found:', data.roomCode, 'as', data.playerRole);
+        // Only show reconnect prompt if we're not already in that game
+        const current = get();
+        if (current.roomCode !== data.roomCode) {
+          set({ pendingReconnect: data });
+        }
       });
 
       // --- Matchmaking events ---
@@ -775,6 +806,40 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       visibleState: null, playerNames: null, gameStarted: false,
       chatMessages: [], unreadChatCount: 0,
     });
+  },
+
+  // ═══════ RECONNECT METHODS ═══════
+
+  dismissReconnect: () => {
+    const { socket, connected, pendingReconnect } = get();
+    if (socket && connected && pendingReconnect) {
+      // Forfeit the game
+      socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
+      setTimeout(() => {
+        const s = get();
+        if (s.socket && s.connected) {
+          s.socket.emit('game:action', {
+            roomCode: pendingReconnect.roomCode,
+            action: { type: 'FORFEIT', reason: 'abandon' },
+          });
+        }
+      }, 500);
+    }
+    set({ pendingReconnect: null });
+  },
+
+  acceptReconnect: () => {
+    const { socket, connected, pendingReconnect } = get();
+    if (socket && connected && pendingReconnect) {
+      socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
+      set({
+        roomCode: pendingReconnect.roomCode,
+        playerRole: pendingReconnect.playerRole,
+        pendingReconnect: null,
+        opponentDisconnected: false,
+        opponentDisconnectDeadline: null,
+      });
+    }
   },
 
   // ═══════ CHAT METHODS ═══════

@@ -858,6 +858,13 @@
       "maintenance": "The server is under maintenance. Please wait...",
       "maintenanceNoNewGames": "Server entering maintenance. No new games can be started. The site will be back in a few minutes.",
       "syncError": "State sync error. Reconnecting..."
+    },
+    "opponentDisconnected": "Opponent disconnected. They have {time} to reconnect or the game is forfeit.",
+    "reconnect": {
+      "title": "Active Game",
+      "description": "You have an ongoing game. Would you like to rejoin or abandon it?",
+      "rejoin": "Rejoin Game",
+      "abandon": "Abandon"
     }
   },
   "collection": {
