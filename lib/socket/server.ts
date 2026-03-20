@@ -23,6 +23,7 @@ interface RoomData {
   guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null;
   isPrivate: boolean;
   isRanked: boolean;
+  isAnonymous: boolean;
   gameMode: 'casual' | 'ranked' | 'sealed';
   createdAt: number;
   hostName?: string;
@@ -123,7 +124,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
     }
     list.push({
       code: room.code,
-      hostName: room.hostName ?? 'Unknown',
+      hostName: room.isAnonymous ? '__anonymous__' : (room.hostName ?? 'Unknown'),
       gameMode: room.gameMode,
       createdAt: room.createdAt,
     });
@@ -831,7 +832,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean }) => {
+    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -860,6 +861,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestDeck: null,
         isPrivate: data.isPrivate ?? false,
         isRanked: gameMode === 'ranked',
+        isAnonymous: data.isAnonymous ?? false,
         gameMode,
         createdAt: Date.now(),
         hostName: data.hostName || userNames.get(data.userId) || 'Unknown',
@@ -1525,6 +1527,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestDeck: null,
           isPrivate: false,
           isRanked: wantRanked,
+          isAnonymous: false,
           gameMode: wantRanked ? 'ranked' : 'casual',
           createdAt: Date.now(),
           actionTimer: null,
