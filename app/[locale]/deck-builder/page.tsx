@@ -418,6 +418,7 @@ export default function DeckBuilderPage() {
   const removeMission = useDeckBuilderStore((s) => s.removeMission);
   const clearDeck = useDeckBuilderStore((s) => s.clearDeck);
   const saveDeck = useDeckBuilderStore((s) => s.saveDeck);
+  const isDirty = useDeckBuilderStore((s) => s.isDirty);
   const loadSavedDecks = useDeckBuilderStore((s) => s.loadSavedDecks);
   const loadDeck = useDeckBuilderStore((s) => s.loadDeck);
   const deleteDeck = useDeckBuilderStore((s) => s.deleteDeck);
@@ -1189,7 +1190,7 @@ export default function DeckBuilderPage() {
           <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
             borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
           }}>
-            <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+            <AngularButton onClick={handleSave} accentColor={loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'} variant={validation.valid && !isSaving ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
               {isSaving ? t("common.loading") : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
             </AngularButton>
             <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton>
@@ -1348,7 +1349,7 @@ export default function DeckBuilderPage() {
           <span className="text-[10px] tabular-nums flex-shrink-0" style={{ color: deckMissions.length === 3 ? '#3e8b3e' : '#b33e3e' }}>
             M:{deckMissions.length}/3
           </span>
-          <AngularButton onClick={handleSave} accentColor="#3e8b3e" variant={validation.valid ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
+          <AngularButton onClick={handleSave} accentColor={loadedDeckId && isDirty ? '#c47a1a' : '#3e8b3e'} variant={validation.valid ? 'primary' : 'muted'} disabled={isSaving || !validation.valid} size="sm">
             {isSaving ? '...' : loadedDeckId ? t("deckBuilder.updateDeck") : t("deckBuilder.saveDeck")}
           </AngularButton>
         </div>
