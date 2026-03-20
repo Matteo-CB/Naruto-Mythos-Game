@@ -432,6 +432,8 @@ function startActionTimer(
             await finalizeGameEnd(room, code, io, 'score');
           } else if (room.gameState.phase === 'action') {
             startActionTimer(room, code, io);
+          } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
+            startEffectTimer(room, code, io);
           }
         }, 1500);
       } else if (room.gameState.phase === 'action') {
@@ -1305,6 +1307,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
                 await finalizeGameEnd(room, code, io, 'score');
               } else if (room.gameState.phase === 'action') {
                 startActionTimer(room, code, io);
+              } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
+                // End-phase effects need resolution (e.g., Giant Spider 103, Rock Lee 117)
+                startEffectTimer(room, code, io);
               }
             } catch (err) {
               console.error('[Socket] Auto-advance error:', err instanceof Error ? err.message : err);

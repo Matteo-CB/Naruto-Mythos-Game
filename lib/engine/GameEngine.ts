@@ -125,7 +125,6 @@ export class GameEngine {
       pendingEffects: [],
       pendingActions: [],
       turnMissionRevealed: false,
-      missionScoredThisTurn: false,
       consecutiveTimeouts: { player1: 0, player2: 0 },
       actionHistory: [],
     };
@@ -411,7 +410,6 @@ export class GameEngine {
     let newState = deepClone(state);
     newState.phase = 'start';
     newState.turnMissionRevealed = false;
-    newState.missionScoredThisTurn = false;
     newState.player1.hasPassed = false;
     newState.player2.hasPassed = false;
     newState.firstPasser = null;
@@ -430,15 +428,8 @@ export class GameEngine {
    * Transition to mission phase and execute scoring.
    */
   static transitionToMissionPhase(state: GameState): GameState {
-    // Guard: prevent double execution of mission scoring in the same turn
-    if (state.missionScoredThisTurn) {
-      console.warn('[GameEngine] transitionToMissionPhase called twice in the same turn - skipping');
-      return GameEngine.transitionToEndPhase(state);
-    }
-
     let newState = deepClone(state);
     newState.phase = 'mission';
-    newState.missionScoredThisTurn = true;
 
     // Execute mission scoring
     newState = executeMissionPhase(newState);
