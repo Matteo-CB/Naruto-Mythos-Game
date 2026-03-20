@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
-import { ELO_ROLES, getAllEloRoleNames } from '@/lib/discord/roles';
+import { ALL_ELO_ROLES } from '@/lib/discord/roles';
+import { prisma } from '@/lib/db/prisma';
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 const DISCORD_API = 'https://discord.com/api/v10';
@@ -28,6 +29,48 @@ async function discordFetch(path: string, options?: RequestInit): Promise<Respon
   return res;
 }
 
+/**
+ * GET — Fetch current Discord role ID mapping from the database.
+ */
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user?.name || !ADMIN_USERNAMES.includes(session.user.name)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const settings = await prisma.siteSettings.findUnique({
+      where: { key: 'global' },
+    });
+
+    const roleIdMap = (settings?.discordRoleIds as Record<string, string> | null) ?? {};
+
+    // Also fetch guild roles to show what exists on Discord
+    let guildRoles: Array<{ id: string; name: string }> = [];
+    if (BOT_TOKEN && GUILD_ID) {
+      const res = await discordFetch(`/guilds/${GUILD_ID}/roles`);
+      if (res.ok) {
+        guildRoles = await res.json() as Array<{ id: string; name: string }>;
+      }
+    }
+
+    return NextResponse.json({
+      storedMapping: roleIdMap,
+      allRoleKeys: ALL_ELO_ROLES.map((r) => ({ key: r.key, label: r.label })),
+      guildRoles: guildRoles.map((r) => ({ id: r.id, name: r.name })),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: `Internal server error: ${error instanceof Error ? error.message : 'unknown'}` },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * POST — Create ELO roles on Discord and store their IDs in SiteSettings.
+ * If roles already exist (matched by label), reuses them.
+ */
 export async function POST() {
   try {
     const session = await auth();
@@ -52,34 +95,27 @@ export async function POST() {
     }
     const existingRoles = await rolesRes.json() as Array<{ id: string; name: string }>;
 
-    // Find old roles to delete
-    const oldRoleNames = ['Genin', 'Chunin', 'Kage'];
-    const eloRoleNames = getAllEloRoleNames();
-    const rolesToDelete = existingRoles.filter(
-      (r) => oldRoleNames.includes(r.name) || eloRoleNames.includes(r.name),
-    );
+    // Build mapping: try to find existing roles by label, create if missing
+    const roleIdMap: Record<string, string> = {};
+    const created: string[] = [];
+    const reused: string[] = [];
 
-    const oldRoleIds = rolesToDelete.map((r) => r.id);
+    for (const roleDef of ALL_ELO_ROLES) {
+      // Try to find an existing role matching the label
+      const existing = existingRoles.find((r) => r.name === roleDef.label);
+      if (existing) {
+        roleIdMap[roleDef.key] = existing.id;
+        reused.push(roleDef.label);
+        continue;
+      }
 
-    // Collect template overwrites from old roles for permission migration
-    const channelsRes = await discordFetch(`/guilds/${GUILD_ID}/channels`);
-    const channels = channelsRes.ok
-      ? (await channelsRes.json() as Array<{
-          id: string;
-          name: string;
-          permission_overwrites?: Array<{ id: string; allow: string; deny: string }>;
-        }>)
-      : [];
-
-    // Create new ELO roles
-    const createdRoles: Array<{ name: string; id: string }> = [];
-    for (const roleDef of ELO_ROLES) {
+      // Create the role
       const res = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
         method: 'POST',
         body: JSON.stringify({
-          name: roleDef.name,
+          name: roleDef.label,
           color: roleDef.color,
-          hoist: true,
+          hoist: roleDef.hoist,
           mentionable: false,
           permissions: '0',
         }),
@@ -87,64 +123,64 @@ export async function POST() {
 
       if (res.ok) {
         const role = await res.json() as { id: string };
-        createdRoles.push({ name: roleDef.name, id: role.id });
+        roleIdMap[roleDef.key] = role.id;
+        created.push(roleDef.label);
+      } else {
+        console.error(`[Discord] Failed to create role "${roleDef.label}": ${res.status}`);
       }
     }
 
-    // Migrate channel permissions
-    let migratedChannels = 0;
-    for (const channel of channels) {
-      const overwrites = channel.permission_overwrites || [];
-      const hasOldOverwrite = overwrites.some((ow) => oldRoleIds.includes(ow.id));
-      if (!hasOldOverwrite) continue;
-
-      // Find template overwrite
-      let template: { allow: string; deny: string } | null = null;
-      for (const ow of overwrites) {
-        if (oldRoleIds.includes(ow.id)) {
-          if (!template || BigInt(ow.allow) > BigInt(template.allow)) {
-            template = { allow: ow.allow, deny: ow.deny };
-          }
-        }
-      }
-
-      if (!template) continue;
-
-      for (const newRole of createdRoles) {
-        const exists = overwrites.some((ow) => ow.id === newRole.id);
-        if (exists) continue;
-
-        await discordFetch(`/channels/${channel.id}/permissions/${newRole.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            id: newRole.id,
-            type: 0,
-            allow: template.allow,
-            deny: template.deny,
-          }),
-        });
-      }
-
-      migratedChannels++;
-    }
-
-    // Delete old roles
-    let deletedCount = 0;
-    for (const role of rolesToDelete) {
-      const res = await discordFetch(`/guilds/${GUILD_ID}/roles/${role.id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok || res.status === 204 || res.status === 404) {
-        deletedCount++;
-      }
-    }
+    // Store the mapping in SiteSettings
+    await prisma.siteSettings.upsert({
+      where: { key: 'global' },
+      update: { discordRoleIds: roleIdMap },
+      create: { key: 'global', discordRoleIds: roleIdMap },
+    });
 
     return NextResponse.json({
-      created: createdRoles.length,
-      deleted: deletedCount,
-      migratedChannels,
-      roles: createdRoles.map((r) => r.name),
+      roleIdMap,
+      created,
+      reused,
+      total: Object.keys(roleIdMap).length,
     });
+  } catch (error) {
+    return NextResponse.json(
+      { error: `Internal server error: ${error instanceof Error ? error.message : 'unknown'}` },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * PUT — Manually set Discord role ID mapping without creating roles.
+ * Body: { roleIdMap: { "unranked": "id", "genin": "id", ... } }
+ */
+export async function PUT(request: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user?.name || !ADMIN_USERNAMES.includes(session.user.name)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json() as { roleIdMap?: Record<string, string> };
+    if (!body.roleIdMap || typeof body.roleIdMap !== 'object') {
+      return NextResponse.json({ error: 'Missing roleIdMap object in body' }, { status: 400 });
+    }
+
+    // Validate keys
+    const validKeys = new Set(ALL_ELO_ROLES.map((r) => r.key));
+    const invalidKeys = Object.keys(body.roleIdMap).filter((k) => !validKeys.has(k));
+    if (invalidKeys.length > 0) {
+      return NextResponse.json({ error: `Invalid role keys: ${invalidKeys.join(', ')}` }, { status: 400 });
+    }
+
+    await prisma.siteSettings.upsert({
+      where: { key: 'global' },
+      update: { discordRoleIds: body.roleIdMap },
+      create: { key: 'global', discordRoleIds: body.roleIdMap },
+    });
+
+    return NextResponse.json({ success: true, roleIdMap: body.roleIdMap });
   } catch (error) {
     return NextResponse.json(
       { error: `Internal server error: ${error instanceof Error ? error.message : 'unknown'}` },

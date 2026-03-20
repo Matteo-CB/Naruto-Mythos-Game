@@ -4,19 +4,19 @@
  * Uses Discord REST API directly (no discord.js at runtime).
  * Syncs a user's Discord ELO role based on their current ELO.
  * Roles are bi-directional: players gain AND lose roles based on current ELO.
+ *
+ * Discord role IDs are stored in SiteSettings.discordRoleIds as a JSON map:
+ *   { "unranked": "123456789", "academy_student": "987654321", ... }
  */
 
 import { prisma } from '@/lib/db/prisma';
-import { getRoleForElo, getAllEloRoleNames, UNRANKED_ROLE, PLACEMENT_MATCHES_REQUIRED } from './roles';
+import { getRoleForElo, ALL_ELO_ROLES, UNRANKED_ROLE, PLACEMENT_MATCHES_REQUIRED } from './roles';
 
 const DISCORD_API = 'https://discord.com/api/v10';
 const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
 const GUILD_ID = process.env.SERVER_DISCORD_ID;
 
-interface DiscordRole {
-  id: string;
-  name: string;
-}
+type RoleIdMap = Record<string, string>; // key -> discord role id
 
 /**
  * Discord REST fetch with automatic retry on rate-limit (429).
@@ -51,38 +51,23 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
- * Get all roles in the guild, cached for 60 seconds.
+ * Load the Discord role ID mapping from SiteSettings.
+ * Returns null if not configured.
  */
-let cachedRoles: DiscordRole[] | null = null;
-let cacheExpiry = 0;
-
-async function getGuildRoles(): Promise<DiscordRole[]> {
-  if (cachedRoles && Date.now() < cacheExpiry) return cachedRoles;
-
-  const res = await discordFetch(`/guilds/${GUILD_ID}/roles`);
-  if (!res.ok) {
-    console.error('[Discord] Failed to fetch guild roles:', res.status);
-    return [];
-  }
-  cachedRoles = await res.json() as DiscordRole[];
-  cacheExpiry = Date.now() + 60_000;
-  return cachedRoles;
-}
-
-/**
- * Invalidate the guild roles cache (after role creation/deletion).
- */
-export function invalidateRoleCache(): void {
-  cachedRoles = null;
-  cacheExpiry = 0;
+async function loadRoleIdMap(): Promise<RoleIdMap | null> {
+  const settings = await prisma.siteSettings.findUnique({
+    where: { key: 'global' },
+  });
+  if (!settings?.discordRoleIds) return null;
+  return settings.discordRoleIds as RoleIdMap;
 }
 
 /**
  * Sync a user's Discord ELO role based on their current ELO.
  *
+ * Uses stored Discord role IDs from SiteSettings.discordRoleIds.
  * Bi-directional: assigns the role matching current ELO.
  * Removes ALL other ELO roles (both higher and lower).
- * Handles promotions, demotions, and placement transitions.
  */
 export async function syncDiscordRole(userId: string): Promise<void> {
   if (!BOT_TOKEN || !GUILD_ID) return;
@@ -93,6 +78,12 @@ export async function syncDiscordRole(userId: string): Promise<void> {
       where: { key: 'global' },
     });
     if (!settings?.leaguesEnabled) return;
+
+    const roleIdMap = settings.discordRoleIds as RoleIdMap | null;
+    if (!roleIdMap || Object.keys(roleIdMap).length === 0) {
+      console.error('[Discord] No discordRoleIds configured in SiteSettings');
+      return;
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -106,24 +97,14 @@ export async function syncDiscordRole(userId: string): Promise<void> {
 
     // Unranked players get the Unranked role, placed players get their ELO role
     const targetRole = isPlaced ? getRoleForElo(user.elo) : UNRANKED_ROLE;
-    const allEloRoleNames = getAllEloRoleNames();
+    const targetRoleId = roleIdMap[targetRole.key];
 
-    console.log(`[Discord] Syncing role for ${user.username ?? userId}: ELO=${user.elo}, games=${totalGames}, placed=${isPlaced}, target="${targetRole.name}"`);
-
-    // Get guild roles
-    const guildRoles = await getGuildRoles();
-    const eloRoleMap = new Map<string, string>(); // name -> id
-    for (const role of guildRoles) {
-      if (allEloRoleNames.includes(role.name)) {
-        eloRoleMap.set(role.name, role.id);
-      }
-    }
-
-    const targetRoleId = eloRoleMap.get(targetRole.name);
     if (!targetRoleId) {
-      console.error(`[Discord] Target role "${targetRole.name}" not found in guild. Available ELO roles: ${[...eloRoleMap.keys()].join(', ') || 'NONE'}`);
+      console.error(`[Discord] No Discord role ID stored for key "${targetRole.key}". Run the admin Discord role setup.`);
       return;
     }
+
+    console.log(`[Discord] Syncing role for ${user.username ?? userId}: ELO=${user.elo}, games=${totalGames}, placed=${isPlaced}, target="${targetRole.label}" (${targetRole.key})`);
 
     // Fetch member's current roles
     const memberRes = await discordFetch(`/guilds/${GUILD_ID}/members/${user.discordId}`);
@@ -137,48 +118,55 @@ export async function syncDiscordRole(userId: string): Promise<void> {
     }
     const member = await memberRes.json() as { roles: string[] };
 
+    // Collect all stored ELO role IDs
+    const allStoredRoleIds = new Set<string>();
+    for (const role of ALL_ELO_ROLES) {
+      const id = roleIdMap[role.key];
+      if (id) allStoredRoleIds.add(id);
+    }
+
     // Determine which roles need to be removed and if target needs to be added
-    const rolesToRemove: Array<{ name: string; id: string }> = [];
-    for (const [roleName, roleId] of eloRoleMap) {
-      if (roleName !== targetRole.name && member.roles.includes(roleId)) {
-        rolesToRemove.push({ name: roleName, id: roleId });
+    const rolesToRemove: Array<{ key: string; id: string }> = [];
+    for (const role of ALL_ELO_ROLES) {
+      const id = roleIdMap[role.key];
+      if (id && id !== targetRoleId && member.roles.includes(id)) {
+        rolesToRemove.push({ key: role.key, id });
       }
     }
     const needsTargetRole = !member.roles.includes(targetRoleId);
 
     // Nothing to do
     if (rolesToRemove.length === 0 && !needsTargetRole) {
-      console.log(`[Discord] Role already correct for ${user.username ?? userId}: "${targetRole.name}"`);
+      console.log(`[Discord] Role already correct for ${user.username ?? userId}: "${targetRole.label}"`);
       return;
     }
 
     // Remove all ELO roles that aren't the target
     for (const roleToRemove of rolesToRemove) {
-      console.log(`[Discord] Removing role "${roleToRemove.name}" from ${user.username ?? userId}`);
+      console.log(`[Discord] Removing role "${roleToRemove.key}" from ${user.username ?? userId}`);
       const removeRes = await discordFetch(
         `/guilds/${GUILD_ID}/members/${user.discordId}/roles/${roleToRemove.id}`,
         { method: 'DELETE' },
       );
       if (!removeRes.ok && removeRes.status !== 204) {
-        console.error(`[Discord] Failed to remove role "${roleToRemove.name}" (${removeRes.status})`);
+        console.error(`[Discord] Failed to remove role "${roleToRemove.key}" (${removeRes.status})`);
       }
-      // Small delay between role operations to avoid rate limits
       await delay(250);
     }
 
     // Add target role if not already present
     if (needsTargetRole) {
-      console.log(`[Discord] Adding role "${targetRole.name}" to ${user.username ?? userId}`);
+      console.log(`[Discord] Adding role "${targetRole.label}" to ${user.username ?? userId}`);
       const addRes = await discordFetch(
         `/guilds/${GUILD_ID}/members/${user.discordId}/roles/${targetRoleId}`,
         { method: 'PUT' },
       );
       if (!addRes.ok && addRes.status !== 204) {
-        console.error(`[Discord] Failed to add role "${targetRole.name}" (${addRes.status})`);
+        console.error(`[Discord] Failed to add role "${targetRole.label}" (${addRes.status})`);
       }
     }
 
-    console.log(`[Discord] Role sync complete for ${user.username ?? userId}: "${targetRole.name}"`);
+    console.log(`[Discord] Role sync complete for ${user.username ?? userId}: "${targetRole.label}"`);
   } catch (error) {
     console.error('[Discord] Role sync error:', error);
   }
@@ -187,7 +175,6 @@ export async function syncDiscordRole(userId: string): Promise<void> {
 /**
  * Sync Discord roles for ALL users with linked Discord accounts.
  * Used by admin bulk-sync endpoint.
- * Returns summary of results.
  */
 export async function syncAllDiscordRoles(): Promise<{ total: number; synced: number; errors: number }> {
   if (!BOT_TOKEN || !GUILD_ID) return { total: 0, synced: 0, errors: 0 };
@@ -208,13 +195,18 @@ export async function syncAllDiscordRoles(): Promise<{ total: number; synced: nu
       console.error(`[Discord] Bulk sync error for ${user.username}`);
       errors++;
     }
-    // Delay between users to avoid rate limits
     await delay(500);
   }
 
   return { total: users.length, synced, errors };
 }
 
+/**
+ * Invalidate the guild roles cache (kept for backward compat).
+ */
+export function invalidateRoleCache(): void {
+  // No longer caching guild roles — using stored IDs from DB
+}
 
 /**
  * Assign a tournament reward role to a player.
@@ -231,12 +223,17 @@ export async function assignTournamentRole(userId: string, roleName: string): Pr
 
     if (!user?.discordId) return;
 
-    // Find or create the role
-    let guildRoles = await getGuildRoles();
+    // Fetch guild roles to find by name
+    const rolesRes = await discordFetch(`/guilds/${GUILD_ID}/roles`);
+    if (!rolesRes.ok) {
+      console.error('[Discord] Failed to fetch guild roles:', rolesRes.status);
+      return;
+    }
+    const guildRoles = await rolesRes.json() as Array<{ id: string; name: string }>;
     let role = guildRoles.find((r) => r.name === roleName);
 
     if (!role) {
-      // Create the role with a gold-ish color
+      // Create the role
       const createRes = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
         method: 'POST',
         body: JSON.stringify({ name: roleName, color: 0xc4a35a, mentionable: false }),
@@ -245,8 +242,7 @@ export async function assignTournamentRole(userId: string, roleName: string): Pr
         console.error('[Discord] Failed to create tournament role:', createRes.status);
         return;
       }
-      role = await createRes.json() as DiscordRole;
-      invalidateRoleCache();
+      role = await createRes.json() as { id: string; name: string };
     }
 
     // Assign the role to the member
