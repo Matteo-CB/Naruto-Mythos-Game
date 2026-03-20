@@ -62,6 +62,7 @@ const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
 const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
+const userNames = new Map<string, string>(); // userId -> username (populated on auth:register)
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
 
@@ -688,9 +689,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
     registerTournamentHandlers(io, socket);
 
     // Register user identity for targeted notifications
-    socket.on('auth:register', (data: { userId: string }) => {
+    socket.on('auth:register', (data: { userId: string; username?: string }) => {
       if (data.userId) {
         registerUserSocket(data.userId, socket.id);
+        if (data.username) {
+          userNames.set(data.userId, data.username);
+        }
       }
     });
 
@@ -856,7 +860,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isRanked: gameMode === 'ranked',
         gameMode,
         createdAt: Date.now(),
-        hostName: data.hostName,
+        hostName: data.hostName || userNames.get(data.userId) || 'Unknown',
         actionTimer: null,
         timerDeadline: null,
         disconnectTimer: null,
@@ -1508,7 +1512,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           code,
           hostId: data.userId,
           hostSocket: socket.id,
-          hostName: data.hostName ?? 'Unknown',
+          hostName: data.hostName || userNames.get(data.userId) || 'Unknown',
           guestId: null,
           guestSocket: null,
           gameState: null,

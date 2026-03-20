@@ -71,7 +71,7 @@ export default function PlayOnlinePage() {
     if (!session?.user?.id) return;
     try {
       if (!connected) {
-        await connect(session.user.id);
+        await connect(session.user.id, session.user.name ?? undefined);
       }
       requestRoomList();
     } catch {
@@ -127,7 +127,7 @@ export default function PlayOnlinePage() {
   useEffect(() => {
     const roomParam = searchParams.get('room');
     if (roomParam && session?.user?.id && !connected) {
-      connect(session.user.id);
+      connect(session.user.id, session.user.name ?? undefined);
       setView('private');
       setShowJoinInput(true);
       setJoinCode(roomParam);
@@ -192,7 +192,7 @@ export default function PlayOnlinePage() {
   const handleCreatePublicRoom = async (mode?: GameMode) => {
     try {
       if (!connected) {
-        await connect(session.user.id);
+        await connect(session.user.id, session.user.name ?? undefined);
       }
       const actualMode = mode ?? selectedMode;
       const isRanked = actualMode === 'ranked';
@@ -206,7 +206,7 @@ export default function PlayOnlinePage() {
   const handleCreatePrivateRoom = async () => {
     try {
       if (!connected) {
-        await connect(session.user.id);
+        await connect(session.user.id, session.user.name ?? undefined);
       }
       const isRanked = selectedMode === 'ranked';
       createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
@@ -221,7 +221,7 @@ export default function PlayOnlinePage() {
     if (!codeToJoin) return;
     try {
       if (!connected) {
-        await connect(session.user.id);
+        await connect(session.user.id, session.user.name ?? undefined);
       }
       joinRoom(codeToJoin, session.user.id);
     } catch {
@@ -628,7 +628,7 @@ function LiveGamesSection() {
     const { connected, connect } = useSocketStore.getState();
     if (!connected) {
       try {
-        await connect(session.user.id);
+        await connect(session.user.id, session.user.name ?? undefined);
       } catch {
         return; // Connection failed
       }
