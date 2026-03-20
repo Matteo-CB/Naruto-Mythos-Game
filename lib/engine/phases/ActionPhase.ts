@@ -42,7 +42,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'REVEAL_CHARACTER':
-      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId);
+      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId, action.useAmbush);
       if (newState === beforeAction) return state;
       break;
     case 'UPGRADE_CHARACTER':
@@ -286,6 +286,7 @@ function handleRevealCharacter(
   missionIndex: number,
   characterInstanceId: string,
   upgradeTargetInstanceId?: string,
+  useAmbush?: boolean,
 ): GameState {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) return state;
 
@@ -334,7 +335,9 @@ function handleRevealCharacter(
   }
 
   // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE
-  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
+  // When useAmbush is explicitly false, skip AMBUSH cost reductions (Shino 033)
+  const skipAmbush = useAmbush === false;
+  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, skipAmbush);
   let costToPay = fullCost;
 
   if (upgradeTarget) {
@@ -459,11 +462,26 @@ function handleRevealCharacter(
   newState = triggerOnPlayReactions(newState, player, missionIndex, true);
 
   // Trigger MAIN + AMBUSH effects via EffectEngine
+  // For Kakashi 016 with useAmbush: AMBUSH already consumed (cost reduction),
+  // so skip MAIN (Andy's rule: choosing AMBUSH reveal means no MAIN trigger)
   const revealedMission = newState.activeMissions[missionIndex];
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
   if (revealedChar) {
-    newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
+    const skipMainForAmbush = useAmbush === true && charTopCard.number === 16;
+    if (skipMainForAmbush) {
+      // Kakashi 016 AMBUSH reveal: copy Shino's cost reduction was already applied via cost.
+      // Log it and skip MAIN effect.
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', player,
+        'EFFECT',
+        'Kakashi Hatake (016) AMBUSH: Copied Shino Aburame cost reduction — revealed for 0 chakra. MAIN effect skipped.',
+        'game.log.effect.kakashi016AmbushReveal',
+        { card: 'KAKASHI HATAKE', id: 'KS-016-UC' },
+      );
+    } else {
+      newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
+    }
   }
 
   // Re-apply Rashomon token removal in case this reveal changes the strongest enemy

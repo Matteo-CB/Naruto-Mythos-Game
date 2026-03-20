@@ -244,6 +244,7 @@
         "orochimaru051Pending": "Orochimaru (051): Lost this mission. Choose a destination mission.",
         "revealHiddenReduced": "Revealed {card} on mission {mission} for {cost} chakra (cost reduced by {reduction}).",
         "shino033CostReduction": "{card} ({id}): Next character costs {reduction} less chakra.",
+        "kakashi016AmbushReveal": "{card} ({id}): Copied Shino cost reduction. MAIN effect skipped.",
         "tenten118SecondDefeat": "{card} ({id}): Defeated a second hidden enemy character.",
         "upgradeFromHand": "{card} ({id}): Upgraded {target} from hand on mission {mission} for {cost} chakra.",
         "upgradeLeafReduced": "{card} ({id}): Upgraded {target} (Leaf Village reduced cost) on mission {mission} for {cost} chakra.",
