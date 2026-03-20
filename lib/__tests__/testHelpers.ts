@@ -203,7 +203,7 @@ export function createActionPhaseState(overrides: Partial<GameState> = {}): Game
     pendingEffects: [],
     pendingActions: [],
     turnMissionRevealed: true,
-    missionScoredThisTurn: false,
+    
     consecutiveTimeouts: { player1: 0, player2: 0 },
     ...overrides,
   };

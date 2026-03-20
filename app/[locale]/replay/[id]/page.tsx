@@ -1062,7 +1062,7 @@ function VisualReplay({
             }
             if (!advanced) {
               try {
-                const forced: GameState = { ...current, phase: 'mission' as GamePhase, missionScoredThisTurn: false };
+                const forced: GameState = { ...current, phase: 'mission' as GamePhase };
                 advanced = GameEngine.applyAction(forced, current.edgeHolder, { type: 'ADVANCE_PHASE' });
               } catch {
                 // Force transition to mission phase
@@ -1071,7 +1071,7 @@ function VisualReplay({
                   phase: 'mission' as GamePhase,
                   pendingActions: [],
                   pendingEffects: [],
-                  missionScoredThisTurn: false,
+                  
                 };
               }
             }
@@ -1130,7 +1130,7 @@ function VisualReplay({
             phase: 'mission' as GamePhase,
             pendingActions: [],
             pendingEffects: [],
-            missionScoredThisTurn: false,
+            
             player1: { ...current.player1, hasPassed: true },
             player2: { ...current.player2, hasPassed: true },
           };

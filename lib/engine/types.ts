@@ -147,8 +147,6 @@ export interface GameState {
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
   turnMissionRevealed: boolean;
-  /** Prevents executeMissionPhase from running twice in the same turn */
-  missionScoredThisTurn: boolean;
   /** Tracks progress through mission scoring when SCORE effects require target selection */
   missionScoringProgress?: MissionScoringProgress;
   /** Instance IDs of Rock Lee characters already moved during this End Phase */
