@@ -244,6 +244,7 @@
         "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
         "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
         "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",
+        "kakashi016AmbushReveal": "{card} ({id}) : Copie la reduction de Shino. Effet MAIN ignore.",
         "tenten118SecondDefeat": "{card} ({id}) : A vaincu un deuxieme personnage ennemi cache.",
         "upgradeFromHand": "{card} ({id}) : UPGRADE de {target} depuis la main sur mission {mission} pour {cost} chakra.",
         "upgradeLeafReduced": "{card} ({id}) : UPGRADE de {target} (cout Feuille reduit) sur mission {mission} pour {cost} chakra.",

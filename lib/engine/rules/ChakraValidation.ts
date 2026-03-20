@@ -24,6 +24,7 @@ export function calculateEffectiveCost(
   card: CharacterCard,
   missionIndex: number,
   isReveal: boolean,
+  skipAmbushReduction?: boolean,
 ): number {
   let cost = card.chakra;
 
@@ -134,7 +135,8 @@ export function calculateEffectiveCost(
   }
 
   // Shino 033 AMBUSH: Pay 4 less when revealing if there's an enemy Jutsu character in this mission
-  if (isReveal && card.number === 33) {
+  // Only applied when player chooses the AMBUSH reveal option (useAmbush = true)
+  if (isReveal && card.number === 33 && !skipAmbushReduction) {
     const hasEnemyJutsu = enemyChars?.some((c: any) => {
       if (c.isHidden) return false;
       const cTop = getTopCard(c);
