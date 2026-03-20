@@ -858,6 +858,13 @@
       "maintenance": "Le serveur est en maintenance. Veuillez patienter...",
       "maintenanceNoNewGames": "Le serveur entre en maintenance. Aucune nouvelle partie ne peut etre lancee. Le site sera de retour dans quelques minutes.",
       "syncError": "Erreur de synchronisation. Reconnexion en cours..."
+    },
+    "opponentDisconnected": "Adversaire deconnecte. Il a {time} pour se reconnecter ou la partie est forfait.",
+    "reconnect": {
+      "title": "Partie en cours",
+      "description": "Vous avez une partie en cours. Voulez-vous la rejoindre ou l'abandonner ?",
+      "rejoin": "Rejoindre",
+      "abandon": "Abandonner"
     }
   },
   "collection": {

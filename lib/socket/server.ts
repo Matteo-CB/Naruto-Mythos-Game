@@ -58,7 +58,7 @@ interface RoomData {
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
 const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
-const DISCONNECT_GRACE_MS = 30_000; // 30 seconds before disconnect = forfeit
+const DISCONNECT_GRACE_MS = 120_000; // 2 minutes before disconnect = forfeit
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
 const rooms = new Map<string, RoomData>();
@@ -698,6 +698,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (data.username) {
           userNames.set(data.userId, data.username);
         }
+        // Check if this user has an active game they need to reconnect to
+        for (const [code, room] of rooms) {
+          if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+          const isHost = room.hostId === data.userId;
+          const isGuest = room.guestId === data.userId;
+          if (isHost || isGuest) {
+            socket.emit('game:active-game', {
+              roomCode: code,
+              playerRole: isHost ? 'player1' : 'player2',
+            });
+            break;
+          }
+        }
       }
     });
 
@@ -744,6 +757,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         clearTimeout(room.disconnectTimer);
         room.disconnectTimer = null;
         console.log(`[Socket] Cancelled disconnect timer for ${player} in room ${roomCode}`);
+
+        // Notify the opponent that the player has reconnected
+        const opponentSock = isHost ? room.guestSocket : room.hostSocket;
+        if (opponentSock) {
+          io.to(opponentSock).emit('game:opponent-reconnected');
+        }
       }
 
       // Re-register user socket
@@ -1849,6 +1868,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
           else if (room.gameState && room.gameState.phase !== 'gameOver') {
             console.log(`[Socket] ${player} disconnected during game in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
             clearActionTimer(room);
+
+            // Notify the opponent that the player disconnected + send countdown deadline
+            const disconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;
+            const opponentSock = isHost ? room.guestSocket : room.hostSocket;
+            if (opponentSock) {
+              io.to(opponentSock).emit('game:opponent-disconnected', {
+                deadline: disconnectDeadline,
+                durationMs: DISCONNECT_GRACE_MS,
+              });
+            }
 
             room.disconnectTimer = setTimeout(async () => {
               if (!room.gameState || room.gameState.phase === 'gameOver') return;

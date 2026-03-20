@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/lib/i18n/routing';
 import { SessionProvider } from 'next-auth/react';
 import { NotificationContainer } from '@/components/social/NotificationContainer';
+import { ReconnectPrompt } from '@/components/ReconnectPrompt';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import { AnimationProvider } from '@/components/AnimationProvider';
@@ -157,6 +158,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         </Suspense>
         <AnimationProvider>{children}</AnimationProvider>
         <NotificationContainer />
+        <ReconnectPrompt />
       </NextIntlClientProvider>
     </SessionProvider>
   );
