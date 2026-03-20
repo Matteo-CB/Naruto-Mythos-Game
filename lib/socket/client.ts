@@ -19,6 +19,7 @@ interface SocketStore {
   socket: Socket | null;
   connected: boolean;
   userId: string | null;
+  userName: string | null;
   roomCode: string | null;
   playerRole: 'player1' | 'player2' | null;
   visibleState: VisibleGameState | null;
@@ -65,7 +66,7 @@ interface SocketStore {
   _lastStateUpdate: number;
   _resyncTimer: ReturnType<typeof setInterval> | null;
 
-  connect: (userId?: string) => Promise<void>;
+  connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
   createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, timerEnabled?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
@@ -107,6 +108,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
   connected: false,
   userId: null,
+  userName: null,
   roomCode: null,
   playerRole: null,
   visibleState: null,
@@ -150,7 +152,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     return [];
   })(),
 
-  connect: (userId?: string) => {
+  connect: (userId?: string, username?: string) => {
     return new Promise((resolve, reject) => {
       // If already connected with a live socket, resolve immediately
       const existing = get().socket;
@@ -191,11 +193,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('connect', () => {
         clearTimeout(timeoutId);
         console.log('[Socket] Connected:', socket.id);
-        set({ connected: true, userId: userId || null, error: null, errorKey: null });
+        set({ connected: true, userId: userId || null, userName: username || null, error: null, errorKey: null });
 
         // Register the user with the socket server for social features
         if (userId) {
-          socket.emit('auth:register', { userId });
+          socket.emit('auth:register', { userId, username });
         }
 
         // Auto-fetch active games list on connect
@@ -219,8 +221,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
         // Re-register user on reconnect
         const uid = get().userId;
+        const uname = get().userName;
         if (uid) {
-          socket.emit('auth:register', { userId: uid });
+          socket.emit('auth:register', { userId: uid, username: uname ?? undefined });
         }
 
         // Rejoin active room so server updates our socket ID
@@ -579,6 +582,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         socket: null,
         connected: false,
         userId: null,
+        userName: null,
         roomCode: null,
         playerRole: null,
         visibleState: null,
