@@ -14902,10 +14902,20 @@ export class EffectEngine {
       { card: 'KAKASHI HATAKE', id: 'KS-106-R', target: discardedCard.name_fr },
     );
 
-    // UPGRADE: copy the discarded card's non-Upgrade instant effect (MAIN, AMBUSH, or SCORE)
+    // UPGRADE: copy the discarded card's non-Upgrade instant effect
+    // Kakashi 106 CANNOT copy: UPGRADE, SCORE, continuous [⧗], or effect: modifiers
+    // AMBUSH is only copyable if Kakashi was revealed (wasRevealed flag)
     if (pending.isUpgrade) {
+      const copier106WasRevealed = pending.wasRevealed ?? false;
       const copyableEffects = (discardedCard.effects ?? []).filter(
-        (e) => e.type !== 'UPGRADE' && !e.description.includes('[⧗]') && !e.description.startsWith('effect:') && !e.description.startsWith('effect.'),
+        (e) => {
+          if (e.type === 'SCORE') return false;
+          if (e.type === 'UPGRADE') return false;
+          if (e.type === 'AMBUSH' && !copier106WasRevealed) return false;
+          if (e.description.includes('[⧗]')) return false;
+          if (e.description.startsWith('effect:') || e.description.startsWith('effect.')) return false;
+          return true;
+        },
       );
       if (copyableEffects.length === 1) {
         // Single copyable effect - execute directly
