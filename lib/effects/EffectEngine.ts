@@ -35,7 +35,7 @@ function findUpgradeTargetIdx(
   const sameNameIdx = chars.findIndex(c => {
     if (c.isHidden) return false;
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     // Block same-name upgrade onto Orochimaru/Summon for cards with flexible restriction
     if (hasFlexibleRestriction) {
       const isSummon = (topCard.keywords ?? []).includes('Summon');
@@ -51,14 +51,14 @@ function findUpgradeTargetIdx(
   const flexIdx = chars.findIndex(c => {
     if (c.isHidden) return false;
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     if (!checkFlexibleUpgrade(card as any, topCard) || (card.chakra ?? 0) <= (topCard.chakra ?? 0)) return false;
     // Exclude targets where upgrading would create a post-upgrade name conflict
     // E.g., Orochimaru 138 upgrading over Naruto when another Orochimaru is already present
     const wouldConflict = chars.some(other => {
       if (other.instanceId === c.instanceId || other.isHidden) return false;
       if (excludeInstanceId && other.instanceId === excludeInstanceId) return false;
-      const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+      const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
       return oTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
     });
     return !wouldConflict;
@@ -77,7 +77,7 @@ function hasSameNameConflict(
   return chars.some(c => {
     if (c.isHidden) return false;
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
   });
 }
@@ -100,7 +100,7 @@ function isMissionValidForPlay(
 
   if (upgradeIdx >= 0) {
     const existing = chars[upgradeIdx];
-    const existingTopCard = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+    const existingTopCard = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
     const upgradeCost = Math.max(0, ((card.chakra ?? 0) - (existingTopCard.chakra ?? 0)) - costReduction);
     if (availableChakra >= upgradeCost) return true;
     // Upgrade unaffordable — fall through to check fresh play (possible for cross-name flex upgrades)
@@ -217,7 +217,7 @@ export class EffectEngine {
     missionIndex: number,
   ): GameState {
     let newState = deepClone(state);
-    const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
     // Build the ordered list of effect types from the card definition (top-to-bottom).
     // When revealed as an upgrade, MAIN, AMBUSH, and UPGRADE all trigger â€' in card order.
@@ -289,7 +289,7 @@ export class EffectEngine {
     missionIndex: number,
   ): GameState {
     let newState = deepClone(state);
-    const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
     // A simple reveal is NOT an upgrade — isUpgrade is only true when actively
     // played as an upgrade via resolvePlayEffects or resolveRevealUpgradeEffects.
@@ -415,7 +415,7 @@ export class EffectEngine {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     for (const char of chars) {
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
       if (hasCharScore) {
         const handler = getEffectHandler(topCard.id, 'SCORE');
@@ -518,7 +518,7 @@ export class EffectEngine {
       if (remainingEffectTypes.length > 0) {
         const syntheticPending: PendingEffect = {
           id: generateInstanceId(),
-          sourceCardId: character ? (character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card).id : '',
+          sourceCardId: character ? (character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card).id : '',
           sourceInstanceId: character?.instanceId ?? '',
           sourceMissionIndex: missionIndex,
           effectType,
@@ -542,7 +542,7 @@ export class EffectEngine {
     const actionId = generateInstanceId();
 
     const topCard = character
-      ? (character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card)
+      ? (character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card)
       : null;
 
     const pendingEffect: PendingEffect = {
@@ -1676,8 +1676,8 @@ export class EffectEngine {
         const gaara153Info = EffectEngine.findCharByInstanceId(newState, targetId);
         const gaara153DefeatedName = gaara153Info ? gaara153Info.character.card.name_fr : '';
         const gaara153DefeatedCost = gaara153Info
-          ? (gaara153Info.character.stack.length > 0
-              ? gaara153Info.character.stack[gaara153Info.character.stack.length - 1]
+          ? (gaara153Info.character.stack?.length > 0
+              ? gaara153Info.character.stack[gaara153Info.character.stack?.length - 1]
               : gaara153Info.character.card
             ).chakra
           : 0;
@@ -1694,7 +1694,7 @@ export class EffectEngine {
             for (const ch of newState.activeMissions[mi][gaara153EnemySide]) {
               if (ch.isHidden) continue;
               if (ch.instanceId === targetId) continue;
-              const tc = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              const tc = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
               if (tc.name_fr === gaara153DefeatedName && tc.chakra < gaara153DefeatedCost) {
                 hideTargets153.push(ch.instanceId);
               }
@@ -1747,8 +1747,8 @@ export class EffectEngine {
         const gaara139Info = EffectEngine.findCharByInstanceId(newState, targetId);
         const gaara139DefeatedName = gaara139Info ? gaara139Info.character.card.name_fr : '';
         const gaara139DefeatedCost = gaara139Info
-          ? (gaara139Info.character.stack.length > 0
-              ? gaara139Info.character.stack[gaara139Info.character.stack.length - 1]
+          ? (gaara139Info.character.stack?.length > 0
+              ? gaara139Info.character.stack[gaara139Info.character.stack?.length - 1]
               : gaara139Info.character.card
             ).chakra
           : 0;
@@ -1770,7 +1770,7 @@ export class EffectEngine {
             for (const ch of newState.activeMissions[mi][gaara139EnemySide]) {
               if (ch.isHidden) continue;
               if (ch.instanceId === targetId) continue;
-              const tc = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              const tc = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
               if (tc.name_fr === gaara139DefeatedName && tc.chakra < gaara139DefeatedCost) {
                 hideTargets.push(ch.instanceId);
               }
@@ -1891,8 +1891,8 @@ export class EffectEngine {
         const tenten118Char = EffectEngine.findCharByInstanceId(newState, targetId);
         let tenten118PrintedPower = 99;
         if (tenten118Char) {
-          const tTop = tenten118Char.character.stack.length > 0
-            ? tenten118Char.character.stack[tenten118Char.character.stack.length - 1]
+          const tTop = tenten118Char.character.stack?.length > 0
+            ? tenten118Char.character.stack[tenten118Char.character.stack?.length - 1]
             : tenten118Char.character.card;
           tenten118PrintedPower = tTop.power ?? 0;
         }
@@ -2051,7 +2051,7 @@ export class EffectEngine {
           for (const char of mission[h001FriendlySide]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.group === 'Leaf Village') h001Targets.push(char.instanceId);
           }
         }
@@ -2170,14 +2170,14 @@ export class EffectEngine {
           for (const char of (s006Mission as any)[s006EnemySide]) {
             if (getEffectivePower(newState, char, s006Opponent) <= 3) {
               // Pre-check: at least one destination must not have same-name conflict
-              const s006TopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const s006TopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               const s006CharName = s006TopCard.name_fr;
               const s006HasDest = newState.activeMissions.some((m: any, i: number) => {
                 if (i === s006mIdx) return false;
                 return !m[s006EnemySide].some((c: any) => {
                   if (c.instanceId === char.instanceId) return false;
                   if (c.isHidden) return false;
-                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                   return cTop.name_fr === s006CharName;
                 });
               });
@@ -2324,7 +2324,7 @@ export class EffectEngine {
         if (j008uMission) {
           for (const char of (j008uMission as any)[j008uEnemySide]) {
             if (char.isHidden) continue;
-            const tc = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const tc = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (tc.chakra <= 3) j008uTargets.push(char.instanceId);
           }
         }
@@ -2372,7 +2372,7 @@ export class EffectEngine {
         if (n010SrcMission) {
           for (const c of (n010SrcMission as any)[n010FriendlySide]) {
             if (c.instanceId === pendingEffect.sourceInstanceId) {
-              const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               n010CharName = top.name_fr;
               break;
             }
@@ -2386,7 +2386,7 @@ export class EffectEngine {
           const friendlyChars = (mission as any)[n010FriendlySide];
           const hasSameName = friendlyChars.some((c: CharacterInPlay) => {
             if (c.instanceId === pendingEffect.sourceInstanceId) return false;
-            const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return top.name_fr === n010CharName;
           });
           if (!hasSameName) n010Targets.push(String(mIdx));
@@ -2452,7 +2452,7 @@ export class EffectEngine {
         const hasTeam10_019 = allChars019.some((char: CharacterInPlay) => {
           if (char.instanceId === pendingEffect.sourceInstanceId) return false;
           if (char.isHidden) return false;
-          const top = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const top = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           return top.keywords?.includes('Team 10');
         });
         if (!hasTeam10_019) {
@@ -2738,7 +2738,7 @@ export class EffectEngine {
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016]) {
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
@@ -2794,7 +2794,7 @@ export class EffectEngine {
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016u]) {
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'SCORE') return false;
               if (eff.type === 'UPGRADE') return false; // Kakashi 016 CANNOT copy UPGRADE
@@ -2845,8 +2845,8 @@ export class EffectEngine {
           pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         const c018SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         if (!c018SrcChar) break;
-        const c018Top = c018SrcChar.character.stack.length > 0
-          ? c018SrcChar.character.stack[c018SrcChar.character.stack.length - 1]
+        const c018Top = c018SrcChar.character.stack?.length > 0
+          ? c018SrcChar.character.stack[c018SrcChar.character.stack?.length - 1]
           : c018SrcChar.character.card;
         const c018CharName = c018Top.name_fr;
 
@@ -2856,7 +2856,7 @@ export class EffectEngine {
           const mission = newState.activeMissions[mIdx];
           const hasSameName = mission[c018FriendlySide].some((c: CharacterInPlay) => {
             if (c.instanceId === pendingEffect.sourceInstanceId) return false;
-            const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return top.name_fr === c018CharName;
           });
           if (!hasSameName) c018Targets.push(String(mIdx));
@@ -2940,7 +2940,7 @@ export class EffectEngine {
 
         const i020Targets: string[] = [];
         for (const char of mission020[enemySide020]) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
           console.log(`[EffectEngine] INO020_CONFIRM_MAIN: enemy ${char.instanceId} isHidden=${char.isHidden} cost=${effectiveCost} name=${char.card.name_fr}`);
           if (effectiveCost <= 2) {
@@ -2995,7 +2995,7 @@ export class EffectEngine {
         );
         const i020uTargets: string[] = [];
         for (const char of mission020u[enemySide020u]) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const effectiveCost = char.isHidden ? 0 : topCard.chakra;
           if (effectiveCost <= 3) {
             if (!char.isHidden && friendlyNames020u.has(char.card.name_fr.toUpperCase())) continue;
@@ -3111,7 +3111,7 @@ export class EffectEngine {
             } else if (played.name) {
               // Visible play: match by name
               if (!char.isHidden) {
-                const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+                const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
                 if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
                   s022Targets.push(char.instanceId);
                 }
@@ -3165,7 +3165,7 @@ export class EffectEngine {
         for (const char of a023AllChars) {
           if (char.instanceId === pendingEffect.sourceInstanceId) continue;
           if (char.isHidden) continue;
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.keywords?.includes('Team 10')) {
             // Pre-check: at least one destination must not have same-name conflict
             const charController = a023Mission.player1Characters.some((c) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
@@ -3176,7 +3176,7 @@ export class EffectEngine {
               return !m[ctrlSide].some((c) => {
                 if (c.instanceId === char.instanceId) return false;
                 if (c.isHidden) return false;
-                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                 return cTop.name_fr === charName;
               });
             });
@@ -3291,11 +3291,11 @@ export class EffectEngine {
 
         let k026LowestCost = Infinity;
         for (const char of k026NonHidden) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.chakra < k026LowestCost) k026LowestCost = topCard.chakra;
         }
         const k026Tied = k026NonHidden.filter((c: CharacterInPlay) => {
-          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return topCard.chakra === k026LowestCost;
         });
 
@@ -3442,7 +3442,7 @@ export class EffectEngine {
         const a028KibaTargets: string[] = [];
         for (const char of a028Mission[a028FriendlySide]) {
           if (char.isHidden) continue;
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.name_fr === 'KIBA INUZUKA') a028KibaTargets.push(char.instanceId);
         }
 
@@ -3513,11 +3513,11 @@ export class EffectEngine {
 
         let a029LowestCost = Infinity;
         for (const char of a029NonHidden) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.chakra < a029LowestCost) a029LowestCost = topCard.chakra;
         }
         const a029Tied = a029NonHidden.filter((c: CharacterInPlay) => {
-          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return topCard.chakra === a029LowestCost;
         });
 
@@ -3670,7 +3670,7 @@ export class EffectEngine {
         if (s033SrcMission) {
           for (const c of s033SrcMission[s033FriendlySide]) {
             if (c.instanceId === pendingEffect.sourceInstanceId) {
-              const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               s033CharName = top.name_fr;
               break;
             }
@@ -3685,7 +3685,7 @@ export class EffectEngine {
           const hasSameName = friendlyChars.some((c: CharacterInPlay) => {
             if (c.instanceId === pendingEffect.sourceInstanceId) return false;
             if (c.isHidden) return false;
-            const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return top.name_fr === s033CharName;
           });
           if (!hasSameName) s033Targets.push(String(i));
@@ -3999,7 +3999,7 @@ export class EffectEngine {
           for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.group === 'Leaf Village') {
               tt041uTargets.push(char.instanceId);
             }
@@ -4172,7 +4172,7 @@ export class EffectEngine {
           const i047Mission = newState.activeMissions[i047mIdx];
           for (const char of [...i047Mission.player1Characters, ...i047Mission.player2Characters]) {
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.name_fr === 'NARUTO UZUMAKI') {
               const charCtrl = i047Mission.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
               if (isMovementBlockedByKurenai(newState, i047mIdx, charCtrl)) continue;
@@ -4182,7 +4182,7 @@ export class EffectEngine {
                 return !m[i047CtrlSide].some((c: any) => {
                   if (c.instanceId === char.instanceId) return false;
                   if (c.isHidden) return false;
-                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                   return cTop.name_fr === 'NARUTO UZUMAKI';
                 });
               });
@@ -4488,13 +4488,13 @@ export class EffectEngine {
           const mChars = newState.activeMissions[i][kb053mFriendlySide];
           const hasSameName = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase();
           });
           // Check same-name upgrade AND flexible cross-name upgrade (e.g. Orochimaru 138)
           const canUpgrade = mChars.some((c: CharacterInPlay) => {
             if (c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             const isSameName = cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase()
               && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
             const isFlex = checkFlexibleUpgrade(kb053mTopCard as any, cTop)
@@ -4623,7 +4623,7 @@ export class EffectEngine {
             let gemmaChar: CharacterInPlay | null = null;
             for (const ch of sideChars) {
               if (ch.isHidden) continue;
-              const fTopCard = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+              const fTopCard = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
               if (fTopCard.number === 49) {
                 const hasSacrifice = (fTopCard.effects ?? []).some(
                   (e: any) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
@@ -4804,7 +4804,7 @@ export class EffectEngine {
             for (const char of mission[side]) {
               if (char.isHidden) continue;
               if (isEnemy && !canBeHiddenByEnemy(newState, char, sideOwner)) continue;
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               if ((topCard.chakra ?? 0) <= 3) { km055HasHideTarget = true; break; }
             }
             if (km055HasHideTarget) break;
@@ -4869,7 +4869,7 @@ export class EffectEngine {
             for (const char of mission[side]) {
               if (char.isHidden) continue;
               if (isEnemy && !canBeHiddenByEnemy(newState, char, sideOwner)) continue;
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               if ((topCard.chakra ?? 0) <= 4) { km056HasHideTarget = true; break; }
             }
             if (km056HasHideTarget) break;
@@ -4903,7 +4903,7 @@ export class EffectEngine {
               for (const char_km of mission_km[side_km]) {
                 if (char_km.isHidden) continue;
                 if (isEnemy_km && !canBeHiddenByEnemy(newState, char_km, sideOwner_km)) continue;
-                const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
+                const topCard_km = char_km.stack?.length > 0 ? char_km.stack[char_km.stack?.length - 1] : char_km.card;
                 if ((topCard_km.chakra ?? 0) <= 4) km056HideTargets.push(char_km.instanceId);
               }
             }
@@ -4974,7 +4974,7 @@ export class EffectEngine {
           const hasSF = (mission as any)[j057FriendlySide].some((char: CharacterInPlay) => {
             if (char.instanceId === pendingEffect.sourceInstanceId) return false;
             if (char.isHidden) return false;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             return topCard.keywords && topCard.keywords.includes('Sound Four');
           });
           if (hasSF) j057Count++;
@@ -5017,7 +5017,7 @@ export class EffectEngine {
           for (const char of (j058Mission as any)[j058FriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               j058Targets.push({ missionIndex: pendingEffect.sourceMissionIndex, instanceId: char.instanceId });
             }
@@ -5062,7 +5062,7 @@ export class EffectEngine {
           for (const char of (mission as any)[j058uFriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               j058uTargets.push({ missionIndex: mIdx, instanceId: char.instanceId });
             }
@@ -5106,7 +5106,7 @@ export class EffectEngine {
           const hasSF = (mission as any)[k059FriendlySide].some((char: CharacterInPlay) => {
             if (char.instanceId === pendingEffect.sourceInstanceId) return false;
             if (char.isHidden) return false;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             return topCard.keywords && topCard.keywords.includes('Sound Four');
           });
           if (hasSF) k059X++;
@@ -5125,14 +5125,14 @@ export class EffectEngine {
           if (isMovementBlockedByKurenai(newState, i, k059Player)) continue;
           for (const char of newState.activeMissions[i][k059FriendlySide]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const charName = topCard.name_fr;
             const hasValidDest = newState.activeMissions.some((m: any, di: number) => {
               if (di === i) return false;
               return !m[k059FriendlySide].some((c: any) => {
                 if (c.instanceId === char.instanceId) return false;
                 if (c.isHidden) return false;
-                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                 return cTop.name_fr === charName;
               });
             });
@@ -5184,7 +5184,7 @@ export class EffectEngine {
         for (const char of [...k060Mission.player1Characters, ...k060Mission.player2Characters]) {
           const charCtrl = k060Mission.player1Characters.some((c: CharacterInPlay) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
           if (isMovementBlockedByKurenai(newState, k060MIdx, charCtrl as PlayerID)) continue;
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const charName = topCard.name_fr;
           const ctrlSide: 'player1Characters' | 'player2Characters' = charCtrl === 'player1' ? 'player1Characters' : 'player2Characters';
           const hasValidDest = char.isHidden || newState.activeMissions.some((m: any, i: number) => {
@@ -5192,7 +5192,7 @@ export class EffectEngine {
             return !m[ctrlSide].some((c: any) => {
               if (c.instanceId === char.instanceId) return false;
               if (c.isHidden) return false;
-              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               return cTop.name_fr === charName;
             });
           });
@@ -5339,7 +5339,7 @@ export class EffectEngine {
           const hasSF = (mission as any)[s061FriendlySide].some((char: CharacterInPlay) => {
             if (char.instanceId === pendingEffect.sourceInstanceId) return false;
             if (char.isHidden) return false;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             return topCard.keywords && topCard.keywords.includes('Sound Four');
           });
           if (hasSF) s061Count++;
@@ -5378,7 +5378,7 @@ export class EffectEngine {
           for (const char of (mission as any)[s062FriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
                 if (eff.type === 'SCORE') return false; // SCORE never copyable
@@ -5402,8 +5402,8 @@ export class EffectEngine {
           // Auto-select the single target — feed into existing SAKON062_COPY_EFFECT logic
           const s062AutoResult = EffectEngine.findCharByInstanceId(newState, s062Targets[0]);
           if (!s062AutoResult) break;
-          const s062TopCard = s062AutoResult.character.stack.length > 0
-            ? s062AutoResult.character.stack[s062AutoResult.character.stack.length - 1]
+          const s062TopCard = s062AutoResult.character.stack?.length > 0
+            ? s062AutoResult.character.stack[s062AutoResult.character.stack?.length - 1]
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
             if (eff.type === 'SCORE') return false; // SCORE never copyable
@@ -5475,7 +5475,7 @@ export class EffectEngine {
           for (const char of (mission as any)[t065aFriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.group === 'Sound Village') t065aTargets.push(char.instanceId);
           }
         }
@@ -5645,7 +5645,7 @@ export class EffectEngine {
         const d066HasSF = (d066Mission as any)[d066FriendlySide].some((char: CharacterInPlay) => {
           if (char.instanceId === pendingEffect.sourceInstanceId) return false;
           if (char.isHidden) return false;
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           return topCard.keywords && topCard.keywords.includes('Sound Four');
         });
 
@@ -5872,8 +5872,8 @@ export class EffectEngine {
             newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
             break;
           }
-          const d069mTopCard = d069mCharResult.character.stack.length > 0
-            ? d069mCharResult.character.stack[d069mCharResult.character.stack.length - 1]
+          const d069mTopCard = d069mCharResult.character.stack?.length > 0
+            ? d069mCharResult.character.stack[d069mCharResult.character.stack?.length - 1]
             : d069mCharResult.character.card;
           const d069mFullRevealCost = (d069mTopCard.chakra ?? 0) + 2;
           // Check for upgrade target — if upgrade exists, minimum cost is (new - old) + 2
@@ -5882,14 +5882,14 @@ export class EffectEngine {
           const d069mFriendly = newState.activeMissions[d069mCharResult.missionIndex][d069mOppSide];
           const d069mUpgradeTarget = d069mFriendly.find((c) => {
             if (c.instanceId === d069mAutoTargetId || c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             if ((d069mTopCard.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
             return cTop.name_fr.toUpperCase() === d069mTopCard.name_fr.toUpperCase();
           });
           let d069mRevealCost = d069mFullRevealCost;
           if (d069mUpgradeTarget) {
-            const d069mOldTop = d069mUpgradeTarget.stack.length > 0
-              ? d069mUpgradeTarget.stack[d069mUpgradeTarget.stack.length - 1]
+            const d069mOldTop = d069mUpgradeTarget.stack?.length > 0
+              ? d069mUpgradeTarget.stack[d069mUpgradeTarget.stack?.length - 1]
               : d069mUpgradeTarget.card;
             d069mRevealCost = Math.max(0, (d069mTopCard.chakra ?? 0) - (d069mOldTop.chakra ?? 0)) + 2;
           }
@@ -5995,14 +5995,14 @@ export class EffectEngine {
         const z071EnemyControl = z071Opponent === 'player1' ? 'player1Characters' : 'player2Characters';
         const z071ValidTargets: string[] = [];
         for (const char of z071Mission[z071EnemySide]) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           const charName = topCard.name_fr;
           const hasValidDest = char.isHidden || newState.activeMissions.some((m, i) => {
             if (i === z071MI) return false;
             return !m[z071EnemyControl].some((c: CharacterInPlay) => {
               if (c.instanceId === char.instanceId) return false;
               if (c.isHidden) return false;
-              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               return cTop.name_fr === charName;
             });
           });
@@ -6240,7 +6240,7 @@ export class EffectEngine {
           card: k073uCard,
           isHidden: true,
           powerTokens: 0,
-          stack: [],
+          stack: [k073uCard],
           controlledBy: k073uPlayer,
           originalOwner: k073uPlayer,
           instanceId: generateInstanceId(),
@@ -6314,7 +6314,7 @@ export class EffectEngine {
             for (const char of mission_k78[side]) {
               if (getEffectivePower(newState, char, charOwner as PlayerID) > 4) continue;
               // Check valid destinations (name uniqueness)
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               const charName = topCard.name_fr;
               const charControlSide = (char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters') as 'player1Characters' | 'player2Characters';
               const hasValidDest = char.isHidden || newState.activeMissions.some((m, i) => {
@@ -6322,7 +6322,7 @@ export class EffectEngine {
                 return !m[charControlSide].some((c: CharacterInPlay) => {
                   if (c.instanceId === char.instanceId) return false;
                   if (c.isHidden) return false;
-                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                   return cTop.name_fr === charName;
                 });
               });
@@ -6466,7 +6466,7 @@ export class EffectEngine {
           for (const char of mission_t80[t080Side]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.group !== 'Sand Village') continue;
             // Check valid destinations (name uniqueness)
             const charName = topCard.name_fr;
@@ -6475,7 +6475,7 @@ export class EffectEngine {
               return !m[t080Side].some((c: CharacterInPlay) => {
                 if (c.instanceId === char.instanceId) return false;
                 if (c.isHidden) return false;
-                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                 return cTop.name_fr === charName;
               });
             });
@@ -6765,7 +6765,7 @@ export class EffectEngine {
         const r083HasAlly = r083Mission[r083Side].some((char: CharacterInPlay) => {
           if (char.instanceId === pendingEffect.sourceInstanceId) return false;
           if (char.isHidden) return false;
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           return topCard.group === 'Sand Village';
         });
 
@@ -6827,7 +6827,7 @@ export class EffectEngine {
         for (const m of newState.activeMissions) {
           for (const c of m[k098FriendlySide]) {
             if (!c.isHidden) {
-              const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               if (topCard.name_fr.toUpperCase().includes('TSUNADE')) {
                 k098HasTsunade = true;
                 break;
@@ -6977,7 +6977,7 @@ export class EffectEngine {
         const m102ValidTargets = m102Mission[m102EnemySide]
           .filter((c: CharacterInPlay) => {
             if (c.isHidden) return false;
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return (topCard.keywords ?? []).some((k: string) => k.toLowerCase().includes('invocation') || k.toLowerCase().includes('summon'));
           })
           .map((c: CharacterInPlay) => c.instanceId);
@@ -7754,7 +7754,7 @@ export class EffectEngine {
         for (const m of newState.activeMissions) {
           for (const c of [...m.player1Characters, ...m.player2Characters]) {
             if (c.instanceId === pendingEffect.sourceInstanceId) continue;
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             if ((topCard.chakra ?? 0) <= 5) k123DefeatTargets.push(c.instanceId);
           }
         }
@@ -7772,7 +7772,7 @@ export class EffectEngine {
           for (const m of newState.activeMissions) {
             for (const c of [...m.player1Characters, ...m.player2Characters]) {
               if (c.instanceId === pendingEffect.sourceInstanceId) continue;
-              const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               if ((topCard.chakra ?? 0) <= 5) k123DefeatAfter.push(c.instanceId);
             }
           }
@@ -7986,7 +7986,7 @@ export class EffectEngine {
         for (let mIdx = 0; mIdx < newState.activeMissions.length; mIdx++) {
           for (const char of newState.activeMissions[mIdx][t125FriendlySide]) {
             if (!char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.group === 'Sound Village') {
               const revealCost = Math.max(0, (topCard.chakra ?? 0) - 2);
               if (t125State.chakra >= revealCost) {
@@ -8995,7 +8995,7 @@ export class EffectEngine {
             const c = chars[j];
             if (c.isHidden) continue;
             if (c.instanceId === pendingEffect.sourceInstanceId) continue;
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             if (topCard.group === 'Leaf Village') {
               chars[j] = { ...c, powerTokens: c.powerTokens + 1 };
               t131Count++;
@@ -9351,7 +9351,7 @@ export class EffectEngine {
         const k106ValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106EnemySide]) {
-            if (c.stack.length > 1) k106ValidTargets.push(c.instanceId);
+            if (c.stack?.length > 1) k106ValidTargets.push(c.instanceId);
           }
         }
         if (k106ValidTargets.length === 0) {
@@ -9419,7 +9419,7 @@ export class EffectEngine {
         const k106uValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106uEnemySide]) {
-            if (c.stack.length > 1) k106uValidTargets.push(c.instanceId);
+            if (c.stack?.length > 1) k106uValidTargets.push(c.instanceId);
           }
         }
         if (k106uValidTargets.length === 0) {
@@ -10901,7 +10901,7 @@ export class EffectEngine {
           for (const mission of newState.activeMissions) {
             for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               if ((topCard.chakra ?? 0) <= 5) {
                 defeatTargets_k.push(char.instanceId);
               }
@@ -11526,7 +11526,7 @@ export class EffectEngine {
           const sidePlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
           const isEnemy = sidePlayer !== k137Player;
           for (const c of k137Mission[side]) {
-            if (!c.isHidden && c.stack.length >= 2) {
+            if (!c.isHidden && c.stack?.length >= 2) {
               if (isEnemy && !canBeHiddenByEnemy(newState, c, sidePlayer)) continue;
               k137ValidTargets.push(c.instanceId);
             }
@@ -11579,8 +11579,8 @@ export class EffectEngine {
         // Find the source card to get its name
         const k137uCharResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         const k137uTopCard = k137uCharResult
-          ? (k137uCharResult.character.stack.length > 0
-              ? k137uCharResult.character.stack[k137uCharResult.character.stack.length - 1]
+          ? (k137uCharResult.character.stack?.length > 0
+              ? k137uCharResult.character.stack[k137uCharResult.character.stack?.length - 1]
               : k137uCharResult.character.card)
           : null;
         const k137uCharName = k137uTopCard?.name_fr ?? '';
@@ -11594,7 +11594,7 @@ export class EffectEngine {
           const hasSameName = friendlyChars.some((c: CharacterInPlay) => {
             if (c.instanceId === pendingEffect.sourceInstanceId) return false;
             if (c.isHidden) return false;
-            const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return tc.name_fr === k137uCharName;
           });
           if (!hasSameName) {
@@ -11716,7 +11716,7 @@ export class EffectEngine {
         const g139ValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const char of newState.activeMissions[i][g139EnemySide]) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const effectiveCost = char.isHidden ? 0 : topCard.chakra;
             if (effectiveCost < g139HiddenCount) {
               g139ValidTargets.push(char.instanceId);
@@ -11788,7 +11788,7 @@ export class EffectEngine {
         const g139mValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const char of newState.activeMissions[i][g139mEnemySide]) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const effectiveCost = char.isHidden ? 0 : topCard.chakra;
             if (effectiveCost < g139mHiddenCount) {
               g139mValidTargets.push(char.instanceId);
@@ -11874,7 +11874,7 @@ export class EffectEngine {
           const i140DefeatTargets: string[] = [];
           for (let mi = 0; mi < newState.activeMissions.length; mi++) {
             for (const char of newState.activeMissions[mi][i140EnemySide]) {
-              const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
               const effectiveCost = char.isHidden ? 0 : topCard.chakra;
               if (effectiveCost <= i140HandSize) {
                 i140DefeatTargets.push(char.instanceId);
@@ -11926,7 +11926,7 @@ export class EffectEngine {
         const i140cDefeatTargets: string[] = [];
         for (let mi = 0; mi < newState.activeMissions.length; mi++) {
           for (const char of newState.activeMissions[mi][i140cEnemySide]) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const effectiveCost = char.isHidden ? 0 : topCard.chakra;
             if (effectiveCost <= i140cHandSize) {
               i140cDefeatTargets.push(char.instanceId);
@@ -12253,7 +12253,7 @@ export class EffectEngine {
           for (const char of newState.activeMissions[i][k148aFriendlySide]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
               if (effect.type === 'SCORE') return false; // SCORE never copyable
@@ -12507,8 +12507,8 @@ export class EffectEngine {
         const k148Target = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!k148Target) break;
 
-        const k148TopCard = k148Target.character.stack.length > 0
-          ? k148Target.character.stack[k148Target.character.stack.length - 1]
+        const k148TopCard = k148Target.character.stack?.length > 0
+          ? k148Target.character.stack[k148Target.character.stack?.length - 1]
           : k148Target.character.card;
 
         // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH, UPGRADE (not SCORE, not continuous)
@@ -13195,7 +13195,7 @@ export class EffectEngine {
               for (const char_km of mission_km[side_km]) {
                 if (char_km.isHidden) continue;
                 if (isEnemy_km && !canBeHiddenByEnemy(newState, char_km, sideOwner_km)) continue;
-                const topCard_km = char_km.stack.length > 0 ? char_km.stack[char_km.stack.length - 1] : char_km.card;
+                const topCard_km = char_km.stack?.length > 0 ? char_km.stack[char_km.stack?.length - 1] : char_km.card;
                 if ((topCard_km.chakra ?? 0) <= 4) {
                   validHideTargets_km.push(char_km.instanceId);
                 }
@@ -13503,8 +13503,8 @@ export class EffectEngine {
         const side_k78 = charPlayer_k78 === 'player1' ? 'player1Characters' : 'player2Characters';
         if (!hiddenChar_k78.isHidden) break; // sanity check
 
-        const topCard_k78 = hiddenChar_k78.stack.length > 0
-          ? hiddenChar_k78.stack[hiddenChar_k78.stack.length - 1]
+        const topCard_k78 = hiddenChar_k78.stack?.length > 0
+          ? hiddenChar_k78.stack[hiddenChar_k78.stack?.length - 1]
           : hiddenChar_k78.card;
 
         // Check if revealing this card would be an upgrade (same-name or flexible cross-name)
@@ -13515,11 +13515,11 @@ export class EffectEngine {
 
         // If there's a flex upgrade target, check if fresh reveal is also possible and offer choice
         if (upgradeTarget_k78) {
-          const existingTC_k78 = upgradeTarget_k78.stack.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack.length - 1] : upgradeTarget_k78.card;
+          const existingTC_k78 = upgradeTarget_k78.stack?.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack?.length - 1] : upgradeTarget_k78.card;
           const isFlexUpgrade_k78 = checkFlexibleUpgrade(topCard_k78 as any, existingTC_k78);
           const hasNameConflict_k78 = m_k78_check[friendlySide_k78].some((c: CharacterInPlay) => {
             if (c.instanceId === targetId || c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase();
           });
           const canFreshReveal_k78 = !hasNameConflict_k78;
@@ -13528,7 +13528,7 @@ export class EffectEngine {
           const upgradeTargetIds_k78: string[] = [];
           for (const c of m_k78_check[friendlySide_k78]) {
             if (c.isHidden || c.instanceId === targetId) continue;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             const isSameName = cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase() && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
             const isFlex = checkFlexibleUpgrade(topCard_k78 as any, cTop) && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
             if (isSameName || isFlex) {
@@ -13579,7 +13579,7 @@ export class EffectEngine {
         // No choice needed — proceed with auto-reveal (possibly auto-upgrade)
         let revealCost_k78: number;
         if (upgradeTarget_k78) {
-          const existingTC = upgradeTarget_k78.stack.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack.length - 1] : upgradeTarget_k78.card;
+          const existingTC = upgradeTarget_k78.stack?.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack?.length - 1] : upgradeTarget_k78.card;
           revealCost_k78 = Math.max(0, ((topCard_k78.chakra ?? 0) - (existingTC.chakra ?? 0)) - 1);
         } else {
           revealCost_k78 = Math.max(0, (topCard_k78.chakra ?? 0) - 1);
@@ -13646,8 +13646,8 @@ export class EffectEngine {
 
         const charResult_k78r = EffectEngine.findCharByInstanceId(newState, hiddenId_k78r);
         if (!charResult_k78r || !charResult_k78r.character.isHidden) break;
-        const topCard_k78r = charResult_k78r.character.stack.length > 0
-          ? charResult_k78r.character.stack[charResult_k78r.character.stack.length - 1]
+        const topCard_k78r = charResult_k78r.character.stack?.length > 0
+          ? charResult_k78r.character.stack[charResult_k78r.character.stack?.length - 1]
           : charResult_k78r.character.card;
         const side_k78r = charResult_k78r.player === 'player1' ? 'player1Characters' : 'player2Characters';
         const doUpgrade_k78r = targetId !== 'FRESH';
@@ -13658,7 +13658,7 @@ export class EffectEngine {
             (c: CharacterInPlay) => c.instanceId === targetId,
           );
           if (!upgradeTarget_k78r) break;
-          const existingTC_k78r = upgradeTarget_k78r.stack.length > 0 ? upgradeTarget_k78r.stack[upgradeTarget_k78r.stack.length - 1] : upgradeTarget_k78r.card;
+          const existingTC_k78r = upgradeTarget_k78r.stack?.length > 0 ? upgradeTarget_k78r.stack[upgradeTarget_k78r.stack?.length - 1] : upgradeTarget_k78r.card;
           revealCost_k78r = Math.max(0, ((topCard_k78r.chakra ?? 0) - (existingTC_k78r.chakra ?? 0)) - 1);
         } else {
           revealCost_k78r = Math.max(0, (topCard_k78r.chakra ?? 0) - 1);
@@ -13830,8 +13830,8 @@ export class EffectEngine {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
           break;
         }
-        const topCard_dosu = charResult_dosu.character.stack.length > 0
-          ? charResult_dosu.character.stack[charResult_dosu.character.stack.length - 1]
+        const topCard_dosu = charResult_dosu.character.stack?.length > 0
+          ? charResult_dosu.character.stack[charResult_dosu.character.stack?.length - 1]
           : charResult_dosu.character.card;
         const fullRevealCost_dosu = (topCard_dosu.chakra ?? 0) + 2;
         // Check for upgrade target — minimum cost may be lower
@@ -13840,14 +13840,14 @@ export class EffectEngine {
         const dosuFriendly = newState.activeMissions[charResult_dosu.missionIndex][dosuOppSide];
         const dosuUpgradeTarget = dosuFriendly.find((c) => {
           if (c.instanceId === targetId || c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           if ((topCard_dosu.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
           return cTop.name_fr.toUpperCase() === topCard_dosu.name_fr.toUpperCase();
         });
         let revealCost_dosu = fullRevealCost_dosu;
         if (dosuUpgradeTarget) {
-          const dosuOldTop = dosuUpgradeTarget.stack.length > 0
-            ? dosuUpgradeTarget.stack[dosuUpgradeTarget.stack.length - 1]
+          const dosuOldTop = dosuUpgradeTarget.stack?.length > 0
+            ? dosuUpgradeTarget.stack[dosuUpgradeTarget.stack?.length - 1]
             : dosuUpgradeTarget.card;
           revealCost_dosu = Math.max(0, (topCard_dosu.chakra ?? 0) - (dosuOldTop.chakra ?? 0)) + 2;
         }
@@ -13915,15 +13915,15 @@ export class EffectEngine {
         const mIdx_dosu69 = charResult_dosu69.missionIndex;
         const side_dosu69: 'player1Characters' | 'player2Characters' =
           opponent_dosu69 === 'player1' ? 'player1Characters' : 'player2Characters';
-        const charTopCard_dosu69 = charResult_dosu69.character.stack.length > 0
-          ? charResult_dosu69.character.stack[charResult_dosu69.character.stack.length - 1]
+        const charTopCard_dosu69 = charResult_dosu69.character.stack?.length > 0
+          ? charResult_dosu69.character.stack[charResult_dosu69.character.stack?.length - 1]
           : charResult_dosu69.character.card;
 
         // Check for upgrade target at same mission (same name, non-hidden, lower cost)
         const friendlyChars_dosu69 = newState.activeMissions[mIdx_dosu69][side_dosu69];
         const upgradeTarget_dosu69 = friendlyChars_dosu69.find((c) => {
           if (c.instanceId === targetInst_dosu69 || c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           if ((charTopCard_dosu69.chakra ?? 0) <= (cTop.chakra ?? 0)) return false;
           return cTop.name_fr.toUpperCase() === charTopCard_dosu69.name_fr.toUpperCase();
         });
@@ -13931,8 +13931,8 @@ export class EffectEngine {
         // Calculate actual cost: if upgrading, use (new - old) + 2 instead of full + 2
         let actualCost_dosu69 = revCost_dosu69;
         if (upgradeTarget_dosu69) {
-          const oldTop_dosu69 = upgradeTarget_dosu69.stack.length > 0
-            ? upgradeTarget_dosu69.stack[upgradeTarget_dosu69.stack.length - 1]
+          const oldTop_dosu69 = upgradeTarget_dosu69.stack?.length > 0
+            ? upgradeTarget_dosu69.stack[upgradeTarget_dosu69.stack?.length - 1]
             : upgradeTarget_dosu69.card;
           const upgradeDiff = Math.max(0, (charTopCard_dosu69.chakra ?? 0) - (oldTop_dosu69.chakra ?? 0));
           actualCost_dosu69 = upgradeDiff + 2; // Dosu penalty (+2) applies on top of upgrade cost difference
@@ -14034,8 +14034,8 @@ export class EffectEngine {
           break;
         }
 
-        const copyTargetTopCard = copyTargetResult.character.stack.length > 0
-          ? copyTargetResult.character.stack[copyTargetResult.character.stack.length - 1]
+        const copyTargetTopCard = copyTargetResult.character.stack?.length > 0
+          ? copyTargetResult.character.stack[copyTargetResult.character.stack?.length - 1]
           : copyTargetResult.character.card;
 
         // Copy effect filter:
@@ -14120,8 +14120,8 @@ export class EffectEngine {
           ? EffectEngine.findCharByInstanceId(newState, parsedCopy.charInstanceId)
           : null;
         const chosenTopCard = chosenTarget
-          ? (chosenTarget.character.stack.length > 0
-              ? chosenTarget.character.stack[chosenTarget.character.stack.length - 1]
+          ? (chosenTarget.character.stack?.length > 0
+              ? chosenTarget.character.stack[chosenTarget.character.stack?.length - 1]
               : chosenTarget.character.card)
           : null;
 
@@ -14176,8 +14176,8 @@ export class EffectEngine {
           let resultingInstanceId_h002 = instanceId_h002;
           const charBeforeReveal = EffectEngine.findCharByInstanceId(newState, instanceId_h002);
           if (charBeforeReveal) {
-            const topCard_h002r = charBeforeReveal.character.stack.length > 0
-              ? charBeforeReveal.character.stack[charBeforeReveal.character.stack.length - 1]
+            const topCard_h002r = charBeforeReveal.character.stack?.length > 0
+              ? charBeforeReveal.character.stack[charBeforeReveal.character.stack?.length - 1]
               : charBeforeReveal.character.card;
             const friendlySide_h002r: 'player1Characters' | 'player2Characters' =
               player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -14216,8 +14216,8 @@ export class EffectEngine {
 
           let h002MissionAdded = false;
           if (upgradeIdx_h002 >= 0) {
-            const existingTop = chars_h002[upgradeIdx_h002].stack.length > 0
-              ? chars_h002[upgradeIdx_h002].stack[chars_h002[upgradeIdx_h002].stack.length - 1]
+            const existingTop = chars_h002[upgradeIdx_h002].stack?.length > 0
+              ? chars_h002[upgradeIdx_h002].stack[chars_h002[upgradeIdx_h002].stack?.length - 1]
               : chars_h002[upgradeIdx_h002].card;
             const upgradeCost = Math.max(0, (card.chakra - existingTop.chakra) - 1);
             if (ps.chakra >= upgradeCost) {
@@ -14386,7 +14386,7 @@ export class EffectEngine {
         {
           const chosenChar = EffectEngine.findCharByInstanceId(newState, targetId);
           if (chosenChar) {
-            const chosenTop = chosenChar.character.stack.length > 0 ? chosenChar.character.stack[chosenChar.character.stack.length - 1] : chosenChar.character.card;
+            const chosenTop = chosenChar.character.stack?.length > 0 ? chosenChar.character.stack[chosenChar.character.stack?.length - 1] : chosenChar.character.card;
             console.log(`[GAARA120_CHOOSE_DEFEAT] Player chose targetId=${targetId} name=${chosenTop.name_fr} id=${chosenTop.id} hidden=${chosenChar.character.isHidden} mission=${chosenChar.missionIndex} validTargets=[${pendingEffect.validTargets?.join(', ')}]`);
           } else {
             console.warn(`[GAARA120_CHOOSE_DEFEAT] Chosen targetId=${targetId} NOT FOUND in state! validTargets=[${pendingEffect.validTargets?.join(', ')}]`);
@@ -14400,7 +14400,7 @@ export class EffectEngine {
         for (const m of newState.activeMissions) {
           for (const c of [...m.player1Characters, ...m.player2Characters]) {
             if (c.instanceId === targetId) {
-              const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               defeatName_g = tc.name_fr;
             }
           }
@@ -14674,7 +14674,7 @@ export class EffectEngine {
     }
 
     const { character, missionIndex } = charResult;
-    const topCard = character.stack.length > 0 ? character.stack[character.stack.length - 1] : character.card;
+    const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
     for (const effectType of remaining) {
       const hasEffect = (topCard.effects ?? []).some((e) => e.type === effectType);
@@ -14820,7 +14820,7 @@ export class EffectEngine {
     destMission[srcKey].push(movedChar);
 
     // Ninja Hounds 100 trigger: when moved to a different mission, look at a hidden character there
-    const movedTopCard = movedChar.stack.length > 0 ? movedChar.stack[movedChar.stack.length - 1] : movedChar.card;
+    const movedTopCard = movedChar.stack?.length > 0 ? movedChar.stack[movedChar.stack?.length - 1] : movedChar.card;
     if (movedTopCard.number === 100 && !movedChar.isHidden) {
       const hasNHEffect = (movedTopCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moves to a different mission'),
@@ -14857,7 +14857,7 @@ export class EffectEngine {
     if (!charResult) return state;
 
     const { character, missionIndex, player } = charResult;
-    if (character.stack.length <= 1) {
+    if (character.stack?.length <= 1) {
       // Not upgraded, nothing to devolve
       return state;
     }
@@ -15271,8 +15271,8 @@ export class EffectEngine {
       return state;
     }
 
-    const charTopCard = charResult.character.stack.length > 0
-      ? charResult.character.stack[charResult.character.stack.length - 1]
+    const charTopCard = charResult.character.stack?.length > 0
+      ? charResult.character.stack[charResult.character.stack?.length - 1]
       : charResult.character.card;
     console.log(`[EffectEngine] defeatCharacter: defeating ${charTopCard.name_fr} (${charTopCard.id}) instanceId=${targetId} hidden=${charResult.character.isHidden} mission=${charResult.missionIndex} player=${charResult.player}`);
 
@@ -15372,8 +15372,8 @@ export class EffectEngine {
     const hasTsunade004 = EffectEngine.hasTsunade004Active(newState, charResult2.player);
     if (hasTsunade004 && charResult2.player === owner) {
       // Only TOP card goes to hand; cards underneath go to discard pile
-      const topCard = defeated.stack.length > 0 ? defeated.stack[defeated.stack.length - 1] : null;
-      const underCards = defeated.stack.length > 1 ? defeated.stack.slice(0, -1) : [];
+      const topCard = defeated.stack?.length > 0 ? defeated.stack[defeated.stack?.length - 1] : null;
+      const underCards = defeated.stack?.length > 1 ? defeated.stack.slice(0, -1) : [];
       if (topCard) newState[owner].hand.push(topCard);
       for (const card of underCards) {
         newState[owner].discardPile.push(card);
@@ -15455,12 +15455,12 @@ export class EffectEngine {
             const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
 
             // Check same-name conflict on the destination side (use top-of-stack name for upgraded chars)
-            const topCardCtrl = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCardCtrl = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const charName = topCardCtrl.name_fr.toUpperCase();
             const hasSameName = currentMission[toSide].some(
               (c: CharacterInPlay) => {
                 if (c.isHidden || c.instanceId === char.instanceId) return false;
-                const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                 return cTop.name_fr.toUpperCase() === charName;
               }
             );
@@ -15473,7 +15473,7 @@ export class EffectEngine {
                 const altChars = altMission[toSide];
                 const hasConflict = altChars.some((c: CharacterInPlay) => {
                   if (c.isHidden || c.instanceId === char.instanceId) return false;
-                  const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                  const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
                   return cTop.name_fr.toUpperCase() === charName;
                 });
                 if (!hasConflict) { altMissionIdx = mi; break; }
@@ -15817,7 +15817,7 @@ export class EffectEngine {
       const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const char of chars) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.number === 4 && topCard.rarity === 'UC') {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('hand instead'),
@@ -15845,8 +15845,8 @@ export class EffectEngine {
     // Kimimaro 056 continuous protection: if an enemy effect targets this character,
     // the opponent must pay 1 chakra or the effect fails (hide is blocked).
     if (isEnemyEffect) {
-      const topCard = charResult.character.stack.length > 0
-        ? charResult.character.stack[charResult.character.stack.length - 1]
+      const topCard = charResult.character.stack?.length > 0
+        ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
       if (topCard.number === 56) {
         const hasProtection = (topCard.effects ?? []).some(
@@ -15903,7 +15903,7 @@ export class EffectEngine {
       const friendlyChars = charResult.player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const friendly of friendlyChars) {
         if (friendly.isHidden || friendly.instanceId === charResult.character.instanceId) continue;
-        const fTopCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+        const fTopCard = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
         if (fTopCard.number === 49) {
           const hasSacrifice = (fTopCard.effects ?? []).some(
             (e) =>
@@ -16133,7 +16133,7 @@ export class EffectEngine {
     // Check if fresh play is also possible (no name conflict with existing visible chars)
     const hasNameConflict = mission[friendlySide].some((c: CharacterInPlay) => {
       if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
     });
 
@@ -16143,7 +16143,7 @@ export class EffectEngine {
       for (let i = 0; i < mission[friendlySide].length; i++) {
         const c = mission[friendlySide][i];
         if (c.isHidden) continue;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
@@ -16151,7 +16151,7 @@ export class EffectEngine {
           if (isFlex) {
             const wouldConflict = mission[friendlySide].some((other: CharacterInPlay) => {
               if (other.instanceId === c.instanceId || other.isHidden) return false;
-              const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+              const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
               return oTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
             });
             if (wouldConflict) continue;
@@ -16236,7 +16236,7 @@ export class EffectEngine {
       isCardUpgrade = true;
 
       // Calculate actual upgrade cost with reduction
-      const eTopGpm = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const eTopGpm = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
       const actualCost = Math.max(0, ((card.chakra ?? 0) - (eTopGpm.chakra ?? 0)) - costReduction);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
@@ -16252,7 +16252,7 @@ export class EffectEngine {
       // Safety check: ensure no same-name visible character exists (name uniqueness)
       const hasNameConflict = mission[friendlySide].some((c: CharacterInPlay) => {
         if (c.isHidden) return false;
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       });
       if (hasNameConflict) {
@@ -16336,14 +16336,14 @@ export class EffectEngine {
       const existingIdx = mission[friendlySide].findIndex(c => c.instanceId === upgradeTargetId);
       if (existingIdx === -1) { ps.discardPile.push(card); return state; }
       const existing = mission[friendlySide][existingIdx];
-      const eTop = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const eTop = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
 
       // Safety: check post-upgrade name conflict for flex upgrades
       const isSameNameUpgrade = eTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       if (!isSameNameUpgrade) {
         const wouldConflict = mission[friendlySide].some((c: CharacterInPlay) => {
           if (c.instanceId === upgradeTargetId || c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
         });
         if (wouldConflict) { ps.discardPile.push(card); return state; }
@@ -16371,7 +16371,7 @@ export class EffectEngine {
       // Fresh play — verify no name conflict
       const hasNameConflictFresh = mission[friendlySide].some((c: CharacterInPlay) => {
         if (c.isHidden) return false;
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
       });
       if (hasNameConflictFresh) { ps.discardPile.push(card); return state; }
@@ -16451,8 +16451,8 @@ export class EffectEngine {
     const charResult = EffectEngine.findCharByInstanceId(newState, targetId);
     if (!charResult) return newState;
 
-    const topCard = charResult.character.stack.length > 0
-      ? charResult.character.stack[charResult.character.stack.length - 1]
+    const topCard = charResult.character.stack?.length > 0
+      ? charResult.character.stack[charResult.character.stack?.length - 1]
       : charResult.character.card;
 
     if ((topCard.chakra ?? 0) <= 3 && !charResult.character.isHidden) {
@@ -16500,7 +16500,7 @@ export class EffectEngine {
       for (const char of mission[enemySide]) {
         if (char.isHidden) continue;
         if (!canBeHiddenByEnemy(newState, char, opponent)) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((topCard.chakra ?? 0) <= 3) {
           validHideTargets.push(char.instanceId);
         }
@@ -16508,7 +16508,7 @@ export class EffectEngine {
       // Friendly chars â€' no immunity check needed (Kimimaro CAN hide itself)
       for (const char of mission[friendlySide]) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((topCard.chakra ?? 0) <= 3) {
           validHideTargets.push(char.instanceId);
         }
@@ -16851,7 +16851,7 @@ export class EffectEngine {
           if (char.instanceId !== targetId) continue;
           if (char.isHidden) return { state, blocked: false }; // Hidden = no continuous effects
 
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.number !== 56) return { state, blocked: false };
 
           // Check if this card has the continuous protection effect
@@ -16929,7 +16929,7 @@ export class EffectEngine {
       for (let i = 0; i < mission[friendlySide].length; i++) {
         const c = mission[friendlySide][i];
         if (c.isHidden) continue;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
@@ -17003,7 +17003,7 @@ export class EffectEngine {
 
 
       // Calculate actual upgrade cost with reduction
-      const existingTop_k053 = existing.stack.length > 0 ? existing.stack[existing.stack.length - 1] : existing.card;
+      const existingTop_k053 = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
       const actualCost = Math.max(0, ((card.chakra ?? 0) - (existingTop_k053.chakra ?? 0)) - 3);
       if (ps.chakra < actualCost) { ps.discardPile.push(card); return state; }
       ps.chakra -= actualCost;
@@ -17097,7 +17097,7 @@ export class EffectEngine {
       for (let i = 0; i < mission[friendlySide_h002].length; i++) {
         const c = mission[friendlySide_h002][i];
         if (c.isHidden) continue;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
@@ -17275,8 +17275,8 @@ export class EffectEngine {
 
     // Return only the top card to hand; discard underlying stack cards
     const ps = newState[player];
-    const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
-    const underCards = target.stack.length > 1 ? target.stack.slice(0, -1) : [];
+    const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
+    const underCards = target.stack?.length > 1 ? target.stack.slice(0, -1) : [];
     ps.hand = [...ps.hand, topCard];
     ps.discardPile = [...ps.discardPile, ...underCards];
     ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
@@ -18278,7 +18278,7 @@ export class EffectEngine {
       if (discardedChar) {
         const owner = discardedChar.originalOwner ?? charResult.player;
         const ownerState = { ...state[owner] };
-        const cardsToDiscard = discardedChar.stack.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
+        const cardsToDiscard = discardedChar.stack?.length > 0 ? [...discardedChar.stack] : [discardedChar.card];
         ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
         ownerState.charactersInPlay = EffectEngine.countCharsForPlayer({ ...state, [owner]: ownerState }, owner);
         state[owner] = ownerState;
@@ -18298,8 +18298,8 @@ export class EffectEngine {
     const moveInitiator = effectInitiator ?? charOwner;
     if (moveInitiator !== charResult.player) {
       // This is an enemy effect moving the character
-      const topCard = charResult.character.stack.length > 0
-        ? charResult.character.stack[charResult.character.stack.length - 1]
+      const topCard = charResult.character.stack?.length > 0
+        ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
       if (topCard.number === 75 && !charResult.character.isHidden) {
         const hasMoveProtection = (topCard.effects ?? []).some(
@@ -18325,7 +18325,7 @@ export class EffectEngine {
       const allCharsInMission = [...sourceMission.player1Characters, ...sourceMission.player2Characters];
       for (const ch of allCharsInMission) {
         if (ch.isHidden) continue;
-        const chTop = ch.stack.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
+        const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
         if (chTop.number === 35) {
           const hasRestriction = (chTop.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && (e.description.includes('cannot move') || e.description.includes("can't be moved")),
@@ -18362,7 +18362,7 @@ export class EffectEngine {
     const destMission = { ...missions[destMissionIndex] };
     // If Rashomon moves, clear its locked target so it retargets in the new mission
     const movedChar = { ...charResult.character, missionIndex: destMissionIndex };
-    const movedTop = movedChar.stack.length > 0 ? movedChar.stack[movedChar.stack.length - 1] : movedChar.card;
+    const movedTop = movedChar.stack?.length > 0 ? movedChar.stack[movedChar.stack?.length - 1] : movedChar.card;
     if (movedTop.number === 67 && movedChar.rempartLockedTargetId) {
       movedChar.rempartLockedTargetId = undefined;
     }
@@ -18420,8 +18420,8 @@ export class EffectEngine {
     const copierResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
     if (!copierResult) return newState;
 
-    const copierTopCard = copierResult.character.stack.length > 0
-      ? copierResult.character.stack[copierResult.character.stack.length - 1]
+    const copierTopCard = copierResult.character.stack?.length > 0
+      ? copierResult.character.stack[copierResult.character.stack?.length - 1]
       : copierResult.character.card;
 
     newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -18480,7 +18480,7 @@ export class EffectEngine {
 
     const char = charResult.character;
     const mIdx = charResult.missionIndex;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
     // Check if revealing this card would be an upgrade (same-name or flexible cross-name)
     const friendlySideRhr = player === "player1" ? "player1Characters" : "player2Characters";
@@ -18490,7 +18490,7 @@ export class EffectEngine {
 
     let cost: number;
     if (upgradeTargetRhr) {
-      const existingTC = upgradeTargetRhr.stack.length > 0 ? upgradeTargetRhr.stack[upgradeTargetRhr.stack.length - 1] : upgradeTargetRhr.card;
+      const existingTC = upgradeTargetRhr.stack?.length > 0 ? upgradeTargetRhr.stack[upgradeTargetRhr.stack?.length - 1] : upgradeTargetRhr.card;
       cost = Math.max(0, ((topCard.chakra ?? 0) - (existingTC.chakra ?? 0)) - costReduction);
     } else {
       cost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
@@ -18592,7 +18592,7 @@ export class EffectEngine {
       return { replaced: false, replacement: 'hide' };
     }
 
-    const topCard = targetChar.stack.length > 0 ? targetChar.stack[targetChar.stack.length - 1] : targetChar.card;
+    const topCard = targetChar.stack?.length > 0 ? targetChar.stack[targetChar.stack?.length - 1] : targetChar.card;
 
     // Hayate 048: If this character would be defeated, hide it instead
     if (topCard.number === 48) {
@@ -18627,7 +18627,7 @@ export class EffectEngine {
 
       for (const friendly of friendlyChars) {
         if (friendly.isHidden || friendly.instanceId === targetChar.instanceId) continue;
-        const fTopCard = friendly.stack.length > 0 ? friendly.stack[friendly.stack.length - 1] : friendly.card;
+        const fTopCard = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
 
         if (fTopCard.number === 49) {
           const hasSacrifice = (fTopCard.effects ?? []).some(
@@ -18669,7 +18669,7 @@ export class EffectEngine {
         let upgradeTarget: CharacterInPlay | undefined;
         for (const c of chars) {
           if (c.isHidden) continue;
-          const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           if (topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
             upgradeTarget = c; break;
           }
@@ -18677,21 +18677,21 @@ export class EffectEngine {
         if (!upgradeTarget) {
           for (const c of chars) {
             if (c.isHidden) continue;
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             if (checkFlexibleUpgrade(card as any, topCard) && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
               upgradeTarget = c; break;
             }
           }
         }
         if (upgradeTarget) {
-          const existingTop = upgradeTarget.stack.length > 0
-            ? upgradeTarget.stack[upgradeTarget.stack.length - 1] : upgradeTarget.card;
+          const existingTop = upgradeTarget.stack?.length > 0
+            ? upgradeTarget.stack[upgradeTarget.stack?.length - 1] : upgradeTarget.card;
           const upgradeCost = Math.max(0, (card.chakra - existingTop.chakra) - costReduction);
           if (playerState.chakra >= upgradeCost) { canPlace = true; break; }
         } else {
           const hasNameConflict = chars.some((c) => {
             if (c.isHidden) return false;
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
           });
           if (!hasNameConflict) {
@@ -18763,7 +18763,7 @@ export class EffectEngine {
       const mission = newState.activeMissions[i];
       for (const char of mission[friendlySide]) {
         if (!char.isHidden) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.name_fr.toLowerCase().includes('akamaru')) {
             akamaruTargets.push(char.instanceId);
           }
@@ -18845,7 +18845,7 @@ export class EffectEngine {
     for (let i = 0; i < newState.activeMissions.length; i++) {
       for (const char of newState.activeMissions[i][friendlySide]) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.name_fr.toUpperCase().includes('AKAMARU')) {
           akamaru = char;
           akamaruMI = i;

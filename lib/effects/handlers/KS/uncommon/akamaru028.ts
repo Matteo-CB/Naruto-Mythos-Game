@@ -35,7 +35,7 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
   const kibaTargets: string[] = [];
   for (const char of friendlyChars) {
     if (char.isHidden) continue;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     if (topCard.name_fr === 'KIBA INUZUKA') {
       kibaTargets.push(char.instanceId);
     }

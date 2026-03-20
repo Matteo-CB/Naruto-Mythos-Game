@@ -24,7 +24,7 @@ export function triggerOnDefeatEffects(
 
       for (const char of mission[side]) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         // Tsunade 003: When any friendly character is defeated, gain 2 Chakra
         if (topCard.number === 3 && controllingPlayer === defeatedCharOwner) {

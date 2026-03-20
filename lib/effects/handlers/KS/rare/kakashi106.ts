@@ -25,7 +25,7 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
   for (const mission of state.activeMissions) {
     const enemyChars = mission[enemySide];
     for (const char of enemyChars) {
-      if (char.stack.length > 1) {
+      if (char.stack?.length > 1) {
         hasUpgraded = true;
         break;
       }

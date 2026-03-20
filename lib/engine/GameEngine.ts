@@ -604,7 +604,7 @@ export class GameEngine {
               validTargets_g.push(c.instanceId); // hidden = power 0 ≤ 1
               continue;
             }
-            const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
             const power = (topCard.power ?? 0) + c.powerTokens;
             if (power <= 1) validTargets_g.push(c.instanceId);
           }
@@ -933,7 +933,7 @@ export class GameEngine {
         const k106dValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106dEnemySide]) {
-            if (c.stack.length > 1) k106dValidTargets.push(c.instanceId);
+            if (c.stack?.length > 1) k106dValidTargets.push(c.instanceId);
           }
         }
         if (k106dValidTargets.length > 0) {
@@ -1342,7 +1342,7 @@ export class GameEngine {
         const g139dValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const char of newState.activeMissions[i][g139dEnemySide]) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             const effectiveCost = char.isHidden ? 0 : topCard.chakra;
             if (effectiveCost < g139dHiddenCount) {
               g139dValidTargets.push(char.instanceId);
@@ -1428,7 +1428,7 @@ export class GameEngine {
         for (const mission of newState.activeMissions) {
           for (const char of mission[enemySide016d]) {
             if (char.isHidden) continue;
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
               if (eff.type === 'UPGRADE') return false;
@@ -1484,7 +1484,7 @@ export class GameEngine {
           );
           const i020dTargets: string[] = [];
           for (const char of mission020d[enemySide020d]) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             const effectiveCost = char.isHidden ? 0 : topCard.chakra;
             if (effectiveCost <= 2) {
               if (!char.isHidden && friendlyNames020d.has(char.card.name_fr.toUpperCase())) continue;
@@ -1654,7 +1654,7 @@ export class GameEngine {
             controlledBy: c.controlledBy,
             originalOwner: c.originalOwner,
             missionIndex: c.missionIndex,
-            stackSize: c.stack.length,
+            stackSize: c.stack?.length ?? 0,
             effectivePower: power,
             isLastPlayed: lastPlayedIds.has(c.instanceId),
           };

@@ -23,7 +23,7 @@ export function canPlayNameOnMission(
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
     // Only visible characters enforce name uniqueness
     if (c.isHidden) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     return topCard.name_fr.toUpperCase() === upperName;
   });
 }
@@ -44,6 +44,6 @@ export function canRevealOnMission(
   const char = chars.find((c) => c.instanceId === characterInstanceId);
   if (!char) return false;
 
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   return canPlayNameOnMission(state, player, topCard.name_fr, missionIndex, characterInstanceId);
 }

@@ -27,7 +27,7 @@ function kakashi137MainHandler(ctx: EffectContext): EffectResult {
     const sidePlayer = side === 'player1Characters' ? 'player1' : 'player2';
     const isEnemy = sidePlayer !== ctx.sourcePlayer;
     for (const c of mission[side]) {
-      if (!c.isHidden && c.stack.length >= 2) {
+      if (!c.isHidden && c.stack?.length >= 2) {
         // Skip immune enemy characters
         if (isEnemy && !canBeHiddenByEnemy(state, c, sidePlayer)) continue;
         validTargets.push(c.instanceId);
@@ -72,8 +72,8 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const topCard = sourceCard.stack.length > 0
-    ? sourceCard.stack[sourceCard.stack.length - 1]
+  const topCard = sourceCard.stack?.length > 0
+    ? sourceCard.stack[sourceCard.stack?.length - 1]
     : sourceCard.card;
   const charName = topCard.name_fr;
 
@@ -86,7 +86,7 @@ function kakashi137UpgradeHandler(ctx: EffectContext): EffectResult {
     const hasSameName = friendlyChars.some((c) => {
       if (c.instanceId === sourceCard.instanceId) return false;
       if (c.isHidden) return false; // Hidden chars are anonymous - name not revealed
-      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return tc.name_fr === charName;
     });
     if (!hasSameName) {

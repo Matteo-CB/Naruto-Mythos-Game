@@ -41,7 +41,7 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
     // R8: Check Kurenai block
     if (isMovementBlockedByKurenai(state, sourceCard.missionIndex, charController as import('@/lib/engine/types').PlayerID)) continue;
     // R10: Check at least one valid destination
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const charName = topCard.name_fr;
     const ctrlSide: 'player1Characters' | 'player2Characters' = charController === 'player1' ? 'player1Characters' : 'player2Characters';
     // Hidden chars have no visible name, so they can go anywhere (no name conflict)
@@ -50,7 +50,7 @@ function handleKidomaru060Main(ctx: EffectContext): EffectResult {
       return !m[ctrlSide].some((c) => {
         if (c.instanceId === char.instanceId) return false;
         if (c.isHidden) return false;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return cTop.name_fr === charName;
       });
     });

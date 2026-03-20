@@ -42,7 +42,7 @@ function handleRempart067Main(ctx: EffectContext): EffectResult {
   let strongestId = '';
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
-    const top = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+    const top = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
     const power = (top.power ?? 0) + enemy.powerTokens;
     if (power > maxPower) {
       maxPower = power;

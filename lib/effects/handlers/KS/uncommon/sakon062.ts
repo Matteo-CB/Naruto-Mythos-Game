@@ -33,7 +33,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
     for (const char of mission[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
         // Check if this card has at least one copyable instant effect
         const hasInstantEffect = topCard.effects?.some((eff) => {

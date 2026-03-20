@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function Error({
   error,
@@ -9,9 +9,22 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const retryCount = useRef(0);
+
   useEffect(() => {
     console.error('[App Error]', error);
-  }, [error]);
+    // Auto-retry up to 3 times silently before showing error screen
+    if (retryCount.current < 3) {
+      retryCount.current++;
+      const timer = setTimeout(() => reset(), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [error, reset]);
+
+  // Don't show anything while auto-retrying
+  if (retryCount.current < 3) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -25,7 +38,7 @@ export default function Error({
         </p>
         <div className="flex gap-3 mt-2">
           <button
-            onClick={reset}
+            onClick={() => { retryCount.current = 0; reset(); }}
             className="px-5 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
             style={{
               backgroundColor: 'rgba(196, 163, 90, 0.1)',

@@ -33,7 +33,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
       const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
       for (const char of mission[side]) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         // Giant Spider 103
         if (topCard.number === 103 && !processedGS.has(char.instanceId)) {
@@ -143,7 +143,7 @@ export function processChosenEndOfRoundEffect(state: GameState, chosenInstanceId
       const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
       for (const char of mission[side]) {
         if (char.instanceId !== chosenInstanceId) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         if (topCard.number === 103) {
           return handleGiantSpider103EndOfRound(newState, chosenInstanceId);
@@ -358,7 +358,7 @@ function handleEndOfRoundAutoTriggers(state: GameState): GameState {
         if (char.isHidden) continue;
         if (returnQueued.has(char.instanceId)) continue;
 
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         const isSummon = (topCard.keywords ?? []).includes('Summon');
 
         // --- Summon keyword return ---
@@ -394,7 +394,7 @@ function handleEndOfRoundAutoTriggers(state: GameState): GameState {
           const hasKiba = allMissionChars.some(
             (c) => {
               if (c.instanceId === char.instanceId || c.isHidden) return false;
-              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               return cTop.name_fr.toUpperCase().includes('KIBA');
             },
           );
@@ -449,7 +449,7 @@ function handleKimimaro123SelfDefeat(state: GameState): GameState {
 
       for (const char of chars) {
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.number !== 123) continue;
 
         // Card 123 always has the continuous self-defeat effect.
@@ -518,7 +518,7 @@ export function handleRockLee117Move(
         if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyMoved.has(char.instanceId)) continue;
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         // Rock Lee 117 (R) and 151 (M) both have the continuous move effect
         if (topCard.number !== 117 && topCard.number !== 151) continue;
 
@@ -538,7 +538,7 @@ export function handleRockLee117Move(
           const destMission = newState.activeMissions[i];
           const destChars = player === 'player1' ? destMission.player1Characters : destMission.player2Characters;
           const hasSameName = destChars.some(
-            (c) => !c.isHidden && (c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card)
+            (c) => !c.isHidden && (c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card)
               .name_fr.toUpperCase() === topCard.name_fr.toUpperCase(),
           );
           if (!hasSameName) {
@@ -637,7 +637,7 @@ export function handleAkamaru028Return(state: GameState, targetInstanceId?: stri
         if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.number !== 28) continue;
 
         // Check for the continuous end-of-round return effect
@@ -708,7 +708,7 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
         if (targetInstanceId && char.instanceId !== targetInstanceId) continue;
         if (alreadyProcessed.has(char.instanceId)) continue;
         if (char.isHidden) continue;
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.number !== 103) continue;
 
         // Include power tokens in threshold (Giant Spider runs before token removal now)
@@ -721,7 +721,7 @@ export function handleGiantSpider103EndOfRound(state: GameState, targetInstanceI
           for (const s of ['player1Characters', 'player2Characters'] as const) {
             for (const c of m[s]) {
               if (c.isHidden) continue;
-              const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
               if (((cTop.power ?? 0) + c.powerTokens) <= powerThreshold) {
                 validTargets.push(c.instanceId);
               }
@@ -802,7 +802,7 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
       const idx = chars.findIndex((c) => c.instanceId === instanceId);
       if (idx !== -1) {
         const char = chars[idx];
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         console.log(`[returnCharacterToHand] Returning ${topCard.name_fr} (${topCard.id}) instanceId=${instanceId} hidden=${char.isHidden} mission=${i} side=${side}`);
         chars.splice(idx, 1);
         mission[side] = chars;
@@ -811,7 +811,7 @@ export function returnCharacterToHand(state: GameState, instanceId: string, play
         // Return entire stack to original owner's hand
         const owner = char.originalOwner;
         const ps = { ...newState[owner] };
-        const allCards = char.stack.length > 0 ? [...char.stack] : [char.card];
+        const allCards = char.stack?.length > 0 ? [...char.stack] : [char.card];
         ps.hand = [...ps.hand, ...allCards];
         ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
         newState[owner] = ps;

@@ -40,7 +40,7 @@ function getValidMissions(
   for (const m of state.activeMissions) {
     const c = m[friendlySide].find((ch) => ch.instanceId === charInstanceId);
     if (c) {
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       charName = topCard.name_fr.toUpperCase();
       break;
     }
@@ -54,7 +54,7 @@ function getValidMissions(
 
     const hasConflict = charName && state.activeMissions[i][friendlySide].some((c) => {
       if (c.isHidden) return false;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return topCard.name_fr.toUpperCase() === charName;
     });
 
@@ -114,14 +114,14 @@ function moveCharTo(
   // Check for name conflict at destination - forced moves ALWAYS discard the moved character
   const destMission = { ...missions[destMissionIndex] };
   const destChars = [...destMission[friendlySide]];
-  const movedTopCard = movedChar.stack.length > 0
-    ? movedChar.stack[movedChar.stack.length - 1]
+  const movedTopCard = movedChar.stack?.length > 0
+    ? movedChar.stack[movedChar.stack?.length - 1]
     : movedChar.card;
   const movedName = movedTopCard.name_fr.toUpperCase();
 
   const conflictIdx = destChars.findIndex((c) => {
     if (c.isHidden) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     return topCard.name_fr.toUpperCase() === movedName;
   });
 
@@ -129,7 +129,7 @@ function moveCharTo(
     // Name conflict - discard the moved character (no auto-upgrade on forced moves)
     const owner = movedChar.originalOwner;
     const ownerState = { ...state[owner] };
-    const cardsToDiscard = movedChar.stack.length > 0 ? [...movedChar.stack] : [movedChar.card];
+    const cardsToDiscard = movedChar.stack?.length > 0 ? [...movedChar.stack] : [movedChar.card];
     ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
     ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
     destMission[friendlySide] = destChars;

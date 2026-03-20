@@ -28,7 +28,7 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
   for (const char of mission[friendlySide]) {
     if (char.instanceId === sourceCard.instanceId) continue;
     if (char.isHidden) continue;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
       hasTarget = true;
       break;
@@ -66,7 +66,7 @@ function handleJirobo058Upgrade(ctx: EffectContext): EffectResult {
     for (const char of m[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
         hasTarget = true;
         break;

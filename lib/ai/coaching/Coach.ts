@@ -425,7 +425,7 @@ export class Coach {
     for (const mission of state.activeMissions) {
       const myChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const char of myChars) {
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         const upgrade = myState.hand.find(
           c => c.name_fr === topCard.name_fr && (c.chakra ?? 0) > (topCard.chakra ?? 0)
         );

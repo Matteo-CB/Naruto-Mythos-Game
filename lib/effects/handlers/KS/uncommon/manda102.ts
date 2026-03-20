@@ -23,7 +23,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
   // Pre-check: non-hidden enemy characters with keyword "Summon" in this mission?
   const hasSummon = enemyChars.some((char) => {
     if (char.isHidden) return false;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     return topCard.keywords && topCard.keywords.includes('Summon');
   });
 

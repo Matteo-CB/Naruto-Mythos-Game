@@ -41,14 +41,14 @@ function handleShizune006Main(ctx: EffectContext): EffectResult {
     for (const char of mission[enemySide]) {
       if (getEffectivePower(state, char, opponentPlayer) <= 3) {
         // Pre-check: at least one destination must not have same-name conflict
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         const charName = topCard.name_fr;
         const hasValidDest = state.activeMissions.some((m, i) => {
           if (i === mIdx) return false;
           return !m[enemySide].some((c) => {
             if (c.instanceId === char.instanceId) return false;
             if (c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return cTop.name_fr === charName;
           });
         });

@@ -65,7 +65,7 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group === 'Leaf Village') {
         validTargets.push(char.instanceId);
       }

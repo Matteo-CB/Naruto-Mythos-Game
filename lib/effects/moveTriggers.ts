@@ -19,8 +19,8 @@ export function checkNinjaHoundsTrigger(
 ): GameState {
   if (movedChar.isHidden) return state;
 
-  const topCard = movedChar.stack.length > 0
-    ? movedChar.stack[movedChar.stack.length - 1]
+  const topCard = movedChar.stack?.length > 0
+    ? movedChar.stack[movedChar.stack?.length - 1]
     : movedChar.card;
 
   if (topCard.number !== 100) return state;
@@ -168,8 +168,8 @@ export function checkChoji018PostMoveTrigger(
   if (charOwner !== charController) return state;
   if (movedChar.isHidden) return state;
 
-  const topCard = movedChar.stack.length > 0
-    ? movedChar.stack[movedChar.stack.length - 1]
+  const topCard = movedChar.stack?.length > 0
+    ? movedChar.stack[movedChar.stack?.length - 1]
     : movedChar.card;
 
   if (topCard.number !== 18) return state;
@@ -194,7 +194,7 @@ export function checkChoji018PostMoveTrigger(
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
     if (!canBeHiddenByEnemy(state, enemy, enemyPlayer)) continue;
-    const enemyTop = enemy.stack.length > 0 ? enemy.stack[enemy.stack.length - 1] : enemy.card;
+    const enemyTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
     const enemyPower = (enemyTop.power ?? 0) + enemy.powerTokens;
     if (enemyPower < chojiPower) {
       hideTargets.push(enemy.instanceId);

@@ -134,7 +134,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
       } else if (played.name) {
         // Visible play: match by name (hidden chars won't match by name since they were played visible)
         if (!char.isHidden) {
-          const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.name_fr.toUpperCase() === played.name.toUpperCase()) {
             validTargets.push(char.instanceId);
           }

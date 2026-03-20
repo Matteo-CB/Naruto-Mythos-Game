@@ -55,7 +55,7 @@ function handleKimimaro056Upgrade(ctx: EffectContext): EffectResult {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.isHidden) continue;
       // Self is a valid target (can hide itself)
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 4) {
         validHideTargets.push(char.instanceId);
       }

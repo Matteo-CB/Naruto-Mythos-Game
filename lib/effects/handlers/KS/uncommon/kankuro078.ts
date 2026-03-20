@@ -36,7 +36,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
       if (isMovementBlockedByKurenai(state, mi, char.controlledBy)) continue;
 
       // Valid destination check (name uniqueness)
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       const charName = topCard.name_fr;
       const charSide = char.controlledBy === 'player1' ? 'player1Characters' : 'player2Characters';
       const hasValidDest = char.isHidden || state.activeMissions.some((m, i) => {
@@ -44,7 +44,7 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
         return !m[charSide].some((c) => {
           if (c.instanceId === char.instanceId) return false;
           if (c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return cTop.name_fr === charName;
         });
       });

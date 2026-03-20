@@ -8,6 +8,7 @@ Build a fully-featured digital implementation of the **Naruto Mythos Trading Car
 
 ## Technology Stack
 
+- No emojis anywhere in the UI
 - **Framework**: Next.js (App Router, already initialized)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
@@ -19,7 +20,6 @@ Build a fully-featured digital implementation of the **Naruto Mythos Trading Car
 - **Auth**: NextAuth.js (credentials + optional OAuth)
 
 ### Strict styling rules
-- No emojis anywhere in the UI
 - No Lucide React or any icon library
 - No CSS gradients
 - Colors come exclusively from the card images and a dark neutral background palette

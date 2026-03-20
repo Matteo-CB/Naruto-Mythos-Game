@@ -119,7 +119,7 @@ function checkOrochimaru051OnMission(state: GameState, missionIndex: number, pla
   const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
   for (const char of mission[side]) {
     if (char.isHidden) continue;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     if (topCard.number !== 51) continue;
     const hasMove = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
@@ -266,7 +266,7 @@ function collectScoreEffectSources(
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const char of chars) {
     if (char.isHidden) continue;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;
 
@@ -577,7 +577,7 @@ function resolveRemainingScoreEffects(
     if (char.isHidden) continue;
     if (processedCharIds.includes(char.instanceId)) continue;
 
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;
 
@@ -615,7 +615,7 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
     const chars = mission[side];
     for (const char of chars) {
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.number !== 51) continue;
 
       const hasMove = (topCard.effects ?? []).some(

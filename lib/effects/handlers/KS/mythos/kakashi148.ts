@@ -50,7 +50,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       if (char.isHidden) continue;
 
       // Check if this character has keyword "Team 7"
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
 
       // Check if this character has any copyable instant effects

@@ -28,7 +28,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
     const hasSoundFour = mission[friendlySide].some((char) => {
       if (char.instanceId === ctx.sourceCard.instanceId) return false;
       if (char.isHidden) return false; // Hidden chars are anonymous - can't identify keyword
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       return topCard.keywords && topCard.keywords.includes('Sound Four');
     });
     if (hasSoundFour) soundFourMissionCount++;
@@ -55,14 +55,14 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
     for (const char of state.activeMissions[i][friendlySide]) {
       if (char.instanceId === ctx.sourceCard.instanceId) continue;
       // R10: Check at least one valid destination (name uniqueness)
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       const charName = topCard.name_fr;
       const hasValidDest = state.activeMissions.some((m, di) => {
         if (di === i) return false;
         return !m[friendlySide].some((c) => {
           if (c.instanceId === char.instanceId) return false;
           if (c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return cTop.name_fr === charName;
         });
       });

@@ -32,7 +32,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
   for (const char of allChars) {
     if (char.instanceId === sourceCard.instanceId) continue;
     if (char.isHidden) continue; // Hidden chars are anonymous - can't identify keyword
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     if (topCard.keywords && topCard.keywords.includes('Team 10')) {
       // Determine the controller of this character
       const charController = mission.player1Characters.includes(char) ? 'player1' : 'player2';
@@ -47,7 +47,7 @@ function handleAsuma023Main(ctx: EffectContext): EffectResult {
         return !m[controllerSide].some((c) => {
           if (c.instanceId === char.instanceId) return false;
           if (c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return cTop.name_fr === charName;
         });
       });

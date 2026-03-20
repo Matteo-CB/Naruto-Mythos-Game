@@ -148,7 +148,7 @@ function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { tot
       if (char.isHidden) continue;
       const charBonus = calculateContinuousChakraBonus(state, player, missionIndex, char);
       if (charBonus > 0) {
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         total += charBonus;
         sources.push({
           cardName: topCard.name_fr,

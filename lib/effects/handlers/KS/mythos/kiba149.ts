@@ -32,7 +32,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][friendlySide]) {
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.name_fr.toUpperCase().includes('AKAMARU')) {
         hasAkamaru = true;
         break;
