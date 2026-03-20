@@ -32,6 +32,8 @@ interface DeckBuilderStore {
 
   // Currently loaded deck ID (for tracking edits)
   loadedDeckId: string | null;
+  // True when deck has been modified since last save/load
+  isDirty: boolean;
 
   // Inline error for failed add
   addError: string | null;
@@ -85,12 +87,13 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
   isLoading: false,
   isSaving: false,
   loadedDeckId: null,
+  isDirty: false,
   addError: null,
   addErrorKey: null,
   addErrorParams: null,
 
   setDeckName: (name: string) => {
-    set({ deckName: name });
+    set({ deckName: name, isDirty: true });
   },
 
   canAddChar: (card: CharacterCard): AddCheckResult => {
@@ -122,14 +125,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       set({ addError: check.reason || null, addErrorKey: check.reasonKey || null, addErrorParams: check.reasonParams || null });
       return;
     }
-    set({ deckChars: [...get().deckChars, card], addError: null, addErrorKey: null, addErrorParams: null });
+    set({ deckChars: [...get().deckChars, card], addError: null, addErrorKey: null, addErrorParams: null, isDirty: true });
   },
 
   removeChar: (index: number) => {
     const { deckChars } = get();
     const updated = [...deckChars];
     updated.splice(index, 1);
-    set({ deckChars: updated });
+    set({ deckChars: updated, isDirty: true });
   },
 
   addMission: (card: MissionCard) => {
@@ -138,14 +141,14 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       set({ addError: check.reason || null, addErrorKey: check.reasonKey || null, addErrorParams: check.reasonParams || null });
       return;
     }
-    set({ deckMissions: [...get().deckMissions, card], addError: null, addErrorKey: null, addErrorParams: null });
+    set({ deckMissions: [...get().deckMissions, card], addError: null, addErrorKey: null, addErrorParams: null, isDirty: true });
   },
 
   removeMission: (index: number) => {
     const { deckMissions } = get();
     const updated = [...deckMissions];
     updated.splice(index, 1);
-    set({ deckMissions: updated });
+    set({ deckMissions: updated, isDirty: true });
   },
 
   clearDeck: () => {
@@ -154,6 +157,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       deckChars: [],
       deckMissions: [],
       loadedDeckId: null,
+      isDirty: false,
       addError: null,
     });
   },
@@ -206,6 +210,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
           const data = await res.json();
           throw new Error(data.error || 'Failed to update deck');
         }
+        set({ isDirty: false });
       } else {
         // Create new deck
         const res = await fetch('/api/decks', {
@@ -221,7 +226,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         }
 
         const created = await res.json();
-        set({ loadedDeckId: created.id });
+        set({ loadedDeckId: created.id, isDirty: false });
       }
 
       // Refresh the saved decks list
@@ -301,6 +306,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         deckChars: resolvedChars,
         deckMissions: resolvedMissions,
         loadedDeckId: deckId,
+        isDirty: false,
       });
     } finally {
       set({ isLoading: false });
