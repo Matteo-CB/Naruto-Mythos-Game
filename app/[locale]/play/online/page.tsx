@@ -640,31 +640,48 @@ function LiveGamesSection() {
 
   const publicGames = activeGames.filter((g) => !g.isPrivate);
 
+  const [spectateLoading, setSpectateLoading] = useState<string | null>(null);
   const handleSpectate = async (game: typeof publicGames[0]) => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id || spectateLoading) return;
+    setSpectateLoading(game.roomCode);
+
     // Clean up any previous spectating session first
     const ss = useSocketStore.getState();
     if (ss.isSpectating || ss.spectatingRoomCode) {
       ss.leaveSpectating();
     }
-    // Also clear any stale game state from a previous spectate/game
+    // Clear stale game state
     useGameStore.setState({ visibleState: null, gameState: null, gameOver: false, isOnlineGame: false });
 
-    // Ensure socket is connected before attempting to spectate
-    const { connected, connect } = useSocketStore.getState();
-    if (!connected) {
+    // Ensure socket is connected
+    const ss2 = useSocketStore.getState();
+    if (!ss2.connected) {
       try {
-        await connect(session.user.id, session.user.name ?? undefined);
+        await ss2.connect(session.user.id, session.user.name ?? undefined);
       } catch {
-        return; // Connection failed
+        setSpectateLoading(null);
+        return;
       }
     }
 
-    // Small delay to let the leave propagate before joining new room
-    setTimeout(() => {
-      spectateGame(game.roomCode, session!.user!.id!, session!.user!.name ?? 'Spectator');
-      router.push('/game' as '/');
-    }, 150);
+    // Join as spectator
+    spectateGame(game.roomCode, session.user.id, session.user.name ?? 'Spectator');
+
+    // Wait for state to arrive (up to 10s), THEN navigate
+    let waited = 0;
+    const poll = setInterval(() => {
+      waited += 200;
+      const st = useSocketStore.getState();
+      if (st.visibleState && st.isSpectating) {
+        clearInterval(poll);
+        setSpectateLoading(null);
+        router.push('/game' as '/');
+      } else if (waited >= 10000) {
+        clearInterval(poll);
+        setSpectateLoading(null);
+        st.leaveSpectating();
+      }
+    }, 200);
   };
 
   return (
@@ -707,9 +724,10 @@ function LiveGamesSection() {
                   </div>
                 </div>
                 <button onClick={() => handleSpectate(game)}
-                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                  disabled={spectateLoading === game.roomCode}
+                  className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50"
                   style={{ backgroundColor: 'rgba(196,163,90,0.1)', border: '1px solid rgba(196,163,90,0.3)', color: '#c4a35a' }}>
-                  {t('spectator.joinSpectate')}
+                  {spectateLoading === game.roomCode ? '...' : t('spectator.joinSpectate')}
                 </button>
               </div>
             ))}

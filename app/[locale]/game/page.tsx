@@ -123,33 +123,29 @@ export default function GamePage() {
     return () => clearTimeout(timer);
   }, [isSpectating, socketError, router]);
 
-  // Spectator: if no state in gameStore after mount, request it from server
-  // Retries every 2s up to 8 times, then gives up and redirects home
+  // Spectator fallback: if we somehow land here without state, keep requesting
   const spectateRetryRef = useRef(0);
   useEffect(() => {
     if (!isSpectating || visibleState) {
       spectateRetryRef.current = 0;
       return;
     }
-    // Already have socket state but not synced yet — sync immediately
     if (socketVisibleState) {
       syncSpectatorState();
       return;
     }
-    // No state anywhere — request from server with increasing urgency
-    const delay = spectateRetryRef.current === 0 ? 500 : 2000; // First retry fast, then slower
+    // Request state from server every 2s (the online page should have waited,
+    // but handle edge cases like page refresh during spectating)
     const timer = setTimeout(() => {
-      if (spectateRetryRef.current >= 8) {
-        // Give up after 8 retries (~17s total)
-        console.warn('[GamePage] Spectate: gave up after retries, redirecting');
+      spectateRetryRef.current += 1;
+      if (spectateRetryRef.current > 15) {
+        // After 30s, give up
         useSocketStore.getState().leaveSpectating();
         router.push('/');
         return;
       }
-      spectateRetryRef.current += 1;
-      console.log(`[GamePage] Spectate: requesting state (retry ${spectateRetryRef.current})`);
       useSocketStore.getState().requestSpectateState();
-    }, delay);
+    }, spectateRetryRef.current === 0 ? 300 : 2000);
     return () => clearTimeout(timer);
   }, [isSpectating, visibleState, socketVisibleState, router, syncSpectatorState]);
 
