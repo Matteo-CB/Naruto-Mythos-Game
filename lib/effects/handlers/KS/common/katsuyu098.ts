@@ -23,7 +23,7 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
     for (const char of friendlyChars) {
       if (char.isHidden) continue;
       if (char.instanceId === sourceCard.instanceId) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.name_fr === 'TSUNADE') {
         hasTsunade = true;
         break;

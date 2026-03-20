@@ -20,7 +20,7 @@ export function calculateCharacterPower(
     return Math.max(0, char.powerTokens + hiddenBonus);
   }
 
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   if (!topCard) return Math.max(0, char.powerTokens);
   let power = (topCard.power ?? 0) + char.powerTokens;
 

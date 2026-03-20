@@ -34,7 +34,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
     for (const char of friendlyChars) {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue; // Hidden characters can't be identified by group
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group !== 'Sand Village') continue;
 
       // Check valid destination (name uniqueness)
@@ -44,7 +44,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
         return !m[friendlySide].some((c) => {
           if (c.instanceId === char.instanceId) return false;
           if (c.isHidden) return false;
-          const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
           return cTop.name_fr === charName;
         });
       });
@@ -82,8 +82,8 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
   }
 
   // Find valid destination missions for self (must not have same-name conflict)
-  const topCard = sourceCard.stack.length > 0
-    ? sourceCard.stack[sourceCard.stack.length - 1]
+  const topCard = sourceCard.stack?.length > 0
+    ? sourceCard.stack[sourceCard.stack?.length - 1]
     : sourceCard.card;
   const selfName = topCard.name_fr;
 
@@ -93,7 +93,7 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[i];
     const friendlyChars = mission[friendlySide];
     const hasConflict = friendlyChars.some((c) => {
-      const cTopCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const cTopCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return !c.isHidden && cTopCard.name_fr === selfName;
     });
     if (!hasConflict) validMissions.push(String(i));

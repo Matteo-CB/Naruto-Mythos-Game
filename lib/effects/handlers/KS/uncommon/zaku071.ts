@@ -50,14 +50,14 @@ function handleZaku071Main(ctx: EffectContext): EffectResult {
   const enemyControlSide = opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const validTargets: string[] = [];
   for (const char of mission[enemySide]) {
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const charName = topCard.name_fr;
     const hasValidDest = char.isHidden || state.activeMissions.some((m, i) => {
       if (i === sourceMissionIndex) return false;
       return !m[enemyControlSide].some((c) => {
         if (c.instanceId === char.instanceId) return false;
         if (c.isHidden) return false;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return cTop.name_fr === charName;
       });
     });

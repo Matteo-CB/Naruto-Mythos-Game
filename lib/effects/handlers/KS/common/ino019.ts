@@ -19,7 +19,7 @@ function handleIno019Main(ctx: EffectContext): EffectResult {
   const hasOtherTeam10 = allChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     return topCard.keywords && topCard.keywords.includes('Team 10');
   });
 

@@ -29,7 +29,7 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
     for (const char of mission[enemySide]) {
       if (char.isHidden) continue;
 
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.chakra > costLimit) continue;
 
       // Check if the character has any copyable instant effects

@@ -55,20 +55,20 @@ export function findHiddenSummonsOnBoard(
       if (!char.isHidden) continue;
       if (char.controlledBy !== player) continue;
 
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Summon')) continue;
 
       const sameNameVisible = mission[friendlySide].find((c: any) => {
         if (c.isHidden) return false;
         if (c.instanceId === char.instanceId) return false;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
       });
 
       let revealCost: number;
       if (sameNameVisible) {
-        const existingTop = sameNameVisible.stack.length > 0
-          ? sameNameVisible.stack[sameNameVisible.stack.length - 1]
+        const existingTop = sameNameVisible.stack?.length > 0
+          ? sameNameVisible.stack[sameNameVisible.stack?.length - 1]
           : sameNameVisible.card;
         if ((topCard.chakra ?? 0) <= (existingTop.chakra ?? 0)) {
           continue;
@@ -114,20 +114,20 @@ export function findHiddenLeafOnBoard(
       if (!char.isHidden) continue;
       if (char.controlledBy !== player) continue;
 
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group !== 'Leaf Village') continue;
 
       const sameNameVisible = mission[friendlySide].find((c: any) => {
         if (c.isHidden) return false;
         if (c.instanceId === char.instanceId) return false;
-        const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
       });
 
       let revealCost: number;
       if (sameNameVisible) {
-        const existingTop = sameNameVisible.stack.length > 0
-          ? sameNameVisible.stack[sameNameVisible.stack.length - 1]
+        const existingTop = sameNameVisible.stack?.length > 0
+          ? sameNameVisible.stack[sameNameVisible.stack?.length - 1]
           : sameNameVisible.card;
         if ((topCard.chakra ?? 0) <= (existingTop.chakra ?? 0)) {
           continue;

@@ -51,7 +51,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
       // Player knows their own hidden cards - can target them by group
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group === 'Sound Village') {
         const revealCost = Math.max(0, topCard.chakra - 2);
         if (playerState.chakra >= revealCost) {
@@ -82,7 +82,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[mIdx];
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group === 'Sound Village') {
         hiddenBoardChars.push({
           instanceId: char.instanceId,

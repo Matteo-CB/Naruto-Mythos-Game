@@ -40,7 +40,7 @@ function kiba113MainHandler(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[i];
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) {
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if (topCard.name_fr.toLowerCase().includes('akamaru')) {
           akamaruTargets.push(char.instanceId);
         }

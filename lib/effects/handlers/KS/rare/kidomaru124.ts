@@ -20,7 +20,7 @@ function kidomaru124AmbushHandler(ctx: EffectContext): EffectResult {
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
   // Check if character was upgraded by looking at stack length (not isUpgrade flag,
   // since AMBUSH fires on reveal which always passes isUpgrade=false)
-  const wasUpgraded = sourceCard && sourceCard.stack.length >= 2;
+  const wasUpgraded = sourceCard && sourceCard.stack?.length >= 2;
   const powerLimit = wasUpgraded ? 5 : 3;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';

@@ -118,7 +118,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     let hasUpgradeTarget = false;
     for (const c of chars) {
       if (c.isHidden) continue;
-      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
         && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
       const isFlex = checkFlexibleUpgrade(topCard as any, tc)
@@ -134,7 +134,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
 
     const hasNameConflict = chars.some((c) => {
       if (c.isHidden) return false;
-      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
     });
 

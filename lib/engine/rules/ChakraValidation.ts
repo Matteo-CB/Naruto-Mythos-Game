@@ -7,7 +7,7 @@ import type { GameState, PlayerID, CharacterCard } from '../types';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getTopCard(char: any): CharacterCard | undefined {
-  if (char.stack?.length > 0) return char.stack[char.stack.length - 1];
+  if (char.stack?.length > 0) return char.stack[char.stack?.length - 1];
   if (char.topCard) return char.topCard;
   return char.card;
 }

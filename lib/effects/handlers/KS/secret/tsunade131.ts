@@ -15,7 +15,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
     for (const char of mission[friendlySide]) {
       if (char.isHidden) continue;
       if (char.instanceId === sourceCard.instanceId) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group === "Leaf Village") {
         hasLeafTarget = true;
         break;

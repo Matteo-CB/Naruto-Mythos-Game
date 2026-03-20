@@ -25,7 +25,7 @@ function getOppChars(mission: ActiveMission, player: PlayerID): CharacterInPlay[
 }
 
 function topCard(c: CharacterInPlay) {
-  return c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+  return c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
 }
 
 // ─── Main Evaluator ─────────────────────────────────────────────────────────

@@ -38,7 +38,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
     for (const char of mission[enemySide]) {
       if (char.isHidden) continue;
       if (!canBeHiddenByEnemy(state, char, opponent)) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 3) {
         validTargets.push(char.instanceId);
       }
@@ -53,7 +53,7 @@ function handleKimimaro055Ambush(ctx: EffectContext): EffectResult {
     for (const char of mission[friendlySide]) {
       if (char.isHidden) continue;
       // Self is a valid target (can hide itself)
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if ((topCard.chakra ?? 0) <= 3) {
         validTargets.push(char.instanceId);
       }

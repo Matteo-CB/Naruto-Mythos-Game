@@ -59,8 +59,8 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const topCard = sourceCard.stack.length > 0
-    ? sourceCard.stack[sourceCard.stack.length - 1]
+  const topCard = sourceCard.stack?.length > 0
+    ? sourceCard.stack[sourceCard.stack?.length - 1]
     : sourceCard.card;
   const charName = topCard.name_fr;
 
@@ -72,7 +72,7 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
     const friendlyChars = mission[friendlySide];
     const hasSameName = friendlyChars.some((c) => {
       if (c.isHidden) return false; // Hidden chars are anonymous - name not revealed
-      const tc = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return tc.name_fr === charName;
     });
     if (!hasSameName) {

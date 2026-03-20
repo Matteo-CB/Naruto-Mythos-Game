@@ -87,8 +87,8 @@ function applyMss05ReturnToHand(
 
   // Return only the TOP card to hand; discard the rest of the stack (cards underneath)
   const playerState = { ...state[sourcePlayer] };
-  const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
-  const underCards = target.stack.length > 1 ? target.stack.slice(0, -1) : [];
+  const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
+  const underCards = target.stack?.length > 1 ? target.stack.slice(0, -1) : [];
   playerState.hand = [...playerState.hand, topCard];
   playerState.discardPile = [...playerState.discardPile, ...underCards];
   playerState.charactersInPlay = Math.max(0, playerState.charactersInPlay - 1);

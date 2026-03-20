@@ -12,8 +12,8 @@ export function canUpgradeCharacter(
   targetChar: CharacterInPlay,
   playerChakra: number,
 ): { valid: boolean; costDiff: number; reason?: string } {
-  const topCard = targetChar.stack.length > 0
-    ? targetChar.stack[targetChar.stack.length - 1]
+  const topCard = targetChar.stack?.length > 0
+    ? targetChar.stack[targetChar.stack?.length - 1]
     : targetChar.card;
 
   // Must be same name

@@ -50,7 +50,7 @@ function kimimaro123UpgradeHandler(ctx: EffectContext): EffectResult {
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.instanceId !== sourceCard.instanceId) {
-        const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+        const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((topCard.chakra ?? 0) <= 5) {
           defeatTargets.push(char.instanceId);
         }

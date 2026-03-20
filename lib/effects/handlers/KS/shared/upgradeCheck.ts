@@ -23,7 +23,7 @@ export function canAffordAsUpgrade(
       if (char.isHidden) continue;
       if (char.controlledBy !== player) continue;
 
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (card.chakra <= (topCard.chakra ?? 0)) continue;
 
       // Check same-name upgrade

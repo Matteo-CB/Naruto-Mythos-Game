@@ -102,7 +102,7 @@ function handlePlayCharacter(
   // Check same-name upgrade first (highest priority)
   const autoUpgradeTarget = chars.find((c) => {
     if (c.isHidden || c.controlledBy !== player) return false;
-    const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     if (card.chakra <= topCard.chakra) return false;
     return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
   });
@@ -303,7 +303,7 @@ function handleRevealCharacter(
   if (!char.isHidden) return state;
   if (char.controlledBy !== player) return state;
 
-  const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   // Determine upgrade target:
   // If upgradeTargetInstanceId is provided, use that specific target (player chose to upgrade).
@@ -314,7 +314,7 @@ function handleRevealCharacter(
     // Player explicitly chose to upgrade this target
     const candidate = chars.find((c) => c.instanceId === upgradeTargetInstanceId);
     if (candidate && !candidate.isHidden) {
-      const cTop = candidate.stack.length > 0 ? candidate.stack[candidate.stack.length - 1] : candidate.card;
+      const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
       if (charTopCard.chakra > cTop.chakra) {
         const isSameName = cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
         if (isSameName || checkFlexibleUpgrade(charTopCard, cTop)) {
@@ -327,7 +327,7 @@ function handleRevealCharacter(
     upgradeTarget = chars.find((c) => {
       if (c.instanceId === characterInstanceId) return false;
       if (c.isHidden) return false;
-      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       if (charTopCard.chakra <= cTop.chakra) return false;
       return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
     });
@@ -338,8 +338,8 @@ function handleRevealCharacter(
   let costToPay = fullCost;
 
   if (upgradeTarget) {
-    const existingTopCard = upgradeTarget.stack.length > 0
-      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+    const existingTopCard = upgradeTarget.stack?.length > 0
+      ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
     // Use fullCost (with cost reductions applied) minus existing card cost
     // e.g. Gaara 075 (cost 3, -2 when hidden reveal) upgrading over cost 2 = max(0, 1 - 2) = 0
@@ -500,8 +500,8 @@ function handleUpgradeCharacter(
   if (charIdx === -1) return state;
 
   const existingChar = { ...chars[charIdx] };
-  const existingTopCard = existingChar.stack.length > 0
-    ? existingChar.stack[existingChar.stack.length - 1]
+  const existingTopCard = existingChar.stack?.length > 0
+    ? existingChar.stack[existingChar.stack?.length - 1]
     : existingChar.card;
 
   // When upgrading over a hidden character, pay the full effective cost of the new card

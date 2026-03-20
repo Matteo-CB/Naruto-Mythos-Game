@@ -28,7 +28,7 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
 
   const hasEnemyJutsu = mission[enemySide].some((c) => {
     if (c.isHidden) return false;
-    const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     return top.keywords?.includes('Jutsu');
   });
 
@@ -68,8 +68,8 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  const topCard = sourceCard.stack.length > 0
-    ? sourceCard.stack[sourceCard.stack.length - 1]
+  const topCard = sourceCard.stack?.length > 0
+    ? sourceCard.stack[sourceCard.stack?.length - 1]
     : sourceCard.card;
   const charName = topCard.name_fr;
 
@@ -82,7 +82,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
     const hasSameName = friendlyChars.some((c) => {
       if (c.instanceId === sourceCard.instanceId) return false;
       if (c.isHidden) return false;
-      const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return top.name_fr === charName;
     });
     if (!hasSameName) {

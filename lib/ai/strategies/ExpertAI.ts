@@ -162,7 +162,7 @@ export class ExpertAI implements AIStrategy {
       for (const side of ['player1Characters', 'player2Characters'] as const) {
         for (const char of mission[side]) {
           if (!char.isHidden) {
-            const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             visibleCardIds.add(topCard.id + '_' + topCard.name_fr);
           }
         }

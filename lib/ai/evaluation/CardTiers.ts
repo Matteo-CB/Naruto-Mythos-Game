@@ -330,7 +330,7 @@ export function evaluateBoardSynergies(state: GameState, player: PlayerID): numb
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     for (const c of chars) {
       if (!c.isHidden) {
-        const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         cardIds.push(topCard.cardId);
       }
     }
@@ -347,7 +347,7 @@ export function hasUpgradeTarget(state: GameState, player: PlayerID, card: Chara
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     for (const c of chars) {
       if (c.isHidden) continue;
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       if (topCard.name_fr === card.name_fr && (topCard.chakra ?? 0) < (card.chakra ?? 0)) {
         return true;
       }

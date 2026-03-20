@@ -26,8 +26,8 @@ export function sortTargetsGemmaLast<T extends { card: { number: number }; stack
   targets: T[],
 ): T[] {
   return [...targets].sort((a, b) => {
-    const aTopCard = a.stack.length > 0 ? a.stack[a.stack.length - 1] : a.card;
-    const bTopCard = b.stack.length > 0 ? b.stack[b.stack.length - 1] : b.card;
+    const aTopCard = a.stack?.length > 0 ? a.stack[a.stack?.length - 1] : a.card;
+    const bTopCard = b.stack?.length > 0 ? b.stack[b.stack?.length - 1] : b.card;
     const aIsGemma = aTopCard.number === 49;
     const bIsGemma = bTopCard.number === 49;
     if (aIsGemma && !bIsGemma) return 1;  // Gemma goes last
@@ -211,7 +211,7 @@ function removeCharacterFromPlay(
   // Add to original owner's discard pile
   const owner = defeated.originalOwner;
   const ownerState = { ...state[owner] };
-  const cardsToDiscard = defeated.stack.length > 0 ? [...defeated.stack] : [defeated.card];
+  const cardsToDiscard = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
   ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
   ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
 

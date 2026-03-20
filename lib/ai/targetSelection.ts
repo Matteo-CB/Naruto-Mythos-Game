@@ -145,7 +145,7 @@ function findCharacterInState(state: GameState, instanceId: string): FoundCharac
  */
 function getCharEffectivePower(char: CharacterInPlay): number {
   if (char.isHidden) return 0;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   return (topCard.power ?? 0) + char.powerTokens;
 }
 
@@ -153,7 +153,7 @@ function getCharEffectivePower(char: CharacterInPlay): number {
  * Chakra cost of a character's top card (relevant for evaluating threat level).
  */
 function getCharCost(char: CharacterInPlay): number {
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   return topCard.chakra ?? 0;
 }
 
@@ -161,7 +161,7 @@ function getCharCost(char: CharacterInPlay): number {
  * Card tier of a character's top card.
  */
 function getCharTier(char: CharacterInPlay): number {
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   return getCardTier(topCard);
 }
 
@@ -170,7 +170,7 @@ function getCharTier(char: CharacterInPlay): number {
  */
 function hasScoreEffect(char: CharacterInPlay): boolean {
   if (char.isHidden) return false;
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   return topCard.effects?.some(e => e.type === 'SCORE') ?? false;
 }
 

@@ -32,7 +32,7 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
   // Pre-filter: exclude targets that would create a same-name duplicate on our side
   const validTargets: string[] = [];
   for (const char of enemyChars) {
-    const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const effectiveCost = char.isHidden ? 0 : topCard.chakra;
     if (effectiveCost <= costLimit) {
       if (!char.isHidden && friendlyNames.has(char.card.name_fr.toUpperCase())) {

@@ -38,7 +38,7 @@ export function validatePlayCharacter(
     // Hidden characters' names aren't checked for uniqueness until revealed
     // But face-visible characters are checked
     if (!c.isHidden) {
-      const topCard = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
     }
     return false;
@@ -121,7 +121,7 @@ export function validateRevealCharacter(
   const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const oc of opponentChars) {
     if (oc.isHidden) continue;
-    const ocTop = oc.stack.length > 0 ? oc.stack[oc.stack.length - 1] : oc.card;
+    const ocTop = oc.stack?.length > 0 ? oc.stack[oc.stack?.length - 1] : oc.card;
     if (ocTop.number === 111 || ocTop.number === 150) {
       const hasRestriction = (ocTop.effects ?? []).some(
         (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot play characters while hidden'),
@@ -133,14 +133,14 @@ export function validateRevealCharacter(
   }
 
   // Use topCard for upgraded hidden characters
-  const charTopCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   // Name uniqueness check - detect reveal-for-upgrade before chakra check
   // Check same-name upgrade target
   const sameNameChar = chars.find((c) => {
     if (c.instanceId === characterInstanceId) return false;
     if (!c.isHidden) {
-      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return cTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
     }
     return false;
@@ -150,13 +150,13 @@ export function validateRevealCharacter(
   // Exclude targets where upgrading would create a post-upgrade name conflict
   const flexibleUpgradeTarget = !sameNameChar ? chars.find((c) => {
     if (c.instanceId === characterInstanceId || c.isHidden) return false;
-    const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+    const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     if (!checkFlexibleUpgrade(charTopCard, cTop) || charTopCard.chakra <= cTop.chakra) return false;
     // Check post-upgrade name conflict
     const wouldConflict = chars.some((other) => {
       if (other.instanceId === characterInstanceId || other.instanceId === c.instanceId) return false;
       if (other.isHidden) return false;
-      const oTop = other.stack.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+      const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
       return oTop.name_fr.toUpperCase() === charTopCard.name_fr.toUpperCase();
     });
     return !wouldConflict;
@@ -166,8 +166,8 @@ export function validateRevealCharacter(
 
   let effectiveCost: number;
   if (upgradeTarget) {
-    const existingTopCard = upgradeTarget.stack.length > 0
-      ? upgradeTarget.stack[upgradeTarget.stack.length - 1]
+    const existingTopCard = upgradeTarget.stack?.length > 0
+      ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
       // Reveal-for-upgrade: pay only the DIFFERENCE (effective cost - existing cost)
@@ -226,7 +226,7 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Hidden' };
   }
 
-  const topCard = target.stack.length > 0 ? target.stack[target.stack.length - 1] : target.card;
+  const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
 
   // Check special upgrade rules
   const isFlexibleUpgrade = checkFlexibleUpgrade(newCard, topCard);
@@ -245,7 +245,7 @@ export function validateUpgradeCharacter(
     const wouldConflict = chars.some((c) => {
       if (c.instanceId === targetInstanceId) return false; // Skip the target being upgraded
       if (c.isHidden) return false;
-      const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return cTop.name_fr.toUpperCase() === newCard.name_fr.toUpperCase();
     });
     if (wouldConflict) {

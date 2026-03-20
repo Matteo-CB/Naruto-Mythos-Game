@@ -31,7 +31,7 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
     const mission = state.activeMissions[mIdx];
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
       if (char.isHidden) continue;
-      const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.name_fr === 'NARUTO UZUMAKI') {
         // R8: Check Kurenai block for the Naruto's controller
         const charController = mission.player1Characters.some((c) => c.instanceId === char.instanceId) ? 'player1' : 'player2';
@@ -44,7 +44,7 @@ function handleIruka047Main(ctx: EffectContext): EffectResult {
           return !m[ctrlSide].some((c) => {
             if (c.instanceId === char.instanceId) return false;
             if (c.isHidden) return false;
-            const cTop = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return cTop.name_fr === 'NARUTO UZUMAKI';
           });
         });

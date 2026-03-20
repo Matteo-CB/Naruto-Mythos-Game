@@ -148,7 +148,7 @@ function matchesTargetCriteria(
   if (filters?.excludeInstanceIds?.includes(char.instanceId)) return false;
 
   // Get the active (top) card for attribute checks
-  const topCard = char.stack.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
   // Use getEffectivePower for accurate power (includes continuous modifiers like Yashamaru +2)
   const isEnemyTarget = targetType === 'enemy_character' || targetType === 'enemy_hidden';
