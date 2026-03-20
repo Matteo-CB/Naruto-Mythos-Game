@@ -33,14 +33,13 @@ function handleShino033Ambush(ctx: EffectContext): EffectResult {
   });
 
   if (hasEnemyJutsu) {
-    // Show CONFIRM popup like other instant AMBUSH effects
+    // Show CONFIRM popup like other instant AMBUSH effects (optional — player can skip)
     return {
       state,
       requiresTargetSelection: true,
       targetSelectionType: 'SHINO033_CONFIRM_AMBUSH',
       validTargets: [sourceCard.instanceId],
-      isOptional: false,
-      isMandatory: true,
+      isOptional: true,
       description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
       descriptionKey: 'game.effect.desc.shino033ConfirmAmbush',
     };

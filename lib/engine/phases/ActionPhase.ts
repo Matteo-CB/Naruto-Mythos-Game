@@ -124,6 +124,11 @@ function handlePlayCharacter(
   const ps = { ...playerState };
   ps.chakra -= effectiveCost;
 
+  // Consume turn-wide cost reduction after use (e.g., Kakashi copying Shino 033)
+  if (state.playCostReduction?.[player]) {
+    state = { ...state, playCostReduction: { ...state.playCostReduction!, [player]: 0 } };
+  }
+
   // Remove card from hand
   const hand = [...ps.hand];
   hand.splice(cardIndex, 1);
@@ -348,6 +353,11 @@ function handleRevealCharacter(
   const ps = { ...state[player] };
   if (ps.chakra < costToPay) return state;
   ps.chakra -= costToPay;
+
+  // Consume turn-wide cost reduction after use (e.g., Kakashi copying Shino 033)
+  if (state.playCostReduction?.[player]) {
+    state = { ...state, playCostReduction: { ...state.playCostReduction!, [player]: 0 } };
+  }
 
   if (upgradeTarget) {
     // Reveal-for-upgrade: merge stacks - put the revealed card's stack on top of the existing one

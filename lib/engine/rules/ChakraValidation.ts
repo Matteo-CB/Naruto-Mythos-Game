@@ -150,6 +150,14 @@ export function calculateEffectiveCost(
     cost += state.playCostIncrease[player] ?? 0;
   }
 
+  // Turn-wide cost reduction (e.g., Kakashi copying Shino 033 AMBUSH)
+  if (state.playCostReduction) {
+    const reduction = state.playCostReduction[player] ?? 0;
+    if (reduction > 0) {
+      cost = Math.max(0, cost - reduction);
+    }
+  }
+
   // Jiraiya 007 sub-play cost reduction for Summon characters
   // This is handled separately when Jiraiya's MAIN effect triggers
 

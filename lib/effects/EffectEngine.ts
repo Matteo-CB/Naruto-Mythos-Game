@@ -3627,14 +3627,34 @@ export class EffectEngine {
       }
 
       case 'SHINO033_CONFIRM_AMBUSH': {
-        // Shino 033 AMBUSH confirmed — log the cost reduction (already applied by ChakraValidation)
-        newState.log = logAction(
-          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT',
-          'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
-          'game.log.effect.shino033CostReduction',
-          { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
-        );
+        // Check if this is a COPIED effect (Kakashi 016/106 copying Shino)
+        // If so, apply turn-wide cost reduction for the next character play
+        const isShino033Self = pendingEffect.sourceCardId === 'KS-033-UC';
+        if (!isShino033Self) {
+          // Copied by Kakashi or similar — apply cost reduction to next play/reveal
+          const player_s033 = pendingEffect.sourcePlayer;
+          const currentReduction = newState.playCostReduction ?? { player1: 0, player2: 0 };
+          newState = {
+            ...newState,
+            playCostReduction: { ...currentReduction, [player_s033]: (currentReduction[player_s033] ?? 0) + 4 },
+          };
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, player_s033,
+            'EFFECT',
+            `Copied Shino Aburame (033) AMBUSH: Next character play costs 4 less.`,
+            'game.log.effect.shino033CopiedReduction',
+            { card: pendingEffect.sourceCardId, reduction: '4' },
+          );
+        } else {
+          // Original Shino — cost reduction already applied by ChakraValidation during reveal
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT',
+            'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
+            'game.log.effect.shino033CostReduction',
+            { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
+          );
+        }
         break;
       }
 
