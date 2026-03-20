@@ -169,6 +169,9 @@ export interface GameState {
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).
    *  Key = player who pays MORE. Reset at start of each turn. */
   playCostIncrease?: { player1: number; player2: number };
+  /** Turn-wide cost reduction for the next character play (e.g., Kakashi copying Shino 033 AMBUSH).
+   *  Consumed on use. Reset at start of each turn. */
+  playCostReduction?: { player1: number; player2: number };
   /** Ordered history of all actions applied during the game (for replay).
    *  createdIds: instanceIds of characters created by this action (for accurate replay ID mapping). */
   actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
