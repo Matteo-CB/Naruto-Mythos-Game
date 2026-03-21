@@ -1033,6 +1033,7 @@ function GameBoardInner() {
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
   const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+  const isSpectating = useSocketStore((s) => s.isSpectating);
 
   // Load user background preference on mount
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
@@ -1140,7 +1141,10 @@ function GameBoardInner() {
             padding: dims.isMobile ? '0' : '4px 0',
           }}
         >
-          <OpponentHand handSize={opponentState.handSize} />
+          {isSpectating && (opponentState as any).hand?.length > 0
+            ? <PlayerHand hand={(opponentState as any).hand} chakra={opponentState.chakra} isSpectatorOpponent />
+            : <OpponentHand handSize={opponentState.handSize} />
+          }
         </section>
 
         {/* Mission area with ActionBar */}
