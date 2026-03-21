@@ -102,6 +102,17 @@ export default function GamePage() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // When spectator clicks "Leave", isSpectating goes false — navigate + clear gameStore
+  const prevSpectatingRef = useRef(isSpectating);
+  useEffect(() => {
+    if (prevSpectatingRef.current && !isSpectating) {
+      // Just left spectating — clear gameStore and redirect
+      useGameStore.setState({ visibleState: null, gameState: null });
+      router.push('/play/online');
+    }
+    prevSpectatingRef.current = isSpectating;
+  }, [isSpectating, router]);
+
   // Sync spectator state to gameStore — runs on mount AND on every socket update
   const syncSpectatorState = useCallback(() => {
     const socketState = useSocketStore.getState();

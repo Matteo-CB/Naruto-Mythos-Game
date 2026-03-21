@@ -232,9 +232,10 @@ export function ActionBar() {
             });
           });
           if (hasEnemyShino) {
-            revealAmbushCost = Math.max(0, (hiddenTop.chakra ?? 0) - 4);
-            // revealNormalCost stays as revealBaseCost (no auto-reduction for Kakashi)
-            revealNormalCost = revealBaseCost;
+            // AMBUSH cost uses calculateEffectiveCost with skipAmbush=false (applies -4)
+            revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false);
+            // Normal cost uses skipAmbush=true (no reduction)
+            revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);
           }
         }
         break;
