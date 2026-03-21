@@ -472,6 +472,45 @@ export function TargetSelector() {
     }
   }
 
+  // ---- REORDER_DISCARD popup ----
+  const isReorderDiscard = eTst === 'REORDER_DISCARD';
+  if (isReorderDiscard && validTargets.length > 1 && visibleState) {
+    // Build order targets from the bottom N cards of the player's discard pile
+    const myDiscard = visibleState.myState.discardPile ?? [];
+    const count = validTargets.length;
+    const lastN = myDiscard.slice(-count);
+    const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
+    for (const card of lastN) {
+      discardTargets.push({
+        instanceId: (card as any).instanceId || (card as any).id,
+        name_fr: (card as any).name_fr ?? '',
+        name_en: (card as any).name_en,
+        image_file: (card as any).image_file,
+        chakra: (card as any).chakra,
+        power: (card as any).power,
+        missionIndex: 0,
+        isHidden: false,
+        isOwn: true,
+      });
+    }
+    if (discardTargets.length > 1) {
+      return (
+        <TargetOrderPopup
+          mode="defeat"
+          targets={discardTargets}
+          description={description}
+          descriptionKey={descriptionKey}
+          descriptionParams={descriptionParams}
+          sourceCardName=""
+          onConfirm={(orderedIds) => {
+            // Submit the full order as JSON to the engine
+            handleSelect(JSON.stringify(orderedIds));
+          }}
+        />
+      );
+    }
+  }
+
   // ---- DRAW_CARD UI (Sakura 011 and future draw effects) ----
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
     const deckCount = pendingTargetSelection.deckSize ?? 0;

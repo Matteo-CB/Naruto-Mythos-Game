@@ -431,6 +431,10 @@ export class GameEngine {
     let newState = deepClone(state);
     newState.phase = 'mission';
 
+    // Reset wonBy on ALL missions — all missions are re-scored every turn
+    // (power changes as tokens are removed each EndPhase, new chars are played, etc.)
+    newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null }));
+
     // Execute mission scoring
     newState = executeMissionPhase(newState);
 
