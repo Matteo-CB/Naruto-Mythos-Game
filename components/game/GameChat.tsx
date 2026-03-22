@@ -188,9 +188,10 @@ export function GameChat() {
                       }}>{t('chat.spectatorTag')}</span>
                     )}
                   </span>
-                  {/* Message */}
+                  {/* Message — Inter font for readability */}
                   <span className="text-[10px]" style={{
                     color: isSystem ? 'rgba(196,163,90,0.7)' : msg.isSpectator ? '#555' : '#ccc',
+                    fontFamily: "'Inter', sans-serif",
                   }}>
                     {msg.isEmote ? renderMessage(msg.message) : msg.message}
                   </span>
