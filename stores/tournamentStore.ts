@@ -80,16 +80,15 @@ interface TournamentStore {
 
 export interface CreateTournamentInput {
   name: string;
-  type: 'simulator' | 'player';
+  type: 'simulator';
   gameMode: 'classic' | 'sealed';
   maxPlayers: number;
   isPublic: boolean;
   useBanList: boolean;
   sealedBoosterCount?: 4 | 5 | 6;
-  discordRoleReward?: string;
-  discordRoleBadge?: string;
   bannedCardIds?: string[];
   allowedLeagues?: string[];
+  scheduledStartAt?: string;
 }
 
 export const useTournamentStore = create<TournamentStore>()((set, get) => ({

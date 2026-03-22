@@ -16,7 +16,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-type Tab = 'simulator' | 'player' | 'create';
+type Tab = 'simulator' | 'create';
 
 export default function TournamentsPage() {
   const t = useTranslations('tournament');
@@ -31,7 +31,6 @@ export default function TournamentsPage() {
 
   const {
     simulatorTournaments,
-    playerTournaments,
     loading,
     error,
     fetchTournaments,
@@ -52,7 +51,6 @@ export default function TournamentsPage() {
   useEffect(() => {
     if (session?.user) {
       fetchTournaments('simulator');
-      fetchTournaments('player');
     }
   }, [session, fetchTournaments]);
 
@@ -76,12 +74,11 @@ export default function TournamentsPage() {
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: 'simulator', label: t('simulatorTab') },
-    { key: 'player', label: t('playerTab') },
-    { key: 'create', label: t('create') },
+    { key: 'simulator', label: t('title') },
+    ...(isAdmin ? [{ key: 'create' as Tab, label: t('create') }] : []),
   ];
 
-  const currentList = activeTab === 'simulator' ? simulatorTournaments : activeTab === 'player' ? playerTournaments : [];
+  const currentList = simulatorTournaments;
 
   return (
     <div id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
