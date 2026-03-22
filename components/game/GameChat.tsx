@@ -176,9 +176,10 @@ export function GameChat() {
             return (
               <div key={msg.id} className="group mb-1.5 flex items-start gap-1.5" style={{ fontFamily: "'Inter', sans-serif" }}>
                 <div className="flex-1 min-w-0">
-                  {/* Username */}
-                  <span className="text-[10px] font-bold mr-1 font-display" style={{
+                  {/* Username — NJNaruto font */}
+                  <span className="text-[10px] font-bold mr-1" style={{
                     color: isSystem ? '#c4a35a' : msg.isSpectator ? '#666' : '#e0e0e0',
+                    fontFamily: 'var(--font-display)',
                   }}>
                     {isSystem ? t('chat.systemTag') : msg.username}
                     {msg.isSpectator && !isSystem && (
