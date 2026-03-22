@@ -475,10 +475,16 @@ export function TargetSelector() {
   // ---- REORDER_DISCARD popup ----
   const isReorderDiscard = eTst === 'REORDER_DISCARD';
   if (isReorderDiscard && validTargets.length > 1 && visibleState) {
-    // Attacker chooses order in OPPONENT's discard pile
-    const opponentDiscard = visibleState.opponentState.discardPile ?? [];
+    // Determine whose discard pile to read from the pending effect's effectDescription
+    let reorderDiscardOwner: string | undefined;
+    const reorderPendingEffect = visibleState.pendingEffects?.find((e: any) => e.targetSelectionType === 'REORDER_DISCARD');
+    try { reorderDiscardOwner = JSON.parse(reorderPendingEffect?.effectDescription ?? '{}').discardOwner; } catch { /* ignore */ }
+    const isOwnDiscard = reorderDiscardOwner === visibleState.myPlayer;
+    const targetDiscard = isOwnDiscard
+      ? (visibleState.myState.discardPile ?? [])
+      : (visibleState.opponentState.discardPile ?? []);
     const count = validTargets.length;
-    const lastN = opponentDiscard.slice(-count);
+    const lastN = targetDiscard.slice(-count);
     const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
     for (const card of lastN) {
       discardTargets.push({
@@ -490,7 +496,7 @@ export function TargetSelector() {
         power: (card as any).power,
         missionIndex: 0,
         isHidden: false,
-        isOwn: false,
+        isOwn: isOwnDiscard,
       });
     }
     if (discardTargets.length > 1) {

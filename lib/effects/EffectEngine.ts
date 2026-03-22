@@ -15777,7 +15777,13 @@ export class EffectEngine {
     if (validTarget2.length === 1) {
       // Auto-apply to the only target
       if (useDefeat) {
-        return EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
+        newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
+        // Both targets defeated → attacker chooses discard order
+        const n133Defender: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        if (newState[n133Defender].discardPile.length >= 2) {
+          newState = EffectEngine.createReorderDiscardPending(newState, n133Defender, pending.sourcePlayer, 2);
+        }
+        return newState;
       } else {
         return EffectEngine.hideCharacterWithLog(newState, validTarget2[0], pending.sourcePlayer);
       }
@@ -18085,8 +18091,11 @@ export class EffectEngine {
     const chosenCard = drawnCards[cardIndex];
     const otherCards = drawnCards.filter((_, i) => i !== cardIndex);
 
-    // Discard the non-chosen cards
-    ps.discardPile.push(...otherCards);
+    // Discard the non-chosen cards (assign instanceIds for reorder tracking)
+    for (let oi = 0; oi < otherCards.length; oi++) {
+      const oc = otherCards[oi];
+      ps.discardPile.push({ ...oc, instanceId: (oc as any).instanceId || (oc as any).id + `-discard-${oi}` } as any);
+    }
 
     // Cost deferred to placement time (upgrade vs fresh play)
 
@@ -18111,7 +18120,11 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
+      let result = EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
+      if (otherCards.length >= 2 && result[player].discardPile.length >= 2) {
+        result = EffectEngine.createReorderDiscardPending(result, player, player, otherCards.length);
+      }
+      return result;
     }
 
     const effectId = generateInstanceId();
@@ -18123,8 +18136,8 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-135-S', costReduction }),
-      targetSelectionType: 'GENERIC_CHOOSE_PLAY_MISSION',
+      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-135-S', costReduction, discardedCount: otherCards.length }),
+      targetSelectionType: 'SAKURA135_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: validMissions,
@@ -18157,8 +18170,14 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
-    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
+    let discardedCount = 0;
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; discardedCount = d.discardedCount ?? 0; } catch { /* ignore */ }
+    let result = EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
+    // After placing the card, let player reorder discarded cards if 2+
+    if (discardedCount >= 2 && result[player].discardPile.length >= 2) {
+      result = EffectEngine.createReorderDiscardPending(result, player, player, discardedCount);
+    }
+    return result;
   }
 
   // =====================================
