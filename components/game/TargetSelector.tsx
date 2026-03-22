@@ -379,7 +379,7 @@ export function TargetSelector() {
     if (!pendingTargetSelection || queuedOrderRef.current.length === 0) return;
     const eTstQ = pendingTargetSelection.engineTargetSelectionType ?? '';
     const isSeqHide = eTstQ.includes('CHOOSE_HIDE_TARGET') || eTstQ === 'KYUBI134_CHOOSE_HIDE_TARGETS';
-    const isSeqDefeat = eTstQ.includes('CHOOSE_DEFEAT_TARGET') || eTstQ === 'GAARA120_CHOOSE_DEFEAT';
+    const isSeqDefeat = eTstQ.includes('CHOOSE_DEFEAT_TARGET');
     if (!isSeqHide && !isSeqDefeat) {
       queuedOrderRef.current = [];
       return;
@@ -424,7 +424,7 @@ export function TargetSelector() {
   // ---- Detect multi-target hide/defeat and render ORDER popup ----
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
-  const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET') || eTst === 'GAARA120_CHOOSE_DEFEAT';
+  const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET');
   const maxSel = pendingTargetSelection.maxSelections;
   const isMultiTargetEffect = maxSel === undefined || maxSel >= validTargets.length;
   if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && isMultiTargetEffect && visibleState && queuedOrderRef.current.length === 0) {
