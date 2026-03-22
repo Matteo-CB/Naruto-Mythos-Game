@@ -633,6 +633,47 @@ function startEffectTimer(
   }, EFFECT_TIMEOUT_MS);
 }
 
+const MISSION_PHASE_TIMEOUT_MS = 120_000; // 2 minutes for mission phase choices
+
+/**
+ * Start a timer for mission phase pending actions (SCORE effects, REORDER_DISCARD).
+ * In ranked games, if the player doesn't respond within 2 minutes, they forfeit.
+ */
+function startMissionPhaseTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  clearActionTimer(room);
+
+  if (!room.gameState) return;
+  if (!room.timerEnabled) return;
+  if (!room.isRanked) return; // Only in ranked
+
+  const pendingAction = room.gameState.pendingActions[0];
+  if (!pendingAction) return;
+
+  const resolverPlayer = pendingAction.player;
+  const resolverSocket = resolverPlayer === 'player1' ? room.hostSocket : room.guestSocket;
+
+  const deadline = Date.now() + MISSION_PHASE_TIMEOUT_MS;
+  room.timerDeadline = deadline;
+
+  if (resolverSocket) {
+    io.to(resolverSocket).emit('game:action-deadline', { deadline, durationMs: MISSION_PHASE_TIMEOUT_MS });
+  }
+
+  room.actionTimer = setTimeout(async () => {
+    if (!rooms.has(code)) return;
+    if (!room.gameState) return;
+
+    console.log(`[Socket] Mission phase timer expired for ${resolverPlayer} in room ${code} — auto-forfeit`);
+    room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, { type: 'FORFEIT', reason: 'timeout' });
+    broadcastState(room, io);
+    await finalizeGameEnd(room, code, io, 'timeout');
+  }, MISSION_PHASE_TIMEOUT_MS);
+}
+
 /**
  * Broadcast visible state to both players.
  */
@@ -1377,8 +1418,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
         } else if (room.gameState.phase === 'action') {
           // Restart timer for next active player
           startActionTimer(room, code, io);
+        } else if (room.gameState.phase === 'mission' && room.gameState.pendingActions.length > 0) {
+          // Mission phase pending (SCORE effects, REORDER_DISCARD) — 2 min timer, forfeit on expiry
+          startMissionPhaseTimer(room, code, io);
+        } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
+          startEffectTimer(room, code, io);
         } else {
-          // Phase changed (mission, end, etc.) - clear timer
           clearActionTimer(room);
         }
       } catch (err) {
