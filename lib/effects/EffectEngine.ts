@@ -10144,15 +10144,17 @@ export class EffectEngine {
       }
       case 'NARUTO133_CHOOSE_TARGET2': {
         // Stage 2: hide or defeat a second enemy (Power ≤2 in any mission)
-        let parsed133t2: { useDefeat?: boolean; target1Id?: string } = {};
+        let parsed133t2: { useDefeat?: boolean; target1Id?: string; discardSizeBefore?: number } = {};
         try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         if (parsed133t2.useDefeat) {
+          const n133Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const n133DiscardBefore = newState[n133Defender].discardPile.length;
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          // Both targets defeated → ATTACKER chooses discard order in opponent's pile
-          const n133DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const n133Discard = newState[n133DefenderPile].discardPile;
-          if (n133Discard.length >= 2) {
-            newState = EffectEngine.createReorderDiscardPending(newState, n133DefenderPile, pendingEffect.sourcePlayer, 2);
+          // Count total cards added to discard by both targets (target 1 + target 2)
+          const n133DiscardBaseline = parsed133t2.discardSizeBefore ?? n133DiscardBefore;
+          const n133TotalDefeated = newState[n133Defender].discardPile.length - n133DiscardBaseline;
+          if (n133TotalDefeated >= 2) {
+            newState = EffectEngine.createReorderDiscardPending(newState, n133Defender, pendingEffect.sourcePlayer, n133TotalDefeated);
           }
         } else {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
@@ -14472,9 +14474,14 @@ export class EffectEngine {
           }
         }
 
-        // Defeat selected target
+        // Defeat selected target (may be replaced by hide via Hayate/Gaara075/Gemma)
+        const g120DefenderSide: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+        const g120DiscardBefore = newState[g120DefenderSide].discardPile.length;
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-        defeatedCount_g++;
+        // Only count if the character actually went to the discard pile
+        if (newState[g120DefenderSide].discardPile.length > g120DiscardBefore) {
+          defeatedCount_g++;
+        }
         let defeatName_g = '';
         for (const m of newState.activeMissions) {
           for (const c of [...m.player1Characters, ...m.player2Characters]) {
@@ -15750,6 +15757,10 @@ export class EffectEngine {
     try { parsed = JSON.parse(pending.effectDescription); } catch { /* ignore */ }
     const useDefeat = parsed.useDefeat ?? false;
 
+    // Track discard size before target 1 for accurate reorder count later
+    const n133DefenderT1: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
+    const discardSizeBeforeT1 = state[n133DefenderT1].discardPile.length;
+
     // Apply hide or defeat to target 1
     let newState: GameState;
     if (useDefeat) {
@@ -15791,10 +15802,10 @@ export class EffectEngine {
       // Auto-apply to the only target
       if (useDefeat) {
         newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
-        // Both targets defeated → attacker chooses discard order
-        const n133Defender: PlayerID = pending.sourcePlayer === 'player1' ? 'player2' : 'player1';
-        if (newState[n133Defender].discardPile.length >= 2) {
-          newState = EffectEngine.createReorderDiscardPending(newState, n133Defender, pending.sourcePlayer, 2);
+        // Count actual cards added to discard by both targets
+        const n133TotalDefeatedAuto = newState[n133DefenderT1].discardPile.length - discardSizeBeforeT1;
+        if (n133TotalDefeatedAuto >= 2) {
+          newState = EffectEngine.createReorderDiscardPending(newState, n133DefenderT1, pending.sourcePlayer, n133TotalDefeatedAuto);
         }
         return newState;
       } else {
@@ -15812,7 +15823,7 @@ export class EffectEngine {
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ useDefeat, target1Id: targetId }),
+      effectDescription: JSON.stringify({ useDefeat, target1Id: targetId, discardSizeBefore: discardSizeBeforeT1 }),
       targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
       sourcePlayer: pending.sourcePlayer,
       requiresTargetSelection: true,
