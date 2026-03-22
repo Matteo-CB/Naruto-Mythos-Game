@@ -50,21 +50,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const {
-      name, type, gameMode, maxPlayers, isPublic,
-      useBanList, sealedBoosterCount, discordRoleReward,
-      discordRoleBadge, bannedCardIds, allowedLeagues,
+      name, gameMode, maxPlayers, isPublic,
+      useBanList, sealedBoosterCount,
+      bannedCardIds, allowedLeagues, scheduledStartAt,
     } = body;
+    const type = 'simulator'; // Only simulator tournaments
 
-    if (!['simulator', 'player'].includes(type)) {
-      return NextResponse.json({ error: 'Invalid tournament type' }, { status: 400 });
-    }
-
-    if (type === 'simulator' && !isAdmin(session)) {
-      return NextResponse.json({ error: 'Only admins can create simulator tournaments' }, { status: 403 });
-    }
-
-    if (type === 'player' && gameMode === 'sealed') {
-      return NextResponse.json({ error: 'Player tournaments only support classic mode' }, { status: 400 });
+    if (!isAdmin(session)) {
+      return NextResponse.json({ error: 'Only admins can create tournaments' }, { status: 403 });
     }
 
     const validSizes = [4, 8, 16, 32];
@@ -101,13 +94,12 @@ export async function POST(req: NextRequest) {
         joinCode: isPublic === false ? generateJoinCode() : null,
         creatorId: session.user.id,
         creatorUsername: user?.username || 'Unknown',
-        requiresDiscord: type === 'simulator',
+        requiresDiscord: true,
         useBanList: useBanList !== false,
         sealedBoosterCount: gameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
-        discordRoleReward: type === 'simulator' ? (discordRoleReward || null) : null,
-        discordRoleBadge: type === 'simulator' ? (discordRoleBadge || null) : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
+        scheduledStartAt: scheduledStartAt ? new Date(scheduledStartAt) : null,
       },
     });
 

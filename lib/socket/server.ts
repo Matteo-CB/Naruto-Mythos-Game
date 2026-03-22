@@ -745,6 +745,67 @@ export function setupSocketHandlers(io: SocketIOServer) {
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
 
+  // Check for scheduled tournament auto-starts (every 30 seconds)
+  setInterval(async () => {
+    try {
+      const now = new Date();
+      const scheduledTournaments = await prisma.tournament.findMany({
+        where: { status: 'registration', scheduledStartAt: { lte: now } },
+        include: { _count: { select: { participants: true } } },
+      });
+      for (const t of scheduledTournaments) {
+        if (t._count.participants < 2) {
+          // Not enough players — cancel
+          await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
+          io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players' });
+          console.log(`[Tournament] Auto-cancelled ${t.name} (${t.id}) — not enough players`);
+          continue;
+        }
+        console.log(`[Tournament] Auto-starting scheduled tournament ${t.name} (${t.id})`);
+        // Trigger start via internal API call
+        try {
+          const { generateBracket } = await import('@/lib/tournament/tournamentEngine');
+          const participants = await prisma.tournamentParticipant.findMany({ where: { tournamentId: t.id } });
+          // Shuffle participants randomly
+          for (let i = participants.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [participants[i], participants[j]] = [participants[j], participants[i]];
+          }
+          // Assign seeds
+          for (let i = 0; i < participants.length; i++) {
+            await prisma.tournamentParticipant.update({ where: { id: participants[i].id }, data: { seed: i + 1 } });
+          }
+          const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
+          // Create match records
+          for (const m of bracket.matches) {
+            const p1Id = (m as any).player1?.participantId || null;
+            const p2Id = (m as any).player2?.participantId || null;
+            const p1Name = (m as any).player1?.username || null;
+            const p2Name = (m as any).player2?.username || null;
+            await prisma.tournamentMatch.create({
+              data: {
+                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+                player1Id: p1Id, player1Username: p1Name,
+                player2Id: p2Id, player2Username: p2Name,
+                winnerId: (m as any).winnerId || null, winnerUsername: (m as any).winnerUsername || null,
+                isBye: (m as any).isBye ?? false, status: m.status,
+              },
+            });
+          }
+          await prisma.tournament.update({
+            where: { id: t.id },
+            data: { status: 'in_progress', currentRound: 1, totalRounds: bracket.totalRounds, startedAt: now },
+          });
+          io.to(`tournament:${t.id}`).emit('tournament:started');
+        } catch (err) {
+          console.error(`[Tournament] Auto-start error for ${t.id}:`, err);
+        }
+      }
+    } catch (err) {
+      console.error('[Tournament] Scheduled check error:', err);
+    }
+  }, 30_000);
+
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
     // Register tournament socket handlers
