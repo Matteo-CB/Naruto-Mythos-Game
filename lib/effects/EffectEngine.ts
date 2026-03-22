@@ -12705,6 +12705,83 @@ export class EffectEngine {
       }
 
       // --- Effect-play upgrade choice: player chose "FRESH" or an upgrade target instanceId ---
+      // Hidden reveal with upgrade-or-fresh choice (flexible upgrade cards like Ukon, Ichibi)
+      case 'REVEAL_HIDDEN_UPGRADE_OR_FRESH': {
+        let rhMeta: { hiddenInstanceId?: string; costReduction?: number; powerUpBonus?: number } = {};
+        try { rhMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        const rhInstanceId = rhMeta.hiddenInstanceId ?? '';
+        const rhReduction = rhMeta.costReduction ?? 0;
+        const rhPowerUp = rhMeta.powerUpBonus ?? 0;
+
+        if (targetId === 'FRESH') {
+          // Reveal as fresh play (no upgrade) — call revealHiddenWithReduction with no upgrade logic
+          // Temporarily remove all potential upgrade targets from the mission so findUpgradeTargetIdx returns -1
+          const rhChar = EffectEngine.findCharByInstanceId(newState, rhInstanceId);
+          if (rhChar) {
+            // Just reveal normally — revealHiddenWithReduction will handle it
+            // But it might auto-upgrade. We need to force no-upgrade.
+            // Simplest: reveal the hidden char, pay fresh cost, trigger effects
+            const rhPlayer = pendingEffect.sourcePlayer;
+            const rhPs = newState[rhPlayer];
+            const rhTopCard = rhChar.character.stack?.length > 0 ? rhChar.character.stack[rhChar.character.stack.length - 1] : rhChar.character.card;
+            const rhFreshCost = Math.max(0, (rhTopCard.chakra ?? 0) - rhReduction);
+            if (rhPs.chakra >= rhFreshCost) {
+              rhPs.chakra -= rhFreshCost;
+              rhChar.character.isHidden = false;
+              rhChar.character.wasRevealedAtLeastOnce = true;
+              if (rhPowerUp > 0) rhChar.character.powerTokens += rhPowerUp;
+              // Update in state
+              const rhMission = newState.activeMissions[rhChar.missionIndex];
+              const rhSide = rhPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+              const rhIdx = rhMission[rhSide].findIndex((c: CharacterInPlay) => c.instanceId === rhInstanceId);
+              if (rhIdx >= 0) rhMission[rhSide][rhIdx] = { ...rhChar.character };
+              rhPs.charactersInPlay = EffectEngine.countCharsForPlayer(newState, rhPlayer);
+              newState = EffectEngine.resolvePlayEffects(newState, rhPlayer, rhChar.character, rhChar.missionIndex, false);
+            }
+          }
+        } else {
+          // Player chose to upgrade over a specific target
+          const rhChar = EffectEngine.findCharByInstanceId(newState, rhInstanceId);
+          const rhUpgradeTarget = EffectEngine.findCharByInstanceId(newState, targetId);
+          if (rhChar && rhUpgradeTarget && rhChar.missionIndex === rhUpgradeTarget.missionIndex) {
+            const rhPlayer = pendingEffect.sourcePlayer;
+            const rhPs = newState[rhPlayer];
+            const rhTopCard = rhChar.character.stack?.length > 0 ? rhChar.character.stack[rhChar.character.stack.length - 1] : rhChar.character.card;
+            const rhUpgTop = rhUpgradeTarget.character.stack?.length > 0 ? rhUpgradeTarget.character.stack[rhUpgradeTarget.character.stack.length - 1] : rhUpgradeTarget.character.card;
+            const rhUpgCost = Math.max(0, ((rhTopCard.chakra ?? 0) - (rhUpgTop.chakra ?? 0)) - rhReduction);
+            if (rhPs.chakra >= rhUpgCost) {
+              rhPs.chakra -= rhUpgCost;
+              // Reveal + stack onto upgrade target
+              rhChar.character.isHidden = false;
+              rhChar.character.wasRevealedAtLeastOnce = true;
+              if (rhPowerUp > 0) rhChar.character.powerTokens += rhPowerUp;
+              const rhMIdx = rhChar.missionIndex;
+              const rhSide = rhPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+              const rhMission = newState.activeMissions[rhMIdx];
+              const rhChars = [...rhMission[rhSide]];
+              const revIdx = rhChars.findIndex((c: CharacterInPlay) => c.instanceId === rhInstanceId);
+              const upgIdx = rhChars.findIndex((c: CharacterInPlay) => c.instanceId === targetId);
+              if (revIdx >= 0 && upgIdx >= 0) {
+                const revealedChar = rhChars.splice(revIdx, 1)[0];
+                const actualUpgIdx = rhChars.findIndex((c: CharacterInPlay) => c.instanceId === targetId);
+                if (actualUpgIdx >= 0) {
+                  rhChars[actualUpgIdx] = {
+                    ...rhChars[actualUpgIdx],
+                    card: revealedChar.card,
+                    stack: [...rhChars[actualUpgIdx].stack, ...revealedChar.stack],
+                    powerTokens: rhChars[actualUpgIdx].powerTokens + revealedChar.powerTokens,
+                  };
+                  rhMission[rhSide] = rhChars;
+                  rhPs.charactersInPlay = EffectEngine.countCharsForPlayer(newState, rhPlayer);
+                  newState = EffectEngine.resolvePlayEffects(newState, rhPlayer, rhChars[actualUpgIdx], rhMIdx, true);
+                }
+              }
+            }
+          }
+        }
+        break;
+      }
+
       case 'EFFECT_PLAY_UPGRADE_OR_FRESH': {
         let meta_upch: { cardName?: string; cardId?: string; costReduction?: number; missionIndex?: number } = {};
         try { meta_upch = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
@@ -18623,6 +18700,58 @@ export class EffectEngine {
     // Check if revealing this card would be an upgrade (same-name or flexible cross-name)
     const friendlySideRhr = player === "player1" ? "player1Characters" : "player2Characters";
     const missionRhr = newState.activeMissions[mIdx];
+
+    // Find ALL affordable upgrade targets (not just the first)
+    const allUpgradeTargets: string[] = [];
+    for (const c of missionRhr[friendlySideRhr]) {
+      if (c.instanceId === instanceId || c.isHidden) continue;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+      const isSameName = cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase() && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
+      const isFlex = checkFlexibleUpgrade(topCard as any, cTop) && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
+      if (isSameName || isFlex) {
+        const upgCost = Math.max(0, ((topCard.chakra ?? 0) - (cTop.chakra ?? 0)) - costReduction);
+        if (ps.chakra >= upgCost) allUpgradeTargets.push(c.instanceId);
+      }
+    }
+
+    // Check if fresh play is possible (no name conflict)
+    const hasNameConflictRhr = missionRhr[friendlySideRhr].some((c: CharacterInPlay) => {
+      if (c.isHidden || c.instanceId === instanceId) return false;
+      const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+      return cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase();
+    });
+    const freshCost = Math.max(0, (topCard.chakra ?? 0) - costReduction);
+    const canFreshPlay = !hasNameConflictRhr && ps.chakra >= freshCost;
+
+    // If both upgrade and fresh play are possible, let the player choose
+    if (allUpgradeTargets.length > 0 && canFreshPlay) {
+      // Put the card data back — don't reveal yet, wait for choice
+      const choiceEffId = generateInstanceId();
+      const choiceActId = generateInstanceId();
+      const validOpts = ['FRESH', ...allUpgradeTargets];
+      newState.pendingEffects.push({
+        id: choiceEffId, sourceCardId: pending.sourceCardId,
+        sourceInstanceId: pending.sourceInstanceId, sourceMissionIndex: mIdx,
+        effectType: pending.effectType,
+        effectDescription: JSON.stringify({ hiddenInstanceId: instanceId, costReduction, powerUpBonus }),
+        targetSelectionType: 'REVEAL_HIDDEN_UPGRADE_OR_FRESH',
+        sourcePlayer: player, requiresTargetSelection: true,
+        validTargets: validOpts, isOptional: false, isMandatory: true,
+        resolved: false, isUpgrade: false,
+      });
+      newState.pendingActions.push({
+        id: choiceActId, type: 'SELECT_TARGET' as PendingAction['type'],
+        player,
+        description: `Play ${topCard.name_fr} normally or upgrade?`,
+        descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
+        descriptionParams: { card: topCard.name_fr },
+        options: validOpts, minSelections: 1, maxSelections: 1,
+        sourceEffectId: choiceEffId,
+      });
+      return newState;
+    }
+
+    // Determine upgrade target (if any, and fresh play not possible)
     const upgradeTargetIdxRhr = findUpgradeTargetIdx(missionRhr[friendlySideRhr], topCard, instanceId);
     const upgradeTargetRhr = upgradeTargetIdxRhr >= 0 ? missionRhr[friendlySideRhr][upgradeTargetIdxRhr] : null;
 
