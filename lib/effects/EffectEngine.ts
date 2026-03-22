@@ -666,6 +666,8 @@ export class EffectEngine {
           return state;
         }
       }
+    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD') {
+      // REORDER_DISCARD sends a JSON array of all IDs as targetId — skip single-target validation
     } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
       console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
       return state;
