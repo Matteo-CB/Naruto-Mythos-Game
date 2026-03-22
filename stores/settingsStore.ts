@@ -8,12 +8,14 @@ interface BackgroundOption {
 
 interface SettingsState {
   animationsEnabled: boolean;
+  allowSpectatorHand: boolean;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
   availableBackgrounds: BackgroundOption[];
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
   setAnimationsEnabled: (v: boolean) => Promise<void>;
+  setAllowSpectatorHand: (v: boolean) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
 }
 
@@ -41,6 +43,7 @@ function cacheBackgrounds(backgrounds: BackgroundOption[]): void {
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
+  allowSpectatorHand: false,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
   availableBackgrounds: getCachedBackgrounds(),
@@ -67,6 +70,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({
         animationsEnabled: prefs.animationsEnabled ?? true,
+        allowSpectatorHand: prefs.allowSpectatorHand ?? false,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
         availableBackgrounds: backgrounds,
@@ -89,6 +93,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ animationsEnabled: prev });
+    }
+  },
+
+  setAllowSpectatorHand: async (v: boolean) => {
+    const prev = get().allowSpectatorHand;
+    set({ allowSpectatorHand: v });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowSpectatorHand: v }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ allowSpectatorHand: prev });
     }
   },
 
