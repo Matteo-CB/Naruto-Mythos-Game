@@ -166,7 +166,7 @@ model GameBackground {
 model Tournament {
   id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
   name               String
-  type               String
+  type               String                  @default("simulator")
   status             String
   gameMode           String
   maxPlayers         Int
@@ -176,13 +176,16 @@ model Tournament {
   joinCode           String?                 @unique
   creatorId          String                  @db.ObjectId
   creatorUsername     String
-  requiresDiscord    Boolean                 @default(false)
+  requiresDiscord    Boolean                 @default(true)
   useBanList         Boolean                 @default(true)
   sealedBoosterCount Int?
   discordRoleReward  String?
   discordRoleBadge   String?
   bannedCardIds      String[]                @default([])
   allowedLeagues     String[]                @default([])
+  scheduledStartAt   DateTime?
+  matchTimeLimitMs   Int                     @default(1800000)
+  joinTimeLimitMs    Int                     @default(300000)
   startedAt          DateTime?
   completedAt        DateTime?
   winnerId           String?                 @db.ObjectId

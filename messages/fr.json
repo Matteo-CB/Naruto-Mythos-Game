@@ -2391,7 +2391,23 @@
       "legendarySannin": "Sannin Legendaire",
       "kage": "Kage",
       "sageOfSixPaths": "Sage des Six Chemins"
-    }
+    },
+    "scheduledStart": "Lancement programme",
+    "startsIn": "Commence dans {time}",
+    "startsAt": "Commence le {date}",
+    "joinTimeRemaining": "Rejoignez votre match dans {time}",
+    "autoForfeitJoin": "Forfait automatique si non rejoint a temps",
+    "gameTimeRemaining": "Temps de jeu restant : {time}",
+    "gameTimerExpired": "Temps ecoule. Vainqueur decide par le score.",
+    "discordRequired": "Compte Discord lie et membre du serveur requis",
+    "discordNotLinked": "Liez votre compte Discord dans les parametres pour participer",
+    "discordNotInServer": "Vous devez rejoindre le serveur Discord pour participer",
+    "podium": "Podium",
+    "finalist": "Finaliste",
+    "semifinalist": "Demi-finaliste",
+    "roleObtained": "{player} a obtenu le role {role}",
+    "matchTimeLimit": "Duree max par match",
+    "joinTimeLimit": "Temps pour rejoindre"
   },
   "playHub": {
     "title": "Jouer",
