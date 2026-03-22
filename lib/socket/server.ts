@@ -1210,6 +1210,34 @@ export function setupSocketHandlers(io: SocketIOServer) {
         if (room.gameState.phase === 'action') {
           startActionTimer(room, code, io);
         }
+
+        // Tournament game timer: 30 min total game time
+        if (room.tournamentId && room.tournamentMatchId) {
+          const matchTimeLimit = 1800000; // 30 min default
+          const tournamentGameDeadline = Date.now() + matchTimeLimit;
+          io.to(code).emit('game:tournament-deadline', { deadline: tournamentGameDeadline, durationMs: matchTimeLimit });
+
+          // Store timer reference on room for cleanup
+          (room as any).tournamentGameTimer = setTimeout(async () => {
+            if (!rooms.has(code)) return;
+            if (!room.gameState || room.gameState.phase === 'gameOver') return;
+
+            console.log(`[Socket] Tournament game timer expired in room ${code}`);
+            // Determine winner by score, then edge token
+            const p1Score = room.gameState.player1.missionPoints;
+            const p2Score = room.gameState.player2.missionPoints;
+            let loser: 'player1' | 'player2';
+            if (p1Score !== p2Score) {
+              loser = p1Score > p2Score ? 'player2' : 'player1';
+            } else {
+              // Equal scores → edge token holder wins
+              loser = room.gameState.edgeHolder === 'player1' ? 'player2' : 'player1';
+            }
+            room.gameState = GameEngine.applyAction(room.gameState, loser, { type: 'FORFEIT', reason: 'timeout' });
+            broadcastState(room, io);
+            await finalizeGameEnd(room, code, io, 'timeout');
+          }, matchTimeLimit);
+        }
       } else {
         const who = socket.id === room.hostSocket ? 'host' : 'guest';
         console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);

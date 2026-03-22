@@ -4,7 +4,8 @@
 import type { Server, Socket } from 'socket.io';
 import { prisma } from '@/lib/db/prisma';
 import { startAbsenceTimer, clearAbsenceTimer } from '@/lib/tournament/absenceManager';
-import { assignTournamentRole } from '@/lib/discord/roleSync';
+import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
+import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
 
@@ -131,22 +132,56 @@ async function advanceMatchWinner(io: Server, tournamentId: string, match: { rou
   });
 
   if (!nextMatch) {
+    // Tournament completed — this was the final match
     await prisma.tournament.update({
       where: { id: tournamentId },
       data: { status: 'completed', winnerId, winnerUsername, completedAt: new Date() },
     });
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: winnerId },
       data: { tournamentWins: { increment: 1 } },
     });
     io.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 
-    // Assign Discord role reward if configured
-    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { discordRoleReward: true } });
-    if (tournament?.discordRoleReward) {
-      assignTournamentRole(winnerId, tournament.discordRoleReward).catch(err => {
-        console.error('[Tournament] Discord role assign error:', err);
+    // Assign "Vainqueur de tournoi X" Discord role
+    let newRoleName: string | null = null;
+    try {
+      newRoleName = await assignTournamentWinnerRole(winnerId, updatedUser.tournamentWins);
+    } catch (err) {
+      console.error('[Tournament] Discord role assign error:', err);
+    }
+
+    // Build podium and send webhook
+    try {
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: tournamentId },
+        include: { matches: true, _count: { select: { participants: true } } },
       });
+      if (tournament) {
+        // Finalist = loser of the final match
+        const finalMatch = tournament.matches.find(m => m.round === match.round && m.matchIndex === match.matchIndex);
+        const finalistId = finalMatch?.player1Id === winnerId ? finalMatch?.player2Id : finalMatch?.player1Id;
+        const finalistUsername = finalMatch?.player1Id === winnerId ? finalMatch?.player2Username : finalMatch?.player1Username;
+
+        // Semi-finalist = losers of semi-final matches (round before final)
+        const semiRound = match.round - 1;
+        const semiMatches = tournament.matches.filter(m => m.round === semiRound && m.status === 'completed');
+        const semiLosers = semiMatches
+          .map(m => m.winnerId === m.player1Id
+            ? { userId: m.player2Id!, username: m.player2Username! }
+            : { userId: m.player1Id!, username: m.player1Username! })
+          .filter(l => l.userId && l.userId !== finalistId);
+        const thirdPlace = semiLosers[0];
+
+        const podium = [
+          { userId: winnerId, username: winnerUsername ?? 'Unknown', place: 1 as const },
+          ...(finalistId && finalistUsername ? [{ userId: finalistId, username: finalistUsername, place: 2 as const }] : []),
+          ...(thirdPlace ? [{ userId: thirdPlace.userId, username: thirdPlace.username, place: 3 as const }] : []),
+        ];
+        await sendTournamentResults(tournament.name, podium, tournament._count.participants, newRoleName);
+      }
+    } catch (err) {
+      console.error('[Tournament] Webhook error:', err);
     }
     return;
   }

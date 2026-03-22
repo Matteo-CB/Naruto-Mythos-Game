@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
+import { isDiscordMember } from '@/lib/discord/tournamentRoles';
 
 // POST - join a tournament
 export async function POST(
@@ -45,10 +46,15 @@ export async function POST(
       select: { username: true, discordId: true, elo: true },
     });
 
-    // Simulator tournaments require Discord link
+    // Tournaments require Discord link + server membership
     if (tournament.requiresDiscord) {
       if (!user?.discordId) {
-        return NextResponse.json({ error: 'Discord account required for simulator tournaments' }, { status: 400 });
+        return NextResponse.json({ error: 'Discord account required. Link your Discord in settings.' }, { status: 400 });
+      }
+      // Verify the user is a member of the Discord server
+      const isMember = await isDiscordMember(user.discordId);
+      if (!isMember) {
+        return NextResponse.json({ error: 'You must join the Discord server to participate in tournaments.' }, { status: 400 });
       }
     }
 
