@@ -53,8 +53,9 @@ export function ActionBar() {
   const isMyTurn = activePlayer === myPlayer && !isProcessing;
   const isActionPhase = phase === 'action';
   const hasPassed = myState.hasPassed;
-  // Block all game actions while an effect popup is minimized (view-only mode)
-  const actionsBlocked = effectPopupMinimized;
+  // Block all game actions while an effect popup is minimized or while ANY player
+  // has unresolved pending effects (e.g., opponent choosing Kin Tsuchi/Zaku draw/chakra)
+  const actionsBlocked = effectPopupMinimized || (visibleState.hasPendingResolution ?? false);
 
   // Determine available actions
   const hasCardSelected = selectedCardIndex !== null;

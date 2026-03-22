@@ -50,6 +50,11 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'PASS':
+      // Block PASS while pending effects/actions are being resolved
+      // (e.g., opponent choosing Kin Tsuchi/Zaku draw/chakra)
+      if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
+        return state;
+      }
       newState = handlePass(newState, player);
       break;
     case 'SELECT_TARGET':
