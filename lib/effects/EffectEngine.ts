@@ -7122,7 +7122,7 @@ export class EffectEngine {
           id: j105EffId, sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
           sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-          effectDescription: '', targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
+          effectDescription: JSON.stringify({ hiddenChars: j105HiddenSummons }), targetSelectionType: 'JIRAIYA105_CHOOSE_SUMMON',
           sourcePlayer: j105Player, requiresTargetSelection: true,
           validTargets: j105AllTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: pendingEffect.isUpgrade,
