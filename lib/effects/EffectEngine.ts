@@ -10129,11 +10129,11 @@ export class EffectEngine {
         try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         if (parsed133t2.useDefeat) {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          // Both targets defeated → let OWNER reorder top 2 cards of their discard
-          const n133Owner: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const n133Discard = newState[n133Owner].discardPile;
+          // Both targets defeated → ATTACKER chooses discard order in opponent's pile
+          const n133DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          const n133Discard = newState[n133DefenderPile].discardPile;
           if (n133Discard.length >= 2) {
-            newState = EffectEngine.createReorderDiscardPending(newState, n133Owner, 2);
+            newState = EffectEngine.createReorderDiscardPending(newState, n133DefenderPile, pendingEffect.sourcePlayer, 2);
           }
         } else {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
@@ -12640,11 +12640,13 @@ export class EffectEngine {
           // Single card fallback — shouldn't happen since we only trigger for 2+
           reorderList = [targetId];
         }
-        let parsedReorder: { count?: number } = {};
+        let parsedReorder: { count?: number; discardOwner?: string } = {};
         try { parsedReorder = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const reorderCount = parsedReorder.count ?? reorderList.length;
-        const reorderOwner = pendingEffect.sourcePlayer;
-        const ownerPS = { ...newState[reorderOwner] };
+        // discardOwner = the player whose discard pile is being reordered (the defender)
+        // sourcePlayer = the attacker who is choosing the order
+        const reorderTarget = (parsedReorder.discardOwner as PlayerID) ?? (pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1');
+        const ownerPS = { ...newState[reorderTarget] };
         const discard = [...ownerPS.discardPile];
 
         if (discard.length >= reorderCount && reorderList.length === reorderCount) {
@@ -12657,10 +12659,10 @@ export class EffectEngine {
           // Put them back in the chosen order
           discard.push(...reorderedCards);
           ownerPS.discardPile = discard;
-          newState[reorderOwner] = ownerPS;
+          newState[reorderTarget] = ownerPS;
 
           newState.log = logAction(
-            newState.log, newState.turn, newState.phase, reorderOwner,
+            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT',
             `Reordered ${reorderCount} cards in discard pile.`,
             'game.log.effect.reorderDiscard',
@@ -14534,8 +14536,8 @@ export class EffectEngine {
         // If no more chained selections, let owner reorder discard if 2+ defeated
         console.log(`[EffectEngine] GAARA120_CHOOSE_DEFEAT end: chainedToNext=${chainedToNext} isUpgrade=${gaaraDesc.isUpgrade} defeatedCount=${defeatedCount_g} sourceInstanceId=${gaaraDesc.sourceInstanceId}`);
         if (!chainedToNext && defeatedCount_g >= 2) {
-          const g120Owner: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          newState = EffectEngine.createReorderDiscardPending(newState, g120Owner, defeatedCount_g);
+          const g120DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
+          newState = EffectEngine.createReorderDiscardPending(newState, g120DefenderPile, pendingEffect.sourcePlayer, defeatedCount_g);
         }
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
@@ -15342,9 +15344,9 @@ export class EffectEngine {
    * Lets the owner choose the order of the last N cards in their discard pile.
    * Last card placed = top of pile (matters for Kabuto 053).
    */
-  static createReorderDiscardPending(state: GameState, owner: PlayerID, count: number): GameState {
+  static createReorderDiscardPending(state: GameState, discardOwner: PlayerID, attacker: PlayerID, count: number): GameState {
     const newState = { ...state };
-    const discard = newState[owner].discardPile;
+    const discard = newState[discardOwner].discardPile;
     if (discard.length < 2 || count < 2) return state;
 
     const actualCount = Math.min(count, discard.length);
@@ -15360,9 +15362,9 @@ export class EffectEngine {
       sourceInstanceId: effId,
       sourceMissionIndex: 0,
       effectType: 'MAIN' as EffectType,
-      effectDescription: JSON.stringify({ count: actualCount }),
+      effectDescription: JSON.stringify({ count: actualCount, discardOwner }),
       targetSelectionType: 'REORDER_DISCARD',
-      sourcePlayer: owner,
+      sourcePlayer: attacker,
       requiresTargetSelection: true,
       validTargets: cardInstanceIds,
       isOptional: false,
@@ -15373,8 +15375,8 @@ export class EffectEngine {
     newState.pendingActions = [...newState.pendingActions, {
       id: actId,
       type: 'SELECT_TARGET' as PendingAction['type'],
-      player: owner,
-      description: `Choose the order for ${actualCount} defeated cards in your discard pile. Last selected = top of pile.`,
+      player: attacker,
+      description: `Choose the order for ${actualCount} defeated cards in opponent's discard pile. Last selected = top of pile.`,
       descriptionKey: 'game.effect.desc.reorderDiscard',
       descriptionParams: { count: String(actualCount) },
       options: cardInstanceIds,

@@ -475,10 +475,10 @@ export function TargetSelector() {
   // ---- REORDER_DISCARD popup ----
   const isReorderDiscard = eTst === 'REORDER_DISCARD';
   if (isReorderDiscard && validTargets.length > 1 && visibleState) {
-    // Build order targets from the bottom N cards of the player's discard pile
-    const myDiscard = visibleState.myState.discardPile ?? [];
+    // Attacker chooses order in OPPONENT's discard pile
+    const opponentDiscard = visibleState.opponentState.discardPile ?? [];
     const count = validTargets.length;
-    const lastN = myDiscard.slice(-count);
+    const lastN = opponentDiscard.slice(-count);
     const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
     for (const card of lastN) {
       discardTargets.push({
@@ -490,7 +490,7 @@ export function TargetSelector() {
         power: (card as any).power,
         missionIndex: 0,
         isHidden: false,
-        isOwn: true,
+        isOwn: false,
       });
     }
     if (discardTargets.length > 1) {
