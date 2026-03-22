@@ -53,10 +53,7 @@ export function ActionBar() {
   const isMyTurn = activePlayer === myPlayer && !isProcessing;
   const isActionPhase = phase === 'action';
   const hasPassed = myState.hasPassed;
-  // Block game actions only while an effect popup is minimized (view-only mode)
   const actionsBlocked = effectPopupMinimized;
-  // Block PASS specifically when pending effects are being resolved (server also rejects)
-  const passBlocked = visibleState.hasPendingResolution ?? false;
 
   // Determine available actions
   const hasCardSelected = selectedCardIndex !== null;
@@ -337,7 +334,7 @@ export function ActionBar() {
   };
 
   const handlePass = () => {
-    if (!isMyTurn || !isActionPhase || hasPassed || actionsBlocked || passBlocked) return;
+    if (!isMyTurn || !isActionPhase || hasPassed || actionsBlocked) return;
     // If player has chakra remaining, ask for confirmation first
     if (myState.chakra >= 1 && !confirmingPass) {
       setConfirmingPass(true);
@@ -573,7 +570,7 @@ export function ActionBar() {
               <ActionButton
                 label={t('common.confirm')}
                 onClick={handlePass}
-                disabled={actionsBlocked || passBlocked}
+                disabled={actionsBlocked}
                 variant="primary"
               />
               <ActionButton
@@ -587,7 +584,7 @@ export function ActionBar() {
             <ActionButton
               label={t('game.pass')}
               onClick={handlePass}
-              disabled={actionsBlocked || passBlocked}
+              disabled={actionsBlocked}
               variant="muted"
             />
           )}
