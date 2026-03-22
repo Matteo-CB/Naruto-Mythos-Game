@@ -220,7 +220,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
-        set({ connected: false });
+        set({ connected: false, opponentDisconnected: false, opponentDisconnectDeadline: null });
         // Only show error for server-initiated disconnect, not temporary transport issues
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
@@ -333,7 +333,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
-        set({ gameStarted: true, _lastStateUpdate: Date.now() });
+        set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentDisconnectDeadline: null });
 
         // Start a periodic resync check - if no state update for 15s during
         // an active game, request current state from the server.
@@ -372,6 +372,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             visibleState: data.visibleState,
             playerRole: data.playerRole,
             _lastStateUpdate: Date.now(),
+            // Clear disconnect banner on any state update (opponent is clearly connected)
+            opponentDisconnected: false,
+            opponentDisconnectDeadline: null,
           };
           if (data.playerNames) {
             update.playerNames = data.playerNames;
@@ -401,7 +404,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           // Clean up resync timer
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
-          set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null });
+          set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
         },
       );
 
