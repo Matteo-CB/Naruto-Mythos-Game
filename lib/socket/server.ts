@@ -150,8 +150,17 @@ function broadcastActiveGames(io: SocketIOServer): void {
     roomCode: string; player1Name: string; player2Name: string;
     spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
   }> = [];
+  // Track seen player IDs to prevent duplicates (same player in multiple rooms)
+  const seenPlayerIds = new Set<string>();
+  const now = Date.now();
   for (const [code, room] of rooms) {
     if (!room.gameState || room.gameState.phase === 'gameOver') continue;
+    // Skip stale rooms (older than 2 hours with no activity)
+    if (now - room.createdAt > 2 * 60 * 60 * 1000) continue;
+    // Skip if either player is already shown in another active game
+    if (seenPlayerIds.has(room.hostId) || (room.guestId && seenPlayerIds.has(room.guestId))) continue;
+    seenPlayerIds.add(room.hostId);
+    if (room.guestId) seenPlayerIds.add(room.guestId);
     activeGames.push({
       roomCode: code,
       player1Name: room.hostName ?? 'Player 1',
