@@ -135,13 +135,6 @@ export class EffectEngine {
     isUpgrade: boolean,
   ): GameState {
     let newState = deepClone(state);
-
-    // Guard: ensure missionIndex is valid (can be stale after effect chains)
-    if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) {
-      console.warn(`[EffectEngine] resolvePlayEffects: invalid missionIndex ${missionIndex} (${newState.activeMissions.length} missions)`);
-      return newState;
-    }
-
     const charStack = character.stack ?? [character.card];
     const topCard = charStack.length > 0 ? charStack[charStack.length - 1] : character.card;
     if (!topCard) return newState;
@@ -296,11 +289,6 @@ export class EffectEngine {
     missionIndex: number,
   ): GameState {
     let newState = deepClone(state);
-
-    if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) {
-      console.warn(`[EffectEngine] resolveRevealEffects: invalid missionIndex ${missionIndex}`);
-      return newState;
-    }
 
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
@@ -15619,46 +15607,19 @@ export class EffectEngine {
               }
             );
             if (hasSameName && !char.isHidden) {
-              // Same-name conflict on current mission — try other missions first
-              let altMissionIdx = -1;
-              for (let mi = 0; mi < newState.activeMissions.length; mi++) {
-                const altMission = newState.activeMissions[mi];
-                if (altMission === currentMission) continue;
-                const altChars = altMission[toSide];
-                const hasConflict = altChars.some((c: CharacterInPlay) => {
-                  if (c.isHidden || c.instanceId === char.instanceId) return false;
-                  const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-                  return cTop.name_fr.toUpperCase() === charName;
-                });
-                if (!hasConflict) { altMissionIdx = mi; break; }
+              // Same-name conflict — the returning character is discarded
+              // (the player chose to play another copy knowing the original was stolen)
+              const removed = currentMission[fromSide].splice(idx, 1)[0];
+              for (let si = 0; si < removed.stack.length; si++) {
+                const card = removed.stack[si];
+                newState[removed.originalOwner].discardPile.push({ ...card, instanceId: removed.instanceId + (si > 0 ? `-stack-${si}` : '') } as any);
               }
-
-              if (altMissionIdx >= 0) {
-                // Move to alternative mission without name conflict
-                const removed = currentMission[fromSide].splice(idx, 1)[0];
-                removed.controlledBy = removed.originalOwner;
-                removed.controllerInstanceId = undefined;
-                removed.missionIndex = altMissionIdx;
-                newState.activeMissions[altMissionIdx][toSide].push(removed);
-                newState.log = logAction(
-                  newState.log, newState.turn, newState.phase, char.originalOwner,
-                  'EFFECT', `${topCardCtrl.name_fr} returned to original owner on mission ${altMissionIdx + 1} (name conflict on original mission).`,
-                  'game.log.effect.controlReturnedAltMission',
-                  { card: topCardCtrl.name_fr, mission: String(altMissionIdx + 1) },
-                );
-              } else {
-                // No valid mission — defeat the character
-                const removed = currentMission[fromSide].splice(idx, 1)[0];
-                for (const card of removed.stack) {
-                  newState[removed.originalOwner].discardPile.push(card);
-                }
-                newState.log = logAction(
-                  newState.log, newState.turn, newState.phase, char.originalOwner,
-                  'EFFECT', `${topCardCtrl.name_fr} returned to owner but conflicts with existing character on all missions — defeated.`,
-                  'game.log.effect.controlReturnedConflict',
-                  { card: topCardCtrl.name_fr, target: topCardCtrl.name_fr },
-                );
-              }
+              newState.log = logAction(
+                newState.log, newState.turn, newState.phase, char.originalOwner,
+                'EFFECT', `${topCardCtrl.name_fr} returned to owner but same name already in play — discarded.`,
+                'game.log.effect.controlReturnedConflict',
+                { card: topCardCtrl.name_fr, target: topCardCtrl.name_fr },
+              );
             } else {
               // No conflict — move to original owner's side on same mission
               const removed = currentMission[fromSide].splice(idx, 1)[0];
