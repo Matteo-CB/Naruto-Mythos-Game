@@ -135,9 +135,16 @@ export class EffectEngine {
     isUpgrade: boolean,
   ): GameState {
     let newState = deepClone(state);
+
+    // Guard: ensure missionIndex is valid (can be stale after effect chains)
+    if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) {
+      console.warn(`[EffectEngine] resolvePlayEffects: invalid missionIndex ${missionIndex} (${newState.activeMissions.length} missions)`);
+      return newState;
+    }
+
     const charStack = character.stack ?? [character.card];
     const topCard = charStack.length > 0 ? charStack[charStack.length - 1] : character.card;
-    if (!topCard) return state;
+    if (!topCard) return newState;
 
     // Build the ordered list of effect types from the card definition (top-to-bottom).
     // When played as upgrade, both MAIN and UPGRADE trigger in card-printed order.
@@ -289,6 +296,12 @@ export class EffectEngine {
     missionIndex: number,
   ): GameState {
     let newState = deepClone(state);
+
+    if (missionIndex < 0 || missionIndex >= newState.activeMissions.length) {
+      console.warn(`[EffectEngine] resolveRevealEffects: invalid missionIndex ${missionIndex}`);
+      return newState;
+    }
+
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
     // A simple reveal is NOT an upgrade — isUpgrade is only true when actively

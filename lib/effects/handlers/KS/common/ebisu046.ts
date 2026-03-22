@@ -15,6 +15,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleEbisu046Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) return { state };
   const friendlyChars =
     sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 

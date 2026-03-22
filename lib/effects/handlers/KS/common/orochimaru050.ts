@@ -22,6 +22,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleOrochimaru050Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) return { state };
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
   const enemyChars =
     opponentPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;

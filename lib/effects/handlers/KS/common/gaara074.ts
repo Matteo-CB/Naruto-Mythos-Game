@@ -11,6 +11,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleGaara074Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Gaara (074): Mission not found.', 'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-074-C' }) } };
+  }
   const friendlyChars =
     sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 

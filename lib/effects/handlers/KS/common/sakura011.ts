@@ -14,6 +14,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleSakura011Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) return { state };
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
 
   // Check for another Team 7 character in this mission (not self, not hidden)

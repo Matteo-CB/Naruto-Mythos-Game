@@ -14,6 +14,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 function handleIno019Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
+  if (!mission) {
+    return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+      'Ino Yamanaka (019): Mission not found.', 'game.log.effect.noTarget', { card: 'INO YAMANAKA', id: 'KS-019-C' }) } };
+  }
   // Check for another Team 10 character in this mission (not self, not hidden, both sides)
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
   const hasOtherTeam10 = allChars.some((char) => {
