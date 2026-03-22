@@ -301,7 +301,7 @@ function processNextMove(
   const validMissions = getValidMissions(filteredState, charId, player, sourceMissionIndex);
 
   if (validMissions.length === 1) {
-    // Auto-move
+    // Auto-move — single valid destination, no player choice needed
     let moved = moveCharTo(filteredState, charId, validMissions[0], player);
     moved = {
       ...moved,
@@ -313,28 +313,20 @@ function processNextMove(
         { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName, from: sourceMissionIndex, to: validMissions[0] },
       ),
     };
-    // Note: move triggers will be called in EffectEngine after resolving this auto-move.
-    // We store the auto-move info so EffectEngine can call triggers.
-    // For auto-moves from the handler, we return a special result that EffectEngine processes.
-    return {
-      state: moved,
-      requiresTargetSelection: true,
-      targetSelectionType: 'SASUKE107_AUTO_MOVED',
-      validTargets: ['confirm'],
-      description: JSON.stringify({
-        movedCharInstanceId: charId,
-        destMissionIndex: validMissions[0],
-        movedCount: movedCount + 1,
-        isUpgrade,
-        sasukeInstanceId,
-        sourceMissionIndex,
-        remainingCharIds: [],
-      }),
-      descriptionKey: 'game.effect.desc.sasuke107AutoMoved',
-      descriptionParams: { target: charName, mission: String(validMissions[0] + 1) },
-      isMandatory: true,
-      isOptional: false,
-    };
+    // After auto-move, check for UPGRADE powerup
+    if (isUpgrade && movedCount + 1 > 0) {
+      return {
+        state: moved,
+        requiresTargetSelection: true,
+        targetSelectionType: 'SASUKE107_CONFIRM_UPGRADE',
+        validTargets: [sasukeInstanceId],
+        isOptional: true,
+        description: JSON.stringify({ movedCount: movedCount + 1, sasukeInstanceId, sourceMissionIndex }),
+        descriptionKey: 'game.effect.desc.sasuke107ConfirmUpgrade',
+        descriptionParams: { count: String(movedCount + 1) },
+      };
+    }
+    return { state: moved };
   }
 
   // Multiple valid missions - need player choice for destination
