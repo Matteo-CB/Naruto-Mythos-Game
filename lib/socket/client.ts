@@ -816,17 +816,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   dismissReconnect: () => {
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
-      // Forfeit the game
+      // Rejoin first so the server maps our socket to the room, then forfeit
       socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
+      // Wait for rejoin to be processed, then forfeit
       setTimeout(() => {
         const s = get();
         if (s.socket && s.connected) {
-          s.socket.emit('game:action', {
-            roomCode: pendingReconnect.roomCode,
-            action: { type: 'FORFEIT', reason: 'abandon' },
-          });
+          s.socket.emit('action:forfeit', { reason: 'abandon' });
         }
-      }, 500);
+      }, 300);
     }
     set({ pendingReconnect: null });
   },
@@ -838,6 +836,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       set({
         roomCode: pendingReconnect.roomCode,
         playerRole: pendingReconnect.playerRole,
+        gameStarted: true,
         pendingReconnect: null,
         opponentDisconnected: false,
         opponentDisconnectDeadline: null,
