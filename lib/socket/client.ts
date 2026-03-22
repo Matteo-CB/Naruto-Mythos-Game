@@ -372,9 +372,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             visibleState: data.visibleState,
             playerRole: data.playerRole,
             _lastStateUpdate: Date.now(),
-            // Clear disconnect banner on any state update (opponent is clearly connected)
-            opponentDisconnected: false,
-            opponentDisconnectDeadline: null,
+            // Don't clear disconnect banner here — state updates can arrive from
+            // phase transitions even while opponent is disconnected.
+            // Only game:opponent-reconnected (line 464) should clear the banner.
           };
           if (data.playerNames) {
             update.playerNames = data.playerNames;
@@ -816,15 +816,17 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   dismissReconnect: () => {
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
-      // Rejoin first so the server maps our socket to the room, then forfeit
-      socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
-      // Wait for rejoin to be processed, then forfeit
+      const rc = pendingReconnect.roomCode;
+      const uid = get().userId;
+      // Rejoin first so the server maps our socket to the room
+      socket.emit('game:rejoin', { roomCode: rc, userId: uid });
+      // Wait 1s for rejoin to be fully processed, then forfeit
       setTimeout(() => {
         const s = get();
         if (s.socket && s.connected) {
           s.socket.emit('action:forfeit', { reason: 'abandon' });
         }
-      }, 300);
+      }, 1000);
     }
     set({ pendingReconnect: null });
   },
@@ -833,10 +835,10 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
       socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
+      // Don't set gameStarted here — let the game:started event from server set it
       set({
         roomCode: pendingReconnect.roomCode,
         playerRole: pendingReconnect.playerRole,
-        gameStarted: true,
         pendingReconnect: null,
         opponentDisconnected: false,
         opponentDisconnectDeadline: null,

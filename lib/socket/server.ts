@@ -829,8 +829,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       // If game is active, send current game state to the rejoining player
       if (room.gameState) {
+        const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         const visibleState = GameEngine.getVisibleState(room.gameState, player);
-        socket.emit('game:state-update', { visibleState, playerRole: player });
+        // Send game:started FIRST so the client sets gameStarted=true before state arrives
+        socket.emit('game:started');
+        socket.emit('game:state-update', { visibleState, playerRole: player, playerNames });
 
         // Restart action timer if needed
         if (room.gameState.phase === 'action' && !room.actionTimer) {
