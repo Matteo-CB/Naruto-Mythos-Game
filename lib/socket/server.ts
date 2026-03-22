@@ -50,6 +50,9 @@ interface RoomData {
   coinFlipDone: { player1: boolean; player2: boolean };
   // Spectators
   spectators: Map<string, { socketId: string; userId: string; username: string }>;
+  // Per-player hand visibility for spectators
+  hostAllowSpectatorHand: boolean;
+  guestAllowSpectatorHand: boolean;
   // Chat
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   chatLastCleanup: number;
@@ -649,14 +652,20 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
       });
     }
 
-    // Broadcast to spectators — they see both hands
+    // Broadcast to spectators — hand visibility depends on player settings
     if (room.spectators.size > 0) {
       const spectatorState = {
         ...p1State,
-        // Merge player2's hand into the spectator view
+        // Player 1 (myState) hand: show only if host allows
+        myState: {
+          ...p1State.myState,
+          hand: room.hostAllowSpectatorHand ? p1State.myState.hand : [],
+          handSize: p1State.myState.hand.length,
+        },
+        // Player 2 (opponentState) hand: show only if guest allows
         opponentState: {
           ...p1State.opponentState,
-          hand: room.gameState.player2.hand,
+          hand: room.guestAllowSpectatorHand ? room.gameState.player2.hand : [],
           handSize: room.gameState.player2.hand.length,
         },
       };
@@ -851,7 +860,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Create a room
-    socket.on('room:create', (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -895,9 +904,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
         timerEnabled: gameMode === 'ranked' || (data.timerEnabled ?? false),
         coinFlipDone: { player1: false, player2: false },
         spectators: new Map(),
+        hostAllowSpectatorHand: false,
+        guestAllowSpectatorHand: false,
         chatMessages: [],
         chatLastCleanup: 0,
       };
+
+      // Fetch host's spectator hand preference
+      try {
+        const hostUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
+        room.hostAllowSpectatorHand = hostUser?.allowSpectatorHand ?? false;
+      } catch { /* default false */ }
 
       rooms.set(code, room);
       playerRooms.set(socket.id, code);
@@ -946,6 +963,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.guestSocket = socket.id;
       playerRooms.set(socket.id, data.code);
       socket.join(data.code);
+
+      // Fetch guest's spectator hand preference
+      try {
+        const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
+        room.guestAllowSpectatorHand = guestUser?.allowSpectatorHand ?? false;
+      } catch { /* default false */ }
 
       console.log(`[Socket] User ${data.userId} joined room ${data.code}`);
       io.to(data.code).emit('room:player-joined', {
@@ -1560,6 +1583,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           timerEnabled: wantRanked,
           coinFlipDone: { player1: false, player2: false },
           spectators: new Map(),
+          hostAllowSpectatorHand: false,
+          guestAllowSpectatorHand: false,
           chatMessages: [],
           chatLastCleanup: 0,
         };

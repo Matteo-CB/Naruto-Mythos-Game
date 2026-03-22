@@ -12267,8 +12267,10 @@ export class EffectEngine {
             if (char.isHidden) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
+            const charIsUpgraded = char.stack?.length > 1;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
-              if (effect.type === 'SCORE') return false; // SCORE never copyable
+              if (effect.type === 'SCORE') return false;
+              if (effect.type === 'UPGRADE' && !charIsUpgraded) return false;
               if (effect.description.includes('[⧗]')) return false;
               if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
               return true;
@@ -12524,10 +12526,13 @@ export class EffectEngine {
           : k148Target.character.card;
 
         // Kakashi 148 AMBUSH (always revealed): can copy MAIN, AMBUSH, UPGRADE (not SCORE, not continuous)
+        // UPGRADE only copyable if the target was actually played as an upgrade (stack > 1)
+        const k148TargetIsUpgraded = k148Target.character.stack?.length > 1;
         const k148Copyable = (k148TopCard.effects ?? []).filter((eff) => {
-          if (eff.type === 'SCORE') return false; // SCORE never copyable
+          if (eff.type === 'SCORE') return false;
           if (eff.description.includes('[⧗]')) return false;
           if (eff.description.startsWith('effect:') || eff.description.startsWith('effect.')) return false;
+          if (eff.type === 'UPGRADE' && !k148TargetIsUpgraded) return false;
           return eff.type === 'MAIN' || eff.type === 'AMBUSH' || eff.type === 'UPGRADE';
         });
 
@@ -15491,13 +15496,18 @@ export class EffectEngine {
       const topCard = defeated.stack?.length > 0 ? defeated.stack[defeated.stack?.length - 1] : null;
       const underCards = defeated.stack?.length > 1 ? defeated.stack.slice(0, -1) : [];
       if (topCard) newState[owner].hand.push(topCard);
-      for (const card of underCards) {
-        newState[owner].discardPile.push(card);
+      for (let ui = 0; ui < underCards.length; ui++) {
+        const card = underCards[ui];
+        const discardCard = { ...card, instanceId: defeated.instanceId + `-stack-${ui}` };
+        newState[owner].discardPile.push(discardCard as any);
       }
     } else {
       // Normal: add all cards in the stack to the original owner's discard pile
-      for (const card of defeated.stack) {
-        newState[owner].discardPile.push(card);
+      // Assign instanceIds from the CharacterInPlay for discard ordering features
+      for (let si = 0; si < defeated.stack.length; si++) {
+        const card = defeated.stack[si];
+        const discardCard = { ...card, instanceId: defeated.instanceId + (si > 0 ? `-stack-${si}` : '') };
+        newState[owner].discardPile.push(discardCard as any);
       }
     }
 

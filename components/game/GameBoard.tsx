@@ -1112,6 +1112,7 @@ function GameBoardInner() {
         backgroundPosition: "center",
         position: "relative",
         overscrollBehavior: "none",
+        paddingTop: isSpectating ? 36 : 0,
       }}
       onClick={handleBoardClick}
     >
@@ -1210,7 +1211,10 @@ function GameBoardInner() {
             paddingBottom: dims.isMobile ? '2px' : '0',
           }}
         >
-          <PlayerHand hand={myState.hand} chakra={myState.chakra} />
+          {isSpectating && myState.hand.length === 0
+            ? <OpponentHand handSize={(myState as any).handSize ?? 0} />
+            : <PlayerHand hand={myState.hand} chakra={myState.chakra} isSpectatorOpponent={isSpectating} />
+          }
         </section>
 
         {/* Player stats bar */}

@@ -468,8 +468,9 @@ function handleRevealCharacter(
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
   if (revealedChar) {
-    const skipMainForAmbush = useAmbush === true && charTopCard.number === 16;
-    if (skipMainForAmbush) {
+    const skipMainForAmbush016 = useAmbush === true && charTopCard.number === 16;
+    const skipMainForAmbush106 = useAmbush === true && charTopCard.number === 106;
+    if (skipMainForAmbush016) {
       // Kakashi 016 AMBUSH reveal: copy Shino's cost reduction was already applied via cost.
       // Log it and skip MAIN effect.
       newState.log = logAction(
@@ -478,6 +479,40 @@ function handleRevealCharacter(
         'Kakashi Hatake (016) AMBUSH: Copied Shino Aburame cost reduction — revealed for 0 chakra. MAIN effect skipped.',
         'game.log.effect.kakashi016AmbushReveal',
         { card: 'KAKASHI HATAKE', id: 'KS-016-UC' },
+      );
+    } else if (skipMainForAmbush106) {
+      // Kakashi 106 AMBUSH reveal + Copy Shino: auto-devolve the upgraded Shino, copy AMBUSH
+      // Find the upgraded enemy character containing Shino 033 in stack
+      const k106EnemySide = player === 'player1' ? 'player2Characters' : 'player1Characters';
+      let k106ShinoTarget: string | null = null;
+      for (const m of newState.activeMissions) {
+        for (const c of (m as any)[k106EnemySide]) {
+          if (c.isHidden || !c.stack || c.stack.length <= 1) continue;
+          if (c.stack.some((sc: any) => sc.number === 33)) {
+            k106ShinoTarget = c.instanceId;
+            break;
+          }
+        }
+        if (k106ShinoTarget) break;
+      }
+      if (k106ShinoTarget) {
+        // Auto-devolve and copy Shino AMBUSH
+        const fakePending = {
+          id: '', sourceCardId: 'KS-106-R', sourceInstanceId: characterInstanceId,
+          sourceMissionIndex: missionIndex, effectType: 'MAIN' as const,
+          effectDescription: '', targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
+          sourcePlayer: player, requiresTargetSelection: false,
+          validTargets: [], isOptional: false, isMandatory: true,
+          resolved: false, isUpgrade: true, wasRevealed: true,
+        };
+        newState = EffectEngine.devolveUpgradedCharacter(newState, fakePending, k106ShinoTarget);
+      }
+      newState.log = logAction(
+        newState.log, newState.turn, 'action', player,
+        'EFFECT',
+        'Kakashi Hatake (106) AMBUSH: Copied Shino Aburame cost reduction — auto-devolved Shino.',
+        'game.log.effect.kakashi106AmbushReveal',
+        { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
       );
     } else {
       newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);

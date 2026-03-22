@@ -11,12 +11,13 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, gameBackground: true },
+      select: { animationsEnabled: true, gameBackground: true, allowSpectatorHand: true },
     });
 
     return NextResponse.json({
       animationsEnabled: user?.animationsEnabled ?? true,
       gameBackground: user?.gameBackground || 'default',
+      allowSpectatorHand: user?.allowSpectatorHand ?? false,
     });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -38,6 +39,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof body.gameBackground === 'string' && body.gameBackground.length > 0) {
       update.gameBackground = body.gameBackground;
+    }
+    if (typeof body.allowSpectatorHand === 'boolean') {
+      update.allowSpectatorHand = body.allowSpectatorHand;
     }
 
     if (Object.keys(update).length === 0) {

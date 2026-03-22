@@ -13,8 +13,8 @@ export default function SettingsPage() {
   const router = useRouter();
   const t = useTranslations('settings');
   const {
-    animationsEnabled, gameBackground, isLoaded, availableBackgrounds,
-    fetchFromServer, setAnimationsEnabled, setGameBackground,
+    animationsEnabled, allowSpectatorHand, gameBackground, isLoaded, availableBackgrounds,
+    fetchFromServer, setAnimationsEnabled, setAllowSpectatorHand, setGameBackground,
   } = useSettingsStore();
   const backgrounds = availableBackgrounds;
 
@@ -105,6 +105,51 @@ export default function SettingsPage() {
             style={{ color: '#555555' }}
           >
             {!isLoaded ? t('loading') : animationsEnabled ? t('animationsOn') : t('animationsOff')}
+          </p>
+        </div>
+
+        {/* Spectator Hand Visibility */}
+        <div
+          className="mt-4 flex flex-col gap-4 p-5"
+          style={{
+            backgroundColor: '#111111',
+            border: '1px solid #1e1e1e',
+            borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
+          }}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <span
+              className="text-sm font-medium tracking-wide"
+              style={{ color: isLoaded ? '#e0e0e0' : '#555555' }}
+            >
+              {t('allowSpectatorHand')}
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={allowSpectatorHand}
+              disabled={!isLoaded}
+              onClick={() => setAllowSpectatorHand(!allowSpectatorHand)}
+              className="relative h-6 w-11 flex-shrink-0 rounded-full transition-colors overflow-hidden"
+              style={{
+                backgroundColor: allowSpectatorHand ? '#c4a35a' : '#333333',
+                cursor: isLoaded ? 'pointer' : 'default',
+                opacity: isLoaded ? 1 : 0.5,
+              }}
+            >
+              <span
+                className="absolute top-0.5 h-5 w-5 rounded-full"
+                style={{
+                  backgroundColor: '#0a0a0a',
+                  left: allowSpectatorHand ? '22px' : '2px',
+                  transition: 'left 150ms ease',
+                }}
+              />
+            </button>
+          </div>
+          <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
+          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            {!isLoaded ? t('loading') : allowSpectatorHand ? t('spectatorHandOn') : t('spectatorHandOff')}
           </p>
         </div>
 

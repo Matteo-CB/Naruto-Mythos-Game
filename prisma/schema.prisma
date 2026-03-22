@@ -40,6 +40,7 @@ model User {
   chatBanUntil      DateTime?
   gameBanned        Boolean      @default(false)
   gameBanUntil      DateTime?
+  allowSpectatorHand Boolean     @default(false)
 }
 
 model Account {

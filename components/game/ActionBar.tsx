@@ -232,9 +232,21 @@ export function ActionBar() {
             });
           });
           if (hasEnemyShino) {
-            // AMBUSH cost uses calculateEffectiveCost with skipAmbush=false (applies -4)
             revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false);
-            // Normal cost uses skipAmbush=true (no reduction)
+            revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);
+          }
+        }
+        // Kakashi 106: if enemy has upgraded Shino + Jutsu in mission, can copy Shino AMBUSH for -4
+        if (hiddenTop.number === 106 && hasEnemyJutsu) {
+          const hasUpgradedShino = visibleState.activeMissions.some((ms) => {
+            const eChars = myPlayer === 'player1' ? ms.player2Characters : ms.player1Characters;
+            return eChars.some((c: any) => {
+              if (c.isHidden || !c.stack || c.stack.length <= 1) return false;
+              return c.stack.some((sc: any) => sc.number === 33);
+            });
+          });
+          if (hasUpgradedShino) {
+            revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false);
             revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);
           }
         }
