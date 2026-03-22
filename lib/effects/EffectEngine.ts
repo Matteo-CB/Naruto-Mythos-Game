@@ -673,7 +673,11 @@ export class EffectEngine {
 
     // Kimimaro 056 continuous protection: opponent must pay 1 chakra to affect him.
     // If opponent can't pay, the effect is CANCELLED.
-    const kimimaro056Result = EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
+    // Only check on the FINAL target selection (not CONFIRM popups where targetId = sourceInstanceId)
+    const isConfirmPopup = targetId === pendingEffect.sourceInstanceId && pendingEffect.validTargets?.length === 1 && pendingEffect.validTargets[0] === pendingEffect.sourceInstanceId;
+    const kimimaro056Result = isConfirmPopup
+      ? { state: newState, blocked: false }
+      : EffectEngine.applyKimimaro056Protection(newState, pendingEffect, targetId);
     newState = kimimaro056Result.state;
     if (kimimaro056Result.blocked) {
       // Effect cancelled - clean up pending and return
