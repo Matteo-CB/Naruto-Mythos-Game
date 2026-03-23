@@ -4380,6 +4380,7 @@ export class EffectEngine {
             stack: [kb052Drawn],
             controlledBy: kb052Player,
             originalOwner: kb052Opponent,
+            controllerInstanceId: pendingEffect.sourceInstanceId,
             missionIndex: 0,
           };
           const missions_kb052 = [...newState.activeMissions];
@@ -12626,6 +12627,7 @@ export class EffectEngine {
               stack: [stolenCard],
               controlledBy: player_kb,
               originalOwner: originalOwner,
+              controllerInstanceId: pendingEffect.sourceInstanceId,
               missionIndex: missionIdx_kb,
             };
             const missions_kb = [...newState.activeMissions];
