@@ -25,6 +25,7 @@ export function SandboxToolbar() {
   const sandboxSetTurn = useGameStore((s) => s.sandboxSetTurn);
   const sandboxSetPhase = useGameStore((s) => s.sandboxSetPhase);
   const sandboxResetAllPowerTokens = useGameStore((s) => s.sandboxResetAllPowerTokens);
+  const sandboxSwitchPlayer = useGameStore((s) => s.sandboxSwitchPlayer);
   const [modal, setModal] = useState<SandboxModal>('none');
   const [chakraInput, setChakraInput] = useState(false);
   const [chakraVal, setChakraVal] = useState('');
@@ -126,6 +127,7 @@ export function SandboxToolbar() {
           </div>
 
           <ToolbarButton label={t('sandbox.resetTokens')} onClick={sandboxResetAllPowerTokens} />
+          <ToolbarButton label={t('sandbox.switchPlayer')} onClick={sandboxSwitchPlayer} accent />
         </div>
       </div>
 

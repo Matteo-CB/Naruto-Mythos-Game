@@ -162,6 +162,8 @@ export interface GameState {
   missionScoringComplete?: boolean;
   /** Which player forfeited (abandon or timeout) - if set, game is over */
   forfeitedBy?: PlayerID;
+  /** Sandbox mode: don't alternate active player after actions */
+  sandboxNoAlternate?: boolean;
   /** Consecutive timeout count per player (online timer) */
   consecutiveTimeouts: { player1: number; player2: number };
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).

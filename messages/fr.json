@@ -1132,7 +1132,8 @@
     "noCharsOnBoard": "Aucun personnage sur le plateau",
     "phaseAction": "Action",
     "phaseMission": "Mission",
-    "resetTokens": "Reset Jetons"
+    "resetTokens": "Reset Jetons",
+    "switchPlayer": "Changer de joueur"
   },
   "online": {
     "title": "Jouer en Ligne",

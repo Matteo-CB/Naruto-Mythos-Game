@@ -130,6 +130,7 @@ interface GameStore {
   sandboxSetPhase: (phase: string) => void;
   sandboxResetAllPowerTokens: () => void;
   sandboxReturnAllFromMission: (missionIndex: number) => void;
+  sandboxSwitchPlayer: () => void;
 }
 
 let animationIdCounter = 0;
@@ -1010,6 +1011,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     useTrainingStore.getState().disable();
     resetIdCounter();
     const state = GameEngine.createGame(config);
+    if (sandbox) state.sandboxNoAlternate = true;
     const visible = GameEngine.getVisibleState(state, 'player1');
 
     set({
@@ -2175,5 +2177,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });
+  },
+
+  sandboxSwitchPlayer: () => {
+    const { isSandboxMode, gameState } = get();
+    if (!isSandboxMode || !gameState) return;
+    const s = JSON.parse(JSON.stringify(gameState)) as GameState;
+    const newPlayer = s.activePlayer === 'player1' ? 'player2' : 'player1';
+    s.activePlayer = newPlayer;
+    set({
+      gameState: s,
+      humanPlayer: newPlayer,
+      visibleState: GameEngine.getVisibleState(s, newPlayer),
+    });
   },
 }));
