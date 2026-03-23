@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 
   const descriptions: Record<string, string> = {
-    en: 'Play the Naruto Mythos Trading Card Game online for free. Battle a smart AI on 4 difficulty levels or challenge other players in real-time multiplayer. Build strategic decks from 186 unique Naruto Shippuden cards, collect rare cards, and climb the competitive ELO rankings. Free browser card game with deck builder, Naruto quiz, and matchmaking system.',
-    fr: "Jouez gratuitement au Naruto Mythos Trading Card Game en ligne. Affrontez une IA intelligente sur 4 niveaux de difficulte ou defiez d'autres joueurs en multijoueur temps reel. Construisez votre deck strategique parmi 186 cartes uniques inspirees de Naruto Shippuden, collectionnez des cartes rares et grimpez le classement ELO competitif. Jeu de cartes gratuit avec deck builder, quiz et matchmaking.",
+    en: 'Free online Naruto Mythos card game simulator. Build decks, play vs AI or online, climb ELO rankings. Deck builder, tournaments and matchmaking.',
+    fr: 'Simulateur du jeu de cartes Naruto Mythos gratuit en ligne. Construisez vos decks, jouez contre l\'IA ou en ligne, grimpez le classement ELO. Deck builder, tournois et matchmaking.',
   };
 
   return {
@@ -67,8 +67,8 @@ export default async function LocaleLayout({ children, params }: Props) {
     operatingSystem: 'Web Browser',
     browserRequirements: 'Requires JavaScript',
     description: locale === 'fr'
-      ? "Jeu de cartes a collectionner Naruto Mythos en ligne gratuit. 186 cartes, IA, multijoueur, deck builder et classement ELO."
-      : 'Free Naruto Mythos online trading card game. 186 cards, AI, multiplayer, deck builder, and ELO rankings.',
+      ? "Simulateur du jeu de cartes Naruto Mythos gratuit en ligne. IA, multijoueur, deck builder et classement ELO."
+      : 'Free Naruto Mythos card game simulator. AI, multiplayer, deck builder, and ELO rankings.',
     offers: {
       '@type': 'Offer',
       price: '0',
@@ -97,8 +97,8 @@ export default async function LocaleLayout({ children, params }: Props) {
     '@type': 'VideoGame',
     name: 'Naruto Mythos TCG',
     description: locale === 'fr'
-      ? "Jeu de cartes strategique en ligne inspire de l'univers Naruto Shippuden. Construisez votre deck, affrontez l'IA ou d'autres joueurs et grimpez le classement."
-      : 'Strategic online card game inspired by the Naruto Shippuden universe. Build your deck, battle AI or other players, and climb the rankings.',
+      ? 'Simulateur du jeu de cartes Naruto Mythos gratuit. Decks, IA, matchmaking en ligne et tournois.'
+      : 'Free Naruto Mythos card game simulator. Decks, AI, online matchmaking and tournaments.',
     url: `${SITE_URL}/${locale}`,
     image: `${SITE_URL}/images/og-image.webp`,
     genre: ['Card Game', 'Strategy Game', 'Collectible Card Game'],
