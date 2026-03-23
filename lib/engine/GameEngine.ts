@@ -177,6 +177,18 @@ export class GameEngine {
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving a pending effect, switch active player (same logic as executeAction)
           // but only when all pending effects/actions are resolved
+          // Check for queued discard reorder — create it now that all effects are resolved
+          if (newState.pendingDiscardReorder && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
+            const pdr = newState.pendingDiscardReorder;
+            newState.pendingDiscardReorder = undefined;
+            const effectSource = pdr.chooser === pdr.discardOwner
+              ? (pdr.discardOwner === 'player1' ? 'player2' : 'player1') // Itachi 140: opponent chooses their own pile
+              : pdr.chooser; // Normal: attacker chooses opponent's pile
+            const selectingOverride = pdr.chooser === pdr.discardOwner ? pdr.chooser : undefined;
+            newState = EffectEngine.createReorderDiscardPending(newState, pdr.discardOwner, effectSource, pdr.count, selectingOverride);
+            break;
+          }
+
           if (newState.phase === 'action' &&
               newState.pendingEffects.length === 0 &&
               newState.pendingActions.length === 0 &&

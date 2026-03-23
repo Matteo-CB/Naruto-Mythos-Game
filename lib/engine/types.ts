@@ -164,6 +164,12 @@ export interface GameState {
   forfeitedBy?: PlayerID;
   /** Sandbox mode: don't alternate active player after actions */
   sandboxNoAlternate?: boolean;
+  /** Queued discard reorder — created after all effects resolve, before turn ends */
+  pendingDiscardReorder?: {
+    discardOwner: PlayerID;
+    chooser: PlayerID;
+    count: number;
+  };
   /** Consecutive timeout count per player (online timer) */
   consecutiveTimeouts: { player1: number; player2: number };
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).
