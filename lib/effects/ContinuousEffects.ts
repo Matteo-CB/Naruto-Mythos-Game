@@ -362,8 +362,12 @@ export function calculateContinuousPowerModifier(
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
       if (!rempartZeroed) {
         const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        const basePlusTok = (selfTop.power ?? 0) + char.powerTokens;
-        if (basePlusTok >= 4) {
+        // Use base power + tokens + OTHER continuous modifiers (not MSS09 itself)
+        // to check the >= 4 threshold. This includes Kakashi +1 Team 7, Temari +2 Edge, etc.
+        let powerForThreshold = (selfTop.power ?? 0) + char.powerTokens;
+        // Add the modifier accumulated so far (from all effects checked BEFORE this one)
+        powerForThreshold += modifier;
+        if (powerForThreshold >= 4) {
           modifier += 1;
         }
       }
