@@ -189,7 +189,7 @@ function handlePlayCharacter(
 
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play continuous reactions from opponent's characters in this mission
-  newState = triggerOnPlayReactions(newState, player, missionIndex);
+  newState = triggerOnPlayReactions(newState, player, missionIndex, false, charInPlay.instanceId);
 
   // Trigger MAIN effects via EffectEngine
   // Re-fetch the character from the updated state (it may have moved)
@@ -415,7 +415,7 @@ function handleRevealCharacter(
 
     // Existing cards' effects trigger BEFORE the newly played card's effects
     // Trigger on-play reactions (isReveal: character was already on the mission)
-    newState = triggerOnPlayReactions(newState, player, missionIndex, true);
+    newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
     // Trigger MAIN + UPGRADE + AMBUSH effects via EffectEngine
     const updatedMission = newState.activeMissions[missionIndex];
@@ -465,7 +465,7 @@ function handleRevealCharacter(
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play reactions (isReveal: character was already on the mission,
   // so Hinata/Neji "when played in this mission" doesn't fire)
-  newState = triggerOnPlayReactions(newState, player, missionIndex, true);
+  newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
   // Trigger MAIN + AMBUSH effects via EffectEngine
   // For Kakashi 016 with useAmbush: AMBUSH already consumed (cost reduction),
@@ -637,7 +637,7 @@ function handleUpgradeCharacter(
 
   // Existing cards' effects trigger BEFORE the newly played card's effects
   // Trigger on-play continuous reactions from opponent's characters in this mission
-  newState = triggerOnPlayReactions(newState, player, missionIndex);
+  newState = triggerOnPlayReactions(newState, player, missionIndex, false, targetInstanceId);
 
   // Trigger MAIN + UPGRADE effects via EffectEngine
   const upgradedMission = newState.activeMissions[missionIndex];
