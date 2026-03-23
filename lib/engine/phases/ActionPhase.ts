@@ -341,8 +341,8 @@ function handleRevealCharacter(
   }
 
   // Calculate cost: if this reveal is an upgrade, pay only the DIFFERENCE
-  // When useAmbush is explicitly false, skip AMBUSH cost reductions (Shino 033)
-  const skipAmbush = useAmbush === false;
+  // AMBUSH cost reduction only applies when useAmbush is explicitly true
+  const skipAmbush = useAmbush !== true;
   const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, skipAmbush);
   let costToPay = fullCost;
 
