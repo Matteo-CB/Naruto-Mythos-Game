@@ -4381,6 +4381,7 @@ export class EffectEngine {
             controlledBy: kb052Player,
             originalOwner: kb052Opponent,
             controllerInstanceId: pendingEffect.sourceInstanceId,
+            discardOnControlLost: true,
             missionIndex: 0,
           };
           const missions_kb052 = [...newState.activeMissions];
@@ -12628,6 +12629,7 @@ export class EffectEngine {
               controlledBy: player_kb,
               originalOwner: originalOwner,
               controllerInstanceId: pendingEffect.sourceInstanceId,
+              discardOnControlLost: true,
               missionIndex: missionIdx_kb,
             };
             const missions_kb = [...newState.activeMissions];
@@ -15716,17 +15718,32 @@ export class EffectEngine {
                 { card: topCardCtrl.name_fr, target: topCardCtrl.name_fr },
               );
             } else {
-              // No conflict — move to original owner's side on same mission
-              const removed = currentMission[fromSide].splice(idx, 1)[0];
-              removed.controlledBy = removed.originalOwner;
-              removed.controllerInstanceId = undefined;
-              currentMission[toSide].push(removed);
-              newState.log = logAction(
-                newState.log, newState.turn, newState.phase, char.originalOwner,
-                'EFFECT', `${topCardCtrl.name_fr} returned to original owner (controller left play).`,
-                'game.log.effect.controlReturned',
-                { card: topCardCtrl.name_fr },
-              );
+              if (char.discardOnControlLost) {
+                // Card stolen from deck (Kabuto 052 etc): goes to owner's discard pile
+                const removed = currentMission[fromSide].splice(idx, 1)[0];
+                for (let si = 0; si < removed.stack.length; si++) {
+                  const card = removed.stack[si];
+                  newState[removed.originalOwner].discardPile.push({ ...card, instanceId: removed.instanceId + (si > 0 ? `-stack-${si}` : '') } as any);
+                }
+                newState.log = logAction(
+                  newState.log, newState.turn, newState.phase, char.originalOwner,
+                  'EFFECT', `${topCardCtrl.name_fr} returned to original owner's discard pile (controller left play).`,
+                  'game.log.effect.controlReturnedDiscard',
+                  { card: topCardCtrl.name_fr },
+                );
+              } else {
+                // Card stolen from board (Ino/Orochimaru): returns to owner's side
+                const removed = currentMission[fromSide].splice(idx, 1)[0];
+                removed.controlledBy = removed.originalOwner;
+                removed.controllerInstanceId = undefined;
+                currentMission[toSide].push(removed);
+                newState.log = logAction(
+                  newState.log, newState.turn, newState.phase, char.originalOwner,
+                  'EFFECT', `${topCardCtrl.name_fr} returned to original owner (controller left play).`,
+                  'game.log.effect.controlReturned',
+                  { card: topCardCtrl.name_fr },
+                );
+              }
             }
     }
 
