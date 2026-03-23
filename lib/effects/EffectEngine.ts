@@ -18173,6 +18173,11 @@ export class EffectEngine {
       ps.discardPile.push({ ...oc, instanceId: (oc as any).instanceId || (oc as any).id + `-discard-${oi}` } as any);
     }
 
+    // Queue reorder if 2+ cards discarded — will fire after all effects resolve
+    if (otherCards.length >= 2) {
+      newState.pendingDiscardReorder = { discardOwner: player, chooser: player, count: otherCards.length };
+    }
+
     // Cost deferred to placement time (upgrade vs fresh play)
 
     // Find valid missions (fresh play or upgrade)
