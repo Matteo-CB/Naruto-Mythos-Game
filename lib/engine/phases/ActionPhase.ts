@@ -1,4 +1,4 @@
-import type { GameState, GameAction, PlayerID, CharacterInPlay, CharacterCard } from '../types';
+import type { GameState, GameAction, PlayerID, CharacterInPlay, CharacterCard, PendingAction } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
 import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
@@ -488,21 +488,45 @@ function handleRevealCharacter(
       );
     } else if (skipMainForAmbush106) {
       // Kakashi 106 AMBUSH reveal + Copy Shino: auto-devolve the upgraded Shino, copy AMBUSH
-      // Find the upgraded enemy character containing Shino 033 in stack
-      const k106EnemySide = player === 'player1' ? 'player2Characters' : 'player1Characters';
-      let k106ShinoTarget: string | null = null;
-      for (const m of newState.activeMissions) {
-        for (const c of (m as any)[k106EnemySide]) {
+      const k106EnemySide: 'player1Characters' | 'player2Characters' = player === 'player1' ? 'player2Characters' : 'player1Characters';
+
+      // Find ALL upgraded enemy characters with Shino 033 in stack
+      const k106ShinoCandidates: { instanceId: string; missionIdx: number }[] = [];
+      for (let mi = 0; mi < newState.activeMissions.length; mi++) {
+        for (const c of newState.activeMissions[mi][k106EnemySide]) {
           if (c.isHidden || !c.stack || c.stack.length <= 1) continue;
           if (c.stack.some((sc: any) => sc.number === 33)) {
-            k106ShinoTarget = c.instanceId;
-            break;
+            k106ShinoCandidates.push({ instanceId: c.instanceId, missionIdx: mi });
           }
         }
-        if (k106ShinoTarget) break;
       }
-      if (k106ShinoTarget) {
-        // Auto-devolve and copy Shino AMBUSH
+
+      // Filter: after devolving, there must still be a Jutsu in Kakashi's mission
+      // (the Shino being devolved might be the only Jutsu)
+      const k106ValidCandidates = k106ShinoCandidates.filter(candidate => {
+        const cMission = newState.activeMissions[candidate.missionIdx];
+        const cChar = cMission[k106EnemySide].find((c: any) => c.instanceId === candidate.instanceId);
+        if (!cChar) return false;
+        const cTopCard = cChar.stack[cChar.stack.length - 1];
+        const cUnderCard = cChar.stack.length >= 2 ? cChar.stack[cChar.stack.length - 2] : null;
+        // After devolve: top card is removed, card underneath stays
+        // Check if Kakashi's mission still has a Jutsu character
+        // If the Shino is NOT in Kakashi's mission, devolving it doesn't affect Kakashi's mission Jutsu
+        if (candidate.missionIdx !== missionIndex) return true;
+        // If the Shino IS in Kakashi's mission, check if card underneath is Jutsu OR another Jutsu exists
+        const underHasJutsu = cUnderCard?.keywords?.includes('Jutsu') ?? false;
+        if (underHasJutsu) return true;
+        // Check if another Jutsu char exists in this mission (excluding this Shino)
+        const otherJutsu = cMission[k106EnemySide].some((other: any) => {
+          if (other.instanceId === candidate.instanceId || other.isHidden) return false;
+          const oTop = other.stack?.length > 0 ? other.stack[other.stack.length - 1] : other.card;
+          return oTop?.keywords?.includes('Jutsu');
+        });
+        return otherJutsu;
+      });
+
+      if (k106ValidCandidates.length === 1) {
+        // Auto-devolve the only valid candidate
         const fakePending = {
           id: '', sourceCardId: 'KS-106-R', sourceInstanceId: characterInstanceId,
           sourceMissionIndex: missionIndex, effectType: 'MAIN' as const,
@@ -511,15 +535,53 @@ function handleRevealCharacter(
           validTargets: [], isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: true, wasRevealed: true,
         };
-        newState = EffectEngine.devolveUpgradedCharacter(newState, fakePending, k106ShinoTarget);
+        newState = EffectEngine.devolveUpgradedCharacter(newState, fakePending, k106ValidCandidates[0].instanceId);
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', player,
+          'EFFECT',
+          'Kakashi Hatake (106) AMBUSH: Copied Shino cost reduction — auto-devolved Shino.',
+          'game.log.effect.kakashi106AmbushReveal',
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
+        );
+      } else if (k106ValidCandidates.length > 1) {
+        // Multiple valid targets — let the player choose which Shino to devolve
+        const k106EffId = generateInstanceId();
+        const k106ActId = generateInstanceId();
+        newState.pendingEffects.push({
+          id: k106EffId, sourceCardId: 'KS-106-R',
+          sourceInstanceId: characterInstanceId, sourceMissionIndex: missionIndex,
+          effectType: 'MAIN' as any, effectDescription: '',
+          targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
+          sourcePlayer: player, requiresTargetSelection: true,
+          validTargets: k106ValidCandidates.map(c => c.instanceId),
+          isOptional: false, isMandatory: true, resolved: false,
+          isUpgrade: true, wasRevealed: true,
+        });
+        newState.pendingActions.push({
+          id: k106ActId, type: 'SELECT_TARGET' as PendingAction['type'],
+          player,
+          description: 'Kakashi Hatake (106): Choose which upgraded Shino to devolve.',
+          descriptionKey: 'game.effect.desc.kakashi106DevolveTarget',
+          options: k106ValidCandidates.map(c => c.instanceId),
+          minSelections: 1, maxSelections: 1, sourceEffectId: k106EffId,
+        });
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', player,
+          'EFFECT',
+          'Kakashi Hatake (106) AMBUSH: Copied Shino cost reduction — choose Shino to devolve.',
+          'game.log.effect.kakashi106AmbushReveal',
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
+        );
+      } else {
+        // No valid candidates (edge case: all Shinos would remove the only Jutsu)
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', player,
+          'EFFECT_NO_TARGET',
+          'Kakashi Hatake (106) AMBUSH: No valid Shino to devolve (would remove all Jutsu).',
+          'game.log.effect.noTarget',
+          { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
+        );
       }
-      newState.log = logAction(
-        newState.log, newState.turn, 'action', player,
-        'EFFECT',
-        'Kakashi Hatake (106) AMBUSH: Copied Shino Aburame cost reduction — auto-devolved Shino.',
-        'game.log.effect.kakashi106AmbushReveal',
-        { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
-      );
     } else {
       newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
     }
