@@ -413,7 +413,7 @@ function buildEffectOrderSelection(
           for (const m of activeMissions) {
             for (const c of [...m.player1Characters, ...m.player2Characters]) {
               if (c.instanceId === pe.sourceInstanceId) {
-                const top = c.stack.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
                 return top;
               }
             }
