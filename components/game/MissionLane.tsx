@@ -181,8 +181,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       </>
     )}
     <motion.div
-      layout="position"
-      initial={{ scale: 0.8, opacity: 0 }}
+      initial={false}
       animate={{
         scale: 1,
         opacity: 1,
@@ -296,14 +295,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           {Array.from({ length: Math.min(character.powerTokens, 5) }).map((_, i) => (
             <motion.div
               key={`token-${i}`}
-              initial={{ scale: 0, y: -10, opacity: 0 }}
+              initial={false}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              transition={{
-                delay: i * 0.08,
-                type: 'spring',
-                stiffness: 400,
-                damping: 15,
-              }}
               style={{
                 width: '11px',
                 height: '11px',
@@ -316,9 +309,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           ))}
           {character.powerTokens > 5 && (
             <motion.span
-              initial={{ opacity: 0, scale: 0.5 }}
+              initial={false}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
               className="text-[8px] font-bold pr-0.5"
               style={{ color: '#f0d890', textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >
@@ -346,9 +338,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       {/* Stack/upgrade indicator - CSS animation replaces Framer Motion repeat:Infinity */}
       {character.stackSize > 1 && (
         <motion.div
-          initial={{ scale: 0 }}
+          initial={false}
           animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="absolute bottom-0.5 left-0.5 px-1 py-0.5 text-[8px] font-bold flex items-center gap-0.5 stack-pulse"
           style={{
             backgroundColor: 'rgba(62, 139, 62, 0.25)',
@@ -725,10 +716,8 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
   return (
     <motion.div
-      layout="position"
-      initial={{ opacity: 0, y: 20 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: missionIndex * 0.1 }}
       onClick={handleClick}
       className="flex flex-col items-center gap-0.5 px-1 py-0.5 h-full"
       style={{

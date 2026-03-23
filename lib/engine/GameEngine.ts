@@ -1679,8 +1679,6 @@ export class GameEngine {
         (e) => e.sourcePlayer === player || e.selectingPlayer === player || !e.requiresTargetSelection,
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
-      // True when ANY player has unresolved pending effects (blocks PASS for all)
-      hasPendingResolution: state.pendingEffects.length > 0 || state.pendingActions.length > 0,
       forfeitedBy: state.forfeitedBy,
     };
   }
