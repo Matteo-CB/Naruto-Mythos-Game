@@ -18182,11 +18182,7 @@ export class EffectEngine {
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
-      let result = EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
-      if (otherCards.length >= 2 && result[player].discardPile.length >= 2) {
-        result = EffectEngine.createReorderDiscardPending(result, player, player, otherCards.length);
-      }
-      return result;
+      return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
     }
 
     const effectId = generateInstanceId();
@@ -18232,14 +18228,11 @@ export class EffectEngine {
     const newState = deepClone(state);
     const player = pending.sourcePlayer;
     let costReduction = 0;
-    let discardedCount = 0;
-    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; discardedCount = d.discardedCount ?? 0; } catch { /* ignore */ }
-    let result = EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
-    // After placing the card, let player reorder discarded cards if 2+
-    if (discardedCount >= 2 && result[player].discardPile.length >= 2) {
-      result = EffectEngine.createReorderDiscardPending(result, player, player, discardedCount);
-    }
-    return result;
+    try { const d = JSON.parse(pending.effectDescription); costReduction = d.costReduction ?? 0; } catch { /* ignore */ }
+    // Place the card — this may create pending effects for the played card's MAIN/UPGRADE
+    // Don't add REORDER_DISCARD here — it conflicts with the played card's pending effects
+    // The discarded cards are already in the pile and their order was set when discarded
+    return EffectEngine.genericPlaceOnMission(newState, player, missionIndex, 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
   }
 
   // =====================================
