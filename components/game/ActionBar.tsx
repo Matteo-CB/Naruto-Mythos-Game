@@ -163,8 +163,7 @@ export function ActionBar() {
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
-        // Use skipAmbush=true for the base reveal cost (normal cost without Shino/Kakashi reduction)
-        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true, true);
+        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
         // Find ALL valid upgrade targets on this mission
         for (const c of myChars) {
           if (c.instanceId === selectedTargetId || c.isHidden) continue;
@@ -520,16 +519,6 @@ export function ActionBar() {
               />
             );
           })}
-
-          {/* Kakashi 106 upgrade + AMBUSH: "Reveal + Upgrade — Copy Shino AMBUSH" */}
-          {canReveal && revealAmbushCost !== null && revealUpgradeTargets.length > 0 && (
-            <ActionButton
-              label={`${t('game.reveal')} + ${t('game.actions.upgrade')} — Copy Shino AMBUSH (${revealAmbushCost} ${t('game.chakra').toLowerCase()})`}
-              onClick={() => handleReveal(revealUpgradeTargets[0]?.instanceId, true)}
-              disabled={!canAffordAmbushReveal}
-              variant="primary"
-            />
-          )}
 
           {/* Plain reveal button(s) - with AMBUSH dual option for Shino 033 / Kakashi 016 */}
           {canReveal && canShowPlainReveal && revealAmbushCost !== null && (
