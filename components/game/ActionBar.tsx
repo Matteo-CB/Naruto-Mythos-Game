@@ -163,7 +163,7 @@ export function ActionBar() {
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
-        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
+        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true, true);
         // Find ALL valid upgrade targets on this mission
         for (const c of myChars) {
           if (c.instanceId === selectedTargetId || c.isHidden) continue;
@@ -519,6 +519,29 @@ export function ActionBar() {
               />
             );
           })}
+
+          {/* Kakashi 106: "Copy Shino AMBUSH" upgrade button */}
+          {canReveal && revealAmbushCost !== null && revealUpgradeTargets.length > 0 && (() => {
+            // Only for Kakashi 106 (has upgrade targets AND ambush cost)
+            const hiddenCard = (() => {
+              for (const m of visibleState.activeMissions) {
+                const chars = myPlayer === 'player1' ? m.player1Characters : m.player2Characters;
+                const t = chars.find(c => c.instanceId === selectedTargetId);
+                if (t) return t.topCard ?? t.card;
+              }
+              return null;
+            })();
+            if (!hiddenCard || hiddenCard.number !== 106) return null;
+            const ambushUpgCost = Math.max(0, revealAmbushCost - (revealUpgradeTargets[0]?.cost != null ? (revealBaseCost - revealUpgradeTargets[0].cost) : 0));
+            return (
+              <ActionButton
+                label={`${t('game.reveal')} + ${t('game.actions.upgrade')} — Copy Shino (${Math.max(0, revealAmbushCost)} ${t('game.chakra').toLowerCase()})`}
+                onClick={() => handleReveal(revealUpgradeTargets[0]?.instanceId, true)}
+                disabled={myState.chakra < revealAmbushCost}
+                variant="primary"
+              />
+            );
+          })()}
 
           {/* Plain reveal button(s) - with AMBUSH dual option for Shino 033 / Kakashi 016 */}
           {canReveal && canShowPlainReveal && revealAmbushCost !== null && (
