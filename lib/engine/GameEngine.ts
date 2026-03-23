@@ -202,9 +202,11 @@ export class GameEngine {
                 }
                 return false;
               });
-              const turnOwner = resolvedAction?.originPlayer ?? player;
-              const otherPlayer: PlayerID = turnOwner === 'player1' ? 'player2' : 'player1';
-              newState.activePlayer = otherPlayer;
+              if (!newState.sandboxNoAlternate) {
+                const turnOwner = resolvedAction?.originPlayer ?? player;
+                const otherPlayer: PlayerID = turnOwner === 'player1' ? 'player2' : 'player1';
+                newState.activePlayer = otherPlayer;
+              }
             }
           }
         } else {
