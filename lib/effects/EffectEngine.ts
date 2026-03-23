@@ -1188,7 +1188,7 @@ export class EffectEngine {
         if (nlUseDefeatT1) {
           newState = EffectEngine.defeatCharacter(newState, targetId, nlPlayerT1);
         } else {
-          newState = EffectEngine.hideCharacterWithLog(newState, targetId, nlPlayerT1);
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, nlPlayerT1, true);
         }
 
         // Find valid targets for target 2: enemy Power ≤2 in ANY mission
@@ -4734,7 +4734,7 @@ export class EffectEngine {
 
         // Hide the chosen target
         const pendingCountBefore054 = newState.pendingEffects.length;
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer, true);
 
         // Check if Gemma 049 intercepted
         const gemma054Pending = newState.pendingEffects.find(
@@ -10121,7 +10121,7 @@ export class EffectEngine {
       case 'KIBA026_OPPONENT_CHOOSE_HIDE': // legacy â€' kept for backward compat with old saved states
       case 'KIBA026_PLAYER_CHOOSE_HIDE':
       case 'AKAMARU029_CHOOSE_HIDE':
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
         break;
 
       // --- Naruto 133 S: Two-stage hide/defeat ---
@@ -10310,7 +10310,7 @@ export class EffectEngine {
 
       case 'KAKASHI137_HIDE_UPGRADED': {
         // Hide the selected upgraded character â€' use hideCharacterWithLog for proper protection checks
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
         break;
       }
 
@@ -13383,8 +13383,9 @@ export class EffectEngine {
         break;
       }
       case 'KIMIMARO056_CHOOSE_HIDE': {
-        // Stage 2: hide the selected character (cost â‰¤ 4) â€' use hideCharacterWithLog for protection checks
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        // Stage 2: hide the selected character (cost ≤ 4)
+        // skipProtection=true because Kimimaro protection was already checked in the main switch
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
         break;
       }
       case 'KIN073_CHOOSE_DISCARD': {
@@ -13463,7 +13464,7 @@ export class EffectEngine {
       }
       case 'KIN073_CHOOSE_ENEMY': {
         // Step 2: Player chose an enemy to hide (after discarding cost).
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
         break;
       }
       case 'DISCARD_FROM_OPPONENT_HAND': {
@@ -16022,7 +16023,7 @@ export class EffectEngine {
   }
 
   /** Hide a character and log the action */
-  static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID): GameState {
+  static hideCharacterWithLog(state: GameState, targetInstanceId: string, sourcePlayer: PlayerID, skipProtection: boolean = false): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetInstanceId);
     if (!charResult) return state;
     if (charResult.character.isHidden) return state;
@@ -16031,7 +16032,8 @@ export class EffectEngine {
 
     // Kimimaro 056 continuous protection: if an enemy effect targets this character,
     // the opponent must pay 1 chakra or the effect fails (hide is blocked).
-    if (isEnemyEffect) {
+    // Skip if already checked in the main switch (skipProtection flag)
+    if (isEnemyEffect && !skipProtection) {
       const topCard = charResult.character.stack?.length > 0
         ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
@@ -16041,7 +16043,6 @@ export class EffectEngine {
         );
         if (hasProtection) {
           if (state[sourcePlayer].chakra >= 1) {
-            // Opponent pays 1 chakra - effect proceeds
             state = {
               ...state,
               [sourcePlayer]: { ...state[sourcePlayer], chakra: state[sourcePlayer].chakra - 1 },
@@ -16054,7 +16055,6 @@ export class EffectEngine {
               ),
             };
           } else {
-            // Opponent cannot pay - effect fails, hide is blocked
             return {
               ...state,
               log: logAction(
