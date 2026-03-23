@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { EffectEngine } from '@/lib/effects/EffectEngine';
 
 /**
  * MSS 05 - "Ramener" / "Bring it Back"
@@ -77,11 +78,16 @@ function applyMss05ReturnToHand(
 
   const target = friendlyChars[targetIndex];
 
-  // Remove from mission
+  // If this character controlled stolen cards (Ino/Kabuto/Orochimaru), return them
+  state = EffectEngine.restoreControlOnLeave(state, target.instanceId);
+
+  // Remove from mission (re-find index after restoreControlOnLeave may have changed the array)
   const missions = [...state.activeMissions];
   const updatedMission = { ...missions[sourceMissionIndex] };
   const chars = [...updatedMission[friendlySide]];
-  chars.splice(targetIndex, 1);
+  const newTargetIndex = chars.findIndex((c) => c.instanceId === targetInstanceId);
+  if (newTargetIndex === -1) return { state };
+  chars.splice(newTargetIndex, 1);
   updatedMission[friendlySide] = chars;
   missions[sourceMissionIndex] = updatedMission;
 

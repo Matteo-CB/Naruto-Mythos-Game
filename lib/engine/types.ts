@@ -65,9 +65,6 @@ export interface CharacterInPlay {
   /** instanceId of the character that took control (Ino 020, Orochimaru 050).
    *  Used to return control when the controller is hidden or defeated. */
   controllerInstanceId?: string;
-  /** When true, if the controller leaves play this card goes to owner's discard
-   *  instead of returning to owner's board (e.g. Kabuto 052 steals from deck). */
-  discardOnControlLost?: boolean;
   /** Rashomon (067): locked enemy target instanceId. Only retargets when
    *  Rashomon moves, or the locked target moves/leaves play. */
   rempartLockedTargetId?: string;
