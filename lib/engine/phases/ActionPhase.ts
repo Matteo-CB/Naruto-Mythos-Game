@@ -75,7 +75,8 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   // If both haven't passed, alternate active player (unless one has passed)
   // Don't switch if there are pending effects/actions - the current player must resolve them first
-  if (!newState.player1.hasPassed && !newState.player2.hasPassed) {
+  // In sandbox mode, don't alternate — player switches manually
+  if (!newState.sandboxNoAlternate && !newState.player1.hasPassed && !newState.player2.hasPassed) {
     if (action.type !== 'PASS' && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
       newState.activePlayer = otherPlayer;
     }

@@ -1132,7 +1132,8 @@
     "noCharsOnBoard": "No characters on the board",
     "phaseAction": "Action",
     "phaseMission": "Mission",
-    "resetTokens": "Reset Tokens"
+    "resetTokens": "Reset Tokens",
+    "switchPlayer": "Switch Player"
   },
   "online": {
     "title": "Play Online",
