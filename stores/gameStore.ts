@@ -884,7 +884,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (pendingForMe.length > 0) {
       // Detect multiple simultaneous effects from DIFFERENT source cards
-      const orderSelOnline = buildEffectOrderSelection(
+      // Skip if effectOrderResolved (player already chose the order)
+      const orderSelOnline = (visibleState as any).effectOrderResolved ? null : buildEffectOrderSelection(
         pendingForMe, visibleState.pendingEffects, visibleState.activeMissions as unknown as GameState['activeMissions'],
         get().playerDisplayNames[humanPlayer],
         (effectId: string) => { get().performAction({ type: 'REORDER_EFFECTS', selectedEffectId: effectId }); },

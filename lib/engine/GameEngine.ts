@@ -542,6 +542,9 @@ export class GameEngine {
       newState.pendingActions.unshift(action);
     }
 
+    // Mark that ordering has been done — client should show first effect directly
+    (newState as any).effectOrderResolved = true;
+
     return newState;
   }
 
@@ -551,6 +554,8 @@ export class GameEngine {
   static handlePendingAction(state: GameState, player: PlayerID, action: GameAction): GameState {
     if (action.type === 'SELECT_TARGET') {
       const newState = deepClone(state);
+      // Clear effect order flag — the chosen effect is now being resolved
+      (newState as any).effectOrderResolved = false;
       const pendingAction = newState.pendingActions.find((p) => p.id === action.pendingActionId);
       if (!pendingAction) return state;
       if (pendingAction.player !== player) return state;
@@ -1679,6 +1684,7 @@ export class GameEngine {
         (e) => e.sourcePlayer === player || e.selectingPlayer === player || !e.requiresTargetSelection,
       ),
       pendingActions: state.pendingActions.filter((a) => a.player === player),
+      effectOrderResolved: (state as any).effectOrderResolved ?? false,
       forfeitedBy: state.forfeitedBy,
     };
   }
