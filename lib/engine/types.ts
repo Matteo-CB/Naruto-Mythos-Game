@@ -324,6 +324,7 @@ export interface VisibleGameState {
   log: GameLogEntry[];
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
+  effectOrderResolved?: boolean;
   forfeitedBy?: PlayerID;
 }
 
