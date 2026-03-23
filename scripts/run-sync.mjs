@@ -18,11 +18,11 @@ const ELO_ROLES = [
   { key: 'academy_student', label: 'Academy Student', minElo: 0 },
   { key: 'genin', label: 'Genin', minElo: 450 },
   { key: 'chunin', label: 'Chunin', minElo: 550 },
-  { key: 'special_jonin', label: 'Special Jonin', minElo: 800 },
+  { key: 'special_jonin', label: 'Special Jonin', minElo: 700 },
   { key: 'elite_jonin', label: 'Elite Jonin', minElo: 1000 },
   { key: 'legendary_sannin', label: 'Legendary Sannin', minElo: 1200 },
-  { key: 'kage', label: 'Kage', minElo: 1600 },
-  { key: 'sage', label: 'Sage of Six Paths', minElo: 2000 },
+  { key: 'kage', label: 'Kage', minElo: 1500 },
+  { key: 'sage', label: 'Sage of Six Paths', minElo: 1700 },
 ];
 const ALL_ROLES = [UNRANKED_ROLE, ...ELO_ROLES];
 
