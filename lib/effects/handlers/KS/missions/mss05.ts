@@ -85,13 +85,20 @@ function applyMss05ReturnToHand(
   updatedMission[friendlySide] = chars;
   missions[sourceMissionIndex] = updatedMission;
 
-  // Return only the TOP card to hand; discard the rest of the stack (cards underneath)
-  const playerState = { ...state[sourcePlayer] };
+  // Return the TOP card to its ORIGINAL OWNER's hand (not the controller)
+  // If the character was stolen (Ino), it goes back to the real owner
+  const owner = target.originalOwner ?? sourcePlayer;
+  const ownerState = { ...state[owner] };
   const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
   const underCards = target.stack?.length > 1 ? target.stack.slice(0, -1) : [];
-  playerState.hand = [...playerState.hand, topCard];
-  playerState.discardPile = [...playerState.discardPile, ...underCards];
-  playerState.charactersInPlay = Math.max(0, playerState.charactersInPlay - 1);
+  ownerState.hand = [...ownerState.hand, topCard];
+  ownerState.discardPile = [...ownerState.discardPile, ...underCards];
+
+  // Update character count for the controller (who had it on the field)
+  const controllerState = owner !== sourcePlayer ? { ...state[sourcePlayer], charactersInPlay: Math.max(0, state[sourcePlayer].charactersInPlay - 1) } : ownerState;
+  if (owner === sourcePlayer) {
+    ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
+  }
 
   const log = logAction(
     state.log,
@@ -99,7 +106,7 @@ function applyMss05ReturnToHand(
     state.phase,
     sourcePlayer,
     'SCORE_RETURN',
-    `MSS 05 (Bring it Back): Returned ${target.card.name_fr} from this mission to hand (mandatory).`,
+    `MSS 05 (Bring it Back): Returned ${target.card.name_fr} to ${owner === sourcePlayer ? 'hand' : 'original owner\'s hand'} (mandatory).`,
     'game.log.score.returnToHand',
     { card: 'Ramener', target: target.card.name_fr },
   );
@@ -108,7 +115,8 @@ function applyMss05ReturnToHand(
     state: {
       ...state,
       activeMissions: missions,
-      [sourcePlayer]: playerState,
+      [owner]: ownerState,
+      ...(owner !== sourcePlayer ? { [sourcePlayer]: controllerState } : {}),
       log,
     },
   };
