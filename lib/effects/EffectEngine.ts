@@ -9358,13 +9358,18 @@ export class EffectEngine {
       }
 
       case 'KAKASHI106_CONFIRM_MAIN': {
-        // If isUpgrade → modifier popup, else → child KAKASHI106_DEVOLVE_TARGET
+        // Normal button (not Copy Shino) — exclude upgraded Shino 033 from devolve targets
         const k106Player = pendingEffect.sourcePlayer;
         const k106EnemySide = k106Player === 'player1' ? 'player2Characters' : 'player1Characters';
         const k106ValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106EnemySide]) {
-            if (c.stack?.length > 1) k106ValidTargets.push(c.instanceId);
+            if (c.stack?.length > 1) {
+              // Exclude upgraded Shino 033 — use the "Copy Shino" button for that
+              const cTop = c.stack[c.stack.length - 1];
+              if (cTop.number === 33) continue;
+              k106ValidTargets.push(c.instanceId);
+            }
           }
         }
         if (k106ValidTargets.length === 0) {
@@ -9427,12 +9432,17 @@ export class EffectEngine {
 
       case 'KAKASHI106_CONFIRM_UPGRADE_MODIFIER': {
         // Player confirmed modifier: devolve with isUpgrade: true (will copy effect)
+        // Exclude Shino 033 — use "Copy Shino" button for that
         const k106uPlayer = pendingEffect.sourcePlayer;
         const k106uEnemySide = k106uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const k106uValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106uEnemySide]) {
-            if (c.stack?.length > 1) k106uValidTargets.push(c.instanceId);
+            if (c.stack?.length > 1) {
+              const cTop = c.stack[c.stack.length - 1];
+              if (cTop.number === 33) continue;
+              k106uValidTargets.push(c.instanceId);
+            }
           }
         }
         if (k106uValidTargets.length === 0) {
