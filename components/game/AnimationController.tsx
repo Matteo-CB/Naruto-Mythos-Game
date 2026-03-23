@@ -470,11 +470,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
             scale: 1,
             opacity: 1,
             rotate: 0,
-            boxShadow: [
-              '0 8px 40px rgba(62, 139, 62, 0.2), 0 0 20px rgba(62, 139, 62, 0.1)',
-              '0 8px 50px rgba(62, 139, 62, 0.5), 0 0 30px rgba(62, 139, 62, 0.3)',
-              '0 8px 40px rgba(62, 139, 62, 0.4), 0 0 20px rgba(62, 139, 62, 0.2)',
-            ],
+            boxShadow: '0 8px 50px rgba(62, 139, 62, 0.5), 0 0 30px rgba(62, 139, 62, 0.3)',
           }}
           transition={{ type: 'spring', stiffness: 140, damping: 14 }}
         >
