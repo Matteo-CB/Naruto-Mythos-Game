@@ -10138,12 +10138,6 @@ export class EffectEngine {
           const n133Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const n133DiscardBefore = newState[n133Defender].discardPile.length;
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          // Count total cards added to discard by both targets (target 1 + target 2)
-          const n133DiscardBaseline = parsed133t2.discardSizeBefore ?? n133DiscardBefore;
-          const n133TotalDefeated = newState[n133Defender].discardPile.length - n133DiscardBaseline;
-          if (n133TotalDefeated >= 2) {
-            newState = EffectEngine.createReorderDiscardPending(newState, n133Defender, pendingEffect.sourcePlayer, n133TotalDefeated);
-          }
         } else {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         }
@@ -14624,12 +14618,8 @@ export class EffectEngine {
           break;
         }
 
-        // If no more chained selections, let owner reorder discard if 2+ defeated
-        console.log(`[EffectEngine] GAARA120_CHOOSE_DEFEAT end: chainedToNext=${chainedToNext} isUpgrade=${gaaraDesc.isUpgrade} defeatedCount=${defeatedCount_g} sourceInstanceId=${gaaraDesc.sourceInstanceId}`);
-        if (!chainedToNext && defeatedCount_g >= 2) {
-          const g120DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          newState = EffectEngine.createReorderDiscardPending(newState, g120DefenderPile, pendingEffect.sourcePlayer, defeatedCount_g);
-        }
+        // If no more chained selections, apply UPGRADE if applicable
+        // Discard order is determined by the order the player chose to defeat (mission by mission)
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();
@@ -15840,11 +15830,6 @@ export class EffectEngine {
       // Auto-apply to the only target
       if (useDefeat) {
         newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
-        // Count actual cards added to discard by both targets
-        const n133TotalDefeatedAuto = newState[n133DefenderT1].discardPile.length - discardSizeBeforeT1;
-        if (n133TotalDefeatedAuto >= 2) {
-          newState = EffectEngine.createReorderDiscardPending(newState, n133DefenderT1, pending.sourcePlayer, n133TotalDefeatedAuto);
-        }
         return newState;
       } else {
         return EffectEngine.hideCharacterWithLog(newState, validTarget2[0], pending.sourcePlayer);
