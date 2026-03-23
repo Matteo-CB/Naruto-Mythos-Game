@@ -16492,7 +16492,7 @@ export class EffectEngine {
 
     // Trigger opponent's continuous on-play reactions (e.g., Hinata 031 chakra, Neji 037 powerup)
     if (!placedChar.isHidden) {
-      state = triggerOnPlayReactions(state, player, missionIndex);
+      state = triggerOnPlayReactions(state, player, missionIndex, false, placedChar.instanceId);
     }
 
     return state;
@@ -16587,7 +16587,7 @@ export class EffectEngine {
 
     // Trigger opponent's continuous on-play reactions (e.g., Hinata 031 chakra, Neji 037 powerup)
     if (!placedChar.isHidden) {
-      state = triggerOnPlayReactions(state, player, missionIndex);
+      state = triggerOnPlayReactions(state, player, missionIndex, false, placedChar.instanceId);
     }
 
     return state;
