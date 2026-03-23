@@ -15,7 +15,20 @@ export function ReconnectPrompt() {
 
   const handleReconnect = () => {
     acceptReconnect();
-    router.push('/game' as '/');
+    // Wait for game:state-update to arrive before navigating
+    // This prevents the game page from redirecting before state arrives
+    const checkState = () => {
+      const ss = useSocketStore.getState();
+      if (ss.visibleState || ss.gameStarted) {
+        router.push('/game' as '/');
+      } else {
+        setTimeout(checkState, 200);
+      }
+    };
+    // Start checking after a short delay (give server time to respond)
+    setTimeout(checkState, 300);
+    // Fallback: navigate after 3s even if no state (server might be slow)
+    setTimeout(() => router.push('/game' as '/'), 3000);
   };
 
   const handleAbandon = () => {
