@@ -8960,6 +8960,10 @@ export class EffectEngine {
           newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
             'EFFECT_DEFEAT', `Ichibi (130) UPGRADE: Defeated ${defeatedCount} hidden enemy character(s) in mission ${mIdx + 1}.`,
             'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: `${defeatedCount} hidden enemies` });
+          if (defeatedCount >= 2) {
+            const i130Def: PlayerID = i130Player === 'player1' ? 'player2' : 'player1';
+            newState.pendingDiscardReorder = { discardOwner: i130Def, chooser: i130Player, count: defeatedCount };
+          }
           break;
         }
         // Multiple missions: mandatory child
