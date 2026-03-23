@@ -1529,13 +1529,20 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     // Forfeit (manual abandon)
-    socket.on('action:forfeit', async (data: { reason: 'abandon' | 'timeout' }) => {
-      const code = playerRooms.get(socket.id);
+    socket.on('action:forfeit', async (data: { reason: 'abandon' | 'timeout'; roomCode?: string; userId?: string }) => {
+      // Try playerRooms first, fall back to roomCode from client
+      const code = playerRooms.get(socket.id) || data.roomCode;
       if (!code) return;
       const room = rooms.get(code);
       if (!room || !room.gameState || room.gameState.phase === 'gameOver') return;
 
-      const player = socket.id === room.hostSocket ? 'player1' : 'player2';
+      // Determine player — check socket.id first, then userId
+      let player: 'player1' | 'player2';
+      if (socket.id === room.hostSocket) player = 'player1';
+      else if (socket.id === room.guestSocket) player = 'player2';
+      else if (data.userId === room.hostId) { player = 'player1'; room.hostSocket = socket.id; playerRooms.set(socket.id, code); }
+      else if (data.userId === room.guestId) { player = 'player2'; room.guestSocket = socket.id; playerRooms.set(socket.id, code); }
+      else return;
       console.log(`[Socket] Forfeit from ${player} in room ${code}, reason: ${data.reason}`);
 
       room.gameState = GameEngine.applyAction(room.gameState, player, {
