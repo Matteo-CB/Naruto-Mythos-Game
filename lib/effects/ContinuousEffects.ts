@@ -638,6 +638,54 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
     }
   }
 
+  // Kimimaro 056 protection: when a continuous enemy effect starts affecting Kimimaro,
+  // the opponent pays 1 chakra. This triggers when a character with a continuous power
+  // modifier (e.g., Itachi 128 -1 power, Sakon 127 -1 power) is played on Kimimaro's mission.
+  const playingSide = playingPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const playedChars = mission[playingSide];
+  // Check if any just-played character has a continuous effect that modifies enemy power
+  for (const playedChar of playedChars) {
+    if (playedChar.isHidden) continue;
+    const pTop = playedChar.stack?.length > 0 ? playedChar.stack[playedChar.stack.length - 1] : playedChar.card;
+    const hasContinuousPowerEffect = (pTop.effects ?? []).some(
+      (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
+        (e.description.includes('-1 Power') || e.description.includes('-2 Power') || e.description.includes('Power')),
+    );
+    if (!hasContinuousPowerEffect) continue;
+
+    // Check if opponent has a visible Kimimaro 056 in this mission
+    for (const enemyChar of opponentChars) {
+      if (enemyChar.isHidden) continue;
+      const eTop = enemyChar.stack?.length > 0 ? enemyChar.stack[enemyChar.stack.length - 1] : enemyChar.card;
+      if (eTop.number !== 56) continue;
+      const hasProtection = (eTop.effects ?? []).some(
+        (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
+      );
+      if (!hasProtection) continue;
+
+      // Check if this continuous effect actually targets Kimimaro
+      // Itachi 128/152: every enemy -1 power → yes
+      // Sakon 127: every enemy -1 power → yes
+      const affectsKimimaro = (pTop.number === 128 || pTop.number === 152 || pTop.number === 127);
+      if (!affectsKimimaro) continue;
+
+      if (newState[playingPlayer].chakra >= 1) {
+        const ps = { ...newState[playingPlayer] };
+        ps.chakra -= 1;
+        newState = { ...newState, [playingPlayer]: ps };
+        newState.log = logAction(
+          newState.log, newState.turn, 'action', opponent,
+          'EFFECT_CONTINUOUS',
+          `Kimimaro (056): ${playingPlayer} pays 1 Chakra for continuous effect on Kimimaro.`,
+          'game.log.effect.kimimaro056Protection',
+          { card: 'KIMIMARO', id: 'KS-056-UC' },
+        );
+      }
+      break; // Only pay once per Kimimaro per play
+    }
+    break; // Only check the most recently played character
+  }
+
   return newState;
 }
 
