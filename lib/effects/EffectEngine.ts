@@ -11055,17 +11055,17 @@ export class EffectEngine {
         if (!n133Mission) break;
 
         // Re-validate target1: Power <= 5 in this mission
-        // When useDefeat=false (hide), exclude hidden chars (redundant to hide a hidden char)
-        // When useDefeat=true (defeat/upgrade), include hidden chars (power 0 qualifies)
+        // Include hidden chars if useDefeat=true OR if isUpgrade (modifier will enable defeat mode)
+        const n133CanTargetHidden = n133UseDefeat || (pendingEffect.isUpgrade ?? false);
         const n133ValidT1 = n133Mission[n133EnemySide]
-          .filter((c: CharacterInPlay) => (n133UseDefeat || !c.isHidden) && getEffectivePower(newState, c, n133Opponent) <= 5)
+          .filter((c: CharacterInPlay) => (n133CanTargetHidden || !c.isHidden) && getEffectivePower(newState, c, n133Opponent) <= 5)
           .map((c: CharacterInPlay) => c.instanceId);
 
         // Re-validate target2: Power <= 2 in ANY mission (same hidden logic)
         const n133ValidT2: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const ch of newState.activeMissions[i][n133EnemySide]) {
-            if ((n133UseDefeat || !ch.isHidden) && getEffectivePower(newState, ch, n133Opponent) <= 2) {
+            if ((n133CanTargetHidden || !ch.isHidden) && getEffectivePower(newState, ch, n133Opponent) <= 2) {
               n133ValidT2.push(ch.instanceId);
             }
           }
