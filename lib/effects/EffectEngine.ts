@@ -1188,7 +1188,7 @@ export class EffectEngine {
         if (nlUseDefeatT1) {
           newState = EffectEngine.defeatCharacter(newState, targetId, nlPlayerT1);
         } else {
-          newState = EffectEngine.hideCharacterWithLog(newState, targetId, nlPlayerT1, true);
+          newState = EffectEngine.hideCharacterWithLog(newState, targetId, nlPlayerT1);
         }
 
         // Find valid targets for target 2: enemy Power ≤2 in ANY mission
@@ -4734,7 +4734,7 @@ export class EffectEngine {
 
         // Hide the chosen target
         const pendingCountBefore054 = newState.pendingEffects.length;
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer, true);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer);
 
         // Check if Gemma 049 intercepted
         const gemma054Pending = newState.pendingEffects.find(
@@ -10121,7 +10121,7 @@ export class EffectEngine {
       case 'KIBA026_OPPONENT_CHOOSE_HIDE': // legacy â€' kept for backward compat with old saved states
       case 'KIBA026_PLAYER_CHOOSE_HIDE':
       case 'AKAMARU029_CHOOSE_HIDE':
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
 
       // --- Naruto 133 S: Two-stage hide/defeat ---
@@ -10310,7 +10310,7 @@ export class EffectEngine {
 
       case 'KAKASHI137_HIDE_UPGRADED': {
         // Hide the selected upgraded character â€' use hideCharacterWithLog for proper protection checks
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
 
@@ -13385,7 +13385,7 @@ export class EffectEngine {
       case 'KIMIMARO056_CHOOSE_HIDE': {
         // Stage 2: hide the selected character (cost ≤ 4)
         // skipProtection=true because Kimimaro protection was already checked in the main switch
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
       case 'KIN073_CHOOSE_DISCARD': {
@@ -13464,7 +13464,7 @@ export class EffectEngine {
       }
       case 'KIN073_CHOOSE_ENEMY': {
         // Step 2: Player chose an enemy to hide (after discarding cost).
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer, true);
+        newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         break;
       }
       case 'DISCARD_FROM_OPPONENT_HAND': {
