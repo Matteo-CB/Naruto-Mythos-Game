@@ -10138,10 +10138,9 @@ export class EffectEngine {
           const n133Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
           const n133DiscardBefore = parsed133t2.discardSizeBefore ?? newState[n133Defender].discardPile.length;
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          // Count total cards added to discard by both targets
           const n133TotalDefeated = newState[n133Defender].discardPile.length - n133DiscardBefore;
           if (n133TotalDefeated >= 2) {
-            newState = EffectEngine.createReorderDiscardPending(newState, n133Defender, pendingEffect.sourcePlayer, n133TotalDefeated);
+            newState.pendingDiscardReorder = { discardOwner: n133Defender, chooser: pendingEffect.sourcePlayer, count: n133TotalDefeated };
           }
         } else {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
@@ -11887,13 +11886,9 @@ export class EffectEngine {
           'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${i140HandSize} cards, then drew ${i140DrawCount} new cards.`,
           'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: 'KS-140-S', discarded: String(i140HandSize), drawn: String(i140DrawCount) });
 
-        // If 2+ cards discarded, let OPPONENT reorder their discard pile
+        // Queue discard reorder for opponent (they choose order of their own discarded cards)
         if (i140HandSize >= 2) {
-          const i140UpgradeChain = (i140IsUpgrade && i140HandSize > 0)
-            ? { itachi140Upgrade: { sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: pendingEffect.sourceInstanceId, sourceMissionIndex: pendingEffect.sourceMissionIndex, i140HandSize, sourcePlayer: i140Player } }
-            : undefined;
-          newState = EffectEngine.createReorderDiscardPending(newState, i140Opponent, i140Player, i140HandSize, i140Opponent, i140UpgradeChain);
-          if (i140UpgradeChain) break; // UPGRADE will be created after REORDER resolves
+          newState.pendingDiscardReorder = { discardOwner: i140Opponent, chooser: i140Opponent, count: i140HandSize };
         }
 
         // If upgrade: chain to CONFIRM_UPGRADE popup for defeat
@@ -12531,7 +12526,7 @@ export class EffectEngine {
           );
           if (defeatedCount >= 2) {
             const i130Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-            newState = EffectEngine.createReorderDiscardPending(newState, i130Defender, pendingEffect.sourcePlayer, defeatedCount);
+            newState.pendingDiscardReorder = { discardOwner: i130Defender, chooser: pendingEffect.sourcePlayer, count: defeatedCount };
           }
         }
         break;
@@ -12691,72 +12686,6 @@ export class EffectEngine {
           );
         }
 
-        // Chain: if effectDescription has gaara120Upgrade data, create UPGRADE confirm now
-        const chainInfo = parsedReorder as any;
-        if (chainInfo.gaara120Upgrade) {
-          const g120u = chainInfo.gaara120Upgrade;
-          const g120uEffId = generateInstanceId();
-          const g120uActId = generateInstanceId();
-          newState.pendingEffects = [...newState.pendingEffects, {
-            id: g120uEffId, sourceCardId: g120u.sourceCardId,
-            sourceInstanceId: g120u.sourceInstanceId,
-            sourceMissionIndex: g120u.sourceMissionIndex,
-            effectType: 'UPGRADE' as EffectType,
-            effectDescription: JSON.stringify({ defeatedCount: g120u.defeatedCount }),
-            targetSelectionType: 'GAARA120_CONFIRM_UPGRADE',
-            sourcePlayer: pendingEffect.sourcePlayer,
-            requiresTargetSelection: true,
-            validTargets: [g120u.sourceInstanceId],
-            isOptional: true, isMandatory: false, resolved: false, isUpgrade: true,
-          }];
-          newState.pendingActions = [...newState.pendingActions, {
-            id: g120uActId, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: pendingEffect.sourcePlayer,
-            description: `Gaara (120) UPGRADE: POWERUP ${g120u.defeatedCount}?`,
-            descriptionKey: 'game.effect.desc.gaara120ConfirmUpgrade',
-            descriptionParams: { count: String(g120u.defeatedCount) },
-            options: [g120u.sourceInstanceId],
-            minSelections: 1, maxSelections: 1, sourceEffectId: g120uEffId,
-          }];
-        }
-
-        // Chain: Itachi 140 UPGRADE after reorder
-        if (chainInfo.itachi140Upgrade) {
-          const i140u = chainInfo.itachi140Upgrade;
-          const i140uEnemySide: 'player1Characters' | 'player2Characters' =
-            i140u.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-          const i140uDefeatTargets: string[] = [];
-          for (let mi = 0; mi < newState.activeMissions.length; mi++) {
-            for (const char of newState.activeMissions[mi][i140uEnemySide]) {
-              const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-              const effectiveCost = char.isHidden ? 0 : topCard.chakra;
-              if (effectiveCost <= i140u.i140HandSize) i140uDefeatTargets.push(char.instanceId);
-            }
-          }
-          if (i140uDefeatTargets.length > 0) {
-            const i140uEffId = generateInstanceId();
-            const i140uActId = generateInstanceId();
-            newState.pendingEffects = [...newState.pendingEffects, {
-              id: i140uEffId, sourceCardId: i140u.sourceCardId,
-              sourceInstanceId: i140u.sourceInstanceId, sourceMissionIndex: i140u.sourceMissionIndex,
-              effectType: 'UPGRADE' as EffectType,
-              effectDescription: `Itachi Uchiwa (140) UPGRADE: Defeat an enemy with cost ${i140u.i140HandSize} or less.`,
-              targetSelectionType: 'DEFEAT_BY_COST_UPGRADE',
-              sourcePlayer: i140u.sourcePlayer, requiresTargetSelection: true,
-              validTargets: i140uDefeatTargets, isOptional: false, isMandatory: true,
-              resolved: false, isUpgrade: true,
-            }];
-            newState.pendingActions = [...newState.pendingActions, {
-              id: i140uActId, type: 'SELECT_TARGET' as PendingAction['type'],
-              player: i140u.sourcePlayer,
-              description: `Itachi Uchiwa (140) UPGRADE: Choose an enemy with cost ${i140u.i140HandSize} or less to defeat.`,
-              descriptionKey: 'game.effect.desc.itachi140DefeatByCost',
-              descriptionParams: { cost: String(i140u.i140HandSize) },
-              options: i140uDefeatTargets, minSelections: 1, maxSelections: 1,
-              sourceEffectId: i140uEffId,
-            }];
-          }
-        }
         break;
       }
 
@@ -14704,17 +14633,12 @@ export class EffectEngine {
           break;
         }
 
-        // If no more chained selections and 2+ defeated, let attacker reorder discard
+        // Queue discard reorder for after all effects resolve
         if (!chainedToNext && defeatedCount_g >= 2) {
           const g120DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          // Chain upgrade data into the reorder so it fires AFTER reorder resolves
-          const g120UpgradeChain = (gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null)
-            ? { gaara120Upgrade: { sourceCardId: pendingEffect.sourceCardId, sourceInstanceId: gaaraDesc.sourceInstanceId, sourceMissionIndex: gaaraDesc.sourceMissionIndex, defeatedCount: defeatedCount_g } }
-            : undefined;
-          newState = EffectEngine.createReorderDiscardPending(newState, g120DefenderPile, pendingEffect.sourcePlayer, defeatedCount_g, undefined, g120UpgradeChain);
-          if (g120UpgradeChain) break; // UPGRADE will be created after REORDER resolves
+          newState.pendingDiscardReorder = { discardOwner: g120DefenderPile, chooser: pendingEffect.sourcePlayer, count: defeatedCount_g };
         }
-        if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null && defeatedCount_g < 2) {
+        if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();
           newState.pendingEffects = [...newState.pendingEffects, {
@@ -15930,7 +15854,7 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
         const n133AutoDefeated = newState[n133DefenderT1].discardPile.length - discardSizeBeforeT1;
         if (n133AutoDefeated >= 2) {
-          newState = EffectEngine.createReorderDiscardPending(newState, n133DefenderT1, pending.sourcePlayer, n133AutoDefeated);
+          newState.pendingDiscardReorder = { discardOwner: n133DefenderT1, chooser: pending.sourcePlayer, count: n133AutoDefeated };
         }
         return newState;
       } else {
