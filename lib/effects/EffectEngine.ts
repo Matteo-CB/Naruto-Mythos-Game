@@ -3633,38 +3633,6 @@ export class EffectEngine {
         break;
       }
 
-      case 'SHINO033_CONFIRM_AMBUSH': {
-        // Check if this is a COPIED effect (Kakashi 016/106 copying Shino)
-        // If so, apply turn-wide cost reduction for the next character play
-        const isShino033Self = pendingEffect.sourceCardId === 'KS-033-UC';
-        if (!isShino033Self) {
-          // Copied by Kakashi or similar — apply cost reduction to next play/reveal
-          const player_s033 = pendingEffect.sourcePlayer;
-          const currentReduction = newState.playCostReduction ?? { player1: 0, player2: 0 };
-          newState = {
-            ...newState,
-            playCostReduction: { ...currentReduction, [player_s033]: (currentReduction[player_s033] ?? 0) + 4 },
-          };
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, player_s033,
-            'EFFECT',
-            `Copied Shino Aburame (033) AMBUSH: Next character play costs 4 less.`,
-            'game.log.effect.shino033CopiedReduction',
-            { card: pendingEffect.sourceCardId, reduction: '4' },
-          );
-        } else {
-          // Original Shino — cost reduction already applied by ChakraValidation during reveal
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT',
-            'Shino Aburame (033): Played paying 4 less (enemy Jutsu character present).',
-            'game.log.effect.shino033CostReduction',
-            { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
-          );
-        }
-        break;
-      }
-
       case 'SHINO033_CONFIRM_UPGRADE': {
         // Re-find valid destination missions (not current, no same-name, R8 Kurenai)
         const s033SrcMI = pendingEffect.sourceMissionIndex;
@@ -9357,16 +9325,12 @@ export class EffectEngine {
       }
 
       case 'KAKASHI106_CONFIRM_MAIN': {
-        // Normal button (not Copy Shino) — exclude upgraded Shino 033 from devolve targets
         const k106Player = pendingEffect.sourcePlayer;
         const k106EnemySide = k106Player === 'player1' ? 'player2Characters' : 'player1Characters';
         const k106ValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106EnemySide]) {
             if (c.stack?.length > 1) {
-              // Exclude upgraded Shino 033 — use the "Copy Shino" button for that
-              const cTop = c.stack[c.stack.length - 1];
-              if (cTop.number === 33) continue;
               k106ValidTargets.push(c.instanceId);
             }
           }
@@ -9431,15 +9395,12 @@ export class EffectEngine {
 
       case 'KAKASHI106_CONFIRM_UPGRADE_MODIFIER': {
         // Player confirmed modifier: devolve with isUpgrade: true (will copy effect)
-        // Exclude Shino 033 — use "Copy Shino" button for that
         const k106uPlayer = pendingEffect.sourcePlayer;
         const k106uEnemySide = k106uPlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const k106uValidTargets: string[] = [];
         for (const m of newState.activeMissions) {
           for (const c of m[k106uEnemySide]) {
             if (c.stack?.length > 1) {
-              const cTop = c.stack[c.stack.length - 1];
-              if (cTop.number === 33) continue;
               k106uValidTargets.push(c.instanceId);
             }
           }

@@ -24,7 +24,6 @@ export function calculateEffectiveCost(
   card: CharacterCard,
   missionIndex: number,
   isReveal: boolean,
-  skipAmbushReduction?: boolean,
 ): number {
   let cost = card.chakra;
 
@@ -134,85 +133,9 @@ export function calculateEffectiveCost(
     }
   }
 
-  // Shino 033 AMBUSH: Pay 4 less when revealing if there's an enemy Jutsu character in this mission
-  // Only applied when player chooses the AMBUSH reveal option (useAmbush = true)
-  if (isReveal && card.number === 33 && !skipAmbushReduction) {
-    const hasEnemyJutsu = enemyChars?.some((c: any) => {
-      if (c.isHidden) return false;
-      const cTop = getTopCard(c);
-      return cTop?.keywords?.includes('Jutsu');
-    });
-    if (hasEnemyJutsu) {
-      cost = Math.max(0, cost - 4);
-    }
-  }
-
-  // Kakashi 016 AMBUSH: copies Shino 033's AMBUSH (pay 4 less) when:
-  // - Enemy has a visible Shino 033 anywhere on field
-  // - There's a Jutsu character in the same mission as Kakashi
-  // Only applied when player chooses the AMBUSH reveal option (useAmbush = true)
-  if (isReveal && card.number === 16 && !skipAmbushReduction) {
-    const enemySide = player === 'player1' ? 'player2Characters' : 'player1Characters';
-    // Check: enemy has visible Shino 033 anywhere
-    let hasEnemyShino = false;
-    for (const m of state.activeMissions) {
-      for (const c of (m as any)[enemySide]) {
-        if (c.isHidden) continue;
-        const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-        if (cTop?.number === 33) { hasEnemyShino = true; break; }
-      }
-      if (hasEnemyShino) break;
-    }
-    // Check: enemy Jutsu character in same mission as Kakashi
-    const hasJutsuInMission = enemyChars?.some((c: any) => {
-      if (c.isHidden) return false;
-      const cTop = getTopCard(c);
-      return cTop?.keywords?.includes('Jutsu');
-    });
-    if (hasEnemyShino && hasJutsuInMission) {
-      cost = Math.max(0, cost - 4);
-    }
-  }
-
-  // Kakashi 106 AMBUSH: copies Shino 033's AMBUSH (pay 4 less) when:
-  // - Kakashi 106 is hidden, being revealed as upgrade
-  // - Enemy has an upgraded character (stack > 1) that devolves to reveal Shino 033
-  // - There's a Jutsu character in the same mission as Kakashi
-  // Only applied when player chooses "Copy Shino AMBUSH" (useAmbush = true)
-  if (isReveal && card.number === 106 && !skipAmbushReduction) {
-    const enemySide106 = player === 'player1' ? 'player2Characters' : 'player1Characters';
-    // Check: enemy has an upgraded character with Shino 033 underneath or as top
-    let hasUpgradedShino = false;
-    for (const m of state.activeMissions) {
-      for (const c of (m as any)[enemySide106]) {
-        if (c.isHidden || !c.stack || c.stack.length <= 1) continue;
-        // Check if any card in the stack is Shino 033
-        const hasShino = c.stack.some((sc: any) => sc.number === 33);
-        if (hasShino) { hasUpgradedShino = true; break; }
-      }
-      if (hasUpgradedShino) break;
-    }
-    const hasJutsuInMission106 = enemyChars?.some((c: any) => {
-      if (c.isHidden) return false;
-      const cTop = getTopCard(c);
-      return cTop?.keywords?.includes('Jutsu');
-    });
-    if (hasUpgradedShino && hasJutsuInMission106) {
-      cost = Math.max(0, cost - 4);
-    }
-  }
-
   // Turn-wide cost increases
   if (state.playCostIncrease) {
     cost += state.playCostIncrease[player] ?? 0;
-  }
-
-  // Turn-wide cost reduction (e.g., Kakashi copying Shino 033 AMBUSH)
-  if (state.playCostReduction) {
-    const reduction = state.playCostReduction[player] ?? 0;
-    if (reduction > 0) {
-      cost = Math.max(0, cost - reduction);
-    }
   }
 
   // Jiraiya 007 sub-play cost reduction for Summon characters

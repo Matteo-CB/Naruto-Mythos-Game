@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -163,7 +163,7 @@ export function ActionBar() {
       const target = myChars.find((c) => c.instanceId === selectedTargetId);
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
-        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true, true);
+        revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
         // Find ALL valid upgrade targets on this mission
         for (const c of myChars) {
           if (c.instanceId === selectedTargetId || c.isHidden) continue;
@@ -199,68 +199,11 @@ export function ActionBar() {
       }
     }
   }
-  // Detect AMBUSH cost reduction eligibility (Shino 033, Kakashi 016 copying Shino)
-  let revealAmbushCost: number | null = null; // null = no AMBUSH option
-  let revealNormalCost = revealBaseCost; // cost WITHOUT AMBUSH
-  if (hasTargetSelected && visibleState.activeMissions) {
-    for (let mi = 0; mi < visibleState.activeMissions.length; mi++) {
-      const m = visibleState.activeMissions[mi];
-      const myChars = myPlayer === 'player1' ? m.player1Characters : m.player2Characters;
-      const enemyChars = myPlayer === 'player1' ? m.player2Characters : m.player1Characters;
-      const target = myChars.find((c) => c.instanceId === selectedTargetId);
-      if (target && target.isHidden && target.card) {
-        const hiddenTop = target.topCard ?? target.card;
-        const hasEnemyJutsu = enemyChars.some((c) => {
-          if (c.isHidden) return false;
-          const ct = c.topCard ?? c.card;
-          return ct?.keywords?.includes('Jutsu');
-        });
-        // Shino 033: AMBUSH = pay 4 less when enemy Jutsu present
-        if (hiddenTop.number === 33 && hasEnemyJutsu) {
-          revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false); // WITH -4 reduction
-          revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);  // WITHOUT reduction
-        }
-        // Kakashi 016: if enemy Shino (Jutsu) exists anywhere, can copy AMBUSH for -4
-        if (hiddenTop.number === 16 && hasEnemyJutsu) {
-          const hasEnemyShino = visibleState.activeMissions.some((ms) => {
-            const eChars = myPlayer === 'player1' ? ms.player2Characters : ms.player1Characters;
-            return eChars.some((c) => {
-              if (c.isHidden) return false;
-              const ct = c.topCard ?? c.card;
-              return ct?.number === 33 && ct?.keywords?.includes('Jutsu');
-            });
-          });
-          if (hasEnemyShino) {
-            revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false);
-            revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);
-          }
-        }
-        // Kakashi 106: if enemy has upgraded Shino + Jutsu in mission, can copy Shino AMBUSH for -4
-        if (hiddenTop.number === 106 && hasEnemyJutsu) {
-          const hasUpgradedShino = visibleState.activeMissions.some((ms) => {
-            const eChars = myPlayer === 'player1' ? ms.player2Characters : ms.player1Characters;
-            return eChars.some((c) => {
-              if (c.isHidden || c.stackSize <= 1) return false;
-              // VisibleCharacter: card = bottom, topCard = top — check both for Shino 033
-              return c.topCard?.number === 33 || c.card?.number === 33;
-            });
-          });
-          if (hasUpgradedShino) {
-            revealAmbushCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, false);
-            revealNormalCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTop, mi, true, true);
-          }
-        }
-        break;
-      }
-    }
-  }
-
   // Can show plain "Reveal" button only if NO same-name upgrade targets exist
   // (same-name upgrade is mandatory - can't have 2 same-name chars on one mission)
   const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
   const canShowPlainReveal = !hasSameNameRevealUpgrade;
-  const canAffordReveal = myState.chakra >= (revealAmbushCost !== null ? revealNormalCost : revealBaseCost);
-  const canAffordAmbushReveal = revealAmbushCost !== null && myState.chakra >= revealAmbushCost;
+  const canAffordReveal = myState.chakra >= revealBaseCost;
 
   // Handlers
   const handlePlayVisible = () => {
@@ -289,7 +232,7 @@ export function ActionBar() {
     if (!error) clearSelection();
   };
 
-  const handleReveal = (upgradeTargetInstanceId?: string, useAmbush?: boolean) => {
+  const handleReveal = (upgradeTargetInstanceId?: string) => {
     if (!canReveal || !selectedTargetId || actionsBlocked) {
       console.warn('[ActionBar] handleReveal blocked:', { canReveal, canAffordReveal, selectedTargetId });
       return;
@@ -313,7 +256,6 @@ export function ActionBar() {
         missionIndex: targetMissionIndex,
         characterInstanceId: selectedTargetId,
         upgradeTargetInstanceId,
-        useAmbush,
       });
     } else {
       console.warn('[ActionBar] handleReveal: character not found in any mission', { selectedTargetId });
@@ -510,27 +452,6 @@ export function ActionBar() {
           {/* Reveal upgrade button(s) - one per valid upgrade target */}
           {canReveal && revealUpgradeTargets.map((opt) => {
             const canAfford = myState.chakra >= opt.cost;
-            // When AMBUSH cost reduction is available, show both normal and AMBUSH upgrade buttons
-            if (revealAmbushCost !== null) {
-              const existingCardCost = revealBaseCost - opt.cost; // derive from normal cost diff
-              const ambushUpgCost = Math.max(0, revealAmbushCost - existingCardCost);
-              return (
-                <Fragment key={`reveal-upgrade-${opt.instanceId}`}>
-                  <ActionButton
-                    label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name} AMBUSH (${ambushUpgCost} ${t('game.chakra').toLowerCase()})`}
-                    onClick={() => handleReveal(opt.instanceId, true)}
-                    disabled={myState.chakra < ambushUpgCost}
-                    variant="primary"
-                  />
-                  <ActionButton
-                    label={`${t('game.reveal')} + ${t('game.actions.upgrade')} ${opt.name} (${opt.cost} ${t('game.chakra').toLowerCase()})`}
-                    onClick={() => handleReveal(opt.instanceId)}
-                    disabled={!canAfford}
-                    variant="secondary"
-                  />
-                </Fragment>
-              );
-            }
             return (
               <ActionButton
                 key={`reveal-upgrade-${opt.instanceId}`}
@@ -542,24 +463,8 @@ export function ActionBar() {
             );
           })}
 
-          {/* Plain reveal button(s) - with AMBUSH dual option for Shino 033 / Kakashi 016 */}
-          {canReveal && canShowPlainReveal && revealAmbushCost !== null && (
-            <>
-              <ActionButton
-                label={`${t('game.reveal')} AMBUSH (${revealAmbushCost} ${t('game.chakra').toLowerCase()})`}
-                onClick={() => handleReveal(undefined, true)}
-                disabled={!canAffordAmbushReveal}
-                variant="primary"
-              />
-              <ActionButton
-                label={`${t('game.reveal')} (${revealNormalCost} ${t('game.chakra').toLowerCase()})`}
-                onClick={() => handleReveal(undefined, false)}
-                disabled={myState.chakra < revealNormalCost}
-                variant="secondary"
-              />
-            </>
-          )}
-          {canReveal && canShowPlainReveal && revealAmbushCost === null && (
+          {/* Plain reveal button */}
+          {canReveal && canShowPlainReveal && (
             <ActionButton
               label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}
               onClick={() => handleReveal()}

@@ -1046,7 +1046,7 @@
       "effects": [
         {
           "type": "AMBUSH",
-          "description": "Play this character paying 4 less if there is an enemy Jutsu character in this mission.",
+          "description": "[⧗] Play this character paying 4 less if there is an enemy Jutsu character in this mission.",
           "description_fr": ""
         },
         {
