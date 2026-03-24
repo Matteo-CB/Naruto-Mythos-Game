@@ -3339,8 +3339,7 @@
       "chakra": 5,
       "power": 6,
       "keywords": [
-        "Sannin",
-        "Jutsu"
+        "Sannin"
       ],
       "group": "Leaf Village",
       "effects": [
@@ -5308,7 +5307,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "Reveal and discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
+          "description": "Discard the top card of your deck: POWERUP X where X is the cost of the discarded card."
         }
       ],
       "image_url": "",
@@ -5338,12 +5337,12 @@
       "group": "Akatsuki",
       "effects": [
         {
-          "type": "UPGRADE",
-          "description": "Move a friendly character in play."
-        },
-        {
           "type": "MAIN",
           "description": "[⧗] Every enemy character in this mission has -1 Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "Move a friendly character in play."
         }
       ],
       "image_url": "/images/cards/KS/mythos_v/KS-128-MV.webp",
@@ -5414,7 +5413,7 @@
         },
         {
           "type": "UPGRADE",
-          "description": "MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.",
+          "description": "MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.",
           "description_fr": ""
         }
       ],
