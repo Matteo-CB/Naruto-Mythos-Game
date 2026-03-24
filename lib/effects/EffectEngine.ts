@@ -11843,7 +11843,11 @@ export class EffectEngine {
         }
 
         // Auto-apply: discard opponent's entire hand, then draw the same number
-        const i140DiscardedHand = [...i140OpponentState.hand];
+        // Assign unique instanceIds to hand cards going to discard (needed for reorder popup)
+        const i140DiscardedHand = i140OpponentState.hand.map((c: any) => ({
+          ...c,
+          instanceId: c.instanceId || generateInstanceId(),
+        }));
         const i140OpDeck = [...i140OpponentState.deck];
         const i140DrawCount = Math.min(i140HandSize, i140OpDeck.length);
         const i140DrawnCards = i140OpDeck.splice(0, i140DrawCount);
