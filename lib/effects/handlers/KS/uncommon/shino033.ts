@@ -8,44 +8,11 @@ import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
  * Chakra: 4 | Power: 4
  * Group: Leaf Village | Keywords: Team 8, Jutsu
  *
- * AMBUSH: Play this character paying 4 less if there's an enemy Jutsu character
- *   in this mission. (Cost reduction is handled in ChakraValidation.ts)
+ * AMBUSH [⧗]: Play this character paying 4 less if there's an enemy Jutsu character
+ *   in this mission. (Continuous cost reduction — handled in ChakraValidation.ts)
  *
  * UPGRADE: Move this character to another mission.
  */
-
-function handleShino033Ambush(ctx: EffectContext): EffectResult {
-  const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
-  const enemySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-
-  if (sourceMissionIndex === undefined || sourceMissionIndex < 0) {
-    return { state };
-  }
-
-  const mission = state.activeMissions[sourceMissionIndex];
-  if (!mission) return { state };
-
-  const hasEnemyJutsu = mission[enemySide].some((c) => {
-    if (c.isHidden) return false;
-    const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-    return top.keywords?.includes('Jutsu');
-  });
-
-  if (hasEnemyJutsu) {
-    // Cost reduction already applied in ChakraValidation.ts — just log it
-    const log = logAction(
-      state.log, state.turn, state.phase, sourcePlayer,
-      'EFFECT',
-      'Shino Aburame (033) AMBUSH: Played for 4 less chakra (enemy Jutsu present).',
-      'game.log.effect.shino033CostReduction',
-      { card: 'SHINO ABURAME', id: 'KS-033-UC', reduction: '4' },
-    );
-    return { state: { ...state, log } };
-  }
-
-  return { state };
-}
 
 function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -108,6 +75,5 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
 }
 
 export function registerShino033Handlers(): void {
-  registerEffect('KS-033-UC', 'AMBUSH', handleShino033Ambush);
   registerEffect('KS-033-UC', 'UPGRADE', handleShino033Upgrade);
 }

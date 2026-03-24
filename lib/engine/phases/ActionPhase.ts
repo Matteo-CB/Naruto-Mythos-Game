@@ -42,7 +42,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'REVEAL_CHARACTER':
-      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId, action.useAmbush);
+      newState = handleRevealCharacter(newState, player, action.missionIndex, action.characterInstanceId, action.upgradeTargetInstanceId);
       if (newState === beforeAction) return state;
       break;
     case 'UPGRADE_CHARACTER':
@@ -129,11 +129,6 @@ function handlePlayCharacter(
   // Pay chakra
   const ps = { ...playerState };
   ps.chakra -= effectiveCost;
-
-  // Consume turn-wide cost reduction after use (e.g., Kakashi copying Shino 033)
-  if (state.playCostReduction?.[player]) {
-    state = { ...state, playCostReduction: { ...state.playCostReduction!, [player]: 0 } };
-  }
 
   // Remove card from hand
   const hand = [...ps.hand];
@@ -292,7 +287,6 @@ function handleRevealCharacter(
   missionIndex: number,
   characterInstanceId: string,
   upgradeTargetInstanceId?: string,
-  useAmbush?: boolean,
 ): GameState {
   if (missionIndex < 0 || missionIndex >= state.activeMissions.length) return state;
 
@@ -340,19 +334,15 @@ function handleRevealCharacter(
     });
   }
 
-  // Calculate cost: AMBUSH reduction only when useAmbush is explicitly true
-  const skipAmbush = useAmbush !== true;
-  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true, skipAmbush);
+  // Calculate cost
+  const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   let costToPay = fullCost;
 
   if (upgradeTarget) {
     const existingTopCard = upgradeTarget.stack?.length > 0
       ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
-    // Use fullCost (with cost reductions applied) minus existing card cost
-    // e.g. Gaara 075 (cost 3, -2 when hidden reveal) upgrading over cost 2 = max(0, 1 - 2) = 0
     const rawDiff = Math.max(0, fullCost - existingTopCard.chakra);
-    // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
     costToPay = hasKurenai034CostReduction(state, player, charTopCard, missionIndex)
       ? Math.max(1, rawDiff) : rawDiff;
   }
@@ -361,11 +351,6 @@ function handleRevealCharacter(
   const ps = { ...state[player] };
   if (ps.chakra < costToPay) return state;
   ps.chakra -= costToPay;
-
-  // Consume turn-wide cost reduction after use (e.g., Kakashi copying Shino 033)
-  if (state.playCostReduction?.[player]) {
-    state = { ...state, playCostReduction: { ...state.playCostReduction!, [player]: 0 } };
-  }
 
   if (upgradeTarget) {
     // Reveal-for-upgrade: merge stacks - put the revealed card's stack on top of the existing one
@@ -467,98 +452,11 @@ function handleRevealCharacter(
   newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
   // Trigger MAIN + AMBUSH effects via EffectEngine
-  // For Kakashi 016 with useAmbush: AMBUSH already consumed (cost reduction),
-  // so skip MAIN (Andy's rule: choosing AMBUSH reveal means no MAIN trigger)
   const revealedMission = newState.activeMissions[missionIndex];
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
   if (revealedChar) {
-    const skipMainForAmbush016 = useAmbush === true && charTopCard.number === 16;
-    const skipMainForAmbush106 = useAmbush === true && charTopCard.number === 106;
-    if (skipMainForAmbush016) {
-      // Kakashi 016 AMBUSH reveal: copy Shino's cost reduction was already applied via cost.
-      // Log it and skip MAIN effect.
-      newState.log = logAction(
-        newState.log, newState.turn, 'action', player,
-        'EFFECT',
-        'Kakashi Hatake (016) AMBUSH: Copied Shino Aburame cost reduction — revealed for 0 chakra. MAIN effect skipped.',
-        'game.log.effect.kakashi016AmbushReveal',
-        { card: 'KAKASHI HATAKE', id: 'KS-016-UC' },
-      );
-    } else if (skipMainForAmbush106) {
-      // Kakashi 106 AMBUSH: Copy Shino — auto-devolve the upgraded Shino
-      const k106EnemySide: 'player1Characters' | 'player2Characters' = player === 'player1' ? 'player2Characters' : 'player1Characters';
-
-      // Find ALL upgraded Shino 033 candidates
-      const k106Candidates: { instanceId: string; missionIdx: number }[] = [];
-      for (let mi = 0; mi < newState.activeMissions.length; mi++) {
-        for (const c of newState.activeMissions[mi][k106EnemySide]) {
-          if (c.isHidden || !c.stack || c.stack.length <= 1) continue;
-          if (c.stack.some((sc: any) => sc.number === 33)) {
-            k106Candidates.push({ instanceId: c.instanceId, missionIdx: mi });
-          }
-        }
-      }
-
-      // Filter: after devolving, Kakashi's mission must still have a Jutsu
-      const k106Valid = k106Candidates.filter(cand => {
-        if (cand.missionIdx !== missionIndex) return true; // Other mission — doesn't affect Kakashi's Jutsu
-        const cMission = newState.activeMissions[cand.missionIdx];
-        const cChar = cMission[k106EnemySide].find((c: any) => c.instanceId === cand.instanceId);
-        if (!cChar) return false;
-        const underCard = cChar.stack.length >= 2 ? cChar.stack[cChar.stack.length - 2] : null;
-        if (underCard?.keywords?.includes('Jutsu')) return true; // Card underneath is Jutsu
-        // Check if another Jutsu exists in this mission (excluding this Shino)
-        return cMission[k106EnemySide].some((other: any) => {
-          if (other.instanceId === cand.instanceId || other.isHidden) return false;
-          const oTop = other.stack?.length > 0 ? other.stack[other.stack.length - 1] : other.card;
-          return oTop?.keywords?.includes('Jutsu');
-        });
-      });
-
-      if (k106Valid.length === 1) {
-        const fakePending = {
-          id: '', sourceCardId: 'KS-106-R', sourceInstanceId: characterInstanceId,
-          sourceMissionIndex: missionIndex, effectType: 'MAIN' as const,
-          effectDescription: '', targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
-          sourcePlayer: player, requiresTargetSelection: false,
-          validTargets: [], isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: true, wasRevealed: true,
-        };
-        newState = EffectEngine.devolveUpgradedCharacter(newState, fakePending, k106Valid[0].instanceId);
-      } else if (k106Valid.length > 1) {
-        // Multiple valid — let player choose
-        const k106EffId = generateInstanceId();
-        const k106ActId = generateInstanceId();
-        newState.pendingEffects.push({
-          id: k106EffId, sourceCardId: 'KS-106-R',
-          sourceInstanceId: characterInstanceId, sourceMissionIndex: missionIndex,
-          effectType: 'MAIN' as any, effectDescription: '',
-          targetSelectionType: 'KAKASHI106_DEVOLVE_TARGET',
-          sourcePlayer: player, requiresTargetSelection: true,
-          validTargets: k106Valid.map(c => c.instanceId),
-          isOptional: false, isMandatory: true, resolved: false,
-          isUpgrade: true, wasRevealed: true,
-        });
-        newState.pendingActions.push({
-          id: k106ActId, type: 'SELECT_TARGET' as PendingAction['type'],
-          player,
-          description: 'Kakashi (106): Choose which upgraded Shino to devolve.',
-          descriptionKey: 'game.effect.desc.kakashi106DevolveTarget',
-          options: k106Valid.map(c => c.instanceId),
-          minSelections: 1, maxSelections: 1, sourceEffectId: k106EffId,
-        });
-      }
-      newState.log = logAction(
-        newState.log, newState.turn, 'action', player,
-        'EFFECT',
-        'Kakashi Hatake (106): Copied Shino cost reduction — auto-devolved upgraded Shino.',
-        'game.log.effect.kakashi106AmbushReveal',
-        { card: 'KAKASHI HATAKE', id: 'KS-106-R' },
-      );
-    } else {
-      newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
-    }
+    newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
 
   // Re-apply Rashomon token removal in case this reveal changes the strongest enemy

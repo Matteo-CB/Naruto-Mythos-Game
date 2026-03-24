@@ -14,7 +14,6 @@ export function executeStartPhase(state: GameState): GameState {
 
   // Reset turn-wide cost modifiers (Shino 033, etc.)
   newState.playCostIncrease = undefined;
-  newState.playCostReduction = undefined;
 
   // Snapshot previous turn's last played for display, then reset tracking
   const prevLastPlayed = newState.lastPlayedInstanceIds ?? { player1: null, player2: null };
