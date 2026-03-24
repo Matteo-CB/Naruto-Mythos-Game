@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { calculateContinuousPowerModifier } from '@/lib/effects/ContinuousEffects';
 
 /**
  * Card 138/130 - OROCHIMARU (S)
@@ -48,8 +49,17 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const previousCard = stack[stack.length - 2];
 
-  // Effective power = base power + power tokens (tokens transfer through upgrades)
-  const effectivePower = (previousCard.power ?? 0) + (ctx.sourceCard.powerTokens ?? 0);
+  // Effective power = base power + power tokens + continuous modifiers (e.g. mission power bonus)
+  // Build a fake CharacterInPlay with previousCard as top to calculate what its power was
+  const fakeChar = {
+    ...ctx.sourceCard,
+    card: previousCard,
+    stack: stack.slice(0, -1), // stack without Orochimaru on top
+  };
+  const continuousBonus = calculateContinuousPowerModifier(
+    state, ctx.sourcePlayer, ctx.sourceMissionIndex, fakeChar,
+  );
+  const effectivePower = (previousCard.power ?? 0) + (ctx.sourceCard.powerTokens ?? 0) + continuousBonus;
 
   if (effectivePower < 6) {
     const log = logAction(

@@ -12646,8 +12646,20 @@ export class EffectEngine {
           // Remove the last N cards
           const removedCards = discard.splice(-reorderCount, reorderCount);
           // Reorder based on the player's chosen order (first in list = bottom, last = top)
+          // Use index tracking to handle duplicate cards correctly
+          // Strip __dupN suffix if present (added by createReorderDiscardPending for dedup)
+          const usedIndices = new Set<number>();
           const reorderedCards = reorderList.map(id => {
-            return removedCards.find((c: any) => (c.instanceId || c.id) === id);
+            const cleanId = id.replace(/__dup\d+$/, '');
+            const idx = removedCards.findIndex((c: any, i: number) => {
+              if (usedIndices.has(i)) return false;
+              return (c.instanceId || c.id) === cleanId;
+            });
+            if (idx >= 0) {
+              usedIndices.add(idx);
+              return removedCards[idx];
+            }
+            return undefined;
           }).filter((c): c is NonNullable<typeof c> => c !== undefined);
           // Put them back in the chosen order
           discard.push(...reorderedCards);
@@ -15430,7 +15442,14 @@ export class EffectEngine {
 
     const actualCount = Math.min(count, discard.length);
     const cardsToOrder = discard.slice(-actualCount);
-    const cardInstanceIds = cardsToOrder.map((c: any) => c.instanceId || c.id || generateInstanceId());
+    // Ensure unique IDs even for duplicate cards (e.g. 2x same version)
+    const seenIds = new Map<string, number>();
+    const cardInstanceIds = cardsToOrder.map((c: any) => {
+      const baseId = c.instanceId || c.id || generateInstanceId();
+      const count = seenIds.get(baseId) ?? 0;
+      seenIds.set(baseId, count + 1);
+      return count > 0 ? `${baseId}__dup${count}` : baseId;
+    });
 
     const chooser = selectingPlayer ?? effectSourcePlayer;
     const effId = generateInstanceId();

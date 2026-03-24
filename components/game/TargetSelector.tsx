@@ -486,9 +486,16 @@ export function TargetSelector() {
     const count = validTargets.length;
     const lastN = targetDiscard.slice(-count);
     const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
-    for (const card of lastN) {
+    // Map index-based unique IDs back to original card IDs for engine submission
+    const discardIdMap: Record<string, string> = {};
+    for (let di = 0; di < lastN.length; di++) {
+      const card = lastN[di];
+      const originalId = (card as any).instanceId || (card as any).id || `card-${di}`;
+      // Use index-based unique ID to distinguish duplicate cards (e.g. 2x Temari)
+      const uniqueId = `discard_${di}`;
+      discardIdMap[uniqueId] = originalId;
       discardTargets.push({
-        instanceId: (card as any).instanceId || (card as any).id,
+        instanceId: uniqueId,
         name_fr: (card as any).name_fr ?? '',
         name_en: (card as any).name_en,
         image_file: (card as any).image_file,
@@ -509,8 +516,9 @@ export function TargetSelector() {
           descriptionParams={descriptionParams}
           sourceCardName=""
           onConfirm={(orderedIds) => {
-            // Submit the full order as JSON to the engine
-            handleSelect(JSON.stringify(orderedIds));
+            // Map unique popup IDs back to original card IDs for engine
+            const originalIds = orderedIds.map(id => discardIdMap[id] ?? id);
+            handleSelect(JSON.stringify(originalIds));
           }}
         />
       );
