@@ -22,11 +22,10 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[ctx.sourceMissionIndex];
   const friendlyChars = mission[friendlySide];
 
-  // Collect all non-hidden friendly characters in THIS mission
-  // Exclude stolen cards (originalOwner !== controller) — can't "return" opponent's cards
+  // Collect all non-hidden friendly characters in THIS mission (including stolen cards)
   const validTargets: string[] = [];
   for (const c of friendlyChars) {
-    if (!c.isHidden && c.originalOwner === c.controlledBy) {
+    if (!c.isHidden) {
       validTargets.push(c.instanceId);
     }
   }
@@ -82,28 +81,30 @@ function applyMss05ReturnToHand(
   // If this character controlled stolen cards (Ino/Kabuto/Orochimaru), return them
   state = EffectEngine.restoreControlOnLeave(state, target.instanceId);
 
-  // Remove from mission (re-find index after restoreControlOnLeave may have changed the array)
+  // Remove from mission (re-find from current state after restoreControlOnLeave)
   const missions = [...state.activeMissions];
   const updatedMission = { ...missions[sourceMissionIndex] };
   const chars = [...updatedMission[friendlySide]];
   const newTargetIndex = chars.findIndex((c) => c.instanceId === targetInstanceId);
   if (newTargetIndex === -1) return { state };
+  const currentTarget = chars[newTargetIndex]; // Use fresh reference from current state
   chars.splice(newTargetIndex, 1);
   updatedMission[friendlySide] = chars;
   missions[sourceMissionIndex] = updatedMission;
 
-  // Return the TOP card to its ORIGINAL OWNER's hand (not the controller)
-  // If the character was stolen (Ino), it goes back to the real owner
-  const owner = target.originalOwner ?? sourcePlayer;
+  // Return the TOP card to its ORIGINAL OWNER's hand
+  // Stolen cards (originalOwner !== controlledBy) go to opponent's hand
+  const owner = currentTarget.originalOwner;
   const ownerState = { ...state[owner] };
-  const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
-  const underCards = target.stack?.length > 1 ? target.stack.slice(0, -1) : [];
+  const topCard = currentTarget.stack?.length > 0 ? currentTarget.stack[currentTarget.stack?.length - 1] : currentTarget.card;
+  const underCards = currentTarget.stack?.length > 1 ? currentTarget.stack.slice(0, -1) : [];
   ownerState.hand = [...ownerState.hand, topCard];
   ownerState.discardPile = [...ownerState.discardPile, ...underCards];
 
   // Update character count for the controller (who had it on the field)
-  const controllerState = owner !== sourcePlayer ? { ...state[sourcePlayer], charactersInPlay: Math.max(0, state[sourcePlayer].charactersInPlay - 1) } : ownerState;
-  if (owner === sourcePlayer) {
+  const controller = currentTarget.controlledBy;
+  const controllerState = controller !== owner ? { ...state[controller], charactersInPlay: Math.max(0, state[controller].charactersInPlay - 1) } : ownerState;
+  if (controller === owner) {
     ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
   }
 
@@ -113,9 +114,9 @@ function applyMss05ReturnToHand(
     state.phase,
     sourcePlayer,
     'SCORE_RETURN',
-    `MSS 05 (Bring it Back): Returned ${target.card.name_fr} to ${owner === sourcePlayer ? 'hand' : 'original owner\'s hand'} (mandatory).`,
+    `MSS 05 (Bring it Back): Returned ${currentTarget.card.name_fr} to ${owner === controller ? 'hand' : 'original owner\'s hand'} (mandatory).`,
     'game.log.score.returnToHand',
-    { card: 'Ramener', target: target.card.name_fr },
+    { card: 'Ramener', target: currentTarget.card.name_fr },
   );
 
   return {
@@ -123,7 +124,7 @@ function applyMss05ReturnToHand(
       ...state,
       activeMissions: missions,
       [owner]: ownerState,
-      ...(owner !== sourcePlayer ? { [sourcePlayer]: controllerState } : {}),
+      ...(controller !== owner ? { [controller]: controllerState } : {}),
       log,
     },
   };
