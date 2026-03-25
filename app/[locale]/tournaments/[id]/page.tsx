@@ -75,7 +75,26 @@ export default function TournamentDetailPage() {
     }
   }, [session, activeTournament, userId]);
 
-  const handleJoin = useCallback(async () => { if (!tournamentId) return; clearError(); try { await joinTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, joinTournament, fetchTournament, clearError]);
+  const [joinCodeInput, setJoinCodeInput] = useState('');
+  const [joinError, setJoinError] = useState('');
+
+  // Discord status from session
+  const userDiscordId = (session?.user as Record<string, unknown>)?.discordId as string | null;
+  const hasDiscordLinked = !!userDiscordId;
+
+  const handleJoin = useCallback(async () => {
+    if (!tournamentId) return;
+    clearError();
+    setJoinError('');
+    try {
+      const code = activeTournament && !activeTournament.isPublic ? joinCodeInput.trim() : undefined;
+      await joinTournament(tournamentId, code);
+      fetchTournament(tournamentId);
+    } catch (err) {
+      setJoinError(err instanceof Error ? err.message : 'Failed to join');
+    }
+  }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament]);
+
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
 
   // Auto-emit tournament:ready when player has an active match
@@ -164,11 +183,6 @@ export default function TournamentDetailPage() {
             style={{ backgroundColor: linkCopied ? '#1a3a1a' : '#1a1a1a', border: `1px solid ${linkCopied ? '#4ade80' : '#333'}`, color: linkCopied ? '#4ade80' : '#888' }}>
             {linkCopied ? t('copied') : t('share')}
           </button>
-          {tour.joinCode && (
-            <span className="px-3 py-1.5 text-xs font-mono" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#c4a35a' }}>
-              {t('codeLabel')}: {tour.joinCode}
-            </span>
-          )}
         </div>
 
         {/* Rules section */}
@@ -277,6 +291,7 @@ export default function TournamentDetailPage() {
         {/* Registration */}
         {tour.status === 'registration' && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
+            {/* Participant list */}
             <div className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
               <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('players')} ({tour.participants.length}/{tour.maxPlayers})</h2>
               {tour.participants.length === 0 ? (
@@ -292,13 +307,80 @@ export default function TournamentDetailPage() {
                 </div>
               )}
             </div>
-            <div className="flex gap-3 mb-4">
+
+            {/* Join / Leave section */}
+            <div className="mb-4">
               {!isParticipant ? (
-                <button onClick={handleJoin} disabled={tour.participants.length >= tour.maxPlayers} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40" style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}>{t('join')}</button>
+                <div className="p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
+                  {/* Discord requirement check */}
+                  {!hasDiscordLinked ? (
+                    <div className="flex flex-col items-center gap-3 py-4">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '2px solid rgba(88, 101, 242, 0.4)' }}>
+                        <span className="text-lg" style={{ color: '#5865F2' }}>D</span>
+                      </div>
+                      <p className="text-xs text-center" style={{ color: '#aaa' }}>{t('discordRequired')}</p>
+                      <p className="text-xs text-center" style={{ color: '#888' }}>{t('discordNotLinked')}</p>
+                      <Link href={'/settings' as '/'} className="px-5 py-2 text-xs font-medium uppercase tracking-wider transition-colors"
+                        style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '1px solid rgba(88, 101, 242, 0.4)', color: '#5865F2' }}>
+                        {tc('settings')}
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      {/* Private tournament: code input */}
+                      {!tour.isPublic && (
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('enterCode')}</label>
+                          <div className="flex gap-2">
+                            <input type="text" value={joinCodeInput} onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                              placeholder="XXXXXX" maxLength={8}
+                              className="flex-1 px-3 py-2 text-sm font-mono text-center uppercase tracking-widest"
+                              style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#c4a35a' }}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleJoin(); }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Join button */}
+                      <button onClick={handleJoin}
+                        disabled={tour.participants.length >= tour.maxPlayers || (!tour.isPublic && !joinCodeInput.trim())}
+                        className="w-full px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40"
+                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}>
+                        {t('join')}
+                      </button>
+
+                      {/* Join error */}
+                      {joinError && (
+                        <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
+                          {joinError}
+                        </p>
+                      )}
+
+                      {tour.participants.length >= tour.maxPlayers && (
+                        <p className="text-xs text-center" style={{ color: '#888' }}>{t('full')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <button onClick={handleLeave} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors" style={{ backgroundColor: 'rgba(204, 68, 68, 0.08)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{t('leave')}</button>
+                <div className="flex gap-3">
+                  <button onClick={handleLeave} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors"
+                    style={{ backgroundColor: 'rgba(204, 68, 68, 0.08)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>
+                    {t('leave')}
+                  </button>
+                </div>
               )}
             </div>
+
+            {/* Show join code only to creator/admin for private tournaments */}
+            {(isAdmin || isCreator) && !tour.isPublic && tour.joinCode && (
+              <div className="mb-4 p-3 flex items-center gap-3" style={{ backgroundColor: '#111', border: '1px solid #333' }}>
+                <span className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('codeLabel')}:</span>
+                <span className="text-sm font-mono tracking-widest" style={{ color: '#c4a35a' }}>{tour.joinCode}</span>
+              </div>
+            )}
+
             {(isAdmin || isCreator) && <TournamentAdmin tournamentId={tournamentId} isAdmin={isAdmin} isCreator={isCreator} />}
           </motion.div>
         )}
