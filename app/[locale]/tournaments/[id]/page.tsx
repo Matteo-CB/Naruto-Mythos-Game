@@ -309,11 +309,15 @@ export default function TournamentDetailPage() {
                   {selectedDeckId === deck.id && <span style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>{myDeckValid ? t('deckValid') : t('deckInvalid')}</span>}
                 </button>
               ))}
-              {myDecks.length === 0 && (
+              {myDecks.length === 0 ? (
                 <p className="text-xs" style={{ color: '#666' }}>
                   <Link href={'/deck-builder' as '/'} style={{ color: '#c4a35a' }}>{t('noDeckWarning')}</Link>
                 </p>
-              )}
+              ) : (!myDeckValid && (
+                <p className="text-xs mt-2" style={{ color: '#666' }}>
+                  <Link href={'/deck-builder' as '/'} style={{ color: '#c4a35a' }}>{t('noValidDeckHint')}</Link>
+                </p>
+              ))}
             </div>
           </motion.div>
         )}

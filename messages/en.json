@@ -2451,6 +2451,7 @@
     "deckErrors": "Deck Errors",
     "changeDeck": "Change Deck",
     "noDeckWarning": "No saved decks. Create one in the deck builder first, then come back to select it.",
+    "noValidDeckHint": "None of your decks match the tournament rules? Create or edit one in the deck builder.",
     "rulesTitle": "Tournament Rules",
     "rulesFormat": "Format: Single elimination bracket",
     "rulesClassic": "Classic: Bring your own deck (30+ cards, 3 missions)",
