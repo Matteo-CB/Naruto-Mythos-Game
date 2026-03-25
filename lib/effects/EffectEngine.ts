@@ -12685,8 +12685,9 @@ export class EffectEngine {
         if (parsedReorder.sakura135Chain) {
           const s135Player = reorderTarget;
           const s135Ps = newState[s135Player];
-          // The chosen card is stored at the end of the discard pile (after the reordered cards)
-          const s135ChosenCard = s135Ps.discardPile[s135Ps.discardPile.length - 1];
+          // The chosen card is stored BEFORE the reordered cards in the discard pile
+          const s135ChosenIdx = s135Ps.discardPile.length - 1 - reorderCount;
+          const s135ChosenCard = s135ChosenIdx >= 0 ? s135Ps.discardPile[s135ChosenIdx] : null;
           if (s135ChosenCard) {
             const s135CostReduction = (parsedReorder as any).costReduction ?? 0;
             const fakePending = {
@@ -18208,14 +18209,14 @@ export class EffectEngine {
     const chosenCard = drawnCards[cardIndex];
     const otherCards = drawnCards.filter((_, i) => i !== cardIndex);
 
-    // Discard the non-chosen cards (assign instanceIds for reorder tracking)
+    // Store chosen card FIRST (before discards) so it's not affected by reorder
+    ps.discardPile.push(chosenCard);
+
+    // Discard the non-chosen cards AFTER the chosen card (assign instanceIds for reorder tracking)
     for (let oi = 0; oi < otherCards.length; oi++) {
       const oc = otherCards[oi];
       ps.discardPile.push({ ...oc, instanceId: (oc as any).instanceId || (oc as any).id + `-discard-${oi}` } as any);
     }
-
-    // Store chosen card at end of discard for genericPlaceOnMission to recover
-    ps.discardPile.push(chosenCard);
 
     // If 2+ cards discarded, show reorder popup FIRST, then chain to placement
     if (otherCards.length >= 2) {
