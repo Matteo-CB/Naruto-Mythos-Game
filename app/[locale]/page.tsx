@@ -406,47 +406,6 @@ export default function Home() {
               )}
             </motion.nav>
 
-            {/* Suggestions (only visible to authorized users) */}
-            {session && (
-              ['Andy', 'Kutxyt', 'admin', 'Daiki0'].includes(session.user?.name ?? '')
-            ) && (
-              <motion.div
-                className="mt-2 flex w-full flex-row gap-2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 1.37, ease: 'easeOut' }}
-              >
-                <Link
-                  href="/admin/suggestions"
-                  className="group relative flex flex-1 h-10 items-center justify-center overflow-hidden text-sm font-semibold tracking-wide transition-all sm:h-12 sm:text-base"
-                  style={{
-                    backgroundColor: '#141414',
-                    border: '1px solid #3b82f6',
-                    color: '#3b82f6',
-                  }}
-                  onMouseEnter={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1.03)';
-                    target.style.borderColor = '#3b82f6';
-                    target.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.15)';
-                    target.style.backgroundColor = '#1a1a1a';
-                  }}
-                  onMouseLeave={(e) => {
-                    const target = e.currentTarget as HTMLElement;
-                    target.style.transform = 'scale(1)';
-                    target.style.borderColor = '#3b82f6';
-                    target.style.boxShadow = 'none';
-                    target.style.backgroundColor = '#141414';
-                  }}
-                >
-                  <span
-                    className="absolute left-0 top-0 h-full w-1"
-                    style={{ backgroundColor: '#3b82f6' }}
-                  />
-                  {t('suggestionTracker')}
-                </Link>
-              </motion.div>
-            )}
 
             {/* Divider */}
             <motion.div
