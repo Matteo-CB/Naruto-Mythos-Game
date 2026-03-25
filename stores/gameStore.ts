@@ -526,17 +526,23 @@ function buildPendingTargetSelectionUI(
         topCardsInfo = parsed.topCards ?? [];
         storedCards = parsed.storedCards ?? [];
       } catch { /* ignore */ }
+      // Lazy-load card index for image lookup
+      let getCharById: ((id: string) => any) | null = null;
+      try { getCharById = require('@/lib/data/cardIndex').getCharacterById; } catch { /* ignore */ }
       handCards = pendingAction.options.map((indexStr) => {
         const idx = parseInt(indexStr, 10);
-        // Use storedCards (full card data from server) if available
         const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
         const cardData = storedCard ? fullCardData(storedCard) : info ? {
           name_fr: info.name, chakra: info.chakra, power: info.power, image_file: info.image_file,
         } : { name_fr: '???' };
-        // Ensure image_file from topCards if storedCard lost it in serialization
-        if (cardData && !cardData.image_file && info?.image_file) {
-          (cardData as any).image_file = info.image_file;
+        // Fallback: look up image from card index by cardId if missing
+        if (cardData && !cardData.image_file) {
+          const cardId = (storedCard as any)?.id ?? (storedCard as any)?.cardId ?? info?.cardId;
+          if (cardId && getCharById) {
+            const indexCard = getCharById(cardId);
+            if (indexCard?.image_file) (cardData as any).image_file = indexCard.image_file;
+          }
         }
         return { index: idx, card: cardData };
       });
