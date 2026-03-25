@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { assignTournamentWinnerRole, removeTournamentRole } from '@/lib/discord/tournamentRoles';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -95,6 +96,7 @@ export async function POST(
 
         const winnerUsername = match.player1Id === winnerId ? match.player1Username : match.player2Username;
         const loserId = match.player1Id === winnerId ? match.player2Id : match.player1Id;
+        const previousWinnerId = match.winnerId;
 
         await prisma.tournamentMatch.update({
           where: { id: matchId },
@@ -107,6 +109,32 @@ export async function POST(
             data: { eliminated: true, eliminatedRound: match.round },
           });
         }
+
+        // If the previous winner was different AND this is the final match (tournament winner changed),
+        // update tournamentWins and Discord roles
+        if (previousWinnerId && previousWinnerId !== winnerId && tournament.winnerId === previousWinnerId) {
+          // Remove win from old winner + remove Discord role
+          try { await removeTournamentRole(previousWinnerId); } catch { /* ignore */ }
+
+          // Add win to new winner + assign Discord role
+          const newWinnerUser = await prisma.user.update({
+            where: { id: winnerId },
+            data: { tournamentWins: { increment: 1 } },
+          });
+          try { await assignTournamentWinnerRole(winnerId, newWinnerUser.tournamentWins); } catch { /* ignore */ }
+
+          // Update tournament record
+          await prisma.tournament.update({
+            where: { id: tournamentId },
+            data: { winnerId, winnerUsername },
+          });
+        }
+
+        // Un-eliminate the new winner if they were previously eliminated
+        await prisma.tournamentParticipant.updateMany({
+          where: { tournamentId, userId: winnerId },
+          data: { eliminated: false, eliminatedRound: null },
+        });
 
         return NextResponse.json({ success: true, message: `Match winner set to ${winnerUsername}` });
       }
