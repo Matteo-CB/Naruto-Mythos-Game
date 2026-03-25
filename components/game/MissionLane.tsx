@@ -692,10 +692,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
     [myChars],
   );
   const oppPower = useMemo(
-    () => oppChars.reduce((sum, c) => {
-      if (c.isHidden && !c.isOwn) return sum;
-      return sum + c.effectivePower;
-    }, 0),
+    () => oppChars.reduce((sum, c) => sum + c.effectivePower, 0),
     [oppChars],
   );
 
