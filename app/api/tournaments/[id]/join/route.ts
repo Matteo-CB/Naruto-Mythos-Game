@@ -33,9 +33,9 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
     }
 
-    // Private tournament - verify code
-    if (!tournament.isPublic && tournament.joinCode) {
-      if (body.joinCode !== tournament.joinCode) {
+    // Private tournament - verify code (public tournaments skip code check)
+    if (!tournament.isPublic) {
+      if (!body.joinCode || body.joinCode !== tournament.joinCode) {
         return NextResponse.json({ error: 'Invalid join code' }, { status: 403 });
       }
     }
