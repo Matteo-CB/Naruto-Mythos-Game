@@ -60,7 +60,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     const friendlyChars = mission[friendlySide];
 
     const hasSameName = friendlyChars.some(c => {
-      if (c.instanceId === sourceCard.instanceId) return false;
+      if (c.instanceId === sourceCard.instanceId || c.isHidden) return false;
       const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       return top.name_fr === charName;
     });
@@ -77,14 +77,13 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // Confirmation popup before move (mandatory — no skip)
+  // Optional effect — player can decline. But once confirmed, no skip on the move itself.
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'CHOJI018_CONFIRM_UPGRADE',
     validTargets: [sourceCard.instanceId],
-    isOptional: false,
-    isMandatory: true,
+    isOptional: true,
     description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.choji018ConfirmUpgrade',
   };

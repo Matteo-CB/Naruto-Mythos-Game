@@ -2862,7 +2862,7 @@ export class EffectEngine {
           if (mIdx === c018SrcChar.missionIndex) continue;
           const mission = newState.activeMissions[mIdx];
           const hasSameName = mission[c018FriendlySide].some((c: CharacterInPlay) => {
-            if (c.instanceId === pendingEffect.sourceInstanceId) return false;
+            if (c.instanceId === pendingEffect.sourceInstanceId || c.isHidden) return false;
             const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             return top.name_fr === c018CharName;
           });
