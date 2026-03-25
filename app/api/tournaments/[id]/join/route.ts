@@ -70,6 +70,21 @@ export async function POST(
       }
     }
 
+    // Check tournament ban
+    const activeBan = await prisma.userBan.findFirst({
+      where: {
+        userId: session.user.id,
+        type: 'tournament',
+        OR: [
+          { permanent: true },
+          { expiresAt: { gt: new Date() } },
+        ],
+      },
+    });
+    if (activeBan) {
+      return NextResponse.json({ error: 'You are banned from tournaments' }, { status: 403 });
+    }
+
     // Check not already joined
     const existing = await prisma.tournamentParticipant.findUnique({
       where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
