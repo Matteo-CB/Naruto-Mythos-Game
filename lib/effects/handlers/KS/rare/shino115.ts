@@ -5,7 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 /**
  * Card 115/130 - SHINO ABURAME (R/RA)
  * Chakra: 5 | Power: 6
- * Group: Leaf Village | Keywords: Équipe 8, Jutsu
+ * Group: Leaf Village | Keywords: Team 8, Jutsu
  *
  * MAIN [⧗]: Friendly characters in this mission cannot be hidden by enemy effects.
  *   → Continuous effect - implemented in ContinuousEffects.ts via checkCanHideCharacter().
