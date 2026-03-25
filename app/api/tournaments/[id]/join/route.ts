@@ -102,7 +102,8 @@ export async function POST(
     });
 
     return NextResponse.json({ participant }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (err) {
+    console.error('[API] POST /api/tournaments/join error:', err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Internal server error' }, { status: 500 });
   }
 }
