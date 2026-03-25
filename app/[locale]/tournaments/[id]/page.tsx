@@ -77,12 +77,14 @@ export default function TournamentDetailPage() {
 
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [joinError, setJoinError] = useState('');
+  // Discord popup: 'not-linked' | 'not-in-server' | null
+  const [discordPopupType, setDiscordPopupType] = useState<'not-linked' | 'not-in-server' | null>(null);
 
   // Discord status from session
   const userDiscordId = (session?.user as Record<string, unknown>)?.discordId as string | null;
   const hasDiscordLinked = !!userDiscordId;
 
-  const handleJoin = useCallback(async () => {
+  const doJoin = useCallback(async () => {
     if (!tournamentId) return;
     clearError();
     setJoinError('');
@@ -94,6 +96,25 @@ export default function TournamentDetailPage() {
       setJoinError(err instanceof Error ? err.message : 'Failed to join');
     }
   }, [tournamentId, joinTournament, fetchTournament, clearError, joinCodeInput, activeTournament]);
+
+  const handleJoin = useCallback(async () => {
+    if (!hasDiscordLinked) {
+      setDiscordPopupType('not-linked');
+      return;
+    }
+    // Check server membership via API
+    try {
+      const res = await fetch('/api/discord/check-member');
+      const data = await res.json();
+      if (!data.isMember) {
+        setDiscordPopupType('not-in-server');
+        return;
+      }
+    } catch {
+      // If check fails, let them join anyway
+    }
+    doJoin();
+  }, [hasDiscordLinked, doJoin]);
 
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
 
@@ -312,56 +333,79 @@ export default function TournamentDetailPage() {
             <div className="mb-4">
               {!isParticipant ? (
                 <div className="p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-                  {/* Discord requirement check */}
-                  {!hasDiscordLinked ? (
-                    <div className="flex flex-col items-center gap-3 py-4">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '2px solid rgba(88, 101, 242, 0.4)' }}>
-                        <span className="text-lg" style={{ color: '#5865F2' }}>D</span>
-                      </div>
-                      <p className="text-xs text-center" style={{ color: '#aaa' }}>{t('discordRequired')}</p>
-                      <p className="text-xs text-center" style={{ color: '#888' }}>{t('discordNotLinked')}</p>
-                      <Link href={'/settings' as '/'} className="px-5 py-2 text-xs font-medium uppercase tracking-wider transition-colors"
-                        style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '1px solid rgba(88, 101, 242, 0.4)', color: '#5865F2' }}>
-                        {tc('settings')}
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-3">
-                      {/* Private tournament: code input */}
-                      {!tour.isPublic && (
-                        <div className="flex flex-col gap-1.5">
-                          <label className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('enterCode')}</label>
-                          <div className="flex gap-2">
-                            <input type="text" value={joinCodeInput} onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                              placeholder="XXXXXX" maxLength={8}
-                              className="flex-1 px-3 py-2 text-sm font-mono text-center uppercase tracking-widest"
-                              style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#c4a35a' }}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleJoin(); }}
-                            />
+                  {/* Discord recommendation popup */}
+                  {discordPopupType && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setDiscordPopupType(null)}>
+                      <div className="max-w-sm w-full mx-4 p-5" style={{ backgroundColor: '#111', border: '1px solid #333' }} onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '2px solid rgba(88, 101, 242, 0.4)' }}>
+                            <span className="text-lg font-bold" style={{ color: '#5865F2' }}>D</span>
                           </div>
+                          <p className="text-sm font-medium" style={{ color: '#ddd' }}>
+                            {discordPopupType === 'not-linked' ? t('discordPopupTitleNotLinked') : t('discordPopupTitleNotInServer')}
+                          </p>
                         </div>
-                      )}
-
-                      {/* Join button */}
-                      <button onClick={handleJoin}
-                        disabled={tour.participants.length >= tour.maxPlayers || (!tour.isPublic && !joinCodeInput.trim())}
-                        className="w-full px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40"
-                        style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}>
-                        {t('join')}
-                      </button>
-
-                      {/* Join error */}
-                      {joinError && (
-                        <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
-                          {joinError}
+                        <p className="text-xs mb-4 leading-relaxed" style={{ color: '#999' }}>
+                          {discordPopupType === 'not-linked' ? t('discordPopupDescNotLinked') : t('discordPopupDescNotInServer')}
                         </p>
-                      )}
-
-                      {tour.participants.length >= tour.maxPlayers && (
-                        <p className="text-xs text-center" style={{ color: '#888' }}>{t('full')}</p>
-                      )}
+                        <div className="flex flex-col gap-2">
+                          {discordPopupType === 'not-linked' ? (
+                            <Link href={'/settings' as '/'} className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider text-center transition-colors"
+                              style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '1px solid rgba(88, 101, 242, 0.4)', color: '#5865F2' }}>
+                              {t('discordLinkAccount')}
+                            </Link>
+                          ) : (
+                            <a href="https://discord.gg/narutomythos" target="_blank" rel="noopener noreferrer"
+                              className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider text-center transition-colors block"
+                              style={{ backgroundColor: 'rgba(88, 101, 242, 0.15)', border: '1px solid rgba(88, 101, 242, 0.4)', color: '#5865F2' }}>
+                              {t('discordJoinServer')}
+                            </a>
+                          )}
+                          <button onClick={() => { setDiscordPopupType(null); doJoin(); }}
+                            className="w-full px-4 py-2 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
+                            style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.2)', color: '#888' }}>
+                            {t('discordContinueWithout')}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
+
+                  <div className="flex flex-col gap-3">
+                    {/* Private tournament: code input */}
+                    {!tour.isPublic && (
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] uppercase tracking-wider" style={{ color: '#888' }}>{t('enterCode')}</label>
+                        <div className="flex gap-2">
+                          <input type="text" value={joinCodeInput} onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                            placeholder="XXXXXX" maxLength={8}
+                            className="flex-1 px-3 py-2 text-sm font-mono text-center uppercase tracking-widest"
+                            style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#c4a35a' }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleJoin(); }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Join button */}
+                    <button onClick={handleJoin}
+                      disabled={tour.participants.length >= tour.maxPlayers || (!tour.isPublic && !joinCodeInput.trim())}
+                      className="w-full px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors disabled:opacity-40"
+                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.1)', border: '1px solid rgba(196, 163, 90, 0.3)', color: '#c4a35a' }}>
+                      {t('join')}
+                    </button>
+
+                    {/* Join error */}
+                    {joinError && (
+                      <p className="text-xs px-2 py-1.5" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
+                        {joinError}
+                      </p>
+                    )}
+
+                    {tour.participants.length >= tour.maxPlayers && (
+                      <p className="text-xs text-center" style={{ color: '#888' }}>{t('full')}</p>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-3">

@@ -101,6 +101,14 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
   }
 
   const discordId = user.accounts[0].providerAccountId;
+
+  // Verify user is still a member of the Discord server before assigning roles
+  const memberCheck = await isDiscordMember(discordId);
+  if (!memberCheck) {
+    console.warn(`[TournamentRoles] User ${userId} (Discord ${discordId}) is not a server member, skipping role assignment`);
+    return null;
+  }
+
   const newRoleName = getRoleName(tournamentWins);
   if (!newRoleName) return null; // wins 11-49: keep current role, no change
 
@@ -142,6 +150,11 @@ export async function removeTournamentRole(userId: string): Promise<void> {
   if (!user || user.accounts.length === 0) return;
 
   const discordId = user.accounts[0].providerAccountId;
+
+  // Verify user is still a member before modifying roles
+  const memberCheck = await isDiscordMember(discordId);
+  if (!memberCheck) return;
+
   const currentWins = user.tournamentWins ?? 0;
   if (currentWins <= 0) return;
 
