@@ -15719,6 +15719,14 @@ export class EffectEngine {
 
       if (!currentMission || !char || !fromSide || idx === -1) continue;
 
+            // If the stolen card has been upgraded (stack > 1), it stays — the upgrade
+            // merged it with the controller's card, so it's no longer purely stolen
+            if (char.stack && char.stack.length > 1) {
+              // Just clear the controller link, card stays in place
+              char.controllerInstanceId = undefined;
+              continue;
+            }
+
             const toSide = char.originalOwner === 'player1' ? 'player1Characters' : 'player2Characters';
 
             // Check same-name conflict on the destination side (use top-of-stack name for upgraded chars)
