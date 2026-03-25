@@ -1,0 +1,32 @@
+VARIANT CARD DIFFERENCES (same number, different rarity)
+=========================================================
+
+1) #104 - TSUNADE
+   KS-104-R:  keywords: [Sannin, Jutsu]
+   KS-104-RA: keywords: [Sannin]
+   >> RA is missing "Jutsu" keyword
+
+   fix : ces cartes ne devrait pas avoir le keywords Jutsu
+
+2) #108 - NARUTO UZUMAKI
+   KS-108-R:  effect[1] "MAIN effect: POWERUP X where X is the Power of the enemy character..."
+   KS-108-MV: effect[1] "MAIN effect: Powerup X where X is the Power of the enemy character..."
+   >> Casing difference only ("POWERUP" vs "Powerup") - cosmetic
+
+   fix : met POWERUP pour les deux
+
+3) #117 - ROCK LEE
+   KS-117-R:  effect[1] "Discard the top card of your deck: POWERUP X..."
+   KS-117-MV: effect[1] "Reveal and discard the top card of your deck: POWERUP X..."
+   >> MV adds "Reveal and" before "discard"
+
+   fix : met ça pour tous : KS-117-R:  effect[1] "Discard the top card of your deck: POWERUP X..."
+
+4) #128 - ITACHI UCHIWA
+   KS-128-R:  effect[0] = MAIN "[⧗] Every enemy character in this mission has -1 Power."
+              effect[1] = UPGRADE "Move a friendly character in play."
+   KS-128-MV: effect[0] = UPGRADE "Move a friendly character in play."
+              effect[1] = MAIN "[⧗] Every enemy character in this mission has -1 Power."
+   >> Effects are in reversed order (MAIN/UPGRADE swapped)
+
+fix : le main doit etre en premier

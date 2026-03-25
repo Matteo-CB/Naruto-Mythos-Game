@@ -1,7 +1,7 @@
 ================================================================================
 NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT REPORT
 ================================================================================
-Generated: 2026-03-17T19:33:33.674Z
+Generated: 2026-03-25T05:11:00.438Z
 Total Issues Found: 11
 
 --- SUMMARY BY SEVERITY ---
@@ -39,7 +39,7 @@ DETAILED ISSUES
 [CRITICAL] Missing Handler
   Card: KS-108-MV NARUTO UZUMAKI
   Description: No UPGRADE handler for KS-108-MV (NARUTO UZUMAKI)
-  Expected: Handler implementing: MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.
+  Expected: Handler implementing: MAIN effect: POWERUP X where X is the Power of the enemy character that is being hidden.
   Actual: No handler registered
   Rule Reference: Every card effect must be individually coded
 
