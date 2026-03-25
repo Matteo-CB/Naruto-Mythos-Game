@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db/prisma';
 import { startAbsenceTimer, clearAbsenceTimer } from '@/lib/tournament/absenceManager';
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
+import { rooms, type RoomData } from '@/lib/socket/server';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
 
@@ -51,6 +52,43 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         clearAbsenceTimer(matchId);
         matchReadyPlayers.delete(matchId);
         const roomCode = `T-${matchId.slice(-6)}`;
+
+        // Create game room for the tournament match
+        if (!rooms.has(roomCode)) {
+          rooms.set(roomCode, {
+            code: roomCode,
+            hostId: match.player1Id,
+            hostSocket: '',
+            guestId: match.player2Id,
+            guestSocket: null,
+            gameState: null,
+            hostDeck: null,
+            guestDeck: null,
+            isPrivate: true,
+            isRanked: true,
+            isAnonymous: false,
+            gameMode: 'ranked',
+            createdAt: Date.now(),
+            actionTimer: null,
+            timerDeadline: null,
+            disconnectTimer: null,
+            replayInitialState: null,
+            isSealed: false,
+            sealedBoosterCount: 5,
+            sealedTimer: null,
+            sealedDeadline: null,
+            timerEnabled: true,
+            tournamentId,
+            tournamentMatchId: matchId,
+            coinFlipDone: { player1: false, player2: false },
+            spectators: new Map(),
+            hostAllowSpectatorHand: false,
+            guestAllowSpectatorHand: false,
+            chatMessages: [],
+            chatLastCleanup: Date.now(),
+          } as RoomData);
+        }
+
         await prisma.tournamentMatch.update({
           where: { id: matchId },
           data: { status: 'in_progress', roomCode, startedAt: new Date(), absenceDeadline: null, absentPlayerId: null },

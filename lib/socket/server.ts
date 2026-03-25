@@ -12,7 +12,7 @@ import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
 
-interface RoomData {
+export interface RoomData {
   code: string;
   hostId: string;
   hostSocket: string;
@@ -64,7 +64,7 @@ const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
 const DISCONNECT_GRACE_MS = 120_000; // 2 minutes before disconnect = forfeit
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
-const rooms = new Map<string, RoomData>();
+export const rooms = new Map<string, RoomData>();
 const playerRooms = new Map<string, string>(); // socketId -> roomCode
 const userNames = new Map<string, string>(); // userId -> username (populated on auth:register)
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
