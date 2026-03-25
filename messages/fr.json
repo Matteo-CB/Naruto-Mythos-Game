@@ -2450,7 +2450,7 @@
     "deckInvalid": "Le deck ne respecte pas les regles du tournoi",
     "deckErrors": "Erreurs du deck",
     "changeDeck": "Changer de deck",
-    "noDeckWarning": "Selectionnez un deck ou vous serez disqualifie",
+    "noDeckWarning": "Aucun deck enregistre. Creez-en un dans le constructeur de deck, puis revenez le selectionner.",
     "rulesTitle": "Regles du tournoi",
     "rulesFormat": "Format : Elimination directe (bracket)",
     "rulesClassic": "Classique : Amenez votre propre deck (30+ cartes, 3 missions)",
@@ -2462,6 +2462,7 @@
     "rulesEdge": "En cas d'egalite, le detenteur du jeton Edge gagne",
     "restrictions": "Restrictions",
     "noRestrictions": "Aucune restriction supplementaire",
+    "maxCopies": "Copies max par carte",
     "share": "Partager",
     "copied": "Copie"
   },
