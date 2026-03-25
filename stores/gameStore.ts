@@ -519,7 +519,7 @@ function buildPendingTargetSelectionUI(
         };
       });
     } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-      let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean; cardId?: string }> = [];
+      let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean; cardId?: string; image_file?: string }> = [];
       let storedCards: any[] = [];
       try {
         const parsed = JSON.parse(pendingEffect?.effectDescription ?? '{}');
@@ -531,12 +531,14 @@ function buildPendingTargetSelectionUI(
         // Use storedCards (full card data from server) if available
         const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-        return {
-          index: idx,
-          card: storedCard ? fullCardData(storedCard) : info ? {
-            name_fr: info.name, chakra: info.chakra, power: info.power,
-          } : { name_fr: '???' },
-        };
+        const cardData = storedCard ? fullCardData(storedCard) : info ? {
+          name_fr: info.name, chakra: info.chakra, power: info.power, image_file: info.image_file,
+        } : { name_fr: '???' };
+        // Ensure image_file from topCards if storedCard lost it in serialization
+        if (cardData && !cardData.image_file && info?.image_file) {
+          (cardData as any).image_file = info.image_file;
+        }
+        return { index: idx, card: cardData };
       });
     } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
       handCards = pendingAction.options.map((amountStr) => {
