@@ -114,7 +114,10 @@ export default function Home() {
 
   // Tournament notification state
   const [tournamentStatus, setTournamentStatus] = useState<'none' | 'registration' | 'in_progress'>('none');
+  const [tournamentNeedsDeck, setTournamentNeedsDeck] = useState(false);
   useEffect(() => {
+    if (!session?.user) return;
+    const myId = (session.user as { id?: string })?.id;
     fetch('/api/tournaments?type=simulator')
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
@@ -123,9 +126,16 @@ export default function Home() {
         const reg = data.tournaments.find((t: { status: string }) => t.status === 'registration');
         if (reg) setTournamentStatus('registration');
         else if (active) setTournamentStatus('in_progress');
+        // Check if user is in a registration tournament without a valid deck
+        if (reg && myId) {
+          const myPart = reg.participants?.find((p: { userId: string }) => p.userId === myId);
+          if (myPart && !(myPart as any).deckValid && reg.gameMode !== 'sealed') {
+            setTournamentNeedsDeck(true);
+          }
+        }
       })
       .catch(() => {});
-  }, []);
+  }, [session]);
 
   const titleText = t('title');
   const titleLetters = titleText.split('');
@@ -330,23 +340,27 @@ export default function Home() {
                     />
                     {t(btn.key)}
                     {/* Tournament notification dot */}
-                    {btn.key === 'tournaments' && tournamentStatus !== 'none' && (
+                    {btn.key === 'tournaments' && (tournamentStatus !== 'none' || tournamentNeedsDeck) && (
                       <span className="relative ml-2 flex items-center justify-center">
                         <span
                           className="absolute inline-flex h-3 w-3 animate-ping rounded-full opacity-60"
                           style={{
-                            backgroundColor: tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
+                            backgroundColor: tournamentNeedsDeck ? '#ef4444' : tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
                           }}
                         />
                         <span
-                          className="relative inline-flex h-2.5 w-2.5 rounded-full"
+                          className="relative inline-flex h-2.5 w-2.5 rounded-full items-center justify-center"
                           style={{
-                            backgroundColor: tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
-                            boxShadow: tournamentStatus === 'registration'
-                              ? '0 0 8px rgba(239, 68, 68, 0.6), 0 0 20px rgba(239, 68, 68, 0.3)'
-                              : '0 0 8px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.3)',
+                            backgroundColor: tournamentNeedsDeck ? '#ef4444' : tournamentStatus === 'registration' ? '#ef4444' : '#3b82f6',
+                            boxShadow: tournamentNeedsDeck
+                              ? '0 0 8px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.4)'
+                              : tournamentStatus === 'registration'
+                                ? '0 0 8px rgba(239, 68, 68, 0.6), 0 0 20px rgba(239, 68, 68, 0.3)'
+                                : '0 0 8px rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.3)',
                           }}
-                        />
+                        >
+                          {tournamentNeedsDeck && <span className="text-[6px] font-black" style={{ color: '#fff' }}>!</span>}
+                        </span>
                       </span>
                     )}
                   </Link>

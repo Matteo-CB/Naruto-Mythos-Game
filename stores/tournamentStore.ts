@@ -70,6 +70,7 @@ interface TournamentStore {
   createTournament: (data: CreateTournamentInput) => Promise<string>;
   startTournament: (id: string) => Promise<void>;
   forfeitMatch: (tournamentId: string, matchId: string, forfeitPlayerId: string) => Promise<void>;
+  selectDeck: (tournamentId: string, deckId: string) => Promise<{ valid: boolean; errors: string[] }>;
   handleTournamentUpdate: (data: Partial<TournamentData> & { id?: string }) => void;
   handleMatchUpdate: (data: Partial<TournamentMatch> & { matchId: string }) => void;
   handleTournamentComplete: (data: { winnerId: string; winnerUsername: string }) => void;
@@ -81,7 +82,7 @@ interface TournamentStore {
 export interface CreateTournamentInput {
   name: string;
   type: 'simulator';
-  gameMode: 'classic' | 'sealed';
+  gameMode: 'classic' | 'sealed' | 'restricted';
   maxPlayers: number;
   isPublic: boolean;
   useBanList: boolean;
@@ -89,6 +90,19 @@ export interface CreateTournamentInput {
   bannedCardIds?: string[];
   allowedLeagues?: string[];
   scheduledStartAt?: string;
+  // Restricted mode
+  allowedGroups?: string[];
+  bannedGroups?: string[];
+  allowedKeywords?: string[];
+  bannedKeywords?: string[];
+  allowedRarities?: string[];
+  bannedRarities?: string[];
+  maxPerRarity?: Record<string, number>;
+  maxCopiesPerCard?: number;
+  minDeckSize?: number;
+  maxDeckSize?: number;
+  maxChakraCost?: number;
+  restrictionNote?: string;
 }
 
 export const useTournamentStore = create<TournamentStore>()((set, get) => ({
@@ -170,6 +184,17 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
     });
     if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Forfeit failed'); }
     await get().fetchTournament(tournamentId);
+  },
+
+  selectDeck: async (tournamentId, deckId) => {
+    const res = await fetch(`/api/tournaments/${tournamentId}/select-deck`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deckId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Deck selection failed');
+    await get().fetchTournament(tournamentId);
+    return { valid: data.deckValid, errors: data.errors ?? [] };
   },
 
   handleTournamentUpdate: (data) => {

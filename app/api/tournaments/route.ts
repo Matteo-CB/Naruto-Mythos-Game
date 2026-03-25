@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       where,
       orderBy: { createdAt: 'desc' },
       include: {
-        participants: { select: { id: true, userId: true, username: true } },
+        participants: { select: { id: true, userId: true, username: true, deckId: true, deckValid: true } },
         _count: { select: { participants: true, matches: true } },
       },
     });
@@ -53,6 +53,11 @@ export async function POST(req: NextRequest) {
       name, gameMode, maxPlayers, isPublic,
       useBanList, sealedBoosterCount,
       bannedCardIds, allowedLeagues, scheduledStartAt,
+      // Restricted mode fields
+      allowedGroups, bannedGroups, allowedKeywords, bannedKeywords,
+      allowedRarities, bannedRarities, maxPerRarity,
+      maxCopiesPerCard, minDeckSize, maxDeckSize, maxChakraCost,
+      restrictionNote,
     } = body;
     const type = 'simulator'; // Only simulator tournaments
 
@@ -99,6 +104,19 @@ export async function POST(req: NextRequest) {
         sealedBoosterCount: gameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
+        // Restricted mode constraints
+        allowedGroups: Array.isArray(allowedGroups) ? allowedGroups : [],
+        bannedGroups: Array.isArray(bannedGroups) ? bannedGroups : [],
+        allowedKeywords: Array.isArray(allowedKeywords) ? allowedKeywords : [],
+        bannedKeywords: Array.isArray(bannedKeywords) ? bannedKeywords : [],
+        allowedRarities: Array.isArray(allowedRarities) ? allowedRarities : [],
+        bannedRarities: Array.isArray(bannedRarities) ? bannedRarities : [],
+        maxPerRarity: maxPerRarity ?? null,
+        maxCopiesPerCard: typeof maxCopiesPerCard === 'number' ? maxCopiesPerCard : null,
+        minDeckSize: typeof minDeckSize === 'number' ? minDeckSize : null,
+        maxDeckSize: typeof maxDeckSize === 'number' ? maxDeckSize : null,
+        maxChakraCost: typeof maxChakraCost === 'number' ? maxChakraCost : null,
+        restrictionNote: typeof restrictionNote === 'string' ? restrictionNote.trim() : null,
         scheduledStartAt: scheduledStartAt ? new Date(scheduledStartAt) : null,
       },
     });
