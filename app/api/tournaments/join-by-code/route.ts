@@ -32,16 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
     }
 
-    // Simulator tournaments require Discord
-    if (tournament.requiresDiscord) {
-      const user = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { discordId: true },
-      });
-      if (!user?.discordId) {
-        return NextResponse.json({ error: 'Discord account required' }, { status: 400 });
-      }
-    }
+    // Discord is recommended but not required — joining is always allowed
 
     // Check not already joined
     const existing = await prisma.tournamentParticipant.findUnique({

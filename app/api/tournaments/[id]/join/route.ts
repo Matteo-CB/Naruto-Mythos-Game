@@ -46,17 +46,7 @@ export async function POST(
       select: { username: true, discordId: true, elo: true },
     });
 
-    // Tournaments require Discord link + server membership
-    if (tournament.requiresDiscord) {
-      if (!user?.discordId) {
-        return NextResponse.json({ error: 'Discord account required. Link your Discord in settings.' }, { status: 400 });
-      }
-      // Verify the user is a member of the Discord server
-      const isMember = await isDiscordMember(user.discordId);
-      if (!isMember) {
-        return NextResponse.json({ error: 'You must join the Discord server to participate in tournaments.' }, { status: 400 });
-      }
-    }
+    // Discord is recommended but not required — joining is always allowed
 
     // League restriction check (simulator tournaments only)
     if (
