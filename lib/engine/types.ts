@@ -170,6 +170,18 @@ export interface GameState {
     chooser: PlayerID;
     count: number;
   };
+  /** Deferred continuation: remaining effect types from a newly played card,
+   *  stored here so that reactions from existing cards resolve first.
+   *  Processed by GameEngine when all other pendings clear. */
+  pendingContinuation?: {
+    sourceCardId: string;
+    sourceInstanceId: string;
+    sourceMissionIndex: number;
+    sourcePlayer: PlayerID;
+    remainingEffectTypes: EffectType[];
+    isUpgrade: boolean;
+    wasRevealed: boolean;
+  };
   /** Consecutive timeout count per player (online timer) */
   consecutiveTimeouts: { player1: number; player2: number };
   /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).

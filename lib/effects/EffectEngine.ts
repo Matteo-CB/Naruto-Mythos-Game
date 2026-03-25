@@ -14828,7 +14828,24 @@ export class EffectEngine {
 
     // Process remaining effects (continuation) if any
     if (pendingEffect.remainingEffectTypes && pendingEffect.remainingEffectTypes.length > 0) {
-      newState = EffectEngine.processRemainingEffects(newState, pendingEffect);
+      // If other pendings exist (reactions from existing cards, e.g. on-move triggers),
+      // defer remaining effects so existing cards resolve first (rule priority).
+      const hasOtherPendings = newState.pendingEffects.length > 0 || newState.pendingActions.length > 0;
+      if (hasOtherPendings) {
+        // Store continuation on state — GameEngine will fire it after reactions resolve
+        newState.pendingContinuation = {
+          sourceCardId: pendingEffect.sourceCardId,
+          sourceInstanceId: pendingEffect.sourceInstanceId,
+          sourceMissionIndex: pendingEffect.sourceMissionIndex,
+          sourcePlayer: pendingEffect.sourcePlayer,
+          remainingEffectTypes: [...pendingEffect.remainingEffectTypes],
+          isUpgrade: pendingEffect.isUpgrade,
+          wasRevealed: pendingEffect.wasRevealed ?? false,
+        };
+      } else {
+        // No reactions — chain immediately (same as before)
+        newState = EffectEngine.processRemainingEffects(newState, pendingEffect);
+      }
     }
 
     return newState;
