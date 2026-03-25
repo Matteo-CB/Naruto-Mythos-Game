@@ -196,7 +196,6 @@ export class GameEngine {
           if (newState.pendingContinuation && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const cont = newState.pendingContinuation;
             newState.pendingContinuation = undefined;
-            // Build a synthetic resolved pending to feed processRemainingEffects
             const syntheticPending: PendingEffect = {
               id: '', sourceCardId: cont.sourceCardId,
               sourceInstanceId: cont.sourceInstanceId,
@@ -210,6 +209,20 @@ export class GameEngine {
               remainingEffectTypes: cont.remainingEffectTypes,
             };
             newState = EffectEngine.processRemainingEffects(newState, syntheticPending);
+            // If continuation created new pendings, wait for them to resolve
+            if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) break;
+            // Otherwise fall through to turn alternation below
+          }
+
+          // Check for another continuation or reorder that appeared
+          if (newState.pendingDiscardReorder && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
+            const pdr2 = newState.pendingDiscardReorder;
+            newState.pendingDiscardReorder = undefined;
+            const effectSource2 = pdr2.chooser === pdr2.discardOwner
+              ? (pdr2.discardOwner === 'player1' ? 'player2' : 'player1')
+              : pdr2.chooser;
+            const selectingOverride2 = pdr2.chooser === pdr2.discardOwner ? pdr2.chooser : undefined;
+            newState = EffectEngine.createReorderDiscardPending(newState, pdr2.discardOwner, effectSource2, pdr2.count, selectingOverride2);
             break;
           }
 
