@@ -55,8 +55,11 @@ export default function TournamentDetailPage() {
     const onM = (d: Parameters<typeof handleMatchUpdate>[0]) => handleMatchUpdate(d);
     const onC = (d: Parameters<typeof handleTournamentComplete>[0]) => handleTournamentComplete(d);
     const onR = (d: Parameters<typeof handleRoundComplete>[0]) => handleRoundComplete(d);
-    socket.on('tournament:update', onU); socket.on('tournament:match-update', onM); socket.on('tournament:complete', onC); socket.on('tournament:round-complete', onR);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-update', onM); socket.off('tournament:complete', onC); socket.off('tournament:round-complete', onR); };
+    const onF = (d: { matchId: string; forfeitedPlayerId: string; winnerId: string; winnerUsername: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'forfeit', winnerId: d.winnerId, winnerUsername: d.winnerUsername } as any); };
+    const onMR = (d: { matchId: string; roomCode: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'in_progress', roomCode: d.roomCode } as any); fetchTournament(tournamentId); };
+    socket.on('tournament:update', onU); socket.on('tournament:match-updated', onM); socket.on('tournament:completed', onC); socket.on('tournament:round-complete', onR);
+    socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); };
   }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete]);
 
   // Fetch user's decks for deck selection
@@ -74,6 +77,19 @@ export default function TournamentDetailPage() {
 
   const handleJoin = useCallback(async () => { if (!tournamentId) return; clearError(); try { await joinTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, joinTournament, fetchTournament, clearError]);
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
+
+  // Auto-emit tournament:ready when player has an active match
+  useEffect(() => {
+    if (!socket || !tournamentId || !userId || !myMatch) return;
+    if (myMatch.status === 'ready' || myMatch.status === 'pending') {
+      socket.emit('tournament:ready', { tournamentId, matchId: myMatch.id, userId });
+    }
+  }, [socket, tournamentId, userId, myMatch]);
+
+  const handlePlayMatch = useCallback(() => {
+    if (!socket || !tournamentId || !userId || !myMatch) return;
+    socket.emit('tournament:ready', { tournamentId, matchId: myMatch.id, userId });
+  }, [socket, tournamentId, userId, myMatch]);
 
   const handleSelectDeck = useCallback(async (deckId: string) => {
     if (!tournamentId) return;
@@ -295,7 +311,7 @@ export default function TournamentDetailPage() {
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>
                 <p className="text-xs mb-3" style={{ color: '#e0e0e0' }}>{myMatch.player1Username ?? t('tbd')} vs {myMatch.player2Username ?? t('tbd')}</p>
                 {myMatch.status === 'ready' && myMatch.roomCode && (
-                  <Link href={('/play/online?code=' + myMatch.roomCode) as '/'} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
+                  <Link href={('/play/online?code=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
                 )}
                 {myMatch.status === 'pending' && <p className="text-xs" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>}
               </div>

@@ -43,8 +43,22 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament already started or completed' }, { status: 400 });
     }
 
+    // Disqualify players without valid decks (non-sealed tournaments)
+    if (tournament.gameMode !== 'sealed') {
+      const invalidPlayers = tournament.participants.filter(p => !p.deckValid || !p.deckId);
+      for (const p of invalidPlayers) {
+        await prisma.tournamentParticipant.update({
+          where: { id: p.id },
+          data: { eliminated: true, eliminatedRound: 0 },
+        });
+      }
+      // Re-fetch participants after disqualification
+      const validParticipants = tournament.participants.filter(p => p.deckValid && p.deckId);
+      tournament.participants = validParticipants;
+    }
+
     if (tournament.participants.length < 2) {
-      return NextResponse.json({ error: 'Need at least 2 players' }, { status: 400 });
+      return NextResponse.json({ error: 'Need at least 2 players with valid decks' }, { status: 400 });
     }
 
     // Check if manual seeds were assigned (via the pairings API)
