@@ -11368,14 +11368,8 @@ export class EffectEngine {
           break;
         }
 
-        // Store top 3 in discard pile as temporary storage (sakura135ChooseCard retrieves them)
-        newState = {
-          ...newState,
-          [s135Player]: {
-            ...newState[s135Player],
-            discardPile: [...newState[s135Player].discardPile, ...s135Top3],
-          },
-        };
+        // Store top 3 cards in a temp field on state (NOT in discard pile — avoids index desync)
+        (newState as any)._sakura135DrawnCards = s135Top3;
 
         // Build indices of affordable cards within the top3 array
         {
@@ -11393,7 +11387,10 @@ export class EffectEngine {
             effectDescription: JSON.stringify({
               topCards: s135Top3.map((c, i) => ({
                 index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
+                cardId: c.id,
               })),
+              // Store the actual card data so sakura135ChooseCard can recover them reliably
+              storedCards: s135Top3,
               costReduction: s135CostReduction,
             }),
             targetSelectionType: 'SAKURA135_CHOOSE_CARD',
@@ -18189,25 +18186,35 @@ export class EffectEngine {
     const player = pending.sourcePlayer;
     const ps = newState[player];
 
-    // The handler drew top 3 from deck and stored them at the end of the discard pile.
-    // The description JSON has card info + costReduction.
     let costReduction = 0;
-    try { costReduction = JSON.parse(pending.effectDescription).costReduction ?? 0; } catch { /* ignore */ }
+    let storedCards: any[] = [];
+    try {
+      const parsed = JSON.parse(pending.effectDescription);
+      costReduction = parsed.costReduction ?? 0;
+      storedCards = parsed.storedCards ?? [];
+    } catch { /* ignore */ }
 
-    // Recover drawn cards from end of discard pile using info from description.
-    let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
-    try { topCardsInfo = JSON.parse(pending.effectDescription).topCards ?? []; } catch { /* ignore */ }
+    // Recover drawn cards from storedCards in description (reliable, not affected by discard pile changes)
+    // Fallback: try _sakura135DrawnCards temp field, then discard pile (legacy)
+    let drawnCards: any[] = storedCards;
+    if (drawnCards.length === 0) {
+      drawnCards = (newState as any)._sakura135DrawnCards ?? [];
+      delete (newState as any)._sakura135DrawnCards;
+    }
+    if (drawnCards.length === 0) {
+      // Legacy fallback: read from discard pile
+      let topCardsInfo: any[] = [];
+      try { topCardsInfo = JSON.parse(pending.effectDescription).topCards ?? []; } catch { /* ignore */ }
+      const numDrawn = topCardsInfo.length;
+      if (numDrawn > 0) {
+        drawnCards = ps.discardPile.splice(ps.discardPile.length - numDrawn, numDrawn);
+      }
+    }
 
-    const numDrawn = topCardsInfo.length;
-    if (numDrawn === 0 || cardIndex < 0 || cardIndex >= numDrawn) return state;
-
-    // The drawn cards are stored at the end of the discard pile
-    const drawnCards = ps.discardPile.splice(ps.discardPile.length - numDrawn, numDrawn);
-
-    if (cardIndex >= drawnCards.length) return state;
+    if (cardIndex < 0 || cardIndex >= drawnCards.length) return state;
 
     const chosenCard = drawnCards[cardIndex];
-    const otherCards = drawnCards.filter((_, i) => i !== cardIndex);
+    const otherCards = drawnCards.filter((_: any, i: number) => i !== cardIndex);
 
     // Store chosen card FIRST (before discards) so it's not affected by reorder
     ps.discardPile.push(chosenCard);
