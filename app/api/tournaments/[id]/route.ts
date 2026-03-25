@@ -27,6 +27,7 @@ export async function GET(
           select: {
             id: true, userId: true, username: true,
             seed: true, eliminated: true, eliminatedRound: true, hasBye: true,
+            deckId: true, deckValid: true,
           },
         },
         matches: {

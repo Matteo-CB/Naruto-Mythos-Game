@@ -183,6 +183,19 @@ model Tournament {
   discordRoleBadge   String?
   bannedCardIds      String[]                @default([])
   allowedLeagues     String[]                @default([])
+  // Restricted mode constraints (gameMode = "restricted")
+  allowedGroups      String[]                @default([])  // e.g. ["Leaf Village","Sand Village"] — empty = all allowed
+  bannedGroups       String[]                @default([])  // e.g. ["Akatsuki"]
+  allowedKeywords    String[]                @default([])  // e.g. ["Team 7"] — empty = all allowed
+  bannedKeywords     String[]                @default([])  // e.g. ["Summon","Rogue Ninja"]
+  allowedRarities    String[]                @default([])  // e.g. ["C","UC","R"] — empty = all allowed
+  bannedRarities     String[]                @default([])  // e.g. ["S","M"]
+  maxPerRarity       Json?                                 // e.g. {"R":4,"S":2} — max cards per rarity
+  maxCopiesPerCard   Int?                                  // override default 2 copies limit
+  minDeckSize        Int?                                  // override default 30
+  maxDeckSize        Int?                                  // optional max deck size
+  maxChakraCost      Int?                                  // max individual card chakra cost
+  restrictionNote    String?                               // free-text note shown to players
   scheduledStartAt   DateTime?
   matchTimeLimitMs   Int                     @default(1800000)
   joinTimeLimitMs    Int                     @default(300000)
@@ -207,6 +220,8 @@ model TournamentParticipant {
   hasBye          Boolean    @default(false)
   sealedPool      Json?
   sealedDeck      Json?
+  deckId          String?    @db.ObjectId      // Selected deck for classic/restricted modes
+  deckValid       Boolean    @default(false)   // Whether selected deck passes tournament rules
   joinedAt        DateTime   @default(now())
 
   @@unique([tournamentId, userId])

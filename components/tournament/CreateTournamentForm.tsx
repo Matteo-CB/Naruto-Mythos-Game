@@ -16,7 +16,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const { createTournament } = useTournamentStore();
 
   const [name, setName] = useState('');
-  const [gameMode, setGameMode] = useState<'classic' | 'sealed'>('classic');
+  const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted'>('classic');
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPublic, setIsPublic] = useState(true);
   const [useBanList, setUseBanList] = useState(true);
@@ -26,6 +26,24 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const [scheduledTime, setScheduledTime] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // Restricted mode state
+  const [allowedGroups, setAllowedGroups] = useState<string[]>([]);
+  const [bannedGroups, setBannedGroups] = useState<string[]>([]);
+  const [allowedKeywords, setAllowedKeywords] = useState<string[]>([]);
+  const [bannedKeywords, setBannedKeywords] = useState<string[]>([]);
+  const [allowedRarities, setAllowedRarities] = useState<string[]>([]);
+  const [bannedRarities, setBannedRarities] = useState<string[]>([]);
+  const [maxPerRarity, setMaxPerRarity] = useState<Record<string, string>>({});
+  const [maxCopiesPerCard, setMaxCopiesPerCard] = useState('');
+  const [minDeckSize, setMinDeckSize] = useState('');
+  const [maxDeckSize, setMaxDeckSize] = useState('');
+  const [maxChakraCost, setMaxChakraCost] = useState('');
+  const [restrictionNote, setRestrictionNote] = useState('');
+  const [bannedCardIds, setBannedCardIds] = useState('');
+
+  const ALL_GROUPS = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
+  const ALL_KEYWORDS = ['Team 7', 'Team 8', 'Team 10', 'Team Gai', 'Team Baki', 'Sannin', 'Jutsu', 'Summon', 'Rogue Ninja', 'Sound Four'];
+  const ALL_RARITIES = ['C', 'UC', 'R', 'RA', 'S', 'M'];
 
   if (!isAdmin) return null;
 
@@ -39,6 +57,12 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         scheduledStartAt = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
       }
 
+      const parsedMaxPerRarity: Record<string, number> = {};
+      for (const [k, v] of Object.entries(maxPerRarity)) {
+        const n = parseInt(v, 10);
+        if (!isNaN(n) && n >= 0) parsedMaxPerRarity[k] = n;
+      }
+
       const input: CreateTournamentInput = {
         name: name.trim(),
         type: 'simulator',
@@ -49,6 +73,21 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         ...(gameMode === 'sealed' ? { sealedBoosterCount: sealedBoosters } : {}),
         ...(allowedLeagues.length > 0 ? { allowedLeagues } : {}),
         ...(scheduledStartAt ? { scheduledStartAt } : {}),
+        ...(bannedCardIds.trim() ? { bannedCardIds: bannedCardIds.split(',').map(s => s.trim()).filter(Boolean) } : {}),
+        ...(gameMode === 'restricted' ? {
+          ...(allowedGroups.length > 0 ? { allowedGroups } : {}),
+          ...(bannedGroups.length > 0 ? { bannedGroups } : {}),
+          ...(allowedKeywords.length > 0 ? { allowedKeywords } : {}),
+          ...(bannedKeywords.length > 0 ? { bannedKeywords } : {}),
+          ...(allowedRarities.length > 0 ? { allowedRarities } : {}),
+          ...(bannedRarities.length > 0 ? { bannedRarities } : {}),
+          ...(Object.keys(parsedMaxPerRarity).length > 0 ? { maxPerRarity: parsedMaxPerRarity } : {}),
+          ...(maxCopiesPerCard ? { maxCopiesPerCard: parseInt(maxCopiesPerCard, 10) } : {}),
+          ...(minDeckSize ? { minDeckSize: parseInt(minDeckSize, 10) } : {}),
+          ...(maxDeckSize ? { maxDeckSize: parseInt(maxDeckSize, 10) } : {}),
+          ...(maxChakraCost ? { maxChakraCost: parseInt(maxChakraCost, 10) } : {}),
+          ...(restrictionNote.trim() ? { restrictionNote: restrictionNote.trim() } : {}),
+        } : {}),
       };
       const id = await createTournament(input);
       router.push(`/tournaments/${id}`);
@@ -83,6 +122,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
         <div className="flex gap-2">
           <ToggleBtn val="classic" cur={gameMode} onClick={() => setGameMode('classic')}>{t('modeClassic')}</ToggleBtn>
           <ToggleBtn val="sealed" cur={gameMode} onClick={() => setGameMode('sealed')}>{t('modeSealed')}</ToggleBtn>
+          <ToggleBtn val="restricted" cur={gameMode} onClick={() => setGameMode('restricted')}>{t('modeRestricted')}</ToggleBtn>
         </div>
       </div>
 
@@ -93,6 +133,142 @@ export function CreateTournamentForm({ isAdmin }: Props) {
             {([4, 5, 6] as const).map(v => (
               <ToggleBtn key={v} val={String(v)} cur={String(sealedBoosters)} onClick={() => setSealedBoosters(v)}>{v}</ToggleBtn>
             ))}
+          </div>
+        </div>
+      )}
+
+      {gameMode === 'restricted' && (
+        <div className="flex flex-col gap-3 p-4" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333', borderLeft: '3px solid #c4a35a' }}>
+          <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#c4a35a' }}>{t('restrictedSettings')}</h3>
+
+          {/* Allowed Groups */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('allowedGroups')}</label>
+            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedGroupsHint')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_GROUPS.map(g => {
+                const sel = allowedGroups.includes(g);
+                return <button key={g} type="button" onClick={() => setAllowedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{g}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Banned Groups */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('bannedGroups')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_GROUPS.map(g => {
+                const sel = bannedGroups.includes(g);
+                return <button key={g} type="button" onClick={() => setBannedGroups(prev => sel ? prev.filter(x => x !== g) : [...prev, g])}
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{g}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Allowed Keywords */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('allowedKeywords')}</label>
+            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedKeywordsHint')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_KEYWORDS.map(kw => {
+                const sel = allowedKeywords.includes(kw);
+                return <button key={kw} type="button" onClick={() => setAllowedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{kw}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Banned Keywords */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('bannedKeywords')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_KEYWORDS.map(kw => {
+                const sel = bannedKeywords.includes(kw);
+                return <button key={kw} type="button" onClick={() => setBannedKeywords(prev => sel ? prev.filter(x => x !== kw) : [...prev, kw])}
+                  className="px-2 py-1 text-[10px] cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{kw}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Allowed Rarities */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('allowedRarities')}</label>
+            <p className="text-[10px]" style={{ color: '#555' }}>{t('allowedRaritiesHint')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_RARITIES.map(r => {
+                const sel = allowedRarities.includes(r);
+                return <button key={r} type="button" onClick={() => setAllowedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#1a3a1a' : '#1a1a1a', color: sel ? '#4ade80' : '#666', border: `1px solid ${sel ? '#4ade80' : '#333'}` }}>{r}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Banned Rarities */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('bannedRarities')}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_RARITIES.map(r => {
+                const sel = bannedRarities.includes(r);
+                return <button key={r} type="button" onClick={() => setBannedRarities(prev => sel ? prev.filter(x => x !== r) : [...prev, r])}
+                  className="px-2 py-1 text-[10px] font-bold cursor-pointer" style={{ backgroundColor: sel ? '#3a1a1a' : '#1a1a1a', color: sel ? '#f87171' : '#666', border: `1px solid ${sel ? '#f87171' : '#333'}` }}>{r}</button>;
+              })}
+            </div>
+          </div>
+
+          {/* Max per Rarity */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('maxPerRarity')}</label>
+            <p className="text-[10px]" style={{ color: '#555' }}>{t('maxPerRarityHint')}</p>
+            <div className="flex flex-wrap gap-2">
+              {ALL_RARITIES.map(r => (
+                <div key={r} className="flex items-center gap-1">
+                  <span className="text-[10px] font-bold" style={{ color: '#888' }}>{r}:</span>
+                  <input type="number" min="0" max="30" value={maxPerRarity[r] ?? ''} placeholder="-"
+                    onChange={(e) => setMaxPerRarity(prev => ({ ...prev, [r]: e.target.value }))}
+                    className="w-10 text-center text-[10px]" style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#e0e0e0', padding: '2px' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Numeric constraints */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1">
+              <label style={labelStyle}>{t('maxCopiesPerCard')}</label>
+              <input type="number" min="1" max="10" value={maxCopiesPerCard} onChange={(e) => setMaxCopiesPerCard(e.target.value)}
+                placeholder="2" style={{ ...inputStyle, padding: '4px 8px' }} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label style={labelStyle}>{t('maxChakraCostLabel')}</label>
+              <input type="number" min="1" max="10" value={maxChakraCost} onChange={(e) => setMaxChakraCost(e.target.value)}
+                placeholder="-" style={{ ...inputStyle, padding: '4px 8px' }} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label style={labelStyle}>{t('minDeckSizeLabel')}</label>
+              <input type="number" min="10" max="60" value={minDeckSize} onChange={(e) => setMinDeckSize(e.target.value)}
+                placeholder="30" style={{ ...inputStyle, padding: '4px 8px' }} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label style={labelStyle}>{t('maxDeckSizeLabel')}</label>
+              <input type="number" min="10" max="60" value={maxDeckSize} onChange={(e) => setMaxDeckSize(e.target.value)}
+                placeholder="-" style={{ ...inputStyle, padding: '4px 8px' }} />
+            </div>
+          </div>
+
+          {/* Banned Card IDs */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('bannedCards')}</label>
+            <input type="text" value={bannedCardIds} onChange={(e) => setBannedCardIds(e.target.value)}
+              placeholder="KS-133-S, KS-143-M, ..." style={{ ...inputStyle, padding: '4px 8px', fontSize: '11px' }} />
+          </div>
+
+          {/* Restriction Note */}
+          <div className="flex flex-col gap-1">
+            <label style={labelStyle}>{t('restrictionNote')}</label>
+            <textarea value={restrictionNote} onChange={(e) => setRestrictionNote(e.target.value)}
+              placeholder={t('restrictionNotePlaceholder')} rows={2}
+              style={{ ...inputStyle, padding: '6px 8px', fontSize: '11px', resize: 'vertical' }} />
           </div>
         </div>
       )}

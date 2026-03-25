@@ -16,7 +16,7 @@ import { TournamentResults } from '@/components/tournament/TournamentResults';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { useSettingsStore } from '@/stores/settingsStore';
-import type { TournamentMatch } from '@/stores/tournamentStore';
+import type { TournamentMatch, TournamentData } from '@/stores/tournamentStore';
 import { LEAGUE_TIERS, getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
@@ -31,9 +31,14 @@ export default function TournamentDetailPage() {
   const { data: session, status } = useSession();
   const { animationsEnabled } = useSettingsStore();
   const { socket } = useSocketStore();
-  const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, clearError } = useTournamentStore();
+  const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, clearError } = useTournamentStore();
 
   const userId = (session?.user as { id?: string })?.id;
+  const [myDecks, setMyDecks] = useState<Array<{ id: string; name: string }>>([]);
+  const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
+  const [deckErrors, setDeckErrors] = useState<string[]>([]);
+  const [deckLoading, setDeckLoading] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const isAdmin = ADMIN_EMAILS.includes(session?.user?.email ?? '') || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
   const isCreator = activeTournament?.creatorId === userId;
   const isParticipant = activeTournament?.participants.some((p) => p.userId === userId);
@@ -54,8 +59,44 @@ export default function TournamentDetailPage() {
     return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-update', onM); socket.off('tournament:complete', onC); socket.off('tournament:round-complete', onR); };
   }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete]);
 
+  // Fetch user's decks for deck selection
+  useEffect(() => {
+    if (!session?.user || !activeTournament || activeTournament.gameMode === 'sealed') return;
+    fetch('/api/decks').then(r => r.ok ? r.json() : null).then(data => {
+      if (data?.decks) setMyDecks(data.decks.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })));
+    }).catch(() => {});
+    // Check if participant already has a deck selected
+    const myParticipant = activeTournament.participants.find(p => p.userId === userId);
+    if (myParticipant && (myParticipant as any).deckId) {
+      setSelectedDeckId((myParticipant as any).deckId);
+    }
+  }, [session, activeTournament, userId]);
+
   const handleJoin = useCallback(async () => { if (!tournamentId) return; clearError(); try { await joinTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, joinTournament, fetchTournament, clearError]);
   const handleLeave = useCallback(async () => { if (!tournamentId) return; clearError(); try { await leaveTournament(tournamentId); fetchTournament(tournamentId); } catch { /* err in store */ } }, [tournamentId, leaveTournament, fetchTournament, clearError]);
+
+  const handleSelectDeck = useCallback(async (deckId: string) => {
+    if (!tournamentId) return;
+    setDeckLoading(true);
+    setDeckErrors([]);
+    try {
+      const result = await selectDeck(tournamentId, deckId);
+      setSelectedDeckId(deckId);
+      if (!result.valid) setDeckErrors(result.errors);
+    } catch (err) {
+      setDeckErrors([err instanceof Error ? err.message : 'Error']);
+    } finally {
+      setDeckLoading(false);
+    }
+  }, [tournamentId, selectDeck]);
+
+  const handleShare = useCallback(() => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    }).catch(() => {});
+  }, []);
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</p></div>);
@@ -69,7 +110,12 @@ export default function TournamentDetailPage() {
 
   const tour = activeTournament;
   const statusKey = tour.status === 'registration' ? 'statusRegistration' : tour.status === 'in_progress' ? 'statusInProgress' : tour.status === 'completed' ? 'statusCompleted' : 'statusCancelled';
-  const modeKey = tour.gameMode === 'sealed' ? 'sealed' : 'classic';
+  const modeKey = tour.gameMode === 'sealed' ? 'sealed' : tour.gameMode === 'restricted' ? 'modeRestricted' : 'classic';
+  const myParticipant = tour.participants.find(p => p.userId === userId);
+  const myDeckValid = (myParticipant as any)?.deckValid ?? false;
+  const myDeckId = (myParticipant as any)?.deckId ?? null;
+  const needsDeck = isParticipant && tour.gameMode !== 'sealed' && tour.status === 'registration';
+  const hasRestrictions = tour.gameMode === 'restricted' || (tour as any).bannedCardIds?.length > 0;
 
   return (
     <div id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
@@ -95,6 +141,119 @@ export default function TournamentDetailPage() {
             </div>
           )}
         </motion.div>
+
+        {/* Share button */}
+        <div className="mb-4 flex gap-2">
+          <button onClick={handleShare} className="px-4 py-1.5 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
+            style={{ backgroundColor: linkCopied ? '#1a3a1a' : '#1a1a1a', border: `1px solid ${linkCopied ? '#4ade80' : '#333'}`, color: linkCopied ? '#4ade80' : '#888' }}>
+            {linkCopied ? t('copied') : t('share')}
+          </button>
+          {tour.joinCode && (
+            <span className="px-3 py-1.5 text-xs font-mono" style={{ backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#c4a35a' }}>
+              {t('codeLabel')}: {tour.joinCode}
+            </span>
+          )}
+        </div>
+
+        {/* Rules section */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}
+          className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid rgba(196, 163, 90, 0.3)' }}>
+          <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('rulesTitle')}</h2>
+          <div className="flex flex-col gap-1.5 text-xs" style={{ color: '#aaa' }}>
+            <p>{t('rulesFormat')}</p>
+            {tour.gameMode === 'classic' && <p>{t('rulesClassic')}</p>}
+            {tour.gameMode === 'sealed' && <p>{t('rulesSealed')}</p>}
+            {tour.gameMode === 'restricted' && <p>{t('rulesRestricted')}</p>}
+            {tour.gameMode !== 'sealed' && <p>{t('rulesDeck')}</p>}
+            <p>{t('rulesMatch')}</p>
+            <p>{t('rulesAbsence')}</p>
+            <p>{t('rulesEdge')}</p>
+          </div>
+        </motion.div>
+
+        {/* Restrictions display */}
+        {hasRestrictions && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}
+            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid #ef4444' }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#ef4444' }}>{t('restrictions')}</h2>
+            <div className="flex flex-col gap-2 text-xs" style={{ color: '#ccc' }}>
+              {(tour as any).allowedGroups?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('allowedGroups')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedGroups.join(', ')}</span></div>
+              )}
+              {(tour as any).bannedGroups?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('bannedGroups')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedGroups.join(', ')}</span></div>
+              )}
+              {(tour as any).allowedKeywords?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('allowedKeywords')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedKeywords.join(', ')}</span></div>
+              )}
+              {(tour as any).bannedKeywords?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('bannedKeywords')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedKeywords.join(', ')}</span></div>
+              )}
+              {(tour as any).allowedRarities?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('allowedRarities')}:</span> <span style={{ color: '#4ade80' }}>{(tour as any).allowedRarities.join(', ')}</span></div>
+              )}
+              {(tour as any).bannedRarities?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('bannedRarities')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedRarities.join(', ')}</span></div>
+              )}
+              {(tour as any).maxPerRarity && Object.keys((tour as any).maxPerRarity).length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('maxPerRarity')}:</span> {Object.entries((tour as any).maxPerRarity).map(([r, v]) => <span key={r} className="ml-1" style={{ color: '#c4a35a' }}>{r}: {String(v)}</span>)}</div>
+              )}
+              {(tour as any).maxCopiesPerCard != null && <div><span style={{ color: '#888' }}>{t('maxCopiesPerCard')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxCopiesPerCard}</span></div>}
+              {(tour as any).maxChakraCost != null && <div><span style={{ color: '#888' }}>{t('maxChakraCostLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxChakraCost}</span></div>}
+              {(tour as any).minDeckSize != null && <div><span style={{ color: '#888' }}>{t('minDeckSizeLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).minDeckSize}</span></div>}
+              {(tour as any).maxDeckSize != null && <div><span style={{ color: '#888' }}>{t('maxDeckSizeLabel')}:</span> <span style={{ color: '#c4a35a' }}>{(tour as any).maxDeckSize}</span></div>}
+              {(tour as any).bannedCardIds?.length > 0 && (
+                <div><span style={{ color: '#888' }}>{t('bannedCards')}:</span> <span style={{ color: '#f87171' }}>{(tour as any).bannedCardIds.join(', ')}</span></div>
+              )}
+              {(tour as any).restrictionNote && (
+                <div className="mt-1 p-2" style={{ backgroundColor: '#0d0d0d', border: '1px solid #333' }}>
+                  <span style={{ color: '#c4a35a' }}>{(tour as any).restrictionNote}</span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Deck selection (registration phase, non-sealed) */}
+        {needsDeck && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.25 }}
+            className="mb-4 p-4" style={{ backgroundColor: '#111111', border: `1px solid ${myDeckId && myDeckValid ? '#333' : '#ef4444'}`, borderLeft: `3px solid ${myDeckId && myDeckValid ? '#4ade80' : '#ef4444'}` }}>
+            <h2 className="text-sm font-medium uppercase tracking-wider mb-2" style={{ color: myDeckId && myDeckValid ? '#4ade80' : '#ef4444' }}>
+              {t('selectDeck')}
+            </h2>
+            <p className="text-xs mb-3" style={{ color: '#888' }}>{t('selectDeckHint')}</p>
+            {myDeckId && (
+              <p className="text-xs mb-2" style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>
+                {myDeckValid ? t('deckValid') : t('deckInvalid')}
+              </p>
+            )}
+            {deckErrors.length > 0 && (
+              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#f87171' }}>
+                <p className="font-medium mb-1">{t('deckErrors')}:</p>
+                {deckErrors.map((err, i) => <p key={i}>- {err}</p>)}
+              </div>
+            )}
+            <div className="flex flex-col gap-1.5">
+              {myDecks.map(deck => (
+                <button key={deck.id} onClick={() => handleSelectDeck(deck.id)} disabled={deckLoading}
+                  className="flex items-center justify-between px-3 py-2 text-xs cursor-pointer transition-colors"
+                  style={{
+                    backgroundColor: selectedDeckId === deck.id ? 'rgba(196, 163, 90, 0.1)' : '#0d0d0d',
+                    border: `1px solid ${selectedDeckId === deck.id ? '#c4a35a' : '#333'}`,
+                    color: selectedDeckId === deck.id ? '#c4a35a' : '#ccc',
+                  }}>
+                  <span>{deck.name}</span>
+                  {selectedDeckId === deck.id && <span style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>{myDeckValid ? t('deckValid') : t('deckInvalid')}</span>}
+                </button>
+              ))}
+              {myDecks.length === 0 && (
+                <p className="text-xs" style={{ color: '#666' }}>
+                  <Link href={'/deck-builder' as '/'} style={{ color: '#c4a35a' }}>{t('noDeckWarning')}</Link>
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{error}</div>}
         {myAbsenceDeadline && (<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4"><AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} /></motion.div>)}
