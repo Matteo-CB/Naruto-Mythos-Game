@@ -128,6 +128,47 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
 }
 
 /**
+ * Remove a tournament win from a player: decrement tournamentWins,
+ * remove current role, assign the lower tier role if applicable.
+ * Used when admin overrides a tournament result.
+ */
+export async function removeTournamentRole(userId: string): Promise<void> {
+  if (!BOT_TOKEN || !GUILD_ID) return;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { accounts: { where: { provider: 'discord' } } },
+  });
+  if (!user || user.accounts.length === 0) return;
+
+  const discordId = user.accounts[0].providerAccountId;
+  const currentWins = user.tournamentWins ?? 0;
+  if (currentWins <= 0) return;
+
+  // Remove current role
+  const currentRoleName = getRoleName(currentWins);
+  if (currentRoleName) {
+    try {
+      const roleId = await findOrCreateRole(currentRoleName);
+      await removeRole(discordId, roleId);
+    } catch { /* ignore */ }
+  }
+
+  // Decrement wins
+  const newWins = Math.max(0, currentWins - 1);
+  await prisma.user.update({ where: { id: userId }, data: { tournamentWins: newWins } });
+
+  // Assign lower role if applicable
+  const newRoleName = getRoleName(newWins);
+  if (newRoleName) {
+    try {
+      const newRoleId = await findOrCreateRole(newRoleName);
+      await addRole(discordId, newRoleId);
+    } catch { /* ignore */ }
+  }
+}
+
+/**
  * Check if a Discord user is a member of the server.
  */
 export async function isDiscordMember(discordId: string): Promise<boolean> {
