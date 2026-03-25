@@ -519,17 +519,21 @@ function buildPendingTargetSelectionUI(
         };
       });
     } else if (tst === 'SAKURA135_CHOOSE_CARD') {
-      let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean }> = [];
-      try { topCardsInfo = JSON.parse(pendingEffect?.effectDescription ?? '{}').topCards ?? []; } catch { /* ignore */ }
-      const numDrawn = topCardsInfo.length || 3;
-      const drawnCards = dataSource.playerDiscard.slice(dataSource.playerDiscard.length - numDrawn);
+      let topCardsInfo: Array<{ index: number; name: string; chakra: number; power: number; isCharacter: boolean; cardId?: string }> = [];
+      let storedCards: any[] = [];
+      try {
+        const parsed = JSON.parse(pendingEffect?.effectDescription ?? '{}');
+        topCardsInfo = parsed.topCards ?? [];
+        storedCards = parsed.storedCards ?? [];
+      } catch { /* ignore */ }
       handCards = pendingAction.options.map((indexStr) => {
         const idx = parseInt(indexStr, 10);
-        const card = idx >= 0 && idx < drawnCards.length ? drawnCards[idx] : null;
+        // Use storedCards (full card data from server) if available
+        const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
         return {
           index: idx,
-          card: card ? fullCardData(card) : info ? {
+          card: storedCard ? fullCardData(storedCard) : info ? {
             name_fr: info.name, chakra: info.chakra, power: info.power,
           } : { name_fr: '???' },
         };
