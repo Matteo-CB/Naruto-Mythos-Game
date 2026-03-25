@@ -23,9 +23,10 @@ function mss05ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlyChars = mission[friendlySide];
 
   // Collect all non-hidden friendly characters in THIS mission
+  // Exclude stolen cards (originalOwner !== controller) — can't "return" opponent's cards
   const validTargets: string[] = [];
   for (const c of friendlyChars) {
-    if (!c.isHidden) {
+    if (!c.isHidden && c.originalOwner === c.controlledBy) {
       validTargets.push(c.instanceId);
     }
   }
