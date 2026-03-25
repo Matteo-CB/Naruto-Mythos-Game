@@ -44,7 +44,6 @@
     "signOut": "Se deconnecter",
     "sealed": "Scellé",
     "training": "Mode Entrainement",
-    "cardTracker": "Suivi des Cartes",
     "suggestionTracker": "Suggestions",
     "settings": "Parametres",
     "customization": "Personnalisation",
@@ -65,7 +64,14 @@
     "loading": "Chargement...",
     "back": "Retour au menu",
     "gameBackground": "Fond de jeu",
-    "selected": "Actif"
+    "selected": "Actif",
+    "username": "Pseudo",
+    "usernameSave": "Sauvegarder",
+    "usernameSaved": "Sauvegarde",
+    "usernameHint": "3 a 20 caracteres, lettres, chiffres, tirets et underscores uniquement.",
+    "usernameLength": "Le pseudo doit contenir entre 3 et 20 caracteres",
+    "usernameInvalid": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores",
+    "usernameTaken": "Ce pseudo est deja pris"
   },
   "game": {
     "turn": "Tour {turn}",

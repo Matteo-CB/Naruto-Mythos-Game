@@ -141,11 +141,11 @@ export function GameLog() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 300, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className={`fixed ${isSpectating ? 'top-9' : 'top-0'} right-0 z-30 flex flex-col`}
+            className={`fixed ${isSpectating ? 'top-9' : 'top-7'} right-0 z-30 flex flex-col`}
             style={{
-              height: isSpectating ? 'calc(100% - 36px)' : '100%',
-              width: '340px',
-              backgroundColor: 'rgba(8, 8, 12, 0.95)',
+              height: isSpectating ? 'calc(100% - 36px)' : 'calc(100% - 56px)',
+              width: '320px',
+              backgroundColor: 'rgba(8, 8, 12, 0.97)',
               borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
             }}
           >
@@ -162,15 +162,15 @@ export function GameLog() {
               </span>
               <button
                 onClick={toggleGameLog}
-                className="text-xs px-2 py-1 cursor-pointer uppercase tracking-wider"
+                className="text-xs px-3 py-1 cursor-pointer uppercase tracking-wider font-bold"
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  backgroundColor: 'rgba(179, 62, 62, 0.15)',
                   border: 'none',
-                  borderLeft: '2px solid rgba(255, 255, 255, 0.1)',
-                  color: '#888888',
+                  borderLeft: '2px solid rgba(179, 62, 62, 0.4)',
+                  color: '#b33e3e',
                 }}
               >
-                {t('common.cancel')}
+                X
               </button>
             </div>
 

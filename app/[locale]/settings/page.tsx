@@ -6,10 +6,10 @@ import { useTranslations } from 'next-intl';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function SettingsPage() {
-  const { status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
   const t = useTranslations('settings');
   const {
@@ -17,6 +17,43 @@ export default function SettingsPage() {
     fetchFromServer, setAnimationsEnabled, setAllowSpectatorHand, setGameBackground,
   } = useSettingsStore();
   const backgrounds = availableBackgrounds;
+
+  // Username editing state
+  const [usernameInput, setUsernameInput] = useState('');
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [usernameError, setUsernameError] = useState('');
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      setUsernameInput(session.user.name);
+    }
+  }, [session?.user?.name]);
+
+  const handleUsernameSave = useCallback(async () => {
+    const trimmed = usernameInput.trim();
+    if (!trimmed || trimmed === session?.user?.name) return;
+    setUsernameStatus('saving');
+    setUsernameError('');
+    try {
+      const res = await fetch('/api/user/username', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUsernameError(data.errorKey ? t(data.errorKey) : data.error);
+        setUsernameStatus('error');
+        return;
+      }
+      await updateSession({ name: data.username });
+      setUsernameStatus('saved');
+      setTimeout(() => setUsernameStatus('idle'), 2000);
+    } catch {
+      setUsernameError('Network error');
+      setUsernameStatus('error');
+    }
+  }, [usernameInput, session?.user?.name, t, updateSession]);
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -56,9 +93,62 @@ export default function SettingsPage() {
           {t('title')}
         </h1>
 
+        {/* Username edit */}
+        <div
+          className="flex flex-col gap-3 p-5"
+          style={{
+            backgroundColor: '#111111',
+            border: '1px solid #262626',
+          }}
+        >
+          <span
+            className="text-sm font-medium tracking-wide"
+            style={{ color: '#e0e0e0' }}
+          >
+            {t('username')}
+          </span>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={usernameInput}
+              onChange={(e) => { setUsernameInput(e.target.value); setUsernameStatus('idle'); setUsernameError(''); }}
+              maxLength={20}
+              className="flex-1 px-3 py-1.5 text-sm font-medium outline-none"
+              style={{
+                backgroundColor: '#0a0a0a',
+                border: '1px solid #333333',
+                color: '#e0e0e0',
+              }}
+              onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = '#c4a35a'; }}
+              onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = '#333333'; }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleUsernameSave(); }}
+            />
+            <button
+              type="button"
+              disabled={usernameStatus === 'saving' || usernameInput.trim() === session?.user?.name}
+              onClick={handleUsernameSave}
+              className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-opacity"
+              style={{
+                backgroundColor: usernameStatus === 'saved' ? '#2d5a2d' : '#c4a35a',
+                color: usernameStatus === 'saved' ? '#a0d0a0' : '#0a0a0a',
+                opacity: (usernameStatus === 'saving' || usernameInput.trim() === session?.user?.name) ? 0.4 : 1,
+                cursor: (usernameStatus === 'saving' || usernameInput.trim() === session?.user?.name) ? 'default' : 'pointer',
+              }}
+            >
+              {usernameStatus === 'saving' ? '...' : usernameStatus === 'saved' ? t('usernameSaved') : t('usernameSave')}
+            </button>
+          </div>
+          {usernameError && (
+            <p className="text-xs" style={{ color: '#b33e3e' }}>{usernameError}</p>
+          )}
+          <p className="text-xs tracking-wide" style={{ color: '#555555' }}>
+            {t('usernameHint')}
+          </p>
+        </div>
+
         {/* Settings card */}
         <div
-          className="flex flex-col gap-4 p-5"
+          className="mt-4 flex flex-col gap-4 p-5"
           style={{
             backgroundColor: '#111111',
             border: '1px solid #262626',

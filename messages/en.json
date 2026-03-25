@@ -44,7 +44,6 @@
     "signOut": "Sign Out",
     "sealed": "Sealed",
     "training": "Training Mode",
-    "cardTracker": "Card Tracker",
     "suggestionTracker": "Suggestions",
     "settings": "Settings",
     "customization": "Customization",
@@ -65,7 +64,14 @@
     "loading": "Loading...",
     "back": "Back to menu",
     "gameBackground": "Game Background",
-    "selected": "Selected"
+    "selected": "Selected",
+    "username": "Username",
+    "usernameSave": "Save",
+    "usernameSaved": "Saved",
+    "usernameHint": "3 to 20 characters, letters, numbers, hyphens and underscores only.",
+    "usernameLength": "Username must be between 3 and 20 characters",
+    "usernameInvalid": "Username can only contain letters, numbers, hyphens and underscores",
+    "usernameTaken": "This username is already taken"
   },
   "game": {
     "turn": "Turn {turn}",

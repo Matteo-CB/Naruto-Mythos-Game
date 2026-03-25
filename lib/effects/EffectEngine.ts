@@ -4427,6 +4427,7 @@ export class EffectEngine {
         newState.pendingActions = [...newState.pendingActions, {
           id: kb053uActId, type: 'DISCARD_CARD' as PendingAction['type'],
           player: kb053uPlayer,
+          originPlayer: kb053uPlayer,
           description: 'Choose a card from your hand to discard.',
           descriptionKey: 'game.effect.desc.kabuto053ChooseDiscard',
           options: kb053uOptions, minSelections: 1, maxSelections: 1,
@@ -4514,6 +4515,7 @@ export class EffectEngine {
         newState.pendingActions = [...newState.pendingActions, {
           id: kb053mActId, type: 'SELECT_TARGET' as PendingAction['type'],
           player: kb053mPlayer,
+          originPlayer: kb053mPlayer,
           description: 'Choose a mission to play the character from discard.',
           descriptionKey: 'game.effect.desc.kabuto053ChooseMission',
           descriptionParams: { cardName: kb053mTopCard.name_fr, cost: String(kb053mReducedCost) },
@@ -12637,7 +12639,7 @@ export class EffectEngine {
           // Single card fallback — shouldn't happen since we only trigger for 2+
           reorderList = [targetId];
         }
-        let parsedReorder: { count?: number; discardOwner?: string } = {};
+        let parsedReorder: { count?: number; discardOwner?: string; sakura135Chain?: boolean; costReduction?: number } = {};
         try { parsedReorder = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const reorderCount = parsedReorder.count ?? reorderList.length;
         // discardOwner = the player whose discard pile is being reordered (the defender)
@@ -12677,6 +12679,23 @@ export class EffectEngine {
             'game.log.effect.reorderDiscard',
             { count: String(reorderCount) },
           );
+        }
+
+        // Chain: Sakura 135 placement after reorder
+        if (parsedReorder.sakura135Chain) {
+          const s135Player = reorderTarget;
+          const s135Ps = newState[s135Player];
+          // The chosen card is stored at the end of the discard pile (after the reordered cards)
+          const s135ChosenCard = s135Ps.discardPile[s135Ps.discardPile.length - 1];
+          if (s135ChosenCard) {
+            const s135CostReduction = (parsedReorder as any).costReduction ?? 0;
+            const fakePending = {
+              ...pendingEffect,
+              sourceCardId: 'KS-135-S',
+              sourcePlayer: s135Player,
+            };
+            newState = EffectEngine.sakura135ContinuePlacement(newState, s135Player, s135ChosenCard, s135CostReduction, fakePending as any);
+          }
         }
 
         break;
@@ -17182,6 +17201,7 @@ export class EffectEngine {
           id: generateInstanceId(),
           type: 'SELECT_TARGET',
           player,
+          originPlayer: player,
           description: `Choose: play ${card.name_fr} as a new character, or upgrade over an existing one?`,
           descriptionKey: 'game.effect.desc.effectPlayUpgradeChoice',
           descriptionParams: { card: card.name_fr },
@@ -18169,14 +18189,26 @@ export class EffectEngine {
       ps.discardPile.push({ ...oc, instanceId: (oc as any).instanceId || (oc as any).id + `-discard-${oi}` } as any);
     }
 
-    // Queue reorder if 2+ cards discarded — will fire after all effects resolve
+    // Store chosen card at end of discard for genericPlaceOnMission to recover
+    ps.discardPile.push(chosenCard);
+
+    // If 2+ cards discarded, show reorder popup FIRST, then chain to placement
     if (otherCards.length >= 2) {
-      newState.pendingDiscardReorder = { discardOwner: player, chooser: player, count: otherCards.length };
+      const chainData = { sakura135Chain: true, costReduction, cardName: chosenCard.name_fr };
+      return EffectEngine.createReorderDiscardPending(newState, player, player, otherCards.length, player, chainData);
     }
 
-    // Cost deferred to placement time (upgrade vs fresh play)
+    // No reorder needed — proceed to placement directly
+    return EffectEngine.sakura135ContinuePlacement(newState, player, chosenCard, costReduction, pending);
+  }
 
-    // Find valid missions (fresh play or upgrade)
+  /** Sakura 135: continue placement after optional reorder. */
+  static sakura135ContinuePlacement(
+    state: GameState, player: PlayerID, chosenCard: any, costReduction: number,
+    pending: PendingEffect,
+  ): GameState {
+    const newState = state;
+    const ps = newState[player];
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
@@ -18189,12 +18221,8 @@ export class EffectEngine {
     }
 
     if (validMissions.length === 0) {
-      ps.discardPile.push(chosenCard);
       return newState;
     }
-
-    // Store chosen card at end of discard for genericPlaceOnMission to recover
-    ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
       return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
@@ -18202,14 +18230,13 @@ export class EffectEngine {
 
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
-
     newState.pendingEffects.push({
       id: effectId,
       sourceCardId: pending.sourceCardId,
       sourceInstanceId: pending.sourceInstanceId,
       sourceMissionIndex: pending.sourceMissionIndex,
       effectType: pending.effectType,
-      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-135-S', costReduction, discardedCount: otherCards.length }),
+      effectDescription: JSON.stringify({ cost: 0, cardName: 'SAKURA HARUNO', cardId: 'KS-135-S', costReduction }),
       targetSelectionType: 'SAKURA135_CHOOSE_MISSION',
       sourcePlayer: player,
       requiresTargetSelection: true,
@@ -18219,11 +18246,11 @@ export class EffectEngine {
       resolved: false,
       isUpgrade: costReduction > 0,
     });
-
     newState.pendingActions.push({
       id: actionId,
       type: 'SELECT_TARGET',
       player,
+      originPlayer: player,
       description: `Sakura Haruno (135): Choose a mission to play ${chosenCard.name_fr} on.`,
       descriptionKey: 'game.effect.desc.sakura135PlayMission',
       descriptionParams: { card: chosenCard.name_fr },
@@ -18232,7 +18259,6 @@ export class EffectEngine {
       maxSelections: 1,
       sourceEffectId: effectId,
     });
-
     return newState;
   }
 

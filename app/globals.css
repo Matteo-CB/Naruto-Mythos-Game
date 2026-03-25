@@ -300,6 +300,12 @@ p, .font-body {
 }
 .last-played-highlight { animation: lastPlayedPulse 2s ease-in-out infinite; }
 
+@keyframes pulseBorderSubtle {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.7; }
+}
+.animate-pulse-subtle { animation: pulseBorderSubtle 2s ease-in-out infinite; }
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
