@@ -1582,50 +1582,26 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!code) return;
       const room = rooms.get(code);
       if (!room || !room.rematchOffer) return;
-      if (!room.hostDeck || !room.guestDeck) return;
 
-      console.log(`[Socket] Rematch accepted in room ${code}, restarting game`);
+      console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select`);
       room.rematchOffer = undefined;
 
-      // Reset game state with same decks
-      const config: GameConfig = {
-        player1: {
-          userId: room.hostId,
-          isAI: false,
-          deck: room.hostDeck.characters,
-          missionCards: room.hostDeck.missions,
-        },
-        player2: {
-          userId: room.guestId!,
-          isAI: false,
-          deck: room.guestDeck.characters,
-          missionCards: room.guestDeck.missions,
-        },
-      };
-
-      room.gameState = GameEngine.createGame(config);
+      // Reset room state — players must re-select decks
+      room.gameState = null;
+      room.hostDeck = null;
+      room.guestDeck = null;
       room.replayInitialState = null;
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
-      // Broadcast fresh state
-      const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
-      const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
-      const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
-
+      // Tell both clients to go back to deck selection
       if (room.hostSocket) {
         io.to(room.hostSocket).emit('game:rematch-accepted');
-        io.to(room.hostSocket).emit('game:state-update', { visibleState: p1State, playerRole: 'player1', playerNames });
+        io.to(room.hostSocket).emit('game:rematch-reselect', { roomCode: code });
       }
       if (room.guestSocket) {
         io.to(room.guestSocket).emit('game:rematch-accepted');
-        io.to(room.guestSocket).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
-      }
-      io.to(code).emit('game:started');
-      broadcastActiveGames(io);
-
-      if (room.gameState.phase === 'action') {
-        startActionTimer(room, code, io);
+        io.to(room.guestSocket).emit('game:rematch-reselect', { roomCode: code });
       }
     });
 

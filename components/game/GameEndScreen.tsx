@@ -36,11 +36,20 @@ export function GameEndScreen() {
   const sealedDeckMissionIds = useGameStore((s) => s.sealedDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
   const rematchState = useSocketStore((s) => s.rematchState);
+  const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   const offerRematch = useSocketStore((s) => s.offerRematch);
   const acceptRematch = useSocketStore((s) => s.acceptRematch);
   const declineRematch = useSocketStore((s) => s.declineRematch);
   const replayAIGame = useGameStore((s) => s.replayAIGame);
   const lastAIGameConfig = useGameStore((s) => s.lastAIGameConfig);
+
+  // Redirect to deck selection on rematch
+  useEffect(() => {
+    if (rematchRoomCode) {
+      useSocketStore.setState({ rematchRoomCode: null });
+      router.push(`/play/online?code=${rematchRoomCode}` as '/');
+    }
+  }, [rematchRoomCode, router]);
 
   const handleChangeDeck = useCallback(() => {
     resetGame();

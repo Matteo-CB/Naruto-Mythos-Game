@@ -53,6 +53,7 @@ interface SocketStore {
 
   // Rematch state
   rematchState: 'none' | 'offered' | 'received' | 'accepted' | 'declined';
+  rematchRoomCode: string | null;
 
   // Sealed state
   isSealedRoom: boolean;
@@ -135,6 +136,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   publicRooms: [],
   maintenanceWarning: false,
   rematchState: 'none',
+  rematchRoomCode: null,
   sealedBoosters: null,
   sealedAllCards: null,
   sealedDeckSubmitted: false,
@@ -445,8 +447,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       socket.on('game:rematch-accepted', () => {
-        console.log('[Socket] Rematch accepted, restarting game');
+        console.log('[Socket] Rematch accepted, redirecting to deck select');
         set({ rematchState: 'accepted', gameEnded: false, gameResult: null, actionDeadline: null });
+      });
+
+      socket.on('game:rematch-reselect', ({ roomCode }: { roomCode: string }) => {
+        console.log('[Socket] Rematch reselect — navigating to deck selection with code:', roomCode);
+        set({ rematchRoomCode: roomCode });
       });
 
       socket.on('game:rematch-declined', () => {
