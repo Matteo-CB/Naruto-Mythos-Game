@@ -77,13 +77,14 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // Confirmation popup before move
+  // Confirmation popup before move (mandatory — no skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'CHOJI018_CONFIRM_UPGRADE',
     validTargets: [sourceCard.instanceId],
-    isOptional: true,
+    isOptional: false,
+    isMandatory: true,
     description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.choji018ConfirmUpgrade',
   };
