@@ -28,6 +28,14 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
+  // Block ALL direct actions while pending effects/actions exist
+  // (e.g., Sakura 135/Kabuto 053 played a card whose effects need resolution)
+  if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT' && action.type !== 'PASS') {
+    if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
+      return state;
+    }
+  }
+
   // Track the pre-action state to detect if the action actually succeeded.
   // Handlers return the SAME object reference on validation failure.
   const beforeAction = newState;
