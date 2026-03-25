@@ -12681,10 +12681,8 @@ export class EffectEngine {
         // Chain: Sakura 135 placement after reorder
         if (parsedReorder.sakura135Chain) {
           const s135Player = reorderTarget;
-          const s135Ps = newState[s135Player];
-          // The chosen card is stored BEFORE the reordered cards in the discard pile
-          const s135ChosenIdx = s135Ps.discardPile.length - 1 - reorderCount;
-          const s135ChosenCard = s135ChosenIdx >= 0 ? s135Ps.discardPile[s135ChosenIdx] : null;
+          // Retrieve chosen card from chainData (stored explicitly, not from discard pile index)
+          const s135ChosenCard = (parsedReorder as any).chosenCard ?? null;
           if (s135ChosenCard) {
             const s135CostReduction = (parsedReorder as any).costReduction ?? 0;
             const fakePending = {
@@ -18216,10 +18214,8 @@ export class EffectEngine {
     const chosenCard = drawnCards[cardIndex];
     const otherCards = drawnCards.filter((_: any, i: number) => i !== cardIndex);
 
-    // Store chosen card FIRST (before discards) so it's not affected by reorder
-    ps.discardPile.push(chosenCard);
-
-    // Discard the non-chosen cards AFTER the chosen card (assign instanceIds for reorder tracking)
+    // Discard the non-chosen cards (assign instanceIds for reorder tracking)
+    // Do NOT push the chosen card to discard — it will be played on a mission
     for (let oi = 0; oi < otherCards.length; oi++) {
       const oc = otherCards[oi];
       ps.discardPile.push({ ...oc, instanceId: (oc as any).instanceId || (oc as any).id + `-discard-${oi}` } as any);
@@ -18227,7 +18223,8 @@ export class EffectEngine {
 
     // If 2+ cards discarded, show reorder popup FIRST, then chain to placement
     if (otherCards.length >= 2) {
-      const chainData = { sakura135Chain: true, costReduction, cardName: chosenCard.name_fr };
+      // Store the chosen card explicitly in chainData so REORDER_DISCARD can retrieve it reliably
+      const chainData = { sakura135Chain: true, costReduction, cardName: chosenCard.name_fr, chosenCard };
       return EffectEngine.createReorderDiscardPending(newState, player, player, otherCards.length, player, chainData);
     }
 
@@ -18256,6 +18253,9 @@ export class EffectEngine {
     if (validMissions.length === 0) {
       return newState;
     }
+
+    // Push chosen card to top of discard pile so genericPlaceOnMission can pop() it
+    ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {
       return EffectEngine.genericPlaceOnMission(newState, player, parseInt(validMissions[0], 10), 0, 'SAKURA HARUNO', 'KS-135-S', costReduction);
