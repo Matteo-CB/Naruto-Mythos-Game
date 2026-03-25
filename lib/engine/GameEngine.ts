@@ -13,6 +13,8 @@ import type {
   VisibleMission,
   VisibleCharacter,
   TurnNumber,
+  PendingEffect,
+  EffectType,
 } from './types';
 import {
   INITIAL_HAND_SIZE,
@@ -186,6 +188,28 @@ export class GameEngine {
               : pdr.chooser; // Normal: attacker chooses opponent's pile
             const selectingOverride = pdr.chooser === pdr.discardOwner ? pdr.chooser : undefined;
             newState = EffectEngine.createReorderDiscardPending(newState, pdr.discardOwner, effectSource, pdr.count, selectingOverride);
+            break;
+          }
+
+          // Check for deferred continuation (remaining effects from new card)
+          // Only fire when all reaction pendings have resolved
+          if (newState.pendingContinuation && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
+            const cont = newState.pendingContinuation;
+            newState.pendingContinuation = undefined;
+            // Build a synthetic resolved pending to feed processRemainingEffects
+            const syntheticPending: PendingEffect = {
+              id: '', sourceCardId: cont.sourceCardId,
+              sourceInstanceId: cont.sourceInstanceId,
+              sourceMissionIndex: cont.sourceMissionIndex,
+              effectType: 'MAIN' as EffectType,
+              effectDescription: '', targetSelectionType: '',
+              sourcePlayer: cont.sourcePlayer,
+              requiresTargetSelection: false, validTargets: [],
+              isOptional: false, isMandatory: false, resolved: true,
+              isUpgrade: cont.isUpgrade, wasRevealed: cont.wasRevealed,
+              remainingEffectTypes: cont.remainingEffectTypes,
+            };
+            newState = EffectEngine.processRemainingEffects(newState, syntheticPending);
             break;
           }
 
