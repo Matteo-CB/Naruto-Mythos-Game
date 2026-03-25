@@ -750,7 +750,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     try {
       const now = new Date();
       const scheduledTournaments = await prisma.tournament.findMany({
-        where: { status: 'registration', scheduledStartAt: { lte: now } },
+        where: { status: 'registration', scheduledStartAt: { not: null, lte: now } },
         include: { _count: { select: { participants: true } } },
       });
       for (const t of scheduledTournaments) {
