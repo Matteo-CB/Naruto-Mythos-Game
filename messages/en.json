@@ -2450,7 +2450,7 @@
     "deckInvalid": "Deck does not meet tournament rules",
     "deckErrors": "Deck Errors",
     "changeDeck": "Change Deck",
-    "noDeckWarning": "Select a deck or you will be disqualified",
+    "noDeckWarning": "No saved decks. Create one in the deck builder first, then come back to select it.",
     "rulesTitle": "Tournament Rules",
     "rulesFormat": "Format: Single elimination bracket",
     "rulesClassic": "Classic: Bring your own deck (30+ cards, 3 missions)",
@@ -2462,6 +2462,7 @@
     "rulesEdge": "In case of a tie, the edge token holder wins",
     "restrictions": "Restrictions",
     "noRestrictions": "No additional restrictions",
+    "maxCopies": "Max copies per card",
     "share": "Share",
     "copied": "Copied"
   },

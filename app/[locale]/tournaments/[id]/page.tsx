@@ -273,6 +273,18 @@ export default function TournamentDetailPage() {
               {t('selectDeck')}
             </h2>
             <p className="text-xs mb-3" style={{ color: '#888' }}>{t('selectDeckHint')}</p>
+            {/* Show tournament restrictions inline so player knows what their deck must respect */}
+            {((tour as any).allowedGroups?.length > 0 || (tour as any).allowedKeywords?.length > 0 || (tour as any).bannedRarities?.length > 0 || (tour as any).bannedCardIds?.length > 0 || (tour as any).maxCopiesPerCard || (tour as any).restrictionNote) && (
+              <div className="mb-3 p-2 text-xs" style={{ backgroundColor: 'rgba(196, 163, 90, 0.05)', border: '1px solid rgba(196, 163, 90, 0.2)' }}>
+                <p className="font-medium mb-1" style={{ color: '#c4a35a' }}>{t('restrictions')}:</p>
+                {(tour as any).allowedGroups?.length > 0 && <p style={{ color: '#999' }}>{t('allowedGroups')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedGroups.join(', ')}</span></p>}
+                {(tour as any).allowedKeywords?.length > 0 && <p style={{ color: '#999' }}>{t('allowedKeywords')}: <span style={{ color: '#4ade80' }}>{(tour as any).allowedKeywords.join(', ')}</span></p>}
+                {(tour as any).bannedRarities?.length > 0 && <p style={{ color: '#999' }}>{t('bannedRarities')}: <span style={{ color: '#f87171' }}>{(tour as any).bannedRarities.join(', ')}</span></p>}
+                {(tour as any).bannedCardIds?.length > 0 && <p style={{ color: '#999' }}>{t('bannedCards')}: <span style={{ color: '#f87171' }}>{(tour as any).bannedCardIds.join(', ')}</span></p>}
+                {(tour as any).maxCopiesPerCard && <p style={{ color: '#999' }}>{t('maxCopies')}: <span style={{ color: '#c4a35a' }}>{(tour as any).maxCopiesPerCard}</span></p>}
+                {(tour as any).restrictionNote && <p style={{ color: '#c4a35a' }}>{(tour as any).restrictionNote}</p>}
+              </div>
+            )}
             {myDeckId && (
               <p className="text-xs mb-2" style={{ color: myDeckValid ? '#4ade80' : '#f87171' }}>
                 {myDeckValid ? t('deckValid') : t('deckInvalid')}
