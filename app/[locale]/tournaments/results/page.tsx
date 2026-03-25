@@ -12,7 +12,7 @@ import { TournamentCard } from '@/components/tournament/TournamentCard';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentData } from '@/stores/tournamentStore';
 
-type FilterTab = 'all' | 'simulator' | 'player';
+type FilterTab = 'all' | 'simulator';
 
 export default function TournamentResultsPage() {
   const t = useTranslations('tournament');
@@ -45,7 +45,6 @@ export default function TournamentResultsPage() {
   const filterTabs: { key: FilterTab; label: string }[] = [
     { key: 'all', label: tc('all') },
     { key: 'simulator', label: t('simulatorTab') },
-    { key: 'player', label: t('playerTab') },
   ];
 
   return (
