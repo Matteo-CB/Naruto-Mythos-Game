@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
         gameMode: gameMode || 'classic',
         maxPlayers,
         isPublic: isPublic !== false,
-        joinCode: isPublic === false ? generateJoinCode() : null,
+        joinCode: generateJoinCode(),
         creatorId: session.user.id,
         creatorUsername: user?.username || 'Unknown',
         requiresDiscord: true,
