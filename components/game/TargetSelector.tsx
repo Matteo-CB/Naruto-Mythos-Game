@@ -257,31 +257,34 @@ function OrderedDefeatPopup({
       }
     } else if (mode === 'naruto133') {
       // group1: P≤5 in source mission (max 1), group2: P≤2 anywhere (max 1), max 2 total
-      // Determine which "slot" each selected card fills
-      // A card in both groups: if selected first, it fills group1 (priority to this mission)
-      let g1Filled = false;
-      let g2Filled = false;
-      for (const id of orderedIds) {
-        const inG1 = targetGroups.group1.has(id);
-        const inG2 = targetGroups.group2.has(id);
-        if (inG1 && !g1Filled) { g1Filled = true; }
-        else if (inG2 && !g2Filled) { g2Filled = true; }
-      }
-
-      for (const t of validTargets) {
-        if (orderedIds.includes(t)) continue;
-        const inG1 = targetGroups.group1.has(t);
-        const inG2 = targetGroups.group2.has(t);
-        // Can this target still fill an open slot?
-        const canFillG1 = inG1 && !g1Filled;
-        const canFillG2 = inG2 && !g2Filled;
-        if (!canFillG1 && !canFillG2) locked.add(t);
-      }
-      // Max 2 total
+      // A card can be in BOTH groups (P≤2 in this mission). Assignment stays flexible.
       if (orderedIds.length >= 2) {
+        // Max 2 selected — lock everything else
         for (const t of validTargets) {
           if (!orderedIds.includes(t)) locked.add(t);
         }
+      } else if (orderedIds.length === 1) {
+        const firstId = orderedIds[0];
+        const firstInG1 = targetGroups.group1.has(firstId);
+        const firstInG2 = targetGroups.group2.has(firstId);
+        const firstOnlyG1 = firstInG1 && !firstInG2; // P 3-5 in this mission
+        const firstOnlyG2 = firstInG2 && !firstInG1; // P≤2 in another mission
+        // firstInBoth = P≤2 in this mission → don't lock anything
+
+        if (firstOnlyG1) {
+          // Group1 filled → only group2 targets remain
+          for (const t of validTargets) {
+            if (orderedIds.includes(t)) continue;
+            if (!targetGroups.group2.has(t)) locked.add(t);
+          }
+        } else if (firstOnlyG2) {
+          // Group2 filled → only group1 targets remain
+          for (const t of validTargets) {
+            if (orderedIds.includes(t)) continue;
+            if (!targetGroups.group1.has(t)) locked.add(t);
+          }
+        }
+        // else: firstInBoth → nothing locked, all remaining targets valid
       }
     }
     return locked;
