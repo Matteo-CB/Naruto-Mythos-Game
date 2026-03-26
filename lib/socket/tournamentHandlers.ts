@@ -87,6 +87,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             guestAllowSpectatorHand: false,
             chatMessages: [],
             chatLastCleanup: Date.now(),
+            trainingCollector: null,
           } as RoomData);
         }
 
