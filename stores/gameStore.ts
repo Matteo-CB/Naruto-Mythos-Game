@@ -12,6 +12,7 @@ import { deepClone } from '@/lib/engine/utils/deepClone';
 import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
+import { getCharacterById } from '@/lib/data/cardIndex';
 
 interface AnimationEvent {
   id: string;
@@ -526,24 +527,16 @@ function buildPendingTargetSelectionUI(
         topCardsInfo = parsed.topCards ?? [];
         storedCards = parsed.storedCards ?? [];
       } catch { /* ignore */ }
-      // Lazy-load card index for image lookup
-      let getCharById: ((id: string) => any) | null = null;
-      try { getCharById = require('@/lib/data/cardIndex').getCharacterById; } catch { /* ignore */ }
       handCards = pendingAction.options.map((indexStr) => {
         const idx = parseInt(indexStr, 10);
         const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-        const cardData = storedCard ? fullCardData(storedCard) : info ? {
+        // Always resolve image from cardIndex (most reliable source)
+        const cardId = (storedCard as any)?.id ?? (storedCard as any)?.cardId ?? info?.cardId;
+        const indexCard = cardId ? getCharacterById(cardId) : null;
+        const cardData = indexCard ? fullCardData(indexCard) : storedCard ? fullCardData(storedCard) : info ? {
           name_fr: info.name, chakra: info.chakra, power: info.power, image_file: info.image_file,
         } : { name_fr: '???' };
-        // Fallback: look up image from card index by cardId if missing
-        if (cardData && !cardData.image_file) {
-          const cardId = (storedCard as any)?.id ?? (storedCard as any)?.cardId ?? info?.cardId;
-          if (cardId && getCharById) {
-            const indexCard = getCharById(cardId);
-            if (indexCard?.image_file) (cardData as any).image_file = indexCard.image_file;
-          }
-        }
         return { index: idx, card: cardData };
       });
     } else if (tst === 'TSUNADE104_CHOOSE_CHAKRA') {
