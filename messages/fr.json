@@ -606,6 +606,8 @@
         "ichibi130OrderDefeat": "Choisissez l'ordre de defaite de {count} ennemis caches.",
         "orderedDefeat": "{count} personnage(s) vaincu(s) dans l'ordre choisi.",
         "gaara120OrderDefeat": "Vaincre les ennemis avec Puissance 1 ou moins. Cliquez dans l'ordre.",
+        "naruto133OrderDefeat": "Choisissez les ennemis a vaincre : Puissance 5 ou moins (cette mission) + Puissance 2 ou moins (n'importe ou). Cliquez dans l'ordre.",
+        "naruto133OrderHide": "Choisissez les ennemis a cacher : Puissance 5 ou moins (cette mission) + Puissance 2 ou moins (n'importe ou). Cliquez dans l'ordre.",
         "gaara120ConfirmUpgrade": "UPGRADE : POWERUP {count} sur Gaara.",
         "reorderDiscard": "Choisissez l'ordre des {count} cartes vaincues dans votre pile de defausse. Dernier choisi = dessus de la pile.",
         "dosu069LookAtHidden": "Selectionnez un personnage cache en jeu a regarder.",
