@@ -8740,7 +8740,7 @@ export class EffectEngine {
       }
 
       case 'GAARA120_CONFIRM_MAIN': {
-        // Start the mission-by-mission defeat flow
+        // Collect ALL valid targets (Power ≤ 1) from ALL missions into one ORDERED_DEFEAT popup
         const g120Player = pendingEffect.sourcePlayer;
         const g120Opponent = g120Player === 'player1' ? 'player2' : 'player1';
         const g120EnemySide: 'player1Characters' | 'player2Characters' =
@@ -8748,20 +8748,15 @@ export class EffectEngine {
         let g120Desc: { isUpgrade?: boolean } = {};
         try { g120Desc = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
 
-        // Find first mission with valid targets
-        let g120FirstMission = -1;
-        let g120FirstTargets: string[] = [];
+        // Collect all valid targets across all missions
+        const g120AllTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           const targets = newState.activeMissions[i][g120EnemySide]
             .filter((c: CharacterInPlay) => getEffectivePower(newState, c, g120Opponent as PlayerID) <= 1)
             .map((c: CharacterInPlay) => c.instanceId);
-          if (targets.length > 0) {
-            g120FirstMission = i;
-            g120FirstTargets = targets;
-            break;
-          }
+          g120AllTargets.push(...targets);
         }
-        if (g120FirstMission === -1) {
+        if (g120AllTargets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, g120Player,
             'EFFECT_NO_TARGET', 'Gaara (120): No enemy characters with Power 1 or less (state changed).',
             'game.log.effect.noTarget', { card: 'GAARA', id: 'KS-120-R' });
@@ -8776,26 +8771,22 @@ export class EffectEngine {
             sourceMissionIndex: pendingEffect.sourceMissionIndex,
             effectType: pendingEffect.effectType,
             effectDescription: JSON.stringify({
-              defeatedCount: 0,
-              nextMissionIndex: g120FirstMission + 1,
               isUpgrade: g120Desc.isUpgrade ?? false,
               sourceInstanceId: pendingEffect.sourceInstanceId,
               sourceMissionIndex: pendingEffect.sourceMissionIndex,
-              missionIndex: g120FirstMission,
             }),
-            targetSelectionType: 'GAARA120_CHOOSE_DEFEAT',
+            targetSelectionType: 'ORDERED_DEFEAT',
             sourcePlayer: g120Player, requiresTargetSelection: true,
-            validTargets: g120FirstTargets, isOptional: true, isMandatory: false,
+            validTargets: g120AllTargets, isOptional: true, isMandatory: false,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
             id: g120ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: g120Player,
-            description: `Gaara (120): Choose an enemy character with Power 1 or less to defeat in mission ${g120FirstMission + 1}.`,
-            descriptionKey: 'game.effect.desc.gaara120ChooseDefeat',
-            descriptionParams: { mission: String(g120FirstMission + 1) },
-            options: g120FirstTargets, minSelections: 1, maxSelections: 1,
+            description: `Gaara (120): Choose enemies with Power 1 or less to defeat (click in order).`,
+            descriptionKey: 'game.effect.desc.gaara120OrderDefeat',
+            options: g120AllTargets, minSelections: 1, maxSelections: g120AllTargets.length,
             sourceEffectId: g120EffId,
           });
           pendingEffect.remainingEffectTypes = undefined;
@@ -8902,79 +8893,50 @@ export class EffectEngine {
       }
 
       case 'ICHIBI130_CONFIRM_UPGRADE': {
-        // Re-compute missions with hidden enemies
+        // Collect ALL hidden enemies across ALL missions into one ORDERED_DEFEAT popup
         const i130Player = pendingEffect.sourcePlayer;
         const i130EnemySide: 'player1Characters' | 'player2Characters' =
           i130Player === 'player1' ? 'player2Characters' : 'player1Characters';
-        const i130Missions: string[] = [];
+        const i130AllHidden: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
-          if (newState.activeMissions[i][i130EnemySide].some((c: CharacterInPlay) => c.isHidden)) {
-            i130Missions.push(String(i));
+          for (const c of newState.activeMissions[i][i130EnemySide]) {
+            if (c.isHidden) i130AllHidden.push(c.instanceId);
           }
         }
-        if (i130Missions.length === 0) {
+        if (i130AllHidden.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
             'EFFECT_NO_TARGET', 'Ichibi (130) UPGRADE: No hidden enemy characters (state changed).',
             'game.log.effect.noTarget', { card: 'ICHIBI', id: 'KS-130-R' });
           break;
         }
-        if (i130Missions.length === 1) {
-          // Auto-resolve: defeat all hidden in that mission
-          const mIdx = parseInt(i130Missions[0]);
-          const hiddenEnemies = newState.activeMissions[mIdx][i130EnemySide].filter((c: CharacterInPlay) => c.isHidden);
-          if (hiddenEnemies.length >= 2) {
-            // 2+ hidden: show ORDERED_DEFEAT popup so attacker chooses defeat order
-            const i130odEffId = generateInstanceId();
-            const i130odActId = generateInstanceId();
-            newState.pendingEffects.push({
-              id: i130odEffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
-              sourceMissionIndex: mIdx, effectType: 'UPGRADE' as EffectType,
-              effectDescription: JSON.stringify({ missionIndex: mIdx }),
-              targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: i130Player,
-              requiresTargetSelection: true, validTargets: hiddenEnemies.map(h => h.instanceId),
-              isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
-              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
-              descriptionParams: { count: String(hiddenEnemies.length) },
-            } as PendingEffect);
-            newState.pendingActions.push({
-              id: i130odActId, type: 'SELECT_TARGET', player: i130Player,
-              description: `Ichibi (130) UPGRADE: Choose defeat order.`,
-              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
-              descriptionParams: { count: String(hiddenEnemies.length) },
-              options: hiddenEnemies.map(h => h.instanceId),
-              minSelections: hiddenEnemies.length, maxSelections: hiddenEnemies.length,
-              sourceEffectId: i130odEffId,
-            });
-          } else {
-            // 0-1 hidden: auto-defeat
-            for (const h of hiddenEnemies) {
-              newState = EffectEngine.defeatCharacter(newState, h.instanceId, i130Player);
-            }
-            newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
-              'EFFECT_DEFEAT', `Ichibi (130) UPGRADE: Defeated ${hiddenEnemies.length} hidden enemy character(s) in mission ${mIdx + 1}.`,
-              'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: `${hiddenEnemies.length} hidden enemies` });
-          }
+        if (i130AllHidden.length === 1) {
+          // Only 1 hidden: auto-defeat
+          newState = EffectEngine.defeatCharacter(newState, i130AllHidden[0], i130Player);
+          newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
+            'EFFECT_DEFEAT', 'Ichibi (130) UPGRADE: Defeated 1 hidden enemy character.',
+            'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: '1 hidden enemy' });
           break;
         }
-        // Multiple missions: mandatory child
         {
           const i130EffId = generateInstanceId();
           const i130ActId = generateInstanceId();
           newState.pendingEffects.push({
-            id: i130EffId, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: pendingEffect.effectType,
-            effectDescription: '', targetSelectionType: 'ICHIBI130_CHOOSE_MISSION',
-            sourcePlayer: i130Player, requiresTargetSelection: true,
-            validTargets: i130Missions, isOptional: false, isMandatory: true,
-            resolved: false, isUpgrade: false,
-          });
+            id: i130EffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
+            sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'UPGRADE' as EffectType,
+            effectDescription: '{}',
+            targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: i130Player,
+            requiresTargetSelection: true, validTargets: i130AllHidden,
+            isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
+            descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+            descriptionParams: { count: String(i130AllHidden.length) },
+          } as PendingEffect);
           newState.pendingActions.push({
             id: i130ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: i130Player,
-            description: 'Ichibi (130) UPGRADE: Choose a mission to defeat all hidden enemies.',
-            descriptionKey: 'game.effect.desc.ichibi130ChooseMission',
-            options: i130Missions, minSelections: 1, maxSelections: 1,
+            description: `Ichibi (130) UPGRADE: Choose defeat order for ${i130AllHidden.length} hidden enemies.`,
+            descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+            descriptionParams: { count: String(i130AllHidden.length) },
+            options: i130AllHidden, minSelections: i130AllHidden.length, maxSelections: i130AllHidden.length,
             sourceEffectId: i130EffId,
           });
         }
@@ -12660,14 +12622,43 @@ export class EffectEngine {
       case 'ORDERED_DEFEAT': {
         let odList: string[] = [];
         try { odList = JSON.parse(targetId); } catch { odList = [targetId]; }
+        const odDefeatedCount = odList.length;
         for (const charId of odList) {
           newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer);
         }
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_DEFEAT', `Defeated ${odList.length} character(s) in chosen order.`,
-          'game.log.effect.orderedDefeat', { count: String(odList.length) },
+          'EFFECT_DEFEAT', `Defeated ${odDefeatedCount} character(s) in chosen order.`,
+          'game.log.effect.orderedDefeat', { count: String(odDefeatedCount) },
         );
+        // Gaara 120 UPGRADE: POWERUP X where X = defeated count
+        let odParsed: { isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
+        try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        if (odParsed.isUpgrade && odDefeatedCount > 0 && odParsed.sourceInstanceId != null && odParsed.sourceMissionIndex != null) {
+          const g120uEffId = generateInstanceId();
+          const g120uActId = generateInstanceId();
+          newState.pendingEffects = [...newState.pendingEffects, {
+            id: g120uEffId, sourceCardId: pendingEffect.sourceCardId,
+            sourceInstanceId: odParsed.sourceInstanceId,
+            sourceMissionIndex: odParsed.sourceMissionIndex,
+            effectType: 'UPGRADE' as EffectType,
+            effectDescription: JSON.stringify({ defeatedCount: odDefeatedCount }),
+            targetSelectionType: 'GAARA120_CONFIRM_UPGRADE',
+            sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+            validTargets: [odParsed.sourceInstanceId],
+            isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
+          }];
+          newState.pendingActions = [...newState.pendingActions, {
+            id: g120uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+            player: pendingEffect.sourcePlayer,
+            description: `Gaara (120) UPGRADE: POWERUP ${odDefeatedCount}.`,
+            descriptionKey: 'game.effect.desc.gaara120ConfirmUpgrade',
+            descriptionParams: { count: String(odDefeatedCount) },
+            options: [odParsed.sourceInstanceId],
+            minSelections: 1, maxSelections: 1,
+            sourceEffectId: g120uEffId,
+          }];
+        }
         break;
       }
 
