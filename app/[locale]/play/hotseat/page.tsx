@@ -21,7 +21,6 @@ export default function HotseatPage() {
   const router = useRouter();
   const startHotseatGame = useGameStore((s) => s.startHotseatGame);
   const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<'normal' | 'free'>('normal');
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [deck1, setDeck1] = useState<ResolvedDeck | null>(null);
   const [deck2, setDeck2] = useState<ResolvedDeck | null>(null);
@@ -83,7 +82,7 @@ export default function HotseatPage() {
       config,
       t('hotseat.player1'),
       t('hotseat.player2'),
-      mode === 'free',
+      true, // Always sandbox mode
     );
     router.push('/game');
   };
@@ -97,37 +96,6 @@ export default function HotseatPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">{t('hotseat.title')}</h1>
             <p className="text-sm text-[#888888]">{t('hotseat.subtitle')}</p>
-          </div>
-
-          {/* Mode selector */}
-          <div className="w-full">
-            <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">{t('hotseat.selectMode')}</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setMode('normal')}
-                className="flex-1 py-3 px-3 text-center transition-colors"
-                style={{
-                  backgroundColor: mode === 'normal' ? '#1a1a1a' : '#111',
-                  border: `1px solid ${mode === 'normal' ? '#c4a35a' : '#262626'}`,
-                  color: mode === 'normal' ? '#e0e0e0' : '#666',
-                }}
-              >
-                <span className="text-xs font-bold uppercase tracking-wider block">{t('hotseat.modeNormal')}</span>
-                <span className="text-[10px] block mt-1" style={{ color: '#888' }}>{t('hotseat.modeNormalDesc')}</span>
-              </button>
-              <button
-                onClick={() => setMode('free')}
-                className="flex-1 py-3 px-3 text-center transition-colors"
-                style={{
-                  backgroundColor: mode === 'free' ? '#1a1a1a' : '#111',
-                  border: `1px solid ${mode === 'free' ? '#c4a35a' : '#262626'}`,
-                  color: mode === 'free' ? '#e0e0e0' : '#666',
-                }}
-              >
-                <span className="text-xs font-bold uppercase tracking-wider block">{t('hotseat.modeFree')}</span>
-                <span className="text-[10px] block mt-1" style={{ color: '#888' }}>{t('hotseat.modeFreeDesc')}</span>
-              </button>
-            </div>
           </div>
 
           {/* Player 1 deck */}
