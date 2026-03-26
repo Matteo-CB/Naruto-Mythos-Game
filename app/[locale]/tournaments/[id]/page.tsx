@@ -66,7 +66,9 @@ export default function TournamentDetailPage() {
   useEffect(() => {
     if (!session?.user || !activeTournament || activeTournament.gameMode === 'sealed') return;
     fetch('/api/decks').then(r => r.ok ? r.json() : null).then(data => {
-      if (data?.decks) setMyDecks(data.decks.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })));
+      // API returns array directly, not { decks: [...] }
+      const decks = Array.isArray(data) ? data : data?.decks ?? [];
+      if (decks.length > 0) setMyDecks(decks.map((d: { id: string; name: string }) => ({ id: d.id, name: d.name })));
     }).catch(() => {});
     // Check if participant already has a deck selected
     const myParticipant = activeTournament.participants.find(p => p.userId === userId);
