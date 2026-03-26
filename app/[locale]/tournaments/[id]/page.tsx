@@ -43,7 +43,7 @@ export default function TournamentDetailPage() {
   const isCreator = activeTournament?.creatorId === userId;
   const isParticipant = activeTournament?.participants.some((p) => p.userId === userId);
   const myMatch: TournamentMatch | undefined = activeTournament?.matches.find((m) => (m.player1Id === userId || m.player2Id === userId) && (m.status === 'pending' || m.status === 'ready' || m.status === 'in_progress'));
-  const myAbsenceDeadline = myMatch?.absenceDeadline && myMatch.absentPlayerId === userId ? myMatch.absenceDeadline : null;
+  const myAbsenceDeadline = myMatch?.absenceDeadline ? myMatch.absenceDeadline : null;
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
   useEffect(() => { if (tournamentId && session?.user) fetchTournament(tournamentId); return () => { clearActiveTournament(); }; }, [tournamentId, session, fetchTournament, clearActiveTournament]);
@@ -336,7 +336,7 @@ export default function TournamentDetailPage() {
         )}
 
         {error && <div className="mb-4 p-3 text-xs" style={{ backgroundColor: 'rgba(204, 68, 68, 0.1)', border: '1px solid rgba(204, 68, 68, 0.3)', color: '#cc4444' }}>{error}</div>}
-        {myAbsenceDeadline && (<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4"><AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} /></motion.div>)}
+        {/* Absence timer moved into match block above */}
 
         {/* Registration */}
         {tour.status === 'registration' && (
@@ -465,15 +465,30 @@ export default function TournamentDetailPage() {
               <div className="mb-6 p-4" style={{ backgroundColor: '#111111', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>
                 <p className="text-xs mb-3" style={{ color: '#e0e0e0' }}>{myMatch.player1Username ?? t('tbd')} vs {myMatch.player2Username ?? t('tbd')}</p>
+                {/* Timer before disqualification */}
+                {myAbsenceDeadline && (
+                  <div className="mb-3">
+                    <AbsenceTimer deadline={myAbsenceDeadline} onExpired={() => fetchTournament(tournamentId)} />
+                  </div>
+                )}
+                {/* Join match button */}
                 {myMatch.roomCode ? (
-                  <Link href={('/play/online?room=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
+                  <Link href={('/play/online?room=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch}
+                    className="block w-full text-center py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+                    style={{ backgroundColor: 'rgba(196, 163, 90, 0.2)', border: '2px solid #c4a35a', color: '#c4a35a' }}>
+                    {t('playMatch')}
+                  </Link>
                 ) : (myMatch.status === 'ready' || myMatch.status === 'in_progress') ? (
-                  <button onClick={handlePlayMatch} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('ready')}</button>
+                  <div>
+                    <button onClick={handlePlayMatch}
+                      className="w-full py-3 text-sm font-bold uppercase tracking-wider cursor-pointer transition-colors"
+                      style={{ backgroundColor: 'rgba(196, 163, 90, 0.2)', border: '2px solid #c4a35a', color: '#c4a35a' }}>
+                      {t('ready')}
+                    </button>
+                    <p className="text-xs mt-2 text-center" style={{ color: '#888' }}>{t('waitingBothReady')}</p>
+                  </div>
                 ) : null}
                 {myMatch.status === 'pending' && <p className="text-xs" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>}
-                {!myMatch.roomCode && myMatch.status === 'ready' && (
-                  <p className="text-xs mt-2" style={{ color: '#888' }}>{t('waitingBothReady')}</p>
-                )}
               </div>
             )}
             <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
