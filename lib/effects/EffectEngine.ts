@@ -8774,6 +8774,7 @@ export class EffectEngine {
               isUpgrade: g120Desc.isUpgrade ?? false,
               sourceInstanceId: pendingEffect.sourceInstanceId,
               sourceMissionIndex: pendingEffect.sourceMissionIndex,
+              constraintMode: 'one-per-mission',
             }),
             targetSelectionType: 'ORDERED_DEFEAT',
             sourcePlayer: g120Player, requiresTargetSelection: true,
@@ -8923,7 +8924,7 @@ export class EffectEngine {
           newState.pendingEffects.push({
             id: i130EffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'UPGRADE' as EffectType,
-            effectDescription: '{}',
+            effectDescription: JSON.stringify({ constraintMode: 'all-in-mission' }),
             targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: i130Player,
             requiresTargetSelection: true, validTargets: i130AllHidden,
             isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,

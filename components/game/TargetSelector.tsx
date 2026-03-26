@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
@@ -195,9 +195,16 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
 // Shows all missions with all characters. Valid targets glow. Player clicks targets in order (1, 2, 3...).
 // Hidden enemy cards show as card backs. Confirm button sends the ordered list.
 
+// constraintMode:
+// 'free' — click any valid target in any order (default)
+// 'one-per-mission' — Gaara 120: max 1 target per mission
+// 'all-in-mission' — Ichibi 130: clicking one selects ALL hidden in that mission, locks other missions
+// 'naruto133' — Naruto 133: 1 target P≤5 in sourceMission + 1 target P≤2 anywhere
+type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133';
+
 function OrderedDefeatPopup({
   missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
-  onConfirm, onDecline, canDecline, minSelections,
+  onConfirm, onDecline, canDecline, minSelections, constraintMode, sourceMissionIndex,
 }: {
   missions: VisibleMission[];
   validTargets: string[];
@@ -206,6 +213,8 @@ function OrderedDefeatPopup({
   descriptionKey?: string;
   descriptionParams?: Record<string, string>;
   minSelections?: number;
+  constraintMode?: ConstraintMode;
+  sourceMissionIndex?: number;
   onConfirm: (orderedIds: string[]) => void;
   onDecline?: () => void;
   canDecline?: boolean;
@@ -214,16 +223,59 @@ function OrderedDefeatPopup({
   const locale = useLocale();
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
+  const mode = constraintMode ?? 'free';
   const minRequired = minSelections ?? validTargets.length;
   const canConfirm = orderedIds.length >= minRequired;
 
+  // Build a map: instanceId -> missionIndex for constraint checking
+  const charMissionMap = useMemo(() => {
+    const map = new Map<string, number>();
+    missions.forEach((m, mIdx) => {
+      [...m.player1Characters, ...m.player2Characters].forEach(c => map.set(c.instanceId, mIdx));
+    });
+    return map;
+  }, [missions]);
+
+  // Determine which targets are currently locked based on constraint mode
+  const lockedTargets = useMemo(() => {
+    const locked = new Set<string>();
+    if (mode === 'one-per-mission') {
+      // Lock other targets in missions where one is already selected
+      const selectedMissions = new Set(orderedIds.map(id => charMissionMap.get(id)));
+      for (const t of validTargets) {
+        if (orderedIds.includes(t)) continue;
+        if (selectedMissions.has(charMissionMap.get(t))) locked.add(t);
+      }
+    } else if (mode === 'all-in-mission') {
+      // If any card selected, lock all cards NOT in the same mission
+      if (orderedIds.length > 0) {
+        const selectedMission = charMissionMap.get(orderedIds[0]);
+        for (const t of validTargets) {
+          if (charMissionMap.get(t) !== selectedMission) locked.add(t);
+        }
+      }
+    }
+    return locked;
+  }, [mode, orderedIds, validTargets, charMissionMap]);
+
   const toggleTarget = useCallback((id: string) => {
+    if (mode === 'all-in-mission') {
+      // Click one card → select ALL valid targets in that mission
+      const clickedMission = charMissionMap.get(id);
+      setOrderedIds(prev => {
+        if (prev.includes(id)) return []; // Deselect all
+        // Select all valid targets in this mission
+        const inMission = validTargets.filter(t => charMissionMap.get(t) === clickedMission);
+        return inMission;
+      });
+      return;
+    }
     setOrderedIds(prev => {
       if (prev.includes(id)) return prev.slice(0, prev.indexOf(id));
       if (prev.length >= validTargets.length) return prev;
       return [...prev, id];
     });
-  }, [validTargets.length]);
+  }, [validTargets, charMissionMap, mode]);
 
   const rankColors: Record<string, string> = { D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e' };
 
@@ -269,7 +321,7 @@ function OrderedDefeatPopup({
                     <span className="text-[9px]" style={{ color: '#555' }}>{t('game.opponent')}</span>
                     <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
                       {oppChars.map(char => {
-                        const isValid = validTargets.includes(char.instanceId);
+                        const isValid = validTargets.includes(char.instanceId) && !lockedTargets.has(char.instanceId);
                         const orderIdx = orderedIds.indexOf(char.instanceId);
                         const isSelected = orderIdx >= 0;
                         return (
@@ -661,6 +713,16 @@ export function TargetSelector() {
 
   // ---- ORDERED_DEFEAT popup (Gaara 120, Ichibi 130, Naruto 133) ----
   if (eTst === 'ORDERED_DEFEAT' && visibleState && validTargets.length > 0) {
+    let odConstraint: ConstraintMode = 'free';
+    let odSourceMission: number | undefined;
+    try {
+      const odPending = visibleState.pendingEffects?.find((e: { targetSelectionType: string }) => e.targetSelectionType === 'ORDERED_DEFEAT');
+      if (odPending) {
+        const odParsed = JSON.parse((odPending as { effectDescription?: string }).effectDescription ?? '{}');
+        odConstraint = odParsed.constraintMode ?? 'free';
+        odSourceMission = odParsed.sourceMissionIndex;
+      }
+    } catch { /* ignore */ }
     return (
       <OrderedDefeatPopup
         missions={visibleState.activeMissions as VisibleMission[]}
@@ -673,6 +735,8 @@ export function TargetSelector() {
         onDecline={canDecline ? handleDecline : undefined}
         canDecline={canDecline}
         minSelections={pendingTargetSelection?.minSelections}
+        constraintMode={odConstraint}
+        sourceMissionIndex={odSourceMission}
       />
     );
   }
