@@ -12307,9 +12307,58 @@ export class EffectEngine {
       // =============================================
       // PLAY SUMMON types
       // =============================================
-      case 'JIRAIYA008_CHOOSE_SUMMON':
+      case 'JIRAIYA008_CHOOSE_SUMMON': {
+        // Clear remainingEffectTypes BEFORE the summon play so they don't propagate
+        // to child pending effects (prevents double UPGRADE trigger)
+        const j008Remaining = pendingEffect.remainingEffectTypes;
+        pendingEffect.remainingEffectTypes = undefined;
+
         newState = EffectEngine.playSummonFromHandWithReduction(newState, pendingEffect, targetId, 2);
+
+        // Queue Jiraiya 008 UPGRADE as a separate CONFIRM pending effect
+        if (j008Remaining?.length) {
+          for (const remainingType of j008Remaining) {
+            if (remainingType === 'UPGRADE') {
+              const j008CharResult = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
+              if (j008CharResult) {
+                const j008MI = j008CharResult.missionIndex;
+                const j008EnemySide = pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+                const j008Mission = newState.activeMissions[j008MI];
+                const j008HideTargets = j008Mission ? (j008Mission as any)[j008EnemySide].filter((c: CharacterInPlay) => {
+                  if (c.isHidden) return false;
+                  const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+                  return tc.chakra <= 3;
+                }) : [];
+                if (j008HideTargets.length > 0) {
+                  const j008uEffId = generateInstanceId();
+                  const j008uActId = generateInstanceId();
+                  newState.pendingEffects.push({
+                    id: j008uEffId, sourceCardId: pendingEffect.sourceCardId,
+                    sourceInstanceId: pendingEffect.sourceInstanceId,
+                    sourceMissionIndex: j008MI, effectType: 'UPGRADE' as EffectType,
+                    effectDescription: JSON.stringify({ sourceMissionIndex: j008MI }),
+                    targetSelectionType: 'JIRAIYA008_CONFIRM_UPGRADE',
+                    sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
+                    validTargets: [pendingEffect.sourceInstanceId],
+                    isOptional: true, isMandatory: false,
+                    resolved: false, isUpgrade: true,
+                  });
+                  newState.pendingActions.push({
+                    id: j008uActId, type: 'SELECT_TARGET' as PendingAction['type'],
+                    player: pendingEffect.sourcePlayer,
+                    description: 'Jiraiya (008) UPGRADE: Hide an enemy with cost 3 or less?',
+                    descriptionKey: 'game.effect.desc.jiraiya008ConfirmUpgrade',
+                    options: [pendingEffect.sourceInstanceId],
+                    minSelections: 1, maxSelections: 1,
+                    sourceEffectId: j008uEffId,
+                  });
+                }
+              }
+            }
+          }
+        }
         break;
+      }
 
       case 'JIRAIYA105_CHOOSE_SUMMON': {
         // Clear remainingEffectTypes BEFORE the summon play so they don't propagate
