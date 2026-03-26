@@ -831,7 +831,7 @@ function buildPendingTargetSelectionUI(
     onDecline: isMultiSelectChoose ? onDecline : (pendingEffect?.isOptional ? onDecline : undefined),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
-    minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : undefined,
+    minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : (tst === 'ORDERED_DEFEAT' ? pendingAction.minSelections : undefined),
     maxSelections: isMultiSelectChoose ? (pendingAction.maxSelections ?? 1) : pendingAction.maxSelections,
   };
 }
