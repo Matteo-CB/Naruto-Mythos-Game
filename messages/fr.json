@@ -398,6 +398,9 @@
       "or": "OU",
       "chooseEffectOrder": "Choisir l'ordre des effets",
       "chooseEffectOrderDesc": "Plusieurs effets se declenchent en meme temps. Choisissez lequel resoudre en premier.",
+      "orderedDefeat": {
+        "progress": "{selected} / {total} selectionne(s)"
+      },
       "desc": {
         "chooseEffectOrder": "Plusieurs effets se declenchent simultanement. Choisissez l'ordre de resolution.",
         "effectPlayUpgradeChoice": "Jouer {card} comme nouveau personnage ou UPGRADE ?",
@@ -600,6 +603,8 @@
         "choji018HideEnemy": "Choisissez un personnage ennemi avec moins de Puissance a cacher.",
         "gaara120ConfirmMain": "MAIN : Vaincre jusqu'a 1 personnage ennemi avec Puissance 1 ou moins dans chaque mission.",
         "gaara120ChooseDefeat": "Choisissez un personnage ennemi avec Puissance 1 ou moins a vaincre dans la mission {mission}.",
+        "ichibi130OrderDefeat": "Choisissez l'ordre de defaite de {count} ennemis caches.",
+        "orderedDefeat": "{count} personnage(s) vaincu(s) dans l'ordre choisi.",
         "gaara120ConfirmUpgrade": "UPGRADE : POWERUP {count} sur Gaara.",
         "reorderDiscard": "Choisissez l'ordre des {count} cartes vaincues dans votre pile de defausse. Dernier choisi = dessus de la pile.",
         "dosu069LookAtHidden": "Selectionnez un personnage cache en jeu a regarder.",

@@ -667,8 +667,8 @@ export class EffectEngine {
           return state;
         }
       }
-    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD') {
-      // REORDER_DISCARD sends a JSON array of all IDs as targetId — skip single-target validation
+    } else if (pendingEffect.targetSelectionType === 'REORDER_DISCARD' || pendingEffect.targetSelectionType === 'ORDERED_DEFEAT') {
+      // REORDER_DISCARD / ORDERED_DEFEAT send a JSON array of all IDs as targetId — skip single-target validation
     } else if (pendingEffect.validTargets && pendingEffect.validTargets.length > 0 && !pendingEffect.validTargets.includes(targetId)) {
       console.warn(`[EffectEngine] Invalid target ${targetId} - not in validTargets [${pendingEffect.validTargets.join(', ')}] for ${pendingEffect.targetSelectionType}`);
       return state;
@@ -8922,18 +8922,37 @@ export class EffectEngine {
           // Auto-resolve: defeat all hidden in that mission
           const mIdx = parseInt(i130Missions[0]);
           const hiddenEnemies = newState.activeMissions[mIdx][i130EnemySide].filter((c: CharacterInPlay) => c.isHidden);
-          const sorted = sortTargetsGemmaLast(hiddenEnemies);
-          let defeatedCount = 0;
-          for (const h of sorted) {
-            newState = EffectEngine.defeatCharacter(newState, h.instanceId, i130Player);
-            defeatedCount++;
-          }
-          newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
-            'EFFECT_DEFEAT', `Ichibi (130) UPGRADE: Defeated ${defeatedCount} hidden enemy character(s) in mission ${mIdx + 1}.`,
-            'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: `${defeatedCount} hidden enemies` });
-          if (defeatedCount >= 2) {
-            const i130Def: PlayerID = i130Player === 'player1' ? 'player2' : 'player1';
-            newState.pendingDiscardReorder = { discardOwner: i130Def, chooser: i130Player, count: defeatedCount };
+          if (hiddenEnemies.length >= 2) {
+            // 2+ hidden: show ORDERED_DEFEAT popup so attacker chooses defeat order
+            const i130odEffId = generateInstanceId();
+            const i130odActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: i130odEffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: mIdx, effectType: 'UPGRADE' as EffectType,
+              effectDescription: JSON.stringify({ missionIndex: mIdx }),
+              targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: i130Player,
+              requiresTargetSelection: true, validTargets: hiddenEnemies.map(h => h.instanceId),
+              isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
+              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+              descriptionParams: { count: String(hiddenEnemies.length) },
+            } as PendingEffect);
+            newState.pendingActions.push({
+              id: i130odActId, type: 'SELECT_TARGET', player: i130Player,
+              description: `Ichibi (130) UPGRADE: Choose defeat order.`,
+              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+              descriptionParams: { count: String(hiddenEnemies.length) },
+              options: hiddenEnemies.map(h => h.instanceId),
+              minSelections: hiddenEnemies.length, maxSelections: hiddenEnemies.length,
+              sourceEffectId: i130odEffId,
+            });
+          } else {
+            // 0-1 hidden: auto-defeat
+            for (const h of hiddenEnemies) {
+              newState = EffectEngine.defeatCharacter(newState, h.instanceId, i130Player);
+            }
+            newState.log = logAction(newState.log, newState.turn, newState.phase, i130Player,
+              'EFFECT_DEFEAT', `Ichibi (130) UPGRADE: Defeated ${hiddenEnemies.length} hidden enemy character(s) in mission ${mIdx + 1}.`,
+              'game.log.effect.defeat', { card: 'ICHIBI', id: 'KS-130-R', target: `${hiddenEnemies.length} hidden enemies` });
           }
           break;
         }
@@ -12480,23 +12499,41 @@ export class EffectEngine {
             pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
           const mission_i = newState.activeMissions[missionIdx_i];
           const hiddenEnemies = mission_i[enemySide_i].filter((c: CharacterInPlay) => c.isHidden);
-          // Sort targets so Gemma 049 is processed last (AoE ordering fix)
-          const sortedHiddenEnemies = sortTargetsGemmaLast(hiddenEnemies);
-          let defeatedCount = 0;
-          for (const hidden of sortedHiddenEnemies) {
-            newState = EffectEngine.defeatCharacter(newState, hidden.instanceId, pendingEffect.sourcePlayer);
-            defeatedCount++;
-          }
-          newState.log = logAction(
-            newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DEFEAT',
-            `Ichibi (130) UPGRADE: Defeated ${defeatedCount} hidden enemy character(s) in mission ${missionIdx_i + 1}.`,
-            'game.log.effect.defeat',
-            { card: 'ICHIBI', id: 'KS-130-R', target: `${defeatedCount} hidden enemies` },
-          );
-          if (defeatedCount >= 2) {
-            const i130Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-            newState.pendingDiscardReorder = { discardOwner: i130Defender, chooser: pendingEffect.sourcePlayer, count: defeatedCount };
+          if (hiddenEnemies.length >= 2) {
+            // 2+ hidden: show ORDERED_DEFEAT popup so attacker chooses defeat order
+            const i130cmEffId = generateInstanceId();
+            const i130cmActId = generateInstanceId();
+            newState.pendingEffects.push({
+              id: i130cmEffId, sourceCardId: 'KS-130-R', sourceInstanceId: pendingEffect.sourceInstanceId,
+              sourceMissionIndex: missionIdx_i, effectType: 'UPGRADE' as EffectType,
+              effectDescription: JSON.stringify({ missionIndex: missionIdx_i }),
+              targetSelectionType: 'ORDERED_DEFEAT', sourcePlayer: pendingEffect.sourcePlayer,
+              requiresTargetSelection: true, validTargets: hiddenEnemies.map(h => h.instanceId),
+              isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
+              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+              descriptionParams: { count: String(hiddenEnemies.length) },
+            } as PendingEffect);
+            newState.pendingActions.push({
+              id: i130cmActId, type: 'SELECT_TARGET', player: pendingEffect.sourcePlayer,
+              description: `Ichibi (130) UPGRADE: Choose defeat order.`,
+              descriptionKey: 'game.effect.desc.ichibi130OrderDefeat',
+              descriptionParams: { count: String(hiddenEnemies.length) },
+              options: hiddenEnemies.map(h => h.instanceId),
+              minSelections: hiddenEnemies.length, maxSelections: hiddenEnemies.length,
+              sourceEffectId: i130cmEffId,
+            });
+          } else {
+            // 0-1 hidden: auto-defeat
+            for (const hidden of hiddenEnemies) {
+              newState = EffectEngine.defeatCharacter(newState, hidden.instanceId, pendingEffect.sourcePlayer);
+            }
+            newState.log = logAction(
+              newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT',
+              `Ichibi (130) UPGRADE: Defeated ${hiddenEnemies.length} hidden enemy character(s) in mission ${missionIdx_i + 1}.`,
+              'game.log.effect.defeat',
+              { card: 'ICHIBI', id: 'KS-130-R', target: `${hiddenEnemies.length} hidden enemies` },
+            );
           }
         }
         break;
@@ -12619,6 +12656,21 @@ export class EffectEngine {
       // =============================================
       // REORDER_DISCARD: owner reorders top N cards of their discard pile
       // =============================================
+      // ORDERED_DEFEAT: attacker chose defeat order — defeat targets in the given order
+      case 'ORDERED_DEFEAT': {
+        let odList: string[] = [];
+        try { odList = JSON.parse(targetId); } catch { odList = [targetId]; }
+        for (const charId of odList) {
+          newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer);
+        }
+        newState.log = logAction(
+          newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_DEFEAT', `Defeated ${odList.length} character(s) in chosen order.`,
+          'game.log.effect.orderedDefeat', { count: String(odList.length) },
+        );
+        break;
+      }
+
       case 'REORDER_DISCARD': {
         // targetId is the instanceId of the card the owner selected as FIRST (bottom)
         // The TargetOrderPopup sends the ordered list as a JSON array in targetId
@@ -14632,11 +14684,7 @@ export class EffectEngine {
           break;
         }
 
-        // Queue discard reorder for after all effects resolve
-        if (!chainedToNext && defeatedCount_g >= 2) {
-          const g120DefenderPile: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          newState.pendingDiscardReorder = { discardOwner: g120DefenderPile, chooser: pendingEffect.sourcePlayer, count: defeatedCount_g };
-        }
+        // Discard order follows the selection order (no reorder popup needed)
         if (!chainedToNext && gaaraDesc.isUpgrade && defeatedCount_g > 0 && gaaraDesc.sourceInstanceId && gaaraDesc.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();
