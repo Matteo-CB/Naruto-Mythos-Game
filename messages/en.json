@@ -2644,6 +2644,9 @@
   },
   "chat": {
     "title": "Chat",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "emotes": "Emotes",
     "report": "Report",
     "reported": "Reported",
     "reportReason": "Why are you reporting this message?",
@@ -2653,20 +2656,11 @@
     "systemTag": "System",
     "joinedAsSpectator": "{name} joined as spectator",
     "leftSpectating": "{name} left",
+    "maxLength": "Max 200 characters",
     "cooldown": "Please wait...",
     "chatBanned": "You are banned from chat",
     "unread": "{count} new",
-    "noMessages": "No messages yet",
-    "preset": {
-      "gg": "GG",
-      "wp": "Well Played",
-      "gl": "Good Luck",
-      "thanks": "Thanks",
-      "sorry": "Sorry",
-      "nice": "Nice Move",
-      "oops": "Oops",
-      "letsgo": "Let's Go"
-    }
+    "noMessages": "No messages yet"
   },
   "moderation": {
     "reports": "Reports",

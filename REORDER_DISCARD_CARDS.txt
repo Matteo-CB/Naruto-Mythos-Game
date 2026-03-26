@@ -1,0 +1,62 @@
+CARDS WITH REORDER DISCARD — PLAN FINAL
+========================================
+
+PRINCIPE: C'est l'ATTAQUANT (celui qui joue l'effet) qui choisit l'ordre
+dans lequel les cartes vaincues vont dans la discard pile adverse.
+Les cartes cachees restent face cachee pendant le choix.
+
+METHODE: Au lieu d'un popup reorder APRES la defaite, integrer le numero
+d'ordre directement dans le popup de selection des cibles. Le joueur
+clique sur les cibles dans l'ordre voulu: 1er clic = va en premier
+dans la discard (fond de pile), dernier clic = top de la discard.
+Pour les effets automatiques (pas de choix de cible), un popup d'ordre
+s'affiche avec les cartes (cachees = dos de carte).
+
+
+1) KS-120-R - GAARA (R)
+   MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.
+
+   CHANGEMENT: Gaara choisit l'ordre de defaite. Popup avec toutes les
+   cibles valides (Power 1 ou moins dans chaque mission). Le joueur
+   clique dans l'ordre voulu. Les cartes cachees sont affichees dos
+   de carte. L'ordre de clic = ordre dans la discard adverse.
+   Supprime le reorder discard popup actuel.
+
+
+2) KS-130-R - ICHIBI (R)
+   UPGRADE: Defeat all hidden enemy characters in the chosen mission.
+
+   CHANGEMENT: Apres avoir choisi la mission, un popup d'ordre s'affiche
+   avec les cartes cachees (toutes en dos de carte puisqu'elles sont
+   hidden). Le joueur Ichibi clique dans l'ordre voulu. L'ordre de
+   clic = ordre dans la discard adverse.
+   Supprime le reorder discard popup actuel.
+
+
+3) KS-133-S - NARUTO UZUMAKI (S)
+   UPGRADE: Instead, defeat both of them.
+
+   CHANGEMENT: Le joueur choisit ses 2 cibles. L'ordre de selection
+   = ordre dans la discard adverse (1er choisi = fond, 2e = top).
+   Les cibles cachees sont en dos de carte pendant la selection.
+   Supprime le reorder discard popup actuel.
+
+
+4) KS-135-S - SAKURA HARUNO (S)
+   MAIN: Look at top 3 cards, play one, discard the other 2.
+
+   AUCUN CHANGEMENT: Garde le reorder discard popup actuel.
+   Le joueur voit ses propres cartes et choisit l'ordre des 2
+   cartes defaussees. C'est un choix strategique (top de discard
+   pour Kabuto 053 etc).
+
+
+5) KS-140-S - ITACHI UCHIWA (S)
+   MAIN: Opponent discards entire hand, draws same number.
+
+   CHANGEMENT: C'est le joueur Itachi (l'attaquant) qui choisit l'ordre
+   dans lequel la main adverse va dans la discard. Popup d'ordre avec
+   les cartes de la main adverse visibles (la main est info publique
+   car Itachi la regarde avant de defausser). L'attaquant clique dans
+   l'ordre voulu. Supprime le reorder discard actuel qui laissait
+   l'adversaire choisir.

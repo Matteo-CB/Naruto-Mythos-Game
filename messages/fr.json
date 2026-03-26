@@ -2644,6 +2644,9 @@
   },
   "chat": {
     "title": "Chat",
+    "placeholder": "Ecrire un message...",
+    "send": "Envoyer",
+    "emotes": "Emotes",
     "report": "Signaler",
     "reported": "Signale",
     "reportReason": "Pourquoi signalez-vous ce message ?",
@@ -2653,20 +2656,11 @@
     "systemTag": "Systeme",
     "joinedAsSpectator": "{name} rejoint en tant que spectateur",
     "leftSpectating": "{name} est parti",
+    "maxLength": "Max 200 caracteres",
     "cooldown": "Veuillez patienter...",
     "chatBanned": "Vous etes banni du chat",
     "unread": "{count} nouveau(x)",
-    "noMessages": "Aucun message",
-    "preset": {
-      "gg": "GG",
-      "wp": "Bien joue",
-      "gl": "Bonne chance",
-      "thanks": "Merci",
-      "sorry": "Desole",
-      "nice": "Beau coup",
-      "oops": "Oups",
-      "letsgo": "C'est parti"
-    }
+    "noMessages": "Aucun message"
   },
   "moderation": {
     "reports": "Signalements",

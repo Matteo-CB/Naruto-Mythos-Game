@@ -31,6 +31,7 @@ import { SandboxToolbar } from "./SandboxToolbar";
 import { EdgeCoinFlip } from "./EdgeCoinFlip";
 import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
+import { SpectatorBanner } from "./SpectatorBanner";
 
 // ----- Shared color maps -----
 
@@ -1032,6 +1033,8 @@ function GameBoardInner() {
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
   const gameBackgroundUrl = useSettingsStore((s) => s.gameBackgroundUrl);
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
+  const isSpectating = useSocketStore((s) => s.isSpectating);
+
   // Load user background preference on mount
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
@@ -1109,7 +1112,7 @@ function GameBoardInner() {
         backgroundPosition: "center",
         position: "relative",
         overscrollBehavior: "none",
-        paddingTop: 0,
+        paddingTop: isSpectating ? 36 : 0,
       }}
       onClick={handleBoardClick}
     >
@@ -1139,7 +1142,10 @@ function GameBoardInner() {
             padding: dims.isMobile ? '0' : '4px 0',
           }}
         >
-          <OpponentHand handSize={opponentState.handSize} />
+          {isSpectating
+            ? null
+            : <OpponentHand handSize={opponentState.handSize} />
+          }
         </section>
 
         {/* Mission area with ActionBar */}
@@ -1205,7 +1211,10 @@ function GameBoardInner() {
             paddingBottom: dims.isMobile ? '2px' : '0',
           }}
         >
-          <PlayerHand hand={myState.hand} chakra={myState.chakra} />
+          {isSpectating
+            ? null
+            : <PlayerHand hand={myState.hand} chakra={myState.chakra} />
+          }
         </section>
 
         {/* Player stats bar */}
@@ -1220,6 +1229,7 @@ function GameBoardInner() {
       <MobileDetailsButton />
 
       <EdgeCoinFlip />
+      <SpectatorBanner />
       <MulliganDialog />
       <GameLog />
       <GameChat />
