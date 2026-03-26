@@ -226,8 +226,6 @@ function OrderedDefeatPopup({
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
   const mode = constraintMode ?? 'free';
   const minRequired = minSelections ?? validTargets.length;
-  // For all-in-mission: can confirm when at least 1 card selected (entire mission auto-selected)
-  const canConfirm = mode === 'all-in-mission' ? orderedIds.length > 0 : orderedIds.length >= minRequired;
   const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
 
   // Build a map: instanceId -> missionIndex for constraint checking
@@ -289,18 +287,23 @@ function OrderedDefeatPopup({
     return locked;
   }, [mode, orderedIds, validTargets, charMissionMap, targetGroups]);
 
+  // For all-in-mission: which mission is locked (first click determines mission)
+  const lockedMission = useMemo(() => {
+    if (mode !== 'all-in-mission' || orderedIds.length === 0) return undefined;
+    return charMissionMap.get(orderedIds[0]);
+  }, [mode, orderedIds, charMissionMap]);
+
+  // For all-in-mission: total targets in locked mission (to know when all are selected)
+  const missionTargetCount = useMemo(() => {
+    if (lockedMission === undefined) return 0;
+    return validTargets.filter(t => charMissionMap.get(t) === lockedMission).length;
+  }, [lockedMission, validTargets, charMissionMap]);
+
+  const canConfirm = mode === 'all-in-mission'
+    ? (lockedMission !== undefined && orderedIds.length === missionTargetCount)
+    : orderedIds.length >= minRequired;
+
   const toggleTarget = useCallback((id: string) => {
-    if (mode === 'all-in-mission') {
-      // Click one card → select ALL valid targets in that mission
-      const clickedMission = charMissionMap.get(id);
-      setOrderedIds(prev => {
-        if (prev.includes(id)) return []; // Deselect all
-        // Select all valid targets in this mission
-        const inMission = validTargets.filter(t => charMissionMap.get(t) === clickedMission);
-        return inMission;
-      });
-      return;
-    }
     setOrderedIds(prev => {
       if (prev.includes(id)) return prev.slice(0, prev.indexOf(id));
       if (prev.length >= validTargets.length) return prev;
