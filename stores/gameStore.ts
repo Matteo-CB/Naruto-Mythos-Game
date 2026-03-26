@@ -13,6 +13,7 @@ import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
 import { getCharacterById } from '@/lib/data/cardIndex';
+import cardsJson from '@/lib/data/sets/KS/cards.json';
 
 interface AnimationEvent {
   id: string;
@@ -531,10 +532,16 @@ function buildPendingTargetSelectionUI(
         const idx = parseInt(indexStr, 10);
         const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
-        // Always resolve image from cardIndex (most reliable source)
         const cardId = (storedCard as any)?.id ?? (storedCard as any)?.cardId ?? info?.cardId;
-        const indexCard = cardId ? getCharacterById(cardId) : null;
-        const cardData = indexCard ? fullCardData(indexCard) : storedCard ? fullCardData(storedCard) : info ? {
+        // Try cardIndex first, then raw JSON, then storedCard, then topCards info
+        let indexCard = cardId ? getCharacterById(cardId) : null;
+        if (!indexCard?.image_file && cardId) {
+          const rawCard = (cardsJson as any).cards?.[cardId];
+          if (rawCard?.image_file) {
+            indexCard = { ...rawCard, image_file: '/' + rawCard.image_file.replace(/\\/g, '/') } as any;
+          }
+        }
+        const cardData = indexCard?.image_file ? fullCardData(indexCard) : storedCard ? fullCardData(storedCard) : info ? {
           name_fr: info.name, chakra: info.chakra, power: info.power, image_file: info.image_file,
         } : { name_fr: '???' };
         return { index: idx, card: cardData };
