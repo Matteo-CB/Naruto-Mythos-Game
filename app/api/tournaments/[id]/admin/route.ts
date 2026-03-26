@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { assignTournamentWinnerRole, removeTournamentRole } from '@/lib/discord/tournamentRoles';
+import { advanceMatchWinner } from '@/lib/socket/tournamentHandlers';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -81,6 +82,10 @@ export async function POST(
               completedAt: new Date(),
             },
           });
+          // Advance winner to next round (handles finals, Discord roles, webhook)
+          if (winnerId) {
+            await advanceMatchWinner(null, tournamentId, activeMatch, winnerId, winnerUsername);
+          }
         }
 
         return NextResponse.json({ success: true, message: `Player disqualified${reason ? ': ' + reason : ''}` });
@@ -135,6 +140,9 @@ export async function POST(
           where: { tournamentId, userId: winnerId },
           data: { eliminated: false, eliminatedRound: null },
         });
+
+        // Advance winner to next round (handles finals, Discord roles, webhook)
+        await advanceMatchWinner(null, tournamentId, match, winnerId, winnerUsername);
 
         return NextResponse.json({ success: true, message: `Match winner set to ${winnerUsername}` });
       }
