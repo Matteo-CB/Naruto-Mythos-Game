@@ -702,10 +702,23 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
       });
     }
 
-    // Broadcast to spectators — board only, no hands at all
+    // Broadcast to spectators — board only, no hands, no hidden cards visible
     if (room.spectators.size > 0) {
+      // Strip hidden card data from ALL characters (spectator sees card backs only)
+      const specMissions = p1State.activeMissions.map((m: any) => ({
+        ...m,
+        player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce
+          ? { ...c, card: undefined, topCard: undefined, isOwn: false }
+          : c
+        ),
+        player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce
+          ? { ...c, card: undefined, topCard: undefined, isOwn: false }
+          : c
+        ),
+      }));
       const spectatorState = {
         ...p1State,
+        activeMissions: specMissions,
         myState: {
           ...p1State.myState,
           hand: [],
@@ -1783,8 +1796,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Send current state (spectators see both hands)
       try {
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const specMs = p1State.activeMissions.map((m: any) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+          player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+        }));
         const spectatorState = {
           ...p1State,
+          activeMissions: specMs,
           myState: { ...p1State.myState, hand: [], handSize: 0 },
           opponentState: { ...p1State.opponentState, hand: [], handSize: 0 },
         };
@@ -1825,8 +1844,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
       try {
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+        const specMs = p1State.activeMissions.map((m: any) => ({
+          ...m,
+          player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+          player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+        }));
         const spectatorState = {
           ...p1State,
+          activeMissions: specMs,
           myState: { ...p1State.myState, hand: [], handSize: 0 },
           opponentState: { ...p1State.opponentState, hand: [], handSize: 0 },
         };
