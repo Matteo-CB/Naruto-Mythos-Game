@@ -1584,12 +1584,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const humanPending = currentState.pendingActions.filter((p) => p.player === humanPlayer);
         if (humanPending.length > 0) break;
 
+        // Clean up orphaned pending effects: effects exist but no matching pending actions for any player.
+        // This can happen when effects auto-resolve but the pendingEffects array isn't cleaned up.
+        if (currentState.pendingEffects.length > 0 && currentState.pendingActions.length === 0) {
+          console.warn('[gameStore] AI: cleaning orphaned pendingEffects with no pending actions:', currentState.pendingEffects.length);
+          currentState = {
+            ...currentState,
+            pendingEffects: [],
+          };
+          iterations++;
+          continue;
+        }
+
         // Mission scoring complete - break to show scored state, then auto-advance
         if (currentState.missionScoringComplete) break;
 
         // Check if it's the AI's turn
         const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
         if (aiActions.length === 0) {
+          // If pending effects/actions are blocking (for the other player), break to let human resolve
+          if (currentState.pendingEffects.length > 0 || currentState.pendingActions.length > 0) {
+            break;
+          }
           // No valid actions but AI hasn't passed yet — force PASS
           if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
             console.warn('[gameStore] AI has no valid actions, forcing PASS');
@@ -1624,7 +1640,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           aiAnimations.push(animEvent);
         }
 
+        const stateBeforeAction = currentState;
         currentState = GameEngine.applyAction(currentState, aiPlayer.player, aiAction);
+
+        // Detect silently rejected actions (executeAction returned unchanged state).
+        // This can happen if the engine rejects the action due to state guards.
+        if (currentState === stateBeforeAction) {
+          console.warn('[gameStore] AI action was silently rejected:', aiAction.type,
+            '| pendingEffects:', currentState.pendingEffects.length,
+            '| pendingActions:', currentState.pendingActions.length);
+          // Pop the animation we speculatively added
+          if (animEvent) aiAnimations.pop();
+          // If there are orphaned pending effects blocking the AI, clean them up
+          if (currentState.pendingEffects.length > 0 && currentState.pendingActions.length === 0) {
+            console.warn('[gameStore] Cleaning orphaned pendingEffects after rejected action');
+            currentState = { ...currentState, pendingEffects: [] };
+          }
+          iterations++;
+          continue;
+        }
 
         if (currentState.phase === 'gameOver') {
           // Queue all AI animations

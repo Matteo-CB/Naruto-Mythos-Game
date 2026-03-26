@@ -18,15 +18,21 @@ const CARD_TIER: Record<string, number> = {
   'KS-133-SV':  10,
   'KS-133-MV':  10,
   'KS-000-L':   10,  // Naruto Legendary - same as 133
+  'KS-134-S':   10,  // Kyubi 134 - 12 power, can't be hidden/defeated + UPGRADE hide total power ≤6
   'KS-132-S':    9,  // Jiraiya - play Summon -5 + UPGRADE force opponent to 2 chars
   'KS-136-S':    9,  // Sasuke - 8 power + UPGRADE mutual defeat + chakra on defeat
   'KS-136-SV':   9,
+  'KS-136-MV':   9,
   'KS-137-S':    9,  // Kakashi - hide upgraded char + UPGRADE move self
   'KS-137-SV':   9,
+  'KS-137-MV':   9,
   'KS-138-S':    9,  // Orochimaru - upgrade over ANY non-Summon + 2 mission pts if target ≥6 power
   'KS-140-S':    9,  // Itachi Tsukuyomi - discard+redraw opponent hand + UPGRADE defeat cost X
-  'KS-130-RA':   9,  // Ichibi RA - 10 power, can't be hidden/defeated + UPGRADE defeat all hidden in mission
-  'KS-076-UC':   9,  // Ichibi - 9 power, upgrade over Gaara, can't be hidden/defeated
+  'KS-130-R':    9,  // Ichibi - 10 power, can't be hidden/defeated + UPGRADE defeat all hidden
+  'KS-130-RA':   9,  // Ichibi RA - same
+  'KS-129-R':    9,  // Kyubi 129 - 10 power, upgrade over Naruto, can't be hidden/defeated
+  'KS-129-RA':   9,
+  'KS-076-UC':   9,  // Ichibi UC - 9 power, upgrade over Gaara, can't be hidden/defeated
   'KS-120-R':    9,  // Gaara R - mass defeat power ≤1 across ALL missions
   'KS-120-RA':   9,
   'KS-120-MV':   9,
@@ -35,6 +41,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-143-M':    8,  // Itachi M - move friendly here + AMBUSH move enemy here
   'KS-144-M':    8,  // Kisame M - steal 1 chakra
   'KS-135-S':    8,  // Sakura S - top 3 deck, play one anywhere (UPGRADE: -4 cost)
+  'KS-135-MV':   8,
   'KS-131-S':    8,  // Tsunade S - POWERUP 1 every friendly Leaf Village in play
   'KS-131-SV':   8,
   'KS-139-S':    8,  // Gaara S - defeat enemy cost < hidden count + hide another
@@ -58,7 +65,8 @@ const CARD_TIER: Record<string, number> = {
   'KS-107-RA':   7,
   'KS-105-R':    7,  // Jiraiya R - Summon -3 + UPGRADE move enemy from mission
   'KS-105-RA':   7,
-  'KS-126-RA':   7,  // Orochimaru RA - 7 power + SCORE defeat weakest enemy + UPGRADE POWERUP 3
+  'KS-126-R':    7,  // Orochimaru R - 7 power + SCORE defeat weakest enemy + UPGRADE POWERUP 3
+  'KS-126-RA':   7,
   'KS-104-R':    7,  // Tsunade R - 6 power + POWERUP X (spend X additional chakra)
   'KS-104-RA':   7,
   'KS-104-MV':   7,
@@ -66,6 +74,12 @@ const CARD_TIER: Record<string, number> = {
   'KS-145-M':    7,  // Naruto M - hidden chars +1 power with Edge
 
   // === Tier B+ (6): Strong cards ===
+  'KS-122-R':    7,  // Jirobo R - 6 power + POWERUP X (chars in mission) + UPGRADE defeat power ≤1
+  'KS-122-RA':   7,
+  'KS-124-R':    7,  // Kidomaru R - AMBUSH defeat power ≤3 in another mission (UPGRADE: ≤5)
+  'KS-124-RA':   7,
+  'KS-127-R':    7,  // Sakon R - 5 power + upgrade over any Sound + AMBUSH hide power ≤5
+  'KS-127-RA':   7,
   'KS-039-UC':   6,  // Rock Lee UC - keeps power tokens + UPGRADE POWERUP 2
   'KS-043-UC':   6,  // Gai UC - keeps power tokens + UPGRADE POWERUP 3
   'KS-118-R':    6,  // Tenten R - AMBUSH defeat hidden + chain defeat if power ≤3
@@ -76,6 +90,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-114-RA':   6,
   'KS-111-R':    6,  // Shikamaru R - block hidden plays + UPGRADE hide power ≤3
   'KS-111-RA':   6,
+  'KS-111-MV':   6,
   'KS-109-R':    6,  // Sakura R - play from discard (UPGRADE: -2 cost)
   'KS-109-RA':   6,
   'KS-110-R':    6,  // Ino R - move weakest enemy + UPGRADE hide after move
@@ -92,6 +107,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-091-UC':   6,  // Itachi UC - see opponent hand + UPGRADE discard 1
   'KS-117-R':    6,  // Rock Lee R - must move end of round + UPGRADE POWERUP X
   'KS-117-RA':   6,
+  'KS-117-MV':   6,
   'KS-112-R':    6,  // Choji R - discard for POWERUP X (cost of discarded) + repeat on UPGRADE
   'KS-112-RA':   6,
   'KS-121-R':    6,  // Temari R - move any friendly + UPGRADE move any
@@ -99,8 +115,10 @@ const CARD_TIER: Record<string, number> = {
   'KS-142-M':    6,  // Sasuke M - discard for POWERUP X+1 (X = enemy count)
   'KS-141-M':    6,  // Naruto M - discard to hide power ≤4
   'KS-115-R':    6,  // Shino R - 6 power + block hide + AMBUSH move friendly
+  'KS-115-RA':   6,
   'KS-103-UC':   6,  // Kyodaigumo - 4 power + end-of-turn hide enemy
   'KS-102-UC':   6,  // Manda - 5 power + AMBUSH defeat enemy Summon
+  'KS-045-UC':   6,  // Anko UC - AMBUSH defeat hidden enemy in play
 
   // === Tier B (5): Solid utility cards ===
   'KS-094-C':    5,  // Gamabunta - 6 power Summon
@@ -221,11 +239,11 @@ const CARD_SYNERGIES: SynergyGroup[] = [
   { cards: ['KS-101-C', 'KS-003-C', 'KS-004-UC', 'KS-104-R', 'KS-104-RA', 'KS-104-MV', 'KS-131-S', 'KS-131-SV', 'KS-005-C', 'KS-006-UC'], bonus: 2, minCount: 2 },  // TonTon + Tsunade/Shizune
 
   // Upgrade chains - same name, increasing cost
-  { cards: ['KS-009-C', 'KS-010-C', 'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-133-S', 'KS-133-SV', 'KS-133-MV', 'KS-000-L', 'KS-141-M', 'KS-145-M'], bonus: 5, minCount: 2 },  // Naruto chain
-  { cards: ['KS-074-C', 'KS-075-C', 'KS-120-R', 'KS-120-RA', 'KS-120-MV', 'KS-076-UC', 'KS-139-S'], bonus: 5, minCount: 2 },  // Gaara chain
-  { cards: ['KS-013-C', 'KS-014-UC', 'KS-107-R', 'KS-107-RA', 'KS-136-S', 'KS-136-SV', 'KS-142-M', 'KS-146-M'], bonus: 4, minCount: 2 },  // Sasuke chain
-  { cards: ['KS-015-C', 'KS-016-UC', 'KS-106-R', 'KS-106-RA', 'KS-137-S', 'KS-137-SV', 'KS-148-M'], bonus: 4, minCount: 2 },  // Kakashi chain
-  { cards: ['KS-050-C', 'KS-051-UC', 'KS-138-S', 'KS-126-RA'], bonus: 4, minCount: 2 },  // Orochimaru chain
+  { cards: ['KS-009-C', 'KS-010-C', 'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-133-S', 'KS-133-SV', 'KS-133-MV', 'KS-000-L', 'KS-141-M', 'KS-145-M', 'KS-129-R', 'KS-129-RA', 'KS-134-S'], bonus: 5, minCount: 2 },  // Naruto/Kyubi chain
+  { cards: ['KS-074-C', 'KS-075-C', 'KS-120-R', 'KS-120-RA', 'KS-120-MV', 'KS-076-UC', 'KS-139-S', 'KS-130-R', 'KS-130-RA'], bonus: 5, minCount: 2 },  // Gaara/Ichibi chain
+  { cards: ['KS-013-C', 'KS-014-UC', 'KS-107-R', 'KS-107-RA', 'KS-136-S', 'KS-136-SV', 'KS-136-MV', 'KS-142-M', 'KS-146-M'], bonus: 4, minCount: 2 },  // Sasuke chain
+  { cards: ['KS-015-C', 'KS-016-UC', 'KS-106-R', 'KS-106-RA', 'KS-137-S', 'KS-137-SV', 'KS-137-MV', 'KS-148-M'], bonus: 4, minCount: 2 },  // Kakashi chain
+  { cards: ['KS-050-C', 'KS-051-UC', 'KS-126-R', 'KS-126-RA', 'KS-138-S'], bonus: 4, minCount: 2 },  // Orochimaru chain
   { cards: ['KS-090-C', 'KS-091-UC', 'KS-128-R', 'KS-128-RA', 'KS-128-MV', 'KS-140-S', 'KS-143-M'], bonus: 4, minCount: 2 },  // Itachi chain
   { cards: ['KS-092-C', 'KS-093-UC', 'KS-144-M'], bonus: 3, minCount: 2 },  // Kisame chain
   { cards: ['KS-086-C', 'KS-087-UC'], bonus: 3, minCount: 2 },  // Zabuza chain
@@ -239,7 +257,7 @@ const CARD_SYNERGIES: SynergyGroup[] = [
   { cards: ['KS-042-C', 'KS-043-UC', 'KS-039-UC', 'KS-036-C', 'KS-037-UC', 'KS-040-C', 'KS-041-UC', 'KS-038-C'], bonus: 3, minCount: 3 },  // Team Guy
   { cards: ['KS-034-C', 'KS-035-UC', 'KS-025-C', 'KS-026-UC', 'KS-027-C', 'KS-028-UC', 'KS-030-C', 'KS-031-UC', 'KS-032-C', 'KS-033-UC'], bonus: 3, minCount: 3 },  // Team 8
   { cards: ['KS-023-C', 'KS-024-UC', 'KS-019-C', 'KS-020-UC', 'KS-021-C', 'KS-022-UC', 'KS-017-C', 'KS-018-UC'], bonus: 3, minCount: 3 },  // Team 10
-  { cards: ['KS-064-C', 'KS-065-UC', 'KS-057-C', 'KS-058-UC', 'KS-059-C', 'KS-060-UC', 'KS-061-C', 'KS-062-UC', 'KS-063-UC', 'KS-125-R', 'KS-125-RA'], bonus: 4, minCount: 3 },  // Sound Four
+  { cards: ['KS-064-C', 'KS-065-UC', 'KS-057-C', 'KS-058-UC', 'KS-059-C', 'KS-060-UC', 'KS-061-C', 'KS-062-UC', 'KS-063-UC', 'KS-125-R', 'KS-125-RA', 'KS-122-R', 'KS-122-RA', 'KS-124-R', 'KS-124-RA', 'KS-127-R', 'KS-127-RA'], bonus: 4, minCount: 3 },  // Sound Four
 
   // Akatsuki pair
   { cards: ['KS-090-C', 'KS-091-UC', 'KS-128-R', 'KS-128-RA', 'KS-128-MV', 'KS-140-S', 'KS-143-M', 'KS-092-C', 'KS-093-UC', 'KS-144-M'], bonus: 3, minCount: 2 },

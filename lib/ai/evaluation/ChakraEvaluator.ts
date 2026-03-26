@@ -85,23 +85,34 @@ export class ChakraEvaluator {
 
   /**
    * Evaluate whether passing now is advisable from a chakra perspective.
-   * If opponent has much more chakra, they can outplay us after we pass.
+   * NOTE: Chakra resets to 0 at end of each turn, so unspent chakra is WASTED.
+   * The AI should almost never conserve — the only exception is turn 1 with
+   * very limited board value, where passing early to get Edge might matter.
    */
   static shouldConserveChakra(state: GameState, player: PlayerID): boolean {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
 
-    // If we have very little chakra left, passing is fine
+    // If we have very little chakra left, passing is fine (nothing to spend)
     if (state[player].chakra <= 1) return false;
 
-    // If opponent already passed, we should spend our chakra
+    // If opponent already passed, we should ALWAYS spend our chakra (free actions!)
     if (state[opponent].hasPassed) return false;
 
-    // If it's early in the game, conserve
-    if (state.turn <= 2 && state[player].chakra > 3) {
-      return true;
-    }
+    // Turns 3-4: NEVER conserve — spend everything, these are the decisive turns.
+    // Chakra resets to 0 at end of turn anyway.
+    if (state.turn >= 3) return false;
 
-    return false;
+    // Turn 2: only conserve if we have no playable cards (very rare)
+    if (state.turn === 2) return false;
+
+    // Turn 1 only: conserve if we want Edge token and have very few good plays
+    // But only if we have no affordable cards at all
+    const hasAffordableCard = state[player].hand.some(
+      c => (c.chakra ?? 0) <= state[player].chakra,
+    );
+    if (hasAffordableCard) return false;
+
+    return true;
   }
 
   /**
