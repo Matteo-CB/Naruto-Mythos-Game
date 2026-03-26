@@ -16120,13 +16120,14 @@ export class EffectEngine {
               ),
             };
           } else {
-            return {
+            // Can't pay — effect still proceeds (pay "if able")
+            state = {
               ...state,
               log: logAction(
                 state.log, state.turn, state.phase, charResult.player,
                 'EFFECT_CONTINUOUS',
-                `Kimimaro (056): ${sourcePlayer} cannot pay 1 Chakra - effect fails.`,
-                'game.log.effect.kimimaro056ProtectionBlocked',
+                `Kimimaro (056): ${sourcePlayer} has 0 Chakra, cannot pay - effect proceeds.`,
+                'game.log.effect.kimimaro056NoPay',
                 { card: 'KIMIMARO', id: 'KS-056-UC' },
               ),
             };
@@ -17116,7 +17117,7 @@ export class EffectEngine {
           const charOwner = char.controlledBy;
           if (charOwner === pending.sourcePlayer) return { state, blocked: false }; // Friendly effect, no protection
 
-          // Opponent must pay 1 chakra to affect Kimimaro. If they can't pay, the effect is CANCELLED.
+          // Opponent must pay 1 chakra IF ABLE. If they can't pay (0 chakra), effect still proceeds.
           const opponent = pending.sourcePlayer;
           if (state[opponent].chakra >= 1) {
             state[opponent].chakra -= 1;
@@ -17127,18 +17128,17 @@ export class EffectEngine {
               'game.log.effect.kimimaro056Protection',
               { card: 'KIMIMARO', id: 'KS-056-UC' },
             );
-            return { state, blocked: false };
           } else {
-            // Can't pay - effect is cancelled
+            // Can't pay - effect still proceeds (pay "if able")
             state.log = logAction(
               state.log, state.turn, state.phase, charOwner,
               'EFFECT_CONTINUOUS',
-              `Kimimaro (056): ${opponent} cannot pay 1 Chakra - effect on Kimimaro is cancelled.`,
-              'game.log.effect.kimimaro056Blocked',
+              `Kimimaro (056): ${opponent} has 0 Chakra, cannot pay - effect proceeds.`,
+              'game.log.effect.kimimaro056NoPay',
               { card: 'KIMIMARO', id: 'KS-056-UC' },
             );
-            return { state, blocked: true };
           }
+          return { state, blocked: false };
         }
       }
     }

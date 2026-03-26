@@ -263,7 +263,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 109/130 - SAKURA HARUNO (R) - "Ninja Medical"
   'KS-109-R': [
     'Choisissez un de vos personnages Village de Konoha dans votre defausse et jouez-le n\'importe ou en payant son cout.',
-    'effet MAIN : A la place, jouez la carte en payant 2 de moins.',
+    'MAIN effect : A la place, jouez la carte en payant 2 de moins.',
   ],
 
   // 120/130 - GAARA (R) - titre non renseigne
@@ -282,13 +282,13 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 133/130 - NARUTO UZUMAKI (S) - "Rasengan"
   'KS-133-S': [
     'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
-    'effet : A la place, vainquez-les tous les deux.',
+    'MAIN effect : A la place, vainquez-les tous les deux.',
   ],
 
   // 135/130 - SAKURA HARUNO (S) - "Corps Medical du Village de la Feuille"
   'KS-135-S': [
     'Regardez les 3 cartes du dessus de votre deck. Jouez un personnage n\'importe ou et defaussez les autres cartes.',
-    'effet : A la place, jouez la carte en payant 4 de moins.',
+    'MAIN effect : A la place, jouez la carte en payant 4 de moins.',
   ],
 
   // 136/130 - SASUKE UCHIWA (S) - "Marque maudite du Ciel"
@@ -300,7 +300,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 135/130 - SAKURA HARUNO (MV) - "Sasuke est en train de me regarder !"
   'KS-135-MV': [
     'Regardez les 3 cartes du dessus de votre deck. Jouez un personnage n\'importe ou et defaussez les autres cartes.',
-    'effet : A la place, jouez la carte en payant 4 de moins.',
+    'MAIN effect : A la place, jouez la carte en payant 4 de moins.',
   ],
 
   // 136/130 - SASUKE UCHIWA (MV) - "Tu m'enerves"
@@ -357,7 +357,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 008/130 - JIRAYA (UC) - "Jutsu d\'Invocation"
   'KS-008-UC': [
     'Jouez un personnage Invocation n\'importe ou en payant 2 de moins.',
-    'effet MAIN : En plus, cachez un personnage ennemi avec un cout de 3 ou moins dans cette mission.',
+    'MAIN effect : En plus, cachez un personnage ennemi avec un cout de 3 ou moins dans cette mission.',
   ],
 
   // 010/130 - NARUTO UZUMAKI (UC) - "Sexy Meta"
@@ -380,7 +380,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 016/130 - KAKASHI HATAKE (UC) - "Ninja Copieur"
   'KS-016-UC': [
     'Copiez un effet instantané non-amélioration d\'un personnage ennemi avec un coût de 4 ou moins en jeu.',
-    'effet MAIN : A la place, il n\'y a pas de limite de coût.',
+    'MAIN effect : A la place, il n\'y a pas de limite de coût.',
   ],
 
   // 017/130 - CHOJI AKIMICHI (C) - "Decuplement"
@@ -397,7 +397,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 020/130 - INO YAMANAKA (UC) - "Transfert de l\'Esprit"
   'KS-020-UC': [
     'Prenez le controle d\'un personnage ennemi avec un cout de 2 ou moins dans cette mission.',
-    'effet MAIN : A la place, la limite de cout est de 3 ou moins.',
+    'MAIN effect : A la place, la limite de cout est de 3 ou moins.',
   ],
 
   // 022/130 - SHIKAMARU NARA (UC) - "Possession des Ombres"
@@ -515,7 +515,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 058/130 - JIROBO (UC) - "Barriere de Terre"
   'KS-058-UC': [
     'POWERUP 1 sur tous les autres personnages Quartet du Son allies dans cette mission.',
-    'effet MAIN : Appliquez l\'effet MAIN aux personnages Quartet du Son dans les autres missions.',
+    'MAIN effect : Appliquez l\'effet MAIN aux personnages Quartet du Son dans les autres missions.',
   ],
 
   // 060/130 - KIDOMARU (UC) - "Toile d\'Araignee"
@@ -607,25 +607,25 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 087/130 - ZABUZA MOMOCHI (UC) - "Prison Aqueuse"
   'KS-087-UC': [
     'S\'il n\'y a qu\'un seul personnage ennemi non cache dans cette mission, cachez-le.',
-    'effet MAIN : A la place, vainquez-le.',
+    'MAIN effect : A la place, vainquez-le.',
   ],
 
   // 089/130 - HAKU (UC) - "Miroirs de Glace"
   'KS-089-UC': [
     'Defaussez la carte du dessus du deck de votre adversaire. PUISSANCE X ou X est le cout de la carte defaussee.',
-    'effet MAIN : A la place, defaussez depuis votre propre deck.',
+    'MAIN effect : A la place, defaussez depuis votre propre deck.',
   ],
 
   // 091/130 - ITACHI UCHIWA (UC) - "Mangekyo Sharingan"
   'KS-091-UC': [
     'Regardez la main de l\'adversaire.',
-    'effet MAIN : En plus, choisissez 1 carte dans la main de l\'adversaire et defaussez-la.',
+    'MAIN effect : En plus, choisissez 1 carte dans la main de l\'adversaire et defaussez-la.',
   ],
 
   // 093/130 - KISAME HOSHIGAKI (UC) - "Samehada"
   'KS-093-UC': [
     'Retirez jusqu\'a 2 jetons de Puissance d\'un personnage ennemi en jeu et placez-les sur ce personnage.',
-    'effet MAIN : A la place, retirez tous les jetons de Puissance et placez-les sur ce personnage.',
+    'MAIN effect : A la place, retirez tous les jetons de Puissance et placez-les sur ce personnage.',
   ],
 
   // 102/130 - MANDA (UC) - "Roi des Serpents"
@@ -663,7 +663,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 106/130 - KAKASHI HATAKE (R) - "Seau Maudit"
   'KS-106-R': [
     'Defaussez la carte du dessus d\'un personnage ennemi ameliore en jeu.',
-    'effet MAIN : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
+    'MAIN effect : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
   ],
 
   // 107/130 - SASUKE UCHIWA (R) - "Chidori"
@@ -679,11 +679,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 110/130 - INO YAMANAKA (R) - "Destruction de l'Esprit"
   'KS-110-R': [
     'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible.',
-    'effet MAIN : Apres l\'avoir deplace, cachez le personnage ennemi.',
+    'MAIN effect : Apres l\'avoir deplace, cachez le personnage ennemi.',
   ],
   'KS-110-RA': [
     'S\'il y a 2 personnages ennemis ou plus dans cette mission, deplacez le personnage ennemi non cache le plus faible.',
-    'effet MAIN : Apres l\'avoir deplace, cachez le personnage ennemi.',
+    'MAIN effect : Apres l\'avoir deplace, cachez le personnage ennemi.',
   ],
 
   // 111/130 - SHIKAMARU NARA (R) - "Etranglement des Ombres"
@@ -701,7 +701,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 113/130 - KIBA INUZUKA (R) - "Crocs Lacerateurs"
   'KS-113-R': [
     'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
-    'effet MAIN : A la place, vainquez-les tous les deux.',
+    'MAIN effect : A la place, vainquez-les tous les deux.',
   ],
 
   // 113b/130 - ASUMA SARUTOBI (R) - "Lames Volantes"
@@ -856,7 +856,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 139/130 - GAARA (S) - "Le Tombeau du Desert"
   'KS-139-S': [
     'Vainquez un personnage ennemi avec un cout inferieur au nombre de personnages allies caches en jeu.',
-    'effet MAIN : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
+    'MAIN effect : En plus, cachez un autre personnage ennemi du meme nom avec un cout inferieur au personnage vaincu.',
   ],
 
   // 140/130 - ITACHI UCHIWA (S) - "Tsukuyomi"
@@ -903,7 +903,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 113/130 V - KIBA INUZUKA (MV) - "Crocs sur crocs"
   'KS-113-MV': [
     'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
-    'effet MAIN : A la place, vainquez-les tous les deux.',
+    'MAIN effect : A la place, vainquez-les tous les deux.',
   ],
 
   // 111/130 V - SHIKAMARU NARA (MV) - "Etranglement des Ombres"
@@ -937,7 +937,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 000/130 - NARUTO UZUMAKI (L) - "Legendaire"
   'KS-000-L': [
     'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
-    'effet MAIN : A la place, vainquez-les tous les deux.',
+    'MAIN effect : A la place, vainquez-les tous les deux.',
   ],
 
   // =====================
@@ -947,7 +947,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 108/130 - NARUTO UZUMAKI (MV) - "Variante Film"
   'KS-108-MV': [
     'Cachez un personnage ennemi avec une Puissance de 3 ou moins dans cette mission.',
-    'effet MAIN : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
+    'MAIN effect : POWERUP X ou X est la Puissance du personnage ennemi qui est cache.',
   ],
 
   // =====================
@@ -964,7 +964,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-106-RA': [
     'Defaussez la carte du dessus d\'un personnage ennemi ameliore en jeu.',
-    'effet MAIN : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
+    'MAIN effect : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
   ],
   'KS-107-RA': [
     '[↯] Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
@@ -972,7 +972,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-109-RA': [
     'Choisissez un de vos personnages Village de Konoha dans votre defausse et jouez-le n\'importe ou en payant son cout.',
-    'effet MAIN : A la place, jouez la carte en payant 2 de moins.',
+    'MAIN effect : A la place, jouez la carte en payant 2 de moins.',
   ],
   'KS-111-RA': [
     '[⧗] L\'adversaire ne peut pas jouer de personnages en cache dans cette mission.',
@@ -984,7 +984,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-113-RA': [
     'Cachez un personnage Akamaru allie. Si vous le faites, cachez un autre personnage dans cette mission.',
-    'effet MAIN : A la place, vainquez-les tous les deux.',
+    'MAIN effect : A la place, vainquez-les tous les deux.',
   ],
   'KS-117-RA': [
     '[⧗] A la fin du tour, vous devez deplacer ce personnage vers une autre mission, si possible.',
@@ -1098,11 +1098,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-133-SV': [
     'Cachez un personnage ennemi avec une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi avec une Puissance de 2 ou moins en jeu.',
-    'effet : À la place, éliminez-les tous les deux.',
+    'MAIN effect : À la place, éliminez-les tous les deux.',
   ],
   'KS-133-MV': [
     'Cachez un personnage ennemi ayant une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi ayant une Puissance de 2 ou moins en jeu.',
-    'effet MAIN : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
+    'MAIN effect : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
   ],
   'KS-136-SV': [
     '[⧗] Quand un personnage est éliminé, gagnez 1 Chakra.',
@@ -1118,6 +1118,6 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-133_2-MV': [
     'Cachez un personnage ennemi ayant une Puissance de 5 ou moins dans cette mission et un autre personnage ennemi ayant une Puissance de 2 ou moins en jeu.',
-    'effet MAIN : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
+    'MAIN effect : Au lieu de cela, envoyez-les tous les deux dans la défausse.',
   ],
 };
