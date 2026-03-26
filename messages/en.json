@@ -606,6 +606,8 @@
         "ichibi130OrderDefeat": "Choose the order to defeat {count} hidden enemies.",
         "orderedDefeat": "Defeated {count} character(s) in chosen order.",
         "gaara120OrderDefeat": "Defeat enemies with Power 1 or less. Click targets in order.",
+        "naruto133OrderDefeat": "Choose enemies to defeat: Power 5 or less (this mission) + Power 2 or less (any). Click in order.",
+        "naruto133OrderHide": "Choose enemies to hide: Power 5 or less (this mission) + Power 2 or less (any). Click in order.",
         "gaara120ConfirmUpgrade": "UPGRADE: POWERUP {count} on Gaara.",
         "reorderDiscard": "Choose the order for {count} defeated cards in your discard pile. Last selected = top of pile.",
         "dosu069LookAtHidden": "Select a hidden character in play to look at.",

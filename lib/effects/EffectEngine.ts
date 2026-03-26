@@ -11067,18 +11067,25 @@ export class EffectEngine {
           break;
         }
 
-        if (n133ValidT1.length > 0) {
-          // Stage 1: choose target1 (Power <= 5 in this mission)
+        // Single ORDERED_DEFEAT popup: all valid targets (group1 = P≤5 this mission, group2 = P≤2 anywhere)
+        {
+          const n133AllTargets = [...new Set([...n133ValidT1, ...n133ValidT2])];
           const n133EffId = generateInstanceId();
           const n133ActId = generateInstanceId();
+          // minSelections: 1 if only one group has targets, 2 if both
+          const n133Min = (n133ValidT1.length > 0 && n133ValidT2.length > 0) ? 2 : 1;
           newState.pendingEffects.push({
             id: n133EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: n133MI, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ missionIndex: n133MI, useDefeat: n133UseDefeat }),
-            targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
+            effectDescription: JSON.stringify({
+              useDefeat: n133UseDefeat, constraintMode: 'naruto133',
+              sourceMissionIndex: n133MI,
+              group1: n133ValidT1, group2: n133ValidT2,
+            }),
+            targetSelectionType: 'ORDERED_DEFEAT',
             sourcePlayer: n133Player, requiresTargetSelection: true,
-            validTargets: n133ValidT1, isOptional: false, isMandatory: true,
+            validTargets: n133AllTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
@@ -11086,37 +11093,11 @@ export class EffectEngine {
             id: n133ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: n133Player,
             description: n133UseDefeat
-              ? 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to defeat (this mission).'
-              : 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to hide (this mission).',
-            descriptionKey: n133UseDefeat ? 'game.effect.desc.naruto133ChooseDefeat1' : 'game.effect.desc.naruto133ChooseHide1',
-            options: n133ValidT1, minSelections: 1, maxSelections: 1,
+              ? 'Naruto Uzumaki (133): Choose enemies to defeat (P≤5 this mission + P≤2 any).'
+              : 'Naruto Uzumaki (133): Choose enemies to hide (P≤5 this mission + P≤2 any).',
+            descriptionKey: n133UseDefeat ? 'game.effect.desc.naruto133OrderDefeat' : 'game.effect.desc.naruto133OrderHide',
+            options: n133AllTargets, minSelections: n133Min, maxSelections: 2,
             sourceEffectId: n133EffId,
-          });
-          pendingEffect.remainingEffectTypes = undefined;
-        } else {
-          // No target1, skip to target2 only
-          const n133EffId2 = generateInstanceId();
-          const n133ActId2 = generateInstanceId();
-          newState.pendingEffects.push({
-            id: n133EffId2, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: n133MI, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ useDefeat: n133UseDefeat, target1Id: null }),
-            targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
-            sourcePlayer: n133Player, requiresTargetSelection: true,
-            validTargets: n133ValidT2, isOptional: false, isMandatory: true,
-            resolved: false, isUpgrade: pendingEffect.isUpgrade,
-            remainingEffectTypes: pendingEffect.remainingEffectTypes,
-          });
-          newState.pendingActions.push({
-            id: n133ActId2, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: n133Player,
-            description: n133UseDefeat
-              ? 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to defeat (any mission).'
-              : 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to hide (any mission).',
-            descriptionKey: n133UseDefeat ? 'game.effect.desc.naruto133ChooseDefeat2' : 'game.effect.desc.naruto133ChooseHide2',
-            options: n133ValidT2, minSelections: 1, maxSelections: 1,
-            sourceEffectId: n133EffId2,
           });
           pendingEffect.remainingEffectTypes = undefined;
         }
@@ -11157,50 +11138,34 @@ export class EffectEngine {
           break;
         }
 
-        if (n133mValidT1.length > 0) {
+        // Single ORDERED_DEFEAT popup with defeat mode
+        {
+          const n133mAllTargets = [...new Set([...n133mValidT1, ...n133mValidT2])];
           const n133mEffId = generateInstanceId();
           const n133mActId = generateInstanceId();
+          const n133mMin = (n133mValidT1.length > 0 && n133mValidT2.length > 0) ? 2 : 1;
           newState.pendingEffects.push({
             id: n133mEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: n133mMI, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ missionIndex: n133mMI, useDefeat: true }),
-            targetSelectionType: 'NARUTO133_CHOOSE_TARGET1',
+            effectDescription: JSON.stringify({
+              useDefeat: true, constraintMode: 'naruto133',
+              sourceMissionIndex: n133mMI,
+              group1: n133mValidT1, group2: n133mValidT2,
+            }),
+            targetSelectionType: 'ORDERED_DEFEAT',
             sourcePlayer: n133mPlayer, requiresTargetSelection: true,
-            validTargets: n133mValidT1, isOptional: false, isMandatory: true,
+            validTargets: n133mAllTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: true,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
             id: n133mActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: n133mPlayer,
-            description: 'Naruto Uzumaki (133): Choose an enemy with Power 5 or less to defeat (this mission).',
-            descriptionKey: 'game.effect.desc.naruto133ChooseDefeat1',
-            options: n133mValidT1, minSelections: 1, maxSelections: 1,
+            description: 'Naruto Uzumaki (133): Choose enemies to defeat (P≤5 this mission + P≤2 any).',
+            descriptionKey: 'game.effect.desc.naruto133OrderDefeat',
+            options: n133mAllTargets, minSelections: n133mMin, maxSelections: 2,
             sourceEffectId: n133mEffId,
-          });
-          pendingEffect.remainingEffectTypes = undefined;
-        } else {
-          const n133mEffId2 = generateInstanceId();
-          const n133mActId2 = generateInstanceId();
-          newState.pendingEffects.push({
-            id: n133mEffId2, sourceCardId: pendingEffect.sourceCardId,
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: n133mMI, effectType: pendingEffect.effectType,
-            effectDescription: JSON.stringify({ useDefeat: true, target1Id: null }),
-            targetSelectionType: 'NARUTO133_CHOOSE_TARGET2',
-            sourcePlayer: n133mPlayer, requiresTargetSelection: true,
-            validTargets: n133mValidT2, isOptional: false, isMandatory: true,
-            resolved: false, isUpgrade: true,
-            remainingEffectTypes: pendingEffect.remainingEffectTypes,
-          });
-          newState.pendingActions.push({
-            id: n133mActId2, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: n133mPlayer,
-            description: 'Naruto Uzumaki (133): Choose an enemy with Power 2 or less to defeat (any mission).',
-            descriptionKey: 'game.effect.desc.naruto133ChooseDefeat2',
-            options: n133mValidT2, minSelections: 1, maxSelections: 1,
-            sourceEffectId: n133mEffId2,
           });
           pendingEffect.remainingEffectTypes = undefined;
         }
@@ -12619,23 +12584,29 @@ export class EffectEngine {
       // =============================================
       // REORDER_DISCARD: owner reorders top N cards of their discard pile
       // =============================================
-      // ORDERED_DEFEAT: attacker chose defeat order — defeat targets in the given order
+      // ORDERED_DEFEAT: attacker chose targets in order — defeat or hide them
       case 'ORDERED_DEFEAT': {
         let odList: string[] = [];
         try { odList = JSON.parse(targetId); } catch { odList = [targetId]; }
-        const odDefeatedCount = odList.length;
+        const odCount = odList.length;
+        let odParsed: { isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number; useDefeat?: boolean; constraintMode?: string } = {};
+        try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
+        // Naruto 133 non-upgrade: hide instead of defeat
+        const odUseDefeat = odParsed.useDefeat !== false; // default true (Gaara, Ichibi always defeat)
         for (const charId of odList) {
-          newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer);
+          if (odUseDefeat) {
+            newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer);
+          } else {
+            newState = EffectEngine.hideCharacterWithLog(newState, charId, pendingEffect.sourcePlayer);
+          }
         }
         newState.log = logAction(
           newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-          'EFFECT_DEFEAT', `Defeated ${odDefeatedCount} character(s) in chosen order.`,
-          'game.log.effect.orderedDefeat', { count: String(odDefeatedCount) },
+          odUseDefeat ? 'EFFECT_DEFEAT' : 'EFFECT_HIDE',
+          `${odUseDefeat ? 'Defeated' : 'Hid'} ${odCount} character(s) in chosen order.`,
+          'game.log.effect.orderedDefeat', { count: String(odCount) },
         );
-        // Gaara 120 UPGRADE: POWERUP X where X = defeated count
-        let odParsed: { isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
-        try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        if (odParsed.isUpgrade && odDefeatedCount > 0 && odParsed.sourceInstanceId != null && odParsed.sourceMissionIndex != null) {
+        if (odParsed.isUpgrade && odCount > 0 && odParsed.sourceInstanceId != null && odParsed.sourceMissionIndex != null) {
           const g120uEffId = generateInstanceId();
           const g120uActId = generateInstanceId();
           newState.pendingEffects = [...newState.pendingEffects, {
@@ -12643,7 +12614,7 @@ export class EffectEngine {
             sourceInstanceId: odParsed.sourceInstanceId,
             sourceMissionIndex: odParsed.sourceMissionIndex,
             effectType: 'UPGRADE' as EffectType,
-            effectDescription: JSON.stringify({ defeatedCount: odDefeatedCount }),
+            effectDescription: JSON.stringify({ defeatedCount: odCount }),
             targetSelectionType: 'GAARA120_CONFIRM_UPGRADE',
             sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
             validTargets: [odParsed.sourceInstanceId],
@@ -12652,9 +12623,9 @@ export class EffectEngine {
           newState.pendingActions = [...newState.pendingActions, {
             id: g120uActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: pendingEffect.sourcePlayer,
-            description: `Gaara (120) UPGRADE: POWERUP ${odDefeatedCount}.`,
+            description: `Gaara (120) UPGRADE: POWERUP ${odCount}.`,
             descriptionKey: 'game.effect.desc.gaara120ConfirmUpgrade',
-            descriptionParams: { count: String(odDefeatedCount) },
+            descriptionParams: { count: String(odCount) },
             options: [odParsed.sourceInstanceId],
             minSelections: 1, maxSelections: 1,
             sourceEffectId: g120uEffId,

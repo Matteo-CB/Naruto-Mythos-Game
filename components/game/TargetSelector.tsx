@@ -204,7 +204,7 @@ type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133
 
 function OrderedDefeatPopup({
   missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
-  onConfirm, onDecline, canDecline, minSelections, constraintMode, sourceMissionIndex,
+  onConfirm, onDecline, canDecline, minSelections, constraintMode, sourceMissionIndex, targetGroups: targetGroupsProp,
 }: {
   missions: VisibleMission[];
   validTargets: string[];
@@ -215,6 +215,7 @@ function OrderedDefeatPopup({
   minSelections?: number;
   constraintMode?: ConstraintMode;
   sourceMissionIndex?: number;
+  targetGroups?: { group1: Set<string>; group2: Set<string> };
   onConfirm: (orderedIds: string[]) => void;
   onDecline?: () => void;
   canDecline?: boolean;
@@ -226,6 +227,7 @@ function OrderedDefeatPopup({
   const mode = constraintMode ?? 'free';
   const minRequired = minSelections ?? validTargets.length;
   const canConfirm = orderedIds.length >= minRequired;
+  const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
 
   // Build a map: instanceId -> missionIndex for constraint checking
   const charMissionMap = useMemo(() => {
@@ -254,9 +256,33 @@ function OrderedDefeatPopup({
           if (charMissionMap.get(t) !== selectedMission) locked.add(t);
         }
       }
+    } else if (mode === 'naruto133') {
+      // group1: P≤5 in source mission, group2: P≤2 anywhere
+      // After selecting 1 from group1, lock other group1 targets
+      // After selecting 1 from group2, lock other group2 targets
+      const hasGroup1Selected = orderedIds.some(id => targetGroups.group1.has(id));
+      const hasGroup2Selected = orderedIds.some(id => targetGroups.group2.has(id));
+      for (const t of validTargets) {
+        if (orderedIds.includes(t)) continue;
+        const inG1 = targetGroups.group1.has(t);
+        const inG2 = targetGroups.group2.has(t);
+        // If this target is only in group1 and group1 is full, lock it
+        if (inG1 && !inG2 && hasGroup1Selected) locked.add(t);
+        // If this target is only in group2 and group2 is full, lock it
+        if (inG2 && !inG1 && hasGroup2Selected) locked.add(t);
+        // If in both groups: lock if both groups are filled
+        if (inG1 && inG2 && hasGroup1Selected && hasGroup2Selected) locked.add(t);
+        // If in both groups and one group filled: still available for the other group
+      }
+      // Max 2 total
+      if (orderedIds.length >= 2) {
+        for (const t of validTargets) {
+          if (!orderedIds.includes(t)) locked.add(t);
+        }
+      }
     }
     return locked;
-  }, [mode, orderedIds, validTargets, charMissionMap]);
+  }, [mode, orderedIds, validTargets, charMissionMap, targetGroups]);
 
   const toggleTarget = useCallback((id: string) => {
     if (mode === 'all-in-mission') {
@@ -715,12 +741,14 @@ export function TargetSelector() {
   if (eTst === 'ORDERED_DEFEAT' && visibleState && validTargets.length > 0) {
     let odConstraint: ConstraintMode = 'free';
     let odSourceMission: number | undefined;
+    let odTargetGroups: { group1: Set<string>; group2: Set<string> } | undefined;
     try {
       const odPending = visibleState.pendingEffects?.find((e: { targetSelectionType: string }) => e.targetSelectionType === 'ORDERED_DEFEAT');
       if (odPending) {
         const odParsed = JSON.parse((odPending as { effectDescription?: string }).effectDescription ?? '{}');
         odConstraint = odParsed.constraintMode ?? 'free';
         odSourceMission = odParsed.sourceMissionIndex;
+        if (odParsed.group1) odTargetGroups = { group1: new Set(odParsed.group1 as string[]), group2: new Set((odParsed.group2 ?? []) as string[]) };
       }
     } catch { /* ignore */ }
     return (
@@ -737,6 +765,7 @@ export function TargetSelector() {
         minSelections={pendingTargetSelection?.minSelections}
         constraintMode={odConstraint}
         sourceMissionIndex={odSourceMission}
+        targetGroups={odTargetGroups}
       />
     );
   }
