@@ -11458,14 +11458,8 @@ export class EffectEngine {
           break;
         }
 
-        // Store top 3 in discard pile as temporary storage
-        newState = {
-          ...newState,
-          [s135mPlayer]: {
-            ...newState[s135mPlayer],
-            discardPile: [...newState[s135mPlayer].discardPile, ...s135mTop3],
-          },
-        };
+        // Store top 3 cards in a temp field on state (NOT in discard pile — avoids duplication)
+        (newState as any)._sakura135DrawnCards = s135mTop3;
 
         {
           const s135mEffId = generateInstanceId();
