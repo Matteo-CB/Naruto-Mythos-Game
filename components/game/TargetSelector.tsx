@@ -226,7 +226,8 @@ function OrderedDefeatPopup({
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
   const mode = constraintMode ?? 'free';
   const minRequired = minSelections ?? validTargets.length;
-  const canConfirm = orderedIds.length >= minRequired;
+  // For all-in-mission: can confirm when at least 1 card selected (entire mission auto-selected)
+  const canConfirm = mode === 'all-in-mission' ? orderedIds.length > 0 : orderedIds.length >= minRequired;
   const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
 
   // Build a map: instanceId -> missionIndex for constraint checking
@@ -257,22 +258,26 @@ function OrderedDefeatPopup({
         }
       }
     } else if (mode === 'naruto133') {
-      // group1: P≤5 in source mission, group2: P≤2 anywhere
-      // After selecting 1 from group1, lock other group1 targets
-      // After selecting 1 from group2, lock other group2 targets
-      const hasGroup1Selected = orderedIds.some(id => targetGroups.group1.has(id));
-      const hasGroup2Selected = orderedIds.some(id => targetGroups.group2.has(id));
+      // group1: P≤5 in source mission (max 1), group2: P≤2 anywhere (max 1), max 2 total
+      // Determine which "slot" each selected card fills
+      // A card in both groups: if selected first, it fills group1 (priority to this mission)
+      let g1Filled = false;
+      let g2Filled = false;
+      for (const id of orderedIds) {
+        const inG1 = targetGroups.group1.has(id);
+        const inG2 = targetGroups.group2.has(id);
+        if (inG1 && !g1Filled) { g1Filled = true; }
+        else if (inG2 && !g2Filled) { g2Filled = true; }
+      }
+
       for (const t of validTargets) {
         if (orderedIds.includes(t)) continue;
         const inG1 = targetGroups.group1.has(t);
         const inG2 = targetGroups.group2.has(t);
-        // If this target is only in group1 and group1 is full, lock it
-        if (inG1 && !inG2 && hasGroup1Selected) locked.add(t);
-        // If this target is only in group2 and group2 is full, lock it
-        if (inG2 && !inG1 && hasGroup2Selected) locked.add(t);
-        // If in both groups: lock if both groups are filled
-        if (inG1 && inG2 && hasGroup1Selected && hasGroup2Selected) locked.add(t);
-        // If in both groups and one group filled: still available for the other group
+        // Can this target still fill an open slot?
+        const canFillG1 = inG1 && !g1Filled;
+        const canFillG2 = inG2 && !g2Filled;
+        if (!canFillG1 && !canFillG2) locked.add(t);
       }
       // Max 2 total
       if (orderedIds.length >= 2) {
