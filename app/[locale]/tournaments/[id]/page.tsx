@@ -30,7 +30,7 @@ export default function TournamentDetailPage() {
   const tournamentId = params?.id as string;
   const { data: session, status } = useSession();
   const { animationsEnabled } = useSettingsStore();
-  const { socket } = useSocketStore();
+  const { socket, connect, connected } = useSocketStore();
   const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, clearError } = useTournamentStore();
 
   const userId = (session?.user as { id?: string })?.id;
@@ -47,6 +47,13 @@ export default function TournamentDetailPage() {
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
   useEffect(() => { if (tournamentId && session?.user) fetchTournament(tournamentId); return () => { clearActiveTournament(); }; }, [tournamentId, session, fetchTournament, clearActiveTournament]);
+
+  // Auto-connect socket for tournament real-time events
+  useEffect(() => {
+    if (session?.user?.id && !connected) {
+      connect(session.user.id);
+    }
+  }, [session, connected, connect]);
 
   useEffect(() => {
     if (!socket || !tournamentId) return;
@@ -458,12 +465,15 @@ export default function TournamentDetailPage() {
               <div className="mb-6 p-4" style={{ backgroundColor: '#111111', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>
                 <p className="text-xs mb-3" style={{ color: '#e0e0e0' }}>{myMatch.player1Username ?? t('tbd')} vs {myMatch.player2Username ?? t('tbd')}</p>
-                {myMatch.status === 'ready' && myMatch.roomCode ? (
+                {myMatch.roomCode ? (
                   <Link href={('/play/online?room=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
-                ) : myMatch.status === 'ready' && !myMatch.roomCode ? (
+                ) : (myMatch.status === 'ready' || myMatch.status === 'in_progress') ? (
                   <button onClick={handlePlayMatch} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('ready')}</button>
                 ) : null}
                 {myMatch.status === 'pending' && <p className="text-xs" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>}
+                {!myMatch.roomCode && myMatch.status === 'ready' && (
+                  <p className="text-xs mt-2" style={{ color: '#888' }}>{t('waitingBothReady')}</p>
+                )}
               </div>
             )}
             <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>

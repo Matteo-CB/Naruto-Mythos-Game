@@ -2352,6 +2352,7 @@
     "registrationOpen": "Inscriptions ouvertes",
     "playMatch": "Jouer le match",
     "ready": "Je suis pret",
+    "waitingBothReady": "En attente que les deux joueurs soient prets...",
     "waitingOpponent": "En attente de l'adversaire...",
     "yourMatchReady": "Votre match est pret !",
     "viewReplay": "Voir le replay",
