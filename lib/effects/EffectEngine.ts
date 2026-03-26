@@ -11482,7 +11482,9 @@ export class EffectEngine {
             effectDescription: JSON.stringify({
               topCards: s135mTop3.map((c, i) => ({
                 index: i, name: c.name_fr, chakra: c.chakra ?? 0, power: c.power ?? 0, isCharacter: c.card_type === 'character',
+                cardId: c.id, image_file: c.image_file,
               })),
+              storedCards: s135mTop3,
               costReduction: s135mCostReduction,
             }),
             targetSelectionType: 'SAKURA135_CHOOSE_CARD',

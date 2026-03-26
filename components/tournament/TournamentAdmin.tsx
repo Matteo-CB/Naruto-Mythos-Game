@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useCallback } from 'react';
+import { useRouter } from '@/lib/i18n/navigation';
 import { useTournamentStore } from '@/stores/tournamentStore';
 
 interface Props {
@@ -16,7 +17,9 @@ const btnBase = 'px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider 
 
 export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const t = useTranslations('tournament');
+  const router = useRouter();
   const { activeTournament, startTournament, forfeitMatch, fetchTournament } = useTournamentStore();
+  const [deleting, setDeleting] = useState(false);
   const [startingTournament, setStartingTournament] = useState(false);
   const [forfeitMatchId, setForfeitMatchId] = useState('');
   const [forfeitPlayerId, setForfeitPlayerId] = useState('');
@@ -282,6 +285,36 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
           )}
         </div>
       )}
+
+      {/* Delete Tournament (permanently remove from database) */}
+      <div style={sectionStyle}>
+        <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" />
+        {expandedSection === 'delete' && (
+          <div className="flex flex-col gap-2 mt-2">
+            <p className="text-[10px]" style={{ color: '#cc4444' }}>{t('deleteTournamentWarning')}</p>
+            <ActionBtn
+              onClick={async () => {
+                if (!confirm(t('deleteTournamentConfirm'))) return;
+                setDeleting(true);
+                try {
+                  const res = await fetch(`/api/tournaments/${tournamentId}`, { method: 'DELETE' });
+                  if (res.ok) {
+                    router.push('/tournaments' as '/');
+                  } else {
+                    const data = await res.json();
+                    setAdminError(data.error || 'Failed to delete');
+                  }
+                } catch { setAdminError('Network error'); }
+                finally { setDeleting(false); }
+              }}
+              color="#cc4444"
+              disabled={deleting}
+            >
+              {deleting ? '...' : t('deleteTournament')}
+            </ActionBtn>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
