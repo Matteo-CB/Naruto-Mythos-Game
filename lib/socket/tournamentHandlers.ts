@@ -66,7 +66,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             hostDeck: null,
             guestDeck: null,
             isPrivate: true,
-            isRanked: true,
+            isRanked: false,
             isAnonymous: false,
             gameMode: 'ranked',
             createdAt: Date.now(),
