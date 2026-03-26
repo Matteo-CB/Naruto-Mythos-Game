@@ -197,7 +197,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
 
 function OrderedDefeatPopup({
   missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
-  onConfirm, onDecline, canDecline,
+  onConfirm, onDecline, canDecline, minSelections,
 }: {
   missions: VisibleMission[];
   validTargets: string[];
@@ -205,6 +205,7 @@ function OrderedDefeatPopup({
   description: string;
   descriptionKey?: string;
   descriptionParams?: Record<string, string>;
+  minSelections?: number;
   onConfirm: (orderedIds: string[]) => void;
   onDecline?: () => void;
   canDecline?: boolean;
@@ -213,7 +214,8 @@ function OrderedDefeatPopup({
   const locale = useLocale();
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
   const [orderedIds, setOrderedIds] = useState<string[]>([]);
-  const allSelected = orderedIds.length === validTargets.length;
+  const minRequired = minSelections ?? validTargets.length;
+  const canConfirm = orderedIds.length >= minRequired;
 
   const toggleTarget = useCallback((id: string) => {
     setOrderedIds(prev => {
@@ -303,7 +305,7 @@ function OrderedDefeatPopup({
           </motion.div>
 
           <div className="flex justify-center gap-3">
-            {allSelected && (
+            {canConfirm && (
               <PopupActionButton accentColor="#c4a35a" onClick={() => onConfirm(orderedIds)}>
                 {t('game.board.confirm')}
               </PopupActionButton>
@@ -670,6 +672,7 @@ export function TargetSelector() {
         onConfirm={(orderedIds) => handleSelect(JSON.stringify(orderedIds))}
         onDecline={canDecline ? handleDecline : undefined}
         canDecline={canDecline}
+        minSelections={pendingTargetSelection?.minSelections}
       />
     );
   }
