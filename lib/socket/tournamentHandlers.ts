@@ -161,7 +161,7 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
   }
 }
 
-async function advanceMatchWinner(io: Server, tournamentId: string, match: { round: number; matchIndex: number }, winnerId: string, winnerUsername: string | null) {
+export async function advanceMatchWinner(io: Server | null, tournamentId: string, match: { round: number; matchIndex: number }, winnerId: string, winnerUsername: string | null) {
   const nextRound = match.round + 1;
   const nextMatchIndex = Math.floor(match.matchIndex / 2);
   const isTopSlot = match.matchIndex % 2 === 0;
@@ -180,7 +180,7 @@ async function advanceMatchWinner(io: Server, tournamentId: string, match: { rou
       where: { id: winnerId },
       data: { tournamentWins: { increment: 1 } },
     });
-    io.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 
     // Assign "Vainqueur de tournoi X" Discord role
     let newRoleName: string | null = null;
@@ -236,7 +236,7 @@ async function advanceMatchWinner(io: Server, tournamentId: string, match: { rou
     await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: { status: 'ready' } });
   }
 
-  io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
+  io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
     matchId: nextMatch.id,
     player1Id: isTopSlot ? winnerId : updated.player1Id,
     player1Username: isTopSlot ? winnerUsername : updated.player1Username,
@@ -249,6 +249,6 @@ async function advanceMatchWinner(io: Server, tournamentId: string, match: { rou
   const roundComplete = allRoundMatches.every(m => m.status === 'completed' || m.status === 'forfeit');
   if (roundComplete) {
     await prisma.tournament.update({ where: { id: tournamentId }, data: { currentRound: nextRound } });
-    io.to(`tournament:${tournamentId}`).emit('tournament:round-complete', { completedRound: match.round, nextRound });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:round-complete', { completedRound: match.round, nextRound });
   }
 }
