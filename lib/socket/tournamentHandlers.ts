@@ -81,9 +81,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             tournamentId,
             tournamentMatchId: matchId,
             coinFlipDone: { player1: false, player2: false },
-            spectators: new Map(),
-            hostAllowSpectatorHand: false,
-            guestAllowSpectatorHand: false,
             chatMessages: [],
             chatLastCleanup: Date.now(),
           } as RoomData);

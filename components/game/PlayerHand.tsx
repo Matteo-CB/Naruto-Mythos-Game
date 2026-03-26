@@ -14,7 +14,6 @@ import { useGameScale } from './GameScaleContext';
 interface PlayerHandProps {
   hand: CharacterCard[];
   chakra: number;
-  isSpectatorOpponent?: boolean;
 }
 
 interface HandCardProps {
@@ -278,7 +277,7 @@ function SortPill({
 
 // ── Player Hand ──────────────────────────────────────────────────
 
-export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpectatorOpponent }: PlayerHandProps) {
+export const PlayerHand = React.memo(function PlayerHand({ hand, chakra }: PlayerHandProps) {
   const t = useTranslations();
   const dims = useGameScale();
   const selectedCardIndex = useUIStore((s) => s.selectedCardIndex);

@@ -85,14 +85,6 @@ interface SocketStore {
   clearError: () => void;
   forfeit: (reason: 'abandon' | 'timeout') => void;
 
-  // Spectator
-  isSpectating: boolean;
-  spectatingRoomCode: string | null;
-  spectatorCount: number;
-  spectateGame: (roomCode: string, userId: string, username: string) => void;
-  requestSpectateState: () => void;
-  leaveSpectating: () => void;
-
   // Chat
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   unreadChatCount: number;
@@ -110,7 +102,7 @@ interface SocketStore {
   acceptReconnect: () => void;
 
   // Active games
-  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }>;
+  activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; turn: number; isRanked: boolean; isPrivate: boolean }>;
   requestActiveGames: () => void;
 }
 
@@ -145,9 +137,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   opponentChangingDeck: false,
   _lastStateUpdate: 0,
   _resyncTimer: null as ReturnType<typeof setInterval> | null,
-  isSpectating: false,
-  spectatingRoomCode: null,
-  spectatorCount: 0,
   chatMessages: [],
   unreadChatCount: 0,
   chatOpen: false,
@@ -551,35 +540,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ maintenanceWarning: true });
       });
 
-      // ═══════ SPECTATOR LISTENERS ═══════
-
-      socket.on('spectate:state-update', (data: {
-        visibleState: VisibleGameState;
-        playerNames: { player1: string; player2: string };
-        spectatorCount: number;
-        roomCode?: string;
-      }) => {
-        const current = get();
-        // Ignore spectator updates if we're not spectating or if it's for a different room
-        if (!current.isSpectating && !current.spectatingRoomCode) return;
-        if (data.roomCode && current.spectatingRoomCode && data.roomCode !== current.spectatingRoomCode) return;
-        set({
-          visibleState: data.visibleState,
-          playerNames: data.playerNames,
-          spectatorCount: data.spectatorCount,
-          isSpectating: true,
-          gameStarted: true,
-        });
-      });
-
-      socket.on('spectate:count-update', (data: { count: number }) => {
-        set({ spectatorCount: data.count });
-      });
-
-      socket.on('spectate:error', (data: { message: string }) => {
-        set({ error: data.message });
-      });
-
       // ═══════ CHAT LISTENERS ═══════
 
       socket.on('chat:message', (msg: { id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }) => {
@@ -602,7 +562,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       // ═══════ ACTIVE GAMES ═══════
 
-      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
+      socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
         const games = data.games ?? [];
         set({ activeGames: games });
         // Cache for instant display on next page load
@@ -783,39 +743,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       console.log('[Socket] Emitting action:forfeit, reason:', reason);
       socket.emit('action:forfeit', { reason });
     }
-  },
-
-  // ═══════ SPECTATOR METHODS ═══════
-
-  spectateGame: (roomCode: string, userId: string, username: string) => {
-    const { socket, connected } = get();
-    if (!socket || !connected) {
-      console.warn('[Socket] Cannot spectate: not connected');
-      set({ error: 'Not connected to server' });
-      return;
-    }
-    console.log(`[Socket] Joining spectate for room ${roomCode}`);
-    socket.emit('spectate:join', { roomCode, userId, username });
-    set({ spectatingRoomCode: roomCode, isSpectating: true, chatMessages: [], unreadChatCount: 0 });
-  },
-
-  requestSpectateState: () => {
-    const { socket, connected, spectatingRoomCode } = get();
-    if (socket && connected && spectatingRoomCode) {
-      socket.emit('spectate:request-state', { roomCode: spectatingRoomCode });
-    }
-  },
-
-  leaveSpectating: () => {
-    const { socket, connected } = get();
-    if (socket && connected) {
-      socket.emit('spectate:leave');
-    }
-    set({
-      isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
-      visibleState: null, playerNames: null, gameStarted: false,
-      chatMessages: [], unreadChatCount: 0,
-    });
   },
 
   // ═══════ RECONNECT METHODS ═══════
