@@ -70,12 +70,6 @@ export function BracketMatch({ match, index }: Props) {
       </div>
 
       {/* Status badge */}
-      {isActive && match.roomCode && (
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider cursor-pointer"
-          style={{ color: '#4a9eff' }}>
-          {t('spectate')}
-        </div>
-      )}
       {match.gameId && isComplete && (
         <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
           {t('viewReplay')}
