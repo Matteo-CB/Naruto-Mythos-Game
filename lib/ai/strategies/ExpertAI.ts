@@ -271,20 +271,35 @@ export class ExpertAI implements AIStrategy {
       }
 
       case 'PASS': {
-        // Edge token management
+        // Edge token management: getting edge is valuable but not worth wasting actions
         if (state.edgeHolder !== player && state.firstPasser === null) {
-          bonus += 5; // We'd get the Edge
+          bonus += 3; // Reduced from 5 — edge is nice but playing is usually better
         }
 
-        // Passing when ahead on all missions is strategic
+        // Passing when far ahead on all missions can be strategic
         const spread = MissionEvaluator.calculatePointSpread(state, player);
-        if (spread > 5) {
-          bonus += 3; // We're ahead, no need to overcommit
+        if (spread > 8) {
+          bonus += 2; // Only slight bonus when clearly dominating
         }
 
-        // Penalty for passing with lots of chakra (wasteful since it resets to 0)
-        if (state[player].chakra > 5) {
-          bonus -= state[player].chakra * 0.5;
+        // STRONG penalty for passing with chakra — chakra resets to 0 at end of turn!
+        // Every unspent chakra is a completely wasted resource.
+        if (state[player].chakra > 0) {
+          const playableCards = state[player].hand.filter(
+            c => (c.chakra ?? 0) <= state[player].chakra,
+          ).length;
+          const canHide = state[player].hand.length > 0 && state[player].chakra >= 1;
+
+          // Penalty scales with wasted chakra AND number of playable cards
+          bonus -= state[player].chakra * 1.0;
+          bonus -= playableCards * 3;
+          if (canHide && playableCards === 0) bonus -= 2;
+
+          // Extra penalty on turns 3-4 where every point matters
+          if (state.turn >= 3) {
+            bonus -= playableCards * 2;
+            bonus -= state[player].chakra * 0.5;
+          }
         }
 
         break;

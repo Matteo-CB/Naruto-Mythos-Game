@@ -40,18 +40,21 @@ export class BoardEvaluator {
     const turn = state.turn ?? 1;
 
     // Turn-dependent weight profiles
+    // Board presence and tempo are boosted to encourage the AI to PLAY cards
+    // rather than passing prematurely.
     const w = {
       missionPoints:    100,
       missionControl:   25 + turn * 10,            // 35/45/55/65
-      boardPresence:    15 - turn * 2,             // 13/11/9/7
-      chakraAdvantage:  turn <= 2 ? 8 : 3,
-      handSize:         turn <= 2 ? 4 : 1,
+      boardPresence:    20 + turn * 2,             // 22/24/26/28 (was 13/11/9/7 — far too low)
+      chakraAdvantage:  turn <= 2 ? 6 : 2,
+      handSize:         turn <= 2 ? 3 : 1,
       handQuality:      turn <= 2 ? 3 : 1,
       hiddenThreats:    5,
       overkillPenalty:  turn >= 3 ? 3 : 1,
       scoreEffects:     2 + turn * 2,              // 4/6/8/10
       synergies:        3,
-      tempo:            1 + turn,                  // 2/3/4/5
+      tempo:            3 + turn * 2,              // 5/7/9/11 (was 2/3/4/5 — too low)
+      passPenalty:      8 + turn * 4,              // 12/16/20/24 — NEW: penalize passing with playable cards
     };
 
     let score = 0;
@@ -95,6 +98,10 @@ export class BoardEvaluator {
     // 13. Summon awareness (temporary board presence, discount on turns 1-3)
     score += BoardEvaluator.evaluateSummonAwareness(state, player, turn);
 
+    // 14. Pass penalty — penalize states where the player passed while having playable cards
+    // This directly combats the "AI passes too much" issue.
+    score -= BoardEvaluator.evaluatePassPenalty(state, player) * w.passPenalty;
+
     return score;
   }
 
@@ -104,12 +111,18 @@ export class BoardEvaluator {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
     let score = 0;
 
+    let totalMyChars = 0;
+    let totalOppChars = 0;
+
     for (const mission of state.activeMissions) {
       const myChars = getMyChars(mission, player);
       const oppChars = getOppChars(mission, player);
 
-      // Character count advantage
-      score += (myChars.length - oppChars.length) * 0.5;
+      totalMyChars += myChars.length;
+      totalOppChars += oppChars.length;
+
+      // Character count advantage per mission
+      score += (myChars.length - oppChars.length) * 0.8;
 
       // Power advantage weighted by mission value
       const myPower = myChars.reduce(
@@ -120,7 +133,22 @@ export class BoardEvaluator {
       );
 
       const missionValue = mission.basePoints + mission.rankBonus;
-      score += (myPower - oppPower) * missionValue * 0.3;
+      score += (myPower - oppPower) * missionValue * 0.35;
+
+      // Bonus for having ANY presence on a mission (contesting it)
+      if (myChars.length > 0 && myPower > 0) {
+        score += missionValue * 0.2;
+      }
+      // Penalty for opponent having uncontested presence
+      if (oppChars.length > 0 && myChars.length === 0) {
+        score -= missionValue * 0.3;
+      }
+    }
+
+    // Global board presence bonus: having characters in play generates chakra next turn
+    // Each character = +1 chakra income, so having more chars is a compounding advantage
+    if (turn < 4) {
+      score += (totalMyChars - totalOppChars) * 1.0;
     }
 
     return score;
@@ -395,15 +423,59 @@ export class BoardEvaluator {
       const playableCards = state[player].hand.filter(
         c => (c.chakra ?? 0) <= state[player].chakra || state[player].chakra >= 1,
       ).length;
-      score += playableCards * 2 + state[player].chakra * 0.5;
+      // Significantly reward free action opportunity
+      score += playableCards * 3 + state[player].chakra * 1.0;
     }
 
-    // We've passed, opponent hasn't - they get free actions
+    // We've passed, opponent hasn't - they get free actions (bad for us)
     if (state[player].hasPassed && !state[opponent].hasPassed) {
-      score -= 3;
+      const oppPlayable = state[opponent].hand.filter(
+        c => (c.chakra ?? 0) <= state[opponent].chakra || state[opponent].chakra >= 1,
+      ).length;
+      score -= 3 + oppPlayable * 1.5;
     }
 
     return score;
+  }
+
+  // ─── Component: Pass Penalty ──────────────────────────────────────────
+
+  /**
+   * Penalize states where the AI has passed while still having playable cards
+   * and chakra to spend. Chakra resets to 0 at end of turn, so unspent chakra
+   * when passing is completely wasted.
+   */
+  static evaluatePassPenalty(state: GameState, player: PlayerID): number {
+    if (state.phase !== 'action') return 0;
+    if (!state[player].hasPassed) return 0;
+
+    const hand = state[player].hand;
+    const chakra = state[player].chakra;
+
+    // Skip placeholder hands (AI sanitized state)
+    if (hand.length > 0 && hand[0].cardId === '__hidden_hand__') return 0;
+
+    // Count how many cards could have been played
+    const playableFaceUp = hand.filter(c => (c.chakra ?? 0) <= chakra).length;
+    const canPlayHidden = hand.length > 0 && chakra >= 1 ? 1 : 0;
+
+    if (playableFaceUp === 0 && canPlayHidden === 0) return 0; // Passing was forced
+
+    let penalty = 0;
+
+    // Penalty scales with unspent chakra (wasted resource)
+    penalty += Math.min(chakra, 10) * 0.3;
+
+    // Penalty scales with number of playable cards left
+    penalty += playableFaceUp * 0.8;
+
+    // Extra penalty on later turns where every action counts
+    const turn = state.turn ?? 1;
+    if (turn >= 3) {
+      penalty *= 1.5;
+    }
+
+    return penalty;
   }
 
   // ─── Component: Summon Awareness ────────────────────────────────────────

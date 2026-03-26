@@ -151,14 +151,26 @@ export class NeuralISMCTS {
     if (validActions.length === 1) return validActions[0];
 
     const root = new MCTSNode(0);
+    let failedSims = 0;
 
     for (let i = 0; i < this.config.simulations; i++) {
       try {
         const determinized = this.determinize(state, aiPlayer);
         this.simulate(root, determinized, aiPlayer, 0);
       } catch {
-        // Skip failed simulations - partial tree is better than no tree
+        failedSims++;
+        // If too many simulations fail (>80%), the engine is crashing on most paths.
+        // Fall back early rather than building a PASS-biased tree.
+        if (failedSims > this.config.simulations * 0.8 && i > 20) {
+          break;
+        }
       }
+    }
+
+    // If nearly all simulations failed, the tree is unreliable.
+    // Use a heuristic fallback that explicitly avoids PASS when possible.
+    if (failedSims > this.config.simulations * 0.6) {
+      return this.heuristicFallback(validActions);
     }
 
     return this.pickBestAction(root, validActions);
@@ -492,7 +504,10 @@ export class NeuralISMCTS {
   private heuristicValue(state: GameState, aiPlayer: PlayerID): number {
     const rawScore = BoardEvaluator.evaluate(state, aiPlayer);
     // Sigmoid normalization to [0, 1]
-    return 1 / (1 + Math.exp(-rawScore / 60));
+    // Divisor of 80 (increased from 60) accommodates the higher raw scores
+    // from boosted board presence and tempo weights while keeping
+    // the sigmoid in its sensitive range.
+    return 1 / (1 + Math.exp(-rawScore / 80));
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -522,6 +537,12 @@ export class NeuralISMCTS {
   }
 
   private tryAutoAdvance(state: GameState, actingPlayer: PlayerID): GameState | null {
+    // Clean up orphaned pending effects (effects with no matching pending actions)
+    // during simulation to prevent simulations from stalling
+    if (state.pendingEffects.length > 0 && state.pendingActions.length === 0) {
+      return { ...state, pendingEffects: [] };
+    }
+
     if (
       (state.phase === 'mission' || state.phase === 'end') &&
       state.pendingActions.length === 0 &&
@@ -583,32 +604,64 @@ export class NeuralISMCTS {
 
   /**
    * Pick the best action from the root node by most visits.
+   * Applies a visit penalty to PASS when the AI has playable alternatives,
+   * so that PASS only wins when it genuinely evaluates as the best move.
    */
   private pickBestAction(root: MCTSNode, validActions: GameAction[]): GameAction {
     let bestAction = validActions[0];
     let bestVisits = -1;
+    const hasNonPass = validActions.some(a => a.type !== 'PASS');
 
     for (const action of validActions) {
       const key = actionKey(action);
       const child = root.children.get(key);
-      if (child && child.visits > bestVisits) {
-        bestVisits = child.visits;
+      if (!child) continue;
+
+      let effectiveVisits = child.visits;
+
+      // If PASS has accumulated visits but there are non-PASS alternatives,
+      // require PASS to have both more visits AND a clearly better win rate.
+      // This prevents the PASS-bias from crashed simulations where PASS
+      // is the only action that doesn't throw.
+      if (action.type === 'PASS' && hasNonPass && child.visits > 0) {
+        if (child.value < 0.55) {
+          // Below 55% win rate: heavily discount PASS visits
+          effectiveVisits = Math.floor(child.visits * 0.5);
+        } else {
+          // Even with good win rate, require 30% more visits
+          effectiveVisits = Math.floor(child.visits * 0.7);
+        }
+      }
+
+      if (effectiveVisits > bestVisits) {
+        bestVisits = effectiveVisits;
         bestAction = action;
       }
     }
 
-    // If tree is empty (all simulations failed), pick a non-PASS action instead of defaulting to PASS
+    // If tree is empty (all simulations failed), use heuristic fallback
     if (bestVisits <= 0 && validActions.length > 1) {
-      console.warn('[ISMCTS] Empty tree — all simulations failed. Picking first non-PASS action.');
-      for (const action of validActions) {
-        if (action.type !== 'PASS') {
-          bestAction = action;
-          break;
-        }
-      }
+      console.warn('[ISMCTS] Empty tree — all simulations failed. Using heuristic fallback.');
+      return this.heuristicFallback(validActions);
     }
 
     return bestAction;
+  }
+
+  /**
+   * Heuristic fallback when MCTS simulations mostly fail.
+   * Uses the quickScore ordering to pick the best non-PASS action.
+   */
+  private heuristicFallback(
+    validActions: GameAction[],
+  ): GameAction {
+    // Simply pick the first non-PASS action (they're typically already ordered well)
+    for (const action of validActions) {
+      if (action.type !== 'PASS') {
+        return action;
+      }
+    }
+    return validActions[0];
   }
 
   /**

@@ -1624,6 +1624,12 @@ export class GameEngine {
           }
           return actions;
         }
+        // If there are ANY unresolved pending effects or pending actions (even for the other player),
+        // executeAction will block all regular actions (PLAY_CHARACTER, PASS, etc.).
+        // Return an empty list to prevent the AI from picking actions that will be silently rejected.
+        if (state.pendingEffects.length > 0 || state.pendingActions.length > 0) {
+          return [];
+        }
         return getValidActionsForPlayer(state, player);
       }
 

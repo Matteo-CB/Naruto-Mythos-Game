@@ -51,7 +51,12 @@ export class MissionEvaluator {
       (sum, c) => sum + calculateCharacterPower(state, c, opponent), 0,
     );
 
-    const missionValue = mission.basePoints + mission.rankBonus;
+    const turn = state.turn ?? 1;
+    const baseMissionValue = mission.basePoints + mission.rankBonus;
+    // Late-game urgency multiplier: missions are worth more on turns 3-4
+    // because there are fewer remaining turns to change outcomes.
+    const urgencyMultiplier = turn >= 4 ? 1.4 : turn >= 3 ? 1.2 : 1.0;
+    const missionValue = baseMissionValue * urgencyMultiplier;
     const totalPower = myPower + oppPower;
 
     // Both at 0 - no one wins
