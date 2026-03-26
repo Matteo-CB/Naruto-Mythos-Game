@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
+import { useSocketStore } from '@/lib/socket/client';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
 
 /**
@@ -99,6 +100,7 @@ export function GameLog() {
   const showGameLog = useUIStore((s) => s.showGameLog);
   const toggleGameLog = useUIStore((s) => s.toggleGameLog);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isSpectating = useSocketStore((s) => s.isSpectating);
 
   const log = visibleState?.log ?? [];
 
@@ -119,7 +121,7 @@ export function GameLog() {
       {!showGameLog && (
         <button
           onClick={toggleGameLog}
-          className="fixed top-10 right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider"
+          className={`fixed ${isSpectating ? 'top-16' : 'top-10'} right-4 z-40 px-3 py-2 text-xs font-medium cursor-pointer uppercase tracking-wider`}
           style={{
             backgroundColor: 'rgba(10, 10, 14, 0.9)',
             borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
@@ -139,9 +141,9 @@ export function GameLog() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 300, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed top-7 right-0 z-30 flex flex-col"
+            className={`fixed ${isSpectating ? 'top-9' : 'top-7'} right-0 z-30 flex flex-col`}
             style={{
-              height: 'calc(100% - 56px)',
+              height: isSpectating ? 'calc(100% - 36px)' : 'calc(100% - 56px)',
               width: '320px',
               backgroundColor: 'rgba(8, 8, 12, 0.97)',
               borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
