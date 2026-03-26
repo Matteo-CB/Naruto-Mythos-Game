@@ -25,7 +25,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
     try {
       const match = await prisma.tournamentMatch.findUnique({ where: { id: matchId } });
       if (!match || match.tournamentId !== tournamentId) return;
-      if (match.status !== 'ready' && match.status !== 'pending') return;
+      // Allow ready/pending/in_progress (in_progress = room may have been lost, let players rejoin)
+      if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
 
       if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
       const ready = matchReadyPlayers.get(matchId)!;
@@ -51,7 +52,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       if (ready.size >= 2 && match.player1Id && match.player2Id) {
         clearAbsenceTimer(matchId);
         matchReadyPlayers.delete(matchId);
-        const roomCode = `T-${matchId.slice(-6)}`;
+        const roomCode = match.roomCode || `T-${matchId.slice(-6)}`;
 
         // Create game room for the tournament match
         if (!rooms.has(roomCode)) {
