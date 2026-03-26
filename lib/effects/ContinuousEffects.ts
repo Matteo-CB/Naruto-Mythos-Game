@@ -195,9 +195,9 @@ export function calculateContinuousPowerModifier(
       if (enemy.isHidden) continue;
       const eTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
       for (const effect of eTop.effects ?? []) {
-        if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
-        // Itachi 128 / 152: Every enemy in this mission has -1 Power
-        if (eTop.number === 128 || eTop.number === 152) {
+        if (!effect.description.includes('[⧗]')) continue;
+        // Itachi 128 (UPGRADE) / 152: Every enemy in this mission has -1 Power
+        if ((eTop.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || eTop.number === 152) {
           hiddenBonus -= 1;
         }
       }
@@ -249,10 +249,10 @@ export function calculateContinuousPowerModifier(
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
 
     for (const effect of enemyTopCard.effects ?? []) {
-      if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
+      if (!effect.description.includes('[⧗]')) continue;
 
-      // Itachi 128 (R) / 152 (M): Every enemy in this mission has -1 Power
-      if (enemyTopCard.number === 128 || enemyTopCard.number === 152) {
+      // Itachi 128 (R, UPGRADE) / 152 (M): Every enemy in this mission has -1 Power
+      if ((enemyTopCard.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || enemyTopCard.number === 152) {
         modifier -= 1;
       }
 
