@@ -494,15 +494,16 @@ export function TargetSelector() {
       // Use index-based unique ID to distinguish duplicate cards (e.g. 2x Temari)
       const uniqueId = `discard_${di}`;
       discardIdMap[uniqueId] = originalId;
+      const wasHidden = !!(card as any).wasHiddenBeforeDefeat;
       discardTargets.push({
         instanceId: uniqueId,
-        name_fr: (card as any).name_fr ?? '',
-        name_en: (card as any).name_en,
-        image_file: (card as any).image_file,
-        chakra: (card as any).chakra,
-        power: (card as any).power,
+        name_fr: wasHidden && !isOwnDiscard ? '???' : ((card as any).name_fr ?? ''),
+        name_en: wasHidden && !isOwnDiscard ? undefined : (card as any).name_en,
+        image_file: wasHidden && !isOwnDiscard ? undefined : (card as any).image_file,
+        chakra: wasHidden && !isOwnDiscard ? undefined : (card as any).chakra,
+        power: wasHidden && !isOwnDiscard ? undefined : (card as any).power,
         missionIndex: 0,
-        isHidden: false,
+        isHidden: wasHidden && !isOwnDiscard,
         isOwn: isOwnDiscard,
       });
     }

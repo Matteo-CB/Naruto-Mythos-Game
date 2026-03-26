@@ -10113,13 +10113,8 @@ export class EffectEngine {
         let parsed133t2: { useDefeat?: boolean; target1Id?: string; discardSizeBefore?: number } = {};
         try { parsed133t2 = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         if (parsed133t2.useDefeat) {
-          const n133Defender: PlayerID = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
-          const n133DiscardBefore = parsed133t2.discardSizeBefore ?? newState[n133Defender].discardPile.length;
+          // Defeat target — discard order follows selection order (1st selected = bottom, 2nd = top)
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          const n133TotalDefeated = newState[n133Defender].discardPile.length - n133DiscardBefore;
-          if (n133TotalDefeated >= 2) {
-            newState.pendingDiscardReorder = { discardOwner: n133Defender, chooser: pendingEffect.sourcePlayer, count: n133TotalDefeated };
-          }
         } else {
           newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         }
@@ -11861,9 +11856,9 @@ export class EffectEngine {
           'EFFECT_DISCARD', `Itachi Uchiwa (140): Opponent discarded ${i140HandSize} cards, then drew ${i140DrawCount} new cards.`,
           'game.log.effect.discardAndDraw', { card: 'ITACHI UCHIWA', id: 'KS-140-S', discarded: String(i140HandSize), drawn: String(i140DrawCount) });
 
-        // Queue discard reorder for opponent (they choose order of their own discarded cards)
+        // Queue discard reorder — Itachi player (attacker) chooses the order
         if (i140HandSize >= 2) {
-          newState.pendingDiscardReorder = { discardOwner: i140Opponent, chooser: i140Opponent, count: i140HandSize };
+          newState.pendingDiscardReorder = { discardOwner: i140Opponent, chooser: i140Player, count: i140HandSize };
         }
 
         // If upgrade: chain to CONFIRM_UPGRADE popup for defeat
@@ -15639,7 +15634,7 @@ export class EffectEngine {
       // Assign instanceIds from the CharacterInPlay for discard ordering features
       for (let si = 0; si < defeated.stack.length; si++) {
         const card = defeated.stack[si];
-        const discardCard = { ...card, instanceId: defeated.instanceId + (si > 0 ? `-stack-${si}` : '') };
+        const discardCard = { ...card, instanceId: defeated.instanceId + (si > 0 ? `-stack-${si}` : ''), wasHiddenBeforeDefeat: defeated.isHidden };
         newState[owner].discardPile.push(discardCard as any);
       }
     }
@@ -15887,11 +15882,8 @@ export class EffectEngine {
     if (validTarget2.length === 1) {
       // Auto-apply to the only target
       if (useDefeat) {
+        // Defeat target — discard order follows selection order (1st = bottom, 2nd = top)
         newState = EffectEngine.defeatCharacter(newState, validTarget2[0], pending.sourcePlayer);
-        const n133AutoDefeated = newState[n133DefenderT1].discardPile.length - discardSizeBeforeT1;
-        if (n133AutoDefeated >= 2) {
-          newState.pendingDiscardReorder = { discardOwner: n133DefenderT1, chooser: pending.sourcePlayer, count: n133AutoDefeated };
-        }
         return newState;
       } else {
         return EffectEngine.hideCharacterWithLog(newState, validTarget2[0], pending.sourcePlayer);
