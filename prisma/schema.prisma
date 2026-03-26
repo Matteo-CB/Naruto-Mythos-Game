@@ -252,6 +252,15 @@ model TournamentMatch {
   @@unique([tournamentId, round, matchIndex])
 }
 
+model TrainingData {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  gameId    String
+  features  Json     // The 200-dim feature array
+  outcome   Float    // 1.0 = win, 0.0 = loss
+  turn      Int
+  createdAt DateTime @default(now())
+}
+
 model CardIssue {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   cardIds     String[] // Array of card IDs sharing the same issue

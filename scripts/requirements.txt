@@ -1,0 +1,6 @@
+torch
+onnx
+onnxruntime
+pymongo
+numpy
+scikit-learn
