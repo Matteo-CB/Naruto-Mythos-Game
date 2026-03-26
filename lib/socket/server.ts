@@ -1054,8 +1054,31 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      // Check if user is already the host
+      // Check if user is the host — for tournament rooms, let them join (connect their socket)
       if (room.hostId === data.userId) {
+        if (room.tournamentId) {
+          console.log(`[Socket] Tournament host ${data.userId} joining room ${data.code}`);
+          room.hostSocket = socket.id;
+          playerRooms.set(socket.id, data.code);
+          socket.join(data.code);
+          socket.emit('room:joined', {
+            code: data.code,
+            playerRole: 'player1',
+            hostId: room.hostId,
+            guestId: room.guestId,
+            gameMode: room.gameMode,
+            isRanked: room.isRanked,
+            tournamentId: room.tournamentId,
+          });
+          // If game already started, send state
+          if (room.gameState) {
+            const { GameEngine } = require('@/lib/engine/GameEngine');
+            const visible = GameEngine.getVisibleState(room.gameState, 'player1');
+            socket.emit('game:started', { playerRole: 'player1' });
+            socket.emit('game:state-update', visible);
+          }
+          return;
+        }
         console.log(`[Socket] User ${data.userId} is the host of room ${data.code}`);
         socket.emit('room:error', { message: 'You are the host of this room' });
         return;
