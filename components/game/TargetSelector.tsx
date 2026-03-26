@@ -191,6 +191,191 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
   );
 }
 
+// ----- Ordered Defeat Board Popup -----
+// Shows all missions with all characters. Valid targets glow. Player clicks targets in order (1, 2, 3...).
+// Hidden enemy cards show as card backs. Confirm button sends the ordered list.
+
+function OrderedDefeatPopup({
+  missions, validTargets, myPlayer, description, descriptionKey, descriptionParams,
+  onConfirm, onDecline, canDecline,
+}: {
+  missions: VisibleMission[];
+  validTargets: string[];
+  myPlayer: string;
+  description: string;
+  descriptionKey?: string;
+  descriptionParams?: Record<string, string>;
+  onConfirm: (orderedIds: string[]) => void;
+  onDecline?: () => void;
+  canDecline?: boolean;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
+  const [orderedIds, setOrderedIds] = useState<string[]>([]);
+  const allSelected = orderedIds.length === validTargets.length;
+
+  const toggleTarget = useCallback((id: string) => {
+    setOrderedIds(prev => {
+      if (prev.includes(id)) return prev.slice(0, prev.indexOf(id));
+      if (prev.length >= validTargets.length) return prev;
+      return [...prev, id];
+    });
+  }, [validTargets.length]);
+
+  const rankColors: Record<string, string> = { D: '#3e8b3e', C: '#c4a35a', B: '#b37e3e', A: '#b33e3e' };
+
+  return (
+    <AnimatePresence>
+      <PopupOverlay>
+        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
+          <PopupMinimizeX onClick={minimizeEffectPopup} />
+          <PopupTitle accentColor="#c4a35a" size="lg">
+            {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
+          </PopupTitle>
+
+          <div className="text-center mb-3">
+            <span className="text-xs" style={{ color: '#888' }}>
+              {t('game.effect.orderedDefeat.progress', { selected: String(orderedIds.length), total: String(validTargets.length) })}
+            </span>
+          </div>
+
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 180, damping: 18 }}
+            className="flex justify-center gap-4 overflow-x-auto px-2 py-3 mb-4"
+          >
+            {missions.map((mission, mIdx) => {
+              const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
+              const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
+              const hasTargets = [...oppChars, ...myChars].some(c => validTargets.includes(c.instanceId));
+
+              return (
+                <div key={`od-mission-${mIdx}`} className="flex flex-col items-center gap-2 px-2"
+                  style={{ opacity: hasTargets ? 1 : 0.35, minWidth: '120px' }}>
+                  <div className="px-2 py-0.5 text-[10px] font-bold text-center"
+                    style={{ backgroundColor: hasTargets ? rankColors[mission.rank] || '#1a1a1a' : '#1a1a1a', color: hasTargets ? '#0a0a0a' : '#333' }}>
+                    {t('game.board.missionRank', { rank: mission.rank })}
+                  </div>
+                  <span className="text-[10px] text-center truncate" style={{ color: '#888', maxWidth: '110px' }}>
+                    {getCardName(mission.card, locale as 'en' | 'fr')}
+                  </span>
+
+                  {/* Opponent side */}
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[9px]" style={{ color: '#555' }}>{t('game.opponent')}</span>
+                    <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
+                      {oppChars.map(char => {
+                        const isValid = validTargets.includes(char.instanceId);
+                        const orderIdx = orderedIds.indexOf(char.instanceId);
+                        const isSelected = orderIdx >= 0;
+                        return (
+                          <OrderedDefeatCard key={char.instanceId} character={char} isValid={isValid}
+                            isSelected={isSelected} orderNumber={isSelected ? orderIdx + 1 : undefined}
+                            onClick={() => isValid && toggleTarget(char.instanceId)} />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="w-full h-px" style={{ backgroundColor: hasTargets ? '#333' : '#1a1a1a' }} />
+
+                  {/* Player side */}
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-[9px]" style={{ color: '#555' }}>{t('game.you')}</span>
+                    <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
+                      {myChars.map(char => {
+                        const isValid = validTargets.includes(char.instanceId);
+                        const orderIdx = orderedIds.indexOf(char.instanceId);
+                        const isSelected = orderIdx >= 0;
+                        return (
+                          <OrderedDefeatCard key={char.instanceId} character={char} isValid={isValid}
+                            isSelected={isSelected} orderNumber={isSelected ? orderIdx + 1 : undefined}
+                            onClick={() => isValid && toggleTarget(char.instanceId)} />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </motion.div>
+
+          <div className="flex justify-center gap-3">
+            {allSelected && (
+              <PopupActionButton accentColor="#c4a35a" onClick={() => onConfirm(orderedIds)}>
+                {t('game.board.confirm')}
+              </PopupActionButton>
+            )}
+            {canDecline && onDecline && (
+              <PopupDismissLink onClick={onDecline}>{t('game.board.skip')}</PopupDismissLink>
+            )}
+          </div>
+        </PopupCornerFrame>
+      </PopupOverlay>
+    </AnimatePresence>
+  );
+}
+
+function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClick }: {
+  character: VisibleCharacter;
+  isValid: boolean;
+  isSelected: boolean;
+  orderNumber?: number;
+  onClick: () => void;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const isHidden = character.isHidden;
+  const canSeeCard = character.isOwn || !isHidden || character.wasRevealedAtLeastOnce;
+  const topCard = character.topCard ?? character.card;
+  const displayName = topCard ? getCardName(topCard, locale as 'en' | 'fr') : '???';
+  const imagePath = topCard?.image_file ? normalizeImagePath(topCard.image_file) : null;
+
+  return (
+    <motion.div
+      whileHover={isValid ? { scale: 1.08, y: -3 } : {}}
+      whileTap={isValid ? { scale: 0.95 } : {}}
+      onClick={isValid ? onClick : undefined}
+      className="relative no-select"
+      style={{
+        width: '65px', height: '91px', cursor: isValid ? 'pointer' : 'default',
+        opacity: isValid ? 1 : 0.3,
+        border: isSelected ? '2px solid #c4a35a' : isValid ? '2px solid rgba(196, 163, 90, 0.5)' : '1px solid #333',
+        boxShadow: isSelected ? '0 0 12px rgba(196, 163, 90, 0.6)' : isValid ? '0 0 8px rgba(196, 163, 90, 0.2)' : 'none',
+      }}
+    >
+      {isHidden && !canSeeCard ? (
+        <img src="/images/card-back.webp" alt={t('card.back')} draggable={false} className="w-full h-full object-cover" />
+      ) : imagePath ? (
+        <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${imagePath}')` }} />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#1a1a1a' }}>
+          <span className="text-[7px] text-center px-0.5" style={{ color: '#888' }}>{displayName}</span>
+        </div>
+      )}
+
+      {/* Order number badge */}
+      {isSelected && orderNumber && (
+        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <span className="text-2xl font-black" style={{ color: '#c4a35a', textShadow: '0 0 8px rgba(196,163,90,0.8)' }}>
+            {orderNumber}
+          </span>
+        </div>
+      )}
+
+      {/* Power */}
+      {!isHidden && topCard && (
+        <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
+          style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0' }}>
+          {character.effectivePower}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 // ----- Mission Lane for Target Selection -----
 
 interface TargetMissionLaneProps {
@@ -470,6 +655,23 @@ export function TargetSelector() {
         />
       );
     }
+  }
+
+  // ---- ORDERED_DEFEAT popup (Gaara 120, Ichibi 130, Naruto 133) ----
+  if (eTst === 'ORDERED_DEFEAT' && visibleState && validTargets.length > 0) {
+    return (
+      <OrderedDefeatPopup
+        missions={visibleState.activeMissions as VisibleMission[]}
+        validTargets={validTargets}
+        myPlayer={visibleState.myPlayer}
+        description={description}
+        descriptionKey={descriptionKey}
+        descriptionParams={descriptionParams as Record<string, string> | undefined}
+        onConfirm={(orderedIds) => handleSelect(JSON.stringify(orderedIds))}
+        onDecline={canDecline ? handleDecline : undefined}
+        canDecline={canDecline}
+      />
+    );
   }
 
   // ---- REORDER_DISCARD popup ----

@@ -398,6 +398,9 @@
       "or": "OR",
       "chooseEffectOrder": "Choose Effect Order",
       "chooseEffectOrderDesc": "Multiple effects triggered at the same time. Choose which to resolve first.",
+      "orderedDefeat": {
+        "progress": "{selected} / {total} selected"
+      },
       "desc": {
         "chooseEffectOrder": "Multiple effects triggered simultaneously. Choose resolution order.",
         "effectPlayUpgradeChoice": "Play {card} as a new character or upgrade?",
@@ -600,6 +603,8 @@
         "choji018HideEnemy": "Choose an enemy character with less Power to hide.",
         "gaara120ConfirmMain": "MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.",
         "gaara120ChooseDefeat": "Choose an enemy character with Power 1 or less to defeat in mission {mission}.",
+        "ichibi130OrderDefeat": "Choose the order to defeat {count} hidden enemies.",
+        "orderedDefeat": "Defeated {count} character(s) in chosen order.",
         "gaara120ConfirmUpgrade": "UPGRADE: POWERUP {count} on Gaara.",
         "reorderDiscard": "Choose the order for {count} defeated cards in your discard pile. Last selected = top of pile.",
         "dosu069LookAtHidden": "Select a hidden character in play to look at.",
