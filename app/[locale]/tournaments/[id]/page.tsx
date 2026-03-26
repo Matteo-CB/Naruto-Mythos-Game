@@ -57,9 +57,10 @@ export default function TournamentDetailPage() {
     const onR = (d: Parameters<typeof handleRoundComplete>[0]) => handleRoundComplete(d);
     const onF = (d: { matchId: string; forfeitedPlayerId: string; winnerId: string; winnerUsername: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'forfeit', winnerId: d.winnerId, winnerUsername: d.winnerUsername } as any); };
     const onMR = (d: { matchId: string; roomCode: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'in_progress', roomCode: d.roomCode } as any); fetchTournament(tournamentId); };
+    const onAT = (d: { matchId: string; playerId: string; deadline: string }) => { handleMatchUpdate({ matchId: d.matchId, absenceDeadline: d.deadline, absentPlayerId: d.playerId } as any); };
     socket.on('tournament:update', onU); socket.on('tournament:match-updated', onM); socket.on('tournament:completed', onC); socket.on('tournament:round-complete', onR);
-    socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); };
+    socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR); socket.on('tournament:absence-timer', onAT);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); };
   }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete]);
 
   // Fetch user's decks for deck selection
@@ -131,7 +132,9 @@ export default function TournamentDetailPage() {
   const handlePlayMatch = useCallback(() => {
     if (!socket || !tournamentId || !userId || !myMatch) return;
     socket.emit('tournament:ready', { tournamentId, matchId: myMatch.id, userId });
-  }, [socket, tournamentId, userId, myMatch]);
+    // Refetch tournament data to get updated absenceDeadline from DB
+    setTimeout(() => fetchTournament(tournamentId), 1000);
+  }, [socket, tournamentId, userId, myMatch, fetchTournament]);
 
   const handleSelectDeck = useCallback(async (deckId: string) => {
     if (!tournamentId) return;
@@ -455,9 +458,11 @@ export default function TournamentDetailPage() {
               <div className="mb-6 p-4" style={{ backgroundColor: '#111111', border: '1px solid rgba(196, 163, 90, 0.3)' }}>
                 <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('yourMatchReady')}</h2>
                 <p className="text-xs mb-3" style={{ color: '#e0e0e0' }}>{myMatch.player1Username ?? t('tbd')} vs {myMatch.player2Username ?? t('tbd')}</p>
-                {myMatch.status === 'ready' && myMatch.roomCode && (
-                  <Link href={('/play/online?code=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
-                )}
+                {myMatch.status === 'ready' && myMatch.roomCode ? (
+                  <Link href={('/play/online?room=' + myMatch.roomCode) as '/'} onClick={handlePlayMatch} className="inline-block px-5 py-2.5 text-sm font-medium uppercase tracking-wider transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('playMatch')}</Link>
+                ) : myMatch.status === 'ready' && !myMatch.roomCode ? (
+                  <button onClick={handlePlayMatch} className="px-5 py-2.5 text-sm font-medium uppercase tracking-wider cursor-pointer transition-colors" style={{ backgroundColor: 'rgba(196, 163, 90, 0.15)', border: '1px solid rgba(196, 163, 90, 0.4)', color: '#c4a35a' }}>{t('ready')}</button>
+                ) : null}
                 {myMatch.status === 'pending' && <p className="text-xs" style={{ color: '#888888' }}>{t('waitingOpponent')}</p>}
               </div>
             )}
