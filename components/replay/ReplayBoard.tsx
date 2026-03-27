@@ -869,7 +869,7 @@ function PlayerBar({
               padding: '2px 6px',
             }}
           >
-            {t('game.pass')}
+            {t('game.board.pass')}
           </span>
         )}
       </div>
@@ -882,7 +882,7 @@ function PlayerBar({
           style={{ borderLeft: '2px solid rgba(90, 122, 187, 0.3)', backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
         >
           <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
-            {t('game.chakra')}
+            {t('game.board.chakra')}
           </span>
           <span
             className="text-xs font-bold tabular-nums"
@@ -898,7 +898,7 @@ function PlayerBar({
           style={{ borderLeft: `2px solid ${color}30`, backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
         >
           <span className="text-[9px] uppercase tracking-wider" style={{ color: '#555' }}>
-            {t('game.score')}
+            {t('game.board.score')}
           </span>
           <span
             className="text-xs font-bold tabular-nums"
@@ -911,10 +911,10 @@ function PlayerBar({
         {/* Counts */}
         <div className="flex items-center gap-2 px-2 py-0.5" style={{ borderLeft: '2px solid rgba(255,255,255,0.06)' }}>
           <span className="text-[8px] tabular-nums" style={{ color: '#555' }}>
-            {t('game.hand')}: {ps.hand.length}
+            {t('game.board.hand')}: {ps.hand.length}
           </span>
           <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
-            {t('game.deck')}: {ps.deck.length}
+            {t('game.board.deck')}: {ps.deck.length}
           </span>
           <button
             className="text-[9px] font-semibold tabular-nums px-2.5 py-1 cursor-pointer transition-colors"
@@ -925,7 +925,7 @@ function PlayerBar({
             }}
             onClick={() => { if ((ps.discardPile?.length ?? 0) > 0) setShowDiscard(!showDiscard); }}
           >
-            {t('game.discard')} ({ps.discardPile?.length ?? 0})
+            {t('game.board.discard')} ({ps.discardPile?.length ?? 0})
           </button>
         </div>
       </div>
