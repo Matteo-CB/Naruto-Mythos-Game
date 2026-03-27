@@ -4200,12 +4200,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a friendly character in play.",
+          "description": "[⧗] Every enemy character in this mission has -1 Power.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "[⧗] Every enemy character in this mission has -1 Power.",
+          "description": "Move a friendly character in play.",
           "description_fr": ""
         }
       ],
@@ -5338,11 +5338,11 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a friendly character in play."
+          "description": "[⧗] Every enemy character in this mission has -1 Power."
         },
         {
           "type": "UPGRADE",
-          "description": "[⧗] Every enemy character in this mission has -1 Power."
+          "description": "Move a friendly character in play."
         }
       ],
       "image_url": "/images/cards/KS/mythos_v/KS-128-MV.webp",
@@ -6322,12 +6322,12 @@
       "effects": [
         {
           "type": "MAIN",
-          "description": "Move a friendly character in play.",
+          "description": "[⧗] Every enemy character in this mission has -1 Power.",
           "description_fr": ""
         },
         {
           "type": "UPGRADE",
-          "description": "[⧗] Every enemy character in this mission has -1 Power.",
+          "description": "Move a friendly character in play.",
           "description_fr": ""
         }
       ],
