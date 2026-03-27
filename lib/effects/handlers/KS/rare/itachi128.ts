@@ -9,15 +9,21 @@ import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
  * Chakra: 6, Power: 6
  * Group: Akatsuki, Keywords: Rogue Ninja
  *
- * MAIN: Move a friendly character in play to another mission.
+ * MAIN [continuous]: Every enemy character in this mission has -1 Power.
+ *   Handled by the engine's PowerCalculation (ContinuousEffects.ts).
+ *
+ * UPGRADE: Move a friendly character in play to another mission.
  *   Player chooses both the character and the destination.
  *   Validates Kurenai block + name uniqueness.
- *
- * UPGRADE [continuous]: Every enemy character in this mission has -1 Power.
- *   Handled by the engine's PowerCalculation (ContinuousEffects.ts).
  */
 
 function itachi128MainHandler(ctx: EffectContext): EffectResult {
+  // Continuous power modifier: every enemy in this mission has -1 Power.
+  // Handled by the engine's PowerCalculation (ContinuousEffects.ts).
+  return { state: ctx.state };
+}
+
+function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -26,9 +32,7 @@ function itachi128MainHandler(ctx: EffectContext): EffectResult {
   const hasMovableChar = state.activeMissions.length >= 2 && state.activeMissions.some((mission, mIdx) => {
     for (const char of mission[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;
-      // Check Kurenai block on source mission
       if (isMovementBlockedByKurenai(state, mIdx, sourcePlayer)) continue;
-      // Check if there's at least one other mission where name doesn't conflict
       for (let destIdx = 0; destIdx < state.activeMissions.length; destIdx++) {
         if (destIdx === mIdx) continue;
         if (canMoveToDestination(state, char, destIdx, sourcePlayer)) {
@@ -65,9 +69,6 @@ function itachi128MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
-/**
- * Check if a character can be moved to a given destination mission (name uniqueness).
- */
 function canMoveToDestination(
   state: GameState,
   char: CharacterInPlay,
@@ -90,12 +91,6 @@ function canMoveToDestination(
     }
   }
   return true;
-}
-
-function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
-  // Continuous power modifier: every enemy in this mission has -1 Power.
-  // Handled by the engine's PowerCalculation (ContinuousEffects.ts).
-  return { state: ctx.state };
 }
 
 export function registerItachi128Handlers(): void {
