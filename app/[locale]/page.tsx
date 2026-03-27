@@ -406,6 +406,40 @@ export default function Home() {
               )}
             </motion.nav>
 
+            {/* Card Nexus CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 1.4 }}
+            >
+              <Link
+                href="/card-nexus"
+                className="group relative flex h-10 items-center justify-center overflow-hidden text-sm font-bold tracking-wider transition-all sm:h-12 sm:text-base"
+                style={{
+                  backgroundColor: 'rgba(196, 163, 90, 0.08)',
+                  border: '1px solid #c4a35a',
+                  color: '#c4a35a',
+                  boxShadow: '0 0 15px rgba(196, 163, 90, 0.15), inset 0 0 15px rgba(196, 163, 90, 0.05)',
+                  textShadow: '0 0 8px rgba(196, 163, 90, 0.4)',
+                  animation: 'glow-pulse 2s ease-in-out infinite',
+                }}
+                onMouseEnter={(e) => {
+                  const target = e.currentTarget;
+                  target.style.transform = 'scale(1.04)';
+                  target.style.boxShadow = '0 0 25px rgba(196, 163, 90, 0.3), inset 0 0 25px rgba(196, 163, 90, 0.1)';
+                  target.style.backgroundColor = 'rgba(196, 163, 90, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget;
+                  target.style.transform = 'scale(1)';
+                  target.style.boxShadow = '0 0 15px rgba(196, 163, 90, 0.15), inset 0 0 15px rgba(196, 163, 90, 0.05)';
+                  target.style.backgroundColor = 'rgba(196, 163, 90, 0.08)';
+                }}
+              >
+                <span className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: '#c4a35a', boxShadow: '0 0 8px rgba(196, 163, 90, 0.6)' }} />
+                {t('cardNexus')}
+              </Link>
+            </motion.div>
 
             {/* Divider */}
             <motion.div
