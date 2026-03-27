@@ -43,6 +43,7 @@
     "admin": "Administration",
     "signOut": "Se deconnecter",
     "sealed": "Scellé",
+    "cardNexus": "Naruto Mythos sur Card Nexus",
     "training": "Mode Entrainement",
     "settings": "Parametres",
     "customization": "Personnalisation",
@@ -1058,6 +1059,17 @@
     "sortByCost": "Trier par cout",
     "sort": "Trier",
     "dragToReorder": "Glissez les cartes pour les reorganiser"
+  },
+  "cardNexus": {
+    "whyTitle": "Pourquoi Naruto Mythos a besoin de Card Nexus",
+    "whyDesc": "Card Nexus est une plateforme universelle pour les jeux de cartes numeriques. Obtenir un support officiel pour Naruto Mythos serait un tournant pour toute la communaute.",
+    "reason1": "Un simulateur en ligne dedie et professionnel avec un soutien officiel — meilleur matchmaking, tournois et une plateforme stable pour le jeu competitif.",
+    "reason2": "Card Nexus apporte de la visibilite au jeu. Des milliers de joueurs de JCC decouvrent de nouveaux jeux via la plateforme chaque jour.",
+    "reason3": "Un support numerique officiel signifie des mises a jour plus rapides, une meilleure gestion des cartes et une integration fluide avec les sorties physiques.",
+    "reason4": "Une base de joueurs plus large signifie plus de tournois, une scene competitive plus forte et une communaute florissante pour les annees a venir.",
+    "callToAction": "Chaque vote compte. Plus on montre notre soutien, plus Card Nexus donnera la priorite a Naruto Mythos. Ca prend 10 secondes et ne coute rien.",
+    "upvoteButton": "Voter sur Card Nexus",
+    "back": "Retour au menu"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
