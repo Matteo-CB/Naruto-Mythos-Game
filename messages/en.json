@@ -43,7 +43,6 @@
     "admin": "Administration",
     "signOut": "Sign Out",
     "sealed": "Sealed",
-    "cardNexus": "Naruto Mythos on Card Nexus",
     "training": "Training Mode",
     "settings": "Settings",
     "customization": "Customization",
@@ -1059,17 +1058,6 @@
     "sortByCost": "Sort by Cost",
     "sort": "Sort",
     "dragToReorder": "Drag cards to reorder"
-  },
-  "cardNexus": {
-    "whyTitle": "Why Naruto Mythos needs Card Nexus",
-    "whyDesc": "Card Nexus is a universal platform for digital card games. Getting Naruto Mythos officially supported would be a game-changer for the entire community.",
-    "reason1": "A dedicated, professional online simulator with official backing — better matchmaking, tournaments, and a stable platform for competitive play.",
-    "reason2": "Card Nexus brings visibility to the game. Thousands of TCG players discover new games through the platform every day.",
-    "reason3": "Official digital support means faster updates, better card management, and seamless integration with the physical game releases.",
-    "reason4": "A larger player base means more tournaments, a stronger competitive scene, and a thriving community for years to come.",
-    "callToAction": "Every upvote matters. The more support we show, the more likely Card Nexus will prioritize Naruto Mythos. It takes 10 seconds and costs nothing.",
-    "upvoteButton": "Upvote on Card Nexus",
-    "back": "Back to menu"
   },
   "discord": {
     "linkDiscord": "Link Discord",
