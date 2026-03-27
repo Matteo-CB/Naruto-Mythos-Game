@@ -3283,28 +3283,35 @@ export class EffectEngine {
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
         const k026Opponent = pendingEffect.sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-        const k026NonHidden = k026Mission[k026EnemySide].filter((c: CharacterInPlay) => {
-          if (c.isHidden) return false;
-          // Check canBeHiddenByEnemy via centralized utility
-          return canBeHiddenByEnemy(newState, c, k026Opponent);
-        });
+        // Find ALL non-hidden enemies first, then find the lowest cost among them
+        const k026AllNonHidden = k026Mission[k026EnemySide].filter((c: CharacterInPlay) => !c.isHidden);
 
-        if (k026NonHidden.length === 0) {
+        if (k026AllNonHidden.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
             'EFFECT_NO_TARGET', 'Kiba Inuzuka (026): No non-hidden enemy to hide (state changed).',
             'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
           break;
         }
 
+        // Find the lowest cost among ALL non-hidden enemies
         let k026LowestCost = Infinity;
-        for (const char of k026NonHidden) {
+        for (const char of k026AllNonHidden) {
           const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
           if (topCard.chakra < k026LowestCost) k026LowestCost = topCard.chakra;
         }
-        const k026Tied = k026NonHidden.filter((c: CharacterInPlay) => {
+
+        // Filter to only those tied at the lowest cost AND that can actually be hidden
+        const k026Tied = k026AllNonHidden.filter((c: CharacterInPlay) => {
           const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-          return topCard.chakra === k026LowestCost;
+          return topCard.chakra === k026LowestCost && canBeHiddenByEnemy(newState, c, k026Opponent);
         });
+
+        if (k026Tied.length === 0) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kiba Inuzuka (026): Lowest cost enemy is protected from being hidden.',
+            'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' });
+          break;
+        }
 
         if (k026Tied.length === 1) {
           // Auto-hide
