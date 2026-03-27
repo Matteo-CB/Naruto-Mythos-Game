@@ -917,22 +917,22 @@ function PlayerBar({
             {t('game.deck')}: {ps.deck.length}
           </span>
           <button
-            className="text-[9px] font-semibold tabular-nums px-2 py-0.5 cursor-pointer transition-colors"
+            className="text-[9px] font-semibold tabular-nums px-2.5 py-1 cursor-pointer transition-colors"
             style={{
-              color: showDiscard ? '#c4a35a' : ps.discardPile.length > 0 ? '#aaa' : '#444',
-              backgroundColor: showDiscard ? 'rgba(196, 163, 90, 0.1)' : ps.discardPile.length > 0 ? 'rgba(255,255,255,0.04)' : 'transparent',
-              border: `1px solid ${showDiscard ? 'rgba(196, 163, 90, 0.3)' : ps.discardPile.length > 0 ? 'rgba(255,255,255,0.1)' : 'transparent'}`,
+              color: showDiscard ? '#c4a35a' : (ps.discardPile?.length ?? 0) > 0 ? '#c4a35a' : '#555',
+              backgroundColor: showDiscard ? 'rgba(196, 163, 90, 0.15)' : (ps.discardPile?.length ?? 0) > 0 ? 'rgba(196, 163, 90, 0.06)' : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${showDiscard ? 'rgba(196, 163, 90, 0.4)' : (ps.discardPile?.length ?? 0) > 0 ? 'rgba(196, 163, 90, 0.2)' : 'rgba(255,255,255,0.06)'}`,
             }}
-            onClick={() => { if (ps.discardPile.length > 0) setShowDiscard(!showDiscard); }}
+            onClick={() => { if ((ps.discardPile?.length ?? 0) > 0) setShowDiscard(!showDiscard); }}
           >
-            {t('game.discard')} ({ps.discardPile.length})
+            {t('game.discard')} ({ps.discardPile?.length ?? 0})
           </button>
         </div>
       </div>
 
       {/* Discard pile popup */}
       <AnimatePresence>
-        {showDiscard && ps.discardPile.length > 0 && (
+        {showDiscard && (ps.discardPile?.length ?? 0) > 0 && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
