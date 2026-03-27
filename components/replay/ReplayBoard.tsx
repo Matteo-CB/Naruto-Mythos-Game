@@ -916,19 +916,17 @@ function PlayerBar({
           <span className="text-[8px] tabular-nums" style={{ color: '#444' }}>
             {t('game.deck')}: {ps.deck.length}
           </span>
-          <span
-            className="text-[8px] tabular-nums"
+          <button
+            className="text-[9px] font-semibold tabular-nums px-2 py-0.5 cursor-pointer transition-colors"
             style={{
-              color: ps.discardPile.length > 0 ? '#888' : '#444',
-              cursor: ps.discardPile.length > 0 ? 'pointer' : 'default',
-              textDecoration: ps.discardPile.length > 0 ? 'underline' : 'none',
-              textDecorationColor: 'rgba(136, 136, 136, 0.3)',
-              textUnderlineOffset: '2px',
+              color: showDiscard ? '#c4a35a' : ps.discardPile.length > 0 ? '#aaa' : '#444',
+              backgroundColor: showDiscard ? 'rgba(196, 163, 90, 0.1)' : ps.discardPile.length > 0 ? 'rgba(255,255,255,0.04)' : 'transparent',
+              border: `1px solid ${showDiscard ? 'rgba(196, 163, 90, 0.3)' : ps.discardPile.length > 0 ? 'rgba(255,255,255,0.1)' : 'transparent'}`,
             }}
             onClick={() => { if (ps.discardPile.length > 0) setShowDiscard(!showDiscard); }}
           >
-            {t('game.discard')}: {ps.discardPile.length}
-          </span>
+            {t('game.discard')} ({ps.discardPile.length})
+          </button>
         </div>
       </div>
 
