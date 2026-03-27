@@ -12667,7 +12667,7 @@ export class EffectEngine {
             targetSelectionType: 'GAARA120_CONFIRM_UPGRADE',
             sourcePlayer: pendingEffect.sourcePlayer, requiresTargetSelection: true,
             validTargets: [odParsed.sourceInstanceId],
-            isOptional: false, isMandatory: true, resolved: false, isUpgrade: true,
+            isOptional: true, isMandatory: false, resolved: false, isUpgrade: true,
           }];
           newState.pendingActions = [...newState.pendingActions, {
             id: g120uActId, type: 'SELECT_TARGET' as PendingAction['type'],
