@@ -1037,8 +1037,8 @@ export function ReplayBoard({ state, playerNames, locale, backgroundUrl, viewAs,
       {/* Top player stats */}
       <PlayerBar player={topPlayer} state={state} playerNames={playerNames} isTop={true} locale={locale} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
-      {/* Top player hand (fanned card-backs) */}
-      <OpponentHandRow handSize={state[topPlayer].hand.length} />
+      {/* Top player hand (fanned face-up in replay) */}
+      <PlayerHandRow cards={state[topPlayer].hand} locale={locale} player={topPlayer} onCardClick={onCardClick ? (c) => onCardClick(c) : undefined} />
 
       {/* Mission area - fills remaining space */}
       <div className="flex-1 flex items-stretch gap-1.5 px-3 py-1 min-h-0 overflow-hidden">
