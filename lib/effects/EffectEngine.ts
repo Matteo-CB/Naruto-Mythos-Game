@@ -13855,7 +13855,13 @@ export class EffectEngine {
             c => c.instanceId === resultCharId_k78,
           );
           if (revealedChar_k78) {
-            newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, revealedChar_k78, mIdx_k78);
+            if (upgradeTarget_k78) {
+              // Revealed as upgrade → trigger MAIN + UPGRADE + AMBUSH
+              newState = EffectEngine.resolveRevealUpgradeEffects(newState, pendingEffect.sourcePlayer, revealedChar_k78, mIdx_k78);
+            } else {
+              // Revealed as fresh → trigger MAIN + AMBUSH only
+              newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, revealedChar_k78, mIdx_k78);
+            }
           }
         }
         break;
@@ -13934,7 +13940,11 @@ export class EffectEngine {
         const resultId_k78r = isCardUpgrade_k78r ? targetId : hiddenId_k78r;
         const resultChar_k78r = newState.activeMissions[mIdx_k78r][side_k78r].find(c => c.instanceId === resultId_k78r);
         if (resultChar_k78r) {
-          newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, resultChar_k78r, mIdx_k78r);
+          if (isCardUpgrade_k78r) {
+            newState = EffectEngine.resolveRevealUpgradeEffects(newState, pendingEffect.sourcePlayer, resultChar_k78r, mIdx_k78r);
+          } else {
+            newState = EffectEngine.resolveRevealEffects(newState, pendingEffect.sourcePlayer, resultChar_k78r, mIdx_k78r);
+          }
         }
         break;
       }
