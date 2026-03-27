@@ -920,8 +920,8 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 128/130 V - ITACHI UCHIHA (MV) - "Amaterasu"
   'KS-128-MV': [
-    'Deplacez un personnage allie en jeu.',
     '[⧗] Chaque personnage ennemi dans cette mission a -1 Puissance.',
+    'Deplacez un personnage allie en jeu.',
   ],
 
   // 120/130 V - GAARA (MV) - "Cercueil de Sable"
