@@ -11079,8 +11079,8 @@ export class EffectEngine {
           const n133AllTargets = [...new Set([...n133ValidT1, ...n133ValidT2])];
           const n133EffId = generateInstanceId();
           const n133ActId = generateInstanceId();
-          // minSelections: 1 if only one group has targets, 2 if both
-          const n133Min = (n133ValidT1.length > 0 && n133ValidT2.length > 0) ? 2 : 1;
+          // minSelections: always 1 — a single card in both groups can satisfy both targets
+          const n133Min = 1;
           newState.pendingEffects.push({
             id: n133EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -11150,7 +11150,7 @@ export class EffectEngine {
           const n133mAllTargets = [...new Set([...n133mValidT1, ...n133mValidT2])];
           const n133mEffId = generateInstanceId();
           const n133mActId = generateInstanceId();
-          const n133mMin = (n133mValidT1.length > 0 && n133mValidT2.length > 0) ? 2 : 1;
+          const n133mMin = 1;
           newState.pendingEffects.push({
             id: n133mEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
