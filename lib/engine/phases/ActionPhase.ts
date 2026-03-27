@@ -28,10 +28,10 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
-  // Block ALL direct actions while pending effects/actions exist
-  // (e.g., Sakura 135/Kabuto 053 played a card whose effects need resolution)
+  // Block ALL direct actions while pending ACTIONS exist (someone must resolve them first).
+  // Orphaned pending effects (no matching actions) should not block.
   if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT' && action.type !== 'PASS') {
-    if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
+    if (newState.pendingActions.length > 0) {
       return state;
     }
   }

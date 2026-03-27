@@ -1624,12 +1624,12 @@ export class GameEngine {
           }
           return actions;
         }
-        // If there are ANY unresolved pending effects or pending actions (even for the other player),
-        // executeAction will block all regular actions (PLAY_CHARACTER, PASS, etc.).
-        // Return an empty list to prevent the AI from picking actions that will be silently rejected.
-        if (state.pendingEffects.length > 0 || state.pendingActions.length > 0) {
-          return [];
+        // If there are pending ACTIONS for the other player, this player can't act.
+        // But orphaned pending effects (no matching actions) should not block.
+        if (state.pendingActions.length > 0) {
+          return []; // Someone needs to resolve pending actions first
         }
+        // Pending effects with no actions = orphaned, don't block regular actions
         return getValidActionsForPlayer(state, player);
       }
 
