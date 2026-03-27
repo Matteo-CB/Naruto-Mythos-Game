@@ -1582,7 +1582,7 @@ export default function DeckBuilderPage() {
               {t("deckBuilder.importDesc")}
             </p>
             <div className="mb-3">
-              <a href="https://shinobuilder.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://exburst.dev/naruto/deckbuilder" target="_blank" rel="noopener noreferrer"
                 className="inline-block text-[10px] uppercase font-bold px-3 py-1.5"
                 style={{ backgroundColor: 'rgba(74,122,181,0.12)', borderLeft: '3px solid #4a7ab5', color: '#4a7ab5', letterSpacing: '0.08em' }}>
                 {t("deckBuilder.importVisit")}
