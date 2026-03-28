@@ -167,6 +167,7 @@ model Tournament {
   id                 String                  @id @default(auto()) @map("_id") @db.ObjectId
   name               String
   type               String                  @default("simulator")
+  format             String                  @default("swiss")
   status             String
   gameMode           String
   maxPlayers         Int

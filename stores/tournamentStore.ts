@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { SwissStanding } from '@/lib/tournament/swissEngine';
 
 export interface TournamentMatch {
   id: string;
@@ -48,10 +49,12 @@ export interface TournamentData {
   discordRoleReward: string | null;
   bannedCardIds: string[];
   allowedLeagues: string[];
+  format?: 'swiss' | 'elimination';
   winnerId: string | null;
   winnerUsername: string | null;
   participants: TournamentParticipant[];
   matches: TournamentMatch[];
+  standings?: SwissStanding[];
   _count?: { participants: number; matches: number };
   createdAt: string;
 }
@@ -75,6 +78,8 @@ interface TournamentStore {
   handleMatchUpdate: (data: Partial<TournamentMatch> & { matchId: string }) => void;
   handleTournamentComplete: (data: { winnerId: string; winnerUsername: string }) => void;
   handleRoundComplete: (data: { completedRound: number; nextRound: number }) => void;
+  handleStandingsUpdate: (data: { standings: SwissStanding[] }) => void;
+  handleSwissRoundGenerated: (data: { round: number }) => void;
   clearActiveTournament: () => void;
   clearError: () => void;
 }
@@ -82,6 +87,7 @@ interface TournamentStore {
 export interface CreateTournamentInput {
   name: string;
   type: 'simulator';
+  format?: 'swiss' | 'elimination';
   gameMode: 'classic' | 'sealed' | 'restricted';
   maxPlayers: number;
   isPublic: boolean;
@@ -217,6 +223,20 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
   handleRoundComplete: (data) => {
     const current = get().activeTournament;
     if (current) set({ activeTournament: { ...current, currentRound: data.nextRound } });
+  },
+
+  handleStandingsUpdate: (data) => {
+    const current = get().activeTournament;
+    if (current) set({ activeTournament: { ...current, standings: data.standings } });
+  },
+
+  handleSwissRoundGenerated: (data) => {
+    const current = get().activeTournament;
+    if (current) {
+      set({ activeTournament: { ...current, currentRound: data.round } });
+      // Refetch to get the new round matches
+      get().fetchTournament(current.id);
+    }
   },
 
   clearActiveTournament: () => set({ activeTournament: null }),
