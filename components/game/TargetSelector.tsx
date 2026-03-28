@@ -305,6 +305,7 @@ function OrderedDefeatPopup({
   // For naruto133: confirm when all fillable slots are filled
   const canConfirmNaruto133 = useMemo(() => {
     if (mode !== 'naruto133' || orderedIds.length === 0) return false;
+    // Determine which slots are filled by current selections
     let g1Filled = false;
     let g2Filled = false;
     for (const id of orderedIds) {
@@ -313,14 +314,14 @@ function OrderedDefeatPopup({
       if (inG1 && !g1Filled) g1Filled = true;
       else if (inG2 && !g2Filled) g2Filled = true;
     }
-    // Check if unfilled slots have any remaining valid targets
+    // Check if unfilled slots still have remaining valid targets
+    const remaining = validTargets.filter(t => !orderedIds.includes(t));
     if (!g1Filled) {
-      const hasG1Remaining = validTargets.some(t => !orderedIds.includes(t) && targetGroups.group1.has(t));
-      if (hasG1Remaining) return false; // Must still pick a group1 target
+      if (remaining.some(t => targetGroups.group1.has(t))) return false;
     }
     if (!g2Filled) {
-      const hasG2Remaining = validTargets.some(t => !orderedIds.includes(t) && targetGroups.group2.has(t) && !targetGroups.group1.has(t));
-      if (hasG2Remaining) return false; // Must still pick a group2-only target
+      // Any remaining group2 target can fill g2 (even if also in group1, since g1 is already filled or has no targets)
+      if (remaining.some(t => targetGroups.group2.has(t))) return false;
     }
     return true;
   }, [mode, orderedIds, validTargets, targetGroups]);
