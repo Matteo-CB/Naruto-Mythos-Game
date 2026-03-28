@@ -348,6 +348,7 @@
       "minimize": "Réduire",
       "restoreEffect": "Effet en attente"
     },
+    "handLabel": "Main",
     "hand": {
       "sortCost": "Trier par Cout",
       "sortPower": "Trier par Puissance"
