@@ -452,7 +452,24 @@ function startActionTimer(
       broadcastState(room, io);
       await finalizeGameEnd(room, code, io, 'timeout');
     } else {
-      // Auto-pass
+      // If pending effects/actions block PASS, auto-resolve them first
+      if (room.gameState.pendingActions.length > 0) {
+        const pendingForPlayer = room.gameState.pendingActions.filter(p => p.player === player);
+        if (pendingForPlayer.length > 0) {
+          const pa = pendingForPlayer[0];
+          // Try to decline optional effects first
+          const pe = room.gameState.pendingEffects.find(e => e.id === pa.sourceEffectId);
+          if (pe && (pe.isOptional || !pe.isMandatory)) {
+            console.log(`[Socket] Timer: auto-declining optional effect for ${player}`);
+            room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: pe.id });
+          } else if (pa.options.length > 0) {
+            console.log(`[Socket] Timer: auto-selecting first target for ${player}`);
+            room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [pa.options[0]] });
+          }
+        }
+      }
+      // Now try to PASS (may still fail if more pending remain — timer will restart)
+      const stateBeforePass = room.gameState;
       console.log(`[Socket] Auto-pass for ${player} in room ${code}`);
       room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'PASS' });
 
