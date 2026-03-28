@@ -11,7 +11,6 @@ import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, val
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
 import { deepClone } from '@/lib/engine/utils/deepClone';
 import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInterval } from '@/lib/socket/maintenance';
-import { TrainingDataCollector } from '@/lib/ai/training/DataCollector';
 
 export interface RoomData {
   code: string;
@@ -57,8 +56,6 @@ export interface RoomData {
   // Chat
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   chatLastCleanup: number;
-  // AI training data collection (ranked games only)
-  trainingCollector: TrainingDataCollector | null;
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
@@ -319,38 +316,6 @@ async function finalizeGameEnd(
     }
   } catch (eloErr) {
     console.error('[Socket] Error persisting game result:', eloErr);
-  }
-
-  // Save training data for ranked games that completed normally (not forfeit/timeout)
-  if (room.trainingCollector && room.isRanked && winReason === 'score' && gameRecordId) {
-    try {
-      room.trainingCollector.finalize(winner);
-      const snapshots = room.trainingCollector.getSnapshots();
-      if (snapshots.length > 0) {
-        // Update gameId to use the persisted DB record ID
-        const documents = snapshots.map(s => ({
-          gameId: gameRecordId!,
-          features: s.features,
-          outcome: s.outcome,
-          turn: s.turn,
-          createdAt: new Date(),
-        }));
-        // Fire-and-forget bulk insert — do not block game end
-        prisma.trainingData.createMany({ data: documents }).catch(err => {
-          console.error('[Socket] Training data save error:', err instanceof Error ? err.message : err);
-        });
-        console.log(`[Socket] Queued ${documents.length} training snapshots for game ${gameRecordId}`);
-      }
-    } catch (trainErr) {
-      console.error('[Socket] Training data collection error:', trainErr instanceof Error ? trainErr.message : trainErr);
-    } finally {
-      room.trainingCollector.clear();
-      room.trainingCollector = null;
-    }
-  } else if (room.trainingCollector) {
-    // Game ended by forfeit/timeout or not ranked — discard training data
-    room.trainingCollector.clear();
-    room.trainingCollector = null;
   }
 
   // Build replay data for client-side save
@@ -732,15 +697,6 @@ function startMissionPhaseTimer(
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
 
-  // Collect training data snapshot (lightweight, fire-and-forget)
-  if (room.trainingCollector && room.gameState.phase !== 'gameOver') {
-    try {
-      room.trainingCollector.collectSnapshot(room.gameState);
-    } catch {
-      // Never let training collection affect gameplay
-    }
-  }
-
   const playerNames = {
     player1: room.hostName ?? 'Player 1',
     player2: room.guestName ?? 'Player 2',
@@ -1012,10 +968,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.gameState = GameEngine.createGame(config);
           room.replayInitialState = null;
 
-          // Initialize training data collector for ranked games
-          if (room.isRanked && room.gameState) {
-            room.trainingCollector = new TrainingDataCollector(room.gameState.gameId);
-          }
+
 
           let hostName = 'Player 1';
           let guestName = 'Player 2';
@@ -1100,7 +1053,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         guestAllowSpectatorHand: false,
         chatMessages: [],
         chatLastCleanup: 0,
-        trainingCollector: null,
       };
 
       // Fetch host's spectator hand preference
@@ -1319,10 +1271,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         // replayInitialState will be captured AFTER mulligans complete (deterministic point)
         room.replayInitialState = null;
 
-        // Initialize training data collector for ranked games
-        if (room.isRanked && room.gameState) {
-          room.trainingCollector = new TrainingDataCollector(room.gameState.gameId);
-        }
 
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
@@ -1824,8 +1772,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestAllowSpectatorHand: false,
           chatMessages: [],
           chatLastCleanup: 0,
-          trainingCollector: null,
-        };
+          };
 
         rooms.set(code, room);
         playerRooms.set(socket.id, code);
