@@ -348,6 +348,7 @@
       "minimize": "Minimize",
       "restoreEffect": "Pending Effect"
     },
+    "handLabel": "Hand",
     "hand": {
       "sortCost": "Sort by Cost",
       "sortPower": "Sort by Power"
