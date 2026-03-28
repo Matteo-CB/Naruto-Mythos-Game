@@ -219,7 +219,10 @@ async function finalizeGameEnd(
   clearActionTimer(room);
 
   const winner = GameEngine.getWinner(room.gameState);
-  if (!winner) return;
+  if (!winner) {
+    console.error(`[Socket] finalizeGameEnd called but no winner! phase=${room.gameState.phase} turn=${room.gameState.turn} pendingEffects=${room.gameState.pendingEffects.length} pendingActions=${room.gameState.pendingActions.length} p1Score=${room.gameState.player1.missionPoints} p2Score=${room.gameState.player2.missionPoints}`);
+    return;
+  }
 
   const p1Score = room.gameState.player1.missionPoints;
   const p2Score = room.gameState.player2.missionPoints;
@@ -227,8 +230,8 @@ async function finalizeGameEnd(
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
   let gameRecordId: string | null = null;
 
+  // Apply ELO changes (separate try-catch so game record save still works if ELO fails)
   try {
-    // Apply ELO changes for ranked games
     if (room.isRanked && room.hostId && room.guestId) {
       const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
       const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
@@ -271,8 +274,12 @@ async function finalizeGameEnd(
         sendRankUpNotification(player2.username, player2.discordId, player2.elo, changes.player2NewElo, p2OldTotal, p2OldTotal + 1).catch(() => {});
       }
     }
+  } catch (eloErr) {
+    console.error('[Socket] ELO update error:', eloErr instanceof Error ? eloErr.message : eloErr);
+  }
 
-    // Persist game record with replay data included
+  // Persist game record (separate try-catch so ELO still works if save fails)
+  try {
     if (room.hostId && room.guestId) {
       const replayForDb = room.gameState ? {
         log: room.gameState.log,
@@ -302,10 +309,24 @@ async function finalizeGameEnd(
           player2Score: p2Score,
           eloChange: eloData?.player1Delta ?? 0,
           completedAt: new Date(),
-          gameState: replayForDb ? JSON.parse(JSON.stringify(replayForDb)) : undefined,
+          gameState: replayForDb ? (() => {
+            try {
+              const serialized = JSON.stringify(replayForDb);
+              // MongoDB BSON limit ~16MB, keep under 12MB to be safe
+              if (serialized.length > 12_000_000) {
+                console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), saving without actionHistory`);
+                return JSON.parse(JSON.stringify({ ...replayForDb, actionHistory: [] }));
+              }
+              return JSON.parse(serialized);
+            } catch (e) {
+              console.error('[Socket] Replay serialization error:', e instanceof Error ? e.message : e);
+              return null;
+            }
+          })() : undefined,
         },
       });
       gameRecordId = gameRecord.id;
+      console.log(`[Socket] Game saved: ${gameRecordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
       // If this game is part of a tournament, update tournament state
       if (room.tournamentId && room.tournamentMatchId && gameRecordId) {
         const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
@@ -314,8 +335,8 @@ async function finalizeGameEnd(
         });
       }
     }
-  } catch (eloErr) {
-    console.error('[Socket] Error persisting game result:', eloErr);
+  } catch (saveErr) {
+    console.error('[Socket] Error saving game record:', saveErr instanceof Error ? saveErr.message : saveErr, saveErr instanceof Error ? saveErr.stack : '');
   }
 
   // Build replay data for client-side save
