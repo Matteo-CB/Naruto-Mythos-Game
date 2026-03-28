@@ -11079,8 +11079,11 @@ export class EffectEngine {
           const n133AllTargets = [...new Set([...n133ValidT1, ...n133ValidT2])];
           const n133EffId = generateInstanceId();
           const n133ActId = generateInstanceId();
-          // minSelections: always 1 — a single card in both groups can satisfy both targets
-          const n133Min = 1;
+          // Check if any target can satisfy BOTH groups (P≤2 in Naruto's mission = in both)
+          // If yes, min=1 (one card fills both slots). If no, min = number of groups with targets.
+          const hasCardInBothGroups = n133ValidT1.some(id => n133ValidT2.includes(id));
+          const groupsWithTargets = (n133ValidT1.length > 0 ? 1 : 0) + (n133ValidT2.filter(id => !n133ValidT1.includes(id)).length > 0 ? 1 : 0);
+          const n133Min = hasCardInBothGroups ? 1 : Math.max(1, groupsWithTargets);
           newState.pendingEffects.push({
             id: n133EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -11150,7 +11153,9 @@ export class EffectEngine {
           const n133mAllTargets = [...new Set([...n133mValidT1, ...n133mValidT2])];
           const n133mEffId = generateInstanceId();
           const n133mActId = generateInstanceId();
-          const n133mMin = 1;
+          const hasCardInBothGroupsM = n133mValidT1.some(id => n133mValidT2.includes(id));
+          const groupsWithTargetsM = (n133mValidT1.length > 0 ? 1 : 0) + (n133mValidT2.filter(id => !n133mValidT1.includes(id)).length > 0 ? 1 : 0);
+          const n133mMin = hasCardInBothGroupsM ? 1 : Math.max(1, groupsWithTargetsM);
           newState.pendingEffects.push({
             id: n133mEffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
