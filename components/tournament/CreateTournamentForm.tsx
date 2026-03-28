@@ -16,6 +16,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
   const { createTournament } = useTournamentStore();
 
   const [name, setName] = useState('');
+  const [format, setFormat] = useState<'swiss' | 'elimination'>('swiss');
   const [gameMode, setGameMode] = useState<'classic' | 'sealed' | 'restricted'>('classic');
   const [maxPlayers, setMaxPlayers] = useState(8);
   const [isPublic, setIsPublic] = useState(true);
@@ -66,6 +67,7 @@ export function CreateTournamentForm({ isAdmin }: Props) {
       const input: CreateTournamentInput = {
         name: name.trim(),
         type: 'simulator',
+        format,
         gameMode,
         maxPlayers,
         isPublic,
@@ -115,6 +117,14 @@ export function CreateTournamentForm({ isAdmin }: Props) {
       <div className="flex flex-col gap-1">
         <label style={labelStyle}>{t('name')}</label>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} style={inputStyle} maxLength={50} />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label style={labelStyle}>{t('format')}</label>
+        <div className="flex gap-2">
+          <ToggleBtn val="swiss" cur={format} onClick={() => setFormat('swiss')}>{t('formatSwiss')}</ToggleBtn>
+          <ToggleBtn val="elimination" cur={format} onClick={() => setFormat('elimination')}>{t('formatElimination')}</ToggleBtn>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1">

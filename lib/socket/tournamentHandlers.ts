@@ -7,8 +7,17 @@ import { startAbsenceTimer, clearAbsenceTimer } from '@/lib/tournament/absenceMa
 import { assignTournamentWinnerRole } from '@/lib/discord/tournamentRoles';
 import { sendTournamentResults } from '@/lib/discord/tournamentWebhook';
 import { rooms, type RoomData } from '@/lib/socket/server';
+import {
+  computeStandings,
+  generateSwissPairings,
+  type SwissPlayer,
+  type SwissMatchResult,
+} from '@/lib/tournament/swissEngine';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
+
+// In-memory lock to prevent double Swiss round generation
+const swissRoundLocks = new Map<string, boolean>();
 
 export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:subscribe', ({ tournamentId }: { tournamentId: string }) => {
@@ -122,14 +131,29 @@ async function handleMatchForfeit(io: Server, tournamentId: string, matchId: str
     where: { id: matchId },
     data: { status: 'forfeit', winnerId, winnerUsername, completedAt: new Date() },
   });
-  await prisma.tournamentParticipant.updateMany({
-    where: { tournamentId, userId: forfeitPlayerId },
-    data: { eliminated: true, eliminatedRound: match.round },
-  });
+
+  // Check format: only eliminate in elimination tournaments
+  const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { format: true } });
+  const isSwiss = tournament?.format === 'swiss';
+
+  if (!isSwiss) {
+    await prisma.tournamentParticipant.updateMany({
+      where: { tournamentId, userId: forfeitPlayerId },
+      data: { eliminated: true, eliminatedRound: match.round },
+    });
+  }
+
   io.to(`tournament:${tournamentId}`).emit('tournament:player-forfeited', {
     matchId, forfeitedPlayerId: forfeitPlayerId, winnerId, winnerUsername,
   });
-  if (winnerId) await advanceMatchWinner(io, tournamentId, match, winnerId, winnerUsername);
+
+  if (winnerId) {
+    if (isSwiss) {
+      await handleSwissMatchEnd(io, tournamentId, match);
+    } else {
+      await advanceMatchWinner(io, tournamentId, match, winnerId, winnerUsername);
+    }
+  }
 }
 
 export async function handleTournamentMatchEnd(io: Server, tournamentId: string, matchId: string, winnerId: string, gameId: string) {
@@ -146,20 +170,223 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
       where: { id: matchId },
       data: { status: 'completed', winnerId, winnerUsername, gameId, completedAt: new Date() },
     });
-    if (loserId) {
-      await prisma.tournamentParticipant.updateMany({
-        where: { tournamentId, userId: loserId },
-        data: { eliminated: true, eliminatedRound: match.round },
-      });
+
+    // Check format
+    const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { format: true } });
+    const isSwiss = tournament?.format === 'swiss';
+
+    if (!isSwiss) {
+      // Elimination: mark loser as eliminated
+      if (loserId) {
+        await prisma.tournamentParticipant.updateMany({
+          where: { tournamentId, userId: loserId },
+          data: { eliminated: true, eliminatedRound: match.round },
+        });
+      }
     }
+
     io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
       matchId, status: 'completed', winnerId, winnerUsername, gameId,
     });
-    await advanceMatchWinner(io, tournamentId, match, winnerId, winnerUsername);
+
+    if (isSwiss) {
+      await handleSwissMatchEnd(io, tournamentId, match);
+    } else {
+      await advanceMatchWinner(io, tournamentId, match, winnerId, winnerUsername);
+    }
   } catch (err) {
     console.error('[Tournament] Match end handler error:', err);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Swiss-specific match end handler
+// ---------------------------------------------------------------------------
+
+async function handleSwissMatchEnd(
+  io: Server,
+  tournamentId: string,
+  match: { round: number; matchIndex: number },
+) {
+  // Check if all matches in current round are completed
+  const allRoundMatches = await prisma.tournamentMatch.findMany({
+    where: { tournamentId, round: match.round },
+  });
+  const roundComplete = allRoundMatches.every(
+    m => m.status === 'completed' || m.status === 'forfeit',
+  );
+
+  if (!roundComplete) {
+    // Not all matches done yet - emit standings update
+    const standings = await buildCurrentStandings(tournamentId);
+    io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
+    return;
+  }
+
+  // Acquire lock to prevent double round generation
+  const lockKey = `${tournamentId}:${match.round}`;
+  if (swissRoundLocks.get(lockKey)) return;
+  swissRoundLocks.set(lockKey, true);
+
+  try {
+    const tournament = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      include: {
+        participants: true,
+        matches: { orderBy: [{ round: 'asc' }, { matchIndex: 'asc' }] },
+      },
+    });
+    if (!tournament) return;
+
+    const { swissPlayers, swissResults } = buildSwissData(tournament.participants, tournament.matches);
+    const standings = computeStandings(swissPlayers, swissResults);
+
+    if (match.round < tournament.totalRounds) {
+      // Generate next round
+      const nextRound = match.round + 1;
+      const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound);
+
+      for (const pairing of pairings) {
+        const isBye = pairing.player2 === null;
+        await prisma.tournamentMatch.create({
+          data: {
+            tournamentId,
+            round: pairing.round,
+            matchIndex: pairing.matchIndex,
+            player1Id: pairing.player1.userId,
+            player1Username: pairing.player1.username,
+            player2Id: pairing.player2?.userId ?? null,
+            player2Username: pairing.player2?.username ?? null,
+            winnerId: isBye ? pairing.player1.userId : null,
+            winnerUsername: isBye ? pairing.player1.username : null,
+            isBye,
+            status: isBye ? 'completed' : 'ready',
+          },
+        });
+
+        if (isBye) {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId, userId: pairing.player1.userId },
+            data: { hasBye: true },
+          });
+        }
+      }
+
+      await prisma.tournament.update({
+        where: { id: tournamentId },
+        data: { currentRound: nextRound },
+      });
+
+      io.to(`tournament:${tournamentId}`).emit('tournament:round-complete', {
+        completedRound: match.round, nextRound,
+      });
+      io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
+    } else {
+      // Tournament complete - final standings
+      const winner = standings[0];
+      await prisma.tournament.update({
+        where: { id: tournamentId },
+        data: {
+          status: 'completed',
+          winnerId: winner.userId,
+          winnerUsername: winner.username,
+          completedAt: new Date(),
+        },
+      });
+
+      const updatedUser = await prisma.user.update({
+        where: { id: winner.userId },
+        data: { tournamentWins: { increment: 1 } },
+      });
+
+      io.to(`tournament:${tournamentId}`).emit('tournament:completed', {
+        winnerId: winner.userId,
+        winnerUsername: winner.username,
+        standings,
+      });
+
+      // Assign Discord role
+      let newRoleName: string | null = null;
+      try {
+        newRoleName = await assignTournamentWinnerRole(winner.userId, updatedUser.tournamentWins);
+      } catch (err) {
+        console.error('[Tournament] Discord role assign error:', err);
+      }
+
+      // Send webhook with podium from standings
+      try {
+        const podium = standings.slice(0, 3).map((s, i) => ({
+          userId: s.userId,
+          username: s.username,
+          place: (i + 1) as 1 | 2 | 3,
+        }));
+        await sendTournamentResults(
+          tournament.name,
+          podium,
+          tournament.participants.length,
+          newRoleName,
+        );
+      } catch (err) {
+        console.error('[Tournament] Webhook error:', err);
+      }
+    }
+  } finally {
+    // Release lock after a short delay to prevent immediate re-entry
+    setTimeout(() => swissRoundLocks.delete(lockKey), 2000);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Swiss helpers
+// ---------------------------------------------------------------------------
+
+function buildSwissData(
+  participants: Array<{ userId: string; username: string; seed: number | null }>,
+  matches: Array<{
+    round: number;
+    player1Id: string | null;
+    player2Id: string | null;
+    winnerId: string | null;
+    isBye: boolean;
+    status: string;
+  }>,
+): { swissPlayers: SwissPlayer[]; swissResults: SwissMatchResult[] } {
+  const swissPlayers: SwissPlayer[] = participants.map((p, i) => ({
+    userId: p.userId,
+    username: p.username,
+    seed: p.seed ?? (i + 1),
+  }));
+
+  const swissResults: SwissMatchResult[] = matches
+    .filter(m => m.status === 'completed' || m.status === 'forfeit')
+    .filter(m => m.player1Id !== null)
+    .map(m => ({
+      round: m.round,
+      player1Id: m.player1Id!,
+      player2Id: m.player2Id ?? m.player1Id!, // bye case
+      winnerId: m.winnerId,
+      isBye: m.isBye,
+    }));
+
+  return { swissPlayers, swissResults };
+}
+
+async function buildCurrentStandings(tournamentId: string) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    include: {
+      participants: true,
+      matches: { orderBy: [{ round: 'asc' }, { matchIndex: 'asc' }] },
+    },
+  });
+  if (!tournament) return [];
+  const { swissPlayers, swissResults } = buildSwissData(tournament.participants, tournament.matches);
+  return computeStandings(swissPlayers, swissResults);
+}
+
+// ---------------------------------------------------------------------------
+// Elimination-specific logic (unchanged)
+// ---------------------------------------------------------------------------
 
 export async function advanceMatchWinner(io: Server | null, tournamentId: string, match: { round: number; matchIndex: number }, winnerId: string, winnerUsername: string | null) {
   const nextRound = match.round + 1;

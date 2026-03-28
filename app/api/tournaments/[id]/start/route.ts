@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { generateBracket } from '@/lib/tournament/tournamentEngine';
+import { computeSwissRoundCount, generateSwissRound1 } from '@/lib/tournament/swissEngine';
+import type { SwissPlayer } from '@/lib/tournament/swissEngine';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
@@ -92,49 +94,94 @@ export async function POST(
       }
     }
 
-    // Generate bracket
-    const participants = orderedParticipants.map(p => ({
-      userId: p.userId,
-      username: p.username,
-    }));
-    const { matches, totalRounds } = generateBracket(participants);
+    const isSwiss = tournament.format === 'swiss';
 
-    // Create match records
-    for (const m of matches) {
-      const matchData = {
-        tournamentId: id,
-        round: m.round,
-        matchIndex: m.matchIndex,
-        player1Id: m.player1.participantId,
-        player1Username: m.player1.username,
-        player2Id: m.player2.participantId,
-        player2Username: m.player2.username,
-        winnerId: m.winnerId,
-        winnerUsername: m.winnerUsername,
-        isBye: m.isBye,
-        status: m.status === 'ready' ? 'ready' : m.status === 'completed' ? 'completed' : 'pending',
-      };
-      await prisma.tournamentMatch.create({ data: matchData });
+    if (isSwiss) {
+      // --- Swiss format: generate round 1 only ---
+      const swissPlayers: SwissPlayer[] = orderedParticipants.map((p, i) => ({
+        userId: p.userId,
+        username: p.username,
+        seed: p.seed ?? (i + 1),
+      }));
+      const totalRounds = computeSwissRoundCount(swissPlayers.length);
+      const round1 = generateSwissRound1(swissPlayers);
 
-      // Mark bye participants
-      if (m.isBye && m.winnerId) {
-        await prisma.tournamentParticipant.updateMany({
-          where: { tournamentId: id, userId: m.winnerId },
-          data: { hasBye: true },
-        });
+      for (const pairing of round1) {
+        const isBye = pairing.player2 === null;
+        const matchData = {
+          tournamentId: id,
+          round: pairing.round,
+          matchIndex: pairing.matchIndex,
+          player1Id: pairing.player1.userId,
+          player1Username: pairing.player1.username,
+          player2Id: pairing.player2?.userId ?? null,
+          player2Username: pairing.player2?.username ?? null,
+          winnerId: isBye ? pairing.player1.userId : null,
+          winnerUsername: isBye ? pairing.player1.username : null,
+          isBye,
+          status: isBye ? 'completed' : 'ready',
+        };
+        await prisma.tournamentMatch.create({ data: matchData });
+
+        if (isBye) {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId: id, userId: pairing.player1.userId },
+            data: { hasBye: true },
+          });
+        }
       }
-    }
 
-    // Update tournament
-    await prisma.tournament.update({
-      where: { id },
-      data: {
-        status: 'in_progress',
-        currentRound: 1,
-        totalRounds,
-        startedAt: new Date(),
-      },
-    });
+      await prisma.tournament.update({
+        where: { id },
+        data: {
+          status: 'in_progress',
+          currentRound: 1,
+          totalRounds,
+          startedAt: new Date(),
+        },
+      });
+    } else {
+      // --- Elimination format: generate full bracket ---
+      const participants = orderedParticipants.map(p => ({
+        userId: p.userId,
+        username: p.username,
+      }));
+      const { matches, totalRounds } = generateBracket(participants);
+
+      for (const m of matches) {
+        const matchData = {
+          tournamentId: id,
+          round: m.round,
+          matchIndex: m.matchIndex,
+          player1Id: m.player1.participantId,
+          player1Username: m.player1.username,
+          player2Id: m.player2.participantId,
+          player2Username: m.player2.username,
+          winnerId: m.winnerId,
+          winnerUsername: m.winnerUsername,
+          isBye: m.isBye,
+          status: m.status === 'ready' ? 'ready' : m.status === 'completed' ? 'completed' : 'pending',
+        };
+        await prisma.tournamentMatch.create({ data: matchData });
+
+        if (m.isBye && m.winnerId) {
+          await prisma.tournamentParticipant.updateMany({
+            where: { tournamentId: id, userId: m.winnerId },
+            data: { hasBye: true },
+          });
+        }
+      }
+
+      await prisma.tournament.update({
+        where: { id },
+        data: {
+          status: 'in_progress',
+          currentRound: 1,
+          totalRounds,
+          startedAt: new Date(),
+        },
+      });
+    }
 
     // Return full tournament
     const updated = await prisma.tournament.findUnique({

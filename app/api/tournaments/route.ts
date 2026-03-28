@@ -58,16 +58,24 @@ export async function POST(req: NextRequest) {
       allowedRarities, bannedRarities, maxPerRarity,
       maxCopiesPerCard, minDeckSize, maxDeckSize, maxChakraCost,
       restrictionNote,
+      format: rawFormat,
     } = body;
     const type = 'simulator'; // Only simulator tournaments
+    const format = (rawFormat === 'elimination') ? 'elimination' : 'swiss';
 
     if (!isAdmin(session)) {
       return NextResponse.json({ error: 'Only admins can create tournaments' }, { status: 403 });
     }
 
-    const validSizes = [4, 8, 16, 32];
-    if (!validSizes.includes(maxPlayers)) {
-      return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32' }, { status: 400 });
+    if (format === 'elimination') {
+      const validSizes = [4, 8, 16, 32];
+      if (!validSizes.includes(maxPlayers)) {
+        return NextResponse.json({ error: 'Max players must be 4, 8, 16, or 32 for elimination' }, { status: 400 });
+      }
+    } else {
+      if (typeof maxPlayers !== 'number' || maxPlayers < 4 || maxPlayers > 32) {
+        return NextResponse.json({ error: 'Max players must be between 4 and 32' }, { status: 400 });
+      }
     }
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -92,6 +100,7 @@ export async function POST(req: NextRequest) {
       data: {
         name: name.trim(),
         type,
+        format,
         status: 'registration',
         gameMode: gameMode || 'classic',
         maxPlayers,

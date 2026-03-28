@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
@@ -10,6 +10,8 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { Footer } from '@/components/Footer';
 import { BracketTree } from '@/components/tournament/BracketTree';
+import { SwissStandings } from '@/components/tournament/SwissStandings';
+import type { SwissStandingEntry } from '@/components/tournament/SwissStandings';
 import { TournamentAdmin } from '@/components/tournament/TournamentAdmin';
 import { AbsenceTimer } from '@/components/tournament/AbsenceTimer';
 import { TournamentResults } from '@/components/tournament/TournamentResults';
@@ -17,6 +19,8 @@ import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore } from '@/lib/socket/client';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentMatch, TournamentData } from '@/stores/tournamentStore';
+import { computeStandings } from '@/lib/tournament/swissEngine';
+import type { SwissMatchResult } from '@/lib/tournament/swissEngine';
 import { LEAGUE_TIERS, getPlayerLeague } from '@/lib/tournament/leagueUtils';
 
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
@@ -31,7 +35,7 @@ export default function TournamentDetailPage() {
   const { data: session, status } = useSession();
   const { animationsEnabled } = useSettingsStore();
   const { socket, connect, connected } = useSocketStore();
-  const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, clearError } = useTournamentStore();
+  const { activeTournament, loading, error, fetchTournament, joinTournament, leaveTournament, selectDeck, clearActiveTournament, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated, clearError } = useTournamentStore();
 
   const userId = (session?.user as { id?: string })?.id;
   const [myDecks, setMyDecks] = useState<Array<{ id: string; name: string }>>([]);
@@ -65,10 +69,13 @@ export default function TournamentDetailPage() {
     const onF = (d: { matchId: string; forfeitedPlayerId: string; winnerId: string; winnerUsername: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'forfeit', winnerId: d.winnerId, winnerUsername: d.winnerUsername } as any); };
     const onMR = (d: { matchId: string; roomCode: string }) => { handleMatchUpdate({ matchId: d.matchId, status: 'in_progress', roomCode: d.roomCode } as any); fetchTournament(tournamentId); };
     const onAT = (d: { matchId: string; playerId: string; deadline: string }) => { handleMatchUpdate({ matchId: d.matchId, absenceDeadline: d.deadline, absentPlayerId: d.playerId } as any); };
+    const onSU = (d: Parameters<typeof handleStandingsUpdate>[0]) => handleStandingsUpdate(d);
+    const onSRG = (d: Parameters<typeof handleSwissRoundGenerated>[0]) => handleSwissRoundGenerated(d);
     socket.on('tournament:update', onU); socket.on('tournament:match-updated', onM); socket.on('tournament:completed', onC); socket.on('tournament:round-complete', onR);
     socket.on('tournament:player-forfeited', onF); socket.on('tournament:match-ready', onMR); socket.on('tournament:absence-timer', onAT);
-    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); };
-  }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete]);
+    socket.on('tournament:standings-updated', onSU); socket.on('tournament:swiss-round-generated', onSRG);
+    return () => { socket.emit('tournament:unsubscribe', { tournamentId }); socket.off('tournament:update', onU); socket.off('tournament:match-updated', onM); socket.off('tournament:completed', onC); socket.off('tournament:round-complete', onR); socket.off('tournament:player-forfeited', onF); socket.off('tournament:match-ready', onMR); socket.off('tournament:absence-timer', onAT); socket.off('tournament:standings-updated', onSU); socket.off('tournament:swiss-round-generated', onSRG); };
+  }, [socket, tournamentId, handleTournamentUpdate, handleMatchUpdate, handleTournamentComplete, handleRoundComplete, handleStandingsUpdate, handleSwissRoundGenerated]);
 
   // Fetch user's decks for deck selection
   useEffect(() => {
@@ -184,6 +191,62 @@ export default function TournamentDetailPage() {
   const myDeckId = (myParticipant as any)?.deckId ?? null;
   const needsDeck = isParticipant && tour.gameMode !== 'sealed' && tour.status === 'registration';
   const hasRestrictions = tour.gameMode === 'restricted' || (tour as any).bannedCardIds?.length > 0;
+  const isSwiss = tour.format === 'swiss';
+
+  // Compute Swiss standings client-side when server hasn't sent them
+  const swissStandings: SwissStandingEntry[] = useMemo(() => {
+    if (!isSwiss) return [];
+    // Prefer server-provided standings
+    if (tour.standings && tour.standings.length > 0) {
+      return tour.standings.map((s) => ({
+        userId: s.userId,
+        username: s.username,
+        rank: s.rank,
+        wins: s.wins,
+        losses: s.losses,
+        draws: s.draws,
+        matchPoints: s.matchPoints,
+        buchholz: s.buchholz,
+        buchholzExtended: s.buchholzExtended,
+        seed: s.seed,
+        hadBye: s.hadBye,
+      }));
+    }
+    // Fallback: compute from matches + participants
+    if (tour.matches.length === 0 || tour.participants.length === 0) return [];
+    const players = tour.participants.map((p) => ({
+      userId: p.userId,
+      username: p.username,
+      seed: p.seed ?? 0,
+    }));
+    const results: SwissMatchResult[] = tour.matches
+      .filter((m) => m.status === 'completed' || m.status === 'forfeit' || m.isBye)
+      .map((m) => ({
+        round: m.round,
+        player1Id: m.player1Id ?? '',
+        player2Id: m.player2Id ?? '',
+        winnerId: m.winnerId,
+        isBye: m.isBye,
+      }));
+    if (results.length === 0) {
+      // No completed matches yet, show initial standings by seed
+      return players
+        .sort((a, b) => a.seed - b.seed)
+        .map((p, i) => ({
+          userId: p.userId,
+          username: p.username,
+          rank: i + 1,
+          wins: 0, losses: 0, draws: 0,
+          matchPoints: 0, buchholz: 0, buchholzExtended: 0,
+          seed: p.seed, hadBye: false,
+        }));
+    }
+    try {
+      return computeStandings(players, results);
+    } catch {
+      return [];
+    }
+  }, [isSwiss, tour.standings, tour.matches, tour.participants]);
 
   return (
     <div id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
@@ -492,8 +555,12 @@ export default function TournamentDetailPage() {
               </div>
             )}
             <div className="p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{t('bracket')}</h2>
-              <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
+              {isSwiss ? (
+                <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              ) : (
+                <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              )}
             </div>
             {(isAdmin || isCreator) && <div className="mt-4"><TournamentAdmin tournamentId={tournamentId} isAdmin={isAdmin} isCreator={isCreator} /></div>}
           </motion.div>
@@ -504,8 +571,12 @@ export default function TournamentDetailPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }}>
             <TournamentResults tournament={tour} />
             <div className="mt-6 p-4 overflow-x-auto" style={{ backgroundColor: '#111111', border: '1px solid #262626' }}>
-              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{t('bracket')}</h2>
-              <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              <h2 className="text-sm font-medium uppercase tracking-wider mb-4" style={{ color: '#c4a35a' }}>{isSwiss ? t('swissStandings') : t('bracket')}</h2>
+              {isSwiss ? (
+                <SwissStandings standings={swissStandings} matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              ) : (
+                <BracketTree matches={tour.matches} totalRounds={tour.totalRounds} currentRound={tour.currentRound} winnerId={tour.winnerId} winnerUsername={tour.winnerUsername} />
+              )}
             </div>
           </motion.div>
         )}
