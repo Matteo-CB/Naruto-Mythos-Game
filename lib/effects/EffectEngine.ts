@@ -15777,6 +15777,7 @@ export class EffectEngine {
     }
 
     if (controlledChars.length === 0) return state;
+    console.log(`[restoreControlOnLeave] Controller ${controllerInstanceId} leaving — returning ${controlledChars.length} controlled character(s)`);
 
     let newState = deepClone(state);
 
