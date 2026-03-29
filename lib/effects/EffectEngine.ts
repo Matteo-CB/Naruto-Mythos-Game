@@ -13806,6 +13806,21 @@ export class EffectEngine {
           }
         }
 
+        // Check name conflict for fresh reveal (no upgrade target)
+        if (!upgradeTarget_k78) {
+          const hasNameConflictFresh_k78 = newState.activeMissions[mIdx_k78][friendlySide_k78].some((c: CharacterInPlay) => {
+            if (c.instanceId === targetId || c.isHidden) return false;
+            const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
+            return cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase();
+          });
+          if (hasNameConflictFresh_k78) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr} — same name already visible in this mission.`,
+              'game.log.effect.nameConflictBlocked', { card: 'KANKURO', id: 'KS-078-UC', target: topCard_k78.name_fr });
+            break;
+          }
+        }
+
         // No choice needed — proceed with auto-reveal (possibly auto-upgrade)
         let revealCost_k78: number;
         if (upgradeTarget_k78) {
