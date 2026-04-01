@@ -633,9 +633,7 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     firstPasser,
     activePlayer,
     log,
-    // Keep lastPlayedGlobal — the highlight persists until the next card is played
-    // or the turn changes (StartPhase clears it). Clearing on PASS caused the
-    // highlight to vanish in AI mode (batch processing) and online mode.
+    // turnPlayedIds persists — all cards played this turn stay highlighted until next turn.
   };
 }
 
@@ -739,16 +737,10 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
  * Track a directly-played character for last-played highlight.
  * Only used for direct player actions (not effect-spawned plays).
  */
-function trackLastPlayed(state: GameState, player: PlayerID, instanceId: string): GameState {
-  const current = state.lastPlayedInstanceIds ?? { player1: null, player2: null };
-  return {
-    ...state,
-    lastPlayedInstanceIds: {
-      ...current,
-      [player]: instanceId,  // Replace, not append — only keep the last card
-    },
-    lastPlayedGlobal: instanceId,  // Single global highlight — only the most recent card
-  };
+function trackLastPlayed(state: GameState, _player: PlayerID, instanceId: string): GameState {
+  const ids = state.turnPlayedIds ?? [];
+  if (ids.includes(instanceId)) return state; // already tracked
+  return { ...state, turnPlayedIds: [...ids, instanceId] };
 }
 
 // triggerOnPlayReactions is now imported from ContinuousEffects.ts

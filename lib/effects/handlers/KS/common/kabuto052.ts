@@ -30,14 +30,13 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
-  // Confirmation popup (no SKIP per Andy)
+  // Confirmation popup (optional — player can skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'KABUTO052_CONFIRM_AMBUSH',
     validTargets: [sourceCard.instanceId],
-    isOptional: false,
-    isMandatory: true,
+    isOptional: true,
     description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.kabuto052ConfirmAmbush',
   };

@@ -13,7 +13,17 @@ import { resetIdCounter } from '@/lib/engine/utils/id';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
 import { getCharacterById } from '@/lib/data/cardIndex';
-import cardsJson from '@/lib/data/sets/KS/cards.json';
+import { playSound } from '@/lib/sound/SoundManager';
+// Lazy-loaded fallback for card image lookup (avoids 192KB in main bundle)
+let _cardsJsonCache: Record<string, unknown> = {};
+let _cardsJsonLoaded = false;
+function getCardsJsonFallback(): Record<string, unknown> {
+  if (!_cardsJsonLoaded) {
+    _cardsJsonLoaded = true;
+    try { _cardsJsonCache = require('@/lib/data/sets/KS/cards.json').cards ?? {}; } catch { /* ignore */ }
+  }
+  return _cardsJsonCache;
+}
 
 interface AnimationEvent {
   id: string;
@@ -536,7 +546,7 @@ function buildPendingTargetSelectionUI(
         // Try cardIndex first, then raw JSON, then storedCard, then topCards info
         let indexCard = cardId ? getCharacterById(cardId) : null;
         if (!indexCard?.image_file && cardId) {
-          const rawCard = (cardsJson as any).cards?.[cardId];
+          const rawCard = (getCardsJsonFallback() as any)?.[cardId];
           if (rawCard?.image_file) {
             indexCard = { ...rawCard, image_file: '/' + rawCard.image_file.replace(/\\/g, '/') } as any;
           }
@@ -1122,6 +1132,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   performAction: (action: GameAction) => {
+    // Play card sound immediately on player action (instant feedback)
+    if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' ||
+        action.type === 'REVEAL_CHARACTER' || action.type === 'UPGRADE_CHARACTER') {
+      playSound('cardPlay');
+    }
+
     const { gameState, humanPlayer, aiPlayer, isAIGame, isOnlineGame, addAnimation } = get();
 
     // Online mode: send action to server via socket, don't apply locally

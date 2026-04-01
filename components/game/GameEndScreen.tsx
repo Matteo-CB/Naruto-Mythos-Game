@@ -40,21 +40,51 @@ export function GameEndScreen() {
   const offerRematch = useSocketStore((s) => s.offerRematch);
   const acceptRematch = useSocketStore((s) => s.acceptRematch);
   const declineRematch = useSocketStore((s) => s.declineRematch);
-  const replayAIGame = useGameStore((s) => s.replayAIGame);
-  const lastAIGameConfig = useGameStore((s) => s.lastAIGameConfig);
 
-  // Redirect to deck selection on rematch
+  // Redirect to deck selection (or booster opening for sealed) on rematch
+  const isSealedRoom = useSocketStore((s) => s.isSealedRoom);
   useEffect(() => {
     if (rematchRoomCode) {
-      useSocketStore.setState({ rematchRoomCode: null });
-      router.push(`/play/online?code=${rematchRoomCode}` as '/');
+      const sealed = useSocketStore.getState().isSealedRoom;
+      useSocketStore.setState({ rematchRoomCode: null, rematchState: 'none' });
+      // Reset gameStore without disconnecting socket (players stay in room)
+      useGameStore.setState({
+        gameState: null,
+        visibleState: null,
+        isOnlineGame: false,
+        isProcessing: false,
+        gameOver: false,
+        winner: null,
+        replayInitialState: null,
+        animationQueue: [],
+        isAnimating: false,
+        pendingTargetSelection: null,
+        actionError: null,
+        sealedDeckCardIds: null,
+        sealedDeckMissionIds: null,
+      });
+      router.push(sealed ? '/play/sealed' : '/play/online');
     }
-  }, [rematchRoomCode, router]);
+  }, [rematchRoomCode, router, isSealedRoom]);
 
   const handleChangeDeck = useCallback(() => {
     resetGame();
     router.push('/play/ai');
   }, [resetGame, router]);
+
+  // Tournament match: auto-redirect to tournament page after showing result
+  const tournamentId = (gameResult as any)?.tournamentId as string | null | undefined;
+  const tournamentRedirectRef = useRef(false);
+  useEffect(() => {
+    if (tournamentId && gameOver && !tournamentRedirectRef.current) {
+      tournamentRedirectRef.current = true;
+      const timer = setTimeout(() => {
+        resetGame();
+        router.push(`/tournaments/${tournamentId}`);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [tournamentId, gameOver, resetGame, router]);
 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [savedGameId, setSavedGameId] = useState<string | null>(null);
@@ -446,52 +476,59 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* AI Replay buttons */}
-            {isAIGame && lastAIGameConfig && (
-              <div className="flex gap-3">
-                <PopupActionButton onClick={replayAIGame} accentColor="#c4a35a">
-                  {t('game.end.replay')}
-                </PopupActionButton>
-                <PopupDismissLink onClick={handleChangeDeck}>
-                  {t('game.end.changeDeck')}
-                </PopupDismissLink>
-              </div>
-            )}
-
-            {/* Online Rematch button */}
-            {isOnlineGame && rematchState === 'none' && (
-              <PopupActionButton onClick={offerRematch} accentColor="#c4a35a">
-                {t('game.end.rematch')}
+            {/* Tournament match: auto-redirect countdown + manual button */}
+            {tournamentId ? (
+              <PopupActionButton
+                onClick={() => { resetGame(); router.push(`/tournaments/${tournamentId}`); }}
+                accentColor="#c4a35a"
+              >
+                {t('game.end.backToTournament')}
               </PopupActionButton>
-            )}
+            ) : (
+              <>
+                {/* AI Rematch — goes back to deck selection */}
+                {isAIGame && (
+                  <PopupActionButton onClick={handleChangeDeck} accentColor="#c4a35a">
+                    {t('game.end.rematch')}
+                  </PopupActionButton>
+                )}
 
-            {isOnlineGame && rematchState === 'offered' && (
-              <span className="text-xs" style={{ color: '#c4a35a' }}>
-                {t('game.end.rematchWaiting')}
-              </span>
-            )}
+                {/* Online Rematch button */}
+                {isOnlineGame && rematchState === 'none' && (
+                  <PopupActionButton onClick={offerRematch} accentColor="#c4a35a">
+                    {t('game.end.rematch')}
+                  </PopupActionButton>
+                )}
 
-            {isOnlineGame && rematchState === 'received' && (
-              <div className="flex gap-3">
-                <PopupActionButton onClick={acceptRematch} accentColor="#4a9e4a">
-                  {t('game.end.rematchAccept')}
+                {isOnlineGame && rematchState === 'offered' && (
+                  <span className="text-xs" style={{ color: '#c4a35a' }}>
+                    {t('game.end.rematchWaiting')}
+                  </span>
+                )}
+
+                {isOnlineGame && rematchState === 'received' && (
+                  <div className="flex gap-3">
+                    <PopupActionButton onClick={acceptRematch} accentColor="#4a9e4a">
+                      {t('game.end.rematchAccept')}
+                    </PopupActionButton>
+                    <PopupActionButton onClick={declineRematch} accentColor="#b33e3e">
+                      {t('game.end.rematchDecline')}
+                    </PopupActionButton>
+                  </div>
+                )}
+
+                {isOnlineGame && rematchState === 'declined' && (
+                  <span className="text-xs" style={{ color: '#b33e3e' }}>
+                    {t('game.end.rematchDeclined')}
+                  </span>
+                )}
+
+                {/* Back to Menu button */}
+                <PopupActionButton onClick={resetGame} accentColor="#c4a35a">
+                  {t('game.end.backToMenu')}
                 </PopupActionButton>
-                <PopupActionButton onClick={declineRematch} accentColor="#b33e3e">
-                  {t('game.end.rematchDecline')}
-                </PopupActionButton>
-              </div>
+              </>
             )}
-
-            {isOnlineGame && rematchState === 'declined' && (
-              <span className="text-xs" style={{ color: '#b33e3e' }}>
-                {t('game.end.rematchDeclined')}
-              </span>
-            )}
-
-            {/* Back to Menu button */}
-            <PopupActionButton onClick={resetGame} accentColor="#c4a35a">
-              {t('game.end.backToMenu')}
-            </PopupActionButton>
           </motion.div>
         </PopupCornerFrame>
       </PopupOverlay>

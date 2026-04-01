@@ -179,20 +179,46 @@ function broadcastActiveGames(io: SocketIOServer): void {
  */
 function cleanupStaleRooms(): void {
   const now = Date.now();
+  let cleaned = 0;
   for (const [code, room] of rooms) {
+    // Stale matchmaking rooms (no guest, no game, TTL expired)
     if (!room.isPrivate && !room.guestId && !room.gameState) {
-      // Check if host socket is still connected
-      // We can't easily check socket liveness here, but we can check TTL
-      // Rooms older than TTL without a guest are stale
       if (!room.createdAt || now - room.createdAt > MATCHMAKING_ROOM_TTL_MS) {
-        console.log(`[Socket] Cleaning stale matchmaking room ${code}`);
+        if (room.hostSocket) playerRooms.delete(room.hostSocket);
         rooms.delete(code);
-        // Clean up playerRooms for the host socket
-        if (room.hostSocket) {
-          playerRooms.delete(room.hostSocket);
-        }
+        cleaned++;
+        continue;
       }
     }
+    // Completed games lingering >10 minutes (both players likely gone)
+    if (room.gameState?.phase === 'gameOver' && now - room.createdAt > 10 * 60 * 1000) {
+      if (room.hostSocket) playerRooms.delete(room.hostSocket);
+      if (room.guestSocket) playerRooms.delete(room.guestSocket);
+      for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+      rooms.delete(code);
+      cleaned++;
+      continue;
+    }
+    // Very old rooms (>4 hours) — force cleanup regardless of state
+    if (now - room.createdAt > 4 * 60 * 60 * 1000) {
+      if (room.hostSocket) playerRooms.delete(room.hostSocket);
+      if (room.guestSocket) playerRooms.delete(room.guestSocket);
+      for (const [, spec] of room.spectators) playerRooms.delete(spec.socketId);
+      clearActionTimer(room);
+      rooms.delete(code);
+      cleaned++;
+    }
+  }
+  // Clean orphaned playerRooms entries (point to rooms that no longer exist)
+  for (const [socketId, code] of playerRooms) {
+    if (code.startsWith('spec:')) {
+      if (!rooms.has(code.slice(5))) { playerRooms.delete(socketId); cleaned++; }
+    } else {
+      if (!rooms.has(code)) { playerRooms.delete(socketId); cleaned++; }
+    }
+  }
+  if (cleaned > 0 || rooms.size > 10) {
+    console.log(`[Cleanup] rooms=${rooms.size} playerRooms=${playerRooms.size} cleaned=${cleaned}`);
   }
 }
 
@@ -233,8 +259,10 @@ async function finalizeGameEnd(
   // Apply ELO changes (separate try-catch so game record save still works if ELO fails)
   try {
     if (room.isRanked && room.hostId && room.guestId) {
-      const player1 = await prisma.user.findUnique({ where: { id: room.hostId } });
-      const player2 = await prisma.user.findUnique({ where: { id: room.guestId } });
+      const [player1, player2] = await Promise.all([
+        prisma.user.findUnique({ where: { id: room.hostId } }),
+        prisma.user.findUnique({ where: { id: room.guestId! } }),
+      ]);
 
       if (player1 && player2) {
         const eloResult = winner === 'player1' ? 'player1' : 'player2';
@@ -281,8 +309,9 @@ async function finalizeGameEnd(
   // Persist game record (separate try-catch so ELO still works if save fails)
   try {
     if (room.hostId && room.guestId) {
+      const rawHistory = room.gameState?.actionHistory ?? [];
       const replayForDb = room.gameState ? {
-        log: room.gameState.log,
+        log: room.gameState.log.length > 500 ? room.gameState.log.slice(-500) : room.gameState.log,
         playerNames: {
           player1: room.hostName ?? 'Player 1',
           player2: room.guestName ?? 'Player 2',
@@ -295,7 +324,7 @@ async function finalizeGameEnd(
           wonBy: m.wonBy ?? null,
         })),
         initialState: room.replayInitialState,
-        actionHistory: room.gameState.actionHistory ?? [],
+        actionHistory: rawHistory.length > 300 ? rawHistory.slice(-300) : rawHistory,
       } : null;
 
       const gameRecord = await prisma.game.create({
@@ -370,6 +399,7 @@ async function finalizeGameEnd(
       winReason,
       gameId: gameRecordId,
       replayData,
+      tournamentId: room.tournamentId ?? null,
     });
   }
   if (room.guestSocket) {
@@ -384,6 +414,7 @@ async function finalizeGameEnd(
       winReason,
       gameId: gameRecordId,
       replayData,
+      tournamentId: room.tournamentId ?? null,
     });
   }
 
@@ -741,7 +772,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
       });
     }
 
-    // Broadcast to spectators — board only, no hands, no hidden cards visible
+    // Broadcast to spectators — board + face-down hands, no hidden card data
     if (room.spectators.size > 0) {
       // Strip hidden card data from ALL characters (spectator sees card backs only)
       const specMissions = p1State.activeMissions.map((m: any) => ({
@@ -755,18 +786,21 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
           : c
         ),
       }));
+      // Send hand sizes (for face-down rendering) but no card data
+      const p1HandSize = room.gameState.player1.hand.length;
+      const p2HandSize = room.gameState.player2.hand.length;
       const spectatorState = {
         ...p1State,
         activeMissions: specMissions,
         myState: {
           ...p1State.myState,
           hand: [],
-          handSize: 0,
+          handSize: p1HandSize,
         },
         opponentState: {
           ...p1State.opponentState,
           hand: [],
-          handSize: 0,
+          handSize: p2HandSize,
         },
       };
       for (const [, spec] of room.spectators) {
@@ -792,6 +826,15 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 
 export function setupSocketHandlers(io: SocketIOServer) {
   ioInstance = io;
+
+  // Global error handlers — prevent process crash from unhandled errors
+  process.on('uncaughtException', (err) => {
+    console.error('[FATAL] Uncaught exception:', err.message, err.stack);
+  });
+  process.on('unhandledRejection', (reason) => {
+    console.error('[FATAL] Unhandled rejection:', reason instanceof Error ? reason.message : reason);
+  });
+
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
 
@@ -821,27 +864,23 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const j = Math.floor(Math.random() * (i + 1));
             [participants[i], participants[j]] = [participants[j], participants[i]];
           }
-          // Assign seeds
-          for (let i = 0; i < participants.length; i++) {
-            await prisma.tournamentParticipant.update({ where: { id: participants[i].id }, data: { seed: i + 1 } });
-          }
+          // Batch assign seeds with $transaction
+          await prisma.$transaction(
+            participants.map((p, i) => prisma.tournamentParticipant.update({ where: { id: p.id }, data: { seed: i + 1 } }))
+          );
           const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
-          // Create match records
-          for (const m of bracket.matches) {
-            const p1Id = (m as any).player1?.participantId || null;
-            const p2Id = (m as any).player2?.participantId || null;
-            const p1Name = (m as any).player1?.username || null;
-            const p2Name = (m as any).player2?.username || null;
-            await prisma.tournamentMatch.create({
-              data: {
-                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
-                player1Id: p1Id, player1Username: p1Name,
-                player2Id: p2Id, player2Username: p2Name,
-                winnerId: (m as any).winnerId || null, winnerUsername: (m as any).winnerUsername || null,
-                isBye: (m as any).isBye ?? false, status: m.status,
-              },
-            });
-          }
+          // Batch create match records
+          await prisma.tournamentMatch.createMany({
+            data: bracket.matches.map((m) => ({
+              tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+              player1Id: (m as any).player1?.participantId || null,
+              player1Username: (m as any).player1?.username || null,
+              player2Id: (m as any).player2?.participantId || null,
+              player2Username: (m as any).player2?.username || null,
+              winnerId: (m as any).winnerId || null, winnerUsername: (m as any).winnerUsername || null,
+              isBye: (m as any).isBye ?? false, status: m.status,
+            })),
+          });
           await prisma.tournament.update({
             where: { id: t.id },
             data: { status: 'in_progress', currentRound: 1, totalRounds: bracket.totalRounds, startedAt: now },
@@ -1660,7 +1699,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room || !room.rematchOffer) return;
 
-      console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select`);
+      console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select (sealed: ${room.isSealed})`);
       room.rematchOffer = undefined;
 
       // Reset room state — players must re-select decks
@@ -1671,14 +1710,56 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
-      // Tell both clients to go back to deck selection
+      // Tell both clients to go back to deck selection (or booster opening for sealed)
       if (room.hostSocket) {
         io.to(room.hostSocket).emit('game:rematch-accepted');
-        io.to(room.hostSocket).emit('game:rematch-reselect', { roomCode: code });
+        io.to(room.hostSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
       }
       if (room.guestSocket) {
         io.to(room.guestSocket).emit('game:rematch-accepted');
-        io.to(room.guestSocket).emit('game:rematch-reselect', { roomCode: code });
+        io.to(room.guestSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
+      }
+
+      // For sealed rooms, regenerate boosters for both players
+      if (room.isSealed) {
+        try {
+          const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
+          const count = room.sealedBoosterCount ?? 6;
+          const hostPool = generateSealedPool(count);
+          const guestPool = generateSealedPool(count);
+
+          if (room.hostSocket) {
+            io.to(room.hostSocket).emit('sealed:boosters', {
+              boosters: hostPool.boosters,
+              allCards: hostPool.allCards,
+            });
+          }
+          if (room.guestSocket) {
+            io.to(room.guestSocket).emit('sealed:boosters', {
+              boosters: guestPool.boosters,
+              allCards: guestPool.allCards,
+            });
+          }
+
+          console.log(`[Socket] Sealed rematch boosters generated for room ${code}`);
+
+          // Start sealed timer
+          const deadline = Date.now() + SEALED_TIMEOUT_MS;
+          room.sealedDeadline = deadline;
+          const roomCode = code;
+          io.to(roomCode).emit('sealed:timer-start', { deadline, durationMs: SEALED_TIMEOUT_MS });
+
+          room.sealedTimer = setTimeout(() => {
+            if (!room.hostDeck || !room.guestDeck) {
+              console.log(`[Socket] Sealed rematch time expired for room ${roomCode}`);
+              io.to(roomCode).emit('sealed:time-expired');
+              if (room.sealedTimer) clearTimeout(room.sealedTimer);
+              room.sealedTimer = null;
+            }
+          }, SEALED_TIMEOUT_MS);
+        } catch (err) {
+          console.error('[Socket] Sealed rematch booster generation error:', err);
+        }
       }
     });
 
@@ -1836,7 +1917,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Track spectator socket for cleanup
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
 
-      // Send current state (spectators see both hands)
+      // Send current state (spectators see face-down hands + board, no card data)
       try {
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
@@ -1844,11 +1925,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
           player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
           player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
         }));
+        const p1HandSize = room.gameState!.player1.hand.length;
+        const p2HandSize = room.gameState!.player2.hand.length;
         const spectatorState = {
           ...p1State,
           activeMissions: specMs,
-          myState: { ...p1State.myState, hand: [], handSize: 0 },
-          opponentState: { ...p1State.opponentState, hand: [], handSize: 0 },
+          myState: { ...p1State.myState, hand: [], handSize: p1HandSize },
+          opponentState: { ...p1State.opponentState, hand: [], handSize: p2HandSize },
         };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {
@@ -1892,11 +1975,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
           player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
           player2Characters: m.player2Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
         }));
+        const p1HandSize = room.gameState!.player1.hand.length;
+        const p2HandSize = room.gameState!.player2.hand.length;
         const spectatorState = {
           ...p1State,
           activeMissions: specMs,
-          myState: { ...p1State.myState, hand: [], handSize: 0 },
-          opponentState: { ...p1State.opponentState, hand: [], handSize: 0 },
+          myState: { ...p1State.myState, hand: [], handSize: p1HandSize },
+          opponentState: { ...p1State.opponentState, hand: [], handSize: p2HandSize },
         };
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         socket.emit('spectate:state-update', {

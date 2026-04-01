@@ -196,14 +196,9 @@ export interface GameState {
   pendingForcedResolver?: PlayerID;
   /** Instance ID of the character played by Hiruzen 002 MAIN effect, for UPGRADE to apply POWERUP 2 */
   _hiruzen002PlayedCharId?: string;
-  /** Instance ID of the last character played directly (not via effects) by each player during the current turn.
-   *  Used to highlight recently played cards on the board. */
-  lastPlayedInstanceIds?: { player1: string | null; player2: string | null };
-  /** Snapshot of lastPlayedInstanceIds from the previous turn, used for display highlight. */
-  previousTurnLastPlayed?: { player1: string | null; player2: string | null };
-  /** The single most recent instanceId played by any player — used for the white highlight.
-   *  Only one card should be highlighted at a time. Cleared on pass. */
-  lastPlayedGlobal?: string;
+  /** All instanceIds played (or revealed/upgraded) by any player during the current turn.
+   *  Every card in this list gets a white highlight border. Cleared when a new turn starts. */
+  turnPlayedIds?: string[];
 }
 
 export interface GameLogEntry {

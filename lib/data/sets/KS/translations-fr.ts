@@ -630,7 +630,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 102/130 - MANDA (UC) - "Roi des Serpents"
   'KS-102-UC': [
-    'EMBUSCADE [↯] Vaincre un personnage Invocateur ennemi dans cette mission.',
+    '[↯] Vaincre un personnage Invocation ennemi dans cette mission.',
     '[⧗] A la fin du tour, vous devez renvoyer ce personnage en main.',
   ],
 
@@ -663,7 +663,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 106/130 - KAKASHI HATAKE (R) - "Seau Maudit"
   'KS-106-R': [
     'Defaussez la carte du dessus d\'un personnage ennemi ameliore en jeu.',
-    'MAIN effect : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
+    'MAIN effect : Copiez n\'importe quel effet instantane non-UPGRADE du personnage ennemi defausse.',
   ],
 
   // 107/130 - SASUKE UCHIWA (R) - "Chidori"
@@ -783,7 +783,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 124/130 - KIDOMARU (R) - "Arc d\'Araignee : Dechirure Feroce"
   'KS-124-R': [
     'Vainquez un personnage ennemi avec une Puissance de 3 ou moins dans une autre mission.',
-    'effet EMBUSCADE : A la place, la limite de Puissance est de 5 ou moins.',
+    'effet AMBUSH : A la place, la limite de Puissance est de 5 ou moins.',
   ],
 
   // 124b/130 - UKON (R) - "Barrage de Poings Multiples"
@@ -964,7 +964,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   ],
   'KS-106-RA': [
     'Defaussez la carte du dessus d\'un personnage ennemi ameliore en jeu.',
-    'MAIN effect : Copiez n\'importe quel effet instantane non-Amelioration du personnage ennemi defausse.',
+    'MAIN effect : Copiez n\'importe quel effet instantane non-UPGRADE du personnage ennemi defausse.',
   ],
   'KS-107-RA': [
     '[↯] Vous devez deplacer tous les autres personnages allies non caches depuis cette mission, si possible.',
@@ -1072,11 +1072,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 115 - Shino Aburame (R/RA)
   'KS-115-R': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'EMBUSCADE : Déplacez un personnage allié dans cette mission vers une autre mission.',
+    'Déplacez un personnage allié dans cette mission vers une autre mission.',
   ],
   'KS-115-RA': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'EMBUSCADE : Déplacez un personnage allié dans cette mission vers une autre mission.',
+    'Déplacez un personnage allié dans cette mission vers une autre mission.',
   ],
 
   // 127 - Sakon (R/RA)

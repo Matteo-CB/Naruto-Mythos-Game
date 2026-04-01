@@ -82,9 +82,17 @@ export default function SealedPage() {
     }
   }, [status, step, router]);
 
+  // Detect sealed rematch: if we arrive here with a room already connected and sealed boosters incoming
+  useEffect(() => {
+    if (socketConnected && socketRoomCode && socketOpponentJoined && !socketGameStarted && mode === null) {
+      setMode('online');
+      setStep('online-waiting');
+    }
+  }, [socketConnected, socketRoomCode, socketOpponentJoined, socketGameStarted, mode]);
+
   // When online boosters arrive, transition to opening
   useEffect(() => {
-    if (mode === 'online' && sealedBoosters && sealedAllCards && step === 'online-waiting') {
+    if (mode === 'online' && sealedBoosters && sealedAllCards && (step === 'online-waiting' || step === 'loading')) {
       const pool: SealedPool = {
         boosters: sealedBoosters as BoosterPack[],
         allCards: sealedAllCards as BoosterCard[],

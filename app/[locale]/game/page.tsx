@@ -7,7 +7,10 @@ import { useGameStore } from '@/stores/gameStore';
 import { useSocketStore } from '@/lib/socket/client';
 import dynamic from 'next/dynamic';
 import { LandscapeBlocker } from '@/components/LandscapeBlocker';
-import { TrainingCoachPanel } from '@/components/game/TrainingCoachPanel';
+const TrainingCoachPanel = dynamic(
+  () => import('@/components/game/TrainingCoachPanel').then((mod) => mod.TrainingCoachPanel),
+  { ssr: false },
+);
 import { BanNotification } from '@/components/BanNotification';
 
 // Dynamically import GameBoard to avoid SSR issues with Framer Motion

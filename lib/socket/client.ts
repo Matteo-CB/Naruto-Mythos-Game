@@ -401,8 +401,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           winReason?: 'score' | 'forfeit' | 'timeout';
           gameId?: string;
           replayData?: unknown;
+          tournamentId?: string | null;
         }) => {
-          console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId);
+          console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
           // Clean up resync timer
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
@@ -448,12 +449,28 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:rematch-accepted', () => {
         console.log('[Socket] Rematch accepted, redirecting to deck select');
-        set({ rematchState: 'accepted', gameEnded: false, gameResult: null, actionDeadline: null });
+        set({
+          rematchState: 'accepted',
+          gameEnded: false,
+          gameResult: null,
+          actionDeadline: null,
+          gameStarted: false,
+          visibleState: null,
+          opponentJoined: true, // both players are still in the room
+        });
       });
 
-      socket.on('game:rematch-reselect', ({ roomCode }: { roomCode: string }) => {
-        console.log('[Socket] Rematch reselect — navigating to deck selection with code:', roomCode);
-        set({ rematchRoomCode: roomCode });
+      socket.on('game:rematch-reselect', ({ roomCode, isSealed }: { roomCode: string; isSealed?: boolean }) => {
+        console.log('[Socket] Rematch reselect — navigating to', isSealed ? 'sealed booster opening' : 'deck selection', 'with code:', roomCode);
+        set({
+          rematchRoomCode: roomCode,
+          isSealedRoom: !!isSealed,
+          sealedDeckSubmitted: false,
+          sealedOpponentReady: false,
+          sealedBoosters: null,
+          sealedAllCards: null,
+          sealedDeadline: null,
+        });
       });
 
       socket.on('game:rematch-declined', () => {

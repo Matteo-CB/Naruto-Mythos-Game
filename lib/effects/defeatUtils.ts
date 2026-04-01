@@ -208,16 +208,30 @@ function removeCharacterFromPlay(
   mission[side] = chars;
   missions[missionIndex] = mission;
 
-  // Add to original owner's discard pile
+  // Add to original owner's discard pile (stolen cards go back to their owner)
   const owner = defeated.originalOwner;
   const ownerState = { ...state[owner] };
   const cardsToDiscard = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
   ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
-  ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
 
-  return {
+  // Decrement charactersInPlay for the player whose side the card was on (the controller)
+  const sidePlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
+
+  let result = {
     ...state,
     activeMissions: missions,
     [owner]: ownerState,
   };
+
+  // If controller differs from owner, decrement controller's count separately
+  if (sidePlayer !== owner) {
+    const controllerState = { ...result[sidePlayer] };
+    controllerState.charactersInPlay = Math.max(0, controllerState.charactersInPlay - 1);
+    result = { ...result, [sidePlayer]: controllerState };
+  } else {
+    ownerState.charactersInPlay = Math.max(0, ownerState.charactersInPlay - 1);
+    result = { ...result, [owner]: ownerState };
+  }
+
+  return result;
 }

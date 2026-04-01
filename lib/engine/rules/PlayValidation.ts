@@ -135,6 +135,16 @@ export function validateRevealCharacter(
   // Use topCard for upgraded hidden characters
   const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
+  // Tenten 040: can only reveal in a mission where currently winning
+  if (charTopCard.number === 40) {
+    const hasTentenRestriction = (charTopCard.effects ?? []).some(
+      (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('currently winning'),
+    );
+    if (hasTentenRestriction && !isWinningMission(state, player, missionIndex)) {
+      return { valid: false, reason: 'Tenten can only be revealed on a mission where you are currently winning.', reasonKey: 'game.error.tentenRestriction' };
+    }
+  }
+
   // Name uniqueness check - detect reveal-for-upgrade before chakra check
   // Check same-name upgrade target
   const sameNameChar = chars.find((c) => {

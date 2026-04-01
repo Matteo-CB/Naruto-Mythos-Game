@@ -1,6 +1,8 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
+import type { CharacterInPlay } from '@/lib/engine/types';
 
 /**
  * Card 143/130 - ITACHI UCHIWA "Traquant Naruto" (M)
@@ -15,19 +17,36 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  *   - Only triggers when Itachi is revealed from hidden.
  */
 
+/** Check if moving a visible character to destMission would create a same-name conflict. */
+function wouldConflictOnDest(
+  char: CharacterInPlay,
+  destChars: CharacterInPlay[],
+): boolean {
+  if (char.isHidden) return false; // hidden chars have no visible name
+  const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  const charName = topCard.name_fr.toUpperCase();
+  return destChars.some(
+    (c) => c.instanceId !== char.instanceId && !c.isHidden &&
+      (c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr.toUpperCase() === charName,
+  );
+}
+
 function itachi143MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
+  const destChars = state.activeMissions[sourceMissionIndex][friendlySide];
 
   // Find all friendly characters in OTHER missions (not this one, not self)
+  // Filter out chars that would create a name conflict on the destination mission
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
+    if (isMovementBlockedByKurenai(state, i, sourcePlayer)) continue;
     for (const char of state.activeMissions[i][friendlySide]) {
-      if (char.instanceId !== ctx.sourceCard.instanceId) {
-        validTargets.push(char.instanceId);
-      }
+      if (char.instanceId === ctx.sourceCard.instanceId) continue;
+      if (wouldConflictOnDest(char, destChars)) continue;
+      validTargets.push(char.instanceId);
     }
   }
 
@@ -57,12 +76,16 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
+  const destChars = state.activeMissions[sourceMissionIndex][enemySide];
 
   // Find all enemy characters in OTHER missions
+  // Filter out chars that would create a name conflict on the destination mission
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
     for (const char of state.activeMissions[i][enemySide]) {
+      if (isMovementBlockedByKurenai(state, i, char.controlledBy)) continue;
+      if (wouldConflictOnDest(char, destChars)) continue;
       validTargets.push(char.instanceId);
     }
   }
