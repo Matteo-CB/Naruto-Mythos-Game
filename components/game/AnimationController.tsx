@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
+import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
 
 // ----- Duration mapping -----
 
@@ -47,7 +48,7 @@ function getAnimationDuration(type: AnimationType): number {
     case 'edge-transfer':
       return 900;
     case 'turn-transition':
-      return 1200;
+      return 3000;
     case 'card-deal':
       return 800;
     case 'game-end':
@@ -783,41 +784,47 @@ function EdgeTransferAnimation({ data }: { data: Record<string, unknown> }) {
 function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const turn = (data.turn as number) || 1;
-
-  // This delegates to TurnOverlay which already exists.
-  // Render a minimal version here as a fallback.
+  // Self-contained: animate in, hold, then animate out within the duration
+  // Total 3000ms: 400ms in + 1800ms hold + 800ms out
   return (
     <motion.div
       key="turn-transition"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      animate={{ opacity: [0, 1, 1, 0] }}
+      transition={{ duration: 3, times: [0, 0.13, 0.73, 1], ease: 'easeInOut' }}
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
     >
       <motion.div
         initial={{ scale: 0.3, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 1.5, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        animate={{
+          scale: [0.3, 1, 1, 0.3],
+          opacity: [0, 1, 1, 0],
+        }}
+        transition={{ duration: 3, times: [0, 0.13, 0.73, 1], ease: 'easeInOut' }}
         className="flex flex-col items-center gap-2"
       >
         <motion.span
           className="text-5xl font-bold tracking-widest uppercase"
           style={{ color: '#c4a35a' }}
           initial={{ letterSpacing: '0.5em', opacity: 0 }}
-          animate={{ letterSpacing: '0.2em', opacity: 1 }}
-          transition={{ delay: 0.1, duration: 0.4 }}
+          animate={{
+            letterSpacing: ['0.5em', '0.2em', '0.2em', '0.5em'],
+            opacity: [0, 1, 1, 0],
+          }}
+          transition={{ duration: 3, times: [0, 0.13, 0.73, 1], ease: 'easeInOut' }}
         >
           {t('game.turn', { turn })}
         </motion.span>
         <motion.div
           className="h-px w-48"
           style={{ backgroundColor: '#c4a35a' }}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
+          initial={{ scaleX: 0, opacity: 1 }}
+          animate={{
+            scaleX: [0, 1, 1, 0],
+            opacity: [1, 1, 1, 0],
+          }}
+          transition={{ duration: 3, times: [0, 0.15, 0.73, 1], ease: 'easeInOut' }}
         />
       </motion.div>
     </motion.div>
@@ -936,6 +943,42 @@ export function AnimationController() {
   const completeAnimation = useGameStore((s) => s.completeAnimation);
   const setAnimating = useGameStore((s) => s.setAnimating);
   const animationsEnabled = useSettingsStore((s) => s.animationsEnabled);
+  const soundEnabled = useSettingsStore((s) => s.soundEnabled);
+  const soundVolume = useSettingsStore((s) => s.soundVolume);
+
+  // Sync sound settings to SoundManager
+  useEffect(() => {
+    setMuted(!soundEnabled);
+    setVolume(soundVolume);
+  }, [soundEnabled, soundVolume]);
+
+  // --- State-diff sound detection (jutsu on effect activation) ---
+  const visibleState = useGameStore((s) => s.visibleState);
+  const prevLogLenRef = useRef(0);
+  useEffect(() => {
+    if (!visibleState) return;
+    const log = visibleState.log;
+    const prevLen = prevLogLenRef.current;
+    if (log.length <= prevLen) {
+      prevLogLenRef.current = log.length;
+      return;
+    }
+    const newEntries = log.slice(prevLen);
+    prevLogLenRef.current = log.length;
+
+    let hasEffect = false;
+    for (const entry of newEntries) {
+      const a = entry.action;
+      // Any instant effect application triggers the jutsu sound
+      if (a.startsWith('EFFECT') || a === 'SCORE_RETURN' || a === 'POWERUP' || a === 'CHAKRA_STEAL') {
+        hasEffect = true;
+        break;
+      }
+    }
+    if (hasEffect) {
+      playSound('jutsu');
+    }
+  }, [visibleState?.log.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync isAnimating state
   useEffect(() => {
@@ -948,6 +991,26 @@ export function AnimationController() {
 
   // Process one animation at a time
   const currentAnim = animationQueue[0] as AnimationEvent | undefined;
+
+  // Play sound when animation starts (card-play, turn-transition, card-deal, effects)
+  useEffect(() => {
+    if (!currentAnim) return;
+    const type = currentAnim.type as AnimationType;
+    switch (type) {
+      case 'turn-transition':
+        playSound('newTurn');
+        break;
+      case 'card-deal':
+        playSound('mulligan');
+        break;
+      case 'power-token':
+      case 'card-move':
+        playSound('jutsu');
+        break;
+      // card-play/reveal/upgrade: handled in gameStore.performAction (instant)
+      // card-hide/defeat: handled by state-diff log detection above
+    }
+  }, [currentAnim?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-complete after animation duration (instant when animations disabled)
   useEffect(() => {

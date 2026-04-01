@@ -19,6 +19,18 @@ const matchReadyPlayers = new Map<string, Set<string>>();
 // In-memory lock to prevent double Swiss round generation
 const swissRoundLocks = new Map<string, boolean>();
 
+/** Clean up in-memory Maps for a completed tournament */
+function cleanupTournamentMaps(tournamentId: string): void {
+  // Clean matchReadyPlayers entries for this tournament's matches
+  for (const [matchId] of matchReadyPlayers) {
+    if (matchId.includes(tournamentId)) matchReadyPlayers.delete(matchId);
+  }
+  // Clean swiss round locks for this tournament
+  for (const [key] of swissRoundLocks) {
+    if (key.startsWith(tournamentId)) swissRoundLocks.delete(key);
+  }
+}
+
 export function registerTournamentHandlers(io: Server, socket: Socket) {
   socket.on('tournament:subscribe', ({ tournamentId }: { tournamentId: string }) => {
     socket.join(`tournament:${tournamentId}`);
@@ -305,6 +317,8 @@ async function handleSwissMatchEnd(
         standings,
       });
 
+      cleanupTournamentMaps(tournamentId);
+
       // Assign Discord role
       let newRoleName: string | null = null;
       try {
@@ -408,6 +422,8 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
       data: { tournamentWins: { increment: 1 } },
     });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
+
+    cleanupTournamentMaps(tournamentId);
 
     // Assign "Vainqueur de tournoi X" Discord role
     let newRoleName: string | null = null;

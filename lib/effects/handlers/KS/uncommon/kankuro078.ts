@@ -58,13 +58,13 @@ function handleKankuro078Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KANKURO', id: 'KS-078-UC' }) } };
   }
 
-  // Confirmation popup
+  // Confirmation popup (mandatory — no skip)
   return {
     state,
     requiresTargetSelection: true,
     targetSelectionType: 'KANKURO078_CONFIRM_AMBUSH',
     validTargets: [sourceCard.instanceId],
-    isOptional: true,
+    isOptional: false,
     description: JSON.stringify({ sourceCardInstanceId: sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.kankuro078ConfirmAmbush',
   };
@@ -74,13 +74,29 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all hidden friendly characters across all missions
+  // Find all hidden friendly characters that can be revealed (no name conflict, or has upgrade target)
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[friendlySide]) {
-      if (char.isHidden) {
-        validTargets.push(char.instanceId);
+      if (!char.isHidden) continue;
+      const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+      const charName = topCard.name_fr.toUpperCase();
+      // Check if revealing would create a name conflict
+      const hasNameConflict = mission[friendlySide].some((c) => {
+        if (c.instanceId === char.instanceId || c.isHidden) return false;
+        const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+        return cTop.name_fr.toUpperCase() === charName;
+      });
+      if (hasNameConflict) {
+        // Check if there's a valid upgrade target (same name, lower cost)
+        const hasUpgradeTarget = mission[friendlySide].some((c) => {
+          if (c.instanceId === char.instanceId || c.isHidden) return false;
+          const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+          return cTop.name_fr.toUpperCase() === charName && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
+        });
+        if (!hasUpgradeTarget) continue; // Can't reveal: name conflict + no upgrade target
       }
+      validTargets.push(char.instanceId);
     }
   }
 

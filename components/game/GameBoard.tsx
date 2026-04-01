@@ -1142,10 +1142,7 @@ function GameBoardInner() {
             padding: dims.isMobile ? '0' : '4px 0',
           }}
         >
-          {isSpectating
-            ? null
-            : <OpponentHand handSize={opponentState.handSize} />
-          }
+          <OpponentHand handSize={opponentState.handSize} />
         </section>
 
         {/* Mission area with ActionBar */}
@@ -1212,7 +1209,7 @@ function GameBoardInner() {
           }}
         >
           {isSpectating
-            ? null
+            ? <OpponentHand handSize={(myState as any).handSize ?? myState.hand.length} />
             : <PlayerHand hand={myState.hand} chakra={myState.chakra} />
           }
         </section>

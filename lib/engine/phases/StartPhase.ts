@@ -16,11 +16,8 @@ export function executeStartPhase(state: GameState): GameState {
   newState.playCostIncrease = undefined;
   newState.pendingContinuation = undefined;
 
-  // Snapshot previous turn's last played for display, then reset tracking
-  const prevLastPlayed = newState.lastPlayedInstanceIds ?? { player1: null, player2: null };
-  newState.previousTurnLastPlayed = { player1: prevLastPlayed.player1, player2: prevLastPlayed.player2 };
-  newState.lastPlayedInstanceIds = { player1: null, player2: null };
-  newState.lastPlayedGlobal = undefined;
+  // Clear all white highlights from last turn
+  newState.turnPlayedIds = [];
 
   // 1. Reveal mission card
   newState = revealMissionCard(newState);

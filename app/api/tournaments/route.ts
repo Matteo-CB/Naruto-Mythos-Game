@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
     const tournaments = await prisma.tournament.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      take: 50,
       include: {
-        participants: { select: { id: true, userId: true, username: true, deckId: true, deckValid: true } },
         _count: { select: { participants: true, matches: true } },
       },
     });

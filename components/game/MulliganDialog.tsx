@@ -10,6 +10,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
+import { playSound } from '@/lib/sound/SoundManager';
 import { useGameScale } from './GameScaleContext';
 import {
   PopupOverlay,
@@ -321,11 +322,13 @@ export function MulliganDialog() {
 
   const handleKeep = () => {
     if (isProcessing) return;
+    playSound('mulligan');
     performAction({ type: 'MULLIGAN', doMulligan: false });
   };
 
   const handleMulligan = () => {
     if (isProcessing) return;
+    playSound('mulligan');
     performAction({ type: 'MULLIGAN', doMulligan: true });
   };
 

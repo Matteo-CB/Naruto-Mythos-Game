@@ -6362,7 +6362,7 @@ export class EffectEngine {
           break;
         }
 
-        // Multiple targets: child MOVE_CHARACTER_POWER_4_OR_LESS with isOptional: true (SKIP 2)
+        // Multiple targets: child MOVE_CHARACTER_POWER_4_OR_LESS (mandatory — no skip)
         const k078cEffId = generateInstanceId();
         const k078cActId = generateInstanceId();
         newState.pendingEffects.push({
@@ -6372,7 +6372,7 @@ export class EffectEngine {
           effectType: pendingEffect.effectType,
           effectDescription: '', targetSelectionType: 'MOVE_CHARACTER_POWER_4_OR_LESS',
           sourcePlayer: k078Player, requiresTargetSelection: true,
-          validTargets: k078ValidTargets, isOptional: true, isMandatory: false,
+          validTargets: k078ValidTargets, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: false,
           remainingEffectTypes: pendingEffect.remainingEffectTypes,
         });
@@ -6389,15 +6389,31 @@ export class EffectEngine {
       }
 
       case 'KANKURO078_CONFIRM_UPGRADE': {
-        // Re-find hidden friendly characters
+        // Re-find hidden friendly characters (filter out those with name conflict + no upgrade target)
         const k078uPlayer = pendingEffect.sourcePlayer;
         const k078uSide = k078uPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
         const k078uTargets: string[] = [];
         for (const mission of newState.activeMissions) {
           for (const char of mission[k078uSide]) {
-            if (char.isHidden && char.instanceId !== pendingEffect.sourceInstanceId) {
-              k078uTargets.push(char.instanceId);
+            if (!char.isHidden || char.instanceId === pendingEffect.sourceInstanceId) continue;
+            const topCard_u = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+            const charName_u = topCard_u.name_fr.toUpperCase();
+            // Check if revealing would create a name conflict
+            const hasConflict_u = mission[k078uSide].some((c: CharacterInPlay) => {
+              if (c.instanceId === char.instanceId || c.isHidden) return false;
+              const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              return cTop.name_fr.toUpperCase() === charName_u;
+            });
+            if (hasConflict_u) {
+              // Check if there's a valid upgrade target (same name, lower cost)
+              const hasUpgrade_u = mission[k078uSide].some((c: CharacterInPlay) => {
+                if (c.instanceId === char.instanceId || c.isHidden) return false;
+                const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+                return cTop.name_fr.toUpperCase() === charName_u && (topCard_u.chakra ?? 0) > (cTop.chakra ?? 0);
+              });
+              if (!hasUpgrade_u) continue; // Can't reveal: name conflict + no upgrade target
             }
+            k078uTargets.push(char.instanceId);
           }
         }
 
@@ -12010,15 +12026,22 @@ export class EffectEngine {
         let i143Parsed: { sourceMissionIndex?: number } = {};
         try { i143Parsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const i143MI = i143Parsed.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
+        const i143DestChars = newState.activeMissions[i143MI][i143FriendlySide];
 
-        // Re-validate friendly targets in other missions
+        // Re-validate friendly targets in other missions (filter name conflicts on destination)
         const i143ValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           if (i === i143MI) continue;
+          if (isMovementBlockedByKurenai(newState, i, i143Player)) continue;
           for (const char of newState.activeMissions[i][i143FriendlySide]) {
-            if (char.instanceId !== pendingEffect.sourceInstanceId) {
-              i143ValidTargets.push(char.instanceId);
+            if (char.instanceId === pendingEffect.sourceInstanceId) continue;
+            // Name conflict check: skip if same name already visible on destination
+            if (!char.isHidden) {
+              const topC = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const cName = topC.name_fr.toUpperCase();
+              if (i143DestChars.some((c: CharacterInPlay) => c.instanceId !== char.instanceId && !c.isHidden && (c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr.toUpperCase() === cName)) continue;
             }
+            i143ValidTargets.push(char.instanceId);
           }
         }
 
@@ -12064,12 +12087,20 @@ export class EffectEngine {
         let i143aParsed: { sourceMissionIndex?: number } = {};
         try { i143aParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         const i143aMI = i143aParsed.sourceMissionIndex ?? pendingEffect.sourceMissionIndex;
+        const i143aDestChars = newState.activeMissions[i143aMI][i143aEnemySide];
 
-        // Re-validate enemy targets in other missions
+        // Re-validate enemy targets in other missions (filter name conflicts on destination)
         const i143aValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           if (i === i143aMI) continue;
           for (const char of newState.activeMissions[i][i143aEnemySide]) {
+            if (isMovementBlockedByKurenai(newState, i, char.controlledBy)) continue;
+            // Name conflict check: skip if same name already visible on destination
+            if (!char.isHidden) {
+              const topC = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+              const cName = topC.name_fr.toUpperCase();
+              if (i143aDestChars.some((c: CharacterInPlay) => c.instanceId !== char.instanceId && !c.isHidden && (c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card).name_fr.toUpperCase() === cName)) continue;
+            }
             i143aValidTargets.push(char.instanceId);
           }
         }
@@ -17604,31 +17635,51 @@ export class EffectEngine {
 
     if (!target || targetMissionIdx === -1 || targetCharIdx === -1) return state;
 
+    // Before removing: restore control of any characters this one was controlling
+    // (e.g., Ino 020 returning to hand should release stolen characters back to opponent)
+    const stateAfterRestore = EffectEngine.restoreControlOnLeave(newState, targetId);
+    // Re-find the character after restore (indices may have shifted)
+    let finalMissionIdx = -1;
+    let finalCharIdx = -1;
+    for (let i = 0; i < stateAfterRestore.activeMissions.length; i++) {
+      const cs = stateAfterRestore.activeMissions[i][friendlySide];
+      for (let j = 0; j < cs.length; j++) {
+        if (cs[j].instanceId === targetId) {
+          finalMissionIdx = i;
+          finalCharIdx = j;
+          break;
+        }
+      }
+      if (finalMissionIdx >= 0) break;
+    }
+    if (finalMissionIdx === -1 || finalCharIdx === -1) return stateAfterRestore;
+
     // Remove from mission
-    const mission = { ...newState.activeMissions[targetMissionIdx] };
+    const mission = { ...stateAfterRestore.activeMissions[finalMissionIdx] };
     const chars = [...mission[friendlySide]];
-    chars.splice(targetCharIdx, 1);
+    const removedTarget = chars[finalCharIdx];
+    chars.splice(finalCharIdx, 1);
     mission[friendlySide] = chars;
-    newState.activeMissions = [...newState.activeMissions];
-    newState.activeMissions[targetMissionIdx] = mission;
+    stateAfterRestore.activeMissions = [...stateAfterRestore.activeMissions];
+    stateAfterRestore.activeMissions[finalMissionIdx] = mission;
 
     // Return only the top card to hand; discard underlying stack cards
-    const ps = newState[player];
-    const topCard = target.stack?.length > 0 ? target.stack[target.stack?.length - 1] : target.card;
-    const underCards = target.stack?.length > 1 ? target.stack.slice(0, -1) : [];
+    const ps = stateAfterRestore[player];
+    const topCard = removedTarget.stack?.length > 0 ? removedTarget.stack[removedTarget.stack?.length - 1] : removedTarget.card;
+    const underCards = removedTarget.stack?.length > 1 ? removedTarget.stack.slice(0, -1) : [];
     ps.hand = [...ps.hand, topCard];
     ps.discardPile = [...ps.discardPile, ...underCards];
     ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
 
-    newState.log = logAction(
-      newState.log, newState.turn, newState.phase, player,
+    stateAfterRestore.log = logAction(
+      stateAfterRestore.log, stateAfterRestore.turn, stateAfterRestore.phase, player,
       'SCORE_RETURN',
       `MSS 05 (Bring it Back): Returned ${topCard.name_fr} to hand (mandatory).`,
       'game.log.score.returnToHand',
       { card: 'Ramener', target: topCard.name_fr },
     );
 
-    return newState;
+    return stateAfterRestore;
   }
 
   // =====================================

@@ -8,6 +8,8 @@ interface BackgroundOption {
 
 interface SettingsState {
   animationsEnabled: boolean;
+  soundEnabled: boolean;
+  soundVolume: number;
   allowSpectatorHand: boolean;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
@@ -15,6 +17,8 @@ interface SettingsState {
   isLoaded: boolean;
   fetchFromServer: () => Promise<void>;
   setAnimationsEnabled: (v: boolean) => Promise<void>;
+  setSoundEnabled: (v: boolean) => void;
+  setSoundVolume: (v: number) => void;
   setAllowSpectatorHand: (v: boolean) => Promise<void>;
   setGameBackground: (id: string, url: string) => Promise<void>;
 }
@@ -41,8 +45,19 @@ function cacheBackgrounds(backgrounds: BackgroundOption[]): void {
   } catch { /* ignore */ }
 }
 
+function getLocalSound(): { enabled: boolean; volume: number } {
+  try {
+    if (typeof window === 'undefined') return { enabled: true, volume: 0.5 };
+    const e = localStorage.getItem('nmtcg-sound-enabled');
+    const v = localStorage.getItem('nmtcg-sound-volume');
+    return { enabled: e !== 'false', volume: v ? parseFloat(v) : 0.5 };
+  } catch { return { enabled: true, volume: 0.5 }; }
+}
+
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
   animationsEnabled: true,
+  soundEnabled: getLocalSound().enabled,
+  soundVolume: getLocalSound().volume,
   allowSpectatorHand: false,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
@@ -94,6 +109,19 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     } catch {
       set({ animationsEnabled: prev });
     }
+  },
+
+  setSoundEnabled: (v: boolean) => {
+    set({ soundEnabled: v });
+    try { localStorage.setItem('nmtcg-sound-enabled', String(v)); } catch { /* ignore */ }
+    import('@/lib/sound/SoundManager').then(m => m.setMuted(!v)).catch(() => {});
+  },
+
+  setSoundVolume: (v: number) => {
+    const clamped = Math.max(0, Math.min(1, v));
+    set({ soundVolume: clamped });
+    try { localStorage.setItem('nmtcg-sound-volume', String(clamped)); } catch { /* ignore */ }
+    import('@/lib/sound/SoundManager').then(m => m.setVolume(clamped)).catch(() => {});
   },
 
   setAllowSpectatorHand: async (v: boolean) => {
