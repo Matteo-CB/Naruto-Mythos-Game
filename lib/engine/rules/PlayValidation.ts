@@ -376,10 +376,11 @@ function isWinningMission(state: GameState, player: PlayerID, missionIndex: numb
     p2Power += calculateCharacterPower(state, c, 'player2');
   }
 
-  // Must have strictly more power to be considered "winning" (ties don't count)
-  if (player === 'player1') {
-    return p1Power > 0 && p1Power > p2Power;
-  } else {
-    return p2Power > 0 && p2Power > p1Power;
-  }
+  // Winning = strictly more power, OR tied power with edge token (edge holder wins ties)
+  const myPower = player === 'player1' ? p1Power : p2Power;
+  const oppPower = player === 'player1' ? p2Power : p1Power;
+  if (myPower <= 0) return false; // must have at least 1 power
+  if (myPower > oppPower) return true;
+  if (myPower === oppPower && state.edgeHolder === player) return true;
+  return false;
 }

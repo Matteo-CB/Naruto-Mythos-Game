@@ -73,7 +73,7 @@ export function GameEndScreen() {
   }, [resetGame, router]);
 
   // Tournament match: auto-redirect to tournament page after showing result
-  const tournamentId = (gameResult as any)?.tournamentId as string | null | undefined;
+  const tournamentId = gameResult?.tournamentId;
   const tournamentRedirectRef = useRef(false);
   useEffect(() => {
     if (tournamentId && gameOver && !tournamentRedirectRef.current) {

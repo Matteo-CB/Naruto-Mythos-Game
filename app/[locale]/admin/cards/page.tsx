@@ -23,6 +23,9 @@ export default function AdminCardsPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterMode>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [banReasonCardId, setBanReasonCardId] = useState<string | null>(null);
+  const [banReason, setBanReason] = useState('');
+  const [bannedReasons, setBannedReasons] = useState<Map<string, string | null>>(new Map());
 
   const allCards = useMemo(() => {
     const chars = getPlayableCharacters();
@@ -43,6 +46,11 @@ export default function AdminCardsPage() {
       const data = await res.json();
       if (res.ok) {
         setBannedIds(new Set(data.bannedCardIds ?? []));
+        const reasonMap = new Map<string, string | null>();
+        for (const b of (data.bannedCards ?? [])) {
+          reasonMap.set(b.cardId, b.reason ?? null);
+        }
+        setBannedReasons(reasonMap);
       }
     } catch {
       // ignore
@@ -51,13 +59,21 @@ export default function AdminCardsPage() {
     }
   };
 
-  const toggleBan = async (cardId: string) => {
+  const toggleBan = async (cardId: string, reason?: string) => {
+    const isBanned = bannedIds.has(cardId);
+    // If banning (not yet banned) and no reason provided, show reason prompt
+    if (!isBanned && reason === undefined) {
+      setBanReasonCardId(cardId);
+      setBanReason('');
+      return;
+    }
     setTogglingId(cardId);
+    setBanReasonCardId(null);
     try {
       const res = await fetch('/api/admin/banned-cards', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cardId }),
+        body: JSON.stringify({ cardId, reason: reason || undefined }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -68,6 +84,12 @@ export default function AdminCardsPage() {
           } else {
             next.delete(cardId);
           }
+          return next;
+        });
+        setBannedReasons((prev) => {
+          const next = new Map(prev);
+          if (data.banned) next.set(cardId, reason ?? null);
+          else next.delete(cardId);
           return next;
         });
       }
@@ -231,20 +253,61 @@ export default function AdminCardsPage() {
                         {card.id}
                       </div>
 
-                      <button
-                        onClick={() => toggleBan(card.id)}
-                        disabled={isToggling}
-                        className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors"
-                        style={{
-                          backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a',
-                          border: `1px solid ${isBanned ? '#b33e3e' : '#4a9e4a'}`,
-                          color: isBanned ? '#b33e3e' : '#4a9e4a',
-                          opacity: isToggling ? 0.5 : 1,
-                          cursor: isToggling ? 'wait' : 'pointer',
-                        }}
-                      >
-                        {isBanned ? t('adminCards.banned') : t('adminCards.authorized')}
-                      </button>
+                      {/* Show ban reason if exists */}
+                      {isBanned && bannedReasons.get(card.id) && (
+                        <div style={{ fontSize: '9px', color: '#b33e3e', lineHeight: 1.2, fontStyle: 'italic' }}>
+                          {bannedReasons.get(card.id)}
+                        </div>
+                      )}
+
+                      {/* Ban reason input popup */}
+                      {banReasonCardId === card.id && (
+                        <div className="flex flex-col gap-1">
+                          <input
+                            type="text"
+                            value={banReason}
+                            onChange={(e) => setBanReason(e.target.value)}
+                            placeholder="Reason (optional)"
+                            className="w-full px-2 py-1 text-xs rounded"
+                            style={{ backgroundColor: '#0a0a0f', border: '1px solid #b33e3e40', color: '#e0e0e0', outline: 'none' }}
+                            autoFocus
+                            onKeyDown={(e) => { if (e.key === 'Enter') toggleBan(card.id, banReason); }}
+                          />
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => toggleBan(card.id, banReason)}
+                              className="flex-1 py-1 text-xs font-bold uppercase"
+                              style={{ backgroundColor: '#1a0a0a', border: '1px solid #b33e3e', color: '#b33e3e' }}
+                            >
+                              Ban
+                            </button>
+                            <button
+                              onClick={() => setBanReasonCardId(null)}
+                              className="px-2 py-1 text-xs"
+                              style={{ backgroundColor: '#141414', border: '1px solid #262626', color: '#555' }}
+                            >
+                              X
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {banReasonCardId !== card.id && (
+                        <button
+                          onClick={() => toggleBan(card.id)}
+                          disabled={isToggling}
+                          className="w-full py-1.5 text-xs font-bold uppercase tracking-wider transition-colors"
+                          style={{
+                            backgroundColor: isBanned ? '#1a0a0a' : '#0a1a0a',
+                            border: `1px solid ${isBanned ? '#b33e3e' : '#4a9e4a'}`,
+                            color: isBanned ? '#b33e3e' : '#4a9e4a',
+                            opacity: isToggling ? 0.5 : 1,
+                            cursor: isToggling ? 'wait' : 'pointer',
+                          }}
+                        >
+                          {isBanned ? t('adminCards.banned') : t('adminCards.authorized')}
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

@@ -1169,6 +1169,8 @@
     "searching": "Recherche d'un adversaire...",
     "matchFound": "Match trouve ! Preparation de la partie...",
     "signedInAs": "Connecte en tant que {name}",
+    "deckBannedTitle": "Votre deck contient des cartes bannies",
+    "deckBannedRankedOnly": "Ces cartes sont bannies en mode Classe uniquement. Vous pouvez les utiliser en mode Casual.",
     "createPrivateRoom": "Creer un Salon Prive",
     "timer": {
       "label": "Timer d'action",

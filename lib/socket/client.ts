@@ -27,6 +27,7 @@ interface SocketStore {
   error: string | null;
   errorKey: string | null;
   errorParams: Record<string, string | number> | null;
+  bannedCardsError: Array<{ cardId: string; reason: string | null }> | null;
   opponentJoined: boolean;
   gameStarted: boolean;
   gameEnded: boolean;
@@ -41,6 +42,7 @@ interface SocketStore {
     winReason?: 'score' | 'forfeit' | 'timeout';
     gameId?: string;
     replayData?: unknown;
+    tournamentId?: string | null;
   } | null;
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
@@ -126,6 +128,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   error: null,
   errorKey: null,
   errorParams: null,
+  bannedCardsError: null,
   opponentJoined: false,
   gameStarted: false,
   gameEnded: false,
@@ -292,13 +295,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ roomCode: data.code, playerRole: data.playerRole, isSealedRoom: data.isSealed });
       });
 
-      socket.on('room:error', (data: { message: string }) => {
+      socket.on('room:error', (data: { message: string; errorKey?: string; bannedCards?: Array<{ cardId: string; reason: string | null }> }) => {
         console.error('[Socket] Room error:', data.message);
-        // Only set error if game hasn't started yet (lobby phase).
-        // During an active game, room errors (e.g. stale rejoin "Room not found")
-        // should not show as in-game action errors.
         if (!get().gameStarted) {
-          set({ error: data.message });
+          set({
+            error: data.message,
+            errorKey: data.errorKey ?? null,
+            bannedCardsError: data.bannedCards ?? null,
+          });
         }
       });
 
@@ -792,7 +796,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  clearError: () => set({ error: null, errorKey: null, errorParams: null }),
+  clearError: () => set({ error: null, errorKey: null, errorParams: null, bannedCardsError: null }),
 
   forfeit: (reason: 'abandon' | 'timeout') => {
     const { socket, connected } = get();

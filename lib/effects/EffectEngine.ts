@@ -7036,6 +7036,7 @@ export class EffectEngine {
           sourcePlayer: t104Player, requiresTargetSelection: true,
           validTargets: t104Options, isOptional: false, isMandatory: true,
           resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          remainingEffectTypes: pendingEffect.remainingEffectTypes,
         });
         newState.pendingActions.push({
           id: t104ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
