@@ -45,6 +45,7 @@ export default function PlayOnlinePage() {
     gameStarted,
     visibleState,
     error,
+    bannedCardsError,
     publicRooms,
     connect,
     disconnect,
@@ -272,10 +273,26 @@ export default function PlayOnlinePage() {
 
         {error && (
           <div
-            className="w-full rounded px-4 py-2 text-xs"
+            className="w-full rounded px-4 py-3 text-xs flex flex-col gap-2"
             style={{ backgroundColor: '#1a0a0a', border: '1px solid #b33e3e', color: '#b33e3e' }}
           >
-            {error}
+            <div>{t('online.deckBannedTitle')}</div>
+            {bannedCardsError && bannedCardsError.length > 0 && (
+              <>
+                <div style={{ color: '#888888', fontSize: '10px' }}>
+                  {t('online.deckBannedRankedOnly')}
+                </div>
+                <div className="flex flex-col gap-1">
+                  {bannedCardsError.map((bc) => (
+                    <div key={bc.cardId} className="flex items-center gap-2" style={{ color: '#e0e0e0' }}>
+                      <span style={{ color: '#b33e3e', fontWeight: 600 }}>{bc.cardId}</span>
+                      {bc.reason && <span style={{ color: '#888888', fontStyle: 'italic' }}>— {bc.reason}</span>}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {!bannedCardsError && <div>{error}</div>}
           </div>
         )}
 

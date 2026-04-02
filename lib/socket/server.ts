@@ -70,6 +70,19 @@ const userNames = new Map<string, string>(); // userId -> username (populated on
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
 
+// Banned cards cache (refreshed every 60s)
+let bannedCardCache: Map<string, string | null> | null = null; // cardId -> reason
+let bannedCardCacheTime = 0;
+const BAN_CACHE_TTL = 60_000;
+
+async function getBannedCards(): Promise<Map<string, string | null>> {
+  if (bannedCardCache && Date.now() - bannedCardCacheTime < BAN_CACHE_TTL) return bannedCardCache;
+  const banned = await prisma.bannedCard.findMany() as Array<{ cardId: string; reason?: string | null }>;
+  bannedCardCache = new Map(banned.map(b => [b.cardId, b.reason ?? null]));
+  bannedCardCacheTime = Date.now();
+  return bannedCardCache;
+}
+
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -265,8 +278,17 @@ async function finalizeGameEnd(
       ]);
 
       if (player1 && player2) {
-        const eloResult = winner === 'player1' ? 'player1' : 'player2';
-        const changes = calculateEloChanges(player1.elo, player2.elo, eloResult);
+        const changes = calculateEloChanges({
+          player1Elo: player1.elo,
+          player2Elo: player2.elo,
+          winner: winner === 'player1' ? 'player1' : 'player2',
+          player1Score: p1Score,
+          player2Score: p2Score,
+          player1ConsecWins: player1.consecutiveWins ?? 0,
+          player1ConsecLosses: player1.consecutiveLosses ?? 0,
+          player2ConsecWins: player2.consecutiveWins ?? 0,
+          player2ConsecLosses: player2.consecutiveLosses ?? 0,
+        });
 
         const p1Stats = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
         const p2Stats = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
@@ -274,11 +296,19 @@ async function finalizeGameEnd(
         const [updatedP1, updatedP2] = await Promise.all([
           prisma.user.update({
             where: { id: room.hostId },
-            data: { elo: changes.player1NewElo, ...p1Stats },
+            data: {
+              elo: changes.player1NewElo, ...p1Stats,
+              consecutiveWins: changes.player1NewConsecWins,
+              consecutiveLosses: changes.player1NewConsecLosses,
+            },
           }),
           prisma.user.update({
             where: { id: room.guestId! },
-            data: { elo: changes.player2NewElo, ...p2Stats },
+            data: {
+              elo: changes.player2NewElo, ...p2Stats,
+              consecutiveWins: changes.player2NewConsecWins,
+              consecutiveLosses: changes.player2NewConsecLosses,
+            },
           }),
         ]);
 
@@ -1284,6 +1314,33 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!code) return;
       const room = rooms.get(code);
       if (!room) return;
+
+      // Enforce ban list for ranked games
+      if (room.isRanked || room.gameMode === 'ranked') {
+        try {
+          const banned = await getBannedCards();
+          if (banned.size > 0) {
+            const foundBanned: Array<{ cardId: string; reason: string | null }> = [];
+            for (const c of data.characters) {
+              if (banned.has(c.id)) foundBanned.push({ cardId: c.id, reason: banned.get(c.id) ?? null });
+            }
+            for (const m of data.missions) {
+              if (banned.has(m.id)) foundBanned.push({ cardId: m.id, reason: banned.get(m.id) ?? null });
+            }
+            if (foundBanned.length > 0) {
+              socket.emit('room:error', {
+                message: 'Deck contains banned cards',
+                errorKey: 'game.error.deckBanned',
+                bannedCards: foundBanned,
+              });
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('[Socket] Ban check error:', err);
+          // Don't block the game if ban check fails
+        }
+      }
 
       if (socket.id === room.hostSocket) {
         room.hostDeck = data;

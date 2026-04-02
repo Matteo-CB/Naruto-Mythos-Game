@@ -41,6 +41,8 @@ model User {
   gameBanned        Boolean      @default(false)
   gameBanUntil      DateTime?
   allowSpectatorHand Boolean     @default(false)
+  consecutiveWins    Int          @default(0)
+  consecutiveLosses  Int          @default(0)
 }
 
 model Account {
@@ -144,6 +146,7 @@ model MatchInvite {
 model BannedCard {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   cardId   String   @unique
+  reason   String?
   bannedAt DateTime @default(now())
 }
 

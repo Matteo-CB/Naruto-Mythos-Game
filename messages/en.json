@@ -1169,6 +1169,8 @@
     "searching": "Searching for opponent...",
     "matchFound": "Match found! Preparing game...",
     "signedInAs": "Signed in as {name}",
+    "deckBannedTitle": "Your deck contains banned cards",
+    "deckBannedRankedOnly": "These cards are banned in Ranked mode only. You can still use them in Casual mode.",
     "createPrivateRoom": "Create Private Room",
     "timer": {
       "label": "Action Timer",

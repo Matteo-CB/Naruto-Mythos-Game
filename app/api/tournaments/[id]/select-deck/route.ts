@@ -60,8 +60,17 @@ export async function POST(
       return NextResponse.json({ error: 'Deck not found or not yours' }, { status: 404 });
     }
 
+    // If tournament uses global ban list, merge it into tournament's bannedCardIds
+    let effectiveTournament = tournament;
+    if (tournament.useBanList) {
+      const globalBanned = await prisma.bannedCard.findMany({ select: { cardId: true } });
+      const globalIds = globalBanned.map(b => b.cardId);
+      const merged = [...new Set([...(tournament.bannedCardIds ?? []), ...globalIds])];
+      effectiveTournament = { ...tournament, bannedCardIds: merged };
+    }
+
     // Validate deck against tournament rules
-    const validation = validateDeckForTournament(deck, tournament);
+    const validation = validateDeckForTournament(deck, effectiveTournament);
 
     // Update participant
     await prisma.tournamentParticipant.update({

@@ -8,12 +8,11 @@ const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 // GET - list all banned card IDs (public, needed by all clients)
 export async function GET() {
   try {
-    const bannedCards = await prisma.bannedCard.findMany({
-      select: { cardId: true },
-    });
+    const bannedCards = await prisma.bannedCard.findMany() as Array<{ cardId: string; reason?: string | null }>;
 
     const response = NextResponse.json({
-      bannedCardIds: bannedCards.map((b: { cardId: string }) => b.cardId),
+      bannedCardIds: bannedCards.map((b) => b.cardId),
+      bannedCards: bannedCards.map((b) => ({ cardId: b.cardId, reason: b.reason ?? null })),
     });
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     return response;
@@ -34,7 +33,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { cardId } = body;
+    const { cardId, reason } = body;
 
     if (!cardId || typeof cardId !== 'string') {
       return NextResponse.json({ error: 'cardId is required' }, { status: 400 });
@@ -50,9 +49,9 @@ export async function POST(req: NextRequest) {
       await prisma.bannedCard.delete({ where: { cardId } });
       return NextResponse.json({ cardId, banned: false });
     } else {
-      // Ban
-      await prisma.bannedCard.create({ data: { cardId } });
-      return NextResponse.json({ cardId, banned: true });
+      // Ban with optional reason
+      await prisma.bannedCard.create({ data: { cardId, reason: typeof reason === 'string' ? reason.trim() || undefined : undefined } as any });
+      return NextResponse.json({ cardId, banned: true, reason: reason || null });
     }
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
