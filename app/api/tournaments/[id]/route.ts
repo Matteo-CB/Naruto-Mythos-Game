@@ -68,14 +68,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (tournament.status === 'completed') {
-      return NextResponse.json({ error: 'Cannot cancel a completed tournament' }, { status: 400 });
-    }
-
-    await prisma.tournament.update({
-      where: { id },
-      data: { status: 'cancelled' },
-    });
+    // Delete all related data then the tournament itself
+    await prisma.tournamentMatch.deleteMany({ where: { tournamentId: id } });
+    await prisma.tournamentParticipant.deleteMany({ where: { tournamentId: id } });
+    await prisma.tournament.delete({ where: { id } });
 
     return NextResponse.json({ success: true });
   } catch {

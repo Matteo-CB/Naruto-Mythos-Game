@@ -13,6 +13,8 @@ import {
   type SwissPlayer,
   type SwissMatchResult,
 } from '@/lib/tournament/swissEngine';
+import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
 
@@ -75,7 +77,35 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         matchReadyPlayers.delete(matchId);
         const roomCode = match.roomCode || `T-${matchId.slice(-6)}`;
 
-        // Create game room for the tournament match
+        // Load participant decks from DB
+        const [p1Participant, p2Participant] = await Promise.all([
+          prisma.tournamentParticipant.findFirst({ where: { tournamentId, userId: match.player1Id } }),
+          prisma.tournamentParticipant.findFirst({ where: { tournamentId, userId: match.player2Id } }),
+        ]);
+
+        let hostDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
+        let guestDeck: { characters: CharacterCard[]; missions: MissionCard[] } | null = null;
+
+        if (p1Participant?.deckId) {
+          const deck = await prisma.deck.findUnique({ where: { id: p1Participant.deckId } });
+          if (deck) {
+            hostDeck = {
+              characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
+              missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
+            };
+          }
+        }
+        if (p2Participant?.deckId) {
+          const deck = await prisma.deck.findUnique({ where: { id: p2Participant.deckId } });
+          if (deck) {
+            guestDeck = {
+              characters: (deck.cardIds ?? []).map((id: string) => getCharacterById(id)).filter(Boolean) as CharacterCard[],
+              missions: (deck.missionIds ?? []).map((id: string) => getMissionById(id)).filter(Boolean) as MissionCard[],
+            };
+          }
+        }
+
+        // Create game room for the tournament match (decks pre-loaded)
         if (!rooms.has(roomCode)) {
           rooms.set(roomCode, {
             code: roomCode,
@@ -84,12 +114,12 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             guestId: match.player2Id,
             guestSocket: null,
             gameState: null,
-            hostDeck: null,
-            guestDeck: null,
+            hostDeck,
+            guestDeck,
             isPrivate: true,
             isRanked: false,
             isAnonymous: false,
-            gameMode: 'ranked',
+            gameMode: 'casual',
             createdAt: Date.now(),
             actionTimer: null,
             timerDeadline: null,

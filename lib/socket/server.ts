@@ -1193,10 +1193,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
           });
           // If game already started, send state
           if (room.gameState) {
-            const { GameEngine } = require('@/lib/engine/GameEngine');
             const visible = GameEngine.getVisibleState(room.gameState, 'player1');
-            socket.emit('game:started', { playerRole: 'player1' });
-            socket.emit('game:state-update', visible);
+            const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
+            socket.emit('game:state-update', { visibleState: visible, playerRole: 'player1', playerNames });
+            socket.emit('game:started');
+          } else if (room.hostDeck && room.guestDeck && room.guestSocket) {
+            // Both decks pre-loaded and guest already connected — trigger auto-start
+            io.to(data.code).emit('room:player-joined', { hostId: room.hostId, guestId: room.guestId });
           }
           return;
         }
@@ -1238,6 +1241,52 @@ export function setupSocketHandlers(io: SocketIOServer) {
       // Room is now full - broadcast updated list (room removed from available)
       if (!room.isPrivate) {
         broadcastRoomList(io);
+      }
+
+      // Tournament rooms: if both decks are pre-loaded, auto-start the game
+      if (room.tournamentId && room.hostDeck && room.guestDeck && room.hostSocket && room.guestSocket && !room.gameState) {
+        // Trigger deck acceptance for both players so the game starts
+        // The room:select-deck handler's "both decks ready" logic will create the game
+        // We just need to emit the events so the clients know
+        const fakeSelectEvent = async () => {
+          // Both decks already set — just trigger the game creation
+          const hostName = room.hostName ?? userNames.get(room.hostId) ?? 'Player 1';
+          const guestName = room.guestName ?? (room.guestId ? userNames.get(room.guestId) : null) ?? 'Player 2';
+          room.hostName = hostName;
+          room.guestName = guestName;
+          try {
+            const config: GameConfig = {
+              player1: { userId: room.hostId, isAI: false, deck: room.hostDeck!.characters, missionCards: room.hostDeck!.missions },
+              player2: { userId: room.guestId!, isAI: false, deck: room.guestDeck!.characters, missionCards: room.guestDeck!.missions },
+            };
+            const { resetIdCounter } = require('@/lib/engine/utils/id');
+            resetIdCounter();
+            room.gameState = GameEngine.createGame(config);
+            room.replayInitialState = deepClone(room.gameState);
+            const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
+            const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
+            const playerNames = { player1: hostName, player2: guestName };
+            io.to(room.hostSocket!).emit('game:state-update', { visibleState: p1State, playerRole: 'player1', playerNames });
+            io.to(room.guestSocket!).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
+            io.to(data.code).emit('game:started');
+            console.log(`[Socket] Tournament game auto-started in room ${data.code}`);
+            // Start tournament timer (30 min)
+            const matchTimeLimit = 1800000;
+            (room as any).tournamentGameTimer = setTimeout(async () => {
+              if (!rooms.has(data.code) || !room.gameState || room.gameState.phase === 'gameOver') return;
+              const p1S = room.gameState.player1.missionPoints;
+              const p2S = room.gameState.player2.missionPoints;
+              const loser: 'player1' | 'player2' = p1S !== p2S
+                ? (p1S > p2S ? 'player2' : 'player1')
+                : (room.gameState.edgeHolder === 'player1' ? 'player2' : 'player1');
+              room.gameState.phase = 'gameOver' as any;
+              await finalizeGameEnd(room, data.code, io, 'timeout');
+            }, matchTimeLimit);
+          } catch (err) {
+            console.error('[Socket] Tournament auto-start error:', err);
+          }
+        };
+        fakeSelectEvent();
       }
 
       // If this is a sealed room and both players are here, generate boosters
@@ -1315,8 +1364,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
-      // Enforce ban list for ranked games
-      if (room.isRanked || room.gameMode === 'ranked') {
+      // Enforce ban list for ranked games (skip tournament rooms — they have their own validation)
+      if ((room.isRanked || room.gameMode === 'ranked') && !room.tournamentId) {
         try {
           const banned = await getBannedCards();
           if (banned.size > 0) {
