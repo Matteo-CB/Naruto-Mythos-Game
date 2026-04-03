@@ -131,14 +131,17 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
   },
 
   fetchTournament: async (id) => {
-    set({ loading: true, error: null });
+    // Only show loading spinner on first load (no activeTournament yet)
+    const isFirstLoad = !get().activeTournament;
+    if (isFirstLoad) set({ loading: true, error: null });
+    else set({ error: null });
     try {
       const res = await fetch(`/api/tournaments/${id}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       set({ activeTournament: data.tournament });
     } catch { set({ error: 'Tournament not found' }); }
-    finally { set({ loading: false }); }
+    finally { if (isFirstLoad) set({ loading: false }); }
   },
 
   joinTournament: async (id, code?) => {

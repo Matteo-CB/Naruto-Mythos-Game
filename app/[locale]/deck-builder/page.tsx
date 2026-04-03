@@ -7,7 +7,7 @@ import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
-import { useBannedCards } from "@/lib/hooks/useBannedCards";
+// Ban list enforced server-side in ranked/tournament only — deck builder allows all cards
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
@@ -426,7 +426,7 @@ export default function DeckBuilderPage() {
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
-  const { bannedIds } = useBannedCards();
+  // Ban list not enforced in deck builder — only in ranked/tournament server-side
 
   // ───── DATA LOADING ─────
   useEffect(() => {
@@ -471,11 +471,11 @@ export default function DeckBuilderPage() {
   const parsedSearch = useMemo(() => parseSearchQuery(deferredSearch), [deferredSearch]);
 
   const filteredChars = useMemo(() => {
-    let chars = availableChars.filter((c) => !bannedIds.has(c.id));
+    let chars = [...availableChars];
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }
-    return [...chars].sort((a, b) => {
+    return chars.sort((a, b) => {
       let cmp = 0;
       switch (sortBy) {
         case 'number': cmp = a.number - b.number; break;
@@ -486,9 +486,9 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, bannedIds, loc, sortBy, sortOrder]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder]);
 
-  const filteredMissions = useMemo(() => availableMissions.filter((m) => !bannedIds.has(m.id)), [availableMissions, bannedIds]);
+  const filteredMissions = useMemo(() => [...availableMissions], [availableMissions]);
 
   // ───── DECK COMPUTATIONS ─────
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
