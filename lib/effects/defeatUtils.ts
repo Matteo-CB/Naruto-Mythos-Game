@@ -66,6 +66,7 @@ export function defeatCharacterInPlay(
   side: 'player1Characters' | 'player2Characters',
   isEnemyEffect: boolean,
   sourcePlayer: PlayerID,
+  simultaneousDefeatIds?: string[],
 ): GameState {
   const mission = state.activeMissions[missionIndex];
   const chars = mission[side];
@@ -152,7 +153,8 @@ export function defeatCharacterInPlay(
   };
 
   // 3. Trigger on-defeat effects (Tsunade 003, Sasuke 136)
-  newState = triggerOnDefeatEffects(newState, targetChar, targetPlayer);
+  // If this is part of a simultaneous batch, skip triggers from characters also being defeated
+  newState = triggerOnDefeatEffects(newState, targetChar, targetPlayer, simultaneousDefeatIds);
 
   return newState;
 }
@@ -165,10 +167,11 @@ export function defeatEnemyCharacter(
   missionIndex: number,
   charInstanceId: string,
   sourcePlayer: PlayerID,
+  simultaneousDefeatIds?: string[],
 ): GameState {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
-  return defeatCharacterInPlay(state, missionIndex, charInstanceId, enemySide, true, sourcePlayer);
+  return defeatCharacterInPlay(state, missionIndex, charInstanceId, enemySide, true, sourcePlayer, simultaneousDefeatIds);
 }
 
 /**
@@ -179,10 +182,11 @@ export function defeatFriendlyCharacter(
   missionIndex: number,
   charInstanceId: string,
   sourcePlayer: PlayerID,
+  simultaneousDefeatIds?: string[],
 ): GameState {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  return defeatCharacterInPlay(state, missionIndex, charInstanceId, friendlySide, false, sourcePlayer);
+  return defeatCharacterInPlay(state, missionIndex, charInstanceId, friendlySide, false, sourcePlayer, simultaneousDefeatIds);
 }
 
 /**

@@ -196,6 +196,12 @@ export class GameEngine {
           if (newState.pendingContinuation && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const cont = newState.pendingContinuation;
             newState.pendingContinuation = undefined;
+            // Restore chain data (temp fields like _tsunade104ChakraSpent)
+            if (cont.chainData) {
+              for (const [k, v] of Object.entries(cont.chainData)) {
+                (newState as any)[k] = v;
+              }
+            }
             const syntheticPending: PendingEffect = {
               id: '', sourceCardId: cont.sourceCardId,
               sourceInstanceId: cont.sourceInstanceId,
@@ -275,17 +281,21 @@ export class GameEngine {
           newState = GameEngine.transitionToEndPhase(newState);
           break;
         }
+        // Handle effect reordering during mission phase
+        if (action.type === 'REORDER_EFFECTS') {
+          newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
+          break;
+        }
         // Handle CHOOSE_SCORE_ORDER: player chose which SCORE effect to resolve next
         if (action.type === 'SELECT_TARGET') {
           const chooseScorePending = newState.pendingEffects.find(
             (e) => e.targetSelectionType === 'CHOOSE_SCORE_ORDER',
           );
           if (chooseScorePending) {
-            // Extract the label from the selected option (format: "SCORE::<label>")
             const selectedOption = action.selectedTargets[0] ?? '';
             const label = selectedOption.startsWith('SCORE::') ? selectedOption.substring(7) : selectedOption;
             newState = resolveChosenScoreEffect(newState, label);
-            // If new pending actions were created (either another CHOOSE_SCORE_ORDER or a handler pending), wait
+            // If new pending actions were created (SCORE handler needs confirmation), wait
             if (newState.pendingActions.length > 0) break;
             // All SCORE effects for this mission resolved - resume remaining missions
             if (newState.missionScoringProgress) {
@@ -296,12 +306,7 @@ export class GameEngine {
             break;
           }
         }
-        // Handle effect reordering during mission phase
-        if (action.type === 'REORDER_EFFECTS') {
-          newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
-          break;
-        }
-        // Handle target selections for SCORE effects
+        // Handle target selections for SCORE effect confirmations (Rasa, etc.)
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
           // After resolving the pending action, resume scoring remaining missions/effects

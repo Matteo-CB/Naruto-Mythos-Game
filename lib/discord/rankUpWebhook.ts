@@ -36,6 +36,7 @@ const TIER_COLORS: Record<string, number> = {
   'Legendary Sannin': 0x9B59B6,
   'Kage': 0xC4A35A,
   'Sage of Six Paths': 0xFFD700,
+  '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂': 0xFF6B35,
 };
 
 const TIER_SYMBOLS: Record<string, string> = {
@@ -47,6 +48,7 @@ const TIER_SYMBOLS: Record<string, string> = {
   'Legendary Sannin': '\u2605',
   'Kage': '\u2605\u2605',
   'Sage of Six Paths': '\u2605\u2605\u2605',
+  '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂': '༒',
 };
 
 /**

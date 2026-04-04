@@ -1426,10 +1426,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Hotseat: check if the other player needs to act next
+    // Hotseat / sandbox: check if the other player needs to act next
     if (get().isHotseatGame) {
+      const isSandbox = get().isSandboxMode;
       const otherPlayer: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
       const otherPending = newState.pendingActions.filter((p) => p.player === otherPlayer);
+
+      // Sandbox mode: handle other player's pending actions directly (same player controls both)
+      if (isSandbox && otherPending.length > 0) {
+        // Switch humanPlayer temporarily to resolve other player's pending
+        const pa = otherPending[0];
+        const pe = newState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
+        const ds: PendingSelectionDataSource = {
+          playerHand: newState[otherPlayer].hand ?? [],
+          playerDiscard: newState[otherPlayer].discardPile ?? [],
+          playerDeckSize: newState[otherPlayer].deck?.length ?? 0,
+          activeMissions: (newState.activeMissions ?? []).map((m) => ({ rank: m.rank })),
+        };
+        const sel = buildPendingTargetSelectionUI(
+          pa, pe, ds, get().playerDisplayNames[otherPlayer],
+          (targetId: string) => { get().performAction({ type: 'SELECT_TARGET', pendingActionId: pa.id, selectedTargets: [targetId] }); },
+          () => { if (pe) get().performAction({ type: 'DECLINE_OPTIONAL_EFFECT', pendingEffectId: pe.id }); },
+        );
+        set({ humanPlayer: otherPlayer, visibleState: GameEngine.getVisibleState(newState, otherPlayer), isProcessing: false, pendingTargetSelection: sel });
+        return;
+      }
 
       // During mulligan: if current player has mulliganed but the other hasn't, switch
       const mulliganSwitch = newState.phase === 'mulligan' &&
@@ -1440,7 +1461,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       if (needsSwitch) {
         set({ hotseatNextPlayer: otherPlayer, isProcessing: false });
-        setTimeout(() => get().confirmHotseatSwitch(), 400);
+        setTimeout(() => get().confirmHotseatSwitch(), isSandbox ? 0 : 400);
       } else {
         set({ isProcessing: false });
       }

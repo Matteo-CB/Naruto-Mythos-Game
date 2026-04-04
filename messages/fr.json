@@ -1059,7 +1059,24 @@
     "hoverToPreview": "Survolez une carte pour voir ses details",
     "sortByCost": "Trier par cout",
     "sort": "Trier",
-    "dragToReorder": "Glissez les cartes pour les reorganiser"
+    "dragToReorder": "Glissez les cartes pour les reorganiser",
+    "hideBanned": "Masquer bannies",
+    "showBanned": "Afficher bannies",
+    "emptyDeck": "Aucune carte dans le deck",
+    "noKeyword": "Aucun mot-cle",
+    "view": {
+      "grid": "Grille",
+      "rows": "Rangees"
+    },
+    "groupBy": {
+      "chakra": "Chakra",
+      "group": "Groupe",
+      "rarity": "Rarete",
+      "power": "Puissance",
+      "keyword": "Mot-cle",
+      "effect": "Effet"
+    },
+    "noEffect": "Aucun effet"
   },
   "discord": {
     "linkDiscord": "Lier Discord",
@@ -1246,6 +1263,7 @@
       "legendarySannin": "Sannin Legendaire",
       "kage": "Kage",
       "sageOfSixPaths": "Rikudo Sennin",
+      "willOfFire": "Heritier de la Volonte du Feu",
       "unranked": "Non classe",
       "placement": "Placement : {current}/{total}"
     }
@@ -2414,7 +2432,8 @@
       "eliteJonin": "Jonin d'Elite",
       "legendarySannin": "Sannin Legendaire",
       "kage": "Kage",
-      "sageOfSixPaths": "Sage des Six Chemins"
+      "sageOfSixPaths": "Sage des Six Chemins",
+      "willOfFire": "Heritier de la Volonte du Feu"
     },
     "scheduledStart": "Lancement programme",
     "startsIn": "Commence dans {time}",

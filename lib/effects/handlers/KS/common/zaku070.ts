@@ -8,7 +8,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
  * MAIN: Opponent gains 1 Chakra.
  *
  * Gives the opponent 1 additional chakra. This is a drawback effect on an otherwise
- * high-power card. The opponent can choose to accept or decline the bonus.
+ * high-power card. Per FAQ: effects that benefit the opponent are MANDATORY.
  */
 function handleZaku070Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -20,7 +20,7 @@ function handleZaku070Main(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'ZAKU070_CONFIRM_MAIN',
     validTargets: [ctx.sourceCard.instanceId],
-    isOptional: true,
+    isOptional: false,
     selectingPlayer: opponentPlayer,
     description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.zaku070ConfirmMain',

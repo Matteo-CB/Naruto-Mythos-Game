@@ -64,30 +64,31 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex items-start gap-2 px-3 py-1.5 text-xs font-body"
+      className="flex flex-col gap-0.5 px-3 py-1.5 font-body"
       style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
     >
-      <span className="shrink-0 tabular-nums" style={{ color: '#555555' }}>
-        {formatTimestamp(entry.timestamp)}
-      </span>
-      <span
-        className="shrink-0 px-1 py-0.5 text-[10px] uppercase font-medium"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.04)',
-          color: '#777777',
-          borderLeft: '2px solid rgba(196, 163, 90, 0.2)',
-        }}
-      >
-        T{entry.turn} {formatPhase(entry.phase)}
-      </span>
-      {entry.player && (
-        <span className="shrink-0 font-medium" style={{ color: playerColor }}>
-          {displayName}
+      {/* Top line: phase + player */}
+      <div className="flex items-center gap-2 text-[10px]">
+        <span
+          className="shrink-0 px-1 py-0.5 uppercase font-medium"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            color: '#777777',
+            borderLeft: '2px solid rgba(196, 163, 90, 0.2)',
+          }}
+        >
+          T{entry.turn} {formatPhase(entry.phase)}
         </span>
-      )}
-      <span className="font-body" style={{ color: '#e0e0e0' }}>
+        {entry.player && (
+          <span className="shrink-0 font-medium" style={{ color: playerColor }}>
+            {displayName}
+          </span>
+        )}
+      </div>
+      {/* Bottom line: details */}
+      <div className="text-xs pl-1" style={{ color: '#e0e0e0' }}>
         {entry.messageKey ? t(entry.messageKey, localizeParams(entry.messageParams, locale) ?? {}) : (entry.details || entry.action)}
-      </span>
+      </div>
     </motion.div>
   );
 });

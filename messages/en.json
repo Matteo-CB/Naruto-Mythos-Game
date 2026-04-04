@@ -1059,7 +1059,24 @@
     "hoverToPreview": "Hover over a card to see its details",
     "sortByCost": "Sort by Cost",
     "sort": "Sort",
-    "dragToReorder": "Drag cards to reorder"
+    "dragToReorder": "Drag cards to reorder",
+    "hideBanned": "Hide Banned",
+    "showBanned": "Show Banned",
+    "emptyDeck": "No cards in deck",
+    "noKeyword": "No Keyword",
+    "view": {
+      "grid": "Grid",
+      "rows": "Rows"
+    },
+    "groupBy": {
+      "chakra": "Chakra",
+      "group": "Group",
+      "rarity": "Rarity",
+      "power": "Power",
+      "keyword": "Keyword",
+      "effect": "Effect"
+    },
+    "noEffect": "No Effect"
   },
   "discord": {
     "linkDiscord": "Link Discord",
@@ -1246,6 +1263,7 @@
       "legendarySannin": "Legendary Sannin",
       "kage": "Kage",
       "sageOfSixPaths": "Sage of Six Paths",
+      "willOfFire": "Inheritor of the Will of Fire",
       "unranked": "Unranked",
       "placement": "Placement: {current}/{total}"
     }
@@ -2414,7 +2432,8 @@
       "eliteJonin": "Elite Jonin",
       "legendarySannin": "Legendary Sannin",
       "kage": "Kage",
-      "sageOfSixPaths": "Sage of Six Paths"
+      "sageOfSixPaths": "Sage of Six Paths",
+      "willOfFire": "Inheritor of the Will of Fire"
     },
     "scheduledStart": "Scheduled Start",
     "startsIn": "Starts in {time}",

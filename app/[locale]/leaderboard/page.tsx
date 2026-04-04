@@ -241,7 +241,7 @@ export default function LeaderboardPage() {
                     {/* Rank */}
                     <span
                       className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
-                      style={{ color: isTop3 ? '#c4a35a' : '#555' }}
+                      style={{ color: isTop3 ? '#c4a35a' : '#555', fontFamily: 'var(--font-inter)' }}
                     >
                       {globalRank}
                     </span>
@@ -268,13 +268,13 @@ export default function LeaderboardPage() {
                     {/* ELO */}
                     <span
                       className="text-sm font-semibold tabular-nums shrink-0 w-10 text-right"
-                      style={{ color: '#e0e0e0' }}
+                      style={{ color: '#e0e0e0', fontFamily: 'var(--font-inter)' }}
                     >
                       {user.elo}
                     </span>
 
                     {/* W/L/D — desktop only */}
-                    <div className="hidden sm:flex items-center gap-1 shrink-0">
+                    <div className="hidden sm:flex items-center gap-1 shrink-0" style={{ fontFamily: 'var(--font-inter)' }}>
                       <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
                         {user.wins}W
                       </span>
@@ -287,7 +287,7 @@ export default function LeaderboardPage() {
                     </div>
 
                     {/* Win rate — desktop only */}
-                    <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888' }}>
+                    <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888', fontFamily: 'var(--font-inter)' }}>
                       {winRate}%
                     </span>
                   </div>

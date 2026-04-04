@@ -15,6 +15,7 @@ export function triggerOnDefeatEffects(
   state: GameState,
   defeatedChar: CharacterInPlay,
   defeatedCharOwner: PlayerID,
+  simultaneousDefeatIds?: string[],
 ): GameState {
   let newState = state;
 
@@ -24,6 +25,8 @@ export function triggerOnDefeatEffects(
 
       for (const char of mission[side]) {
         if (char.isHidden) continue;
+        // Skip if this trigger source is also being defeated in the same batch
+        if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
         // Tsunade 003: When any friendly character is defeated, gain 2 Chakra

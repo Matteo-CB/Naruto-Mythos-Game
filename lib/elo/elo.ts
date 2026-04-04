@@ -15,7 +15,8 @@ const K_FACTOR_LOW = 32;
 const K_FACTOR_HIGH = 16;
 const K_THRESHOLD = 2000;
 const ELO_FLOOR = 100;
-const MIN_WIN_GAIN = 5;
+const MIN_WIN_GAIN = 10;       // minimum ELO gained per victory
+const MAX_LOSS = 22;           // maximum ELO lost per defeat
 const MAX_SCORE_MARGIN = 7;
 const MARGIN_BONUS_CAP = 0.5; // +50% max for dominant wins
 const STREAK_THRESHOLD = 3;   // streaks activate at 3+
@@ -24,7 +25,7 @@ const STREAK_MAX_LEVELS = 5;  // cap at 5 levels = 40%
 const DEMOTION_SHIELD = 30;   // can't fall more than 30 below league threshold
 
 // League thresholds for demotion shield (ascending order)
-const LEAGUE_THRESHOLDS = [0, 450, 550, 700, 1000, 1200, 1500, 1700];
+const LEAGUE_THRESHOLDS = [0, 450, 550, 700, 1000, 1200, 1500, 1700, 2200];
 
 // ─── Core functions ──────────────────────────────────────────────────────────
 
@@ -183,7 +184,7 @@ export function calculateEloChanges(
   const El = expectedScore(loserElo, winnerElo);
   const rawLoseDelta = Kl * (0.0 - El); // negative
   const protection = loseStreakProtection(loserConsecLosses + 1); // +1 because this loss counts
-  const adjustedLoseDelta = Math.round(rawLoseDelta * protection);
+  const adjustedLoseDelta = Math.max(-MAX_LOSS, Math.round(rawLoseDelta * protection)); // cap loss
   let loserNewElo = Math.max(ELO_FLOOR, loserElo + adjustedLoseDelta);
   loserNewElo = applyDemotionShield(loserElo, loserNewElo);
 

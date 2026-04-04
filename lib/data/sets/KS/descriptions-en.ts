@@ -481,7 +481,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   // 071/130 - ZAKU ABUMI (UC) - "Slicing Sound Wave"
   'KS-071-UC': [
-    'If you have fewer characters in this mission than the opponent, move an enemy character from this mission.',
+    'If you have less non-hidden characters than the opponent in this mission, move an enemy character from this mission.',
     'POWERUP 2.',
   ],
 
@@ -1062,11 +1062,11 @@ export const effectDescriptionsEn: Record<string, string[]> = {
   // 115 - Shino Aburame (R/RA)
   'KS-115-R': [
     '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
-    'AMBUSH: Move a friendly character in this mission to another mission.',
+    'Move one friendly character in this mission.',
   ],
   'KS-115-RA': [
     '[⧗] Friendly characters in this mission cannot be hidden by enemy effects.',
-    'AMBUSH: Move a friendly character in this mission to another mission.',
+    'Move one friendly character in this mission.',
   ],
 
   // 127 - Sakon (R/RA)
