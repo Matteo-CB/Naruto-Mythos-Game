@@ -83,7 +83,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="relative flex items-center gap-4 rounded-lg p-4"
+                    className={`relative flex items-center gap-4 rounded-lg p-4 ${isTop ? 'sm:col-span-2' : ''}`}
                     style={{
                       backgroundColor: tier.bgColor,
                       border: `1px solid ${tier.borderColor}`,

@@ -108,6 +108,16 @@ export const RANK_TIERS: RankTier[] = [
     symbol: '\u2605\u2605\u2605',
     image: '/images/leagues/sage-of-six-paths.webp',
   },
+  {
+    key: 'willOfFire',
+    minElo: 2200,
+    color: '#FF6B35',
+    bgColor: 'rgba(255, 107, 53, 0.12)',
+    borderColor: 'rgba(255, 107, 53, 0.6)',
+    glowColor: 'rgba(255, 107, 53, 0.4)',
+    symbol: '\u2726\u2726\u2726',
+    image: '/images/leagues/will-of-fire.webp',
+  },
 ];
 
 export function getRankTier(elo: number): RankTier {

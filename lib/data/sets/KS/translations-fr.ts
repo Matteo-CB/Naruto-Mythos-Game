@@ -560,7 +560,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   // 071/130 - ZAKU ABUMI (UC) - "Onde Sonore Tranchante"
   'KS-071-UC': [
-    'Si vous avez moins de personnages dans cette mission que l\'adversaire, deplacez un personnage ennemi depuis cette mission.',
+    'Si vous avez moins de personnages non-caches dans cette mission que l\'adversaire, deplacez un personnage ennemi depuis cette mission.',
     'POWERUP 2.',
   ],
 
@@ -1072,11 +1072,11 @@ export const effectDescriptionsFr: Record<string, string[]> = {
   // 115 - Shino Aburame (R/RA)
   'KS-115-R': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'Déplacez un personnage allié dans cette mission vers une autre mission.',
+    'Deplacez un personnage allie dans cette mission.',
   ],
   'KS-115-RA': [
     '[⧗] Les personnages alliés dans cette mission ne peuvent pas être cachés par des effets ennemis.',
-    'Déplacez un personnage allié dans cette mission vers une autre mission.',
+    'Deplacez un personnage allie dans cette mission.',
   ],
 
   // 127 - Sakon (R/RA)

@@ -269,6 +269,12 @@ async function finalizeGameEnd(
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
   let gameRecordId: string | null = null;
 
+  // Pre-emptive cleanup: delete old games to free space before writing ELO/game record
+  try {
+    const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000);
+    await prisma.game.deleteMany({ where: { completedAt: { lt: cutoff }, status: 'completed' } });
+  } catch { /* ignore cleanup errors */ }
+
   // Apply ELO changes (separate try-catch so game record save still works if ELO fails)
   try {
     if (room.isRanked && room.hostId && room.guestId) {
@@ -333,15 +339,47 @@ async function finalizeGameEnd(
       }
     }
   } catch (eloErr) {
-    console.error('[Socket] ELO update error:', eloErr instanceof Error ? eloErr.message : eloErr);
+    const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
+    console.error('[Socket] ELO update error:', errMsg);
+    // If quota exceeded, force cleanup and retry ELO update once
+    if (errMsg.includes('quota') || errMsg.includes('AtlasError')) {
+      try {
+        console.log('[Socket] DB quota exceeded — force deleting old games and retrying ELO...');
+        await prisma.game.deleteMany({ where: { status: 'completed' } });
+        if (room.isRanked && room.hostId && room.guestId) {
+          const [p1Retry, p2Retry] = await Promise.all([
+            prisma.user.findUnique({ where: { id: room.hostId } }),
+            prisma.user.findUnique({ where: { id: room.guestId! } }),
+          ]);
+          if (p1Retry && p2Retry) {
+            const retryChanges = calculateEloChanges({
+              player1Elo: p1Retry.elo, player2Elo: p2Retry.elo,
+              winner: winner === 'player1' ? 'player1' : 'player2',
+              player1Score: p1Score, player2Score: p2Score,
+              player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
+              player2ConsecWins: p2Retry.consecutiveWins ?? 0, player2ConsecLosses: p2Retry.consecutiveLosses ?? 0,
+            });
+            const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+            const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+            const [uP1, uP2] = await Promise.all([
+              prisma.user.update({ where: { id: room.hostId }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
+              prisma.user.update({ where: { id: room.guestId! }, data: { elo: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } }),
+            ]);
+            eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: uP1.elo, player2NewElo: uP2.elo, player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
+            console.log('[Socket] ELO retry succeeded after quota cleanup');
+          }
+        }
+      } catch (retryErr) {
+        console.error('[Socket] ELO retry also failed:', retryErr instanceof Error ? retryErr.message : retryErr);
+      }
+    }
   }
 
   // Persist game record (separate try-catch so ELO still works if save fails)
   try {
     if (room.hostId && room.guestId) {
-      const rawHistory = room.gameState?.actionHistory ?? [];
       const replayForDb = room.gameState ? {
-        log: room.gameState.log.length > 500 ? room.gameState.log.slice(-500) : room.gameState.log,
+        log: room.gameState.log,
         playerNames: {
           player1: room.hostName ?? 'Player 1',
           player2: room.guestName ?? 'Player 2',
@@ -354,7 +392,7 @@ async function finalizeGameEnd(
           wonBy: m.wonBy ?? null,
         })),
         initialState: room.replayInitialState,
-        actionHistory: rawHistory.length > 300 ? rawHistory.slice(-300) : rawHistory,
+        actionHistory: room.gameState.actionHistory ?? [],
       } : null;
 
       const gameRecord = await prisma.game.create({
@@ -867,6 +905,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
+
+  // Periodic DB cleanup: delete games older than 12 hours (every 30 minutes)
+  setInterval(async () => {
+    try {
+      const { cleanupOldGames } = await import('@/lib/db/gameCleanup');
+      await cleanupOldGames();
+    } catch { /* ignore */ }
+  }, 30 * 60 * 1000);
 
   // Check for scheduled tournament auto-starts (every 30 seconds)
   setInterval(async () => {

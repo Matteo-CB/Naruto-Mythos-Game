@@ -3744,7 +3744,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Move a friendly character in this mission to another mission.",
+          "description": "Move one friendly character in this mission.",
           "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
         }
       ],
@@ -5853,7 +5853,7 @@
         },
         {
           "type": "AMBUSH",
-          "description": "Move a friendly character in this mission to another mission.",
+          "description": "Move one friendly character in this mission.",
           "description_fr": "Déplacez un personnage allié dans cette mission vers une autre mission."
         }
       ],

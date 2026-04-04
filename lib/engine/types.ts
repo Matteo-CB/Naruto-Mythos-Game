@@ -181,6 +181,7 @@ export interface GameState {
     remainingEffectTypes: EffectType[];
     isUpgrade: boolean;
     wasRevealed: boolean;
+    chainData?: Record<string, unknown>;
   };
   /** Consecutive timeout count per player (online timer) */
   consecutiveTimeouts: { player1: number; player2: number };

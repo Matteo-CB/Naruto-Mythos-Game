@@ -86,6 +86,10 @@ export function resumeMissionScoring(state: GameState): GameState {
         // Only run Orochimaru 051 if it wasn't already handled before SCORE (edge token case)
         if (!(newState.edgeHolder === missionLoser && checkOrochimaru051OnMission(newState, missionIdx, missionLoser))) {
           newState = handleOrochimaru051Move(newState, missionIdx, missionWinner);
+          // If Orochimaru created a pending (destination choice), wait for resolution
+          if (newState.pendingActions.length > 0) {
+            return newState;
+          }
         }
       }
     }
@@ -250,22 +254,28 @@ function collectScoreEffectSources(
 ): ScoreEffectSource[] {
   const mission = state.activeMissions[missionIndex];
   const sources: ScoreEffectSource[] = [];
+  // Skip already-processed effects (prevents double-trigger on resume)
+  const processed = state.missionScoringProgress?.processedCharacterIds ?? [];
+  const missionScoreDone = state.missionScoringProgress?.missionCardScoreDone ?? false;
 
   // Mission card SCORE effects
-  const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
-  if (hasMissionScore) {
-    const scoreEffect = (mission.card.effects ?? []).find((e) => e.type === 'SCORE');
-    sources.push({
-      cardId: mission.card.id,
-      instanceId: null,
-      label: `${mission.card.name_fr} (Mission) - ${scoreEffect?.description ?? 'SCORE'}`,
-    });
+  if (!missionScoreDone) {
+    const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
+    if (hasMissionScore) {
+      const scoreEffect = (mission.card.effects ?? []).find((e) => e.type === 'SCORE');
+      sources.push({
+        cardId: mission.card.id,
+        instanceId: null,
+        label: `${mission.card.name_fr} (Mission) - ${scoreEffect?.description ?? 'SCORE'}`,
+      });
+    }
   }
 
   // Winner's character SCORE effects
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const char of chars) {
     if (char.isHidden) continue;
+    if (processed.includes(char.instanceId)) continue; // Already resolved
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;

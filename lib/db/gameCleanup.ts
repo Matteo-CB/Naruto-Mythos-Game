@@ -1,6 +1,6 @@
 import { prisma } from './prisma';
 
-const GAME_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const GAME_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 let lastCleanup = 0;
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // Run at most once per hour

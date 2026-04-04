@@ -8251,31 +8251,45 @@ export class EffectEngine {
       }
 
       case 'SHINO115_CONFIRM_AMBUSH': {
+        // Move a friendly character FROM another mission TO Shino's mission
         const s115Player = pendingEffect.sourcePlayer;
         const s115Side: 'player1Characters' | 'player2Characters' =
           s115Player === 'player1' ? 'player1Characters' : 'player2Characters';
-        const s115MI = pendingEffect.sourceMissionIndex;
-        const s115Mission = newState.activeMissions[s115MI];
-        if (!s115Mission || newState.activeMissions.length < 2) {
+        const s115MI = pendingEffect.sourceMissionIndex; // Shino's mission (destination)
+        if (newState.activeMissions.length < 2) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
-            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: No valid targets (state changed).',
+            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: Only 1 mission in play.',
             'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
           break;
         }
-        // Check Kurenai block
-        if (isMovementBlockedByKurenai(newState, s115MI, s115Player)) {
-          newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
-            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: Movement blocked by Kurenai.',
-            'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
-          break;
+        const s115DestChars = newState.activeMissions[s115MI][s115Side];
+        // Find friendly characters in OTHER missions that can move to Shino's mission
+        const s115Targets: string[] = [];
+        for (let i = 0; i < newState.activeMissions.length; i++) {
+          if (i === s115MI) continue;
+          if (isMovementBlockedByKurenai(newState, i, s115Player)) continue;
+          for (const c of newState.activeMissions[i][s115Side]) {
+            // Name conflict check on destination
+            if (!c.isHidden) {
+              const topC = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
+              const cName = topC.name_fr.toUpperCase();
+              if (s115DestChars.some((dc: CharacterInPlay) => dc.instanceId !== c.instanceId && !dc.isHidden && (dc.stack?.length > 0 ? dc.stack[dc.stack.length - 1] : dc.card).name_fr.toUpperCase() === cName)) continue;
+            }
+            s115Targets.push(c.instanceId);
+          }
         }
-        const s115Targets: string[] = s115Mission[s115Side]
-          .filter((c: CharacterInPlay) => c.instanceId !== pendingEffect.sourceInstanceId)
-          .map((c: CharacterInPlay) => c.instanceId);
         if (s115Targets.length === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, s115Player,
-            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: No friendly characters to move (state changed).',
+            'EFFECT_NO_TARGET', 'Shino Aburame (115) AMBUSH: No friendly character in another mission to move here.',
             'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-115-R' });
+          break;
+        }
+        if (s115Targets.length === 1) {
+          // Auto-move the only target to Shino's mission
+          newState = EffectEngine.moveCharToMissionDirectPublic(
+            newState, s115Targets[0], s115MI,
+            s115Player, 'Shino Aburame', 'KS-115-R',
+          );
           break;
         }
         {
@@ -8285,7 +8299,8 @@ export class EffectEngine {
             id: s115EffId, sourceCardId: pendingEffect.sourceCardId,
             sourceInstanceId: pendingEffect.sourceInstanceId,
             sourceMissionIndex: s115MI, effectType: pendingEffect.effectType,
-            effectDescription: '', targetSelectionType: 'SHINO115_MOVE_FRIENDLY',
+            effectDescription: JSON.stringify({ destMissionIndex: s115MI }),
+            targetSelectionType: 'SHINO115_MOVE_FRIENDLY',
             sourcePlayer: s115Player, requiresTargetSelection: true,
             validTargets: s115Targets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
@@ -8293,7 +8308,7 @@ export class EffectEngine {
           newState.pendingActions.push({
             id: s115ActId, type: 'SELECT_TARGET' as PendingAction['type'],
             player: s115Player,
-            description: 'Shino Aburame (115) AMBUSH: Choose a friendly character to move.',
+            description: 'Shino Aburame (115) AMBUSH: Choose a friendly character to move to this mission.',
             descriptionKey: 'game.effect.desc.shino115MoveFriendly',
             options: s115Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: s115EffId,
@@ -10143,13 +10158,22 @@ export class EffectEngine {
       // =============================================
       // MOVE types (two-stage: character selection â†' destination selection)
       // =============================================
+      case 'SHINO115_MOVE_FRIENDLY': {
+        // Fixed destination: move to Shino's mission (sourceMissionIndex)
+        let s115Dest = pendingEffect.sourceMissionIndex;
+        try { const d = JSON.parse(pendingEffect.effectDescription); s115Dest = d.destMissionIndex ?? s115Dest; } catch { /* use sourceMissionIndex */ }
+        newState = EffectEngine.moveCharToMissionDirectPublic(
+          newState, targetId, s115Dest,
+          pendingEffect.sourcePlayer, 'Shino Aburame', 'KS-115-R',
+        );
+        break;
+      }
       case 'JIRAIYA105_MOVE_ENEMY':
       case 'KANKURO119_MOVE_CHARACTER':
       case 'TEMARI121_MOVE_FRIENDLY':
       case 'TEMARI121_MOVE_ANY':
       case 'ITACHI152_CHOOSE_MOVE':
-      case 'ITACHI128_MOVE_FRIENDLY':
-      case 'SHINO115_MOVE_FRIENDLY': {
+      case 'ITACHI128_MOVE_FRIENDLY': {
         // Stage 1: player chose which character to move. Now prompt for destination mission.
         const moveCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
         if (moveCharResult) {
@@ -12686,9 +12710,11 @@ export class EffectEngine {
         try { odParsed = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
         // Naruto 133 non-upgrade: hide instead of defeat
         const odUseDefeat = odParsed.useDefeat !== false; // default true (Gaara, Ichibi always defeat)
+        // Simultaneous batch: pass all IDs so on-defeat triggers (Tsunade 003) skip
+        // characters that are also being defeated in this same batch
         for (const charId of odList) {
           if (odUseDefeat) {
-            newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer);
+            newState = EffectEngine.defeatCharacter(newState, charId, pendingEffect.sourcePlayer, odList);
           } else {
             newState = EffectEngine.hideCharacterWithLog(newState, charId, pendingEffect.sourcePlayer);
           }
@@ -13215,25 +13241,11 @@ export class EffectEngine {
         }
 
         // Process all batch targets, skipping the protected character
+        // Gemma already sacrificed — skip all further protection checks (skipProtection = true)
         let batchHiddenCount = 0;
         for (const batchTargetId of batchAll) {
           if (batchTargetId === protectedCharId) continue; // Skip the protected char
-          const pendingCountBefore = newState.pendingEffects.length;
-          newState = EffectEngine.hideCharacterWithLog(newState, batchTargetId, batchSourceP);
-          // If another Gemma pending was created (shouldn't happen since Gemma is gone)
-          const newGemmaPending = newState.pendingEffects.find(
-            (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
-              && newState.pendingEffects.length > pendingCountBefore,
-          );
-          if (newGemmaPending) {
-            const restIds = batchAll.slice(batchAll.indexOf(batchTargetId) + 1).filter(id => id !== protectedCharId);
-            const desc = JSON.parse(newGemmaPending.effectDescription);
-            desc.batchRemainingTargets = restIds;
-            desc.batchSourcePlayer = batchSourceP;
-            desc.batchHiddenCount = batchHiddenCount;
-            newGemmaPending.effectDescription = JSON.stringify(desc);
-            break;
-          }
+          newState = EffectEngine.hideCharacterWithLog(newState, batchTargetId, batchSourceP, true);
           const charAfter = EffectEngine.findCharByInstanceId(newState, batchTargetId);
           if (charAfter && charAfter.character.isHidden) batchHiddenCount++;
         }
@@ -14949,6 +14961,11 @@ export class EffectEngine {
       const hasOtherPendings = newState.pendingEffects.length > 0 || newState.pendingActions.length > 0;
       if (hasOtherPendings) {
         // Store continuation on state — GameEngine will fire it after reactions resolve
+        // Preserve temp chain data (e.g. _tsunade104ChakraSpent) so UPGRADE handlers can read it
+        const chainData: Record<string, unknown> = {};
+        if ((newState as any)._tsunade104ChakraSpent !== undefined) {
+          chainData._tsunade104ChakraSpent = (newState as any)._tsunade104ChakraSpent;
+        }
         newState.pendingContinuation = {
           sourceCardId: pendingEffect.sourceCardId,
           sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -14957,6 +14974,7 @@ export class EffectEngine {
           remainingEffectTypes: [...pendingEffect.remainingEffectTypes],
           isUpgrade: pendingEffect.isUpgrade,
           wasRevealed: pendingEffect.wasRevealed ?? false,
+          chainData: Object.keys(chainData).length > 0 ? chainData : undefined,
         };
       } else {
         // No reactions — chain immediately (same as before)
@@ -15642,7 +15660,7 @@ export class EffectEngine {
     return newState;
   }
 
-  static defeatCharacter(state: GameState, targetId: string, sourcePlayer?: PlayerID): GameState {
+  static defeatCharacter(state: GameState, targetId: string, sourcePlayer?: PlayerID, simultaneousDefeatIds?: string[]): GameState {
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult) {
       console.warn(`[EffectEngine] defeatCharacter: character ${targetId} not found in any mission. Cannot defeat.`);
@@ -15722,7 +15740,8 @@ export class EffectEngine {
       ),
     };
     // Trigger on-defeat effects (Tsunade 003, Sasuke 136)
-    newState = triggerOnDefeatEffects(newState, charResult.character, charResult.player);
+    // Skip triggers from characters also dying in the same simultaneous batch
+    newState = triggerOnDefeatEffects(newState, charResult.character, charResult.player, simultaneousDefeatIds);
     return newState;
   }
 
@@ -16345,27 +16364,9 @@ export class EffectEngine {
    *  Hides remaining targets that were deferred when Gemma's sacrifice interrupted the batch. */
   static resumeBatchHideAfterGemma(state: GameState, remainingTargetIds: string[], batchSourcePlayer: PlayerID): GameState {
     let currentState = state;
-    let hiddenCount = 0;
+    // Gemma already sacrificed — skip all protection checks for remaining targets
     for (const targetId of remainingTargetIds) {
-      const pendingCountBefore = currentState.pendingEffects.length;
-      currentState = EffectEngine.hideCharacterWithLog(currentState, targetId, batchSourcePlayer);
-      // If another Gemma pending was created (shouldn't happen since Gemma is gone, but just in case)
-      const newGemmaPending = currentState.pendingEffects.find(
-        (pe) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
-          && currentState.pendingEffects.length > pendingCountBefore,
-      );
-      if (newGemmaPending) {
-        // Store remaining targets in this new pending too
-        const restIds = remainingTargetIds.slice(remainingTargetIds.indexOf(targetId) + 1);
-        const desc = JSON.parse(newGemmaPending.effectDescription);
-        desc.batchRemainingTargets = restIds;
-        desc.batchSourcePlayer = batchSourcePlayer;
-        desc.batchHiddenCount = hiddenCount;
-        newGemmaPending.effectDescription = JSON.stringify(desc);
-        break;
-      }
-      const charAfter = EffectEngine.findCharByInstanceId(currentState, targetId);
-      if (charAfter && charAfter.character.isHidden) hiddenCount++;
+      currentState = EffectEngine.hideCharacterWithLog(currentState, targetId, batchSourcePlayer, true);
     }
     return currentState;
   }

@@ -9,7 +9,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
  * MAIN: Opponent draws a card.
  *
  * Makes the opponent draw 1 card from their deck. This is a drawback effect on an otherwise
- * efficient card. The opponent can choose to accept or decline the draw.
+ * efficient card. Per FAQ: effects that benefit the opponent are MANDATORY.
  */
 function handleKin072Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -36,7 +36,7 @@ function handleKin072Main(ctx: EffectContext): EffectResult {
     requiresTargetSelection: true,
     targetSelectionType: 'KIN072_CONFIRM_MAIN',
     validTargets: [ctx.sourceCard.instanceId],
-    isOptional: true,
+    isOptional: false,
     selectingPlayer: opponentPlayer,
     description: JSON.stringify({ sourceCardInstanceId: ctx.sourceCard.instanceId }),
     descriptionKey: 'game.effect.desc.kin072ConfirmMain',

@@ -65,9 +65,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(deck, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error('[API /decks POST]', err instanceof Error ? err.message : err);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: err instanceof Error ? err.message : 'Unknown' },
       { status: 500 },
     );
   }

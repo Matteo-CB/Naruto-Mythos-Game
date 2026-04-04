@@ -7,7 +7,7 @@ import { Link } from "@/lib/i18n/navigation";
 import type { CharacterCard, MissionCard } from "@/lib/engine/types";
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
-// Ban list enforced server-side in ranked/tournament only — deck builder allows all cards
+import { useBannedCards } from "@/lib/hooks/useBannedCards";
 import { normalizeImagePath } from "@/lib/utils/imagePath";
 import {
   getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel,
@@ -32,6 +32,51 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
 };
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+// ───────────────────── EFFECT FUNCTION CLASSIFIER ─────────────────────
+// Classifies a card's effects into gameplay categories based on description keywords
+
+type EffectFunction = 'defeat' | 'hide' | 'draw' | 'move' | 'powerup' | 'chakra' | 'control' | 'play' | 'protect' | 'continuous' | 'score';
+
+const EFFECT_FN_PATTERNS: Array<{ fn: EffectFunction; patterns: RegExp[] }> = [
+  { fn: 'defeat', patterns: [/defeat/i, /destroy/i, /vainc/i] },
+  { fn: 'hide', patterns: [/\bhide\b/i, /\bhidden\b/i, /cach[eé]/i] },
+  { fn: 'draw', patterns: [/\bdraw\b/i, /\bpioch/i, /\btop card of.*deck/i] },
+  { fn: 'move', patterns: [/\bmove\b/i, /\bdeplace/i] },
+  { fn: 'powerup', patterns: [/powerup/i, /power token/i, /puissance/i] },
+  { fn: 'chakra', patterns: [/chakra \+/i, /\bgain.*chakra/i, /\bsteal.*chakra/i, /\bchakra/i] },
+  { fn: 'control', patterns: [/take control/i, /prendre le controle/i, /control of/i] },
+  { fn: 'play', patterns: [/\bplay a\b/i, /\bplay.*from\b/i, /\breveal\b/i, /\bjouer\b/i, /\brevel/i] },
+  { fn: 'protect', patterns: [/instead of/i, /cannot be/i, /\bprotect/i, /\bne peut pas/i, /au lieu/i] },
+  { fn: 'continuous', patterns: [/\[⧗\]/] },
+  { fn: 'score', patterns: [/\[↯\]/] },
+];
+
+function classifyCardEffects(card: { effects?: Array<{ description: string }> }): EffectFunction[] {
+  if (!card.effects || card.effects.length === 0) return [];
+  const fns = new Set<EffectFunction>();
+  for (const eff of card.effects) {
+    const desc = eff.description;
+    for (const { fn, patterns } of EFFECT_FN_PATTERNS) {
+      if (patterns.some((p) => p.test(desc))) fns.add(fn);
+    }
+  }
+  return Array.from(fns);
+}
+
+const EFFECT_FN_LABELS: Record<EffectFunction, { en: string; fr: string }> = {
+  defeat: { en: 'Defeat', fr: 'Defaite' },
+  hide: { en: 'Hide', fr: 'Cacher' },
+  draw: { en: 'Draw', fr: 'Piocher' },
+  move: { en: 'Move', fr: 'Deplacer' },
+  powerup: { en: 'Power Up', fr: 'Puissance+' },
+  chakra: { en: 'Chakra', fr: 'Chakra' },
+  control: { en: 'Control', fr: 'Controle' },
+  play: { en: 'Play/Reveal', fr: 'Jouer/Reveler' },
+  protect: { en: 'Protect', fr: 'Protection' },
+  continuous: { en: 'Continuous', fr: 'Continu' },
+  score: { en: 'Score', fr: 'Score' },
+};
 
 // ───────────────────── ADVANCED SEARCH PARSER ─────────────────────
 
@@ -60,6 +105,7 @@ interface SearchFilter {
   effectAmbushText: Array<{ value: string; negated: boolean }>;
   effectScoreText: Array<{ value: string; negated: boolean }>;
   nameVersions: Array<{ value: string; negated: boolean }>;
+  effectFunctions: Array<{ value: string; negated: boolean }>;
 }
 
 function emptyFilter(): SearchFilter {
@@ -68,6 +114,7 @@ function emptyFilter(): SearchFilter {
     rarities: [], sets: [], effects: [], effectText: [],
     effectMainText: [], effectMainInstantText: [], effectMainContinuousText: [],
     effectUpgradeText: [], effectAmbushText: [], effectScoreText: [], nameVersions: [],
+    effectFunctions: [],
   };
 }
 
@@ -79,7 +126,7 @@ function parseSearchQuery(raw: string): SearchFilter {
   normalized = normalized.replace(/(\w+):?\[([^\]]+)\](\+\S+)?/g, (_, key, content, suffix) => `${key}:"${content}${suffix ?? ''}"`);
 
   // Match tokens: optional - prefix, key, operator, value (quoted, bracketed, or word)
-  const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgres])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
+  const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgresf])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
   let remaining = normalized;
 
   let match: RegExpExecArray | null;
@@ -131,6 +178,7 @@ function parseSearchQuery(raw: string): SearchFilter {
         case 'eup': filter.effectUpgradeText.push({ value: normalizeStr(val), negated }); break;
         case 'ea': filter.effectAmbushText.push({ value: normalizeStr(val), negated }); break;
         case 'es': filter.effectScoreText.push({ value: normalizeStr(val), negated }); break;
+        case 'f': filter.effectFunctions.push({ value: normalizeStr(val), negated }); break;
       }
     }
   }
@@ -250,6 +298,14 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   if (!matchEffText(filter.effectUpgradeText, (e) => e.type === 'UPGRADE')) return false;
   if (!matchEffText(filter.effectAmbushText, (e) => e.type === 'AMBUSH')) return false;
   if (!matchEffText(filter.effectScoreText, (e) => e.type === 'SCORE')) return false;
+  // Effect function filter (f:defeat, f:hide, f:draw, etc.)
+  if (filter.effectFunctions.length > 0) {
+    const cardFns = classifyCardEffects(card);
+    const fnPos = filter.effectFunctions.filter((f) => !f.negated);
+    const fnNeg = filter.effectFunctions.filter((f) => f.negated);
+    if (fnPos.length > 0 && !fnPos.some((f) => cardFns.some((fn) => fn.includes(f.value)))) return false;
+    for (const f of fnNeg) { if (cardFns.some((fn) => fn.includes(f.value))) return false; }
+  }
   return true;
 }
 
@@ -426,7 +482,12 @@ export default function DeckBuilderPage() {
   const canAddMission = useDeckBuilderStore((s) => s.canAddMission);
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
-  // Ban list not enforced in deck builder — only in ranked/tournament server-side
+  const { bannedIds } = useBannedCards();
+  const [showBanned, setShowBanned] = useState(true);
+  type DeckViewMode = 'grid' | 'rows';
+  type DeckGroupBy = 'chakra' | 'group' | 'rarity' | 'power' | 'keyword' | 'effect';
+  const [deckViewMode, setDeckViewMode] = useState<DeckViewMode>('grid');
+  const [deckGroupBy, setDeckGroupBy] = useState<DeckGroupBy>('chakra');
 
   // ───── DATA LOADING ─────
   useEffect(() => {
@@ -472,6 +533,7 @@ export default function DeckBuilderPage() {
 
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
+    if (!showBanned) chars = chars.filter((c) => !bannedIds.has(c.id));
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }
@@ -486,9 +548,12 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showBanned, bannedIds]);
 
-  const filteredMissions = useMemo(() => [...availableMissions], [availableMissions]);
+  const filteredMissions = useMemo(() => {
+    if (!showBanned) return availableMissions.filter((m) => !bannedIds.has(m.id));
+    return [...availableMissions];
+  }, [availableMissions, showBanned, bannedIds]);
 
   // ───── DECK COMPUTATIONS ─────
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
@@ -524,6 +589,45 @@ export default function DeckBuilderPage() {
     });
     return Array.from(groups.entries()).sort((a, b) => a[0] - b[0]);
   }, [deckChars]);
+
+  // Grouped deck rows for horizontal view
+  const deckGroupedRows = useMemo(() => {
+    const groups = new Map<string, { card: CharacterCard; idx: number }[]>();
+    deckChars.forEach((card, i) => {
+      if (deckGroupBy === 'effect') {
+        // A card can belong to multiple effect groups
+        const fns = classifyCardEffects(card);
+        if (fns.length === 0) {
+          const arr = groups.get('-') || [];
+          arr.push({ card, idx: i });
+          groups.set('-', arr);
+        } else {
+          for (const fn of fns) {
+            const arr = groups.get(fn) || [];
+            arr.push({ card, idx: i });
+            groups.set(fn, arr);
+          }
+        }
+      } else {
+        let key: string;
+        switch (deckGroupBy) {
+          case 'chakra': key = String(card.chakra ?? 0); break;
+          case 'power': key = String(card.power ?? 0); break;
+          case 'group': key = card.group || 'Independent'; break;
+          case 'rarity': key = card.rarity; break;
+          case 'keyword': key = (card.keywords?.[0]) || '-'; break;
+        }
+        const arr = groups.get(key) || [];
+        arr.push({ card, idx: i });
+        groups.set(key, arr);
+      }
+    });
+    return Array.from(groups.entries()).sort((a, b) => {
+      if (deckGroupBy === 'chakra' || deckGroupBy === 'power') return Number(a[0]) - Number(b[0]);
+      if (deckGroupBy === 'rarity') return (RARITY_ORDER[a[0] as keyof typeof RARITY_ORDER] ?? 99) - (RARITY_ORDER[b[0] as keyof typeof RARITY_ORDER] ?? 99);
+      return a[0].localeCompare(b[0]);
+    });
+  }, [deckChars, deckGroupBy]);
 
   // Info panel data for the currently previewed card
   const previewAddCheck = useMemo(() => {
@@ -1074,8 +1178,8 @@ export default function DeckBuilderPage() {
 
       <SectionDivider width={100} />
 
-      {/* Sort button — always visible, greyed out when deck empty */}
-      <div className="flex items-center gap-2 mb-2">
+      {/* View controls */}
+      <div className="flex items-center gap-2 mb-2 flex-wrap">
         <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
           className="px-2 py-0.5 text-[9px] uppercase font-bold"
           style={{
@@ -1086,30 +1190,91 @@ export default function DeckBuilderPage() {
           }}>
           {t("deckBuilder.sortByCost")}
         </button>
+        <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+        {/* View mode toggle */}
+        {(['grid', 'rows'] as DeckViewMode[]).map((m) => (
+          <button key={m} onClick={() => setDeckViewMode(m)}
+            className="px-2 py-0.5 text-[9px] uppercase font-bold"
+            style={{
+              backgroundColor: deckViewMode === m ? 'rgba(196,163,90,0.12)' : 'rgba(255,255,255,0.02)',
+              borderBottom: deckViewMode === m ? '2px solid #c4a35a' : '2px solid transparent',
+              color: deckViewMode === m ? '#c4a35a' : '#555',
+            }}>
+            {t(`deckBuilder.view.${m}`)}
+          </button>
+        ))}
+        {/* Group by selector (only in rows mode) */}
+        {deckViewMode === 'rows' && (
+          <>
+            <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            {(['chakra', 'group', 'rarity', 'power', 'keyword', 'effect'] as DeckGroupBy[]).map((g) => (
+              <button key={g} onClick={() => setDeckGroupBy(g)}
+                className="px-1.5 py-0.5 text-[8px] uppercase font-bold"
+                style={{
+                  backgroundColor: deckGroupBy === g ? 'rgba(196,163,90,0.1)' : 'transparent',
+                  color: deckGroupBy === g ? '#c4a35a' : '#444',
+                  borderBottom: deckGroupBy === g ? '1px solid #c4a35a' : '1px solid transparent',
+                }}>
+                {t(`deckBuilder.groupBy.${g}`)}
+              </button>
+            ))}
+          </>
+        )}
       </div>
 
-      {/* Character grid — always shows 30 slots minimum */}
-      <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
-        {Array.from({ length: Math.max(30, deckChars.length) }).map((_, i) => {
-          const card = deckChars[i];
-          if (card) {
+      {/* Character cards — grid or rows view */}
+      {deckViewMode === 'grid' ? (
+        <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
+          {Array.from({ length: Math.max(30, deckChars.length) }).map((_, i) => {
+            const card = deckChars[i];
+            if (card) {
+              return (
+                <DeckCard
+                  key={`${card.id}-${i}`}
+                  card={card}
+                  idx={i}
+                  onRemove={handleRemoveChar}
+                  onHover={handlePreview}
+                />
+              );
+            }
             return (
-              <DeckCard
-                key={`${card.id}-${i}`}
-                card={card}
-                idx={i}
-                onRemove={handleRemoveChar}
-                onHover={handlePreview}
-              />
+              <div key={`empty-${i}`} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
+                <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.12 }} draggable={false} />
+              </div>
             );
-          }
-          return (
-            <div key={`empty-${i}`} className="relative overflow-hidden" style={{ aspectRatio: '5/7', backgroundColor: '#0a0a0a' }}>
-              <img src="/images/card-back.webp" alt="" className="w-full h-full object-cover" style={{ opacity: 0.12 }} draggable={false} />
-            </div>
-          );
-        })}
-      </div>
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {deckGroupedRows.length === 0 ? (
+            <div className="text-[10px] text-center py-4" style={{ color: '#444' }}>{t("deckBuilder.emptyDeck")}</div>
+          ) : deckGroupedRows.map(([groupKey, cards]) => {
+            const label = deckGroupBy === 'chakra' ? `${t("deckBuilder.groupBy.chakra")} ${groupKey}`
+              : deckGroupBy === 'power' ? `${t("deckBuilder.groupBy.power")} ${groupKey}`
+              : deckGroupBy === 'rarity' ? getRarityLabel(groupKey, loc)
+              : deckGroupBy === 'group' ? getCardGroup(groupKey, loc)
+              : deckGroupBy === 'effect' ? (groupKey === '-' ? t("deckBuilder.noEffect") : (EFFECT_FN_LABELS[groupKey as EffectFunction]?.[loc as 'en' | 'fr'] ?? groupKey))
+              : groupKey === '-' ? t("deckBuilder.noKeyword") : getCardKeyword(groupKey, loc);
+            return (
+              <div key={groupKey}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[9px] uppercase font-bold" style={{ color: '#c4a35a', letterSpacing: '0.08em' }}>{label}</span>
+                  <span className="text-[8px]" style={{ color: '#555' }}>({cards.length})</span>
+                  <div className="flex-1 h-px" style={{ backgroundColor: 'rgba(196,163,90,0.15)' }} />
+                </div>
+                <div className="flex gap-1 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#333 transparent' }}>
+                  {cards.map(({ card, idx }) => (
+                    <div key={`${card.id}-${idx}`} className="flex-shrink-0" style={{ width: '60px' }}>
+                      <DeckCard card={card} idx={idx} onRemove={handleRemoveChar} onHover={handlePreview} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 
@@ -1297,6 +1462,24 @@ export default function DeckBuilderPage() {
               {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
             </div>
           </div>
+
+          {/* Banned toggle */}
+          {bannedIds.size > 0 && (
+            <div className="px-3 pb-1 flex-shrink-0">
+              <button
+                onClick={() => setShowBanned(!showBanned)}
+                className="text-[9px] uppercase font-bold px-2 py-1"
+                style={{
+                  backgroundColor: showBanned ? 'rgba(179,62,62,0.1)' : 'rgba(62,139,62,0.1)',
+                  borderLeft: `2px solid ${showBanned ? '#b33e3e' : '#3e8b3e'}`,
+                  color: showBanned ? '#b33e3e' : '#3e8b3e',
+                }}
+              >
+                {showBanned ? t("deckBuilder.hideBanned") : t("deckBuilder.showBanned")}
+                {' '}({bannedIds.size})
+              </button>
+            </div>
+          )}
 
           {/* Scrollable card grid */}
           <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>
