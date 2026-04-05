@@ -50,7 +50,11 @@ export default function TournamentDetailPage() {
   const myAbsenceDeadline = myMatch?.absenceDeadline ? myMatch.absenceDeadline : null;
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
-  useEffect(() => { if (tournamentId && session?.user) fetchTournament(tournamentId); return () => { clearActiveTournament(); }; }, [tournamentId, session, fetchTournament, clearActiveTournament]);
+  useEffect(() => {
+    if (tournamentId && session?.user) fetchTournament(tournamentId);
+    return () => { clearActiveTournament(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tournamentId, session?.user?.id]);
 
   // Auto-connect socket for tournament real-time events
   useEffect(() => {
@@ -173,17 +177,44 @@ export default function TournamentDetailPage() {
     }).catch(() => {});
   }, []);
 
+  // Compute Swiss standings — must be before any early returns (React hooks rules)
+  const tour = activeTournament;
+  const isSwiss = tour?.format === 'swiss';
+  const swissStandings: SwissStandingEntry[] = useMemo(() => {
+    if (!isSwiss || !tour) return [];
+    if (tour.standings && tour.standings.length > 0) {
+      return tour.standings.map((s) => ({
+        userId: s.userId, username: s.username, rank: s.rank,
+        wins: s.wins, losses: s.losses, draws: s.draws,
+        matchPoints: s.matchPoints, buchholz: s.buchholz, buchholzExtended: s.buchholzExtended,
+        seed: s.seed, hadBye: s.hadBye,
+      }));
+    }
+    if (tour.matches.length === 0 || tour.participants.length === 0) return [];
+    const players = tour.participants.map((p) => ({ userId: p.userId, username: p.username, seed: p.seed ?? 0 }));
+    const results: SwissMatchResult[] = tour.matches
+      .filter((m) => m.status === 'completed' || m.status === 'forfeit' || m.isBye)
+      .map((m) => ({ round: m.round, player1Id: m.player1Id ?? '', player2Id: m.player2Id ?? '', winnerId: m.winnerId, isBye: m.isBye }));
+    if (results.length === 0) {
+      return players.sort((a, b) => a.seed - b.seed).map((p, i) => ({
+        userId: p.userId, username: p.username, rank: i + 1,
+        wins: 0, losses: 0, draws: 0, matchPoints: 0, buchholz: 0, buchholzExtended: 0,
+        seed: p.seed, hadBye: false,
+      }));
+    }
+    try { return computeStandings(players, results); } catch { return []; }
+  }, [isSwiss, tour?.standings, tour?.matches, tour?.participants]);
+
   if (status === 'loading' || status === 'unauthenticated') {
     return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</p></div>);
   }
-  if (loading && !activeTournament) {
+  if (loading && !tour) {
     return (<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm" style={{ color: '#888888' }}>{tc('loading')}</p></div>);
   }
-  if (!activeTournament) {
+  if (!tour) {
     return (<div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}><p className="text-sm mb-4" style={{ color: '#888888' }}>{t('notFound')}</p><Link href={'/tournaments' as '/'} className="text-sm transition-colors" style={{ color: '#c4a35a' }}>{t('backToList')}</Link></div>);
   }
 
-  const tour = activeTournament;
   const statusKey = tour.status === 'registration' ? 'statusRegistration' : tour.status === 'in_progress' ? 'statusInProgress' : tour.status === 'completed' ? 'statusCompleted' : 'statusCancelled';
   const modeKey = tour.gameMode === 'sealed' ? 'sealed' : tour.gameMode === 'restricted' ? 'modeRestricted' : 'classic';
   const myParticipant = tour.participants.find(p => p.userId === userId);
@@ -191,62 +222,6 @@ export default function TournamentDetailPage() {
   const myDeckId = (myParticipant as any)?.deckId ?? null;
   const needsDeck = isParticipant && tour.gameMode !== 'sealed' && tour.status === 'registration';
   const hasRestrictions = tour.gameMode === 'restricted' || (tour as any).bannedCardIds?.length > 0;
-  const isSwiss = tour.format === 'swiss';
-
-  // Compute Swiss standings client-side when server hasn't sent them
-  const swissStandings: SwissStandingEntry[] = useMemo(() => {
-    if (!isSwiss) return [];
-    // Prefer server-provided standings
-    if (tour.standings && tour.standings.length > 0) {
-      return tour.standings.map((s) => ({
-        userId: s.userId,
-        username: s.username,
-        rank: s.rank,
-        wins: s.wins,
-        losses: s.losses,
-        draws: s.draws,
-        matchPoints: s.matchPoints,
-        buchholz: s.buchholz,
-        buchholzExtended: s.buchholzExtended,
-        seed: s.seed,
-        hadBye: s.hadBye,
-      }));
-    }
-    // Fallback: compute from matches + participants
-    if (tour.matches.length === 0 || tour.participants.length === 0) return [];
-    const players = tour.participants.map((p) => ({
-      userId: p.userId,
-      username: p.username,
-      seed: p.seed ?? 0,
-    }));
-    const results: SwissMatchResult[] = tour.matches
-      .filter((m) => m.status === 'completed' || m.status === 'forfeit' || m.isBye)
-      .map((m) => ({
-        round: m.round,
-        player1Id: m.player1Id ?? '',
-        player2Id: m.player2Id ?? '',
-        winnerId: m.winnerId,
-        isBye: m.isBye,
-      }));
-    if (results.length === 0) {
-      // No completed matches yet, show initial standings by seed
-      return players
-        .sort((a, b) => a.seed - b.seed)
-        .map((p, i) => ({
-          userId: p.userId,
-          username: p.username,
-          rank: i + 1,
-          wins: 0, losses: 0, draws: 0,
-          matchPoints: 0, buchholz: 0, buchholzExtended: 0,
-          seed: p.seed, hadBye: false,
-        }));
-    }
-    try {
-      return computeStandings(players, results);
-    } catch {
-      return [];
-    }
-  }, [isSwiss, tour.standings, tour.matches, tour.participants]);
 
   return (
     <div id="main-content" className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>

@@ -116,7 +116,7 @@ export default function TournamentsPage() {
               ) : (
                 <div className="space-y-3">
                   {currentList.map((tournament) => (
-                    <Link key={tournament.id} href={('/tournaments/' + tournament.id) as '/'}><TournamentCard tournament={tournament} /></Link>
+                    <TournamentCard key={tournament.id} tournament={tournament} />
                   ))}
                 </div>
               )}
