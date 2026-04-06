@@ -79,7 +79,7 @@ export default function ProfilePage({
     else setLoading(true);
 
     try {
-      const res = await fetch(`/api/profile/${username}?page=${page}`);
+      const res = await fetch(`/api/profile/${encodeURIComponent(username)}?page=${page}`);
       if (!res.ok) throw new Error('Not found');
       const data: ProfileData = await res.json();
 

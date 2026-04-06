@@ -425,7 +425,7 @@ export default function Home() {
               {session ? (
                 <>
                   <Link
-                    href={`/profile/${session.user?.name ?? ''}`}
+                    href={`/profile/${encodeURIComponent(session.user?.name ?? '')}`}
                     className="flex h-9 flex-1 items-center justify-center text-xs font-medium tracking-wide transition-all sm:h-10 sm:text-sm"
                     style={{
                       backgroundColor: 'transparent',

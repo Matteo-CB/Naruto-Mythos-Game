@@ -236,8 +236,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { discordId: true, role: true },
+            select: { username: true, discordId: true, role: true },
           });
+          if (dbUser?.username) token.name = dbUser.username;
           token.discordId = dbUser?.discordId ?? null;
           token.role = dbUser?.role ?? 'user';
         } catch {

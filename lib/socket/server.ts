@@ -1268,10 +1268,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       room.guestId = data.userId;
       room.guestSocket = socket.id;
+      room.guestName = room.guestName || userNames.get(data.userId) || undefined;
       playerRooms.set(socket.id, data.code);
       socket.join(data.code);
 
-      // Fetch guest's spectator hand preference
+      // Fetch guest name + spectator hand preference from DB if not already set
+      if (!room.guestName) {
+        try {
+          const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { username: true } });
+          if (guestUser?.username) room.guestName = guestUser.username;
+        } catch { /* ignore */ }
+      }
       try {
         const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
         room.guestAllowSpectatorHand = guestUser?.allowSpectatorHand ?? false;
