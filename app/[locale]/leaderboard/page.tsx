@@ -249,7 +249,7 @@ export default function LeaderboardPage() {
                     {/* Player name + badges */}
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       <Link
-                        href={`/profile/${user.username}` as '/'}
+                        href={`/profile/${encodeURIComponent(user.username)}` as '/'}
                         className="text-sm truncate transition-colors"
                         style={{ color: '#e0e0e0' }}
                       >

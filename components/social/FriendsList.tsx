@@ -57,7 +57,7 @@ export function FriendsList() {
         >
           <div className="flex items-center gap-3">
             <Link
-              href={`/profile/${friend.username}`}
+              href={`/profile/${encodeURIComponent(friend.username)}`}
               className="text-sm font-medium no-underline"
               style={{ color: '#e0e0e0' }}
             >
