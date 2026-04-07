@@ -2348,7 +2348,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           // Handle disconnect during an active game
           else if (room.gameState && room.gameState.phase !== 'gameOver') {
             console.log(`[Socket] ${player} disconnected during game in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
-            clearActionTimer(room);
+            // Do NOT clear action timer — it keeps running during disconnect.
+            // If it expires while disconnected, auto-pass happens normally.
 
             // Notify the opponent that the player disconnected + send countdown deadline
             const disconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;

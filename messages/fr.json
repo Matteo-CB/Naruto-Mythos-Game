@@ -1062,6 +1062,8 @@
     "dragToReorder": "Glissez les cartes pour les reorganiser",
     "hideBanned": "Masquer bannies",
     "showBanned": "Afficher bannies",
+    "hideAlt": "Masquer Alt Art",
+    "showAlt": "Afficher Alt Art",
     "emptyDeck": "Aucune carte dans le deck",
     "noKeyword": "Aucun mot-cle",
     "view": {
