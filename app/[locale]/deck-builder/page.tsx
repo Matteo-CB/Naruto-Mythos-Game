@@ -484,6 +484,7 @@ export default function DeckBuilderPage() {
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
   const { bannedIds } = useBannedCards();
   const [showBanned, setShowBanned] = useState(true);
+  const [showAltArt, setShowAltArt] = useState(true);
   type DeckViewMode = 'grid' | 'rows';
   type DeckGroupBy = 'chakra' | 'group' | 'rarity' | 'power' | 'keyword' | 'effect';
   const [deckViewMode, setDeckViewMode] = useState<DeckViewMode>('grid');
@@ -534,6 +535,7 @@ export default function DeckBuilderPage() {
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
     if (!showBanned) chars = chars.filter((c) => !bannedIds.has(c.id));
+    if (!showAltArt) chars = chars.filter((c) => c.rarity !== 'RA');
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }
@@ -548,7 +550,7 @@ export default function DeckBuilderPage() {
       }
       return sortOrder === 'desc' ? -cmp : cmp;
     });
-  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showBanned, bannedIds]);
+  }, [availableChars, deferredSearch, parsedSearch, loc, sortBy, sortOrder, showBanned, bannedIds, showAltArt]);
 
   const filteredMissions = useMemo(() => {
     if (!showBanned) return availableMissions.filter((m) => !bannedIds.has(m.id));
@@ -608,6 +610,20 @@ export default function DeckBuilderPage() {
             groups.set(fn, arr);
           }
         }
+      } else if (deckGroupBy === 'keyword') {
+        // A card can belong to multiple keyword groups
+        const kws = card.keywords ?? [];
+        if (kws.length === 0) {
+          const arr = groups.get('-') || [];
+          arr.push({ card, idx: i });
+          groups.set('-', arr);
+        } else {
+          for (const kw of kws) {
+            const arr = groups.get(kw) || [];
+            arr.push({ card, idx: i });
+            groups.set(kw, arr);
+          }
+        }
       } else {
         let key: string;
         switch (deckGroupBy) {
@@ -615,11 +631,10 @@ export default function DeckBuilderPage() {
           case 'power': key = String(card.power ?? 0); break;
           case 'group': key = card.group || 'Independent'; break;
           case 'rarity': key = card.rarity; break;
-          case 'keyword': key = (card.keywords?.[0]) || '-'; break;
         }
-        const arr = groups.get(key) || [];
+        const arr = groups.get(key!) || [];
         arr.push({ card, idx: i });
-        groups.set(key, arr);
+        groups.set(key!, arr);
       }
     });
     return Array.from(groups.entries()).sort((a, b) => {
@@ -1480,6 +1495,21 @@ export default function DeckBuilderPage() {
               </button>
             </div>
           )}
+
+          {/* Alt art toggle */}
+          <div className="px-3 pb-1 flex-shrink-0">
+            <button
+              onClick={() => setShowAltArt(!showAltArt)}
+              className="text-[9px] uppercase font-bold px-2 py-1"
+              style={{
+                backgroundColor: showAltArt ? 'rgba(196,163,90,0.1)' : 'rgba(136,136,136,0.08)',
+                borderLeft: `2px solid ${showAltArt ? '#c4a35a' : '#555'}`,
+                color: showAltArt ? '#c4a35a' : '#555',
+              }}
+            >
+              {showAltArt ? t("deckBuilder.hideAlt") : t("deckBuilder.showAlt")}
+            </button>
+          </div>
 
           {/* Scrollable card grid */}
           <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>

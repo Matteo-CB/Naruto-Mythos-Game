@@ -1062,6 +1062,8 @@
     "dragToReorder": "Drag cards to reorder",
     "hideBanned": "Hide Banned",
     "showBanned": "Show Banned",
+    "hideAlt": "Hide Alt Art",
+    "showAlt": "Show Alt Art",
     "emptyDeck": "No cards in deck",
     "noKeyword": "No Keyword",
     "view": {

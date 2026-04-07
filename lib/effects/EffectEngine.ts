@@ -15800,9 +15800,19 @@ export class EffectEngine {
     for (const mission of newState.activeMissions) {
       for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
         if (char.instanceId === targetId) {
-          char.isHidden = true;
-          // When a controller is hidden, return any characters it took control of
-          return EffectEngine.restoreControlOnLeave(newState, targetId);
+          // First restore control of any stolen characters BEFORE hiding
+          // (restoreControlOnLeave needs the controller to still be visible to find it)
+          let result = EffectEngine.restoreControlOnLeave(newState, targetId);
+          // Now hide the character in the result state
+          for (const m of result.activeMissions) {
+            for (const c of [...m.player1Characters, ...m.player2Characters]) {
+              if (c.instanceId === targetId) {
+                c.isHidden = true;
+                break;
+              }
+            }
+          }
+          return result;
         }
       }
     }
