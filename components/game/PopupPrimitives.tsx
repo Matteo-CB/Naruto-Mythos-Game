@@ -98,10 +98,11 @@ export function PopupCornerFrame({
       transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.05 }}
       className={`relative ${className}`}
       style={{
-        maxWidth,
+        maxWidth: `min(${maxWidth}, calc(100vw - 24px))`,
         width: fitContent ? 'fit-content' : '90vw',
         minWidth: fitContent ? '220px' : undefined,
         padding,
+        boxSizing: 'border-box' as const,
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
       }}
@@ -208,7 +209,7 @@ export function PopupDescription({
       className="mb-5 px-5 py-3"
       style={{
         borderLeft: `3px solid ${accentColor}`,
-        maxWidth: '480px',
+        maxWidth: 'min(480px, calc(100vw - 48px))',
       }}
     >
       <span className="font-body text-xs leading-relaxed" style={{ color: '#c8c8c8' }}>

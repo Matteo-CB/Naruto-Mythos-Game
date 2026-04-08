@@ -695,8 +695,7 @@ function AbandonConfirmDialog({
         style={{
           backgroundColor: 'rgba(8, 8, 14, 0.95)',
           boxShadow: '0 16px 64px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255,255,255,0.04)',
-          minWidth: '280px',
-          maxWidth: '400px',
+          maxWidth: 'min(400px, calc(100vw - 32px))',
         }}
       >
         {/* Corner brackets */}
