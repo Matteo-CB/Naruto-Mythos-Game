@@ -56,8 +56,10 @@ interface Props {
   variant: Variant;
 }
 
-export function CardBackgroundDecor({ variant }: Props) {
-  const [left, right] = CARD_SETS[variant];
+export function CardBackgroundDecor({ variant: _variant }: Props) {
+  // Disabled — using bgmenu background instead
+  return null;
+  const [left, right] = CARD_SETS[_variant];
 
   return (
     <div

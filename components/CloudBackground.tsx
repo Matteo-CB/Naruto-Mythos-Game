@@ -2,30 +2,6 @@
 
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
-
-const CLOUD_PLACEMENTS = [
-  { src: '/images/icons/cloud-2.webp', x: '5%',  y: '3%',  size: 90,  rotation: -8,  opacity: 0.10, delay: 0 },
-  { src: '/images/icons/cloud-5.webp', x: '75%', y: '2%',  size: 80,  rotation: 12,  opacity: 0.08, delay: 0.3 },
-  { src: '/images/icons/cloud-6.webp', x: '40%', y: '8%',  size: 70,  rotation: -5,  opacity: 0.07, delay: 0.6 },
-  { src: '/images/icons/cloud-2.webp', x: '88%', y: '15%', size: 65,  rotation: 15,  opacity: 0.09, delay: 0.2 },
-  { src: '/images/icons/cloud-5.webp', x: '20%', y: '18%', size: 55,  rotation: -12, opacity: 0.06, delay: 0.5 },
-  { src: '/images/icons/cloud-6.webp', x: '60%', y: '22%', size: 75,  rotation: 8,   opacity: 0.08, delay: 0.1 },
-  { src: '/images/icons/cloud-5.webp', x: '92%', y: '32%', size: 60,  rotation: -15, opacity: 0.07, delay: 0.4 },
-  { src: '/images/icons/cloud-2.webp', x: '8%',  y: '35%', size: 85,  rotation: 5,   opacity: 0.09, delay: 0.7 },
-  { src: '/images/icons/cloud-6.webp', x: '50%', y: '38%', size: 50,  rotation: -10, opacity: 0.06, delay: 0.2 },
-  { src: '/images/icons/cloud-5.webp', x: '70%', y: '48%', size: 70,  rotation: 18,  opacity: 0.08, delay: 0.3 },
-  { src: '/images/icons/cloud-2.webp', x: '15%', y: '52%', size: 60,  rotation: -8,  opacity: 0.07, delay: 0.6 },
-  { src: '/images/icons/cloud-6.webp', x: '85%', y: '55%', size: 55,  rotation: 10,  opacity: 0.06, delay: 0.1 },
-  { src: '/images/icons/cloud-6.webp', x: '35%', y: '62%', size: 65,  rotation: -12, opacity: 0.08, delay: 0.5 },
-  { src: '/images/icons/cloud-2.webp', x: '78%', y: '68%', size: 80,  rotation: 7,   opacity: 0.07, delay: 0.4 },
-  { src: '/images/icons/cloud-5.webp', x: '3%',  y: '72%', size: 55,  rotation: -5,  opacity: 0.09, delay: 0.2 },
-  { src: '/images/icons/cloud-5.webp', x: '55%', y: '78%', size: 60,  rotation: 15,  opacity: 0.07, delay: 0.3 },
-  { src: '/images/icons/cloud-6.webp', x: '25%', y: '82%', size: 75,  rotation: -10, opacity: 0.08, delay: 0.7 },
-  { src: '/images/icons/cloud-2.webp', x: '90%', y: '85%', size: 50,  rotation: 8,   opacity: 0.06, delay: 0.1 },
-  { src: '/images/icons/cloud-6.webp', x: '45%', y: '92%', size: 70,  rotation: -7,  opacity: 0.07, delay: 0.5 },
-  { src: '/images/icons/cloud-2.webp', x: '10%', y: '95%', size: 60,  rotation: 12,  opacity: 0.06, delay: 0.4 },
-];
 
 interface CloudBackgroundProps {
   className?: string;
@@ -35,75 +11,81 @@ interface CloudBackgroundProps {
 export const CloudBackground = memo(function CloudBackground({ className = '', animated = true }: CloudBackgroundProps) {
   return (
     <div
-      className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+      className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
       style={{ zIndex: 0 }}
       aria-hidden="true"
     >
-      {CLOUD_PLACEMENTS.map((cloud, i) => {
-        const floatDuration = 15 + (i % 5) * 4;
-        const floatRange = 8 + (i % 3) * 4;
-        const h = Math.round(cloud.size * 0.6);
+      {/* Main background image — slow cinematic drift */}
+      {animated ? (
+        <motion.div
+          className="absolute"
+          style={{
+            top: '-8%',
+            left: '-8%',
+            width: '116%',
+            height: '116%',
+            backgroundImage: 'url(/bgmenu/bgmenu.webp)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(2px) saturate(0.8) brightness(0.45)',
+          }}
+          animate={{
+            x: [0, 20, -15, 10, -5, 0],
+            y: [0, -12, 8, -18, 5, 0],
+            scale: [1, 1.03, 1.01, 1.04, 1.02, 1],
+          }}
+          transition={{
+            duration: 60,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url(/bgmenu/bgmenu.webp)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(2px) saturate(0.8) brightness(0.45)',
+          }}
+        />
+      )}
 
-        if (animated) {
-          return (
-            <motion.div
-              key={i}
-              className="absolute select-none"
-              style={{
-                left: cloud.x,
-                top: cloud.y,
-                width: cloud.size,
-                height: h,
-                opacity: cloud.opacity,
-                transform: `rotate(${cloud.rotation}deg)`,
-              }}
-              animate={{
-                y: [0, -floatRange, 0, floatRange * 0.5, 0],
-                x: [0, floatRange * 0.3, 0, -floatRange * 0.3, 0],
-              }}
-              transition={{
-                duration: floatDuration,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: cloud.delay * 3,
-              }}
-            >
-              <Image
-                src={cloud.src}
-                alt=""
-                width={cloud.size}
-                height={h}
-                loading="lazy"
-                style={{ filter: 'saturate(0.7)' }}
-              />
-            </motion.div>
-          );
-        }
+      {/* Color tint — blend the image into the site's dark theme */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundColor: 'rgba(6, 6, 10, 0.35)',
+          mixBlendMode: 'multiply',
+        }}
+      />
 
-        return (
-          <div
-            key={i}
-            className="absolute select-none"
-            style={{
-              left: cloud.x,
-              top: cloud.y,
-              width: cloud.size,
-              height: h,
-              opacity: cloud.opacity,
-              transform: `rotate(${cloud.rotation}deg)`,
-            }}
-          >
-            <Image
-              src={cloud.src}
-              alt=""
-              width={cloud.size}
-              height={h}
-              loading="lazy"
-              style={{ filter: 'saturate(0.7)' }}
-            />
-          </div>
-        );
-      })}
+      {/* Ambient color overlay — subtle purple mood matching accent */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at 25% 15%, rgba(90, 60, 130, 0.08) 0%, transparent 55%), radial-gradient(ellipse at 75% 85%, rgba(50, 40, 90, 0.06) 0%, transparent 45%)',
+        }}
+      />
+
+      {/* Heavy vignette — fades edges into pure black, content area subtly visible */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 20%, rgba(6, 6, 10, 0.5) 55%, rgba(6, 6, 10, 0.92) 100%)',
+        }}
+      />
+
+      {/* Top/bottom fade strips — seamless blending with page edges */}
+      <div
+        className="absolute inset-x-0 top-0 h-24"
+        style={{ background: 'linear-gradient(to bottom, rgba(6, 6, 10, 0.9), transparent)' }}
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 h-24"
+        style={{ background: 'linear-gradient(to top, rgba(6, 6, 10, 0.9), transparent)' }}
+      />
     </div>
   );
 });

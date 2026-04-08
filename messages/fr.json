@@ -1062,8 +1062,8 @@
     "dragToReorder": "Glissez les cartes pour les reorganiser",
     "hideBanned": "Masquer bannies",
     "showBanned": "Afficher bannies",
-    "hideAlt": "Masquer Alt Art",
-    "showAlt": "Afficher Alt Art",
+    "hideAlt": "Masquer variantes",
+    "showAlt": "Afficher variantes",
     "emptyDeck": "Aucune carte dans le deck",
     "noKeyword": "Aucun mot-cle",
     "view": {
@@ -2438,6 +2438,8 @@
       "willOfFire": "Heritier de la Volonte du Feu"
     },
     "scheduledStart": "Lancement programme",
+    "startingSoon": "Lancement imminent...",
+    "startsInLabel": "Commence dans",
     "startsIn": "Commence dans {time}",
     "startsAt": "Commence le {date}",
     "joinTimeRemaining": "Rejoignez votre match dans {time}",
@@ -2492,6 +2494,7 @@
     "noValidDeckHint": "Aucun de vos decks ne respecte les regles du tournoi ? Creez ou modifiez-en un dans le constructeur de deck.",
     "rulesTitle": "Regles du tournoi",
     "rulesFormat": "Format : Elimination directe (bracket)",
+    "rulesFormatSwiss": "Format : Rondes suisses — tous les joueurs jouent chaque ronde, pas d'elimination",
     "rulesClassic": "Classique : Amenez votre propre deck (30+ cartes, 3 missions)",
     "rulesSealed": "Scelle : Construisez un deck a partir de boosters ouverts aleatoirement",
     "rulesRestricted": "Restreint : Construisez un deck en respectant les restrictions ci-dessous",
@@ -2530,7 +2533,12 @@
     "swissReady": "Pret",
     "swissPending": "En attente",
     "swissRound": "Ronde {round}",
-    "swissFinalStandings": "Classement final"
+    "swissFinalStandings": "Classement final",
+    "swissStatusPending": "En attente",
+    "swissStatusReady": "Pret",
+    "swissStatusInProgress": "En cours",
+    "swissStatusCompleted": "Termine",
+    "swissStatusForfeit": "Forfait"
   },
   "playHub": {
     "title": "Jouer",

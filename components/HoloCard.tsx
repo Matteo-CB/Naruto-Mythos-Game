@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useCallback, useState } from 'react';
-import Image from 'next/image';
 import '@/styles/holo-card.css';
 
 interface Props {
@@ -99,23 +98,19 @@ export function HoloCard({
           onClick={handleClick}
         >
           <div className="holo-card__front">
-            <Image
+            <img
               src={src}
               alt={alt}
-              width={width}
-              height={height}
-              priority
-              fetchPriority="high"
               draggable={false}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
           </div>
           <div className="holo-card__back">
-            <Image
+            <img
               src={backSrc}
               alt="Card back"
-              width={width}
-              height={height}
               draggable={false}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
           </div>
           <div className="holo-card__glare" />

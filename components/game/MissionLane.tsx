@@ -35,7 +35,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
   const zoomCard = useUIStore((s) => s.zoomCard);
-  const { bannedIds } = useBannedCards();
+  // Ban enforcement is server-side only
 
   // Sandbox context menu
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
@@ -102,12 +102,8 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     }
   };
 
-  // Image path: show for ANY card that has card data + image_file (own, opponent visible, or re-hidden)
-  // Banned cards always show card back (no image)
-  const isBanned = hasCardData && character.card ? bannedIds.has(character.card.id) : false;
-  const imagePath = !isBanned && hasCardData
-    ? normalizeImagePath(character.card?.image_file)
-    : null;
+  // Image path: show for ANY card that has card data + image_file
+  const imagePath = hasCardData ? normalizeImagePath(character.card?.image_file) : null;
 
   // Effective power display (includes continuous modifiers from engine)
   const totalPower = character.effectivePower;

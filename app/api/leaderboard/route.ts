@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
       : {};
 
     // For league filters: fetch a bounded set and post-filter by placement matches
-    // For unranked: same approach but inverted filter
-    const needsPostFilter = !!league;
+    const needsPostFilter = !!league && league !== 'unranked';
     const fetchLimit = needsPostFilter ? Math.min(limit * 3, 150) : limit;
     const fetchSkip = needsPostFilter ? 0 : offset;
 
@@ -60,15 +59,22 @@ export async function GET(request: NextRequest) {
 
     // Post-filter: exclude unranked from league filters, or only show unranked
     if (league === 'unranked') {
-      users = users.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
+      // For unranked: re-fetch ALL users ordered by createdAt desc and filter
+      const allUsers = await prisma.user.findMany({
+        where: search ? { username: { contains: search, mode: 'insensitive' as const } } : {},
+        select: { id: true, username: true, elo: true, wins: true, losses: true, draws: true, role: true, badgePrefs: true },
+        orderBy: { createdAt: 'desc' },
+        take: 500,
+      });
+      users = allUsers.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
     } else if (league) {
       users = users.filter((u) => u.wins + u.losses + u.draws >= PLACEMENT_MATCHES);
     }
 
-    const total = needsPostFilter ? users.length : await prisma.user.count({ where });
+    const total = (league === 'unranked' || needsPostFilter) ? users.length : await prisma.user.count({ where });
 
-    // Apply pagination for league-filtered results (post-filter pagination)
-    if (needsPostFilter) {
+    // Apply pagination for filtered results
+    if (league === 'unranked' || needsPostFilter) {
       users = users.slice(offset, offset + limit);
     }
 

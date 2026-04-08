@@ -9,18 +9,22 @@ import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
+import { CloudBackground } from '@/components/CloudBackground';
 
 // Pool of featured cards - one is picked randomly on each page load
 const FEATURED_CARDS = [
-  { src: '/images/cards/KS/rare_art/KS-108-RA.webp', alt: 'Naruto Uzumaki - Rare Art', rarity: 'rare' as const },
-  { src: '/images/cards/KS/rare_art/KS-107-RA.webp', alt: 'Sasuke Uchiwa - Rare Art', rarity: 'rare' as const },
-  { src: '/images/cards/KS/rare_art/KS-128-RA.webp', alt: 'Itachi Uchiwa - Rare Art', rarity: 'rare' as const },
-  { src: '/images/cards/KS/rare/KS-123-R.webp', alt: 'Kimimaro - Rare', rarity: 'rare' as const },
-  { src: '/images/cards/KS/rare/KS-113-R.webp', alt: 'Kiba Inuzuka - Rare', rarity: 'rare' as const },
-  { src: '/images/cards/KS/mythos/KS-142-M.webp', alt: 'Sasuke Uchiha - Mythos', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos/KS-148-M.webp', alt: 'Kakashi Hatake - Mythos', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos/KS-147-M.webp', alt: 'Sakura Haruno - Mythos', rarity: 'mythos' as const },
-  { src: '/images/cards/KS/mythos/KS-146-M.webp', alt: 'Sasuke Uchiwa - Mythos', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-104-MV.webp', alt: 'Tsunade - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-108-MV.webp', alt: 'Naruto Uzumaki - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-111-MV.webp', alt: 'Shikamaru Nara - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-113-MV.webp', alt: 'Kiba Inuzuka - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-117-MV.webp', alt: 'Rock Lee - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-120-MV.webp', alt: 'Gaara - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-128-MV.webp', alt: 'Itachi Uchiwa - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-133-MV.webp', alt: 'Naruto Rasengan - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-133_2-MV.webp', alt: 'Naruto Rasengan Alt - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-135-MV.webp', alt: 'Sakura Haruno - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-136-MV.webp', alt: 'Sasuke Uchiwa - Mythos V', rarity: 'mythos' as const },
+  { src: '/images/cards/KS/mythos_v/KS-137-MV.webp', alt: 'Kakashi Hatake - Mythos V', rarity: 'mythos' as const },
 ];
 
 // Cloud positions - only cloud-2, cloud-5, cloud-6
@@ -146,82 +150,7 @@ export default function Home() {
       className="relative min-h-screen w-full overflow-x-hidden overflow-y-auto flex flex-col"
       style={{ backgroundColor: '#0a0a0a' }}
     >
-      {/* === BACKGROUND CLOUD PATTERN === */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {cloudPositions.map((cloud, i) => (
-          <div
-            key={`cloud-${i}`}
-            className="absolute"
-            style={{
-              top: cloud.top,
-              left: cloud.left,
-              width: cloud.width,
-              height: cloud.width * 0.6,
-              opacity: cloud.opacity,
-              transform: `rotate(${cloud.rotate}deg)`,
-            }}
-          >
-            <Image
-              src={cloud.src}
-              alt=""
-              width={cloud.width}
-              height={Math.round(cloud.width * 0.6)}
-              className="select-none"
-              style={{ filter: 'saturate(0.7)' }}
-              priority={false}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* === FLOATING WEAPON DECORATIONS === */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {mounted && floatingElements.map((el, i) => (
-          <motion.div
-            key={`float-${i}`}
-            className="absolute"
-            style={{
-              top: el.top,
-              left: 'left' in el ? el.left : undefined,
-              right: 'right' in el ? el.right : undefined,
-              width: el.size,
-              height: el.size,
-              opacity: el.opacity,
-            }}
-            animate={
-              el.spin
-                ? {
-                    y: [0, -10, 0, 10, 0],
-                    rotate: [0, 360],
-                  }
-                : {
-                    y: [0, -8, 0, 8, 0],
-                    rotate: [el.rotate - 3, el.rotate + 3, el.rotate - 3],
-                  }
-            }
-            transition={
-              el.spin
-                ? {
-                    y: { duration: el.duration, repeat: Infinity, ease: 'easeInOut' },
-                    rotate: { duration: el.duration * 2, repeat: Infinity, ease: 'linear' },
-                  }
-                : {
-                    y: { duration: el.duration, repeat: Infinity, ease: 'easeInOut' },
-                    rotate: { duration: el.duration * 1.5, repeat: Infinity, ease: 'easeInOut' },
-                  }
-            }
-          >
-            <Image
-              src={el.src}
-              alt=""
-              width={el.size}
-              height={el.size}
-              className="select-none"
-              style={{ objectFit: 'contain' }}
-            />
-          </motion.div>
-        ))}
-      </div>
+      <CloudBackground />
 
       {/* === LANGUAGE SWITCHER (top-right) === */}
       <div className="absolute top-3 right-4 z-50 sm:top-4 sm:right-6">

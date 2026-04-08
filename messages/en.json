@@ -1062,8 +1062,8 @@
     "dragToReorder": "Drag cards to reorder",
     "hideBanned": "Hide Banned",
     "showBanned": "Show Banned",
-    "hideAlt": "Hide Alt Art",
-    "showAlt": "Show Alt Art",
+    "hideAlt": "Hide Variants",
+    "showAlt": "Show Variants",
     "emptyDeck": "No cards in deck",
     "noKeyword": "No Keyword",
     "view": {
@@ -2438,6 +2438,8 @@
       "willOfFire": "Inheritor of the Will of Fire"
     },
     "scheduledStart": "Scheduled Start",
+    "startingSoon": "Starting soon...",
+    "startsInLabel": "Starts in",
     "startsIn": "Starts in {time}",
     "startsAt": "Starts at {date}",
     "joinTimeRemaining": "Join your match within {time}",
@@ -2492,6 +2494,7 @@
     "noValidDeckHint": "None of your decks match the tournament rules? Create or edit one in the deck builder.",
     "rulesTitle": "Tournament Rules",
     "rulesFormat": "Format: Single elimination bracket",
+    "rulesFormatSwiss": "Format: Swiss rounds — all players play every round, no elimination",
     "rulesClassic": "Classic: Bring your own deck (30+ cards, 3 missions)",
     "rulesSealed": "Sealed: Build a deck from randomly opened boosters",
     "rulesRestricted": "Restricted: Build a deck following the tournament restrictions below",
@@ -2530,7 +2533,12 @@
     "swissReady": "Ready",
     "swissPending": "Pending",
     "swissRound": "Round {round}",
-    "swissFinalStandings": "Final Standings"
+    "swissFinalStandings": "Final Standings",
+    "swissStatusPending": "Pending",
+    "swissStatusReady": "Ready",
+    "swissStatusInProgress": "In Progress",
+    "swissStatusCompleted": "Completed",
+    "swissStatusForfeit": "Forfeit"
   },
   "playHub": {
     "title": "Play",

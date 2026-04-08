@@ -26,6 +26,39 @@ import { LEAGUE_TIERS, getPlayerLeague } from '@/lib/tournament/leagueUtils';
 const ADMIN_EMAILS = ['matteo.biyikli3224@gmail.com'];
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
+function ScheduledCountdown({ deadline }: { deadline: string }) {
+  const t = useTranslations('tournament');
+  const [remaining, setRemaining] = useState('');
+  const [expired, setExpired] = useState(false);
+
+  useEffect(() => {
+    const tick = () => {
+      const left = new Date(deadline).getTime() - Date.now();
+      if (left <= 0) { setExpired(true); setRemaining('0:00'); return; }
+      const h = Math.floor(left / 3600000);
+      const m = Math.floor((left % 3600000) / 60000);
+      const s = Math.floor((left % 60000) / 1000);
+      setRemaining(h > 0 ? `${h}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s` : `${m}:${s.toString().padStart(2, '0')}`);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  return (
+    <div className="mt-3 p-3 text-center" style={{ backgroundColor: 'rgba(196, 163, 90, 0.08)', border: '1px solid rgba(196, 163, 90, 0.2)' }}>
+      <span className="text-xs uppercase tracking-wider" style={{ color: '#888' }}>
+        {expired ? t('startingSoon') : t('startsInLabel')}
+      </span>
+      {!expired && (
+        <span className="ml-2 text-sm font-bold tabular-nums" style={{ color: '#c4a35a', fontFamily: 'var(--font-inter)' }}>
+          {remaining}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function TournamentDetailPage() {
   const t = useTranslations('tournament');
   const tc = useTranslations('common');
@@ -248,6 +281,11 @@ export default function TournamentDetailPage() {
           )}
         </motion.div>
 
+        {/* Scheduled start countdown */}
+        {tour.status === 'registration' && tour.scheduledStartAt && (
+          <ScheduledCountdown deadline={tour.scheduledStartAt} />
+        )}
+
         {/* Share button */}
         <div className="mb-4 flex gap-2">
           <button onClick={handleShare} className="px-4 py-1.5 text-xs font-medium uppercase tracking-wider cursor-pointer transition-colors"
@@ -261,7 +299,7 @@ export default function TournamentDetailPage() {
           className="mb-4 p-4" style={{ backgroundColor: '#111111', border: '1px solid #262626', borderLeft: '3px solid rgba(196, 163, 90, 0.3)' }}>
           <h2 className="text-sm font-medium uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>{t('rulesTitle')}</h2>
           <div className="flex flex-col gap-1.5 text-xs" style={{ color: '#aaa' }}>
-            <p>{t('rulesFormat')}</p>
+            <p>{isSwiss ? t('rulesFormatSwiss') : t('rulesFormat')}</p>
             {tour.gameMode === 'classic' && <p>{t('rulesClassic')}</p>}
             {tour.gameMode === 'sealed' && <p>{t('rulesSealed')}</p>}
             {tour.gameMode === 'restricted' && <p>{t('rulesRestricted')}</p>}

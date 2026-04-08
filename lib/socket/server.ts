@@ -933,34 +933,59 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Tournament] Auto-starting scheduled tournament ${t.name} (${t.id})`);
         // Trigger start via internal API call
         try {
-          const { generateBracket } = await import('@/lib/tournament/tournamentEngine');
           const participants = await prisma.tournamentParticipant.findMany({ where: { tournamentId: t.id } });
           // Shuffle participants randomly
           for (let i = participants.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [participants[i], participants[j]] = [participants[j], participants[i]];
           }
-          // Batch assign seeds with $transaction
+          // Batch assign seeds
           await prisma.$transaction(
             participants.map((p, i) => prisma.tournamentParticipant.update({ where: { id: p.id }, data: { seed: i + 1 } }))
           );
-          const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
-          // Batch create match records
-          await prisma.tournamentMatch.createMany({
-            data: bracket.matches.map((m) => ({
-              tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
-              player1Id: (m as any).player1?.participantId || null,
-              player1Username: (m as any).player1?.username || null,
-              player2Id: (m as any).player2?.participantId || null,
-              player2Username: (m as any).player2?.username || null,
-              winnerId: (m as any).winnerId || null, winnerUsername: (m as any).winnerUsername || null,
-              isBye: (m as any).isBye ?? false, status: m.status,
-            })),
-          });
-          await prisma.tournament.update({
-            where: { id: t.id },
-            data: { status: 'in_progress', currentRound: 1, totalRounds: bracket.totalRounds, startedAt: now },
-          });
+
+          const isSwissFormat = t.format === 'swiss';
+          const playerList = participants.map(p => ({ userId: p.userId, username: p.username, seed: 0 }));
+
+          if (isSwissFormat) {
+            // Swiss: generate round 1 only
+            const { computeSwissRoundCount, generateSwissRound1 } = await import('@/lib/tournament/swissEngine');
+            const totalRounds = computeSwissRoundCount(playerList.length);
+            const round1 = generateSwissRound1(playerList.map((p, i) => ({ ...p, seed: i + 1 })));
+            await prisma.tournamentMatch.createMany({
+              data: round1.map((m) => ({
+                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+                player1Id: m.player1.userId, player1Username: m.player1.username,
+                player2Id: m.player2?.userId ?? null, player2Username: m.player2?.username ?? null,
+                winnerId: m.player2 === null ? m.player1.userId : null,
+                winnerUsername: m.player2 === null ? m.player1.username : null,
+                isBye: m.player2 === null, status: m.player2 === null ? 'completed' : 'ready',
+              })),
+            });
+            await prisma.tournament.update({
+              where: { id: t.id },
+              data: { status: 'in_progress', currentRound: 1, totalRounds, startedAt: now },
+            });
+          } else {
+            // Elimination: generate full bracket
+            const { generateBracket } = await import('@/lib/tournament/tournamentEngine');
+            const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
+            await prisma.tournamentMatch.createMany({
+              data: bracket.matches.map((m) => ({
+                tournamentId: t.id, round: m.round, matchIndex: m.matchIndex,
+                player1Id: (m as any).player1?.participantId || null,
+                player1Username: (m as any).player1?.username || null,
+                player2Id: (m as any).player2?.participantId || null,
+                player2Username: (m as any).player2?.username || null,
+                winnerId: (m as any).winnerId || null, winnerUsername: (m as any).winnerUsername || null,
+                isBye: (m as any).isBye ?? false, status: m.status,
+              })),
+            });
+            await prisma.tournament.update({
+              where: { id: t.id },
+              data: { status: 'in_progress', currentRound: 1, totalRounds: bracket.totalRounds, startedAt: now },
+            });
+          }
           io.to(`tournament:${t.id}`).emit('tournament:started');
         } catch (err) {
           console.error(`[Tournament] Auto-start error for ${t.id}:`, err);
