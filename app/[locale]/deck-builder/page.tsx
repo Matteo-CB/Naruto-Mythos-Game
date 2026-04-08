@@ -535,7 +535,7 @@ export default function DeckBuilderPage() {
   const filteredChars = useMemo(() => {
     let chars = [...availableChars];
     if (!showBanned) chars = chars.filter((c) => !bannedIds.has(c.id));
-    if (!showAltArt) chars = chars.filter((c) => c.rarity !== 'RA');
+    if (!showAltArt) chars = chars.filter((c) => !['RA', 'MV', 'SV', 'L'].includes(c.rarity));
     if (deferredSearch) {
       chars = chars.filter((c) => matchesSearchFilter(c, parsedSearch, loc));
     }

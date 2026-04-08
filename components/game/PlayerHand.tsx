@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
-import { useBannedCards } from '@/lib/hooks/useBannedCards';
+// Ban enforcement is server-side only — cards always show their image
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -98,9 +98,7 @@ const HandCard = React.memo(function HandCard({
   const translateX = offset * dims.handFanSpacing;
   const arcY = Math.abs(offset) * dims.handFanArc;
 
-  const { bannedIds } = useBannedCards();
-  const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
+  const imagePath = normalizeImagePath(card.image_file);
 
   const animateProps = useMemo(
     () => ({

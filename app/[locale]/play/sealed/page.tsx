@@ -422,7 +422,7 @@ export default function SealedPage() {
                   <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>
                     {t('vsAI')}
                   </span>
-                  <span className="text-xs mt-0.5" style={{ color: '#666' }}>
+                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
                     {t('vsAIDesc')}
                   </span>
                 </button>
@@ -435,7 +435,7 @@ export default function SealedPage() {
                   <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>
                     {t('online')}
                   </span>
-                  <span className="text-xs mt-0.5" style={{ color: '#666' }}>
+                  <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>
                     {t('onlineDesc')}
                   </span>
                 </button>
@@ -485,7 +485,7 @@ export default function SealedPage() {
                     style={{ backgroundColor: '#141414', borderColor: '#262626' }}
                   >
                     <span className="text-base font-medium" style={{ color: '#e0e0e0' }}>{d.label}</span>
-                    <span className="text-xs mt-0.5" style={{ color: '#666' }}>{d.description}</span>
+                    <span className="text-xs mt-0.5 font-inter-force" style={{ color: '#666' }}>{d.description}</span>
                   </button>
                 ))}
               </motion.div>

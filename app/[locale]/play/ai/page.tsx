@@ -118,7 +118,7 @@ export default function PlayAIPage() {
               }`}
             >
               <span className="text-base font-medium">{d.label}</span>
-              <span className="text-xs text-[#666] mt-0.5">{d.description}</span>
+              <span className="text-xs text-[#666] mt-0.5 font-inter-force">{d.description}</span>
             </button>
           ))}
         </div>

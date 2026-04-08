@@ -288,10 +288,11 @@ async function handleSwissMatchEnd(
       const nextRound = match.round + 1;
       const pairings = generateSwissPairings(swissPlayers, swissResults, nextRound);
 
-      for (const pairing of pairings) {
-        const isBye = pairing.player2 === null;
-        await prisma.tournamentMatch.create({
-          data: {
+      // Batch create all matches for next round
+      await prisma.tournamentMatch.createMany({
+        data: pairings.map((pairing) => {
+          const isBye = pairing.player2 === null;
+          return {
             tournamentId,
             round: pairing.round,
             matchIndex: pairing.matchIndex,
@@ -303,15 +304,18 @@ async function handleSwissMatchEnd(
             winnerUsername: isBye ? pairing.player1.username : null,
             isBye,
             status: isBye ? 'completed' : 'ready',
-          },
-        });
-
-        if (isBye) {
-          await prisma.tournamentParticipant.updateMany({
-            where: { tournamentId, userId: pairing.player1.userId },
+          };
+        }),
+      });
+      // Mark bye recipients
+      const byePlayers = pairings.filter(p => p.player2 === null);
+      if (byePlayers.length > 0) {
+        await Promise.all(byePlayers.map(p =>
+          prisma.tournamentParticipant.updateMany({
+            where: { tournamentId, userId: p.player1.userId },
             data: { hasBye: true },
-          });
-        }
+          })
+        ));
       }
 
       await prisma.tournament.update({

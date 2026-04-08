@@ -17,10 +17,13 @@ interface DecorativeIconsProps {
   animated?: boolean;
 }
 
-export const DecorativeIcons = memo(function DecorativeIcons({ className = '', animated = true }: DecorativeIconsProps) {
+export const DecorativeIcons = memo(function DecorativeIcons(_props: DecorativeIconsProps) {
+  // Disabled — using bgmenu background instead
+  return null;
+  /* Original code preserved for rollback:
   return (
     <div
-      className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+      className={`absolute inset-0 overflow-hidden pointer-events-none`}
       style={{ zIndex: 0 }}
       aria-hidden="true"
     >
@@ -90,4 +93,5 @@ export const DecorativeIcons = memo(function DecorativeIcons({ className = '', a
       })}
     </div>
   );
+  */
 });

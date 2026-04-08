@@ -100,7 +100,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
         }`}
       >
         <span className="text-sm font-medium">{t('playAI.randomDeck')}</span>
-        <span className="text-xs text-[#666] mt-0.5">{t('playAI.randomDeckDesc')}</span>
+        <span className="text-xs text-[#666] mt-0.5 font-inter-force">{t('playAI.randomDeckDesc')}</span>
       </button>
 
       {/* Saved decks */}
@@ -124,7 +124,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
           }`}
         >
           <span className="text-sm font-medium">{deck.name}</span>
-          <span className="text-xs text-[#666] mt-0.5">
+          <span className="text-xs text-[#666] mt-0.5 font-inter-force">
             {deck.cardIds.length} {t('deckBuilder.characters', { count: deck.cardIds.length })} + {deck.missionIds.length} missions
           </span>
         </button>

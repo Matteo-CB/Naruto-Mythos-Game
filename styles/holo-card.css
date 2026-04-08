@@ -74,6 +74,9 @@
 .holo-card__back {
   transform: rotateY(180deg);
   backface-visibility: hidden;
+  background: #0a0a0a;
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .holo-card__back img {
@@ -91,6 +94,16 @@
 .holo-card__front {
   opacity: 1;
   transition: opacity 0.33s ease-out;
+  overflow: hidden;
+  background: #0a0a0a;
+  border-radius: var(--radius);
+}
+
+.holo-card__front img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius);
 }
 
 /* Hide shine/glare when card is flipped (showing back) */

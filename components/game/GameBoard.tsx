@@ -77,12 +77,11 @@ function CardPreviewContent({
   const unpinCard = useUIStore((s) => s.unpinCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
 
-  const { bannedIds } = useBannedCards();
+  // Ban enforcement is server-side only
 
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
-  const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
+  const imagePath = normalizeImagePath(card.image_file);
 
   const rarityColor = rarityColorMap[card.rarity] ?? "#888888";
 
@@ -522,7 +521,7 @@ function FullscreenCardDetail() {
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
 
-  const { bannedIds } = useBannedCards();
+  // Ban enforcement is server-side only
 
   if (!showFullscreenCard || !pinnedCard) return null;
 
@@ -530,8 +529,7 @@ function FullscreenCardDetail() {
   const missionContext = pinnedMissionContext;
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
-  const isBanned = bannedIds.has(card.id);
-  const imagePath = !isBanned ? normalizeImagePath(card.image_file) : null;
+  const imagePath = normalizeImagePath(card.image_file);
 
   const rarityColor = rarityColorMap[card.rarity] ?? "#888888";
 

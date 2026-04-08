@@ -50,6 +50,7 @@ export interface TournamentData {
   bannedCardIds: string[];
   allowedLeagues: string[];
   format?: 'swiss' | 'elimination';
+  scheduledStartAt?: string | null;
   winnerId: string | null;
   winnerUsername: string | null;
   participants: TournamentParticipant[];

@@ -78,7 +78,7 @@ export default function PlayHubPage() {
                 <span className="text-sm font-bold uppercase tracking-wider" style={{ color: "#c4a35a" }}>
                   {t(mode.titleKey)}
                 </span>
-                <span className="text-xs mt-1" style={{ color: "#888888" }}>
+                <span className="text-xs mt-1 font-inter-force" style={{ color: "#888888" }}>
                   {t(mode.descKey)}
                 </span>
               </Link>

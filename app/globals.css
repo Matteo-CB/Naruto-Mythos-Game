@@ -19,6 +19,7 @@
   --accent: #c4a35a;
   --danger: #b33e3e;
   --success: #3e8b3e;
+  --accent-glow: rgba(196, 163, 90, 0.4);
 }
 
 @theme inline {
@@ -33,6 +34,23 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-body: var(--font-inter);
+}
+
+::selection {
+  background-color: #c4a35a !important;
+  color: #0a0a0a !important;
+}
+
+::-moz-selection {
+  background-color: #c4a35a !important;
+  color: #0a0a0a !important;
+}
+
+*, *::before, *::after {
+  &::selection {
+    background-color: #c4a35a !important;
+    color: #0a0a0a !important;
+  }
 }
 
 html, body {
@@ -58,9 +76,26 @@ th, td,
   font-family: 'NJNaruto', Arial, sans-serif;
 }
 
+/* Override: force Inter on elements inside .font-inter-force containers */
+.font-inter-force,
+.font-inter-force a,
+.font-inter-force button,
+.font-inter-force span,
+.font-inter-force nav,
+.font-inter-force label,
+.font-inter-force small {
+  font-family: var(--font-inter), 'Inter', sans-serif !important;
+}
+
 /* Inter for long-form text: paragraphs, descriptions, effect text */
 p, .font-body {
   font-family: var(--font-inter), 'Inter', sans-serif;
+}
+
+/* Override NJNaruto with Inter where explicitly requested */
+.font-inter-force,
+.font-inter-force * {
+  font-family: var(--font-inter), 'Inter', sans-serif !important;
 }
 
 * {
