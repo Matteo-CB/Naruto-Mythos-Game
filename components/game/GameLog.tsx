@@ -145,7 +145,7 @@ export function GameLog() {
             className={`fixed ${isSpectating ? 'top-9' : 'top-7'} right-0 z-30 flex flex-col`}
             style={{
               height: isSpectating ? 'calc(100% - 36px)' : 'calc(100% - 56px)',
-              width: '320px',
+              width: 'min(320px, calc(100vw - 8px))',
               backgroundColor: 'rgba(8, 8, 12, 0.97)',
               borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
             }}

@@ -121,7 +121,7 @@ export function GameChat() {
       style={{
         bottom: 0,
         left: 0,
-        width: dims.isMobile ? '280px' : '320px',
+        width: dims.isMobile ? 'min(280px, calc(100vw - 16px))' : '320px',
         height: dims.isMobile ? '55vh' : '420px',
         maxHeight: '80vh',
         backgroundColor: 'rgba(8, 8, 12, 0.97)',
