@@ -465,12 +465,12 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
         {selectedCardIndex !== null && hand.length > 1 && (
           <div className="flex items-center gap-1">
             <SortPill
-              label="\u25C0"
+              label={t('game.hand.moveLeft')}
               onClick={moveCardLeft}
               accentColor={canMoveLeft ? 'rgba(196, 163, 90, 0.6)' : 'rgba(80,80,80,0.3)'}
             />
             <SortPill
-              label="\u25B6"
+              label={t('game.hand.moveRight')}
               onClick={moveCardRight}
               accentColor={canMoveRight ? 'rgba(196, 163, 90, 0.6)' : 'rgba(80,80,80,0.3)'}
             />

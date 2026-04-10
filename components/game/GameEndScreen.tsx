@@ -36,36 +36,12 @@ export function GameEndScreen() {
   const sealedDeckMissionIds = useGameStore((s) => s.sealedDeckMissionIds);
   const gameResult = useSocketStore((s) => s.gameResult);
   const rematchState = useSocketStore((s) => s.rematchState);
-  const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   const offerRematch = useSocketStore((s) => s.offerRematch);
   const acceptRematch = useSocketStore((s) => s.acceptRematch);
   const declineRematch = useSocketStore((s) => s.declineRematch);
 
-  // Redirect to deck selection (or booster opening for sealed) on rematch
-  const isSealedRoom = useSocketStore((s) => s.isSealedRoom);
-  useEffect(() => {
-    if (rematchRoomCode) {
-      const sealed = useSocketStore.getState().isSealedRoom;
-      useSocketStore.setState({ rematchRoomCode: null, rematchState: 'none' });
-      // Reset gameStore without disconnecting socket (players stay in room)
-      useGameStore.setState({
-        gameState: null,
-        visibleState: null,
-        isOnlineGame: false,
-        isProcessing: false,
-        gameOver: false,
-        winner: null,
-        replayInitialState: null,
-        animationQueue: [],
-        isAnimating: false,
-        pendingTargetSelection: null,
-        actionError: null,
-        sealedDeckCardIds: null,
-        sealedDeckMissionIds: null,
-      });
-      router.push(sealed ? '/play/sealed' : '/play/online');
-    }
-  }, [rematchRoomCode, router, isSealedRoom]);
+  // Online rematch redirect lives on GamePage so it fires even after this
+  // component unmounts. AI rematch navigates directly below.
 
   const handleChangeDeck = useCallback(() => {
     resetGame();

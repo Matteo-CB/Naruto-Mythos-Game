@@ -204,23 +204,34 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
-  // Handle rematch restart - reset gameOver so the board shows again
-  const rematchState = useSocketStore((s) => s.rematchState);
-  const gameOver = useGameStore((s) => s.gameOver);
+  // Rematch redirect — when the server emits game:rematch-reselect, it sets
+  // rematchRoomCode on the socket store. We need to navigate BOTH players to
+  // the deck selection page (or sealed booster opening) while keeping the
+  // socket connection + roomCode intact. This lives on the GamePage (not on
+  // GameEndScreen) because GameEndScreen gets unmounted the moment gameStore
+  // state is cleared, and we need the redirect to fire reliably.
+  const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   useEffect(() => {
-    if (isOnlineGame && rematchState === 'accepted' && gameOver) {
-      useGameStore.setState({
-        gameOver: false,
-        winner: null,
-        pendingTargetSelection: null,
-        animationQueue: [],
-        isAnimating: false,
-        replayInitialState: null,
-      });
-      // Reset rematchState so this doesn't re-trigger
-      useSocketStore.setState({ rematchState: 'none' });
-    }
-  }, [isOnlineGame, rematchState, gameOver]);
+    if (!rematchRoomCode) return;
+    const sealed = useSocketStore.getState().isSealedRoom;
+    useSocketStore.setState({ rematchRoomCode: null, rematchState: 'none' });
+    useGameStore.setState({
+      gameState: null,
+      visibleState: null,
+      isOnlineGame: false,
+      isProcessing: false,
+      gameOver: false,
+      winner: null,
+      replayInitialState: null,
+      animationQueue: [],
+      isAnimating: false,
+      pendingTargetSelection: null,
+      actionError: null,
+      sealedDeckCardIds: null,
+      sealedDeckMissionIds: null,
+    });
+    router.push(sealed ? '/play/sealed' : '/play/online');
+  }, [rematchRoomCode, router]);
 
   // Bridge socket game:error to gameStore actionError for online games
   useEffect(() => {

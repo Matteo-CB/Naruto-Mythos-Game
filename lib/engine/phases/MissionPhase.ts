@@ -150,24 +150,26 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
     { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, name_en: mission.card.name_en || mission.card.name_fr, p1Power, p2Power },
   );
 
-  // Determine winner - a player must have at least 1 power to win
+  // Determine winner — a player must have at least 1 total power to win.
+  // Totals may be negative; the ≥1 requirement is enforced here, not by clamping.
   let winner: PlayerID | 'draw' | null = null;
 
-  if (p1Power === 0 && p2Power === 0) {
-    // Both have 0 power - neither wins (draw)
-    winner = 'draw';
+  if (p1Power > p2Power) {
+    winner = p1Power >= 1 ? 'player1' : 'draw';
+  } else if (p2Power > p1Power) {
+    winner = p2Power >= 1 ? 'player2' : 'draw';
+  } else {
+    // Tie — both sides have identical totals. Edge holder wins if that total is ≥1.
+    winner = p1Power >= 1 ? state.edgeHolder : 'draw';
+  }
+
+  if (winner === 'draw') {
     log = logSystem(log, state.turn, 'mission', 'NO_WINNER',
-      `Mission ${missionIndex + 1}: Both players have 0 power - no winner.`,
+      `Mission ${missionIndex + 1}: Neither player has enough power to win (${p1Power} vs ${p2Power}).`,
       'game.log.noWinner',
       { index: missionIndex + 1 },
     );
-  } else if (p1Power > p2Power) {
-    winner = 'player1';
-  } else if (p2Power > p1Power) {
-    winner = 'player2';
-  } else {
-    // Non-zero tie - edge holder wins
-    winner = state.edgeHolder;
+  } else if (p1Power === p2Power) {
     log = logSystem(log, state.turn, 'mission', 'TIE_BREAK',
       `Tie on mission ${missionIndex + 1}. Edge holder (${state.edgeHolder}) wins.`,
       'game.log.tieBreak',
@@ -746,8 +748,9 @@ export function moveOrochimaru051(
 
 /**
  * Calculate total power for a player on a specific mission.
- * Hidden characters contribute 0 power.
- * Applies continuous power modifiers.
+ * Applies all continuous power modifiers. Totals may be negative when debuffs
+ * exceed base power; the "≥1 to win a mission" rule is enforced in scoreMission,
+ * not by clamping here.
  */
 function calculateMissionPower(
   state: GameState,
@@ -761,5 +764,5 @@ function calculateMissionPower(
     totalPower += calculateCharacterPower(state, char, player);
   }
 
-  return Math.max(0, totalPower);
+  return totalPower;
 }

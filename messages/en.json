@@ -352,7 +352,9 @@
     "handLabel": "Hand",
     "hand": {
       "sortCost": "Sort by Cost",
-      "sortPower": "Sort by Power"
+      "sortPower": "Sort by Power",
+      "moveLeft": "Left",
+      "moveRight": "Right"
     },
     "effect": {
       "orochimaruReveal": "Orochimaru: Infiltration",
