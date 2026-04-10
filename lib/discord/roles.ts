@@ -28,9 +28,9 @@ export const ELO_ROLES: EloRole[] = [
   { key: 'special_jonin',   label: 'Special Jonin',   color: 0x5A7ABB, colorHex: '#5A7ABB', minElo: 700, hoist: true },
   { key: 'elite_jonin',     label: 'Elite Jonin',     color: 0x5865F2, colorHex: '#5865F2', minElo: 1000, hoist: true },
   { key: 'legendary_sannin', label: 'Legendary Sannin', color: 0x9B59B6, colorHex: '#9B59B6', minElo: 1200, hoist: true },
-  { key: 'kage',            label: 'Kage',            color: 0xC4A35A, colorHex: '#C4A35A', minElo: 1500, hoist: true },
-  { key: 'sage',            label: 'Sage of Six Paths', color: 0xFFD700, colorHex: '#FFD700', minElo: 1700, hoist: true },
-  { key: 'will_of_fire',   label: '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂', color: 0xFF6B35, colorHex: '#FF6B35', minElo: 2200, hoist: true },
+  { key: 'kage',            label: 'Kage',            color: 0xC4A35A, colorHex: '#C4A35A', minElo: 1700, hoist: true },
+  { key: 'sage',            label: 'Sage of Six Paths', color: 0xFFD700, colorHex: '#FFD700', minElo: 2000, hoist: true },
+  { key: 'will_of_fire',   label: '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂', color: 0xFF6B35, colorHex: '#FF6B35', minElo: 2500, hoist: true },
 ];
 
 /** All roles including unranked */

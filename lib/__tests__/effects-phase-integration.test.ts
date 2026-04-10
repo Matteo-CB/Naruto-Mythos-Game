@@ -350,7 +350,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
     expect(power).toBe(5); // 3 base + 2 edge
   });
 
-  it('Sasuke debuff should reduce power (min 0)', () => {
+  it('Sasuke debuff should reduce power below zero', () => {
     const sasuke = mockCharInPlay({ instanceId: 'sas-1', missionIndex: 0 }, {
       id: 'KS-013-C', number: 13, name_fr: 'Sasuke', power: 2,
       effects: [{ type: 'MAIN', description: '[⧗] -1 Power for every other non-hidden friendly character in this mission.' }],
@@ -363,7 +363,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
     });
 
     const power = calculateCharacterPower(state, sasuke, 'player1');
-    expect(power).toBe(0); // 2 base - 3 allies = -1 → clamped to 0 (power never negative)
+    expect(power).toBe(-1); // 2 base - 3 allies = -1 (negative power is allowed)
   });
 });
 

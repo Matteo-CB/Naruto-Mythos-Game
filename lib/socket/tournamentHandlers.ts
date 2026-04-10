@@ -323,6 +323,30 @@ async function handleSwissMatchEnd(
         data: { currentRound: nextRound },
       });
 
+      // Auto-start absence timers for all non-bye matches in the new round
+      const newMatches = await prisma.tournamentMatch.findMany({
+        where: { tournamentId, round: nextRound, status: 'ready', isBye: false },
+      });
+      for (const nm of newMatches) {
+        const deadline = startAbsenceTimer(nm.id, async () => {
+          // Forfeit both players if neither showed up — pick player1 as "winner" by default
+          const absent1 = !matchReadyPlayers.get(nm.id)?.has(nm.player1Id ?? '');
+          const absent2 = !matchReadyPlayers.get(nm.id)?.has(nm.player2Id ?? '');
+          const forfeitId = absent1 ? nm.player1Id : nm.player2Id;
+          if (forfeitId) {
+            await handleMatchForfeit(io, tournamentId, nm.id, forfeitId);
+          }
+          matchReadyPlayers.delete(nm.id);
+        });
+        await prisma.tournamentMatch.update({
+          where: { id: nm.id },
+          data: { absenceDeadline: deadline, absentPlayerId: null },
+        });
+        io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+          matchId: nm.id, playerId: null, deadline: deadline.toISOString(),
+        });
+      }
+
       io.to(`tournament:${tournamentId}`).emit('tournament:round-complete', {
         completedRound: match.round, nextRound,
       });
@@ -511,6 +535,23 @@ export async function advanceMatchWinner(io: Server | null, tournamentId: string
   const p2 = isTopSlot ? updated.player2Id : winnerId;
   if (p1 && p2) {
     await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: { status: 'ready' } });
+    // Auto-start absence timer for the new ready match
+    if (io) {
+      const deadline = startAbsenceTimer(nextMatch.id, async () => {
+        const ready = matchReadyPlayers.get(nextMatch.id);
+        const absent1 = !ready?.has(p1!);
+        const forfeitId = absent1 ? p1! : p2!;
+        await handleMatchForfeit(io, tournamentId, nextMatch.id, forfeitId);
+        matchReadyPlayers.delete(nextMatch.id);
+      });
+      await prisma.tournamentMatch.update({
+        where: { id: nextMatch.id },
+        data: { absenceDeadline: deadline },
+      });
+      io.to(`tournament:${tournamentId}`).emit('tournament:absence-timer', {
+        matchId: nextMatch.id, playerId: null, deadline: deadline.toISOString(),
+      });
+    }
   }
 
   io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {

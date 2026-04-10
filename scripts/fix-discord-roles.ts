@@ -49,8 +49,8 @@ const ELO_ROLE_NAMES = [
   { name: '\u257C Special Jonin \u257E', minElo: 700 },
   { name: '\u257C Elite Jonin \u257E', minElo: 1000 },
   { name: '\u257C Legendary Sannin \u257E', minElo: 1200 },
-  { name: '\u257C Kage \u257E', minElo: 1500 },
-  { name: '\u257C Sage of Six Paths \u257E', minElo: 1700 },
+  { name: '\u257C Kage \u257E', minElo: 1700 },
+  { name: '\u257C Sage of Six Paths \u257E', minElo: 2000 },
 ];
 
 const ALL_MANAGED_ROLE_NAMES = [UNRANKED_ROLE_NAME, ...ELO_ROLE_NAMES.map(r => r.name)];

@@ -25,7 +25,7 @@ const STREAK_MAX_LEVELS = 5;  // cap at 5 levels = 40%
 const DEMOTION_SHIELD = 30;   // can't fall more than 30 below league threshold
 
 // League thresholds for demotion shield (ascending order)
-const LEAGUE_THRESHOLDS = [0, 450, 550, 700, 1000, 1200, 1500, 1700, 2200];
+const LEAGUE_THRESHOLDS = [0, 450, 550, 700, 1000, 1200, 1700, 2000, 2500]; // Kage 1700, Sage 2000, WoF 2500
 
 // ─── Core functions ──────────────────────────────────────────────────────────
 

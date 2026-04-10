@@ -90,7 +90,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'kage',
-    minElo: 1500,
+    minElo: 1700,
     color: '#C4A35A',
     bgColor: 'rgba(196, 163, 90, 0.1)',
     borderColor: 'rgba(196, 163, 90, 0.4)',
@@ -100,7 +100,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'sageOfSixPaths',
-    minElo: 1700,
+    minElo: 2000,
     color: '#FFD700',
     bgColor: 'rgba(255, 215, 0, 0.1)',
     borderColor: 'rgba(255, 215, 0, 0.5)',
@@ -110,7 +110,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'willOfFire',
-    minElo: 2200,
+    minElo: 2500,
     color: '#FF6B35',
     bgColor: 'rgba(255, 107, 53, 0.12)',
     borderColor: 'rgba(255, 107, 53, 0.6)',

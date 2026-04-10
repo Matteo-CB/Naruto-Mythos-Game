@@ -48,7 +48,8 @@ export default function SettingsPage() {
       }
       await updateSession({ name: data.username });
       setUsernameStatus('saved');
-      setTimeout(() => setUsernameStatus('idle'), 2000);
+      // Force page reload so ALL components pick up the new username from session
+      setTimeout(() => window.location.reload(), 1000);
     } catch {
       setUsernameError('Network error');
       setUsernameStatus('error');
