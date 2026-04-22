@@ -288,7 +288,8 @@ async function finalizeGameEnd(
 
   // Pre-emptive cleanup: delete old games to free space before writing ELO/game record
   try {
-    const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000);
+    const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
+    const cutoff = new Date(Date.now() - GAME_TTL_MS);
     await prisma.game.deleteMany({ where: { completedAt: { lt: cutoff }, status: 'completed' } });
   } catch { /* ignore cleanup errors */ }
 
@@ -343,6 +344,44 @@ async function finalizeGameEnd(
           player1TotalGames: updatedP1.wins + updatedP1.losses + updatedP1.draws,
           player2TotalGames: updatedP2.wins + updatedP2.losses + updatedP2.draws,
         };
+
+        // Persist per-player EloHistory snapshots so admins can audit ELO
+        // trajectories even after the Game row is purged (72h). These rows
+        // are kept for ELO_HISTORY_TTL_MS (14 days) — see lib/db/gameCleanup.ts.
+        const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
+        const p2Result: 'win' | 'loss' = winner === 'player2' ? 'win' : 'loss';
+        prisma.eloHistory.createMany({
+          data: [
+            {
+              userId: room.hostId!,
+              opponentId: room.guestId!,
+              opponentUsername: player2.username,
+              opponentElo: player2.elo,
+              oldElo: player1.elo,
+              newElo: changes.player1NewElo,
+              delta: changes.player1Delta,
+              result: p1Result,
+              myScore: p1Score,
+              opponentScore: p2Score,
+              isRanked: true,
+            },
+            {
+              userId: room.guestId!,
+              opponentId: room.hostId!,
+              opponentUsername: player1.username,
+              opponentElo: player1.elo,
+              oldElo: player2.elo,
+              newElo: changes.player2NewElo,
+              delta: changes.player2Delta,
+              result: p2Result,
+              myScore: p2Score,
+              opponentScore: p1Score,
+              isRanked: true,
+            },
+          ],
+        }).catch((err) => {
+          console.warn('[Socket] EloHistory write failed:', err instanceof Error ? err.message : err);
+        });
 
         // Sync Discord roles (fire-and-forget)
         syncDiscordRole(room.hostId).catch(() => {});
@@ -923,7 +962,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
   // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
   setInterval(() => cleanupStaleRooms(), 60_000);
 
-  // Periodic DB cleanup: delete games older than 12 hours (every 30 minutes)
+  // Periodic DB cleanup: delete games older than GAME_TTL_MS (every 30 minutes)
   setInterval(async () => {
     try {
       const { cleanupOldGames } = await import('@/lib/db/gameCleanup');

@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isCharacterCopyable } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 /**
  * Card 062/130 - SAKON (UC)
@@ -34,6 +35,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+      if (!isCharacterCopyable(topCard)) continue;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
         // Check if this card has at least one copyable instant effect
         const hasInstantEffect = topCard.effects?.some((eff) => {

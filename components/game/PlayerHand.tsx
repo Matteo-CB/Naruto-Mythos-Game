@@ -477,7 +477,9 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        {hand.length > 1 && (
+        {/* Sort pills — hidden on mobile to save vertical space (per designer
+            feedback). The manual left/right move arrows above still work. */}
+        {hand.length > 1 && !dims.isMobile && (
           <div className="flex items-center gap-2">
             <SortPill
               label={t('game.hand.sortCost')}
@@ -499,9 +501,13 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
-          {t('game.board.handCount', { count: hand.length })}
-        </span>
+        {/* Hand count pill is useful context but redundant on mobile where
+            the fanned cards are fully visible. Hide to save space. */}
+        {!dims.isMobile && (
+          <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
+            {t('game.board.handCount', { count: hand.length })}
+          </span>
+        )}
       </div>
     </div>
   );

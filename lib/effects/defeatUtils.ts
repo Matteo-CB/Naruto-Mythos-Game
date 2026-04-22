@@ -83,21 +83,17 @@ export function defeatCharacterInPlay(
 
   if (replacement.replaced) {
     if (replacement.replacement === 'hide') {
-      // Hide instead of defeat (Hayate 048 or Gaara 075)
-      const missions = [...state.activeMissions];
-      const m = { ...missions[missionIndex] };
-      const cs = [...m[side]];
-      cs[charIdx] = { ...cs[charIdx], isHidden: true };
-      m[side] = cs;
-      missions[missionIndex] = m;
-
+      // Hide instead of defeat (Hayate 048 or Gaara 075). Route through
+      // EffectEngine.hideCharacter so any characters this target is controlling
+      // (Ino 020 / Orochimaru 050 stolen cards) are returned to their original
+      // owners before the isHidden flag is flipped.
+      const hidden = EffectEngine.hideCharacter(state, charInstanceId);
       return {
-        ...state,
-        activeMissions: missions,
+        ...hidden,
         log: logAction(
-          state.log,
-          state.turn,
-          state.phase,
+          hidden.log,
+          hidden.turn,
+          hidden.phase,
           targetPlayer,
           'EFFECT_REPLACEMENT',
           `${targetChar.card.name_fr} was hidden instead of defeated (replacement effect).`,

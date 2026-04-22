@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { isCharacterCopyable } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
 /**
  * Card 148/130 - KAKASHI HATAKE (M)
@@ -52,6 +53,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       // Check if this character has keyword "Team 7"
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
+      if (!isCharacterCopyable(topCard)) continue;
 
       // Check if this character has any copyable instant effects
       // Kakashi 148 is AMBUSH (always revealed), so AMBUSH effects ARE copyable

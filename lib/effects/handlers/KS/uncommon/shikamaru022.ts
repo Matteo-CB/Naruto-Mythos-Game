@@ -70,13 +70,30 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     }
   }
 
-  // Step 2: If we found a primary action, scan forward from it to collect all characters
-  // that entered play (including via effects) during that same action sequence.
+  // Step 2: If we found a primary action, scan forward from it to collect all
+  // characters that entered play (including via chained effects) during the
+  // same action sequence. We `continue` (not `break`) on non-opponent entries
+  // so that reactive triggers from the Shikamaru side (e.g. Hinata gains
+  // chakra on opponent's play) don't cut the scan short and miss the
+  // opponent's subsequent effect-played characters (e.g. Sakura 135 S fetching
+  // Kabuto, Kakashi 016 copying Kabuto's play-from-discard, etc.). We stop
+  // only at the opponent's NEXT primary action (a new PLAY_* or PASS), which
+  // can't happen within the same action sequence anyway.
   if (primaryActionIdx >= 0) {
     for (let i = primaryActionIdx; i < state.log.length; i++) {
       const entry = state.log[i];
       if (entry.turn !== currentTurn || entry.phase !== 'action') break;
-      if (entry.player !== opponent) break;
+      if (entry.player !== opponent) continue;
+      // After the primary action, any *further* PASS from opponent means a
+      // new primary action would start — stop collection there.
+      if (i > primaryActionIdx && entry.action === 'PASS') break;
+      // A new PLAY_* primary from opponent after the first one (shouldn't
+      // occur within a single action but be defensive) also ends the chain.
+      if (i > primaryActionIdx && (PLAY_ACTIONS.has(entry.action) || entry.action === 'PLAY_HIDDEN')) {
+        // This is a fresh primary action, not part of the previous chain —
+        // but it IS still a play by the opponent, so we count it as a
+        // multi-play primary (shouldn't happen in practice, but don't miss it).
+      }
 
       const missionNum = entry.messageParams?.mission != null
         ? Number(entry.messageParams.mission) - 1

@@ -12,6 +12,7 @@ import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { EloBadgeLarge, EloBadge } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
+import { EloHistoryChart } from '@/components/EloHistoryChart';
 
 interface ProfileData {
   id: string;
@@ -380,6 +381,11 @@ export default function ProfilePage({
             </div>
           </section>
         )}
+
+        {/* ──── ELO History (last 14 days) ──── */}
+        <section className="mb-6">
+          <EloHistoryChart username={profile.username} />
+        </section>
 
         {/* ──── Recent Games ──── */}
         <section>

@@ -867,6 +867,7 @@
       "invalidMission": "Index de mission invalide.",
       "targetNotFound": "Personnage cible introuvable.",
       "cannotUpgradeOpponent": "Impossible d'UPGRADE le personnage adverse.",
+      "cannotUpgradeControlled": "Impossible d'UPGRADE un personnage sous contrôle.",
       "cannotUpgradeHidden": "Impossible d'UPGRADE un personnage cache.",
       "upgradeSameName": "L'UPGRADE doit porter le meme nom de personnage.",
       "flexibleUpgradeRestriction": "Impossible d'UPGRADE sur un Invocation ou Orochimaru.",

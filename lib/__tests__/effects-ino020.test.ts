@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { initializeRegistry, getEffectHandler } from '@/lib/effects/EffectRegistry';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
+import { checkChoji018PostMoveTrigger } from '@/lib/effects/moveTriggers';
 import { GameEngine } from '@/lib/engine/GameEngine';
 import type { GameState, CharacterInPlay, ActiveMission, CharacterCard, MissionCard, PlayerID } from '@/lib/engine/types';
 
@@ -104,5 +105,87 @@ describe('Ino 020 (UC) - Take Control', () => {
     const afterSelect = GameEngine.applyAction(afterUpgradeConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: selectPa.id, selectedTargets: ['e3'] });
     expect(afterSelect.activeMissions[0].player2Characters.some(c => c.instanceId === 'e3')).toBe(false);
     expect(afterSelect.activeMissions[0].player1Characters.some(c => c.instanceId === 'e3')).toBe(true);
+  });
+
+  describe('take-control and controller-leaves-play (advanced ruling)', () => {
+    it('hiding the controller does NOT break control — stolen card stays on controller side', () => {
+      // Per the advanced ruling (Marcello, Naruto Mythos TCG): hide does not
+      // return stolen cards anymore. Only an actual leave-play does.
+      const itachi = mockChar({
+        instanceId: 'itachi-1',
+        card: mockCard({ id: 'KS-090-C', number: 90, name_fr: 'ITACHI UCHIWA', chakra: 2, power: 3 }),
+        controlledBy: 'player2',
+        originalOwner: 'player1',
+        controllerInstanceId: 'ino-1',
+      });
+      const ino = mockChar({
+        instanceId: 'ino-1',
+        card: ino020,
+        controlledBy: 'player2',
+        originalOwner: 'player2',
+      });
+      const state = makeState({
+        activeMissions: [
+          mockMission({
+            player1Characters: [],
+            player2Characters: [ino, itachi],
+          }),
+          mockMission({ rank: 'C', rankBonus: 2 }),
+        ],
+      });
+
+      const after = EffectEngine.hideCharacterWithLog(state, 'ino-1', 'player1');
+
+      // Ino is hidden, on player2's side.
+      const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
+      expect(hiddenIno?.isHidden).toBe(true);
+
+      // Itachi stays on player2's side with controller link preserved.
+      const itachiStill = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
+      expect(itachiStill).toBeDefined();
+      expect(itachiStill?.controlledBy).toBe('player2');
+      expect(itachiStill?.controllerInstanceId).toBe('ino-1');
+      expect(after.activeMissions[0].player1Characters).toEqual([]);
+    });
+
+    it('Choji 018 post-move hide on the controller leaves the stolen card in place', () => {
+      const itachi = mockChar({
+        instanceId: 'itachi-1',
+        card: mockCard({ id: 'KS-090-C', number: 90, name_fr: 'ITACHI UCHIWA', chakra: 2, power: 5 }),
+        controlledBy: 'player2',
+        originalOwner: 'player1',
+        controllerInstanceId: 'ino-1',
+      });
+      const ino = mockChar({
+        instanceId: 'ino-1',
+        card: ino020,
+        controlledBy: 'player2',
+        originalOwner: 'player2',
+      });
+      const choji018 = mockCard({
+        id: 'KS-018-UC', number: 18, name_fr: 'CHOJI AKIMICHI', rarity: 'UC',
+        chakra: 4, power: 4,
+        keywords: ['Team 10', 'Jutsu'], group: 'Leaf Village',
+        effects: [{ type: 'MAIN', description: '[⧗] After you move this character, hide an enemy character in this mission with less Power than this character.' }],
+      });
+      const choji = mockChar({ instanceId: 'choji-1', card: choji018, missionIndex: 0 });
+      const state = makeState({
+        activeMissions: [
+          mockMission({ player1Characters: [choji], player2Characters: [ino, itachi] }),
+          mockMission({ rank: 'C', rankBonus: 2 }),
+        ],
+      });
+
+      const after = checkChoji018PostMoveTrigger(state, choji, 0, 'player1', 'player1');
+
+      // Ino hidden on player2 side; Itachi still under control on the same side.
+      const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
+      expect(hiddenIno?.isHidden).toBe(true);
+
+      const itachiStill = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
+      expect(itachiStill).toBeDefined();
+      expect(itachiStill?.controlledBy).toBe('player2');
+      expect(itachiStill?.controllerInstanceId).toBe('ino-1');
+    });
   });
 });

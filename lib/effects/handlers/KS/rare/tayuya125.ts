@@ -28,12 +28,12 @@ function tayuya125MainHandler(ctx: EffectContext): EffectResult {
 function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
-  const friendlySide: 'player1Characters' | 'player2Characters' =
-    sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
   const validTargets: string[] = [];
 
-  // Find Sound Village characters in hand that the player can afford (fresh play OR upgrade, cost - 2)
+  // Per designer ruling: Tayuya 125 UPGRADE plays a Sound Village character
+  // from HAND only (like Jiraiya 007), not from the board. Hidden board
+  // characters are NOT valid targets for this effect.
   for (let i = 0; i < playerState.hand.length; i++) {
     const card = playerState.hand[i];
     if (card.group === 'Sound Village') {
@@ -46,21 +46,6 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     }
   }
 
-  // Also find hidden friendly Sound Village characters on the board that can be revealed (cost - 2)
-  for (const mission of state.activeMissions) {
-    for (const char of mission[friendlySide]) {
-      if (!char.isHidden) continue;
-      // Player knows their own hidden cards - can target them by group
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.group === 'Sound Village') {
-        const revealCost = Math.max(0, topCard.chakra - 2);
-        if (playerState.chakra >= revealCost) {
-          validTargets.push(`board:${char.instanceId}`);
-        }
-      }
-    }
-  }
-
   if (validTargets.length === 0) {
     return {
       state: {
@@ -68,33 +53,12 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
         log: logAction(
           state.log, state.turn, state.phase, sourcePlayer,
           'EFFECT_NO_TARGET',
-          'Tayuya (125) UPGRADE: No affordable Sound Village character in hand or hidden on board (cost reduced by 2).',
+          'Tayuya (125) UPGRADE: No affordable Sound Village character in hand (cost reduced by 2).',
           'game.log.effect.noTarget',
           { card: 'TAYUYA', id: 'KS-125-R' },
         ),
       },
     };
-  }
-
-  // Embed hidden board char info so the UI can display card names/images for board: targets
-  const hiddenBoardChars: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
-  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
-    const mission = state.activeMissions[mIdx];
-    for (const char of mission[friendlySide]) {
-      if (!char.isHidden) continue;
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.group === 'Sound Village') {
-        hiddenBoardChars.push({
-          instanceId: char.instanceId,
-          name_fr: topCard.name_fr,
-          name_en: topCard.name_en,
-          chakra: topCard.chakra ?? 0,
-          power: topCard.power ?? 0,
-          image_file: topCard.image_file,
-          missionIndex: mIdx,
-        });
-      }
-    }
   }
 
   // CONFIRM popup before executing
@@ -104,8 +68,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     targetSelectionType: 'TAYUYA125_CONFIRM_UPGRADE',
     validTargets: [ctx.sourceCard.instanceId],
     description: JSON.stringify({
-      text: 'Tayuya (125) UPGRADE: Play a Sound Village character, paying 2 less.',
-      hiddenChars: hiddenBoardChars,
+      text: 'Tayuya (125) UPGRADE: Play a Sound Village character from hand, paying 2 less.',
     }),
     descriptionKey: 'game.effect.desc.tayuya125ConfirmUpgrade',
     isOptional: true,

@@ -1205,13 +1205,21 @@ export function TargetSelector() {
                 const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
                 const isHighlight = card.isSummon || card.isMatch;
                 const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#333333';
+                // Whole-card click opens the fullscreen zoom — required so the
+                // player can read the card's effects / keywords on mobile
+                // (where hover doesn't fire) and so the info is always
+                // reachable without hunting for a tiny hover button.
+                const openZoom = () => useUIStore.getState().zoomCard(card as unknown as CharacterCard);
                 return (
                   <motion.div
                     key={idx}
                     initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
                     animate={{ scale: 1, rotateY: 0, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.2 + idx * 0.1 }}
-                    className="relative"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={openZoom}
+                    className="relative cursor-pointer"
                     style={{
                       width: dims.previewMed.w + 'px',
                       height: dims.previewMed.h + 'px',
@@ -1243,13 +1251,12 @@ export function TargetSelector() {
                     <div className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[9px] font-bold" style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#4a9eff', border: '1px solid #4a9eff' }}>
                       {card.chakra}
                     </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); useUIStore.getState().zoomCard(card as unknown as CharacterCard); }}
-                      className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#8b5cf6', border: '1px solid rgba(138,92,246,0.4)' }}
+                    <div
+                      className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold pointer-events-none"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: '#8b5cf6', border: '1px solid rgba(138,92,246,0.3)' }}
                     >
                       {t('game.board.details')}
-                    </button>
+                    </div>
                   </motion.div>
                 );
               })}

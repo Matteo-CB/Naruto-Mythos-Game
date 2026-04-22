@@ -21,8 +21,13 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Count total characters in this mission (both sides, including hidden)
-  const totalChars = mission.player1Characters.length + mission.player2Characters.length;
+  // Count every character in this mission (both sides, hidden included).
+  // Per designer ruling "Jirobo counts everything", Jirobo himself is part of
+  // the count — guarantee it regardless of play-path timing by checking
+  // whether the source card is already in the mission and adding 1 if not.
+  const allChars = [...mission.player1Characters, ...mission.player2Characters];
+  const selfAlreadyCounted = allChars.some((c) => c.instanceId === sourceCard.instanceId);
+  const totalChars = allChars.length + (selfAlreadyCounted ? 0 : 1);
 
   if (totalChars === 0) {
     return { state };

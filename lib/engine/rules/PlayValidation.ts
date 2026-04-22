@@ -231,6 +231,13 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
+  // Per the advanced ruling, controlled cards (Ino 020 / Orochimaru 050 /
+  // Kabuto infiltrator) cannot be upgraded — even by the current controller.
+  // Detected by controlledBy ≠ originalOwner (someone took control of it).
+  if (target.controlledBy !== target.originalOwner) {
+    return { valid: false, reason: 'Cannot upgrade a controlled character.', reasonKey: 'game.error.cannotUpgradeControlled' };
+  }
+
   // Hidden characters have no visible name — cannot be upgrade targets
   if (target.isHidden) {
     return { valid: false, reason: 'Hidden' };

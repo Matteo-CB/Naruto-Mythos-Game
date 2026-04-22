@@ -34,6 +34,7 @@ model User {
   friendshipsReceived Friendship[]  @relation("FriendshipReceived")
   matchInvitesSent     MatchInvite[] @relation("MatchInviteSent")
   matchInvitesReceived MatchInvite[] @relation("MatchInviteReceived")
+  eloHistory        EloHistory[]
   accounts          Account[]
   tournamentWins    Int          @default(0)
   chatBanned        Boolean      @default(false)
@@ -43,6 +44,30 @@ model User {
   allowSpectatorHand Boolean     @default(false)
   consecutiveWins    Int          @default(0)
   consecutiveLosses  Int          @default(0)
+}
+
+/// Per-game ELO snapshot. Survives the Game row purge (72h) up to 14 days so
+/// admins can audit a player's recent ELO trajectory even after the source
+/// Game has been deleted. Purged by cleanupOldEloHistory in lib/db/gameCleanup.ts.
+model EloHistory {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String    @db.ObjectId
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId           String?   @db.ObjectId  // may be null after the Game is purged
+  opponentId       String?   @db.ObjectId  // nullable: opponent account might be deleted
+  opponentUsername String                  // duplicated so the row is self-describing
+  opponentElo      Int                     // opponent ELO at the time the game finished
+  oldElo           Int                     // this user's ELO BEFORE the game
+  newElo           Int                     // this user's ELO AFTER the game
+  delta            Int                     // newElo - oldElo (signed)
+  result           String                  // "win" | "loss" | "draw"
+  myScore          Int                     // mission points scored by this user
+  opponentScore    Int                     // mission points scored by the opponent
+  isRanked         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
 
 model Account {

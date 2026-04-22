@@ -2,6 +2,10 @@ import type { GameState, PlayerID, CharacterInPlay, PendingEffect, PendingAction
 import { logAction } from '../engine/utils/gameLog';
 import { generateInstanceId } from '../engine/utils/id';
 import { canBeHiddenByEnemy } from './ContinuousEffects';
+// Circular-safe: EffectEngine.ts also imports from this file, but its class
+// body is fully evaluated by the time these trigger functions are actually
+// invoked at runtime (effect processing happens after module load).
+import { EffectEngine } from './EffectEngine';
 
 /**
  * Check and trigger Ninja Hounds 100 continuous move effect.
@@ -215,30 +219,11 @@ export function checkChoji018PostMoveTrigger(
   }
 
   if (hideTargets.length === 1) {
-    // Auto-hide single target
-    const targetId = hideTargets[0];
-    const missions = [...state.activeMissions];
-    const m = { ...missions[destMissionIndex] };
-    const chars = [...m[enemySide]];
-    const idx = chars.findIndex(c => c.instanceId === targetId);
-    if (idx !== -1) {
-      const targetName = chars[idx].card.name_fr;
-      chars[idx] = { ...chars[idx], isHidden: true };
-      m[enemySide] = chars;
-      missions[destMissionIndex] = m;
-      return {
-        ...state,
-        activeMissions: missions,
-        log: logAction(
-          state.log, state.turn, state.phase, charController,
-          'EFFECT_HIDE',
-          `Choji Akimichi (018): Hid ${targetName} after moving (less Power).`,
-          'game.log.effect.hide',
-          { card: 'CHOJI AKIMICHI', id: 'KS-018-UC', target: targetName },
-        ),
-      };
-    }
-    return state;
+    // Auto-hide single target via hideCharacterWithLog so that protection
+    // effects (Kimimaro 056, Shino 115, Gemma 049) get a chance to intercept.
+    // Per the advanced ruling, hide does NOT break control — controlled
+    // characters stay on the controller's side when the controller is hidden.
+    return EffectEngine.hideCharacterWithLog(state, hideTargets[0], charController);
   }
 
   // Multiple targets: create pending target selection

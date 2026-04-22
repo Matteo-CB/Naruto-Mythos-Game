@@ -44,7 +44,16 @@ interface PendingTargetSelection {
   effectChoices?: Array<{ effectType: string; description: string }>; // for effect copy choice (Kakashi/Sakon)
   handCards?: Array<{ index: number; card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; missionLabel?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }; targetId?: string }>; // for hand selection
   revealedCard?: { name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; canSteal: boolean; revealTitleKey?: string; revealResultKey?: string }; // for info reveal (Orochimaru, Itachi, etc.)
-  revealedCards?: Array<{ name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
+  revealedCards?: Array<{
+    id?: string; name_fr: string; name_en?: string;
+    title_fr?: string; title_en?: string;
+    chakra: number; power: number; image_file?: string;
+    isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean;
+    // Full-card fields (optional) so the reveal UI can show effects / keywords
+    // when the user clicks a revealed card — used for Sasuke 014 and Itachi 091.
+    effects?: Array<{ type: string; description: string }>;
+    keywords?: string[]; group?: string; rarity?: string; card_type?: string;
+  }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
   // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
@@ -716,8 +725,13 @@ function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.itachi091RevealTitle',
           revealResultKey: 'game.effect.itachi091RevealResult',
         };
-        revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean }) => ({
-          name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file, isDiscarded: c.isDiscarded ?? false,
+        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; isDiscarded?: boolean; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => ({
+          id: c.id, name_fr: c.name_fr, name_en: c.name_en,
+          title_fr: c.title_fr, title_en: c.title_en,
+          chakra: c.chakra, power: c.power, image_file: c.image_file,
+          isDiscarded: c.isDiscarded ?? false,
+          effects: c.effects, keywords: c.keywords, group: c.group,
+          rarity: c.rarity, card_type: c.card_type,
         }));
       } else if (isDosuLookReveal) {
         revealedCard = {
@@ -732,8 +746,12 @@ function buildPendingTargetSelectionUI(
           revealTitleKey: 'game.effect.sasuke014RevealTitle',
           revealResultKey: 'game.effect.sasuke014RevealResult',
         };
-        revealedCards = (rd.cards ?? []).map((c: { name_fr: string; chakra: number; power: number; image_file?: string }) => ({
-          name_fr: c.name_fr, chakra: c.chakra, power: c.power, image_file: c.image_file,
+        revealedCards = (rd.cards ?? []).map((c: { id?: string; name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra: number; power: number; image_file?: string; effects?: Array<{ type: string; description: string }>; keywords?: string[]; group?: string; rarity?: string; card_type?: string }) => ({
+          id: c.id, name_fr: c.name_fr, name_en: c.name_en,
+          title_fr: c.title_fr, title_en: c.title_en,
+          chakra: c.chakra, power: c.power, image_file: c.image_file,
+          effects: c.effects, keywords: c.keywords, group: c.group,
+          rarity: c.rarity, card_type: c.card_type,
         }));
       } else if (isTayuya065Reveal) {
         revealedCard = {

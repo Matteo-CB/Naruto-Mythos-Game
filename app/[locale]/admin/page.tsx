@@ -13,7 +13,7 @@ import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-type Tab = 'settings' | 'cards' | 'backgrounds' | 'players' | 'reports';
+type Tab = 'settings' | 'cards' | 'backgrounds' | 'players' | 'reports' | 'suspicious';
 
 interface ActionResult {
   success: boolean;
@@ -397,6 +397,7 @@ export default function AdminPage() {
     { key: 'backgrounds', label: t('tabBackgrounds') },
     { key: 'players', label: 'Players' },
     { key: 'reports', label: tc('moderation.reports') },
+    { key: 'suspicious', label: 'Suspicious' },
   ];
 
   return (
@@ -839,6 +840,8 @@ export default function AdminPage() {
 
         {tab === 'reports' && <ReportsPanel />}
 
+        {tab === 'suspicious' && <SuspiciousPanel />}
+
       </div>
       <Footer />
     </main>
@@ -990,6 +993,270 @@ function ReportsPanel() {
           ))}
         </>
       )}
+    </div>
+  );
+}
+
+// ============================================================================
+// SUSPICIOUS PANEL
+// ============================================================================
+
+interface SuspiciousUser {
+  id: string; username: string; email: string; elo: number;
+  wins: number; losses: number; draws: number;
+  discordId: string | null; createdAt: string;
+}
+interface SuspiciousGame {
+  id: string; player1Id: string | null; player2Id: string | null;
+  player1Name: string | null; player2Name: string | null;
+  winnerId: string | null; player1Score: number; player2Score: number;
+  eloChange: number | null; durationSec: number | null;
+  completedAt: string | null; createdAt: string;
+}
+interface SuspiciousFinding {
+  id: string;
+  type: string;
+  severity: 'low' | 'medium' | 'high';
+  title: string;
+  description: string;
+  users: SuspiciousUser[];
+  game: SuspiciousGame | null;
+  metrics: Record<string, string | number>;
+}
+
+function SuspiciousPanel() {
+  const [findings, setFindings] = useState<SuspiciousFinding[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState('');
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const [actionMsg, setActionMsg] = useState<string | null>(null);
+  const [actioningId, setActioningId] = useState<string | null>(null);
+  const [confirmRevertGameId, setConfirmRevertGameId] = useState<string | null>(null);
+
+  const runAnalysis = async (opts?: { user?: string }) => {
+    setLoading(true);
+    setError(null);
+    setActionMsg(null);
+    try {
+      const qs = opts?.user ? `?user=${encodeURIComponent(opts.user)}` : '';
+      const res = await fetch(`/api/admin/suspicious${qs}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? 'Analysis failed');
+        setFindings([]);
+      } else {
+        setFindings(data.findings ?? []);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Analysis failed');
+      setFindings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    runAnalysis();
+  }, []);
+
+  const handleRevertElo = async (gameId: string) => {
+    setActioningId(gameId);
+    setActionMsg(null);
+    try {
+      const res = await fetch('/api/admin/suspicious', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'revert-elo', gameId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setActionMsg(`Revert failed: ${data.message ?? data.error ?? 'unknown error'}`);
+      } else {
+        setActionMsg(data.message);
+        await runAnalysis(filter ? { user: filter } : undefined);
+      }
+    } catch (e) {
+      setActionMsg(`Revert failed: ${e instanceof Error ? e.message : 'unknown error'}`);
+    } finally {
+      setActioningId(null);
+      setConfirmRevertGameId(null);
+    }
+  };
+
+  const visible = findings.filter((f) => !dismissed.has(f.id));
+
+  const severityColor = (s: SuspiciousFinding['severity']) =>
+    s === 'high' ? '#b33e3e' : s === 'medium' ? '#c4a35a' : '#888888';
+
+  return (
+    <div className="max-w-4xl flex flex-col gap-4">
+      <div className="rounded-lg p-4" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
+        <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: '#c4a35a' }}>
+          Suspicious activity detector
+        </h2>
+        <p className="text-[11px] mb-3" style={{ color: '#666' }}>
+          Heuristics: same email base / Discord ID across accounts, accounts created minutes apart that played each other, repeat opponents (last 72h), sub-60s ranked forfeits (last 72h), new accounts with abnormally high win rates. Completed ranked games older than 72h are purged by the server, so game-based signals only cover the most recent window.
+        </p>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Filter by user id or username…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runAnalysis(filter ? { user: filter } : undefined)}
+            className="flex-1 px-3 py-1.5 text-xs rounded"
+            style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#ddd' }}
+          />
+          <button
+            onClick={() => runAnalysis(filter ? { user: filter } : undefined)}
+            disabled={loading}
+            className="px-3 py-1.5 text-[11px] rounded uppercase tracking-wider font-bold cursor-pointer"
+            style={{ backgroundColor: '#c4a35a', color: '#0a0a0a' }}
+          >
+            {loading ? 'Running…' : 'Run analysis'}
+          </button>
+          {filter && (
+            <button
+              onClick={() => { setFilter(''); runAnalysis(); }}
+              className="px-3 py-1.5 text-[11px] rounded"
+              style={{ backgroundColor: '#141414', border: '1px solid #333', color: '#888' }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        {error && (
+          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: '#b33e3e', border: '1px solid #b33e3e33' }}>
+            {error}
+          </div>
+        )}
+        {actionMsg && (
+          <div className="mt-3 text-[11px] px-3 py-2 rounded" style={{ backgroundColor: 'rgba(196,163,90,0.1)', color: '#c4a35a', border: '1px solid #c4a35a33' }}>
+            {actionMsg}
+          </div>
+        )}
+        <div className="mt-3 text-[10px]" style={{ color: '#555' }}>
+          {visible.length} finding{visible.length !== 1 ? 's' : ''} shown
+          {dismissed.size > 0 && ` (${dismissed.size} dismissed this session)`}
+        </div>
+      </div>
+
+      {visible.length === 0 && !loading && (
+        <div className="rounded-lg p-6 text-center" style={{ backgroundColor: '#111', border: '1px solid #1e1e1e' }}>
+          <span className="text-xs" style={{ color: '#555' }}>
+            No findings. {filter ? 'Try a different user filter or clear it to see global results.' : 'Nothing flagged right now.'}
+          </span>
+        </div>
+      )}
+
+      {visible.map((f) => (
+        <div
+          key={f.id}
+          className="rounded-lg p-4 flex flex-col gap-3"
+          style={{ backgroundColor: '#141414', border: `1px solid ${severityColor(f.severity)}44` }}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="text-[9px] px-2 py-0.5 rounded uppercase font-bold tracking-wider"
+                style={{ backgroundColor: `${severityColor(f.severity)}22`, color: severityColor(f.severity) }}
+              >
+                {f.severity}
+              </span>
+              <span className="text-[9px] px-2 py-0.5 rounded uppercase" style={{ backgroundColor: '#0a0a0a', color: '#888', border: '1px solid #262626' }}>
+                {f.type.replace(/_/g, ' ')}
+              </span>
+              <span className="text-sm font-bold" style={{ color: '#ddd' }}>{f.title}</span>
+            </div>
+            <button
+              onClick={() => setDismissed((s) => new Set(s).add(f.id))}
+              className="text-[10px] px-2 py-1 rounded"
+              style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626', color: '#666' }}
+              title="Hide this finding for the rest of the session"
+            >
+              Dismiss
+            </button>
+          </div>
+
+          <p className="text-[11px]" style={{ color: '#aaa' }}>{f.description}</p>
+
+          {f.users.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>Involved accounts</div>
+              {f.users.map((u) => (
+                <div key={u.id} className="flex items-center gap-3 text-[11px] flex-wrap" style={{ color: '#ccc' }}>
+                  <span className="font-bold" style={{ color: '#c4a35a' }}>{u.username}</span>
+                  <span style={{ color: '#666' }}>ELO {u.elo}</span>
+                  <span style={{ color: '#666' }}>W/L/D {u.wins}/{u.losses}/{u.draws}</span>
+                  <span style={{ color: '#555' }}>{u.email}</span>
+                  {u.discordId && <span style={{ color: '#555' }}>discord {u.discordId}</span>}
+                  <span style={{ color: '#444' }}>created {new Date(u.createdAt).toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {f.game && (
+            <div className="flex flex-col gap-1 mt-1 pt-2" style={{ borderTop: '1px solid #262626' }}>
+              <div className="text-[10px] uppercase tracking-wider" style={{ color: '#555' }}>Game</div>
+              <div className="text-[11px] flex items-center gap-3 flex-wrap" style={{ color: '#ccc' }}>
+                <span style={{ color: '#666' }}>#{f.game.id.slice(-8)}</span>
+                <span>{f.game.player1Name ?? '?'} {f.game.player1Score} — {f.game.player2Score} {f.game.player2Name ?? '?'}</span>
+                {f.game.durationSec != null && <span style={{ color: '#666' }}>{f.game.durationSec}s</span>}
+                {f.game.eloChange != null && <span style={{ color: '#666' }}>ELO Δ {f.game.eloChange}</span>}
+                {f.game.completedAt && <span style={{ color: '#444' }}>{new Date(f.game.completedAt).toLocaleString()}</span>}
+              </div>
+              {confirmRevertGameId === f.game.id ? (
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[10px]" style={{ color: '#b33e3e' }}>Confirm revert ELO for this game?</span>
+                  <button
+                    onClick={() => f.game && handleRevertElo(f.game.id)}
+                    disabled={actioningId === f.game.id}
+                    className="text-[10px] px-3 py-1 rounded"
+                    style={{ backgroundColor: '#b33e3e', color: '#fff' }}
+                  >
+                    {actioningId === f.game.id ? 'Reverting…' : 'Yes, revert'}
+                  </button>
+                  <button
+                    onClick={() => setConfirmRevertGameId(null)}
+                    className="text-[10px] px-3 py-1 rounded"
+                    style={{ backgroundColor: '#0a0a0a', border: '1px solid #333', color: '#888' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    onClick={() => f.game && setConfirmRevertGameId(f.game.id)}
+                    disabled={f.game.eloChange == null}
+                    className="text-[10px] px-3 py-1 rounded cursor-pointer"
+                    style={{
+                      backgroundColor: f.game.eloChange == null ? '#141414' : 'rgba(179,62,62,0.1)',
+                      color: f.game.eloChange == null ? '#555' : '#b33e3e',
+                      border: `1px solid ${f.game.eloChange == null ? '#262626' : '#b33e3e44'}`,
+                    }}
+                    title={f.game.eloChange == null ? 'No ELO change to revert' : undefined}
+                  >
+                    Revert ELO
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {Object.keys(f.metrics).length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap text-[10px]" style={{ color: '#555' }}>
+              {Object.entries(f.metrics).map(([k, v]) => (
+                <span key={k} className="px-2 py-0.5 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }}>
+                  {k}: <span style={{ color: '#888' }}>{String(v)}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

@@ -38,35 +38,61 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find eligible friendly targets (non-hidden, not Sasuke himself)
+  // Eligible friendly targets: non-hidden, not Sasuke himself.
   const friendlyTargets = mission[friendlySide].filter(
     (c) => !c.isHidden && c.instanceId !== ctx.sourceCard.instanceId,
   );
+  // Any enemy in this mission is a valid target (including hidden — hidden
+  // characters have power 0 but are still valid defeat targets).
   const enemyTargets = mission[enemySide];
 
-  if (friendlyTargets.length === 0 || enemyTargets.length === 0) {
+  // "MUST, IF ABLE" semantics per the advanced ruling: the card is always
+  // playable; whichever side actually has a target still gets forced into
+  // selection. Only if both sides are empty does the effect fizzle entirely.
+  const hasFriendly = friendlyTargets.length > 0;
+  const hasEnemy = enemyTargets.length > 0;
+
+  if (!hasFriendly && !hasEnemy) {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
       'EFFECT_NO_TARGET',
-      'Sasuke Uchiwa (136): No valid targets for mutual destruction (upgrade).',
+      'Sasuke Uchiwa (136) UPGRADE: No friendly nor enemy character in this mission to defeat.',
       'game.log.effect.noTarget',
       { card: 'SASUKE UCHIWA', id: 'KS-136-S' },
     );
     return { state: { ...state, log } };
   }
 
-  // Stage 1: Player chooses which friendly to sacrifice
+  // Stage 1 — pick the friendly to defeat. If no friendly, skip straight
+  // to enemy-only stage by reusing the same two-stage resolver but signaling
+  // that the friendly step has nothing to do.
+  if (hasFriendly) {
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SASUKE136_CHOOSE_FRIENDLY',
+      validTargets: friendlyTargets.map((c) => c.instanceId),
+      isMandatory: true,
+      description: JSON.stringify({
+        missionIndex: ctx.sourceMissionIndex,
+        text: 'Sasuke Uchiwa (136) UPGRADE: Choose a friendly character to defeat.',
+      }),
+      descriptionKey: 'game.effect.desc.sasuke136ChooseFriendly',
+    };
+  }
+
+  // No friendly, only enemy — jump to Stage 2 directly (defeat an enemy).
   return {
     state,
     requiresTargetSelection: true,
-    targetSelectionType: 'SASUKE136_CHOOSE_FRIENDLY',
-    validTargets: friendlyTargets.map((c) => c.instanceId),
+    targetSelectionType: 'SASUKE136_CHOOSE_ENEMY',
+    validTargets: enemyTargets.map((c) => c.instanceId),
     isMandatory: true,
     description: JSON.stringify({
       missionIndex: ctx.sourceMissionIndex,
-      text: 'Sasuke Uchiwa (136) UPGRADE: Choose a friendly character to defeat.',
+      text: 'Sasuke Uchiwa (136) UPGRADE: No friendly to sacrifice — choose an enemy to defeat.',
     }),
-    descriptionKey: 'game.effect.desc.sasuke136ChooseFriendly',
+    descriptionKey: 'game.effect.desc.sasuke136ChooseEnemy',
   };
 }
 
