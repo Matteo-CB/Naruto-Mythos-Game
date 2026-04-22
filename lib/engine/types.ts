@@ -237,6 +237,12 @@ export interface PendingEffect {
   remainingEffectTypes?: EffectType[];
   // When the selecting player differs from the source player (e.g., opponent choices)
   selectingPlayer?: PlayerID;
+  // Set to true when this pending descends (directly or transitively) from an
+  // optional confirm popup. Lets the target-selection UI show a Cancel button
+  // all the way down the chain so a player who accepts an optional effect by
+  // mistake can still back out before committing a target choice. Propagated
+  // automatically by the dispatcher — handlers don't need to set it.
+  rootOptional?: boolean;
 }
 
 export interface PendingAction {

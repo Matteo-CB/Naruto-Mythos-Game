@@ -856,7 +856,13 @@ function buildPendingTargetSelectionUI(
     playerName,
     engineTargetSelectionType: tst || undefined,
     onSelect,
-    onDecline: isMultiSelectChoose ? onDecline : (pendingEffect?.isOptional ? onDecline : undefined),
+    onDecline: isMultiSelectChoose
+      ? onDecline
+      // Offer Cancel not just for the initial optional confirm popup but for
+      // EVERY descendant of it (rootOptional is propagated automatically by
+      // EffectEngine.applyTargetedEffect). So a player who accepted an
+      // optional effect by mistake can still back out of the target picker.
+      : ((pendingEffect?.isOptional || pendingEffect?.rootOptional) ? onDecline : undefined),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
     minSelections: isMultiSelectChoose ? (pendingAction.minSelections ?? 0) : (tst === 'ORDERED_DEFEAT' ? pendingAction.minSelections : undefined),

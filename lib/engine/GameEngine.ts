@@ -635,7 +635,11 @@ export class GameEngine {
       if (effectIdx === -1) return state;
 
       const effect = newState.pendingEffects[effectIdx];
-      if (!effect.isOptional) return state;
+      // Accept decline for the initial optional popup AND for any descendant
+      // pending whose root was optional (rootOptional flag propagated by the
+      // EffectEngine dispatcher). This lets a player cancel after accepting
+      // an optional effect by mistake.
+      if (!effect.isOptional && !effect.rootOptional) return state;
 
       // Special case: Gaara 120 - declining means "skip this mission, continue to remaining missions"
       if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {

@@ -547,6 +547,7 @@ export class EffectEngine {
       ? (character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card)
       : null;
 
+    const isThisOptional = !result.isMandatory;
     const pendingEffect: PendingEffect = {
       id: effectId,
       sourceCardId: topCard?.id ?? '',
@@ -558,13 +559,16 @@ export class EffectEngine {
       sourcePlayer: player,
       requiresTargetSelection: true,
       validTargets: result.validTargets ?? [],
-      isOptional: !result.isMandatory,
+      isOptional: isThisOptional,
       isMandatory: result.isMandatory ?? false,
       resolved: false,
       isUpgrade,
       wasRevealed: wasRevealed ?? false,
       remainingEffectTypes: remainingEffectTypes.length > 0 ? remainingEffectTypes : undefined,
       selectingPlayer: result.selectingPlayer,
+      // Track optional-ness of the root popup so descendants can still offer
+      // a Cancel button. The dispatcher propagates this flag automatically.
+      rootOptional: isThisOptional,
     };
 
     // Determine PendingAction type based on targetSelectionType
@@ -653,6 +657,13 @@ export class EffectEngine {
   ): GameState {
     let newState = deepClone(state);
     const targetId = selectedTargets[0]; // Most effects select 1 target
+
+    // Snapshot existing pending effect ids so we can identify children created
+    // by this dispatch and propagate rootOptional automatically (no handler
+    // needs to set it manually). This lets the UI keep showing a Cancel
+    // button down the whole chain of an originally-optional effect.
+    const preDispatchPendingIds = new Set(state.pendingEffects.map((pe) => pe.id));
+    const parentWasOptional = !!(pendingEffect.rootOptional || pendingEffect.isOptional);
 
     // Validate target is in valid targets list (prevents wrong character from being affected)
     // Multi-select types (Kiba 026 / Tayuya 065 UPGRADE) send comma-separated indices or "skip"
@@ -14972,6 +14983,17 @@ export class EffectEngine {
       console.error(`[EffectEngine] Error in applyTargetedEffect for ${pendingEffect.targetSelectionType}:`, err);
       // Recover gracefully — remove the broken pending effect and continue the game
       newState = deepClone(state);
+    }
+
+    // Propagate rootOptional to any child pending effects freshly created by
+    // this dispatch, so the UI keeps showing a Cancel button for the whole
+    // chain. Handlers don't need to be aware of this flag.
+    if (parentWasOptional) {
+      for (const pe of newState.pendingEffects) {
+        if (!preDispatchPendingIds.has(pe.id) && pe.id !== pendingEffect.id) {
+          pe.rootOptional = true;
+        }
+      }
     }
 
     newState.pendingEffects = newState.pendingEffects.filter((pe) => pe.id !== pendingEffect.id);
