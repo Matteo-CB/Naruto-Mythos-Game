@@ -100,33 +100,46 @@ function s(base: number, scale: number): number {
 function buildDimensions(scale: number, vw: number, vh: number): GameDimensions {
   const isMobile = vh < 500;
 
-  // On mobile, use tighter spacing to maximize mission/card area
-  const emptyLaneMinW = isMobile ? Math.round(100 * scale) : s(BASE.emptyLaneMinW, scale);
-  const emptyLaneMaxW = isMobile ? Math.round(160 * scale) : s(BASE.emptyLaneMaxW, scale);
-  const missionMaxW = isMobile ? Math.round(100 * scale) : s(BASE.missionMaxW, scale);
-  const sidePileW = isMobile ? Math.round(40 * scale) : s(BASE.sidePileW, scale);
+  // On mobile, use tighter spacing to maximize mission/card area.
+  // Designer feedback (Andy): "focus on function, not quality — every mission
+  // should show ~4 cards before needing to scroll". We pack slots into a 2×2
+  // grid by widening each mission lane a bit and shrinking the character
+  // slots so they tile cleanly.
+  const emptyLaneMinW = isMobile ? Math.round(110 * scale) : s(BASE.emptyLaneMinW, scale);
+  const emptyLaneMaxW = isMobile ? Math.round(170 * scale) : s(BASE.emptyLaneMaxW, scale);
+  // Mobile mission-card display shrinks hard so more of the lane is free for
+  // character slots (the gameplay content). The mission card itself is just
+  // context; the cards placed on it are what the player interacts with.
+  const missionMaxW = isMobile ? Math.round(70 * scale) : s(BASE.missionMaxW, scale);
+  const sidePileW = isMobile ? Math.round(38 * scale) : s(BASE.sidePileW, scale);
   const handMinW = isMobile ? Math.round(240 * scale) : s(BASE.handMinW, scale);
   const opponentMinW = isMobile ? Math.round(150 * scale) : s(BASE.opponentMinW, scale);
 
-  // Mobile: smaller opponent hand, compact player hand, larger mission cards
-  const opponentHandH = isMobile ? Math.round(50 * scale) : s(BASE.opponentHandH, scale);
-  const playerHandH = isMobile ? Math.round(130 * scale) : s(BASE.playerHandH, scale);
-  const handFanSpacing = isMobile ? Math.round(42 * scale) : s(BASE.handFanSpacing, scale);
+  // Mobile: shrink opponent hand + player hand so more vertical space goes to
+  // the missions (where the gameplay actually happens).
+  const opponentHandH = isMobile ? Math.round(44 * scale) : s(BASE.opponentHandH, scale);
+  const playerHandH = isMobile ? Math.round(110 * scale) : s(BASE.playerHandH, scale);
+  const handFanSpacing = isMobile ? Math.round(38 * scale) : s(BASE.handFanSpacing, scale);
   const opponentFanSpacing = isMobile ? Math.round(14 * scale) : s(BASE.opponentFanSpacing, scale);
-  const opponentContainerH = isMobile ? Math.round(40 * scale) : s(BASE.opponentContainerH, scale);
+  const opponentContainerH = isMobile ? Math.round(36 * scale) : s(BASE.opponentContainerH, scale);
 
-  // Mobile: slightly larger hand cards for better touch targets
-  const handCardW = isMobile ? Math.round(85 * scale) : s(BASE.handCardW, scale);
-  const handCardH = isMobile ? Math.round(119 * scale) : s(BASE.handCardH, scale);
-  const opponentCardW = isMobile ? Math.round(36 * scale) : s(BASE.opponentCardW, scale);
-  const opponentCardH = isMobile ? Math.round(50 * scale) : s(BASE.opponentCardH, scale);
+  // Mobile: tighter hand cards so they fit in the smaller fan.
+  const handCardW = isMobile ? Math.round(78 * scale) : s(BASE.handCardW, scale);
+  const handCardH = isMobile ? Math.round(109 * scale) : s(BASE.handCardH, scale);
+  const opponentCardW = isMobile ? Math.round(32 * scale) : s(BASE.opponentCardW, scale);
+  const opponentCardH = isMobile ? Math.round(45 * scale) : s(BASE.opponentCardH, scale);
+
+  // Mobile mission / character slot: significantly smaller so each mission
+  // lane fits 2 slots per row × 2 rows = 4 visible before scroll kicks in.
+  const missionCardW = isMobile ? Math.round(48 * scale) : s(BASE.missionCardW, scale);
+  const missionCardH = isMobile ? Math.round(68 * scale) : s(BASE.missionCardH, scale);
 
   return {
     scale,
     isCompact: scale < 0.8,
     isMobile,
     handCard: { w: handCardW, h: handCardH },
-    missionCard: { w: s(BASE.missionCardW, scale), h: s(BASE.missionCardH, scale) },
+    missionCard: { w: missionCardW, h: missionCardH },
     sideCard: { w: s(BASE.sideCardW, scale), h: s(BASE.sideCardH, scale) },
     opponentCard: { w: opponentCardW, h: opponentCardH },
     opponentHandH,
