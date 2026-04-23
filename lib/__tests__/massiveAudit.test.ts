@@ -1364,14 +1364,14 @@ describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
 
     it('hidden character is cost 0, power 0 but can have tokens', () => {
       // "A Hidden Character is a normal Character with cost 1 and Power 0"
-      // Wait - FAQ says cost 1? But CLAUDE.md says cost 0 when targeted by enemy effects
+      // Wait - FAQ says cost 1? But rulebook says cost 0 when targeted by enemy effects
       addIssue({
         severity: 'HIGH',
         category: 'Rule Discrepancy',
-        description: 'FAQ IMG_3978 says hidden char has cost 1, but CLAUDE.md says cost 0 when targeted by enemy effects. Need to verify which is correct for enemy targeting.',
-        expected: 'Hidden character: cost 0 when targeted by enemy effects (per CLAUDE.md)',
+        description: 'FAQ IMG_3978 says hidden char has cost 1, but rulebook says cost 0 when targeted by enemy effects. Need to verify which is correct for enemy targeting.',
+        expected: 'Hidden character: cost 0 when targeted by enemy effects (per rulebook)',
         actual: 'FAQ says "cost 1 and Power 0" - this may refer to the PLAY cost, not the effective cost for targeting',
-        rule_reference: 'FAQ IMG_3978 vs CLAUDE.md hidden character rules',
+        rule_reference: 'FAQ IMG_3978 vs rulebook hidden character rules',
       });
     });
   });

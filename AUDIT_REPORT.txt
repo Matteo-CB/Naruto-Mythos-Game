@@ -1,7 +1,7 @@
 ================================================================================
 NARUTO MYTHOS TCG - COMPREHENSIVE GAME ENGINE AUDIT REPORT
 ================================================================================
-Generated: 2026-04-22T21:32:35.120Z
+Generated: 2026-04-23T17:42:29.210Z
 Total Issues Found: 11
 
 --- SUMMARY BY SEVERITY ---
@@ -75,10 +75,10 @@ DETAILED ISSUES
   Rule Reference: FAQ IMG_3971
 
 [HIGH] Rule Discrepancy
-  Description: FAQ IMG_3978 says hidden char has cost 1, but CLAUDE.md says cost 0 when targeted by enemy effects. Need to verify which is correct for enemy targeting.
-  Expected: Hidden character: cost 0 when targeted by enemy effects (per CLAUDE.md)
+  Description: FAQ IMG_3978 says hidden char has cost 1, but rulebook says cost 0 when targeted by enemy effects. Need to verify which is correct for enemy targeting.
+  Expected: Hidden character: cost 0 when targeted by enemy effects (per rulebook)
   Actual: FAQ says "cost 1 and Power 0" - this may refer to the PLAY cost, not the effective cost for targeting
-  Rule Reference: FAQ IMG_3978 vs CLAUDE.md hidden character rules
+  Rule Reference: FAQ IMG_3978 vs rulebook hidden character rules
 
 [HIGH] FAQ Compliance
   Description: When an effect forces a character with same name into a mission where that name already exists, the new one should be discarded WITHOUT applying effects
