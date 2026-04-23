@@ -8040,7 +8040,7 @@ export class EffectEngine {
           newState.pendingActions.push({
             id: t125ActId, type: 'CHOOSE_CARD_FROM_LIST' as PendingAction['type'],
             player: t125Player,
-            description: JSON.stringify({ text: 'Tayuya (125) UPGRADE: Choose a Sound Village character to play (paying 2 less).', hiddenChars: t125Hidden }),
+            description: JSON.stringify({ text: 'Tayuya (125) UPGRADE: Choose a Sound Village character to play (paying 2 less).' }),
             descriptionKey: 'game.effect.desc.tayuya125PlaySound',
             options: t125Targets, minSelections: 1, maxSelections: 1,
             sourceEffectId: t125EffId,

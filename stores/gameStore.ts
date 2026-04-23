@@ -396,6 +396,7 @@ interface PendingEffectData {
   targetSelectionType?: string;
   effectDescription: string;
   isOptional?: boolean;
+  rootOptional?: boolean;
 }
 
 /** Extract full card data for HandCardSelector so details/zoom work properly. */
