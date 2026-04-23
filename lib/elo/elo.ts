@@ -1,16 +1,19 @@
 /**
- * Vanilla ELO rating system for the Naruto Mythos TCG.
+ * ELO rating system for the Naruto Mythos TCG.
  *
- * Features (intentionally minimal):
- * - Standard ELO base formula: newElo = oldElo + K * (actualScore - expectedScore)
- * - K = 32 under ELO 2000, K = 16 at or above (FIDE-style)
+ * Base formula (FIDE-style):
+ * - newElo = oldElo + K * (actualScore - expectedScore)
+ * - K = 32 under ELO 2000, K = 16 at or above
  * - Floor at 100 so a beginner never drops into nonsense territory
  *
- * Removed (compared to the previous "intelligent" version):
- * - Minimum ELO gain / maximum ELO loss clamps
- * - Score margin bonus
- * - Win-streak bonus and lose-streak protection
- * - Demotion shield at league thresholds
+ * Two clamps requested by the project owner:
+ * - A winner always gains at least MIN_WIN_GAIN ELO (so farming smurfs stays
+ *   tempting enough to detect, and a legit underdog win still feels rewarding).
+ * - A loser never drops more than MAX_LOSS ELO in a single defeat (so a bad
+ *   matchup against a much stronger player doesn't nuke the season).
+ *
+ * The clamp is applied to the integer delta BEFORE the floor so the displayed
+ * delta (newElo - oldElo) matches exactly what is persisted.
  *
  * consecutiveWins / consecutiveLosses are still tracked and returned so the
  * DB columns keep working, but they no longer affect the ELO math.
@@ -20,6 +23,8 @@ const K_FACTOR_LOW = 32;
 const K_FACTOR_HIGH = 16;
 const K_THRESHOLD = 2000;
 const ELO_FLOOR = 100;
+const MIN_WIN_GAIN = 10;
+const MAX_LOSS = 25;
 
 function getKFactor(elo: number): number {
   return elo < K_THRESHOLD ? K_FACTOR_LOW : K_FACTOR_HIGH;
@@ -36,8 +41,14 @@ export function calculateNewElo(
 ): number {
   const K = getKFactor(playerElo);
   const E = expectedScore(playerElo, opponentElo);
-  const newElo = Math.round(playerElo + K * (actualScore - E));
-  return Math.max(ELO_FLOOR, newElo);
+  let delta = Math.round(K * (actualScore - E));
+
+  // Winner: floor the gain so a favored player still gets a visible reward.
+  if (actualScore === 1.0 && delta < MIN_WIN_GAIN) delta = MIN_WIN_GAIN;
+  // Loser: cap the loss so an underdog doesn't implode on a single defeat.
+  if (actualScore === 0.0 && delta < -MAX_LOSS) delta = -MAX_LOSS;
+
+  return Math.max(ELO_FLOOR, playerElo + delta);
 }
 
 export interface EloInput {
