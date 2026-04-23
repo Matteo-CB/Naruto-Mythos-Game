@@ -1,0 +1,97 @@
+{
+  "entries": [
+    {
+      "date": "2026-04-23",
+      "title_fr": "Ajustement du système ELO",
+      "title_en": "ELO system tuning",
+      "changes_fr": [
+        "Vous gagnez maintenant au moins 10 points ELO à chaque victoire, même contre un adversaire plus faible.",
+        "Vous ne pouvez plus perdre plus de 25 points ELO en une seule défaite. Un mauvais match ne plombe plus toute votre saison.",
+        "Le gain ou la perte affiché à la fin de la partie correspond exactement au changement appliqué sur votre profil."
+      ],
+      "changes_en": [
+        "You now gain at least 10 ELO points on every win, even against a weaker opponent.",
+        "You can no longer lose more than 25 ELO points in a single defeat. One bad matchup will not wreck your season anymore.",
+        "The gain or loss shown at the end of the game matches exactly what is applied to your profile."
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "title_fr": "Historique ELO public",
+      "title_en": "Public ELO history",
+      "changes_fr": [
+        "Votre profil affiche désormais une courbe de votre ELO sur les 14 derniers jours, avec les adversaires rencontrés.",
+        "Les parties jouées sont conservées 72 heures, le temps de revoir vos replays.",
+        "Les joueurs suspectés de farm ELO sont détectés automatiquement par plusieurs critères (mêmes IP, comptes créés ensemble, forfaits courts, etc.)."
+      ],
+      "changes_en": [
+        "Your profile now shows an ELO curve for the last 14 days, with the opponents you faced.",
+        "Played games are kept for 72 hours so you have time to watch the replays.",
+        "Players suspected of ELO farming are flagged automatically through several signals (shared IPs, accounts made together, short forfeits, etc.)."
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "title_fr": "Corrections de règles selon le créateur du jeu",
+      "title_en": "Rule corrections from the game designer",
+      "changes_fr": [
+        "Sasuke 136 doit désormais défaire un personnage si possible, même si seul un ennemi est une cible valide.",
+        "Sakon 062 copie correctement l'embuscade de Kidomaru et les autres effets révélés.",
+        "Shikamaru 022 voit bien tous les personnages joués au tour précédent, plus seulement le dernier.",
+        "Itachi 140 peut viser n'importe quel personnage avec son effet de prise de contrôle, pas uniquement un ennemi.",
+        "Tayuya 125 cible uniquement des cartes en main, plus les cartes cachées.",
+        "Jirobo 122 se compte lui-même dans son effet de décompte.",
+        "Shino 115 ne peut plus être copié par aucun effet.",
+        "Les effets statiques comme Hayate 048 et Gemma 049 respectent maintenant la règle de non-répétition.",
+        "Les personnages pris par Orochimaru, Itachi et autres effets de contrôle reviennent à leur propriétaire d'origine quand ils quittent le jeu."
+      ],
+      "changes_en": [
+        "Sasuke 136 must now defeat a character when able, even if only an enemy is a legal target.",
+        "Sakon 062 correctly copies Kidomaru's ambush and other revealed effects.",
+        "Shikamaru 022 now sees every character played on the previous turn, not just the last one.",
+        "Itachi 140 can target any character with his take-control effect, not only an enemy.",
+        "Tayuya 125 only targets cards in hand now, no longer hidden cards.",
+        "Jirobo 122 counts himself in his counting effect.",
+        "Shino 115 can no longer be copied by any effect.",
+        "Static effects like Hayate 048 and Gemma 049 now respect the no-repetition rule.",
+        "Characters stolen by Orochimaru, Itachi and other control effects return to their original owner when they leave play."
+      ]
+    },
+    {
+      "date": "2026-04-20",
+      "title_fr": "Confort de jeu et anti-troll",
+      "title_en": "Quality of life and anti-trolling",
+      "changes_fr": [
+        "Un bouton Annuler est disponible sur tous les effets optionnels. Vous pouvez toujours revenir en arrière quand vous n'êtes pas obligé de choisir une cible.",
+        "Les flèches de déplacement des cartes en main affichent Gauche et Droite au lieu de caractères illisibles.",
+        "Un joueur qui se déconnecte 3 fois dans la même partie perd automatiquement, pour éviter les parties sabotées.",
+        "Le timer de déconnexion démarre désormais correctement quand un adversaire quitte la partie.",
+        "Le bouton rematch fonctionne de nouveau dans tous les modes.",
+        "Les cartes peuvent avoir une puissance négative. Il faut toujours au moins 1 de puissance pour remporter une mission."
+      ],
+      "changes_en": [
+        "A Cancel button is available on every optional effect. You can always back out when you are not required to choose a target.",
+        "The hand sort arrows now show Left and Right instead of unreadable characters.",
+        "A player who disconnects 3 times in the same game automatically forfeits, to stop sabotaged matches.",
+        "The disconnect timer now starts correctly when an opponent leaves the game.",
+        "The rematch button works again in every mode.",
+        "Characters can have negative power. You still need at least 1 total power to win a mission."
+      ]
+    },
+    {
+      "date": "2026-04-15",
+      "title_fr": "Support mobile",
+      "title_en": "Mobile support",
+      "changes_fr": [
+        "Le plateau a été retravaillé pour les téléphones: 4 cartes par mission sont visibles avant d'avoir à scroller.",
+        "Les cartes en main et les emplacements de mission ont été réduits pour laisser plus de place au gameplay.",
+        "Les boutons de tri des cartes sont masqués sur mobile pour gagner de l'espace."
+      ],
+      "changes_en": [
+        "The board has been reworked for phones: 4 cards per mission are visible before you need to scroll.",
+        "Hand cards and mission slots have been shrunk to leave more room for the gameplay.",
+        "The hand sort buttons are hidden on mobile to save space."
+      ]
+    }
+  ]
+}

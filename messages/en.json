@@ -2768,5 +2768,13 @@
     "actionTaken": "Action taken: {action}",
     "noAction": "No action was taken",
     "understood": "Understood"
+  },
+  "changelog": {
+    "buttonLabel": "News",
+    "modalTitle": "What's New",
+    "modalSubtitle": "Patch notes",
+    "close": "Close",
+    "empty": "No updates yet.",
+    "latestBadge": "Latest"
   }
 }

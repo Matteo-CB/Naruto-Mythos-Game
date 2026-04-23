@@ -2768,5 +2768,13 @@
     "actionTaken": "Action prise : {action}",
     "noAction": "Aucune action n'a ete prise",
     "understood": "Compris"
+  },
+  "changelog": {
+    "buttonLabel": "MAJ",
+    "modalTitle": "Mises a jour",
+    "modalSubtitle": "Notes de patch",
+    "close": "Fermer",
+    "empty": "Aucune mise a jour pour le moment.",
+    "latestBadge": "Nouveau"
   }
 }
