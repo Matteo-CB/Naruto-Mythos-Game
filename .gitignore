@@ -46,3 +46,6 @@ nul
 
 # brute-force script data
 newvisual/brute*_progress.json
+
+# local-only project notes, not published
+CLAUDE.md
