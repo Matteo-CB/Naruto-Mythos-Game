@@ -21,8 +21,10 @@ export async function GET(
       cleanupOldGames().catch(() => {});
     }
 
-    const user = await prisma.user.findUnique({
-      where: { username },
+    const normalized = username.replace(/\+/g, ' ');
+
+    const user = await prisma.user.findFirst({
+      where: { username: { equals: normalized, mode: 'insensitive' } },
       select: {
         id: true,
         username: true,
