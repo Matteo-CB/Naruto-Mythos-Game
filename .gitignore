@@ -58,3 +58,12 @@ AUDIT_REPORT.txt
 
 # systemd unit and any similar server-only config: kept on the server, not in the repo
 naruto-mythos.service
+
+# deployment configuration, server only, never in the repo
+Dockerfile
+deploy.sh
+docker-compose.yml
+nixpacks.toml
+renew-ssl.sh
+renew-ssl-auto.sh
+nginx/
