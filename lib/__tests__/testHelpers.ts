@@ -11,9 +11,7 @@ import type {
 } from '../engine/types';
 import { generateInstanceId, generateGameId } from '../engine/utils/id';
 
-/**
- * Create a mock character card for testing.
- */
+
 export function mockCharacter(overrides: Partial<CharacterCard> = {}): CharacterCard {
   return {
     id: overrides.id ?? 'KS-001-C',
@@ -35,9 +33,7 @@ export function mockCharacter(overrides: Partial<CharacterCard> = {}): Character
   };
 }
 
-/**
- * Create a mock mission card for testing.
- */
+
 export function mockMission(overrides: Partial<MissionCard> = {}): MissionCard {
   return {
     id: overrides.id ?? 'KS-001-MMS',
@@ -59,9 +55,7 @@ export function mockMission(overrides: Partial<MissionCard> = {}): MissionCard {
   };
 }
 
-/**
- * Create a mock character in play.
- */
+
 export function mockCharInPlay(
   overrides: Partial<CharacterInPlay> = {},
   cardOverrides: Partial<CharacterCard> = {},
@@ -80,9 +74,7 @@ export function mockCharInPlay(
   };
 }
 
-/**
- * Create a minimal deck for testing (30 unique cards).
- */
+
 export function createTestDeck(count: number = 30): CharacterCard[] {
   const deck: CharacterCard[] = [];
   for (let i = 0; i < count; i++) {
@@ -100,9 +92,7 @@ export function createTestDeck(count: number = 30): CharacterCard[] {
   return deck;
 }
 
-/**
- * Create a test game config with two decks and missions.
- */
+
 export function createTestConfig(overrides: Partial<GameConfig> = {}): GameConfig {
   const missions1 = [
     mockMission({ id: 'KS-001-MMS', name_fr: 'Mission A', basePoints: 2 }),
@@ -132,9 +122,7 @@ export function createTestConfig(overrides: Partial<GameConfig> = {}): GameConfi
   };
 }
 
-/**
- * Create a game state that's ready for the action phase (after mulligan + start phase).
- */
+
 export function createActionPhaseState(overrides: Partial<GameState> = {}): GameState {
   const mission = mockMission({ basePoints: 3 });
 

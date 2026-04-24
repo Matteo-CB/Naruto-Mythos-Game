@@ -63,7 +63,7 @@ describe('Upgrade Validation', () => {
       { name_fr: 'Naruto', chakra: 4, power: 4 },
     );
 
-    // New card must be higher than the top of stack (cost 4), not bottom (cost 2)
+    
     const card3 = mockCharacter({ name_fr: 'Naruto', chakra: 3, power: 3 });
     const result3 = canUpgradeCharacter(card3, target, 10);
     expect(result3.valid).toBe(false); // 3 <= 4

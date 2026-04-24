@@ -52,7 +52,7 @@ export function GameInfo() {
 
   return (
     <div className="flex flex-col gap-2.5 p-3 h-full overflow-y-auto">
-      {/* Turn + Phase + Active - combined card */}
+      
       <PanelFrame accentColor="rgba(196, 163, 90, 0.3)" padding="10px 12px">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -106,12 +106,12 @@ export function GameInfo() {
         </div>
       </PanelFrame>
 
-      {/* Edge Token */}
+      
       <EdgeToken holder={edgeHolder} myPlayer={myPlayer} />
 
       <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} showDiamond />
 
-      {/* Score Display */}
+      
       <ScoreDisplay
         playerScore={myState.missionPoints}
         opponentScore={opponentState.missionPoints}
@@ -121,7 +121,7 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(196, 163, 90, 0.15)" width={80} />
 
-      {/* Chakra */}
+      
       <PanelFrame accentColor="rgba(196, 163, 90, 0.2)" padding="8px 10px">
         <div className="flex flex-col gap-1.5">
           <span
@@ -137,7 +137,7 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
-      {/* Decks */}
+      
       <div className="flex flex-col gap-1.5">
         <span
           className="text-[10px] uppercase tracking-wider font-medium"
@@ -152,7 +152,7 @@ export function GameInfo() {
 
       <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />
 
-      {/* Discard piles */}
+      
       <div className="flex flex-col gap-1.5">
         <span
           className="text-[10px] uppercase tracking-wider font-medium"
@@ -164,7 +164,7 @@ export function GameInfo() {
         <InfoRow label={t('game.opponent')} value={opponentState.discardPileSize} valueColor="#888888" />
       </div>
 
-      {/* Pass status */}
+      
       {phase === 'action' && (
         <>
           <SectionDivider color="rgba(255, 255, 255, 0.06)" width={60} />

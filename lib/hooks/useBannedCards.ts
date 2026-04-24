@@ -7,7 +7,7 @@ export interface BannedCardInfo {
   reason: string | null;
 }
 
-// Module-level cache to avoid refetching across components
+
 let cachedBannedIds: Set<string> | null = null;
 let cachedBannedMap: Map<string, string | null> | null = null; // cardId -> reason
 let fetchPromise: Promise<void> | null = null;
@@ -32,9 +32,7 @@ async function fetchBannedCards(): Promise<void> {
   }
 }
 
-/**
- * Hook to fetch and cache banned card IDs + reasons.
- */
+
 export function useBannedCards(): {
   bannedIds: Set<string>;
   bannedReasons: Map<string, string | null>;

@@ -6,23 +6,14 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { findHiddenLeafOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 
-/**
- * Card 002/130 - HIRUZEN SARUTOBI "Troisieme Hokage" (UC)
- * Chakra: 5 | Power: 4
- * Group: Leaf Village | Keywords: Hokage
- *
- * MAIN: Play a Leaf Village character anywhere paying 1 less.
- *   - Includes Leaf Village cards in hand AND hidden Leaf Village characters on board.
- *
- * UPGRADE: POWERUP 2 the character played with the MAIN effect.
- */
+
 
 function handleHiruzen002Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const playerState = state[sourcePlayer];
   const costReduction = 1;
 
-  // Find affordable Leaf Village characters in hand
+  
   const affordableLeafIndices: string[] = [];
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   for (let i = 0; i < playerState.hand.length; i++) {
@@ -32,7 +23,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     let canPlace = false;
     for (const mission of state.activeMissions) {
       const chars = mission[friendlySide];
-      // Find upgrade target: same-name first, then flexible cross-name
+      
       let upgradeTarget: CharacterInPlay | undefined;
       for (const c of chars) {
         if (c.isHidden) continue;
@@ -63,7 +54,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
           break;
         }
       } else {
-        // Check for name conflict (same name but can't upgrade)
+        
         const hasNameConflict = chars.some((c) => {
           if (c.isHidden) return false;
           const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -83,7 +74,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // Find hidden Leaf Village characters on the board
+  
   const hiddenTargets = findHiddenLeafOnBoard(state, sourcePlayer, costReduction);
   const hiddenLeafIds = hiddenTargets.map(h => `HIDDEN_${h.instanceId}`);
 
@@ -104,7 +95,7 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -118,17 +109,13 @@ function handleHiruzen002Main(ctx: EffectContext): EffectResult {
   };
 }
 
-/**
- * UPGRADE: POWERUP 2 the character played with the MAIN effect.
- * This is a SEPARATE effect that triggers after MAIN completes.
- * It checks _hiruzen002PlayedCharId to find which character was played.
- */
+
 function handleHiruzen002Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const playedCharId = (state as any)._hiruzen002PlayedCharId as string | undefined;
 
   if (!playedCharId) {
-    // MAIN was declined or no character was played — UPGRADE can't apply
+    
     return {
       state: {
         ...state,
@@ -143,7 +130,7 @@ function handleHiruzen002Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Show confirmation before applying POWERUP 2
+  
   return {
     state,
     requiresTargetSelection: true,

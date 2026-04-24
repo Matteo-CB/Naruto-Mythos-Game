@@ -4,20 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 import { checkFlexibleUpgrade } from '@/lib/engine/rules/PlayValidation';
 
-/**
- * Card 053/130 - KABUTO YAKUSHI (UC)
- * Chakra: 4 | Power: 4
- * Group: Sound Village | Keywords: Jutsu
- *
- * UPGRADE: Discard a card from your hand.
- *   (French: "Défaussez une carte de votre main.")
- *
- * MAIN: Play the top character from your discard pile anywhere, paying 3 less.
- *   (French: "Jouez le personnage en haut de votre pile de defausse en payant 3 de moins.")
- *   - Always the top card (last added) - no browsing/choosing.
- *   - If the top card is not a character or not affordable, fizzles.
- *   - Player chooses which mission to play it on.
- */
+
 
 function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
@@ -38,7 +25,7 @@ function handleKabuto053Upgrade(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup (no SKIP per Andy)
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -69,10 +56,10 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Top of discard pile = last element in the array
+  
   const topCard = playerState.discardPile[playerState.discardPile.length - 1];
 
-  // Must be a character card
+  
   if (topCard.card_type !== 'character') {
     return {
       state: {
@@ -106,7 +93,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Find valid missions (fresh play or upgrade)
+  
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
@@ -159,7 +146,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup (no SKIP per Andy)
+  
   return {
     state,
     requiresTargetSelection: true,

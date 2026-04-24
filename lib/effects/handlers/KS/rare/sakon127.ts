@@ -6,17 +6,7 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 import { ukon124bMainHandler } from './ukon124b';
 
-/**
- * Card 127/130 - SAKON (R/RA)
- * Chakra: 5 | Power: 5
- * Group: Sound Village | Keywords: Sound Four, Jutsu
- *
- * MAIN [⧗]: You can play this character as an upgrade over any Sound Village character.
- *   → Continuous upgrade-eligibility expansion. No-op handler; logic in PlayValidation.ts.
- *
- * AMBUSH: Hide an enemy character in this mission with Power 5 or less.
- *   → Dedicated handler with CONFIRM popup (decoupled from Ukon 124b).
- */
+
 
 function sakon127AmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex, sourceCard } = ctx;
@@ -26,7 +16,7 @@ function sakon127AmbushHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 5 that can be hidden
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => canBeHiddenByEnemy(state, c, opponentPlayer) && getEffectivePower(state, c, opponentPlayer) <= 5)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -46,7 +36,7 @@ function sakon127AmbushHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // CONFIRM popup before executing
+  
   return {
     state,
     requiresTargetSelection: true,

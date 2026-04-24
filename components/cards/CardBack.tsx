@@ -2,16 +2,16 @@
 
 import { memo } from 'react';
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface CardBackProps {
   className?: string;
 }
 
-// ---------------------
-// Component: Hidden card back
-// ---------------------
+
+
+
 function CardBackInner({ className = '' }: CardBackProps) {
   return (
     <div
@@ -21,7 +21,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
         backgroundColor: '#1a1a1a',
       }}
     >
-      {/* Textured pattern using repeating borders */}
+      
       <div
         style={{
           position: 'absolute',
@@ -31,7 +31,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      {/* Inner frame */}
+      
       <div
         style={{
           position: 'absolute',
@@ -44,7 +44,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      {/* Second inner frame for depth */}
+      
       <div
         style={{
           position: 'absolute',
@@ -57,7 +57,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      {/* Texture dots pattern */}
+      
       <div
         style={{
           position: 'absolute',
@@ -69,7 +69,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
         }}
       />
 
-      {/* Center text: MYTHOS */}
+      
       <div
         style={{
           position: 'absolute',
@@ -102,8 +102,8 @@ function CardBackInner({ className = '' }: CardBackProps) {
         </div>
       </div>
 
-      {/* Corner accents */}
-      {/* Top-left */}
+      
+      
       <div
         style={{
           position: 'absolute',
@@ -115,7 +115,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
           borderLeft: '1px solid #333333',
         }}
       />
-      {/* Top-right */}
+      
       <div
         style={{
           position: 'absolute',
@@ -127,7 +127,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
           borderRight: '1px solid #333333',
         }}
       />
-      {/* Bottom-left */}
+      
       <div
         style={{
           position: 'absolute',
@@ -139,7 +139,7 @@ function CardBackInner({ className = '' }: CardBackProps) {
           borderLeft: '1px solid #333333',
         }}
       />
-      {/* Bottom-right */}
+      
       <div
         style={{
           position: 'absolute',

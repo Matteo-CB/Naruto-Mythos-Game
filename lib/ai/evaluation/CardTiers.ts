@@ -1,19 +1,12 @@
-/**
- * CardTiers - Strategic card value ratings for AI evaluation.
- *
- * Each playable card is rated 1-10 based on its strategic impact.
- * Cards not explicitly listed use a fallback formula based on stats/effects.
- *
- * Also provides synergy detection (upgrade chains, team combos, named pairs).
- */
+
 
 import type { CharacterCard, GameState, PlayerID, CharacterInPlay } from '../../engine/types';
 import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
 
-// ─── Explicit Card Tier Ratings ──────────────────────────────────────────────
+
 
 const CARD_TIER: Record<string, number> = {
-  // === Tier S (9-10): Game-changing cards ===
+  
   'KS-133-S':   10,  // Naruto Rasengan - hide/defeat 2 enemies (5 or less + 2 or less)
   'KS-133-SV':  10,
   'KS-133-MV':  10,
@@ -37,7 +30,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-120-RA':   9,
   'KS-120-MV':   9,
 
-  // === Tier A (7-8): Very strong cards ===
+  
   'KS-143-M':    8,  // Itachi M - move friendly here + AMBUSH move enemy here
   'KS-144-M':    8,  // Kisame M - steal 1 chakra
   'KS-135-S':    8,  // Sakura S - top 3 deck, play one anywhere (UPGRADE: -4 cost)
@@ -73,7 +66,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-148-M':    7,  // Kakashi M - gain Edge + AMBUSH copy Team 7 effect
   'KS-145-M':    7,  // Naruto M - hidden chars +1 power with Edge
 
-  // === Tier B+ (6): Strong cards ===
+  
   'KS-122-R':    7,  // Jirobo R - 6 power + POWERUP X (chars in mission) + UPGRADE defeat power ≤1
   'KS-122-RA':   7,
   'KS-124-R':    7,  // Kidomaru R - AMBUSH defeat power ≤3 in another mission (UPGRADE: ≤5)
@@ -120,7 +113,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-102-UC':   6,  // Manda - 5 power + AMBUSH defeat enemy Summon
   'KS-045-UC':   6,  // Anko UC - AMBUSH defeat hidden enemy in play
 
-  // === Tier B (5): Solid utility cards ===
+  
   'KS-094-C':    5,  // Gamabunta - 6 power Summon
   'KS-095-C':    5,  // Gamahiro - 6 power Summon + draw 1
   'KS-098-C':    5,  // Katsuyu - 5 power Summon + POWERUP 2 with Tsunade
@@ -154,7 +147,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-147-M':    5,  // Sakura M - CHAKRA +2 without Edge
   'KS-083-UC':   5,  // Rasa - SCORE +1 mission pt if Sand Village ally
 
-  // === Tier C+ (4): Above-average cards ===
+  
   'KS-086-C':    4,  // Zabuza C - 5 power vanilla
   'KS-044-C':    4,  // Anko - [⧗] CHAKRA +1 with Leaf ally
   'KS-025-C':    4,  // Kiba C - [⧗] CHAKRA +1 with Akamaru
@@ -181,7 +174,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-071-UC':   4,  // Zaku UC - move enemy if fewer chars + UPGRADE POWERUP 2
   'KS-080-UC':   4,  // Temari UC - move Sand + UPGRADE move self
 
-  // === Tier C (3): Average cards ===
+  
   'KS-009-C':    3,  // Naruto C - 3 power vanilla (but upgrade chain starter)
   'KS-011-C':    3,  // Sakura C - draw 1 if Team 7 ally
   'KS-032-C':    3,  // Shino C - 3 power + both draw 1
@@ -203,7 +196,7 @@ const CARD_TIER: Record<string, number> = {
   'KS-052-C':    3,  // Kabuto C - AMBUSH steal top of opponent deck as hidden
   'KS-005-C':    3,  // Shizune C - CHAKRA +1
 
-  // === Tier D (2): Below-average / Filler cards ===
+  
   'KS-036-C':    2,  // Neji C - 2 power + remove 2 tokens
   'KS-030-C':    2,  // Hinata C - 2 power + remove 2 tokens
   'KS-019-C':    2,  // Ino C - 1 power + POWERUP 1 if Team 10 ally
@@ -217,28 +210,28 @@ const CARD_TIER: Record<string, number> = {
   'KS-097-C':    2,  // Gamatatsu - 2 power Summon
   'KS-021-C':    2,  // Shikamaru C - 0 power + draw 1 if Edge
 
-  // === Tier E (1): Weakest cards ===
+  
   'KS-101-C':    1,  // Ton Ton - 0 power + [⧗] +1 with Tsunade/Shizune
 };
 
-// ─── Synergy Definitions ─────────────────────────────────────────────────────
+
 
 interface SynergyGroup {
-  /** Card IDs that participate in this synergy (any 2+ present = bonus) */
+  
   cards: string[];
-  /** Score bonus when 2+ cards are present together */
+  
   bonus: number;
-  /** Minimum cards from the group that must be present for the bonus */
+  
   minCount: number;
 }
 
 const CARD_SYNERGIES: SynergyGroup[] = [
-  // Named pairs
+  
   { cards: ['KS-025-C', 'KS-027-C', 'KS-026-UC', 'KS-028-UC', 'KS-029-UC', 'KS-113-R', 'KS-113-RA', 'KS-113-MV'], bonus: 5, minCount: 2 },  // Kiba + Akamaru (any version)
   { cards: ['KS-084-C', 'KS-074-C', 'KS-075-C', 'KS-120-R', 'KS-120-RA', 'KS-120-MV', 'KS-076-UC', 'KS-139-S'], bonus: 4, minCount: 2 },  // Yashamaru/Gaara synergy
   { cards: ['KS-101-C', 'KS-003-C', 'KS-004-UC', 'KS-104-R', 'KS-104-RA', 'KS-104-MV', 'KS-131-S', 'KS-131-SV', 'KS-005-C', 'KS-006-UC'], bonus: 2, minCount: 2 },  // TonTon + Tsunade/Shizune
 
-  // Upgrade chains - same name, increasing cost
+  
   { cards: ['KS-009-C', 'KS-010-C', 'KS-108-R', 'KS-108-RA', 'KS-108-MV', 'KS-133-S', 'KS-133-SV', 'KS-133-MV', 'KS-000-L', 'KS-141-M', 'KS-145-M', 'KS-129-R', 'KS-129-RA', 'KS-134-S'], bonus: 5, minCount: 2 },  // Naruto/Kyubi chain
   { cards: ['KS-074-C', 'KS-075-C', 'KS-120-R', 'KS-120-RA', 'KS-120-MV', 'KS-076-UC', 'KS-139-S', 'KS-130-R', 'KS-130-RA'], bonus: 5, minCount: 2 },  // Gaara/Ichibi chain
   { cards: ['KS-013-C', 'KS-014-UC', 'KS-107-R', 'KS-107-RA', 'KS-136-S', 'KS-136-SV', 'KS-136-MV', 'KS-142-M', 'KS-146-M'], bonus: 4, minCount: 2 },  // Sasuke chain
@@ -249,34 +242,31 @@ const CARD_SYNERGIES: SynergyGroup[] = [
   { cards: ['KS-086-C', 'KS-087-UC'], bonus: 3, minCount: 2 },  // Zabuza chain
   { cards: ['KS-088-C', 'KS-089-UC'], bonus: 3, minCount: 2 },  // Haku chain
 
-  // Jiraiya + Summons
+  
   { cards: ['KS-007-C', 'KS-008-UC', 'KS-105-R', 'KS-105-RA', 'KS-132-S', 'KS-094-C', 'KS-095-C', 'KS-096-C', 'KS-097-C', 'KS-098-C', 'KS-102-UC', 'KS-103-UC', 'KS-066-UC', 'KS-067-UC'], bonus: 4, minCount: 2 },
 
-  // Team keyword synergies (sensei + members)
+  
   { cards: ['KS-015-C', 'KS-016-UC', 'KS-106-R', 'KS-106-RA', 'KS-137-S', 'KS-137-SV', 'KS-148-M', 'KS-009-C', 'KS-010-C', 'KS-011-C', 'KS-012-UC', 'KS-013-C', 'KS-014-UC'], bonus: 3, minCount: 3 },  // Team 7
   { cards: ['KS-042-C', 'KS-043-UC', 'KS-039-UC', 'KS-036-C', 'KS-037-UC', 'KS-040-C', 'KS-041-UC', 'KS-038-C'], bonus: 3, minCount: 3 },  // Team Guy
   { cards: ['KS-034-C', 'KS-035-UC', 'KS-025-C', 'KS-026-UC', 'KS-027-C', 'KS-028-UC', 'KS-030-C', 'KS-031-UC', 'KS-032-C', 'KS-033-UC'], bonus: 3, minCount: 3 },  // Team 8
   { cards: ['KS-023-C', 'KS-024-UC', 'KS-019-C', 'KS-020-UC', 'KS-021-C', 'KS-022-UC', 'KS-017-C', 'KS-018-UC'], bonus: 3, minCount: 3 },  // Team 10
   { cards: ['KS-064-C', 'KS-065-UC', 'KS-057-C', 'KS-058-UC', 'KS-059-C', 'KS-060-UC', 'KS-061-C', 'KS-062-UC', 'KS-063-UC', 'KS-125-R', 'KS-125-RA', 'KS-122-R', 'KS-122-RA', 'KS-124-R', 'KS-124-RA', 'KS-127-R', 'KS-127-RA'], bonus: 4, minCount: 3 },  // Sound Four
 
-  // Akatsuki pair
+  
   { cards: ['KS-090-C', 'KS-091-UC', 'KS-128-R', 'KS-128-RA', 'KS-128-MV', 'KS-140-S', 'KS-143-M', 'KS-092-C', 'KS-093-UC', 'KS-144-M'], bonus: 3, minCount: 2 },
 ];
 
-// ─── Public API ──────────────────────────────────────────────────────────────
 
-/**
- * Get the strategic tier rating of a card (1-10).
- * Uses explicit tier map first, then falls back to stat-based calculation.
- */
+
+
 export function getCardTier(card: CharacterCard): number {
   const explicit = CARD_TIER[card.cardId];
   if (explicit !== undefined) return explicit;
 
-  // Fallback: derive tier from card stats and effect types
+  
   let tier = 1;
 
-  // Power/cost efficiency
+  
   const cost = card.chakra ?? 0;
   const power = card.power ?? 0;
   if (cost > 0) {
@@ -285,11 +275,11 @@ export function getCardTier(card: CharacterCard): number {
     tier += Math.min(2, power);
   }
 
-  // Base power bonus
+  
   if (power >= 6) tier += 1.5;
   else if (power >= 4) tier += 0.5;
 
-  // Effect bonuses
+  
   for (const effect of card.effects ?? []) {
     const desc = effect.description.toLowerCase();
     if (effect.type === 'AMBUSH') tier += 2;
@@ -313,10 +303,7 @@ export function getCardTier(card: CharacterCard): number {
   return Math.min(10, Math.max(1, Math.round(tier)));
 }
 
-/**
- * Evaluate synergy bonuses for a set of cards (hand or board).
- * Returns a score bonus based on detected synergies.
- */
+
 export function evaluateCardSynergies(cardIds: string[]): number {
   const idSet = new Set(cardIds);
   let totalBonus = 0;
@@ -331,16 +318,12 @@ export function evaluateCardSynergies(cardIds: string[]): number {
   return totalBonus;
 }
 
-/**
- * Evaluate synergies in a player's hand.
- */
+
 export function evaluateHandSynergies(hand: CharacterCard[]): number {
   return evaluateCardSynergies(hand.map(c => c.cardId));
 }
 
-/**
- * Evaluate synergies active on the board (characters in play for a player).
- */
+
 export function evaluateBoardSynergies(state: GameState, player: PlayerID): number {
   const cardIds: string[] = [];
 
@@ -357,9 +340,7 @@ export function evaluateBoardSynergies(state: GameState, player: PlayerID): numb
   return evaluateCardSynergies(cardIds);
 }
 
-/**
- * Check if a card in hand has a valid upgrade target on the board.
- */
+
 export function hasUpgradeTarget(state: GameState, player: PlayerID, card: CharacterCard): boolean {
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -374,9 +355,7 @@ export function hasUpgradeTarget(state: GameState, player: PlayerID, card: Chara
   return false;
 }
 
-/**
- * Check if a character is a Summon (returns to hand at end of round).
- */
+
 export function isSummon(card: CharacterCard): boolean {
   return card.keywords?.includes('Summon') ?? false;
 }

@@ -72,7 +72,7 @@ export function SpectatorCount() {
 }
 
 function useGameStore_isOnline() {
-  // Avoid circular import — inline selector
+  
   try {
     const { useGameStore } = require('@/stores/gameStore');
     return useGameStore((s: { isOnlineGame: boolean }) => s.isOnlineGame);

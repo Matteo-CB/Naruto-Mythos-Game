@@ -2,20 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 081/130 - BAKI (Common)
- * Chakra: 3 | Power: 2
- * Group: Sand Village | Keywords: Team Baki
- * SCORE [arrow]: Draw a card.
- *
- * When the player wins the mission where Baki is assigned, draw 1 card.
- * Confirmation popup before drawing (SCORE effects are optional).
- */
+
 function handleBaki081Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
-  // Pre-check: deck empty → fizzle
+  
   if (playerState.deck.length === 0) {
     return {
       state: {
@@ -27,7 +19,7 @@ function handleBaki081Score(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

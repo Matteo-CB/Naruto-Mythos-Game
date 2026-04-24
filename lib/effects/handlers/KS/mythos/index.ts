@@ -1,7 +1,4 @@
-/**
- * Mythos card effect handlers index.
- * Registers all mythos card handlers with the effect registry.
- */
+
 
 import { registerItachi143Handlers } from './itachi143';
 import { registerKisame144Handlers } from './kisame144';
@@ -18,11 +15,11 @@ import { registerItachi152Handlers } from './itachi152';
 import { registerGaara153Handlers } from './gaara153';
 
 export function registerAllMythosHandlers(): void {
-  // Existing handlers
+  
   registerItachi143Handlers();     // 143/130 - ITACHI: Move friendly / AMBUSH move enemy
   registerKisame144Handlers();     // 144/130 - KISAME: Steal 1 chakra
 
-  // New handlers
+  
   registerNaruto141Handlers();     // 141/130 - NARUTO: Discard to hide P4 enemy
   registerSasuke142Handlers();     // 142/130 - SASUKE: Discard to POWERUP X+1
   registerNaruto145();             // 145/130 - NARUTO: [continuous] hidden +1 Power if Edge

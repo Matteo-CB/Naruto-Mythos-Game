@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import type { TournamentMatch } from '@/stores/tournamentStore';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
+
+
+
 
 export interface SwissStandingEntry {
   userId: string;
@@ -32,18 +32,18 @@ interface SwissStandingsProps {
   winnerUsername?: string | null;
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
+
+
+
 
 const GOLD = '#c4a35a';
 const SILVER = '#a8a8a8';
 const BRONZE = '#cd7f32';
 const MEDAL_COLORS = [GOLD, SILVER, BRONZE];
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+
+
+
 
 export function SwissStandings({
   standings,
@@ -55,7 +55,7 @@ export function SwissStandings({
 }: SwissStandingsProps) {
   const t = useTranslations('tournament');
 
-  // Past rounds that are fully collapsed by default
+  
   const [expandedRounds, setExpandedRounds] = useState<Set<number>>(new Set());
 
   const toggleRound = (round: number) => {
@@ -67,7 +67,7 @@ export function SwissStandings({
     });
   };
 
-  // Derive current round matches and past round matches
+  
   const currentRoundMatches = useMemo(
     () =>
       matches
@@ -93,7 +93,7 @@ export function SwissStandings({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Champion banner */}
+      
       {isCompleted && winnerUsername && (
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -126,7 +126,7 @@ export function SwissStandings({
             {winnerUsername}
           </motion.span>
 
-          {/* Top 3 podium */}
+          
           {standings.length >= 2 && (
             <div className="flex items-end gap-6 mt-4">
               {standings.slice(0, 3).map((s, i) => (
@@ -156,7 +156,7 @@ export function SwissStandings({
         </motion.div>
       )}
 
-      {/* Header */}
+      
       <div className="flex items-center justify-between">
         <h3
           className="text-sm font-bold uppercase tracking-widest"
@@ -169,7 +169,7 @@ export function SwissStandings({
         </span>
       </div>
 
-      {/* Standings table */}
+      
       <div
         className="overflow-x-auto"
         style={{ border: '1px solid #262626', backgroundColor: '#111' }}
@@ -286,7 +286,7 @@ export function SwissStandings({
         </table>
       </div>
 
-      {/* Current round pairings */}
+      
       {!isCompleted && currentRoundMatches.length > 0 && (
         <div>
           <h4
@@ -351,7 +351,7 @@ export function SwissStandings({
         </div>
       )}
 
-      {/* Past rounds (collapsible) */}
+      
       {pastRounds.length > 0 && (
         <div>
           <h4
@@ -457,9 +457,9 @@ export function SwissStandings({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Match status badge sub-component
-// ---------------------------------------------------------------------------
+
+
+
 
 function MatchStatusBadge({ status }: { status: string }) {
   const t = useTranslations('tournament');

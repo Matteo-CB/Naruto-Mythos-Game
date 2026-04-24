@@ -3,27 +3,11 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 
-/**
- * Card 051/130 - OROCHIMARU (UC)
- * Chakra: 6 | Power: 5
- * Group: Sound Village | Keywords: Sannin
- *
- * MAIN [continuous]: If you lost this mission in Mission Phase, move this character
- * to another mission.
- *   - This is a continuous/passive effect. The actual logic of detecting mission loss
- *     and triggering the move is handled by ContinuousEffects.ts / MissionPhase.ts.
- *   - The MAIN handler here is a no-op that logs the continuous effect activation.
- *
- * UPGRADE: Defeat a hidden enemy character in play (any mission).
- *   - Find all hidden enemy characters across all missions.
- *   - If exactly one valid target, auto-apply.
- *   - If multiple targets, require target selection.
- *   - Defeat the target.
- */
+
 
 function handleOrochimaru051Main(ctx: EffectContext): EffectResult {
-  // Continuous effect [hourglass] - if you lost this mission, move to another mission.
-  // This is passively handled in MissionPhase.ts / ContinuousEffects.ts.
+  
+  
   const log = logAction(
     ctx.state.log,
     ctx.state.turn,
@@ -43,7 +27,7 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all hidden enemy characters across all missions
+  
   const validTargets: string[] = [];
   const targetMissionMap: Record<string, number> = {};
 
@@ -63,7 +47,7 @@ function handleOrochimaru051Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'OROCHIMARU', id: 'KS-051-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

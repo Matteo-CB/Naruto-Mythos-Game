@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-// ============================================================
-// Shared popup primitives for all effect/confirm overlays.
-// Design: angular corner brackets, chakra-line titles,
-// skewed action buttons, text-link dismissals.
-// ============================================================
 
-// ----- Fullscreen backdrop -----
+
+
+
+
+
+
 
 export function PopupOverlay({
   children,
@@ -28,7 +28,7 @@ export function PopupOverlay({
       onClick={onClickBg}
       style={{
         backgroundColor: 'rgba(4, 4, 8, 0.92)',
-        // Subtle layered depth without CSS gradients — just overlapping shadows
+        
         boxShadow: 'inset 0 0 200px 60px rgba(0,0,0,0.4)',
         overflow: 'hidden',
       }}
@@ -38,8 +38,8 @@ export function PopupOverlay({
   );
 }
 
-// ----- Corner-bracket frame -----
-// Four L-shaped corner accents around the content area.
+
+
 
 const CORNER_SIZE = 24;
 const CORNER_THICKNESS = 2;
@@ -116,7 +116,7 @@ export function PopupCornerFrame({
   );
 }
 
-// ----- Title with animated chakra line -----
+
 
 export function PopupTitle({
   children,
@@ -144,7 +144,7 @@ export function PopupTitle({
       >
         {children}
       </span>
-      {/* Animated chakra line — draws from center outward */}
+      
       <svg
         width={lineWidths[size]}
         height="3"
@@ -175,7 +175,7 @@ export function PopupTitle({
           animate={{ pathLength: 1 }}
           transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
         />
-        {/* Center diamond dot */}
+        
         <motion.rect
           x={lineWidths[size] / 2 - 2}
           y="-0.5"
@@ -192,7 +192,7 @@ export function PopupTitle({
   );
 }
 
-// ----- Description text -----
+
 
 export function PopupDescription({
   children,
@@ -219,7 +219,7 @@ export function PopupDescription({
   );
 }
 
-// ----- Confirm / Action button (skewed accent) -----
+
 
 export function PopupActionButton({
   onClick,
@@ -268,7 +268,7 @@ export function PopupActionButton({
   );
 }
 
-// ----- Skip / Decline text link -----
+
 
 export function PopupDismissLink({
   onClick,
@@ -304,7 +304,7 @@ export function PopupDismissLink({
   );
 }
 
-// ----- Minimized floating pill (shared) -----
+
 
 export function PopupMinimizePill({
   text,
@@ -347,7 +347,7 @@ export function PopupMinimizePill({
   );
 }
 
-// ----- Minimize X button (top-right of popup) -----
+
 
 export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
   const t = useTranslations();
@@ -386,7 +386,7 @@ export function PopupMinimizeX({ onClick }: { onClick: () => void }) {
   );
 }
 
-// ----- Small corner-bracket panel (non-animated, for sidebar/HUD sections) -----
+
 
 const SMALL_CORNER = 16;
 const SMALL_CORNER_THICKNESS = 1;
@@ -449,7 +449,7 @@ export function PanelFrame({
   );
 }
 
-// ----- Section divider (thin line with optional center diamond) -----
+
 
 export function SectionDivider({
   color = 'rgba(196, 163, 90, 0.2)',
@@ -491,7 +491,7 @@ export function SectionDivider({
   );
 }
 
-// ----- Animated stat value -----
+
 
 export function StatValue({
   value,
@@ -518,7 +518,7 @@ export function StatValue({
   );
 }
 
-// ----- Angular button (general-purpose, for use outside popups) -----
+
 
 export function AngularButton({
   onClick,
@@ -605,7 +605,7 @@ export function AngularButton({
   );
 }
 
-// ----- Valid targets count badge -----
+
 
 export function PopupTargetCount({
   count,

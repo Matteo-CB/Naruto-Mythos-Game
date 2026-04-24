@@ -3,26 +3,9 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 116/130 - NEJI HYUGA (R)
- * Chakra: 4, Power: 4
- * Group: Leaf Village, Keywords: Team Guy
- *
- * MAIN: Defeat a character in this mission with exactly Power 4.
- *   Find all non-hidden characters (any player, not self) in this mission with
- *   effective power == 4. Target selection if multiple. Defeat the selected target.
- *
- * UPGRADE: Defeat a character with exactly Power 6 in this mission.
- *   This is a STANDALONE additional effect (no "MAIN effect:" prefix in JSON).
- *   When upgrading, BOTH MAIN and UPGRADE fire independently:
- *   - MAIN defeats a character with exactly Power 4
- *   - UPGRADE defeats a character with exactly Power 6
- */
 
-/**
- * Helper: find characters with exactly the given power in the source mission.
- * Always prompts for target selection (effect is optional).
- */
+
+
 function defeatCharacterWithExactPower(
   ctx: EffectContext,
   targetPower: number,
@@ -39,7 +22,7 @@ function defeatCharacterWithExactPower(
 
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Find all characters with exactly the target power (any player, not self, not hidden)
+  
   const validTargets: Array<{ instanceId: string; isEnemy: boolean }> = [];
 
   for (const char of mission[friendlySide]) {
@@ -68,7 +51,7 @@ function defeatCharacterWithExactPower(
     };
   }
 
-  // Always prompt for target selection (effect is optional — no "you must")
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -105,7 +88,7 @@ function hasCharacterWithExactPower(ctx: EffectContext, targetPower: number): bo
 function neji116MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Pre-check: any character with exactly Power 4 in this mission?
+  
   if (!hasCharacterWithExactPower(ctx, 4)) {
     return {
       state: {
@@ -135,7 +118,7 @@ function neji116MainHandler(ctx: EffectContext): EffectResult {
 function neji116UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Pre-check: any character with exactly Power 6 in this mission?
+  
   if (!hasCharacterWithExactPower(ctx, 6)) {
     return {
       state: {

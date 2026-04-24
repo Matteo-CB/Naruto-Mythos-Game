@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate friendship exists (accepted, in either direction)
+    
     const friendship = await prisma.friendship.findFirst({
       where: {
         status: 'accepted',
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for existing pending invite from sender to receiver (not expired)
+    
     const existingInvite = await prisma.matchInvite.findFirst({
       where: {
         senderId: session.user.id,
@@ -62,13 +62,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up sender info
+    
     const sender = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, username: true, elo: true },
     });
 
-    // Create match invite (expires in 2 minutes)
+    
     const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
     const invite = await prisma.matchInvite.create({
       data: {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Emit socket event to receiver
+    
     emitToUser(receiverId, 'match:invite-received', {
       inviteId: invite.id,
       sender: {

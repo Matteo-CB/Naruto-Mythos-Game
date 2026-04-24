@@ -1,4 +1,4 @@
-// Complete game engine type system
+
 
 export type PlayerID = 'player1' | 'player2';
 export type GamePhase = 'setup' | 'mulligan' | 'start' | 'action' | 'mission' | 'end' | 'gameOver';
@@ -7,9 +7,9 @@ export type MissionRank = 'D' | 'C' | 'B' | 'A';
 export type EffectType = 'MAIN' | 'UPGRADE' | 'AMBUSH' | 'SCORE';
 export type Rarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'MMS';
 
-// ---------------------
-// Card Data Interfaces
-// ---------------------
+
+
+
 
 export interface CardEffect {
   type: EffectType;
@@ -48,9 +48,9 @@ export interface MissionCard extends CardData {
   basePoints: number;
 }
 
-// ---------------------
-// In-Play Interfaces
-// ---------------------
+
+
+
 
 export interface CharacterInPlay {
   instanceId: string;
@@ -62,11 +62,9 @@ export interface CharacterInPlay {
   controlledBy: PlayerID;
   originalOwner: PlayerID;
   missionIndex: number;
-  /** instanceId of the character that took control (Ino 020, Orochimaru 050).
-   *  Used to return control when the controller is hidden or defeated. */
+  
   controllerInstanceId?: string;
-  /** Rashomon (067): locked enemy target instanceId. Only retargets when
-   *  Rashomon moves, or the locked target moves/leaves play. */
+  
   rempartLockedTargetId?: string;
 }
 
@@ -80,9 +78,9 @@ export interface ActiveMission {
   wonBy?: PlayerID | 'draw' | null;
 }
 
-// ---------------------
-// Player State
-// ---------------------
+
+
+
 
 export interface PlayerState {
   id: PlayerID;
@@ -101,34 +99,32 @@ export interface PlayerState {
   unusedMission: MissionCard | null; // The 3rd mission card not selected for the mission deck
 }
 
-// ---------------------
-// Game State
-// ---------------------
 
-/** Identifies a single SCORE effect source (mission card or character). */
+
+
+
+
 export interface ScoreEffectSource {
-  /** Card ID of the source (mission card or top card of character stack) */
+  
   cardId: string;
-  /** Instance ID of the character (null for mission card SCORE) */
+  
   instanceId: string | null;
-  /** Human-readable label: card name + effect type */
+  
   label: string;
 }
 
 export interface MissionScoringProgress {
-  /** Index into rankOrder ['D','C','B','A'] - which rank we're currently scoring */
+  
   currentRankIndex: number;
-  /** Whether the mission card's SCORE effect has been processed for the current mission */
+  
   missionCardScoreDone: boolean;
-  /** instanceIds of characters whose SCORE effects have already been processed on the current mission */
+  
   processedCharacterIds: string[];
-  /** The player who won the current mission (needed for resumption) */
+  
   winner: PlayerID;
-  /** When multiple SCORE effects are available, this lists all unresolved ones.
-   *  The player picks which to resolve next via a CHOOSE_SCORE_ORDER pending. */
+  
   pendingScoreEffects?: ScoreEffectSource[];
-  /** When loser has edge token + Orochimaru 051, the move runs first.
-   *  This tracks that SCORE effects still need to run after the move resolves. */
+  
   pendingScoreAfterOrochimaru?: { winner: PlayerID; missionIndex: number; rankIndex: number };
 }
 
@@ -147,32 +143,29 @@ export interface GameState {
   pendingEffects: PendingEffect[];
   pendingActions: PendingAction[];
   turnMissionRevealed: boolean;
-  /** Tracks progress through mission scoring when SCORE effects require target selection */
+  
   missionScoringProgress?: MissionScoringProgress;
-  /** Instance IDs of Rock Lee characters already moved during this End Phase */
+  
   endPhaseMovedIds?: string[];
-  /** Instance IDs of Akamaru 028 characters already processed for optional return during this End Phase */
+  
   endPhaseAkamaru028Ids?: string[];
-  /** Instance IDs of Giant Spider 103 characters already processed for optional hide during this End Phase */
+  
   endPhaseGiantSpider103Ids?: string[];
-  /** Whether power tokens have been removed during this End Phase (deferred when multi-effect ordering is active) */
+  
   endPhaseTokensRemoved?: boolean;
-  /** Set when all mission scoring is complete but End Phase hasn't run yet.
-   * Allows the UI to show SCORE effect results (POWERUP tokens, etc.) before tokens are removed. */
+  
   missionScoringComplete?: boolean;
-  /** Which player forfeited (abandon or timeout) - if set, game is over */
+  
   forfeitedBy?: PlayerID;
-  /** Sandbox mode: don't alternate active player after actions */
+  
   sandboxNoAlternate?: boolean;
-  /** Queued discard reorder — created after all effects resolve, before turn ends */
+  
   pendingDiscardReorder?: {
     discardOwner: PlayerID;
     chooser: PlayerID;
     count: number;
   };
-  /** Deferred continuation: remaining effect types from a newly played card,
-   *  stored here so that reactions from existing cards resolve first.
-   *  Processed by GameEngine when all other pendings clear. */
+  
   pendingContinuation?: {
     sourceCardId: string;
     sourceInstanceId: string;
@@ -183,22 +176,17 @@ export interface GameState {
     wasRevealed: boolean;
     chainData?: Record<string, unknown>;
   };
-  /** Consecutive timeout count per player (online timer) */
+  
   consecutiveTimeouts: { player1: number; player2: number };
-  /** Turn-wide cost increase for playing characters (set by Shino 033 MAIN effect).
-   *  Key = player who pays MORE. Reset at start of each turn. */
+  
   playCostIncrease?: { player1: number; player2: number };
-  /** Ordered history of all actions applied during the game (for replay).
-   *  createdIds: instanceIds of characters created by this action (for accurate replay ID mapping). */
+  
   actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
-  /** When a forced-choice pending (e.g. Dosu069) is created for a player,
-   *  this records which player should receive the turn once all pendings clear.
-   *  Cleared by GameEngine when the turn switch fires. */
+  
   pendingForcedResolver?: PlayerID;
-  /** Instance ID of the character played by Hiruzen 002 MAIN effect, for UPGRADE to apply POWERUP 2 */
+  
   _hiruzen002PlayedCharId?: string;
-  /** All instanceIds played (or revealed/upgraded) by any player during the current turn.
-   *  Every card in this list gets a white highlight border. Cleared when a new turn starts. */
+  
   turnPlayedIds?: string[];
 }
 
@@ -213,9 +201,9 @@ export interface GameLogEntry {
   timestamp: number;
 }
 
-// ---------------------
-// Effects
-// ---------------------
+
+
+
 
 export interface PendingEffect {
   id: string;
@@ -233,15 +221,15 @@ export interface PendingEffect {
   resolved: boolean;
   isUpgrade: boolean;
   wasRevealed?: boolean; // Whether the source card was revealed from hidden
-  // Continuation: remaining effect types to process after this pending is resolved
+  
   remainingEffectTypes?: EffectType[];
-  // When the selecting player differs from the source player (e.g., opponent choices)
+  
   selectingPlayer?: PlayerID;
-  // Set to true when this pending descends (directly or transitively) from an
-  // optional confirm popup. Lets the target-selection UI show a Cancel button
-  // all the way down the chain so a player who accepts an optional effect by
-  // mistake can still back out before committing a target choice. Propagated
-  // automatically by the dispatcher — handlers don't need to set it.
+  
+  
+  
+  
+  
   rootOptional?: boolean;
 }
 
@@ -249,7 +237,7 @@ export interface PendingAction {
   id: string;
   type: 'SELECT_TARGET' | 'CHOOSE_CARD_FROM_LIST' | 'DISCARD_CARD' | 'PUT_CARD_ON_DECK' | 'INFO_REVEAL' | 'CHOOSE_EFFECT';
   player: PlayerID;
-  /** The player whose action originally created this pending (may differ from player who resolves it). */
+  
   originPlayer?: PlayerID;
   description: string;
   descriptionKey?: string;
@@ -260,9 +248,9 @@ export interface PendingAction {
   sourceEffectId?: string;
 }
 
-// ---------------------
-// Continuous Effects
-// ---------------------
+
+
+
 
 export type ContinuousEffectType =
   | 'power_modifier'
@@ -287,9 +275,9 @@ export interface ContinuousEffect {
   value?: number;
 }
 
-// ---------------------
-// Actions
-// ---------------------
+
+
+
 
 export type GameAction =
   | { type: 'PLAY_CHARACTER'; cardIndex: number; missionIndex: number; hidden: false }
@@ -304,9 +292,9 @@ export type GameAction =
   | { type: 'FORFEIT'; reason: 'abandon' | 'timeout' }
   | { type: 'ADVANCE_PHASE' };
 
-// ---------------------
-// Game Configuration
-// ---------------------
+
+
+
 
 export interface PlayerConfig {
   userId: string | null;
@@ -322,9 +310,9 @@ export interface GameConfig {
   randomSeed?: number;
 }
 
-// ---------------------
-// Visible State (for clients)
-// ---------------------
+
+
+
 
 export interface VisibleGameState {
   gameId: string;
@@ -358,8 +346,8 @@ export interface VisibleOpponentState {
 }
 
 export interface VisibleMission extends Omit<ActiveMission, 'player1Characters' | 'player2Characters'> {
-  // Characters visible to the viewing player
-  // Hidden enemy characters show as unknown
+  
+  
   player1Characters: VisibleCharacter[];
   player2Characters: VisibleCharacter[];
 }
@@ -380,9 +368,9 @@ export interface VisibleCharacter {
   isLastPlayed: boolean; // Was this character played directly in the current turn by the opponent?
 }
 
-// ---------------------
-// Rank bonus mapping
-// ---------------------
+
+
+
 
 export const RANK_BONUS: Record<MissionRank, number> = {
   'D': 1,

@@ -16,7 +16,7 @@ import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
 
-// ----- Sub-components -----
+
 
 interface CharacterSlotProps {
   character: VisibleCharacter;
@@ -35,9 +35,9 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const hidePreview = useUIStore((s) => s.hidePreview);
   const pinCard = useUIStore((s) => s.pinCard);
   const zoomCard = useUIStore((s) => s.zoomCard);
-  // Ban enforcement is server-side only
+  
 
-  // Sandbox context menu
+  
   const isSandboxMode = useGameStore((s) => s.isSandboxMode);
   const sandboxDefeatCharacter = useGameStore((s) => s.sandboxDefeatCharacter);
   const sandboxReturnToHand = useGameStore((s) => s.sandboxReturnToHand);
@@ -47,7 +47,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
   const [showSandboxMenu, setShowSandboxMenu] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
 
-  // Granular selector - only re-renders when turn ownership actually changes
+  
   const isMyTurn = useGameStore((s) =>
     !s.isProcessing &&
     s.visibleState?.phase === 'action' &&
@@ -56,26 +56,26 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   const isSelected = selectedTargetId === character.instanceId;
   const isHidden = character.isHidden;
-  // card data is present for own cards (hidden or not), opponent visible cards,
-  // AND re-hidden enemy cards (wasRevealedAtLeastOnce = public knowledge)
+  
+  
   const hasCardData = !!character.card;
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  // Determine if this is a revealable character (own hidden character)
-  // Block reveal selection when an effect popup is minimized (view-only mode)
+  
+  
   const isRevealable = isOwn && isHidden && isMyTurn && hasCardData && !effectPopupMinimized;
 
-  // A re-hidden card: was revealed at least once, now face-down again
+  
   const isReHidden = isHidden && character.wasRevealedAtLeastOnce;
-  // True hidden enemy: never revealed, not our card
+  
   const isUnknownHiddenEnemy = isHidden && !isOwn && !character.wasRevealedAtLeastOnce;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!isMyTurn) {
-      // When not your turn, pin for preview if card data available
-      // This includes own hidden cards and re-hidden enemy cards
+      
+      
       if (!isUnknownHiddenEnemy && character.card) {
         pinCard(character.card);
       }
@@ -83,13 +83,13 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     }
     if (isRevealable) {
       selectTarget(character.instanceId);
-      // Also pin preview so the player can scroll and read card details
+      
       if (character.card) {
         pinCard(character.card);
       }
       return;
     }
-    // For own hidden cards, re-hidden cards, or opponent visible cards, pin for preview
+    
     if (!isUnknownHiddenEnemy && character.card) {
       pinCard(character.card);
     }
@@ -102,14 +102,14 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     }
   };
 
-  // Image path: show for ANY card that has card data + image_file
+  
   const imagePath = hasCardData ? normalizeImagePath(character.card?.image_file) : null;
 
-  // Effective power display (includes continuous modifiers from engine)
+  
   const totalPower = character.effectivePower;
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    // Block preview only for unknown hidden enemy cards (never revealed)
+    
     if (isUnknownHiddenEnemy || !character.card) return;
     showPreview(character.card, { x: e.clientX, y: e.clientY });
   };
@@ -130,7 +130,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
 
   return (
     <>
-    {/* Sandbox context menu */}
+    
     {showSandboxMenu && isSandboxMode && (
       <>
         <div className="fixed inset-0 z-[80]" onClick={() => setShowSandboxMenu(false)} />
@@ -211,7 +211,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
       }}
     >
       {isHidden && !isReHidden ? (
-        /* Never-revealed hidden card: show card back */
+        
         <img
           src="/images/card-back.webp"
           alt={t('card.back')}
@@ -219,7 +219,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           className="w-full h-full object-cover"
         />
       ) : isReHidden ? (
-        /* Re-hidden card (was revealed, now face-down): show greyed-out card face */
+        
         <>
           {imagePath ? (
             <div
@@ -243,7 +243,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
           )}
         </>
       ) : (
-        /* Visible card: normal rendering */
+        
         <>
           {imagePath ? (
             <div
@@ -263,7 +263,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </>
       )}
 
-      {/* Power display (bottom-right) - CSS animation replaces Framer Motion repeat:Infinity */}
+      
       {!isHidden && (
         <div
           className={`absolute bottom-0.5 right-0.5 flex items-center justify-center text-[11px] font-bold tabular-nums${character.powerTokens > 0 ? ' power-glow' : ''}`}
@@ -282,7 +282,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {/* Physical Power tokens */}
+      
       {character.powerTokens > 0 && (
         <div
           className="absolute top-0.5 right-0.5 flex flex-col items-end gap-0.5"
@@ -316,7 +316,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {/* Chakra cost (top-left) for visible cards */}
+      
       {!isHidden && character.card && (
         <div
           className="absolute top-0.5 left-0.5 w-5 h-5 flex items-center justify-center text-[9px] font-bold"
@@ -331,7 +331,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
         </div>
       )}
 
-      {/* Stack/upgrade indicator - CSS animation replaces Framer Motion repeat:Infinity */}
+      
       {character.stackSize > 1 && (
         <motion.div
           initial={false}
@@ -363,7 +363,7 @@ const CharacterSlot = React.memo(function CharacterSlot({ character, isOwn, miss
     prev.isOwn === next.isOwn,
 );
 
-// ----- Mission Card Component -----
+
 
 function MissionCardDisplay({
   mission,
@@ -408,7 +408,7 @@ function MissionCardDisplay({
 
   return (
     <>
-    {/* Mission sandbox context menu */}
+    
     {showMissionMenu && isSandboxMode && (
       <>
         <div className="fixed inset-0 z-[80]" onClick={() => setShowMissionMenu(false)} />
@@ -435,7 +435,7 @@ function MissionCardDisplay({
       </>
     )}
 
-    {/* Mission swap modal */}
+    
     {showSwapModal && isSandboxMode && (
       <MissionSwapModal
         missionIndex={index}
@@ -502,7 +502,7 @@ function MissionCardDisplay({
         </div>
       )}
 
-      {/* Rank badge */}
+      
       <div
         className="absolute top-1 left-1 px-1.5 py-0.5 text-[10px] font-bold"
         style={{
@@ -515,7 +515,7 @@ function MissionCardDisplay({
         {mission.rank}
       </div>
 
-      {/* Points badge */}
+      
       <div
         className="absolute top-1 right-1 px-1 py-0.5 text-[9px] font-bold tabular-nums"
         style={{
@@ -527,7 +527,7 @@ function MissionCardDisplay({
         {totalPoints} {t('game.board.pts')}
       </div>
 
-      {/* Won/Lost indicator */}
+      
       {mission.wonBy && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
@@ -552,7 +552,7 @@ function MissionCardDisplay({
   );
 }
 
-/** Modal for selecting a replacement mission card */
+
 function MissionSwapModal({
   missionIndex,
   currentMissionId,
@@ -640,7 +640,7 @@ function MissionSwapModal({
   );
 }
 
-// ----- Main MissionLane -----
+
 
 interface MissionLaneProps {
   mission: VisibleMission;
@@ -667,12 +667,12 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
 
   const effectPopupMinimized_ml = useUIStore((s) => s.effectPopupMinimized);
 
-  // Determine if this lane is a valid drop target (card selected, ready to target mission)
-  // Block mission selection when an effect popup is minimized (view-only mode)
+  
+  
   const isTargetable = isMyTurn && selectedCardIndex !== null && !effectPopupMinimized_ml;
   const isSelected = selectedMissionIndex === missionIndex;
 
-  // Separate characters by side (player's characters and opponent's characters)
+  
   const myChars =
     myPlayer === 'player1'
       ? mission.player1Characters
@@ -682,7 +682,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
       ? mission.player2Characters
       : mission.player1Characters;
 
-  // Power totals (memoized to avoid recomputation on every render)
+  
   const myPower = useMemo(
     () => myChars.reduce((sum, c) => sum + c.effectivePower, 0),
     [myChars],
@@ -722,7 +722,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         border: '1px solid rgba(255, 255, 255, 0.04)',
       }}
     >
-      {/* Opponent characters - scrollable when overflowing */}
+      
       <div
         className="flex-1 flex flex-col min-h-0"
       >
@@ -742,7 +742,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
             ))}
           </div>
         </div>
-        {/* Opponent power - compact inline */}
+        
         {oppChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
@@ -755,9 +755,9 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         )}
       </div>
 
-      {/* Mission card - centered, never pushed */}
+      
       <div className="relative w-full flex justify-center shrink-0">
-        {/* Drop zone highlight - only when this mission is selected */}
+        
         {isSelected && (
           <div
             className="absolute inset-0 -m-1.5"
@@ -772,11 +772,11 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         <MissionCardDisplay mission={mission} index={missionIndex} myPlayer={myPlayer} />
       </div>
 
-      {/* Player characters - scrollable when overflowing */}
+      
       <div
         className="flex-1 flex flex-col min-h-0"
       >
-        {/* Player power - compact inline */}
+        
         {myChars.length > 0 && (
           <div className="shrink-0 flex justify-center py-0.5">
             <span
@@ -805,7 +805,7 @@ export const MissionLane = React.memo(function MissionLane({ mission, missionInd
         </div>
       </div>
 
-      {/* Score badge - absolute bottom, always visible */}
+      
       <div
         className="shrink-0 flex items-center justify-center gap-1 w-full px-1.5 py-0.5"
         style={{

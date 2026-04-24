@@ -39,7 +39,7 @@ export default function SealedPage() {
   const setSealedDeck = useGameStore((s) => s.setSealedDeck);
   const startOnlineGame = useGameStore((s) => s.startOnlineGame);
 
-  // Socket store for online sealed
+  
   const socketConnect = useSocketStore((s) => s.connect);
   const socketCreateRoom = useSocketStore((s) => s.createRoom);
   const socketJoinRoom = useSocketStore((s) => s.joinRoom);
@@ -70,7 +70,7 @@ export default function SealedPage() {
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [boosterCount, setBoosterCount] = useState<4 | 5 | 6>(6);
 
-  // Auth check - redirect to login if not authenticated
+  
   useEffect(() => {
     if (status === 'loading') return;
     if (status === 'unauthenticated') {
@@ -82,7 +82,7 @@ export default function SealedPage() {
     }
   }, [status, step, router]);
 
-  // Detect sealed rematch: if we arrive here with a room already connected and sealed boosters incoming
+  
   useEffect(() => {
     if (socketConnected && socketRoomCode && socketOpponentJoined && !socketGameStarted && mode === null) {
       setMode('online');
@@ -90,7 +90,7 @@ export default function SealedPage() {
     }
   }, [socketConnected, socketRoomCode, socketOpponentJoined, socketGameStarted, mode]);
 
-  // When online boosters arrive, transition to opening
+  
   useEffect(() => {
     if (mode === 'online' && sealedBoosters && sealedAllCards && (step === 'online-waiting' || step === 'loading')) {
       const pool: SealedPool = {
@@ -102,7 +102,7 @@ export default function SealedPage() {
     }
   }, [mode, sealedBoosters, sealedAllCards, step]);
 
-  // When online game starts: initialize gameStore with online state then navigate to /game
+  
   const gameInitRef = useRef(false);
   useEffect(() => {
     if (
@@ -131,7 +131,7 @@ export default function SealedPage() {
     }
   }, []);
 
-  // Connect socket and fetch sealed rooms when entering online-create
+  
   useEffect(() => {
     if (step === 'online-create' && session?.user?.id) {
       (async () => {
@@ -141,13 +141,13 @@ export default function SealedPage() {
           }
           requestRoomList();
         } catch {
-          // Error handled via socket store
+          
         }
       })();
     }
   }, [step, session?.user?.id, socketConnected, socketConnect, requestRoomList]);
 
-  // Cleanup socket on unmount if game not started
+  
   useEffect(() => {
     return () => {
       if (!useSocketStore.getState().gameStarted) {
@@ -166,7 +166,7 @@ export default function SealedPage() {
       setIsPrivateRoom(false);
       setStep('online-waiting');
     } catch {
-      // Error handled via socket store
+      
     }
   }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
 
@@ -180,7 +180,7 @@ export default function SealedPage() {
       setIsPrivateRoom(true);
       setStep('online-waiting');
     } catch {
-      // Error handled via socket store
+      
     }
   }, [session?.user?.id, socketConnected, socketConnect, socketCreateRoom, boosterCount]);
 
@@ -194,14 +194,14 @@ export default function SealedPage() {
       socketJoinRoom(codeToJoin, session.user.id);
       setStep('online-waiting');
     } catch {
-      // Error handled via socket store
+      
     }
   }, [session?.user?.id, joinCode, socketConnected, socketConnect, socketJoinRoom]);
 
   const handleDifficultySelect = useCallback((diff: AIDifficulty) => {
     setDifficulty(diff);
 
-    // Generate boosters
+    
     import('@/lib/sealed/boosterGenerator').then((mod) => {
       try {
         const pool = mod.generateSealedPool(boosterCount);
@@ -231,7 +231,7 @@ export default function SealedPage() {
       if (mode === 'ai') {
         setStep('starting');
 
-        // Generate AI boosters and build AI deck
+        
         Promise.all([
           import('@/lib/sealed/boosterGenerator'),
           import('@/lib/sealed/aiSealedDeckBuilder'),
@@ -241,7 +241,7 @@ export default function SealedPage() {
             const aiPool = boosterMod.generateSealedPool(boosterCount);
             const aiDeck = aiMod.buildAISealedDeck(aiPool);
 
-            // AI missions: try to avoid overlap with player
+            
             const playerMissionIds = new Set(missions.map((m) => m.id));
             let aiMissions = aiDeck.missions.filter((m) => !playerMissionIds.has(m.id));
             if (aiMissions.length < 3) {
@@ -285,7 +285,7 @@ export default function SealedPage() {
           setStep('building');
         });
       } else if (mode === 'online') {
-        // Submit deck via socket
+        
         setSealedDeck(
           characters.map((c) => c.id),
           missions.map((m) => m.id),
@@ -301,12 +301,12 @@ export default function SealedPage() {
     router.push('/');
   }, [router]);
 
-  // Compute remaining seconds for online timer
+  
   const onlineTimerSeconds = sealedDeadline
     ? Math.max(0, Math.floor((sealedDeadline - Date.now()) / 1000))
     : 900;
 
-  // Filter public rooms to sealed mode only
+  
   const sealedPublicRooms = publicRooms.filter((r) => r.gameMode === 'sealed');
 
   const DIFFICULTIES = [
@@ -316,7 +316,7 @@ export default function SealedPage() {
     { key: 'impossible' as AIDifficulty, label: tAI('difficulties.impossible'), description: tAI('difficulties.impossibleDesc') },
   ];
 
-  // Loading state
+  
   if (step === 'loading') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -325,7 +325,7 @@ export default function SealedPage() {
     );
   }
 
-  // Access denied
+  
   if (step === 'denied') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -343,17 +343,17 @@ export default function SealedPage() {
     );
   }
 
-  // Booster opening
+  
   if (step === 'opening' && sealedPool) {
     return <BoosterOpening boosters={sealedPool.boosters} onComplete={handleBoostersComplete} />;
   }
 
-  // Pool review
+  
   if (step === 'review' && allOpenedCards.length > 0) {
     return <SealedPoolReview cards={allOpenedCards} onContinue={handleContinueToBuilding} />;
   }
 
-  // Deck building
+  
   if (step === 'building' && allOpenedCards.length > 0) {
     return (
       <SealedDeckBuilder
@@ -366,7 +366,7 @@ export default function SealedPage() {
     );
   }
 
-  // Starting game / waiting for opponent deck
+  
   if (step === 'starting') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
@@ -388,13 +388,13 @@ export default function SealedPage() {
     );
   }
 
-  // Mode selection, difficulty, and online create pages
+  
   return (
     <main id="main-content" className="flex min-h-screen relative flex-col bg-[#0a0a0a]">
       <CloudBackground />
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center gap-6 max-w-md w-full relative z-10">
-          {/* Title */}
+          
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-1" style={{ color: '#e0e0e0' }}>
               {t('title')}
@@ -405,7 +405,7 @@ export default function SealedPage() {
           </div>
 
           <AnimatePresence mode="wait">
-            {/* Mode selection */}
+            
             {step === 'mode-select' && (
               <motion.div
                 key="mode-select"
@@ -442,7 +442,7 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            {/* Difficulty selection (AI mode) */}
+            
             {step === 'difficulty' && (
               <motion.div
                 key="difficulty"
@@ -451,7 +451,7 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-2 w-full"
               >
-                {/* Booster count selector */}
+                
                 <div className="flex items-center justify-between p-3 rounded-lg mb-1" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
                   <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                     {t('boosterCountLabel')}
@@ -491,7 +491,7 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            {/* Online room creation/join */}
+            
             {step === 'online-create' && (
               <motion.div
                 key="online-create"
@@ -500,7 +500,7 @@ export default function SealedPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col gap-4 w-full"
               >
-                {/* Booster count selector */}
+                
                 <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
                   <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
                     {t('boosterCountLabel')}
@@ -523,7 +523,7 @@ export default function SealedPage() {
                   </div>
                 </div>
 
-                {/* Browse / Private toggle */}
+                
                 <div
                   className="flex w-full rounded-lg overflow-hidden"
                   style={{ border: '1px solid #262626' }}
@@ -551,7 +551,7 @@ export default function SealedPage() {
                   </button>
                 </div>
 
-                {/* Public rooms browse */}
+                
                 {onlineView === 'browse' && (
                   <>
                     <div
@@ -603,7 +603,7 @@ export default function SealedPage() {
                   </>
                 )}
 
-                {/* Private room */}
+                
                 {onlineView === 'private' && (
                   <div className="flex flex-col gap-3">
                     <button
@@ -654,7 +654,7 @@ export default function SealedPage() {
               </motion.div>
             )}
 
-            {/* Online waiting room */}
+            
             {step === 'online-waiting' && (
               <motion.div
                 key="online-waiting"
@@ -701,7 +701,7 @@ export default function SealedPage() {
             )}
           </AnimatePresence>
 
-          {/* Back button */}
+          
           <button
             onClick={() => {
               if (step === 'difficulty') {

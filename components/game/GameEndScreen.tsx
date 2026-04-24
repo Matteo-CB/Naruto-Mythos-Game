@@ -40,15 +40,15 @@ export function GameEndScreen() {
   const acceptRematch = useSocketStore((s) => s.acceptRematch);
   const declineRematch = useSocketStore((s) => s.declineRematch);
 
-  // Online rematch redirect lives on GamePage so it fires even after this
-  // component unmounts. AI rematch navigates directly below.
+  
+  
 
   const handleChangeDeck = useCallback(() => {
     resetGame();
     router.push('/play/ai');
   }, [resetGame, router]);
 
-  // Tournament match: auto-redirect to tournament page after showing result
+  
   const tournamentId = gameResult?.tournamentId;
   const tournamentRedirectRef = useRef(false);
   useEffect(() => {
@@ -230,19 +230,19 @@ export function GameEndScreen() {
           maxWidth="520px"
           padding="40px 32px"
         >
-          {/* Dramatic heading */}
+          
           <PopupTitle accentColor={headingColor} size="xl">
             {headingText}
           </PopupTitle>
 
-          {/* Score comparison */}
+          
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
             className="flex items-center justify-center gap-8 mb-6"
           >
-            {/* Player score */}
+            
             <div className="flex flex-col items-center gap-1">
               <span className="text-sm" style={{ color: '#888888' }}>
                 {t('game.you')}
@@ -261,7 +261,7 @@ export function GameEndScreen() {
               </span>
             </div>
 
-            {/* Vertical divider */}
+            
             <div
               style={{
                 width: '1px',
@@ -270,7 +270,7 @@ export function GameEndScreen() {
               }}
             />
 
-            {/* Opponent score */}
+            
             <div className="flex flex-col items-center gap-1">
               <span className="text-sm" style={{ color: '#888888' }}>
                 {t('game.opponent')}
@@ -290,7 +290,7 @@ export function GameEndScreen() {
             </div>
           </motion.div>
 
-          {/* Edge token winner note */}
+          
           {isDraw && (
             <motion.span
               initial={{ opacity: 0 }}
@@ -303,7 +303,7 @@ export function GameEndScreen() {
             </motion.span>
           )}
 
-          {/* ELO change for ranked matches */}
+          
           {isRanked && eloDelta != null && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
@@ -364,14 +364,14 @@ export function GameEndScreen() {
 
           <SectionDivider color="rgba(255, 255, 255, 0.06)" width={100} />
 
-          {/* Action buttons */}
+          
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
             className="flex flex-col items-center gap-3 mt-4"
           >
-            {/* Auto-save status */}
+            
             {saveState === 'saving' && (
               <span className="text-xs" style={{ color: '#888888' }}>
                 {t('game.end.savingReplay')}
@@ -383,7 +383,7 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* Watch Replay button */}
+            
             {saveState === 'saved' && savedGameId && (
               <>
                 <span className="text-xs" style={{ color: '#4a9e4a' }}>
@@ -409,7 +409,7 @@ export function GameEndScreen() {
               </>
             )}
 
-            {/* Save Sealed Deck */}
+            
             {!!session?.user?.id && sealedDeckCardIds && sealedDeckMissionIds && sealedSaveState !== 'saved' && (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-xs uppercase tracking-wider" style={{ color: '#888888' }}>
@@ -452,7 +452,7 @@ export function GameEndScreen() {
               </span>
             )}
 
-            {/* Tournament match: auto-redirect countdown + manual button */}
+            
             {tournamentId ? (
               <PopupActionButton
                 onClick={() => { resetGame(); router.push(`/tournaments/${tournamentId}`); }}
@@ -462,14 +462,14 @@ export function GameEndScreen() {
               </PopupActionButton>
             ) : (
               <>
-                {/* AI Rematch — goes back to deck selection */}
+                
                 {isAIGame && (
                   <PopupActionButton onClick={handleChangeDeck} accentColor="#c4a35a">
                     {t('game.end.rematch')}
                   </PopupActionButton>
                 )}
 
-                {/* Online Rematch button */}
+                
                 {isOnlineGame && rematchState === 'none' && (
                   <PopupActionButton onClick={offerRematch} accentColor="#c4a35a">
                     {t('game.end.rematch')}
@@ -499,7 +499,7 @@ export function GameEndScreen() {
                   </span>
                 )}
 
-                {/* Back to Menu button */}
+                
                 <PopupActionButton onClick={resetGame} accentColor="#c4a35a">
                   {t('game.end.backToMenu')}
                 </PopupActionButton>

@@ -11,9 +11,7 @@ async function isAdmin() {
   return session?.user?.email === ADMIN_EMAIL || ADMIN_USERNAMES.includes(session?.user?.name ?? '');
 }
 
-/**
- * GET /api/admin/backgrounds - list all backgrounds (admin)
- */
+
 export async function GET() {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -27,11 +25,7 @@ export async function GET() {
   return NextResponse.json({ backgrounds });
 }
 
-/**
- * POST /api/admin/backgrounds - upload a new background
- * Expects multipart form: file (image), name (string)
- * Stores image as a static file in public/images/backgrounds/
- */
+
 export async function POST(request: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -54,12 +48,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File must be an image' }, { status: 400 });
     }
 
-    // Convert to base64 data URL for DB storage
+    
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64 = buffer.toString('base64');
     const dataUrl = `data:${file.type};base64,${base64}`;
 
-    // Get next sort order
+    
     const last = await prisma.gameBackground.findFirst({ orderBy: { sortOrder: 'desc' } });
     const sortOrder = (last?.sortOrder ?? -1) + 1;
 
@@ -81,10 +75,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * DELETE /api/admin/backgrounds - delete a background by id
- * Body: { id: string }
- */
+
 export async function DELETE(request: NextRequest) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
@@ -98,7 +89,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.gameBackground.delete({ where: { id } });
 
-    // Reset any users who had this background to default
+    
     await prisma.$runCommandRaw({
       update: 'User',
       updates: [

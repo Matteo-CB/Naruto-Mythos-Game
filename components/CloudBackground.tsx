@@ -15,7 +15,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
       style={{ zIndex: 0 }}
       aria-hidden="true"
     >
-      {/* Main background image — slow cinematic drift */}
+      
       {animated ? (
         <motion.div
           className="absolute"
@@ -52,7 +52,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         />
       )}
 
-      {/* Color tint — blend the image into the site's dark theme */}
+      
       <div
         className="absolute inset-0"
         style={{
@@ -61,7 +61,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      {/* Ambient color overlay — subtle purple mood matching accent */}
+      
       <div
         className="absolute inset-0"
         style={{
@@ -69,7 +69,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      {/* Heavy vignette — fades edges into pure black, content area subtly visible */}
+      
       <div
         className="absolute inset-0"
         style={{
@@ -77,7 +77,7 @@ export const CloudBackground = memo(function CloudBackground({ className = '', a
         }}
       />
 
-      {/* Top/bottom fade strips — seamless blending with page edges */}
+      
       <div
         className="absolute inset-x-0 top-0 h-24"
         style={{ background: 'linear-gradient(to bottom, rgba(6, 6, 10, 0.9), transparent)' }}

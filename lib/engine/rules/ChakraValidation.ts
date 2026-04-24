@@ -1,10 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 
-/**
- * Get the top card from a character, supporting both CharacterInPlay (has .stack)
- * and VisibleCharacter (has .topCard). This allows calculateEffectiveCost to work
- * with both server-side GameState and client-side VisibleGameState.
- */
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getTopCard(char: any): CharacterCard | undefined {
   if (char.stack?.length > 0) return char.stack[char.stack?.length - 1];
@@ -12,11 +8,7 @@ function getTopCard(char: any): CharacterCard | undefined {
   return char.card;
 }
 
-/**
- * Calculate the effective cost to play a character card,
- * considering all cost modifiers from continuous effects.
- * Works with both GameState (server) and VisibleGameState (client).
- */
+
 export function calculateEffectiveCost(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,
@@ -36,7 +28,7 @@ export function calculateEffectiveCost(
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   if (!friendlyChars) return cost;
 
-  // Check cost modifiers from continuous effects in this mission (both sides)
+  
   const allCharsInMission = [...(friendlyChars || []), ...(player === 'player1' ? mission.player2Characters : mission.player1Characters) || []];
   for (const charInMission of allCharsInMission) {
     if (charInMission.isHidden) continue;
@@ -47,27 +39,27 @@ export function calculateEffectiveCost(
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Kurenai 034: Other Team 8 characters cost 1 less (min 1) in this mission
+      
       if (topCard.number === 34 && effect.description.includes('Team 8') && effect.description.includes('less')) {
         if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {
           cost = Math.max(1, cost - 1);
         }
       }
 
-      // Gamakichi 096: Pay 1 less if Naruto Uzumaki in this mission
-      // This applies to Gamakichi itself when being played
+      
+      
       if (card.number === 96 && topCard.name_fr?.toUpperCase().includes('NARUTO UZUMAKI')) {
-        // Naruto is already in the mission - Gamakichi costs 1 less
+        
         cost = Math.max(0, cost - 1);
       }
     }
   }
 
-  // Self cost modifiers (the card being played)
+  
   for (const effect of card.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-    // Gamakichi 096: Pay 1 less if Naruto in this mission
+    
     if (card.number === 96 && effect.description.includes('Naruto Uzumaki') && effect.description.includes('1 less')) {
       const hasNaruto = friendlyChars.some(
         (c: any) => {
@@ -81,20 +73,20 @@ export function calculateEffectiveCost(
       }
     }
 
-    // Gaara 075: Play while hidden paying 2 less
+    
     if (card.number === 75 && effect.description.includes('hidden paying 2 less')) {
-      // This only applies when the card is currently hidden and being revealed
+      
       if (isReveal) {
         cost = Math.max(0, cost - 2);
       }
     }
 
-    // Itachi 090: Play while hidden paying 3 less if Sasuke Uchiha in this mission
-    // Only applies when revealing from hidden (isReveal), not when playing face-visible
+    
+    
     if (card.number === 90 && effect.description.includes('Sasuke Uchiha') && effect.description.includes('3 less')) {
       if (isReveal) {
-        // Check friendly characters (all, player knows their own hidden cards)
-        // and visible enemy characters (hidden enemy identity is unknown)
+        
+        
         const enemySide = player === 'player1' ? mission.player2Characters : mission.player1Characters;
         const checkableChars = [
           ...(friendlyChars || []).filter((c: any) => !c.isHidden),
@@ -113,7 +105,7 @@ export function calculateEffectiveCost(
     }
   }
 
-  // Check enemy continuous effects that increase cost
+  
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
   if (!enemyChars) return Math.max(0, cost);
   for (const enemy of enemyChars) {
@@ -125,15 +117,15 @@ export function calculateEffectiveCost(
     for (const effect of enemyTopCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Tayuya 125 (R/RA): Non-hidden enemy characters cost an additional 1 Chakra to play in this mission
-      // Applies to both face-visible plays and reveals from hidden
+      
+      
       if (enemyTopCard.number === 125 && effect.description.includes('additional 1 Chakra')) {
         cost += 1;
       }
     }
   }
 
-  // Shino 033 AMBUSH [⧗]: Pay 4 less when revealing if there's an enemy Jutsu character in this mission
+  
   if (isReveal && card.number === 33) {
     const hasEnemyJutsu = enemyChars?.some((c: any) => {
       if (c.isHidden) return false;
@@ -145,21 +137,18 @@ export function calculateEffectiveCost(
     }
   }
 
-  // Turn-wide cost increases
+  
   if (state.playCostIncrease) {
     cost += state.playCostIncrease[player] ?? 0;
   }
 
-  // Jiraiya 007 sub-play cost reduction for Summon characters
-  // This is handled separately when Jiraiya's MAIN effect triggers
+  
+  
 
   return Math.max(0, cost);
 }
 
-/**
- * Check if Kurenai 034's continuous cost reduction applies to this card on this mission.
- * Used by PlayValidation to enforce minimum 1 cost on upgrades when Kurenai's reduction is active.
- */
+
 export function hasKurenai034CostReduction(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,

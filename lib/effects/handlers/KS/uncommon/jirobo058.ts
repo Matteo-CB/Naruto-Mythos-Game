@@ -2,27 +2,14 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 058/130 - JIROBO (UC)
- * Chakra: 4 | Power: 3
- * Group: Sound Village | Keywords: Sound Four
- *
- * MAIN: POWERUP 1 to all other friendly characters with keyword "Sound Four" in this mission.
- *   - Find all friendly non-hidden characters in this mission (not self) that have
- *     the "Sound Four" keyword. Add 1 power token to each.
- *
- * UPGRADE: [↯] Apply the MAIN effect to Sound Four characters in the OTHER missions.
- *   - This is a SEPARATE effect (not a modifier of MAIN).
- *   - POWERUP 1 to all friendly non-hidden Sound Four characters in missions OTHER than
- *     the source mission.
- */
+
 
 function handleJirobo058Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Pre-check: any valid Sound Four targets in THIS mission?
+  
   const mission = state.activeMissions[sourceMissionIndex];
   let hasTarget = false;
   for (const char of mission[friendlySide]) {
@@ -41,7 +28,7 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -58,7 +45,7 @@ function handleJirobo058Upgrade(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Pre-check: any valid Sound Four targets in OTHER missions?
+  
   let hasTarget = false;
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue; // Skip source mission
@@ -81,7 +68,7 @@ function handleJirobo058Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-058-UC' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -7,11 +7,7 @@ const PLACEMENT_MATCHES_REQUIRED = 5;
 
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-/**
- * POST /api/admin/test-rankup
- * Sends a rank-up notification for every ranked player (Discord linked or not).
- * Admin-only endpoint for testing the webhook.
- */
+
 export async function POST() {
   try {
     const session = await auth();

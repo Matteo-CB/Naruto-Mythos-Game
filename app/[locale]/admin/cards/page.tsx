@@ -53,7 +53,7 @@ export default function AdminCardsPage() {
         setBannedReasons(reasonMap);
       }
     } catch {
-      // ignore
+      
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function AdminCardsPage() {
 
   const toggleBan = async (cardId: string, reason?: string) => {
     const isBanned = bannedIds.has(cardId);
-    // If banning (not yet banned) and no reason provided, show reason prompt
+    
     if (!isBanned && reason === undefined) {
       setBanReasonCardId(cardId);
       setBanReason('');
@@ -94,13 +94,13 @@ export default function AdminCardsPage() {
         });
       }
     } catch {
-      // ignore
+      
     } finally {
       setTogglingId(null);
     }
   };
 
-  // Not admin
+  
   if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
     return (
       <main id="main-content" className="flex min-h-screen relative flex-col" style={{ backgroundColor: '#0a0a0a' }}>
@@ -126,11 +126,11 @@ export default function AdminCardsPage() {
 
   const searchLower = search.toLowerCase();
   const filtered = allCards.filter((card) => {
-    // Search filter
+    
     if (searchLower && !card.name_fr.toLowerCase().includes(searchLower) && !card.id.toLowerCase().includes(searchLower)) {
       return false;
     }
-    // Status filter
+    
     if (filter === 'banned' && !bannedIds.has(card.id)) return false;
     if (filter === 'authorized' && bannedIds.has(card.id)) return false;
     return true;
@@ -144,7 +144,7 @@ export default function AdminCardsPage() {
 
       <div className="flex-1 flex flex-col items-center px-4 py-8 relative z-10">
         <div className="w-full max-w-6xl flex flex-col gap-6">
-          {/* Header */}
+          
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
               {t('adminCards.title')}
@@ -158,7 +158,7 @@ export default function AdminCardsPage() {
             </Link>
           </div>
 
-          {/* Stats + Search */}
+          
           <div className="flex items-center gap-4 flex-wrap">
             <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
               {t('adminCards.bannedCount', { count: bannedCount })}
@@ -179,7 +179,7 @@ export default function AdminCardsPage() {
             />
           </div>
 
-          {/* Filter tabs */}
+          
           <div className="flex flex-wrap gap-2">
             {(['all', 'banned', 'authorized'] as FilterMode[]).map((f) => (
               <button
@@ -197,7 +197,7 @@ export default function AdminCardsPage() {
             ))}
           </div>
 
-          {/* Card Grid */}
+          
           {loading ? (
             <p className="text-sm" style={{ color: '#888888' }}>{t('common.loading')}</p>
           ) : filtered.length === 0 ? (
@@ -224,12 +224,12 @@ export default function AdminCardsPage() {
                       transition: 'opacity 0.2s, border-color 0.2s',
                     }}
                   >
-                    {/* Card thumbnail */}
+                    
                     <div style={{ width: '100%' }}>
                       <CardFace card={card} />
                     </div>
 
-                    {/* Card info + toggle */}
+                    
                     <div className="p-2 flex flex-col gap-1.5">
                       <div
                         style={{
@@ -253,14 +253,14 @@ export default function AdminCardsPage() {
                         {card.id}
                       </div>
 
-                      {/* Show ban reason if exists */}
+                      
                       {isBanned && bannedReasons.get(card.id) && (
                         <div style={{ fontSize: '9px', color: '#b33e3e', lineHeight: 1.2, fontStyle: 'italic' }}>
                           {bannedReasons.get(card.id)}
                         </div>
                       )}
 
-                      {/* Ban reason input popup */}
+                      
                       {banReasonCardId === card.id && (
                         <div className="flex flex-col gap-1">
                           <input

@@ -2,19 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 098/130 - KATSUYU (Common)
- * Chakra: 3 | Power: 5
- * Group: Independent | Keywords: Summon
- * MAIN (1): If there is a friendly Tsunade in play, POWERUP 2.
- * MAIN (2) [continuous]: At the end of the round, you must return this character to your hand.
- *
- * Confirmation popup before POWERUP (MAIN effects are optional).
- */
+
 function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Pre-check: friendly Tsunade anywhere in play?
+  
   let hasTsunade = false;
   for (const mission of state.activeMissions) {
     const friendlyChars =
@@ -38,7 +30,7 @@ function handleKatsuyu098Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KATSUYU', id: 'KS-098-C' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

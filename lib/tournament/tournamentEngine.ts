@@ -1,6 +1,4 @@
-/**
- * Tournament bracket generation & advancement logic (single elimination).
- */
+
 
 export interface Participant {
   userId: string;
@@ -28,29 +26,25 @@ export interface BracketResult {
   totalRounds: number;
 }
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
 
-/**
- * Generate a full single-elimination bracket for the given participants.
- * Participants should already be shuffled (random seeding) or ordered (manual).
- * Pads to the next power of 2 with byes.
- */
+
+
+
+
 export function generateBracket(participants: Participant[]): BracketResult {
   const size = nextPowerOf2(participants.length);
   const totalRounds = Math.log2(size);
 
-  // Seed array - nulls become byes
+  
   const seeded: (Participant | null)[] = [...participants];
   while (seeded.length < size) seeded.push(null);
 
-  // Standard bracket ordering so byes are spread evenly
+  
   const ordered = standardSeedPairing(seeded);
 
   const matches: BracketMatch[] = [];
 
-  // Round 1
+  
   for (let i = 0; i < ordered.length; i += 2) {
     const p1 = ordered[i];
     const p2 = ordered[i + 1];
@@ -69,7 +63,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
     });
   }
 
-  // Placeholder matches for rounds 2+
+  
   for (let round = 2; round <= totalRounds; round++) {
     const matchCount = size / Math.pow(2, round);
     for (let i = 0; i < matchCount; i++) {
@@ -86,7 +80,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
     }
   }
 
-  // Propagate round-1 bye winners into round 2
+  
   const round1 = matches.filter(m => m.round === 1);
   for (const m of round1) {
     if (m.isBye && m.winnerId) {
@@ -97,10 +91,7 @@ export function generateBracket(participants: Participant[]): BracketResult {
   return { matches, totalRounds };
 }
 
-/**
- * Advance a match winner to the next round.
- * Returns the updated next-round match, or null if the tournament is over (final completed).
- */
+
 export function advanceWinner(
   matches: BracketMatch[],
   completedMatch: BracketMatch,
@@ -108,27 +99,23 @@ export function advanceWinner(
   return propagateWinner(matches, completedMatch);
 }
 
-/**
- * Check if all matches in a given round are completed.
- */
+
 export function isRoundComplete(matches: BracketMatch[], round: number): boolean {
   return matches
     .filter(m => m.round === round)
     .every(m => m.status === 'completed');
 }
 
-/**
- * Get the list of matches that are ready to play (both slots filled, not started).
- */
+
 export function getReadyMatches(matches: BracketMatch[]): BracketMatch[] {
   return matches.filter(
     m => m.status === 'ready' || (m.status === 'pending' && m.player1.participantId && m.player2.participantId),
   );
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+
+
+
 
 function propagateWinner(matches: BracketMatch[], completed: BracketMatch): BracketMatch | null {
   const nextRound = completed.round + 1;
@@ -151,13 +138,13 @@ function propagateWinner(matches: BracketMatch[], completed: BracketMatch): Brac
     nextMatch.player2 = winnerSlot;
   }
 
-  // Both slots filled → match is ready
+  
   if (nextMatch.player1.participantId && nextMatch.player2.participantId) {
     nextMatch.status = 'ready';
   }
 
-  // If one slot is a bye propagation (the other feeder was also a bye/completed)
-  // and the other slot is still null, we wait - it'll fill when the other feeder completes.
+  
+  
 
   return nextMatch;
 }
@@ -168,10 +155,7 @@ export function nextPowerOf2(n: number): number {
   return p;
 }
 
-/**
- * Standard bracket seeding order using the fold algorithm.
- * Ensures byes (null entries at the end of the array) are spread across the bracket.
- */
+
 function standardSeedPairing<T>(arr: (T | null)[]): (T | null)[] {
   const n = arr.length;
   if (n <= 2) return arr;
@@ -189,9 +173,7 @@ function bracketOrder(n: number): number[] {
   return result;
 }
 
-/**
- * Generate a random 8-character join code (uppercase alphanumeric).
- */
+
 export function generateJoinCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous 0/O/1/I
   let code = '';

@@ -5,23 +5,11 @@ import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 111/130 - SHIKAMARU NARA (R)
- * Chakra: 3, Power: 2
- * Group: Leaf Village, Keywords: Team 10
- *
- * MAIN [continuous]: Opponent cannot play characters hidden in this mission.
- *   This is a continuous play restriction effect. The handler is a no-op;
- *   the engine handles the play restriction in the action validation layer.
- *
- * UPGRADE: Hide an enemy character with Power 3 or less in this mission.
- *
- * Confirmation popup before target selection.
- */
+
 
 function shikamaru111MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous play restriction - handled by the engine's action validation.
-  // No-op handler to register the card.
+  
+  
   return { state: ctx.state };
 }
 
@@ -33,7 +21,7 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Pre-check: non-hidden enemies with effective power <= 3 that can be hidden
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => canBeHiddenByEnemy(state, c, opponentPlayer) && getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -53,7 +41,7 @@ function shikamaru111UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

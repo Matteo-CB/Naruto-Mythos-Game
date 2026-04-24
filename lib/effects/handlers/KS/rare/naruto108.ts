@@ -3,16 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 108/130 - NARUTO UZUMAKI "Believe it!" (R/RA)
- * Chakra: 5, Power: 5
- * Group: Leaf Village, Keywords: Team 7, Jutsu
- *
- * MAIN: Hide an enemy character with Power 3 or less in this mission.
- * UPGRADE: MAIN effect: Powerup X where X is the Power of the enemy character that is being hidden.
- *
- * Confirmation popup before target selection. Modifier pattern for UPGRADE.
- */
+
 
 function naruto108MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -20,7 +11,7 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
   const enemySideKey: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-check: any enemy with Power <= 3 in this mission?
+  
   const thisMission = state.activeMissions[sourceMissionIndex];
   const hasValidTarget = thisMission[enemySideKey].some(
     (c) => !c.isHidden && getEffectivePower(state, c, opponentPlayer) <= 3,
@@ -41,7 +32,7 @@ function naruto108MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

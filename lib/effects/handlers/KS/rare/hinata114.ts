@@ -2,23 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 114/130 - HINATA HYUGA (R)
- * Chakra: 3, Power: 2
- * Group: Leaf Village, Keywords: Team 8
- *
- * MAIN: POWERUP 2 (self); then POWERUP 1 on another friendly character in play.
- *   First applies POWERUP 2 on self, then requires target selection for
- *   which other friendly character in play receives POWERUP 1.
- *
- * UPGRADE: Remove all Power tokens from an enemy character in play.
- *   When isUpgrade: find enemies with powerTokens > 0. Target selection. Set tokens to 0.
- */
+
 
 function hinata114MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourceCard } = ctx;
 
-  // Return CONFIRM popup — POWERUP 2 self + POWERUP 1 target will be handled after confirmation
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -74,7 +63,7 @@ function hinata114UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-check: find enemy characters with power tokens > 0
+  
   let hasValidTarget = false;
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {

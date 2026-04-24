@@ -2,9 +2,7 @@ import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
 import { NeuralISMCTS } from '../neural/NeuralISMCTS';
 
-/**
- * Medium AI - solid heuristic ISMCTS without the neural net.
- */
+
 export class MediumAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'medium';
 

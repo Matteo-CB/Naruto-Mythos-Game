@@ -3,21 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 113/130 V - KIBA INUZUKA (M) "Fang Over Fang"
- * Chakra: 5, Power: 4
- * Group: Leaf Village, Keywords: Team 8
- *
- * MAIN: Hide a friendly Akamaru in play; if you do, hide another character
- *       in this mission (not self, not the Akamaru just hidden).
- *
- * UPGRADE: MAIN effect changes: instead of hiding, defeat both targets.
- *
- * Same confirmation flow as KS-113-R:
- *   1. KIBA149_CONFIRM_MAIN → optional confirm popup
- *   2. KIBA149_CONFIRM_UPGRADE → optional confirm popup (if upgrade)
- *   3. Target selection for Akamaru + enemy
- */
+
 
 function kiba149MainHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
@@ -27,7 +13,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-condition: Find a friendly non-hidden Akamaru in play
+  
   let hasAkamaru = false;
   for (let i = 0; i < state.activeMissions.length; i++) {
     for (const char of state.activeMissions[i][friendlySide]) {
@@ -52,7 +38,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Pre-condition 2: Check there's at least one valid second target in this mission
+  
   const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' : 'player1';
   const thisMission = state.activeMissions[ctx.sourceMissionIndex];
   let hasSecondTarget = false;
@@ -82,7 +68,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return confirmation popup (like Sasuke 146)
+  
   const extraData = JSON.stringify({
     sourceMissionIndex: ctx.sourceMissionIndex,
     sourceCardInstanceId: ctx.sourceCard.instanceId,
@@ -101,7 +87,7 @@ function kiba149MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function kiba149UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  
   return { state: ctx.state };
 }
 

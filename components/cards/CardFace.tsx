@@ -9,9 +9,9 @@ import CardBack from './CardBack';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword } from '@/lib/utils/cardLocale';
 
-// ---------------------
-// Rarity bar color mapping (no gradients, solid colors only)
-// ---------------------
+
+
+
 const RARITY_COLORS: Record<Rarity, string> = {
   C: '#6b7280',       // gray
   UC: '#22c55e',      // green
@@ -25,9 +25,9 @@ const RARITY_COLORS: Record<Rarity, string> = {
   MMS: '#6b7280',     // gray
 };
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface CardFaceProps {
   card: CharacterCard | MissionCard;
   powerTokens?: number;
@@ -36,13 +36,13 @@ export interface CardFaceProps {
   banned?: boolean;
 }
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = false, banned = false }: CardFaceProps) {
   const locale = useLocale();
 
-  // Banned cards always show card back
+  
   if (banned) {
     return <CardBack className={className} />;
   }
@@ -59,7 +59,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         backgroundColor: '#141414',
       }}
     >
-      {/* Card art background */}
+      
       {hasImage ? (
         <img
           src={imageSrc}
@@ -74,7 +74,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}
         />
       ) : (
-        /* Text-based card face for cards without images */
+        
         <div
           style={{
             position: 'absolute',
@@ -87,7 +87,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             padding: '8%',
           }}
         >
-          {/* Rarity accent line at top */}
+          
           <div style={{
             width: '40%',
             height: '2px',
@@ -95,7 +95,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
             marginBottom: '6%',
             opacity: 0.6,
           }} />
-          {/* Character name */}
+          
           <div style={{
             color: '#d0d0d0',
             fontSize: '0.65em',
@@ -107,7 +107,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
           }}>
             {getCardName(card, locale as 'en' | 'fr')}
           </div>
-          {/* Title */}
+          
           {getCardTitle(card, locale as 'en' | 'fr') && (
             <div style={{
               color: '#777777',
@@ -119,7 +119,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               {getCardTitle(card, locale as 'en' | 'fr')}
             </div>
           )}
-          {/* Group */}
+          
           {card.group && (
             <div style={{
               color: '#666666',
@@ -129,7 +129,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               {getCardGroup(card.group, locale as 'en' | 'fr')}
             </div>
           )}
-          {/* Keywords */}
+          
           {card.keywords && card.keywords.length > 0 && (
             <div style={{
               display: 'flex',
@@ -154,9 +154,9 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
               ))}
             </div>
           )}
-          {/* Spacer */}
+          
           <div style={{ flex: 1 }} />
-          {/* Card ID at bottom */}
+          
           <div style={{
             color: '#3a3a3a',
             fontSize: '0.35em',
@@ -167,7 +167,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Dark overlay for text readability at bottom (only for cards with images) */}
+      
       {hasImage && (
         <div
           style={{
@@ -182,7 +182,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         />
       )}
 
-      {/* Chakra cost badge (top-left) - character cards only */}
+      
       {card.card_type === 'character' && card.chakra !== undefined && (
         <div
           style={{
@@ -221,7 +221,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Power badge (bottom-right) - character cards only */}
+      
       {card.card_type === 'character' && (
         <div
           style={{
@@ -260,7 +260,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Power tokens indicator */}
+      
       {powerTokens > 0 && (
         <div
           style={{
@@ -286,7 +286,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Name and title (bottom-left) - only for cards with images */}
+      
       {hasImage && (
         <div
           style={{
@@ -329,7 +329,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         </div>
       )}
 
-      {/* Rarity indicator bar (bottom edge) */}
+      
       <div
         style={{
           position: 'absolute',
@@ -342,7 +342,7 @@ function CardFaceInner({ card, powerTokens = 0, className = '', showEffects = fa
         }}
       />
 
-      {/* Optional: effect text overlay (for card preview mode) */}
+      
       {showEffects && card.effects && card.effects.length > 0 && (
         <div
           style={{

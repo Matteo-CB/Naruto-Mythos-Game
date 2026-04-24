@@ -8,7 +8,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useGameScale } from './GameScaleContext';
 import { playSound, setVolume, setMuted } from '@/lib/sound/SoundManager';
 
-// ----- Duration mapping -----
+
 
 type AnimationType =
   | 'card-play'
@@ -52,14 +52,14 @@ function getAnimationDuration(type: AnimationType): number {
     case 'card-deal':
       return 800;
     case 'game-end':
-      // Game end is handled by GameEndScreen, auto-complete quickly
+      
       return 200;
     default:
       return 800;
   }
 }
 
-// ----- Animation Renderers -----
+
 
 interface AnimationEvent {
   id: string;
@@ -86,7 +86,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <div className="flex flex-col items-center gap-3">
-        {/* Physical card sliding up from bottom */}
+        
         <motion.div
           className="overflow-hidden"
           style={{
@@ -135,7 +135,7 @@ function CardPlayAnimation({ data }: { data: Record<string, unknown> }) {
           )}
         </motion.div>
 
-        {/* Card name label */}
+        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
@@ -185,7 +185,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <div className="flex flex-col items-center gap-3" style={{ perspective: '800px' }}>
-        {/* 3D card flip: face-down -> face-up */}
+        
         <motion.div
           className="relative overflow-hidden"
           style={{
@@ -197,7 +197,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           animate={{ rotateY: 0, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
         >
-          {/* Front face (card art) */}
+          
           <div
             className="absolute inset-0 overflow-hidden"
             style={{
@@ -225,7 +225,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
               />
             )}
           </div>
-          {/* Back face (face-down) */}
+          
           <div
             className="absolute inset-0 overflow-hidden"
             style={{
@@ -244,7 +244,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           </div>
         </motion.div>
 
-        {/* Glow pulse during flip */}
+        
         <motion.div
           className="absolute"
           style={{
@@ -257,7 +257,7 @@ function CardRevealAnimation({ data }: { data: Record<string, unknown> }) {
           transition={{ duration: 0.7, times: [0, 0.5, 1] }}
         />
 
-        {/* Label */}
+        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
@@ -327,7 +327,7 @@ function CardDefeatAnimation({ data }: { data: Record<string, unknown> }) {
         >
           {cardName}
         </motion.span>
-        {/* Dissolve particles */}
+        
         <div className="relative w-32 h-1 overflow-hidden">
           {Array.from({ length: 6 }).map((_, i) => (
             <motion.div
@@ -457,7 +457,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <div className="flex flex-col items-center gap-3">
-        {/* Card image sliding in over the old card */}
+        
         <motion.div
           className="overflow-hidden"
           style={{
@@ -495,7 +495,7 @@ function CardUpgradeAnimation({ data }: { data: Record<string, unknown> }) {
           )}
         </motion.div>
 
-        {/* Label */}
+        
         <motion.div
           className="flex flex-col items-center gap-1 px-6 py-2"
           style={{
@@ -784,8 +784,8 @@ function EdgeTransferAnimation({ data }: { data: Record<string, unknown> }) {
 function TurnTransitionAnimation({ data }: { data: Record<string, unknown> }) {
   const t = useTranslations();
   const turn = (data.turn as number) || 1;
-  // Self-contained: animate in, hold, then animate out within the duration
-  // Total 3000ms: 400ms in + 1800ms hold + 800ms out
+  
+  
   return (
     <motion.div
       key="turn-transition"
@@ -846,7 +846,7 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
     >
       <div className="flex flex-col items-center gap-3">
-        {/* Physical card shapes sliding down */}
+        
         <div className="flex items-center gap-1.5">
           {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
             <motion.div
@@ -871,7 +871,7 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
           ))}
         </div>
 
-        {/* Label */}
+        
         <motion.div
           className="flex items-center gap-2 px-4 py-1.5"
           style={{
@@ -900,7 +900,7 @@ function CardDealAnimation({ data }: { data: Record<string, unknown> }) {
   );
 }
 
-// ----- Render dispatcher -----
+
 
 function renderAnimation(anim: AnimationEvent) {
   switch (anim.type) {
@@ -929,14 +929,14 @@ function renderAnimation(anim: AnimationEvent) {
     case 'card-deal':
       return <CardDealAnimation key={anim.id} data={anim.data} />;
     case 'game-end':
-      // Handled by GameEndScreen, return nothing
+      
       return null;
     default:
       return null;
   }
 }
 
-// ----- Main Component -----
+
 
 export function AnimationController() {
   const animationQueue = useGameStore((s) => s.animationQueue);
@@ -946,13 +946,13 @@ export function AnimationController() {
   const soundEnabled = useSettingsStore((s) => s.soundEnabled);
   const soundVolume = useSettingsStore((s) => s.soundVolume);
 
-  // Sync sound settings to SoundManager
+  
   useEffect(() => {
     setMuted(!soundEnabled);
     setVolume(soundVolume);
   }, [soundEnabled, soundVolume]);
 
-  // --- State-diff sound detection (jutsu on effect activation) ---
+  
   const visibleState = useGameStore((s) => s.visibleState);
   const prevLogLenRef = useRef(0);
   useEffect(() => {
@@ -969,7 +969,7 @@ export function AnimationController() {
     let hasEffect = false;
     for (const entry of newEntries) {
       const a = entry.action;
-      // Any instant effect application triggers the jutsu sound
+      
       if (a.startsWith('EFFECT') || a === 'SCORE_RETURN' || a === 'POWERUP' || a === 'CHAKRA_STEAL') {
         hasEffect = true;
         break;
@@ -980,7 +980,7 @@ export function AnimationController() {
     }
   }, [visibleState?.log.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync isAnimating state
+  
   useEffect(() => {
     if (animationQueue.length > 0) {
       setAnimating(true);
@@ -989,10 +989,10 @@ export function AnimationController() {
     }
   }, [animationQueue.length, setAnimating]);
 
-  // Process one animation at a time
+  
   const currentAnim = animationQueue[0] as AnimationEvent | undefined;
 
-  // Play sound when animation starts (card-play, turn-transition, card-deal, effects)
+  
   useEffect(() => {
     if (!currentAnim) return;
     const type = currentAnim.type as AnimationType;
@@ -1007,12 +1007,12 @@ export function AnimationController() {
       case 'card-move':
         playSound('jutsu');
         break;
-      // card-play/reveal/upgrade: handled in gameStore.performAction (instant)
-      // card-hide/defeat: handled by state-diff log detection above
+      
+      
     }
   }, [currentAnim?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-complete after animation duration (instant when animations disabled)
+  
   useEffect(() => {
     if (!currentAnim) return;
     const duration = animationsEnabled ? getAnimationDuration(currentAnim.type as AnimationType) : 0;

@@ -1,7 +1,4 @@
-/**
- * Normalize a card image_file path to a valid URL with cache-busting.
- * Bump IMAGE_VERSION when deploying new card images.
- */
+
 const IMAGE_VERSION = 2;
 
 export function normalizeImagePath(imageFile?: string): string | null {

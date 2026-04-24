@@ -5,23 +5,11 @@ import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeChec
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import type { CharacterInPlay, CharacterCard } from '@/lib/engine/types';
 
-/**
- * Card 125/130 - TAYUYA (R)
- * Chakra: 3, Power: 2
- * Group: Sound Village, Keywords: Sound Four
- *
- * MAIN [continuous]: Non-hidden enemies cost 1 extra Chakra to play in this mission.
- *   This is a continuous cost modifier handled by the engine's chakra validation.
- *   The handler here is a no-op.
- *
- * UPGRADE: Play a Sound Village character from hand, paying 2 less.
- *   When isUpgrade: find Sound Village characters in hand that the player can afford
- *   (cost - 2). Target selection for which to play, then which mission.
- */
+
 
 function tayuya125MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous cost modifier - handled by the engine's chakra validation.
-  // Non-hidden enemies cost 1 extra to play in this mission.
+  
+  
   return { state: ctx.state };
 }
 
@@ -31,9 +19,9 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const validTargets: string[] = [];
 
-  // Per designer ruling: Tayuya 125 UPGRADE plays a Sound Village character
-  // from HAND only (like Jiraiya 007), not from the board. Hidden board
-  // characters are NOT valid targets for this effect.
+  
+  
+  
   for (let i = 0; i < playerState.hand.length; i++) {
     const card = playerState.hand[i];
     if (card.group === 'Sound Village') {
@@ -61,7 +49,7 @@ function tayuya125UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // CONFIRM popup before executing
+  
   return {
     state,
     requiresTargetSelection: true,

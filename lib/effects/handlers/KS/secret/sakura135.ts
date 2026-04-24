@@ -2,23 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 135/130 - SAKURA HARUNO "Corps Medical du Village de la Feuille" (S)
- * Chakra: 5, Power: 4
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN: Look at the top 3 cards of your deck. Play one character anywhere
- *       and discard the other cards.
- *
- * UPGRADE (effect:): Instead, play the card paying 4 less.
- *
- * Two-stage target selection:
- *   Stage 1: SAKURA135_CHOOSE_CARD - choose which character card from top 3 to play
- *   Stage 2: SAKURA135_CHOOSE_MISSION - choose which mission to play it on
- *
- * The handler draws the top 3 cards and stores them in the pending state.
- * The EffectEngine methods handle the rest.
- */
+
 
 function sakura135MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -35,7 +19,7 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Always return base CONFIRM — upgrade modifier will be prompted separately
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-// POST - join a tournament by code
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
     }
 
-    // Discord is recommended but not required — joining is always allowed
+    
 
-    // Check not already joined
+    
     const existing = await prisma.tournamentParticipant.findUnique({
       where: {
         tournamentId_userId: {

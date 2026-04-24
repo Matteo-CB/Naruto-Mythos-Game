@@ -84,7 +84,7 @@ export function EffectChoiceSelector() {
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupDescription>
 
-          {/* Effect choices — staggered from alternating sides */}
+          
           <div className="flex flex-col gap-3 mb-5">
             {effectChoices.map((choice, idx) => {
               const style = EFFECT_TYPE_STYLES[choice.effectType] || DEFAULT_STYLE;
@@ -111,7 +111,7 @@ export function EffectChoiceSelector() {
                     transition: 'background-color 0.2s, border-left-width 0.15s',
                   }}
                 >
-                  {/* Effect type — vertical strip badge */}
+                  
                   <div
                     className="shrink-0 px-2.5 py-1 text-[9px] font-bold uppercase text-center"
                     style={{
@@ -130,7 +130,7 @@ export function EffectChoiceSelector() {
                     )}
                   </div>
 
-                  {/* Effect description */}
+                  
                   <span
                     className="font-body text-[12px] leading-relaxed flex-1"
                     style={{ color: '#c8c8c8' }}

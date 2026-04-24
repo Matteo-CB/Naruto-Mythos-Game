@@ -86,24 +86,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const discordId = profile.id as string;
         const discordUsername = (profile as { username?: string }).username ?? profile.name ?? 'user';
 
-        // Check if a user already exists with this discordId
+        
         const existingUser = await prisma.user.findFirst({
           where: { discordId },
         });
 
         if (existingUser) {
-          // Update discordUsername if changed
+          
           await prisma.user.update({
             where: { id: existingUser.id },
             data: { discordUsername },
           });
 
-          // Override the user id/name so the JWT uses our existing user
+          
           user.id = existingUser.id;
           user.name = existingUser.username;
           user.email = existingUser.email;
 
-          // Ensure the Account record exists for this user
+          
           const existingAccount = await prisma.account.findUnique({
             where: {
               provider_providerAccountId: {
@@ -129,13 +129,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
           }
 
-          // Trigger role sync (fire-and-forget)
+          
           syncDiscordRole(existingUser.id).catch(() => {});
 
           return true;
         }
 
-        // No existing user with this discordId - check if there's a linked Account
+        
         const existingAccount = await prisma.account.findUnique({
           where: {
             provider_providerAccountId: {
@@ -147,7 +147,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (existingAccount) {
-          // Account already linked - update discordId/username on user
+          
           await prisma.user.update({
             where: { id: existingAccount.userId },
             data: { discordId, discordUsername },
@@ -161,8 +161,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return true;
         }
 
-        // Brand new Discord user - create user + account
-        // Generate a unique username from Discord username
+        
+        
         let baseUsername = discordUsername.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 17);
         if (baseUsername.length < 3) baseUsername = `user_${discordId.slice(-6)}`;
         let finalUsername = baseUsername;
@@ -176,7 +176,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const discordEmail = (profile as { email?: string }).email;
         let email = discordEmail || `discord_${discordId}@naruto-mythos.local`;
 
-        // Check email uniqueness
+        
         const emailExists = await prisma.user.findUnique({ where: { email } });
         if (emailExists) {
           email = `discord_${discordId}@naruto-mythos.local`;
@@ -211,7 +211,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user.name = newUser.username;
         user.email = newUser.email;
 
-        // Trigger initial role sync
+        
         syncDiscordRole(newUser.id).catch(() => {});
 
         return true;
@@ -225,13 +225,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.name = user.name;
       }
 
-      // For Discord sign-in, we already set user.id in signIn callback
+      
       if (account?.provider === 'discord' && user?.id) {
         token.id = user.id;
         token.name = user.name;
       }
 
-      // Refresh discordId and role from DB on sign-in or session update
+      
       if (token.id && (trigger === 'signIn' || trigger === 'update' || !('discordId' in token))) {
         try {
           const dbUser = await prisma.user.findUnique({
@@ -242,7 +242,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.discordId = dbUser?.discordId ?? null;
           token.role = dbUser?.role ?? 'user';
         } catch {
-          // Keep existing value on error
+          
         }
       }
 

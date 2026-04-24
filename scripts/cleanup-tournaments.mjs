@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
 
-// Load .env manually (no dotenv dependency)
+
 try {
   const envContent = readFileSync('.env', 'utf8');
   for (const line of envContent.split('\n')) {

@@ -1,21 +1,4 @@
-/**
- * NeuralISMCTS: Information Set Monte Carlo Tree Search
- * with optional Neural Network value function.
- *
- * Algorithm:
- *  For each simulation:
- *    1. DETERMINIZE: fill in opponent's unknown hand with random cards
- *    2. SELECTION: traverse tree using UCB1 (PUCT if NN available)
- *    3. EXPANSION: add one new child node for an untried action
- *    4. EVALUATION: use NN value function or heuristic at leaf nodes
- *    5. BACKPROPAGATION: update visits and values up the path
- *
- *  Final selection: action with the most visits across all simulations.
- *
- * The IS-MCTS key insight: the tree is shared across ALL determinizations.
- * A node represents "what I'd do given this sequence of visible actions",
- * not a specific hidden state. This correctly handles hidden information.
- */
+
 
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import { GameEngine } from '../../engine/GameEngine';
@@ -25,7 +8,7 @@ import { BoardEvaluator } from '../evaluation/BoardEvaluator';
 import { FeatureExtractor } from './FeatureExtractor';
 import type { NeuralEvaluator } from './NeuralEvaluator';
 
-// ─── Action Key ────────────────────────────────────────────────────────────────
+
 
 function actionKey(action: GameAction): string {
   switch (action.type) {
@@ -54,13 +37,13 @@ function actionKey(action: GameAction): string {
   }
 }
 
-// ─── MCTS Node ─────────────────────────────────────────────────────────────────
+
 
 class MCTSNode {
   visits = 0;
   totalValue = 0;
   children: Map<string, MCTSNode> = new Map();
-  /** Set of action keys already expanded from this node */
+  
   expandedKeys: Set<string> = new Set();
   depth: number;
 
@@ -72,12 +55,7 @@ class MCTSNode {
     return this.visits === 0 ? 0.5 : this.totalValue / this.visits;
   }
 
-  /**
-   * UCB1 score for child selection.
-   * From the parent's perspective:
-   *   - If it's the AI's turn: maximize child value
-   *   - If it's the opponent's turn: minimize (1 - child value)
-   */
+  
   ucb1Score(child: MCTSNode, isAITurn: boolean, c: number): number {
     if (child.visits === 0) return Infinity;
     const exploitation = isAITurn ? child.value : (1 - child.value);
@@ -86,20 +64,20 @@ class MCTSNode {
   }
 }
 
-// ─── Configuration ─────────────────────────────────────────────────────────────
+
 
 export interface ISMCTSConfig {
-  /** Number of simulations per move decision */
+  
   simulations: number;
-  /** Maximum tree depth before leaf evaluation */
+  
   maxDepth: number;
-  /** UCB1 exploration constant (sqrt(2) ≈ 1.41 is standard) */
+  
   explorationC: number;
-  /** Optional neural network evaluator */
+  
   evaluator: NeuralEvaluator | null;
-  /** Max number of valid actions to consider at each node (branching limit) */
+  
   maxBranching: number;
-  /** Use batched async NN evaluation (slower per move but higher quality) */
+  
   useBatchedEval: boolean;
 }
 
@@ -130,7 +108,7 @@ export const DEFAULT_RIKUDO_CONFIG: ISMCTSConfig = {
   useBatchedEval: true,
 };
 
-// ─── Main ISMCTS Class ─────────────────────────────────────────────────────────
+
 
 export class NeuralISMCTS {
   private config: ISMCTSConfig;
@@ -139,10 +117,7 @@ export class NeuralISMCTS {
     this.config = config;
   }
 
-  /**
-   * Choose the best action synchronously (no NN batching).
-   * Used when NN is not available or for Chunin difficulty.
-   */
+  
   chooseActionSync(
     state: GameState,
     aiPlayer: PlayerID,
@@ -159,16 +134,16 @@ export class NeuralISMCTS {
         this.simulate(root, determinized, aiPlayer, 0);
       } catch {
         failedSims++;
-        // If too many simulations fail (>80%), the engine is crashing on most paths.
-        // Fall back early rather than building a PASS-biased tree.
+        
+        
         if (failedSims > this.config.simulations * 0.8 && i > 20) {
           break;
         }
       }
     }
 
-    // If nearly all simulations failed, the tree is unreliable.
-    // Use a heuristic fallback that explicitly avoids PASS when possible.
+    
+    
     if (failedSims > this.config.simulations * 0.6) {
       return this.heuristicFallback(validActions);
     }
@@ -176,10 +151,7 @@ export class NeuralISMCTS {
     return this.pickBestAction(root, validActions);
   }
 
-  /**
-   * Choose the best action with batched async NN evaluation.
-   * Runs simulations in waves, batching leaf evaluations together.
-   */
+  
   async chooseActionAsync(
     state: GameState,
     aiPlayer: PlayerID,
@@ -192,17 +164,17 @@ export class NeuralISMCTS {
     const totalSims = this.config.simulations;
 
     if (!this.config.useBatchedEval || !this.config.evaluator?.isReady()) {
-      // Fall back to sync
+      
       return this.chooseActionSync(state, aiPlayer, validActions);
     }
 
-    // Run simulations in batches for NN evaluation
+    
     for (let start = 0; start < totalSims; start += batchSize) {
       const batch = Math.min(batchSize, totalSims - start);
       const leafStates: GameState[] = [];
       const leafPaths: MCTSNode[][] = [];
 
-      // Collect leaf states from this batch
+      
       for (let i = 0; i < batch; i++) {
         try {
           const determinized = this.determinize(state, aiPlayer);
@@ -210,13 +182,13 @@ export class NeuralISMCTS {
           leafStates.push(leafState);
           leafPaths.push(path);
         } catch {
-          // Skip failed simulations
+          
         }
       }
 
       if (leafStates.length === 0) continue;
 
-      // Batch evaluate all leaf states
+      
       const evaluator = this.config.evaluator!;
       let nnValues: number[] = [];
 
@@ -235,7 +207,7 @@ export class NeuralISMCTS {
           nnValues = await evaluator.evaluateBatch(nonNullFeatures);
         }
 
-        // Assign values and backpropagate
+        
         for (let i = 0; i < leafStates.length; i++) {
           const leafState = leafStates[i];
           const path = leafPaths[i];
@@ -246,7 +218,7 @@ export class NeuralISMCTS {
           } else {
             const nnIdx = nonNullIndices.indexOf(i);
             if (nnIdx >= 0) {
-              // NN value: probability that player1 wins → convert to aiPlayer perspective
+              
               const p1WinProb = nnValues[nnIdx];
               value = aiPlayer === 'player1' ? p1WinProb : (1 - p1WinProb);
             } else {
@@ -254,14 +226,14 @@ export class NeuralISMCTS {
             }
           }
 
-          // Backpropagate
+          
           for (const node of path) {
             node.visits++;
             node.totalValue += value;
           }
         }
       } catch {
-        // NN evaluation failed for this batch — fall back to heuristic for all leaves
+        
         for (let i = 0; i < leafStates.length; i++) {
           const leafState = leafStates[i];
           const path = leafPaths[i];
@@ -279,18 +251,16 @@ export class NeuralISMCTS {
     return this.pickBestAction(root, validActions);
   }
 
-  // ─── Core MCTS Simulation ──────────────────────────────────────────────────
+  
 
-  /**
-   * Run one MCTS simulation (synchronous, with heuristic evaluation).
-   */
+  
   private simulate(
     node: MCTSNode,
     state: GameState,
     aiPlayer: PlayerID,
     depth: number,
   ): number {
-    // Terminal
+    
     if (state.phase === 'gameOver') {
       const v = this.terminalValue(state, aiPlayer);
       node.visits++;
@@ -298,7 +268,7 @@ export class NeuralISMCTS {
       return v;
     }
 
-    // Depth limit → evaluate leaf
+    
     if (depth >= this.config.maxDepth) {
       const v = this.heuristicValue(state, aiPlayer);
       node.visits++;
@@ -330,7 +300,7 @@ export class NeuralISMCTS {
       return v;
     }
 
-    // Limit branching factor for performance
+    
     let limitedActions: GameAction[];
     try {
       limitedActions = this.limitBranching(actions, state, actingPlayer);
@@ -340,21 +310,21 @@ export class NeuralISMCTS {
         : actions;
     }
 
-    // Find untried actions at this node
+    
     const untriedActions = limitedActions.filter(a => !node.expandedKeys.has(actionKey(a)));
 
     let selectedAction: GameAction;
     let childNode: MCTSNode;
 
     if (untriedActions.length > 0) {
-      // EXPANSION: pick a random untried action
+      
       selectedAction = untriedActions[Math.floor(Math.random() * untriedActions.length)];
       const key = actionKey(selectedAction);
       node.expandedKeys.add(key);
       childNode = new MCTSNode(depth + 1);
       node.children.set(key, childNode);
     } else {
-      // SELECTION: UCB1 over existing children
+      
       const isAITurn = actingPlayer === aiPlayer;
       let bestScore = -Infinity;
       selectedAction = limitedActions[0];
@@ -374,7 +344,7 @@ export class NeuralISMCTS {
       }
     }
 
-    // Apply action
+    
     let newState: GameState;
     try {
       newState = GameEngine.applyAction(state, actingPlayer, selectedAction);
@@ -385,20 +355,17 @@ export class NeuralISMCTS {
       return v;
     }
 
-    // Recurse
+    
     const value = this.simulate(childNode, newState, aiPlayer, depth + 1);
 
-    // Backpropagate to this node
+    
     node.visits++;
     node.totalValue += value;
 
     return value;
   }
 
-  /**
-   * Run one simulation but stop at the leaf to collect it for batch NN evaluation.
-   * Returns the path (nodes to update) and the leaf state.
-   */
+  
   private simulateCollectLeaf(
     node: MCTSNode,
     state: GameState,
@@ -410,7 +377,7 @@ export class NeuralISMCTS {
     let currentNode = node;
 
     while (true) {
-      // Terminal or depth limit
+      
       if (currentState.phase === 'gameOver' || path.length > this.config.maxDepth) {
         break;
       }
@@ -448,14 +415,14 @@ export class NeuralISMCTS {
       let childNode: MCTSNode;
 
       if (untriedActions.length > 0) {
-        // Expansion
+        
         selectedAction = untriedActions[Math.floor(Math.random() * untriedActions.length)];
         const key = actionKey(selectedAction);
         currentNode.expandedKeys.add(key);
         childNode = new MCTSNode(path.length);
         currentNode.children.set(key, childNode);
       } else {
-        // Selection: UCB1
+        
         const isAITurn = actingPlayer === aiPlayer;
         let bestScore = -Infinity;
         selectedAction = limitedActions[0];
@@ -475,7 +442,7 @@ export class NeuralISMCTS {
         }
       }
 
-      // Apply action
+      
       try {
         currentState = GameEngine.applyAction(currentState, actingPlayer, selectedAction);
       } catch {
@@ -489,7 +456,7 @@ export class NeuralISMCTS {
     return { path, leafState: currentState };
   }
 
-  // ─── Value Functions ────────────────────────────────────────────────────────
+  
 
   private terminalValue(state: GameState, aiPlayer: PlayerID): number {
     const opponent: PlayerID = aiPlayer === 'player1' ? 'player2' : 'player1';
@@ -503,19 +470,16 @@ export class NeuralISMCTS {
 
   private heuristicValue(state: GameState, aiPlayer: PlayerID): number {
     const rawScore = BoardEvaluator.evaluate(state, aiPlayer);
-    // Sigmoid normalization to [0, 1]
-    // Divisor of 80 (increased from 60) accommodates the higher raw scores
-    // from boosted board presence and tempo weights while keeping
-    // the sigmoid in its sensitive range.
+    
+    
+    
+    
     return 1 / (1 + Math.exp(-rawScore / 80));
   }
 
-  // ─── Helpers ────────────────────────────────────────────────────────────────
+  
 
-  /**
-   * Limit branching factor: keep the top N actions by quick heuristic.
-   * Always includes PASS to avoid tree distortion.
-   */
+  
   private getDecisionPlayer(state: GameState): PlayerID {
     if (state.phase === 'mulligan') {
       return state.player1.hasMulliganed ? 'player2' : 'player1';
@@ -537,8 +501,8 @@ export class NeuralISMCTS {
   }
 
   private tryAutoAdvance(state: GameState, actingPlayer: PlayerID): GameState | null {
-    // Clean up orphaned pending effects (effects with no matching pending actions)
-    // during simulation to prevent simulations from stalling
+    
+    
     if (state.pendingEffects.length > 0 && state.pendingActions.length === 0) {
       return { ...state, pendingEffects: [] };
     }
@@ -570,7 +534,7 @@ export class NeuralISMCTS {
 
     const result = scored.slice(0, this.config.maxBranching).map(s => s.action);
 
-    // Ensure PASS is always included
+    
     if (!result.some(a => a.type === 'PASS')) {
       const pass = actions.find(a => a.type === 'PASS');
       if (pass) result[result.length - 1] = pass;
@@ -602,11 +566,7 @@ export class NeuralISMCTS {
     }
   }
 
-  /**
-   * Pick the best action from the root node by most visits.
-   * Applies a visit penalty to PASS when the AI has playable alternatives,
-   * so that PASS only wins when it genuinely evaluates as the best move.
-   */
+  
   private pickBestAction(root: MCTSNode, validActions: GameAction[]): GameAction {
     let bestAction = validActions[0];
     let bestVisits = -1;
@@ -619,16 +579,16 @@ export class NeuralISMCTS {
 
       let effectiveVisits = child.visits;
 
-      // If PASS has accumulated visits but there are non-PASS alternatives,
-      // require PASS to have both more visits AND a clearly better win rate.
-      // This prevents the PASS-bias from crashed simulations where PASS
-      // is the only action that doesn't throw.
+      
+      
+      
+      
       if (action.type === 'PASS' && hasNonPass && child.visits > 0) {
         if (child.value < 0.55) {
-          // Below 55% win rate: heavily discount PASS visits
+          
           effectiveVisits = Math.floor(child.visits * 0.5);
         } else {
-          // Even with good win rate, require 30% more visits
+          
           effectiveVisits = Math.floor(child.visits * 0.7);
         }
       }
@@ -639,7 +599,7 @@ export class NeuralISMCTS {
       }
     }
 
-    // If tree is empty (all simulations failed), use heuristic fallback
+    
     if (bestVisits <= 0 && validActions.length > 1) {
       console.warn('[ISMCTS] Empty tree — all simulations failed. Using heuristic fallback.');
       return this.heuristicFallback(validActions);
@@ -648,14 +608,11 @@ export class NeuralISMCTS {
     return bestAction;
   }
 
-  /**
-   * Heuristic fallback when MCTS simulations mostly fail.
-   * Uses the quickScore ordering to pick the best non-PASS action.
-   */
+  
   private heuristicFallback(
     validActions: GameAction[],
   ): GameAction {
-    // Simply pick the first non-PASS action (they're typically already ordered well)
+    
     for (const action of validActions) {
       if (action.type !== 'PASS') {
         return action;
@@ -664,10 +621,7 @@ export class NeuralISMCTS {
     return validActions[0];
   }
 
-  /**
-   * Determinize: create a copy of the state with opponent's hidden hand filled in
-   * using random cards from the unknown pool.
-   */
+  
   private determinize(state: GameState, aiPlayer: PlayerID): GameState {
     const cloned = deepClone(state);
     const opponent: PlayerID = aiPlayer === 'player1' ? 'player2' : 'player1';
@@ -676,14 +630,14 @@ export class NeuralISMCTS {
     const hasVisibleOpponentHand = oppState.hand.length > 0 && !this.isHiddenHandPlaceholder(oppState.hand);
     if (hasVisibleOpponentHand) return cloned;
 
-    // Build pool of cards that could be in the opponent's hand:
-    // We use our own deck as a proxy (cards we haven't played or drawn)
-    // In a real implementation this would be filtered by known revealed cards.
+    
+    
+    
     const pool = shuffle([...cloned[aiPlayer].deck]);
 
     if (pool.length === 0) return cloned;
 
-    // Estimate hand size: typical is 5 at start, decreasing by 1-2 per turn played
+    
     const estimatedHandSize = oppState.hand.length > 0
       ? Math.min(pool.length, oppState.hand.length)
       : Math.min(pool.length, Math.max(1, 5 - (state.turn - 1)));
@@ -692,9 +646,7 @@ export class NeuralISMCTS {
     return cloned;
   }
 
-  /**
-   * Get detailed statistics for analysis/coaching.
-   */
+  
   getActionStats(
     state: GameState,
     aiPlayer: PlayerID,

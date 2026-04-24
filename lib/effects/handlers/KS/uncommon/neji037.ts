@@ -2,27 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 037/130 - NEJI HYUGA (UC)
- * Chakra: 4 | Power: 3
- * Group: Leaf Village | Keywords: Team Guy, Kekkei Genkai
- *
- * MAIN [continuous]: When a non-hidden enemy character is played in this mission, POWERUP 1 (self).
- *   - This is a continuous/passive effect. The actual logic of detecting when an
- *     enemy character is played face-visible in this mission and granting POWERUP 1
- *     is handled by ContinuousEffects.ts.
- *   - The MAIN handler here is a no-op that logs the continuous effect activation.
- *
- * UPGRADE: Remove all Power tokens from an enemy character in this mission.
- *   - Find non-hidden enemy characters in this mission that have powerTokens > 0.
- *   - If exactly one valid target, auto-apply.
- *   - If multiple targets, require target selection.
- *   - Set the target's powerTokens to 0.
- */
+
 
 function handleNeji037Main(ctx: EffectContext): EffectResult {
-  // Continuous effect [hourglass] - POWERUP 1 self when enemy plays non-hidden character here.
-  // This is passively checked in ContinuousEffects.ts.
+  
+  
   const log = logAction(
     ctx.state.log,
     ctx.state.turn,
@@ -44,7 +28,7 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
     opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemy characters with power tokens > 0
+  
   const validTargets: string[] = [];
   for (const char of enemyChars) {
     if (char.isHidden) continue;
@@ -59,7 +43,7 @@ function handleNeji037Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-037-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

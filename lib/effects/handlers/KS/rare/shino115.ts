@@ -4,30 +4,20 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 import type { CharacterInPlay } from '@/lib/engine/types';
 
-/**
- * Card 115/130 - SHINO ABURAME (R/RA)
- * Chakra: 5 | Power: 6
- * Group: Leaf Village | Keywords: Team 8, Jutsu
- *
- * MAIN [continuous]: Friendly characters in this mission cannot be hidden by enemy effects.
- *   -> Implemented in ContinuousEffects.ts via checkCanHideCharacter().
- *
- * AMBUSH: Move one friendly character in this mission.
- *   -> Move a friendly character FROM another mission TO Shino's mission.
- */
+
 
 function shino115AmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find friendly characters in OTHER missions (not Shino's mission) that can move here
+  
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
     if (isMovementBlockedByKurenai(state, i, sourcePlayer)) continue;
     for (const char of state.activeMissions[i][friendlySide]) {
-      // Check name uniqueness: would this character conflict on Shino's mission?
+      
       if (!char.isHidden) {
         const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
         const charName = topCard.name_fr.toUpperCase();
@@ -71,5 +61,5 @@ function shino115AmbushHandler(ctx: EffectContext): EffectResult {
 export function registerShino115Handlers(): void {
   registerEffect('KS-115-R', 'AMBUSH', shino115AmbushHandler);
   registerEffect('KS-115-RA', 'AMBUSH', shino115AmbushHandler);
-  // MAIN [continuous] is handled in ContinuousEffects.ts
+  
 }

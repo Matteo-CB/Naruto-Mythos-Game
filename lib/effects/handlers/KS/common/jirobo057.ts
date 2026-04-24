@@ -2,20 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 057/130 - JIROBO (Common)
- * Chakra: 2 | Power: 2
- * Group: Sound Village | Keywords: Sound Four
- * MAIN: POWERUP X. X is the number of missions where you have at least one friendly
- * Sound Four character.
- *
- * Counts missions containing at least one friendly non-hidden Sound Four character
- * (including this card's mission after it's played). Adds that many power tokens to self.
- */
+
 function handleJirobo057Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Count missions with at least one friendly Sound Four character
+  
   let soundFourMissionCount = 0;
   for (const mission of state.activeMissions) {
     const friendlyChars =
@@ -39,7 +30,7 @@ function handleJirobo057Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIROBO', id: 'KS-057-C' }) } };
   }
 
-  // Confirmation popup (no SKIP per Andy)
+  
   return {
     state,
     requiresTargetSelection: true,

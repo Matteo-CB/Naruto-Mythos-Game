@@ -11,7 +11,7 @@ export async function GET() {
 
     const now = new Date();
 
-    // Fetch incoming pending invitations (where current user is receiver)
+    
     const incoming = await prisma.matchInvite.findMany({
       where: {
         receiverId: session.user.id,
@@ -26,7 +26,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Fetch outgoing pending invitations (where current user is sender)
+    
     const outgoing = await prisma.matchInvite.findMany({
       where: {
         senderId: session.user.id,

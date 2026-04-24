@@ -39,7 +39,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
     return `${t('round')} ${round}`;
   }, [totalRounds, t]);
 
-  // Calculate SVG connection lines
+  
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
@@ -90,7 +90,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
 
   return (
     <div className="relative" ref={containerRef}>
-      {/* SVG lines */}
+      
       <svg
         ref={svgRef}
         className="absolute inset-0 pointer-events-none"
@@ -110,7 +110,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
         ))}
       </svg>
 
-      {/* Bracket grid */}
+      
       <div className="flex gap-8 overflow-x-auto pb-4" style={{ minHeight: 200 }}>
         {roundGroups.map((roundMatches, roundIdx) => (
           <div key={roundIdx} className="flex flex-col items-center flex-shrink-0">
@@ -136,7 +136,7 @@ export function BracketTree({ matches, totalRounds, currentRound, winnerId, winn
           </div>
         ))}
 
-        {/* Champion display */}
+        
         {winnerId && (
           <div className="flex flex-col items-center justify-center flex-shrink-0 ml-4">
             <div className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: '#c4a35a' }}>

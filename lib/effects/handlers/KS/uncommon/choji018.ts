@@ -6,18 +6,7 @@ import type { PlayerID } from '@/lib/engine/types';
 import { canBeHiddenByEnemy, isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
-/**
- * Card 018/130 - CHOJI AKIMICHI "Le Boulet Humain" (UC)
- * Chakra: 4 | Power: 4
- * Group: Leaf Village | Keywords: Team 10, Jutsu
- *
- * MAIN [continuous]: After you move this character, hide an enemy character in this
- * mission with less Power than this character.
- *
- * UPGRADE: Move this character.
- *   - After moving, the continuous MAIN triggers: hide an enemy with less Power
- *     in the destination mission. Player chooses if multiple targets.
- */
+
 function handleChoji018Main(ctx: EffectContext): EffectResult {
   const state = ctx.state;
   const log = logAction(
@@ -44,14 +33,14 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Check if Kurenai 035 blocks movement from this mission
+  
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Choji Akimichi (018): Cannot move — Kurenai blocks movement from this mission.',
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // Find valid destination missions (not current mission, no same-name conflict)
+  
   const validTargets: string[] = [];
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     if (mIdx === sourceMissionIndex) continue;
@@ -70,14 +59,14 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no valid destination, effect fizzles
+  
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Choji Akimichi (018): No valid mission to move to (upgrade effect fizzles).',
       'game.log.effect.noTarget', { card: 'CHOJI AKIMICHI', id: 'KS-018-UC' }) } };
   }
 
-  // Optional effect — player can decline. But once confirmed, no skip on the move itself.
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -89,10 +78,7 @@ function handleChoji018Upgrade(ctx: EffectContext): EffectResult {
   };
 }
 
-/**
- * After Choji moves, find non-hidden enemy characters at his destination with less Power.
- * If 0: log no target. If 1: auto-hide. If multiple: return target selection.
- */
+
 export function postMoveHide(
   state: import('@/lib/effects/EffectTypes').EffectContext['state'],
   chojiInstanceId: string,
@@ -109,10 +95,10 @@ export function postMoveHide(
   if (!chojiChar) return { state };
 
   const enemyPlayer: PlayerID = sourcePlayer === 'player1' ? 'player2' : 'player1';
-  // Use effective power (includes continuous effects like MSS02 +1, Sasuke -1/ally, etc.)
+  
   const chojiPower = calculateCharacterPower(state, chojiChar, sourcePlayer);
 
-  // Find non-hidden enemies with less effective power that can be hidden
+  
   const hideTargets: string[] = [];
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
@@ -135,13 +121,13 @@ export function postMoveHide(
   }
 
   if (hideTargets.length === 1) {
-    // Auto-hide single target via hideCharacterWithLog (respects Gemma 049, Kimimaro 056, etc.)
+    
     const targetId = hideTargets[0];
     let newState = EffectEngine.hideCharacterWithLog(state, targetId, sourcePlayer);
     return { state: newState };
   }
 
-  // Multiple targets: player chooses (mandatory — continuous effect)
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -171,7 +157,7 @@ function moveCharacterToMission(
   const fromChars = [...fromMission[friendlySide]];
   const toChars = [...toMission[friendlySide]];
 
-  // Find and remove character from source mission
+  
   const charIdx = fromChars.findIndex(c => c.instanceId === charInstanceId);
   if (charIdx === -1) return state;
 

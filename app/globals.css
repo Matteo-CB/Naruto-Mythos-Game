@@ -66,7 +66,7 @@ body {
   text-rendering: optimizeSpeed;
 }
 
-/* NJNaruto for all short UI text: headings, buttons, labels, links, spans, badges, stats */
+
 h1, h2, h3, h4, h5, h6,
 button, label, a, nav,
 span, small,
@@ -76,7 +76,7 @@ th, td,
   font-family: 'NJNaruto', Arial, sans-serif;
 }
 
-/* Override: force Inter on elements inside .font-inter-force containers */
+
 .font-inter-force,
 .font-inter-force a,
 .font-inter-force button,
@@ -87,12 +87,12 @@ th, td,
   font-family: var(--font-inter), 'Inter', sans-serif !important;
 }
 
-/* Inter for long-form text: paragraphs, descriptions, effect text */
+
 p, .font-body {
   font-family: var(--font-inter), 'Inter', sans-serif;
 }
 
-/* Override NJNaruto with Inter where explicitly requested */
+
 .font-inter-force,
 .font-inter-force * {
   font-family: var(--font-inter), 'Inter', sans-serif !important;
@@ -103,28 +103,28 @@ p, .font-body {
   scrollbar-color: #333 #0a0a0a;
 }
 
-/* Card aspect ratio */
+
 .card-aspect {
   aspect-ratio: 63/88;
 }
 
-/* Mission card aspect ratio (landscape) */
+
 .mission-aspect {
   aspect-ratio: 88/63;
 }
 
-/* Deck builder: hover highlight for character rows */
+
 .deck-char-row:hover {
   background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
-/* Prevent text selection on game elements */
+
 .no-select {
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* Portrait blocker — mobile/tablet only, shows when device is in portrait */
+
 .portrait-blocker {
   display: none;
   position: fixed;
@@ -157,7 +157,7 @@ p, .font-body {
   letter-spacing: 0.05em;
 }
 
-/* Phone rotation animation — phone tips from upright to landscape */
+
 .phone-rotate-animation {
   width: 90px;
   height: 90px;
@@ -207,7 +207,7 @@ p, .font-body {
   }
 }
 
-/* Fullscreen button — CSS-drawn expand icon */
+
 .fullscreen-btn {
   display: none;
   align-items: center;
@@ -236,7 +236,7 @@ p, .font-body {
   color: var(--background);
 }
 
-/* CSS fullscreen icon — four corner brackets */
+
 .fullscreen-icon {
   position: relative;
   width: 16px;
@@ -273,7 +273,7 @@ p, .font-body {
   border-width: 0 2px 2px 0;
 }
 
-/* Floating fullscreen button for in-game use */
+
 .fullscreen-float {
   display: none;
   position: fixed;
@@ -305,19 +305,19 @@ p, .font-body {
   height: 18px;
 }
 
-/* Hide floating button when in fullscreen */
+
 :fullscreen .fullscreen-float,
 :-webkit-full-screen .fullscreen-float {
   display: none;
 }
 
-/* Hide portrait blocker text button when in fullscreen (already landscape) */
+
 :fullscreen .portrait-blocker,
 :-webkit-full-screen .portrait-blocker {
   display: none !important;
 }
 
-/* Power token glow — CSS alternative to Framer Motion repeat:Infinity */
+
 @keyframes powerGlow {
   0%, 100% { box-shadow: 0 0 4px rgba(196, 163, 90, 0.2); }
   50%       { box-shadow: 0 0 10px rgba(196, 163, 90, 0.6); }
@@ -341,7 +341,7 @@ p, .font-body {
 }
 .animate-pulse-subtle { animation: pulseBorderSubtle 2s ease-in-out infinite; }
 
-/* Reduce motion for users who prefer it */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

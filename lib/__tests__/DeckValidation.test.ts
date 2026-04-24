@@ -32,7 +32,7 @@ describe('Deck Validation', () => {
 
   it('should reject a deck with more than 2 copies of the same version', () => {
     const deck = createTestDeck(27);
-    // Add 3 copies of the same card
+    
     const duplicate = mockCharacter({ id: 'KS-001-C', name_fr: 'Hiruzen' });
     deck.push(duplicate, duplicate, duplicate);
 
@@ -45,7 +45,7 @@ describe('Deck Validation', () => {
 
   it('should treat RA variants as the same version (strip A suffix)', () => {
     const deck = createTestDeck(28);
-    // Add 1 normal + 1 RA of the same card (should be 2 of same version)
+    
     const normal = mockCharacter({ id: 'KS-108-R', name_fr: 'Naruto' });
     const rareArt = mockCharacter({ id: 'KS-108-RA', name_fr: 'Naruto', is_rare_art: true });
     deck.push(normal, rareArt);
@@ -71,7 +71,7 @@ describe('Deck Validation', () => {
 
   it('should allow different versions of the same character', () => {
     const deck = createTestDeck(26);
-    // Different versions (different card numbers)
+    
     deck.push(
       mockCharacter({ id: 'KS-074-C', name_fr: 'Gaara', chakra: 2 }),
       mockCharacter({ id: 'KS-074-C', name_fr: 'Gaara', chakra: 2 }),

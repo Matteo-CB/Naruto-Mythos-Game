@@ -28,40 +28,40 @@ export interface RoomData {
   createdAt: number;
   hostName?: string;
   guestName?: string;
-  // Timer fields
+  
   actionTimer: ReturnType<typeof setTimeout> | null;
   timerDeadline: number | null;
   disconnectTimer: ReturnType<typeof setTimeout> | null;
-  // Who is currently in the disconnect grace period and when it expires.
-  // Needed so the rejoin handler can re-emit the banner to a player who came
-  // back from a transient blip while the opponent is still down.
+  
+  
+  
   disconnectedPlayer: 'player1' | 'player2' | null;
   disconnectDeadline: number | null;
-  // Disconnect abuse tracking: forfeit after too many in-game disconnects
+  
   player1DisconnectCount: number;
   player2DisconnectCount: number;
-  // Replay
+  
   replayInitialState: GameState | null;
-  // Sealed mode
+  
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
   sealedTimer: ReturnType<typeof setTimeout> | null;
   sealedDeadline: number | null;
-  // Timer toggle (casual rooms can disable)
+  
   timerEnabled: boolean;
-  // Rematch
+  
   rematchOffer?: 'player1' | 'player2';
-  // Tournament
+  
   tournamentId?: string;
   tournamentMatchId?: string;
-  // Coin flip sync: track which players finished their coin flip animation
+  
   coinFlipDone: { player1: boolean; player2: boolean };
-  // Spectators
+  
   spectators: Map<string, { socketId: string; userId: string; username: string }>;
-  // Per-player hand visibility for spectators
+  
   hostAllowSpectatorHand: boolean;
   guestAllowSpectatorHand: boolean;
-  // Chat
+  
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   chatLastCleanup: number;
 }
@@ -79,7 +79,7 @@ const userNames = new Map<string, string>(); // userId -> username (populated on
 const MATCHMAKING_ROOM_TTL_MS = 5 * 60 * 1000; // 5 min stale room cleanup
 let ioInstance: SocketIOServer | null = null; // Stored for getPublicRoomList socket liveness check
 
-// Banned cards cache (refreshed every 60s)
+
 let bannedCardCache: Map<string, string | null> | null = null; // cardId -> reason
 let bannedCardCacheTime = 0;
 const BAN_CACHE_TTL = 60_000;
@@ -101,10 +101,7 @@ function generateRoomCode(): string {
   return code;
 }
 
-/**
- * Clean up any existing room for this socket before joining matchmaking.
- * Prevents stale rooms from accumulating.
- */
+
 function cleanupPlayerRoom(socket: Socket): void {
   const existingCode = playerRooms.get(socket.id);
   if (!existingCode) return;
@@ -113,13 +110,13 @@ function cleanupPlayerRoom(socket: Socket): void {
     playerRooms.delete(socket.id);
     return;
   }
-  // If this socket is the host of a room with no game running, remove it
+  
   if (existingRoom.hostSocket === socket.id && !existingRoom.gameState) {
     if (existingRoom.sealedTimer) clearTimeout(existingRoom.sealedTimer);
     rooms.delete(existingCode);
     socket.leave(existingCode);
   }
-  // If this socket is the guest, clear guest info
+  
   if (existingRoom.guestSocket === socket.id) {
     existingRoom.guestId = null;
     existingRoom.guestSocket = null;
@@ -129,9 +126,7 @@ function cleanupPlayerRoom(socket: Socket): void {
   playerRooms.delete(socket.id);
 }
 
-/**
- * Build the list of public waiting rooms and broadcast to all connected sockets.
- */
+
 function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> {
   const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number }> = [];
   const staleRoomCodes: string[] = [];
@@ -139,7 +134,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
     if (room.isPrivate) continue;
     if (room.guestId) continue; // Already has a guest
     if (room.gameState) continue; // Game already started
-    // Verify host socket is still connected
+    
     if (room.hostSocket && ioInstance) {
       const hostSock = ioInstance.sockets.sockets.get(room.hostSocket);
       if (!hostSock || !hostSock.connected) {
@@ -154,7 +149,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
       createdAt: room.createdAt,
     });
   }
-  // Cleanup stale rooms
+  
   for (const code of staleRoomCodes) {
     const room = rooms.get(code);
     if (room?.hostSocket) playerRooms.delete(room.hostSocket);
@@ -172,14 +167,14 @@ function broadcastActiveGames(io: SocketIOServer): void {
     roomCode: string; player1Name: string; player2Name: string;
     spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
   }> = [];
-  // Track seen player IDs to prevent duplicates (same player in multiple rooms)
+  
   const seenPlayerIds = new Set<string>();
   const now = Date.now();
   for (const [code, room] of rooms) {
     if (!room.gameState || room.gameState.phase === 'gameOver') continue;
-    // Skip stale rooms (older than 2 hours with no activity)
+    
     if (now - room.createdAt > 2 * 60 * 60 * 1000) continue;
-    // Skip if either player is already shown in another active game
+    
     if (seenPlayerIds.has(room.hostId) || (room.guestId && seenPlayerIds.has(room.guestId))) continue;
     seenPlayerIds.add(room.hostId);
     if (room.guestId) seenPlayerIds.add(room.guestId);
@@ -196,14 +191,12 @@ function broadcastActiveGames(io: SocketIOServer): void {
   io.emit('games:list-update', { games: activeGames });
 }
 
-/**
- * Periodically clean stale public matchmaking rooms (no guest, no game, TTL expired).
- */
+
 function cleanupStaleRooms(): void {
   const now = Date.now();
   let cleaned = 0;
   for (const [code, room] of rooms) {
-    // Stale matchmaking rooms (no guest, no game, TTL expired)
+    
     if (!room.isPrivate && !room.guestId && !room.gameState) {
       if (!room.createdAt || now - room.createdAt > MATCHMAKING_ROOM_TTL_MS) {
         if (room.hostSocket) playerRooms.delete(room.hostSocket);
@@ -212,7 +205,7 @@ function cleanupStaleRooms(): void {
         continue;
       }
     }
-    // Completed games lingering >10 minutes (both players likely gone)
+    
     if (room.gameState?.phase === 'gameOver' && now - room.createdAt > 10 * 60 * 1000) {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
@@ -221,7 +214,7 @@ function cleanupStaleRooms(): void {
       cleaned++;
       continue;
     }
-    // Very old rooms (>4 hours) — force cleanup regardless of state
+    
     if (now - room.createdAt > 4 * 60 * 60 * 1000) {
       if (room.hostSocket) playerRooms.delete(room.hostSocket);
       if (room.guestSocket) playerRooms.delete(room.guestSocket);
@@ -231,7 +224,7 @@ function cleanupStaleRooms(): void {
       cleaned++;
     }
   }
-  // Clean orphaned playerRooms entries (point to rooms that no longer exist)
+  
   for (const [socketId, code] of playerRooms) {
     if (code.startsWith('spec:')) {
       if (!rooms.has(code.slice(5))) { playerRooms.delete(socketId); cleaned++; }
@@ -252,10 +245,7 @@ function clearActionTimer(room: RoomData): void {
   }
 }
 
-/**
- * Persist game result and apply ELO, then emit game:ended to both players.
- * Shared between normal game end, manual forfeit, and auto-timeout forfeit.
- */
+
 async function finalizeGameEnd(
   room: RoomData,
   code: string,
@@ -265,8 +255,8 @@ async function finalizeGameEnd(
   if (!room.gameState) return;
 
   clearActionTimer(room);
-  // Cancel any dangling disconnect grace timer so it can't auto-forfeit a
-  // game that has already ended via score/forfeit/timeout.
+  
+  
   if (room.disconnectTimer) {
     clearTimeout(room.disconnectTimer);
     room.disconnectTimer = null;
@@ -286,14 +276,14 @@ async function finalizeGameEnd(
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
   let gameRecordId: string | null = null;
 
-  // Pre-emptive cleanup: delete old games to free space before writing ELO/game record
+  
   try {
     const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
     const cutoff = new Date(Date.now() - GAME_TTL_MS);
     await prisma.game.deleteMany({ where: { completedAt: { lt: cutoff }, status: 'completed' } });
   } catch { /* ignore cleanup errors */ }
 
-  // Apply ELO changes (separate try-catch so game record save still works if ELO fails)
+  
   try {
     if (room.isRanked && room.hostId && room.guestId) {
       const [player1, player2] = await Promise.all([
@@ -345,9 +335,9 @@ async function finalizeGameEnd(
           player2TotalGames: updatedP2.wins + updatedP2.losses + updatedP2.draws,
         };
 
-        // Persist per-player EloHistory snapshots so admins can audit ELO
-        // trajectories even after the Game row is purged (72h). These rows
-        // are kept for ELO_HISTORY_TTL_MS (14 days) — see lib/db/gameCleanup.ts.
+        
+        
+        
         const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
         const p2Result: 'win' | 'loss' = winner === 'player2' ? 'win' : 'loss';
         prisma.eloHistory.createMany({
@@ -383,11 +373,11 @@ async function finalizeGameEnd(
           console.warn('[Socket] EloHistory write failed:', err instanceof Error ? err.message : err);
         });
 
-        // Sync Discord roles (fire-and-forget)
+        
         syncDiscordRole(room.hostId).catch(() => {});
         syncDiscordRole(room.guestId!).catch(() => {});
 
-        // Rank-up webhook notifications (fire-and-forget)
+        
         const p1OldTotal = player1.wins + player1.losses + player1.draws;
         const p2OldTotal = player2.wins + player2.losses + player2.draws;
         sendRankUpNotification(player1.username, player1.discordId, player1.elo, changes.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});
@@ -397,7 +387,7 @@ async function finalizeGameEnd(
   } catch (eloErr) {
     const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
     console.error('[Socket] ELO update error:', errMsg);
-    // If quota exceeded, force cleanup and retry ELO update once
+    
     if (errMsg.includes('quota') || errMsg.includes('AtlasError')) {
       try {
         console.log('[Socket] DB quota exceeded — force deleting old games and retrying ELO...');
@@ -431,7 +421,7 @@ async function finalizeGameEnd(
     }
   }
 
-  // Persist game record (separate try-catch so ELO still works if save fails)
+  
   try {
     if (room.hostId && room.guestId) {
       const replayForDb = room.gameState ? {
@@ -465,7 +455,7 @@ async function finalizeGameEnd(
           gameState: replayForDb ? (() => {
             try {
               const serialized = JSON.stringify(replayForDb);
-              // MongoDB BSON limit ~16MB, keep under 12MB to be safe
+              
               if (serialized.length > 12_000_000) {
                 console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), saving without actionHistory`);
                 return JSON.parse(JSON.stringify({ ...replayForDb, actionHistory: [] }));
@@ -480,7 +470,7 @@ async function finalizeGameEnd(
       });
       gameRecordId = gameRecord.id;
       console.log(`[Socket] Game saved: ${gameRecordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
-      // If this game is part of a tournament, update tournament state
+      
       if (room.tournamentId && room.tournamentMatchId && gameRecordId) {
         const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
         handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, gameRecordId).catch(err => {
@@ -492,7 +482,7 @@ async function finalizeGameEnd(
     console.error('[Socket] Error saving game record:', saveErr instanceof Error ? saveErr.message : saveErr, saveErr instanceof Error ? saveErr.stack : '');
   }
 
-  // Build replay data for client-side save
+  
   const replayData = room.gameState ? {
     log: room.gameState.log,
     playerNames: {
@@ -506,7 +496,7 @@ async function finalizeGameEnd(
       rankBonus: m.rankBonus,
       wonBy: m.wonBy ?? null,
     })),
-    // Visual replay data
+    
     initialState: room.replayInitialState,
     actionHistory: room.gameState.actionHistory ?? [],
   } : null;
@@ -542,14 +532,11 @@ async function finalizeGameEnd(
     });
   }
 
-  // Update live games list for spectators
+  
   broadcastActiveGames(io);
 }
 
-/**
- * Start (or restart) the action timer for the active player.
- * On timeout: auto-pass first, then auto-forfeit after MAX_CONSECUTIVE_TIMEOUTS.
- */
+
 function startActionTimer(
   room: RoomData,
   code: string,
@@ -558,9 +545,9 @@ function startActionTimer(
   clearActionTimer(room);
 
   if (!room.gameState) return;
-  // Only run timer during action phase (also excludes gameOver)
+  
   if (room.gameState.phase !== 'action') return;
-  // Skip timer if disabled for this room (casual rooms can opt out)
+  
   if (!room.timerEnabled) return;
 
   const activePlayer = room.gameState.activePlayer;
@@ -569,7 +556,7 @@ function startActionTimer(
   const deadline = Date.now() + ACTION_TIMEOUT_MS;
   room.timerDeadline = deadline;
 
-  // Notify the active player of the deadline
+  
   if (targetSocket) {
     io.to(targetSocket).emit('game:action-deadline', { deadline, durationMs: ACTION_TIMEOUT_MS });
   }
@@ -585,20 +572,20 @@ function startActionTimer(
     console.log(`[Socket] Timer expired for ${player} in room ${code} (timeout #${timeouts})`);
 
     if (timeouts >= MAX_CONSECUTIVE_TIMEOUTS) {
-      // Auto-forfeit after too many timeouts
+      
       console.log(`[Socket] Auto-forfeit for ${player} after ${timeouts} consecutive timeouts`);
       room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'FORFEIT', reason: 'timeout' });
 
-      // Broadcast final state
+      
       broadcastState(room, io);
       await finalizeGameEnd(room, code, io, 'timeout');
     } else {
-      // If pending effects/actions block PASS, auto-resolve them first
+      
       if (room.gameState.pendingActions.length > 0) {
         const pendingForPlayer = room.gameState.pendingActions.filter(p => p.player === player);
         if (pendingForPlayer.length > 0) {
           const pa = pendingForPlayer[0];
-          // Try to decline optional effects first
+          
           const pe = room.gameState.pendingEffects.find(e => e.id === pa.sourceEffectId);
           if (pe && (pe.isOptional || !pe.isMandatory)) {
             console.log(`[Socket] Timer: auto-declining optional effect for ${player}`);
@@ -609,25 +596,25 @@ function startActionTimer(
           }
         }
       }
-      // Now try to PASS (may still fail if more pending remain — timer will restart)
+      
       const stateBeforePass = room.gameState;
       console.log(`[Socket] Auto-pass for ${player} in room ${code}`);
       room.gameState = GameEngine.applyAction(room.gameState, player, { type: 'PASS' });
 
-      // Notify the timed-out player
+      
       if (targetSocket) {
         io.to(targetSocket).emit('game:auto-passed');
       }
 
-      // Broadcast updated state
+      
       broadcastState(room, io);
 
-      // Check if game ended (both passed → mission phase → end phase → game over)
+      
       const winner = GameEngine.getWinner(room.gameState);
       if (winner) {
         await finalizeGameEnd(room, code, io, 'score');
       } else if (room.gameState.missionScoringComplete) {
-        // Mission scoring done - auto-advance after brief pause
+        
         setTimeout(async () => {
           if (!rooms.has(code)) return; // Room was deleted
           if (!room.gameState || !room.gameState.missionScoringComplete) return;
@@ -643,18 +630,14 @@ function startActionTimer(
           }
         }, 1500);
       } else if (room.gameState.phase === 'action') {
-        // Restart timer for next active player
+        
         startActionTimer(room, code, io);
       }
     }
   }, ACTION_TIMEOUT_MS);
 }
 
-/**
- * Start a timer for the forced resolver (opponent who must respond to an effect).
- * Pauses the active player's timer and gives the forced resolver 2 minutes.
- * On timeout: auto-decline the pending action (character gets defeated).
- */
+
 function startForcedResolverTimer(
   room: RoomData,
   code: string,
@@ -669,12 +652,12 @@ function startForcedResolverTimer(
   const forcedSocket = forcedPlayer === 'player1' ? room.hostSocket : room.guestSocket;
   const activeSocket = forcedPlayer === 'player1' ? room.guestSocket : room.hostSocket;
 
-  // Pause active player's timer
+  
   if (activeSocket) {
     io.to(activeSocket).emit('game:action-deadline-pause');
   }
 
-  // Send deadline to forced resolver
+  
   const deadline = Date.now() + ACTION_TIMEOUT_MS;
   room.timerDeadline = deadline;
   if (forcedSocket) {
@@ -688,7 +671,7 @@ function startForcedResolverTimer(
     const resolver = room.gameState.pendingForcedResolver;
     console.log(`[Socket] Forced resolver timer expired for ${resolver} in room ${code}`);
 
-    // Auto-decline: find the pending effect for this player and decline it
+    
     const pendingEffect = room.gameState.pendingEffects.find(
       (e: { selectingPlayer?: string; sourcePlayer: string; isOptional?: boolean }) =>
         (e.selectingPlayer === resolver || e.sourcePlayer === resolver),
@@ -699,7 +682,7 @@ function startForcedResolverTimer(
         pendingEffectId: pendingEffect.id,
       });
     } else {
-      // Fallback: try declining via SELECT_TARGET with empty targets
+      
       const pendingAction = room.gameState.pendingActions.find(
         (a: { player: string }) => a.player === resolver,
       );
@@ -712,31 +695,26 @@ function startForcedResolverTimer(
       }
     }
 
-    // Notify the timed-out player
+    
     if (forcedSocket) {
       io.to(forcedSocket).emit('game:auto-declined');
     }
 
-    // Broadcast updated state
+    
     broadcastState(room, io);
 
-    // Check if game ended
+    
     const winner = GameEngine.getWinner(room.gameState);
     if (winner) {
       await finalizeGameEnd(room, code, io, 'score');
     } else if (room.gameState.phase === 'action') {
-      // Restart timer for the original active player
+      
       startActionTimer(room, code, io);
     }
   }, ACTION_TIMEOUT_MS);
 }
 
-/**
- * Start a timer for pending effect resolution (60 seconds).
- * On timeout:
- * - Optional effects → auto-decline
- * - Mandatory effects → auto-select a random valid target
- */
+
 function startEffectTimer(
   room: RoomData,
   code: string,
@@ -747,7 +725,7 @@ function startEffectTimer(
   if (!room.gameState) return;
   if (!room.timerEnabled) return;
 
-  // Find the pending action that needs resolution
+  
   const pendingAction = room.gameState.pendingActions[0];
   if (!pendingAction) return;
 
@@ -761,7 +739,7 @@ function startEffectTimer(
     io.to(resolverSocket).emit('game:action-deadline', { deadline, durationMs: EFFECT_TIMEOUT_MS });
   }
 
-  // Pause the other player's perspective
+  
   const otherSocket = resolverPlayer === 'player1' ? room.guestSocket : room.hostSocket;
   if (otherSocket) {
     io.to(otherSocket).emit('game:action-deadline-pause');
@@ -786,14 +764,14 @@ function startEffectTimer(
     const isOptional = pendingEffect?.isOptional ?? true;
 
     if (isOptional && pendingEffect) {
-      // Auto-decline optional effect
+      
       console.log(`[Socket] Auto-declining optional effect for ${resolverPlayer}`);
       room.gameState = GameEngine.applyAction(room.gameState, resolverPlayer, {
         type: 'DECLINE_OPTIONAL_EFFECT',
         pendingEffectId: pendingEffect.id,
       });
     } else if (pendingEffect && currentPendingAction) {
-      // Mandatory effect — pick a random valid target
+      
       const validTargets = pendingEffect.validTargets ?? currentPendingAction.options ?? [];
       if (validTargets.length > 0) {
         const randomTarget = validTargets[Math.floor(Math.random() * validTargets.length)];
@@ -816,7 +794,7 @@ function startEffectTimer(
     if (winner) {
       await finalizeGameEnd(room, code, io, 'score');
     } else if (room.gameState.phase === 'action') {
-      // Check if more effects pending
+      
       if (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0) {
         startEffectTimer(room, code, io);
       } else {
@@ -828,10 +806,7 @@ function startEffectTimer(
 
 const MISSION_PHASE_TIMEOUT_MS = 120_000; // 2 minutes for mission phase choices
 
-/**
- * Start a timer for mission phase pending actions (SCORE effects, REORDER_DISCARD).
- * In ranked games, if the player doesn't respond within 2 minutes, they forfeit.
- */
+
 function startMissionPhaseTimer(
   room: RoomData,
   code: string,
@@ -867,9 +842,7 @@ function startMissionPhaseTimer(
   }, MISSION_PHASE_TIMEOUT_MS);
 }
 
-/**
- * Broadcast visible state to both players.
- */
+
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
 
@@ -896,9 +869,9 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
       });
     }
 
-    // Broadcast to spectators — board + face-down hands, no hidden card data
+    
     if (room.spectators.size > 0) {
-      // Strip hidden card data from ALL characters (spectator sees card backs only)
+      
       const specMissions = p1State.activeMissions.map((m: any) => ({
         ...m,
         player1Characters: m.player1Characters.map((c: any) => c.isHidden && !c.wasRevealedAtLeastOnce
@@ -910,7 +883,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
           : c
         ),
       }));
-      // Send hand sizes (for face-down rendering) but no card data
+      
       const p1HandSize = room.gameState.player1.hand.length;
       const p2HandSize = room.gameState.player2.hand.length;
       const spectatorState = {
@@ -938,7 +911,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     }
   } catch (err) {
     console.error('[Socket] broadcastState error:', err instanceof Error ? err.message : err);
-    // Notify both players so UI doesn't freeze
+    
     if (room.hostSocket) {
       io.to(room.hostSocket).emit('game:error', { message: 'State sync error', errorKey: 'game.error.syncError' });
     }
@@ -951,7 +924,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
 export function setupSocketHandlers(io: SocketIOServer) {
   ioInstance = io;
 
-  // Global error handlers — prevent process crash from unhandled errors
+  
   process.on('uncaughtException', (err) => {
     console.error('[FATAL] Uncaught exception:', err.message, err.stack);
   });
@@ -959,10 +932,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
     console.error('[FATAL] Unhandled rejection:', reason instanceof Error ? reason.message : reason);
   });
 
-  // Periodic cleanup of stale matchmaking rooms (every 60 seconds)
+  
   setInterval(() => cleanupStaleRooms(), 60_000);
 
-  // Periodic DB cleanup: delete games older than GAME_TTL_MS (every 30 minutes)
+  
   setInterval(async () => {
     try {
       const { cleanupOldGames } = await import('@/lib/db/gameCleanup');
@@ -970,7 +943,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     } catch { /* ignore */ }
   }, 30 * 60 * 1000);
 
-  // Check for scheduled tournament auto-starts (every 30 seconds)
+  
   setInterval(async () => {
     try {
       const now = new Date();
@@ -980,22 +953,22 @@ export function setupSocketHandlers(io: SocketIOServer) {
       });
       for (const t of scheduledTournaments) {
         if (t._count.participants < 2) {
-          // Not enough players — cancel
+          
           await prisma.tournament.update({ where: { id: t.id }, data: { status: 'cancelled' } });
           io.to(`tournament:${t.id}`).emit('tournament:cancelled', { reason: 'not_enough_players' });
           console.log(`[Tournament] Auto-cancelled ${t.name} (${t.id}) — not enough players`);
           continue;
         }
         console.log(`[Tournament] Auto-starting scheduled tournament ${t.name} (${t.id})`);
-        // Trigger start via internal API call
+        
         try {
           const participants = await prisma.tournamentParticipant.findMany({ where: { tournamentId: t.id } });
-          // Shuffle participants randomly
+          
           for (let i = participants.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [participants[i], participants[j]] = [participants[j], participants[i]];
           }
-          // Batch assign seeds
+          
           await prisma.$transaction(
             participants.map((p, i) => prisma.tournamentParticipant.update({ where: { id: p.id }, data: { seed: i + 1 } }))
           );
@@ -1004,7 +977,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const playerList = participants.map(p => ({ userId: p.userId, username: p.username, seed: 0 }));
 
           if (isSwissFormat) {
-            // Swiss: generate round 1 only
+            
             const { computeSwissRoundCount, generateSwissRound1 } = await import('@/lib/tournament/swissEngine');
             const totalRounds = computeSwissRoundCount(playerList.length);
             const round1 = generateSwissRound1(playerList.map((p, i) => ({ ...p, seed: i + 1 })));
@@ -1023,7 +996,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               data: { status: 'in_progress', currentRound: 1, totalRounds, startedAt: now },
             });
           } else {
-            // Elimination: generate full bracket
+            
             const { generateBracket } = await import('@/lib/tournament/tournamentEngine');
             const bracket = generateBracket(participants.map(p => ({ userId: p.userId, username: p.username })));
             await prisma.tournamentMatch.createMany({
@@ -1054,17 +1027,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
   io.on('connection', (socket: Socket) => {
     console.log(`Player connected: ${socket.id}`);
-    // Register tournament socket handlers
+    
     registerTournamentHandlers(io, socket);
 
-    // Register user identity for targeted notifications
+    
     socket.on('auth:register', (data: { userId: string; username?: string }) => {
       if (data.userId) {
         registerUserSocket(data.userId, socket.id);
         if (data.username) {
           userNames.set(data.userId, data.username);
         }
-        // Check if this user has an active game they need to reconnect to
+        
         for (const [code, room] of rooms) {
           if (!room.gameState || room.gameState.phase === 'gameOver') continue;
           const isHost = room.hostId === data.userId;
@@ -1080,7 +1053,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // Rejoin a room after reconnection (socket ID changed)
+    
     socket.on('game:rejoin', async (data: { roomCode: string; userId: string }) => {
       const { roomCode, userId } = data;
       if (!roomCode || !userId) return;
@@ -1091,7 +1064,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      // Determine if this user is host or guest
+      
       const isHost = room.hostId === userId;
       const isGuest = room.guestId === userId;
       if (!isHost && !isGuest) {
@@ -1104,31 +1077,31 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] game:rejoin: ${player} reconnecting in room ${roomCode}, old socket: ${oldSocketId}, new socket: ${socket.id}`);
 
-      // Update socket ID in room
+      
       if (isHost) {
         room.hostSocket = socket.id;
       } else {
         room.guestSocket = socket.id;
       }
 
-      // Update playerRooms map
+      
       if (oldSocketId) playerRooms.delete(oldSocketId);
       playerRooms.set(socket.id, roomCode);
 
-      // Join the socket.io room
+      
       socket.join(roomCode);
 
-      // Three possible cases on rejoin:
-      //  (a) I am the player who was in the active-game grace period —
-      //      clear my own timer and tell the opponent I'm back.
-      //  (b) I came back from a transient blip but the OPPONENT is still in
-      //      the grace period — the timer keeps running on the server, and I
-      //      need the banner rehydrated so I see the countdown again. We
-      //      defer emitting the banner until AFTER game:started below,
-      //      because the client's game:started handler wipes the banner
-      //      state on purpose (in case the previous session was stale).
-      //  (c) I am rejoining during sealed deck-building with a cleanup timer
-      //      queued against me — just cancel it, no opponent notification.
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       let rehydrateOpponentDisconnect: { deadline: number; durationMs: number } | null = null;
       if (room.disconnectedPlayer === player && room.disconnectTimer) {
         clearTimeout(room.disconnectTimer);
@@ -1137,7 +1110,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.disconnectDeadline = null;
         console.log(`[Socket] Cancelled disconnect timer for ${player} in room ${roomCode}`);
 
-        // Notify the opponent that the player has reconnected
+        
         const opponentSock = isHost ? room.guestSocket : room.hostSocket;
         if (opponentSock) {
           io.to(opponentSock).emit('game:opponent-reconnected');
@@ -1152,29 +1125,29 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Cancelled sealed pre-game cleanup timer for ${player} in room ${roomCode}`);
       }
 
-      // Re-register user socket
+      
       registerUserSocket(userId, socket.id);
 
-      // If game is active, send current game state to the rejoining player
+      
       if (room.gameState) {
         const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
         const visibleState = GameEngine.getVisibleState(room.gameState, player);
-        // Send game:started FIRST so the client sets gameStarted=true before state arrives
+        
         socket.emit('game:started');
         socket.emit('game:state-update', { visibleState, playerRole: player, playerNames });
 
-        // Restart action timer if needed
+        
         if (room.gameState.phase === 'action' && !room.actionTimer) {
           startActionTimer(room, roomCode, io);
         }
 
-        // Rehydrate opponent-disconnected banner AFTER game:started so the
-        // client's game:started handler (which clears it) doesn't wipe it.
+        
+        
         if (rehydrateOpponentDisconnect) {
           socket.emit('game:opponent-disconnected', rehydrateOpponentDisconnect);
         }
       } else {
-        // Pre-game rejoin (e.g. sealed deck-building phase)
+        
         console.log(`[Socket] game:rejoin: ${player} rejoined room ${roomCode} during pre-game phase`);
         socket.emit('room:rejoined', {
           code: roomCode,
@@ -1182,12 +1155,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
           playerRole: player === 'player1' ? 'player1' : 'player2',
         });
 
-        // Re-check if both decks are submitted - if so, create the game
-        // This handles the case where both players submitted decks but the
-        // game creation event was lost due to a socket disconnection
+        
+        
+        
         if (room.hostDeck && room.guestDeck && !room.gameState) {
           console.log(`[Socket] game:rejoin: Both decks already submitted in room ${roomCode}, creating game now`);
-          // Clear sealed timer
+          
           if (room.sealedTimer) {
             clearTimeout(room.sealedTimer);
             room.sealedTimer = null;
@@ -1248,7 +1221,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // Create a room
+    
     socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; timerEnabled?: boolean; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
@@ -1257,7 +1230,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
-      // Clean up any existing room this player might be in
+      
       cleanupPlayerRoom(socket);
 
       let code: string;
@@ -1303,7 +1276,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         chatLastCleanup: 0,
       };
 
-      // Fetch host's spectator hand preference
+      
       try {
         const hostUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
         room.hostAllowSpectatorHand = hostUser?.allowSpectatorHand ?? false;
@@ -1316,13 +1289,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Room ${code} created by ${data.userId} (mode: ${gameMode})`);
       socket.emit('room:created', { code, isSealed: room.isSealed });
 
-      // Broadcast updated room list to all connected sockets
+      
       if (!room.isPrivate) {
         broadcastRoomList(io);
       }
     });
 
-    // Join a room
+    
     socket.on('room:join', async (data: { code: string; userId: string }) => {
       console.log(`[Socket] User ${data.userId} trying to join room ${data.code}`);
       
@@ -1333,7 +1306,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      // Check if user is the host — for tournament rooms, let them join (connect their socket)
+      
       if (room.hostId === data.userId) {
         if (room.tournamentId) {
           console.log(`[Socket] Tournament host ${data.userId} joining room ${data.code}`);
@@ -1349,14 +1322,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
             isRanked: room.isRanked,
             tournamentId: room.tournamentId,
           });
-          // If game already started, send state
+          
           if (room.gameState) {
             const visible = GameEngine.getVisibleState(room.gameState, 'player1');
             const playerNames = { player1: room.hostName ?? 'Player 1', player2: room.guestName ?? 'Player 2' };
             socket.emit('game:state-update', { visibleState: visible, playerRole: 'player1', playerNames });
             socket.emit('game:started');
           } else if (room.hostDeck && room.guestDeck && room.guestSocket) {
-            // Both decks pre-loaded and guest already connected — trigger auto-start
+            
             io.to(data.code).emit('room:player-joined', { hostId: room.hostId, guestId: room.guestId });
           }
           return;
@@ -1366,14 +1339,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      // Check if room has a guest (but allow same user to rejoin)
+      
       if (room.guestId && room.guestId !== data.userId) {
         console.log(`[Socket] Room ${data.code} is full`);
         socket.emit('room:error', { message: 'Room is full' });
         return;
       }
 
-      // If same user is rejoining, update socket
+      
       if (room.guestId === data.userId) {
         console.log(`[Socket] User ${data.userId} rejoining room ${data.code}`);
       }
@@ -1384,7 +1357,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.set(socket.id, data.code);
       socket.join(data.code);
 
-      // Fetch guest name + spectator hand preference from DB if not already set
+      
       if (!room.guestName) {
         try {
           const guestUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { username: true } });
@@ -1403,18 +1376,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isSealed: room.isSealed,
       });
 
-      // Room is now full - broadcast updated list (room removed from available)
+      
       if (!room.isPrivate) {
         broadcastRoomList(io);
       }
 
-      // Tournament rooms: if both decks are pre-loaded, auto-start the game
+      
       if (room.tournamentId && room.hostDeck && room.guestDeck && room.hostSocket && room.guestSocket && !room.gameState) {
-        // Trigger deck acceptance for both players so the game starts
-        // The room:select-deck handler's "both decks ready" logic will create the game
-        // We just need to emit the events so the clients know
+        
+        
+        
         const fakeSelectEvent = async () => {
-          // Both decks already set — just trigger the game creation
+          
           const hostName = room.hostName ?? userNames.get(room.hostId) ?? 'Player 1';
           const guestName = room.guestName ?? (room.guestId ? userNames.get(room.guestId) : null) ?? 'Player 2';
           room.hostName = hostName;
@@ -1435,7 +1408,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             io.to(room.guestSocket!).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
             io.to(data.code).emit('game:started');
             console.log(`[Socket] Tournament game auto-started in room ${data.code}`);
-            // Start tournament timer (30 min)
+            
             const matchTimeLimit = 1800000;
             (room as any).tournamentGameTimer = setTimeout(async () => {
               if (!rooms.has(data.code) || !room.gameState || room.gameState.phase === 'gameOver') return;
@@ -1454,7 +1427,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         fakeSelectEvent();
       }
 
-      // If this is a sealed room and both players are here, generate boosters
+      
       if (room.isSealed && room.guestId) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
@@ -1462,7 +1435,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const hostPool = generateSealedPool(count);
           const guestPool = generateSealedPool(count);
 
-          // Send boosters to each player
+          
           if (room.hostSocket) {
             io.to(room.hostSocket).emit('sealed:boosters', {
               boosters: hostPool.boosters,
@@ -1476,17 +1449,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
           console.log(`[Socket] Sealed boosters generated for room ${data.code}`);
 
-          // Start sealed timer (15 minutes)
+          
           const deadline = Date.now() + SEALED_TIMEOUT_MS;
           room.sealedDeadline = deadline;
           io.to(data.code).emit('sealed:timer-start', { deadline, durationMs: SEALED_TIMEOUT_MS });
 
           room.sealedTimer = setTimeout(() => {
-            // Time's up - check if both decks submitted
+            
             if (!room.hostDeck || !room.guestDeck) {
               console.log(`[Socket] Sealed time expired for room ${data.code}`);
               io.to(data.code).emit('sealed:time-expired');
-              // Clean up room
+              
               if (room.sealedTimer) clearTimeout(room.sealedTimer);
               room.sealedTimer = null;
             }
@@ -1498,8 +1471,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // Submit deck selection (works for both normal and sealed)
-    // Player wants to change their deck (before game starts)
+    
+    
     socket.on('room:change-deck', () => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1512,7 +1485,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.guestDeck = null;
       }
 
-      // Notify the other player that this player is changing deck
+      
       const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
       if (otherSocket) {
         io.to(otherSocket).emit('room:opponent-changing-deck');
@@ -1529,7 +1502,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
-      // Enforce ban list for ranked games (skip tournament rooms — they have their own validation)
+      
       if ((room.isRanked || room.gameMode === 'ranked') && !room.tournamentId) {
         try {
           const banned = await getBannedCards();
@@ -1552,7 +1525,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }
         } catch (err) {
           console.error('[Socket] Ban check error:', err);
-          // Don't block the game if ban check fails
+          
         }
       }
 
@@ -1562,18 +1535,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.guestDeck = data;
       }
 
-      // Clear sealed timer when a deck is submitted in sealed mode
+      
       if (room.isSealed) {
-        // Notify the other player that this player is ready
+        
         const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
           io.to(otherSocket).emit('sealed:opponent-ready');
         }
       }
 
-      // Check if both players have selected decks
+      
       if (room.hostDeck && room.guestDeck) {
-        // Clear sealed timer since both decks are in
+        
         if (room.sealedTimer) {
           clearTimeout(room.sealedTimer);
           room.sealedTimer = null;
@@ -1599,14 +1572,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
 
         room.gameState = GameEngine.createGame(config);
-        // replayInitialState will be captured AFTER mulligans complete (deterministic point)
+        
         room.replayInitialState = null;
 
 
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
 
-        // Fetch player usernames for display
+        
         let hostName = 'Player 1';
         let guestName = 'Player 2';
         try {
@@ -1617,12 +1590,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
           if (hostUser?.username) hostName = hostUser.username;
           if (guestUser?.username) guestName = guestUser.username;
         } catch {
-          // If DB lookup fails, fall back to default names
+          
         }
         room.hostName = hostName;
         room.guestName = guestName;
 
-        // Send filtered visible state to each player
+        
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
         console.log(`[Socket] P1 visible: hand=${p1State.myState.hand.length}, phase=${p1State.phase}`);
@@ -1653,32 +1626,32 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Game started event emitted to room ${code}`);
         broadcastActiveGames(io);
 
-        // Start action timer once game reaches action phase
-        // (mulligan phase doesn't use the timer - timer starts on first action phase)
+        
+        
         if (room.gameState.phase === 'action') {
           startActionTimer(room, code, io);
         }
 
-        // Tournament game timer: 30 min total game time
+        
         if (room.tournamentId && room.tournamentMatchId) {
           const matchTimeLimit = 1800000; // 30 min default
           const tournamentGameDeadline = Date.now() + matchTimeLimit;
           io.to(code).emit('game:tournament-deadline', { deadline: tournamentGameDeadline, durationMs: matchTimeLimit });
 
-          // Store timer reference on room for cleanup
+          
           (room as any).tournamentGameTimer = setTimeout(async () => {
             if (!rooms.has(code)) return;
             if (!room.gameState || room.gameState.phase === 'gameOver') return;
 
             console.log(`[Socket] Tournament game timer expired in room ${code}`);
-            // Determine winner by score, then edge token
+            
             const p1Score = room.gameState.player1.missionPoints;
             const p2Score = room.gameState.player2.missionPoints;
             let loser: 'player1' | 'player2';
             if (p1Score !== p2Score) {
               loser = p1Score > p2Score ? 'player2' : 'player1';
             } else {
-              // Equal scores → edge token holder wins
+              
               loser = room.gameState.edgeHolder === 'player1' ? 'player2' : 'player1';
             }
             room.gameState = GameEngine.applyAction(room.gameState, loser, { type: 'FORFEIT', reason: 'timeout' });
@@ -1690,7 +1663,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const who = socket.id === room.hostSocket ? 'host' : 'guest';
         console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);
         socket.emit('room:deck-accepted');
-        // Notify opponent that this player has (re-)selected their deck
+        
         const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
           io.to(otherSocket).emit('room:opponent-deck-ready');
@@ -1698,7 +1671,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // State resync request - client can request current state if they think they're stuck
+    
     socket.on('game:request-state', () => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1714,7 +1687,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Resync state sent to ${player} in room ${code}`);
     });
 
-    // Coin flip synchronization — both players must finish the animation before mulligan appears
+    
     socket.on('coin-flip-done', () => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1726,12 +1699,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (room.coinFlipDone.player1 && room.coinFlipDone.player2) {
         console.log(`[Socket] Both players done with coin flip in room ${code}, broadcasting sync`);
         io.to(code).emit('coin-flip-sync');
-        // Reset for potential rematch
+        
         room.coinFlipDone = { player1: false, player2: false };
       }
     });
 
-    // Game action
+    
     socket.on('action:perform', async (data: { action: GameAction }) => {
       const code = playerRooms.get(socket.id);
       if (!code) {
@@ -1744,11 +1717,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-      // Determine which player this socket is
+      
       const player = socket.id === room.hostSocket ? 'player1' : 'player2';
       console.log(`[Socket] action:perform from ${player}: ${data.action.type}, phase: ${room.gameState.phase}`);
 
-      // Validate it's this player's turn (or they have pending actions to resolve)
+      
       const hasPendingAction = room.gameState.pendingActions.some((p: { player: string }) => p.player === player);
       if (room.gameState.activePlayer !== player && !hasPendingAction) {
         if (room.gameState.phase === 'action') {
@@ -1759,11 +1732,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       try {
-        // Save old log length to detect silently rejected actions
+        
         const oldLogLength = room.gameState.log.length;
         const prevState = room.gameState;
 
-        // Apply action server-side (authoritative)
+        
         const prevPhase = room.gameState.phase;
         room.gameState = GameEngine.applyAction(
           room.gameState,
@@ -1771,20 +1744,20 @@ export function setupSocketHandlers(io: SocketIOServer) {
           data.action,
         );
 
-        // Capture replay initial state when mulligans complete (deterministic snapshot)
+        
         if (prevPhase === 'mulligan' && room.gameState.phase !== 'mulligan' && !room.replayInitialState) {
           room.replayInitialState = deepClone(room.gameState);
           room.replayInitialState.actionHistory = [];
           room.gameState.actionHistory = [];
         }
 
-        // Detect silently rejected actions (validation failed, state unchanged)
+        
         const isPlayAction = ['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER'].includes(data.action.type);
         const isTargetAction = data.action.type === 'SELECT_TARGET';
 
-        // SELECT_TARGET silent failure: only flag if truly nothing changed at all.
-        // Compare pending effect types/IDs (not just count) to avoid false positives when
-        // CONFIRM popups resolve to child selections (count stays same but content changes).
+        
+        
+        
         if (isTargetAction && room.gameState.log.length === oldLogLength) {
           const prevPendingIds = prevState.pendingEffects.map((p) => p.targetSelectionType + ':' + p.id).join(',');
           const newPendingIds = room.gameState.pendingEffects.map((p) => p.targetSelectionType + ':' + p.id).join(',');
@@ -1806,7 +1779,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
 
         if (isPlayAction && room.gameState.log.length === oldLogLength) {
-          // Action was rejected - get the specific validation reason
+          
           let errorMessage = 'Action not allowed.';
           let errorKey = 'game.error.actionNotAllowed';
           let errorParams: Record<string, string | number> | undefined;
@@ -1840,33 +1813,33 @@ export function setupSocketHandlers(io: SocketIOServer) {
           } catch { /* use generic message */ }
           console.log(`[Socket] Action rejected for ${player}: ${errorMessage}`);
           socket.emit('game:error', { message: errorMessage, errorKey, errorParams });
-          // Broadcast unchanged state so client resets isProcessing
+          
           broadcastState(room, io);
           return;
         }
 
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
-        // Reset consecutive timeouts for this player (they acted voluntarily)
+        
         if (data.action.type !== 'PASS' || room.gameState.consecutiveTimeouts[player] === 0) {
           room.gameState.consecutiveTimeouts[player] = 0;
         }
 
-        // Broadcast updated visible state to each player
+        
         broadcastState(room, io);
 
-        // Broadcast the action for narration
+        
         io.to(code).emit('game:action-performed', {
           player,
           action: data.action,
         });
 
-        // Check game over
+        
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
           await finalizeGameEnd(room, code, io, 'score');
         } else if (room.gameState.missionScoringComplete) {
-          // Mission scoring done - wait briefly so clients see SCORE results, then auto-advance
+          
           clearActionTimer(room);
           setTimeout(async () => {
             try {
@@ -1881,7 +1854,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               } else if (room.gameState.phase === 'action') {
                 startActionTimer(room, code, io);
               } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
-                // End-phase effects need resolution (e.g., Giant Spider 103, Rock Lee 117)
+                
                 startEffectTimer(room, code, io);
               }
             } catch (err) {
@@ -1889,16 +1862,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
             }
           }, 1500);
         } else if (room.gameState.phase === 'action' && room.gameState.pendingForcedResolver) {
-          // Opponent must respond to a forced choice - start their timer, pause active player's
+          
           startForcedResolverTimer(room, code, io);
         } else if (room.gameState.phase === 'action' && (room.gameState.pendingEffects.length > 0 || room.gameState.pendingActions.length > 0)) {
-          // Pending effect resolution — 60 second timer
+          
           startEffectTimer(room, code, io);
         } else if (room.gameState.phase === 'action') {
-          // Restart timer for next active player
+          
           startActionTimer(room, code, io);
         } else if (room.gameState.phase === 'mission' && room.gameState.pendingActions.length > 0) {
-          // Mission phase pending (SCORE effects, REORDER_DISCARD) — 2 min timer, forfeit on expiry
+          
           startMissionPhaseTimer(room, code, io);
         } else if (room.gameState.phase === 'end' && room.gameState.pendingActions.length > 0) {
           startEffectTimer(room, code, io);
@@ -1906,8 +1879,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           clearActionTimer(room);
         }
       } catch (err) {
-        // applyAction uses deepClone internally, so original state is NOT mutated on failure.
-        // Broadcast unchanged state to both players so they stay in sync and isProcessing clears.
+        
+        
         broadcastState(room, io);
         socket.emit('game:error', {
           message: err instanceof Error ? err.message : 'Invalid action',
@@ -1915,15 +1888,15 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // Forfeit (manual abandon)
+    
     socket.on('action:forfeit', async (data: { reason: 'abandon' | 'timeout'; roomCode?: string; userId?: string }) => {
-      // Try playerRooms first, fall back to roomCode from client
+      
       const code = playerRooms.get(socket.id) || data.roomCode;
       if (!code) return;
       const room = rooms.get(code);
       if (!room || !room.gameState || room.gameState.phase === 'gameOver') return;
 
-      // Determine player — check socket.id first, then userId
+      
       let player: 'player1' | 'player2';
       if (socket.id === room.hostSocket) player = 'player1';
       else if (socket.id === room.guestSocket) player = 'player2';
@@ -1941,12 +1914,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       await finalizeGameEnd(room, code, io, data.reason === 'timeout' ? 'timeout' : 'forfeit');
     });
 
-    // Room list request (for public room browser)
+    
     socket.on('room:list', () => {
       socket.emit('room:list-update', getPublicRoomList());
     });
 
-    // --- Rematch ---
+    
     socket.on('game:rematch-offer', () => {
       const code = playerRooms.get(socket.id);
       if (!code) return;
@@ -1956,7 +1929,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const offerer = socket.id === room.hostSocket ? 'player1' : 'player2';
       room.rematchOffer = offerer;
 
-      // Forward to opponent
+      
       const opponentSocket = offerer === 'player1' ? room.guestSocket : room.hostSocket;
       if (opponentSocket) {
         io.to(opponentSocket).emit('game:rematch-offered');
@@ -1973,7 +1946,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select (sealed: ${room.isSealed})`);
       room.rematchOffer = undefined;
 
-      // Reset room state — players must re-select decks
+      
       room.gameState = null;
       room.hostDeck = null;
       room.guestDeck = null;
@@ -1981,7 +1954,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
-      // Tell both clients to go back to deck selection (or booster opening for sealed)
+      
       if (room.hostSocket) {
         io.to(room.hostSocket).emit('game:rematch-accepted');
         io.to(room.hostSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
@@ -1991,7 +1964,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         io.to(room.guestSocket).emit('game:rematch-reselect', { roomCode: code, isSealed: room.isSealed });
       }
 
-      // For sealed rooms, regenerate boosters for both players
+      
       if (room.isSealed) {
         try {
           const { generateSealedPool } = await import('@/lib/sealed/boosterGenerator');
@@ -2014,7 +1987,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
           console.log(`[Socket] Sealed rematch boosters generated for room ${code}`);
 
-          // Start sealed timer
+          
           const deadline = Date.now() + SEALED_TIMEOUT_MS;
           room.sealedDeadline = deadline;
           const roomCode = code;
@@ -2048,7 +2021,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Rematch declined in room ${code}`);
     });
 
-    // Matchmaking
+    
     socket.on('matchmaking:join', (data: { userId: string; isRanked?: boolean; hostName?: string }) => {
       if (isMaintenanceActive()) {
         socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
@@ -2058,24 +2031,24 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${data.isRanked ?? true})`);
       const wantRanked = data.isRanked ?? true;
 
-      // Clean up any existing room/matchmaking state for this player
+      
       cleanupPlayerRoom(socket);
 
-      // Also clean stale rooms before searching
+      
       cleanupStaleRooms();
 
-      // Find an available public room with matching ranked preference
-      // Verify the host socket is still connected before matching
+      
+      
       let foundRoom: RoomData | null = null;
       for (const [code, room] of rooms) {
         if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked) {
-          // Verify host socket is still live
+          
           const hostSocketObj = io.sockets.sockets.get(room.hostSocket);
           if (hostSocketObj && hostSocketObj.connected) {
             foundRoom = room;
             break;
           } else {
-            // Stale room - host disconnected without cleanup
+            
             console.log(`[Socket] Matchmaking: removing stale room ${code} (host socket disconnected)`);
             rooms.delete(code);
             playerRooms.delete(room.hostSocket);
@@ -2085,7 +2058,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       if (foundRoom) {
         console.log(`[Socket] Matchmaking: found room ${foundRoom.code} for user ${data.userId}`);
-        // Join existing room
+        
         foundRoom.guestId = data.userId;
         foundRoom.guestSocket = socket.id;
         playerRooms.set(socket.id, foundRoom.code);
@@ -2096,7 +2069,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           guestId: foundRoom.guestId,
         });
 
-        // Send matchmaking:found with role info so both players know who they are
+        
         if (foundRoom.hostSocket) {
           io.to(foundRoom.hostSocket).emit('matchmaking:found', {
             code: foundRoom.code,
@@ -2109,7 +2082,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         });
       } else {
         console.log(`[Socket] Matchmaking: creating new room for user ${data.userId}`);
-        // Create a new public room
+        
         let code: string;
         do {
           code = generateRoomCode();
@@ -2166,7 +2139,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(code);
       if (!room) return;
 
-      // Only remove if waiting (no guest yet) and not a started game
+      
       if (!room.guestId && !room.gameState) {
         const wasPublic = !room.isPrivate;
         rooms.delete(code);
@@ -2177,8 +2150,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
     });
 
-    // Disconnect
-    // ═══════ SPECTATOR EVENTS ═══════
+    
+    
 
     socket.on('spectate:join', (data: { roomCode: string; userId: string; username: string }) => {
       const room = rooms.get(data.roomCode);
@@ -2186,13 +2159,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
         socket.emit('spectate:error', { message: 'Game not found or not in progress' });
         return;
       }
-      // Add spectator
+      
       room.spectators.set(socket.id, { socketId: socket.id, userId: data.userId, username: data.username });
       socket.join(data.roomCode);
-      // Track spectator socket for cleanup
+      
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
 
-      // Send current state (spectators see face-down hands + board, no card data)
+      
       try {
         const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
         const specMs = p1State.activeMissions.map((m: any) => ({
@@ -2215,17 +2188,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
           spectatorCount: room.spectators.size,
           roomCode: data.roomCode,
         });
-        // Send chat history
+        
         socket.emit('chat:history', { messages: room.chatMessages.slice(-50) });
       } catch (err) {
         console.error('[Socket] Spectator state error:', err);
       }
 
-      // Notify room
+      
       const count = room.spectators.size;
       io.to(data.roomCode).emit('spectate:count-update', { count });
 
-      // Broadcast system chat message
+      
       const joinMsg = {
         id: `sys-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         userId: 'system', username: 'System',
@@ -2236,7 +2209,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       io.to(data.roomCode).emit('chat:message', joinMsg);
     });
 
-    // Spectator can re-request state (e.g. after page navigation)
+    
     socket.on('spectate:request-state', (data: { roomCode: string }) => {
       const room = rooms.get(data.roomCode);
       if (!room || !room.gameState) {
@@ -2294,12 +2267,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       playerRooms.delete(socket.id);
     });
 
-    // ═══════ CHAT EVENTS ═══════
+    
 
     socket.on('chat:send', async (data: { message: string; isEmote: boolean }) => {
       if (!data.message || data.message.length > 200) return;
 
-      // Find room — player or spectator
+      
       let roomCode = playerRooms.get(socket.id);
       let isSpectator = false;
       if (roomCode?.startsWith('spec:')) {
@@ -2310,7 +2283,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const room = rooms.get(roomCode);
       if (!room) return;
 
-      // Determine user info
+      
       let userId = '';
       let username = '';
       if (isSpectator) {
@@ -2325,7 +2298,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
       if (!userId) return;
 
-      // Check chat ban
+      
       try {
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -2336,7 +2309,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             socket.emit('chat:error', { message: 'You are banned from chat', errorKey: 'chat.chatBanned' });
             return;
           }
-          // Ban expired — clear it
+          
           await prisma.user.update({ where: { id: userId }, data: { chatBanned: false, chatBanUntil: null } });
         }
       } catch { /* ignore ban check errors */ }
@@ -2351,10 +2324,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
       };
 
       room.chatMessages.push(chatMsg);
-      // Keep only last 100 messages in memory
+      
       if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
 
-      // Persist to DB (fire-and-forget)
+      
       prisma.chatMessage.create({
         data: {
           roomCode, userId, username,
@@ -2364,28 +2337,28 @@ export function setupSocketHandlers(io: SocketIOServer) {
         },
       }).catch(() => {});
 
-      // Trigger cleanup (rate-limited to 1x/hour)
+      
       import('@/lib/db/chatCleanup').then(m => m.cleanupOldChatMessages()).catch(() => {});
 
-      // Broadcast rules:
-      // - Player messages → everyone (players + spectators)
-      // - Spectator messages → spectators only (players don't see)
+      
+      
+      
       if (isSpectator) {
         for (const [, spec] of room.spectators) {
           io.to(spec.socketId).emit('chat:message', chatMsg);
         }
       } else {
-        // Send to players
+        
         if (room.hostSocket) io.to(room.hostSocket).emit('chat:message', chatMsg);
         if (room.guestSocket) io.to(room.guestSocket).emit('chat:message', chatMsg);
-        // Send to spectators too
+        
         for (const [, spec] of room.spectators) {
           io.to(spec.socketId).emit('chat:message', chatMsg);
         }
       }
     });
 
-    // ═══════ ACTIVE GAMES LIST ═══════
+    
 
     socket.on('games:list', () => {
       const activeGames: Array<{
@@ -2414,12 +2387,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       socket.emit('games:list-update', { games: activeGames });
     });
 
-    // ═══════ DISCONNECT ═══════
+    
 
     socket.on('disconnect', () => {
       console.log(`[Socket] Player disconnecting: ${socket.id}`);
 
-      // Handle spectator disconnect
+      
       const specKey = playerRooms.get(socket.id);
       if (specKey?.startsWith('spec:')) {
         const roomCode = specKey.slice(5);
@@ -2444,34 +2417,34 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const isHost = room.hostSocket === socket.id;
           const player = isHost ? 'player1' : 'player2';
 
-          // Handle disconnect during game-over (rematch pending or post-game)
+          
           if (room.gameState && room.gameState.phase === 'gameOver') {
             console.log(`[Socket] ${player} disconnected during gameOver in room ${code}`);
             const opponentSocket = isHost ? room.guestSocket : room.hostSocket;
             if (opponentSocket) {
-              // If a rematch was offered, notify the opponent it's declined
+              
               if (room.rematchOffer) {
                 room.rematchOffer = undefined;
                 io.to(opponentSocket).emit('game:rematch-declined');
               }
-              // Notify opponent that the other player left
+              
               io.to(opponentSocket).emit('game:opponent-left');
             }
-            // Clean up room since the game is over and a player left
+            
             rooms.delete(code);
           }
 
-          // Handle disconnect during an active game
+          
           else if (room.gameState && room.gameState.phase !== 'gameOver') {
-            // Anti-troll: count every disconnect during this game.
-            // More than MAX_DISCONNECTS (i.e. 3rd disconnect) = instant forfeit, no grace period.
+            
+            
             const newCount = (player === 'player1'
               ? ++room.player1DisconnectCount
               : ++room.player2DisconnectCount);
 
             if (newCount > MAX_DISCONNECTS) {
               console.log(`[Socket] ${player} disconnected ${newCount}× in room ${code} — instant forfeit (anti-troll)`);
-              // Clear any in-flight grace timer for this room before forfeiting
+              
               if (room.disconnectTimer) {
                 clearTimeout(room.disconnectTimer);
                 room.disconnectTimer = null;
@@ -2489,19 +2462,19 @@ export function setupSocketHandlers(io: SocketIOServer) {
               return;
             }
 
-            // If there was already a grace timer running (e.g. the opponent had
-            // just disconnected), clear it before installing the new one so we
-            // don't leak timers when both players go down in a row.
+            
+            
+            
             if (room.disconnectTimer) {
               clearTimeout(room.disconnectTimer);
               room.disconnectTimer = null;
             }
 
             console.log(`[Socket] ${player} disconnected during game in room ${code} (${newCount}/${MAX_DISCONNECTS + 1}), starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
-            // Do NOT clear action timer — it keeps running during disconnect.
-            // If it expires while disconnected, auto-pass happens normally.
+            
+            
 
-            // Notify the opponent that the player disconnected + send countdown deadline
+            
             const disconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;
             room.disconnectedPlayer = player;
             room.disconnectDeadline = disconnectDeadline;
@@ -2531,11 +2504,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
               await finalizeGameEnd(room, code, io, 'forfeit');
             }, DISCONNECT_GRACE_MS);
           } else if (room.isSealed && room.guestId && !room.gameState) {
-            // Sealed pre-game disconnect: use grace period instead of immediate cleanup
-            // This allows reconnection during the long deck-building phase
+            
+            
             console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}, starting ${DISCONNECT_GRACE_MS / 1000}s grace period`);
             room.disconnectTimer = setTimeout(() => {
-              // If the player hasn't reconnected, clean up
+              
               if (isHost) {
                 console.log(`[Socket] Grace period expired for host in sealed room ${code}, removing room`);
                 if (room.sealedTimer) clearTimeout(room.sealedTimer);
@@ -2551,7 +2524,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               }
             }, DISCONNECT_GRACE_MS);
           } else if (isHost) {
-            // Host disconnected before game started - remove room
+            
             if (!room.gameState) {
               console.log(`[Socket] Host left room ${code} before game started, removing room`);
               const wasPublic = !room.isPrivate;
@@ -2559,7 +2532,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               if (wasPublic) broadcastRoomList(io);
             }
           } else if (room.guestSocket === socket.id) {
-            // Guest disconnected before game started - reset guest info
+            
             console.log(`[Socket] Guest left room ${code}, resetting guest`);
             room.guestId = null;
             room.guestSocket = null;
@@ -2569,7 +2542,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
         playerRooms.delete(socket.id);
       }
-      // Clean up user-to-socket mapping
+      
       removeSocketFromAll(socket.id);
 
       console.log(`[Socket] Player disconnected: ${socket.id}`);
@@ -2577,7 +2550,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
   });
 }
 
-// --- Maintenance drain utilities ---
+
 
 export function getActiveGameCount(): number {
   let count = 0;
@@ -2602,10 +2575,10 @@ export function startMaintenanceDrain(io: SocketIOServer): void {
   const activeGames = getActiveGameCount();
   console.log(`[Maintenance] Drain started. ${activeGames} active game(s).`);
 
-  // Broadcast warning to all connected clients
+  
   io.emit('server:maintenance-warning', { activeGames });
 
-  // If no active games, shut down immediately
+  
   if (activeGames === 0) {
     console.log('[Maintenance] No active games. Shutting down now.');
     io.emit('server:maintenance', { timestamp: Date.now() });
@@ -2613,7 +2586,7 @@ export function startMaintenanceDrain(io: SocketIOServer): void {
     return;
   }
 
-  // Poll every 5s to check when all games finish
+  
   const checkInterval = setInterval(() => {
     const remaining = getActiveGameCount();
     console.log(`[Maintenance] ${remaining} game(s) still active.`);
@@ -2630,7 +2603,7 @@ export function startMaintenanceDrain(io: SocketIOServer): void {
 
   setCheckInterval(checkInterval);
 
-  // Hard timeout after 5 minutes
+  
   const timeout = setTimeout(() => {
     clearInterval(checkInterval);
     console.log('[Maintenance] Drain timeout (5 min). Force shutting down.');

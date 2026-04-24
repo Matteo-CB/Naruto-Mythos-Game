@@ -28,7 +28,7 @@ export function NotificationContainer() {
   const prevInviteIdsRef = useRef<Set<string>>(new Set());
   const dismissTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  // Watch for new incoming friend requests
+  
   useEffect(() => {
     const currentIds = new Set(incomingRequests.map((r) => r.friendshipId));
     const prevIds = prevRequestIdsRef.current;
@@ -46,14 +46,14 @@ export function NotificationContainer() {
           addedAt: Date.now(),
         }));
 
-        // Filter out duplicates
+        
         const existingIds = new Set(prev.map((n) => n.id));
         const uniqueNew = newNotifs.filter((n) => !existingIds.has(n.id));
 
         return [...prev, ...uniqueNew];
       });
 
-      // Set auto-dismiss timers for friend requests
+      
       for (const r of newRequests) {
         const notifId = `friend-${r.friendshipId}`;
         const timer = setTimeout(() => {
@@ -66,7 +66,7 @@ export function NotificationContainer() {
     prevRequestIdsRef.current = currentIds;
   }, [incomingRequests]);
 
-  // Watch for new incoming match invites
+  
   useEffect(() => {
     const currentIds = new Set(incomingMatchInvites.map((inv) => inv.inviteId));
     const prevIds = prevInviteIdsRef.current;
@@ -94,7 +94,7 @@ export function NotificationContainer() {
     prevInviteIdsRef.current = currentIds;
   }, [incomingMatchInvites]);
 
-  // Clean up timers on unmount
+  
   useEffect(() => {
     return () => {
       for (const timer of dismissTimersRef.current.values()) {
@@ -119,7 +119,7 @@ export function NotificationContainer() {
     [router],
   );
 
-  // Only show the most recent MAX_VISIBLE notifications
+  
   const visibleNotifications = activeNotifications.slice(-MAX_VISIBLE);
 
   return (

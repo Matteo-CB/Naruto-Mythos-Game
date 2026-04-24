@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 
-// --- Interfaces ---
+
 
 interface Friend {
   id: string;
@@ -32,7 +32,7 @@ interface SearchResult {
 }
 
 interface SocialStore {
-  // State
+  
   friends: Friend[];
   incomingRequests: FriendRequest[];
   outgoingRequests: FriendRequest[];
@@ -42,7 +42,7 @@ interface SocialStore {
   searchLoading: boolean;
   loading: boolean;
 
-  // API Actions
+  
   fetchFriends: () => Promise<void>;
   fetchRequests: () => Promise<void>;
   fetchPendingInvites: () => Promise<void>;
@@ -57,7 +57,7 @@ interface SocialStore {
   cancelMatchInvite: (inviteId: string) => Promise<void>;
   clearSearch: () => void;
 
-  // Socket event handlers
+  
   handleFriendRequestReceived: (data: FriendRequest) => void;
   handleFriendRequestAccepted: (data: { friendshipId: string; friend: Friend }) => void;
   handleFriendRemoved: (data: { friendshipId: string }) => void;
@@ -67,10 +67,10 @@ interface SocialStore {
   handleMatchInviteCancelled: (inviteId: string) => void;
 }
 
-// --- Store ---
+
 
 export const useSocialStore = create<SocialStore>((set, get) => ({
-  // Initial state
+  
   friends: [],
   incomingRequests: [],
   outgoingRequests: [],
@@ -80,7 +80,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
   searchLoading: false,
   loading: false,
 
-  // --- API Actions ---
+  
 
   fetchFriends: async () => {
     set({ loading: true });
@@ -91,7 +91,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         set({ friends: data.friends ?? data });
       }
     } catch {
-      // Silently handle network errors
+      
     } finally {
       set({ loading: false });
     }
@@ -103,7 +103,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       const res = await fetch('/api/friends/requests', { credentials: 'include' });
       const data = await res.json();
       if (res.ok) {
-        // Transform API response (id/sender/receiver) to match FriendRequest interface (friendshipId/user)
+        
         const incoming: FriendRequest[] = (data.incoming ?? []).map((r: Record<string, unknown>) => ({
           friendshipId: r.id as string,
           user: r.sender as { id: string; username: string; elo: number },
@@ -117,7 +117,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         set({ incomingRequests: incoming, outgoingRequests: outgoing });
       }
     } catch {
-      // Silently handle network errors
+      
     } finally {
       set({ loading: false });
     }
@@ -135,7 +135,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         });
       }
     } catch {
-      // Silently handle network errors
+      
     } finally {
       set({ loading: false });
     }
@@ -154,7 +154,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         set({ searchResults: data.users ?? data });
       }
     } catch {
-      // Silently handle network errors
+      
     } finally {
       set({ searchLoading: false });
     }
@@ -169,11 +169,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Re-fetch requests to stay in sync
+        
         await get().fetchRequests();
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -186,17 +186,17 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Optimistically remove from incoming requests
+        
         set((state) => ({
           incomingRequests: state.incomingRequests.filter(
             (r) => r.friendshipId !== friendshipId
           ),
         }));
-        // Re-fetch friends to get the updated list
+        
         await get().fetchFriends();
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -209,7 +209,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Optimistically remove from incoming requests
+        
         set((state) => ({
           incomingRequests: state.incomingRequests.filter(
             (r) => r.friendshipId !== friendshipId
@@ -217,7 +217,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         }));
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -228,13 +228,13 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Optimistically remove from friends list
+        
         set((state) => ({
           friends: state.friends.filter((f) => f.friendshipId !== friendshipId),
         }));
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -247,11 +247,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Re-fetch pending invites to stay in sync
+        
         await get().fetchPendingInvites();
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -265,7 +265,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
       });
       const data = await res.json();
       if (res.ok) {
-        // Remove from incoming invites
+        
         set((state) => ({
           incomingMatchInvites: state.incomingMatchInvites.filter(
             (inv) => inv.inviteId !== inviteId
@@ -288,7 +288,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Optimistically remove from incoming invites
+        
         set((state) => ({
           incomingMatchInvites: state.incomingMatchInvites.filter(
             (inv) => inv.inviteId !== inviteId
@@ -296,7 +296,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         }));
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -309,7 +309,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         credentials: 'include',
       });
       if (res.ok) {
-        // Optimistically remove from outgoing invites
+        
         set((state) => ({
           outgoingMatchInvites: state.outgoingMatchInvites.filter(
             (inv) => inv.inviteId !== inviteId
@@ -317,7 +317,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
         }));
       }
     } catch {
-      // Silently handle network errors
+      
     }
   },
 
@@ -325,11 +325,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
     set({ searchResults: [], searchLoading: false });
   },
 
-  // --- Socket Event Handlers ---
+  
 
   handleFriendRequestReceived: (data: FriendRequest) => {
     set((state) => {
-      // Avoid duplicate entries
+      
       const exists = state.incomingRequests.some(
         (r) => r.friendshipId === data.friendshipId
       );
@@ -342,11 +342,11 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   handleFriendRequestAccepted: (data: { friendshipId: string; friend: Friend }) => {
     set((state) => ({
-      // Remove the matching outgoing request
+      
       outgoingRequests: state.outgoingRequests.filter(
         (r) => r.friendshipId !== data.friendshipId
       ),
-      // Add the new friend (avoid duplicates)
+      
       friends: state.friends.some((f) => f.friendshipId === data.friendshipId)
         ? state.friends
         : [...state.friends, data.friend],
@@ -361,7 +361,7 @@ export const useSocialStore = create<SocialStore>((set, get) => ({
 
   handleMatchInviteReceived: (data: MatchInvitation) => {
     set((state) => {
-      // Avoid duplicate entries
+      
       const exists = state.incomingMatchInvites.some(
         (inv) => inv.inviteId === data.inviteId
       );

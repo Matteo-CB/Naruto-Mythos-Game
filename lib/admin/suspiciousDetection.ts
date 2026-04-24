@@ -1,17 +1,4 @@
-/**
- * Suspicious-activity heuristics for the admin panel.
- *
- * Limitations to be aware of:
- *  - Completed ranked games are deleted from the DB after GAME_TTL_MS
- *    (see lib/db/gameCleanup.ts + finalizeGameEnd in lib/socket/server.ts).
- *    Game-based heuristics therefore only cover that window.
- *  - We don't log IP addresses anywhere, so cross-account matching relies on
- *    shared emails, shared Discord IDs, and clustered createdAt timestamps.
- *
- * Each heuristic returns a list of Findings. A Finding is a compact record
- * the UI can render directly: severity, short description, the users/games
- * involved, and (optionally) a game id the admin can revert ELO on.
- */
+
 
 import { prisma } from '@/lib/db/prisma';
 import { GAME_TTL_MS } from '@/lib/db/gameCleanup';
@@ -64,12 +51,12 @@ export interface Finding {
   metrics: Record<string, string | number>;
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+
 
 function emailBase(email: string): string {
   const at = email.indexOf('@');
   if (at < 0) return email.toLowerCase();
-  // Strip +suffix aliases and non-alphanum noise so "a.b+1@gmail" ≡ "ab@gmail"
+  
   return email
     .slice(0, at)
     .toLowerCase()
@@ -130,12 +117,9 @@ async function hydrateGames(ids: string[]): Promise<Map<string, FindingGame>> {
   return out;
 }
 
-// ── Heuristics ──────────────────────────────────────────────────────────────
 
-/**
- * H1. Two or more users share the same normalized email base
- * (everything before @, aliases stripped). Strong signal for multi-accounting.
- */
+
+
 async function findSameEmailBase(): Promise<Finding[]> {
   const users = await prisma.user.findMany({
     select: { id: true, username: true, email: true, elo: true,
@@ -171,9 +155,7 @@ async function findSameEmailBase(): Promise<Finding[]> {
   return findings;
 }
 
-/**
- * H2. Two or more users link the same Discord ID. Same person.
- */
+
 async function findSameDiscordId(): Promise<Finding[]> {
   const rows = await prisma.user.findMany({
     where: { discordId: { not: null } },
@@ -206,10 +188,7 @@ async function findSameDiscordId(): Promise<Finding[]> {
   return findings;
 }
 
-/**
- * H3. Two accounts created within 10 minutes of each other, then played against
- * each other. Classic smurf pattern to feed ELO to one side.
- */
+
 async function findCreatedTogetherPlayedTogether(): Promise<Finding[]> {
   const now = Date.now();
   const TWENTYFOUR_H = 24 * 60 * 60 * 1000;
@@ -227,7 +206,7 @@ async function findCreatedTogetherPlayedTogether(): Promise<Finding[]> {
       const b = recentUsers[j];
       const gap = Math.abs(a.createdAt.getTime() - b.createdAt.getTime());
       if (gap > WINDOW_MS) continue;
-      // Only flag if they've actually played each other (ranked or not).
+      
       const headToHead = await prisma.game.count({
         where: {
           OR: [
@@ -254,10 +233,7 @@ async function findCreatedTogetherPlayedTogether(): Promise<Finding[]> {
   return findings;
 }
 
-/**
- * H4. Any pair of users who played each other >= 3 times inside the game
- * retention window where the same side won every game (ELO farming).
- */
+
 async function findRepeatOpponents(): Promise<Finding[]> {
   const cutoff = new Date(Date.now() - GAME_TTL_MS);
   const games = await prisma.game.findMany({
@@ -285,7 +261,7 @@ async function findRepeatOpponents(): Promise<Finding[]> {
   const findings: Finding[] = [];
   for (const [key, v] of pairs) {
     if (v.gameIds.length < 3) continue;
-    // One-sided series: one player won every game
+    
     const oneSided = v.winners.size === 1;
     const [idA, idB] = key.split('|');
     const users = await hydrateUsers([idA, idB]);
@@ -309,10 +285,7 @@ async function findRepeatOpponents(): Promise<Finding[]> {
   return findings;
 }
 
-/**
- * H5. Ranked games that ended by forfeit within 60s of creation.
- * Sub-60s ranked games are almost always self-forfeits to feed ELO.
- */
+
 async function findShortForfeits(): Promise<Finding[]> {
   const cutoff = new Date(Date.now() - GAME_TTL_MS);
   const games = await prisma.game.findMany({
@@ -330,7 +303,7 @@ async function findShortForfeits(): Promise<Finding[]> {
     if (!g.completedAt || !g.createdAt) continue;
     const durationSec = (g.completedAt.getTime() - g.createdAt.getTime()) / 1000;
     if (durationSec > 60) continue;
-    // A sub-60s ranked game is abnormal regardless of the reason.
+    
     const gameMap = await hydrateGames([g.id]);
     const game = gameMap.get(g.id) ?? null;
     const users = await hydrateUsers([g.player1Id, g.player2Id].filter(Boolean) as string[]);
@@ -353,10 +326,7 @@ async function findShortForfeits(): Promise<Finding[]> {
   return findings;
 }
 
-/**
- * H6. An account less than 48h old with 5+ ranked wins, all against
- * opponents that also have very few games. New smurf alt.
- */
+
 async function findRapidWinsNewAccount(): Promise<Finding[]> {
   const now = Date.now();
   const TWO_DAYS = 48 * 60 * 60 * 1000;
@@ -395,9 +365,9 @@ async function findRapidWinsNewAccount(): Promise<Finding[]> {
   return findings;
 }
 
-// ── Public API ──────────────────────────────────────────────────────────────
 
-/** Run every heuristic and return a single deduplicated, severity-sorted list. */
+
+
 export async function runAllHeuristics(): Promise<Finding[]> {
   const results = await Promise.all([
     findSameEmailBase(),
@@ -410,12 +380,12 @@ export async function runAllHeuristics(): Promise<Finding[]> {
   const all = results.flat();
   const bySeverity = { high: 0, medium: 1, low: 2 };
   all.sort((a, b) => bySeverity[a.severity] - bySeverity[b.severity]);
-  // Dedup by id in case two heuristics produced the same finding.
+  
   const seen = new Set<string>();
   return all.filter((f) => (seen.has(f.id) ? false : (seen.add(f.id), true)));
 }
 
-/** Run all heuristics then restrict to findings involving the given user IDs. */
+
 export async function runHeuristicsForUsers(userIds: string[]): Promise<Finding[]> {
   const all = await runAllHeuristics();
   if (userIds.length === 0) return all;
@@ -423,15 +393,7 @@ export async function runHeuristicsForUsers(userIds: string[]): Promise<Finding[
   return all.filter((f) => f.users.some((u) => idSet.has(u.id)));
 }
 
-/**
- * Revert the ELO change of a single ranked game:
- *  - Undo the delta on both players' ELO (and reset consecWins/Losses to 0
- *    for both, since we're rewinding their streak past this game).
- *  - Decrement the winner's wins / loser's losses by 1.
- *  - Null out game.eloChange so the same game can't be reverted twice and so
- *    heuristics ignore it going forward.
- *  Returns the summary of what changed.
- */
+
 export async function revertGameElo(gameId: string): Promise<{
   ok: boolean;
   message: string;

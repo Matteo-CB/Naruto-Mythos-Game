@@ -52,7 +52,7 @@ export async function GET(
       });
     }
 
-    // Declined or other status -> treat as none
+    
     return NextResponse.json({ status: 'none' });
   } catch {
     return NextResponse.json(

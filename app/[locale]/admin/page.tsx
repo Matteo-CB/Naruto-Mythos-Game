@@ -28,7 +28,7 @@ export default function AdminPage() {
   const { data: session } = useSession();
   const [tab, setTab] = useState<Tab>('settings');
 
-  // ---- Settings state ----
+  
   const [resetEloLoading, setResetEloLoading] = useState(false);
   const [discordRolesLoading, setDiscordRolesLoading] = useState(false);
   const [discordSyncLoading, setDiscordSyncLoading] = useState(false);
@@ -40,14 +40,14 @@ export default function AdminPage() {
   const [testerSearch, setTesterSearch] = useState('');
   const [testerAdding, setTesterAdding] = useState(false);
 
-  // ---- Cards state ----
+  
   const [bannedIds, setBannedIds] = useState<Set<string>>(new Set());
   const [cardsLoading, setCardsLoading] = useState(true);
   const [cardSearch, setCardSearch] = useState('');
   const [cardFilter, setCardFilter] = useState<FilterMode>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  // ---- Backgrounds state ----
+  
   const [bgList, setBgList] = useState<Array<{ id: string; name: string; url: string; sortOrder: number }>>([]);
   const [bgLoading, setBgLoading] = useState(true);
   const [bgUploading, setBgUploading] = useState(false);
@@ -55,7 +55,7 @@ export default function AdminPage() {
   const [bgFile, setBgFile] = useState<File | null>(null);
   const [bgConfirmDeleteId, setBgConfirmDeleteId] = useState<string | null>(null);
 
-  // ---- Players state ----
+  
   const [playerSearch, setPlayerSearch] = useState('');
   const [players, setPlayers] = useState<Array<{ id: string; username: string; elo: number; wins: number; losses: number; draws: number; role: string; discordUsername: string | null }>>([]);
   const [playersLoading, setPlayersLoading] = useState(false);
@@ -81,7 +81,7 @@ export default function AdminPage() {
     return [...chars, ...missions] as (CharacterCard | MissionCard)[];
   }, []);
 
-  // ---- Fetch functions ----
+  
   const fetchTesters = () => {
     fetch('/api/admin/testers')
       .then((res) => res.json())
@@ -242,7 +242,7 @@ export default function AdminPage() {
     setResults((prev) => [result, ...prev]);
   };
 
-  // ---- Settings handlers ----
+  
   const handleToggleLeagues = async () => {
     setLeaguesToggling(true);
     try {
@@ -360,7 +360,7 @@ export default function AdminPage() {
     }
   };
 
-  // ---- Cards handlers ----
+  
   const toggleBan = async (cardId: string) => {
     setTogglingId(cardId);
     try {
@@ -382,7 +382,7 @@ export default function AdminPage() {
     }
   };
 
-  // ---- Filtered data ----
+  
   const searchLower = cardSearch.toLowerCase();
   const filteredCards = allCards.filter((card) => {
     if (searchLower && !card.name_fr.toLowerCase().includes(searchLower) && !card.id.toLowerCase().includes(searchLower)) return false;
@@ -405,7 +405,7 @@ export default function AdminPage() {
       <CloudBackground />
 
       <div className="max-w-6xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
-        {/* Header */}
+        
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
             {t('title')}
@@ -419,7 +419,7 @@ export default function AdminPage() {
           </Link>
         </div>
 
-        {/* Tabs */}
+        
         <div className="flex gap-2 mb-8 flex-wrap">
           {tabs.map((tb) => (
             <button
@@ -437,10 +437,10 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* ============ SETTINGS TAB ============ */}
+        
         {tab === 'settings' && (
           <div className="max-w-2xl">
-            {/* Leagues Toggle */}
+            
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('leagues.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('leagues.description')}</p>
@@ -464,7 +464,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* ELO Management */}
+            
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('elo.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('elo.description')}</p>
@@ -478,7 +478,7 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* Discord Roles */}
+            
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('discord.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('discord.description')}</p>
@@ -492,7 +492,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Testers Management */}
+            
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('testers.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('testers.description')}</p>
@@ -527,7 +527,7 @@ export default function AdminPage() {
               )}
             </div>
 
-            {/* Results Log */}
+            
             {results.length > 0 && (
               <div className="rounded-lg p-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
                 <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: '#888888' }}>{t('actionLog')}</h2>
@@ -543,10 +543,10 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ============ CARDS TAB ============ */}
+        
         {tab === 'cards' && (
           <div>
-            {/* Stats + Search */}
+            
             <div className="flex items-center gap-4 flex-wrap mb-4">
               <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>
                 {tc('adminCards.bannedCount', { count: bannedIds.size })}
@@ -559,7 +559,7 @@ export default function AdminPage() {
               />
             </div>
 
-            {/* Filter tabs */}
+            
             <div className="flex flex-wrap gap-2 mb-4">
               {(['all', 'banned', 'authorized'] as FilterMode[]).map((f) => (
                 <button key={f} onClick={() => setCardFilter(f)} className="px-4 py-2 text-xs font-bold uppercase tracking-wider cursor-pointer" style={{ backgroundColor: cardFilter === f ? '#1a1a1a' : '#0a0a0a', borderBottom: cardFilter === f ? `2px solid ${f === 'banned' ? '#b33e3e' : f === 'authorized' ? '#4a9e4a' : '#c4a35a'}` : '2px solid transparent', color: cardFilter === f ? '#e0e0e0' : '#555555' }}>
@@ -568,7 +568,7 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* Card Grid */}
+            
             {cardsLoading ? (
               <p className="text-sm" style={{ color: '#888888' }}>{tc('common.loading')}</p>
             ) : filteredCards.length === 0 ? (
@@ -596,14 +596,14 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ============ BACKGROUNDS TAB ============ */}
+        
         {tab === 'backgrounds' && (
           <div className="max-w-2xl">
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: '#141414', border: '1px solid #262626' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: '#888888' }}>{t('backgrounds.title')}</h2>
               <p className="text-xs mb-4" style={{ color: '#555555' }}>{t('backgrounds.description')}</p>
 
-              {/* Upload form */}
+              
               <div className="flex flex-col gap-3 mb-6 p-4 rounded" style={{ backgroundColor: '#0a0a0a', border: '1px solid #1a1a1a' }}>
                 <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('backgrounds.uploadLabel')}</label>
                 <input
@@ -630,7 +630,7 @@ export default function AdminPage() {
                 </button>
               </div>
 
-              {/* List */}
+              
               {bgLoading ? (
                 <p className="text-sm" style={{ color: '#888888' }}>{tc('common.loading')}</p>
               ) : bgList.length === 0 ? (
@@ -659,10 +659,10 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ============ PLAYERS TAB ============ */}
+        
         {tab === 'players' && (
           <div className="max-w-4xl">
-            {/* Search */}
+            
             <div className="flex gap-2 mb-4">
               <input
                 type="text"
@@ -683,7 +683,7 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* Player list */}
+            
             {players.length > 0 && (
               <div className="flex flex-col gap-1.5 mb-6">
                 {players.map((p) => (
@@ -698,7 +698,7 @@ export default function AdminPage() {
                     <span className="text-sm font-medium" style={{ color: '#e0e0e0' }}>{p.username}</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#1a1a1a', color: '#888' }}>{p.role}</span>
 
-                    {/* ELO - click to edit */}
+                    
                     {eloEditId === p.id ? (
                       <div className="flex items-center gap-1">
                         <input
@@ -762,7 +762,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Selected player's games */}
+            
             {selectedPlayerId && (
               <div>
                 <div className="flex items-center gap-3 mb-3">
@@ -997,9 +997,9 @@ function ReportsPanel() {
   );
 }
 
-// ============================================================================
-// SUSPICIOUS PANEL
-// ============================================================================
+
+
+
 
 interface SuspiciousUser {
   id: string; username: string; email: string; elo: number;

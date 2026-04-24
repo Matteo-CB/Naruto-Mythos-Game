@@ -18,7 +18,7 @@ export async function POST() {
       return NextResponse.json({ error: 'No Discord linked' }, { status: 400 });
     }
 
-    // Prevent unlinking if user has no password (Discord-only account)
+    
     if (!user.password) {
       return NextResponse.json(
         { error: 'Cannot unlink Discord from a Discord-only account' },
@@ -26,7 +26,7 @@ export async function POST() {
       );
     }
 
-    // Remove Discord account link
+    
     await prisma.account.deleteMany({
       where: {
         userId: session.user.id,
@@ -34,7 +34,7 @@ export async function POST() {
       },
     });
 
-    // Clear Discord fields on user
+    
     await prisma.user.update({
       where: { id: session.user.id },
       data: { discordId: null, discordUsername: null },

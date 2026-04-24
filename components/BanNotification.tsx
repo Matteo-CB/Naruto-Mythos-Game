@@ -26,7 +26,7 @@ export function BanNotification() {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    // Check if already dismissed this session
+    
     try {
       const seen = localStorage.getItem('ban-notif-dismissed');
       if (seen) setDismissed(new Set(JSON.parse(seen)));
@@ -55,7 +55,7 @@ export function BanNotification() {
   const gameBan = bans.find((b) => b.type === 'game');
   const chatBan = bans.find((b) => b.type === 'chat');
 
-  // Game ban: blocking modal
+  
   if (gameBan && !dismissed.has('gameBan')) {
     const dateStr = gameBan.expiresAt ? new Date(gameBan.expiresAt).toLocaleDateString() : '';
     return (
@@ -83,7 +83,7 @@ export function BanNotification() {
 
   const items: Array<{ key: string; content: React.ReactNode }> = [];
 
-  // Chat ban banner
+  
   if (chatBan && !dismissed.has('chatBan')) {
     const dateStr = chatBan.expiresAt ? new Date(chatBan.expiresAt).toLocaleDateString() : '';
     items.push({
@@ -96,7 +96,7 @@ export function BanNotification() {
     });
   }
 
-  // Report outcome notifications
+  
   for (let i = 0; i < notifications.length; i++) {
     const notif = notifications[i];
     const key = `report-${i}`;

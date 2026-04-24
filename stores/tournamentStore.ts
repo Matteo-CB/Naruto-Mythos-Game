@@ -97,7 +97,7 @@ export interface CreateTournamentInput {
   bannedCardIds?: string[];
   allowedLeagues?: string[];
   scheduledStartAt?: string;
-  // Restricted mode
+  
   allowedGroups?: string[];
   bannedGroups?: string[];
   allowedKeywords?: string[];
@@ -132,7 +132,7 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
   },
 
   fetchTournament: async (id) => {
-    // Only show loading spinner on very first load (no tournament data at all)
+    
     const current = get().activeTournament;
     const isFirstLoad = !current || current.id !== id;
     if (isFirstLoad) set({ loading: true, error: null });
@@ -240,7 +240,7 @@ export const useTournamentStore = create<TournamentStore>()((set, get) => ({
     const current = get().activeTournament;
     if (current) {
       set({ activeTournament: { ...current, currentRound: data.round } });
-      // Refetch to get the new round matches
+      
       get().fetchTournament(current.id);
     }
   },

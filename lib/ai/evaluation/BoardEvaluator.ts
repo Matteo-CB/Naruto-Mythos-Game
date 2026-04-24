@@ -1,12 +1,4 @@
-/**
- * BoardEvaluator - Central heuristic for AI decision-making.
- *
- * Returns a score from the perspective of the given player.
- * Positive = favorable, negative = unfavorable.
- *
- * Turn-aware: weights shift as the game progresses.
- * Card-aware: uses CardTiers for card quality, synergies, and strategic context.
- */
+
 
 import type { GameState, PlayerID, CharacterInPlay, ActiveMission } from '../../engine/types';
 import { calculateCharacterPower } from '../../engine/phases/PowerCalculation';
@@ -14,7 +6,7 @@ import { MissionEvaluator } from './MissionEvaluator';
 import { ChakraEvaluator } from './ChakraEvaluator';
 import { getCardTier, evaluateHandSynergies, evaluateBoardSynergies, hasUpgradeTarget, isSummon, evaluateCardSynergies } from './CardTiers';
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+
 
 function getMyChars(mission: ActiveMission, player: PlayerID): CharacterInPlay[] {
   return player === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -28,20 +20,17 @@ function topCard(c: CharacterInPlay) {
   return c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
 }
 
-// ─── Main Evaluator ─────────────────────────────────────────────────────────
+
 
 export class BoardEvaluator {
-  /**
-   * Evaluate the entire board state from a player's perspective.
-   * Combines 11+ weighted components with turn-dependent weights.
-   */
+  
   static evaluate(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
     const turn = state.turn ?? 1;
 
-    // Turn-dependent weight profiles
-    // Board presence and tempo are boosted to encourage the AI to PLAY cards
-    // rather than passing prematurely.
+    
+    
+    
     const w = {
       missionPoints:    100,
       missionControl:   25 + turn * 10,            // 35/45/55/65
@@ -59,53 +48,53 @@ export class BoardEvaluator {
 
     let score = 0;
 
-    // 1. Mission points scored (always most important)
+    
     score += (state[player].missionPoints - state[opponent].missionPoints) * w.missionPoints;
 
-    // 2. Mission control (projected wins - confidence-based)
+    
     score += MissionEvaluator.evaluateMissionControl(state, player) * w.missionControl;
 
-    // 3. Board presence (characters + power, weighted by mission value)
+    
     score += BoardEvaluator.evaluateBoardPresence(state, player, turn) * w.boardPresence;
 
-    // 4. Chakra advantage
+    
     score += ChakraEvaluator.evaluateChakraAdvantage(state, player) * w.chakraAdvantage;
 
-    // 5. Hand size advantage
+    
     score += (state[player].hand.length - state[opponent].hand.length) * w.handSize;
 
-    // 6. Edge token (dynamic value based on tied/close missions)
+    
     score += BoardEvaluator.evaluateEdgeValue(state, player);
 
-    // 7. Hand quality (card-tier aware)
+    
     score += BoardEvaluator.evaluateHandQuality(state, player) * w.handQuality;
 
-    // 8. Hidden character threats (card-aware)
+    
     score += BoardEvaluator.evaluateHiddenThreats(state, player) * w.hiddenThreats;
 
-    // 9. Overkill penalty (wasted power)
+    
     score -= BoardEvaluator.evaluateOverkill(state, player) * w.overkillPenalty;
 
-    // 10. SCORE effect anticipation
+    
     score += BoardEvaluator.evaluateScoreEffects(state, player) * w.scoreEffects;
 
-    // 11. Synergies (hand + board)
+    
     score += BoardEvaluator.evaluateSynergies(state, player) * w.synergies;
 
-    // 12. Tempo (action advantage when opponent has passed)
+    
     score += BoardEvaluator.evaluateTempo(state, player) * w.tempo;
 
-    // 13. Summon awareness (temporary board presence, discount on turns 1-3)
+    
     score += BoardEvaluator.evaluateSummonAwareness(state, player, turn);
 
-    // 14. Pass penalty — penalize states where the player passed while having playable cards
-    // This directly combats the "AI passes too much" issue.
+    
+    
     score -= BoardEvaluator.evaluatePassPenalty(state, player) * w.passPenalty;
 
     return score;
   }
 
-  // ─── Component: Board Presence ──────────────────────────────────────────
+  
 
   static evaluateBoardPresence(state: GameState, player: PlayerID, turn: number): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -121,10 +110,10 @@ export class BoardEvaluator {
       totalMyChars += myChars.length;
       totalOppChars += oppChars.length;
 
-      // Character count advantage per mission
+      
       score += (myChars.length - oppChars.length) * 0.8;
 
-      // Power advantage weighted by mission value
+      
       const myPower = myChars.reduce(
         (sum, c) => sum + calculateCharacterPower(state, c, player), 0,
       );
@@ -135,18 +124,18 @@ export class BoardEvaluator {
       const missionValue = mission.basePoints + mission.rankBonus;
       score += (myPower - oppPower) * missionValue * 0.35;
 
-      // Bonus for having ANY presence on a mission (contesting it)
+      
       if (myChars.length > 0 && myPower > 0) {
         score += missionValue * 0.2;
       }
-      // Penalty for opponent having uncontested presence
+      
       if (oppChars.length > 0 && myChars.length === 0) {
         score -= missionValue * 0.3;
       }
     }
 
-    // Global board presence bonus: having characters in play generates chakra next turn
-    // Each character = +1 chakra income, so having more chars is a compounding advantage
+    
+    
     if (turn < 4) {
       score += (totalMyChars - totalOppChars) * 1.0;
     }
@@ -154,7 +143,7 @@ export class BoardEvaluator {
     return score;
   }
 
-  // ─── Component: Dynamic Edge Token Value ────────────────────────────────
+  
 
   static evaluateEdgeValue(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -184,20 +173,20 @@ export class BoardEvaluator {
       }
     }
 
-    // Turn multiplier: edge matters much more on turn 4 (final scoring)
+    
     const turnMultiplier = turn === 4 ? 2.5 : turn === 3 ? 1.8 : 1.0;
 
     const edgeImpact = (tiedMissionValue * 3 + closeMissionValue * 0.5) * turnMultiplier;
 
     if (hasEdge) {
-      // Minimum value of 5 - edge is always somewhat valuable
+      
       return Math.max(5, edgeImpact);
     }
-    // Not having edge when missions are tied is bad
+    
     return -edgeImpact * 0.6;
   }
 
-  // ─── Component: Hand Quality (Card-Tier Aware) ──────────────────────────
+  
 
   static evaluateHandQuality(state: GameState, player: PlayerID): number {
     let score = 0;
@@ -205,7 +194,7 @@ export class BoardEvaluator {
     const chakra = state[player].chakra;
     const turn = state.turn ?? 1;
 
-    // Skip placeholder hands (AI sanitized state)
+    
     if (hand.length > 0 && hand[0].cardId === '__hidden_hand__') {
       return hand.length * 0.5; // Small bonus per card in hand
     }
@@ -214,7 +203,7 @@ export class BoardEvaluator {
       const tier = getCardTier(card);
       const cost = card.chakra ?? 0;
 
-      // Card value scaled by affordability
+      
       if (cost <= chakra) {
         score += tier * 1.0; // Playable now
       } else if (cost <= chakra + 5 + turn) {
@@ -223,12 +212,12 @@ export class BoardEvaluator {
         score += tier * 0.1; // Too expensive
       }
 
-      // SCORE cards are more valuable later
+      
       if (card.effects?.some(e => e.type === 'SCORE') && turn >= 2) {
         score += tier * 0.3;
       }
 
-      // Upgrade potential: having a target in play is very efficient
+      
       if (hasUpgradeTarget(state, player, card)) {
         score += tier * 0.5;
       }
@@ -237,7 +226,7 @@ export class BoardEvaluator {
     return score;
   }
 
-  // ─── Component: Hidden Threats (Card-Aware) ─────────────────────────────
+  
 
   static evaluateHiddenThreats(state: GameState, player: PlayerID): number {
     let myScore = 0;
@@ -247,21 +236,21 @@ export class BoardEvaluator {
       const myChars = getMyChars(mission, player);
       const oppChars = getOppChars(mission, player);
 
-      // OUR hidden characters: AI knows what they are
+      
       for (const c of myChars) {
         if (!c.isHidden) continue;
         const card = topCard(c);
         const tier = getCardTier(card);
 
-        // Base value from card tier
+        
         let value = tier * 0.5;
 
-        // AMBUSH synergy - we hid this card on purpose for the AMBUSH
+        
         if (card.effects?.some(e => e.type === 'AMBUSH')) {
           value += tier * 0.8;
         }
 
-        // Power tokens on hidden chars still count for scoring
+        
         if (c.powerTokens > 0) {
           value += c.powerTokens * 0.5;
         }
@@ -269,7 +258,7 @@ export class BoardEvaluator {
         myScore += value;
       }
 
-      // OPPONENT hidden characters: unknown identity, moderate threat
+      
       for (const c of oppChars) {
         if (!c.isHidden) continue;
         oppScore += 3; // Unknown threat per hidden card
@@ -282,7 +271,7 @@ export class BoardEvaluator {
     return myScore - oppScore;
   }
 
-  // ─── Component: Overkill Penalty ────────────────────────────────────────
+  
 
   static evaluateOverkill(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -304,11 +293,11 @@ export class BoardEvaluator {
       if (myPower > oppPower && myPower > 0) {
         const excess = myPower - oppPower - 1;
         if (excess > 0) {
-          // Don't penalize if opponent has hidden chars (uncertainty)
+          
           const oppHidden = oppChars.filter(c => c.isHidden).length;
           if (oppHidden > 0) continue;
 
-          // More overkill on low-value missions is worse
+          
           const valueAdjust = Math.max(1, 8 - missionValue);
           totalWaste += excess * 0.3 * valueAdjust * 0.5;
         }
@@ -318,7 +307,7 @@ export class BoardEvaluator {
     return totalWaste;
   }
 
-  // ─── Component: SCORE Effect Anticipation ───────────────────────────────
+  
 
   static evaluateScoreEffects(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -336,12 +325,12 @@ export class BoardEvaluator {
         (sum, c) => sum + calculateCharacterPower(state, c, opponent), 0,
       );
 
-      // Only count SCORE effects if we're winning or tied with edge
+      
       const winning = myPower > oppPower ||
         (myPower === oppPower && myPower > 0 && state.edgeHolder === player);
       if (!winning || myPower === 0) continue;
 
-      // Our characters' SCORE effects
+      
       for (const c of myChars) {
         if (c.isHidden) continue;
         const card = topCard(c);
@@ -351,7 +340,7 @@ export class BoardEvaluator {
         }
       }
 
-      // Mission card's SCORE effects
+      
       if (mission.card.effects?.some(e => e.type === 'SCORE')) {
         score += 2;
       }
@@ -360,21 +349,21 @@ export class BoardEvaluator {
     return score;
   }
 
-  // ─── Component: Synergies ───────────────────────────────────────────────
+  
 
   static evaluateSynergies(state: GameState, player: PlayerID): number {
     let score = 0;
 
-    // Hand synergies
+    
     const hand = state[player].hand;
     if (hand.length > 0 && hand[0].cardId !== '__hidden_hand__') {
       score += evaluateHandSynergies(hand);
     }
 
-    // Board synergies (visible characters)
+    
     score += evaluateBoardSynergies(state, player);
 
-    // Cross-hand-board synergies: cards in hand that synergize with board
+    
     if (hand.length > 0 && hand[0].cardId !== '__hidden_hand__') {
       const boardCardIds: string[] = [];
       for (const mission of state.activeMissions) {
@@ -387,11 +376,11 @@ export class BoardEvaluator {
       const combinedSynergy = evaluateCardSynergies([...boardCardIds, ...handCardIds]);
       const boardOnlySynergy = evaluateCardSynergies(boardCardIds);
       const handOnlySynergy = evaluateCardSynergies(handCardIds);
-      // Cross synergy = total - individual (avoid double-counting)
+      
       score += Math.max(0, combinedSynergy - boardOnlySynergy - handOnlySynergy);
     }
 
-    // Penalty: Akamaru without Kiba on the same mission
+    
     for (const mission of state.activeMissions) {
       const myChars = getMyChars(mission, player);
       const hasAkamaru = myChars.some(c =>
@@ -409,7 +398,7 @@ export class BoardEvaluator {
     return score;
   }
 
-  // ─── Component: Tempo ───────────────────────────────────────────────────
+  
 
   static evaluateTempo(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -418,16 +407,16 @@ export class BoardEvaluator {
 
     let score = 0;
 
-    // Opponent has passed, we haven't - free actions!
+    
     if (state[opponent].hasPassed && !state[player].hasPassed) {
       const playableCards = state[player].hand.filter(
         c => (c.chakra ?? 0) <= state[player].chakra || state[player].chakra >= 1,
       ).length;
-      // Significantly reward free action opportunity
+      
       score += playableCards * 3 + state[player].chakra * 1.0;
     }
 
-    // We've passed, opponent hasn't - they get free actions (bad for us)
+    
     if (state[player].hasPassed && !state[opponent].hasPassed) {
       const oppPlayable = state[opponent].hand.filter(
         c => (c.chakra ?? 0) <= state[opponent].chakra || state[opponent].chakra >= 1,
@@ -438,13 +427,9 @@ export class BoardEvaluator {
     return score;
   }
 
-  // ─── Component: Pass Penalty ──────────────────────────────────────────
+  
 
-  /**
-   * Penalize states where the AI has passed while still having playable cards
-   * and chakra to spend. Chakra resets to 0 at end of turn, so unspent chakra
-   * when passing is completely wasted.
-   */
+  
   static evaluatePassPenalty(state: GameState, player: PlayerID): number {
     if (state.phase !== 'action') return 0;
     if (!state[player].hasPassed) return 0;
@@ -452,10 +437,10 @@ export class BoardEvaluator {
     const hand = state[player].hand;
     const chakra = state[player].chakra;
 
-    // Skip placeholder hands (AI sanitized state)
+    
     if (hand.length > 0 && hand[0].cardId === '__hidden_hand__') return 0;
 
-    // Count how many cards could have been played
+    
     const playableFaceUp = hand.filter(c => (c.chakra ?? 0) <= chakra).length;
     const canPlayHidden = hand.length > 0 && chakra >= 1 ? 1 : 0;
 
@@ -463,13 +448,13 @@ export class BoardEvaluator {
 
     let penalty = 0;
 
-    // Penalty scales with unspent chakra (wasted resource)
+    
     penalty += Math.min(chakra, 10) * 0.3;
 
-    // Penalty scales with number of playable cards left
+    
     penalty += playableFaceUp * 0.8;
 
-    // Extra penalty on later turns where every action counts
+    
     const turn = state.turn ?? 1;
     if (turn >= 3) {
       penalty *= 1.5;
@@ -478,7 +463,7 @@ export class BoardEvaluator {
     return penalty;
   }
 
-  // ─── Component: Summon Awareness ────────────────────────────────────────
+  
 
   static evaluateSummonAwareness(state: GameState, player: PlayerID, turn: number): number {
     if (turn === 4) return 0; // Turn 4: summons count fully (last scoring)
@@ -490,7 +475,7 @@ export class BoardEvaluator {
         if (c.isHidden) continue;
         const card = topCard(c);
         if (isSummon(card)) {
-          // Summons return to hand at end of turn - discount their board presence
+          
           const power = calculateCharacterPower(state, c, player);
           discount += power * 0.3; // ~30% discount on summon power value
         }
@@ -500,7 +485,7 @@ export class BoardEvaluator {
     return -discount;
   }
 
-  // ─── Terminal Evaluation ────────────────────────────────────────────────
+  
 
   static evaluateTerminal(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';

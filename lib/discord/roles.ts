@@ -1,11 +1,4 @@
-/**
- * ELO-based Discord role definitions.
- *
- * 8-tier Naruto-themed rank system + Unranked.
- * Roles are identified by a fixed `key` (never changes).
- * Discord role IDs are stored in the database so role names
- * can be freely changed on Discord without breaking sync.
- */
+
 
 export interface EloRole {
   key: string;        // Fixed identifier (never changes)
@@ -16,7 +9,7 @@ export interface EloRole {
   hoist: boolean;
 }
 
-/** Special role for players who haven't completed placement matches */
+
 export const UNRANKED_ROLE: EloRole = {
   key: 'unranked', label: 'Unranked', color: 0x555555, colorHex: '#555555', minElo: -1, hoist: true,
 };
@@ -33,15 +26,12 @@ export const ELO_ROLES: EloRole[] = [
   { key: 'will_of_fire',   label: '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂', color: 0xFF6B35, colorHex: '#FF6B35', minElo: 2500, hoist: true },
 ];
 
-/** All roles including unranked */
+
 export const ALL_ELO_ROLES: EloRole[] = [UNRANKED_ROLE, ...ELO_ROLES];
 
 export const PLACEMENT_MATCHES_REQUIRED = 5;
 
-/**
- * Get the role definition matching a given ELO.
- * Returns the highest tier the ELO qualifies for.
- */
+
 export function getRoleForElo(elo: number): EloRole {
   let matched = ELO_ROLES[0];
   for (const role of ELO_ROLES) {
@@ -52,30 +42,22 @@ export function getRoleForElo(elo: number): EloRole {
   return matched;
 }
 
-/**
- * Get all ELO role keys.
- */
+
 export function getAllEloRoleKeys(): string[] {
   return ALL_ELO_ROLES.map((r) => r.key);
 }
 
-/**
- * Get all ELO role labels (used for name-based matching on Discord).
- */
+
 export function getAllEloRoleNames(): string[] {
   return ALL_ELO_ROLES.map((r) => r.label);
 }
 
-/**
- * Get the rank label for display on the website.
- */
+
 export function getRankLabel(elo: number): string {
   return getRoleForElo(elo).label;
 }
 
-/**
- * Find a role definition by its key.
- */
+
 export function getRoleByKey(key: string): EloRole | undefined {
   return ALL_ELO_ROLES.find((r) => r.key === key);
 }

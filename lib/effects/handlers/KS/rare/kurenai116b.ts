@@ -4,17 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 116b/130 - KURENAI YUHI (R)
- * Chakra: 3, Power: 2
- * Group: Leaf Village, Keywords: Team 8
- *
- * AMBUSH: Defeat an enemy character with Power 4 or less in this mission.
- *   Find non-hidden enemies in this mission with effective power <= 4. Target selection. Defeat.
- *
- * UPGRADE: Move this character to another mission.
- *   When isUpgrade: find valid missions (other than current). Target selection. Move self.
- */
+
 
 function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
@@ -24,7 +14,7 @@ function kurenai116bAmbushHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find enemies with effective power <= 4 (hidden chars have power 0, so they qualify)
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 4)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -64,7 +54,7 @@ function kurenai116bUpgradeHandler(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Find other missions to move to (no same-name conflict at destination)
+  
   const validMissions: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;

@@ -3,25 +3,19 @@ import type { CardData, CharacterCard, MissionCard } from '../engine/types';
 type Locale = 'en' | 'fr';
 type AnyCard = CardData | CharacterCard | MissionCard;
 
-/**
- * Get the display name of a card based on the current locale.
- * Falls back to name_fr if name_en is not available.
- */
+
 export function getCardName(card: AnyCard, locale: Locale): string {
   if (locale === 'en' && card.name_en) return card.name_en;
   return card.name_fr;
 }
 
-/**
- * Get the display title of a card based on the current locale.
- * Falls back to title_fr if title_en is not available.
- */
+
 export function getCardTitle(card: AnyCard, locale: Locale): string {
   if (locale === 'en' && card.title_en) return card.title_en;
   return card.title_fr;
 }
 
-// ─── Group Translations ───
+
 
 const GROUP_FR: Record<string, string> = {
   'Leaf Village': 'Village de Konoha',
@@ -36,7 +30,7 @@ export function getCardGroup(group: string, locale: Locale): string {
   return group;
 }
 
-// ─── Keyword Translations ───
+
 
 const KEYWORD_FR: Record<string, string> = {
   'Team 7': 'Équipe 7',
@@ -65,7 +59,7 @@ export function getCardKeyword(keyword: string, locale: Locale): string {
   return keyword;
 }
 
-// ─── Rarity Labels ───
+
 
 const RARITY_LABELS_EN: Record<string, string> = {
   C: 'Common',

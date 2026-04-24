@@ -1,11 +1,4 @@
-/**
- * Admin endpoint: inspect a player's EloHistory (per-game ELO deltas kept for 14
- * days, independent of the Game table which purges at 72h).
- *
- * GET /api/admin/elo-history?user=<id|username>&days=<1..14>
- *   Returns the user's ELO deltas within the requested window, newest first,
- *   plus an aggregate summary (total delta, wins, losses, distinct opponents).
- */
+
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
@@ -32,7 +25,7 @@ export async function GET(request: Request) {
 
   if (!q) return NextResponse.json({ error: 'Missing user query param' }, { status: 400 });
 
-  // Resolve user by id or case-insensitive username substring.
+  
   const looksLikeId = /^[0-9a-f]{24}$/i.test(q);
   const user = await prisma.user.findFirst({
     where: looksLikeId
@@ -51,7 +44,7 @@ export async function GET(request: Request) {
     orderBy: { createdAt: 'desc' },
   });
 
-  // Aggregate summary
+  
   const opponents = new Map<string, { username: string; count: number; deltaSum: number; wins: number; losses: number }>();
   let totalDelta = 0;
   let wins = 0, losses = 0, draws = 0;
@@ -69,7 +62,7 @@ export async function GET(request: Request) {
     opponents.set(key, cur);
   }
 
-  // Per-day summary
+  
   const byDay = new Map<string, { games: number; deltaSum: number; wins: number; losses: number }>();
   for (const h of history) {
     const d = h.createdAt.toISOString().slice(0, 10);

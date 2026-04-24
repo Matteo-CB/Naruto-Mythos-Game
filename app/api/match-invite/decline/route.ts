@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the invite and verify the current user is the receiver
+    
     const invite = await prisma.matchInvite.findUnique({
       where: { id: inviteId },
     });
@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update invite status to declined
+    
     await prisma.matchInvite.update({
       where: { id: inviteId },
       data: { status: 'declined' },
     });
 
-    // Emit socket event to the sender
+    
     emitToUser(invite.senderId, 'match:invite-declined', {
       inviteId: invite.id,
     });

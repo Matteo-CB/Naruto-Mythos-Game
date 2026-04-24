@@ -3,26 +3,12 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 128/130 V - ITACHI UCHIHA (M)
- * Chakra: 6, Power: 5
- * Group: Akatsuki, Keywords: Rogue Ninja
- *
- * UPGRADE: Move a friendly character in play to another mission.
- *   - When isUpgrade: find friendly characters (not self) across all missions.
- *   - Require target selection for which character to move.
- *   - The destination mission is handled by a second selection or auto-resolved
- *     to the mission with the fewest friendly characters (excluding current).
- *
- * MAIN [continuous]: Every enemy character in this mission has -1 Power.
- *   - Continuous no-op. The power modifier is handled by the engine during
- *     scoring (ContinuousEffects / MissionPhase power calculation).
- */
+
 
 function itachi152MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
 
-  // Log the continuous effect
+  
   state = {
     ...state,
     log: logAction(
@@ -34,12 +20,12 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // UPGRADE: Move a friendly character to another mission
+  
   if (ctx.isUpgrade) {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    // Find friendly characters in other missions (not self)
+    
     const validTargets: string[] = [];
     for (let i = 0; i < state.activeMissions.length; i++) {
       for (const char of state.activeMissions[i][friendlySide]) {
@@ -73,7 +59,7 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
       };
     }
 
-    // Auto-resolve: single target, move to a different mission
+    
     const targetId = validTargets[0];
     state = autoMoveCharacter(state, targetId, friendlySide, ctx);
   }
@@ -81,17 +67,14 @@ function itachi152MainHandler(ctx: EffectContext): EffectResult {
   return { state };
 }
 
-/**
- * Auto-resolve moving a character to another mission.
- * Picks the mission with fewest friendly characters (excluding the character's current mission).
- */
+
 function autoMoveCharacter(
   state: import('@/lib/engine/types').GameState,
   targetId: string,
   friendlySide: 'player1Characters' | 'player2Characters',
   ctx: EffectContext,
 ): import('@/lib/engine/types').GameState {
-  // Find the character and its current mission
+  
   let charToMove: CharacterInPlay | null = null;
   let fromMissionIndex = -1;
 
@@ -106,7 +89,7 @@ function autoMoveCharacter(
 
   if (!charToMove || fromMissionIndex === -1) return state;
 
-  // Find best destination mission (fewest friendly chars, different from source)
+  
   let bestMission = -1;
   let fewest = Infinity;
   for (let i = 0; i < state.activeMissions.length; i++) {
@@ -119,7 +102,7 @@ function autoMoveCharacter(
   }
 
   if (bestMission === -1) {
-    // Only one mission exists, cannot move
+    
     return {
       ...state,
       log: logAction(
@@ -132,7 +115,7 @@ function autoMoveCharacter(
     };
   }
 
-  // Remove from source mission
+  
   const missions = [...state.activeMissions];
   const sourceMission = { ...missions[fromMissionIndex] };
   const sourceChars = [...sourceMission[friendlySide]];
@@ -144,7 +127,7 @@ function autoMoveCharacter(
   sourceMission[friendlySide] = sourceChars;
   missions[fromMissionIndex] = sourceMission;
 
-  // Add to destination mission
+  
   const destMission = { ...missions[bestMission] };
   destMission[friendlySide] = [...destMission[friendlySide], movedChar];
   missions[bestMission] = destMission;
@@ -163,7 +146,7 @@ function autoMoveCharacter(
 }
 
 function itachi152UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  
   return { state: ctx.state };
 }
 

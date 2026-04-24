@@ -10,14 +10,14 @@ interface MissionContext {
 }
 
 interface UIStore {
-  // Card preview
+  
   previewCard: CharacterCard | MissionCard | null;
   previewPosition: { x: number; y: number } | null;
   previewMissionContext: MissionContext | null;
   showPreview: (card: CharacterCard | MissionCard, position: { x: number; y: number }, missionContext?: MissionContext) => void;
   hidePreview: () => void;
 
-  // Pinned card preview
+  
   pinnedCard: CharacterCard | MissionCard | null;
   pinnedMissionContext: MissionContext | null;
   pinCard: (card: CharacterCard | MissionCard, missionContext?: MissionContext) => void;
@@ -26,7 +26,7 @@ interface UIStore {
   toggleFullscreenCard: () => void;
   zoomCard: (card: CharacterCard | MissionCard, missionContext?: MissionContext) => void;
 
-  // Selection state
+  
   selectedCardIndex: number | null;
   selectedMissionIndex: number | null;
   selectedTargetId: string | null;
@@ -35,32 +35,32 @@ interface UIStore {
   selectTarget: (id: string | null) => void;
   clearSelection: () => void;
 
-  // Dialogs
+  
   showConfirmDialog: boolean;
   confirmDialogData: { title: string; message: string; onConfirm: () => void } | null;
   openConfirmDialog: (title: string, message: string, onConfirm: () => void) => void;
   closeConfirmDialog: () => void;
 
-  // Game log
+  
   showGameLog: boolean;
   toggleGameLog: () => void;
 
-  // Turn overlay
+  
   showTurnOverlay: boolean;
   turnOverlayText: string;
   showTurnTransition: (text: string) => void;
   hideTurnOverlay: () => void;
 
-  // Effect popup minimize
+  
   effectPopupMinimized: boolean;
   minimizeEffectPopup: () => void;
   restoreEffectPopup: () => void;
 
-  // Edge coin flip → mulligan sequencing
+  
   coinFlipComplete: boolean;
   setCoinFlipComplete: (done: boolean) => void;
 
-  // Hand reorder (UI-only, does not affect game state)
+  
   handOrder: number[] | null; // null = natural order; array maps displayIndex → originalIndex
   setHandOrder: (order: number[] | null) => void;
   resetHandOrder: () => void;
@@ -107,10 +107,10 @@ export const useUIStore = create<UIStore>((set) => ({
   selectedCardIndex: null,
   selectedMissionIndex: null,
   selectedTargetId: null,
-  // Selecting a hand card clears any hidden-character reveal selection (they are mutually exclusive).
+  
   selectCard: (index) => set({ selectedCardIndex: index, selectedTargetId: null, selectedMissionIndex: null }),
   selectMission: (index) => set({ selectedMissionIndex: index }),
-  // Selecting a hidden character for reveal clears any hand-card/mission selection (mutually exclusive).
+  
   selectTarget: (id) => set({ selectedTargetId: id, selectedCardIndex: null, selectedMissionIndex: null }),
   clearSelection: () =>
     set({

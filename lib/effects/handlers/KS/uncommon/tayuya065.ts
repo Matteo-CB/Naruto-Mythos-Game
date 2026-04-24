@@ -3,29 +3,14 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 
-/**
- * Card 065/130 - TAYUYA (UC)
- * Chakra: 4 | Power: 2
- * Group: Sound Village | Keywords: Sound Four
- *
- * AMBUSH: POWERUP 2 a friendly Sound Village character in play.
- *   - Find all friendly non-hidden Sound Village characters across all missions.
- *   - If exactly one valid target, auto-apply POWERUP 2.
- *   - If multiple targets, require target selection.
- *
- * UPGRADE: Look at the top 3 cards of your deck, draw any with keyword "Summon",
- * put the rest back on top in any order.
- *   - Look at up to 3 cards from the top of the deck.
- *   - Add any with keyword "Summon" to hand.
- *   - Put the rest back on top of the deck (order doesn't matter for auto-resolve).
- */
+
 
 function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly non-hidden Sound Village characters across all missions
+  
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -45,7 +30,7 @@ function handleTayuya065Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
-  // Confirmation popup before POWERUP
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -67,7 +52,7 @@ function handleTayuya065Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TAYUYA', id: 'KS-065-UC' }) } };
   }
 
-  // Confirmation popup before peeking at deck
+  
   return {
     state,
     requiresTargetSelection: true,

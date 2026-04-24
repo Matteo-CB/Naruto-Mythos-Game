@@ -40,7 +40,7 @@ export function BracketMatch({ match, index }: Props) {
         />
       )}
 
-      {/* Player 1 */}
+      
       <div
         className="flex items-center justify-between px-3 py-2 text-xs"
         style={{
@@ -55,7 +55,7 @@ export function BracketMatch({ match, index }: Props) {
         {match.winnerId === match.player1Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
-      {/* Player 2 */}
+      
       <div
         className="flex items-center justify-between px-3 py-2 text-xs"
         style={{
@@ -69,7 +69,7 @@ export function BracketMatch({ match, index }: Props) {
         {match.winnerId === match.player2Id && <span style={{ color: '#c4a35a' }}>W</span>}
       </div>
 
-      {/* Status badge */}
+      
       {isActive && match.roomCode && (
         <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-wider cursor-pointer"
           style={{ color: '#4a9eff' }}>

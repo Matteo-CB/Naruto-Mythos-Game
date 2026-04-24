@@ -9,61 +9,57 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { useTrainingStore } from '@/stores/trainingStore';
 import { useSocketStore } from '@/lib/socket/client';
 
-/**
- * Edge Token coin-flip driven by requestAnimationFrame for absolute
- * 60fps smoothness. Zero React re-renders during the spin.
- * Only the result phase uses React state.
- */
+
 
 const TOKEN_SIZE = 150;
 const SPIN_DURATION_MS = 2800;
 const RESULT_HOLD_MS = 2000;
 const REVOLUTIONS = 7;
 
-// Custom easing: fast start, smooth deceleration, micro-bounces at end
+
 function easeOutCoinFlip(t: number): number {
   if (t < 0.72) {
-    // Main spin: fast then decelerate (modified ease-out cubic)
+    
     const p = t / 0.72;
     return p * (2 - p) * 0.72;
   }
   if (t < 0.82) {
-    // First bounce overshoot
+    
     const p = (t - 0.72) / 0.10;
     return 0.72 + 0.28 * (1 + Math.sin(p * Math.PI) * 0.012);
   }
   if (t < 0.91) {
-    // Second micro bounce
+    
     const p = (t - 0.82) / 0.09;
     return 0.72 + 0.28 * (1 - Math.sin(p * Math.PI) * 0.005);
   }
-  // Settle
+  
   const p = (t - 0.91) / 0.09;
   return 0.72 + 0.28 * (1 + (1 - p) * 0.001);
 }
 
-// Vertical arc: coin goes up then comes down with small bounces
+
 function arcOffset(t: number): number {
   if (t < 0.72) {
-    // Parabolic arc: peak at t=0.3 of the spin portion
+    
     const p = t / 0.72;
     const arc = Math.sin(p * Math.PI);
     return -arc * 22;
   }
   if (t < 0.80) {
-    // First bounce
+    
     const p = (t - 0.72) / 0.08;
     return -Math.sin(p * Math.PI) * 5;
   }
   if (t < 0.88) {
-    // Second bounce
+    
     const p = (t - 0.80) / 0.08;
     return -Math.sin(p * Math.PI) * 2;
   }
   return 0;
 }
 
-// Wobble after landing
+
 function wobble(t: number): { z: number; x: number } {
   if (t < 0.72) return { z: 0, x: 0 };
   if (t < 0.82) {
@@ -81,7 +77,7 @@ function wobble(t: number): { z: number; x: number } {
   return { z: 0, x: 0 };
 }
 
-// Shadow scale from arc height
+
 function shadowScale(t: number): { scale: number; opacity: number } {
   const h = Math.abs(arcOffset(t));
   const maxH = 22;
@@ -108,7 +104,7 @@ export function EdgeCoinFlip() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [hasTriggered, setHasTriggered] = useState(false);
 
-  // Refs for direct DOM manipulation (no React re-renders)
+  
   const coinRef = useRef<HTMLDivElement>(null);
   const arcRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
@@ -125,26 +121,26 @@ export function EdgeCoinFlip() {
   const accentColor = playerHasEdge ? '#c4a35a' : '#b33e3e';
   const accentRgb = playerHasEdge ? '196,163,90' : '179,62,62';
 
-  // The core animation loop: runs at native refresh rate
+  
   const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) startTimeRef.current = timestamp;
     const elapsed = timestamp - startTimeRef.current;
     const progress = Math.min(elapsed / SPIN_DURATION_MS, 1);
 
-    // Compute current rotation
+    
     const easedProgress = easeOutCoinFlip(progress);
     const currentDeg = easedProgress * totalDeg;
 
-    // Compute wobble
+    
     const w = wobble(progress);
 
-    // Compute vertical offset
+    
     const yOffset = arcOffset(progress);
 
-    // Compute shadow
+    
     const s = shadowScale(progress);
 
-    // Apply transforms directly to DOM (no React re-render)
+    
     if (coinRef.current) {
       coinRef.current.style.transform =
         `rotateY(${currentDeg}deg) rotateZ(${w.z}deg) rotateX(${w.x}deg)`;
@@ -160,7 +156,7 @@ export function EdgeCoinFlip() {
     if (progress < 1) {
       rafRef.current = requestAnimationFrame(animate);
     } else {
-      // Animation complete, snap to final position
+      
       if (coinRef.current) {
         coinRef.current.style.transform =
           `rotateY(${totalDeg}deg) rotateZ(0deg) rotateX(0deg)`;
@@ -172,34 +168,34 @@ export function EdgeCoinFlip() {
         shadowRef.current.style.transform = 'translateX(-50%) scale(1)';
         shadowRef.current.style.opacity = '0.35';
       }
-      // Transition to result (only React state change during the whole flip)
+      
       setPhase('result');
     }
   }, [totalDeg]);
 
   const setCoinFlipComplete = useUIStore((s) => s.setCoinFlipComplete);
 
-  // For modes that skip the coin flip, signal complete immediately
+  
   useEffect(() => {
     if (isMulliganPhase && (isSandboxMode || isHotseatGame || isTrainingMode)) {
       setCoinFlipComplete(true);
     }
   }, [isMulliganPhase, isSandboxMode, isHotseatGame, isTrainingMode, setCoinFlipComplete]);
 
-  // Trigger
+  
   useEffect(() => {
     if (!isMulliganPhase || hasTriggered || isSandboxMode || isHotseatGame || isTrainingMode) return;
     setHasTriggered(true);
     if (!animationsEnabled) {
-      // Go straight to result phase — the result→done effect handles
-      // both online sync (waiting) and offline (immediate done) paths
+      
+      
       setPhase('result');
       return;
     }
     setPhase('animating');
   }, [isMulliganPhase, hasTriggered, isSandboxMode, isHotseatGame, isTrainingMode, animationsEnabled]);
 
-  // Start rAF loop when animating
+  
   useEffect(() => {
     if (phase !== 'animating') return;
     startTimeRef.current = 0;
@@ -209,12 +205,12 @@ export function EdgeCoinFlip() {
     };
   }, [phase, animate]);
 
-  // Result -> done: signal coin flip complete
+  
   useEffect(() => {
     if (phase !== 'result') return;
     const timer = setTimeout(() => {
       if (isOnlineGame) {
-        // Online: emit to server and wait for both players to finish
+        
         setPhase('waiting');
         coinFlipDoneSocket();
       } else {
@@ -225,8 +221,8 @@ export function EdgeCoinFlip() {
     return () => clearTimeout(timer);
   }, [phase, setCoinFlipComplete, isOnlineGame, coinFlipDoneSocket]);
 
-  // Waiting phase: transition to done once coin-flip-sync arrives (sets coinFlipComplete)
-  // Fallback: if sync never arrives after 5s, force complete to avoid permanent block
+  
+  
   useEffect(() => {
     if (phase !== 'waiting') return;
     if (coinFlipComplete) {
@@ -270,7 +266,7 @@ export function EdgeCoinFlip() {
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.95)', overflow: 'hidden' }}
         onClick={isWaiting ? undefined : handleSkip}
       >
-        {/* Soft ambient on result */}
+        
         {showResultText && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -287,14 +283,14 @@ export function EdgeCoinFlip() {
           />
         )}
 
-        {/* Coin area */}
+        
         <div style={{ position: 'relative', width: TOKEN_SIZE, height: TOKEN_SIZE + 20 }}>
-          {/* Arc wrapper (direct DOM via ref) */}
+          
           <div
             ref={arcRef}
             style={{ width: TOKEN_SIZE, height: TOKEN_SIZE }}
           >
-            {/* Perspective */}
+            
             <div
               style={{
                 width: '100%',
@@ -303,7 +299,7 @@ export function EdgeCoinFlip() {
                 perspectiveOrigin: '50% 48%',
               }}
             >
-              {/* The coin (direct DOM via ref) */}
+              
               <div
                 ref={coinRef}
                 style={{
@@ -315,7 +311,7 @@ export function EdgeCoinFlip() {
                   transform: `rotateY(${isResult ? landAngle : 0}deg)`,
                 }}
               >
-                {/* ===== FACE ===== */}
+                
                 <div
                   className="absolute inset-0 rounded-full overflow-hidden"
                   style={{
@@ -333,7 +329,7 @@ export function EdgeCoinFlip() {
                     style={{ objectFit: 'cover', borderRadius: '50%' }}
                     draggable={false}
                   />
-                  {/* Beveled rim */}
+                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -343,7 +339,7 @@ export function EdgeCoinFlip() {
                   />
                 </div>
 
-                {/* ===== BACK (brushed dark metal) ===== */}
+                
                 <div
                   className="absolute inset-0 rounded-full overflow-hidden"
                   style={{
@@ -356,7 +352,7 @@ export function EdgeCoinFlip() {
                     transition: 'box-shadow 0.5s ease',
                   }}
                 >
-                  {/* Beveled rim */}
+                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -366,7 +362,7 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  {/* Brushed metal (fine radial lines) */}
+                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -380,7 +376,7 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  {/* Soft highlight spot */}
+                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -389,7 +385,7 @@ export function EdgeCoinFlip() {
                     }}
                   />
 
-                  {/* Inner vignette */}
+                  
                   <div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -402,7 +398,7 @@ export function EdgeCoinFlip() {
             </div>
           </div>
 
-          {/* Ground shadow (direct DOM via ref) */}
+          
           <div
             ref={shadowRef}
             style={{
@@ -420,7 +416,7 @@ export function EdgeCoinFlip() {
           />
         </div>
 
-        {/* Result text */}
+        
         <AnimatePresence>
           {showResultText && (
             <motion.div

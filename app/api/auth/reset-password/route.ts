@@ -15,10 +15,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
     }
 
-    // Hash the incoming token to compare with stored hash
+    
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    // Find user with matching token that hasn't expired
+    
     const user = await prisma.user.findFirst({
       where: {
         resetToken: hashedToken,
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'invalidToken' }, { status: 400 });
     }
 
-    // Hash new password and clear reset token
+    
     const hashedPassword = await bcrypt.hash(password, 12);
 
     await prisma.user.update({

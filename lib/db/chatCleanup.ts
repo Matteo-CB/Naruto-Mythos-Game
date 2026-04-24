@@ -3,10 +3,7 @@ import { prisma } from './prisma';
 let lastCleanup = 0;
 const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 hour
 
-/**
- * Delete chat messages older than 30 days.
- * Rate-limited to once per hour.
- */
+
 export async function cleanupOldChatMessages(): Promise<void> {
   const now = Date.now();
   if (now - lastCleanup < CLEANUP_INTERVAL) return;

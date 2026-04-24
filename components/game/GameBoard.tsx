@@ -33,7 +33,7 @@ import { useSocketStore } from "@/lib/socket/client";
 import { GameChat } from "./GameChat";
 import { SpectatorBanner } from "./SpectatorBanner";
 
-// ----- Shared color maps -----
+
 
 const rarityColorMap: Record<string, string> = {
   C: "#888888",
@@ -61,7 +61,7 @@ const rankColorMap: Record<string, string> = {
   A: "#b33e3e",
 };
 
-// ----- Card Preview Content (shared between hover and pinned) -----
+
 
 function CardPreviewContent({
   card,
@@ -77,7 +77,7 @@ function CardPreviewContent({
   const unpinCard = useUIStore((s) => s.unpinCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
 
-  // Ban enforcement is server-side only
+  
 
   const isCharacter = card.card_type === "character";
   const isMission = card.card_type === "mission";
@@ -101,7 +101,7 @@ function CardPreviewContent({
         maxHeight: "calc(100vh - 32px)",
       }}
     >
-      {/* Card image */}
+      
       {imagePath ? (
         <div
           className="w-full shrink-0 flex items-center justify-center"
@@ -132,12 +132,12 @@ function CardPreviewContent({
         </div>
       )}
 
-      {/* Card details (scrollable) */}
+      
       <div
         className="p-3.5 flex flex-col gap-2 overflow-y-auto"
         style={{ maxHeight: "380px" }}
       >
-        {/* Type badge + Rarity */}
+        
         <div className="flex items-center justify-between">
           <span
             className="text-[10px] px-1.5 py-0.5 font-bold uppercase tracking-wider"
@@ -163,7 +163,7 @@ function CardPreviewContent({
           </span>
         </div>
 
-        {/* Name */}
+        
         <span
           className="text-sm font-bold leading-tight"
           style={{ color: "#e0e0e0" }}
@@ -171,21 +171,21 @@ function CardPreviewContent({
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
-        {/* English name for missions */}
+        
         {isMission && card.name_en && locale !== 'en' && (
           <span className="text-xs -mt-1" style={{ color: "#666666" }}>
             {card.name_en}
           </span>
         )}
 
-        {/* Title */}
+        
         {(card.title_fr || card.title_en) && (
           <span className="text-xs" style={{ color: "#999999" }}>
             {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
 
-        {/* Mission rank + points info */}
+        
         {isMission && missionContext && (
           <div
             className="flex flex-col gap-1.5 p-2.5 mt-0.5"
@@ -254,7 +254,7 @@ function CardPreviewContent({
           </div>
         )}
 
-        {/* Base points fallback for mission cards without context */}
+        
         {isMission && !missionContext && "basePoints" in card && (
           <div className="flex items-center gap-3 mt-0.5">
             <span className="text-xs" style={{ color: "#c4a35a" }}>
@@ -264,7 +264,7 @@ function CardPreviewContent({
           </div>
         )}
 
-        {/* Chakra + Power (character cards) */}
+        
         {isCharacter && (
           <div
             className="flex items-center gap-4 p-2 mt-0.5"
@@ -308,7 +308,7 @@ function CardPreviewContent({
           </div>
         )}
 
-        {/* Keywords */}
+        
         {card.keywords && card.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-0.5">
             {card.keywords.map((kw) => (
@@ -327,19 +327,19 @@ function CardPreviewContent({
           </div>
         )}
 
-        {/* Group */}
+        
         {card.group && (
           <span className="text-[10px]" style={{ color: "#777777" }}>
             {t("collection.details.group")}: {getCardGroup(card.group, locale as 'en' | 'fr')}
           </span>
         )}
 
-        {/* Card ID */}
+        
         <span className="text-[9px]" style={{ color: "#444444" }}>
           {card.id}
         </span>
 
-        {/* Effects section */}
+        
         <div
           className="mt-0.5 flex flex-col gap-2 pt-2"
           style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
@@ -401,7 +401,7 @@ function CardPreviewContent({
         </div>
       </div>
 
-      {/* Pinned action buttons */}
+      
       {isPinned && (
         <div
           className="flex items-center justify-between px-3 py-2 shrink-0"
@@ -445,7 +445,7 @@ function CardPreviewContent({
   );
 }
 
-// ----- Mobile Details Button (floating, appears when a card is pinned on mobile) -----
+
 
 function MobileDetailsButton() {
   const t = useTranslations();
@@ -453,7 +453,7 @@ function MobileDetailsButton() {
   const pinnedCard = useUIStore((s) => s.pinnedCard);
   const showFullscreenCard = useUIStore((s) => s.showFullscreenCard);
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
-  // Only show on touch devices when a card is pinned and fullscreen isn't already open
+  
   if (!dims.isMobile || !pinnedCard || showFullscreenCard) return null;
   return (
     <button
@@ -466,7 +466,7 @@ function MobileDetailsButton() {
   );
 }
 
-// ----- Card Preview Panel (fixed right-side) -----
+
 
 function CardPreview() {
   const dims = useGameScale();
@@ -479,7 +479,7 @@ function CardPreview() {
   const displayMissionContext = pinnedCard ? pinnedMissionContext : previewMissionContext;
   const isPinned = !!pinnedCard;
 
-  // Hide the side panel on mobile - users can still tap cards for fullscreen detail
+  
   if (!displayCard || dims.isMobile) return null;
 
   return (
@@ -509,7 +509,7 @@ function CardPreview() {
   );
 }
 
-// ----- Fullscreen Card Detail Modal -----
+
 
 function FullscreenCardDetail() {
   const t = useTranslations();
@@ -521,7 +521,7 @@ function FullscreenCardDetail() {
   const toggleFullscreenCard = useUIStore((s) => s.toggleFullscreenCard);
   const unpinCard = useUIStore((s) => s.unpinCard);
 
-  // Ban enforcement is server-side only
+  
 
   if (!showFullscreenCard || !pinnedCard) return null;
 
@@ -538,10 +538,10 @@ function FullscreenCardDetail() {
     unpinCard();
   };
 
-  // Shared card info content
+  
   const cardInfoContent = (
     <>
-      {/* Type badge + Rarity */}
+      
       <div className="flex items-center justify-between">
         <span
           className={`${dims.isMobile ? 'text-[9px] px-1.5 py-0.5' : 'text-xs px-2 py-1'} font-bold uppercase tracking-wider`}
@@ -567,7 +567,7 @@ function FullscreenCardDetail() {
         </span>
       </div>
 
-      {/* Name */}
+      
       <div className="flex flex-col gap-0.5">
         <span
           className={`${dims.isMobile ? 'text-sm' : 'text-lg'} font-bold leading-tight`}
@@ -582,7 +582,7 @@ function FullscreenCardDetail() {
         )}
       </div>
 
-      {/* Chakra + Power (character cards) */}
+      
       {isCharacter && (
         <div
           className={`flex items-center ${dims.isMobile ? 'gap-3 p-1.5' : 'gap-6 p-3'}`}
@@ -626,7 +626,7 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      {/* Mission rank + points (compact on mobile) */}
+      
       {isMission && missionContext && (
         <div
           className={`flex flex-col gap-1 ${dims.isMobile ? 'p-1.5' : 'p-3'}`}
@@ -660,14 +660,14 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      {/* Base points fallback */}
+      
       {isMission && !missionContext && "basePoints" in card && (
         <span className="text-xs" style={{ color: "#c4a35a" }}>
           {t("game.board.base")}: {(card as MissionCard).basePoints} {t("game.board.pts")}
         </span>
       )}
 
-      {/* Keywords */}
+      
       {card.keywords && card.keywords.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {card.keywords.map((kw) => (
@@ -686,14 +686,14 @@ function FullscreenCardDetail() {
         </div>
       )}
 
-      {/* Group */}
+      
       {card.group && (
         <span className={`${dims.isMobile ? 'text-[10px]' : 'text-sm'}`} style={{ color: "#999999" }}>
           {getCardGroup(card.group, locale as 'en' | 'fr')}
         </span>
       )}
 
-      {/* Effects section */}
+      
       <div
         className={`flex flex-col ${dims.isMobile ? 'gap-1.5 pt-1.5' : 'gap-2.5 pt-3'}`}
         style={{ borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
@@ -756,16 +756,16 @@ function FullscreenCardDetail() {
     </>
   );
 
-  // Mobile: bottom sheet - slides up from bottom, no backdrop click (avoids ghost-click bug)
+  
   if (dims.isMobile) {
     return (
       <>
-        {/* Backdrop - pointer-events-none to prevent ghost clicks from the Details tap */}
+        
         <div
           className="fixed inset-0 pointer-events-none"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", zIndex: 299 }}
         />
-        {/* Bottom sheet */}
+        
         <motion.div
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
@@ -779,7 +779,7 @@ function FullscreenCardDetail() {
             boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.7)",
           }}
         >
-          {/* Close button - only toggles fullscreen, keeps card pinned so Details btn reappears */}
+          
           <button
             onClick={() => toggleFullscreenCard()}
             className="absolute top-2 right-2 z-10 w-7 h-7 flex items-center justify-center text-[11px] font-bold cursor-pointer"
@@ -792,7 +792,7 @@ function FullscreenCardDetail() {
             X
           </button>
 
-          {/* Card image - sized to fill a good portion of the sheet */}
+          
           {imagePath ? (
             <div
               className="w-full shrink-0 flex items-center justify-center"
@@ -817,7 +817,7 @@ function FullscreenCardDetail() {
             </div>
           )}
 
-          {/* Scrollable card info */}
+          
           <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
             {cardInfoContent}
           </div>
@@ -826,7 +826,7 @@ function FullscreenCardDetail() {
     );
   }
 
-  // Desktop: centered fullscreen modal (unchanged)
+  
   return (
     <AnimatePresence>
       <motion.div
@@ -855,13 +855,13 @@ function FullscreenCardDetail() {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Corner brackets */}
+          
           <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
           <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none" style={{ borderTop: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
           <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderLeft: '2px solid rgba(196, 163, 90, 0.5)' }} />
           <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none" style={{ borderBottom: '2px solid rgba(196, 163, 90, 0.5)', borderRight: '2px solid rgba(196, 163, 90, 0.5)' }} />
 
-          {/* Close button — centered at top for easy access */}
+          
           <button
             onClick={handleClose}
             className="absolute top-3 left-1/2 -translate-x-1/2 z-10 px-5 h-8 flex items-center justify-center text-xs font-bold uppercase tracking-wider cursor-pointer"
@@ -874,7 +874,7 @@ function FullscreenCardDetail() {
             X
           </button>
 
-          {/* Large card image */}
+          
           {imagePath ? (
             <div
               className="w-full shrink-0 flex items-center justify-center"
@@ -905,7 +905,7 @@ function FullscreenCardDetail() {
             </div>
           )}
 
-          {/* Full card details (scrollable) */}
+          
           <div
             className="p-5 flex flex-col gap-3 overflow-y-auto"
             style={{ maxHeight: "calc(90vh - 340px)" }}
@@ -918,14 +918,14 @@ function FullscreenCardDetail() {
   );
 }
 
-// ----- Maintenance Notification -----
+
 
 function MaintenanceNotification() {
   const t = useTranslations('common');
   const socketWarning = useSocketStore((s) => s.maintenanceWarning);
   const [apiWarning, setApiWarning] = useState(false);
 
-  // For AI/hotseat games (no socket), poll the API once on mount
+  
   useEffect(() => {
     if (socketWarning) return;
     fetch('/api/admin/maintenance')
@@ -956,7 +956,7 @@ function MaintenanceNotification() {
   );
 }
 
-// ----- Beta Test Notification -----
+
 
 const BETA_DISMISSED_KEY = 'naruto-mythos-beta-dismissed';
 
@@ -1009,7 +1009,7 @@ function BetaNotification() {
   );
 }
 
-// ----- Main Game Board -----
+
 
 export default function GameBoard() {
   return (
@@ -1033,14 +1033,14 @@ function GameBoardInner() {
   const fetchSettings = useSettingsStore((s) => s.fetchFromServer);
   const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  // Load user background preference on mount
+  
   useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const prevTurnRef = useRef<number | null>(null);
 
-  // Lock scroll on both <html> and <body> while game board is mounted - prevents
-  // Framer Motion layout animations from temporarily pushing content beyond
-  // container bounds and triggering a scrollbar.
+  
+  
+  
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -1070,9 +1070,9 @@ function GameBoardInner() {
     }
   }, [visibleState?.turn, addAnimation, visibleState]);
 
-  // Clicking the board background unpins - but not when the fullscreen sheet is open
-  // (mobile ghost-tap: when Details button disappears after tap, a synthetic click fires at
-  //  the same coordinates and passes through the pointer-events-none backdrop to the board div)
+  
+  
+  
   const handleBoardClick = useCallback(() => {
     if (pinnedCard && !showFullscreenCard) {
       unpinCard();
@@ -1123,14 +1123,14 @@ function GameBoardInner() {
       <BetaNotification />
       <SandboxToolbar />
 
-      {/* Left side: Opponent deck + discard */}
+      
       <OpponentSidePiles />
 
       <main className="flex-1 flex flex-col min-w-0 relative z-10">
-        {/* Opponent stats bar */}
+        
         <OpponentStatsBar />
 
-        {/* Opponent hand */}
+        
         <section
           className="shrink-0 flex items-center justify-center"
           style={{
@@ -1143,7 +1143,7 @@ function GameBoardInner() {
           <OpponentHand handSize={opponentState.handSize} />
         </section>
 
-        {/* Mission area with ActionBar */}
+        
         <section className="flex-1 flex flex-col min-h-0">
           <div className={`flex-1 flex items-stretch justify-center ${dims.isMobile ? 'px-1 py-0' : 'px-3 py-0.5'} min-h-0 overflow-hidden`}>
             <div className={`flex ${dims.isMobile ? 'gap-0.5' : 'gap-1.5'} items-stretch justify-center w-full`}>
@@ -1190,13 +1190,13 @@ function GameBoardInner() {
             </div>
           </div>
 
-          {/* ActionBar below missions */}
+          
           <div className="shrink-0 flex justify-center py-0.5" style={{ pointerEvents: 'auto' }}>
             <ActionBar />
           </div>
         </section>
 
-        {/* Player hand */}
+        
         <section
           className="shrink-0 flex items-end justify-center"
           style={{
@@ -1212,11 +1212,11 @@ function GameBoardInner() {
           }
         </section>
 
-        {/* Player stats bar */}
+        
         <PlayerStatsBar />
       </main>
 
-      {/* Right side: Player deck + discard */}
+      
       <PlayerSidePiles />
 
       <CardPreview />

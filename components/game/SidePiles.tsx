@@ -8,9 +8,9 @@ import { DiscardPileViewer } from './DiscardPileViewer';
 import { useGameScale } from './GameScaleContext';
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 
-// ---------------------
-// Deck pile visual
-// ---------------------
+
+
+
 function DeckPile({ count, accentColor }: { count: number; accentColor: string }) {
   const t = useTranslations();
   const dims = useGameScale();
@@ -24,7 +24,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
         {t('game.deck')}
       </span>
       <div className="relative" style={{ width: CARD_W + 6, height: CARD_H + 6 }}>
-        {/* Stack shadow layers */}
+        
         {Array.from({ length: stackLayers }).map((_, i) => (
           <div
             key={i}
@@ -39,7 +39,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
             }}
           />
         ))}
-        {/* Top card */}
+        
         <motion.div
           key={count}
           initial={{ scale: 0.95, opacity: 0.8 }}
@@ -68,7 +68,7 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
           />
         </motion.div>
       </div>
-      {/* Count badge */}
+      
       <motion.span
         key={count}
         initial={{ scale: 1.4, opacity: 0.5 }}
@@ -82,9 +82,9 @@ function DeckPile({ count, accentColor }: { count: number; accentColor: string }
   );
 }
 
-// ---------------------
-// Discard pile visual
-// ---------------------
+
+
+
 function DiscardPile({
   count,
   accentColor,
@@ -118,7 +118,7 @@ function DiscardPile({
         }}
         title={`${t('game.discard')}: ${count}`}
       >
-        {/* Stack shadow layers */}
+        
         {Array.from({ length: stackLayers }).map((_, i) => (
           <div
             key={i}
@@ -133,7 +133,7 @@ function DiscardPile({
             }}
           />
         ))}
-        {/* Top card or empty slot */}
+        
         {count > 0 ? (
           <div
             className="absolute overflow-hidden"
@@ -168,7 +168,7 @@ function DiscardPile({
           />
         )}
       </motion.button>
-      {/* Count badge */}
+      
       <motion.span
         key={count}
         initial={{ scale: 1.4, opacity: 0.5 }}
@@ -185,9 +185,9 @@ function DiscardPile({
   );
 }
 
-// ---------------------
-// Left side: Opponent piles
-// ---------------------
+
+
+
 export function OpponentSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);
@@ -234,9 +234,9 @@ export function OpponentSidePiles() {
   );
 }
 
-// ---------------------
-// Right side: Player piles
-// ---------------------
+
+
+
 export function PlayerSidePiles() {
   const t = useTranslations();
   const visibleState = useGameStore((s) => s.visibleState);

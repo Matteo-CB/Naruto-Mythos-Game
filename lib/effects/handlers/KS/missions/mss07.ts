@@ -2,17 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * MSS 07 - "Je dois partir" / "I Have to Go"
- *
- * SCORE [↯]: Move a friendly hidden character in play.
- *   - OPTIONAL effect (no "you must" in text).
- *   - The scoring player may move one of their hidden characters from any mission
- *     to a different mission.
- *   - If multiple hidden characters, requires character selection.
- *   - If multiple destination missions, requires mission selection (two-stage).
- *   - Player can always decline.
- */
+
 
 function mss07ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
@@ -20,7 +10,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Check for hidden friendly characters across all missions
+  
   let hasHiddenFriendly = false;
 
   if (state.activeMissions.length > 1) {
@@ -49,7 +39,7 @@ function mss07ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before move
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -20,27 +20,27 @@ interface AddCheckResult {
 }
 
 interface DeckBuilderStore {
-  // Deck state
+  
   deckName: string;
   deckChars: CharacterCard[];
   deckMissions: MissionCard[];
 
-  // Saved decks
+  
   savedDecks: SavedDeck[];
   isLoading: boolean;
   isSaving: boolean;
 
-  // Currently loaded deck ID (for tracking edits)
+  
   loadedDeckId: string | null;
-  // True when deck has been modified since last save/load
+  
   isDirty: boolean;
 
-  // Inline error for failed add
+  
   addError: string | null;
   addErrorKey: string | null;
   addErrorParams: Record<string, string | number> | null;
 
-  // Actions
+  
   setDeckName: (name: string) => void;
   addChar: (card: CharacterCard) => void;
   removeChar: (index: number) => void;
@@ -51,11 +51,11 @@ interface DeckBuilderStore {
   reorderChars: (fromIndex: number, toIndex: number) => void;
   sortCharsByCost: () => void;
 
-  // Validation helpers
+  
   canAddChar: (card: CharacterCard) => AddCheckResult;
   canAddMission: (card: MissionCard) => AddCheckResult;
 
-  // Persistence
+  
   saveDeck: () => Promise<void>;
   loadSavedDecks: () => Promise<void>;
   loadDeck: (deckId: string, allChars: CharacterCard[], allMissions: MissionCard[]) => Promise<void>;
@@ -64,22 +64,17 @@ interface DeckBuilderStore {
 
 export type { AddCheckResult };
 
-/**
- * Normalize a card ID for version comparison.
- * All variants of the same card number count as the same version:
- * KS-108-R, KS-108-RA, KS-108-MV, KS-108-SV → all normalize to "KS-108"
- * Max 2 copies total across ALL variants of the same card number.
- */
+
 function normalizeVersionId(id: string): string {
-  // Extract set + number: "KS-108-R" → "KS-108", "KS-108-RA" → "KS-108"
+  
   const match = id.match(/^(KS-\d+)/);
   if (match) return match[1];
-  // Legacy format fallback: strip suffix
+  
   return id.replace(/\s*A$/, '').trim();
 }
 
 export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
-  // Initial state
+  
   deckName: '',
   deckChars: [],
   deckMissions: [],
@@ -198,7 +193,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
 
     try {
       if (loadedDeckId) {
-        // Update existing deck
+        
         const res = await fetch(`/api/decks/${loadedDeckId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -212,7 +207,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         }
         set({ isDirty: false });
       } else {
-        // Create new deck
+        
         const res = await fetch('/api/decks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -229,7 +224,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         set({ loadedDeckId: created.id, isDirty: false });
       }
 
-      // Refresh the saved decks list
+      
       await get().loadSavedDecks();
     } finally {
       set({ isSaving: false });
@@ -243,7 +238,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
       const res = await fetch('/api/decks', { credentials: 'include' });
 
       if (!res.ok) {
-        // If unauthorized or error, just clear the list
+        
         set({ savedDecks: [] });
         return;
       }
@@ -283,7 +278,7 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         missionIds: string[];
       };
 
-      // Resolve card IDs back to full card objects (supports old IDs via fallback)
+      
       const charMap = new Map(allChars.map((c) => [c.id, c]));
       const missionMap = new Map(allMissions.map((m) => [m.id, m]));
 
@@ -325,16 +320,16 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
         throw new Error(data.error || 'Failed to delete deck');
       }
 
-      // If the deleted deck is the currently loaded one, clear the editor
+      
       const { loadedDeckId } = get();
       if (loadedDeckId === deckId) {
         get().clearDeck();
       }
 
-      // Refresh the saved decks list
+      
       await get().loadSavedDecks();
     } catch {
-      // Re-throw so UI can handle
+      
       throw new Error('Failed to delete deck');
     }
   },

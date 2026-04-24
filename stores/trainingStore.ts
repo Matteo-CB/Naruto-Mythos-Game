@@ -1,10 +1,6 @@
 'use client';
 
-/**
- * Training Mode Store - completely separate from the main game store.
- * Tracks coaching state for the training mode only.
- * Zero impact on normal gameplay.
- */
+
 
 import { create } from 'zustand';
 import type { GameState, PlayerID } from '@/lib/engine/types';
@@ -13,25 +9,25 @@ import type { CoachAdvice } from '@/lib/ai/coaching/CoachTypes';
 export type MoveQuality = 'great' | 'good' | 'ok' | 'mistake' | 'blunder';
 
 export interface TrainingStore {
-  /** Whether training mode is active */
+  
   isTrainingMode: boolean;
 
-  /** Latest coaching advice from the AI */
+  
   coachAdvice: CoachAdvice | null;
 
-  /** Is the coach currently computing advice? */
+  
   isAnalysing: boolean;
 
-  /** Quality of the last player move */
+  
   lastMoveQuality: MoveQuality | null;
 
-  /** Win probability delta from last move (positive = improved position) */
+  
   lastMoveDelta: number | null;
 
-  /** Whether the coaching panel is expanded/visible */
+  
   isPanelOpen: boolean;
 
-  // ─── Actions ──────────────────────────────────────────────────────────────
+  
 
   enable: () => void;
   disable: () => void;
@@ -64,12 +60,9 @@ export const useTrainingStore = create<TrainingStore>((set) => ({
   }),
 }));
 
-// ─── Move quality classification ─────────────────────────────────────────────
 
-/**
- * Classify a move based on the change in win probability.
- * delta = newWinProb - oldWinProb (from the player's perspective)
- */
+
+
 export function classifyMove(delta: number): MoveQuality {
   if (delta >= 0.08) return 'great';
   if (delta >= 0.02) return 'good';

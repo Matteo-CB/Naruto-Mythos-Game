@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
-// ---------------------
-// Constants
-// ---------------------
+
+
+
 const TOTAL_LESSONS = 8;
 
 const CARD_IMAGES = {
@@ -23,9 +23,9 @@ const CARD_IMAGES = {
   cloud: '/images/icons/cloud-2.webp',
 } as const;
 
-// ---------------------
-// Slide direction variants for lesson transitions
-// ---------------------
+
+
+
 const slideVariants = {
   enter: (direction: number) => ({
     x: direction > 0 ? 300 : -300,
@@ -41,9 +41,9 @@ const slideVariants = {
   }),
 };
 
-// ---------------------
-// Reusable inline info panel (replaces floating LessonBubble)
-// ---------------------
+
+
+
 function InfoPanel({
   title,
   description,
@@ -85,9 +85,9 @@ function InfoPanel({
   );
 }
 
-// ---------------------
-// Lesson scene components
-// ---------------------
+
+
+
 
 function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
   return (
@@ -102,7 +102,7 @@ function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '28px',
       }}
     >
-      {/* Two cards facing each other */}
+      
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
         <motion.div
           initial={{ x: -40, opacity: 0, rotate: -8 }}
@@ -150,7 +150,7 @@ function LessonOverview({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      {/* Info panels below */}
+      
       <div
         style={{
           display: 'grid',
@@ -202,7 +202,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '28px',
       }}
     >
-      {/* Card with numbered annotation dots */}
+      
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -221,7 +221,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
           }}
         />
 
-        {/* Numbered circles overlaid on the card */}
+        
         {ANNOTATIONS.map((a, i) => (
           <motion.div
             key={a.id}
@@ -253,7 +253,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
         ))}
       </motion.div>
 
-      {/* Annotation legend below the card */}
+      
       <div
         style={{
           display: 'grid',
@@ -279,7 +279,7 @@ function LessonCardAnatomy({ t }: { t: ReturnType<typeof useTranslations> }) {
               borderRadius: '6px',
             }}
           >
-            {/* Matching numbered circle */}
+            
             <span
               style={{
                 width: '20px',
@@ -343,7 +343,7 @@ function LessonTurnStructure({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '24px',
       }}
     >
-      {/* Phase boxes in a row */}
+      
       <div
         style={{
           display: 'flex',
@@ -399,7 +399,7 @@ function LessonTurnStructure({ t }: { t: ReturnType<typeof useTranslations> }) {
         ))}
       </div>
 
-      {/* Phase descriptions below */}
+      
       <div
         style={{
           display: 'grid',
@@ -441,7 +441,7 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '24px',
       }}
     >
-      {/* Three modes with card + description together */}
+      
       <div
         style={{
           display: 'flex',
@@ -470,7 +470,7 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
               borderRadius: '8px',
             }}
           >
-            {/* Card visual */}
+            
             {mode.key === 'reveal' ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', height: '80px' }}>
                 <Image
@@ -504,7 +504,7 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
               />
             )}
 
-            {/* Label */}
+            
             <span
               style={{
                 color: '#c4a35a',
@@ -517,7 +517,7 @@ function LessonPlayingCards({ t }: { t: ReturnType<typeof useTranslations> }) {
               {t(`tutorial.lessons.playingCards.${mode.key}Label`)}
             </span>
 
-            {/* Description */}
+            
             <div className="font-body" style={{ color: '#cccccc', fontSize: '0.88rem', lineHeight: 1.55, textAlign: 'center' }}>
               {t(`tutorial.lessons.playingCards.${mode.key}Bubble`)}
             </div>
@@ -541,7 +541,7 @@ function LessonMissions({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '24px',
       }}
     >
-      {/* Two mission cards */}
+      
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
         <motion.div
           initial={{ opacity: 0, rotate: -4 }}
@@ -571,7 +571,7 @@ function LessonMissions({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      {/* Info grid below */}
+      
       <div
         style={{
           display: 'grid',
@@ -619,7 +619,7 @@ function LessonUpgrade({ t }: { t: ReturnType<typeof useTranslations> }) {
         gap: '24px',
       }}
     >
-      {/* Stacked cards to show upgrade */}
+      
       <div style={{ position: 'relative', width: '140px', height: '170px' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -674,7 +674,7 @@ function LessonUpgrade({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </div>
 
-      {/* Info grid below */}
+      
       <div
         style={{
           display: 'grid',
@@ -728,7 +728,7 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
         gap: '20px',
       }}
     >
-      {/* Three info cards */}
+      
       <div
         style={{
           display: 'flex',
@@ -770,7 +770,7 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
         ))}
       </div>
 
-      {/* Pro tip inline */}
+      
       <InfoPanel
         title={t('tutorial.lessons.special.tipsTitle')}
         description={t('tutorial.lessons.special.tipsBubble')}
@@ -780,9 +780,9 @@ function LessonSpecialMechanics({ t }: { t: ReturnType<typeof useTranslations> }
   );
 }
 
-// ---------------------
-// Lesson 8: Play a Full Game (guided 1-turn walkthrough)
-// ---------------------
+
+
+
 function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
   const [step, setStep] = useState(0);
   const TOTAL_STEPS = 8;
@@ -795,7 +795,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
     if (step > 0) setStep((s) => s - 1);
   }, [step]);
 
-  // Helper to render the explanation panel below visual content
+  
   const stepInfo = (titleKey: string, descKey: string, delay: number) => (
     <InfoPanel
       title={t(`tutorial.lessons.gameplay.${titleKey}` as Parameters<typeof t>[0])}
@@ -832,7 +832,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             gap: '20px',
           }}
         >
-          {/* Step 0: Setup */}
+          
           {step === 0 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '32px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -886,7 +886,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 1: Start Phase - Mission Reveal */}
+          
           {step === 1 && (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
@@ -903,7 +903,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 2: Start Phase - Chakra & Draw */}
+          
           {step === 2 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -923,7 +923,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 3: Action Phase - Play Character */}
+          
           {step === 3 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -944,7 +944,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 4: Action Phase - Opponent Plays Hidden */}
+          
           {step === 4 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -966,7 +966,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 5: Action Phase - Both Pass */}
+          
           {step === 5 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '40px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -989,7 +989,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 6: Mission Phase - Scoring */}
+          
           {step === 6 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1018,7 +1018,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
             </>
           )}
 
-          {/* Step 7: End Phase */}
+          
           {step === 7 && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '32px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1047,7 +1047,7 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Step navigation */}
+      
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
           onClick={goPrevStep}
@@ -1089,9 +1089,9 @@ function LessonGameplay({ t }: { t: ReturnType<typeof useTranslations> }) {
   );
 }
 
-// ---------------------
-// Main component: LessonViewer
-// ---------------------
+
+
+
 export function LessonViewer() {
   const t = useTranslations('learn');
   const [currentLesson, setCurrentLesson] = useState(0);
@@ -1124,7 +1124,7 @@ export function LessonViewer() {
 
   const progressPercent = ((currentLesson + 1) / TOTAL_LESSONS) * 100;
 
-  // Render current lesson scene
+  
   function renderLessonScene(index: number) {
     switch (index) {
       case 0:
@@ -1161,7 +1161,7 @@ export function LessonViewer() {
         border: '1px solid rgba(196, 163, 90, 0.15)',
       }}
     >
-      {/* Progress bar at top */}
+      
       <div
         style={{
           position: 'relative',
@@ -1180,7 +1180,7 @@ export function LessonViewer() {
         />
       </div>
 
-      {/* Lesson title header */}
+      
       <div
         style={{
           padding: '16px 20px 8px',
@@ -1218,7 +1218,7 @@ export function LessonViewer() {
         </motion.p>
       </div>
 
-      {/* Lesson scene area with AnimatePresence */}
+      
       <div
         style={{
           position: 'relative',
@@ -1248,7 +1248,7 @@ export function LessonViewer() {
         </AnimatePresence>
       </div>
 
-      {/* Navigation footer */}
+      
       <div
         style={{
           display: 'flex',
@@ -1258,7 +1258,7 @@ export function LessonViewer() {
           borderTop: '1px solid rgba(196, 163, 90, 0.1)',
         }}
       >
-        {/* Prev button */}
+        
         <button
           onClick={goPrev}
           disabled={currentLesson === 0}
@@ -1290,7 +1290,7 @@ export function LessonViewer() {
           {t('tutorial.prev')}
         </button>
 
-        {/* Lesson counter */}
+        
         <span
           style={{
             color: '#666666',
@@ -1302,7 +1302,7 @@ export function LessonViewer() {
           {t('tutorial.lesson', { current: String(currentLesson + 1), total: String(TOTAL_LESSONS) })}
         </span>
 
-        {/* Next button */}
+        
         <button
           onClick={goNext}
           disabled={currentLesson === TOTAL_LESSONS - 1}

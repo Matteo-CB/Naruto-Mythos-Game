@@ -24,10 +24,10 @@ export async function GET() {
     const now = new Date();
     const bans: Array<{ type: string; permanent: boolean; expiresAt: string | null }> = [];
 
-    // Check if bans have expired
+    
     if (user.chatBanned) {
       if (user.chatBanUntil && user.chatBanUntil < now) {
-        // Ban expired — clear it
+        
         await prisma.user.update({
           where: { id: session.user.id },
           data: { chatBanned: false, chatBanUntil: null },
@@ -56,7 +56,7 @@ export async function GET() {
       }
     }
 
-    // Check for unnotified resolved reports where this user was the reporter
+    
     const resolvedReports = await prisma.chatReport.findMany({
       where: {
         reporterId: session.user.id,
@@ -71,7 +71,7 @@ export async function GET() {
       },
     });
 
-    // Mark them as notified
+    
     if (resolvedReports.length > 0) {
       await prisma.chatReport.updateMany({
         where: { id: { in: resolvedReports.map((r) => r.id) } },

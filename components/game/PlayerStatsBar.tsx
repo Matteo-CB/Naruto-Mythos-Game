@@ -43,12 +43,12 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         borderTop: '2px solid rgba(196, 163, 90, 0.15)',
       }}
     >
-      {/* Player name */}
+      
       <span className="text-xs font-semibold shrink-0" style={{ color: '#c4a35a' }}>
         {playerName}
       </span>
 
-      {/* Edge token — diamond shape */}
+      
       <div className="flex items-center gap-1 shrink-0" title={t('game.edge')}>
         <div
           style={{
@@ -64,7 +64,7 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         </span>
       </div>
 
-      {/* Turn + Phase */}
+      
       <div className="flex items-center gap-1.5 shrink-0">
         <span className="text-[10px]" style={{ color: '#888888' }}>
           {t('game.turnLabel')}
@@ -85,10 +85,10 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         </span>
       </div>
 
-      {/* Spacer */}
+      
       <div className="flex-1" />
 
-      {/* Deck + Discard on mobile (side piles hidden) */}
+      
       {dims.isMobile && (
         <>
           <StatPill label={t('game.deck')} value={myState.deck.length} color="#888888" />
@@ -96,10 +96,10 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
         </>
       )}
 
-      {/* Chakra */}
+      
       <StatPill label={t('game.chakra')} value={myState.chakra} color="#c4a35a" />
 
-      {/* Score */}
+      
       <StatPill label={t('game.score')} value={myState.missionPoints} color="#e0e0e0" />
     </div>
   );

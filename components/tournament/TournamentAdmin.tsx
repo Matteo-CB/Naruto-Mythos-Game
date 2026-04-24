@@ -27,22 +27,22 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminMessage, setAdminMessage] = useState('');
   const [adminError, setAdminError] = useState('');
-  // Disqualify
+  
   const [dqUserId, setDqUserId] = useState('');
   const [dqReason, setDqReason] = useState('');
-  // Set winner
+  
   const [swMatchId, setSwMatchId] = useState('');
   const [swWinnerId, setSwWinnerId] = useState('');
-  // Reset match
+  
   const [resetMatchId, setResetMatchId] = useState('');
-  // Ban player
+  
   const [banUserId, setBanUserId] = useState('');
   const [banReason, setBanReason] = useState('');
   const [banPermanent, setBanPermanent] = useState(false);
   const [banDays, setBanDays] = useState('7');
-  // Remove participant
+  
   const [removeUserId, setRemoveUserId] = useState('');
-  // Expanded sections
+  
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   if (!activeTournament || (!isAdmin && !isCreator)) return null;
@@ -113,11 +113,11 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         {isAdmin ? 'Admin Panel' : t('organizer')}
       </h3>
 
-      {/* Feedback */}
+      
       {adminMessage && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#1a3a1a', color: '#4ade80', border: '1px solid #333' }}>{adminMessage}</p>}
       {adminError && <p className="text-[10px] px-2 py-1" style={{ backgroundColor: '#3a1a1a', color: '#f87171', border: '1px solid #333' }}>{adminError}</p>}
 
-      {/* Start Tournament */}
+      
       {tour.status === 'registration' && (
         <div style={sectionStyle}>
           <button onClick={handleStart} disabled={!canStart || startingTournament}
@@ -129,7 +129,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Force Forfeit */}
+      
       {tour.status === 'in_progress' && activeMatches.length > 0 && (
         <div style={sectionStyle}>
           <SectionHeader id="forfeit" label={t('forceForfeit')} color="#cc4444" />
@@ -157,7 +157,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Disqualify Player */}
+      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="disqualify" label="Disqualify Player" color="#ef4444" />
@@ -175,7 +175,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Set Match Winner (override) */}
+      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="setWinner" label="Override Match Result" color="#f59e0b" />
@@ -205,7 +205,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Reset Match */}
+      
       {tour.status === 'in_progress' && (
         <div style={sectionStyle}>
           <SectionHeader id="resetMatch" label="Reset Match" color="#3b82f6" />
@@ -223,7 +223,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Remove Participant (registration only) */}
+      
       {tour.status === 'registration' && tour.participants.length > 0 && (
         <div style={sectionStyle}>
           <SectionHeader id="removePlayer" label="Remove Player" color="#f97316" />
@@ -239,7 +239,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Ban Player from Tournaments */}
+      
       <div style={sectionStyle}>
         <SectionHeader id="banPlayer" label="Ban Player" color="#dc2626" />
         {expandedSection === 'banPlayer' && (
@@ -273,7 +273,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         )}
       </div>
 
-      {/* Cancel Tournament */}
+      
       {tour.status !== 'completed' && tour.status !== 'cancelled' && (
         <div style={sectionStyle}>
           <SectionHeader id="cancel" label={t('cancel')} color="#666" />
@@ -286,7 +286,7 @@ export function TournamentAdmin({ tournamentId, isAdmin, isCreator }: Props) {
         </div>
       )}
 
-      {/* Delete Tournament (permanently remove from database) */}
+      
       <div style={sectionStyle}>
         <SectionHeader id="delete" label={t('deleteTournament')} color="#cc4444" />
         {expandedSection === 'delete' && (

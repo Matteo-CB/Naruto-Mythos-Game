@@ -14,7 +14,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// GET - list tournaments with optional filters
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST - create a tournament
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       name, gameMode, maxPlayers, isPublic,
       useBanList, sealedBoosterCount,
       bannedCardIds, allowedLeagues, scheduledStartAt,
-      // Restricted mode fields
+      
       allowedGroups, bannedGroups, allowedKeywords, bannedKeywords,
       allowedRarities, bannedRarities, maxPerRarity,
       maxCopiesPerCard, minDeckSize, maxDeckSize, maxChakraCost,
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
     }
 
-    // Validate allowedLeagues (simulator only)
+    
     const leagueRestrictions: string[] = [];
     if (type === 'simulator' && Array.isArray(allowedLeagues) && allowedLeagues.length > 0) {
       if (!validateLeagueKeys(allowedLeagues)) {
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
         sealedBoosterCount: gameMode === 'sealed' ? (sealedBoosterCount || 5) : null,
         bannedCardIds: Array.isArray(bannedCardIds) ? bannedCardIds : [],
         allowedLeagues: leagueRestrictions,
-        // Restricted mode constraints
+        
         allowedGroups: Array.isArray(allowedGroups) ? allowedGroups : [],
         bannedGroups: Array.isArray(bannedGroups) ? bannedGroups : [],
         allowedKeywords: Array.isArray(allowedKeywords) ? allowedKeywords : [],

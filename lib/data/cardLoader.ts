@@ -1,10 +1,10 @@
 import type { CardData, CharacterCard, MissionCard, Rarity } from '../engine/types';
 import { allCardData as rawData } from './sets';
 
-// Card data is loaded from per-set files in lib/data/sets/.
-// The sets/index.ts aggregator merges all sets into a single dataset.
 
-// Raw card shape from the JSON (values may be "" for incomplete cards)
+
+
+
 interface RawJsonCard {
   id: string;
   rarity: string;
@@ -77,11 +77,11 @@ function normalizeMissionCard(raw: RawJsonCard): MissionCard {
   } as MissionCard;
 }
 
-// Access the cards map from the JSON
+
 const rawCards = (rawData as { cards: Record<string, RawJsonCard> }).cards;
 const rawCardList = Object.values(rawCards);
 
-// Singleton cached data
+
 let _allCards: CardData[] | null = null;
 let _characters: CharacterCard[] | null = null;
 let _missions: MissionCard[] | null = null;
@@ -89,10 +89,7 @@ let _playableCharacters: CharacterCard[] | null = null;
 let _playableMissions: MissionCard[] | null = null;
 let _oldIdToNewId: Map<string, string> | null = null;
 
-/**
- * Returns a map from old card IDs (e.g. "001/130", "MSS 01") to new IDs (e.g. "KS-001-C").
- * Used to resolve saved decks that reference legacy IDs.
- */
+
 export function getOldIdMap(): Map<string, string> {
   if (!_oldIdToNewId) {
     _oldIdToNewId = new Map();
@@ -105,10 +102,7 @@ export function getOldIdMap(): Map<string, string> {
   return _oldIdToNewId;
 }
 
-/**
- * Resolve a card ID that may be in old or new format.
- * Returns the new-format ID, or the original if no mapping found.
- */
+
 export function resolveCardId(id: string): string {
   const oldMap = getOldIdMap();
   return oldMap.get(id) ?? id;

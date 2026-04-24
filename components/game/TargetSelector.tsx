@@ -22,7 +22,7 @@ import {
 } from './PopupPrimitives';
 import { TargetOrderPopup } from './TargetOrderPopup';
 
-// ----- Target Character Card -----
+
 
 interface TargetCharacterProps {
   character: VisibleCharacter;
@@ -73,7 +73,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
           : 'none',
       }}
     >
-      {/* Pulsing glow for valid targets */}
+      
       {isValidTarget && (
         <motion.div
           className="absolute inset-0"
@@ -147,7 +147,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         </>
       )}
 
-      {/* Power display */}
+      
       {!isHidden && (
         <div
           className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
@@ -160,7 +160,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         </div>
       )}
 
-      {/* Name overlay for valid targets */}
+      
       {isValidTarget && (
         <div
           className="absolute inset-x-0 bottom-0 text-center py-0.5 text-[7px] font-medium truncate px-0.5"
@@ -173,7 +173,7 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
         </div>
       )}
 
-      {/* Details button (visible cards only) */}
+      
       {character.card && !isHidden && (
         <button
           onClick={(e) => { e.stopPropagation(); zoomCard(character.card as CharacterCard | MissionCard); }}
@@ -191,15 +191,15 @@ function TargetCharacter({ character, isValidTarget, onSelect }: TargetCharacter
   );
 }
 
-// ----- Ordered Defeat Board Popup -----
-// Shows all missions with all characters. Valid targets glow. Player clicks targets in order (1, 2, 3...).
-// Hidden enemy cards show as card backs. Confirm button sends the ordered list.
 
-// constraintMode:
-// 'free' — click any valid target in any order (default)
-// 'one-per-mission' — Gaara 120: max 1 target per mission
-// 'all-in-mission' — Ichibi 130: clicking one selects ALL hidden in that mission, locks other missions
-// 'naruto133' — Naruto 133: 1 target P≤5 in sourceMission + 1 target P≤2 anywhere
+
+
+
+
+
+
+
+
 type ConstraintMode = 'free' | 'one-per-mission' | 'all-in-mission' | 'naruto133';
 
 function OrderedDefeatPopup({
@@ -228,7 +228,7 @@ function OrderedDefeatPopup({
   const minRequired = minSelections ?? validTargets.length;
   const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
 
-  // Build a map: instanceId -> missionIndex for constraint checking
+  
   const charMissionMap = useMemo(() => {
     const map = new Map<string, number>();
     missions.forEach((m, mIdx) => {
@@ -237,18 +237,18 @@ function OrderedDefeatPopup({
     return map;
   }, [missions]);
 
-  // Determine which targets are currently locked based on constraint mode
+  
   const lockedTargets = useMemo(() => {
     const locked = new Set<string>();
     if (mode === 'one-per-mission') {
-      // Lock other targets in missions where one is already selected
+      
       const selectedMissions = new Set(orderedIds.map(id => charMissionMap.get(id)));
       for (const t of validTargets) {
         if (orderedIds.includes(t)) continue;
         if (selectedMissions.has(charMissionMap.get(t))) locked.add(t);
       }
     } else if (mode === 'all-in-mission') {
-      // If any card selected, lock all cards NOT in the same mission
+      
       if (orderedIds.length > 0) {
         const selectedMission = charMissionMap.get(orderedIds[0]);
         for (const t of validTargets) {
@@ -256,10 +256,10 @@ function OrderedDefeatPopup({
         }
       }
     } else if (mode === 'naruto133') {
-      // group1: P≤5 in source mission (max 1), group2: P≤2 anywhere (max 1), max 2 total
-      // A card can be in BOTH groups (P≤2 in this mission). Assignment stays flexible.
+      
+      
       if (orderedIds.length >= 2) {
-        // Max 2 selected — lock everything else
+        
         for (const t of validTargets) {
           if (!orderedIds.includes(t)) locked.add(t);
         }
@@ -269,43 +269,43 @@ function OrderedDefeatPopup({
         const firstInG2 = targetGroups.group2.has(firstId);
         const firstOnlyG1 = firstInG1 && !firstInG2; // P 3-5 in this mission
         const firstOnlyG2 = firstInG2 && !firstInG1; // P≤2 in another mission
-        // firstInBoth = P≤2 in this mission → don't lock anything
+        
 
         if (firstOnlyG1) {
-          // Group1 filled → only group2 targets remain
+          
           for (const t of validTargets) {
             if (orderedIds.includes(t)) continue;
             if (!targetGroups.group2.has(t)) locked.add(t);
           }
         } else if (firstOnlyG2) {
-          // Group2 filled → only group1 targets remain
+          
           for (const t of validTargets) {
             if (orderedIds.includes(t)) continue;
             if (!targetGroups.group1.has(t)) locked.add(t);
           }
         }
-        // else: firstInBoth → nothing locked, all remaining targets valid
+        
       }
     }
     return locked;
   }, [mode, orderedIds, validTargets, charMissionMap, targetGroups]);
 
-  // For all-in-mission: which mission is locked (first click determines mission)
+  
   const lockedMission = useMemo(() => {
     if (mode !== 'all-in-mission' || orderedIds.length === 0) return undefined;
     return charMissionMap.get(orderedIds[0]);
   }, [mode, orderedIds, charMissionMap]);
 
-  // For all-in-mission: total targets in locked mission (to know when all are selected)
+  
   const missionTargetCount = useMemo(() => {
     if (lockedMission === undefined) return 0;
     return validTargets.filter(t => charMissionMap.get(t) === lockedMission).length;
   }, [lockedMission, validTargets, charMissionMap]);
 
-  // For naruto133: confirm when all fillable slots are filled
+  
   const canConfirmNaruto133 = useMemo(() => {
     if (mode !== 'naruto133' || orderedIds.length === 0) return false;
-    // Determine which slots are filled by current selections
+    
     let g1Filled = false;
     let g2Filled = false;
     for (const id of orderedIds) {
@@ -314,13 +314,13 @@ function OrderedDefeatPopup({
       if (inG1 && !g1Filled) g1Filled = true;
       else if (inG2 && !g2Filled) g2Filled = true;
     }
-    // Check if unfilled slots still have remaining valid targets
+    
     const remaining = validTargets.filter(t => !orderedIds.includes(t));
     if (!g1Filled) {
       if (remaining.some(t => targetGroups.group1.has(t))) return false;
     }
     if (!g2Filled) {
-      // Any remaining group2 target can fill g2 (even if also in group1, since g1 is already filled or has no targets)
+      
       if (remaining.some(t => targetGroups.group2.has(t))) return false;
     }
     return true;
@@ -379,7 +379,7 @@ function OrderedDefeatPopup({
                     {getCardName(mission.card, locale as 'en' | 'fr')}
                   </span>
 
-                  {/* Opponent side */}
+                  
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[9px]" style={{ color: '#555' }}>{t('game.opponent')}</span>
                     <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -398,7 +398,7 @@ function OrderedDefeatPopup({
 
                   <div className="w-full h-px" style={{ backgroundColor: hasTargets ? '#333' : '#1a1a1a' }} />
 
-                  {/* Player side */}
+                  
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[9px]" style={{ color: '#555' }}>{t('game.you')}</span>
                     <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -473,7 +473,7 @@ function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClic
         </div>
       )}
 
-      {/* Order number badge */}
+      
       {isSelected && orderNumber && (
         <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <span className="text-2xl font-black" style={{ color: '#c4a35a', textShadow: '0 0 8px rgba(196,163,90,0.8)' }}>
@@ -482,7 +482,7 @@ function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClic
         </div>
       )}
 
-      {/* Power */}
+      
       {!isHidden && topCard && (
         <div className="absolute bottom-0.5 right-0.5 px-1 text-[9px] font-bold tabular-nums"
           style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: character.powerTokens > 0 ? '#c4a35a' : '#e0e0e0' }}>
@@ -493,7 +493,7 @@ function OrderedDefeatCard({ character, isValid, isSelected, orderNumber, onClic
   );
 }
 
-// ----- Mission Lane for Target Selection -----
+
 
 interface TargetMissionLaneProps {
   mission: VisibleMission;
@@ -518,16 +518,16 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
     ...mission.player2Characters,
   ];
 
-  // Calculate total power per side
+  
   const myChars = myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
   const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
   const myPower = myChars.reduce((sum, c) => sum + (c.isHidden ? 0 : c.effectivePower), 0);
   const oppPower = oppChars.reduce((sum, c) => sum + (c.isHidden && !c.isOwn ? 0 : c.effectivePower), 0);
 
-  // Check if the valid targets are mission indices (e.g. '0', '1', '2') vs character instance IDs
+  
   const isMissionTarget = validTargets.includes(String(missionIndex));
 
-  // Check if any character in this mission is a valid target
+  
   const hasValidCharTargets = allChars.some(c => validTargets.includes(c.instanceId));
   const hasValidTargets = isMissionTarget || hasValidCharTargets;
 
@@ -551,7 +551,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         padding: '8px',
       }}
     >
-      {/* Mission rank label */}
+      
       <div
         className="px-2 py-0.5 text-[10px] font-bold text-center"
         style={{
@@ -562,7 +562,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         {t('game.board.missionRank', { rank: mission.rank })}
       </div>
 
-      {/* Mission name */}
+      
       <span
         className="text-[10px] text-center truncate"
         style={{
@@ -573,7 +573,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         {getCardName(mission.card, locale as 'en' | 'fr')}
       </span>
 
-      {/* Power comparison bar */}
+      
       <div
         className="flex items-center justify-center gap-2 w-full px-2 py-0.5"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
@@ -593,7 +593,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         </span>
       </div>
 
-      {/* Opponent characters (top) */}
+      
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.opponent')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -608,7 +608,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         </div>
       </div>
 
-      {/* Divider */}
+      
       <div
         className="w-full h-px"
         style={{
@@ -616,7 +616,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
         }}
       />
 
-      {/* Player characters (bottom) */}
+      
       <div className="flex flex-col items-center gap-1">
         <span className="text-[9px]" style={{ color: '#555555' }}>{t('game.you')}</span>
         <div className="flex flex-wrap gap-1 justify-center" style={{ minHeight: '94px' }}>
@@ -634,7 +634,7 @@ function TargetMissionLane({ mission, missionIndex, validTargets, onSelect, myPl
   );
 }
 
-// ----- Main Target Selector -----
+
 
 export function TargetSelector() {
   const t = useTranslations();
@@ -649,7 +649,7 @@ export function TargetSelector() {
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
   const restoreEffectPopup = useUIStore((s) => s.restoreEffectPopup);
 
-  // Auto-restore when pending selection changes (new effect arrives)
+  
   const prevPendingIdRef = useRef<string | null>(null);
   const currentPendingId = pendingTargetSelection?.descriptionKey ?? pendingTargetSelection?.description ?? null;
   useEffect(() => {
@@ -670,13 +670,13 @@ export function TargetSelector() {
     declineTarget();
   }, [declineTarget]);
 
-  // Multi-select state for Kiba 026 / Tayuya 065 UPGRADE CHOOSE
+  
   const [multiSelectChoices, setMultiSelectChoices] = useState<Set<string>>(new Set());
 
-  // Queued order for sequential defeat/hide (player chose full order in popup)
+  
   const queuedOrderRef = useRef<string[]>([]);
 
-  // Auto-submit queued targets when a new sequential prompt arrives
+  
   useEffect(() => {
     if (!pendingTargetSelection || queuedOrderRef.current.length === 0) return;
     const eTstQ = pendingTargetSelection.engineTargetSelectionType ?? '';
@@ -686,7 +686,7 @@ export function TargetSelector() {
       queuedOrderRef.current = [];
       return;
     }
-    // Find the next queued target that's still valid
+    
     const vt = new Set(pendingTargetSelection.validTargets);
     let nextTarget: string | null = null;
     while (queuedOrderRef.current.length > 0) {
@@ -697,20 +697,20 @@ export function TargetSelector() {
       }
     }
     if (nextTarget) {
-      // Small delay to let state propagate
+      
       const timer = setTimeout(() => selectTarget(nextTarget!), 80);
       return () => clearTimeout(timer);
     }
-    // No valid queued target found — clear queue, user will see popup
+    
     queuedOrderRef.current = [];
   }, [pendingTargetSelection, selectTarget]);
 
   if (!pendingTargetSelection || !visibleState) return null;
 
-  // Hand selection is handled by HandCardSelector
+  
   if (pendingTargetSelection.selectionType === 'CHOOSE_FROM_HAND') return null;
 
-  // Minimized floating pill — user can click to restore the popup
+  
   if (effectPopupMinimized) {
     const effectDesc = pendingTargetSelection.descriptionKey
       ? t(pendingTargetSelection.descriptionKey, pendingTargetSelection.descriptionParams as Record<string, string> | undefined)
@@ -723,14 +723,14 @@ export function TargetSelector() {
   const displayName = playerName || t('game.you');
   const isInfoReveal = pendingTargetSelection.selectionType === 'INFO_REVEAL';
 
-  // ---- Detect multi-target hide/defeat and render ORDER popup ----
+  
   const eTst = pendingTargetSelection.engineTargetSelectionType ?? '';
   const isHideOrder = eTst.includes('CHOOSE_HIDE_TARGET') || eTst === 'KYUBI134_CHOOSE_HIDE_TARGETS';
   const isDefeatOrder = eTst.includes('CHOOSE_DEFEAT_TARGET');
   const maxSel = pendingTargetSelection.maxSelections;
   const isMultiTargetEffect = maxSel === undefined || maxSel >= validTargets.length;
   if ((isHideOrder || isDefeatOrder) && validTargets.length > 1 && isMultiTargetEffect && visibleState && queuedOrderRef.current.length === 0) {
-    // Build order targets from visible state characters
+    
     const orderTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }> = [];
     for (const targetId of validTargets) {
       for (let mIdx = 0; mIdx < visibleState.activeMissions.length; mIdx++) {
@@ -763,7 +763,7 @@ export function TargetSelector() {
           descriptionKey={descriptionKey}
           descriptionParams={descriptionParams}
           onConfirm={(orderedIds) => {
-            // Store remaining targets in queue, submit the first
+            
             queuedOrderRef.current = orderedIds.slice(1);
             handleSelect(orderedIds[0]);
           }}
@@ -774,7 +774,7 @@ export function TargetSelector() {
     }
   }
 
-  // ---- ORDERED_DEFEAT popup (Gaara 120, Ichibi 130, Naruto 133) ----
+  
   if (eTst === 'ORDERED_DEFEAT' && visibleState && validTargets.length > 0) {
     let odConstraint: ConstraintMode = 'free';
     let odSourceMission: number | undefined;
@@ -807,10 +807,10 @@ export function TargetSelector() {
     );
   }
 
-  // ---- REORDER_DISCARD popup ----
+  
   const isReorderDiscard = eTst === 'REORDER_DISCARD';
   if (isReorderDiscard && validTargets.length > 1 && visibleState) {
-    // Determine whose discard pile to read from the pending effect's effectDescription
+    
     let reorderDiscardOwner: string | undefined;
     const reorderPendingEffect = visibleState.pendingEffects?.find((e: any) => e.targetSelectionType === 'REORDER_DISCARD');
     try { reorderDiscardOwner = JSON.parse(reorderPendingEffect?.effectDescription ?? '{}').discardOwner; } catch { /* ignore */ }
@@ -821,12 +821,12 @@ export function TargetSelector() {
     const count = validTargets.length;
     const lastN = targetDiscard.slice(-count);
     const discardTargets: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; isHidden?: boolean; isOwn?: boolean }> = [];
-    // Map index-based unique IDs back to original card IDs for engine submission
+    
     const discardIdMap: Record<string, string> = {};
     for (let di = 0; di < lastN.length; di++) {
       const card = lastN[di];
       const originalId = (card as any).instanceId || (card as any).id || `card-${di}`;
-      // Use index-based unique ID to distinguish duplicate cards (e.g. 2x Temari)
+      
       const uniqueId = `discard_${di}`;
       discardIdMap[uniqueId] = originalId;
       const wasHidden = !!(card as any).wasHiddenBeforeDefeat;
@@ -852,7 +852,7 @@ export function TargetSelector() {
           descriptionParams={descriptionParams}
           sourceCardName=""
           onConfirm={(orderedIds) => {
-            // Map unique popup IDs back to original card IDs for engine
+            
             const originalIds = orderedIds.map(id => discardIdMap[id] ?? id);
             handleSelect(JSON.stringify(originalIds));
           }}
@@ -861,7 +861,7 @@ export function TargetSelector() {
     }
   }
 
-  // ---- DRAW_CARD UI (Sakura 011 and future draw effects) ----
+  
   if (pendingTargetSelection.selectionType === 'DRAW_CARD') {
     const deckCount = pendingTargetSelection.deckSize ?? 0;
     return (
@@ -873,7 +873,7 @@ export function TargetSelector() {
               {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
             </PopupTitle>
 
-            {/* Deck visual */}
+            
             <motion.div
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -947,7 +947,7 @@ export function TargetSelector() {
     );
   }
 
-  // ---- CONFIRM_HIDE / CONFIRM_DEFEAT UI ----
+  
   if (pendingTargetSelection.selectionType === 'CONFIRM_HIDE' || pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT') {
     const isDefeat = pendingTargetSelection.selectionType === 'CONFIRM_DEFEAT';
     const cardData = pendingTargetSelection.confirmCardData;
@@ -964,7 +964,7 @@ export function TargetSelector() {
               {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
             </PopupTitle>
 
-            {/* Card display */}
+            
             <motion.div
               initial={{ scale: 0.7, rotateY: 15, opacity: 0 }}
               animate={{ scale: 1, rotateY: 0, opacity: 1 }}
@@ -993,7 +993,7 @@ export function TargetSelector() {
                   </span>
                 </div>
               )}
-              {/* Action badge — skewed strip */}
+              
               <div className="absolute inset-0 flex items-center justify-center">
                 <span
                   className="text-[10px] font-bold uppercase px-3 py-1"
@@ -1045,7 +1045,7 @@ export function TargetSelector() {
     );
   }
 
-  // Multi-select card choose mode (Kiba 026 / Tayuya 065 UPGRADE CHOOSE)
+  
   if (pendingTargetSelection.isMultiSelect && pendingTargetSelection.revealedCards && pendingTargetSelection.revealedCards.length > 0) {
     const cards = pendingTargetSelection.revealedCards;
     const maxSel = pendingTargetSelection.maxSelections ?? 1;
@@ -1094,7 +1094,7 @@ export function TargetSelector() {
               </PopupDescription>
             )}
 
-            {/* Cards grid */}
+            
             <div className="flex flex-wrap gap-3 mb-6 justify-center">
               {cards.map((card, idx) => {
                 const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
@@ -1135,7 +1135,7 @@ export function TargetSelector() {
                       </div>
                     )}
 
-                    {/* Selection indicator — animated border accent */}
+                    
                     {isSelected && (
                       <motion.div
                         className="absolute inset-0"
@@ -1184,7 +1184,7 @@ export function TargetSelector() {
     );
   }
 
-  // Multi-card reveal mode (Tayuya 065 UPGRADE etc.)
+  
   if (isInfoReveal && pendingTargetSelection.revealedCards && pendingTargetSelection.revealedCards.length > 0) {
     const cards = pendingTargetSelection.revealedCards;
     const resultColor = '#c4a35a';
@@ -1205,10 +1205,10 @@ export function TargetSelector() {
                 const imgPath = card.image_file ? normalizeImagePath(card.image_file) : null;
                 const isHighlight = card.isSummon || card.isMatch;
                 const borderColor = isHighlight ? '#4aff6b' : card.isDiscarded ? '#b33e3e' : '#333333';
-                // Whole-card click opens the fullscreen zoom — required so the
-                // player can read the card's effects / keywords on mobile
-                // (where hover doesn't fire) and so the info is always
-                // reachable without hunting for a tiny hover button.
+                
+                
+                
+                
                 const openZoom = () => useUIStore.getState().zoomCard(card as unknown as CharacterCard);
                 return (
                   <motion.div
@@ -1279,7 +1279,7 @@ export function TargetSelector() {
     );
   }
 
-  // Info reveal mode: show the revealed card with a confirm button
+  
   if (isInfoReveal && revealedCard) {
     const imagePath = revealedCard.image_file ? normalizeImagePath(revealedCard.image_file) : null;
     const hasCustomKeys = !!revealedCard.revealTitleKey;
@@ -1296,7 +1296,7 @@ export function TargetSelector() {
                 : t('game.effect.orochimaruReveal')}
             </PopupTitle>
 
-            {/* Card display */}
+            
             <motion.div
               initial={{ scale: 0.3, rotateY: 180, opacity: 0 }}
               animate={{ scale: 1, rotateY: 0, opacity: 1 }}
@@ -1352,10 +1352,10 @@ export function TargetSelector() {
     );
   }
 
-  // ---- EFFECT_PLAY_UPGRADE_OR_FRESH: choose between fresh play and upgrade ----
+  
   if (pendingTargetSelection.selectionType === 'EFFECT_PLAY_UPGRADE_OR_FRESH') {
     const upgradeTargets = validTargets.filter(id => id !== 'FRESH');
-    // Find the upgrade target characters from active missions
+    
     const upgradeChars: { char: VisibleCharacter; missionIdx: number }[] = [];
     for (const mission of visibleState.activeMissions) {
       const myChars = visibleState.myPlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -1376,7 +1376,7 @@ export function TargetSelector() {
             </PopupTitle>
 
             <div className="flex gap-6 items-start justify-center">
-              {/* Fresh play option — only shown when FRESH is a valid choice */}
+              
               {validTargets.includes('FRESH') && (
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
@@ -1406,7 +1406,7 @@ export function TargetSelector() {
               </motion.div>
               )}
 
-              {/* Divider — only shown when both fresh and upgrade are available */}
+              
               {validTargets.includes('FRESH') && upgradeChars.length > 0 && (
               <div className="flex flex-col items-center justify-center self-stretch">
                 <div className="w-px flex-1" style={{ backgroundColor: '#262626' }} />
@@ -1415,7 +1415,7 @@ export function TargetSelector() {
               </div>
               )}
 
-              {/* Upgrade targets */}
+              
               <motion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -1438,7 +1438,7 @@ export function TargetSelector() {
     );
   }
 
-  // ---- Defeat / Hide order choice — new ordering popup ----
+  
   if (
     (pendingTargetSelection.selectionType === 'ORDER_DEFEAT_TARGETS' ||
      pendingTargetSelection.selectionType === 'ORDER_HIDE_TARGETS') &&
@@ -1455,7 +1455,7 @@ export function TargetSelector() {
         descriptionParams={descriptionParams}
         sourceCardName={pendingTargetSelection.sourceCardName}
         onConfirm={(orderedIds) => {
-          // Submit ordered targets as comma-separated string
+          
           handleSelect(orderedIds.join(','));
         }}
         onDecline={canDecline ? handleDecline : undefined}
@@ -1464,7 +1464,7 @@ export function TargetSelector() {
     );
   }
 
-  // ---- Effect Order Choice — floating bottom bar with card thumbnails ----
+  
   if (pendingTargetSelection.selectionType === 'CHOOSE_EFFECT_ORDER' && pendingTargetSelection.effectOrderChoices) {
     const choices = pendingTargetSelection.effectOrderChoices;
     return (
@@ -1483,7 +1483,7 @@ export function TargetSelector() {
             pointerEvents: 'auto',
           }}
         >
-          {/* Title */}
+          
           <div
             className="px-4 py-1.5 text-center uppercase tracking-widest"
             style={{
@@ -1498,7 +1498,7 @@ export function TargetSelector() {
             {t('game.effect.chooseEffectOrder')}
           </div>
 
-          {/* Card choices side by side */}
+          
           <div className="flex items-stretch gap-3">
             {choices.map((choice, idx) => {
               const imgPath = choice.sourceCardImage ? normalizeImagePath(choice.sourceCardImage) : null;
@@ -1524,7 +1524,7 @@ export function TargetSelector() {
                     boxShadow: `0 0 20px ${accent}30, 0 4px 24px rgba(0,0,0,0.6)`,
                   }}
                 >
-                  {/* Pulsing border glow */}
+                  
                   <motion.div
                     className="absolute inset-0 pointer-events-none"
                     style={{ border: `2px solid ${accent}` }}
@@ -1538,7 +1538,7 @@ export function TargetSelector() {
                     transition={{ repeat: Infinity, duration: 1.5 }}
                   />
 
-                  {/* Card image */}
+                  
                   <div className="relative w-full" style={{ height: '100px' }}>
                     {imgPath ? (
                       <img
@@ -1553,12 +1553,12 @@ export function TargetSelector() {
                         <span style={{ color: '#555', fontSize: '11px' }}>?</span>
                       </div>
                     )}
-                    {/* Darkening at bottom for text readability */}
+                    
                     <div className="absolute bottom-0 left-0 right-0 h-8"
                       style={{ background: 'linear-gradient(transparent, rgba(4,4,8,0.95))' }} />
                   </div>
 
-                  {/* Effect type badge */}
+                  
                   <div
                     className="w-full px-2 py-1.5 text-center"
                     style={{ backgroundColor: `${accent}15` }}
@@ -1571,7 +1571,7 @@ export function TargetSelector() {
                     </span>
                   </div>
 
-                  {/* Card name */}
+                  
                   <div className="w-full px-2 py-2 text-center" style={{ minHeight: '36px' }}>
                     <span
                       className="font-bold leading-tight"
@@ -1589,7 +1589,7 @@ export function TargetSelector() {
     );
   }
 
-  // ---- Generic CONFIRM popup ----
+  
   if (pendingTargetSelection.selectionType === 'EFFECT_CONFIRM') {
     const confirmTarget = validTargets[0];
     let confirmImage: string | null = null;
@@ -1661,11 +1661,11 @@ export function TargetSelector() {
     );
   }
 
-  // ---- Default: Board target selection ----
-  // Detect mission-only targeting (all valid targets are mission indices like '0','1','2','3')
+  
+  
   const isMissionOnlyTargeting = validTargets.length > 0 && validTargets.every(t => /^\d+$/.test(t));
   const missionCount = visibleState.activeMissions.length;
-  // Adaptive width: fit content for mission-only, wider for character targeting
+  
   const popupMaxWidth = isMissionOnlyTargeting ? '90vw' : '85vw';
 
   return (
@@ -1695,7 +1695,7 @@ export function TargetSelector() {
             <PopupTargetCount count={validTargets.length} accentColor="#c4a35a" />
           </div>
 
-          {/* Board view with targets highlighted */}
+          
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

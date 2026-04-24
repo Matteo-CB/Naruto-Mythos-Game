@@ -44,7 +44,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
 
   const resolveAndSelect = (deckId: string | null) => {
     if (!deckId) {
-      // Random deck — ban enforcement is server-side (ranked only)
+      
       const shuffledChars = [...allCharacters].sort(() => Math.random() - 0.5);
       const shuffledMissions = [...allMissions].sort(() => Math.random() - 0.5);
       onSelect({
@@ -87,7 +87,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
         {t('playAI.selectDeck')}
       </p>
 
-      {/* Random option */}
+      
       <button
         onClick={() => {
           setSelectedDeckId(null);
@@ -103,7 +103,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions }: DeckSelec
         <span className="text-xs text-[#666] mt-0.5 font-inter-force">{t('playAI.randomDeckDesc')}</span>
       </button>
 
-      {/* Saved decks */}
+      
       {loading && (
         <p className="text-xs text-[#555] italic">{t('common.loading')}</p>
       )}

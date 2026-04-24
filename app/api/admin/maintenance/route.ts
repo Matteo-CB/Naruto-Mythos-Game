@@ -9,7 +9,7 @@ const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 export async function GET() {
   const state = getMaintenanceState();
 
-  // Admin users get full details
+  
   const session = await auth();
   if (session?.user?.name && ADMIN_USERNAMES.includes(session.user.name)) {
     return NextResponse.json({
@@ -19,7 +19,7 @@ export async function GET() {
     });
   }
 
-  // Public: only expose active status
+  
   return NextResponse.json({ active: state.active });
 }
 

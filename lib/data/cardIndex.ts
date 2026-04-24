@@ -1,7 +1,7 @@
 import type { CardData, CharacterCard, MissionCard } from '../engine/types';
 import { getAllCards, getAllCharacters, getAllMissions, getPlayableCharacters, getPlayableMissions } from './cardLoader';
 
-// Singleton index maps
+
 let _byId: Map<string, CardData> | null = null;
 let _byOldId: Map<string, CardData> | null = null;
 let _charById: Map<string, CharacterCard> | null = null;
@@ -20,8 +20,8 @@ function buildIdMap(): Map<string, CardData> {
 }
 
 function buildOldIdMap(): Map<string, CardData> {
-  // Build a mapping from old-format IDs (e.g. "001/130") to CardData
-  // Uses the number and rarity to reconstruct old IDs
+  
+  
   const map = new Map<string, CardData>();
   const rarityToOld: Record<string, string> = {
     'C': 'C', 'UC': 'UC', 'R': 'R', 'RA': 'RA',
@@ -29,7 +29,7 @@ function buildOldIdMap(): Map<string, CardData> {
   };
 
   for (const card of getAllCards()) {
-    // Standard old ID format: "NNN/130"
+    
     const numStr = String(card.number).padStart(3, '0');
 
     if (card.rarity === 'L') {
@@ -107,7 +107,7 @@ function buildRarityMap(): Map<string, CardData[]> {
 
 export function getCardById(id: string): CardData | undefined {
   if (!_byId) _byId = buildIdMap();
-  // Try new ID first, then old ID format
+  
   const result = _byId.get(id);
   if (result) return result;
   if (!_byOldId) _byOldId = buildOldIdMap();
@@ -159,10 +159,10 @@ export function getUniqueRarities(): string[] {
   return Array.from(_byRarity.keys());
 }
 
-// Check if two card IDs refer to the same "version" for deck-building purposes
-// RA variants of the same card number are NOT considered different versions
+
+
 export function isSameVersion(cardId1: string, cardId2: string): boolean {
-  // KS-108-R and KS-108-RA are the same version
+  
   const normalize = (id: string) => id.replace('-RA', '-R');
   return normalize(cardId1) === normalize(cardId2);
 }

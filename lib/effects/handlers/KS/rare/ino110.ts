@@ -3,18 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 110/130 - INO YAMANAKA (R)
- * Chakra: 5, Power: 4
- * Group: Leaf Village, Keywords: Team 10, Jutsu
- *
- * MAIN: If there are 2 or more enemy characters in this mission,
- *   move the weakest non-hidden enemy character from this mission.
- *
- * UPGRADE: MAIN effect: After moving, hide the enemy character.
- *
- * Confirmation popup before target selection. Modifier pattern for UPGRADE.
- */
+
 
 function ino110MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -25,7 +14,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
 
   const enemies = mission[enemySide];
 
-  // Pre-check: 2+ enemy characters in this mission?
+  
   if (enemies.length < 2) {
     return {
       state: {
@@ -41,7 +30,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Pre-check: at least one other mission to move to
+  
   if (state.activeMissions.length <= 1) {
     return {
       state: {
@@ -57,7 +46,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Pre-check: non-hidden enemies exist
+  
   const nonHiddenEnemies = enemies.filter((c) => !c.isHidden);
   if (nonHiddenEnemies.length === 0) {
     return {
@@ -74,7 +63,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -87,7 +76,7 @@ function ino110MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function ino110UpgradeHandler(ctx: EffectContext): EffectResult {
-  // No-op: modifier handled via CONFIRM_MAIN → CONFIRM_UPGRADE_MODIFIER in engine.
+  
   return { state: ctx.state };
 }
 

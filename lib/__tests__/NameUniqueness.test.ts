@@ -31,7 +31,7 @@ describe('Name Uniqueness', () => {
       ),
     );
 
-    // Two hidden with same name can coexist
+    
     const result = canPlayNameOnMission(state, 'player1', 'Naruto', 0);
     expect(result).toBe(true);
   });
@@ -51,7 +51,7 @@ describe('Name Uniqueness', () => {
 
   it('should allow same name on different missions', () => {
     const state = createActionPhaseState();
-    // Add second mission
+    
     state.activeMissions.push({
       card: state.activeMissions[0].card,
       rank: 'C',
@@ -62,7 +62,7 @@ describe('Name Uniqueness', () => {
       wonBy: null,
     });
 
-    // Naruto on mission 0
+    
     state.activeMissions[0].player1Characters.push(
       mockCharInPlay(
         { controlledBy: 'player1', isHidden: false },
@@ -70,7 +70,7 @@ describe('Name Uniqueness', () => {
       ),
     );
 
-    // Can play Naruto on mission 1 (different mission)
+    
     const result = canPlayNameOnMission(state, 'player1', 'Naruto', 1);
     expect(result).toBe(true);
   });
@@ -84,7 +84,7 @@ describe('Name Uniqueness', () => {
       ),
     );
 
-    // Player 2 can still play Naruto on the same mission
+    
     const result = canPlayNameOnMission(state, 'player2', 'Naruto', 0);
     expect(result).toBe(true);
   });
@@ -97,7 +97,7 @@ describe('Name Uniqueness', () => {
     );
     state.activeMissions[0].player1Characters.push(char);
 
-    // Excluding the existing character should allow the name
+    
     const result = canPlayNameOnMission(state, 'player1', 'Naruto', 0, char.instanceId);
     expect(result).toBe(true);
   });

@@ -1,7 +1,4 @@
-/**
- * Comprehensive tests for all 48 Common card effect handlers.
- * Tests each handler's MAIN, AMBUSH, UPGRADE, and SCORE effects individually.
- */
+
 import { describe, it, expect, beforeAll } from 'vitest';
 import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState } from './testHelpers';
 import { initializeRegistry } from '../effects/EffectRegistry';
@@ -14,7 +11,7 @@ beforeAll(() => {
   initializeRegistry();
 });
 
-/** Helper: create a minimal EffectContext for testing */
+
 function makeCtx(
   state: GameState,
   sourcePlayer: 'player1' | 'player2',
@@ -26,9 +23,9 @@ function makeCtx(
   return { state, sourcePlayer, sourceCard, sourceMissionIndex, triggerType, isUpgrade };
 }
 
-// ===================================================================
-// 001/130 - HIRUZEN SARUTOBI: POWERUP 2 another friendly Leaf Village character
-// ===================================================================
+
+
+
 describe('001/130 - Hiruzen Sarutobi', () => {
   it('should require target selection for a single valid Leaf Village target (optional effect)', () => {
     const hiruzen = mockCharInPlay({ instanceId: 'hiruzen-1' }, {
@@ -48,12 +45,12 @@ describe('001/130 - Hiruzen Sarutobi', () => {
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
-    // Effect is optional - confirmation popup before target selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.isOptional).toBe(true);
     expect(result.targetSelectionType).toBe('HIRUZEN001_CONFIRM_MAIN');
     expect(result.validTargets).toContain('hiruzen-1'); // self as target for confirm
-    // Token NOT applied yet (pending confirmation)
+    
     const ally = result.state.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-1');
     expect(ally?.powerTokens).toBe(0);
   });
@@ -75,7 +72,7 @@ describe('001/130 - Hiruzen Sarutobi', () => {
 
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
-    // No change
+    
     expect(result.state.activeMissions[0].player1Characters[1].powerTokens).toBe(0);
   });
 
@@ -95,16 +92,16 @@ describe('001/130 - Hiruzen Sarutobi', () => {
 
     const handler = getEffectHandler('KS-001-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', hiruzen, 0));
-    // Confirmation popup - self as target
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('HIRUZEN001_CONFIRM_MAIN');
     expect(result.validTargets).toContain('hiruzen-1');
   });
 });
 
-// ===================================================================
-// 003/130 - TSUNADE: On-defeat trigger (continuous, tested in defeatUtils)
-// ===================================================================
+
+
+
 describe('003/130 - Tsunade', () => {
   it('should have a registered MAIN handler (continuous no-op)', () => {
     const handler = getEffectHandler('KS-003-C', 'MAIN');
@@ -112,9 +109,9 @@ describe('003/130 - Tsunade', () => {
   });
 });
 
-// ===================================================================
-// 007/130 - JIRAIYA: Play a Summon paying 1 less
-// ===================================================================
+
+
+
 describe('007/130 - Jiraiya', () => {
   it('should prompt to choose a Summon from hand when affordable Summons exist', () => {
     const jiraiya = mockCharInPlay({ instanceId: 'jiraiya-1' }, {
@@ -137,7 +134,7 @@ describe('007/130 - Jiraiya', () => {
 
     const handler = getEffectHandler('KS-007-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jiraiya, 0));
-    // Confirmation popup before summon selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('JIRAIYA007_CONFIRM_MAIN');
     expect(result.validTargets).toContain('jiraiya-1'); // self as target for confirm
@@ -165,9 +162,9 @@ describe('007/130 - Jiraiya', () => {
   });
 });
 
-// ===================================================================
-// 009/130 - NARUTO UZUMAKI (C): No effects
-// ===================================================================
+
+
+
 describe('009/130 - Naruto Uzumaki (C)', () => {
   it('should be a no-op handler', () => {
     const handler = getEffectHandler('KS-009-C', 'MAIN')!;
@@ -179,9 +176,9 @@ describe('009/130 - Naruto Uzumaki (C)', () => {
   });
 });
 
-// ===================================================================
-// 011/130 - SAKURA HARUNO: Draw 1 if another Team 7 in this mission
-// ===================================================================
+
+
+
 describe('011/130 - Sakura Haruno', () => {
   it('should draw 1 card when another Team 7 character is in the same mission', () => {
     const sakura = mockCharInPlay({ instanceId: 'sakura-1' }, {
@@ -204,10 +201,10 @@ describe('011/130 - Sakura Haruno', () => {
 
     const handler = getEffectHandler('KS-011-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakura, 0));
-    // Effect is now optional - returns requiresTargetSelection so player can skip
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('SAKURA011_DRAW');
-    // State is unchanged (draw happens in EffectEngine when player confirms)
+    
     expect(result.state.player1.hand.length).toBe(0);
   });
 
@@ -255,9 +252,9 @@ describe('011/130 - Sakura Haruno', () => {
   });
 });
 
-// ===================================================================
-// 013/130 - SASUKE: Continuous -1 Power per friendly (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('013/130 - Sasuke Uchiha (C)', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-013-C', 'MAIN');
@@ -265,9 +262,9 @@ describe('013/130 - Sasuke Uchiha (C)', () => {
   });
 });
 
-// ===================================================================
-// 015/130 - KAKASHI: Continuous Team 7 +1 Power (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('015/130 - Kakashi Hatake (C)', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-015-C', 'MAIN');
@@ -275,9 +272,9 @@ describe('015/130 - Kakashi Hatake (C)', () => {
   });
 });
 
-// ===================================================================
-// 019/130 - INO YAMANAKA: POWERUP 1 if another Team 10 in this mission
-// ===================================================================
+
+
+
 describe('019/130 - Ino Yamanaka', () => {
   it('should POWERUP 1 self when another Team 10 character is present', () => {
     const ino = mockCharInPlay({ instanceId: 'ino-1', powerTokens: 0 }, {
@@ -296,7 +293,7 @@ describe('019/130 - Ino Yamanaka', () => {
 
     const handler = getEffectHandler('KS-019-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', ino, 0));
-    // Now returns a CONFIRM popup instead of applying POWERUP directly
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('INO019_CONFIRM_MAIN');
     expect(result.validTargets).toContain('ino-1');
@@ -321,9 +318,9 @@ describe('019/130 - Ino Yamanaka', () => {
   });
 });
 
-// ===================================================================
-// 021/130 - SHIKAMARU: No effects (or minimal)
-// ===================================================================
+
+
+
 describe('021/130 - Shikamaru Nara', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-021-C', 'MAIN');
@@ -331,9 +328,9 @@ describe('021/130 - Shikamaru Nara', () => {
   });
 });
 
-// ===================================================================
-// 023/130 - ASUMA SARUTOBI
-// ===================================================================
+
+
+
 describe('023/130 - Asuma Sarutobi', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-023-C', 'MAIN');
@@ -341,9 +338,9 @@ describe('023/130 - Asuma Sarutobi', () => {
   });
 });
 
-// ===================================================================
-// 025/130 - KIBA: Continuous CHAKRA+1 if Akamaru (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('025/130 - Kiba Inuzuka', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-025-C', 'MAIN');
@@ -351,9 +348,9 @@ describe('025/130 - Kiba Inuzuka', () => {
   });
 });
 
-// ===================================================================
-// 027/130 - AKAMARU: Continuous return to hand if no Kiba (tested in EndPhase)
-// ===================================================================
+
+
+
 describe('027/130 - Akamaru', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-027-C', 'MAIN');
@@ -361,9 +358,9 @@ describe('027/130 - Akamaru', () => {
   });
 });
 
-// ===================================================================
-// 034/130 - KURENAI: Continuous Team 8 cost reduction (tested in ChakraValidation)
-// ===================================================================
+
+
+
 describe('034/130 - Yuhi Kurenai', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-034-C', 'MAIN');
@@ -371,9 +368,9 @@ describe('034/130 - Yuhi Kurenai', () => {
   });
 });
 
-// ===================================================================
-// 036/130 - NEJI: Remove up to 2 Power tokens from enemy character
-// ===================================================================
+
+
+
 describe('036/130 - Neji Hyuga', () => {
   it('should return CONFIRM popup when valid enemy target with power tokens exists', () => {
     const neji = mockCharInPlay({ instanceId: 'neji-1' }, {
@@ -417,9 +414,9 @@ describe('036/130 - Neji Hyuga', () => {
   });
 });
 
-// ===================================================================
-// 040/130 - TENTEN: Play only in winning mission (tested in ActionPhase validation)
-// ===================================================================
+
+
+
 describe('040/130 - Tenten', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-040-C', 'MAIN');
@@ -427,9 +424,9 @@ describe('040/130 - Tenten', () => {
   });
 });
 
-// ===================================================================
-// 042/130 - GAI: Continuous Team Guy +1 Power (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('042/130 - Gai Maito', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-042-C', 'MAIN');
@@ -437,9 +434,9 @@ describe('042/130 - Gai Maito', () => {
   });
 });
 
-// ===================================================================
-// 044/130 - ANKO: Continuous CHAKRA+1 if Leaf ally (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('044/130 - Anko Mitarashi', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-044-C', 'MAIN');
@@ -447,9 +444,9 @@ describe('044/130 - Anko Mitarashi', () => {
   });
 });
 
-// ===================================================================
-// 046/130 - EBISU: Draw 1 if friendly has less Power in this mission
-// ===================================================================
+
+
+
 describe('046/130 - Ebisu', () => {
   it('should draw 1 card when a weaker friendly exists', () => {
     const ebisu = mockCharInPlay({ instanceId: 'ebisu-1' }, {
@@ -502,9 +499,9 @@ describe('046/130 - Ebisu', () => {
   });
 });
 
-// ===================================================================
-// 047/130 - IRUKA
-// ===================================================================
+
+
+
 describe('047/130 - Iruka', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-047-C', 'MAIN');
@@ -512,9 +509,9 @@ describe('047/130 - Iruka', () => {
   });
 });
 
-// ===================================================================
-// 048/130 - HAYATE: Continuous hide instead of defeat (tested in EffectEngine)
-// ===================================================================
+
+
+
 describe('048/130 - Hayate Gekko', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-048-C', 'MAIN');
@@ -522,9 +519,9 @@ describe('048/130 - Hayate Gekko', () => {
   });
 });
 
-// ===================================================================
-// 049/130 - GEMMA: Continuous sacrifice for Leaf ally (tested in EffectEngine)
-// ===================================================================
+
+
+
 describe('049/130 - Gemma Shiranui', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-049-C', 'MAIN');
@@ -532,9 +529,9 @@ describe('049/130 - Gemma Shiranui', () => {
   });
 });
 
-// ===================================================================
-// 050/130 - OROCHIMARU: AMBUSH - look at hidden enemy, steal if cost<=3
-// ===================================================================
+
+
+
 describe('050/130 - Orochimaru', () => {
   it('should request target selection for hidden enemy in this mission (AMBUSH)', () => {
     const orochimaru = mockCharInPlay({ instanceId: 'oro-1' }, {
@@ -579,9 +576,9 @@ describe('050/130 - Orochimaru', () => {
   });
 });
 
-// ===================================================================
-// 055/130 - KIMIMARO: AMBUSH - discard a card to hide a character cost<=3
-// ===================================================================
+
+
+
 describe('055/130 - Kimimaro', () => {
   it('should require hand selection to choose which card to discard (AMBUSH)', () => {
     const kimimaro = mockCharInPlay({ instanceId: 'kim-1' }, {
@@ -605,11 +602,11 @@ describe('055/130 - Kimimaro', () => {
     const handler = getEffectHandler('KS-055-C', 'AMBUSH')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', kimimaro, 0, 'AMBUSH'));
-    // Now returns CONFIRM popup first
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIMIMARO055_CONFIRM_AMBUSH');
     expect(result.validTargets).toEqual(['kim-1']); // sourceCard instanceId
-    // Hand unchanged until player confirms
+    
     expect(result.state.player1.hand.length).toBe(1);
   });
 
@@ -634,9 +631,9 @@ describe('055/130 - Kimimaro', () => {
   });
 });
 
-// ===================================================================
-// 057/130 - JIROBO: POWERUP X (X = missions with Sound Four)
-// ===================================================================
+
+
+
 describe('057/130 - Jirobo', () => {
   it('should POWERUP based on number of missions with Sound Four', () => {
     const jirobo = mockCharInPlay({ instanceId: 'jirobo-1', powerTokens: 0 }, {
@@ -662,7 +659,7 @@ describe('057/130 - Jirobo', () => {
 
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
-    // Now returns CONFIRM popup (no SKIP)
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('JIROBO057_CONFIRM_MAIN');
     expect(result.validTargets).toEqual(['jirobo-1']);
@@ -707,7 +704,7 @@ describe('057/130 - Jirobo', () => {
 
     const handler = getEffectHandler('KS-057-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', jirobo, 0));
-    // Now returns CONFIRM popup (no SKIP)
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('JIROBO057_CONFIRM_MAIN');
     expect(result.validTargets).toEqual(['jirobo-1']);
@@ -715,9 +712,9 @@ describe('057/130 - Jirobo', () => {
   });
 });
 
-// ===================================================================
-// 059/130 - KIDOMARU: Move X friendly characters (X = Sound Four missions)
-// ===================================================================
+
+
+
 describe('059/130 - Kidomaru', () => {
   it('should auto-move friendly characters when Sound Four missions exist', () => {
     const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
@@ -746,16 +743,16 @@ describe('059/130 - Kidomaru', () => {
 
     const handler = getEffectHandler('KS-059-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // Now returns CONFIRM popup first
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU059_CONFIRM_MAIN');
     expect(result.validTargets).toEqual(['kid-1']);
   });
 });
 
-// ===================================================================
-// 061/130 - SAKON: Draw X cards (X = Sound Four missions)
-// ===================================================================
+
+
+
 describe('061/130 - Sakon', () => {
   it('should draw cards based on Sound Four mission count', () => {
     const sakon = mockCharInPlay({ instanceId: 'sakon-1' }, {
@@ -777,7 +774,7 @@ describe('061/130 - Sakon', () => {
 
     const handler = getEffectHandler('KS-061-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', sakon, 0));
-    // Now returns CONFIRM popup instead of immediate draw
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('SAKON061_CONFIRM_MAIN');
     expect(result.validTargets).toContain('sakon-1');
@@ -785,9 +782,9 @@ describe('061/130 - Sakon', () => {
   });
 });
 
-// ===================================================================
-// 064/130 - TAYUYA: Continuous CHAKRA+X (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('064/130 - Tayuya', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-064-C', 'MAIN');
@@ -795,9 +792,9 @@ describe('064/130 - Tayuya', () => {
   });
 });
 
-// ===================================================================
-// 060/130 - KIDÔMARU UC: MAIN move character; AMBUSH defeat power ≤ 1
-// ===================================================================
+
+
+
 describe('060/130 - Kidômaru UC', () => {
   it('AMBUSH should include hidden enemies as valid targets (power 0 <= 1)', () => {
     const kidomaru = mockCharInPlay({ instanceId: 'kid-1' }, {
@@ -816,7 +813,7 @@ describe('060/130 - Kidômaru UC', () => {
 
     const handler = getEffectHandler('KS-060-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // Now returns CONFIRM popup first
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU060_CONFIRM_AMBUSH');
     expect(result.validTargets).toEqual(['kid-1']); // sourceCard instanceId
@@ -839,7 +836,7 @@ describe('060/130 - Kidômaru UC', () => {
 
     const handler = getEffectHandler('KS-060-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // power 3 > 1, no valid targets
+    
     expect(result.requiresTargetSelection).toBeFalsy();
   });
 
@@ -864,16 +861,16 @@ describe('060/130 - Kidômaru UC', () => {
 
     const handler = getEffectHandler('KS-060-UC', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kidomaru, 0));
-    // Now returns CONFIRM popup first
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIDOMARU060_CONFIRM_MAIN');
     expect(result.validTargets).toEqual(['kid-1']); // sourceCard instanceId
   });
 });
 
-// ===================================================================
-// 068/130 - DOSU KINUTA: MAIN look at hidden; AMBUSH defeat hidden
-// ===================================================================
+
+
+
 describe('068/130 - Dosu Kinuta', () => {
   it('should request target selection for MAIN (look at hidden)', () => {
     const dosu = mockCharInPlay({ instanceId: 'dosu-1' }, {
@@ -936,9 +933,9 @@ describe('068/130 - Dosu Kinuta', () => {
   });
 });
 
-// ===================================================================
-// 070/130 - ZAKU: Opponent gains 1 Chakra
-// ===================================================================
+
+
+
 describe('070/130 - Zaku Abumi', () => {
   it('should give opponent 1 chakra', () => {
     const zaku = mockCharInPlay({ instanceId: 'zaku-1' }, {
@@ -955,17 +952,17 @@ describe('070/130 - Zaku Abumi', () => {
 
     const handler = getEffectHandler('KS-070-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', zaku, 0));
-    // Handler now uses CONFIRM popup pattern — opponent must confirm before gaining chakra
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('ZAKU070_CONFIRM_MAIN');
-    // Chakra not changed yet (pending confirmation by opponent)
+    
     expect(result.state.player2.chakra).toBe(5);
   });
 });
 
-// ===================================================================
-// 072/130 - KIN TSUCHI: Opponent draws a card
-// ===================================================================
+
+
+
 describe('072/130 - Kin Tsuchi', () => {
   it('should make opponent draw 1 card', () => {
     const kin = mockCharInPlay({ instanceId: 'kin-1' }, {
@@ -985,10 +982,10 @@ describe('072/130 - Kin Tsuchi', () => {
 
     const handler = getEffectHandler('KS-072-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', kin, 0));
-    // Handler now uses CONFIRM popup pattern — opponent must confirm before drawing
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('KIN072_CONFIRM_MAIN');
-    // Hand not changed yet (pending confirmation by opponent)
+    
     expect(result.state.player2.hand.length).toBe(0);
   });
 
@@ -1013,9 +1010,9 @@ describe('072/130 - Kin Tsuchi', () => {
   });
 });
 
-// ===================================================================
-// 074/130 - GAARA (C, first version): POWERUP X (X = friendly hidden in this mission)
-// ===================================================================
+
+
+
 describe('074/130 - Gaara (C)', () => {
   it('should return CONFIRM popup when friendly hidden characters exist in this mission', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-1', powerTokens: 0 }, {
@@ -1058,9 +1055,9 @@ describe('074/130 - Gaara (C)', () => {
   });
 });
 
-// ===================================================================
-// 075/130 - GAARA (C, second version): Continuous (tested in EffectEngine + ChakraValidation)
-// ===================================================================
+
+
+
 describe('075/130 - Gaara (C alt)', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-075-C', 'MAIN');
@@ -1068,9 +1065,9 @@ describe('075/130 - Gaara (C alt)', () => {
   });
 });
 
-// ===================================================================
-// 077/130 - KANKURO: Continuous CHAKRA+1 if enemy (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('077/130 - Kankuro', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-077-C', 'MAIN');
@@ -1078,9 +1075,9 @@ describe('077/130 - Kankuro', () => {
   });
 });
 
-// ===================================================================
-// 079/130 - TEMARI: Continuous +2 Power if Edge (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('079/130 - Temari', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-079-C', 'MAIN');
@@ -1088,9 +1085,9 @@ describe('079/130 - Temari', () => {
   });
 });
 
-// ===================================================================
-// 081/130 - BAKI: SCORE draw 1 card
-// ===================================================================
+
+
+
 describe('081/130 - Baki', () => {
   it('should draw 1 card on SCORE', () => {
     const baki = mockCharInPlay({ instanceId: 'baki-1' }, {
@@ -1111,7 +1108,7 @@ describe('081/130 - Baki', () => {
     const handler = getEffectHandler('KS-081-C', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', baki, 0, 'SCORE'));
-    // Now returns CONFIRM popup instead of direct draw
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('BAKI081_CONFIRM_SCORE');
     expect(result.validTargets).toEqual(['baki-1']);
@@ -1119,9 +1116,9 @@ describe('081/130 - Baki', () => {
   });
 });
 
-// ===================================================================
-// 084/130 - YASHAMARU: Continuous +2 Power if Gaara (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('084/130 - Yashamaru', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-084-C', 'MAIN');
@@ -1129,9 +1126,9 @@ describe('084/130 - Yashamaru', () => {
   });
 });
 
-// ===================================================================
-// 086/130 - ZABUZA MOMOCHI: No effects
-// ===================================================================
+
+
+
 describe('086/130 - Zabuza Momochi', () => {
   it('should be a no-op handler', () => {
     const handler = getEffectHandler('KS-086-C', 'MAIN')!;
@@ -1143,9 +1140,9 @@ describe('086/130 - Zabuza Momochi', () => {
   });
 });
 
-// ===================================================================
-// 088/130 - HAKU: Draw 1, then put 1 card on top of deck
-// ===================================================================
+
+
+
 describe('088/130 - Haku', () => {
   it('should offer optional draw choice (not auto-draw) requiring target selection type HAKU088_CONFIRM_DRAW', () => {
     const haku = mockCharInPlay({ instanceId: 'haku-1' }, {
@@ -1165,7 +1162,7 @@ describe('088/130 - Haku', () => {
 
     const handler = getEffectHandler('KS-088-C', 'MAIN')!;
     const result = handler(makeCtx(state, 'player1', haku, 0));
-    // Draw is optional - should NOT auto-draw; instead prompt for confirmation
+    
     expect(result.state.player1.hand.length).toBe(1); // unchanged (no auto-draw)
     expect(result.state.player1.deck.length).toBe(1); // deck unchanged
     expect(result.requiresTargetSelection).toBe(true);
@@ -1196,9 +1193,9 @@ describe('088/130 - Haku', () => {
   });
 });
 
-// ===================================================================
-// 090/130 - ITACHI (C): Continuous cost reduction (tested in ChakraValidation)
-// ===================================================================
+
+
+
 describe('090/130 - Itachi Uchiha (C)', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-090-C', 'MAIN');
@@ -1206,9 +1203,9 @@ describe('090/130 - Itachi Uchiha (C)', () => {
   });
 });
 
-// ===================================================================
-// 092/130 - KISAME (C): AMBUSH steal up to 2 Power tokens from enemy
-// ===================================================================
+
+
+
 describe('092/130 - Kisame Hoshigaki (C)', () => {
   it('should require target selection for a single valid enemy with power tokens (AMBUSH)', () => {
     const kisame = mockCharInPlay({ instanceId: 'kisame-1', powerTokens: 0 }, {
@@ -1253,10 +1250,10 @@ describe('092/130 - Kisame Hoshigaki (C)', () => {
   });
 });
 
-// ===================================================================
-// 094-098 - SUMMON characters (Gama Bunta, Gamahiro, Gamakichi, Gamatatsu, Katsuyu)
-// These are continuous effects tested in EndPhase (return to hand)
-// ===================================================================
+
+
+
+
 describe('Summon characters (094-098)', () => {
   it('094/130 - Gama Bunta should have a handler', () => {
     const handler = getEffectHandler('KS-094-C', 'MAIN');
@@ -1280,9 +1277,9 @@ describe('Summon characters (094-098)', () => {
   });
 });
 
-// ===================================================================
-// 099/130 - PAKKUN: SCORE move self to another mission
-// ===================================================================
+
+
+
 describe('099/130 - Pakkun', () => {
   it('should require target selection to choose destination mission on SCORE', () => {
     const pakkun = mockCharInPlay({ instanceId: 'pakkun-1' }, {
@@ -1320,9 +1317,9 @@ describe('099/130 - Pakkun', () => {
   });
 });
 
-// ===================================================================
-// 100/130 - NINJA HOUNDS: Continuous move trigger (no-op handler)
-// ===================================================================
+
+
+
 describe('100/130 - Ninja Hounds', () => {
   it('should have a registered handler (no-op)', () => {
     const handler = getEffectHandler('KS-100-C', 'MAIN');
@@ -1330,9 +1327,9 @@ describe('100/130 - Ninja Hounds', () => {
   });
 });
 
-// ===================================================================
-// 101/130 - TON TON: Continuous +1 Power if Tsunade/Shizune (tested in ContinuousEffects)
-// ===================================================================
+
+
+
 describe('101/130 - Ton Ton', () => {
   it('should have a registered handler', () => {
     const handler = getEffectHandler('KS-101-C', 'MAIN');
@@ -1340,9 +1337,9 @@ describe('101/130 - Ton Ton', () => {
   });
 });
 
-// ===================================================================
-// 062/130 - SAKON UC: AMBUSH copy instant effect from Sound Four
-// ===================================================================
+
+
+
 describe('062/130 - Sakon UC (copy effect)', () => {
   it('AMBUSH should return target selection with friendly Sound Four characters', () => {
     const sakon062 = mockCharInPlay({ instanceId: 'sakon062-1', missionIndex: 0 }, {
@@ -1387,7 +1384,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
 
     const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
-    // Hidden Sound Four chars are excluded - no valid targets
+    
     expect(result.requiresTargetSelection).toBeFalsy();
   });
 
@@ -1396,7 +1393,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
       id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
       effects: [{ type: 'AMBUSH', description: 'Copy effect' }],
     });
-    // Tayuya 064: only continuous MAIN effect
+    
     const tayuya064 = mockCharInPlay({ instanceId: 'tayuya-1', missionIndex: 1 }, {
       id: 'KS-064-C', number: 64, name_fr: 'TAYUYA', keywords: ['Sound Four'], group: 'Sound Village',
       effects: [{ type: 'MAIN', description: '[⧗] CHAKRA +X X is the number of missions...' }],
@@ -1410,7 +1407,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
 
     const handler = getEffectHandler('KS-062-UC', 'AMBUSH')!;
     const result = handler(makeCtx(state, 'player1', sakon062, 0, 'AMBUSH'));
-    // Tayuya 064 only has [⧗] continuous - no copyable instant effects
+    
     expect(result.requiresTargetSelection).toBeFalsy();
   });
 
@@ -1419,7 +1416,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
       id: 'KS-062-UC', number: 62, name_fr: 'SAKON', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
       effects: [{ type: 'AMBUSH', description: 'Copy effect' }],
     });
-    // Kidomaru 060: has both MAIN and AMBUSH instant effects
+    
     const kidomaru060 = mockCharInPlay({ instanceId: 'kid060-1', missionIndex: 1 }, {
       id: 'KS-060-UC', number: 60, name_fr: 'KIDÔMARU', keywords: ['Sound Four', 'Jutsu'], group: 'Sound Village',
       effects: [
@@ -1475,11 +1472,11 @@ describe('062/130 - Sakon UC (copy effect)', () => {
       isUpgrade: false,
     };
 
-    // Get the Jirobo 057 card data (the top card)
+    
     const jiroboTopCard = jirobo057.stack.length > 0 ? jirobo057.stack[jirobo057.stack.length - 1] : jirobo057.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jiroboTopCard, 'MAIN');
-    // Jirobo 057 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    
     const confirmPending = resultState.pendingEffects.find(
       (pe: any) => pe.targetSelectionType === 'JIROBO057_CONFIRM_MAIN',
     );
@@ -1529,7 +1526,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const sakon061TopCard = sakon061.stack.length > 0 ? sakon061.stack[sakon061.stack.length - 1] : sakon061.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, sakon061TopCard, 'MAIN');
-    // Sakon 061 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    
     const confirmPending = resultState.pendingEffects.find(
       (pe: any) => pe.targetSelectionType === 'SAKON061_CONFIRM_MAIN',
     );
@@ -1580,7 +1577,7 @@ describe('062/130 - Sakon UC (copy effect)', () => {
     const jirobo058TopCard = jirobo058.stack.length > 0 ? jirobo058.stack[jirobo058.stack.length - 1] : jirobo058.card;
 
     const resultState = EffectEngine.executeCopiedEffect(state, mockPending, jirobo058TopCard, 'MAIN');
-    // Jirobo 058 MAIN now returns CONFIRM popup → executeCopiedEffect creates pending
+    
     const confirmPending = resultState.pendingEffects.find(
       (pe: any) => pe.targetSelectionType === 'JIROBO058_CONFIRM_MAIN',
     );
@@ -1589,9 +1586,9 @@ describe('062/130 - Sakon UC (copy effect)', () => {
   });
 });
 
-// ===================================================================
-// Registry completeness check
-// ===================================================================
+
+
+
 describe('Registry completeness', () => {
   const commonCardIds = [
     'KS-001-C', 'KS-003-C', 'KS-007-C', 'KS-009-C', 'KS-011-C', 'KS-013-C', 'KS-015-C',

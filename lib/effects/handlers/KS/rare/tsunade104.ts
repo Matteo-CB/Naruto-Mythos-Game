@@ -2,17 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 104/130 - TSUNADE (R)
- * Chakra: 5, Power: 6
- * Group: Leaf Village, Keywords: Sannin
- *
- * MAIN: Spend any amount of additional Chakra. POWERUP X, where X is the
- *   amount of additional Chakra spent. Player chooses from 0..N.
- *
- * UPGRADE: POWERUP X (same X as MAIN — free, no additional chakra cost).
- *   The UPGRADE just doubles the MAIN bonus. If 0 was spent on MAIN, UPGRADE gives 0.
- */
+
 
 function tsunade104MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
@@ -20,7 +10,7 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
   const maxChakra = playerState.chakra;
 
   if (maxChakra <= 0) {
-    // No chakra to spend — MAIN gives 0 POWERUP, store 0 for UPGRADE
+    
     const newState = { ...state };
     (newState as any)._tsunade104ChakraSpent = 0;
     return {
@@ -37,7 +27,7 @@ function tsunade104MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -54,7 +44,7 @@ function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
   const mainSpent = (state as any)._tsunade104ChakraSpent ?? 0;
 
   if (mainSpent <= 0) {
-    // MAIN spent 0 → UPGRADE gives 0
+    
     return {
       state: {
         ...state,
@@ -69,7 +59,7 @@ function tsunade104UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // UPGRADE gives free POWERUP X (same X as MAIN) — no confirmation needed
+  
   return {
     state,
     requiresTargetSelection: true,

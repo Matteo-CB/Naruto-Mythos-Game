@@ -1,7 +1,4 @@
-/**
- * Comprehensive tests for all 9 Mission SCORE effect handlers.
- * MSS 01-08, MSS 10.
- */
+
 import { describe, it, expect, beforeAll } from 'vitest';
 import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState } from './testHelpers';
 import { initializeRegistry, getEffectHandler } from '../effects/EffectRegistry';
@@ -32,9 +29,9 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
   return { card: mockMission(), rank, basePoints: 3, rankBonus, wonBy: null, player1Characters: p1, player2Characters: p2 };
 }
 
-// ===================================================================
-// MSS 01 - Call for Support: POWERUP 2 a character in play
-// ===================================================================
+
+
+
 describe('MSS 01 - Call for Support', () => {
   it('should require target selection for POWERUP 2 when a friendly character exists', () => {
     const ally = mockCharInPlay({ instanceId: 'ally-1', powerTokens: 0 }, { name_fr: 'Ally' });
@@ -45,7 +42,7 @@ describe('MSS 01 - Call for Support', () => {
     const handler = getEffectHandler('KS-001-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern before actual target selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS01_CONFIRM_SCORE');
     expect(result.validTargets).toContain('KS-001-MMS');
@@ -62,13 +59,13 @@ describe('MSS 01 - Call for Support', () => {
   });
 });
 
-// ===================================================================
-// MSS 02 - Chunin Exam: No SCORE effect (no-op)
-// ===================================================================
+
+
+
 describe('MSS 02 - Chunin Exam', () => {
   it('should have a handler registered (no-op or none)', () => {
     const handler = getEffectHandler('KS-002-MMS', 'SCORE');
-    // MSS 02 may or may not have a handler. If it does, it should be a no-op.
+    
     if (handler) {
       const state = createActionPhaseState();
       const result = handler(makeCtx(state, 'player1', 0));
@@ -77,9 +74,9 @@ describe('MSS 02 - Chunin Exam', () => {
   });
 });
 
-// ===================================================================
-// MSS 03 - Find the Traitor: Opponent discards a card from hand
-// ===================================================================
+
+
+
 describe('MSS 03 - Find the Traitor', () => {
   it('should auto-discard when opponent has exactly 1 card', () => {
     const baseState = createActionPhaseState();
@@ -93,10 +90,10 @@ describe('MSS 03 - Find the Traitor', () => {
     const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern — shows MSS03_CONFIRM_SCORE regardless of hand size
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS03_CONFIRM_SCORE');
-    // State is unchanged at this step (awaiting confirm)
+    
     expect(result.state.player2.hand.length).toBe(1);
     expect(result.state.player2.discardPile.length).toBe(0);
   });
@@ -114,11 +111,11 @@ describe('MSS 03 - Find the Traitor', () => {
     const handler = getEffectHandler('KS-003-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern before actual discard selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS03_CONFIRM_SCORE');
     expect(result.validTargets).toContain('KS-003-MMS');
-    // State should be unchanged (no discard yet)
+    
     expect(result.state.player2.hand.length).toBe(2);
     expect(result.state.player2.discardPile.length).toBe(0);
   });
@@ -138,9 +135,9 @@ describe('MSS 03 - Find the Traitor', () => {
   });
 });
 
-// ===================================================================
-// MSS 04 - Assassination: Defeat an enemy hidden character
-// ===================================================================
+
+
+
 describe('MSS 04 - Assassination', () => {
   it('should defeat an enemy hidden character', () => {
     const hiddenEnemy = mockCharInPlay({ instanceId: 'he-1', isHidden: true, controlledBy: 'player2', originalOwner: 'player2' }, {
@@ -156,10 +153,10 @@ describe('MSS 04 - Assassination', () => {
     const handler = getEffectHandler('KS-004-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern before actual defeat
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS04_CONFIRM_SCORE');
-    // Hidden enemy NOT yet defeated (awaiting confirm)
+    
     expect(result.state.activeMissions[0].player2Characters.length).toBe(1);
   });
 
@@ -177,9 +174,9 @@ describe('MSS 04 - Assassination', () => {
   });
 });
 
-// ===================================================================
-// MSS 05 - Bring it Back: Return a friendly non-hidden character to hand (mandatory)
-// ===================================================================
+
+
+
 describe('MSS 05 - Bring it Back', () => {
   it('should return a friendly non-hidden character to hand', () => {
     const ally = mockCharInPlay({ instanceId: 'ally-1', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -212,9 +209,9 @@ describe('MSS 05 - Bring it Back', () => {
   });
 });
 
-// ===================================================================
-// MSS 06 - Rescue a Friend: Draw 1 card
-// ===================================================================
+
+
+
 describe('MSS 06 - Rescue a Friend', () => {
   it('should draw 1 card', () => {
     const deckCard = mockCharacter({ name_fr: 'DrawnCard' });
@@ -228,10 +225,10 @@ describe('MSS 06 - Rescue a Friend', () => {
     const handler = getEffectHandler('KS-006-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern before drawing
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS06_CONFIRM_SCORE');
-    // Hand not changed yet (awaiting confirm)
+    
     expect(result.state.player1.hand.length).toBe(0);
   });
 
@@ -249,9 +246,9 @@ describe('MSS 06 - Rescue a Friend', () => {
   });
 });
 
-// ===================================================================
-// MSS 07 - I Have to Go: Move a friendly hidden character
-// ===================================================================
+
+
+
 describe('MSS 07 - I Have to Go', () => {
   it('should offer optional target selection to move a hidden friendly character', () => {
     const hidden = mockCharInPlay({ instanceId: 'h-1', isHidden: true }, { name_fr: 'HiddenToMove' });
@@ -265,7 +262,7 @@ describe('MSS 07 - I Have to Go', () => {
     const handler = getEffectHandler('KS-007-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern — MSS07_CONFIRM_SCORE before actual move selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS07_CONFIRM_SCORE');
     expect(result.validTargets).toBeDefined();
@@ -287,9 +284,9 @@ describe('MSS 07 - I Have to Go', () => {
   });
 });
 
-// ===================================================================
-// MSS 08 - Set a Trap: Put a card from hand as hidden character
-// ===================================================================
+
+
+
 describe('MSS 08 - Set a Trap', () => {
   it('should prompt to choose a card from hand to place as hidden character', () => {
     const handCard = mockCharacter({ name_fr: 'TrapCard' });
@@ -303,7 +300,7 @@ describe('MSS 08 - Set a Trap', () => {
     const handler = getEffectHandler('KS-008-MMS', 'SCORE')!;
     expect(handler).toBeDefined();
     const result = handler(makeCtx(state, 'player1', 0));
-    // Handler uses CONFIRM popup pattern before card selection
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('MSS08_CONFIRM_SCORE');
     expect(result.validTargets).toContain('KS-008-MMS');
@@ -323,9 +320,9 @@ describe('MSS 08 - Set a Trap', () => {
   });
 });
 
-// ===================================================================
-// MSS 10 - Chakra Training: No SCORE effect (or no-op)
-// ===================================================================
+
+
+
 describe('MSS 10 - Chakra Training', () => {
   it('should have a handler registered (no-op or none)', () => {
     const handler = getEffectHandler('KS-010-MMS', 'SCORE');
@@ -337,9 +334,9 @@ describe('MSS 10 - Chakra Training', () => {
   });
 });
 
-// ===================================================================
-// Registry completeness check
-// ===================================================================
+
+
+
 describe('Mission handler registry', () => {
   const missionIds = ['KS-001-MMS', 'KS-003-MMS', 'KS-004-MMS', 'KS-005-MMS', 'KS-006-MMS', 'KS-007-MMS', 'KS-008-MMS'];
 

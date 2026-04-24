@@ -7,7 +7,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const costReduction = 2;
 
-  // Pre-check: any affordable summons?
+  
   const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
   const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
 
@@ -17,7 +17,7 @@ function handleJiraiya008Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-008-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -37,7 +37,7 @@ function handleJiraiya008Upgrade(ctx: EffectContext): EffectResult {
   const upgradeMission = state.activeMissions[sourceMissionIndex];
   if (!upgradeMission) return { state };
 
-  // Pre-check: any enemy with cost 3 or less?
+  
   let hasTarget = false;
   for (const char of upgradeMission[enemySide]) {
     if (char.isHidden) continue;
@@ -54,7 +54,7 @@ function handleJiraiya008Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIRAYA', id: 'KS-008-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

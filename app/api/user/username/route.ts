@@ -20,7 +20,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Username can only contain letters, numbers, hyphens and underscores', errorKey: 'settings.usernameInvalid' }, { status: 400 });
     }
 
-    // Check uniqueness (case-insensitive)
+    
     const existing = await prisma.user.findFirst({
       where: {
         username: { equals: newUsername, mode: 'insensitive' },

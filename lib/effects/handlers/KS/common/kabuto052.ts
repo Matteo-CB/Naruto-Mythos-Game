@@ -4,25 +4,12 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 052/130 - KABUTO YAKUSHI "La taupe" (Common)
- * Chakra: 3 | Power: 3
- * Group: Sound Village
- * AMBUSH: Draw the top card of the opponent's deck and put it hidden in any
- * mission under your control.
- *
- * When revealed from hidden:
- * 1. Draw the top card of the opponent's deck.
- * 2. Place it as a hidden character on any mission (face-down, under source player's control).
- * 3. The card's original owner remains the opponent (if it leaves play, it goes to opponent's discard).
- * 4. If the opponent's deck is empty, effect fizzles.
- * 5. If no valid mission exists (same-name conflict on all missions), effect fizzles.
- */
+
 function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Check if opponent's deck is empty
+  
   const opponentState = state[opponentPlayer];
   if (opponentState.deck.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
@@ -30,7 +17,7 @@ function handleKabuto052Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-052-C' }) } };
   }
 
-  // Confirmation popup (optional — player can skip)
+  
   return {
     state,
     requiresTargetSelection: true,

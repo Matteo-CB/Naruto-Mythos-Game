@@ -15,7 +15,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST - start the tournament (generate bracket)
+
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -45,7 +45,7 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament already started or completed' }, { status: 400 });
     }
 
-    // Disqualify players without valid decks (non-sealed tournaments)
+    
     if (tournament.gameMode !== 'sealed') {
       const invalidPlayers = tournament.participants.filter(p => !p.deckValid || !p.deckId);
       for (const p of invalidPlayers) {
@@ -54,7 +54,7 @@ export async function POST(
           data: { eliminated: true, eliminatedRound: 0 },
         });
       }
-      // Re-fetch participants after disqualification
+      
       const validParticipants = tournament.participants.filter(p => p.deckValid && p.deckId);
       tournament.participants = validParticipants;
     }
@@ -63,18 +63,18 @@ export async function POST(
       return NextResponse.json({ error: 'Need at least 2 players with valid decks' }, { status: 400 });
     }
 
-    // Check if manual seeds were assigned (via the pairings API)
+    
     const hasManualSeeds = tournament.participants.some(p => p.seed !== null && p.seed !== undefined);
 
     let orderedParticipants;
     if (hasManualSeeds) {
-      // Respect manual pairings - sort by seed (unset seeds go last, randomized)
+      
       const seeded = tournament.participants.filter(p => p.seed !== null && p.seed !== undefined);
       const unseeded = [...tournament.participants.filter(p => p.seed === null || p.seed === undefined)]
         .sort(() => Math.random() - 0.5);
       seeded.sort((a, b) => (a.seed ?? 0) - (b.seed ?? 0));
       orderedParticipants = [...seeded, ...unseeded];
-      // Assign seeds to any unseeded participants
+      
       for (let i = 0; i < orderedParticipants.length; i++) {
         if (orderedParticipants[i].seed === null || orderedParticipants[i].seed === undefined) {
           await prisma.tournamentParticipant.update({
@@ -84,7 +84,7 @@ export async function POST(
         }
       }
     } else {
-      // No manual seeds - shuffle randomly
+      
       orderedParticipants = [...tournament.participants].sort(() => Math.random() - 0.5);
       for (let i = 0; i < orderedParticipants.length; i++) {
         await prisma.tournamentParticipant.update({
@@ -97,7 +97,7 @@ export async function POST(
     const isSwiss = tournament.format === 'swiss';
 
     if (isSwiss) {
-      // --- Swiss format: generate round 1 only ---
+      
       const swissPlayers: SwissPlayer[] = orderedParticipants.map((p, i) => ({
         userId: p.userId,
         username: p.username,
@@ -141,7 +141,7 @@ export async function POST(
         },
       });
     } else {
-      // --- Elimination format: generate full bracket ---
+      
       const participants = orderedParticipants.map(p => ({
         userId: p.userId,
         username: p.username,
@@ -183,7 +183,7 @@ export async function POST(
       });
     }
 
-    // Return full tournament
+    
     const updated = await prisma.tournament.findUnique({
       where: { id },
       include: {

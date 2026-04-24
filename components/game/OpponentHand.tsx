@@ -11,7 +11,7 @@ interface OpponentHandProps {
 function CardBack({ index, total }: { index: number; total: number }) {
   const t = useTranslations();
   const dims = useGameScale();
-  // Fan effect: spread cards with rotation around a central arc
+  
   const midpoint = (total - 1) / 2;
   const offset = index - midpoint;
   const rotation = offset * 2; // degrees per card from center
@@ -59,7 +59,7 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
   const dims = useGameScale();
   return (
     <div className="flex flex-col items-center gap-1.5">
-      {/* Hand size label */}
+      
       <span
         className="text-[11px] tabular-nums"
         style={{ color: '#888888' }}
@@ -67,7 +67,7 @@ export function OpponentHand({ handSize }: OpponentHandProps) {
         {t('game.board.opponentHandCount', { count: handSize })}
       </span>
 
-      {/* Fanned card backs */}
+      
       <div
         className="relative flex items-center justify-center"
         style={{ height: dims.opponentContainerH + 'px', minWidth: dims.opponentMinW + 'px' }}

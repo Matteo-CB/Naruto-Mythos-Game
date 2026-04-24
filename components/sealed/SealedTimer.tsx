@@ -10,7 +10,7 @@ interface SealedTimerProps {
   paused?: boolean;
 }
 
-// Web Audio API beep generator
+
 function playBeep(frequency: number, duration: number, volume: number) {
   try {
     const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
@@ -24,7 +24,7 @@ function playBeep(frequency: number, duration: number, volume: number) {
     oscillator.type = 'sine';
     gainNode.gain.value = volume;
 
-    // Fade out
+    
     gainNode.gain.setValueAtTime(volume, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
@@ -33,7 +33,7 @@ function playBeep(frequency: number, duration: number, volume: number) {
 
     setTimeout(() => ctx.close(), (duration + 0.1) * 1000);
   } catch {
-    // Audio not available
+    
   }
 }
 
@@ -79,7 +79,7 @@ export function SealedTimer({ totalSeconds, onTimeUp, paused = false }: SealedTi
     return () => clearInterval(interval);
   }, [paused, remaining]);
 
-  // Sound alerts at specific times
+  
   const checkAlerts = useCallback(() => {
     const alerts: Array<{ time: number; level: 'info' | 'warning' | 'critical' }> = [
       { time: 600, level: 'info' },     // 10:00

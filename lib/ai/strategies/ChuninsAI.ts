@@ -1,12 +1,4 @@
-/**
- * Chunin AI - Niveau 1 sur 3
- *
- * ISMCTS avec 200 simulations, sans réseau de neurones.
- * Utilise l'évaluateur heuristique (BoardEvaluator) aux feuilles.
- * Environ 5-8x plus fort que l'Expert actuel.
- *
- * Temps de réponse estimé: 50-150ms par action.
- */
+
 
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy } from '../AIPlayer';
@@ -43,7 +35,7 @@ export class ChuninsAI implements AIStrategy {
     const avgCost = hand.reduce((s, c) => s + (c.chakra ?? 0), 0) / hand.length;
     const hasEffects = hand.some(c => c.effects && c.effects.length > 0);
 
-    // Keep if: decent average power or good effects and reasonable cost
+    
     const keepHand = totalPower >= 8 || (hasEffects && avgCost <= 5);
 
     const keep = validActions.find(a => a.type === 'MULLIGAN' && !a.doMulligan);

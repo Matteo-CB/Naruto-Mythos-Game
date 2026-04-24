@@ -79,7 +79,7 @@ function MulliganCard({
           : '0 4px 16px rgba(0, 0, 0, 0.5)',
       }}
     >
-      {/* Card image */}
+      
       {imagePath ? (
         <div
           className="w-full h-full bg-cover bg-center"
@@ -99,7 +99,7 @@ function MulliganCard({
         </div>
       )}
 
-      {/* Card info overlay */}
+      
       <div
         className="absolute inset-x-0 bottom-0 px-1.5 py-1.5 flex items-end justify-between"
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
@@ -118,7 +118,7 @@ function MulliganCard({
         </span>
       </div>
 
-      {/* Chakra badge — square */}
+      
       <div
         className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
         style={{
@@ -130,7 +130,7 @@ function MulliganCard({
         {card.chakra}
       </div>
 
-      {/* Rarity indicator */}
+      
       <div
         className="absolute top-1 right-1 px-1 text-[8px] font-medium"
         style={{
@@ -162,7 +162,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
           className="overflow-y-auto flex flex-col gap-2"
           style={{ maxHeight: 'min(280px, 40vh)' }}
         >
-          {/* Header: Name + Rarity */}
+          
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold leading-tight" style={{ color: '#e0e0e0' }}>
               {getCardName(card, locale)}
@@ -179,14 +179,14 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </span>
           </div>
 
-          {/* Title */}
+          
           {title && (
             <span className="font-body text-xs -mt-1" style={{ color: '#999999' }}>
               {title}
             </span>
           )}
 
-          {/* Stats row */}
+          
           <div
             className="flex items-center gap-4 p-2"
             style={{
@@ -213,7 +213,7 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </div>
           </div>
 
-          {/* Keywords */}
+          
           {card.keywords && card.keywords.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {card.keywords.map((kw) => (
@@ -232,14 +232,14 @@ function MulliganCardDetail({ card }: { card: CharacterCard }) {
             </div>
           )}
 
-          {/* Group */}
+          
           {card.group && (
             <span className="font-body text-[10px]" style={{ color: '#777777' }}>
               {t('collection.details.group')}: {getCardGroup(card.group, locale)}
             </span>
           )}
 
-          {/* Effects */}
+          
           {card.effects && card.effects.length > 0 && (
             <div
               className="flex flex-col gap-2 pt-2 mt-0.5"
@@ -299,13 +299,13 @@ export function MulliganDialog() {
   const coinFlipComplete = useUIStore((s) => s.coinFlipComplete);
   const [selectedCard, setSelectedCard] = useState<CharacterCard | null>(null);
 
-  // Wait for coin flip animation to finish before showing mulligan
+  
   if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete) return null;
 
   const hand = visibleState.myState.hand;
   const hasMulliganed = visibleState.myState.hasMulliganed;
 
-  // If already mulliganed, show waiting message
+  
   if (hasMulliganed) {
     return (
       <PopupOverlay>
@@ -348,9 +348,9 @@ export function MulliganDialog() {
           style={{ maxHeight: '85vh' }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Scrollable content */}
+          
           <div className="flex flex-col items-center gap-5 overflow-y-auto w-full shrink min-h-0">
-            {/* Title */}
+            
             <PopupTitle accentColor="#c4a35a" size="lg">
               {t('game.mulligan.title')}
             </PopupTitle>
@@ -359,7 +359,7 @@ export function MulliganDialog() {
               {t('game.mulligan.description')}
             </span>
 
-            {/* Edge badge */}
+            
             <span
               className="font-body text-xs text-center px-3 py-1.5"
               style={{
@@ -377,7 +377,7 @@ export function MulliganDialog() {
                 : t('game.mulligan.opponentHasEdge')}
             </span>
 
-            {/* Cards */}
+            
             <div className="flex gap-3 justify-center flex-wrap">
               {hand.map((card, i) => (
                 <MulliganCard
@@ -390,14 +390,14 @@ export function MulliganDialog() {
               ))}
             </div>
 
-            {/* Click hint */}
+            
             {!selectedCard && (
               <span className="font-body text-[11px]" style={{ color: '#555555' }}>
                 {t('game.mulligan.clickHint')}
               </span>
             )}
 
-            {/* Inline card detail */}
+            
             <AnimatePresence mode="wait">
               {selectedCard && (
                 <MulliganCardDetail key={selectedCard.id} card={selectedCard} />
@@ -405,7 +405,7 @@ export function MulliganDialog() {
             </AnimatePresence>
           </div>
 
-          {/* Buttons — pinned outside scroll area */}
+          
           <div className="flex gap-4 items-center shrink-0">
             <PopupActionButton onClick={handleKeep} disabled={isProcessing} accentColor="#c4a35a">
               {t('game.mulligan.keep')}

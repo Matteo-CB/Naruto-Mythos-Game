@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
-    // Apply action
+    
     const now = new Date();
     let expiresAt: Date | null = null;
     if (duration) {
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
 
-    // Reward reporter with ELO if specified
+    
     const rewardAmount = reporterReward ? parseInt(reporterReward, 10) : 0;
     if (rewardAmount > 0 && action !== 'dismiss') {
       const reporter = await prisma.user.findUnique({ where: { id: report.reporterId }, select: { elo: true } });
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Mark report as resolved
+    
     await prisma.chatReport.update({
       where: { id: reportId },
       data: {

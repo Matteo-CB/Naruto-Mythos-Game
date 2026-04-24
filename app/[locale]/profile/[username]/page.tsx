@@ -149,7 +149,7 @@ export default function ProfilePage({
 
       <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-6 py-6 sm:py-10">
 
-        {/* ──── Nav bar ──── */}
+        
         <div className="flex items-center justify-end gap-3 mb-6">
           {session?.user?.id && profile.id !== session.user.id && (
             <FriendshipButton userId={profile.id} username={profile.username} />
@@ -164,12 +164,12 @@ export default function ProfilePage({
           </Link>
         </div>
 
-        {/* ──── Hero section: Avatar area + name + league ──── */}
+        
         <div
           className="relative rounded-lg overflow-hidden mb-6"
           style={{ backgroundColor: '#111111', border: '1px solid #1e1e1e' }}
         >
-          {/* Subtle top accent */}
+          
           <div
             className="absolute top-0 left-0 right-0 h-px"
             style={{ background: 'linear-gradient(90deg, transparent 10%, #c4a35a33, transparent 90%)' }}
@@ -177,7 +177,7 @@ export default function ProfilePage({
 
           <div className="flex flex-col sm:flex-row items-center gap-5 p-5 sm:p-7">
 
-            {/* League badge — large on the left */}
+            
             {leaguesEnabled ? (
               <div className="shrink-0">
                 <EloBadgeLarge elo={profile.elo} totalGames={total} />
@@ -197,7 +197,7 @@ export default function ProfilePage({
               </div>
             )}
 
-            {/* Name + meta */}
+            
             <div className="flex-1 min-w-0 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold truncate" style={{ color: '#e0e0e0' }}>
@@ -217,7 +217,7 @@ export default function ProfilePage({
                 {t('memberSince', { date: new Date(profile.createdAt).toLocaleDateString() })}
               </p>
 
-              {/* Discord badge */}
+              
               {profile.discordUsername && (
                 <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
                   <svg width="14" height="11" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -247,7 +247,7 @@ export default function ProfilePage({
                 </div>
               )}
 
-              {/* Discord link button (own profile, not linked) */}
+              
               {!profile.discordUsername && isOwner && (
                 <a
                   href="/api/user/link-discord"
@@ -264,7 +264,7 @@ export default function ProfilePage({
           </div>
         </div>
 
-        {/* ──── Stats row ──── */}
+        
         <div
           className="grid grid-cols-4 gap-px rounded-lg overflow-hidden mb-6"
           style={{ backgroundColor: '#1e1e1e' }}
@@ -290,7 +290,7 @@ export default function ProfilePage({
           ))}
         </div>
 
-        {/* ──── Badge Preferences (own profile only) ──── */}
+        
         {isOwner && (profile.role === 'admin' || leaguesEnabled) && (
           <div
             className="rounded-lg p-4 mb-6"
@@ -351,7 +351,7 @@ export default function ProfilePage({
           </div>
         )}
 
-        {/* ──── Decks section ──── */}
+        
         {profile.decks.length > 0 && (
           <section className="mb-6">
             <div className="flex items-center gap-3 mb-3">
@@ -382,12 +382,12 @@ export default function ProfilePage({
           </section>
         )}
 
-        {/* ──── ELO History (last 14 days) ──── */}
+        
         <section className="mb-6">
           <EloHistoryChart username={profile.username} />
         </section>
 
-        {/* ──── Recent Games ──── */}
+        
         <section>
           <div className="flex items-center gap-3 mb-3">
             <h2 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#555' }}>
@@ -432,7 +432,7 @@ export default function ProfilePage({
                       borderLeft: `2px solid ${resultColor}`,
                     }}
                   >
-                    {/* Result tag */}
+                    
                     <span
                       className="text-[10px] font-bold uppercase w-5 text-center shrink-0"
                       style={{ color: resultColor }}
@@ -440,17 +440,17 @@ export default function ProfilePage({
                       {resultLabel}
                     </span>
 
-                    {/* Opponent */}
+                    
                     <span className="text-sm truncate flex-1 min-w-0" style={{ color: '#ccc' }}>
                       {opponent}
                     </span>
 
-                    {/* Score */}
+                    
                     <span className="text-xs tabular-nums shrink-0" style={{ color: '#888' }}>
                       {myScore}-{oppScore}
                     </span>
 
-                    {/* ELO change */}
+                    
                     {eloVal !== null && eloVal !== 0 && (
                       <span
                         className="text-[10px] tabular-nums shrink-0 w-8 text-right"
@@ -460,7 +460,7 @@ export default function ProfilePage({
                       </span>
                     )}
 
-                    {/* Replay */}
+                    
                     {game.hasReplay && (
                       <Link
                         href={`/replay/${game.id}`}
@@ -471,7 +471,7 @@ export default function ProfilePage({
                       </Link>
                     )}
 
-                    {/* Date — hidden on very small screens */}
+                    
                     {game.completedAt && (
                       <span className="text-[10px] shrink-0 hidden sm:block" style={{ color: '#444' }}>
                         {new Date(game.completedAt).toLocaleDateString()}
@@ -483,7 +483,7 @@ export default function ProfilePage({
             </div>
           )}
 
-          {/* Load More */}
+          
           {hasMore && (
             <div className="flex justify-center mt-4">
               <button

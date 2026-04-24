@@ -3,14 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 099/130 - PAKKUN (Common)
- * Chakra: 1 | Power: 1
- * Group: Independent | Keywords: Ninja Hound
- * SCORE [arrow]: Move this character.
- *
- * Confirmation popup before move target selection (SCORE effects are optional).
- */
+
 function handlePakkun099Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   if (!sourceCard) {
@@ -24,14 +17,14 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Pre-check: Kurenai 035 movement block
+  
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_BLOCKED',
       'Pakkun (099): Movement blocked by Yuhi Kurenai (035).',
       'game.log.effect.moveBlockedKurenai', { card: 'PAKKUN', id: 'KS-099-C' }) } };
   }
 
-  // Pre-check: valid destination missions
+  
   let hasValidDest = false;
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
@@ -54,7 +47,7 @@ function handlePakkun099Score(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'PAKKUN', id: 'KS-099-C' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

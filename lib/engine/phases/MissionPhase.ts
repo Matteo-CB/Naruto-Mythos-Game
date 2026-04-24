@@ -7,26 +7,14 @@ import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effe
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
-/**
- * Execute the Mission Phase:
- * Evaluate missions in rank order D -> C -> B -> A
- * For each mission:
- * 1. Sum total power of each player's characters
- * 2. Higher power wins (ties go to Edge holder)
- * 3. Must have at least 1 power to win
- * 4. Winner gains mission points (base + rank bonus)
- * 5. Trigger SCORE effects
- *
- * If a SCORE effect requires target selection, we save progress and return.
- * resumeMissionScoring() picks up where we left off.
- */
+
 export function executeMissionPhase(state: GameState): GameState {
   let newState: GameState = { ...state, missionScoringProgress: undefined };
 
-  // Rashomon (067): permanently remove power tokens from strongest enemy before scoring
+  
   newState = applyRempartTokenRemoval(newState);
 
-  // Score missions by rank order: D, C, B, A
+  
   for (let rankIdx = 0; rankIdx < RANK_ORDER.length; rankIdx++) {
     const rank = RANK_ORDER[rankIdx];
     const missionIdx = newState.activeMissions.findIndex((m) => m.rank === rank);
@@ -34,7 +22,7 @@ export function executeMissionPhase(state: GameState): GameState {
 
     newState = scoreMission(newState, missionIdx, rankIdx);
 
-    // If a SCORE effect created a pending action, stop and wait for resolution
+    
     if (newState.pendingActions.length > 0) {
       return newState;
     }
@@ -43,25 +31,22 @@ export function executeMissionPhase(state: GameState): GameState {
   return newState;
 }
 
-/**
- * Resume mission scoring after a SCORE pending action has been resolved.
- * Continues from where we left off using missionScoringProgress.
- */
+
 export function resumeMissionScoring(state: GameState): GameState {
   let newState = { ...state };
   const progress = newState.missionScoringProgress;
 
   if (!progress) {
-    // No progress saved - nothing to resume
+    
     return newState;
   }
 
-  // Resume SCORE effects for the current mission's remaining characters
+  
   const currentRank = RANK_ORDER[progress.currentRankIndex];
   const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
 
   if (missionIdx !== -1) {
-    // Check if we need to run SCORE effects after Orochimaru 051 moved (edge token ordering)
+    
     if (progress.pendingScoreAfterOrochimaru) {
       const { winner: scoreWinner, missionIndex: scoreMissionIdx, rankIndex: scoreRankIdx } = progress.pendingScoreAfterOrochimaru;
       newState = { ...newState, missionScoringProgress: undefined };
@@ -69,24 +54,24 @@ export function resumeMissionScoring(state: GameState): GameState {
       if (newState.pendingActions.length > 0) {
         return newState;
       }
-      // Continue to remaining missions below
+      
     } else {
-      // Resume character SCORE effects on the current mission
+      
       newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
 
       if (newState.pendingActions.length > 0) {
         return newState;
       }
 
-      // Handle Orochimaru 051 move for the current mission (if not done yet)
+      
       const mission = newState.activeMissions[missionIdx];
       const missionWinner = mission.wonBy ?? null;
       if (missionWinner && missionWinner !== 'draw') {
         const missionLoser: PlayerID = missionWinner === 'player1' ? 'player2' : 'player1';
-        // Only run Orochimaru 051 if it wasn't already handled before SCORE (edge token case)
+        
         if (!(newState.edgeHolder === missionLoser && checkOrochimaru051OnMission(newState, missionIdx, missionLoser))) {
           newState = handleOrochimaru051Move(newState, missionIdx, missionWinner);
-          // If Orochimaru created a pending (destination choice), wait for resolution
+          
           if (newState.pendingActions.length > 0) {
             return newState;
           }
@@ -95,10 +80,10 @@ export function resumeMissionScoring(state: GameState): GameState {
     }
   }
 
-  // Clear progress for this mission - continue to remaining missions
+  
   newState = { ...newState, missionScoringProgress: undefined };
 
-  // Continue scoring from the next rank
+  
   for (let rankIdx = progress.currentRankIndex + 1; rankIdx < RANK_ORDER.length; rankIdx++) {
     const rank = RANK_ORDER[rankIdx];
     const nextMissionIdx = newState.activeMissions.findIndex((m) => m.rank === rank);
@@ -114,10 +99,7 @@ export function resumeMissionScoring(state: GameState): GameState {
   return newState;
 }
 
-/**
- * Check if a player has a face-visible Orochimaru 051 with the continuous loss-move effect
- * on the specified mission.
- */
+
 function checkOrochimaru051OnMission(state: GameState, missionIndex: number, player: PlayerID): boolean {
   const mission = state.activeMissions[missionIndex];
   const side = player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -136,7 +118,7 @@ function checkOrochimaru051OnMission(state: GameState, missionIndex: number, pla
 function scoreMission(state: GameState, missionIndex: number, rankIndex: number): GameState {
   const mission = state.activeMissions[missionIndex];
 
-  // Calculate total power for each player
+  
   const p1Power = calculateMissionPower(state, mission, 'player1');
   const p2Power = calculateMissionPower(state, mission, 'player2');
 
@@ -150,8 +132,8 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
     { index: missionIndex + 1, rank: mission.rank, name: mission.card.name_fr, name_en: mission.card.name_en || mission.card.name_fr, p1Power, p2Power },
   );
 
-  // Determine winner — a player must have at least 1 total power to win.
-  // Totals may be negative; the ≥1 requirement is enforced here, not by clamping.
+  
+  
   let winner: PlayerID | 'draw' | null = null;
 
   if (p1Power > p2Power) {
@@ -159,7 +141,7 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
   } else if (p2Power > p1Power) {
     winner = p2Power >= 1 ? 'player2' : 'draw';
   } else {
-    // Tie — both sides have identical totals. Edge holder wins if that total is ≥1.
+    
     winner = p1Power >= 1 ? state.edgeHolder : 'draw';
   }
 
@@ -201,17 +183,17 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
 
     newState = { ...newState, [winner]: ps, log };
 
-    // Edge token ordering: when both SCORE (winner) and Orochimaru 051 loss effect (loser)
-    // trigger simultaneously, the edge token holder resolves first.
+    
+    
     const loser: PlayerID = winner === 'player1' ? 'player2' : 'player1';
     const loserHasOro051 = checkOrochimaru051OnMission(newState, missionIndex, loser);
 
     if (loserHasOro051 && newState.edgeHolder === loser) {
-      // Loser has edge token — Orochimaru 051 moves BEFORE winner's SCORE effects
+      
       newState = handleOrochimaru051Move(newState, missionIndex, winner);
 
       if (newState.pendingActions.length > 0) {
-        // Orochimaru move needs target selection — save that SCORE effects still need to run
+        
         newState.missionScoringProgress = {
           currentRankIndex: rankIndex,
           missionCardScoreDone: false,
@@ -222,33 +204,31 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
         return newState;
       }
 
-      // Orochimaru moved (or had only 1 destination). Now run SCORE effects.
+      
       newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
       if (newState.pendingActions.length > 0) {
         return newState;
       }
     } else {
-      // Default order: winner SCORE first, then Orochimaru 051 move
+      
       newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
 
       if (newState.pendingActions.length > 0) {
         return newState;
       }
 
-      // Orochimaru 051 (UC): If you lost this mission, move Orochimaru to another mission
+      
       newState = handleOrochimaru051Move(newState, missionIndex, winner);
     }
   } else {
-    // No winner or draw — still check Orochimaru 051 (won't trigger on draw, but safe to call)
+    
     newState = handleOrochimaru051Move(newState, missionIndex, winner);
   }
 
   return newState;
 }
 
-/**
- * Collect all SCORE effect sources for a mission (mission card + winner's characters).
- */
+
 function collectScoreEffectSources(
   state: GameState,
   player: PlayerID,
@@ -256,11 +236,11 @@ function collectScoreEffectSources(
 ): ScoreEffectSource[] {
   const mission = state.activeMissions[missionIndex];
   const sources: ScoreEffectSource[] = [];
-  // Skip already-processed effects (prevents double-trigger on resume)
+  
   const processed = state.missionScoringProgress?.processedCharacterIds ?? [];
   const missionScoreDone = state.missionScoringProgress?.missionCardScoreDone ?? false;
 
-  // Mission card SCORE effects
+  
   if (!missionScoreDone) {
     const hasMissionScore = (mission.card.effects ?? []).some((e) => e.type === 'SCORE');
     if (hasMissionScore) {
@@ -273,7 +253,7 @@ function collectScoreEffectSources(
     }
   }
 
-  // Winner's character SCORE effects
+  
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const char of chars) {
     if (char.isHidden) continue;
@@ -293,9 +273,7 @@ function collectScoreEffectSources(
   return sources;
 }
 
-/**
- * Create a CHOOSE_SCORE_ORDER pending action so the player picks which SCORE effect resolves next.
- */
+
 function createScoreOrderChoice(
   state: GameState,
   player: PlayerID,
@@ -325,7 +303,7 @@ function createScoreOrderChoice(
     isUpgrade: false,
   };
 
-  // Options are encoded as "SCORE::<label>" for the CHOOSE_EFFECT UI
+  
   const pendingAction: PendingAction = {
     id: actionId,
     type: 'CHOOSE_EFFECT',
@@ -341,7 +319,7 @@ function createScoreOrderChoice(
   newState.pendingEffects = [...newState.pendingEffects, pendingEffect];
   newState.pendingActions = [...newState.pendingActions, pendingAction];
 
-  // Save progress with the full list of pending SCORE effects
+  
   newState.missionScoringProgress = {
     currentRankIndex: rankIndex,
     missionCardScoreDone: false,
@@ -353,10 +331,7 @@ function createScoreOrderChoice(
   return newState;
 }
 
-/**
- * Resolve SCORE effects for a mission, saving progress when target selection is needed.
- * If multiple SCORE effects exist, the player chooses resolution order.
- */
+
 function resolveScoreEffectsWithProgress(
   state: GameState,
   player: PlayerID,
@@ -369,18 +344,16 @@ function resolveScoreEffectsWithProgress(
     return state;
   }
 
-  // Single SCORE effect: resolve directly (no choice needed)
+  
   if (sources.length === 1) {
     return resolveSingleScoreEffect(state, player, missionIndex, rankIndex, sources[0]);
   }
 
-  // Multiple SCORE effects: let the player choose the order
+  
   return createScoreOrderChoice(state, player, missionIndex, rankIndex, sources);
 }
 
-/**
- * Resolve a single identified SCORE effect source.
- */
+
 function resolveSingleScoreEffect(
   state: GameState,
   player: PlayerID,
@@ -391,7 +364,7 @@ function resolveSingleScoreEffect(
   let newState = { ...state };
   const mission = newState.activeMissions[missionIndex];
 
-  // Find the character in play (null for mission card SCORE)
+  
   let character = null;
   if (source.instanceId) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -402,7 +375,7 @@ function resolveSingleScoreEffect(
 
   if (result.pending) {
     newState = result.state;
-    // Accumulate processedCharacterIds (don't overwrite)
+    
     const existingProcessed = newState.missionScoringProgress?.processedCharacterIds ?? [];
     const processedCharIds: string[] = source.instanceId
       ? [...existingProcessed, source.instanceId]
@@ -412,7 +385,7 @@ function resolveSingleScoreEffect(
       missionCardScoreDone: !source.instanceId ? true : (newState.missionScoringProgress?.missionCardScoreDone ?? false),
       processedCharacterIds: processedCharIds,
       winner: player,
-      // Do NOT copy pendingScoreEffects here — caller manages remaining sources
+      
     };
     return newState;
   }
@@ -421,10 +394,7 @@ function resolveSingleScoreEffect(
   return newState;
 }
 
-/**
- * Called when the player selects which SCORE effect to resolve next from a CHOOSE_SCORE_ORDER pending.
- * Returns the updated state after resolving the chosen effect (or creating its own pending).
- */
+
 export function resolveChosenScoreEffect(
   state: GameState,
   selectedLabel: string,
@@ -433,7 +403,7 @@ export function resolveChosenScoreEffect(
   const progress = newState.missionScoringProgress;
   if (!progress || !progress.pendingScoreEffects) return state;
 
-  // Remove the CHOOSE_SCORE_ORDER pending effect and action
+  
   newState.pendingEffects = newState.pendingEffects.filter(
     (e) => e.targetSelectionType !== 'CHOOSE_SCORE_ORDER',
   );
@@ -441,18 +411,18 @@ export function resolveChosenScoreEffect(
     (a) => !a.options.some((o) => o.startsWith('SCORE::')) || a.type !== 'CHOOSE_EFFECT',
   );
 
-  // Find the selected source by matching label
+  
   const selectedSource = progress.pendingScoreEffects.find((s) => s.label === selectedLabel);
   if (!selectedSource) return state;
 
-  // Remove the selected source from pending list
+  
   const remainingSources = progress.pendingScoreEffects.filter((s) => s !== selectedSource);
 
   const currentRank = RANK_ORDER[progress.currentRankIndex];
   const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
   if (missionIdx === -1) return state;
 
-  // Update progress with remaining sources
+  
   newState.missionScoringProgress = {
     ...progress,
     missionCardScoreDone: selectedSource.instanceId === null ? true : progress.missionCardScoreDone,
@@ -462,7 +432,7 @@ export function resolveChosenScoreEffect(
     pendingScoreEffects: remainingSources.length > 0 ? remainingSources : undefined,
   };
 
-  // Resolve the selected SCORE effect
+  
   const result = resolveSingleScoreEffect(
     newState,
     progress.winner,
@@ -471,22 +441,22 @@ export function resolveChosenScoreEffect(
     selectedSource,
   );
 
-  // If the resolved effect created its own pending (target selection), wait
+  
   if (result.pendingActions.length > 0) {
-    // Preserve the remaining sources in progress
+    
     if (remainingSources.length > 0 && result.missionScoringProgress) {
       result.missionScoringProgress.pendingScoreEffects = remainingSources;
     }
     return result;
   }
 
-  // Effect resolved without pending. If more SCORE effects remain, present choice again.
+  
   if (remainingSources.length > 1) {
     return createScoreOrderChoice(result, progress.winner, missionIdx, progress.currentRankIndex, remainingSources);
   }
 
   if (remainingSources.length === 1) {
-    // Only one left - resolve directly
+    
     const lastResult = resolveSingleScoreEffect(
       result,
       progress.winner,
@@ -495,7 +465,7 @@ export function resolveChosenScoreEffect(
       remainingSources[0],
     );
     if (lastResult.pendingActions.length > 0) {
-      // Update progress for the last effect
+      
       if (lastResult.missionScoringProgress) {
         lastResult.missionScoringProgress.missionCardScoreDone = remainingSources[0].instanceId === null
           ? true : lastResult.missionScoringProgress.missionCardScoreDone;
@@ -505,7 +475,7 @@ export function resolveChosenScoreEffect(
             remainingSources[0].instanceId,
           ];
         }
-        // Clear pendingScoreEffects — this was the last source, prevent re-trigger
+        
         lastResult.missionScoringProgress.pendingScoreEffects = undefined;
       }
       return lastResult;
@@ -513,7 +483,7 @@ export function resolveChosenScoreEffect(
     return lastResult;
   }
 
-  // All SCORE effects resolved - clear pendingScoreEffects
+  
   if (result.missionScoringProgress) {
     result.missionScoringProgress.pendingScoreEffects = undefined;
   }
@@ -521,10 +491,7 @@ export function resolveChosenScoreEffect(
   return result;
 }
 
-/**
- * Resume remaining SCORE effects after a pending (from an individual SCORE handler) was resolved.
- * This handles both the ordered-choice flow (pendingScoreEffects) and legacy sequential flow.
- */
+
 function resolveRemainingScoreEffects(
   state: GameState,
   player: PlayerID,
@@ -533,24 +500,24 @@ function resolveRemainingScoreEffects(
 ): GameState {
   let newState = { ...state };
 
-  // If mission card SCORE wasn't done, it means we're resuming after its pending was resolved.
-  // The handler already ran and created a pending; that pending has now been resolved.
-  // Mark it as done - do NOT re-run the handler.
+  
+  
+  
   if (!progress.missionCardScoreDone) {
     progress = { ...progress, missionCardScoreDone: true };
   }
 
-  // If we have a pending SCORE effects list (player-ordered flow), use it
+  
   if (progress.pendingScoreEffects && progress.pendingScoreEffects.length > 0) {
     const remaining = progress.pendingScoreEffects;
 
     if (remaining.length > 1) {
-      // Multiple remain - present choice again
+      
       return createScoreOrderChoice(newState, player, missionIndex, progress.currentRankIndex, remaining);
     }
 
     if (remaining.length === 1) {
-      // Single remaining - resolve directly
+      
       const lastResult = resolveSingleScoreEffect(
         newState,
         player,
@@ -568,7 +535,7 @@ function resolveRemainingScoreEffects(
               remaining[0].instanceId,
             ];
           }
-          // Clear pendingScoreEffects — this was the last source, prevent re-trigger
+          
           lastResult.missionScoringProgress.pendingScoreEffects = undefined;
         }
         return lastResult;
@@ -576,11 +543,11 @@ function resolveRemainingScoreEffects(
       return lastResult;
     }
 
-    // All resolved
+    
     return newState;
   }
 
-  // Fallback: sequential flow (no pendingScoreEffects - legacy or single-effect path)
+  
   const mission = newState.activeMissions[missionIndex];
   const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   const processedCharIds = [...progress.processedCharacterIds];
@@ -612,16 +579,14 @@ function resolveRemainingScoreEffects(
   return newState;
 }
 
-/**
- * Orochimaru 051 (UC): [⧗] If you lost this mission during Mission Evaluation, move to another mission.
- */
+
 function handleOrochimaru051Move(state: GameState, missionIndex: number, winner: PlayerID | 'draw' | null): GameState {
   let newState = state;
   const mission = newState.activeMissions[missionIndex];
 
   for (const side of ['player1Characters', 'player2Characters'] as const) {
     const player: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
-    // Only trigger for the losing player (draw = no loser)
+    
     if (winner === player || winner === null || winner === 'draw') continue;
 
     const chars = mission[side];
@@ -635,10 +600,10 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
       );
       if (!hasMove) continue;
 
-      // Kurenai 035: enemy characters cannot move from this mission
+      
       if (isMovementBlockedByKurenai(newState, missionIndex, player)) continue;
 
-      // Collect ALL valid destination missions
+      
       const validDests: number[] = [];
       for (let i = 0; i < newState.activeMissions.length; i++) {
         if (i === missionIndex) continue;
@@ -655,13 +620,13 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
       if (validDests.length === 0) continue;
 
       if (validDests.length === 1) {
-        // Auto-move when only one valid destination
+        
         const destIdx = validDests[0];
         newState = moveOrochimaru051(newState, missionIndex, destIdx, char.instanceId, side, player);
         break;
       }
 
-      // Multiple destinations: ask the player to choose
+      
       const effectId = generateInstanceId();
       const actionId = generateInstanceId();
       newState = { ...newState };
@@ -708,9 +673,7 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
   return newState;
 }
 
-/**
- * Execute the actual Orochimaru 051 move to a specific destination mission.
- */
+
 export function moveOrochimaru051(
   state: GameState,
   sourceMissionIndex: number,
@@ -746,12 +709,7 @@ export function moveOrochimaru051(
   return newState;
 }
 
-/**
- * Calculate total power for a player on a specific mission.
- * Applies all continuous power modifiers. Totals may be negative when debuffs
- * exceed base power; the "≥1 to win a mission" rule is enforced in scoreMission,
- * not by clamping here.
- */
+
 function calculateMissionPower(
   state: GameState,
   mission: ActiveMission,

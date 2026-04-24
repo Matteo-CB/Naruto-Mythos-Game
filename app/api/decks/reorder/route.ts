@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'orderedIds required' }, { status: 400 });
     }
 
-    // Verify all decks belong to this user
+    
     const decks = await prisma.deck.findMany({
       where: { userId: session.user.id },
       select: { id: true },
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Update sortOrder for each deck
+    
     await Promise.all(
       orderedIds.map((id, index) =>
         prisma.deck.update({

@@ -68,7 +68,7 @@ export default function PlayOnlinePage() {
     });
   }, []);
 
-  // Connect and request room list on mount
+  
   const connectAndFetch = useCallback(async () => {
     if (!session?.user?.id) return;
     try {
@@ -77,7 +77,7 @@ export default function PlayOnlinePage() {
       }
       requestRoomList();
     } catch {
-      // Error set in socket store
+      
     }
   }, [session?.user?.id, connected, connect, requestRoomList]);
 
@@ -102,7 +102,7 @@ export default function PlayOnlinePage() {
     }
   }, [error, clearError]);
 
-  // Redirect to maintenance page if server is draining and player is not in a game
+  
   const maintenanceWarning = useSocketStore((s) => s.maintenanceWarning);
   useEffect(() => {
     if (maintenanceWarning && !gameStarted) {
@@ -110,7 +110,7 @@ export default function PlayOnlinePage() {
     }
   }, [maintenanceWarning, gameStarted, router]);
 
-  // When game starts: initialize gameStore with online state and navigate to /game
+  
   const playerNames = useSocketStore((s) => s.playerNames);
   const gameInitRef = useRef(false);
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function PlayOnlinePage() {
     }
   }, [gameStarted, visibleState, playerRole, startOnlineGame, router, session, playerNames]);
 
-  // Auto-join room from match invite (via ?room= query param)
+  
   useEffect(() => {
     const roomParam = searchParams.get('room');
     if (roomParam && session?.user?.id && !connected) {
@@ -201,7 +201,7 @@ export default function PlayOnlinePage() {
       createRoom(session.user.id, false, isRanked, false, actualMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled, isAnonymous);
       setIsPrivateRoom(false);
     } catch {
-      // Error set in socket store
+      
     }
   };
 
@@ -214,7 +214,7 @@ export default function PlayOnlinePage() {
       createRoom(session.user.id, true, isRanked, false, selectedMode, session.user.name ?? undefined, undefined, isRanked ? true : timerEnabled);
       setIsPrivateRoom(true);
     } catch {
-      // Error set in socket store
+      
     }
   };
 
@@ -227,7 +227,7 @@ export default function PlayOnlinePage() {
       }
       joinRoom(codeToJoin, session.user.id);
     } catch {
-      // Error set in socket store
+      
     }
   };
 
@@ -236,11 +236,11 @@ export default function PlayOnlinePage() {
     setDeckSelected(true);
   };
 
-  // Split rooms by mode
+  
   const casualRooms = publicRooms.filter((r) => r.gameMode === 'casual');
   const rankedRooms = publicRooms.filter((r) => r.gameMode === 'ranked');
 
-  // Show deck selector once in a room and opponent has joined
+  
   const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards;
 
   const modeStyle = (mode: GameMode) => ({
@@ -296,7 +296,7 @@ export default function PlayOnlinePage() {
           </div>
         )}
 
-        {/* Deck selector (shown after opponent joins) */}
+        
         {showDeckSelector && (
           <div
             className="w-full rounded-lg p-6"
@@ -325,10 +325,10 @@ export default function PlayOnlinePage() {
           </div>
         )}
 
-        {/* Main UI (hide once deck selection is shown) */}
+        
         {!showDeckSelector && !deckSelected && (
           <>
-            {/* Browse / Private toggle */}
+            
             <div
               className="flex w-full rounded-lg overflow-hidden"
               style={{ border: '1px solid #262626' }}
@@ -358,7 +358,7 @@ export default function PlayOnlinePage() {
 
             {view === 'browse' && !roomCode && (
               <>
-                {/* Anonymous toggle */}
+                
                 <div
                   className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg mb-2"
                   style={{ backgroundColor: '#0e0e0e', border: '1px solid #1a1a1a' }}
@@ -383,9 +383,9 @@ export default function PlayOnlinePage() {
                   </button>
                 </div>
 
-                {/* Dual room lists — casual + ranked side by side */}
+                
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Casual column */}
+                  
                   <div className="flex flex-col">
                     <div className="px-3 py-2" style={{ backgroundColor: '#111', borderBottom: '2px solid #c4a35a' }}>
                       <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#c4a35a' }}>
@@ -422,7 +422,7 @@ export default function PlayOnlinePage() {
                     </button>
                   </div>
 
-                  {/* Ranked column */}
+                  
                   <div className="flex flex-col">
                     <div className="px-3 py-2" style={{ backgroundColor: '#111', borderBottom: '2px solid #b33e3e' }}>
                       <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#b33e3e' }}>
@@ -460,7 +460,7 @@ export default function PlayOnlinePage() {
                   </div>
                 </div>
 
-                {/* Live Games — spectate */}
+                
                 <LiveGamesSection />
               </>
             )}
@@ -541,7 +541,7 @@ export default function PlayOnlinePage() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {/* Mode selector tabs */}
+                    
                     <div className="flex w-full rounded-t-lg overflow-hidden">
                       {(['casual', 'ranked'] as GameMode[]).map((mode) => (
                         <button
@@ -558,7 +558,7 @@ export default function PlayOnlinePage() {
                       {t(`online.modeDesc.${selectedMode}`)}
                     </p>
 
-                    {/* Timer toggle (casual only) */}
+                    
                     {selectedMode === 'casual' && (
                       <div
                         className="flex items-center justify-between w-full px-4 py-3 rounded-lg"
@@ -662,15 +662,15 @@ function LiveGamesSection() {
     if (!session?.user?.id || spectateLoading) return;
     setSpectateLoading(game.roomCode);
 
-    // Clean up any previous spectating session first
+    
     const ss = useSocketStore.getState();
     if (ss.isSpectating || ss.spectatingRoomCode) {
       ss.leaveSpectating();
     }
-    // Clear stale game state
+    
     useGameStore.setState({ visibleState: null, gameState: null, gameOver: false, isOnlineGame: false });
 
-    // Ensure socket is connected
+    
     const ss2 = useSocketStore.getState();
     if (!ss2.connected) {
       try {
@@ -681,10 +681,10 @@ function LiveGamesSection() {
       }
     }
 
-    // Join as spectator
+    
     spectateGame(game.roomCode, session.user.id, session.user.name ?? 'Spectator');
 
-    // Wait for state to arrive (up to 10s), THEN navigate
+    
     let waited = 0;
     const poll = setInterval(() => {
       waited += 200;

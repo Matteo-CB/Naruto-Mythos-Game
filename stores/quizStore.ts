@@ -16,29 +16,29 @@ function getDifficultyMultiplier(difficulty: number): number {
 }
 
 interface QuizState {
-  // Config
+  
   difficulty: number | null;
   questions: QuizQuestion[];
 
-  // Progress
+  
   currentIndex: number;
   answers: (QuizAnswer | null)[];
   answerTimes: number[];
 
-  // Timer
+  
   timeRemaining: number;
   timerActive: boolean;
 
-  // Score tracking
+  
   score: number;
   streak: number;
   bestStreak: number;
 
-  // Status
+  
   isComplete: boolean;
   showingAnswer: boolean;
 
-  // Actions
+  
   startQuiz: (difficulty: number, questions: QuizQuestion[]) => void;
   submitAnswer: (answer: QuizAnswer, timeSpent: number) => void;
   nextQuestion: () => void;
@@ -114,7 +114,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       );
       newScore += questionScore;
     } else if (partial > 0) {
-      // Partial credit for drag & drop types (doesn't count as streak)
+      
       newStreak = 0;
       const base = Math.round(100 * partial);
       const difficultyMultiplier = getDifficultyMultiplier(state.difficulty);

@@ -1,7 +1,4 @@
-/**
- * Reset all users' ELO to 500 and wins/losses/draws to 0.
- * Run once: node scripts/reset-elo.mjs
- */
+
 
 import { PrismaClient } from '@prisma/client';
 

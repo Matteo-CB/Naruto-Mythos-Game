@@ -4,20 +4,9 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 import type { CharacterInPlay } from '@/lib/engine/types';
 
-/**
- * Card 143/130 - ITACHI UCHIWA "Traquant Naruto" (M)
- * Chakra: 5, Power: 5
- * Group: Akatsuki, Keywords: Rogue Ninja
- *
- * MAIN: Move a friendly character to this mission.
- *   - Player chooses which friendly character from another mission to move here.
- *
- * AMBUSH: Move an enemy character to this mission.
- *   - Player chooses which enemy character from another mission to move here.
- *   - Only triggers when Itachi is revealed from hidden.
- */
 
-/** Check if moving a visible character to destMission would create a same-name conflict. */
+
+
 function wouldConflictOnDest(
   char: CharacterInPlay,
   destChars: CharacterInPlay[],
@@ -37,8 +26,8 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const destChars = state.activeMissions[sourceMissionIndex][friendlySide];
 
-  // Find all friendly characters in OTHER missions (not this one, not self)
-  // Filter out chars that would create a name conflict on the destination mission
+  
+  
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
@@ -61,7 +50,7 @@ function itachi143MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup first — EffectEngine will handle the actual target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -78,8 +67,8 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const destChars = state.activeMissions[sourceMissionIndex][enemySide];
 
-  // Find all enemy characters in OTHER missions
-  // Filter out chars that would create a name conflict on the destination mission
+  
+  
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
@@ -101,7 +90,7 @@ function itachi143AmbushHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup first — EffectEngine will handle the actual target selection
+  
   return {
     state,
     requiresTargetSelection: true,

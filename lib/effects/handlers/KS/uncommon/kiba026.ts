@@ -4,17 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
-/**
- * Card 026/130 - KIBA INUZUKA "Ninpo ! La Danse du Chien !" (UC)
- * Chakra: 3 | Power: 3
- * Group: Leaf Village | Keywords: Team 8, Jutsu
- *
- * MAIN: Hide the non-hidden enemy character with the lowest cost in this mission.
- *   - If multiple enemies are tied for the lowest cost, the KIBA PLAYER chooses which to hide.
- *
- * UPGRADE: Look at the 3 top cards of your deck, reveal and draw any Akamaru characters,
- *   then put back the other cards on top of the deck.
- */
+
 function handleKiba026Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
 
@@ -27,7 +17,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
 
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Find non-hidden enemies that can be hidden by enemy effects
+  
   const nonHiddenEnemies = enemyChars.filter(c => canBeHiddenByEnemy(newState, c, opponentPlayer));
 
   if (nonHiddenEnemies.length === 0) {
@@ -36,7 +26,7 @@ function handleKiba026Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' }) } };
   }
 
-  // Confirmation popup before hiding
+  
   return {
     state: newState,
     requiresTargetSelection: true,
@@ -60,7 +50,7 @@ function handleKiba026Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KIBA INUZUKA', id: 'KS-026-UC' }) } };
   }
 
-  // Confirmation popup before peeking at deck
+  
   return {
     state: newState,
     requiresTargetSelection: true,

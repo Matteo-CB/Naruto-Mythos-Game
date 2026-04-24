@@ -47,17 +47,17 @@ interface SocketStore {
   playerNames: { player1: string; player2: string } | null;
   actionDeadline: number | null;
 
-  // Public room browser
+  
   publicRooms: PublicRoom[];
 
-  // Maintenance
+  
   maintenanceWarning: boolean;
 
-  // Rematch state
+  
   rematchState: 'none' | 'offered' | 'received' | 'accepted' | 'declined';
   rematchRoomCode: string | null;
 
-  // Sealed state
+  
   isSealedRoom: boolean;
   sealedBoosters: unknown[] | null;
   sealedAllCards: unknown[] | null;
@@ -65,7 +65,7 @@ interface SocketStore {
   sealedOpponentReady: boolean;
   sealedDeadline: number | null;
 
-  // Internal: online resync watchdog
+  
   _lastStateUpdate: number;
   _resyncTimer: ReturnType<typeof setInterval> | null;
 
@@ -87,7 +87,7 @@ interface SocketStore {
   clearError: () => void;
   forfeit: (reason: 'abandon' | 'timeout') => void;
 
-  // Spectator
+  
   isSpectating: boolean;
   spectatingRoomCode: string | null;
   spectatorCount: number;
@@ -95,23 +95,23 @@ interface SocketStore {
   requestSpectateState: () => void;
   leaveSpectating: () => void;
 
-  // Chat
+  
   chatMessages: Array<{ id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }>;
   unreadChatCount: number;
   chatOpen: boolean;
   sendChatMessage: (message: string, isEmote: boolean) => void;
   setChatOpen: (open: boolean) => void;
 
-  // Opponent disconnect/reconnect
+  
   opponentDisconnected: boolean;
   opponentDisconnectDeadline: number | null;
 
-  // Active game reconnect prompt (shown when user returns to site with active game)
+  
   pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2' } | null;
   dismissReconnect: () => void;
   acceptReconnect: () => void;
 
-  // Active games
+  
   activeGames: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }>;
   requestActiveGames: () => void;
 }
@@ -162,7 +162,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       const cached = typeof window !== 'undefined' ? localStorage.getItem('nmtcg-active-games') : null;
       if (cached) {
         const { games, ts } = JSON.parse(cached);
-        // Use cache if less than 30s old
+        
         if (Date.now() - ts < 30000 && Array.isArray(games)) return games;
       }
     } catch { /* ignore */ }
@@ -171,14 +171,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
   connect: (userId?: string, username?: string) => {
     return new Promise((resolve, reject) => {
-      // If already connected with a live socket, resolve immediately
+      
       const existing = get().socket;
       if (existing?.connected) {
         resolve();
         return;
       }
 
-      // If there's a stale socket that isn't connected, clean it up
+      
       if (existing) {
         existing.removeAllListeners();
         existing.disconnect();
@@ -197,7 +197,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         timeout: CONNECT_TIMEOUT_MS,
       });
 
-      // Timeout for initial connection
+      
       const timeoutId = setTimeout(() => {
         if (!socket.connected) {
           console.error('[Socket] Connection timed out after', CONNECT_TIMEOUT_MS, 'ms');
@@ -212,12 +212,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Connected:', socket.id);
         set({ connected: true, userId: userId || null, userName: username || null, error: null, errorKey: null });
 
-        // Register the user with the socket server for social features
+        
         if (userId) {
           socket.emit('auth:register', { userId, username });
         }
 
-        // Auto-fetch active games list on connect
+        
         socket.emit('games:list');
 
         resolve();
@@ -226,7 +226,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('disconnect', (reason) => {
         console.log('[Socket] Disconnected, reason:', reason);
         set({ connected: false, opponentDisconnected: false, opponentDisconnectDeadline: null });
-        // Only show error for server-initiated disconnect, not temporary transport issues
+        
         if (reason === 'io server disconnect') {
           set({ error: 'Disconnected by server.', errorKey: 'game.error.connectionLost' });
         }
@@ -236,14 +236,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         console.log('[Socket] Reconnected after', attemptNumber, 'attempts');
         set({ connected: true, error: null, errorKey: null });
 
-        // Re-register user on reconnect
+        
         const uid = get().userId;
         const uname = get().userName;
         if (uid) {
           socket.emit('auth:register', { userId: uid, username: uname ?? undefined });
         }
 
-        // Rejoin active room so server updates our socket ID
+        
         const rc = get().roomCode;
         if (rc && uid) {
           console.log('[Socket] Rejoining room', rc, 'after reconnect');
@@ -263,7 +263,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         reject(new Error(`Socket connection failed: ${err.message}`));
       });
 
-      // --- Room events ---
+      
 
       socket.on('room:created', (data: { code: string }) => {
         console.log('[Socket] Room created:', data.code);
@@ -313,7 +313,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }
       });
 
-      // ---/* Sealed events ---
+      
 
       socket.on('sealed:boosters', (data: { boosters: unknown[]; allCards: unknown[] }) => {
         console.log('[Socket] Sealed boosters received:', data.boosters?.length, 'boosters');
@@ -335,15 +335,15 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ sealedDeadline: 0 });
       });
 
-      // --- Game events ---
+      
 
       socket.on('game:started', () => {
         console.log('[Socket] Game started');
         set({ gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentDisconnectDeadline: null });
 
-        // Start a periodic resync check - if no state update for 15s during
-        // an active game, request current state from the server.
-        // This prevents the game from appearing stuck if a state-update was lost.
+        
+        
+        
         const existingTimer = get()._resyncTimer;
         if (existingTimer) clearInterval(existingTimer);
         const resyncTimer = setInterval(() => {
@@ -378,9 +378,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             visibleState: data.visibleState,
             playerRole: data.playerRole,
             _lastStateUpdate: Date.now(),
-            // Don't clear disconnect banner here — state updates can arrive from
-            // phase transitions even while opponent is disconnected.
-            // Only game:opponent-reconnected (line 464) should clear the banner.
+            
+            
+            
           };
           if (data.playerNames) {
             update.playerNames = data.playerNames;
@@ -408,17 +408,17 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           tournamentId?: string | null;
         }) => {
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
-          // Clean up resync timer
+          
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
           set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
         },
       );
 
-      // --- Timer events ---
+      
 
       socket.on('game:action-deadline', (data: { deadline: number; durationMs?: number }) => {
-        // Use durationMs to compute local deadline (avoids server/client clock skew)
+        
         const localDeadline = data.durationMs ? Date.now() + data.durationMs : data.deadline;
         set({ actionDeadline: localDeadline });
       });
@@ -438,13 +438,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ actionDeadline: null });
       });
 
-      // --- Public room list ---
+      
 
       socket.on('room:list-update', (rooms: PublicRoom[]) => {
         set({ publicRooms: rooms });
       });
 
-      // --- Rematch events ---
+      
 
       socket.on('game:rematch-offered', () => {
         console.log('[Socket] Opponent offered rematch');
@@ -499,14 +499,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('game:active-game', (data: { roomCode: string; playerRole: 'player1' | 'player2' }) => {
         console.log('[Socket] Active game found:', data.roomCode, 'as', data.playerRole);
-        // Only show reconnect prompt if we're not already in that game
+        
         const current = get();
         if (current.roomCode !== data.roomCode) {
           set({ pendingReconnect: data });
         }
       });
 
-      // --- Matchmaking events ---
+      
 
       socket.on('matchmaking:waiting', () => {
         console.log('[Socket] Matchmaking waiting');
@@ -523,14 +523,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         });
       });
 
-      // --- Coin flip sync ---
+      
 
       socket.on('coin-flip-sync', () => {
         console.log('[Socket] Both players completed coin flip — showing mulligan');
         useUIStore.getState().setCoinFlipComplete(true);
       });
 
-      // --- Social events (delegated to socialStore) ---
+      
 
       socket.on('friend:request-received', (data) => {
         useSocialStore.getState().handleFriendRequestReceived(data);
@@ -560,7 +560,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         useSocialStore.getState().handleMatchInviteCancelled(data.inviteId);
       });
 
-      // --- Maintenance events ---
+      
 
       socket.on('server:maintenance', () => {
         console.log('[Socket] Server going down for maintenance');
@@ -572,7 +572,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ maintenanceWarning: true });
       });
 
-      // ═══════ SPECTATOR LISTENERS ═══════
+      
 
       socket.on('spectate:state-update', (data: {
         visibleState: VisibleGameState;
@@ -581,7 +581,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         roomCode?: string;
       }) => {
         const current = get();
-        // Ignore spectator updates if we're not spectating or if it's for a different room
+        
         if (!current.isSpectating && !current.spectatingRoomCode) return;
         if (data.roomCode && current.spectatingRoomCode && data.roomCode !== current.spectatingRoomCode) return;
         set({
@@ -601,7 +601,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ error: data.message });
       });
 
-      // ═══════ CHAT LISTENERS ═══════
+      
 
       socket.on('chat:message', (msg: { id: string; userId: string; username: string; message: string; isEmote: boolean; isSpectator: boolean; timestamp: number }) => {
         set((state) => {
@@ -621,12 +621,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ error: data.message, errorKey: data.errorKey ?? null });
       });
 
-      // ═══════ ACTIVE GAMES ═══════
+      
 
       socket.on('games:list-update', (data: { games: Array<{ roomCode: string; player1Name: string; player2Name: string; spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean }> }) => {
         const games = data.games ?? [];
         set({ activeGames: games });
-        // Cache for instant display on next page load
+        
         try { localStorage.setItem('nmtcg-active-games', JSON.stringify({ games, ts: Date.now() })); } catch { /* ignore */ }
       });
 
@@ -728,7 +728,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   joinMatchmaking: (userId: string, isRanked = true) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      // Reset state before joining matchmaking to avoid stale data from previous sessions
+      
       set({
         roomCode: null,
         playerRole: null,
@@ -806,7 +806,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  // ═══════ SPECTATOR METHODS ═══════
+  
 
   spectateGame: (roomCode: string, userId: string, username: string) => {
     const { socket, connected } = get();
@@ -839,17 +839,17 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     });
   },
 
-  // ═══════ RECONNECT METHODS ═══════
+  
 
   dismissReconnect: () => {
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
       const rc = pendingReconnect.roomCode;
       const uid = get().userId;
-      // Rejoin first so the server maps our socket to the room
+      
       socket.emit('game:rejoin', { roomCode: rc, userId: uid });
-      // Send forfeit with roomCode + userId so server can identify us
-      // even if game:rejoin hasn't fully processed yet
+      
+      
       setTimeout(() => {
         const s = get();
         if (s.socket && s.connected) {
@@ -864,8 +864,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const { socket, connected, pendingReconnect } = get();
     if (socket && connected && pendingReconnect) {
       socket.emit('game:rejoin', { roomCode: pendingReconnect.roomCode, userId: get().userId });
-      // Set gameStarted immediately so the game page doesn't redirect
-      // The server will also send game:started but we can't wait for it
+      
+      
       set({
         roomCode: pendingReconnect.roomCode,
         playerRole: pendingReconnect.playerRole,
@@ -877,7 +877,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  // ═══════ CHAT METHODS ═══════
+  
 
   sendChatMessage: (message: string, isEmote: boolean) => {
     const { socket, connected } = get();
@@ -890,7 +890,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     set({ chatOpen: open, unreadChatCount: open ? 0 : get().unreadChatCount });
   },
 
-  // ═══════ ACTIVE GAMES ═══════
+  
 
   requestActiveGames: () => {
     const { socket, connected } = get();

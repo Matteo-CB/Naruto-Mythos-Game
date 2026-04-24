@@ -34,7 +34,7 @@ describe('GameEngine', () => {
       const config = createTestConfig();
       const state = GameEngine.createGame(config);
 
-      // 2 missions selected from each player (3 each, pick 2)
+      
       expect(state.missionDeck.length).toBe(4);
     });
 
@@ -103,7 +103,7 @@ describe('GameEngine', () => {
         doMulligan: false,
       });
 
-      // After both mulligan, should transition through start phase to action phase
+      
       expect(state.phase).toBe('action');
       expect(state.turn).toBe(1);
     });
@@ -138,7 +138,7 @@ describe('GameEngine', () => {
         doMulligan: false,
       });
 
-      // Base chakra is 5 (no characters in play on turn 1)
+      
       expect(state.player1.chakra).toBe(5);
       expect(state.player2.chakra).toBe(5);
     });
@@ -171,13 +171,13 @@ describe('GameEngine', () => {
         doMulligan: false,
       });
 
-      // Try to mulligan again
+      
       const state2 = GameEngine.applyAction(state, 'player1', {
         type: 'MULLIGAN',
         doMulligan: true,
       });
 
-      // Should be unchanged (already mulliganed)
+      
       expect(state2.player1.hasMulliganed).toBe(true);
     });
   });
@@ -245,13 +245,13 @@ describe('GameEngine', () => {
 
       expect(visible.myState.hand.length).toBe(5);
       expect(visible.opponentState.handSize).toBe(5);
-      // Opponent state should not have the actual hand
+      
       expect((visible.opponentState as any).hand).toBeUndefined();
     });
 
     it('should show own hidden characters', () => {
       const state = createActionPhaseState();
-      // Play a hidden character
+      
       const newState = GameEngine.applyAction(state, 'player1', {
         type: 'PLAY_HIDDEN',
         cardIndex: 0,
@@ -268,7 +268,7 @@ describe('GameEngine', () => {
 
     it('should not show opponent hidden character details', () => {
       const state = createActionPhaseState({ activePlayer: 'player2' });
-      // Player 2 plays hidden
+      
       const newState = GameEngine.applyAction(state, 'player2', {
         type: 'PLAY_HIDDEN',
         cardIndex: 0,
@@ -285,7 +285,7 @@ describe('GameEngine', () => {
 
     it('should not show re-hidden card to opponent even if wasRevealedAtLeastOnce', () => {
       const state = createActionPhaseState();
-      // Manually set up a character that was revealed then re-hidden (e.g., by Kabuto 054)
+      
       const reHiddenChar: CharacterInPlay = {
         instanceId: 'rehidden-1',
         card: state.player2.deck[0],

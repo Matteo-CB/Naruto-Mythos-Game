@@ -2,25 +2,10 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 004/130 - TSUNADE "La Creation et le Renouveau" (UC)
- * Chakra: 4 | Power: 4
- * Group: Leaf Village | Keywords: Sannin, Jutsu
- *
- * MAIN [continuous]: Defeated friendly characters go into your hand instead of
- * your discard pile.
- *   - This is a continuous effect. The actual defeat-to-hand redirect logic is
- *     handled in the defeat resolution code of the game engine (onDefeatTriggers.ts).
- *   - The MAIN handler here is a no-op since the effect is passive/continuous.
- *
- * UPGRADE: Choose one character in your discard pile and put them into your hand.
- *   - When triggered as an upgrade, find all character cards in the source player's
- *     discard pile. If multiple choices, require target selection.
- *   - Move the chosen card from discard pile to hand.
- */
+
 function handleTsunade004Main(ctx: EffectContext): EffectResult {
-  // Continuous defeat-to-hand redirect - actual logic handled in the game engine
-  // when defeat resolution occurs and checks for Tsunade 004 being face-visible in play.
+  
+  
   const state = ctx.state;
   const log = logAction(
     state.log,
@@ -39,7 +24,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const playerState = state[sourcePlayer];
 
-  // Pre-check: any characters in discard pile?
+  
   const discardPile = playerState.discardPile;
   let hasCharacter = false;
   for (let idx = 0; idx < discardPile.length; idx++) {
@@ -54,7 +39,7 @@ function handleTsunade004Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TSUNADE', id: 'KS-004-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

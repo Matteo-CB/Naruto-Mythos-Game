@@ -1,7 +1,4 @@
-/**
- * SoundManager — singleton that preloads and plays game sound effects.
- * Uses HTMLAudioElement.cloneNode() for concurrent playback.
- */
+
 
 export type SoundName = 'cardPlay' | 'mulligan' | 'newTurn' | 'jutsu';
 
@@ -12,7 +9,7 @@ const SOUND_PATHS: Record<SoundName, string> = {
   jutsu: '/sound/justu.mp3',
 };
 
-/** Per-sound volume multiplier (relative to global volume) */
+
 const SOUND_GAIN: Record<SoundName, number> = {
   cardPlay: 1.0,
   mulligan: 1.0,
@@ -20,7 +17,7 @@ const SOUND_GAIN: Record<SoundName, number> = {
   jutsu: 0.25,
 };
 
-/** Sounds that should fade out instead of cutting abruptly */
+
 const FADE_OUT: Partial<Record<SoundName, number>> = {
   newTurn: 600,
 };
@@ -54,7 +51,7 @@ export function playSound(name: SoundName): void {
 
     const fadeDuration = FADE_OUT[name];
     if (fadeDuration && fadeDuration > 0) {
-      // Set up fade-out before the sound ends
+      
       clone.addEventListener('timeupdate', () => {
         if (!clone.duration || isNaN(clone.duration)) return;
         const remaining = (clone.duration - clone.currentTime) * 1000;
@@ -66,7 +63,7 @@ export function playSound(name: SoundName): void {
 
     clone.play().catch(() => {});
   } catch {
-    // Ignore — browser may block autoplay before user interaction
+    
   }
 }
 

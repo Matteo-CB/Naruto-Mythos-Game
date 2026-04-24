@@ -3,24 +3,10 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { calculateContinuousPowerModifier } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 138/130 - OROCHIMARU (S)
- * Chakra: 7, Power: 6
- * Group: Independent, Keywords: Sannin, Rogue Ninja
- *
- * MAIN [continuous]: Can upgrade over any character that is not a Summon
- *                    nor named "Orochimaru".
- *   - Continuous no-op. The upgrade legality logic is handled by the engine's
- *     action validation (ActionPhase / GameEngine.validateUpgrade).
- *
- * UPGRADE: Gain 2 Mission points if the upgraded character had Power 6 or more.
- *   - When isUpgrade: look at the card being upgraded over (the previous top card
- *     in the stack). If that card's base power >= 6, add 2 to the player's
- *     missionPoints.
- */
+
 
 function orochimaru138MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous upgrade flexibility - handled by engine's upgrade validation
+  
   const log = logAction(
     ctx.state.log, ctx.state.turn, ctx.state.phase, ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
@@ -34,7 +20,7 @@ function orochimaru138MainHandler(ctx: EffectContext): EffectResult {
 function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
 
-  // Find the previous card in the stack (the one being upgraded over)
+  
   const stack = ctx.sourceCard.stack;
   if (stack.length < 2) {
     const log = logAction(
@@ -49,8 +35,8 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
 
   const previousCard = stack[stack.length - 2];
 
-  // Effective power = base power + power tokens + continuous modifiers (e.g. mission power bonus)
-  // Build a fake CharacterInPlay with previousCard as top to calculate what its power was
+  
+  
   const fakeChar = {
     ...ctx.sourceCard,
     card: previousCard,
@@ -72,7 +58,7 @@ function orochimaru138UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Previous card has effective Power >= 6, return CONFIRM popup
+  
   return {
     state,
     requiresTargetSelection: true,

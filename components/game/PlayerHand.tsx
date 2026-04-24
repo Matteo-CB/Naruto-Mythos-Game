@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { useUIStore } from '@/stores/uiStore';
 import type { CharacterCard } from '@/lib/engine/types';
-// Ban enforcement is server-side only — cards always show their image
+
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { useGameScale } from './GameScaleContext';
@@ -32,7 +32,7 @@ interface HandCardProps {
   fanSpacing: number;
 }
 
-// ── Reconcile hand order when hand changes (cards played/drawn) ──
+
 
 function reconcileHandOrder(
   prevOrder: number[],
@@ -44,11 +44,11 @@ function reconcileHandOrder(
   const usedNewIndices = new Set<number>();
   const newOrder: number[] = [];
 
-  // For each slot in the previous display order, find the matching card in newHand
+  
   for (const origIdx of prevOrder) {
     const oldCard = prevHand[origIdx];
     if (!oldCard) continue;
-    // Greedy match by card id (handles duplicates correctly)
+    
     const newIdx = newHand.findIndex(
       (c, i) => !usedNewIndices.has(i) && c.id === oldCard.id,
     );
@@ -58,21 +58,21 @@ function reconcileHandOrder(
     }
   }
 
-  // Append any newly drawn cards (not in previous hand)
+  
   for (let i = 0; i < newHand.length; i++) {
     if (!usedNewIndices.has(i)) {
       newOrder.push(i);
     }
   }
 
-  // If order is natural [0,1,2,...], return null
+  
   if (newOrder.length === newHand.length && newOrder.every((v, i) => v === i)) {
     return null;
   }
   return newOrder;
 }
 
-// ── Hand Card ────────────────────────────────────────────────────
+
 
 const HandCard = React.memo(function HandCard({
   card,
@@ -91,7 +91,7 @@ const HandCard = React.memo(function HandCard({
   const locale = useLocale();
   const dims = useGameScale();
 
-  // Fan effect based on display index
+  
   const midpoint = (total - 1) / 2;
   const offset = displayIndex - midpoint;
   const rotation = offset * 2.5;
@@ -169,7 +169,7 @@ const HandCard = React.memo(function HandCard({
         cursor: 'pointer',
       }}
     >
-      {/* Card image background */}
+      
       {imagePath ? (
         <div
           className="w-full h-full bg-cover bg-center"
@@ -186,7 +186,7 @@ const HandCard = React.memo(function HandCard({
         </div>
       )}
 
-      {/* Card info overlay */}
+      
       <div
         className="absolute inset-x-0 bottom-0 px-1 py-1 flex items-end justify-between"
         style={{
@@ -207,7 +207,7 @@ const HandCard = React.memo(function HandCard({
         </span>
       </div>
 
-      {/* Chakra cost badge */}
+      
       <div
         className="absolute top-1 left-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold"
         style={{
@@ -222,7 +222,7 @@ const HandCard = React.memo(function HandCard({
         {card.chakra}
       </div>
 
-      {/* Unaffordable overlay */}
+      
       {!canAfford && (
         <div
           className="absolute inset-0"
@@ -233,7 +233,7 @@ const HandCard = React.memo(function HandCard({
   );
 });
 
-// ── Sort pill button ─────────────────────────────────────────────
+
 
 function SortPill({
   label,
@@ -274,7 +274,7 @@ function SortPill({
   );
 }
 
-// ── Player Hand ──────────────────────────────────────────────────
+
 
 export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpectatorOpponent }: PlayerHandProps) {
   const t = useTranslations();
@@ -298,7 +298,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  // ── Reconcile hand order when hand changes ──
+  
 
   const prevHandRef = useRef<CharacterCard[]>(hand);
   const prevHandLenRef = useRef(hand.length);
@@ -309,7 +309,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     prevHandRef.current = hand;
     prevHandLenRef.current = hand.length;
 
-    // Skip initial render
+    
     if (prevHand === hand) return;
 
     const currentOrder = useUIStore.getState().handOrder;
@@ -319,7 +319,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     setHandOrder(newOrder);
   }, [hand, setHandOrder]);
 
-  // ── Build display hand ──
+  
 
   const displayHand = useMemo(() => {
     if (!handOrder || handOrder.length !== hand.length) {
@@ -331,9 +331,9 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     }));
   }, [hand, handOrder]);
 
-  // ── Drag state ──
+  
 
-  // ── Selection handler (converts display click to original index) ──
+  
 
   const handleSelect = useCallback(
     (originalIndex: number) => {
@@ -347,7 +347,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     [isMyTurn, effectPopupMinimized, selectedCardIndex, selectCard],
   );
 
-  // ── Move selected card left/right ──
+  
 
   const moveCardLeft = useCallback(() => {
     if (selectedCardIndex === null || hand.length <= 1) return;
@@ -355,10 +355,10 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
       handOrder && handOrder.length === hand.length
         ? [...handOrder]
         : hand.map((_, i) => i);
-    // Find display index of the selected card
+    
     const displayIdx = currentOrder.indexOf(selectedCardIndex);
     if (displayIdx <= 0) return;
-    // Swap with the card to the left
+    
     [currentOrder[displayIdx], currentOrder[displayIdx - 1]] =
       [currentOrder[displayIdx - 1], currentOrder[displayIdx]];
     const isNatural = currentOrder.every((v, i) => v === i);
@@ -379,7 +379,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     setHandOrder(isNatural ? null : currentOrder);
   }, [selectedCardIndex, handOrder, hand, setHandOrder]);
 
-  // Check if selected card can move left/right
+  
   const selectedDisplayIdx = useMemo(() => {
     if (selectedCardIndex === null) return -1;
     const currentOrder =
@@ -392,7 +392,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
   const canMoveLeft = selectedCardIndex !== null && selectedDisplayIdx > 0;
   const canMoveRight = selectedCardIndex !== null && selectedDisplayIdx >= 0 && selectedDisplayIdx < hand.length - 1;
 
-  // ── Sort handlers ──
+  
 
   const sortByCost = useCallback(() => {
     if (hand.length <= 1) return;
@@ -410,7 +410,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     setHandOrder(isNatural ? null : indices);
   }, [hand, setHandOrder]);
 
-  // Detect active sort
+  
   const activeSortType = useMemo(() => {
     if (!handOrder || handOrder.length !== hand.length) return null;
 
@@ -429,7 +429,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
 
   return (
     <div className="flex flex-col items-center gap-1">
-      {/* Fanned cards */}
+      
       <div
         className="relative flex items-center justify-center"
         style={{ height: dims.handContainerH + 'px', minWidth: dims.handMinW + 'px' }}
@@ -459,9 +459,9 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
         })}
       </div>
 
-      {/* Hand count + sort + move controls */}
+      
       <div className="flex items-center justify-center gap-3 py-1">
-        {/* Move left/right arrows (only when a card is selected) */}
+        
         {selectedCardIndex !== null && hand.length > 1 && (
           <div className="flex items-center gap-1">
             <SortPill
@@ -477,8 +477,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        {/* Sort pills — hidden on mobile to save vertical space (per designer
-            feedback). The manual left/right move arrows above still work. */}
+        
         {hand.length > 1 && !dims.isMobile && (
           <div className="flex items-center gap-2">
             <SortPill
@@ -501,8 +500,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
           </div>
         )}
 
-        {/* Hand count pill is useful context but redundant on mobile where
-            the fanned cards are fully visible. Hide to save space. */}
+        
         {!dims.isMobile && (
           <span className="text-[11px] tabular-nums" style={{ color: '#888888' }}>
             {t('game.board.handCount', { count: hand.length })}

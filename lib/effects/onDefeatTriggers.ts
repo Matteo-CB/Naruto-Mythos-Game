@@ -1,16 +1,7 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
 import { logAction } from '../engine/utils/gameLog';
 
-/**
- * Trigger on-defeat continuous effects.
- *
- * Scans all face-visible characters for:
- * - Tsunade 003: When a friendly character is defeated, gain 2 chakra
- * - Sasuke 136: When any character is defeated, gain 1 chakra
- *
- * Extracted into its own module to avoid circular dependency between
- * EffectEngine and defeatUtils.
- */
+
 export function triggerOnDefeatEffects(
   state: GameState,
   defeatedChar: CharacterInPlay,
@@ -25,11 +16,11 @@ export function triggerOnDefeatEffects(
 
       for (const char of mission[side]) {
         if (char.isHidden) continue;
-        // Skip if this trigger source is also being defeated in the same batch
+        
         if (simultaneousDefeatIds && simultaneousDefeatIds.includes(char.instanceId)) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
-        // Tsunade 003: When any friendly character is defeated, gain 2 Chakra
+        
         if (topCard.number === 3 && controllingPlayer === defeatedCharOwner) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
@@ -54,7 +45,7 @@ export function triggerOnDefeatEffects(
           }
         }
 
-        // Sasuke 136: When ANY character is defeated, gain 1 Chakra
+        
         if (topCard.number === 136) {
           const hasEffect = (topCard.effects ?? []).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),

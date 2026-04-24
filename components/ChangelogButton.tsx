@@ -42,7 +42,7 @@ export function ChangelogButton() {
       const seen = localStorage.getItem(STORAGE_KEY);
       setHasNew(seen !== latestDate && latestDate !== '');
     } catch {
-      /* ignore */
+      
     }
   }, [latestDate]);
 
@@ -51,7 +51,7 @@ export function ChangelogButton() {
     try {
       localStorage.setItem(STORAGE_KEY, latestDate);
     } catch {
-      /* ignore */
+      
     }
     setHasNew(false);
   }

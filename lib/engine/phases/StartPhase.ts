@@ -3,30 +3,25 @@ import { BASE_CHAKRA_PER_TURN, CARDS_DRAWN_PER_TURN, TURN_TO_RANK, RANK_BONUS } 
 import { logSystem, logAction } from '../utils/gameLog';
 import { calculateContinuousChakraBonus, calculateMissionChakraBonus } from '../../effects/ContinuousEffects';
 
-/**
- * Execute the Start Phase:
- * 1. Reveal the top card of the mission deck, assign rank based on turn
- * 2. Each player gains 5 chakra + 1 per character in play + CHAKRA +X bonuses
- * 3. Each player draws 2 cards
- */
+
 export function executeStartPhase(state: GameState): GameState {
   let newState = { ...state };
 
-  // Reset turn-wide cost modifiers (Shino 033, etc.)
+  
   newState.playCostIncrease = undefined;
   newState.pendingContinuation = undefined;
 
-  // Clear all white highlights from last turn
+  
   newState.turnPlayedIds = [];
 
-  // 1. Reveal mission card
+  
   newState = revealMissionCard(newState);
 
-  // 2. Grant chakra
+  
   newState = grantChakra(newState, 'player1');
   newState = grantChakra(newState, 'player2');
 
-  // 3. Draw cards
+  
   newState = drawCards(newState, 'player1', CARDS_DRAWN_PER_TURN);
   newState = drawCards(newState, 'player2', CARDS_DRAWN_PER_TURN);
 
@@ -71,21 +66,19 @@ function revealMissionCard(state: GameState): GameState {
   };
 }
 
-/**
- * Grant chakra: 5 base + 1 per character in play + CHAKRA +X continuous effects
- */
+
 function grantChakra(state: GameState, player: PlayerID): GameState {
   const playerState = { ...state[player] };
 
-  // Count characters in play (including hidden)
+  
   let charCount = 0;
   for (const mission of state.activeMissions) {
     const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
     charCount += chars.length;
   }
 
-  // Calculate CHAKRA +X bonuses from continuous effects (characters + missions)
-  // Also collect individual bonus sources for detailed logging
+  
+  
   const { total: chakraBonus, sources } = calculateChakraBonusDetailed(state, player);
 
   const totalChakra = BASE_CHAKRA_PER_TURN + charCount + chakraBonus;
@@ -102,7 +95,7 @@ function grantChakra(state: GameState, player: PlayerID): GameState {
     { total: totalChakra, base: BASE_CHAKRA_PER_TURN, chars: charCount, bonus: chakraBonus, finalTotal: playerState.chakra },
   );
 
-  // Log individual chakra bonus sources so players can see which effects are active
+  
   for (const source of sources) {
     log = logAction(
       log,
@@ -129,10 +122,7 @@ interface ChakraBonusSource {
   reason: string;
 }
 
-/**
- * Calculate CHAKRA +X bonuses from continuous effects on the board.
- * Returns both total and individual sources for detailed logging.
- */
+
 function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { total: number; sources: ChakraBonusSource[] } {
   let total = 0;
   const sources: ChakraBonusSource[] = [];
@@ -156,7 +146,7 @@ function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { tot
     }
   }
 
-  // Add mission SCORE [⧗] chakra bonuses (e.g., MSS-10 "Chakra Training")
+  
   const missionBonus = calculateMissionChakraBonus(state, player);
   if (missionBonus > 0) {
     total += missionBonus;
@@ -166,10 +156,7 @@ function calculateChakraBonusDetailed(state: GameState, player: PlayerID): { tot
   return { total, sources };
 }
 
-/**
- * Calculate CHAKRA +X bonuses from continuous effects on the board.
- * Delegates to centralized ContinuousEffects module.
- */
+
 export function calculateChakraBonus(state: GameState, player: PlayerID): number {
   return calculateChakraBonusDetailed(state, player).total;
 }

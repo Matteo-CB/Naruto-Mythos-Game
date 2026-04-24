@@ -5,19 +5,7 @@ import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 126/130 - OROCHIMARU (R)
- * Chakra: 5, Power: 4
- * Group: Sound Village, Keywords: Sannin
- *
- * SCORE: Defeat the weakest (lowest effective power) non-hidden enemy character in play.
- *   Triggers when the player wins the mission where Orochimaru is assigned.
- *   Find all non-hidden enemies across all missions. Pick the one with the lowest
- *   effective power. If tied, target selection.
- *
- * UPGRADE: POWERUP 3 (self).
- *   When isUpgrade: POWERUP 3 on self.
- */
+
 
 function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -25,7 +13,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find all non-hidden enemy characters across all missions
+  
   const candidates: Array<{ char: CharacterInPlay; missionIndex: number; power: number }> = [];
 
   for (let i = 0; i < state.activeMissions.length; i++) {
@@ -56,7 +44,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // CONFIRM popup before executing
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -71,7 +59,7 @@ function orochimaru126ScoreHandler(ctx: EffectContext): EffectResult {
 function orochimaru126UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourceCard } = ctx;
 
-  // CONFIRM popup before applying POWERUP 3
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
 
       <div className="w-full max-w-3xl mx-auto relative z-10 flex-1 px-4 sm:px-6 py-6 sm:py-10">
 
-        {/* ──── Header ──── */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-wider uppercase" style={{ color: '#c4a35a' }}>
@@ -123,7 +123,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {/* ──── Search ──── */}
+        
         <div className="relative mb-5">
           <input
             ref={searchRef}
@@ -152,7 +152,7 @@ export default function LeaderboardPage() {
           )}
         </div>
 
-        {/* ──── League filter ──── */}
+        
         {leaguesEnabled && (
           <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-1 no-scrollbar">
             <button
@@ -199,7 +199,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {/* ──── Player count ──── */}
+        
         {!loading && totalPlayers > 0 && (
           <div className="flex items-center gap-3 mb-3">
             <div className="flex-1 h-px" style={{ backgroundColor: '#1e1e1e' }} />
@@ -210,7 +210,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {/* ──── Rankings ──── */}
+        
         <section>
           {loading ? (
             <div className="flex items-center justify-center py-16">
@@ -238,7 +238,7 @@ export default function LeaderboardPage() {
                       borderLeft: `2px solid ${borderAccent}`,
                     }}
                   >
-                    {/* Rank */}
+                    
                     <span
                       className="text-xs sm:text-sm font-bold tabular-nums w-6 sm:w-8 text-center shrink-0"
                       style={{ color: isTop3 ? '#c4a35a' : '#555', fontFamily: 'var(--font-inter)' }}
@@ -246,7 +246,7 @@ export default function LeaderboardPage() {
                       {globalRank}
                     </span>
 
-                    {/* Player name + badges */}
+                    
                     <div className="flex items-center gap-1.5 flex-1 min-w-0">
                       <Link
                         href={`/profile/${encodeURIComponent(user.username)}` as '/'}
@@ -258,14 +258,14 @@ export default function LeaderboardPage() {
                       <UserBadges role={user.role} badgePrefs={user.badgePrefs} size="sm" />
                     </div>
 
-                    {/* League badge */}
+                    
                     {leaguesEnabled && (
                       <div className="shrink-0">
                         <EloBadge elo={user.elo} size="sm" showElo={false} totalGames={total} />
                       </div>
                     )}
 
-                    {/* ELO */}
+                    
                     <span
                       className="text-sm font-semibold tabular-nums shrink-0 w-10 text-right"
                       style={{ color: '#e0e0e0', fontFamily: 'var(--font-inter)' }}
@@ -273,7 +273,7 @@ export default function LeaderboardPage() {
                       {user.elo}
                     </span>
 
-                    {/* W/L/D — desktop only */}
+                    
                     <div className="hidden sm:flex items-center gap-1 shrink-0" style={{ fontFamily: 'var(--font-inter)' }}>
                       <span className="text-[10px] tabular-nums px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(62,139,62,0.1)', color: '#3e8b3e' }}>
                         {user.wins}W
@@ -286,7 +286,7 @@ export default function LeaderboardPage() {
                       </span>
                     </div>
 
-                    {/* Win rate — desktop only */}
+                    
                     <span className="hidden sm:block text-xs tabular-nums shrink-0 w-10 text-right" style={{ color: '#888', fontFamily: 'var(--font-inter)' }}>
                       {winRate}%
                     </span>
@@ -296,7 +296,7 @@ export default function LeaderboardPage() {
             </div>
           )}
 
-          {/* ──── Pagination ──── */}
+          
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-3 mt-5">
               <button

@@ -36,7 +36,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
             style={{ maxHeight: '80vh' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            
             <div
               className="flex items-center justify-between px-5 py-3 shrink-0"
               style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
@@ -59,7 +59,7 @@ export function DiscardPileViewer({ cards, onClose, title }: DiscardPileViewerPr
               <PopupMinimizeX onClick={onClose} />
             </div>
 
-            {/* Card grid */}
+            
             <div className="p-4 overflow-y-auto flex-1">
               {cards.length === 0 ? (
                 <div className="flex items-center justify-center py-12">

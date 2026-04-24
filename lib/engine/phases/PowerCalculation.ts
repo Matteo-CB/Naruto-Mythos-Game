@@ -1,13 +1,7 @@
 import type { GameState, CharacterInPlay, PlayerID } from '../types';
 import { calculateContinuousPowerModifier } from '../../effects/ContinuousEffects';
 
-/**
- * Calculate the effective power of a character in play,
- * including base power, power tokens, and all continuous modifiers.
- * Hidden characters have 0 base power but power tokens still count.
- * Individual power can go negative — debuffs apply to hidden characters too.
- * The ≥1-to-win rule is enforced at the mission-total level, not here.
- */
+
 export function calculateCharacterPower(
   state: GameState,
   char: CharacterInPlay,

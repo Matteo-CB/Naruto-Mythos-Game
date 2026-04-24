@@ -1,15 +1,4 @@
-/**
- * Discord ELO Roles Setup Script
- *
- * Replaces old Genin/Chunin/Kage rank roles with the new 8-tier ELO system.
- * Migrates channel permissions so new roles inherit access from old ones.
- *
- * Usage:
- *   node scripts/discord-elo-roles.mjs [BOT_TOKEN] [GUILD_ID]
- *
- * If no arguments provided, reads from environment variables:
- *   BOT_DISCORD_TOKEN, SERVER_DISCORD_ID
- */
+
 
 import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
@@ -17,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load .env manually (no dotenv dependency needed)
+
 try {
   const envFile = readFileSync(new URL('../.env', import.meta.url), 'utf-8');
   for (const line of envFile.split('\n')) {
@@ -52,7 +41,7 @@ async function discordFetch(path, options = {}) {
     },
   });
 
-  // Handle rate limiting
+  
   if (res.status === 429) {
     const data = await res.json();
     const retryAfter = (data.retry_after || 1) * 1000;
@@ -64,11 +53,11 @@ async function discordFetch(path, options = {}) {
   return res;
 }
 
-// Old rank roles to delete (already cleaned up — kept empty for safety)
+
 const OLD_ROLE_NAMES = [];
 
-// New ELO roles (ordered from lowest to highest tier)
-// iconFile: league WebP images used as role icons (requires Guild Boost Level 2)
+
+
 const ELO_ROLES = [
   { name: '\u257C Academy Student \u257E', color: 0x888888, minElo: 0,    iconFile: 'academy-student.webp' },
   { name: '\u257C Genin \u257E',           color: 0x3E8B3E, minElo: 450,  iconFile: 'genin.webp' },
@@ -80,10 +69,7 @@ const ELO_ROLES = [
   { name: '\u257C Sage of Six Paths \u257E', color: 0xFFD700, minElo: 1200, iconFile: 'sage-of-six-paths.webp' },
 ];
 
-/**
- * Load a league icon as base64 data URI for Discord role icon.
- * Discord accepts role icons as base64-encoded image data URIs.
- */
+
 function loadIconAsBase64(filename) {
   try {
     const filePath = resolve(__dirname, '..', 'public', 'images', 'leagues', filename);
@@ -99,7 +85,7 @@ async function main() {
   console.log('\n  Naruto Mythos TCG - ELO Roles Setup');
   console.log('  ====================================\n');
 
-  // Step 1: Fetch existing guild roles
+  
   console.log('  [1/5] Fetching existing roles...');
   const rolesRes = await discordFetch(`/guilds/${GUILD_ID}/roles`);
   if (!rolesRes.ok) {
@@ -109,7 +95,7 @@ async function main() {
   const existingRoles = await rolesRes.json();
   console.log(`    Found ${existingRoles.length} roles.`);
 
-  // Step 2: Find old rank roles and collect their IDs
+  
   console.log('\n  [2/5] Identifying old rank roles...');
   const oldRoleIds = [];
   for (const roleName of OLD_ROLE_NAMES) {
@@ -122,7 +108,7 @@ async function main() {
     }
   }
 
-  // Check for existing ELO roles (to update in-place instead of delete/recreate)
+  
   const existingEloRoleNames = ELO_ROLES.map((r) => r.name);
   const existingEloRoles = existingRoles.filter((r) => existingEloRoleNames.includes(r.name));
   const existingEloMap = new Map(existingEloRoles.map((r) => [r.name, r]));
@@ -130,12 +116,12 @@ async function main() {
     console.log(`\n    Found ${existingEloRoles.length} existing ELO roles — will update in-place (members keep their roles).`);
   }
 
-  // Step 3: Create or update ELO roles
+  
   console.log('\n  [3/5] Creating/updating ELO roles...');
   const newRoleIds = [];
 
   for (const roleDef of ELO_ROLES) {
-    // Load league icon as base64
+    
     const iconData = roleDef.iconFile ? loadIconAsBase64(roleDef.iconFile) : null;
 
     const roleBody = {
@@ -145,16 +131,16 @@ async function main() {
       mentionable: false,
     };
 
-    // Add icon if loaded (requires Guild Boost Level 2 / ROLE_ICONS feature)
+    
     if (iconData) {
       roleBody.icon = iconData;
     }
 
-    // Check if this role already exists — PATCH to update instead of recreating
+    
     const existingRole = existingEloMap.get(roleDef.name);
 
     if (existingRole) {
-      // Update existing role via PATCH (preserves member assignments)
+      
       const res = await discordFetch(`/guilds/${GUILD_ID}/roles/${existingRole.id}`, {
         method: 'PATCH',
         body: JSON.stringify(roleBody),
@@ -162,7 +148,7 @@ async function main() {
 
       if (!res.ok) {
         const errText = await res.text();
-        // If icon failed due to missing boosts, retry without icon
+        
         if (iconData && (errText.includes('ROLE_ICONS') || errText.includes('50101') || errText.includes('more boosts'))) {
           console.log(`    Note: Guild needs more boosts for role icons. Updating "${roleDef.name}" without icon...`);
           delete roleBody.icon;
@@ -187,7 +173,7 @@ async function main() {
       continue;
     }
 
-    // Role doesn't exist yet — create it
+    
     roleBody.permissions = '0';
     const res = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
       method: 'POST',
@@ -196,7 +182,7 @@ async function main() {
 
     if (!res.ok) {
       const errText = await res.text();
-      // If icon failed due to missing ROLE_ICONS feature or insufficient boosts, retry without icon
+      
       if (iconData && (errText.includes('ROLE_ICONS') || errText.includes('50101') || errText.includes('more boosts'))) {
         console.log(`    Note: Guild needs more boosts for role icons. Creating "${roleDef.name}" without icon...`);
         delete roleBody.icon;
@@ -222,10 +208,10 @@ async function main() {
     console.log(`    + ${roleDef.name} (${role.id}) [created${iconData ? ', with icon' : ''}]`);
   }
 
-  // Step 4: Migrate channel permissions
+  
   console.log('\n  [4/5] Migrating channel permissions...');
 
-  // Fetch all channels
+  
   const channelsRes = await discordFetch(`/guilds/${GUILD_ID}/channels`);
   if (!channelsRes.ok) {
     console.error('    Failed to fetch channels:', channelsRes.status);
@@ -236,11 +222,11 @@ async function main() {
     for (const channel of channels) {
       const overwrites = channel.permission_overwrites || [];
 
-      // Check if this channel has overwrites for any old role
+      
       const hasOldOverwrite = overwrites.some((ow) => oldRoleIds.includes(ow.id));
       if (!hasOldOverwrite) continue;
 
-      // Find the most permissive old overwrite to use as template
+      
       let templateOverwrite = null;
       for (const ow of overwrites) {
         if (oldRoleIds.includes(ow.id)) {
@@ -252,9 +238,9 @@ async function main() {
 
       if (!templateOverwrite) continue;
 
-      // Add overwrites for all new ELO roles using the template
+      
       for (const newRole of newRoleIds) {
-        // Skip if this channel already has an overwrite for this role
+        
         const exists = overwrites.some((ow) => ow.id === newRole.id);
         if (exists) continue;
 
@@ -283,7 +269,7 @@ async function main() {
     console.log(`    ${migratedCount} channels migrated.`);
   }
 
-  // Step 5: Delete old roles
+  
   console.log('\n  [5/5] Deleting old rank roles...');
   for (const roleId of oldRoleIds) {
     const role = existingRoles.find((r) => r.id === roleId);
@@ -302,7 +288,7 @@ async function main() {
     }
   }
 
-  // Summary
+  
   console.log('\n  ====================================');
   console.log('  ELO Roles Setup Complete!');
   console.log('  ====================================\n');

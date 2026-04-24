@@ -2,22 +2,14 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 011/130 - SAKURA HARUNO (Common)
- * Chakra: 2 | Power: 2
- * Group: Leaf Village | Keywords: Team 7
- * MAIN: If there's another Team 7 character in this mission, draw a card.
- *
- * Checks if there is at least one other non-hidden Team 7 character in the same
- * mission. If so, the player draws 1 card from their deck.
- */
+
 function handleSakura011Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   if (!mission) return { state };
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
 
-  // Check for another Team 7 character in this mission (not self, not hidden)
+  
   const hasOtherTeam7 = allChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
@@ -31,8 +23,8 @@ function handleSakura011Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKURA HARUNO', id: 'KS-011-C' }) } };
   }
 
-  // Effect is optional - route through pending action so player can skip.
-  // Uses dedicated DRAW_CARD UI (shows deck + Draw/Skip buttons).
+  
+  
   return {
     state,
     requiresTargetSelection: true,

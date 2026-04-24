@@ -2,23 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 117/130 - ROCK LEE (R)
- * Chakra: 4, Power: 5
- * Group: Leaf Village, Keywords: Team Guy
- *
- * MAIN [continuous]: At end of round, must move to another mission.
- *   This is a continuous end-of-round effect handled by the engine's EndPhase logic.
- *   The handler here is a no-op that registers the card.
- *
- * UPGRADE: Reveal and discard the top card of your deck. POWERUP X where X = the
- *   chakra cost of the discarded card.
- *   When isUpgrade: discard own deck[0], POWERUP its chakra cost on self.
- */
+
 
 function rockLee117MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous end-of-round effect - handled by the engine's EndPhase.
-  // Rock Lee must move to another mission at the end of each turn.
+  
+  
   return { state: ctx.state };
 }
 

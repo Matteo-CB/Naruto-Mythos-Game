@@ -1,11 +1,6 @@
 'use client';
 
-/**
- * TrainingCoachPanel - Real-time coaching panel.
- *
- * Shown ONLY in Training mode (isTrainingMode = true).
- * Positioned as a side overlay on the game board.
- */
+
 
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,7 +23,7 @@ import { getCardName } from '@/lib/utils/cardLocale';
 import type { CoachAdvice, MissionCoachAnalysis } from '@/lib/ai/coaching/CoachTypes';
 import type { GameState } from '@/lib/engine/types';
 
-// ─── Fast ISMCTS for coaching (fewer sims = faster response) ─────────────────
+
 
 const coachMCTS = new NeuralISMCTS({
   simulations: 80,
@@ -39,7 +34,7 @@ const coachMCTS = new NeuralISMCTS({
   useBatchedEval: false,
 });
 
-// ─── Win probability from current state ──────────────────────────────────────
+
 
 function estimateWinProbability(state: GameState, player: 'player1'): number {
   try {
@@ -47,7 +42,7 @@ function estimateWinProbability(state: GameState, player: 'player1'): number {
     const evaluator = NeuralEvaluator.getInstance();
     if (evaluator.isReady()) {
       const features = FeatureExtractor.extract(sanitized, player);
-      // evaluateSync returns 0.5 for now - use heuristic fallback
+      
     }
     const raw = BoardEvaluator.evaluate(state, player);
     return 1 / (1 + Math.exp(-raw / 60));
@@ -56,7 +51,7 @@ function estimateWinProbability(state: GameState, player: 'player1'): number {
   }
 }
 
-// ─── Build quick coach advice without full ISMCTS ────────────────────────────
+
 
 type TranslateFn = (key: string, params?: Record<string, string | number>) => string;
 
@@ -68,7 +63,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
   const winProb = estimateWinProbability(state, player);
   const loc = locale as 'en' | 'fr';
 
-  // Mission analysis
+  
   const missionAnalysis: MissionCoachAnalysis[] = state.activeMissions.map((mission, idx) => {
     const myChars = mission.player1Characters;
     const oppChars = mission.player2Characters;
@@ -110,7 +105,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
     return { missionIndex: idx, rank: mission.rank, myWinProbability, myPower, opponentPower: oppPower, pointValue, status, recommendation, note };
   });
 
-  // Quick action ranking using ISMCTS stats
+  
   const actionStats = validActions.length > 0 && validActions.length <= 15
     ? coachMCTS.getActionStats(sanitized, player, validActions, 80)
     : [];
@@ -124,7 +119,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
       advantage: t('coach.action.simulations', { visits: stat.visits, winRate: `${(stat.winRate * 100).toFixed(0)}%` }),
     }));
 
-  // Hand ratings
+  
   const myState = state.player1;
   const handRatings = myState.hand.map((card, i) => {
     const power = card.power ?? 0;
@@ -149,7 +144,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
     };
   });
 
-  // Warnings
+  
   const warnings: string[] = [];
   const oppHidden = state.activeMissions.reduce(
     (s, m) => s + m.player2Characters.filter(c => c.isHidden).length, 0
@@ -159,7 +154,7 @@ function buildQuickAdvice(state: GameState, t: TranslateFn, locale: string): Coa
   if (myState.missionPoints < state.player2.missionPoints && state.turn >= 3)
     warnings.push(t('coach.warn.behind', { diff: state.player2.missionPoints - myState.missionPoints, turn: state.turn }));
 
-  // Tips
+  
   const tips: string[] = [];
   const bestMission = missionAnalysis.find(m => m.status === 'empty' || m.status === 'tied');
   if (bestMission) tips.push(t('coach.tip.missionOpen', { rank: bestMission.rank, pts: bestMission.pointValue }));
@@ -209,7 +204,7 @@ function describeAction(action: any, state: GameState, winRate: number, t: Trans
   }
 }
 
-// ─── Board assessment colors ─────────────────────────────────────────────────
+
 
 const BOARD_KEYS: Record<CoachAdvice['boardAssessment'], string> = {
   winning:         'coach.board.winning',
@@ -227,7 +222,7 @@ const BOARD_COLORS: Record<CoachAdvice['boardAssessment'], string> = {
   losing:          '#ef4444',
 };
 
-// ─── Status colors ────────────────────────────────────────────────────────────
+
 
 const STATUS_COLORS: Record<MissionCoachAnalysis['status'], string> = {
   dominating: '#4ade80',
@@ -237,7 +232,7 @@ const STATUS_COLORS: Record<MissionCoachAnalysis['status'], string> = {
   empty:      '#444444',
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+
 
 export function TrainingCoachPanel() {
   const t = useTranslations();
@@ -268,7 +263,7 @@ export function TrainingCoachPanel() {
     try {
       const advice = buildQuickAdvice(state, t, locale);
 
-      // Compare to previous win probability to assess last move quality
+      
       if (prevWinProbRef.current !== null && prevStateRef.current !== null) {
         if (prevStateRef.current.activePlayer === humanPlayer) {
           const delta = advice.winProbability - prevWinProbRef.current;
@@ -308,7 +303,7 @@ export function TrainingCoachPanel() {
 
   return (
     <>
-      {/* Toggle button */}
+      
       <button
         onClick={togglePanel}
         className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center"
@@ -330,7 +325,7 @@ export function TrainingCoachPanel() {
         {isPanelOpen ? t('coach.close') : t('coach.open')}
       </button>
 
-      {/* Sliding panel */}
+      
       <AnimatePresence>
         {isPanelOpen && (
           <motion.aside
@@ -346,7 +341,7 @@ export function TrainingCoachPanel() {
               paddingBottom: 20,
             }}
           >
-            {/* Header */}
+            
             <div
               className="sticky top-0 z-10 px-4 py-3 flex items-center justify-between"
               style={{ backgroundColor: '#0d0d0d', borderBottom: '1px solid #1e1e1e' }}
@@ -359,7 +354,7 @@ export function TrainingCoachPanel() {
               )}
             </div>
 
-            {/* Move Quality Indicator */}
+            
             <AnimatePresence>
               {lastMoveQuality && lastMoveDelta !== null && (
                 <motion.div
@@ -395,13 +390,13 @@ export function TrainingCoachPanel() {
             {coachAdvice ? (
               <div className="px-3 space-y-4 mt-3">
 
-                {/* Win Probability */}
+                
                 <WinProbBar
                   probability={coachAdvice.winProbability}
                   assessment={coachAdvice.boardAssessment}
                 />
 
-                {/* Mission Status */}
+                
                 <section>
                   <SectionTitle>{t('coach.missions')}</SectionTitle>
                   <div className="space-y-1.5">
@@ -411,7 +406,7 @@ export function TrainingCoachPanel() {
                   </div>
                 </section>
 
-                {/* Best Recommended Action */}
+                
                 {coachAdvice.bestAction && (
                   <section>
                     <SectionTitle>{t('coach.bestMove')}</SectionTitle>
@@ -424,7 +419,7 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                {/* Hand Card Ratings */}
+                
                 {coachAdvice.handRatings.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.handCards')}</SectionTitle>
@@ -436,7 +431,7 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                {/* Warnings */}
+                
                 {coachAdvice.warnings.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.warnings')}</SectionTitle>
@@ -458,7 +453,7 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                {/* Tips */}
+                
                 {coachAdvice.tips.length > 0 && (
                   <section>
                     <SectionTitle>{t('coach.tips')}</SectionTitle>
@@ -480,7 +475,7 @@ export function TrainingCoachPanel() {
                   </section>
                 )}
 
-                {/* Footer */}
+                
                 <p className="text-[10px] text-[#333] text-center pt-2">
                   {coachAdvice.neuralNetUsed ? t('coach.neuralActive') : t('coach.heuristicMode')} - {t('coach.sims', { count: coachAdvice.simulationsUsed })}
                 </p>
@@ -497,7 +492,7 @@ export function TrainingCoachPanel() {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (

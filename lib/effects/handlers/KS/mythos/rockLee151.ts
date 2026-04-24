@@ -2,27 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 117/130 V - ROCK LEE (M)
- * Chakra: 5, Power: 5
- * Group: Leaf Village, Keywords: Team Gai
- *
- * MAIN [continuous]: At end of round, must move to another mission.
- *   - Continuous no-op. The forced move is handled by the engine's EndPhase
- *     or MissionPhase post-scoring logic.
- *
- * UPGRADE: Reveal and discard the top card of your deck.
- *          POWERUP X where X = the chakra cost of the discarded card.
- *   - When isUpgrade: check if deck has cards. If yes, take deck[0],
- *     add it to discard pile (it's revealed publicly), then POWERUP its
- *     chakra cost on self.
- *   - If deck is empty, fizzles.
- */
+
 
 function rockLee151MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
 
-  // Log the continuous effect
+  
   state = {
     ...state,
     log: logAction(
@@ -34,7 +19,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // UPGRADE: Reveal top card, discard, POWERUP X
+  
   if (ctx.isUpgrade) {
     const ps = { ...state[ctx.sourcePlayer] };
     const deck = [...ps.deck];
@@ -53,7 +38,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
       return { state };
     }
 
-    // Reveal and discard top card
+    
     const topCard = deck.shift()!;
     ps.deck = deck;
     ps.discardPile = [...ps.discardPile, topCard];
@@ -72,7 +57,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
       ),
     };
 
-    // POWERUP X on self
+    
     if (powerupAmount > 0) {
       const friendlySide: 'player1Characters' | 'player2Characters' =
         ctx.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -120,7 +105,7 @@ function rockLee151MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function rockLee151UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  
   return { state: ctx.state };
 }
 

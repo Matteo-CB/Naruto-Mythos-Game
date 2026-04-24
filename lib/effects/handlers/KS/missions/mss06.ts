@@ -2,13 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * MSS 06 - "Sauvetage d'un ami" / "Rescue a Friend"
- *
- * SCORE [arrow]: Draw a card.
- *   - The scoring player draws 1 card from the top of their deck.
- *   - If the deck is empty, nothing happens (no penalty).
- */
+
 
 function mss06ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
@@ -28,7 +22,7 @@ function mss06ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before drawing
+  
   return {
     state,
     requiresTargetSelection: true,

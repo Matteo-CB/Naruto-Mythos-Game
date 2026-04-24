@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if receiver exists
+    
     const receiver = await prisma.user.findUnique({
       where: { id: receiverId },
       select: { id: true },
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check existing friendship in both directions
+    
     const existing = await prisma.friendship.findFirst({
       where: {
         OR: [
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Pending request from receiver to sender -> auto-accept
+      
       if (
         existing.status === 'pending' &&
         existing.senderId === receiverId &&
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ friendship }, { status: 201 });
       }
 
-      // Pending request from sender to receiver -> already sent
+      
       if (
         existing.status === 'pending' &&
         existing.senderId === userId &&
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Declined request -> allow re-sending by creating a new one
+      
       if (existing.status === 'declined') {
         await prisma.friendship.delete({ where: { id: existing.id } });
       }

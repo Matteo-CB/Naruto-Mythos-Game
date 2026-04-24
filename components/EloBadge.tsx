@@ -207,10 +207,7 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
   );
 }
 
-/**
- * Larger, more detailed badge for profile pages.
- * Includes league image and rank description.
- */
+
 export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: number }) {
   const t = useTranslations('profile');
   const tier = getRankTier(elo);
@@ -232,7 +229,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         minWidth: '180px',
       }}
     >
-      {/* Top decorative line */}
+      
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{
@@ -241,7 +238,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         }}
       />
 
-      {/* League image or unranked symbol */}
+      
       {unranked ? (
         <span
           style={{
@@ -268,7 +265,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         />
       )}
 
-      {/* Rank Name */}
+      
       <span
         className="font-bold uppercase tracking-widest text-center"
         style={{
@@ -281,7 +278,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
       </span>
 
-      {/* ELO value */}
+      
       <span
         className="tabular-nums font-bold mt-2"
         style={{
@@ -301,7 +298,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         ELO
       </span>
 
-      {/* Placement progress for unranked */}
+      
       {unranked && totalGames !== undefined && (
         <div className="flex flex-col items-center mt-3 w-full">
           <span
@@ -326,7 +323,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
         </div>
       )}
 
-      {/* Bottom decorative line */}
+      
       <div
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{

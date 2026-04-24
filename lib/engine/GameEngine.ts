@@ -33,7 +33,7 @@ import { calculateCharacterPower } from './phases/PowerCalculation';
 import { isRempartZeroed, canBeHiddenByEnemy } from '../effects/ContinuousEffects';
 import { getEffectivePower } from '../effects/powerUtils';
 
-/** Collect all character instanceIds from a game state (for replay ID tracking). */
+
 function collectCharInstanceIds(state: GameState): Set<string> {
   const ids = new Set<string>();
   for (const mission of state.activeMissions) {
@@ -44,22 +44,19 @@ function collectCharInstanceIds(state: GameState): Set<string> {
 }
 
 export class GameEngine {
-  /**
-   * Create a new game from two player configurations.
-   * Handles: random starting player, mission deck construction, initial draw, mulligan setup.
-   */
+  
   static createGame(config: GameConfig): GameState {
-    // NOTE: resetIdCounter() is NOT called here — callers must reset if needed.
-    // On the server, concurrent games share the global counter; resetting here
-    // would cause ID collisions between simultaneous games (e.g., inst_1 reused
-    // in Game A after Game B resets the counter). Client-side callers (gameStore)
-    // reset the counter themselves before calling createGame.
+    
+    
+    
+    
+    
     const gameId = generateGameId();
 
-    // Randomly determine starting player (Edge token holder)
+    
     const startingPlayer: PlayerID = Math.random() < 0.5 ? 'player1' : 'player2';
 
-    // Each player shuffles their 3 mission cards, randomly selects 2
+    
     const p1Missions = shuffle(config.player1.missionCards);
     const p2Missions = shuffle(config.player2.missionCards);
     const p1SelectedMissions = p1Missions.slice(0, 2);
@@ -67,14 +64,14 @@ export class GameEngine {
     const p1UnusedMission = p1Missions[2] || null;
     const p2UnusedMission = p2Missions[2] || null;
 
-    // Combine selected missions and shuffle to form the mission deck
+    
     const missionDeck = shuffle([...p1SelectedMissions, ...p2SelectedMissions]);
 
-    // Each player shuffles their character deck
+    
     const p1Deck = shuffle([...config.player1.deck]);
     const p2Deck = shuffle([...config.player2.deck]);
 
-    // Each player draws 5 cards
+    
     const p1Hand = p1Deck.splice(0, INITIAL_HAND_SIZE);
     const p2Hand = p2Deck.splice(0, INITIAL_HAND_SIZE);
 
@@ -138,21 +135,18 @@ export class GameEngine {
     };
   }
 
-  /**
-   * Apply an action to the game state. Returns a new state.
-   * This is the main reducer - validates the action, applies it, handles phase transitions.
-   */
+  
   static applyAction(state: GameState, player: PlayerID, action: GameAction): GameState {
-    // Snapshot character IDs before the action for replay tracking
+    
     const prevCharIds = collectCharInstanceIds(state);
 
     let newState = deepClone(state);
 
-    // Track action for replay
+    
     if (!newState.actionHistory) newState.actionHistory = [];
     newState.actionHistory.push({ player, action });
 
-    // FORFEIT can happen in any phase - handle before the phase switch
+    
     if (action.type === 'FORFEIT') {
       newState.phase = 'gameOver';
       newState.forfeitedBy = player;
@@ -165,8 +159,8 @@ export class GameEngine {
         break;
 
       case 'start':
-        // Start phase is automatic - no player actions needed
-        // This shouldn't normally be called
+        
+        
         break;
 
       case 'action':
@@ -175,11 +169,11 @@ export class GameEngine {
           break;
         }
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
-          // Handle pending effect target selections during action phase
+          
           newState = GameEngine.handlePendingAction(newState, player, action);
-          // After resolving a pending effect, switch active player (same logic as executeAction)
-          // but only when all pending effects/actions are resolved
-          // Check for queued discard reorder — create it now that all effects are resolved
+          
+          
+          
           if (newState.pendingDiscardReorder && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const pdr = newState.pendingDiscardReorder;
             newState.pendingDiscardReorder = undefined;
@@ -191,12 +185,12 @@ export class GameEngine {
             break;
           }
 
-          // Check for deferred continuation (remaining effects from new card)
-          // Only fire when all reaction pendings have resolved
+          
+          
           if (newState.pendingContinuation && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const cont = newState.pendingContinuation;
             newState.pendingContinuation = undefined;
-            // Restore chain data (temp fields like _tsunade104ChakraSpent)
+            
             if (cont.chainData) {
               for (const [k, v] of Object.entries(cont.chainData)) {
                 (newState as any)[k] = v;
@@ -215,12 +209,12 @@ export class GameEngine {
               remainingEffectTypes: cont.remainingEffectTypes,
             };
             newState = EffectEngine.processRemainingEffects(newState, syntheticPending);
-            // If continuation created new pendings, wait for them to resolve
+            
             if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) break;
-            // Otherwise fall through to turn alternation below
+            
           }
 
-          // Check for another continuation or reorder that appeared
+          
           if (newState.pendingDiscardReorder && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
             const pdr2 = newState.pendingDiscardReorder;
             newState.pendingDiscardReorder = undefined;
@@ -237,18 +231,18 @@ export class GameEngine {
               newState.pendingActions.length === 0 &&
               !newState.player1.hasPassed &&
               !newState.player2.hasPassed) {
-            // If a forced-choice sequence was tracked (e.g. Dosu069 → opponent choice),
-            // give the turn to the recorded resolver player (the opponent of the Dosu player).
-            // This correctly handles chains: even if the reveal triggers MAIN/AMBUSH pending
-            // effects that are then resolved, the turn still goes to the right player.
+            
+            
+            
+            
             if (newState.pendingForcedResolver) {
               newState.activePlayer = newState.pendingForcedResolver;
               newState.pendingForcedResolver = undefined;
             } else {
-              // Check if this was an opponent-facing effect (e.g. Zaku 070, Kin 072)
-              // by looking at the resolved action's originPlayer. If the resolver (player)
-              // differs from the origin (card owner), the turn should alternate from the
-              // card owner's perspective, not the resolver's.
+              
+              
+              
+              
               const resolvedAction = state.pendingActions.find((p) => {
                 if (action.type === 'SELECT_TARGET') return p.id === action.pendingActionId;
                 if (action.type === 'DECLINE_OPTIONAL_EFFECT') {
@@ -267,26 +261,26 @@ export class GameEngine {
         } else {
           newState = executeAction(newState, player, action);
         }
-        // ActionPhase sets phase to 'mission' when both pass, to avoid circular dependency.
-        // We complete the transition here (only if no pending effects remain).
+        
+        
         if (newState.phase === 'mission' && newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
           newState = GameEngine.transitionToMissionPhase(newState);
         }
         break;
 
       case 'mission':
-        // ADVANCE_PHASE: UI has shown the scored state, now advance to End Phase
+        
         if (action.type === 'ADVANCE_PHASE') {
           newState.missionScoringComplete = undefined;
           newState = GameEngine.transitionToEndPhase(newState);
           break;
         }
-        // Handle effect reordering during mission phase
+        
         if (action.type === 'REORDER_EFFECTS') {
           newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
           break;
         }
-        // Handle CHOOSE_SCORE_ORDER: player chose which SCORE effect to resolve next
+        
         if (action.type === 'SELECT_TARGET') {
           const chooseScorePending = newState.pendingEffects.find(
             (e) => e.targetSelectionType === 'CHOOSE_SCORE_ORDER',
@@ -295,9 +289,9 @@ export class GameEngine {
             const selectedOption = action.selectedTargets[0] ?? '';
             const label = selectedOption.startsWith('SCORE::') ? selectedOption.substring(7) : selectedOption;
             newState = resolveChosenScoreEffect(newState, label);
-            // If new pending actions were created (SCORE handler needs confirmation), wait
+            
             if (newState.pendingActions.length > 0) break;
-            // All SCORE effects for this mission resolved - resume remaining missions
+            
             if (newState.missionScoringProgress) {
               newState = resumeMissionScoring(newState);
               if (newState.pendingActions.length > 0) break;
@@ -306,51 +300,51 @@ export class GameEngine {
             break;
           }
         }
-        // Handle target selections for SCORE effect confirmations (Rasa, etc.)
+        
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
-          // After resolving the pending action, resume scoring remaining missions/effects
+          
           if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
             if (newState.missionScoringProgress) {
-              // Resume scoring from where we left off
+              
               newState = resumeMissionScoring(newState);
-              // If resumption created new pending actions, wait for resolution
+              
               if (newState.pendingActions.length > 0) break;
             }
-            // All SCORE effects resolved - pause for UI to show results
+            
             newState.missionScoringComplete = true;
           }
         }
         break;
 
       case 'end':
-        // Handle REORDER_EFFECTS for end-of-round effect ordering
+        
         if (action.type === 'REORDER_EFFECTS') {
           newState = GameEngine.handleReorderEffects(newState, player, action.selectedEffectId);
           break;
         }
 
-        // Handle pending actions from end-of-round effects
+        
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
-          // Check if this is an END_OF_ROUND_EFFECT_ORDER selection
+          
           if (action.type === 'SELECT_TARGET') {
             const pa = newState.pendingActions.find((p) => p.id === action.pendingActionId);
             const pe = pa ? newState.pendingEffects.find((e) => e.id === pa.sourceEffectId) : null;
             if (pe?.targetSelectionType === 'END_OF_ROUND_EFFECT_ORDER') {
               const chosenInstanceId = action.selectedTargets[0];
               newState = deepClone(newState);
-              // Remove the ordering pending effect + action
+              
               newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== pe.id);
               newState.pendingActions = newState.pendingActions.filter((a) => a.id !== pa!.id);
-              // Process the chosen effect
+              
               newState = processChosenEndOfRoundEffect(newState, chosenInstanceId);
               if (newState.pendingActions.length > 0) break;
-              // Process remaining effects
+              
               newState = processRemainingEndOfRoundEffects(newState);
               if (newState.pendingActions.length > 0) break;
-              // All interactive effects done — finalize (tokens + auto triggers)
+              
               newState = finalizeEndPhase(newState);
-              // Transition to next turn
+              
               newState.endPhaseMovedIds = undefined;
               newState.endPhaseAkamaru028Ids = undefined;
               newState.endPhaseGiantSpider103Ids = undefined;
@@ -366,16 +360,16 @@ export class GameEngine {
           }
 
           newState = GameEngine.handlePendingAction(newState, player, action);
-          // After resolving, check if more end-phase effects need processing
+          
           if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
-            // Check for remaining interactive end-of-round effects (may create ordering choice)
+            
             newState = processRemainingEndOfRoundEffects(newState);
             if (newState.pendingActions.length > 0) break;
 
-            // All interactive effects done — finalize (tokens + auto triggers)
+            
             newState = finalizeEndPhase(newState);
 
-            // All end-of-round effects resolved - finish end phase transition
+            
             newState.endPhaseMovedIds = undefined;
             newState.endPhaseAkamaru028Ids = undefined;
             newState.endPhaseGiantSpider103Ids = undefined;
@@ -388,8 +382,8 @@ export class GameEngine {
             }
           }
         } else if (action.type === 'ADVANCE_PHASE' && newState.pendingActions.length === 0) {
-          // Fallback: force advance when stuck in end phase with no pending actions (e.g., during replay)
-          // Clear any stale pending effects that don't have matching actions
+          
+          
           newState.pendingEffects = [];
           newState.endPhaseMovedIds = undefined;
           newState.endPhaseAkamaru028Ids = undefined;
@@ -405,11 +399,11 @@ export class GameEngine {
         break;
 
       case 'gameOver':
-        // Game is over - no actions accepted
+        
         break;
     }
 
-    // Record instanceIds of characters created by this action (for accurate replay ID mapping)
+    
     if (newState.actionHistory && newState.actionHistory.length > 0) {
       const newCharIds = collectCharInstanceIds(newState);
       const created: string[] = [];
@@ -424,9 +418,7 @@ export class GameEngine {
     return newState;
   }
 
-  /**
-   * Handle mulligan decisions. Once both players have decided, transition to start phase.
-   */
+  
   static handleMulligan(state: GameState, player: PlayerID, action: GameAction): GameState {
     if (action.type !== 'MULLIGAN') return state;
 
@@ -437,7 +429,7 @@ export class GameEngine {
     const ps = newState[player];
 
     if (action.doMulligan) {
-      // Return all cards to deck, shuffle, draw 5 new
+      
       ps.deck = shuffle([...ps.deck, ...ps.hand]);
       ps.hand = ps.deck.splice(0, INITIAL_HAND_SIZE);
       newState.log = logSystem(newState.log, 1, 'mulligan', 'MULLIGAN', `${player} mulligans their hand.`,
@@ -449,19 +441,17 @@ export class GameEngine {
 
     ps.hasMulliganed = true;
 
-    // Check if both players have decided
+    
     const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
     if (newState[otherPlayer].hasMulliganed) {
-      // Both decided - move to start phase of turn 1
+      
       newState = GameEngine.transitionToStartPhase(newState);
     }
 
     return newState;
   }
 
-  /**
-   * Transition to start phase and execute it automatically.
-   */
+  
   static transitionToStartPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'start';
@@ -470,78 +460,72 @@ export class GameEngine {
     newState.player2.hasPassed = false;
     newState.firstPasser = null;
 
-    // Execute start phase logic
+    
     newState = executeStartPhase(newState);
 
-    // Transition to action phase
+    
     newState.phase = 'action';
     newState.activePlayer = newState.edgeHolder;
 
     return newState;
   }
 
-  /**
-   * Transition to mission phase and execute scoring.
-   */
+  
   static transitionToMissionPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'mission';
 
-    // Reset wonBy on ALL missions — all missions are re-scored every turn
-    // (power changes as tokens are removed each EndPhase, new chars are played, etc.)
+    
+    
     newState.activeMissions = newState.activeMissions.map(m => ({ ...m, wonBy: null }));
 
-    // Execute mission scoring
+    
     newState = executeMissionPhase(newState);
 
-    // If there are pending actions from SCORE effects, wait for resolution
+    
     if (newState.pendingActions.length > 0) {
       return newState;
     }
 
-    // All scoring done - pause so UI can show SCORE results (POWERUP tokens, etc.)
-    // before End Phase removes them. The caller sends ADVANCE_PHASE to proceed.
+    
+    
     newState.missionScoringComplete = true;
     return newState;
   }
 
-  /**
-   * Transition to end phase and execute cleanup.
-   */
+  
   static transitionToEndPhase(state: GameState): GameState {
     let newState = deepClone(state);
     newState.phase = 'end';
     newState.missionScoringProgress = undefined;
 
-    // Execute end phase logic (may create ordering choice or individual effect pending)
+    
     newState = executeEndPhase(newState);
 
-    // If there are pending actions (ordering choice or individual effect), wait
+    
     if (newState.pendingActions.length > 0) {
       return newState;
     }
 
-    // No interactive effects — clean up and transition
+    
     newState.endPhaseMovedIds = undefined;
     newState.endPhaseAkamaru028Ids = undefined;
     newState.endPhaseGiantSpider103Ids = undefined;
     newState.endPhaseTokensRemoved = undefined;
 
-    // Check if game is over
+    
     if (newState.turn >= TOTAL_TURNS) {
       return GameEngine.endGame(newState);
     }
 
-    // Advance to next turn
+    
     newState.turn = (newState.turn + 1) as TurnNumber;
 
-    // Transition to start phase of next turn
+    
     return GameEngine.transitionToStartPhase(newState);
   }
 
-  /**
-   * End the game and determine the winner.
-   */
+  
   static endGame(state: GameState): GameState {
     const newState = deepClone(state);
     newState.phase = 'gameOver';
@@ -555,7 +539,7 @@ export class GameEngine {
     } else if (p2Points > p1Points) {
       winner = 'player2';
     } else {
-      // Tie - edge holder wins
+      
       winner = newState.edgeHolder;
     }
 
@@ -574,10 +558,7 @@ export class GameEngine {
     return newState;
   }
 
-  /**
-   * Handle REORDER_EFFECTS action: move the selected effect to the front of the queue.
-   * Used when multiple simultaneous effects trigger and the player chooses resolution order.
-   */
+  
   static handleReorderEffects(state: GameState, player: PlayerID, selectedEffectId: string): GameState {
     const newState = deepClone(state);
     const effectIdx = newState.pendingEffects.findIndex((e) => e.id === selectedEffectId);
@@ -586,11 +567,11 @@ export class GameEngine {
     const effect = newState.pendingEffects[effectIdx];
     if (effect.sourcePlayer !== player) return state;
 
-    // Move selected effect to front
+    
     newState.pendingEffects.splice(effectIdx, 1);
     newState.pendingEffects.unshift(effect);
 
-    // Move corresponding action to front
+    
     const actionIdx = newState.pendingActions.findIndex((a) => a.sourceEffectId === selectedEffectId);
     if (actionIdx > 0) {
       const action = newState.pendingActions[actionIdx];
@@ -598,34 +579,32 @@ export class GameEngine {
       newState.pendingActions.unshift(action);
     }
 
-    // Mark that ordering has been done — client should show first effect directly
+    
     (newState as any).effectOrderResolved = true;
 
     return newState;
   }
 
-  /**
-   * Handle pending target selections and effect resolutions.
-   */
+  
   static handlePendingAction(state: GameState, player: PlayerID, action: GameAction): GameState {
     if (action.type === 'SELECT_TARGET') {
       const newState = deepClone(state);
-      // Clear effect order flag — the chosen effect is now being resolved
+      
       (newState as any).effectOrderResolved = false;
       const pendingAction = newState.pendingActions.find((p) => p.id === action.pendingActionId);
       if (!pendingAction) return state;
       if (pendingAction.player !== player) return state;
 
-      // Find the associated PendingEffect
+      
       const pendingEffect = newState.pendingEffects.find((e) => e.id === pendingAction.sourceEffectId);
       if (!pendingEffect) {
-        // No effect found - just remove the pending action
+        
         newState.pendingActions = newState.pendingActions.filter((p) => p.id !== action.pendingActionId);
         return newState;
       }
 
-      // Apply the targeted effect via EffectEngine
-      // applyTargetedEffect handles removing the pending effect/action and processing continuations
+      
+      
       return EffectEngine.applyTargetedEffect(newState, pendingEffect, action.selectedTargets);
     }
 
@@ -635,26 +614,26 @@ export class GameEngine {
       if (effectIdx === -1) return state;
 
       const effect = newState.pendingEffects[effectIdx];
-      // Accept decline for the initial optional popup AND for any descendant
-      // pending whose root was optional (rootOptional flag propagated by the
-      // EffectEngine dispatcher). This lets a player cancel after accepting
-      // an optional effect by mistake.
+      
+      
+      
+      
       if (!effect.isOptional && !effect.rootOptional) return state;
 
-      // Special case: Gaara 120 - declining means "skip this mission, continue to remaining missions"
+      
       if (effect.targetSelectionType === 'GAARA120_CHOOSE_DEFEAT') {
         let gDesc: { defeatedCount?: number; nextMissionIndex?: number; isUpgrade?: boolean; sourceInstanceId?: string; sourceMissionIndex?: number } = {};
         try { gDesc = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
         const { defeatedCount = 0, nextMissionIndex = 0, isUpgrade = false, sourceInstanceId, sourceMissionIndex } = gDesc;
 
-        // Remove the declined effect and action
+        
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
 
         const enemySide_g: 'player1Characters' | 'player2Characters' =
           effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-        // Continue checking remaining missions from nextMissionIndex
+        
         let chainedToNext = false;
         for (let mi = nextMissionIndex; mi < newState.activeMissions.length; mi++) {
           const mission_g = newState.activeMissions[mi];
@@ -670,7 +649,7 @@ export class GameEngine {
           }
           if (validTargets_g.length === 0) continue;
 
-          // Prompt for this mission (isOptional: true - player can skip)
+          
           const chainData = JSON.stringify({ defeatedCount, nextMissionIndex: mi + 1, isUpgrade, sourceInstanceId, sourceMissionIndex, missionIndex: mi });
           const effId = generateInstanceId();
           const actId = generateInstanceId();
@@ -706,7 +685,7 @@ export class GameEngine {
           break;
         }
 
-        // If no remaining missions need prompting, apply UPGRADE powerup if applicable
+        
         if (!chainedToNext && isUpgrade && defeatedCount > 0 && sourceInstanceId && sourceMissionIndex != null) {
           const friendlySide_g: 'player1Characters' | 'player2Characters' =
             effect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -731,16 +710,16 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Dosu 069 - declining means the opponent lets the character be defeated
+      
       if (effect.targetSelectionType === 'DOSU069_OPPONENT_CHOICE') {
         let parsed: { targetInstanceId?: string; sourcePlayer?: string } = {};
         try { parsed = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
         const defeatTargetId = parsed.targetInstanceId ?? (effect.validTargets?.[0] ?? '');
         const dosuPlayer = (parsed.sourcePlayer ?? effect.sourcePlayer) as import('./types').PlayerID;
         if (defeatTargetId) {
-          // Defeat the character
+          
           const defeated = EffectEngine.defeatCharacter(newState, defeatTargetId, dosuPlayer);
-          // Remove the effect and action
+          
           defeated.pendingEffects = defeated.pendingEffects.filter((e) => e.id !== effect.id);
           defeated.pendingActions = defeated.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
           defeated.log = logAction(
@@ -757,7 +736,7 @@ export class GameEngine {
         }
       }
 
-      // Special case: Gemma 049 sacrifice (defeat) - declining means the original target gets defeated
+      
       if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_CHOICE') {
         let parsed049: { targetInstanceId?: string; effectSource?: string } = {};
         try { parsed049 = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -766,7 +745,7 @@ export class GameEngine {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
         if (defeatTargetId049) {
-          // Use defeatCharacterDirect to avoid re-triggering Gemma check
+          
           newState = EffectEngine.defeatCharacterDirect(newState, defeatTargetId049);
           const charResult049 = EffectEngine.findCharByInstanceId(state, defeatTargetId049);
           if (charResult049) {
@@ -784,7 +763,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Gemma 049 sacrifice (hide) - declining means the original target gets hidden
+      
       if (effect.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE') {
         let parsed049h: { targetInstanceId?: string; effectSource?: string; batchRemainingTargets?: string[]; batchSourcePlayer?: string } = {};
         try { parsed049h = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -804,7 +783,7 @@ export class GameEngine {
             );
           }
         }
-        // Resume batch hide if there are remaining targets
+        
         if (parsed049h.batchRemainingTargets && parsed049h.batchRemainingTargets.length > 0) {
           const batchPlayer = (parsed049h.batchSourcePlayer ?? effectSource049h) as import('./types').PlayerID;
           newState = EffectEngine.resumeBatchHideAfterGemma(newState, parsed049h.batchRemainingTargets, batchPlayer);
@@ -815,14 +794,14 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Gemma 049 batch protect choice declined → process all targets normally (no protection)
+      
       if (effect.targetSelectionType === 'GEMMA049_CHOOSE_PROTECT_HIDE') {
         let parsed049cp: { batchAllTargets?: string[]; batchSourcePlayer?: string } = {};
         try { parsed049cp = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
-        // Keep the pending effect as "not resolved" during batch processing so that
-        // hideCharacterWithLog's alreadyHasGemmaPending check prevents re-triggering Gemma.
+        
+        
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
-        // Hide all batch targets normally (Gemma won't re-trigger because the pending is still present)
+        
         const batchAll049 = parsed049cp.batchAllTargets ?? [];
         const batchSourceP049 = (parsed049cp.batchSourcePlayer ?? (effect.sourcePlayer === 'player1' ? 'player2' : 'player1')) as import('./types').PlayerID;
         let hiddenCount049 = 0;
@@ -831,7 +810,7 @@ export class GameEngine {
           const charAfter = EffectEngine.findCharByInstanceId(newState, bId);
           if (charAfter && charAfter.character.isHidden) hiddenCount049++;
         }
-        // Now remove the pending effect
+        
         newState.pendingEffects = newState.pendingEffects.filter((e) => e.id !== effect.id);
         if (hiddenCount049 > 0) {
           newState.log = logAction(
@@ -845,7 +824,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Zabuza 087 UPGRADE modifier declined → execute base MAIN (hide instead of defeat)
+      
       if (effect.targetSelectionType === 'ZABUZA087_CONFIRM_UPGRADE_MODIFIER') {
         let z087dData: { targetInstanceId?: string; missionIndex?: number } = {};
         try { z087dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -873,7 +852,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Haku 089 UPGRADE modifier declined → execute base MAIN (discard from opponent deck)
+      
       if (effect.targetSelectionType === 'HAKU089_CONFIRM_UPGRADE_MODIFIER') {
         const h089dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         let h089dData: { missionIndex?: number } = {};
@@ -897,9 +876,9 @@ export class GameEngine {
         return newState;
       }
 
-      // --- Batch 10: Modifier DECLINE handlers ---
+      
 
-      // Itachi 091 UPGRADE modifier declined → execute base MAIN (reveal hand only, no discard)
+      
       if (effect.targetSelectionType === 'ITACHI091_CONFIRM_UPGRADE_MODIFIER') {
         const i091dOpponent = effect.sourcePlayer === 'player1' ? 'player2' : 'player1';
         newState.pendingEffects.splice(effectIdx, 1);
@@ -941,7 +920,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Kisame 093 UPGRADE modifier declined → execute base MAIN (steal up to 2, not all)
+      
       if (effect.targetSelectionType === 'KISAME093_CONFIRM_UPGRADE_MODIFIER') {
         const k093dEnemySide: 'player1Characters' | 'player2Characters' =
           effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -983,7 +962,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Kakashi 106 UPGRADE modifier declined → execute base MAIN (devolve only, no copy)
+      
       if (effect.targetSelectionType === 'KAKASHI106_CONFIRM_UPGRADE_MODIFIER') {
         const k106dEnemySide: 'player1Characters' | 'player2Characters' =
           effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -1025,7 +1004,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Naruto 108 UPGRADE modifier declined → execute base MAIN (hide only, no POWERUP)
+      
       if (effect.targetSelectionType === 'NARUTO108_CONFIRM_UPGRADE_MODIFIER') {
         let n108dData: { missionIndex?: number } = {};
         try { n108dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1071,7 +1050,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Sakura 109 UPGRADE modifier declined → execute base MAIN (full cost, costReduction: 0)
+      
       if (effect.targetSelectionType === 'SAKURA109_CONFIRM_UPGRADE_MODIFIER') {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
@@ -1115,7 +1094,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Ino 110 UPGRADE modifier declined → execute base MAIN (move only, no hide)
+      
       if (effect.targetSelectionType === 'INO110_CONFIRM_UPGRADE_MODIFIER') {
         let i110dData: { missionIndex?: number } = {};
         try { i110dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1171,7 +1150,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Kidomaru 124 UPGRADE modifier declined → execute base AMBUSH with P<=3
+      
       if (effect.targetSelectionType === 'KIDOMARU124_CONFIRM_UPGRADE_MODIFIER') {
         let k124dData: { sourceMissionIndex?: number } = {};
         try { k124dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1223,7 +1202,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Naruto 133 UPGRADE modifier declined → execute base MAIN (hide instead of defeat)
+      
       if (effect.targetSelectionType === 'NARUTO133_CONFIRM_UPGRADE_MODIFIER') {
         let n133dData: { missionIndex?: number } = {};
         try { n133dData = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1302,9 +1281,9 @@ export class GameEngine {
         return newState;
       }
 
-      // Sakura 135 UPGRADE modifier declined → execute base MAIN (full cost, no reduction)
+      
       if (effect.targetSelectionType === 'SAKURA135_CONFIRM_UPGRADE_MODIFIER') {
-        // Declined UPGRADE → go directly to draw logic (base MAIN, no cost reduction, no re-prompt)
+        
         const s135dPlayer = effect.sourcePlayer;
         const s135dPs = newState[s135dPlayer];
         newState.pendingEffects.splice(effectIdx, 1);
@@ -1317,12 +1296,12 @@ export class GameEngine {
           return newState;
         }
 
-        // Draw top 3 cards from deck
+        
         const s135dDeck = [...s135dPs.deck];
         const s135dTop3 = s135dDeck.splice(0, Math.min(3, s135dDeck.length));
         newState = { ...newState, [s135dPlayer]: { ...s135dPs, deck: s135dDeck } };
 
-        // Find affordable character cards (no cost reduction)
+        
         const s135dAvailable = s135dTop3.filter((card) => {
           if (card.card_type !== 'character') return false;
           return (card.chakra ?? 0) <= newState[s135dPlayer].chakra;
@@ -1336,7 +1315,7 @@ export class GameEngine {
           return newState;
         }
 
-        // Store top 3 in discard pile as temporary storage
+        
         newState = { ...newState, [s135dPlayer]: { ...newState[s135dPlayer], discardPile: [...newState[s135dPlayer].discardPile, ...s135dTop3] } };
 
         const s135dEffId = generateInstanceId();
@@ -1373,7 +1352,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Gaara 139 UPGRADE modifier declined → go directly to target selection (no re-prompt)
+      
       if (effect.targetSelectionType === 'GAARA139_CONFIRM_UPGRADE_MODIFIER') {
         const g139dPlayer = effect.sourcePlayer;
         const g139dEnemySide: 'player1Characters' | 'player2Characters' =
@@ -1383,7 +1362,7 @@ export class GameEngine {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
 
-        // Re-count friendly hidden characters
+        
         let g139dHiddenCount = 0;
         for (const mission of newState.activeMissions) {
           for (const char of mission[g139dFriendlySide]) {
@@ -1398,7 +1377,7 @@ export class GameEngine {
           return newState;
         }
 
-        // Re-validate targets: enemy with cost < hiddenCount
+        
         const g139dValidTargets: string[] = [];
         for (let i = 0; i < newState.activeMissions.length; i++) {
           for (const char of newState.activeMissions[i][g139dEnemySide]) {
@@ -1442,7 +1421,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Kiba 113/149 UPGRADE confirmation declined → continue with hide mode
+      
       if (effect.targetSelectionType === 'KIBA113_CONFIRM_UPGRADE' || effect.targetSelectionType === 'KIBA149_CONFIRM_UPGRADE') {
         newState.pendingEffects.splice(effectIdx, 1);
         newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
@@ -1459,7 +1438,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Special case: Giant Spider 103 - declining the hide still returns Giant Spider to hand
+      
       if (effect.targetSelectionType === 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET') {
         let k103Data: { giantSpiderInstanceId?: string } = {};
         try { k103Data = JSON.parse(effect.effectDescription); } catch { /* ignore */ }
@@ -1475,12 +1454,12 @@ export class GameEngine {
         }
       }
 
-      // Clean up Hiruzen 002 metadata when declining UPGRADE confirmation
+      
       if (effect.targetSelectionType === 'HIRUZEN002_CONFIRM_UPGRADE') {
         delete (newState as any)._hiruzen002PlayedCharId;
       }
 
-      // Kakashi 016 UPGRADE declined: execute MAIN with base cost 4 limit
+      
       if (effect.targetSelectionType === 'KAKASHI016_CONFIRM_UPGRADE') {
         const enemySide016d: 'player1Characters' | 'player2Characters' =
           effect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -1527,7 +1506,7 @@ export class GameEngine {
         return newState;
       }
 
-      // Ino 020 UPGRADE declined: execute MAIN with base cost 2 limit
+      
       if (effect.targetSelectionType === 'INO020_CONFIRM_UPGRADE') {
         const i020dSrcChar = EffectEngine.findCharByInstanceId(newState, effect.sourceInstanceId ?? '');
         const i020dMIdx = i020dSrcChar?.missionIndex ?? effect.sourceMissionIndex;
@@ -1578,11 +1557,11 @@ export class GameEngine {
         return newState;
       }
 
-      // Remove the effect and its associated action
+      
       newState.pendingEffects.splice(effectIdx, 1);
       newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
 
-      // Process remaining effects (continuation) if any
+      
       if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
         return EffectEngine.processRemainingEffects(newState, effect);
       }
@@ -1593,9 +1572,7 @@ export class GameEngine {
     return state;
   }
 
-  /**
-   * Get all valid actions for a player in the current state.
-   */
+  
   static getValidActions(state: GameState, player: PlayerID): GameAction[] {
     switch (state.phase) {
       case 'mulligan': {
@@ -1608,7 +1585,7 @@ export class GameEngine {
       }
 
       case 'action': {
-        // If there are pending target selections for this player, those must be resolved first
+        
         const pendingForPlayer = state.pendingActions.filter((p) => p.player === player);
         if (pendingForPlayer.length > 0) {
           const actions: GameAction[] = [];
@@ -1621,7 +1598,7 @@ export class GameEngine {
               });
             }
           }
-          // Also allow declining optional effects
+          
           const pendingEffects = state.pendingEffects.filter(
             (e) => e.sourcePlayer === player && e.isOptional && !e.resolved,
           );
@@ -1633,18 +1610,18 @@ export class GameEngine {
           }
           return actions;
         }
-        // If there are pending ACTIONS for the other player, this player can't act.
-        // But orphaned pending effects (no matching actions) should not block.
+        
+        
         if (state.pendingActions.length > 0) {
           return []; // Someone needs to resolve pending actions first
         }
-        // Pending effects with no actions = orphaned, don't block regular actions
+        
         return getValidActionsForPlayer(state, player);
       }
 
       case 'mission':
       case 'end': {
-        // Handle pending actions (SELECT_TARGET + DECLINE for optional effects)
+        
         const actions: GameAction[] = state.pendingActions
           .filter((p) => p.player === player)
           .flatMap((p) => {
@@ -1654,7 +1631,7 @@ export class GameEngine {
               selectedTargets: [opt],
             }));
           });
-        // Also allow declining optional effects (same pattern as action phase)
+        
         const pendingEffects = state.pendingEffects.filter(
           (e) => e.sourcePlayer === player && e.isOptional && !e.resolved,
         );
@@ -1672,16 +1649,13 @@ export class GameEngine {
     }
   }
 
-  /**
-   * Get the game state visible to a specific player.
-   * Filters hidden information (opponent's hand, face-down cards).
-   */
+  
   static getVisibleState(state: GameState, player: PlayerID): VisibleGameState {
     const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
     const myState = state[player];
     const oppState = state[otherPlayer];
 
-    // Highlight all cards played this turn (white border)
+    
     const lastPlayedIds = new Set<string>(state.turnPlayedIds ?? []);
 
     const opponentVisible: VisibleOpponentState = {
@@ -1700,12 +1674,12 @@ export class GameEngine {
       const makeVisible = (chars: CharacterInPlay[], side: PlayerID): VisibleCharacter[] =>
         chars.map((c) => {
           const isOwn = c.controlledBy === player;
-          // Can see if: own card, OR not hidden, OR was revealed at least once (public info).
+          
           const canSee = isOwn || !c.isHidden || c.wasRevealedAtLeastOnce;
           let power = 0;
           try { power = calculateCharacterPower(state, c, side); } catch { /* prevent crash */ }
           const topCard = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-          // Rempart 067: the targeted character loses all Power tokens visually
+          
           let tokensZeroed = false;
           try { tokensZeroed = isRempartZeroed(state, mIdx, c, side); } catch { /* prevent crash */ }
           return {
@@ -1754,13 +1728,11 @@ export class GameEngine {
     };
   }
 
-  /**
-   * Get the winner of the game (only valid in gameOver phase).
-   */
+  
   static getWinner(state: GameState): PlayerID | null {
     if (state.phase !== 'gameOver') return null;
 
-    // Forfeit: the other player wins
+    
     if (state.forfeitedBy) {
       return state.forfeitedBy === 'player1' ? 'player2' : 'player1';
     }
@@ -1773,9 +1745,7 @@ export class GameEngine {
     return state.edgeHolder; // Tie goes to edge holder
   }
 
-  /**
-   * Count all characters in play for a given player across all missions.
-   */
+  
   static countCharactersInPlay(state: GameState, player: PlayerID): number {
     let count = 0;
     for (const mission of state.activeMissions) {
@@ -1785,9 +1755,7 @@ export class GameEngine {
     return count;
   }
 
-  /**
-   * Get all characters controlled by a player across all missions.
-   */
+  
   static getPlayerCharacters(state: GameState, player: PlayerID): CharacterInPlay[] {
     const chars: CharacterInPlay[] = [];
     for (const mission of state.activeMissions) {
@@ -1797,9 +1765,7 @@ export class GameEngine {
     return chars;
   }
 
-  /**
-   * Find a character in play by its instance ID.
-   */
+  
   static findCharacterByInstanceId(
     state: GameState,
     instanceId: string,

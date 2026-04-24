@@ -3,28 +3,19 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 033/130 - SHINO ABURAME (UC)
- * Chakra: 4 | Power: 4
- * Group: Leaf Village | Keywords: Team 8, Jutsu
- *
- * AMBUSH [⧗]: Play this character paying 4 less if there's an enemy Jutsu character
- *   in this mission. (Continuous cost reduction — handled in ChakraValidation.ts)
- *
- * UPGRADE: Move this character to another mission.
- */
+
 
 function handleShino033Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
 
-  // R8: Need at least 2 missions to move
+  
   if (state.activeMissions.length <= 1) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Shino Aburame (033): Only 1 mission in play — cannot move.',
       'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
-  // R8: Check Kurenai block — Shino moves himself
+  
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_BLOCKED',
       'Shino Aburame (033): Cannot move from this mission (Kurenai 035 block).',
@@ -39,7 +30,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Find valid destination missions (not current mission, no same-name conflict)
+  
   const validTargets: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     if (i === sourceMissionIndex) continue;
@@ -62,7 +53,7 @@ function handleShino033Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SHINO ABURAME', id: 'KS-033-UC' }) } };
   }
 
-  // Confirmation popup before move
+  
   return {
     state,
     requiresTargetSelection: true,

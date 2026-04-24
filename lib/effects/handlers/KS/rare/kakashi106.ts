@@ -2,25 +2,14 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 106/130 - KAKASHI HATAKE (R)
- * Chakra: 5, Power: 4
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN: Discard the top card of an upgraded enemy character's stack
- *   (remove the top card, revealing the previous card underneath).
- *
- * UPGRADE: MAIN effect: Also copy any non-Upgrade instant effect of the discarded card.
- *
- * Confirmation popup before target selection. Modifier pattern for UPGRADE.
- */
+
 
 function kakashi106MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-check: any upgraded enemy characters across all missions?
+  
   let hasUpgraded = false;
   for (const mission of state.activeMissions) {
     const enemyChars = mission[enemySide];
@@ -48,7 +37,7 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -61,7 +50,7 @@ function kakashi106MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function kakashi106UpgradeHandler(ctx: EffectContext): EffectResult {
-  // No-op: modifier handled via CONFIRM_MAIN → CONFIRM_UPGRADE_MODIFIER in engine.
+  
   return { state: ctx.state };
 }
 

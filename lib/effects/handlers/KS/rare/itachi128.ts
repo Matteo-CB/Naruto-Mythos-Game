@@ -4,22 +4,11 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 128/130 - ITACHI UCHIWA (R)
- * Chakra: 6, Power: 6
- * Group: Akatsuki, Keywords: Rogue Ninja
- *
- * MAIN [continuous]: Every enemy character in this mission has -1 Power.
- *   Handled by the engine's PowerCalculation (ContinuousEffects.ts).
- *
- * UPGRADE: Move a friendly character in play to another mission.
- *   Player chooses both the character and the destination.
- *   Validates Kurenai block + name uniqueness.
- */
+
 
 function itachi128MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous power modifier: every enemy in this mission has -1 Power.
-  // Handled by the engine's PowerCalculation (ContinuousEffects.ts).
+  
+  
   return { state: ctx.state };
 }
 
@@ -28,7 +17,7 @@ function itachi128UpgradeHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find friendly characters (not self) that have at least one valid destination
+  
   const hasMovableChar = state.activeMissions.length >= 2 && state.activeMissions.some((mission, mIdx) => {
     for (const char of mission[friendlySide]) {
       if (char.instanceId === sourceCard.instanceId) continue;

@@ -1,7 +1,4 @@
-/**
- * Uncommon card effect handlers index.
- * Registers all uncommon card handlers with the effect registry.
- */
+
 
 import { registerHandler as registerHiruzen002 } from './hiruzen002';
 import { registerTsunade004Handlers } from './tsunade004';
@@ -53,10 +50,7 @@ import { registerHandler as registerKisame093 } from './kisame093';
 import { registerManda102Handlers } from './manda102';
 import { registerHandler as registerGiantSpider103 } from './giantSpider103';
 
-/**
- * Register all uncommon card effect handlers with the effect registry.
- * Called once during application initialization.
- */
+
 export function registerAllUncommonHandlers(): void {
   registerHiruzen002();         // 002/130 - HIRUZEN SARUTOBI: Play Leaf Village paying 1 less / UPGRADE POWERUP 2
   registerTsunade004Handlers(); // 004/130 - TSUNADE: [continuous] Defeated go to hand / UPGRADE discard to hand

@@ -5,34 +5,34 @@ import { motion } from 'framer-motion';
 import type { CharacterCard } from '@/lib/engine/types';
 import CardFace from './CardFace';
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface CardInHandProps {
   card: CharacterCard;
-  /** Whether this card is currently selected by the player */
+  
   isSelected?: boolean;
-  /** Whether the player can afford to play this card (based on chakra) */
+  
   canAfford?: boolean;
-  /** Whether it is currently this player's turn to act */
+  
   isPlayable?: boolean;
-  /** The chakra cost to display on the card badge */
+  
   displayCost?: number;
-  /** Called when the card is clicked */
+  
   onClick?: (card: CharacterCard) => void;
-  /** Called when mouse enters for preview purposes */
+  
   onHoverStart?: (card: CharacterCard) => void;
-  /** Called when mouse leaves */
+  
   onHoverEnd?: () => void;
-  /** Optional extra className for sizing */
+  
   className?: string;
-  /** Index in hand for staggered animations */
+  
   index?: number;
 }
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 function CardInHandInner({
   card,
   isSelected = false,
@@ -120,7 +120,7 @@ function CardInHandInner({
         filter: !canAfford && isPlayable ? 'brightness(0.5)' : undefined,
       }}
     >
-      {/* Selection highlight border */}
+      
       <div
         className={className}
         style={{
@@ -137,7 +137,7 @@ function CardInHandInner({
         <CardFace card={card} />
       </div>
 
-      {/* Chakra cost overlay badge (top-center, shown on hover when different from card cost) */}
+      
       {displayCost !== undefined && displayCost !== card.chakra && (
         <div
           style={{
@@ -166,7 +166,7 @@ function CardInHandInner({
         </div>
       )}
 
-      {/* Cannot afford indicator */}
+      
       {!canAfford && isPlayable && (
         <div
           style={{
@@ -199,7 +199,7 @@ function CardInHandInner({
         </div>
       )}
 
-      {/* Selection glow effect */}
+      
       {isSelected && (
         <div
           style={{

@@ -40,7 +40,7 @@ export function SandboxToolbar() {
 
   return (
     <>
-      {/* Toolbar - Row 1: Main actions */}
+      
       <div
         className="fixed top-0 left-0 right-0 z-[60] flex flex-col"
         style={{
@@ -48,7 +48,7 @@ export function SandboxToolbar() {
           borderBottom: '1px solid #262626',
         }}
       >
-        {/* Row 1: Card actions */}
+        
         <div className="flex items-center justify-center gap-1 sm:gap-1.5 py-1 px-2 sm:px-3 flex-wrap">
           <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-bold mr-1 sm:mr-2" style={{ color: '#c4a35a' }}>
             {t('hotseat.modeFree')}
@@ -65,7 +65,7 @@ export function SandboxToolbar() {
 
           <ToolbarButton label="+5 Chakra" onClick={() => sandboxAddChakra(5)} />
 
-          {/* Inline chakra setter */}
+          
           {chakraInput ? (
             <div className="flex items-center gap-1">
               <input
@@ -93,7 +93,7 @@ export function SandboxToolbar() {
 
           <div className="w-px h-4 mx-0.5" style={{ backgroundColor: '#333' }} />
 
-          {/* Turn control */}
+          
           <div className="flex items-center gap-0.5">
             <span className="text-[8px] uppercase" style={{ color: '#666' }}>T</span>
             {[1, 2, 3, 4].map((turn) => (
@@ -110,7 +110,7 @@ export function SandboxToolbar() {
             ))}
           </div>
 
-          {/* Phase control */}
+          
           <div className="flex items-center gap-0.5">
             {(['action', 'mission'] as const).map((phase) => (
               <button
@@ -131,7 +131,7 @@ export function SandboxToolbar() {
         </div>
       </div>
 
-      {/* Modals */}
+      
       {modal === 'draw' && (
         <CardGridModal
           title={t('sandbox.drawCard')}
@@ -202,7 +202,7 @@ function ToolbarButton({ label, onClick, accent }: { label: string; onClick: () 
   );
 }
 
-/** Reusable modal that displays a grid of cards (deck, hand, etc.) */
+
 function CardGridModal({
   title,
   subtitle,
@@ -256,7 +256,7 @@ function CardGridModal({
   );
 }
 
-/** Modal for browsing ALL cards in the game and adding them to hand */
+
 function AllCardsModal({
   onSelect,
   onClose,
@@ -306,7 +306,7 @@ function AllCardsModal({
         style={{ backgroundColor: '#111', border: '1px solid #333' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        
         <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #262626' }}>
           <span className="text-xs uppercase tracking-wider font-bold" style={{ color: '#c4a35a' }}>
             {t('sandbox.allCards')} ({filtered.length})
@@ -316,7 +316,7 @@ function AllCardsModal({
           </button>
         </div>
 
-        {/* Search */}
+        
         <div className="px-3 pt-3 pb-2">
           <input
             type="text"
@@ -331,7 +331,7 @@ function AllCardsModal({
           />
         </div>
 
-        {/* Card grid */}
+        
         <div className="flex-1 overflow-y-auto p-3">
           <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
             {filtered.map((card: CharacterCard) => {
@@ -364,21 +364,21 @@ function AllCardsModal({
                       </span>
                     </div>
                   )}
-                  {/* Cost badge */}
+                  
                   <span
                     className="absolute top-0 left-0 text-[8px] font-bold px-1"
                     style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#4a9eff' }}
                   >
                     {card.chakra}
                   </span>
-                  {/* Power badge */}
+                  
                   <span
                     className="absolute top-0 right-0 text-[8px] font-bold px-1"
                     style={{ backgroundColor: 'rgba(0,0,0,0.8)', color: '#c4a35a' }}
                   >
                     {card.power}
                   </span>
-                  {/* Name */}
+                  
                   <span
                     className="absolute bottom-0 left-0 right-0 text-[6px] sm:text-[7px] text-center truncate px-0.5"
                     style={{ backgroundColor: 'rgba(0,0,0,0.85)', color: '#ccc' }}
@@ -395,7 +395,7 @@ function AllCardsModal({
   );
 }
 
-/** Modal showing all characters on the board — click to return one to hand */
+
 function BoardCharactersModal({
   title,
   subtitle,
@@ -505,7 +505,7 @@ function BoardCharactersModal({
   );
 }
 
-/** Modal for moving a character between missions */
+
 function MoveCharacterModal({
   onMove,
   onClose,
@@ -524,7 +524,7 @@ function MoveCharacterModal({
   const rankLabels = ['D', 'C', 'B', 'A'];
 
   if (selected) {
-    // Step 2: choose destination mission
+    
     return (
       <div className="fixed inset-0 z-[70] flex items-center justify-center"
         style={{ backgroundColor: 'rgba(0,0,0,0.85)' }} onClick={onClose}>
@@ -565,7 +565,7 @@ function MoveCharacterModal({
     );
   }
 
-  // Step 1: select a character to move
+  
   const hasAnyChars = missions.some((m) =>
     m.player1Characters.length > 0 || m.player2Characters.length > 0
   );

@@ -2,20 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 036/130 - NEJI HYUGA (Common)
- * Chakra: 2 | Power: 2
- * Group: Leaf Village | Keywords: Team Guy
- * MAIN: Remove up to 2 Power tokens from an enemy character in play.
- *
- * Select an enemy character in play that has at least 1 power token.
- * Remove up to 2 power tokens from that character. This effect is optional.
- */
+
 function handleNeji036Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Find all enemy characters with power tokens across all missions
+  
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -29,14 +21,14 @@ function handleNeji036Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no valid targets, effect fizzles
+  
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Neji Hyuga (036): No enemy with Power tokens to remove.',
       'game.log.effect.noTarget', { card: 'NEJI HYUGA', id: 'KS-036-C' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

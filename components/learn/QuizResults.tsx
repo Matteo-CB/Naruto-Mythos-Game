@@ -6,9 +6,9 @@ import { useTranslations } from 'next-intl';
 import { useQuizStore } from '@/stores/quizStore';
 import { isAnswerCorrect, getPartialScore } from '@/lib/quiz/questionGenerator';
 
-// =====================================================================
-// CONSTANTS
-// =====================================================================
+
+
+
 
 const GOLD = '#c4a35a';
 const DARK_BG = '#0a0a0a';
@@ -27,9 +27,9 @@ const DIFFICULTY_COLORS: Record<number, string> = {
   5: '#6a6abb',
 };
 
-// =====================================================================
-// PROPS
-// =====================================================================
+
+
+
 
 interface QuizResultsProps {
   onRetry: () => void;
@@ -37,9 +37,9 @@ interface QuizResultsProps {
   onSaveScore?: () => Promise<void>;
 }
 
-// =====================================================================
-// ANIMATED COUNTER
-// =====================================================================
+
+
+
 
 function AnimatedCounter({
   target,
@@ -61,7 +61,7 @@ function AnimatedCounter({
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / (duration * 1000), 1);
-      // Ease out cubic
+      
       const eased = 1 - Math.pow(1 - progress, 3);
       setCurrent(Math.round(eased * target));
       if (progress < 1) {
@@ -78,9 +78,9 @@ function AnimatedCounter({
   );
 }
 
-// =====================================================================
-// STAT CARD
-// =====================================================================
+
+
+
 
 function StatCard({
   label,
@@ -116,9 +116,9 @@ function StatCard({
   );
 }
 
-// =====================================================================
-// COMPONENT
-// =====================================================================
+
+
+
 
 export function QuizResults({
   onRetry,
@@ -138,7 +138,7 @@ export function QuizResults({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Compute stats
+  
   const total = questions.length;
   let correctCount = 0;
   let partialCount = 0;
@@ -172,7 +172,7 @@ export function QuizResults({
       await onSaveScore();
       setSaved(true);
     } catch {
-      // Silently fail
+      
     } finally {
       setSaving(false);
     }
@@ -184,7 +184,7 @@ export function QuizResults({
       style={{ backgroundColor: DARK_BG }}
     >
       <div className="max-w-md w-full">
-        {/* Title */}
+        
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ export function QuizResults({
             {t('quiz.resultsTitle')}
           </h2>
 
-          {/* Difficulty badge */}
+          
           <span
             className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider"
             style={{
@@ -212,7 +212,7 @@ export function QuizResults({
           </span>
         </motion.div>
 
-        {/* Animated score */}
+        
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -225,7 +225,7 @@ export function QuizResults({
           </div>
         </motion.div>
 
-        {/* Stats grid */}
+        
         <div className="grid grid-cols-2 gap-2 mb-4">
           <StatCard
             label={t('quiz.statCorrect')}
@@ -249,7 +249,7 @@ export function QuizResults({
           />
         </div>
 
-        {/* Breakdown toggle */}
+        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -359,14 +359,14 @@ export function QuizResults({
           </AnimatePresence>
         </motion.div>
 
-        {/* Action buttons */}
+        
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
           className="flex flex-col gap-3"
         >
-          {/* Save score */}
+          
           {onSaveScore && (
             <button
               onClick={handleSave}
@@ -389,7 +389,7 @@ export function QuizResults({
             </button>
           )}
 
-          {/* Retry */}
+          
           <button
             onClick={onRetry}
             className="w-full px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all"
@@ -404,7 +404,7 @@ export function QuizResults({
             {t('quiz.tryAgain')}
           </button>
 
-          {/* Change difficulty */}
+          
           <button
             onClick={onChangeDifficulty}
             className="w-full px-6 py-3 text-sm uppercase tracking-wider transition-all"

@@ -4,24 +4,10 @@ import type { PlayerID } from '@/lib/engine/types';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 134/130 - KYUBI (S)
- * Chakra: 8, Power: 9
- * Group: Independent, Keywords: Summon
- *
- * MAIN [continuous]: Can't be hidden or defeated by enemy effects.
- *   - Continuous no-op. The engine handles defeat replacement and hide immunity
- *     via ContinuousEffects / EffectEngine.checkDefeatReplacement.
- *
- * UPGRADE: Hide any number of non-hidden characters (from any player, not self)
- *          with total Power 6 or less.
- *   - For auto-resolution: greedily pick enemy characters starting from weakest
- *     until the total power reaches 6 or no more valid targets.
- *   - All selected characters are hidden simultaneously.
- */
+
 
 function kyubi134MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous immunity - handled by ContinuousEffects engine
+  
   const log = logAction(
     ctx.state.log, ctx.state.turn, ctx.state.phase, ctx.sourcePlayer,
     'EFFECT_CONTINUOUS',
@@ -35,8 +21,8 @@ function kyubi134MainHandler(ctx: EffectContext): EffectResult {
 function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
   const state = ctx.state;
 
-  // Collect all non-hidden characters across all missions (any player, not self)
-  // that have Power > 0 and Power <= 6
+  
+  
   const validTargets: string[] = [];
 
   for (let i = 0; i < state.activeMissions.length; i++) {
@@ -65,7 +51,7 @@ function kyubi134UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup instead of direct target selection
+  
   return {
     state,
     requiresTargetSelection: true,

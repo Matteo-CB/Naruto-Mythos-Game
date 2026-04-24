@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the invite and verify the current user is the sender
+    
     const invite = await prisma.matchInvite.findUnique({
       where: { id: inviteId },
     });
@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update invite status to cancelled
+    
     await prisma.matchInvite.update({
       where: { id: inviteId },
       data: { status: 'cancelled' },
     });
 
-    // Emit socket event to the receiver
+    
     emitToUser(invite.receiverId, 'match:invite-cancelled', {
       inviteId: invite.id,
     });

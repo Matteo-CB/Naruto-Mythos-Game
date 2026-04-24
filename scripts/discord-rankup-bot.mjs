@@ -1,22 +1,8 @@
-/**
- * Naruto Mythos TCG - Discord Rank-Up Notification Bot
- *
- * Creates a #rank-ups channel and posts notifications when players change rank.
- * Polls the game's leaderboard API at regular intervals to detect ELO changes.
- *
- * Usage:
- *   node scripts/discord-rankup-bot.mjs [BOT_TOKEN] [GUILD_ID] [API_BASE_URL]
- *
- * Or set environment variables:
- *   BOT_DISCORD_TOKEN, SERVER_DISCORD_ID, GAME_API_URL
- *
- * Example:
- *   node scripts/discord-rankup-bot.mjs "your-bot-token" "your-guild-id" "https://naruto.daikicorp.fr"
- */
+
 
 import { readFileSync } from 'fs';
 
-// Load .env manually (no dotenv dependency needed)
+
 try {
   const envFile = readFileSync(new URL('../.env', import.meta.url), 'utf-8');
   for (const line of envFile.split('\n')) {
@@ -46,10 +32,10 @@ const API = 'https://discord.com/api/v10';
 const POLL_INTERVAL = 60_000; // Check every 60 seconds
 const CHANNEL_NAME = 'rank-ups';
 
-// ──────────────────────────────────────────────
-// ELO RANK DEFINITIONS (must match discord-elo-roles.mjs)
-// Icons are the league WebP images served from the game site
-// ──────────────────────────────────────────────
+
+
+
+
 const RANKS = [
   { name: 'Academy Student', role: '\u257C Academy Student \u257E', color: 0x888888, minElo: 0,    icon: `${API_BASE}/images/leagues/academy-student.webp` },
   { name: 'Genin',           role: '\u257C Genin \u257E',           color: 0x3E8B3E, minElo: 450,  icon: `${API_BASE}/images/leagues/genin.webp` },
@@ -61,7 +47,7 @@ const RANKS = [
   { name: 'Sage of Six Paths',role:'\u257C Sage of Six Paths \u257E',color: 0xFFD700, minElo: 1200, icon: `${API_BASE}/images/leagues/sage-of-six-paths.webp` },
 ];
 
-// Rank-up messages (themed)
+
 const RANK_UP_TITLES = {
   'Academy Student': 'A NEW NINJA ENROLLS',
   'Genin':           'GENIN PROMOTION',
@@ -95,9 +81,9 @@ const RANK_DOWN_TITLES = {
   'Sage of Six Paths':'STILL A SAGE',
 };
 
-// ──────────────────────────────────────────────
-// DISCORD API HELPERS
-// ──────────────────────────────────────────────
+
+
+
 
 async function discordFetch(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
@@ -120,9 +106,9 @@ async function discordFetch(path, options = {}) {
   return res;
 }
 
-// ──────────────────────────────────────────────
-// RANK HELPERS
-// ──────────────────────────────────────────────
+
+
+
 
 function getRank(elo) {
   let rank = RANKS[0];
@@ -143,7 +129,7 @@ function getRankIndex(elo) {
 function buildProgressBar(elo, rank, nextRank) {
   const barLength = 16;
   if (!nextRank) {
-    // Max rank — full bar
+    
     return '▓'.repeat(barLength) + ' MAX';
   }
   const range = nextRank.minElo - rank.minElo;
@@ -153,9 +139,9 @@ function buildProgressBar(elo, rank, nextRank) {
   return '▓'.repeat(filled) + '░'.repeat(empty) + ` ${elo}/${nextRank.minElo}`;
 }
 
-// ──────────────────────────────────────────────
-// NOTIFICATION EMBEDS
-// ──────────────────────────────────────────────
+
+
+
 
 function buildRankUpEmbed(username, oldRank, newRank, elo, wins, losses) {
   const isPromotion = getRankIndex(newRank.minElo) > getRankIndex(oldRank.minElo);
@@ -193,7 +179,7 @@ function buildRankUpEmbed(username, oldRank, newRank, elo, wins, losses) {
     },
   ];
 
-  // Add next milestone for promotions
+  
   if (isPromotion && nextRank) {
     fields.push({
       name: 'Next Rank',
@@ -221,12 +207,12 @@ function buildRankUpEmbed(username, oldRank, newRank, elo, wins, losses) {
   };
 }
 
-// ──────────────────────────────────────────────
-// CHANNEL SETUP
-// ──────────────────────────────────────────────
+
+
+
 
 async function findOrCreateChannel() {
-  // Check if channel already exists
+  
   const channelsRes = await discordFetch(`/guilds/${GUILD_ID}/channels`);
   if (!channelsRes.ok) {
     console.error('  Failed to fetch channels:', channelsRes.status);
@@ -241,12 +227,12 @@ async function findOrCreateChannel() {
     return existing.id;
   }
 
-  // Find the COMPETITIVE category to place the channel in
+  
   const competitiveCategory = channels.find(
     (ch) => ch.type === 4 && ch.name.includes('COMPETITIVE'),
   );
 
-  // Create the channel
+  
   const createBody = {
     name: CHANNEL_NAME,
     type: 0, // GUILD_TEXT
@@ -270,7 +256,7 @@ async function findOrCreateChannel() {
   const newChannel = await createRes.json();
   console.log(`  Created #${CHANNEL_NAME} channel (${newChannel.id})`);
 
-  // Post welcome message with league icon
+  
   await discordFetch(`/channels/${newChannel.id}/messages`, {
     method: 'POST',
     body: JSON.stringify({
@@ -303,11 +289,11 @@ async function findOrCreateChannel() {
   return newChannel.id;
 }
 
-// ──────────────────────────────────────────────
-// LEADERBOARD POLLING
-// ──────────────────────────────────────────────
 
-// In-memory cache of player ELOs to detect rank changes
+
+
+
+
 const playerCache = new Map(); // username -> { elo, rank, wins, losses }
 
 async function fetchLeaderboard() {
@@ -345,7 +331,7 @@ async function checkForRankChanges(channelId) {
       const oldRankIndex = getRankIndex(oldRank.minElo);
       const newRankIndex = getRankIndex(elo);
 
-      // Rank changed!
+      
       if (oldRankIndex !== newRankIndex) {
         const isPromotion = newRankIndex > oldRankIndex;
         notifications.push({
@@ -365,11 +351,11 @@ async function checkForRankChanges(channelId) {
       }
     }
 
-    // Update cache
+    
     playerCache.set(username, { elo, rank: currentRank, wins, losses });
   }
 
-  // Post notifications (promotions first, then demotions)
+  
   notifications.sort((a, b) => {
     if (a.isPromotion !== b.isPromotion) return a.isPromotion ? -1 : 1;
     return getRankIndex(b.newRank.minElo) - getRankIndex(a.newRank.minElo);
@@ -396,14 +382,14 @@ async function checkForRankChanges(channelId) {
       console.log(`  [Notify] Posted rank change for ${notif.username}`);
     }
 
-    // Small delay between messages to avoid rate limits
+    
     await new Promise((r) => setTimeout(r, 500));
   }
 }
 
-// ──────────────────────────────────────────────
-// MAIN
-// ──────────────────────────────────────────────
+
+
+
 
 async function main() {
   console.log('\n  Naruto Mythos TCG - Rank-Up Bot');
@@ -413,12 +399,12 @@ async function main() {
   console.log(`  API Base:  ${API_BASE}`);
   console.log(`  Poll Interval: ${POLL_INTERVAL / 1000}s\n`);
 
-  // Step 1: Create or find the rank-ups channel
+  
   console.log('  [Setup] Finding or creating #rank-ups channel...');
   const channelId = await findOrCreateChannel();
   console.log(`  [Setup] Channel ID: ${channelId}\n`);
 
-  // Step 2: Initial leaderboard load (populate cache, no notifications)
+  
   console.log('  [Setup] Loading initial leaderboard data...');
   const initialPlayers = await fetchLeaderboard();
   if (initialPlayers && Array.isArray(initialPlayers)) {
@@ -436,7 +422,7 @@ async function main() {
     console.log('  [Setup] No players found (API may be unreachable).\n');
   }
 
-  // Step 3: Start polling loop
+  
   console.log('  [Running] Polling for rank changes...\n');
 
   const poll = async () => {
@@ -447,10 +433,10 @@ async function main() {
     }
   };
 
-  // Poll immediately, then at intervals
+  
   setInterval(poll, POLL_INTERVAL);
 
-  // Keep the process alive
+  
   console.log('  Bot is running. Press Ctrl+C to stop.\n');
 }
 

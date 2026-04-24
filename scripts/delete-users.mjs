@@ -1,34 +1,10 @@
-/**
- * Delete one or more user accounts cleanly, anonymizing their past games so
- * opponents keep their replays.
- *
- * Usage:
- *   node scripts/delete-users.mjs                       # dry-run (default)
- *   node scripts/delete-users.mjs --confirm             # actually delete
- *   node scripts/delete-users.mjs "user1" "user2"       # override usernames
- *   node scripts/delete-users.mjs "user1" --confirm
- *   node scripts/delete-users.mjs --confirm --skip-discord   # skip Discord role cleanup
- *
- * Strategy per user:
- *  - hard-delete: Account, Deck, Friendship, MatchInvite, QuizScore,
- *                 UserBan, ChatReport, ChatMessage, TournamentParticipant,
- *                 Room (where host or guest).
- *  - anonymize (null the userId, keep the row): Game.player1Id/player2Id/winnerId,
- *                 TournamentMatch.player1Id/player2Id/winnerId.
- *  - left orphan (String field, not nullable): Tournament.creatorId.
- *    The duplicated `creatorUsername` column keeps the UI readable.
- *  - Discord: remove all ELO/Unranked roles from the user's Discord account
- *    (best-effort — failures log a warning but don't block the DB delete).
- *
- * Aborts if any targeted user is currently in an active tournament
- * (status not 'completed' and not 'cancelled'). Pass --force to override.
- */
+
 
 import { PrismaClient } from '@prisma/client';
 import { readFileSync } from 'fs';
 
-// Manual .env loader (no dotenv dependency) — matches the pattern used by
-// the other scripts in this folder.
+
+
 try {
   const envContent = readFileSync('.env', 'utf8');
   for (const line of envContent.split('\n')) {
@@ -44,7 +20,7 @@ try {
     if (!process.env[key]) process.env[key] = val;
   }
 } catch {
-  /* .env not found — assume env is set externally */
+  
 }
 
 const DEFAULT_USERNAMES = ['Konoha_Senpu', 'Zensho'];
@@ -58,7 +34,7 @@ const targets = usernames.length > 0 ? usernames : DEFAULT_USERNAMES;
 
 const prisma = new PrismaClient();
 
-// ── Discord role cleanup helpers ─────────────────────────────────────────────
+
 const DISCORD_API = 'https://discord.com/api/v10';
 const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
 const GUILD_ID = process.env.SERVER_DISCORD_ID;
@@ -86,7 +62,7 @@ async function discordFetch(path, options, retries = 2) {
   return res;
 }
 
-/** Load all managed ELO/Unranked role IDs from SiteSettings. */
+
 async function loadManagedRoleIds() {
   const settings = await prisma.siteSettings.findUnique({ where: { key: 'global' } });
   const map = settings?.discordRoleIds ?? null;
@@ -94,8 +70,7 @@ async function loadManagedRoleIds() {
   return Object.values(map).filter((v) => typeof v === 'string' && v.length > 0);
 }
 
-/** Remove every managed ELO/Unranked role from a single Discord member.
- *  Best-effort — logs and returns a summary, never throws. */
+
 async function removeAllManagedRolesFromMember(discordId, managedRoleIds) {
   if (!discordReady()) return { skipped: true, removed: 0, errors: 0 };
   if (!discordId) return { skipped: true, removed: 0, errors: 0 };
@@ -138,7 +113,7 @@ async function removeAllManagedRolesFromMember(discordId, managedRoleIds) {
 }
 
 async function resolveUsers(names) {
-  // Case-sensitive lookup (username is unique). Report unresolved names clearly.
+  
   const users = await prisma.user.findMany({
     where: { username: { in: names } },
     select: { id: true, username: true, email: true, createdAt: true, discordId: true },
@@ -232,7 +207,7 @@ async function deleteUserCascade(user) {
   const uid = user.id;
   const results = {};
 
-  // --- Hard deletes (things that reference this user directly) ---
+  
   results.decks = (await prisma.deck.deleteMany({ where: { userId: uid } })).count;
   results.friendships = (await prisma.friendship.deleteMany({
     where: { OR: [{ senderId: uid }, { receiverId: uid }] },
@@ -252,11 +227,11 @@ async function deleteUserCascade(user) {
   results.rooms = (await prisma.room.deleteMany({
     where: { OR: [{ hostId: uid }, { guestId: uid }] },
   })).count;
-  // Account has onDelete: Cascade in the schema, but we also delete explicitly
-  // so the count is visible in the output.
+  
+  
   results.accounts = (await prisma.account.deleteMany({ where: { userId: uid } })).count;
 
-  // --- Anonymize (null the fk, keep the row so the opponent keeps their replay) ---
+  
   results.gamesAsPlayer1 = (await prisma.game.updateMany({
     where: { player1Id: uid }, data: { player1Id: null },
   })).count;
@@ -276,7 +251,7 @@ async function deleteUserCascade(user) {
     where: { winnerId: uid }, data: { winnerId: null },
   })).count;
 
-  // --- Finally delete the user ---
+  
   await prisma.user.delete({ where: { id: uid } });
   results.userDeleted = 1;
 
@@ -309,7 +284,7 @@ async function main() {
     for (const [k, v] of Object.entries(foot.orphan)) console.log(`    ${k.padEnd(26)} ${v}`);
   }
 
-  // Discord readiness note
+  
   if (skipDiscord) {
     console.log('\nDiscord cleanup: skipped (--skip-discord).');
   } else if (!discordReady()) {
@@ -340,7 +315,7 @@ async function main() {
     return;
   }
 
-  // Preload Discord role map once (used for every user).
+  
   const managedRoleIds = !skipDiscord && discordReady() ? await loadManagedRoleIds() : [];
   if (!skipDiscord && discordReady() && managedRoleIds.length === 0) {
     console.warn('\nWARNING: Discord cleanup enabled but SiteSettings.discordRoleIds is empty.');
@@ -351,7 +326,7 @@ async function main() {
   for (const u of users) {
     console.log(`\n- ${u.username} (id: ${u.id})`);
 
-    // 1. Discord role cleanup BEFORE the DB delete (we still need discordId).
+    
     if (!skipDiscord && u.discordId && managedRoleIds.length > 0) {
       const discordRes = await removeAllManagedRolesFromMember(u.discordId, managedRoleIds);
       if (discordRes.skipped) {
@@ -364,7 +339,7 @@ async function main() {
       console.log(`    discord                     no linked account`);
     }
 
-    // 2. DB cascade delete + anonymization.
+    
     const res = await deleteUserCascade(u);
     for (const [k, v] of Object.entries(res)) console.log(`    ${k.padEnd(28)} ${v}`);
   }

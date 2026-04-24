@@ -39,7 +39,7 @@ export default function ManageDecksPage() {
         setDecks(data);
       }
     } catch {
-      // ignore
+      
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function ManageDecksPage() {
         setDecks((prev) => prev.filter((d) => d.id !== id));
       }
     } catch {
-      // ignore
+      
     }
     setConfirmDeleteId(null);
   };
@@ -75,7 +75,7 @@ export default function ManageDecksPage() {
         );
       }
     } catch {
-      // ignore
+      
     }
     setRenamingId(null);
     setRenameValue('');
@@ -90,7 +90,7 @@ export default function ManageDecksPage() {
         body: JSON.stringify({ orderedIds: newDecks.map((d) => d.id) }),
       });
     } catch {
-      // ignore
+      
     } finally {
       setSaving(false);
     }
@@ -108,7 +108,7 @@ export default function ManageDecksPage() {
         .filter((m): m is NonNullable<typeof m> => m != null);
       await exportDeckAsImage(deck.name, chars, missions);
     } catch {
-      // ignore
+      
     } finally {
       setExportingId(null);
     }
@@ -144,7 +144,7 @@ export default function ManageDecksPage() {
     saveOrder(newDecks);
   };
 
-  // Drag and drop handlers
+  
   const handleDragStart = (index: number) => {
     setDragIndex(index);
   };
@@ -178,7 +178,7 @@ export default function ManageDecksPage() {
     <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <div className="max-w-xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
-        {/* Header */}
+        
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#c4a35a' }}>
             {t('deckManager.title')}
@@ -237,7 +237,7 @@ export default function ManageDecksPage() {
                   }}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    {/* Order indicator + drag handle */}
+                    
                     <div className="flex sm:flex-col items-center gap-1 sm:gap-0.5 shrink-0">
                       <button
                         onClick={() => moveUp(index)}
@@ -263,7 +263,7 @@ export default function ManageDecksPage() {
                       </button>
                     </div>
 
-                    {/* Deck info */}
+                    
                     <div className="flex-1 min-w-0">
                       {isRenaming ? (
                         <div className="flex items-center gap-2">
@@ -305,7 +305,7 @@ export default function ManageDecksPage() {
                       )}
                     </div>
 
-                    {/* Actions */}
+                    
                     {!isRenaming && (
                       <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                         {isConfirming ? (
@@ -337,7 +337,7 @@ export default function ManageDecksPage() {
                             <Link
                               href="/deck-builder"
                               onClick={() => {
-                                // Store the deck ID to load when the builder opens
+                                
                                 sessionStorage.setItem('loadDeckId', deck.id);
                               }}
                               className="px-2.5 py-1 text-[10px] bg-[#141414] border border-[#262626] text-[#888] hover:text-[#e0e0e0] hover:border-[#444] transition-colors"

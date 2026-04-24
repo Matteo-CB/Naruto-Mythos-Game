@@ -2,16 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 083/130 - RASA "Quatrieme Kazekage" (UC)
- * Chakra: 3 | Power: 3
- * Group: Sand Village
- *
- * SCORE [arrow]: Gain 1 Mission point if there's another friendly Sand Village character
- * in this mission.
- *
- * Confirmation popup before gaining the point (SCORE effects are optional).
- */
+
 
 function handleRasa083Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -19,7 +10,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const friendlyChars = mission[friendlySide];
 
-  // Pre-check: another Sand Village character in this mission?
+  
   const hasOtherSandVillage = friendlyChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
@@ -34,7 +25,7 @@ function handleRasa083Score(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

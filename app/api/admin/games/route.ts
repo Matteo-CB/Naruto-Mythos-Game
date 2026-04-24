@@ -10,10 +10,7 @@ async function isAdmin(): Promise<boolean> {
   return !!session?.user?.name && ADMIN_USERNAMES.includes(session.user.name);
 }
 
-/**
- * GET /api/admin/games?userId=xxx
- * Get games for a specific player
- */
+
 export async function GET(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -45,10 +42,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ games });
 }
 
-/**
- * DELETE /api/admin/games
- * Delete a game and restore ELO for both players
- */
+
 export async function DELETE(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -68,20 +62,20 @@ export async function DELETE(request: NextRequest) {
 
   if (!game) return NextResponse.json({ error: 'Game not found' }, { status: 404 });
 
-  // Restore ELO and W/L/D if the game was completed and ranked
+  
   if (game.status === 'completed' && !game.isAiGame && game.player1Id && game.player2Id && game.eloChange) {
     const eloChange = game.eloChange;
 
-    // Determine result to reverse
+    
     const p1Won = game.winnerId === game.player1Id;
     const p2Won = game.winnerId === game.player2Id;
     const isDraw = !game.winnerId;
 
-    // Reverse ELO
+    
     const p1EloRevert = -eloChange;
     const p2EloRevert = eloChange; // eloChange is from p1's perspective
 
-    // Reverse W/L/D
+    
     const p1StatsRevert = p1Won
       ? { wins: { decrement: 1 } }
       : p2Won
@@ -104,18 +98,18 @@ export async function DELETE(request: NextRequest) {
       }),
     ]);
 
-    // Ensure ELO doesn't go below 100
+    
     await prisma.user.updateMany({
       where: { elo: { lt: 100 } },
       data: { elo: 100 },
     });
 
-    // Re-sync Discord roles
+    
     syncDiscordRole(game.player1Id).catch(() => {});
     syncDiscordRole(game.player2Id).catch(() => {});
   }
 
-  // Delete the game
+  
   await prisma.game.delete({ where: { id: gameId } });
 
   return NextResponse.json({ success: true, eloRestored: !!game.eloChange });

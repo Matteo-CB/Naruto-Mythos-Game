@@ -3,17 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 
-/**
- * Card 045/130 - ANKO MITARASHI (UC)
- * Chakra: 4 | Power: 3
- * Group: Leaf Village | Keywords: Jutsu
- *
- * AMBUSH: Defeat a hidden enemy character in play (any mission).
- *   - Find all hidden enemy characters across all missions.
- *   - If exactly one valid target, auto-apply.
- *   - If multiple targets, require target selection.
- *   - Defeat the target using defeatEnemyCharacter (respects replacement effects).
- */
+
 
 function handleAnko045Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -21,7 +11,7 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     opponentPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all hidden enemy characters across all missions
+  
   const validTargets: string[] = [];
   const targetMissionMap: Record<string, number> = {};
 
@@ -41,7 +31,7 @@ function handleAnko045Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'ANKO MITARASHI', id: 'KS-045-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

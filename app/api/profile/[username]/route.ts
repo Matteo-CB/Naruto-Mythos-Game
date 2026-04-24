@@ -14,7 +14,7 @@ export async function GET(
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
     const perPage = 20;
 
-    // Throttled fire-and-forget: clean up old games at most once per 5 minutes
+    
     const now = Date.now();
     if (now - lastCleanup > 5 * 60 * 1000) {
       lastCleanup = now;
@@ -54,8 +54,8 @@ export async function GET(
       status: 'completed' as const,
     };
 
-    // Get total game count + paginated games + replay IDs in parallel
-    // Don't load gameState (can be hundreds of KB per game) — only check existence
+    
+    
     const [totalGames, games, gamesWithReplay] = await Promise.all([
       prisma.game.count({ where: gameFilter }),
       prisma.game.findMany({

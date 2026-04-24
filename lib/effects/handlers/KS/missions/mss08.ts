@@ -2,18 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * MSS 08 - "Tendre un piege" / "Set a Trap"
- *
- * SCORE [arrow]: Put a card from your hand as a hidden character to any mission.
- *   - The scoring player chooses a card from their hand, then chooses a mission.
- *   - The card is placed face-down (hidden) on the chosen mission.
- *   - No chakra cost is paid for this placement.
- *
- * Two-stage target selection:
- *   Stage 1: MSS08_CHOOSE_CARD - choose which card from hand
- *   Stage 2: MSS08_CHOOSE_MISSION - choose which mission to place it on
- */
+
 
 function mss08ScoreHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -41,7 +30,7 @@ function mss08ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before card selection (optional — player can skip)
+  
   return {
     state,
     requiresTargetSelection: true,

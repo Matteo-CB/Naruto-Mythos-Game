@@ -44,7 +44,7 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     [searchUsers, clearSearch],
   );
 
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -61,7 +61,7 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     };
   }, []);
 
-  // Cleanup debounce on unmount
+  
   useEffect(() => {
     return () => {
       if (debounceRef.current) {
@@ -70,7 +70,7 @@ export function UserSearchDropdown({ namespace }: UserSearchDropdownProps) {
     };
   }, []);
 
-  // Show dropdown when results change and query is not empty
+  
   useEffect(() => {
     if (query.trim() && (searchResults.length > 0 || searchLoading)) {
       setIsOpen(true);

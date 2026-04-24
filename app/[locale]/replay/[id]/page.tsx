@@ -89,7 +89,7 @@ function formatTimestamp(ts: number): string {
   return `${mins}:${secs}`;
 }
 
-// ----- Card Preview Panel (right-side, matches GameBoard CardPreviewContent) -----
+
 
 function ReplayCardPreview({
   card,
@@ -123,7 +123,7 @@ function ReplayCardPreview({
         maxHeight: 'calc(100vh - 32px)',
       }}
     >
-      {/* Card image */}
+      
       {imagePath ? (
         <div
           className="w-full shrink-0 flex items-center justify-center"
@@ -146,9 +146,9 @@ function ReplayCardPreview({
         </div>
       )}
 
-      {/* Card details (scrollable) */}
+      
       <div className="p-3.5 flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: '380px' }}>
-        {/* Type + Rarity */}
+        
         <div className="flex items-center justify-between">
           <span
             className="text-[10px] px-1.5 py-0.5 font-bold uppercase tracking-wider"
@@ -168,19 +168,19 @@ function ReplayCardPreview({
           </span>
         </div>
 
-        {/* Name */}
+        
         <span className="text-sm font-bold leading-tight" style={{ color: '#e0e0e0' }}>
           {getCardName(card, locale as 'en' | 'fr')}
         </span>
 
-        {/* Title */}
+        
         {(card.title_fr || card.title_en) && (
           <span className="text-xs" style={{ color: '#999999' }}>
             {getCardTitle(card, locale as 'en' | 'fr')}
           </span>
         )}
 
-        {/* Mission rank + points */}
+        
         {isMission && missionContext && (
           <div
             className="flex flex-col gap-1.5 p-2.5 mt-0.5"
@@ -212,7 +212,7 @@ function ReplayCardPreview({
           </div>
         )}
 
-        {/* Chakra + Power (character) */}
+        
         {isCharacter && (
           <div
             className="flex items-center gap-4 p-2 mt-0.5"
@@ -230,7 +230,7 @@ function ReplayCardPreview({
           </div>
         )}
 
-        {/* Keywords */}
+        
         {card.keywords && card.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-0.5">
             {card.keywords.map((kw) => (
@@ -245,17 +245,17 @@ function ReplayCardPreview({
           </div>
         )}
 
-        {/* Group */}
+        
         {card.group && (
           <span className="text-[10px]" style={{ color: '#777777' }}>
             {t('collection.details.group')}: {getCardGroup(card.group, locale as 'en' | 'fr')}
           </span>
         )}
 
-        {/* Card ID */}
+        
         <span className="text-[9px]" style={{ color: '#444444' }}>{card.id}</span>
 
-        {/* Effects */}
+        
         <div className="mt-0.5 flex flex-col gap-2 pt-2" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#888888' }}>{t('card.effects')}</span>
           {card.effects && card.effects.length > 0 ? (
@@ -288,7 +288,7 @@ function ReplayCardPreview({
         </div>
       </div>
 
-      {/* Close button */}
+      
       <div className="flex items-center justify-end px-3 py-2 shrink-0" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
         <button
           onClick={onClose}
@@ -302,7 +302,7 @@ function ReplayCardPreview({
   );
 }
 
-// ----- Share Button -----
+
 
 function ShareButton({ gameId }: { gameId: string }) {
   const t = useTranslations('replay');
@@ -355,7 +355,7 @@ function ShareButton({ gameId }: { gameId: string }) {
   );
 }
 
-// ----- Score Overlay (top-right) -----
+
 
 function ScoreOverlay({
   game,
@@ -421,7 +421,7 @@ function ScoreOverlay({
         className="flex items-center gap-4"
         style={{ backgroundColor: 'rgba(10, 10, 18, 0.88)', backdropFilter: 'blur(12px)' }}
       >
-        {/* P1 */}
+        
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: p1Won ? '#c4a35a' : '#777' }}>
             {playerNames.player1}
@@ -436,7 +436,7 @@ function ScoreOverlay({
 
         <span className="text-[10px]" style={{ color: '#333' }}>-</span>
 
-        {/* P2 */}
+        
         <div className="flex items-center gap-2">
           <span
             className="text-lg font-bold tabular-nums"
@@ -453,7 +453,7 @@ function ScoreOverlay({
   );
 }
 
-// ----- Text Timeline Component (fullscreen overlay) -----
+
 
 function TextTimeline({
   log,
@@ -483,7 +483,7 @@ function TextTimeline({
   const filteredLog = selectedTurn === null ? log : log.filter((e) => e.turn === selectedTurn);
   const turns = [...new Set(log.map((e) => e.turn))].sort((a, b) => a - b);
 
-  // When syncing with visual replay, determine which log entries correspond to currentStep
+  
   const syncedLogLength = useMemo(() => {
     if (currentStep == null || !states || states.length === 0) return null;
     const state = states[currentStep];
@@ -491,7 +491,7 @@ function TextTimeline({
     return state.log?.length ?? 0;
   }, [currentStep, states]);
 
-  // Newly highlighted entry indices (entries added in the current step)
+  
   const highlightedIndices = useMemo(() => {
     if (currentStep == null || !states || states.length === 0 || syncedLogLength == null) return new Set<number>();
     const prevLogLen = currentStep > 0 ? (states[currentStep - 1]?.log?.length ?? 0) : 0;
@@ -510,7 +510,7 @@ function TextTimeline({
     }
   }, []);
 
-  // Sync visibleCount with currentStep when provided
+  
   useEffect(() => {
     if (syncedLogLength != null) {
       setVisibleCount(syncedLogLength);
@@ -529,7 +529,7 @@ function TextTimeline({
     return () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
   }, [isPlaying, speed, filteredLog.length, stopAutoPlay]);
 
-  // Auto-scroll to highlighted entries
+  
   useEffect(() => {
     if (highlightRef.current && scrollRef.current) {
       highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -540,7 +540,7 @@ function TextTimeline({
 
   useEffect(() => {
     if (syncedLogLength == null) {
-      // Only reset when NOT synced with visual replay
+      
       setVisibleCount(filteredLog.length);
       stopAutoPlay();
     }
@@ -551,13 +551,13 @@ function TextTimeline({
     return key ? t(key) : phase;
   };
 
-  // When synced with visual replay, show all entries but dim future ones.
-  // When not synced (standalone auto-play), slice as before.
+  
+  
   const displayEntries = syncedLogLength != null ? filteredLog : filteredLog.slice(0, visibleCount);
 
   return (
     <div className="fixed inset-0 z-50" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      {/* Semi-transparent backdrop */}
+      
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -567,7 +567,7 @@ function TextTimeline({
         onClick={onClose}
       />
 
-      {/* Side panel sliding from left */}
+      
       <motion.div
         initial={{ x: -340 }}
         animate={{ x: 0 }}
@@ -581,7 +581,7 @@ function TextTimeline({
           backdropFilter: 'blur(12px)',
         }}
       >
-        {/* Header */}
+        
         <div
           className="flex items-center justify-between px-4 py-3 shrink-0"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
@@ -631,7 +631,7 @@ function TextTimeline({
           </div>
         </div>
 
-        {/* Turn filters */}
+        
         <div className="flex gap-1 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
           <button
             onClick={() => setSelectedTurn(null)}
@@ -663,7 +663,7 @@ function TextTimeline({
           ))}
         </div>
 
-        {/* Log entries */}
+        
         <div ref={scrollRef} className="overflow-y-auto flex-1">
           {displayEntries.length === 0 ? (
             <div className="flex items-center justify-center py-12">
@@ -674,9 +674,9 @@ function TextTimeline({
               const playerColor = entry.player === 'player1' ? '#c4a35a' : entry.player === 'player2' ? '#b33e3e' : undefined;
               const displayName = entry.player ? playerNames[entry.player] : null;
               const isHighlighted = highlightedIndices.has(i);
-              // When synced, entries beyond the current step's log length are future entries
+              
               const isFuture = syncedLogLength != null && i >= syncedLogLength;
-              // Assign the highlightRef to the last highlighted entry for auto-scroll
+              
               const isLastHighlighted = isHighlighted && !highlightedIndices.has(i + 1);
               return (
                 <div
@@ -722,7 +722,7 @@ function TextTimeline({
   );
 }
 
-// ----- Visual Replay Component (fullscreen) -----
+
 
 function VisualReplay({
   initialState,
@@ -762,11 +762,11 @@ function VisualReplay({
     const result: GameState[] = [turn1Start, initialState];
     let current = initialState;
 
-    // Track instanceId mapping: original (from recording) → current (during replay)
-    // This handles ID drift caused by deepClone regenerating IDs in applyAction.
+    
+    
     const idMap = new Map<string, string>();
 
-    // Collect all character instanceIds from a state
+    
     function collectCharIds(st: GameState): Set<string> {
       const ids = new Set<string>();
       for (const m of st.activeMissions) {
@@ -777,28 +777,28 @@ function VisualReplay({
       return ids;
     }
 
-    // After each applyAction, detect new characters and update the ID map.
-    // Uses createdIds from actionHistory when available (recorded during original game),
-    // falling back to state comparison when replaying old games without createdIds.
+    
+    
+    
     function updateIdMap(prev: GameState, next: GameState, origAction: GameAction, origCreatedIds?: string[]) {
       const prevIds = collectCharIds(prev);
       const nextIds = collectCharIds(next);
 
-      // Collect new character instanceIds (in next but not in prev) from the REPLAY
+      
       const replayNewIds: string[] = [];
       for (const id of nextIds) {
         if (!prevIds.has(id)) replayNewIds.push(id);
       }
 
-      // If we have the original game's createdIds, build precise mapping:
-      // original createdIds[i] → replayNewIds[i]
+      
+      
       if (origCreatedIds && origCreatedIds.length > 0 && replayNewIds.length > 0) {
         for (let i = 0; i < origCreatedIds.length && i < replayNewIds.length; i++) {
           idMap.set(origCreatedIds[i], replayNewIds[i]);
         }
       }
 
-      // Self-map any new replay IDs not already mapped (for mapId fallback)
+      
       for (const newId of replayNewIds) {
         if (!idMap.has(newId)) {
           idMap.set(newId, newId);
@@ -806,7 +806,7 @@ function VisualReplay({
       }
     }
 
-    // Remap an ID through the idMap, falling back to original if no mapping exists
+    
     function mapId(id: string): string {
       return idMap.get(id) ?? id;
     }
@@ -814,15 +814,15 @@ function VisualReplay({
     function remapAction(action: GameAction, state: GameState): GameAction {
       if (action.type === 'SELECT_TARGET') {
         const origId = action.pendingActionId;
-        // Try direct match first, then mapped match
+        
         let pending = state.pendingActions.find((p) => p.id === origId);
         let remapped = action;
         if (!pending && state.pendingActions.length > 0) {
-          // Try to match by type similarity — find the first pending with matching sourceEffectId type
+          
           pending = state.pendingActions[0];
           remapped = { ...remapped, pendingActionId: pending.id };
         }
-        // Remap selectedTargets: first try idMap, then fall back to valid options
+        
         if (pending && remapped.selectedTargets.length > 0) {
           const validOptions = new Set(pending.options);
           const mappedTargets = remapped.selectedTargets.map((t) => {
@@ -832,7 +832,7 @@ function VisualReplay({
             return t;
           });
           remapped = { ...remapped, selectedTargets: mappedTargets };
-          // If still not valid, fall back to first available option
+          
           const stillInvalid = remapped.selectedTargets.some((t) => !validOptions.has(t));
           if (stillInvalid && pending.options.length > 0) {
             const fallbackTargets = remapped.selectedTargets.map((t, i) => {
@@ -859,16 +859,16 @@ function VisualReplay({
           const origId = action.characterInstanceId;
           const mappedId = mapId(origId);
           const allChars = [...mission.player1Characters, ...mission.player2Characters];
-          // Try mapped ID first, then original
+          
           const found = allChars.find((c) => c.instanceId === mappedId) || allChars.find((c) => c.instanceId === origId);
           if (found) {
             return { ...action, characterInstanceId: found.instanceId };
           }
-          // Fall back to first hidden character owned by active player
+          
           const playerChars = state.activePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
           const hiddenChars = playerChars.filter((c) => c.isHidden);
           if (hiddenChars.length > 0) {
-            // Map the original ID to the found hidden char for future actions
+            
             idMap.set(origId, hiddenChars[0].instanceId);
             return { ...action, characterInstanceId: hiddenChars[0].instanceId };
           }
@@ -900,11 +900,11 @@ function VisualReplay({
         return action;
       }
       if (action.type === 'REORDER_EFFECTS') {
-        // Remap selectedEffectId to matching pending effect in replay state
+        
         const origId = action.selectedEffectId;
         const found = state.pendingEffects.find((e) => e.id === origId);
         if (!found && state.pendingEffects.length > 0) {
-          // Fall back to first unresolved pending effect
+          
           return { ...action, selectedEffectId: state.pendingEffects[0].id };
         }
         return action;
@@ -912,9 +912,9 @@ function VisualReplay({
       return action;
     }
 
-    // Auto-resolve a single pending action/effect — returns new state or null if stuck
+    
     function autoResolvePending(st: GameState): GameState | null {
-      // Handle simultaneous effects from different source cards — auto-pick first
+      
       if (st.pendingEffects.length >= 2 && st.pendingActions.length >= 2) {
         const uniqueSources = new Set(st.pendingEffects.filter((e) => !e.resolved).map((e) => e.sourceInstanceId));
         if (uniqueSources.size >= 2) {
@@ -930,9 +930,9 @@ function VisualReplay({
         const pa = st.pendingActions[0];
         const pe = st.pendingEffects.find((e) => e.id === pa.sourceEffectId);
 
-        // Detect CONFIRM popups: optional effects with exactly 1 valid target.
-        // In the real game, players almost always confirm these.
-        // Auto-CONFIRM (select the single target) instead of declining to preserve effects.
+        
+        
+        
         const isConfirmPopup = pe?.isOptional && pa.options.length === 1 &&
           pe.targetSelectionType?.includes('CONFIRM');
 
@@ -949,7 +949,7 @@ function VisualReplay({
         const isOpt = pe?.isOptional || pa.minSelections === 0 || pa.options.length === 0;
         try {
           if (pa.options.length > 0) {
-            // Try selecting first valid option (covers both mandatory and optional with targets)
+            
             return GameEngine.applyAction(st, pa.player, {
               type: 'SELECT_TARGET',
               pendingActionId: pa.id,
@@ -962,7 +962,7 @@ function VisualReplay({
             });
           }
         } catch { /* fallthrough */ }
-        // Force-remove if engine can't handle it
+        
         return {
           ...st,
           pendingActions: st.pendingActions.filter((p) => p.id !== pa.id),
@@ -977,19 +977,19 @@ function VisualReplay({
       return null;
     }
 
-    // Main replay loop
+    
     for (const { player, action, createdIds } of actionHistory) {
       const prevTurn = current.turn;
       const counterBefore = getIdCounter();
       const remappedAction = remapAction(action, current);
       try {
         const next = GameEngine.applyAction(current, player, remappedAction);
-        // Detect stalled SELECT_TARGET — compare pending IDs not just count
+        
         if (remappedAction.type === 'SELECT_TARGET' && current.pendingActions.length > 0) {
           const prevPendingIds = current.pendingActions.map((p) => p.id).join(',');
           const nextPendingIds = next.pendingActions.map((p) => p.id).join(',');
           if (prevPendingIds === nextPendingIds && next.phase === current.phase) {
-            // The target selection didn't resolve — auto-resolve the stuck pending instead
+            
             setIdCounter(counterBefore);
             const resolved = autoResolvePending(current);
             if (resolved) {
@@ -999,12 +999,12 @@ function VisualReplay({
             continue;
           }
         }
-        // Track ID changes between states — use original createdIds for precise mapping
+        
         updateIdMap(current, next, action, createdIds);
         current = next;
       } catch {
         setIdCounter(counterBefore);
-        // If we have stuck pending state, auto-resolve it before continuing
+        
         if (current.pendingActions.length > 0 || current.pendingEffects.length > 0) {
           const resolved = autoResolvePending(current);
           if (resolved) {
@@ -1021,23 +1021,23 @@ function VisualReplay({
       result.push(current);
     }
 
-    // Recovery loop — advance state to gameOver after actionHistory is exhausted
+    
     let recovery = 0;
     while (current.phase !== 'gameOver' && recovery < 500) {
       let advanced: GameState | null = null;
       try {
-        // Clear orphan pending effects (no matching pending actions)
+        
         if (current.pendingEffects.length > 0 && current.pendingActions.length === 0) {
           current = { ...current, pendingEffects: [] };
         }
 
-        // Handle pending actions in ANY phase
+        
         if (current.pendingActions.length > 0) {
           advanced = autoResolvePending(current);
         } else if (current.phase === 'action') {
-          // No pending actions — need to advance past action phase
+          
           if (!current.player1.hasPassed || !current.player2.hasPassed) {
-            // Force-pass whoever hasn't passed
+            
             let st = current;
             for (const p of ['player1', 'player2'] as PlayerID[]) {
               if (!st[p].hasPassed) {
@@ -1050,7 +1050,7 @@ function VisualReplay({
             }
             advanced = st;
           } else {
-            // Both passed — transition to mission phase
+            
             for (const p of ['player1', 'player2'] as PlayerID[]) {
               try {
                 const attempt = GameEngine.applyAction(current, p, { type: 'PASS' });
@@ -1065,7 +1065,7 @@ function VisualReplay({
                 const forced: GameState = { ...current, phase: 'mission' as GamePhase };
                 advanced = GameEngine.applyAction(forced, current.edgeHolder, { type: 'ADVANCE_PHASE' });
               } catch {
-                // Force transition to mission phase
+                
                 advanced = {
                   ...current,
                   phase: 'mission' as GamePhase,
@@ -1123,7 +1123,7 @@ function VisualReplay({
           break;
         }
       } catch {
-        // Last-resort force-advance
+        
         if (current.phase === 'action') {
           advanced = {
             ...current,
@@ -1186,7 +1186,7 @@ function VisualReplay({
       recovery++;
     }
 
-    // Last resort: if still not at gameOver, force it
+    
     if (current.phase !== 'gameOver') {
       console.warn('[Replay] Recovery could not reach gameOver naturally, forcing. Final state:', {
         turn: current.turn, phase: current.phase,
@@ -1258,13 +1258,13 @@ function VisualReplay({
       }}
       onClick={() => previewCard && setPreviewCard(null)}
     >
-      {/* Background overlay */}
+      
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ backgroundColor: backgroundUrl ? 'rgba(0, 0, 0, 0.35)' : 'transparent' }}
       />
 
-      {/* Top-left: back + share + log buttons */}
+      
       <div className="absolute top-2 left-2 z-30 flex items-center gap-1.5">
         <Link
           href="/"
@@ -1310,7 +1310,7 @@ function VisualReplay({
         </button>
       </div>
 
-      {/* Centered: final score overlay — only show at end of replay */}
+      
       {currentStep >= states.length - 1 && (
         <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
           <div className="pointer-events-auto">
@@ -1319,12 +1319,12 @@ function VisualReplay({
         </div>
       )}
 
-      {/* Board fills everything above controls */}
+      
       <div className="flex-1 min-h-0 relative z-10">
         <ReplayBoard state={currentState} playerNames={playerNames} locale={locale} backgroundUrl={backgroundUrl} viewAs={viewAs} onCardClick={handleCardClick} />
       </div>
 
-      {/* Playback controls docked at bottom */}
+      
       <div className="shrink-0 relative z-20">
         <PlaybackControls
           currentStep={currentStep}
@@ -1335,7 +1335,7 @@ function VisualReplay({
         />
       </div>
 
-      {/* Card preview panel (right side) */}
+      
       <AnimatePresence>
         {previewCard && (
           <motion.div
@@ -1357,7 +1357,7 @@ function VisualReplay({
         )}
       </AnimatePresence>
 
-      {/* Log side panel */}
+      
       <AnimatePresence>
         {showLog && <TextTimeline log={log} playerNames={playerNames} onClose={() => setShowLog(false)} currentStep={currentStep} states={states} />}
       </AnimatePresence>
@@ -1365,7 +1365,7 @@ function VisualReplay({
   );
 }
 
-// ----- Text-only Replay (fallback, also fullscreen) -----
+
 
 function TextOnlyReplay({
   log,
@@ -1424,7 +1424,7 @@ function TextOnlyReplay({
       className="w-screen flex flex-col"
       style={{ height: '100dvh', backgroundColor: '#0a0a0a', overscrollBehavior: 'none' }}
     >
-      {/* Header */}
+      
       <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid #1e1e28' }}>
         <div className="flex items-center gap-3">
           <Link
@@ -1457,7 +1457,7 @@ function TextOnlyReplay({
         </div>
       </div>
 
-      {/* Controls */}
+      
       <div className="flex items-center gap-2 px-4 py-2 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <button
           onClick={isPlaying ? stopAutoPlay : () => { setVisibleCount(0); setIsPlaying(true); }}
@@ -1521,7 +1521,7 @@ function TextOnlyReplay({
         ))}
       </div>
 
-      {/* Log entries */}
+      
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {displayEntries.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -1566,7 +1566,7 @@ function TextOnlyReplay({
   );
 }
 
-// ----- Main Page -----
+
 
 export default function ReplayPage({
   params,
@@ -1667,7 +1667,7 @@ export default function ReplayPage({
   const log = game.gameState.log ?? [];
   const hasVisualReplay = !!game.gameState.initialState && !!game.gameState.actionHistory && game.gameState.actionHistory.length > 0;
 
-  // Auto-detect which player the viewer is
+  
   const userId = session?.user?.id;
   const defaultViewAs: PlayerID | undefined = userId
     ? userId === game.player2Id ? 'player2' : 'player1'

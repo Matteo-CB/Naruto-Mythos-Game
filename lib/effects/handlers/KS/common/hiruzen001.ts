@@ -2,19 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 001/130 - HIRUZEN SARUTOBI (Common)
- * Chakra: 3 | Power: 3
- * Group: Leaf Village | Keywords: Hokage
- * MAIN: POWERUP 2 another friendly Leaf Village character.
- *
- * Adds 2 power tokens to another friendly Leaf Village character in any mission (not self).
- * This effect is optional (no "you must" in text).
- */
+
 function handleHiruzen001Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Pre-check: find all valid targets
+  
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -38,7 +30,7 @@ function handleHiruzen001Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'HIRUZEN SARUTOBI', id: 'KS-001-C' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

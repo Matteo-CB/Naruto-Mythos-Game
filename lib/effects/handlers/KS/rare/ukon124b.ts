@@ -6,22 +6,11 @@ import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 124b/130 - UKON (R)
- * Chakra: 4, Power: 3
- * Group: Sound Village, Keywords: Sound Four
- *
- * MAIN [continuous]: Can be played as upgrade over any Sound Village character.
- *   This is a continuous upgrade-eligibility expansion handled by the engine's
- *   upgrade validation logic. The handler here is a no-op.
- *
- * AMBUSH: Hide an enemy in this mission with Power 5 or less.
- *   Find non-hidden enemies in this mission with effective power <= 5. Target selection. Hide.
- */
+
 
 export function ukon124bMainHandler(ctx: EffectContext): EffectResult {
-  // Continuous effect: can be played as upgrade over any Sound Village character.
-  // Handled by the engine's upgrade validation logic.
+  
+  
   return { state: ctx.state };
 }
 
@@ -33,7 +22,7 @@ export function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find non-hidden enemies with effective power <= 5 that can be hidden
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => canBeHiddenByEnemy(state, c, opponentPlayer) && getEffectivePower(state, c, opponentPlayer) <= 5)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -53,7 +42,7 @@ export function ukon124bAmbushHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // If exactly one target, auto-resolve
+  
   if (validTargets.length === 1) {
     return applyHide(state, validTargets[0], sourcePlayer, enemySide, sourceMissionIndex);
   }
@@ -75,7 +64,7 @@ function applyHide(
   _enemySide: 'player1Characters' | 'player2Characters',
   _missionIndex: number,
 ): EffectResult {
-  // Use centralized hide to respect Kimimaro 056 protection, Gemma 049 sacrifice, and immunities
+  
   const newState = EffectEngine.hideCharacterWithLog(state, targetInstanceId, sourcePlayer);
   return { state: newState };
 }

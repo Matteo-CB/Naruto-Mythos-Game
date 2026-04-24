@@ -57,7 +57,7 @@ interface Props {
 }
 
 export function CardBackgroundDecor({ variant: _variant }: Props) {
-  // Disabled — using bgmenu background instead
+  
   return null;
   const [left, right] = CARD_SETS[_variant];
 
@@ -67,7 +67,7 @@ export function CardBackgroundDecor({ variant: _variant }: Props) {
       style={{ zIndex: 1 }}
       aria-hidden="true"
     >
-      {/* Left card */}
+      
       <div
         className="absolute"
         style={{
@@ -87,7 +87,7 @@ export function CardBackgroundDecor({ variant: _variant }: Props) {
         />
       </div>
 
-      {/* Right card */}
+      
       <div
         className="absolute"
         style={{

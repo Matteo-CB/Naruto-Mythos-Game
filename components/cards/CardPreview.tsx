@@ -8,9 +8,9 @@ import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { CharacterCard, MissionCard, CardEffect, Rarity } from '@/lib/engine/types';
 import CardBack from './CardBack';
 
-// ---------------------
-// Utility
-// ---------------------
+
+
+
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 
@@ -34,9 +34,9 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   SCORE: '#eab308',
 };
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface CardPreviewProps {
   card: CharacterCard | MissionCard | null;
   visible: boolean;
@@ -45,9 +45,9 @@ export interface CardPreviewProps {
   banned?: boolean;
 }
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = false }: CardPreviewProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -82,7 +82,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               overflow: 'hidden',
             }}
           >
-            {/* Card image section */}
+            
             <div
               style={{
                 position: 'relative',
@@ -130,7 +130,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              {/* Rarity indicator top-right */}
+              
               <div
                 style={{
                   position: 'absolute',
@@ -154,9 +154,9 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
               </div>
             </div>
 
-            {/* Info section */}
+            
             <div style={{ padding: '12px 14px' }}>
-              {/* Name and title */}
+              
               <div style={{ marginBottom: '8px' }}>
                 <div
                   style={{
@@ -182,7 +182,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 )}
               </div>
 
-              {/* Stats row */}
+              
               <div
                 style={{
                   display: 'flex',
@@ -211,7 +211,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 )}
               </div>
 
-              {/* Keywords */}
+              
               {card.keywords && card.keywords.length > 0 && (
                 <div style={{ marginBottom: '8px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                   {card.keywords.map((kw) => (
@@ -232,7 +232,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              {/* Group */}
+              
               {card.group && (
                 <div
                   style={{
@@ -245,7 +245,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              {/* Effects */}
+              
               {card.effects && card.effects.length > 0 && (
                 <div
                   style={{
@@ -289,7 +289,7 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
                 </div>
               )}
 
-              {/* Card ID */}
+              
               <div
                 style={{
                   color: '#444444',
@@ -308,9 +308,9 @@ function CardPreviewInner({ card, visible, position, powerTokens = 0, banned = f
   );
 }
 
-// ---------------------
-// Sub-components
-// ---------------------
+
+
+
 function StatBadge({
   label,
   value,

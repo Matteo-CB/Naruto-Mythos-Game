@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion';
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface LessonBubbleProps {
   title: string;
   description: string;
@@ -14,16 +14,16 @@ export interface LessonBubbleProps {
   image?: string;
 }
 
-// ---------------------
-// Arrow size constants
-// ---------------------
+
+
+
 const ARROW_SIZE = 8;
 
-// ---------------------
-// Slide offset by arrow direction
-// When the arrow is on the top, the bubble slides in from above (negative y)
-// When the arrow is on the left, the bubble slides in from the left (negative x)
-// ---------------------
+
+
+
+
+
 function getSlideOffset(arrowSide: 'top' | 'bottom' | 'left' | 'right') {
   switch (arrowSide) {
     case 'top':
@@ -37,9 +37,9 @@ function getSlideOffset(arrowSide: 'top' | 'bottom' | 'left' | 'right') {
   }
 }
 
-// ---------------------
-// Arrow CSS styles using the border trick
-// ---------------------
+
+
+
 function getArrowStyles(side: 'top' | 'bottom' | 'left' | 'right'): React.CSSProperties {
   const base: React.CSSProperties = {
     position: 'absolute',
@@ -91,9 +91,9 @@ function getArrowStyles(side: 'top' | 'bottom' | 'left' | 'right'): React.CSSPro
   }
 }
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 export function LessonBubble({
   title,
   description,
@@ -125,12 +125,12 @@ export function LessonBubble({
         zIndex: 10,
       }}
     >
-      {/* Arrow */}
+      
       <div style={getArrowStyles(arrowSide)} />
 
-      {/* Content */}
+      
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-        {/* Optional thumbnail */}
+        
         {image && (
           <img
             src={image}
@@ -147,7 +147,7 @@ export function LessonBubble({
         )}
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Title */}
+          
           <div
             style={{
               color: '#c4a35a',
@@ -161,7 +161,7 @@ export function LessonBubble({
             {title}
           </div>
 
-          {/* Description */}
+          
           <div
             className="font-body"
             style={{

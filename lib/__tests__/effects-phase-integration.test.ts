@@ -1,11 +1,4 @@
-/**
- * Phase integration tests.
- * Tests how card effects integrate with game phases:
- * - EndPhase: summon returns, Akamaru check, power token removal (Rock Lee exception)
- * - StartPhase: chakra calculation with continuous CHAKRA +X effects
- * - MissionPhase: scoring with continuous power modifiers
- * - Defeat replacement chain: Hayate hide-instead, Gemma sacrifice, on-defeat triggers
- */
+
 import { describe, it, expect, beforeAll } from 'vitest';
 import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState } from './testHelpers';
 import { initializeRegistry } from '../effects/EffectRegistry';
@@ -26,9 +19,9 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
   return { card: mockMission(), rank, basePoints: 3, rankBonus, wonBy: null, player1Characters: p1, player2Characters: p2 };
 }
 
-// ===================================================================
-// END PHASE - Power Token Removal
-// ===================================================================
+
+
+
 describe('EndPhase - Power Token Removal', () => {
   it('should remove all power tokens from normal characters', () => {
     const char1 = mockCharInPlay({ instanceId: 'c1', powerTokens: 3 }, { name_fr: 'C1', power: 2 });
@@ -64,9 +57,9 @@ describe('EndPhase - Power Token Removal', () => {
   });
 });
 
-// ===================================================================
-// END PHASE - Summon Returns
-// ===================================================================
+
+
+
 describe('EndPhase - Summon Returns', () => {
   it('should return Summon characters to hand at end of round', () => {
     const gamaBunta = mockCharInPlay({ instanceId: 'gb-1', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -117,9 +110,9 @@ describe('EndPhase - Summon Returns', () => {
   });
 });
 
-// ===================================================================
-// END PHASE - Akamaru Check
-// ===================================================================
+
+
+
 describe('EndPhase - Akamaru Return', () => {
   it('should return Akamaru to hand when no Kiba in same mission', () => {
     const akamaru = mockCharInPlay({ instanceId: 'aka-1', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -158,9 +151,9 @@ describe('EndPhase - Akamaru Return', () => {
   });
 });
 
-// ===================================================================
-// END PHASE - Summon Keyword Return
-// ===================================================================
+
+
+
 describe('EndPhase - Summon Return', () => {
   it('should return Summon keyword cards to hand at end of round', () => {
     const gamaBunta = mockCharInPlay({ instanceId: 'gb-1', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -220,15 +213,15 @@ describe('EndPhase - Summon Return', () => {
     };
 
     const result = executeEndPhase(state);
-    // Giant Spider should NOT be returned by generic Summon logic (it's handled by handleGiantSpider103EndOfRound)
+    
     expect(result.activeMissions[0].player1Characters.length).toBe(1);
     expect(result.player1.hand.length).toBe(0);
   });
 });
 
-// ===================================================================
-// END PHASE - Chakra Reset
-// ===================================================================
+
+
+
 describe('EndPhase - Chakra Reset', () => {
   it('should reset both players chakra to 0', () => {
     const state = createActionPhaseState({
@@ -243,9 +236,9 @@ describe('EndPhase - Chakra Reset', () => {
   });
 });
 
-// ===================================================================
-// START PHASE - Chakra Bonus Calculation
-// ===================================================================
+
+
+
 describe('StartPhase - Chakra Bonus Calculation', () => {
   it('should calculate Kiba + Akamaru chakra bonus', () => {
     const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
@@ -302,9 +295,9 @@ describe('StartPhase - Chakra Bonus Calculation', () => {
   });
 });
 
-// ===================================================================
-// POWER CALCULATION
-// ===================================================================
+
+
+
 describe('PowerCalculation - with continuous modifiers', () => {
   it('hidden characters should have 0 base power but power tokens count', () => {
     const hidden = mockCharInPlay({ instanceId: 'h-1', isHidden: true, powerTokens: 5 }, {
@@ -315,7 +308,7 @@ describe('PowerCalculation - with continuous modifiers', () => {
     });
 
     const power = calculateCharacterPower(state, hidden, 'player1');
-    // Base power (10) is ignored for hidden chars, but power tokens (5) still count
+    
     expect(power).toBe(5);
   });
 
@@ -367,9 +360,9 @@ describe('PowerCalculation - with continuous modifiers', () => {
   });
 });
 
-// ===================================================================
-// COST REDUCTION
-// ===================================================================
+
+
+
 describe('ChakraValidation - Cost Reduction', () => {
   it('Kurenai 034 should reduce Team 8 cost by 1', () => {
     const kurenai = mockCharInPlay({ instanceId: 'kur-1' }, {
@@ -400,9 +393,9 @@ describe('ChakraValidation - Cost Reduction', () => {
   });
 });
 
-// ===================================================================
-// DEFEAT REPLACEMENT - Hayate 048
-// ===================================================================
+
+
+
 describe('Defeat Replacement - Hayate 048', () => {
   it('should hide Hayate instead of defeating him', () => {
     const hayate = mockCharInPlay({ instanceId: 'hay-1', controlledBy: 'player2', originalOwner: 'player2' }, {
@@ -420,9 +413,9 @@ describe('Defeat Replacement - Hayate 048', () => {
   });
 });
 
-// ===================================================================
-// DEFEAT REPLACEMENT - Gaara 075
-// ===================================================================
+
+
+
 describe('Defeat Replacement - Gaara 075', () => {
   it('should hide Gaara 075 instead of defeat by enemy effect', () => {
     const gaara = mockCharInPlay({ instanceId: 'gaara-1', controlledBy: 'player2', originalOwner: 'player2' }, {
@@ -453,9 +446,9 @@ describe('Defeat Replacement - Gaara 075', () => {
   });
 });
 
-// ===================================================================
-// DEFEAT REPLACEMENT - Gemma 049 (sacrifice)
-// ===================================================================
+
+
+
 describe('Defeat Replacement - Gemma 049', () => {
   it('should sacrifice Gemma to protect a Leaf Village ally', () => {
     const leafAlly = mockCharInPlay({ instanceId: 'la-1', controlledBy: 'player1', originalOwner: 'player1' }, {
@@ -494,9 +487,9 @@ describe('Defeat Replacement - Gemma 049', () => {
   });
 });
 
-// ===================================================================
-// DEFEAT UTILS - On-Defeat Triggers
-// ===================================================================
+
+
+
 describe('defeatUtils - On-Defeat Triggers', () => {
   it('should trigger Tsunade 003 on friendly defeat (+2 chakra)', () => {
     const tsunade = mockCharInPlay({ instanceId: 'tsu-1' }, {
@@ -520,9 +513,9 @@ describe('defeatUtils - On-Defeat Triggers', () => {
     };
 
     const result = defeatFriendlyCharacter(state, 0, 'vic-1', 'player1');
-    // Tsunade should trigger: +2 chakra for friendly defeat
+    
     expect(result.player1.chakra).toBe(7); // 5 + 2
-    // Victim should be removed
+    
     expect(result.activeMissions[0].player1Characters.length).toBe(1); // only Tsunade remains
   });
 
@@ -546,7 +539,7 @@ describe('defeatUtils - On-Defeat Triggers', () => {
     };
 
     const result = defeatEnemyCharacter(state, 0, 'ev-1', 'player1');
-    // Sasuke 136 should trigger: +1 chakra for any defeat
+    
     expect(result.player1.chakra).toBe(4); // 3 + 1
     expect(result.activeMissions[0].player2Characters.length).toBe(0);
   });
@@ -573,14 +566,14 @@ describe('defeatUtils - On-Defeat Triggers', () => {
     };
 
     const result = defeatFriendlyCharacter(state, 0, 'vic', 'player1');
-    // Tsunade +2, Sasuke +1 = +3 total
+    
     expect(result.player1.chakra).toBe(3);
   });
 });
 
-// ===================================================================
-// DEFEAT UTILS - Normal defeat
-// ===================================================================
+
+
+
 describe('defeatUtils - Normal defeat', () => {
   it('should remove character and add to discard pile', () => {
     const enemy = mockCharInPlay({ instanceId: 'e-1', controlledBy: 'player2', originalOwner: 'player2' }, {
@@ -599,9 +592,9 @@ describe('defeatUtils - Normal defeat', () => {
   });
 });
 
-// ===================================================================
-// SCORE EFFECTS via EffectEngine
-// ===================================================================
+
+
+
 describe('EffectEngine - resolveScoreEffects', () => {
   it('should trigger character SCORE effects for the winner (returns CONFIRM popup)', () => {
     const baki = mockCharInPlay({ instanceId: 'baki-1' }, {
@@ -619,7 +612,7 @@ describe('EffectEngine - resolveScoreEffects', () => {
     };
 
     const result = EffectEngine.resolveScoreEffects(state, 'player1', 0);
-    // Baki 081 SCORE now returns a CONFIRM popup instead of direct draw
+    
     const pending = result.pendingEffects?.find((e: any) => e.targetSelectionType === 'BAKI081_CONFIRM_SCORE');
     expect(pending).toBeTruthy();
   });

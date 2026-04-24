@@ -2,25 +2,9 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 028/130 - AKAMARU "Les Hommes-Betes Enrages" (UC)
- * Chakra: 2 | Power: 3
- * Group: Leaf Village | Keywords: Team 8, Jutsu
- *
- * MAIN [continuous]: At the end of the round, you may return this card to your hand.
- *   - This is a continuous effect. The actual end-of-round return-to-hand logic is
- *     handled in EndPhase.ts (similar to Akamaru 027).
- *   - The MAIN handler here is a no-op.
- *
- * AMBUSH: POWERUP 2 a friendly Kiba Inuzuka in this mission.
- *   - When revealed from hidden, find a friendly character named "KIBA INUZUKA"
- *     in the same mission and add 2 power tokens to them.
- *   - If no friendly Kiba Inuzuka is in this mission, the effect fizzles.
- *   - If multiple friendly Kiba Inuzuka (shouldn't normally happen due to name uniqueness),
- *     require target selection.
- */
+
 function handleAkamaru028Main(ctx: EffectContext): EffectResult {
-  // Continuous end-of-round return to hand - actual logic handled in EndPhase.ts
+  
   return { state: ctx.state };
 }
 
@@ -31,7 +15,7 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
   const friendlyChars = mission[friendlySide];
 
-  // Find friendly Kiba Inuzuka in this mission
+  
   const kibaTargets: string[] = [];
   for (const char of friendlyChars) {
     if (char.isHidden) continue;
@@ -41,14 +25,14 @@ function handleAkamaru028Ambush(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no friendly Kiba Inuzuka, effect fizzles
+  
   if (kibaTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Akamaru (028): No friendly Kiba Inuzuka in this mission for POWERUP 2.',
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-028-UC' }) } };
   }
 
-  // Confirmation popup before POWERUP
+  
   return {
     state,
     requiresTargetSelection: true,

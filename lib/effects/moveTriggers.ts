@@ -2,19 +2,12 @@ import type { GameState, PlayerID, CharacterInPlay, PendingEffect, PendingAction
 import { logAction } from '../engine/utils/gameLog';
 import { generateInstanceId } from '../engine/utils/id';
 import { canBeHiddenByEnemy } from './ContinuousEffects';
-// Circular-safe: EffectEngine.ts also imports from this file, but its class
-// body is fully evaluated by the time these trigger functions are actually
-// invoked at runtime (effect processing happens after module load).
+
+
+
 import { EffectEngine } from './EffectEngine';
 
-/**
- * Check and trigger Ninja Hounds 100 continuous move effect.
- *
- * Card text: "[hourglass] Each time this character moves to a different mission,
- *            look at a hidden enemy character in this mission."
- *
- * Creates a pending action so the player can choose which hidden enemy character to peek at.
- */
+
 export function checkNinjaHoundsTrigger(
   state: GameState,
   movedChar: CharacterInPlay,
@@ -37,7 +30,7 @@ export function checkNinjaHoundsTrigger(
   const mission = state.activeMissions[destMissionIndex];
   if (!mission) return state;
 
-  // Find hidden ENEMY characters in the destination mission
+  
   const enemySide: 'player1Characters' | 'player2Characters' =
     player === 'player1' ? 'player2Characters' : 'player1Characters';
   const hiddenEnemies = mission[enemySide].filter(
@@ -58,7 +51,7 @@ export function checkNinjaHoundsTrigger(
   }
 
   if (hiddenEnemies.length === 1) {
-    // Auto-select if only one target, but still create a reveal pending to show the card info
+    
     const target = hiddenEnemies[0];
     const effectId = generateInstanceId();
     const actionId = generateInstanceId();
@@ -109,7 +102,7 @@ export function checkNinjaHoundsTrigger(
     };
   }
 
-  // Multiple hidden enemies: let the player choose which one to look at
+  
   const validTargets = hiddenEnemies.map((c) => c.instanceId);
   const effectId = generateInstanceId();
   const actionId = generateInstanceId();
@@ -153,14 +146,7 @@ export function checkNinjaHoundsTrigger(
   };
 }
 
-/**
- * Check and trigger Choji 018 continuous post-move hide effect.
- *
- * Card text: "[⧗] After you move this character, hide an enemy character
- *            in this mission with less Power than this character."
- *
- * Only triggers on friendly moves (charOwner === character's controller).
- */
+
 export function checkChoji018PostMoveTrigger(
   state: GameState,
   movedChar: CharacterInPlay,
@@ -168,7 +154,7 @@ export function checkChoji018PostMoveTrigger(
   charOwner: PlayerID,
   charController: PlayerID,
 ): GameState {
-  // Only triggers on friendly moves
+  
   if (charOwner !== charController) return state;
   if (movedChar.isHidden) return state;
 
@@ -193,7 +179,7 @@ export function checkChoji018PostMoveTrigger(
 
   const enemyPlayer: PlayerID = charController === 'player1' ? 'player2' : 'player1';
 
-  // Find non-hidden enemies with less power that can be hidden
+  
   const hideTargets: string[] = [];
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
@@ -219,14 +205,14 @@ export function checkChoji018PostMoveTrigger(
   }
 
   if (hideTargets.length === 1) {
-    // Auto-hide single target via hideCharacterWithLog so that protection
-    // effects (Kimimaro 056, Shino 115, Gemma 049) get a chance to intercept.
-    // Per the advanced ruling, hide does NOT break control — controlled
-    // characters stay on the controller's side when the controller is hidden.
+    
+    
+    
+    
     return EffectEngine.hideCharacterWithLog(state, hideTargets[0], charController);
   }
 
-  // Multiple targets: create pending target selection
+  
   const effectId = generateInstanceId();
   const actionId = generateInstanceId();
 

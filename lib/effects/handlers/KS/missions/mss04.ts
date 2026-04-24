@@ -2,11 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * MSS 04 - "Assassinat" / "Assassination"
- *
- * SCORE [arrow]: Defeat an enemy hidden character.
- */
+
 
 function mss04ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
@@ -14,7 +10,7 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Collect all hidden enemy characters across all missions
+  
   const validTargets: string[] = [];
 
   for (let i = 0; i < state.activeMissions.length; i++) {
@@ -37,7 +33,7 @@ function mss04ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before defeat
+  
   return {
     state,
     requiresTargetSelection: true,

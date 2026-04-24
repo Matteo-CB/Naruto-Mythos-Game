@@ -145,7 +145,7 @@ export function FriendshipButton({ userId, username }: FriendshipButtonProps) {
     );
   }
 
-  // status === 'accepted'
+  
   return (
     <div className="flex items-center gap-2">
       <span

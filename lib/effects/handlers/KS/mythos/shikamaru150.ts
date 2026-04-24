@@ -3,24 +3,12 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 111/130 V - SHIKAMARU NARA (M)
- * Chakra: 6, Power: 5
- * Group: Leaf Village, Keywords: Team 10, Jutsu
- *
- * MAIN [continuous]: Opponent cannot play characters hidden in this mission.
- *   - Continuous no-op. The play restriction is enforced by the engine's
- *     action validation (ActionPhase / GameEngine.validatePlayHidden).
- *
- * UPGRADE: Hide an enemy with Power 3 or less in this mission.
- *   - When isUpgrade: find non-hidden enemies in this mission with effective
- *     power <= 3. Require target selection.
- */
+
 
 function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
   let state = { ...ctx.state };
 
-  // Log the continuous effect
+  
   state = {
     ...state,
     log: logAction(
@@ -32,7 +20,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
     ),
   };
 
-  // UPGRADE: Hide an enemy with Power 3 or less in this mission
+  
   if (ctx.isUpgrade) {
     const opponentPlayer = ctx.sourcePlayer === 'player1' ? 'player2' as const : 'player1' as const;
     const enemySide: 'player1Characters' | 'player2Characters' =
@@ -71,7 +59,7 @@ function shikamaru150MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function shikamaru150UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  
   return { state: ctx.state };
 }
 

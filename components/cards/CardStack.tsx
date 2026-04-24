@@ -5,21 +5,21 @@ import type { CharacterCard, VisibleCharacter } from '@/lib/engine/types';
 import CardFace from './CardFace';
 import CardBack from './CardBack';
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface CardStackProps {
-  /** The visible character data from the game state */
+  
   character: VisibleCharacter;
-  /** Optional additional className for sizing */
+  
   className?: string;
-  /** Click handler for the stack */
+  
   onClick?: () => void;
 }
 
-// ---------------------
-// Component: Evolved card stack showing top card with offset hint of cards beneath
-// ---------------------
+
+
+
 function CardStackInner({ character, className = '', onClick }: CardStackProps) {
   const { isHidden, card, powerTokens, stackSize } = character;
   const hasStack = stackSize > 1;
@@ -42,12 +42,12 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
       style={{
         position: 'relative',
         cursor: onClick ? 'pointer' : 'default',
-        // Extra padding at bottom-right to accommodate stacked card offsets
+        
         paddingBottom: hasStack ? '4px' : undefined,
         paddingRight: hasStack ? '4px' : undefined,
       }}
     >
-      {/* Stacked card hints behind the top card */}
+      
       {hasStack &&
         Array.from({ length: Math.min(stackSize - 1, 3) }).map((_, idx) => {
           const offset = (idx + 1) * 4;
@@ -72,7 +72,7 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
           );
         })}
 
-      {/* Top card */}
+      
       <div
         className={className}
         style={{
@@ -87,7 +87,7 @@ function CardStackInner({ character, className = '', onClick }: CardStackProps) 
         )}
       </div>
 
-      {/* Stack/upgrade count indicator */}
+      
       {hasStack && (
         <div
           style={{

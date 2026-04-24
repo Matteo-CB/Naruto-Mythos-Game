@@ -1,8 +1,4 @@
-/**
- * End-to-end tests for POWERUP and UPGRADE flows.
- * Uses REAL card IDs to verify effect handlers are actually triggered
- * through the full GameEngine.applyAction pipeline.
- */
+
 import { describe, it, expect } from 'vitest';
 import { GameEngine } from '../engine/GameEngine';
 import { mockCharacter, mockCharInPlay, mockMission, createActionPhaseState } from './testHelpers';
@@ -11,7 +7,7 @@ import { generateInstanceId, generateGameId } from '../engine/utils/id';
 import { getAllCharacters } from '../data/cardLoader';
 import { getEffectHandler } from '../effects/EffectRegistry';
 
-// Load ALL card data (including cards without visuals, needed for upgrade tests)
+
 const allChars = getAllCharacters();
 function findCard(id: string) {
   return allChars.find(c => c.id === id);
@@ -23,7 +19,7 @@ describe('POWERUP end-to-end', () => {
     expect(hiruzen).toBeDefined();
     expect(hiruzen.effects?.some(e => e.type === 'MAIN')).toBe(true);
 
-    // A friendly Leaf Village character already on mission 0
+    
     const ally = mockCharInPlay(
       { instanceId: 'ally-leaf', controlledBy: 'player1', missionIndex: 0 },
       { id: 'KS-003-C', name_fr: 'TSUNADE', group: 'Leaf Village', power: 2, chakra: 2 },
@@ -46,7 +42,7 @@ describe('POWERUP end-to-end', () => {
       }],
     });
 
-    // Play Hiruzen on mission 0
+    
     const newState = GameEngine.applyAction(state, 'player1', {
       type: 'PLAY_CHARACTER',
       cardIndex: 0,
@@ -54,16 +50,16 @@ describe('POWERUP end-to-end', () => {
       hidden: false,
     });
 
-    // Hiruzen should be on the board
+    
     const p1Chars = newState.activeMissions[0].player1Characters;
     expect(p1Chars.length).toBe(2);
 
-    // Effect is optional - confirmation popup should be waiting
+    
     expect(newState.pendingEffects.length).toBeGreaterThan(0);
     const pendingEff = newState.pendingEffects.find(e => e.targetSelectionType === 'HIRUZEN001_CONFIRM_MAIN');
     expect(pendingEff).toBeDefined();
     expect(pendingEff!.isOptional).toBe(true);
-    // Token NOT yet applied (awaiting player confirmation)
+    
     const updatedAlly = p1Chars.find(c => c.instanceId === 'ally-leaf');
     expect(updatedAlly!.powerTokens).toBe(0);
   });
@@ -71,7 +67,7 @@ describe('POWERUP end-to-end', () => {
   it('Hiruzen 001 should fizzle if no Leaf Village target', () => {
     const hiruzen = findCard('KS-001-C')!;
 
-    // Only non-Leaf Village ally
+    
     const ally = mockCharInPlay(
       { instanceId: 'ally-sand', controlledBy: 'player1', missionIndex: 0 },
       { name_fr: 'Enemy', group: 'Sand Village', power: 2 },
@@ -101,7 +97,7 @@ describe('POWERUP end-to-end', () => {
       hidden: false,
     });
 
-    // Ally should have 0 power tokens (fizzled)
+    
     const updatedAlly = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'ally-sand');
     expect(updatedAlly!.powerTokens).toBe(0);
   });
@@ -110,7 +106,7 @@ describe('POWERUP end-to-end', () => {
     const gaara = findCard('KS-074-C')!;
     expect(gaara).toBeDefined();
 
-    // Two hidden allies in the same mission
+    
     const hidden1 = mockCharInPlay(
       { instanceId: 'h1', controlledBy: 'player1', missionIndex: 0, isHidden: true },
       { name_fr: 'Hidden1' },
@@ -144,14 +140,14 @@ describe('POWERUP end-to-end', () => {
       hidden: false,
     });
 
-    // After playing, a CONFIRM popup should be pending
+    
     const confirmPending = afterPlay.pendingEffects.find(
       (e: any) => e.targetSelectionType === 'GAARA074_CONFIRM_MAIN'
     );
     expect(confirmPending).toBeDefined();
     expect(afterPlay.pendingActions.length).toBeGreaterThan(0);
 
-    // Player confirms the effect
+    
     const confirmAction = afterPlay.pendingActions[0];
     const newState = GameEngine.applyAction(afterPlay, 'player1', {
       type: 'SELECT_TARGET',
@@ -159,7 +155,7 @@ describe('POWERUP end-to-end', () => {
       selectedTargets: [confirmAction.options[0]],
     });
 
-    // Gaara should have powerTokens = 2 (2 hidden allies)
+    
     const playedGaara = newState.activeMissions[0].player1Characters.find(
       (c: any) => c.card.id === 'KS-074-C'
     );
@@ -175,16 +171,16 @@ describe('UPGRADE end-to-end', () => {
     expect(naruto009).toBeDefined();
     expect(naruto108).toBeDefined();
 
-    // Check names match for upgrade
+    
     expect(naruto009.name_fr.toUpperCase()).toBe(naruto108.name_fr.toUpperCase());
     expect(naruto108.chakra).toBeGreaterThan(naruto009.chakra);
 
-    // Place Naruto 009 on board with an enemy that has power 3 or less
+    
     const narutoOnBoard = mockCharInPlay(
       { instanceId: 'naruto-in-play', controlledBy: 'player1', missionIndex: 0 },
       { ...naruto009 },
     );
-    // Enemy with power 3 in the same mission
+    
     const enemy = mockCharInPlay(
       { instanceId: 'enemy-1', controlledBy: 'player2', originalOwner: 'player2', missionIndex: 0 },
       { id: 'KS-099-C', name_fr: 'Enemy', power: 3, chakra: 2 },
@@ -207,7 +203,7 @@ describe('UPGRADE end-to-end', () => {
       }],
     });
 
-    // Step 1: Apply the upgrade action - this creates a pending target selection for MAIN effect
+    
     const stateAfterUpgrade = GameEngine.applyAction(state, 'player1', {
       type: 'UPGRADE_CHARACTER',
       cardIndex: 0,
@@ -215,41 +211,41 @@ describe('UPGRADE end-to-end', () => {
       targetInstanceId: 'naruto-in-play',
     });
 
-    // Stack should be upgraded
+    
     const upgraded = stateAfterUpgrade.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
     expect(upgraded).toBeDefined();
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-108-R');
 
-    // Chakra should be reduced by the cost difference (108 cost - 009 cost)
+    
     const costDiff = naruto108.chakra - naruto009.chakra;
     expect(stateAfterUpgrade.player1.chakra).toBe(20 - costDiff);
 
-    // MAIN effect now returns CONFIRM popup first
+    
     expect(stateAfterUpgrade.pendingActions.length).toBeGreaterThan(0);
     const confirmAction = stateAfterUpgrade.pendingActions[0];
-    // CONFIRM popup has the source card instanceId as option
+    
     expect(confirmAction.options).toContain('naruto-in-play');
 
-    // Step 2: Confirm the MAIN effect
+    
     const stateAfterConfirm = GameEngine.applyAction(stateAfterUpgrade, 'player1', {
       type: 'SELECT_TARGET',
       pendingActionId: confirmAction.id,
       selectedTargets: ['naruto-in-play'],
     });
 
-    // After confirming, it should show UPGRADE modifier popup (since this is an upgrade)
+    
     expect(stateAfterConfirm.pendingActions.length).toBeGreaterThan(0);
     const modifierAction = stateAfterConfirm.pendingActions[0];
 
-    // Step 3: Confirm the UPGRADE modifier
+    
     const stateAfterModifier = GameEngine.applyAction(stateAfterConfirm, 'player1', {
       type: 'SELECT_TARGET',
       pendingActionId: modifierAction.id,
       selectedTargets: ['naruto-in-play'],
     });
 
-    // Step 4: Now select the target enemy
+    
     expect(stateAfterModifier.pendingActions.length).toBeGreaterThan(0);
     const targetAction = stateAfterModifier.pendingActions[0];
     expect(targetAction.options).toContain('enemy-1');
@@ -260,11 +256,11 @@ describe('UPGRADE end-to-end', () => {
       selectedTargets: ['enemy-1'],
     });
 
-    // MAIN effect: enemy should be hidden (power 3 <= 3)
+    
     const updatedEnemy = finalState.activeMissions[0].player2Characters.find(c => c.instanceId === 'enemy-1');
     expect(updatedEnemy!.isHidden).toBe(true);
 
-    // UPGRADE effect: POWERUP X where X = enemy power (3) - applied inside naruto108ApplyHide
+    
     const finalUpgraded = finalState.activeMissions[0].player1Characters.find(c => c.instanceId === 'naruto-in-play');
     expect(finalUpgraded!.powerTokens).toBe(3);
   });
@@ -275,11 +271,11 @@ describe('UPGRADE end-to-end', () => {
     expect(gaara074).toBeDefined();
     expect(gaara120).toBeDefined();
 
-    // Check names match for upgrade
+    
     expect(gaara074.name_fr.toUpperCase()).toBe(gaara120.name_fr.toUpperCase());
     expect(gaara120.chakra).toBeGreaterThan(gaara074.chakra);
 
-    // Place Gaara 074 on board, add weak enemies
+    
     const gaaraOnBoard = mockCharInPlay(
       { instanceId: 'gaara-in-play', controlledBy: 'player1', missionIndex: 0 },
       { ...gaara074 },
@@ -328,18 +324,18 @@ describe('UPGRADE end-to-end', () => {
       targetInstanceId: 'gaara-in-play',
     });
 
-    // Stack should be upgraded
+    
     const upgraded = newState.activeMissions[0].player1Characters.find(c => c.instanceId === 'gaara-in-play');
     expect(upgraded).toBeDefined();
     expect(upgraded!.stack.length).toBe(2);
     expect(upgraded!.card.id).toBe('KS-120-R');
 
-    // MAIN effect uses CONFIRM popup pattern — first creates GAARA120_CONFIRM_MAIN pending
-    // Player must confirm before per-mission defeat selection (GAARA120_CHOOSE_DEFEAT) is shown
+    
+    
     const gaara120Pending = newState.pendingEffects.find(e => e.targetSelectionType === 'GAARA120_CONFIRM_MAIN');
     expect(gaara120Pending).toBeDefined();
     expect(gaara120Pending!.isOptional).toBe(true);
-    // Enemies NOT yet defeated (awaiting player confirmation)
+    
     const m0Enemies = newState.activeMissions[0].player2Characters;
     expect(m0Enemies.find(c => c.instanceId === 'weak1')).toBeDefined();
   });
@@ -348,7 +344,7 @@ describe('UPGRADE end-to-end', () => {
     const rockLee = findCard('KS-039-UC')!;
     expect(rockLee).toBeDefined();
 
-    // A lower cost Rock Lee already on board
+    
     const leeOnBoard = mockCharInPlay(
       { instanceId: 'lee-in-play', controlledBy: 'player1', missionIndex: 0, powerTokens: 1 },
       { id: 'KS-039-UC', name_fr: rockLee.name_fr, chakra: rockLee.chakra - 1, power: rockLee.power - 1, keywords: ['Team Guy'], group: 'Leaf Village',
@@ -383,14 +379,14 @@ describe('UPGRADE end-to-end', () => {
       targetInstanceId: 'lee-in-play',
     });
 
-    // After upgrade, should have a pending CONFIRM popup for UPGRADE effect
+    
     expect(newState.pendingEffects.length).toBeGreaterThan(0);
     const confirmPending = newState.pendingEffects.find(p => p.targetSelectionType === 'ROCKLEE039_CONFIRM_UPGRADE');
     expect(confirmPending).toBeDefined();
     const confirmAction = newState.pendingActions.find(a => a.sourceEffectId === confirmPending!.id);
     expect(confirmAction).toBeDefined();
 
-    // Confirm the popup to apply POWERUP 2
+    
     const confirmedState = GameEngine.applyAction(newState, 'player1', {
       type: 'SELECT_TARGET',
       pendingActionId: confirmAction!.id,
@@ -399,7 +395,7 @@ describe('UPGRADE end-to-end', () => {
 
     const upgraded = confirmedState.activeMissions[0].player1Characters.find(c => c.instanceId === 'lee-in-play');
     expect(upgraded).toBeDefined();
-    // Should have 1 (existing) + 2 (UPGRADE POWERUP) = 3 tokens
+    
     expect(upgraded!.powerTokens).toBe(3);
   });
 });

@@ -74,7 +74,7 @@ export default function LegalPage() {
       </header>
 
       <main className="relative z-10 flex-1 px-6 py-8 max-w-3xl mx-auto w-full">
-        {/* ═══ MENTIONS LEGALES ═══ */}
+        
         <div
           className="rounded p-6 mb-6"
           style={{
@@ -102,7 +102,7 @@ export default function LegalPage() {
           </Section>
         </div>
 
-        {/* ═══ POLITIQUE DE CONFIDENTIALITE ═══ */}
+        
         <div
           className="rounded p-6"
           style={{

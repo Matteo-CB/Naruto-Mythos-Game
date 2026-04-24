@@ -10,10 +10,7 @@ async function isAdmin(): Promise<boolean> {
   return !!session?.user?.name && ADMIN_USERNAMES.includes(session.user.name);
 }
 
-/**
- * GET /api/admin/players?search=xxx
- * Search players by username
- */
+
 export async function GET(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -35,10 +32,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ users });
 }
 
-/**
- * POST /api/admin/players
- * Actions: reset-player, set-elo, set-role, delete-games
- */
+
 export async function POST(request: NextRequest) {
   if (!(await isAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -49,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   switch (action) {
     case 'reset-player': {
-      // Reset ELO, W/L/D, delete all games
+      
       await prisma.user.update({
         where: { id: userId },
         data: { elo: 500, wins: 0, losses: 0, draws: 0, discordHighestElo: 0 },

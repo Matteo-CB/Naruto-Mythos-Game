@@ -3,29 +3,21 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 080/130 - TEMARI "Wind Scythe" (UC)
- * Chakra: 4 | Power: 3
- * Group: Sand Village | Keywords: Team Baki
- *
- * MAIN: Move another friendly Sand Village character to another mission.
- *
- * UPGRADE: Move this character to another mission.
- */
+
 
 function handleTemari080Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Need at least 2 missions
+  
   if (state.activeMissions.length < 2) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_NO_TARGET', 'Temari (080): Only 1 mission in play, cannot move.',
       'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
-  // Find all friendly Sand Village characters across all missions (not self)
-  // Filter by Kurenai blocking and valid destination
+  
+  
   const validTargets: string[] = [];
   for (let mi = 0; mi < state.activeMissions.length; mi++) {
     const mission = state.activeMissions[mi];
@@ -37,7 +29,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.group !== 'Sand Village') continue;
 
-      // Check valid destination (name uniqueness)
+      
       const charName = topCard.name_fr;
       const hasValidDest = state.activeMissions.some((m, i) => {
         if (i === mi) return false;
@@ -58,7 +50,7 @@ function handleTemari080Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -74,14 +66,14 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Kurenai 035: if enemy Kurenai blocks movement from this mission, fizzle
+  
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer,
       'EFFECT_BLOCKED', 'Temari (080): Movement blocked by Yuhi Kurenai (035).',
       'game.log.effect.moveBlockedKurenai', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
-  // Find valid destination missions for self (must not have same-name conflict)
+  
   const topCard = sourceCard.stack?.length > 0
     ? sourceCard.stack[sourceCard.stack?.length - 1]
     : sourceCard.card;
@@ -105,7 +97,7 @@ function handleTemari080Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TEMARI', id: 'KS-080-UC' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -3,15 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 046/130 - EBISU (Common)
- * Chakra: 3 | Power: 3
- * Group: Leaf Village | Keywords: Pouvoir
- * MAIN: If there is a friendly non-hidden character with less Power than this character
- * in this mission, draw a card.
- *
- * "Power" includes base power + power tokens + continuous modifiers (effective power).
- */
+
 function handleEbisu046Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
@@ -19,10 +11,10 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
   const friendlyChars =
     sourcePlayer === 'player1' ? mission.player1Characters : mission.player2Characters;
 
-  // Use effective power (base + tokens + continuous modifiers)
+  
   const sourcePower = calculateCharacterPower(state, sourceCard, sourcePlayer);
 
-  // Check for a friendly non-hidden character with less Power
+  
   const hasLesserFriendly = friendlyChars.some((char) => {
     if (char.instanceId === sourceCard.instanceId) return false;
     if (char.isHidden) return false;
@@ -36,7 +28,7 @@ function handleEbisu046Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'EBISU', id: 'KS-046-C' }) } };
   }
 
-  // Confirmation popup before drawing
+  
   return {
     state,
     requiresTargetSelection: true,

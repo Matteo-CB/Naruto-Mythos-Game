@@ -1,7 +1,4 @@
-/**
- * Common card effect handlers index.
- * Registers all 54 common card handlers with the effect registry.
- */
+
 
 import { registerHandler as registerHiruzen001 } from './hiruzen001';
 import { registerHandler as registerTsunade003 } from './tsunade003';
@@ -58,12 +55,9 @@ import { registerHandler as registerPakkun099 } from './pakkun099';
 import { registerHandler as registerNinjaHounds100 } from './ninjaHounds100';
 import { registerHandler as registerTonton101 } from './tonton101';
 
-/**
- * Register all common card effect handlers with the effect registry.
- * Called once during application initialization.
- */
+
 export function registerAllCommonHandlers(): void {
-  // Leaf Village characters
+  
   registerHiruzen001();    // 001/130 - HIRUZEN SARUTOBI: POWERUP 2 another Leaf Village
   registerTsunade003();    // 003/130 - TSUNADE: [continuous] On friendly defeat, gain 2 chakra
   registerShizune005();    // 005/130 - SHIZUNE: [continuous] CHAKRA +1
@@ -91,7 +85,7 @@ export function registerAllCommonHandlers(): void {
   registerHayate048();     // 048/130 - HAYATE GEKKO: [continuous] Hide instead of defeat
   registerGenma049();      // 049/130 - GEMMA SHIRANUI: [continuous] Sacrifice for Leaf ally
 
-  // Sound Village characters
+  
   registerOrochimaru050(); // 050/130 - OROCHIMARU: AMBUSH look/steal hidden enemy
   registerKabuto052();     // 052/130 - KABUTO YAKUSHI: AMBUSH steal top of opponent deck
   registerKimimaro055();   // 055/130 - KIMIMARO: AMBUSH discard to hide character
@@ -103,7 +97,7 @@ export function registerAllCommonHandlers(): void {
   registerZaku070();       // 070/130 - ZAKU ABUMI: Opponent gains 1 chakra
   registerKin072();        // 072/130 - KIN TSUCHI: Opponent draws a card
 
-  // Sand Village characters
+  
   registerGaara074();      // 074/130 - GAARA: POWERUP X (hidden allies count)
   registerGaara075();      // 075/130 - GAARA: [continuous] Hide on defeat/move, pay 2 less hidden
   registerKankuro077();    // 077/130 - KANKURO: [continuous] CHAKRA +1 if enemy in mission
@@ -111,20 +105,20 @@ export function registerAllCommonHandlers(): void {
   registerBaki081();       // 081/130 - BAKI: SCORE draw a card
   registerYashamaru084();  // 084/130 - YASHAMARU: [continuous] +2 Power if Gaara present
 
-  // Independent / Akatsuki characters
+  
   registerZabuza086();     // 086/130 - ZABUZA MOMOCHI: No effects
   registerHaku088();       // 088/130 - HAKU: Draw 1, put 1 on top of deck
   registerItachi090();     // 090/130 - ITACHI UCHIWA: [continuous] Pay 3 less if Sasuke present
   registerKisame092();     // 092/130 - KISAME HOSHIGAKI: AMBUSH steal Power tokens
 
-  // Summon characters
+  
   registerGamabunta094();  // 094/130 - GAMA BUNTA: [continuous] Return at end of round
   registerGamahiro095();   // 095/130 - GAMAHIRO: Draw if friendly, [continuous] return at end
   registerGamakichi096();  // 096/130 - GAMAKICHI: [continuous] Pay 1 less if Naruto, return at end
   registerGamatatsu097();  // 097/130 - GAMATATSU: [continuous] Return at end of round
   registerKatsuyu098();    // 098/130 - KATSUYU: POWERUP 2 if Tsunade, [continuous] return at end
 
-  // Ninja Hound / Pig characters
+  
   registerPakkun099();     // 099/130 - PAKKUN: SCORE move self
   registerNinjaHounds100(); // 100/130 - NINJA HOUNDS: [continuous] Look at hidden on move
   registerTonton101();     // 101/130 - TON TON: [continuous] +1 Power if Tsunade/Shizune

@@ -9,11 +9,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useSocketStore } from '@/lib/socket/client';
 import type { GameLogEntry, GamePhase } from '@/lib/engine/types';
 
-/**
- * When locale is 'en', swap _en variants into base keys for i18n interpolation.
- * E.g. { card: 'NARUTO UZUMAKI', card_en: 'NARUTO UZUMAKI', title: 'Jeune Ninja', title_en: 'Young Ninja' }
- * becomes { card: 'NARUTO UZUMAKI', title: 'Young Ninja', ... } in English.
- */
+
 function localizeParams(
   params: Record<string, string | number> | undefined,
   locale: string,
@@ -67,7 +63,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
       className="flex flex-col gap-0.5 px-3 py-1.5 font-body"
       style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.03)' }}
     >
-      {/* Top line: phase + player */}
+      
       <div className="flex items-center gap-2 text-[10px]">
         <span
           className="shrink-0 px-1 py-0.5 uppercase font-medium"
@@ -85,7 +81,7 @@ const LogEntry = React.memo(function LogEntry({ entry, formatPhase, playerDispla
           </span>
         )}
       </div>
-      {/* Bottom line: details */}
+      
       <div className="text-xs pl-1" style={{ color: '#e0e0e0' }}>
         {entry.messageKey ? t(entry.messageKey, localizeParams(entry.messageParams, locale) ?? {}) : (entry.details || entry.action)}
       </div>
@@ -118,7 +114,7 @@ export function GameLog() {
 
   return (
     <>
-      {/* Toggle button */}
+      
       {!showGameLog && (
         <button
           onClick={toggleGameLog}
@@ -134,7 +130,7 @@ export function GameLog() {
         </button>
       )}
 
-      {/* Log panel */}
+      
       <AnimatePresence>
         {showGameLog && (
           <motion.div
@@ -150,7 +146,7 @@ export function GameLog() {
               borderLeft: '3px solid rgba(196, 163, 90, 0.15)',
             }}
           >
-            {/* Header */}
+            
             <div
               className="flex items-center justify-between px-4 py-3 shrink-0"
               style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
@@ -175,7 +171,7 @@ export function GameLog() {
               </button>
             </div>
 
-            {/* Entries */}
+            
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto"

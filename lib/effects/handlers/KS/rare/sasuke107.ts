@@ -4,29 +4,14 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 107/130 - SASUKE UCHIWA (R)
- * Chakra: 5, Power: 5
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN: Must move all other non-hidden friendly characters from this mission to other missions.
- *   This is a mandatory effect ("must"). All non-hidden friendly characters in this mission
- *   (except Sasuke himself) are moved to other missions. Player chooses destination for each.
- *
- * UPGRADE: POWERUP X where X = number of characters moved.
- *   When isUpgrade: count the moved characters and apply POWERUP on self.
- */
 
-/** Get the side key for a player */
+
+
 function side(player: PlayerID): 'player1Characters' | 'player2Characters' {
   return player === 'player1' ? 'player1Characters' : 'player2Characters';
 }
 
-/**
- * Find valid destination missions for a character.
- * Prefers conflict-free missions. Only allows missions with same-name conflicts
- * if ALL other missions have conflicts (since the move is MANDATORY).
- */
+
 function getValidMissions(
   state: GameState,
   charInstanceId: string,
@@ -35,7 +20,7 @@ function getValidMissions(
 ): number[] {
   const friendlySide = side(player);
 
-  // Find the character's name
+  
   let charName = '';
   for (const m of state.activeMissions) {
     const c = m[friendlySide].find((ch) => ch.instanceId === charInstanceId);
@@ -65,14 +50,11 @@ function getValidMissions(
     }
   }
 
-  // Only return conflict-free missions — "if able" means skip chars that can't legally move
+  
   return conflictFree;
 }
 
-/**
- * Move a character to a destination mission, handling upgrade if same-name exists.
- * Returns the updated state.
- */
+
 function moveCharTo(
   state: GameState,
   charInstanceId: string,
@@ -82,20 +64,20 @@ function moveCharTo(
   const friendlySide = side(player);
   const missions = [...state.activeMissions];
 
-  // Check Kurenai 035 movement block before moving
-  // Find source mission of the character
+  
+  
   for (let i = 0; i < missions.length; i++) {
     const chars = missions[i][friendlySide];
     if (chars.some(c => c.instanceId === charInstanceId)) {
       if (isMovementBlockedByKurenai(state, i, player)) {
-        // Movement blocked - character stays in place
+        
         return state;
       }
       break;
     }
   }
 
-  // Find and remove from source mission
+  
   let movedChar: CharacterInPlay | null = null;
   for (let i = 0; i < missions.length; i++) {
     const chars = missions[i][friendlySide];
@@ -111,7 +93,7 @@ function moveCharTo(
 
   if (!movedChar) return state;
 
-  // Check for name conflict at destination - forced moves ALWAYS discard the moved character
+  
   const destMission = { ...missions[destMissionIndex] };
   const destChars = [...destMission[friendlySide]];
   const movedTopCard = movedChar.stack?.length > 0
@@ -126,7 +108,7 @@ function moveCharTo(
   });
 
   if (conflictIdx !== -1) {
-    // Name conflict - discard the moved character (no auto-upgrade on forced moves)
+    
     const owner = movedChar.originalOwner;
     const ownerState = { ...state[owner] };
     const cardsToDiscard = movedChar.stack?.length > 0 ? [...movedChar.stack] : [movedChar.card];
@@ -137,7 +119,7 @@ function moveCharTo(
     return { ...state, activeMissions: missions, [owner]: ownerState };
   }
 
-  // No conflict - place as new character
+  
   destChars.push({ ...movedChar, missionIndex: destMissionIndex });
 
   destMission[friendlySide] = destChars;
@@ -146,9 +128,7 @@ function moveCharTo(
   return { ...state, activeMissions: missions };
 }
 
-/**
- * Apply POWERUP on Sasuke after all moves are done.
- */
+
 function applyUpgradePowerup(
   state: GameState,
   sasukeInstanceId: string,
@@ -185,14 +165,8 @@ function applyUpgradePowerup(
   return state;
 }
 
-/**
- * Process chars to move one at a time. Auto-moves chars with 0-1 valid destinations,
- * returns target selection for the first char that needs a player choice.
- */
-/**
- * Filter charIds to only those that still exist on the board and can move.
- * Returns { moveable: instanceIds that have valid destinations, unmoveable: those with no valid dest }
- */
+
+
 function filterMoveableChars(
   state: GameState,
   charIds: string[],
@@ -204,7 +178,7 @@ function filterMoveableChars(
   let s = state;
 
   for (const charId of charIds) {
-    // Check if char still exists
+    
     let charExists = false;
     let charName = '';
     for (const m of s.activeMissions) {
@@ -219,7 +193,7 @@ function filterMoveableChars(
 
     const validMissions = getValidMissions(s, charId, player, sourceMissionIndex);
     if (validMissions.length === 0) {
-      // "if able" — character can't legally move, skip it
+      
       s = {
         ...s,
         log: logAction(
@@ -248,13 +222,13 @@ function processNextMove(
   sasukeInstanceId: string,
   sourceMissionIndex: number,
 ): EffectResult {
-  // Filter remaining chars to only those that exist and can move
+  
   const remaining = charIds.slice(idx);
   const { moveable, state: filteredState } = filterMoveableChars(state, remaining, player, sourceMissionIndex);
 
-  // All chars processed or none can move
+  
   if (moveable.length === 0) {
-    // UPGRADE: POWERUP X is optional — show CONFIRM popup instead of auto-applying
+    
     if (isUpgrade && movedCount > 0) {
       return {
         state: filteredState,
@@ -270,7 +244,7 @@ function processNextMove(
     return { state: filteredState };
   }
 
-  // 2+ characters remaining: let the player choose which to move next
+  
   if (moveable.length >= 2) {
     return {
       state: filteredState,
@@ -289,7 +263,7 @@ function processNextMove(
     };
   }
 
-  // Exactly 1 character remaining: proceed directly
+  
   const charId = moveable[0];
   const friendlySide = side(player);
   let charName = '';
@@ -301,7 +275,7 @@ function processNextMove(
   const validMissions = getValidMissions(filteredState, charId, player, sourceMissionIndex);
 
   if (validMissions.length === 1) {
-    // Auto-move — single valid destination, no player choice needed
+    
     let moved = moveCharTo(filteredState, charId, validMissions[0], player);
     moved = {
       ...moved,
@@ -313,7 +287,7 @@ function processNextMove(
         { card: 'SASUKE UCHIWA', id: 'KS-107-R', target: charName, from: sourceMissionIndex, to: validMissions[0] },
       ),
     };
-    // After auto-move, check for UPGRADE powerup
+    
     if (isUpgrade && movedCount + 1 > 0) {
       return {
         state: moved,
@@ -329,7 +303,7 @@ function processNextMove(
     return { state: moved };
   }
 
-  // Multiple valid missions - need player choice for destination
+  
   return {
     state: filteredState,
     requiresTargetSelection: true,
@@ -357,7 +331,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const friendlyChars = mission[friendlySide];
 
-  // Find non-hidden friendly characters in this mission (excluding self)
+  
   const charsToMove = friendlyChars.filter(
     (c: CharacterInPlay) => c.instanceId !== sourceCard.instanceId && !c.isHidden,
   );
@@ -377,7 +351,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Process characters one by one (if no other missions exist, processNextMove will discard them)
+  
   const charIds = charsToMove.map((c) => c.instanceId);
   return processNextMove(
     state, charIds, 0, 0, isUpgrade, sourcePlayer,
@@ -386,7 +360,7 @@ function sasuke107MainHandler(ctx: EffectContext): EffectResult {
 }
 
 function sasuke107UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler via isUpgrade flag.
+  
   return { state: ctx.state };
 }
 
@@ -395,7 +369,5 @@ export function registerSasuke107Handlers(): void {
   registerEffect('KS-107-R', 'UPGRADE', sasuke107UpgradeHandler);
 }
 
-/**
- * Exported for use by EffectEngine to continue processing after player selects a destination.
- */
+
 export { moveCharTo, getValidMissions, applyUpgradePowerup };

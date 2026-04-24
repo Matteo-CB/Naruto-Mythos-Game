@@ -1,8 +1,4 @@
-/**
- * Hard AI - strong level.
- *
- * ISMCTS 600 simulations, with neural network guidance when available.
- */
+
 
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
@@ -44,7 +40,7 @@ export class HardAI implements AIStrategy {
       return this.decideMulligan(state, player, validActions);
     }
 
-    // Try neural evaluation, fall back to heuristic MCTS on any failure
+    
     try {
       await this.evaluator.load();
 

@@ -3,25 +3,9 @@ import { logAction } from '../engine/utils/gameLog';
 import { EffectEngine } from './EffectEngine';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 
-/**
- * Centralized defeat utility.
- *
- * Every handler that defeats a character MUST use this function instead of
- * inline splice-and-discard. It enforces:
- *
- * 1. Defeat replacement checks (Hayate 048, Gaara 075, Gemma 049)
- * 2. On-defeat triggers (Tsunade 003, Sasuke 136)
- */
 
-/**
- * Sort AoE targets so that Gemma Shiranui (card 49 / KS-049-C) is processed LAST.
- *
- * Gemma 049 has a continuous sacrifice effect: she can be defeated instead of
- * a friendly Leaf Village character in the same mission. When an AoE defeats
- * or hides multiple characters including Gemma AND a Leaf Village ally,
- * non-Gemma targets must be processed first so Gemma can still offer her
- * protection before she herself is affected.
- */
+
+
 export function sortTargetsGemmaLast<T extends { card: { number: number }; stack: { number: number }[] }>(
   targets: T[],
 ): T[] {
@@ -36,10 +20,7 @@ export function sortTargetsGemmaLast<T extends { card: { number: number }; stack
   });
 }
 
-/**
- * Find a character by instanceId across all missions.
- * Returns the character, the mission index, and which side it's on.
- */
+
 function findCharacterInPlay(
   state: GameState,
   instanceId: string,
@@ -56,9 +37,7 @@ function findCharacterInPlay(
   return null;
 }
 
-/**
- * Defeat a character, respecting replacement effects and triggering on-defeat effects.
- */
+
 export function defeatCharacterInPlay(
   state: GameState,
   missionIndex: number,
@@ -76,17 +55,17 @@ export function defeatCharacterInPlay(
   const targetChar = chars[charIdx];
   const targetPlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
 
-  // 1. Check defeat replacement (Hayate 048, Gaara 075, Gemma 049)
+  
   const replacement = EffectEngine.checkDefeatReplacement(
     state, targetChar, targetPlayer, missionIndex, isEnemyEffect,
   );
 
   if (replacement.replaced) {
     if (replacement.replacement === 'hide') {
-      // Hide instead of defeat (Hayate 048 or Gaara 075). Route through
-      // EffectEngine.hideCharacter so any characters this target is controlling
-      // (Ino 020 / Orochimaru 050 stolen cards) are returned to their original
-      // owners before the isHidden flag is flipped.
+      
+      
+      
+      
       const hidden = EffectEngine.hideCharacter(state, charInstanceId);
       return {
         ...hidden,
@@ -104,10 +83,10 @@ export function defeatCharacterInPlay(
     }
 
     if (replacement.replacement === 'sacrifice' && replacement.sacrificeInstanceId) {
-      // Gemma 049 sacrifices himself to protect the target
+      
       const sacrificeInfo = findCharacterInPlay(state, replacement.sacrificeInstanceId);
       if (sacrificeInfo) {
-        // Defeat the sacrifice instead
+        
         let newState = removeCharacterFromPlay(
           state, sacrificeInfo.missionIndex, replacement.sacrificeInstanceId, sacrificeInfo.side,
         );
@@ -124,14 +103,14 @@ export function defeatCharacterInPlay(
             { target: targetChar.card.name_fr },
           ),
         };
-        // Trigger on-defeat for the sacrificed character
+        
         newState = triggerOnDefeatEffects(newState, sacrificeInfo.char, targetPlayer);
         return newState;
       }
     }
   }
 
-  // 2. Normal defeat: remove from play, discard
+  
   let newState = removeCharacterFromPlay(state, missionIndex, charInstanceId, side);
 
   newState = {
@@ -148,16 +127,14 @@ export function defeatCharacterInPlay(
     ),
   };
 
-  // 3. Trigger on-defeat effects (Tsunade 003, Sasuke 136)
-  // If this is part of a simultaneous batch, skip triggers from characters also being defeated
+  
+  
   newState = triggerOnDefeatEffects(newState, targetChar, targetPlayer, simultaneousDefeatIds);
 
   return newState;
 }
 
-/**
- * Shorthand: defeat an enemy character. Determines the side automatically.
- */
+
 export function defeatEnemyCharacter(
   state: GameState,
   missionIndex: number,
@@ -170,9 +147,7 @@ export function defeatEnemyCharacter(
   return defeatCharacterInPlay(state, missionIndex, charInstanceId, enemySide, true, sourcePlayer, simultaneousDefeatIds);
 }
 
-/**
- * Shorthand: defeat a friendly character (e.g., Sasuke 136 UPGRADE mutual destruction).
- */
+
 export function defeatFriendlyCharacter(
   state: GameState,
   missionIndex: number,
@@ -185,17 +160,14 @@ export function defeatFriendlyCharacter(
   return defeatCharacterInPlay(state, missionIndex, charInstanceId, friendlySide, false, sourcePlayer, simultaneousDefeatIds);
 }
 
-/**
- * Low-level removal: splice character from mission array, add to discard pile.
- * Does NOT check replacement or trigger on-defeat effects.
- */
+
 function removeCharacterFromPlay(
   state: GameState,
   missionIndex: number,
   charInstanceId: string,
   side: 'player1Characters' | 'player2Characters',
 ): GameState {
-  // Before removing, return any characters this one was controlling
+  
   state = EffectEngine.restoreControlOnLeave(state, charInstanceId);
   const missions = [...state.activeMissions];
   const mission = { ...missions[missionIndex] };
@@ -208,13 +180,13 @@ function removeCharacterFromPlay(
   mission[side] = chars;
   missions[missionIndex] = mission;
 
-  // Add to original owner's discard pile (stolen cards go back to their owner)
+  
   const owner = defeated.originalOwner;
   const ownerState = { ...state[owner] };
   const cardsToDiscard = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
   ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
 
-  // Decrement charactersInPlay for the player whose side the card was on (the controller)
+  
   const sidePlayer: PlayerID = side === 'player1Characters' ? 'player1' : 'player2';
 
   let result = {
@@ -223,7 +195,7 @@ function removeCharacterFromPlay(
     [owner]: ownerState,
   };
 
-  // If controller differs from owner, decrement controller's count separately
+  
   if (sidePlayer !== owner) {
     const controllerState = { ...result[sidePlayer] };
     controllerState.charactersInPlay = Math.max(0, controllerState.charactersInPlay - 1);

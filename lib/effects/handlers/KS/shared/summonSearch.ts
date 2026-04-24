@@ -11,10 +11,7 @@ export interface HiddenCharTarget {
   missionIndex: number;
 }
 
-/**
- * Find all Summon cards in the player's hand that are affordable with the given cost reduction.
- * Returns hand indices as numbers.
- */
+
 export function findAffordableSummonsInHand(
   state: GameState,
   player: PlayerID,
@@ -34,12 +31,7 @@ export function findAffordableSummonsInHand(
   return indices;
 }
 
-/**
- * Find all hidden Summon characters controlled by the player on the board
- * that could be revealed with the given cost reduction.
- * Checks name uniqueness: skips if a visible same-name character exists on the same mission
- * (unless it would be a valid upgrade).
- */
+
 export function findHiddenSummonsOnBoard(
   state: GameState,
   player: PlayerID,
@@ -95,10 +87,7 @@ export function findHiddenSummonsOnBoard(
   return targets;
 }
 
-/**
- * Find all hidden Leaf Village characters controlled by the player on the board
- * that could be revealed with a cost reduction.
- */
+
 export function findHiddenLeafOnBoard(
   state: GameState,
   player: PlayerID,

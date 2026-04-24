@@ -40,7 +40,7 @@ describe('AI System', () => {
       const ai = new AIPlayer('easy', 'player2');
       const newState = ai.executeTurn(state);
 
-      // State should have changed (some action was taken)
+      
       expect(newState).not.toBe(state);
     });
   });
@@ -74,7 +74,7 @@ describe('AI System', () => {
 
       const action = ai.chooseAction(state, 'player2', validActions);
 
-      // Should choose to play a card (not pass) when there are playable cards
+      
       expect(action.type).not.toBe('PASS');
     });
 
@@ -104,7 +104,7 @@ describe('AI System', () => {
       const validActions = GameEngine.getValidActions(state, 'player2');
 
       const action = ai.chooseAction(state, 'player2', validActions);
-      // Hard AI should recognize that playing is better than passing in turn 1
+      
       expect(['PLAY_CHARACTER', 'PLAY_HIDDEN', 'UPGRADE_CHARACTER', 'REVEAL_CHARACTER', 'PASS']).toContain(action.type);
     }, 30000);
   });
@@ -135,7 +135,7 @@ describe('AI System', () => {
 
         let state = GameEngine.createGame(config);
 
-        // Both players keep hand
+        
         state = GameEngine.applyAction(state, 'player1', {
           type: 'MULLIGAN',
           doMulligan: false,
@@ -156,12 +156,12 @@ describe('AI System', () => {
             const action = ai.getAction(state);
             if (!action) break;
 
-            // Verify the action is in the valid actions list
+            
             expect(validActions).toContainEqual(action);
 
             state = GameEngine.applyAction(state, 'player2', action);
           } else {
-            // Player 1 passes to let AI play
+            
             state = GameEngine.applyAction(state, 'player1', { type: 'PASS' });
           }
           turns++;

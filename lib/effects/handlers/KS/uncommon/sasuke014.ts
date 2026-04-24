@@ -2,18 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 014/130 - SASUKE UCHIWA "Sharingan" (UC)
- * Chakra: 3 | Power: 4
- * Group: Leaf Village | Keywords: Team 7, Kekkei Genkai
- *
- * AMBUSH: Look at the opponent's hand. (Mandatory)
- *
- * UPGRADE: AMBUSH effect: In addition, discard 1 card.
- *   If you do so, choose 1 card in the opponent's hand and discard it.
- *   (The UPGRADE includes the AMBUSH effect - shows opponent's hand first,
- *    then offers the discard chain.)
- */
+
 
 function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, isUpgrade } = ctx;
@@ -31,7 +20,7 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup before revealing hand
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -44,8 +33,8 @@ function handleSasuke014Ambush(ctx: EffectContext): EffectResult {
 }
 
 function handleSasuke014Upgrade(ctx: EffectContext): EffectResult {
-  // UPGRADE modifies AMBUSH - the AMBUSH handler checks ctx.isUpgrade
-  // and chains the discard flow when true. No separate UPGRADE action needed.
+  
+  
   return { state: ctx.state };
 }
 

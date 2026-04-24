@@ -1,6 +1,6 @@
 import { FEATURE_DIM } from './FeatureExtractor';
 
-// Lazy import to avoid crashing when the runtime package is missing.
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type OrtModule = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,7 +100,7 @@ export class NeuralEvaluator {
   }
 
   evaluateSync(_features: Float32Array): number {
-    // The ONNX runtimes exposed here are async-only.
+    
     return 0.5;
   }
 

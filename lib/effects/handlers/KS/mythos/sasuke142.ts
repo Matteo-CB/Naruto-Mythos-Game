@@ -2,25 +2,13 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 142/130 - SASUKE UCHIWA (M)
- * Chakra: 4, Power: 3
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN: Discard a card from hand. If you do, POWERUP X+1 where X = number
- *       of enemy characters in this mission.
- *   - Player must discard a card from hand first (cost).
- *   - If no cards in hand, the effect fizzles.
- *   - Count ALL enemy characters in this mission (including hidden ones).
- *   - Then apply POWERUP (X+1) on self.
- *   - For auto-resolution: discard the lowest-power card from hand.
- */
+
 
 function sasuke142MainHandler(ctx: EffectContext): EffectResult {
   const state = ctx.state;
   const playerState = state[ctx.sourcePlayer];
 
-  // Check if player has cards in hand to discard
+  
   if (playerState.hand.length === 0) {
     const log = logAction(
       state.log, state.turn, state.phase, ctx.sourcePlayer,
@@ -32,7 +20,7 @@ function sasuke142MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup first — EffectEngine will handle the actual discard selection
+  
   return {
     state,
     requiresTargetSelection: true,

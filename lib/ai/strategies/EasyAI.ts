@@ -2,10 +2,7 @@ import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
 import { NeuralISMCTS } from '../neural/NeuralISMCTS';
 
-/**
- * Easy AI - beginner-friendly.
- * Small ISMCTS budget + occasional deliberate mistakes.
- */
+
 export class EasyAI implements AIStrategy {
   readonly difficulty: AIDifficulty = 'easy';
 
@@ -34,7 +31,7 @@ export class EasyAI implements AIStrategy {
       return Math.random() < 0.65 ? keep : mulligan;
     }
 
-    // Deliberate imperfection so Easy stays beatable.
+    
     if (Math.random() < 0.2) {
       return validActions[Math.floor(Math.random() * validActions.length)];
     }

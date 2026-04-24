@@ -2,21 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 030/130 - HINATA HYUGA "Poing Souple" (Common)
- * Chakra: 2 | Power: 2
- * Group: Leaf Village | Keywords: Team 8, Taijutsu
- * MAIN: Remove up to 2 Power tokens from an enemy character in play.
- *
- * Targets a non-hidden enemy character across all missions that has at least 1 power token.
- * Removes min(2, target.powerTokens) tokens from the target.
- * If multiple valid targets, requires target selection.
- */
+
 function handleHinata030Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
 
-  // Find all enemy characters with powerTokens > 0 across all missions
-  // "in play" includes hidden characters - consistent with Neji 036 (same effect)
+  
+  
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
@@ -29,14 +20,14 @@ function handleHinata030Main(ctx: EffectContext): EffectResult {
     }
   }
 
-  // If no valid targets, effect fizzles
+  
   if (validTargets.length === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Hinata Hyuga (030): No enemy character with Power tokens in play.',
       'game.log.effect.noTarget', { card: 'HINATA HYUGA', id: 'KS-030-C' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

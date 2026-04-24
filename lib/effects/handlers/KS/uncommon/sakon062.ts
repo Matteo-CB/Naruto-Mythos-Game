@@ -3,31 +3,14 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isCharacterCopyable } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
-/**
- * Card 062/130 - SAKON (UC)
- * Chakra: 4 | Power: 4
- * Group: Sound Village | Keywords: Sound Four, Jutsu
- *
- * AMBUSH: Copy an instant effect (non-continuous [⧗], non-UPGRADE) of another
- * friendly character with keyword "Sound Four" in play.
- *   - Find all friendly non-hidden characters with keyword "Sound Four" across all missions
- *     (excluding self).
- *   - The player selects which Sound Four character to copy from.
- *   - The copied effect must be an instant effect (MAIN, AMBUSH, or SCORE without [⧗]).
- *   - Effects starting with "effect:" or "effect." modifiers are also excluded.
- *   - The actual execution of the copied effect is handled by the engine after target selection.
- *
- * This is a complex copy effect. The handler returns target selection for which Sound Four
- * character to copy from. The engine then reads that card's effects and re-executes the
- * appropriate instant effect.
- */
+
 
 function handleSakon062Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly non-hidden Sound Four characters in play (not self)
+  
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -37,7 +20,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (!isCharacterCopyable(topCard)) continue;
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
-        // Check if this card has at least one copyable instant effect
+        
         const hasInstantEffect = topCard.effects?.some((eff) => {
           if (eff.type === 'SCORE') return false; // SCORE never copyable
           if (eff.description && eff.description.includes('[⧗]')) return false;
@@ -57,7 +40,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-062-UC' }) } };
   }
 
-  // Confirmation popup before copy
+  
   return {
     state,
     requiresTargetSelection: true,

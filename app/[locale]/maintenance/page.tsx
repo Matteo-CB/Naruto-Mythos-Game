@@ -59,7 +59,7 @@ function CardCarousel() {
   const N = CAROUSEL_CARDS.length;
   const angle = 360 / N;
 
-  // Responsive card size
+  
   const [cardSize, setCardSize] = useState({ w: 160, h: 224 });
   useEffect(() => {
     function update() {
@@ -112,7 +112,7 @@ function CardCarousel() {
           </motion.div>
         </div>
       </div>
-      {/* Reflection */}
+      
       <div
         className="relative pointer-events-none"
         style={{
@@ -139,7 +139,7 @@ export default function MaintenancePage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Poll the server to check if maintenance is over, redirect to home when it is
+  
   useEffect(() => {
     const poll = setInterval(async () => {
       try {
@@ -149,7 +149,7 @@ export default function MaintenancePage() {
           router.push('/');
         }
       } catch {
-        // Server still down, keep polling
+        
       }
     }, 5000);
     return () => clearInterval(poll);
@@ -175,7 +175,7 @@ export default function MaintenancePage() {
         <LanguageSwitcher />
       </div>
 
-      {/* Main content */}
+      
       <div className="relative z-10 flex flex-col items-center px-4 max-w-[600px] text-center">
         <h1
           className="font-display tracking-wider"
@@ -200,7 +200,7 @@ export default function MaintenancePage() {
           {t('subtitle')}
         </p>
 
-        {/* Divider */}
+        
         <div className="my-6" style={{ width: 120, height: 1, background: 'rgba(196, 163, 90, 0.1)' }} />
 
         <p
@@ -215,7 +215,7 @@ export default function MaintenancePage() {
           {t('message')}
         </p>
 
-        {/* Timer */}
+        
         <div className="mt-7 text-center">
           <p
             className="font-body uppercase"
@@ -236,11 +236,11 @@ export default function MaintenancePage() {
           </p>
         </div>
 
-        {/* Card carousel */}
+        
         <CardCarousel />
       </div>
 
-      {/* Status bar */}
+      
       <div
         className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10"
         style={{ fontSize: '0.7rem', color: '#888888', letterSpacing: '0.05em' }}

@@ -14,20 +14,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-/**
- * POST /api/tournaments/[id]/admin
- * Body: { action: string, ...params }
- *
- * Admin actions for tournament management:
- * - disqualify: remove a player from the tournament
- * - setMatchWinner: override match result
- * - resetMatch: reset a match to pending/ready state
- * - banPlayer: ban a user from all tournaments
- * - unbanPlayer: remove tournament ban
- * - cancelTournament: cancel the tournament
- * - removeParticipant: remove player during registration
- * - addNote: add admin note to tournament
- */
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -57,7 +44,7 @@ export async function POST(
     const { action } = body;
 
     switch (action) {
-      // ── Disqualify a player ──
+      
       case 'disqualify': {
         const { userId, reason } = body;
         if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
@@ -67,7 +54,7 @@ export async function POST(
           data: { eliminated: true, eliminatedRound: tournament.currentRound || 0 },
         });
 
-        // Forfeit any active match this player has
+        
         const activeMatch = tournament.matches.find(
           m => (m.player1Id === userId || m.player2Id === userId)
             && (m.status === 'ready' || m.status === 'in_progress' || m.status === 'pending'),
@@ -82,7 +69,7 @@ export async function POST(
               completedAt: new Date(),
             },
           });
-          // Advance winner to next round (handles finals, Discord roles, webhook)
+          
           if (winnerId) {
             await advanceMatchWinner(null, tournamentId, activeMatch, winnerId, winnerUsername);
           }
@@ -91,7 +78,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: `Player disqualified${reason ? ': ' + reason : ''}` });
       }
 
-      // ── Override match result ──
+      
       case 'setMatchWinner': {
         const { matchId, winnerId } = body;
         if (!matchId || !winnerId) return NextResponse.json({ error: 'matchId and winnerId required' }, { status: 400 });
@@ -115,39 +102,39 @@ export async function POST(
           });
         }
 
-        // If the previous winner was different AND this is the final match (tournament winner changed),
-        // update tournamentWins and Discord roles
+        
+        
         if (previousWinnerId && previousWinnerId !== winnerId && tournament.winnerId === previousWinnerId) {
-          // Remove win from old winner + remove Discord role
+          
           try { await removeTournamentRole(previousWinnerId); } catch { /* ignore */ }
 
-          // Add win to new winner + assign Discord role
+          
           const newWinnerUser = await prisma.user.update({
             where: { id: winnerId },
             data: { tournamentWins: { increment: 1 } },
           });
           try { await assignTournamentWinnerRole(winnerId, newWinnerUser.tournamentWins); } catch { /* ignore */ }
 
-          // Update tournament record
+          
           await prisma.tournament.update({
             where: { id: tournamentId },
             data: { winnerId, winnerUsername },
           });
         }
 
-        // Un-eliminate the new winner if they were previously eliminated
+        
         await prisma.tournamentParticipant.updateMany({
           where: { tournamentId, userId: winnerId },
           data: { eliminated: false, eliminatedRound: null },
         });
 
-        // Advance winner to next round (handles finals, Discord roles, webhook)
+        
         await advanceMatchWinner(null, tournamentId, match, winnerId, winnerUsername);
 
         return NextResponse.json({ success: true, message: `Match winner set to ${winnerUsername}` });
       }
 
-      // ── Reset a match ──
+      
       case 'resetMatch': {
         const { matchId: resetMatchId } = body;
         if (!resetMatchId) return NextResponse.json({ error: 'matchId required' }, { status: 400 });
@@ -155,7 +142,7 @@ export async function POST(
         const match = tournament.matches.find(m => m.id === resetMatchId);
         if (!match) return NextResponse.json({ error: 'Match not found' }, { status: 404 });
 
-        // Determine new status based on players
+        
         const newStatus = match.player1Id && match.player2Id ? 'ready' : 'pending';
 
         await prisma.tournamentMatch.update({
@@ -167,7 +154,7 @@ export async function POST(
           },
         });
 
-        // Un-eliminate both players if they were eliminated in this match's round
+        
         if (match.player1Id) {
           await prisma.tournamentParticipant.updateMany({
             where: { tournamentId, userId: match.player1Id, eliminatedRound: match.round },
@@ -184,7 +171,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: 'Match reset' });
       }
 
-      // ── Ban player from tournaments ──
+      
       case 'banPlayer': {
         const { userId: banUserId, reason: banReason, permanent, durationDays } = body;
         if (!banUserId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
@@ -208,7 +195,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: `Player banned from tournaments${permanent ? ' (permanent)' : ` for ${durationDays || 7} days`}` });
       }
 
-      // ── Unban player ──
+      
       case 'unbanPlayer': {
         const { userId: unbanUserId } = body;
         if (!unbanUserId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
@@ -220,7 +207,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: 'Tournament ban removed' });
       }
 
-      // ── Cancel tournament ──
+      
       case 'cancelTournament': {
         if (tournament.status === 'completed') {
           return NextResponse.json({ error: 'Cannot cancel completed tournament' }, { status: 400 });
@@ -232,7 +219,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: 'Tournament cancelled' });
       }
 
-      // ── Remove participant during registration ──
+      
       case 'removeParticipant': {
         const { userId: removeUserId } = body;
         if (!removeUserId) return NextResponse.json({ error: 'userId required' }, { status: 400 });
@@ -245,7 +232,7 @@ export async function POST(
         return NextResponse.json({ success: true, message: 'Participant removed' });
       }
 
-      // ── Update restriction note ──
+      
       case 'updateNote': {
         const { note } = body;
         await prisma.tournament.update({

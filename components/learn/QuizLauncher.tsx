@@ -4,17 +4,17 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 interface QuizLauncherProps {
   onStart: (difficulty: number) => void;
   bestScores?: Record<number, number>;
 }
 
-// ---------------------
-// Constants
-// ---------------------
+
+
+
 const DIFFICULTIES = [1, 2, 3, 4, 5] as const;
 
 const QUESTION_COUNTS: Record<number, number> = {
@@ -41,9 +41,9 @@ const RANK_COLORS: Record<number, string> = {
   5: '#6a6abb',
 };
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
   const t = useTranslations('learn');
   const [selected, setSelected] = useState<number | null>(null);
@@ -53,7 +53,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
       className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-4"
       style={{ backgroundColor: '#0a0a0a' }}
     >
-      {/* Decorative card images */}
+      
       <div
         className="fixed top-12 left-4 hidden lg:block"
         style={{ opacity: 0.15, pointerEvents: 'none' }}
@@ -86,7 +86,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
       </div>
 
       <div className="max-w-xl w-full">
-        {/* Title */}
+        
         <motion.h1
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -107,7 +107,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
           {t('quiz.selectDifficulty')}
         </motion.p>
 
-        {/* Difficulty buttons */}
+        
         <div className="flex flex-col gap-2 mb-4">
           {DIFFICULTIES.map((diff, index) => {
             const isSelected = selected === diff;
@@ -133,7 +133,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {/* Rank badge */}
+                    
                     <div
                       className="flex-shrink-0 flex items-center justify-center text-xs font-bold uppercase"
                       style={{
@@ -150,14 +150,14 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                     </div>
 
                     <div>
-                      {/* Rank name */}
+                      
                       <div
                         className="text-sm font-bold uppercase tracking-wide"
                         style={{ color: rankColor }}
                       >
                         {t(`quiz.difficulties.${diff}`)}
                       </div>
-                      {/* Description */}
+                      
                       <div
                         className="text-xs mt-0.5"
                         style={{ color: '#888888' }}
@@ -167,7 +167,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                     </div>
                   </div>
 
-                  {/* Info: question count + time */}
+                  
                   <div className="text-right flex-shrink-0 ml-4">
                     <div className="text-xs" style={{ color: '#aaaaaa' }}>
                       {QUESTION_COUNTS[diff]} {t('quiz.questions')}
@@ -175,7 +175,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
                     <div className="text-xs mt-0.5" style={{ color: '#888888' }}>
                       {TIME_LIMITS[diff]}s / {t('quiz.perQuestion')}
                     </div>
-                    {/* Best score */}
+                    
                     {bestScores && bestScores[diff] !== undefined && (
                       <div
                         className="text-xs mt-1 font-bold"
@@ -191,7 +191,7 @@ export function QuizLauncher({ onStart, bestScores }: QuizLauncherProps) {
           })}
         </div>
 
-        {/* Start button */}
+        
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

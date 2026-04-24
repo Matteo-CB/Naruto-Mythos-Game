@@ -3,21 +3,11 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
 
-/**
- * Card 010/130 - NARUTO UZUMAKI "Permutation" (UC)
- * Chakra: 3 | Power: 3
- * Group: Leaf Village | Keywords: Team 7, Jutsu
- *
- * AMBUSH: Move this character from this mission.
- *   - When revealed from hidden, this character can be moved to another mission.
- *   - Find other missions where the source player doesn't already have a character
- *     with the same name. If multiple options, require target selection.
- *   - Move self to the chosen mission.
- */
+
 function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
 
-  // Check if Kurenai 035 blocks movement from this mission
+  
   if (isMovementBlockedByKurenai(state, sourceMissionIndex, sourcePlayer)) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
       'Naruto Uzumaki (010): Cannot move — Kurenai blocks movement from this mission.',
@@ -32,7 +22,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
     : sourceCard.card;
   const charName = topCard.name_fr;
 
-  // Pre-check: any valid destination missions?
+  
   let hasDestination = false;
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     if (mIdx === sourceMissionIndex) continue;
@@ -58,7 +48,7 @@ function handleNaruto010Ambush(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'NARUTO UZUMAKI', id: 'KS-010-C' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -88,7 +78,7 @@ function moveCharacterToMission(
   const fromChars = [...fromMission[friendlySide]];
   const toChars = [...toMission[friendlySide]];
 
-  // Find and remove character from source mission
+  
   const charIdx = fromChars.findIndex(c => c.instanceId === charInstanceId);
   if (charIdx === -1) return state;
 

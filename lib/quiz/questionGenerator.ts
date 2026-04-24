@@ -1,14 +1,11 @@
-/**
- * Question type system and dynamic question generator for the Naruto Mythos TCG quiz.
- * Generates diverse interactive question types from card data and game rules.
- */
+
 
 import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 
-// =====================================================================
-// TYPE DEFINITIONS
-// =====================================================================
+
+
+
 
 export type QuestionType =
   | 'multipleChoice'
@@ -27,7 +24,7 @@ interface BaseQuestion {
   questionTextKey: string;
   questionParams?: Record<string, string>;
   questionImage?: string;
-  /** Which zone to censor on card images (e.g., 'name' hides the name band at top). */
+  
   censorZone?: 'name' | 'none';
   explanationKey: string;
   explanationParams?: Record<string, string>;
@@ -91,9 +88,9 @@ export type QuizQuestion =
   | CategorySortQuestion
   | SpotErrorQuestion;
 
-// =====================================================================
-// ANSWER TYPES
-// =====================================================================
+
+
+
 
 export type QuizAnswer =
   | { type: 'multipleChoice'; selectedIndex: number }
@@ -104,9 +101,9 @@ export type QuizAnswer =
   | { type: 'categorySort'; mapping: Record<number, number> }
   | { type: 'spotError'; selectedIndices: number[] };
 
-// =====================================================================
-// ANSWER VALIDATION
-// =====================================================================
+
+
+
 
 export function isAnswerCorrect(question: QuizQuestion, answer: QuizAnswer | null): boolean {
   if (!answer) return false;
@@ -182,9 +179,9 @@ export function getPartialScore(question: QuizQuestion, answer: QuizAnswer | nul
   }
 }
 
-// =====================================================================
-// UTILITIES
-// =====================================================================
+
+
+
 
 function createRng(seed: number) {
   let s = seed | 0;
@@ -237,7 +234,7 @@ function uid(prefix: string): string {
   return `${prefix}-${++_counter}`;
 }
 
-// Collect distinct cards by name (no duplicates)
+
 function distinctByName(cards: CharacterCard[]): CharacterCard[] {
   const seen = new Set<string>();
   return cards.filter((c) => {
@@ -247,7 +244,7 @@ function distinctByName(cards: CharacterCard[]): CharacterCard[] {
   });
 }
 
-// Group key mappings
+
 const GROUP_KEY: Record<string, string> = {
   'Leaf Village': 'quiz.group.leaf',
   'Sand Village': 'quiz.group.sand',
@@ -275,9 +272,9 @@ const EFFECT_TYPE_KEY: Record<string, string> = {
 const ALL_GROUPS = ['Leaf Village', 'Sand Village', 'Sound Village', 'Akatsuki', 'Independent'];
 const ALL_EFFECT_TYPES = ['MAIN', 'UPGRADE', 'AMBUSH', 'SCORE'] as const;
 
-// =====================================================================
-// GENERATORS
-// =====================================================================
+
+
+
 
 type Gen = (
   chars: CharacterCard[],
@@ -285,7 +282,7 @@ type Gen = (
   rng: () => number
 ) => QuizQuestion | null;
 
-// --------------- STATS (no images - must recall from memory) ---------------
+
 
 const genChakraCostMC: Gen = (chars, _, rng) => {
   const card = pickOne(
@@ -493,7 +490,7 @@ const genSortByChakra: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- IDENTITY (images allowed for recognition) ---------------
+
 
 const genIdentifyCard: Gen = (chars, _, rng) => {
   const unique = distinctByName(chars).filter((c) => c.image_file);
@@ -579,7 +576,7 @@ const genTitleMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- EFFECTS (no images) ---------------
+
 
 const genEffectTypeMC: Gen = (chars, _, rng) => {
   const withEffects = chars.filter((c) => c.effects.length > 0);
@@ -650,7 +647,7 @@ const genMatchEffectTypes: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- GROUPS & KEYWORDS (no images) ---------------
+
 
 const genGroupMC: Gen = (chars, _, rng) => {
   const card = pickOne(chars, rng);
@@ -756,7 +753,7 @@ const genCategorySortGroup: Gen = (chars, _, rng) => {
   };
 };
 
-// --------------- MISSIONS ---------------
+
 
 const genIdentifyMission: Gen = (_, missions, rng) => {
   const withImage = missions.filter((m) => m.image_file);
@@ -801,7 +798,7 @@ const genMissionEffectMC: Gen = (_, missions, rng) => {
   };
 };
 
-// --------------- ADVANCED ---------------
+
 
 const genUpgradeCostFill: Gen = (chars, _, rng) => {
   const nameMap: Record<string, CharacterCard[]> = {};
@@ -955,11 +952,11 @@ const genCategorySortRarity: Gen = (chars, _, rng) => {
   };
 };
 
-// =====================================================================
-// NEW SCENARIO & STRATEGY GENERATORS
-// =====================================================================
 
-// --- Which character belongs to a keyword group? (no image) ---
+
+
+
+
 const genTeamMemberMC: Gen = (chars, _, rng) => {
   const keywordMap: Record<string, CharacterCard[]> = {};
   for (const c of distinctByName(chars)) {
@@ -996,7 +993,7 @@ const genTeamMemberMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Which character does NOT belong to a group? (no image) ---
+
 const genNotInGroupMC: Gen = (chars, _, rng) => {
   const groups = ALL_GROUPS.filter((g) => chars.some((c) => c.group === g));
   if (groups.length < 2) return null;
@@ -1026,7 +1023,7 @@ const genNotInGroupMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Which character has the highest power? (no image) ---
+
 const genHigherPowerMC: Gen = (chars, _, rng) => {
   const distinct: CharacterCard[] = [];
   const usedNames = new Set<string>();
@@ -1058,7 +1055,7 @@ const genHigherPowerMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Start Phase chakra calculation (no image) ---
+
 const genStartPhaseChakraFill: Gen = (_, __, rng) => {
   const charCount = Math.floor(rng() * 5) + 1; // 1-5 characters
   const total = 5 + charCount;
@@ -1081,7 +1078,7 @@ const genStartPhaseChakraFill: Gen = (_, __, rng) => {
   };
 };
 
-// --- Mission total points calculation (no image) ---
+
 const genMissionPointsFill: Gen = (_, __, rng) => {
   const basePoints = Math.floor(rng() * 3) + 1; // 1-3
   const turn = Math.floor(rng() * 4) + 1; // 1-4
@@ -1111,16 +1108,16 @@ const genMissionPointsFill: Gen = (_, __, rng) => {
   };
 };
 
-// --- Who wins the mission? (scenario) ---
+
 const genWhoWinsMissionMC: Gen = (_, __, rng) => {
   const variant = rng();
   let p1Power: number, p2Power: number;
   if (variant < 0.15) {
-    // Both 0 - nobody wins
+    
     p1Power = 0;
     p2Power = 0;
   } else if (variant < 0.4) {
-    // Tie - edge decides
+    
     const power = Math.floor(rng() * 6) + 1;
     p1Power = power;
     p2Power = power;
@@ -1164,7 +1161,7 @@ const genWhoWinsMissionMC: Gen = (_, __, rng) => {
   };
 };
 
-// --- Can you legally upgrade? (T/F) ---
+
 const genUpgradeLegalTF: Gen = (chars, _, rng) => {
   const nameMap: Record<string, CharacterCard[]> = {};
   for (const c of chars) {
@@ -1181,17 +1178,17 @@ const genUpgradeLegalTF: Gen = (chars, _, rng) => {
   const [name, cards] = pickOne(upgradable, rng);
   const costs = [...new Set(cards.map((c) => c.chakra))].sort((a, b) => a - b);
 
-  // Randomly decide if we present a legal or illegal scenario
+  
   const isLegal = rng() > 0.4;
   let fromCost: number, toCost: number;
 
   if (isLegal) {
-    // Legal: to > from
+    
     fromCost = costs[0];
     toCost = costs[costs.length - 1];
     if (toCost <= fromCost) return null;
   } else {
-    // Illegal: to <= from (same cost or lower)
+    
     if (costs.length >= 2) {
       toCost = costs[0];
       fromCost = costs[costs.length - 1];
@@ -1214,7 +1211,7 @@ const genUpgradeLegalTF: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Hidden character rules (T/F) ---
+
 const genHiddenRulesTF: Gen = (_, __, rng) => {
   const scenarios = [
     {
@@ -1256,7 +1253,7 @@ const genHiddenRulesTF: Gen = (_, __, rng) => {
   };
 };
 
-// --- Mission rank on turn X ---
+
 const genMissionRankMC: Gen = (_, __, rng) => {
   const turn = Math.floor(rng() * 4) + 1;
   const ranks = ['D', 'C', 'B', 'A'];
@@ -1277,7 +1274,7 @@ const genMissionRankMC: Gen = (_, __, rng) => {
   };
 };
 
-// --- Can you afford to play this card? (T/F) ---
+
 const genCanAffordTF: Gen = (chars, _, rng) => {
   const card = pickOne(chars.filter((c) => c.chakra > 0), rng);
   if (!card) return null;
@@ -1304,7 +1301,7 @@ const genCanAffordTF: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Effect recall: what does this character's effect do? (no image) ---
+
 const genEffectRecallMC: Gen = (chars, _, rng) => {
   const withEffects = chars.filter((c) => c.effects.length > 0 && c.effects[0].description.length > 15);
   if (withEffects.length < 4) return null;
@@ -1314,7 +1311,7 @@ const genEffectRecallMC: Gen = (chars, _, rng) => {
 
   const correct = selected[0];
   const correctDesc = correct.effects[0].description;
-  // Truncate to first 80 chars for readability
+  
   const truncate = (s: string) => s.length > 80 ? s.substring(0, 77) + '...' : s;
   const options = shuffle(selected.map((c) => truncate(c.effects[0].description)), rng);
 
@@ -1332,7 +1329,7 @@ const genEffectRecallMC: Gen = (chars, _, rng) => {
   };
 };
 
-// --- Edge token: who plays first? (T/F) ---
+
 const genEdgeRuleTF: Gen = (_, __, rng) => {
   const scenarios = [
     {
@@ -1368,9 +1365,9 @@ const genEdgeRuleTF: Gen = (_, __, rng) => {
   };
 };
 
-// =====================================================================
-// MAIN GENERATOR
-// =====================================================================
+
+
+
 
 const QUESTION_COUNTS: Record<number, number> = {
   1: 10,
@@ -1390,10 +1387,10 @@ export function generateQuizQuestions(
   const missions = getPlayableMissions();
   const totalCount = count ?? QUESTION_COUNTS[difficulty] ?? 15;
 
-  // Select generators by difficulty - scenario/strategy questions get high weights
+  
   const generators: Array<{ gen: Gen; weight: number }> = [];
 
-  // Difficulty 1+: basic stats (low weight), identity, groups, + new scenario questions
+  
   generators.push(
     { gen: genChakraCostMC, weight: 1 },
     { gen: genPowerMC, weight: 1 },
@@ -1402,12 +1399,12 @@ export function generateQuizQuestions(
     { gen: genStatsTF, weight: 1 },
     { gen: genIdentifyCard, weight: 3 },
     { gen: genGroupMC, weight: 2 },
-    // New scenario questions at d1+
+    
     { gen: genMissionRankMC, weight: 3 },
     { gen: genCanAffordTF, weight: 3 },
   );
 
-  // Difficulty 2+: matching, rarities, effects, missions + more scenarios
+  
   if (difficulty >= 2) {
     generators.push(
       { gen: genMatchChakraPairs, weight: 1 },
@@ -1419,7 +1416,7 @@ export function generateQuizQuestions(
       { gen: genMatchGroupPairs, weight: 1 },
       { gen: genIdentifyMission, weight: 2 },
       { gen: genTitleMC, weight: 2 },
-      // New scenario questions at d2+
+      
       { gen: genTeamMemberMC, weight: 3 },
       { gen: genNotInGroupMC, weight: 3 },
       { gen: genHigherPowerMC, weight: 3 },
@@ -1431,7 +1428,7 @@ export function generateQuizQuestions(
     );
   }
 
-  // Difficulty 3+: sorting, advanced, spot-the-error + hard scenarios
+  
   if (difficulty >= 3) {
     generators.push(
       { gen: genSortByPower, weight: 1 },
@@ -1443,24 +1440,24 @@ export function generateQuizQuestions(
       { gen: genUpgradeCostFill, weight: 2 },
       { gen: genSpotErrorCard, weight: 2 },
       { gen: genMissionEffectMC, weight: 2 },
-      // New hard scenario questions
+      
       { gen: genHiddenRulesTF, weight: 3 },
       { gen: genEffectRecallMC, weight: 4 },
     );
   }
 
-  // Get rules questions - increase proportion to 30-35%
+  
   let rulesQs: QuizQuestion[] = [];
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getRulesQuestions } = require('./rulesQuestions');
     rulesQs = getRulesQuestions(Math.min(difficulty, 5) as 1 | 2 | 3 | 4 | 5);
   } catch {
-    // Rules questions not available
+    
   }
   const selectedRules = pick(rulesQs, Math.ceil(totalCount * 0.3), rng);
 
-  // Generate card-based questions
+  
   const cardQsNeeded = totalCount - selectedRules.length;
   const cardQs: QuizQuestion[] = [];
   const totalWeight = generators.reduce((s, g) => s + g.weight, 0);

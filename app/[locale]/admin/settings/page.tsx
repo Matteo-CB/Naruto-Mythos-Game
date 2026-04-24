@@ -122,7 +122,7 @@ export default function AdminSettingsPage() {
           success: true,
           message: `Discord Roles: Created ${data.created}, deleted ${data.deleted}, migrated ${data.migratedChannels} channels`,
         });
-        // Auto-sync all users after roles are created
+        
         await handleSyncDiscordRoles();
       } else {
         addResult({ success: false, message: `Discord Roles failed: ${data.error}` });
@@ -198,7 +198,7 @@ export default function AdminSettingsPage() {
     <main className="min-h-screen relative flex flex-col" style={{ backgroundColor: '#0a0a0a' }}>
       <CloudBackground />
       <div className="max-w-2xl mx-auto relative z-10 flex-1 px-4 py-8 w-full">
-        {/* Header */}
+        
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold" style={{ color: '#c4a35a' }}>
             {t('title')}
@@ -212,7 +212,7 @@ export default function AdminSettingsPage() {
           </Link>
         </div>
 
-        {/* Navigation tabs */}
+        
         <div className="flex gap-2 mb-8 flex-wrap">
           <Link
             href="/admin/settings"
@@ -237,7 +237,7 @@ export default function AdminSettingsPage() {
           </Link>
         </div>
 
-        {/* Leagues Toggle */}
+        
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -276,7 +276,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* ELO Management */}
+        
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -302,7 +302,7 @@ export default function AdminSettingsPage() {
           </button>
         </div>
 
-        {/* Discord Roles */}
+        
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -343,7 +343,7 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Testers Management */}
+        
         <div
           className="rounded-lg p-6 mb-6"
           style={{ backgroundColor: '#141414', border: '1px solid #262626' }}
@@ -355,7 +355,7 @@ export default function AdminSettingsPage() {
             {t('testers.description')}
           </p>
 
-          {/* Add tester */}
+          
           <div className="flex gap-2 mb-4">
             <input
               type="text"
@@ -386,7 +386,7 @@ export default function AdminSettingsPage() {
             </button>
           </div>
 
-          {/* Tester list */}
+          
           {testers.length === 0 ? (
             <p className="text-xs" style={{ color: '#555555' }}>{t('testers.noTesters')}</p>
           ) : (
@@ -418,7 +418,7 @@ export default function AdminSettingsPage() {
           )}
         </div>
 
-        {/* Results Log */}
+        
         {results.length > 0 && (
           <div
             className="rounded-lg p-6"

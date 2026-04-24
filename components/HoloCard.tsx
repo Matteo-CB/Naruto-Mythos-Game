@@ -40,15 +40,15 @@ export function HoloCard({
     const mx = (px * 100).toFixed(1) + '%';
     const my = (py * 100).toFixed(1) + '%';
 
-    // Rotation: +-15deg based on cursor position
+    
     const ry = ((px - 0.5) * 30).toFixed(2) + 'deg';
     const rx = ((0.5 - py) * 30).toFixed(2) + 'deg';
 
-    // Position percentages for backgrounds
+    
     const posx = (px * 100).toFixed(1) + '%';
     const posy = (py * 100).toFixed(1) + '%';
 
-    // Hypotenuse from center (0 to ~0.7)
+    
     const cx = px - 0.5;
     const cy = py - 0.5;
     const hyp = Math.sqrt(cx * cx + cy * cy).toFixed(3);

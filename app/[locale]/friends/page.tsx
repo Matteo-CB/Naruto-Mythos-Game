@@ -38,7 +38,7 @@ export default function FriendsPage() {
 
   const incomingCount = incomingRequests.length;
 
-  // Not authenticated
+  
   if (!session?.user) {
     return (
       <div
@@ -101,7 +101,7 @@ export default function FriendsPage() {
         transition={{ duration: 0.4 }}
         className="max-w-2xl mx-auto relative z-10 flex-1 w-full px-4 py-8"
       >
-        {/* Title */}
+        
         <motion.h1
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export default function FriendsPage() {
           {t('title')}
         </motion.h1>
 
-        {/* Search bar */}
+        
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -122,7 +122,7 @@ export default function FriendsPage() {
           <UserSearchDropdown />
         </motion.div>
 
-        {/* Tabs */}
+        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -168,7 +168,7 @@ export default function FriendsPage() {
           </button>
         </motion.div>
 
-        {/* Tab content */}
+        
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 8 }}
@@ -179,7 +179,7 @@ export default function FriendsPage() {
           {activeTab === 'requests' && <FriendRequestsList />}
         </motion.div>
 
-        {/* Back to menu */}
+        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

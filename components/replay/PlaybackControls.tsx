@@ -41,7 +41,7 @@ export function PlaybackControls({
     setIsPlaying(true);
   }, [currentStep, totalSteps, onStepChange]);
 
-  // Auto-advance
+  
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
@@ -56,14 +56,14 @@ export function PlaybackControls({
     };
   }, [isPlaying, speed, onStepChange]);
 
-  // Stop at end
+  
   useEffect(() => {
     if (isPlaying && currentStep >= totalSteps - 1) {
       stopPlay();
     }
   }, [currentStep, totalSteps, isPlaying, stopPlay]);
 
-  // Keyboard shortcuts
+  
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -125,7 +125,7 @@ export function PlaybackControls({
     return turnStarts[0]?.turn ?? 1;
   })();
 
-  // Scrub via click or drag on progress bar
+  
   const handleProgressClick = (e: React.MouseEvent) => {
     const bar = progressBarRef.current;
     if (!bar) return;
@@ -163,7 +163,7 @@ export function PlaybackControls({
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      {/* Action label */}
+      
       {actionLabel && (
         <div
           className="px-4 py-1"
@@ -175,7 +175,7 @@ export function PlaybackControls({
         </div>
       )}
 
-      {/* Progress bar with turn markers */}
+      
       <div className="px-4 pt-2 pb-0.5">
         <div
           ref={progressBarRef}
@@ -197,7 +197,7 @@ export function PlaybackControls({
               />
             );
           })}
-          {/* Filled bar */}
+          
           <div
             className="absolute left-0 top-0 h-full"
             style={{
@@ -206,7 +206,7 @@ export function PlaybackControls({
               transition: isPlaying ? 'none' : 'width 0.15s ease-out',
             }}
           />
-          {/* Diamond handle */}
+          
           <div
             className="absolute top-1/2 -translate-y-1/2 transition-all group-hover:scale-125"
             style={{
@@ -223,9 +223,9 @@ export function PlaybackControls({
         </div>
       </div>
 
-      {/* Controls row */}
+      
       <div className="flex items-center justify-between px-4 py-1.5 gap-3">
-        {/* Turn jump pills */}
+        
         <div className="flex items-center gap-1">
           {turnStarts.map(({ turn, step }) => (
             <button
@@ -245,7 +245,7 @@ export function PlaybackControls({
           ))}
         </div>
 
-        {/* Main controls */}
+        
         <div className="flex items-center gap-1">
           <button
             onClick={goToStart}
@@ -315,7 +315,7 @@ export function PlaybackControls({
           </button>
         </div>
 
-        {/* Speed + counter */}
+        
         <div className="flex items-center gap-3">
           <button
             onClick={cycleSpeed}

@@ -1,10 +1,4 @@
-/**
- * Admin endpoint for the suspicious-activity review panel.
- *
- * GET  /api/admin/suspicious                 → list all findings
- * GET  /api/admin/suspicious?user=<id|name>  → findings involving that user
- * POST /api/admin/suspicious                 → action: { action: 'revert-elo', gameId }
- */
+
 
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
@@ -38,7 +32,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ findings });
     }
 
-    // Accept either a user id (Mongo ObjectId-looking) or a username substring.
+    
     const looksLikeId = /^[0-9a-f]{24}$/i.test(filter);
     const users = await prisma.user.findMany({
       where: looksLikeId

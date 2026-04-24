@@ -6,32 +6,26 @@ export interface DeckValidationResult {
   errors: string[];
 }
 
-/**
- * Validate a deck according to the construction rules:
- * - Minimum 30 character cards
- * - Max 2 copies of the same version (card number + edition)
- * - Rare Art variants of the same card number are NOT different versions
- * - Exactly 3 mission cards
- */
+
 export function validateDeck(
   characterCards: CharacterCard[],
   missionCards: MissionCard[],
 ): DeckValidationResult {
   const errors: string[] = [];
 
-  // Check minimum character cards
+  
   if (characterCards.length < MIN_DECK_SIZE) {
     errors.push(`Deck needs at least ${MIN_DECK_SIZE} character cards (has ${characterCards.length}).`);
   }
 
-  // Check mission cards count
+  
   if (missionCards.length !== MISSION_CARDS_PER_PLAYER) {
     errors.push(`Must select exactly ${MISSION_CARDS_PER_PLAYER} mission cards (has ${missionCards.length}).`);
   }
 
-  // Check max copies per version
-  // All variants of the same card number count as the same version:
-  // KS-108-R, KS-108-RA, KS-108-MV, KS-108-SV → max 2 total
+  
+  
+  
   const versionCounts = new Map<string, number>();
   for (const card of characterCards) {
     const match = card.id.match(/^(KS-\d+)/);
@@ -46,14 +40,14 @@ export function validateDeck(
     }
   }
 
-  // Check all character cards are playable (have visuals or complete data)
+  
   for (const card of characterCards) {
     if (!card.has_visual && !card.data_complete) {
       errors.push(`Card ${card.id} (${card.name_fr}) is not playable (no visual).`);
     }
   }
 
-  // Check all mission cards are playable
+  
   for (const card of missionCards) {
     if (!card.has_visual && !card.data_complete) {
       errors.push(`Mission ${card.id} (${card.name_fr}) is not playable (no visual).`);

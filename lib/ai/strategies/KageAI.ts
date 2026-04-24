@@ -1,15 +1,4 @@
-/**
- * Kage AI - Niveau 2 sur 3
- *
- * ISMCTS avec 1000 simulations + réseau de neurones (si disponible).
- * Utilise l'évaluation par lots (batched) du réseau.
- * Environ 20-30x plus fort que l'Expert actuel.
- *
- * Sans modèle entraîné: tourne avec l'heuristique BoardEvaluator.
- * Avec modèle: activement guidé par le réseau de neurones.
- *
- * Temps de réponse estimé: 200-800ms par action.
- */
+
 
 import type { GameState, GameAction, PlayerID } from '../../engine/types';
 import type { AIStrategy, AIDifficulty } from '../AIPlayer';
@@ -42,10 +31,7 @@ export class KageAI implements AIStrategy {
     return this.mcts.chooseActionSync(state, player, validActions);
   }
 
-  /**
-   * Async version - uses batched NN inference for better quality evaluations.
-   * Call this from the server when async is acceptable.
-   */
+  
   async chooseActionAsync(
     state: GameState,
     player: PlayerID,
@@ -66,7 +52,7 @@ export class KageAI implements AIStrategy {
 
     let score = 0;
 
-    // Chakra curve
+    
     const costs = hand.map(c => c.chakra ?? 0);
     const minCost = Math.min(...costs);
     const avgCost = costs.reduce((s, c) => s + c, 0) / costs.length;
@@ -74,11 +60,11 @@ export class KageAI implements AIStrategy {
     if (minCost <= 2) score += 3; // Can play turn 1
     if (avgCost <= 5) score += 2; // Good curve
 
-    // Power
+    
     const totalPower = hand.reduce((s, c) => s + (c.power ?? 0), 0);
     score += totalPower * 0.4;
 
-    // Effects
+    
     for (const card of hand) {
       if (card.effects?.some(e => e.type === 'AMBUSH')) score += 2;
       if (card.effects?.some(e => e.type === 'SCORE')) score += 1.5;
@@ -86,7 +72,7 @@ export class KageAI implements AIStrategy {
       if (card.effects?.some(e => /POWERUP/i.test(e.description))) score += 1;
     }
 
-    // Synergy: multiple cards of same group
+    
     const groups = hand.map(c => c.group).filter(Boolean);
     const groupCounts = new Map<string, number>();
     for (const g of groups) {

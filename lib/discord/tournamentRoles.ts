@@ -5,7 +5,7 @@ const GUILD_ID = process.env.SERVER_DISCORD_ID;
 
 const TOURNAMENT_ROLE_COLOR = 0xc4a35a; // Gold color matching the site accent
 
-// Role tiers: 1-10 and 50
+
 const TOURNAMENT_TIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50] as const;
 
 function getRoleName(wins: number): string | null {
@@ -36,14 +36,14 @@ async function discordFetch(path: string, options?: RequestInit): Promise<Respon
 async function findOrCreateRole(roleName: string): Promise<string> {
   if (!GUILD_ID) throw new Error('SERVER_DISCORD_ID not set');
 
-  // Check existing roles
+  
   const rolesRes = await discordFetch(`/guilds/${GUILD_ID}/roles`);
   if (!rolesRes.ok) throw new Error(`Failed to fetch guild roles: ${rolesRes.status}`);
   const roles = await rolesRes.json();
   const existing = roles.find((r: { name: string }) => r.name === roleName);
   if (existing) return existing.id;
 
-  // Create role
+  
   const createRes = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
     method: 'POST',
     body: JSON.stringify({
@@ -78,18 +78,14 @@ async function removeRole(discordId: string, roleId: string): Promise<void> {
   }
 }
 
-/**
- * Assign the correct "Vainqueur de tournoi X" role to a player.
- * Creates the role on Discord if it doesn't exist.
- * Removes previous tournament winner role.
- */
+
 export async function assignTournamentWinnerRole(userId: string, tournamentWins: number): Promise<string | null> {
   if (!BOT_TOKEN || !GUILD_ID) {
     console.warn('[TournamentRoles] Missing BOT_DISCORD_TOKEN or SERVER_DISCORD_ID');
     return null;
   }
 
-  // Get user's Discord account
+  
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: { accounts: { where: { provider: 'discord' } } },
@@ -102,7 +98,7 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
 
   const discordId = user.accounts[0].providerAccountId;
 
-  // Verify user is still a member of the Discord server before assigning roles
+  
   const memberCheck = await isDiscordMember(discordId);
   if (!memberCheck) {
     console.warn(`[TournamentRoles] User ${userId} (Discord ${discordId}) is not a server member, skipping role assignment`);
@@ -112,7 +108,7 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
   const newRoleName = getRoleName(tournamentWins);
   if (!newRoleName) return null; // wins 11-49: keep current role, no change
 
-  // Remove previous role
+  
   const prevRoleName = getPreviousRoleName(tournamentWins);
   if (prevRoleName) {
     try {
@@ -123,7 +119,7 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
     }
   }
 
-  // Assign new role
+  
   try {
     const newRoleId = await findOrCreateRole(newRoleName);
     await addRole(discordId, newRoleId);
@@ -135,11 +131,7 @@ export async function assignTournamentWinnerRole(userId: string, tournamentWins:
   }
 }
 
-/**
- * Remove a tournament win from a player: decrement tournamentWins,
- * remove current role, assign the lower tier role if applicable.
- * Used when admin overrides a tournament result.
- */
+
 export async function removeTournamentRole(userId: string): Promise<void> {
   if (!BOT_TOKEN || !GUILD_ID) return;
 
@@ -151,14 +143,14 @@ export async function removeTournamentRole(userId: string): Promise<void> {
 
   const discordId = user.accounts[0].providerAccountId;
 
-  // Verify user is still a member before modifying roles
+  
   const memberCheck = await isDiscordMember(discordId);
   if (!memberCheck) return;
 
   const currentWins = user.tournamentWins ?? 0;
   if (currentWins <= 0) return;
 
-  // Remove current role
+  
   const currentRoleName = getRoleName(currentWins);
   if (currentRoleName) {
     try {
@@ -167,11 +159,11 @@ export async function removeTournamentRole(userId: string): Promise<void> {
     } catch { /* ignore */ }
   }
 
-  // Decrement wins
+  
   const newWins = Math.max(0, currentWins - 1);
   await prisma.user.update({ where: { id: userId }, data: { tournamentWins: newWins } });
 
-  // Assign lower role if applicable
+  
   const newRoleName = getRoleName(newWins);
   if (newRoleName) {
     try {
@@ -181,9 +173,7 @@ export async function removeTournamentRole(userId: string): Promise<void> {
   }
 }
 
-/**
- * Check if a Discord user is a member of the server.
- */
+
 export async function isDiscordMember(discordId: string): Promise<boolean> {
   if (!BOT_TOKEN || !GUILD_ID) return false;
   try {

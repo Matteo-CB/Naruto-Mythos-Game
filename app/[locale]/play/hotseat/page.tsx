@@ -41,7 +41,7 @@ export default function HotseatPage() {
     const availableChars = cards.characters.filter((c) => !bannedIds.has(c.id));
     const availableMissions = cards.missions.filter((m) => !bannedIds.has(m.id));
 
-    // Player 1 deck
+    
     const p1Deck = deck1
       ? deck1.characters
       : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
@@ -49,12 +49,12 @@ export default function HotseatPage() {
       ? deck1.missions
       : [...availableMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    // Player 2 deck
+    
     const p2Deck = deck2
       ? deck2.characters
       : [...availableChars].sort(() => Math.random() - 0.5).slice(0, 30);
 
-    // Ensure no mission overlap
+    
     const p1MissionIds = new Set(p1Missions.map((m) => m.id));
     const p2MissionPool = availableMissions.filter((m) => !p1MissionIds.has(m.id));
     const p2Missions = deck2
@@ -98,7 +98,7 @@ export default function HotseatPage() {
             <p className="text-sm text-[#888888]">{t('hotseat.subtitle')}</p>
           </div>
 
-          {/* Player 1 deck */}
+          
           {cards && (
             <div className="w-full">
               <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">{t('hotseat.player1Deck')}</p>
@@ -110,7 +110,7 @@ export default function HotseatPage() {
             </div>
           )}
 
-          {/* Player 2 deck */}
+          
           {cards && (
             <div className="w-full">
               <p className="text-xs text-[#888888] uppercase tracking-wider mb-2">{t('hotseat.player2Deck')}</p>
@@ -122,14 +122,14 @@ export default function HotseatPage() {
             </div>
           )}
 
-          {/* Card count info */}
+          
           {cards && (
             <p className="text-xs text-[#555]">
               {t('playAI.cardsLoaded', { chars: cards.characters.length, missions: cards.missions.length })}
             </p>
           )}
 
-          {/* Actions */}
+          
           <div className="flex gap-3 w-full">
             <button
               onClick={() => router.push('/play')}

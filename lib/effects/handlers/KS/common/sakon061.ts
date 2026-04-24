@@ -2,19 +2,11 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 061/130 - SAKON (Common)
- * Chakra: 3 | Power: 2
- * Group: Sound Village | Keywords: Sound Four
- * MAIN: Draw X card(s). X is the number of missions where you have at least one friendly
- * Sound Four character.
- *
- * Counts missions with friendly Sound Four characters, then draws that many cards.
- */
+
 function handleSakon061Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Count missions with at least one friendly Sound Four character
+  
   let soundFourMissionCount = 0;
   for (const mission of state.activeMissions) {
     const friendlyChars =
@@ -38,7 +30,7 @@ function handleSakon061Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'SAKON', id: 'KS-061-C' }) } };
   }
 
-  // Confirmation popup before draw
+  
   return {
     state,
     requiresTargetSelection: true,

@@ -7,28 +7,12 @@ import { EffectEngine } from '@/lib/effects/EffectEngine';
 import { sortTargetsGemmaLast } from '@/lib/effects/defeatUtils';
 import type { PlayerID, CharacterInPlay } from '@/lib/engine/types';
 
-/**
- * Card 054/130 - KABUTO YAKUSHI (UC)
- * Chakra: 5 | Power: 3
- * Group: Sound Village | Keywords: Jutsu
- *
- * UPGRADE: POWERUP 1 (self).
- *   - Add 1 power token to this character when played as an upgrade.
- *
- * MAIN: Hide all non-hidden characters in this mission with less Power than this character.
- *   - Get effective power of self (printed power + power tokens; if hidden, 0).
- *   - Find ALL characters (friend + foe, excluding self) in this mission whose
- *     effective power is strictly less than self's effective power.
- *   - Hide them all via hideCharacterWithLog (respects Gemma 049 sacrifice, Kimimaro 056
- *     protection, Shino 115 protection, and hide immunity).
- *   - Note: When isUpgrade, the UPGRADE POWERUP 1 is applied first, so self's power
- *     is already incremented before the MAIN effect evaluates.
- */
+
 
 function handleKabuto054Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourceCard } = ctx;
 
-  // Confirmation popup before POWERUP
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -44,7 +28,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Get effective power of self
+  
   const selfPower = getEffectivePower(state, sourceCard, sourcePlayer);
 
   if (selfPower <= 0) {
@@ -53,7 +37,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
-  // Pre-check: at least 1 valid target
+  
   let hasTarget = false;
   for (const side of ['player1Characters', 'player2Characters'] as const) {
     const sidePlayer = (side === 'player1Characters' ? 'player1' : 'player2') as PlayerID;
@@ -72,7 +56,7 @@ function handleKabuto054Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'KABUTO YAKUSHI', id: 'KS-054-UC' }) } };
   }
 
-  // Confirmation popup before batch hide
+  
   return {
     state,
     requiresTargetSelection: true,

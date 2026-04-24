@@ -2,24 +2,14 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 087/130 - ZABUZA MOMOCHI "Water Prison Jutsu" (UC)
- * Chakra: 5 | Power: 5
- * Group: Independent | Keywords: Rogue Ninja, Jutsu
- *
- * MAIN: If only one non-hidden enemy character in this mission, hide them.
- * UPGRADE: MAIN effect: Instead, defeat that character.
- *
- * Modifier pattern: CONFIRM MAIN → if upgrade, CONFIRM UPGRADE MODIFIER (defeat vs hide).
- * The UPGRADE "effect:" is a Type A modifier — the engine skips it in orderedTypes.
- */
+
 
 function handleZabuza087Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Pre-check: exactly 1 non-hidden enemy in this mission
+  
   const nonHiddenEnemies = mission[enemySide].filter((c) => !c.isHidden);
 
   if (nonHiddenEnemies.length !== 1) {
@@ -30,7 +20,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -43,7 +33,7 @@ function handleZabuza087Main(ctx: EffectContext): EffectResult {
 }
 
 function handleZabuza087UpgradeNoop(ctx: EffectContext): EffectResult {
-  // No-op: Type A modifier — handled by engine's ZABUZA087_CONFIRM_MAIN + UPGRADE_MODIFIER cases.
+  
   return { state: ctx.state };
 }
 

@@ -13,7 +13,7 @@ export default function Error({
 
   useEffect(() => {
     console.error('[App Error]', error);
-    // Auto-retry up to 3 times silently before showing error screen
+    
     if (retryCount.current < 3) {
       retryCount.current++;
       const timer = setTimeout(() => reset(), 200);
@@ -21,7 +21,7 @@ export default function Error({
     }
   }, [error, reset]);
 
-  // Don't show anything while auto-retrying
+  
   if (retryCount.current < 3) {
     return null;
   }

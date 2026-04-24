@@ -72,7 +72,7 @@ export function TargetOrderPopup({
   const toggleTarget = useCallback((instanceId: string) => {
     setOrderedIds((prev) => {
       if (prev.includes(instanceId)) {
-        // Remove this and all after it
+        
         return prev.slice(0, prev.indexOf(instanceId));
       }
       return [...prev, instanceId];
@@ -87,7 +87,7 @@ export function TargetOrderPopup({
     }
   }, [allSelected, orderedIds, onConfirm]);
 
-  // Auto-confirm when only 1 target
+  
   if (targets.length === 1) {
     onConfirm([targets[0].instanceId]);
     return null;
@@ -97,12 +97,12 @@ export function TargetOrderPopup({
     <AnimatePresence>
       <PopupOverlay>
         <PopupCornerFrame accentColor={`${accentColor}55`} maxWidth="600px" padding="24px 20px">
-          {/* Title */}
+          
           <PopupTitle accentColor={accentColor} size="lg">
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
           </PopupTitle>
 
-          {/* Subtitle */}
+          
           <p
             className="font-body text-xs text-center mb-4"
             style={{ color: '#777' }}
@@ -114,7 +114,7 @@ export function TargetOrderPopup({
             )}
           </p>
 
-          {/* Source card badge */}
+          
           {sourceCardName && (
             <div className="flex justify-center mb-3">
               <span
@@ -130,7 +130,7 @@ export function TargetOrderPopup({
             </div>
           )}
 
-          {/* Targets grid */}
+          
           <div className="flex flex-wrap justify-center gap-3 mb-5">
             {targets.map((target) => {
               const orderIndex = orderedIds.indexOf(target.instanceId);
@@ -162,7 +162,7 @@ export function TargetOrderPopup({
                     transition: 'border-color 0.15s, box-shadow 0.15s',
                   }}
                 >
-                  {/* Card image */}
+                  
                   {target.isHidden ? (
                     <img
                       src="/images/card-back.webp"
@@ -192,7 +192,7 @@ export function TargetOrderPopup({
                     </div>
                   )}
 
-                  {/* Order number badge */}
+                  
                   {isSelected && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -213,7 +213,7 @@ export function TargetOrderPopup({
                     </motion.div>
                   )}
 
-                  {/* Action badge overlay when selected */}
+                  
                   {isSelected && (
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -237,7 +237,7 @@ export function TargetOrderPopup({
                     </motion.div>
                   )}
 
-                  {/* Pulsing border when not yet selected */}
+                  
                   {!isSelected && (
                     <motion.div
                       className="absolute inset-0 pointer-events-none"
@@ -253,7 +253,7 @@ export function TargetOrderPopup({
                     />
                   )}
 
-                  {/* Mission rank badge */}
+                  
                   <div
                     className="absolute top-1 right-1 px-1.5 py-0.5 text-[8px] font-bold uppercase"
                     style={{
@@ -265,7 +265,7 @@ export function TargetOrderPopup({
                     {target.missionRank ?? `M${target.missionIndex + 1}`}
                   </div>
 
-                  {/* Card name */}
+                  
                   <div
                     className="absolute inset-x-0 bottom-0 px-1 py-1 text-center"
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.85)' }}
@@ -283,7 +283,7 @@ export function TargetOrderPopup({
                     )}
                   </div>
 
-                  {/* Details button */}
+                  
                   {!target.isHidden && target.image_file && (
                     <button
                       onClick={(e) => {
@@ -305,7 +305,7 @@ export function TargetOrderPopup({
             })}
           </div>
 
-          {/* Progress indicator */}
+          
           <div className="flex justify-center gap-1.5 mb-4">
             {targets.map((_, i) => (
               <div
@@ -322,7 +322,7 @@ export function TargetOrderPopup({
             ))}
           </div>
 
-          {/* Actions */}
+          
           <div className="flex items-center justify-center gap-5">
             <PopupActionButton
               onClick={handleConfirm}

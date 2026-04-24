@@ -4,27 +4,16 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 122/130 - JIROBO (R)
- * Chakra: 4, Power: 3
- * Group: Sound Village, Keywords: Sound Four
- *
- * MAIN: POWERUP X where X = total number of characters (both players) in this mission.
- *   Count all characters (both sides, including hidden) in this mission.
- *   POWERUP that amount on self.
- *
- * UPGRADE: Defeat an enemy with Power 1 or less in this mission.
- *   When isUpgrade: find non-hidden enemies with effective power <= 1. Target selection. Defeat.
- */
+
 
 function jirobo122MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Count every character in this mission (both sides, hidden included).
-  // Per designer ruling "Jirobo counts everything", Jirobo himself is part of
-  // the count — guarantee it regardless of play-path timing by checking
-  // whether the source card is already in the mission and adding 1 if not.
+  
+  
+  
+  
   const allChars = [...mission.player1Characters, ...mission.player2Characters];
   const selfAlreadyCounted = allChars.some((c) => c.instanceId === sourceCard.instanceId);
   const totalChars = allChars.length + (selfAlreadyCounted ? 0 : 1);
@@ -33,7 +22,7 @@ function jirobo122MainHandler(ctx: EffectContext): EffectResult {
     return { state };
   }
 
-  // CONFIRM popup before applying POWERUP
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -54,7 +43,7 @@ function jirobo122UpgradeHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find enemies with effective power <= 1 (hidden chars have power 0, valid targets)
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 1)
     .map((c: CharacterInPlay) => c.instanceId);

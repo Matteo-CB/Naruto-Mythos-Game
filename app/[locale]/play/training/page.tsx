@@ -116,7 +116,7 @@ export default function TrainingPage() {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="flex flex-col gap-6 max-w-lg w-full relative z-10">
 
-          {/* Header */}
+          
           <div className="text-center">
             <h1 className="text-3xl font-bold text-[#e0e0e0] mb-1">
               Mode Entraînement
@@ -127,7 +127,7 @@ export default function TrainingPage() {
             </p>
           </div>
 
-          {/* Coach badge */}
+          
           <div
             className="border px-4 py-3 text-sm"
             style={{ borderColor: '#c4a35a22', backgroundColor: '#c4a35a0a' }}
@@ -143,7 +143,7 @@ export default function TrainingPage() {
             </ul>
           </div>
 
-          {/* Difficulty */}
+          
           <div className="flex flex-col gap-2">
             <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">
               Difficulté de l&apos;adversaire
@@ -170,7 +170,7 @@ export default function TrainingPage() {
             ))}
           </div>
 
-          {/* Deck selector */}
+          
           {cards && (
             <DeckSelector
               onSelect={setSelectedDeck}
@@ -179,7 +179,7 @@ export default function TrainingPage() {
             />
           )}
 
-          {/* Actions */}
+          
           <div className="flex gap-3 w-full">
             <button
               onClick={() => router.push('/')}

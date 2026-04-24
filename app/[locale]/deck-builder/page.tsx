@@ -20,7 +20,7 @@ import {
   PopupDismissLink, SectionDivider, AngularButton,
 } from "@/components/game/PopupPrimitives";
 
-// ───────────────────── CONSTANTS ─────────────────────
+
 
 const RARITY_COLORS: Record<string, string> = {
   C: '#888888', UC: '#3e8b3e', R: '#c4a35a', RA: '#c4a35a',
@@ -33,8 +33,8 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
 type SortField = 'number' | 'name' | 'chakra' | 'power' | 'rarity';
 const normalizeStr = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-// ───────────────────── EFFECT FUNCTION CLASSIFIER ─────────────────────
-// Classifies a card's effects into gameplay categories based on description keywords
+
+
 
 type EffectFunction = 'defeat' | 'hide' | 'draw' | 'move' | 'powerup' | 'chakra' | 'control' | 'play' | 'protect' | 'continuous' | 'score';
 
@@ -78,7 +78,7 @@ const EFFECT_FN_LABELS: Record<EffectFunction, { en: string; fr: string }> = {
   score: { en: 'Score', fr: 'Score' },
 };
 
-// ───────────────────── ADVANCED SEARCH PARSER ─────────────────────
+
 
 interface KeywordFilter {
   terms: string[];  // all must match (AND)
@@ -120,12 +120,12 @@ function emptyFilter(): SearchFilter {
 
 function parseSearchQuery(raw: string): SearchFilter {
   const filter = emptyFilter();
-  // Normalize commas to spaces so "c:4, k:Jutsu" works like "c:4 k:Jutsu"
+  
   let normalized = raw.replace(/,\s*/g, ' ');
-  // Pre-process bracket syntax: e:[discard pile] → e:"discard pile", k:[Team 7]+Jutsu → k:"Team 7+Jutsu"
+  
   normalized = normalized.replace(/(\w+):?\[([^\]]+)\](\+\S+)?/g, (_, key, content, suffix) => `${key}:"${content}${suffix ?? ''}"`);
 
-  // Match tokens: optional - prefix, key, operator, value (quoted, bracketed, or word)
+  
   const tokenRegex = /(-)?(eup|emi|emc|em|ea|es|nv|[cpkgresf])(:|=|>=|<=|>|<)("([^"]+)"|(\S+))/gi;
   let remaining = normalized;
 
@@ -137,7 +137,7 @@ function parseSearchQuery(raw: string): SearchFilter {
     const value = match[5] ?? match[6];
     remaining = remaining.replace(match[0], '');
 
-    // Handle / (OR) within value — split into multiple entries
+    
     const values = value.split('/').map((v) => v.trim()).filter(Boolean);
 
     for (const val of values) {
@@ -183,10 +183,10 @@ function parseSearchQuery(raw: string): SearchFilter {
     }
   }
 
-  // Parse remaining text for name queries — support / (OR) and - (negate)
+  
   const leftover = remaining.trim();
   if (leftover) {
-    // Split by / for OR segments
+    
     const segments = leftover.split(/\s*\/\s*/);
     for (const seg of segments) {
       const trimmed = seg.trim();
@@ -213,7 +213,7 @@ function compareOp(actual: number, op: string, target: number): boolean {
 }
 
 function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: string): boolean {
-  // Name / ID (NOT title — title is via nv: only)
+  
   if (filter.nameQueries.length > 0) {
     const positives = filter.nameQueries.filter((q) => !q.negated);
     const negatives = filter.nameQueries.filter((q) => q.negated);
@@ -221,29 +221,29 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
     const nameFr = normalizeStr(card.name_fr);
     const idStr = card.id.toLowerCase();
     const matchesAny = (q: string) => nameStr.includes(q) || nameFr.includes(q) || idStr.includes(q);
-    // Positives: at least one must match (OR via /)
+    
     if (positives.length > 0 && !positives.some((q) => matchesAny(q.text))) return false;
-    // Negatives: none must match
+    
     for (const q of negatives) { if (matchesAny(q.text)) return false; }
   }
-  // Name version (nv:)
+  
   for (const nv of filter.nameVersions) {
     const titleStr = normalizeStr(getCardTitle(card, locale as 'en' | 'fr'));
     const titleFr = normalizeStr(card.title_fr ?? '');
     const has = titleStr.includes(nv.value) || titleFr.includes(nv.value);
     if (nv.negated ? has : !has) return false;
   }
-  // Chakra — OR within same / group, AND between groups
+  
   const chakraPos = filter.chakra.filter((c) => !c.negated);
   const chakraNeg = filter.chakra.filter((c) => c.negated);
   if (chakraPos.length > 0 && !chakraPos.some((c) => compareOp(card.chakra ?? 0, c.op, c.val))) return false;
   for (const c of chakraNeg) { if (compareOp(card.chakra ?? 0, c.op, c.val)) return false; }
-  // Power
+  
   const powerPos = filter.power.filter((p) => !p.negated);
   const powerNeg = filter.power.filter((p) => p.negated);
   if (powerPos.length > 0 && !powerPos.some((p) => compareOp(card.power ?? 0, p.op, p.val))) return false;
   for (const p of powerNeg) { if (compareOp(card.power ?? 0, p.op, p.val)) return false; }
-  // Keywords — OR for positives (from / split), AND for negatives
+  
   const kwPos = filter.keywords.filter((kf) => !kf.negated);
   const kwNeg = filter.keywords.filter((kf) => kf.negated);
   if (kwPos.length > 0) {
@@ -263,27 +263,27 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
       : allMatch;
     if (matches) return false;
   }
-  // Set
+  
   for (const s of filter.sets) {
     const has = card.id.toUpperCase().startsWith(s.value + '-');
     if (s.negated ? has : !has) return false;
   }
-  // Group — OR for positives, AND for negatives
+  
   const groupPos = filter.groups.filter((g) => !g.negated);
   const groupNeg = filter.groups.filter((g) => g.negated);
   if (groupPos.length > 0 && !groupPos.some((g) => card.group && normalizeStr(card.group).includes(g.value))) return false;
   for (const g of groupNeg) { if (card.group && normalizeStr(card.group).includes(g.value)) return false; }
-  // Rarity — OR within positives
+  
   const rarPos = filter.rarities.filter((r) => !r.negated);
   const rarNeg = filter.rarities.filter((r) => r.negated);
   if (rarPos.length > 0 && !rarPos.some((r) => card.rarity === r.value)) return false;
   for (const r of rarNeg) { if (card.rarity === r.value) return false; }
-  // Effect type — OR within positives
+  
   const effPos = filter.effects.filter((e) => !e.negated);
   const effNeg = filter.effects.filter((e) => e.negated);
   if (effPos.length > 0 && !card.effects?.some((e) => effPos.some((f) => f.value === e.type))) return false;
   for (const e of effNeg) { if (card.effects?.some((ef) => ef.type === e.value)) return false; }
-  // Effect text search — OR for positives, AND for negatives (applies to all effect text filters)
+  
   const matchEffText = (entries: typeof filter.effectText, predicate: (e: { type: string; description: string }) => boolean) => {
     const pos = entries.filter((t) => !t.negated);
     const neg = entries.filter((t) => t.negated);
@@ -298,7 +298,7 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   if (!matchEffText(filter.effectUpgradeText, (e) => e.type === 'UPGRADE')) return false;
   if (!matchEffText(filter.effectAmbushText, (e) => e.type === 'AMBUSH')) return false;
   if (!matchEffText(filter.effectScoreText, (e) => e.type === 'SCORE')) return false;
-  // Effect function filter (f:defeat, f:hide, f:draw, etc.)
+  
   if (filter.effectFunctions.length > 0) {
     const cardFns = classifyCardEffects(card);
     const fnPos = filter.effectFunctions.filter((f) => !f.negated);
@@ -309,7 +309,7 @@ function matchesSearchFilter(card: CharacterCard, filter: SearchFilter, locale: 
   return true;
 }
 
-// ───────────────────── CATALOG CHARACTER CARD ─────────────────────
+
 
 const CatalogCard = memo(function CatalogCard({
   card, allowed, inDeckCount, onAdd, onHover,
@@ -351,7 +351,7 @@ const CatalogCard = memo(function CatalogCard({
   );
 });
 
-// ───────────────────── CATALOG MISSION CARD ─────────────────────
+
 
 const CatalogMission = memo(function CatalogMission({
   card, allowed, onAdd, onHover,
@@ -386,7 +386,7 @@ const CatalogMission = memo(function CatalogMission({
   );
 });
 
-// ───────────────────── DECK CHARACTER CARD ─────────────────────
+
 
 const DeckCard = memo(function DeckCard({
   card, idx, onRemove, onHover,
@@ -420,9 +420,9 @@ const DeckCard = memo(function DeckCard({
   );
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════
+
+
+
 
 export default function DeckBuilderPage() {
   const t = useTranslations();
@@ -430,13 +430,13 @@ export default function DeckBuilderPage() {
   const loc = locale as "en" | "fr";
   const { data: session, status } = useSession();
 
-  // ───── DATA STATE ─────
+  
   const [availableChars, setAvailableChars] = useState<CharacterCard[]>([]);
   const [availableMissions, setAvailableMissions] = useState<MissionCard[]>([]);
   const [allChars, setAllChars] = useState<CharacterCard[]>([]);
   const [allMissions, setAllMissions] = useState<MissionCard[]>([]);
 
-  // ───── UI STATE ─────
+  
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
   const [sortBy, setSortBy] = useState<SortField>('number');
@@ -445,7 +445,7 @@ export default function DeckBuilderPage() {
   const [mobileView, setMobileView] = useState<'catalog' | 'deck'>('catalog');
   const [mobileInfoOpen, setMobileInfoOpen] = useState(false);
 
-  // ───── MODAL STATE ─────
+  
   const [showSavedDecks, setShowSavedDecks] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -456,7 +456,7 @@ export default function DeckBuilderPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  // ───── STORE ─────
+  
   const deckName = useDeckBuilderStore((s) => s.deckName);
   const deckChars = useDeckBuilderStore((s) => s.deckChars);
   const deckMissions = useDeckBuilderStore((s) => s.deckMissions);
@@ -490,7 +490,7 @@ export default function DeckBuilderPage() {
   const [deckViewMode, setDeckViewMode] = useState<DeckViewMode>('grid');
   const [deckGroupBy, setDeckGroupBy] = useState<DeckGroupBy>('chakra');
 
-  // ───── DATA LOADING ─────
+  
   useEffect(() => {
     import("@/lib/data/cardLoader").then((mod) => {
       setAvailableChars(mod.getPlayableCharacters());
@@ -502,7 +502,7 @@ export default function DeckBuilderPage() {
 
   useEffect(() => { loadSavedDecks(); }, [loadSavedDecks]);
 
-  // Auto-load from manage page
+  
   useEffect(() => {
     try {
       const pendingId = sessionStorage.getItem('loadDeckId');
@@ -513,7 +513,7 @@ export default function DeckBuilderPage() {
     } catch { /* SSR / privacy */ }
   }, [availableChars, availableMissions, loadDeck]);
 
-  // Auto-clear add error
+  
   useEffect(() => {
     if (addError) {
       const timer = setTimeout(() => clearAddError(), 3000);
@@ -521,7 +521,7 @@ export default function DeckBuilderPage() {
     }
   }, [addError, clearAddError]);
 
-  // Lock body scroll
+  
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -529,7 +529,7 @@ export default function DeckBuilderPage() {
   }, []);
 
 
-  // ───── FILTERED DATA ─────
+  
   const parsedSearch = useMemo(() => parseSearchQuery(deferredSearch), [deferredSearch]);
 
   const filteredChars = useMemo(() => {
@@ -557,7 +557,7 @@ export default function DeckBuilderPage() {
     return [...availableMissions];
   }, [availableMissions, showBanned, bannedIds]);
 
-  // ───── DECK COMPUTATIONS ─────
+  
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
 
   const deckCardCounts = useMemo(() => {
@@ -566,7 +566,7 @@ export default function DeckBuilderPage() {
     return counts;
   }, [deckChars]);
 
-  // Pre-compute allowed state for all catalog cards (avoids per-card store calls during render)
+  
   const allowedMap = useMemo(() => {
     const map = new Map<string, boolean>();
     for (const c of filteredChars) map.set(c.id, canAddChar(c).allowed);
@@ -592,12 +592,12 @@ export default function DeckBuilderPage() {
     return Array.from(groups.entries()).sort((a, b) => a[0] - b[0]);
   }, [deckChars]);
 
-  // Grouped deck rows for horizontal view
+  
   const deckGroupedRows = useMemo(() => {
     const groups = new Map<string, { card: CharacterCard; idx: number }[]>();
     deckChars.forEach((card, i) => {
       if (deckGroupBy === 'effect') {
-        // A card can belong to multiple effect groups
+        
         const fns = classifyCardEffects(card);
         if (fns.length === 0) {
           const arr = groups.get('-') || [];
@@ -611,7 +611,7 @@ export default function DeckBuilderPage() {
           }
         }
       } else if (deckGroupBy === 'keyword') {
-        // A card can belong to multiple keyword groups
+        
         const kws = card.keywords ?? [];
         if (kws.length === 0) {
           const arr = groups.get('-') || [];
@@ -644,7 +644,7 @@ export default function DeckBuilderPage() {
     });
   }, [deckChars, deckGroupBy]);
 
-  // Info panel data for the currently previewed card
+  
   const previewAddCheck = useMemo(() => {
     if (!previewCard) return null;
     return previewCard.card_type !== 'mission'
@@ -653,12 +653,12 @@ export default function DeckBuilderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [previewCard, deckChars, deckMissions]);
 
-  // ───── STABLE CALLBACKS (for memo'd children) ─────
+  
   const handleAddChar = useCallback((card: CharacterCard) => addChar(card), [addChar]);
   const handleAddMission = useCallback((card: MissionCard) => addMission(card), [addMission]);
   const handleRemoveChar = useCallback((idx: number) => removeChar(idx), [removeChar]);
   const handlePreview = useCallback((card: CharacterCard | MissionCard) => setPreviewCard(card), []);
-  // ───── SAVE / LOAD / DELETE ─────
+  
   const handleSave = useCallback(async () => {
     setSaveError(null);
     const trimmedName = (deckName || '').trim() || 'Untitled Deck';
@@ -693,7 +693,7 @@ export default function DeckBuilderPage() {
     }
   }, [deleteDeck, t]);
 
-  // ───── IMPORT ─────
+  
   const handleImport = useCallback(() => {
     const code = importCode.trim();
     if (!code) return;
@@ -715,7 +715,7 @@ export default function DeckBuilderPage() {
       id = id.replace(/-SV$/, '-S'); id = id.replace(/-MYTHOS$/, '-M');
       return id;
     };
-    // Resolve variant formats: "133|2", "133_2", "KS-133|2" → { number, variantIdx }
+    
     const parseVariantFormat = (raw: string): { num: number; variantIdx: number } | null => {
       const m = raw.trim().match(/^(?:KS-)?(\d+)[|_](\d+)$/);
       if (!m) return null;
@@ -727,13 +727,13 @@ export default function DeckBuilderPage() {
       if (!match) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
       const rawCardId = match[1]; const qty = parseInt(match[2], 10);
 
-      // Try variant format first (133|2, 133_2)
+      
       const variantParsed = parseVariantFormat(rawCardId);
       if (variantParsed) {
         const candidates = charByNumber.get(variantParsed.num);
         const mByNum = missionByNumber.get(variantParsed.num);
         if (candidates && candidates.length > 0) {
-          // variantIdx 1 = first variant, 2 = second, etc.
+          
           const idx = Math.max(0, variantParsed.variantIdx - 1);
           const pick = idx < candidates.length ? candidates[idx] : candidates[0];
           for (let i = 0; i < qty; i++) chars.push(pick);
@@ -779,7 +779,7 @@ export default function DeckBuilderPage() {
     setImportCode("");
   }, [importCode, allChars, allMissions, clearDeck, setDeckName, addChar, addMission, t]);
 
-  // ───── EXPORT ─────
+  
   const exportCode = useMemo(() => {
     const counts = new Map<string, number>();
     for (const c of deckChars) { const id = c.cardId || c.id; counts.set(id, (counts.get(id) || 0) + 1); }
@@ -797,9 +797,9 @@ export default function DeckBuilderPage() {
     });
   }, [exportCode]);
 
-  // ═════════════════════════════════════════════════════
-  //  UNAUTHENTICATED
-  // ═════════════════════════════════════════════════════
+  
+  
+  
 
   if (status === 'loading') {
     return (
@@ -827,9 +827,9 @@ export default function DeckBuilderPage() {
     );
   }
 
-  // ═════════════════════════════════════════════════════
-  //  CARD INFO PANEL (re-used desktop + mobile)
-  // ═════════════════════════════════════════════════════
+  
+  
+  
 
   const renderInfoContent = () => {
     if (!previewCard || !previewAddCheck) {
@@ -852,7 +852,7 @@ export default function DeckBuilderPage() {
 
     return (
       <div className="flex-1 overflow-y-auto px-3 py-3" style={{ minHeight: 0 }}>
-        {/* Image */}
+        
         <div className="relative overflow-hidden mx-auto mb-3" style={{
           width: '100%',
           maxWidth: isChar ? '180px' : '100%',
@@ -868,7 +868,7 @@ export default function DeckBuilderPage() {
           )}
         </div>
 
-        {/* Type + Rarity badges */}
+        
         <div className="flex items-center gap-2 mb-1">
           <span className="text-[10px] uppercase font-bold px-1.5 py-0.5" style={{
             backgroundColor: isChar ? 'rgba(255,255,255,0.04)' : 'rgba(196,163,90,0.12)',
@@ -880,11 +880,11 @@ export default function DeckBuilderPage() {
           }}>{getRarityLabel(card.rarity, loc)}</span>
         </div>
 
-        {/* Name + Title */}
+        
         <div className="text-sm font-bold" style={{ color: '#e0e0e0' }}>{getCardName(card, loc)}</div>
         {isChar && <div className="text-[11px] mb-2" style={{ color: '#777' }}>{getCardTitle(charCard, loc)}</div>}
 
-        {/* Stats */}
+        
         {isChar && (
           <div className="flex items-center gap-0 my-2 py-2" style={{
             backgroundColor: 'rgba(255,255,255,0.02)', borderLeft: '3px solid rgba(196, 163, 90, 0.3)',
@@ -901,12 +901,12 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        {/* Group */}
+        
         {isChar && charCard.group && (
           <div className="text-[10px] mb-1" style={{ color: '#6b8a6b' }}>{getCardGroup(charCard.group, loc)}</div>
         )}
 
-        {/* Keywords */}
+        
         {isChar && charCard.keywords && charCard.keywords.length > 0 && (
           <div className="flex gap-1 mt-1 mb-2 flex-wrap">
             {charCard.keywords.map((kw, i) => (
@@ -917,7 +917,7 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        {/* Effects */}
+        
         {card.effects && card.effects.length > 0 && (
           <div className="flex flex-col gap-1.5 mt-2">
             {card.effects.map((eff, i) => {
@@ -936,7 +936,7 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        {/* Add to deck button */}
+        
         <div className="mt-3">
           <AngularButton
             onClick={() => isChar ? addChar(charCard) : addMission(card as MissionCard)}
@@ -953,21 +953,21 @@ export default function DeckBuilderPage() {
     );
   };
 
-  // ═════════════════════════════════════════════════════
-  //  FILTER CHIPS (re-used desktop + mobile)
-  // ═════════════════════════════════════════════════════
+  
+  
+  
 
-  // ═════════════════════════════════════════════════════
-  //  SEARCH HELP POPUP
-  // ═════════════════════════════════════════════════════
+  
+  
+  
   const [showSearchHelp, setShowSearchHelp] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const searchFilters = [
-    // Stats (0-1)
+    
     { key: 'c', label: t('deckBuilder.search.chakraLabel'), desc: t('deckBuilder.search.chakraDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['c:4', 'c>3', 'c<=5'] },
     { key: 'p', label: t('deckBuilder.search.powerLabel'), desc: t('deckBuilder.search.powerDesc'), ops: [':', '=', '>', '>=', '<', '<='], examples: ['p:5', 'p>=3', 'p<2'] },
-    // Card Properties (2-8)
+    
     { key: 'k', label: t('deckBuilder.search.keywordLabel'), desc: t('deckBuilder.search.keywordDesc'), ops: [':'], examples: ['k:Jutsu', 'k:Sannin'] },
     { key: 'k', label: t('deckBuilder.search.keywordAndLabel'), desc: t('deckBuilder.search.keywordAndDesc'), ops: [':'], examples: ['k:Jutsu+Team 7'] },
     { key: 'k', label: t('deckBuilder.search.keywordOnlyLabel'), desc: t('deckBuilder.search.keywordOnlyDesc'), ops: [':'], examples: ['k:!Jutsu', 'k:!Summon'] },
@@ -975,7 +975,7 @@ export default function DeckBuilderPage() {
     { key: 'r', label: t('deckBuilder.search.rarityLabel'), desc: t('deckBuilder.search.rarityDesc'), ops: [':'], examples: ['r:S', 'r:UC', 'r:M', 'r:SV', 'r:MV'] },
     { key: 's', label: t('deckBuilder.search.setLabel'), desc: t('deckBuilder.search.setDesc'), ops: [':'], examples: ['s:KS'] },
     { key: 'nv', label: t('deckBuilder.search.nvLabel'), desc: t('deckBuilder.search.nvDesc'), ops: [':'], examples: ['nv:Hokage', 'nv:Rasengan'] },
-    // Effects (9+)
+    
     { key: 'e', label: t('deckBuilder.search.effectTypeLabel'), desc: t('deckBuilder.search.effectTypeDesc'), ops: [':'], examples: ['e:AMBUSH', 'e:SCORE'] },
     { key: 'e', label: t('deckBuilder.search.effectTextLabel'), desc: t('deckBuilder.search.effectTextDesc'), ops: [':'], examples: ['e:move', 'e:[discard pile]'] },
     { key: 'em', label: t('deckBuilder.search.emLabel'), desc: t('deckBuilder.search.emDesc'), ops: [':'], examples: ['em:hide', 'em:defeat'] },
@@ -990,7 +990,7 @@ export default function DeckBuilderPage() {
 
   const heroCards = ['/images/cards/KS/secret/KS-133-S.webp', '/images/cards/KS/mythos/KS-143-M.webp', '/images/cards/KS/secret/KS-136-S.webp', '/images/cards/KS/secret/KS-137-S.webp', '/images/cards/KS/mythos/KS-144-M.webp'];
 
-  // Group filters for display: Stats | Card Properties | Effects
+  
   const statsFilters = searchFilters.slice(0, 2);   // c, p
   const cardFilters = searchFilters.slice(2, 9);     // k, k+, k!, g, r, s, nv
   const effectFilters = searchFilters.slice(9);       // e, e text, em, emi, emc, eup, ea, es
@@ -1031,7 +1031,7 @@ export default function DeckBuilderPage() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Hero header */}
+        
         <div className="relative shrink-0 overflow-hidden" style={{ height: '110px' }}>
           <div className="absolute inset-0 flex justify-center gap-2" style={{ opacity: 0.2, filter: 'blur(1px)' }}>
             {heroCards.map((src, i) => (
@@ -1054,11 +1054,11 @@ export default function DeckBuilderPage() {
           </button>
         </div>
 
-        {/* Scrollable content */}
+        
         <div className="flex-1 overflow-y-auto py-5">
           <div className="max-w-4xl mx-auto px-5 sm:px-8">
 
-            {/* Name search */}
+            
             <div className="mb-5 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <p className="font-body text-[11px] mb-2" style={{ color: '#888' }}>{t('deckBuilder.search.nameDesc')}</p>
               <div className="flex flex-wrap gap-1.5">
@@ -1072,10 +1072,10 @@ export default function DeckBuilderPage() {
               </div>
             </div>
 
-            {/* Three-column grid centered */}
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
-              {/* Col 1 — Stats */}
+              
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#c4a35a', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   Stats
@@ -1083,7 +1083,7 @@ export default function DeckBuilderPage() {
                 {statsFilters.map((f, i) => renderFilterRow(f, i, '#c4a35a'))}
               </div>
 
-              {/* Col 2 — Card Properties */}
+              
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#3e8b3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   Properties
@@ -1091,7 +1091,7 @@ export default function DeckBuilderPage() {
                 {cardFilters.map((f, i) => renderFilterRow(f, i, '#3e8b3e'))}
               </div>
 
-              {/* Col 3 — Effects */}
+              
               <div>
                 <span className="text-sm tracking-wider block mb-3" style={{ color: '#b33e3e', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                   Effects
@@ -1103,7 +1103,7 @@ export default function DeckBuilderPage() {
               </div>
             </div>
 
-            {/* Combine examples */}
+            
             <div className="pt-5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
               <span className="text-sm tracking-wider block mb-1" style={{ color: '#6a6abb', fontFamily: "'NJNaruto', sans-serif", opacity: 0.7 }}>
                 {t('deckBuilder.search.combineTitle')}
@@ -1138,13 +1138,13 @@ export default function DeckBuilderPage() {
     </div>
   ) : null;
 
-  // ═════════════════════════════════════════════════════
-  //  DECK VIEW CONTENT (re-used desktop + mobile)
-  // ═════════════════════════════════════════════════════
+  
+  
+  
 
   const renderDeckContent = () => (
     <>
-      {/* Missions row */}
+      
       <div className="flex items-center gap-2 mb-2">
         <span className="text-[9px] uppercase font-bold" style={{ color: '#777', letterSpacing: '0.1em' }}>{t("deckBuilder.missionCards")}</span>
         <div className="flex gap-2">
@@ -1193,7 +1193,7 @@ export default function DeckBuilderPage() {
 
       <SectionDivider width={100} />
 
-      {/* View controls */}
+      
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
           className="px-2 py-0.5 text-[9px] uppercase font-bold"
@@ -1206,7 +1206,7 @@ export default function DeckBuilderPage() {
           {t("deckBuilder.sortByCost")}
         </button>
         <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
-        {/* View mode toggle */}
+        
         {(['grid', 'rows'] as DeckViewMode[]).map((m) => (
           <button key={m} onClick={() => setDeckViewMode(m)}
             className="px-2 py-0.5 text-[9px] uppercase font-bold"
@@ -1218,7 +1218,7 @@ export default function DeckBuilderPage() {
             {t(`deckBuilder.view.${m}`)}
           </button>
         ))}
-        {/* Group by selector (only in rows mode) */}
+        
         {deckViewMode === 'rows' && (
           <>
             <div className="h-3 w-px" style={{ backgroundColor: 'rgba(255,255,255,0.08)' }} />
@@ -1237,7 +1237,7 @@ export default function DeckBuilderPage() {
         )}
       </div>
 
-      {/* Character cards — grid or rows view */}
+      
       {deckViewMode === 'grid' ? (
         <div className="grid gap-0.5" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
           {Array.from({ length: Math.max(30, deckChars.length) }).map((_, i) => {
@@ -1293,17 +1293,17 @@ export default function DeckBuilderPage() {
     </>
   );
 
-  // ═══════════════════════════════════════════════════════════════
-  //  MAIN LAYOUT
-  // ═══════════════════════════════════════════════════════════════
+  
+  
+  
 
   return (
     <main id="main-content" className="relative" style={{ backgroundColor: '#0a0a0a', height: '100vh', overflow: 'hidden' }}>
 
-      {/* ═══════ DESKTOP 3-PANEL ═══════ */}
+      
       <div className="hidden lg:flex relative z-10" style={{ height: '100vh' }}>
 
-        {/* ── LEFT: Card Info Panel (always visible) ── */}
+        
         <div className="flex flex-col flex-shrink-0" style={{
           width: '250px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
@@ -1318,9 +1318,9 @@ export default function DeckBuilderPage() {
           {renderInfoContent()}
         </div>
 
-        {/* ── CENTER: Deck View ── */}
+        
         <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
-          {/* Header bar */}
+          
           <div className="flex items-center gap-3 px-4 py-2 flex-shrink-0" style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -1352,7 +1352,7 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          {/* Error bar */}
+          
           {(saveError || addError) && (
             <div className="px-4 py-1 flex-shrink-0">
               <div className="text-[10px] py-1 px-2" style={{
@@ -1361,12 +1361,12 @@ export default function DeckBuilderPage() {
             </div>
           )}
 
-          {/* Deck content area */}
+          
           <div className="flex-1 overflow-y-auto px-4 py-3" style={{ minHeight: 0 }}>
             {renderDeckContent()}
           </div>
 
-          {/* Action bar */}
+          
           <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
             borderTop: '1px solid rgba(255,255,255,0.04)', backgroundColor: 'rgba(10, 10, 10, 0.9)',
           }}>
@@ -1388,13 +1388,13 @@ export default function DeckBuilderPage() {
           </div>
         </div>
 
-        {/* ── RIGHT: Card Catalog ── */}
+        
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
           width: '540px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderLeft: '1px solid rgba(255,255,255,0.06)',
         }}>
-          {/* Missions section (above search) */}
+          
           <div className="px-3 pt-3 pb-1 flex-shrink-0">
             <span className="text-[8px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
             <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
@@ -1412,7 +1412,7 @@ export default function DeckBuilderPage() {
 
           <div className="h-px mx-3" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
-          {/* Search (below missions) */}
+          
           <div className="px-3 pt-2 pb-2 flex-shrink-0">
             <div className="flex items-center gap-1.5">
               <input
@@ -1433,7 +1433,7 @@ export default function DeckBuilderPage() {
               >
                 ?
               </button>
-              {/* Sort dropdown */}
+              
               <div className="relative">
                 <button
                   onClick={() => setShowSortDropdown((v) => !v)}
@@ -1478,7 +1478,7 @@ export default function DeckBuilderPage() {
             </div>
           </div>
 
-          {/* Banned toggle */}
+          
           {bannedIds.size > 0 && (
             <div className="px-3 pb-1 flex-shrink-0">
               <button
@@ -1496,7 +1496,7 @@ export default function DeckBuilderPage() {
             </div>
           )}
 
-          {/* Alt art toggle */}
+          
           <div className="px-3 pb-1 flex-shrink-0">
             <button
               onClick={() => setShowAltArt(!showAltArt)}
@@ -1511,10 +1511,10 @@ export default function DeckBuilderPage() {
             </button>
           </div>
 
-          {/* Scrollable card grid */}
+          
           <div className="flex-1 overflow-y-auto px-3 pb-3" style={{ minHeight: 0 }}>
 
-            {/* Characters section */}
+            
             <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))' }}>
               {filteredChars.map((card) => (
                 <CatalogCard
@@ -1531,9 +1531,9 @@ export default function DeckBuilderPage() {
         </div>
       </div>
 
-      {/* ═══════ MOBILE LAYOUT ═══════ */}
+      
       <div className="lg:hidden flex flex-col relative z-10" style={{ height: '100vh' }}>
-        {/* Top bar */}
+        
         <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
           borderBottom: '1px solid rgba(196, 163, 90, 0.12)',
@@ -1567,7 +1567,7 @@ export default function DeckBuilderPage() {
           </AngularButton>
         </div>
 
-        {/* Error bar */}
+        
         {(saveError || addError) && (
           <div className="px-3 py-1 flex-shrink-0">
             <div className="text-[10px] py-1 px-2" style={{
@@ -1576,11 +1576,11 @@ export default function DeckBuilderPage() {
           </div>
         )}
 
-        {/* Content */}
+        
         <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
           {mobileView === 'catalog' ? (
             <div className="px-3 py-2">
-              {/* Search */}
+              
               <div className="flex items-center gap-1.5 mb-1">
                 <input type="text" placeholder={t("collection.search")} value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -1633,7 +1633,7 @@ export default function DeckBuilderPage() {
                 {t("deckBuilder.filters.resultsCount", { count: filteredChars.length })}
               </div>
 
-              {/* Missions */}
+              
               <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>{t("deckBuilder.missionCards")}</span>
               <div className="grid grid-cols-5 gap-1 mb-3">
                 {filteredMissions.map((m) => (
@@ -1644,7 +1644,7 @@ export default function DeckBuilderPage() {
 
               <div className="h-px my-2" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
 
-              {/* Characters */}
+              
               <span className="text-[9px] uppercase font-bold block mb-1" style={{ color: '#777' }}>
                 {t("deckBuilder.characters", { count: filteredChars.length })}
               </span>
@@ -1658,7 +1658,7 @@ export default function DeckBuilderPage() {
             </div>
           ) : (
             <div className="px-3 py-2">
-              {/* Deck name */}
+              
               <input type="text" placeholder={t("deckBuilder.deckName")} value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
                 className="w-full px-2 py-1.5 text-xs mb-2 focus:outline-none"
@@ -1667,7 +1667,7 @@ export default function DeckBuilderPage() {
 
               {renderDeckContent()}
 
-              {/* Action buttons */}
+              
               <div className="flex flex-wrap gap-1.5 mt-4 mb-2">
                 <AngularButton onClick={() => setShowSavedDecks(true)} variant="secondary" size="sm">{t("deckBuilder.loadDeck")}</AngularButton>
                 <AngularButton onClick={() => setShowImportModal(true)} variant="secondary" size="sm">{t("deckBuilder.importButton")}</AngularButton>
@@ -1685,7 +1685,7 @@ export default function DeckBuilderPage() {
           )}
         </div>
 
-        {/* Mobile info strip */}
+        
         {previewCard && (
           <div className="flex-shrink-0 cursor-pointer" style={{
             backgroundColor: 'rgba(10, 10, 10, 0.98)',
@@ -1720,12 +1720,12 @@ export default function DeckBuilderPage() {
         )}
       </div>
 
-      {/* ═══════ MODALS ═══════ */}
+      
 
-      {/* Search Help */}
+      
       {renderSearchHelp()}
 
-      {/* Saved Decks */}
+      
       {showSavedDecks && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
@@ -1786,7 +1786,7 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      {/* Import Modal */}
+      
       {showImportModal && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="480px">
@@ -1824,7 +1824,7 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      {/* Export Modal */}
+      
       {showExportModal && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
@@ -1852,7 +1852,7 @@ export default function DeckBuilderPage() {
         </PopupOverlay>
       )}
 
-      {/* Overwrite Confirm Modal */}
+      
       {overwriteConflict && (
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(179, 62, 62, 0.35)" maxWidth="400px">

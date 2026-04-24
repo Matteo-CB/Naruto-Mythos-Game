@@ -13,16 +13,16 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({ where: { email } });
 
-    // Always return success to prevent email enumeration
+    
     if (!user) {
       return NextResponse.json({ success: true });
     }
 
-    // Generate token
+    
     const rawToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
 
-    // Store hashed token with 1-hour expiry
+    
     await prisma.user.update({
       where: { id: user.id },
       data: {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send email with raw token
+    
     await sendResetEmail(email, rawToken, locale || 'en');
 
     return NextResponse.json({ success: true });

@@ -16,12 +16,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    // Prevent self-reporting
+    
     if (targetId === session.user.id) {
       return NextResponse.json({ error: 'Cannot report yourself' }, { status: 400 });
     }
 
-    // Check for duplicate report
+    
     const existing = await prisma.chatReport.findFirst({
       where: {
         messageId,

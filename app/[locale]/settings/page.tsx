@@ -18,7 +18,7 @@ export default function SettingsPage() {
   } = useSettingsStore();
   const backgrounds = availableBackgrounds;
 
-  // Username editing state
+  
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [usernameError, setUsernameError] = useState('');
@@ -48,7 +48,7 @@ export default function SettingsPage() {
       }
       await updateSession({ name: data.username });
       setUsernameStatus('saved');
-      // Force page reload so ALL components pick up the new username from session
+      
       setTimeout(() => window.location.reload(), 1000);
     } catch {
       setUsernameError('Network error');
@@ -56,14 +56,14 @@ export default function SettingsPage() {
     }
   }, [usernameInput, session?.user?.name, t, updateSession]);
 
-  // Redirect unauthenticated users
+  
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.replace('/login');
     }
   }, [status, router]);
 
-  // Load preferences + backgrounds from server once authenticated
+  
   useEffect(() => {
     if (status === 'authenticated') {
       fetchFromServer();
@@ -86,7 +86,7 @@ export default function SettingsPage() {
         className="relative z-10 w-full max-w-md px-4 py-8"
         style={{ zIndex: 1 }}
       >
-        {/* Title */}
+        
         <h1
           className="mb-8 text-center text-base font-semibold uppercase tracking-[0.25em]"
           style={{ color: '#c4a35a' }}
@@ -94,7 +94,7 @@ export default function SettingsPage() {
           {t('title')}
         </h1>
 
-        {/* Username edit */}
+        
         <div
           className="flex flex-col gap-3 p-5"
           style={{
@@ -147,7 +147,7 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* Settings card */}
+        
         <div
           className="mt-4 flex flex-col gap-4 p-5"
           style={{
@@ -155,7 +155,7 @@ export default function SettingsPage() {
             border: '1px solid #262626',
           }}
         >
-          {/* Animations toggle row */}
+          
           <div className="flex items-center justify-between gap-4">
             <span
               className="text-sm font-medium tracking-wide"
@@ -187,10 +187,10 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          {/* Divider */}
+          
           <div style={{ height: '1px', backgroundColor: '#1e1e1e' }} />
 
-          {/* Status label */}
+          
           <p
             className="text-xs tracking-wide"
             style={{ color: '#555555' }}
@@ -199,7 +199,7 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* Game Background picker */}
+        
         {backgrounds.length > 0 && (
           <div
             className="mt-4 flex flex-col gap-4 p-5"
@@ -258,7 +258,7 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Back link */}
+        
         <div className="mt-6 text-center">
           <Link
             href="/"

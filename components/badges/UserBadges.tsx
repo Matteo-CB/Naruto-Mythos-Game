@@ -12,12 +12,7 @@ interface UserBadgesProps {
   size?: 'sm' | 'md';
 }
 
-/**
- * Displays all applicable badges for a user in a row.
- * Badges hidden via badgePrefs are not shown.
- * Unranked players (< 5 games) don't get a league badge at all.
- * Order: Admin > League
- */
+
 export function UserBadges({
   role = 'user',
   elo,
@@ -29,7 +24,7 @@ export function UserBadges({
   const hiddenBadges = new Set(badgePrefs);
 
   const showAdmin = role === 'admin' && !hiddenBadges.has('admin');
-  // Hide league badge entirely for unranked players (< PLACEMENT_MATCHES_REQUIRED games)
+  
   const isUnranked = totalGames !== undefined && totalGames < PLACEMENT_MATCHES_REQUIRED;
   const showLeague = leaguesEnabled && elo !== undefined && !hiddenBadges.has('league') && !isUnranked;
 

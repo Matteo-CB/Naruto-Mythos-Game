@@ -1,15 +1,10 @@
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 
-/**
- * MSS 10 - "Entrainement au chakra" / "Chakra Training"
- *
- * No effects. This mission has no SCORE effect.
- * Handler registered as a no-op for completeness.
- */
+
 
 function mss10ScoreHandler(ctx: EffectContext): EffectResult {
-  // No effect
+  
   return { state: ctx.state };
 }
 

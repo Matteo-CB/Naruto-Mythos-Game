@@ -8,19 +8,17 @@ import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/Cha
 import { EffectEngine } from '../../effects/EffectEngine';
 import { triggerOnPlayReactions, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 
-/**
- * Execute a player action during the Action Phase.
- */
+
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
-  // Verify it's the action phase
+  
   if (state.phase !== 'action') return state;
 
-  // Verify the player can act
+  
   const playerState = state[player];
   if (playerState.hasPassed) return state;
 
-  // Check if it's this player's turn to act
-  // After one player passes, the other can take multiple actions
+  
+  
   const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
   const otherPassed = state[otherPlayer].hasPassed;
 
@@ -28,16 +26,16 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
 
   let newState = deepClone(state);
 
-  // Block ALL direct actions while pending ACTIONS exist (someone must resolve them first).
-  // Orphaned pending effects (no matching actions) should not block.
+  
+  
   if (action.type !== 'SELECT_TARGET' && action.type !== 'DECLINE_OPTIONAL_EFFECT' && action.type !== 'PASS') {
     if (newState.pendingActions.length > 0) {
       return state;
     }
   }
 
-  // Track the pre-action state to detect if the action actually succeeded.
-  // Handlers return the SAME object reference on validation failure.
+  
+  
   const beforeAction = newState;
 
   switch (action.type) {
@@ -58,8 +56,8 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       if (newState === beforeAction) return state;
       break;
     case 'PASS':
-      // Block PASS while pending effects/actions are being resolved
-      // (e.g., opponent choosing Kin Tsuchi/Zaku draw/chakra)
+      
+      
       if (newState.pendingEffects.length > 0 || newState.pendingActions.length > 0) {
         return state;
       }
@@ -67,23 +65,23 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
       break;
     case 'SELECT_TARGET':
     case 'DECLINE_OPTIONAL_EFFECT':
-      // Handle pending effects during action phase
+      
       break;
     default:
       return state;
   }
 
-  // After the action, check phase transitions
+  
   if (newState.player1.hasPassed && newState.player2.hasPassed) {
-    // Both players passed - signal that transition to mission phase is needed
-    // The actual transition is handled by GameEngine.applyAction to avoid circular dependency
+    
+    
     newState.phase = 'mission' as GameState['phase'];
     return newState;
   }
 
-  // If both haven't passed, alternate active player (unless one has passed)
-  // Don't switch if there are pending effects/actions - the current player must resolve them first
-  // In sandbox mode, don't alternate — player switches manually
+  
+  
+  
   if (!newState.sandboxNoAlternate && !newState.player1.hasPassed && !newState.player2.hasPassed) {
     if (action.type !== 'PASS' && newState.pendingEffects.length === 0 && newState.pendingActions.length === 0) {
       newState.activePlayer = otherPlayer;
@@ -93,9 +91,7 @@ export function executeAction(state: GameState, player: PlayerID, action: GameAc
   return newState;
 }
 
-/**
- * Play a character card face-visible on a mission.
- */
+
 function handlePlayCharacter(
   state: GameState,
   player: PlayerID,
@@ -108,12 +104,12 @@ function handlePlayCharacter(
 
   const card = playerState.hand[cardIndex];
 
-  // Auto-detect upgrade: if a same-name or flexible-upgrade-eligible visible character
-  // with strictly lower cost exists on this mission, redirect to upgrade logic.
+  
+  
   const missionForUpgradeCheck = state.activeMissions[missionIndex];
   const chars = player === 'player1' ? missionForUpgradeCheck.player1Characters : missionForUpgradeCheck.player2Characters;
 
-  // Check same-name upgrade first (highest priority)
+  
   const autoUpgradeTarget = chars.find((c) => {
     if (c.isHidden || c.controlledBy !== player) return false;
     const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -125,25 +121,25 @@ function handlePlayCharacter(
     return handleUpgradeCharacter(state, player, cardIndex, missionIndex, autoUpgradeTarget.instanceId);
   }
 
-  // Flexible (cross-name) upgrades are NOT auto-detected here.
-  // The player must explicitly choose "Upgrade" via UPGRADE_CHARACTER action.
-  // The UI (ActionBar) already shows separate "Play" and "Upgrade [target]" buttons.
+  
+  
+  
 
   const effectiveCost = calculateEffectiveCost(state, player, card, missionIndex, false);
 
   const validation = validatePlayCharacter(state, player, card, missionIndex, effectiveCost);
   if (!validation.valid) return state;
 
-  // Pay chakra
+  
   const ps = { ...playerState };
   ps.chakra -= effectiveCost;
 
-  // Remove card from hand
+  
   const hand = [...ps.hand];
   hand.splice(cardIndex, 1);
   ps.hand = hand;
 
-  // Create character in play
+  
   const charInPlay: CharacterInPlay = {
     instanceId: generateInstanceId(),
     card,
@@ -156,7 +152,7 @@ function handlePlayCharacter(
     missionIndex,
   };
 
-  // Add to mission
+  
   const missions = [...state.activeMissions];
   const mission = { ...missions[missionIndex] };
   if (player === 'player1') {
@@ -166,7 +162,7 @@ function handlePlayCharacter(
   }
   missions[missionIndex] = mission;
 
-  // Update character count
+  
   ps.charactersInPlay = countPlayerCharsInMissions(missions, player);
 
   const log = logAction(
@@ -187,15 +183,15 @@ function handlePlayCharacter(
     log,
   };
 
-  // Track this direct play for last-played highlight
+  
   newState = trackLastPlayed(newState, player, charInPlay.instanceId);
 
-  // Existing cards' effects trigger BEFORE the newly played card's effects
-  // Trigger on-play continuous reactions from opponent's characters in this mission
+  
+  
   newState = triggerOnPlayReactions(newState, player, missionIndex, false, charInPlay.instanceId);
 
-  // Trigger MAIN effects via EffectEngine
-  // Re-fetch the character from the updated state (it may have moved)
+  
+  
   const updatedMission = newState.activeMissions[missionIndex];
   const updatedChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
   const playedChar = updatedChars[updatedChars.length - 1]; // Just added as last
@@ -203,15 +199,13 @@ function handlePlayCharacter(
     newState = EffectEngine.resolvePlayEffects(newState, player, playedChar, missionIndex, false);
   }
 
-  // Re-apply Rashomon token removal in case this play changes the strongest enemy
+  
   newState = applyRempartTokenRemoval(newState);
 
   return newState;
 }
 
-/**
- * Play a character card face-down (hidden) on a mission.
- */
+
 function handlePlayHidden(
   state: GameState,
   player: PlayerID,
@@ -227,16 +221,16 @@ function handlePlayHidden(
   const validation = validatePlayHidden(state, player, card, missionIndex);
   if (!validation.valid) return state;
 
-  // Pay 1 chakra (fixed cost for hidden play)
+  
   const ps = { ...playerState };
   ps.chakra -= HIDDEN_PLAY_COST;
 
-  // Remove from hand
+  
   const hand = [...ps.hand];
   hand.splice(cardIndex, 1);
   ps.hand = hand;
 
-  // Create hidden character in play
+  
   const charInPlay: CharacterInPlay = {
     instanceId: generateInstanceId(),
     card,
@@ -249,7 +243,7 @@ function handlePlayHidden(
     missionIndex,
   };
 
-  // Add to mission
+  
   const missions = [...state.activeMissions];
   const mission = { ...missions[missionIndex] };
   if (player === 'player1') {
@@ -279,16 +273,13 @@ function handlePlayHidden(
     log,
   };
 
-  // Track hidden plays for last-played highlight (opponent can see a card was placed)
+  
   newState = trackLastPlayed(newState, player, charInPlay.instanceId);
 
   return newState;
 }
 
-/**
- * Reveal a hidden character, paying its printed chakra cost.
- * Triggers MAIN and AMBUSH effects.
- */
+
 function handleRevealCharacter(
   state: GameState,
   player: PlayerID,
@@ -314,13 +305,13 @@ function handleRevealCharacter(
 
   const charTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
-  // Determine upgrade target:
-  // If upgradeTargetInstanceId is provided, use that specific target (player chose to upgrade).
-  // If not provided, auto-detect ONLY for same-name upgrades (mandatory, can't have 2 same-name chars).
-  // Flexible (different-name) upgrades are NEVER auto-detected - player must explicitly choose.
+  
+  
+  
+  
   let upgradeTarget: CharacterInPlay | undefined;
   if (upgradeTargetInstanceId) {
-    // Player explicitly chose to upgrade this target
+    
     const candidate = chars.find((c) => c.instanceId === upgradeTargetInstanceId);
     if (candidate && !candidate.isHidden) {
       const cTop = candidate.stack?.length > 0 ? candidate.stack[candidate.stack?.length - 1] : candidate.card;
@@ -332,7 +323,7 @@ function handleRevealCharacter(
       }
     }
   } else {
-    // Auto-detect: only same-name upgrades (mandatory - can't have 2 same-name chars)
+    
     upgradeTarget = chars.find((c) => {
       if (c.instanceId === characterInstanceId) return false;
       if (c.isHidden) return false;
@@ -342,7 +333,7 @@ function handleRevealCharacter(
     });
   }
 
-  // Calculate cost
+  
   const fullCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
   let costToPay = fullCost;
 
@@ -355,13 +346,13 @@ function handleRevealCharacter(
       ? Math.max(1, rawDiff) : rawDiff;
   }
 
-  // Pay cost
+  
   const ps = { ...state[player] };
   if (ps.chakra < costToPay) return state;
   ps.chakra -= costToPay;
 
   if (upgradeTarget) {
-    // Reveal-for-upgrade: merge stacks - put the revealed card's stack on top of the existing one
+    
     const upgradeTargetIdx = chars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
     const upgraded = { ...upgradeTarget };
     upgraded.stack = [...upgraded.stack, ...char.stack];
@@ -369,12 +360,12 @@ function handleRevealCharacter(
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
     upgraded.isHidden = false;
     upgraded.wasRevealedAtLeastOnce = true;
-    // Lock control on upgrade (Ino rule)
+    
     if (upgraded.controllerInstanceId && upgraded.controlledBy === player) {
       upgraded.controllerInstanceId = undefined;
     }
 
-    // Remove the revealed hidden character and update the upgrade target
+    
     const updatedChars = chars.filter((c) => c.instanceId !== characterInstanceId);
     const mergedIdx = updatedChars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
     if (mergedIdx !== -1) updatedChars[mergedIdx] = upgraded;
@@ -402,26 +393,26 @@ function handleRevealCharacter(
       log,
     };
 
-    // Track this direct play for last-played highlight
+    
     newState = trackLastPlayed(newState, player, upgradeTarget.instanceId);
 
-    // Existing cards' effects trigger BEFORE the newly played card's effects
-    // Trigger on-play reactions (isReveal: character was already on the mission)
+    
+    
     newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
-    // Trigger MAIN + UPGRADE + AMBUSH effects via EffectEngine
+    
     const updatedMission = newState.activeMissions[missionIndex];
     const updatedMissionChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
     const upgradedChar = updatedMissionChars.find((c) => c.instanceId === upgradeTarget.instanceId);
     if (upgradedChar) {
-      // Resolve all three effect types: MAIN + UPGRADE + AMBUSH
+      
       newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex);
     }
     return newState;
   }
 
-  // Normal reveal (no upgrade)
-  // Reveal the character
+  
+  
   char.isHidden = false;
   char.wasRevealedAtLeastOnce = true;
   chars[charIdx] = char;
@@ -451,15 +442,15 @@ function handleRevealCharacter(
     log,
   };
 
-  // Track this direct play for last-played highlight
+  
   newState = trackLastPlayed(newState, player, characterInstanceId);
 
-  // Existing cards' effects trigger BEFORE the newly played card's effects
-  // Trigger on-play reactions (isReveal: character was already on the mission,
-  // so Hinata/Neji "when played in this mission" doesn't fire)
+  
+  
+  
   newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
-  // Trigger MAIN + AMBUSH effects via EffectEngine
+  
   const revealedMission = newState.activeMissions[missionIndex];
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
@@ -467,16 +458,13 @@ function handleRevealCharacter(
     newState = EffectEngine.resolveRevealEffects(newState, player, revealedChar, missionIndex);
   }
 
-  // Re-apply Rashomon token removal in case this reveal changes the strongest enemy
+  
   newState = applyRempartTokenRemoval(newState);
 
   return newState;
 }
 
-/**
- * Upgrade a character by playing a same-name card with higher cost over it.
- * Pay only the difference in cost.
- */
+
 function handleUpgradeCharacter(
   state: GameState,
   player: PlayerID,
@@ -505,41 +493,41 @@ function handleUpgradeCharacter(
     ? existingChar.stack[existingChar.stack?.length - 1]
     : existingChar.card;
 
-  // When upgrading over a hidden character, pay the full effective cost of the new card
-  // (this combines the hidden reveal cost + upgrade diff in one action).
-  // When upgrading over a visible character, pay only the chakra diff.
-  // Use calculateEffectiveCost to apply cost reductions (e.g. Kurenai 034 Team 8 -1).
+  
+  
+  
+  
   const isHiddenUpgrade = existingChar.isHidden;
   const effectiveNewCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
   const rawUpgradeDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
-  // Kurenai 034: minimum cost 1 applies to the final upgrade cost too
+  
   const costDiff = (!isHiddenUpgrade && hasKurenai034CostReduction(state, player, newCard, missionIndex))
     ? Math.max(1, rawUpgradeDiff) : rawUpgradeDiff;
 
-  // Pay cost
+  
   const ps = { ...playerState };
   if (ps.chakra < costDiff) return state;
   ps.chakra -= costDiff;
 
-  // If target was hidden, reveal it now (combined reveal + upgrade)
+  
   if (isHiddenUpgrade) {
     existingChar.isHidden = false;
     existingChar.wasRevealedAtLeastOnce = true;
   }
 
-  // Remove card from hand
+  
   const hand = [...ps.hand];
   hand.splice(cardIndex, 1);
   ps.hand = hand;
 
-  // Upgrade: place new card on top, old text is ignored
+  
   existingChar.card = newCard;
   existingChar.stack = [...existingChar.stack, newCard];
-  // Power tokens transfer
-  // Character retains hidden/visible status
+  
+  
 
-  // If a controlled character is upgraded by its new controller, lock control permanently.
-  // Ino/Orochimaru leaving play will no longer cause this character to return.
+  
+  
   if (existingChar.controllerInstanceId && existingChar.controlledBy === player) {
     existingChar.controllerInstanceId = undefined;
   }
@@ -571,17 +559,17 @@ function handleUpgradeCharacter(
     log,
   };
 
-  // Upgrading does NOT count as "leaving the field" — controlled characters persist
-  // through upgrade. Control only ends on defeat, hide, or leaving play.
+  
+  
 
-  // Track this direct play for last-played highlight
+  
   newState = trackLastPlayed(newState, player, targetInstanceId);
 
-  // Existing cards' effects trigger BEFORE the newly played card's effects
-  // Trigger on-play continuous reactions from opponent's characters in this mission
+  
+  
   newState = triggerOnPlayReactions(newState, player, missionIndex, false, targetInstanceId);
 
-  // Trigger MAIN + UPGRADE effects via EffectEngine
+  
   const upgradedMission = newState.activeMissions[missionIndex];
   const upgradedChars = player === 'player1' ? upgradedMission.player1Characters : upgradedMission.player2Characters;
   const upgradedChar = upgradedChars.find((c) => c.instanceId === targetInstanceId);
@@ -589,15 +577,13 @@ function handleUpgradeCharacter(
     newState = EffectEngine.resolvePlayEffects(newState, player, upgradedChar, missionIndex, true);
   }
 
-  // Re-apply Rashomon token removal in case this upgrade changes the strongest enemy
+  
   newState = applyRempartTokenRemoval(newState);
 
   return newState;
 }
 
-/**
- * Player passes. First passer gets the Edge token for next turn.
- */
+
 function handlePass(state: GameState, player: PlayerID): GameState {
   const ps = { ...state[player] };
   ps.hasPassed = true;
@@ -605,7 +591,7 @@ function handlePass(state: GameState, player: PlayerID): GameState {
   let edgeHolder = state.edgeHolder;
   let firstPasser = state.firstPasser;
 
-  // First player to pass gets the Edge token
+  
   if (firstPasser === null) {
     firstPasser = player;
     edgeHolder = player;
@@ -622,7 +608,7 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     takesEdge ? 'game.log.passEdge' : 'game.log.pass',
   );
 
-  // After passing, the other player becomes active (if they haven't passed)
+  
   const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
   const activePlayer = state[otherPlayer].hasPassed ? state.activePlayer : otherPlayer;
 
@@ -633,33 +619,31 @@ function handlePass(state: GameState, player: PlayerID): GameState {
     firstPasser,
     activePlayer,
     log,
-    // turnPlayedIds persists — all cards played this turn stay highlighted until next turn.
+    
   };
 }
 
-/**
- * Get all valid actions for a player during the action phase.
- */
+
 export function getValidActionsForPlayer(state: GameState, player: PlayerID): GameAction[] {
   const actions: GameAction[] = [];
   const ps = state[player];
 
   if (ps.hasPassed) return [];
 
-  // Check if it's this player's turn to act
+  
   const otherPlayer: PlayerID = player === 'player1' ? 'player2' : 'player1';
   const otherPassed = state[otherPlayer].hasPassed;
   if (!otherPassed && state.activePlayer !== player) return [];
 
-  // PASS is always available
+  
   actions.push({ type: 'PASS' });
 
-  // For each card in hand, check if it can be played on each mission
+  
   for (let cardIdx = 0; cardIdx < ps.hand.length; cardIdx++) {
     const card = ps.hand[cardIdx];
 
     for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
-      // Play face-visible
+      
       const effectiveCost = calculateEffectiveCost(state, player, card, mIdx, false);
       const playValidation = validatePlayCharacter(state, player, card, mIdx, effectiveCost);
       if (playValidation.valid) {
@@ -671,7 +655,7 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
         });
       }
 
-      // Play hidden
+      
       const hiddenValidation = validatePlayHidden(state, player, card, mIdx);
       if (hiddenValidation.valid) {
         actions.push({
@@ -681,7 +665,7 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
         });
       }
 
-      // Upgrade existing characters
+      
       const chars = player === 'player1'
         ? state.activeMissions[mIdx].player1Characters
         : state.activeMissions[mIdx].player2Characters;
@@ -701,7 +685,7 @@ export function getValidActionsForPlayer(state: GameState, player: PlayerID): Ga
     }
   }
 
-  // Reveal hidden characters
+  
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     const chars = player === 'player1'
       ? state.activeMissions[mIdx].player1Characters
@@ -733,14 +717,11 @@ function countPlayerCharsInMissions(missions: GameState['activeMissions'], playe
   return count;
 }
 
-/**
- * Track a directly-played character for last-played highlight.
- * Only used for direct player actions (not effect-spawned plays).
- */
+
 function trackLastPlayed(state: GameState, _player: PlayerID, instanceId: string): GameState {
   const ids = state.turnPlayedIds ?? [];
   if (ids.includes(instanceId)) return state; // already tracked
   return { ...state, turnPlayedIds: [...ids, instanceId] };
 }
 
-// triggerOnPlayReactions is now imported from ContinuousEffects.ts
+

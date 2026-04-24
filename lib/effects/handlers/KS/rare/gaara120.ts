@@ -5,18 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter } from '@/lib/effects/defeatUtils';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 120/130 - GAARA (R)
- * Also applies to 120/130 A (Rare Art variant - same effects, handled by registry normalization)
- * Chakra: 4, Power: 4
- * Group: Sand Village, Keywords: Team Baki
- *
- * MAIN: Defeat up to 1 enemy character with Power 1 or less in every mission.
- *   - For each mission, if there are multiple valid targets, the player must choose.
- *   - "Up to 1" means the player can choose not to defeat anyone in a given mission.
- *
- * UPGRADE: POWERUP X, where X is the number of characters defeated by the MAIN effect.
- */
+
 
 function gaara120MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
@@ -25,7 +14,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Check if any mission has valid targets (power ≤ 1 enemies)
+  
   let hasAnyTarget = false;
   for (const mission of state.activeMissions) {
     if (mission[enemySide].some((c) => getEffectivePower(state, c, opponentPlayer) <= 1)) {
@@ -49,7 +38,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // CONFIRM popup before starting mission-by-mission selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -61,9 +50,7 @@ function gaara120MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
-/**
- * Apply UPGRADE POWERUP X where X = defeatedCount on Gaara.
- */
+
 function applyGaaraUpgradePowerup(
   state: import('@/lib/engine/types').GameState,
   sourcePlayer: import('@/lib/engine/types').PlayerID,
@@ -102,7 +89,7 @@ function applyGaaraUpgradePowerup(
 }
 
 function gaara120UpgradeHandler(ctx: EffectContext): EffectResult {
-  // UPGRADE logic is integrated into MAIN handler when isUpgrade is true.
+  
   return { state: ctx.state };
 }
 

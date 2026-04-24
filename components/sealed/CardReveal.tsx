@@ -69,7 +69,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
     }, flipDuration);
   }, [highRarity, onRevealed]);
 
-  // Auto-reveal with staggered delay - useEffect ensures it runs only once
+  
   useEffect(() => {
     if (!autoReveal || hasFlippedRef.current) return;
     const timer = setTimeout(() => {
@@ -87,7 +87,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
       style={{ perspective: '1000px', width: cardWidth, height: cardHeight }}
       onClick={handleFlip}
     >
-      {/* 3D flip container */}
+      
       <motion.div
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: highRarity ? 0.8 : 0.5, ease: 'easeInOut' }}
@@ -98,7 +98,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           position: 'relative',
         }}
       >
-        {/* Card back */}
+        
         <div
           style={{
             position: 'absolute',
@@ -119,7 +119,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
                 : { width: '100%', height: '100%', objectFit: 'cover' as const }),
             }}
           />
-          {/* Tap hint shimmer */}
+          
           {!isFlipped && !hasFlippedRef.current && (
             <motion.div
               className="absolute inset-0"
@@ -130,7 +130,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
           )}
         </div>
 
-        {/* Card front */}
+        
         <div
           style={{
             position: 'absolute',
@@ -159,7 +159,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
             </div>
           )}
 
-          {/* Holo shimmer overlay */}
+          
           {card.isHolo && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
@@ -174,7 +174,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
         </div>
       </motion.div>
 
-      {/* Rarity glow effect (only after flip) */}
+      
       {isFlipped && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -188,7 +188,7 @@ export function CardReveal({ card, index, onRevealed, autoReveal = false, delay 
         />
       )}
 
-      {/* Rarity label */}
+      
       {isFlipped && (
         <motion.div
           initial={{ opacity: 0, y: 5 }}

@@ -19,7 +19,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const [stage, setStage] = useState<Stage>('ready');
   const [collectedCards, setCollectedCards] = useState<BoosterCard[]>([]);
 
-  // Track how many cards have been revealed for the current booster
+  
   const revealedCountRef = useRef(0);
   const isTransitioningRef = useRef(false);
   const collectedCardsRef = useRef<BoosterCard[]>([]);
@@ -27,7 +27,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   const currentBooster = boosters[currentIndex];
   const totalBoosters = boosters.length;
 
-  // Sort cards for reveal: common first, then UC, R, RA, MMS, S, M, L
+  
   const sortedCards = currentBooster
     ? [...currentBooster.cards].sort((a, b) => {
         const order: Record<string, number> = { C: 0, UC: 1, R: 2, RA: 3, MMS: 4, S: 5, SV: 5, M: 6, MV: 6, L: 7 };
@@ -39,10 +39,10 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
     if (stage !== 'ready') return;
     setStage('shaking');
 
-    // Shake for 600ms then open
+    
     setTimeout(() => {
       setStage('opening');
-      // Opening animation lasts 800ms
+      
       setTimeout(() => {
         revealedCountRef.current = 0;
         isTransitioningRef.current = false;
@@ -52,13 +52,13 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
   }, [stage]);
 
   const handleCardRevealed = useCallback(() => {
-    // Prevent duplicate calls during transition
+    
     if (isTransitioningRef.current) return;
 
     revealedCountRef.current += 1;
 
     if (revealedCountRef.current >= sortedCards.length) {
-      // All cards revealed - lock to prevent more calls
+      
       isTransitioningRef.current = true;
 
       setTimeout(() => {
@@ -67,7 +67,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         setCollectedCards(newCollected);
         setStage('collected');
 
-        // Move to next booster or finish
+        
         setTimeout(() => {
           if (currentIndex + 1 < totalBoosters) {
             setCurrentIndex((prev) => prev + 1);
@@ -75,7 +75,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             isTransitioningRef.current = false;
             setStage('ready');
           } else {
-            // All boosters opened
+            
             onComplete(newCollected);
           }
         }, 600);
@@ -85,7 +85,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col items-center justify-center" style={{ backgroundColor: '#0a0a0a' }}>
-      {/* Booster counter */}
+      
       <motion.div
         className="absolute top-4 left-1/2 -translate-x-1/2 z-50"
         initial={{ opacity: 0, y: -20 }}
@@ -96,7 +96,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         </span>
       </motion.div>
 
-      {/* Background particles */}
+      
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {Array.from({ length: 20 }).map((_, i) => (
           <motion.div
@@ -123,7 +123,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Booster display */}
+        
         {(stage === 'ready' || stage === 'shaking') && (
           <motion.div
             key={`booster-${currentIndex}`}
@@ -147,7 +147,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
             }}
             onClick={handleBoosterTap}
           >
-            {/* Booster image - displayed naturally, no cropping */}
+            
             <img
               src="/images/booster.webp"
               alt={t('boosterPack')}
@@ -158,7 +158,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
               }}
             />
 
-            {/* Tap hint */}
+            
             {stage === 'ready' && (
               <motion.div
                 className="absolute -bottom-12 left-0 right-0 text-center"
@@ -173,7 +173,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        {/* Card reveal grid */}
+        
         {stage === 'revealing' && (
           <motion.div
             key={`reveal-${currentIndex}`}
@@ -195,7 +195,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
           </motion.div>
         )}
 
-        {/* Collected animation */}
+        
         {stage === 'collected' && (
           <motion.div
             key={`collected-${currentIndex}`}
@@ -214,7 +214,7 @@ export function BoosterOpening({ boosters, onComplete }: BoosterOpeningProps) {
         )}
       </AnimatePresence>
 
-      {/* Collected cards counter */}
+      
       {collectedCards.length > 0 && (
         <motion.div
           className="absolute bottom-6 left-1/2 -translate-x-1/2"

@@ -3,20 +3,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 
-/**
- * Card 113b/130 - ASUMA SARUTOBI (R)
- * (This card has a dual ID, using 113/130 with a "b" variant)
- * Chakra: 4, Power: 3
- * Group: Leaf Village, Keywords: Team 10
- *
- * AMBUSH: Draw a card.
- *   When revealed from hidden, draw 1 card from deck.
- *
- * MAIN: Discard a card from hand to defeat a character with Power <= discarded card's Power.
- *   Two-stage target selection:
- *   Stage 1: Choose which card to discard from hand.
- *   Stage 2: Choose a valid character to defeat (power <= discarded card's power).
- */
+
 
 function asuma113bAmbushHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
@@ -37,7 +24,7 @@ function asuma113bAmbushHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Draw 1 card
+  
   const newDeck = [...playerState.deck];
   const drawnCard = newDeck.shift()!;
   const newHand = [...playerState.hand, drawnCard];
@@ -80,7 +67,7 @@ function asuma113bMainHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // Stage 1: Choose which card to discard from hand
+  
   const handIndices = playerState.hand.map((_: unknown, i: number) => String(i));
 
   return {

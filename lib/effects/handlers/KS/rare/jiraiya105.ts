@@ -5,16 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard } from '@/lib/effects/handlers/KS/shared/summonSearch';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
-/**
- * Card 105/130 - JIRAIYA (R)
- * Chakra: 5, Power: 5
- * Group: Leaf Village, Keywords: Sannin
- *
- * MAIN: Play a Summon from hand or from hidden on board, paying 3 less chakra.
- * UPGRADE: Move an enemy character from this mission to another mission (separate effect).
- *
- * Confirmation popup before both MAIN and UPGRADE target selections.
- */
+
 
 function handleJiraiya105Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
@@ -34,7 +25,7 @@ function handleJiraiya105Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-105-R' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -70,7 +61,7 @@ function jiraiya105UpgradeHandler(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'JIRAIYA', id: 'KS-105-R' }) } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

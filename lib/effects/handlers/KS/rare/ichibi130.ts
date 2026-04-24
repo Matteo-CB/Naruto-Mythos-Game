@@ -4,23 +4,11 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatEnemyCharacter, sortTargetsGemmaLast } from '@/lib/effects/defeatUtils';
 import type { CharacterInPlay } from '@/lib/engine/types';
 
-/**
- * Card 130/130 - ICHIBI (R)
- * Chakra: 6, Power: 8
- * Group: Independent, Keywords: Summon
- *
- * MAIN [continuous]: Can't be hidden or defeated by enemy effects.
- *   This is a continuous protection effect handled by the engine's
- *   defeat replacement and hide prevention logic. The handler here is a no-op.
- *
- * UPGRADE: Choose a mission and defeat all hidden enemy characters there.
- *   When isUpgrade: require target selection for which mission.
- *   Then defeat all hidden enemies in the chosen mission.
- */
+
 
 function ichibi130MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous protection: can't be hidden or defeated by enemy effects.
-  // Handled by the engine's protection layer.
+  
+  
   return { state: ctx.state };
 }
 
@@ -29,7 +17,7 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find missions that have hidden enemy characters
+  
   const missionsWithHiddenEnemies: string[] = [];
   for (let i = 0; i < state.activeMissions.length; i++) {
     const mission = state.activeMissions[i];
@@ -54,7 +42,7 @@ function ichibi130UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // CONFIRM popup before executing
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -79,7 +67,7 @@ function defeatAllHiddenEnemies(
     return { state };
   }
 
-  // Sort targets so Gemma 049 is processed last (AoE ordering fix)
+  
   const sortedTargets = sortTargetsGemmaLast(hiddenEnemies);
 
   let newState = state;

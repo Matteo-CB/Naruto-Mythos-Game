@@ -13,7 +13,7 @@ const TrainingCoachPanel = dynamic(
 );
 import { BanNotification } from '@/components/BanNotification';
 
-// Dynamically import GameBoard to avoid SSR issues with Framer Motion
+
 const GameBoard = dynamic(
   () => import('@/components/game/GameBoard').then((mod) => mod.default),
   {
@@ -61,7 +61,7 @@ export default function GamePage() {
   const updateOnlineState = useGameStore((s) => s.updateOnlineState);
   const endOnlineGame = useGameStore((s) => s.endOnlineGame);
 
-  // Socket state for online game syncing
+  
   const socketVisibleState = useSocketStore((s) => s.visibleState);
   const socketGameStarted = useSocketStore((s) => s.gameStarted);
   const socketGameEnded = useSocketStore((s) => s.gameEnded);
@@ -73,14 +73,14 @@ export default function GamePage() {
   const socketClearError = useSocketStore((s) => s.clearError);
   const isSpectating = useSocketStore((s) => s.isSpectating);
 
-  // For AI games, gameState must exist; for online/spectator, visibleState must exist
+  
   const hasActiveGame = gameState || (isOnlineGame && visibleState) || isSpectating;
 
-  // Delay redirect to give Zustand time to propagate state from startOnlineGame
+  
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hasActiveGame) {
-      // Give a brief delay before redirecting - state may be propagating
+      
       redirectTimerRef.current = setTimeout(() => {
         const gs = useGameStore.getState();
         const ss = useSocketStore.getState();
@@ -94,7 +94,7 @@ export default function GamePage() {
     };
   }, [hasActiveGame, router]);
 
-  // Clean up spectator state when unmounting (e.g., navigating back to lobby)
+  
   useEffect(() => {
     return () => {
       const ss = useSocketStore.getState();
@@ -105,18 +105,18 @@ export default function GamePage() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When spectator clicks "Leave", isSpectating goes false — navigate + clear gameStore
+  
   const prevSpectatingRef = useRef(isSpectating);
   useEffect(() => {
     if (prevSpectatingRef.current && !isSpectating) {
-      // Just left spectating — clear gameStore and redirect
+      
       useGameStore.setState({ visibleState: null, gameState: null });
       router.push('/play/online');
     }
     prevSpectatingRef.current = isSpectating;
   }, [isSpectating, router]);
 
-  // Sync spectator state to gameStore — runs on mount AND on every socket update
+  
   const syncSpectatorState = useCallback(() => {
     const socketState = useSocketStore.getState();
     if (socketState.isSpectating && socketState.visibleState) {
@@ -138,12 +138,12 @@ export default function GamePage() {
     }
   }, []);
 
-  // Sync on reactive state change
+  
   useEffect(() => {
     syncSpectatorState();
   }, [isSpectating, socketVisibleState, syncSpectatorState]);
 
-  // Also subscribe to socket store for spectator updates (catches state that arrived before mount)
+  
   useEffect(() => {
     if (!isSpectating) return;
     const unsub = useSocketStore.subscribe((state) => {
@@ -154,7 +154,7 @@ export default function GamePage() {
     return unsub;
   }, [isSpectating, syncSpectatorState]);
 
-  // Spectator error — clean up and redirect home
+  
   useEffect(() => {
     if (!isSpectating || !socketError) return;
     useSocketStore.getState().leaveSpectating();
@@ -162,7 +162,7 @@ export default function GamePage() {
     return () => clearTimeout(timer);
   }, [isSpectating, socketError, router]);
 
-  // Spectator fallback: if we somehow land here without state, keep requesting
+  
   const spectateRetryRef = useRef(0);
   useEffect(() => {
     if (!isSpectating || visibleState) {
@@ -173,12 +173,12 @@ export default function GamePage() {
       syncSpectatorState();
       return;
     }
-    // Request state from server every 2s (the online page should have waited,
-    // but handle edge cases like page refresh during spectating)
+    
+    
     const timer = setTimeout(() => {
       spectateRetryRef.current += 1;
       if (spectateRetryRef.current > 15) {
-        // After 30s, give up
+        
         useSocketStore.getState().leaveSpectating();
         router.push('/');
         return;
@@ -188,7 +188,7 @@ export default function GamePage() {
     return () => clearTimeout(timer);
   }, [isSpectating, visibleState, socketVisibleState, router, syncSpectatorState]);
 
-  // Sync socket state updates to gameStore for online games (NOT spectators)
+  
   useEffect(() => {
     if (isOnlineGame && socketGameStarted && socketVisibleState && !isSpectating) {
       console.log('[GamePage] Syncing socket state to gameStore, phase:', socketVisibleState.phase,
@@ -197,19 +197,19 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketGameStarted, socketVisibleState, updateOnlineState, isSpectating]);
 
-  // Handle game ended for online games
+  
   useEffect(() => {
     if (isOnlineGame && socketGameEnded && socketGameResult) {
       endOnlineGame(socketGameResult.winner);
     }
   }, [isOnlineGame, socketGameEnded, socketGameResult, endOnlineGame]);
 
-  // Rematch redirect — when the server emits game:rematch-reselect, it sets
-  // rematchRoomCode on the socket store. We need to navigate BOTH players to
-  // the deck selection page (or sealed booster opening) while keeping the
-  // socket connection + roomCode intact. This lives on the GamePage (not on
-  // GameEndScreen) because GameEndScreen gets unmounted the moment gameStore
-  // state is cleared, and we need the redirect to fire reliably.
+  
+  
+  
+  
+  
+  
   const rematchRoomCode = useSocketStore((s) => s.rematchRoomCode);
   useEffect(() => {
     if (!rematchRoomCode) return;
@@ -233,7 +233,7 @@ export default function GamePage() {
     router.push(sealed ? '/play/sealed' : '/play/online');
   }, [rematchRoomCode, router]);
 
-  // Bridge socket game:error to gameStore actionError for online games
+  
   useEffect(() => {
     if (isOnlineGame && socketError) {
       useGameStore.setState({
@@ -243,10 +243,10 @@ export default function GamePage() {
         isProcessing: false,
       });
       socketClearError();
-      // Force state resync after error so board shows correct state
+      
       const sock = useSocketStore.getState().socket;
       if (sock) sock.emit('game:request-state');
-      // Auto-clear error after 4 seconds (same as AI mode)
+      
       const timer = setTimeout(() => {
         const store = useGameStore.getState();
         if (store.actionError) {
@@ -257,7 +257,7 @@ export default function GamePage() {
     }
   }, [isOnlineGame, socketError, socketErrorKey, socketErrorParams, socketClearError]);
 
-  // Show connection lost banner for online games
+  
   const showConnectionLost = isOnlineGame && !socketConnected && hasActiveGame;
   const opponentDisconnected = useSocketStore((s) => s.opponentDisconnected);
   const opponentDisconnectDeadline = useSocketStore((s) => s.opponentDisconnectDeadline);
@@ -270,7 +270,7 @@ export default function GamePage() {
     );
   }
 
-  // Spectator joined but state hasn't synced to gameStore yet — show loading
+  
   if (isSpectating && !visibleState) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">

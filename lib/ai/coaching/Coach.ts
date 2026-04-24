@@ -1,14 +1,4 @@
-/**
- * Coach: AI coaching engine.
- *
- * Uses ISMCTS with neural network evaluation to:
- *  1. Estimate the current win probability
- *  2. Rank all valid actions by quality
- *  3. Rate cards in the player's hand
- *  4. Generate strategic warnings and tips
- *
- * The coach always sees the full sanitized state (same info as the player).
- */
+
 
 import type { GameState, GameAction, PlayerID, ActiveMission } from '../../engine/types';
 import { GameEngine } from '../../engine/GameEngine';
@@ -41,18 +31,15 @@ export class Coach {
     });
   }
 
-  /**
-   * Produce coaching advice for the given player.
-   * State should already be sanitized to the player's perspective.
-   */
+  
   async analyse(state: GameState, player: PlayerID): Promise<CoachAdvice> {
     const sanitized = AIPlayer.sanitizeStateForAI(state, player);
     const validActions = GameEngine.getValidActions(sanitized, player);
 
-    // 1. Get ISMCTS action stats (visits + win rates per action)
+    
     const actionStats = this.mcts.getActionStats(sanitized, player, validActions, COACH_SIMULATIONS);
 
-    // 2. Compute overall win probability from root state evaluation
+    
     let winProbability = 0.5;
     const nnReady = this.evaluator.isReady();
     if (nnReady) {
@@ -64,10 +51,10 @@ export class Coach {
       winProbability = 1 / (1 + Math.exp(-heuristic / 60));
     }
 
-    // 3. Per-mission analysis
+    
     const missionAnalysis = this.analyseMissions(sanitized, player);
 
-    // 4. Rank actions with explanations
+    
     const totalVisits = actionStats.reduce((s, a) => s + a.visits, 0);
     const actionRankings: ActionExplanation[] = actionStats
       .sort((a, b) => b.winRate - a.winRate)
@@ -82,15 +69,15 @@ export class Coach {
 
     const bestAction = actionRankings.length > 0 ? actionRankings[0] : null;
 
-    // 5. Hand card ratings
+    
     const handRatings = this.rateHandCards(sanitized, player);
 
-    // 6. Warnings and tips
+    
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
     const warnings = this.generateWarnings(sanitized, player, opponent);
     const tips = this.generateTips(sanitized, player, missionAnalysis);
 
-    // 7. Board assessment
+    
     const boardAssessment = this.assessBoard(winProbability);
 
     return {
@@ -107,7 +94,7 @@ export class Coach {
     };
   }
 
-  // ─── Mission Analysis ───────────────────────────────────────────────────────
+  
 
   private analyseMissions(state: GameState, player: PlayerID): MissionCoachAnalysis[] {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -198,7 +185,7 @@ export class Coach {
     }
   }
 
-  // ─── Action Explanation ─────────────────────────────────────────────────────
+  
 
   private explainAction(
     action: GameAction,
@@ -242,7 +229,7 @@ export class Coach {
     }
   }
 
-  // ─── Hand Card Ratings ──────────────────────────────────────────────────────
+  
 
   private rateHandCards(state: GameState, player: PlayerID): HandCardRating[] {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
@@ -258,19 +245,19 @@ export class Coach {
       let bestMissionIndex: number | null = null;
       let bestMissionScore = -Infinity;
 
-      // Can we afford it?
+      
       const canAfford = (card.chakra ?? 0) <= myState.chakra;
       if (!canAfford) {
         rating = 2;
         reason = `Trop cher (${card.chakra} chakra requis, ${myState.chakra} disponible)`;
       } else {
-        // Find best mission for this card
+        
         for (let m = 0; m < state.activeMissions.length; m++) {
           const mission = state.activeMissions[m];
           const myChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
           const oppChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
-          // Check name uniqueness
+          
           const nameConflict = myChars.some(c => c.card.name_fr === card.name_fr && !c.isHidden);
           if (nameConflict) continue;
 
@@ -286,7 +273,7 @@ export class Coach {
           const newMyPower = myPower + (card.power ?? 0);
           const advantage = newMyPower - oppPower;
 
-          // Score: mission value × power advantage
+          
           const missionScore = missionValue * (advantage > 0 ? 2 : 0.5) + missionValue;
 
           if (missionScore > bestMissionScore) {
@@ -295,25 +282,25 @@ export class Coach {
           }
         }
 
-        // Rate the card
+        
         const power = card.power ?? 0;
         const hasAmbush = card.effects?.some(e => e.type === 'AMBUSH');
         const hasScore = card.effects?.some(e => e.type === 'SCORE');
         const hasPowerup = card.effects?.some(e => /POWERUP/i.test(e.description));
         const hasChakraBonus = card.effects?.some(e => /CHAKRA\s*\+/i.test(e.description));
 
-        // Power-based rating
+        
         if (power >= 6) rating = 8;
         else if (power >= 4) rating = 6.5;
         else if (power >= 2) rating = 5;
         else rating = 3;
 
-        // Effect bonuses
+        
         if (hasScore) { rating += 1; }
         if (hasPowerup) { rating += 0.5; }
         if (hasChakraBonus && state.turn <= 2) { rating += 1; }
 
-        // AMBUSH cards: better hidden
+        
         if (hasAmbush) {
           rating += 0.5;
           reason = `Carte AMBUSH - envisage de la cacher d'abord`;
@@ -342,14 +329,14 @@ export class Coach {
     return ratings;
   }
 
-  // ─── Warnings & Tips ────────────────────────────────────────────────────────
+  
 
   private generateWarnings(state: GameState, player: PlayerID, opponent: PlayerID): string[] {
     const warnings: string[] = [];
     const oppState = state[opponent];
     const myState = state[player];
 
-    // Hidden characters that could be revealed
+    
     const oppHiddenCount = state.activeMissions.reduce((s, m) => {
       const chars = player === 'player1' ? m.player2Characters : m.player1Characters;
       return s + chars.filter(c => c.isHidden).length;
@@ -361,14 +348,14 @@ export class Coach {
       );
     }
 
-    // Opponent has enough chakra to play high-cost cards
+    
     if (oppState.chakra >= 6 && oppState.hand.length > 0) {
       warnings.push(
         `L'adversaire a ${oppState.chakra} chakra - il peut jouer des cartes puissantes.`
       );
     }
 
-    // We're behind on points with few turns left
+    
     if (myState.missionPoints < oppState.missionPoints && state.turn >= 3) {
       const deficit = oppState.missionPoints - myState.missionPoints;
       warnings.push(
@@ -376,12 +363,12 @@ export class Coach {
       );
     }
 
-    // Running low on deck
+    
     if (myState.deck.length <= 3) {
       warnings.push(`Ton deck est presque vide (${myState.deck.length} cartes restantes).`);
     }
 
-    // Low chakra for late game
+    
     if (state.turn === 4 && myState.chakra < 3 && myState.hand.length > 0) {
       warnings.push('Peu de chakra au dernier tour - gere bien tes ressources.');
     }
@@ -397,7 +384,7 @@ export class Coach {
     const tips: string[] = [];
     const myState = state[player];
 
-    // High-value missions to focus on
+    
     const highValueMission = missionAnalysis
       .filter(m => m.status === 'empty' || m.status === 'tied')
       .sort((a, b) => b.pointValue - a.pointValue)[0];
@@ -408,7 +395,7 @@ export class Coach {
       );
     }
 
-    // AMBUSH cards in hand
+    
     const ambushCard = myState.hand.find(c => c.effects?.some(e => e.type === 'AMBUSH'));
     if (ambushCard && state.turn <= 3) {
       tips.push(
@@ -416,12 +403,12 @@ export class Coach {
       );
     }
 
-    // Edge token tip
+    
     if (state.edgeHolder !== player && !myState.hasPassed) {
       tips.push('Passe en premier si tu es en avance - tu récupèreras le jeton Avantage.');
     }
 
-    // Upgrade available
+    
     for (const mission of state.activeMissions) {
       const myChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
       for (const char of myChars) {
@@ -441,7 +428,7 @@ export class Coach {
     return tips.slice(0, 4); // max 4 tips to avoid info overload
   }
 
-  // ─── Board Assessment ───────────────────────────────────────────────────────
+  
 
   private assessBoard(winProbability: number): CoachAdvice['boardAssessment'] {
     if (winProbability >= 0.72) return 'winning';
@@ -452,7 +439,7 @@ export class Coach {
   }
 }
 
-/** Singleton coach instance */
+
 let coachInstance: Coach | null = null;
 
 export function getCoach(): Coach {

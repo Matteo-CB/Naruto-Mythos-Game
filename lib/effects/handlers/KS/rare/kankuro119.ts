@@ -4,17 +4,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import type { CharacterInPlay } from '@/lib/engine/types';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 119/130 - KANKURO (R)
- * Chakra: 4, Power: 3
- * Group: Sand Village, Keywords: Team Baki
- *
- * MAIN: Defeat an enemy with Power 3 or less in this mission.
- *   Find non-hidden enemies in this mission with effective power <= 3. Target selection. Defeat.
- *
- * UPGRADE: Move any character in play (any player) to another mission.
- *   When isUpgrade: find all characters across all missions. Target selection for who and where.
- */
+
 
 function kankuro119MainHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -24,7 +14,7 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   const enemyChars = mission[enemySide];
 
-  // Find enemies with effective power <= 3 (hidden chars have power 0, so they qualify)
+  
   const validTargets: string[] = enemyChars
     .filter((c: CharacterInPlay) => getEffectivePower(state, c, opponentPlayer) <= 3)
     .map((c: CharacterInPlay) => c.instanceId);
@@ -58,7 +48,7 @@ function kankuro119MainHandler(ctx: EffectContext): EffectResult {
 function kankuro119UpgradeHandler(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Find all characters in play (any player, any mission, including self)
+  
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {

@@ -6,9 +6,9 @@ import { effectDescriptionsFr } from '@/lib/data/effectTranslationsFr';
 import { effectDescriptionsEn } from '@/lib/data/effectDescriptionsEn';
 import type { MissionCard, MissionRank, PlayerID, CardEffect } from '@/lib/engine/types';
 
-// ---------------------
-// Utility
-// ---------------------
+
+
+
 import { normalizeImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 
@@ -26,9 +26,9 @@ const EFFECT_TYPE_COLORS: Record<string, string> = {
   SCORE: '#eab308',
 };
 
-// ---------------------
-// Props
-// ---------------------
+
+
+
 export interface MissionCardProps {
   card: MissionCard;
   rank: MissionRank;
@@ -40,9 +40,9 @@ export interface MissionCardProps {
   highlight?: boolean;
 }
 
-// ---------------------
-// Component
-// ---------------------
+
+
+
 function MissionCardInner({
   card,
   rank,
@@ -87,7 +87,7 @@ function MissionCardInner({
         opacity: wonBy ? 0.85 : 1,
       }}
     >
-      {/* Card art background */}
+      
       {hasImage ? (
         <img
           src={imageSrc}
@@ -112,7 +112,7 @@ function MissionCardInner({
         />
       )}
 
-      {/* Dark overlay for text readability */}
+      
       <div
         style={{
           position: 'absolute',
@@ -122,7 +122,7 @@ function MissionCardInner({
         }}
       />
 
-      {/* Rank badge (top-left) */}
+      
       <div
         style={{
           position: 'absolute',
@@ -158,7 +158,7 @@ function MissionCardInner({
         </div>
       </div>
 
-      {/* Points display (top-right) */}
+      
       <div
         style={{
           position: 'absolute',
@@ -207,7 +207,7 @@ function MissionCardInner({
         </div>
       </div>
 
-      {/* Mission name (center/bottom area) */}
+      
       <div
         style={{
           position: 'absolute',
@@ -243,7 +243,7 @@ function MissionCardInner({
         )}
       </div>
 
-      {/* Effects section (bottom) */}
+      
       {card.effects && card.effects.length > 0 && (
         <div
           style={{
@@ -292,7 +292,7 @@ function MissionCardInner({
         </div>
       )}
 
-      {/* Won/Lost indicator overlay */}
+      
       {wonBy && (() => {
         const isDraw = wonBy === 'draw';
         const didWin = !isDraw && (myPlayer ? wonBy === myPlayer : true);

@@ -16,9 +16,9 @@ import type {
   SpotErrorQuestion,
 } from '@/lib/quiz/questionGenerator';
 
-// =====================================================================
-// CONSTANTS
-// =====================================================================
+
+
+
 
 const TIME_LIMITS: Record<number, number> = {
   1: 30,
@@ -37,15 +37,15 @@ const BORDER = '#262626';
 const TEXT_LIGHT = '#cccccc';
 const TEXT_DIM = '#888888';
 
-// =====================================================================
-// UTILITY: extract card number and name from image path
-// =====================================================================
+
+
+
 
 function extractCardInfoFromPath(imagePath: string): { number: string; name: string } {
   const path = imagePath.replace(/\\/g, '/');
-  // Get filename without extension, e.g. "KS-108-R"
+  
   const filename = path.split('/').pop()?.replace(/\.\w+$/, '') ?? '';
-  // Match new format: KS-XXX-RARITY
+  
   const ksMatch = filename.match(/^KS-(\d+[a-z]?)-(\w+)$/);
   if (ksMatch) {
     return { number: ksMatch[1], name: ksMatch[2] };
@@ -53,9 +53,9 @@ function extractCardInfoFromPath(imagePath: string): { number: string; name: str
   return { number: '', name: filename };
 }
 
-// =====================================================================
-// UTILITY: determine if a question should have its card image blurred
-// =====================================================================
+
+
+
 
 const NO_BLUR_QUESTION_KEYS = new Set([
   'quiz.q.identifyCard',
@@ -67,9 +67,9 @@ function shouldBlurImage(questionTextKey: string, hasImage: boolean): boolean {
   return hasImage && !NO_BLUR_QUESTION_KEYS.has(questionTextKey);
 }
 
-// =====================================================================
-// UTILITY: seeded shuffle for initial order of drag items
-// =====================================================================
+
+
+
 
 function seededShuffle<T>(arr: T[], seed: string): T[] {
   let s = 0;
@@ -88,11 +88,11 @@ function seededShuffle<T>(arr: T[], seed: string): T[] {
   return result;
 }
 
-// =====================================================================
-// SMALL CARD THUMBNAIL
-// =====================================================================
 
-/** Detect if the card name is at the bottom of the card image (Secret/Mission layouts). */
+
+
+
+
 function isNameAtBottom(src?: string): boolean {
   if (!src) return false;
   const p = src.replace(/\\/g, '/').toLowerCase();
@@ -147,9 +147,9 @@ function CardThumbnail({
   );
 }
 
-// =====================================================================
-// TIMER BAR
-// =====================================================================
+
+
+
 
 function TimerBar({
   timeRemaining,
@@ -186,9 +186,9 @@ function TimerBar({
   );
 }
 
-// =====================================================================
-// TOP BAR
-// =====================================================================
+
+
+
 
 function TopBar({ timeLimit }: { timeLimit: number }) {
   const t = useTranslations('learn');
@@ -200,7 +200,7 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
 
   return (
     <div className="mb-6">
-      {/* Row: question counter, score, streak */}
+      
       <div className="flex items-center justify-between mb-2">
         <span className="text-base font-bold" style={{ color: TEXT_LIGHT }}>
           {t('quiz.questionCounter', {
@@ -229,7 +229,7 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
         </div>
       </div>
 
-      {/* Timer */}
+      
       <TimerBar timeRemaining={timeRemaining} timeLimit={timeLimit} />
       <div className="text-right mt-1">
         <span className="text-xs" style={{ color: TEXT_DIM }}>
@@ -240,9 +240,9 @@ function TopBar({ timeLimit }: { timeLimit: number }) {
   );
 }
 
-// =====================================================================
-// QUESTION IMAGE
-// =====================================================================
+
+
+
 
 function QuestionImage({
   src,
@@ -342,9 +342,9 @@ function QuestionImage({
   );
 }
 
-// =====================================================================
-// EXPLANATION PANEL (shown after answering)
-// =====================================================================
+
+
+
 
 function ExplanationPanel({
   question,
@@ -406,9 +406,9 @@ function ExplanationPanel({
   );
 }
 
-// =====================================================================
-// 1. MULTIPLE CHOICE RENDERER
-// =====================================================================
+
+
+
 
 function MultipleChoiceRenderer({
   question,
@@ -485,9 +485,9 @@ function MultipleChoiceRenderer({
   );
 }
 
-// =====================================================================
-// 2. TRUE / FALSE RENDERER
-// =====================================================================
+
+
+
 
 function TrueFalseRenderer({
   question,
@@ -557,9 +557,9 @@ function TrueFalseRenderer({
   );
 }
 
-// =====================================================================
-// 3. MATCH PAIRS RENDERER (drag & drop + click fallback)
-// =====================================================================
+
+
+
 
 function MatchPairsRenderer({
   question,
@@ -580,14 +580,14 @@ function MatchPairsRenderer({
   const pairs = question.pairs;
   const pairCount = pairs.length;
 
-  // mapping: leftIndex -> rightIndex
+  
   const [mapping, setMapping] = useState<Record<number, number>>({});
-  // For click-to-assign: which pool item is "selected"
+  
   const [clickSelected, setClickSelected] = useState<number | null>(null);
-  // Which drop zone is being dragged over
+  
   const [dragOverZone, setDragOverZone] = useState<number | null>(null);
 
-  // Pool of right-side items (shuffled). Index in pool = original pair index.
+  
   const shuffledRight = useMemo(
     () =>
       seededShuffle(
@@ -597,13 +597,13 @@ function MatchPairsRenderer({
     [pairs, question.id]
   );
 
-  // Items still in pool (not yet placed)
+  
   const placedRight = new Set(Object.values(mapping));
   const poolItems = shuffledRight.filter((i) => !placedRight.has(i));
 
   const allPlaced = Object.keys(mapping).length === pairCount;
 
-  // Drag handlers
+  
   const handleDragStart = useCallback(
     (e: React.DragEvent, rightIdx: number) => {
       e.dataTransfer.setData('text/plain', String(rightIdx));
@@ -632,7 +632,7 @@ function MatchPairsRenderer({
       const rightIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
       if (isNaN(rightIdx)) return;
       setMapping((prev) => {
-        // If this right item was already placed elsewhere, remove it
+        
         const next = { ...prev };
         for (const key of Object.keys(next)) {
           if (next[Number(key)] === rightIdx) {
@@ -646,7 +646,7 @@ function MatchPairsRenderer({
     []
   );
 
-  // Click-to-assign: click pool item then click drop zone
+  
   const handlePoolClick = useCallback(
     (rightIdx: number) => {
       if (showingAnswer) return;
@@ -671,7 +671,7 @@ function MatchPairsRenderer({
         });
         setClickSelected(null);
       } else {
-        // If zone has a placed item, return it to pool
+        
         if (mapping[leftIdx] !== undefined) {
           setMapping((prev) => {
             const next = { ...prev };
@@ -684,19 +684,19 @@ function MatchPairsRenderer({
     [showingAnswer, clickSelected, mapping]
   );
 
-  // Submit
+  
   const handleSubmit = useCallback(() => {
     if (!allPlaced || showingAnswer) return;
     onSubmit({ type: 'matchPairs', mapping });
   }, [allPlaced, showingAnswer, mapping, onSubmit]);
 
-  // Feedback colors after answer
+  
   const userMapping =
     userAnswer && userAnswer.type === 'matchPairs' ? userAnswer.mapping : null;
 
   return (
     <div>
-      {/* Left items with drop zones */}
+      
       <div className="flex flex-col gap-2 mb-4">
         {pairs.map((pair, leftIdx) => {
           const placedRightIdx = showingAnswer
@@ -705,10 +705,10 @@ function MatchPairsRenderer({
           const hasPlaced = placedRightIdx !== undefined;
           const isOver = dragOverZone === leftIdx;
 
-          // Feedback
+          
           let zoneBorder = BORDER;
           if (showingAnswer && userMapping) {
-            // Correct match: leftIdx -> leftIdx (the pairs array is the correct order)
+            
             const isCorrectMatch = userMapping[leftIdx] === leftIdx;
             zoneBorder = isCorrectMatch ? FEEDBACK_GREEN : FEEDBACK_RED;
           } else if (isOver) {
@@ -721,7 +721,7 @@ function MatchPairsRenderer({
               className="flex items-center gap-3"
               style={{ minHeight: '48px' }}
             >
-              {/* Left side: label + image */}
+              
               <div
                 className="flex items-center gap-3 flex-1 px-4 py-3"
                 style={{
@@ -737,7 +737,7 @@ function MatchPairsRenderer({
                 </span>
               </div>
 
-              {/* Arrow indicator */}
+              
               <span
                 className="text-xs flex-shrink-0"
                 style={{ color: TEXT_DIM }}
@@ -745,7 +745,7 @@ function MatchPairsRenderer({
                 --&gt;
               </span>
 
-              {/* Drop zone */}
+              
               <div
                 onDragOver={(e) => handleDragOver(e, leftIdx)}
                 onDragLeave={handleDragLeave}
@@ -788,7 +788,7 @@ function MatchPairsRenderer({
         })}
       </div>
 
-      {/* Pool of right-side items */}
+      
       {!showingAnswer && poolItems.length > 0 && (
         <div className="mb-4">
           <div className="text-sm mb-2" style={{ color: TEXT_DIM }}>
@@ -830,7 +830,7 @@ function MatchPairsRenderer({
         </div>
       )}
 
-      {/* Submit button */}
+      
       {!showingAnswer && (
         <div className="flex justify-center">
           <button
@@ -854,9 +854,9 @@ function MatchPairsRenderer({
   );
 }
 
-// =====================================================================
-// 4. SORT ORDER RENDERER (drag & drop reorder)
-// =====================================================================
+
+
+
 
 function SortOrderRenderer({
   question,
@@ -874,7 +874,7 @@ function SortOrderRenderer({
   const t = useTranslations('learn');
   const items = question.items;
 
-  // Initial shuffled order: array of item indices
+  
   const initialOrder = useMemo(
     () =>
       seededShuffle(
@@ -931,7 +931,7 @@ function SortOrderRenderer({
     []
   );
 
-  // Move up/down buttons (mobile-friendly)
+  
   const moveItem = useCallback((posIdx: number, direction: -1 | 1) => {
     setOrder((prev) => {
       const next = [...prev];
@@ -947,7 +947,7 @@ function SortOrderRenderer({
     onSubmit({ type: 'sortOrder', order });
   }, [order, showingAnswer, onSubmit]);
 
-  // Feedback
+  
   const userOrder =
     userAnswer && userAnswer.type === 'sortOrder' ? userAnswer.order : null;
 
@@ -988,7 +988,7 @@ function SortOrderRenderer({
                 userSelect: 'none',
               }}
             >
-              {/* Position number */}
+              
               <span
                 className="text-sm font-bold flex-shrink-0"
                 style={{ color: TEXT_DIM, width: '24px', textAlign: 'center' }}
@@ -996,7 +996,7 @@ function SortOrderRenderer({
                 {posIdx + 1}
               </span>
 
-              {/* Drag handle indicator */}
+              
               {!showingAnswer && (
                 <span
                   className="text-sm flex-shrink-0"
@@ -1014,7 +1014,7 @@ function SortOrderRenderer({
                 {item?.label}
               </span>
 
-              {/* Up/Down buttons for mobile */}
+              
               {!showingAnswer && (
                 <div className="flex flex-col gap-0.5 flex-shrink-0">
                   <button
@@ -1085,9 +1085,9 @@ function SortOrderRenderer({
   );
 }
 
-// =====================================================================
-// 5. FILL NUMBER RENDERER
-// =====================================================================
+
+
+
 
 function FillNumberRenderer({
   question,
@@ -1119,7 +1119,7 @@ function FillNumberRenderer({
   return (
     <div>
       <div className="flex items-center justify-center gap-3 mb-4">
-        {/* Minus button */}
+        
         {!showingAnswer && (
           <button
             onClick={() => setValue((v) => Math.max(0, v - 1))}
@@ -1138,7 +1138,7 @@ function FillNumberRenderer({
           </button>
         )}
 
-        {/* Number input */}
+        
         <div className="flex items-center gap-2">
           {showingAnswer ? (
             <div
@@ -1179,7 +1179,7 @@ function FillNumberRenderer({
           )}
         </div>
 
-        {/* Plus button */}
+        
         {!showingAnswer && (
           <button
             onClick={() => setValue((v) => v + 1)}
@@ -1199,7 +1199,7 @@ function FillNumberRenderer({
         )}
       </div>
 
-      {/* Correct answer display */}
+      
       {showingAnswer && userVal !== question.correctAnswer && (
         <div className="text-center text-xs mb-3" style={{ color: FEEDBACK_GREEN }}>
           {t('quiz.correctAnswer')}: {question.correctAnswer}
@@ -1228,9 +1228,9 @@ function FillNumberRenderer({
   );
 }
 
-// =====================================================================
-// 6. CATEGORY SORT RENDERER (drag & drop)
-// =====================================================================
+
+
+
 
 function CategorySortRenderer({
   question,
@@ -1248,14 +1248,14 @@ function CategorySortRenderer({
   const t = useTranslations('learn');
   const { categories, items } = question;
 
-  // mapping: itemIndex -> categoryIndex
+  
   const [mapping, setMapping] = useState<Record<number, number>>({});
   const [clickSelected, setClickSelected] = useState<number | null>(null);
   const [dragOverCat, setDragOverCat] = useState<number | null>(null);
 
   const allPlaced = Object.keys(mapping).length === items.length;
 
-  // Drag from pool
+  
   const handleDragStart = useCallback(
     (e: React.DragEvent, itemIdx: number) => {
       e.dataTransfer.setData('text/plain', String(itemIdx));
@@ -1287,7 +1287,7 @@ function CategorySortRenderer({
     []
   );
 
-  // Click fallback
+  
   const handlePoolItemClick = useCallback(
     (itemIdx: number) => {
       if (showingAnswer) return;
@@ -1305,7 +1305,7 @@ function CategorySortRenderer({
     [showingAnswer, clickSelected]
   );
 
-  // Remove item from category (click to return to pool)
+  
   const handleRemoveFromCat = useCallback(
     (itemIdx: number) => {
       if (showingAnswer) return;
@@ -1323,14 +1323,14 @@ function CategorySortRenderer({
     onSubmit({ type: 'categorySort', mapping });
   }, [allPlaced, showingAnswer, mapping, onSubmit]);
 
-  // Feedback
+  
   const userMapping =
     userAnswer && userAnswer.type === 'categorySort'
       ? userAnswer.mapping
       : null;
   const displayMapping = showingAnswer && userMapping ? userMapping : mapping;
 
-  // Pool: items not yet placed
+  
   const placedSet = new Set(
     Object.keys(displayMapping).map(Number)
   );
@@ -1340,7 +1340,7 @@ function CategorySortRenderer({
 
   return (
     <div>
-      {/* Category zones */}
+      
       <div
         className="grid gap-3 mb-4"
         style={{
@@ -1371,7 +1371,7 @@ function CategorySortRenderer({
                 cursor: showingAnswer ? 'default' : 'pointer',
               }}
             >
-              {/* Category header */}
+              
               <div
                 className="px-3 py-3 text-sm font-bold uppercase tracking-wider text-center"
                 style={{
@@ -1382,7 +1382,7 @@ function CategorySortRenderer({
                 {t(cat as Parameters<typeof t>[0])}
               </div>
 
-              {/* Items in this category */}
+              
               <div className="flex flex-col gap-2 p-3">
                 {catItems.map((itemIdx) => {
                   const item = items[itemIdx];
@@ -1415,7 +1415,7 @@ function CategorySortRenderer({
                       >
                         {item?.label}
                       </span>
-                      {/* Show correct category arrow if wrong */}
+                      
                       {showingAnswer &&
                         userMapping &&
                         userMapping[itemIdx] !== item.correctCategory && (
@@ -1440,7 +1440,7 @@ function CategorySortRenderer({
         })}
       </div>
 
-      {/* Pool */}
+      
       {!showingAnswer && poolItems.length > 0 && (
         <div className="mb-4">
           <div className="text-sm mb-2" style={{ color: TEXT_DIM }}>
@@ -1480,7 +1480,7 @@ function CategorySortRenderer({
         </div>
       )}
 
-      {/* Submit */}
+      
       {!showingAnswer && (
         <div className="flex justify-center">
           <button
@@ -1504,9 +1504,9 @@ function CategorySortRenderer({
   );
 }
 
-// =====================================================================
-// 7. SPOT ERROR RENDERER
-// =====================================================================
+
+
+
 
 function SpotErrorRenderer({
   question,
@@ -1564,19 +1564,19 @@ function SpotErrorRenderer({
 
           if (showingAnswer) {
             if (stmt.isError && userSelected?.has(idx)) {
-              // Correctly identified error
+              
               borderColor = FEEDBACK_GREEN;
               bgColor = 'rgba(62, 139, 62, 0.1)';
             } else if (stmt.isError && !userSelected?.has(idx)) {
-              // Missed error
+              
               borderColor = FEEDBACK_RED;
               bgColor = 'rgba(179, 62, 62, 0.05)';
             } else if (!stmt.isError && userSelected?.has(idx)) {
-              // Incorrectly flagged as error
+              
               borderColor = FEEDBACK_RED;
               bgColor = 'rgba(179, 62, 62, 0.1)';
             } else {
-              // Correctly not flagged
+              
               borderColor = 'rgba(62, 139, 62, 0.3)';
             }
           }
@@ -1595,7 +1595,7 @@ function SpotErrorRenderer({
                 outline: 'none',
               }}
             >
-              {/* Checkbox indicator */}
+              
               <div
                 className="flex-shrink-0 flex items-center justify-center text-sm"
                 style={{
@@ -1619,7 +1619,7 @@ function SpotErrorRenderer({
                 )}
               </span>
 
-              {/* After answer: show if this IS an error */}
+              
               {showingAnswer && stmt.isError && (
                 <span
                   className="text-sm ml-auto flex-shrink-0 font-bold"
@@ -1654,9 +1654,9 @@ function SpotErrorRenderer({
   );
 }
 
-// =====================================================================
-// QUESTION ROUTER
-// =====================================================================
+
+
+
 
 function QuestionRenderer({
   question,
@@ -1746,14 +1746,14 @@ function QuestionRenderer({
   }
 }
 
-// =====================================================================
-// MAIN QUIZ SESSION COMPONENT
-// =====================================================================
+
+
+
 
 export function QuizSession() {
   const t = useTranslations('learn');
 
-  // Store selectors
+  
   const difficulty = useQuizStore((s) => s.difficulty);
   const questions = useQuizStore((s) => s.questions);
   const currentIndex = useQuizStore((s) => s.currentIndex);
@@ -1768,14 +1768,14 @@ export function QuizSession() {
   const userAnswer = answers[currentIndex] ?? null;
   const timeLimit = TIME_LIMITS[difficulty ?? 1] ?? 30;
 
-  // Track when question started for timeSpent
+  
   const questionStartRef = useRef<number>(Date.now());
 
   useEffect(() => {
     questionStartRef.current = Date.now();
   }, [currentIndex]);
 
-  // Timer tick
+  
   useEffect(() => {
     if (!timerActive) return;
     const interval = setInterval(() => {
@@ -1784,7 +1784,7 @@ export function QuizSession() {
     return () => clearInterval(interval);
   }, [timerActive, tickTimer]);
 
-  // Handle submit from child renderers
+  
   const handleSubmit = useCallback(
     (answer: QuizAnswer) => {
       if (showingAnswer) return;
@@ -1794,10 +1794,10 @@ export function QuizSession() {
     [showingAnswer, submitAnswer]
   );
 
-  // Check correctness for explanation panel
+  
   const isCorrect = useMemo(() => {
     if (!showingAnswer || !question || !userAnswer) return false;
-    // Import inline check from store logic
+    
     switch (question.type) {
       case 'multipleChoice':
         return (
@@ -1845,7 +1845,7 @@ export function QuizSession() {
     }
   }, [showingAnswer, question, userAnswer]);
 
-  // Partial score message for drag types
+  
   const partialMsg = useMemo(() => {
     if (!showingAnswer || !question || !userAnswer || isCorrect) return undefined;
     let partial = 0;
@@ -1905,10 +1905,10 @@ export function QuizSession() {
       style={{ backgroundColor: DARK_BG }}
     >
       <div className="max-w-2xl w-full">
-        {/* Top bar */}
+        
         <TopBar timeLimit={timeLimit} />
 
-        {/* Question card */}
+        
         <AnimatePresence mode="wait">
           <motion.div
             key={`question-${currentIndex}`}
@@ -1917,7 +1917,7 @@ export function QuizSession() {
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Question image - blurred when it would reveal the answer */}
+            
             <QuestionImage
               src={question.questionImage}
               blurred={
@@ -1930,7 +1930,7 @@ export function QuizSession() {
               censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
-            {/* Question text */}
+            
             <div
               className="text-lg font-bold mb-5 text-center"
               style={{ color: TEXT_LIGHT, lineHeight: 1.5 }}
@@ -1941,7 +1941,7 @@ export function QuizSession() {
               )}
             </div>
 
-            {/* Question type renderer */}
+            
             <QuestionRenderer
               question={question}
               onSubmit={handleSubmit}
@@ -1957,7 +1957,7 @@ export function QuizSession() {
               censorZone={!showingAnswer ? question.censorZone : undefined}
             />
 
-            {/* Timeout indicator */}
+            
             {showingAnswer && userAnswer === null && (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -1969,7 +1969,7 @@ export function QuizSession() {
               </motion.div>
             )}
 
-            {/* Explanation panel */}
+            
             {showingAnswer && (
               <ExplanationPanel
                 question={question}

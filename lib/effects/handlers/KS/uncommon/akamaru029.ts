@@ -4,25 +4,10 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { canBeHiddenByEnemy } from '@/lib/effects/ContinuousEffects';
 import { EffectEngine } from '@/lib/effects/EffectEngine';
 
-/**
- * Card 029/130 - AKAMARU "Le Loup Bicephale" (UC)
- * Chakra: 4 | Power: 4
- * Group: Leaf Village | Keywords: Team 8, Jutsu
- *
- * MAIN [continuous]: You can play this character as an upgrade over Kiba Inuzuka.
- *   - This is a continuous/passive effect. The actual upgrade-over-different-name logic
- *     is handled in the game engine's action validation (allows Akamaru 029 to upgrade
- *     over a Kiba Inuzuka character despite having a different name).
- *   - The MAIN handler here is a no-op.
- *
- * UPGRADE: Hide the non-hidden enemy character with the lowest cost in this mission.
- *   - When triggered as an upgrade, find non-hidden enemies in this mission.
- *   - Pick the one with lowest printed chakra cost. If tied, pick the first one.
- *   - Hide the selected character.
- */
+
 function handleAkamaru029Main(ctx: EffectContext): EffectResult {
-  // Continuous effect - can upgrade over Kiba Inuzuka.
-  // Actual logic handled in the game engine's action validation.
+  
+  
   const state = ctx.state;
   const log = logAction(
     state.log,
@@ -46,7 +31,7 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
 
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Find non-hidden enemies that can be hidden by enemy effects
+  
   const nonHiddenEnemies = enemyChars.filter(c => canBeHiddenByEnemy(state, c, opponentPlayer));
 
   if (nonHiddenEnemies.length === 0) {
@@ -55,7 +40,7 @@ function handleAkamaru029Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'AKAMARU', id: 'KS-029-UC' }) } };
   }
 
-  // Confirmation popup before hiding
+  
   return {
     state,
     requiresTargetSelection: true,

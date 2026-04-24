@@ -11,7 +11,7 @@ import { HoloCard } from '@/components/HoloCard';
 import { Footer } from '@/components/Footer';
 import { CloudBackground } from '@/components/CloudBackground';
 
-// Pool of featured cards - one is picked randomly on each page load
+
 const FEATURED_CARDS = [
   { src: '/images/cards/KS/mythos_v/KS-104-MV.webp', alt: 'Tsunade - Mythos V', rarity: 'mythos' as const },
   { src: '/images/cards/KS/mythos_v/KS-108-MV.webp', alt: 'Naruto Uzumaki - Mythos V', rarity: 'mythos' as const },
@@ -27,45 +27,45 @@ const FEATURED_CARDS = [
   { src: '/images/cards/KS/mythos_v/KS-137-MV.webp', alt: 'Kakashi Hatake - Mythos V', rarity: 'mythos' as const },
 ];
 
-// Cloud positions - only cloud-2, cloud-5, cloud-6
+
 const cloudPositions = [
-  // Row 1 - top
+  
   { src: '/images/icons/cloud-2.webp', top: '2%', left: '4%', width: 110, opacity: 0.10, rotate: -8 },
   { src: '/images/icons/cloud-5.webp', top: '5%', left: '28%', width: 80, opacity: 0.07, rotate: 5 },
   { src: '/images/icons/cloud-6.webp', top: '1%', left: '55%', width: 100, opacity: 0.11, rotate: -3 },
   { src: '/images/icons/cloud-2.webp', top: '6%', left: '80%', width: 90, opacity: 0.08, rotate: 10 },
-  // Row 2
+  
   { src: '/images/icons/cloud-5.webp', top: '18%', left: '10%', width: 75, opacity: 0.07, rotate: 15 },
   { src: '/images/icons/cloud-6.webp', top: '20%', left: '42%', width: 110, opacity: 0.09, rotate: -12 },
   { src: '/images/icons/cloud-2.webp', top: '15%', left: '72%', width: 85, opacity: 0.08, rotate: 3 },
-  // Row 3
+  
   { src: '/images/icons/cloud-6.webp', top: '35%', left: '2%', width: 95, opacity: 0.10, rotate: -5 },
   { src: '/images/icons/cloud-5.webp', top: '37%', left: '32%', width: 75, opacity: 0.07, rotate: 8 },
   { src: '/images/icons/cloud-2.webp', top: '33%', left: '60%', width: 100, opacity: 0.09, rotate: -10 },
   { src: '/images/icons/cloud-6.webp', top: '40%', left: '84%', width: 70, opacity: 0.08, rotate: 6 },
-  // Row 4
+  
   { src: '/images/icons/cloud-5.webp', top: '55%', left: '6%', width: 80, opacity: 0.08, rotate: 12 },
   { src: '/images/icons/cloud-2.webp', top: '52%', left: '38%', width: 90, opacity: 0.10, rotate: -7 },
   { src: '/images/icons/cloud-6.webp', top: '58%', left: '68%', width: 100, opacity: 0.09, rotate: 4 },
-  // Row 5
+  
   { src: '/images/icons/cloud-2.webp', top: '72%', left: '12%', width: 85, opacity: 0.09, rotate: -15 },
   { src: '/images/icons/cloud-5.webp', top: '75%', left: '48%', width: 70, opacity: 0.07, rotate: 9 },
   { src: '/images/icons/cloud-6.webp', top: '70%', left: '78%', width: 105, opacity: 0.10, rotate: -4 },
-  // Row 6 - bottom
+  
   { src: '/images/icons/cloud-5.webp', top: '82%', left: '3%', width: 90, opacity: 0.08, rotate: 7 },
   { src: '/images/icons/cloud-2.webp', top: '84%', left: '35%', width: 75, opacity: 0.07, rotate: -11 },
   { src: '/images/icons/cloud-6.webp', top: '80%', left: '62%', width: 95, opacity: 0.09, rotate: 3 },
   { src: '/images/icons/cloud-5.webp', top: '83%', left: '82%', width: 80, opacity: 0.07, rotate: -6 },
 ];
 
-// Floating decorative weapon elements
+
 const floatingElements = [
   { src: '/images/icons/shuriken.webp', top: '22%', right: '3%', size: 30, opacity: 0.04, rotate: 0, duration: 12, spin: true },
   { src: '/images/icons/shuriken.webp', top: '78%', left: '4%', size: 26, opacity: 0.05, rotate: 0, duration: 14, spin: true },
   { src: '/images/icons/akatsuki-cloud.webp', top: '82%', right: '4%', size: 40, opacity: 0.04, rotate: 5, duration: 11 },
 ];
 
-// Menu button configs - game section
+
 const menuButtons = [
   { key: 'play' as const, href: '/play', primary: true },
   { key: 'customization' as const, href: '/settings', primary: false },
@@ -76,7 +76,7 @@ const menuButtons = [
   { key: 'tournaments' as const, href: '/tournaments', primary: false },
 ];
 
-// Account buttons
+
 const accountButtons = [
   { key: 'signIn' as const, href: '/login' },
   { key: 'register' as const, href: '/register' },
@@ -98,7 +98,7 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  // Refresh session once to pick up discordId/role changes from DB
+  
   useEffect(() => {
     if (session && !sessionRefreshed) {
       setSessionRefreshed(true);
@@ -106,7 +106,7 @@ export default function Home() {
     }
   }, [session, sessionRefreshed, updateSession]);
 
-  // Fetch fresh role from API to avoid stale JWT issues
+  
   useEffect(() => {
     if (session?.user) {
       fetch('/api/user/me')
@@ -116,7 +116,7 @@ export default function Home() {
     }
   }, [session]);
 
-  // Tournament notification state
+  
   const [tournamentStatus, setTournamentStatus] = useState<'none' | 'registration' | 'in_progress'>('none');
   const [tournamentNeedsDeck, setTournamentNeedsDeck] = useState(false);
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function Home() {
         const reg = data.tournaments.find((t: { status: string }) => t.status === 'registration');
         if (reg) setTournamentStatus('registration');
         else if (active) setTournamentStatus('in_progress');
-        // Check if user is in a registration tournament without a valid deck
+        
         if (reg && myId) {
           const myPart = reg.participants?.find((p: { userId: string }) => p.userId === myId);
           if (myPart && !(myPart as any).deckValid && reg.gameMode !== 'sealed') {
@@ -152,18 +152,18 @@ export default function Home() {
     >
       <CloudBackground />
 
-      {/* === LANGUAGE SWITCHER (top-right) === */}
+      
       <div className="absolute top-3 right-4 z-50 sm:top-4 sm:right-6">
         <LanguageSwitcher />
       </div>
 
-      {/* === MAIN CONTENT: side-by-side on desktop, stacked on mobile === */}
+      
       <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-6 sm:px-8 sm:py-0">
         <div className="flex w-full max-w-5xl flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
 
-          {/* LEFT SIDE: Title + Navigation */}
+          
           <div className="flex w-full flex-col items-start flex-shrink-0 lg:max-w-[420px]">
-            {/* Title */}
+            
             <div className="mb-1">
               <div className="flex items-center flex-wrap">
                 {titleLetters.map((letter, i) => (
@@ -188,7 +188,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Subtitle */}
+            
             <motion.p
               className="font-display mb-5 text-xs font-medium uppercase tracking-[0.35em] sm:mb-8 sm:text-sm"
               style={{ color: '#888888' }}
@@ -199,7 +199,7 @@ export default function Home() {
               {t('subtitle')}
             </motion.p>
 
-            {/* Navigation Buttons */}
+            
             <motion.nav
               aria-label="Main navigation"
               className="flex w-full flex-col gap-2"
@@ -256,7 +256,7 @@ export default function Home() {
                       target.style.backgroundColor = '#141414';
                     }}
                   >
-                    {/* Accent bar on left */}
+                    
                     <span
                       className="absolute left-0 top-0 h-full w-1 transition-all"
                       style={{
@@ -268,7 +268,7 @@ export default function Home() {
                       }}
                     />
                     {t(btn.key)}
-                    {/* Tournament notification dot */}
+                    
                     {btn.key === 'tournaments' && (tournamentStatus !== 'none' || tournamentNeedsDeck) && (
                       <span className="relative ml-2 flex items-center justify-center">
                         <span
@@ -295,7 +295,7 @@ export default function Home() {
                   </Link>
                 </motion.div>
               ))}
-              {/* Sealed button */}
+              
               {(
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -335,7 +335,7 @@ export default function Home() {
               )}
             </motion.nav>
 
-            {/* Divider */}
+            
             <motion.div
               className="my-2.5 h-px w-full sm:my-3"
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.06)' }}
@@ -344,7 +344,7 @@ export default function Home() {
               transition={{ duration: 0.3, delay: 1.4 }}
             />
 
-            {/* Account buttons */}
+            
             <motion.div
               className="flex w-full flex-wrap gap-2.5"
               initial={{ opacity: 0, y: 20 }}
@@ -477,7 +477,7 @@ export default function Home() {
               )}
             </motion.div>
 
-            {/* Discord link */}
+            
             <motion.div
               className="mt-2.5 w-full sm:mt-3"
               initial={{ opacity: 0, y: 10 }}
@@ -511,7 +511,7 @@ export default function Home() {
               </a>
             </motion.div>
 
-            {/* Footer text */}
+            
             <motion.p
               className="mt-4 text-[10px] tracking-widest uppercase sm:mt-6 sm:text-xs"
               style={{ color: '#333333' }}
@@ -523,7 +523,7 @@ export default function Home() {
             </motion.p>
           </div>
 
-          {/* RIGHT SIDE: Holographic card - hidden on small screens */}
+          
           <motion.div
             className="relative hidden flex-shrink-0 items-center justify-center lg:flex"
             initial={{ opacity: 0, x: 80 }}
@@ -534,7 +534,7 @@ export default function Home() {
               ease: [0.25, 0.46, 0.45, 0.94],
             }}
           >
-            {/* Glow pulse behind card */}
+            
             <motion.div
               className="absolute rounded-2xl"
               style={{

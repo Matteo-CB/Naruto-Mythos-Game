@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST - force-forfeit a player in a match
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string; matchId: string }> },
@@ -49,7 +49,7 @@ export async function POST(
       return NextResponse.json({ error: 'Match already resolved' }, { status: 400 });
     }
 
-    // Determine winner (the player who did NOT forfeit)
+    
     let winnerId: string | null = null;
     let winnerUsername: string | null = null;
     if (match.player1Id === forfeitPlayerId) {
@@ -72,13 +72,13 @@ export async function POST(
       },
     });
 
-    // Mark forfeited player as eliminated
+    
     await prisma.tournamentParticipant.updateMany({
       where: { tournamentId: id, userId: forfeitPlayerId },
       data: { eliminated: true, eliminatedRound: match.round },
     });
 
-    // Advance winner to next round
+    
     if (winnerId && winnerUsername) {
       const nextRound = match.round + 1;
       const nextMatchIndex = Math.floor(match.matchIndex / 2);
@@ -109,7 +109,7 @@ export async function POST(
           data: updateData,
         });
 
-        // If both players are now set, mark as ready
+        
         const p1 = isTopSlot ? winnerId : updated.player1Id;
         const p2 = isTopSlot ? updated.player2Id : winnerId;
         if (p1 && p2) {
@@ -119,7 +119,7 @@ export async function POST(
           });
         }
       } else {
-        // No next match = this was the final - tournament complete
+        
         await prisma.tournament.update({
           where: { id },
           data: {

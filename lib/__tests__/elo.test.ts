@@ -47,14 +47,14 @@ describe('ELO System', () => {
 
     it('should use K=32 for players below 2000', () => {
       const newElo = calculateNewElo(1000, 1000, 1.0);
-      // K=32, E=0.5, actual=1.0, delta = 32*(1-0.5) = 16
+      
       expect(newElo).toBe(1016);
     });
 
     it('should use K=16 for players at/above 2000', () => {
       const newElo = calculateNewElo(2000, 2000, 1.0);
-      // K=16, E=0.5, actual=1.0, raw delta = 16*(1-0.5) = 8.
-      // Clamp floors the win at +10, so newElo = 2010.
+      
+      
       expect(newElo).toBe(2010);
     });
 
@@ -76,14 +76,14 @@ describe('ELO System', () => {
     });
 
     it('should floor win gain at +10 against a much lower-rated opponent', () => {
-      // K=32 vs a 100-rated opponent: raw delta rounds to 0/1. Clamp lifts to +10.
+      
       const gain = calculateNewElo(1500, 100, 1.0) - 1500;
       expect(gain).toBe(10);
     });
 
     it('should cap a favored player\'s upset loss at -25', () => {
-      // 1500 losing to a 100-rated opponent: raw delta 32 * (0 - ~1) ≈ -32.
-      // Clamp caps the loss to -25 so a bad upset does not nuke a season.
+      
+      
       const hardLoss = calculateNewElo(1500, 100, 0.0) - 1500;
       expect(hardLoss).toBe(-25);
     });

@@ -58,7 +58,7 @@ const delay = (ms) => new Promise(r => setTimeout(r, ms));
 async function main() {
   const prisma = new PrismaClient();
 
-  // Load stored Discord role IDs from SiteSettings
+  
   const settings = await prisma.siteSettings.findUnique({
     where: { key: 'global' },
   });
@@ -79,14 +79,14 @@ async function main() {
     console.log(`  ${role.key} (${role.label}): ${id || 'NOT SET'}`);
   }
 
-  // Collect all stored ELO role IDs
+  
   const allRoleIds = new Set();
   for (const role of ALL_ROLES) {
     const id = roleIdMap[role.key];
     if (id) allRoleIds.add(id);
   }
 
-  // Fetch all users with Discord linked
+  
   const users = await prisma.user.findMany({
     where: { discordId: { not: null } },
     select: { id: true, username: true, elo: true, discordId: true, wins: true, losses: true, draws: true },
@@ -109,7 +109,7 @@ async function main() {
       continue;
     }
 
-    // Fetch member
+    
     const memberRes = await discordFetch(`/guilds/${GUILD_ID}/members/${user.discordId}`);
     if (!memberRes.ok) {
       if (memberRes.status === 404) {
@@ -122,7 +122,7 @@ async function main() {
     }
     const member = await memberRes.json();
 
-    // Find current ELO roles to report
+    
     const currentEloRoles = [];
     for (const role of ALL_ROLES) {
       const id = roleIdMap[role.key];
@@ -131,7 +131,7 @@ async function main() {
       }
     }
 
-    // Find roles to remove
+    
     const rolesToRemove = [];
     for (const role of ALL_ROLES) {
       const id = roleIdMap[role.key];
@@ -149,7 +149,7 @@ async function main() {
 
     console.log(`  [${user.username}] ELO=${user.elo} games=${totalGames} | current: [${currentEloRoles.join(', ')}] -> target: "${targetRole.label}"`);
 
-    // Remove old roles
+    
     for (const r of rolesToRemove) {
       const res = await discordFetch(`/guilds/${GUILD_ID}/members/${user.discordId}/roles/${r.id}`, { method: 'DELETE' });
       if (res.ok || res.status === 204) {
@@ -160,7 +160,7 @@ async function main() {
       await delay(250);
     }
 
-    // Add target role
+    
     if (needsTarget) {
       const res = await discordFetch(`/guilds/${GUILD_ID}/members/${user.discordId}/roles/${targetRoleId}`, { method: 'PUT' });
       if (res.ok || res.status === 204) {

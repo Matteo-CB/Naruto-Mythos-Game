@@ -9,7 +9,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
   const friendlySide: "player1Characters" | "player2Characters" =
     sourcePlayer === "player1" ? "player1Characters" : "player2Characters";
 
-  // Pre-validate: check if there are any non-hidden friendly Leaf Village characters
+  
   let hasLeafTarget = false;
   for (const mission of state.activeMissions) {
     for (const char of mission[friendlySide]) {
@@ -38,7 +38,7 @@ function tsunade131MainHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before executing
+  
   return {
     state,
     requiresTargetSelection: true,

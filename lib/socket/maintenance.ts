@@ -1,8 +1,4 @@
-/**
- * Centralized in-memory maintenance state.
- * Shared between Express middleware, Socket.io server, and API routes
- * (all run in the same Node.js process via custom server).
- */
+
 
 let maintenanceActive = false;
 let maintenanceStartedAt: number | null = null;

@@ -3,21 +3,12 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 
-/**
- * Card 082/130 - BAKI "Wind Blade" (UC)
- * Chakra: 4 | Power: 4
- * Group: Sand Village | Keywords: Team Baki
- *
- * SCORE [arrow]: Defeat a hidden character in play (friendly or enemy, any mission).
- * UPGRADE: Defeat an enemy character with Power 1 or less in this mission.
- *
- * Both effects get CONFIRM popups. Target selection after confirm is optional (SKIP).
- */
+
 
 function handleBaki082Score(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
 
-  // Pre-check: any hidden characters in play?
+  
   let hasHidden = false;
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
@@ -33,7 +24,7 @@ function handleBaki082Score(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -53,7 +44,7 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
   const mission = state.activeMissions[sourceMissionIndex];
   if (!mission) return { state };
 
-  // Pre-check: any enemy with P≤1?
+  
   const hasValidTarget = mission[enemySide].some(
     (char) => getEffectivePower(state, char, enemyPlayer) <= 1,
   );
@@ -65,7 +56,7 @@ function handleBaki082Upgrade(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

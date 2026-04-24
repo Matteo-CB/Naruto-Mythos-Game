@@ -2,22 +2,10 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 136/130 - SASUKE UCHIWA "Marque maudite du Ciel" (S)
- * Chakra: 7, Power: 8
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN [hourglass]: When a character is defeated, gain 1 Chakra.
- *   - Continuous/passive. Triggered via onDefeatTriggers.triggerOnDefeatEffects().
- *
- * UPGRADE: You must choose a friendly non-hidden character AND any enemy character
- *          in this mission and defeat them, if able.
- *   Stage 1: Player chooses which friendly to sacrifice
- *   Stage 2: Player chooses which enemy to destroy
- */
+
 
 function sasuke136MainHandler(ctx: EffectContext): EffectResult {
-  // Continuous on-defeat trigger - handled by onDefeatTriggers.triggerOnDefeatEffects()
+  
   const state = ctx.state;
   const log = logAction(
     state.log, state.turn, state.phase, ctx.sourcePlayer,
@@ -38,17 +26,17 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     ctx.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Eligible friendly targets: non-hidden, not Sasuke himself.
+  
   const friendlyTargets = mission[friendlySide].filter(
     (c) => !c.isHidden && c.instanceId !== ctx.sourceCard.instanceId,
   );
-  // Any enemy in this mission is a valid target (including hidden — hidden
-  // characters have power 0 but are still valid defeat targets).
+  
+  
   const enemyTargets = mission[enemySide];
 
-  // "MUST, IF ABLE" semantics per the advanced ruling: the card is always
-  // playable; whichever side actually has a target still gets forced into
-  // selection. Only if both sides are empty does the effect fizzle entirely.
+  
+  
+  
   const hasFriendly = friendlyTargets.length > 0;
   const hasEnemy = enemyTargets.length > 0;
 
@@ -63,9 +51,9 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Stage 1 — pick the friendly to defeat. If no friendly, skip straight
-  // to enemy-only stage by reusing the same two-stage resolver but signaling
-  // that the friendly step has nothing to do.
+  
+  
+  
   if (hasFriendly) {
     return {
       state,
@@ -81,7 +69,7 @@ function sasuke136UpgradeHandler(ctx: EffectContext): EffectResult {
     };
   }
 
-  // No friendly, only enemy — jump to Stage 2 directly (defeat an enemy).
+  
   return {
     state,
     requiresTargetSelection: true,

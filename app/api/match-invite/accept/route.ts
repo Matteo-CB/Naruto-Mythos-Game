@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the invite and verify the current user is the receiver
+    
     const invite = await prisma.matchInvite.findUnique({
       where: { id: inviteId },
     });
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if expired
+    
     if (invite.expiresAt <= new Date()) {
       return NextResponse.json(
         { error: 'Invitation has expired' },
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate a unique room code
+    
     let roomCode = generateRoomCode();
     let existingRoom = await prisma.room.findUnique({ where: { code: roomCode } });
     while (existingRoom) {
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       existingRoom = await prisma.room.findUnique({ where: { code: roomCode } });
     }
 
-    // Update invite status and set room code
+    
     const updatedInvite = await prisma.matchInvite.update({
       where: { id: inviteId },
       data: {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create the room
+    
     await prisma.room.create({
       data: {
         code: roomCode,
@@ -91,13 +91,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Look up receiver info
+    
     const receiver = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { id: true, username: true, elo: true },
     });
 
-    // Emit socket event to the sender
+    
     emitToUser(invite.senderId, 'match:invite-accepted', {
       inviteId: updatedInvite.id,
       roomCode,

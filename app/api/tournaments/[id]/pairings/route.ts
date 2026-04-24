@@ -12,7 +12,7 @@ function isAdmin(session: { user?: { email?: string | null; name?: string | null
   return false;
 }
 
-// POST - set manual pairings (admin only, simulator tournaments)
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -52,7 +52,7 @@ export async function POST(
       return NextResponse.json({ error: 'orderedPlayerIds array required' }, { status: 400 });
     }
 
-    // Update seeds according to the manual ordering
+    
     for (let i = 0; i < orderedPlayerIds.length; i++) {
       await prisma.tournamentParticipant.updateMany({
         where: { tournamentId: id, userId: orderedPlayerIds[i] },

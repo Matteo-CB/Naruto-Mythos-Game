@@ -1,23 +1,4 @@
-/**
- * ELO rating system for the Naruto Mythos TCG.
- *
- * Base formula (FIDE-style):
- * - newElo = oldElo + K * (actualScore - expectedScore)
- * - K = 32 under ELO 2000, K = 16 at or above
- * - Floor at 100 so a beginner never drops into nonsense territory
- *
- * Two clamps requested by the project owner:
- * - A winner always gains at least MIN_WIN_GAIN ELO (so farming smurfs stays
- *   tempting enough to detect, and a legit underdog win still feels rewarding).
- * - A loser never drops more than MAX_LOSS ELO in a single defeat (so a bad
- *   matchup against a much stronger player doesn't nuke the season).
- *
- * The clamp is applied to the integer delta BEFORE the floor so the displayed
- * delta (newElo - oldElo) matches exactly what is persisted.
- *
- * consecutiveWins / consecutiveLosses are still tracked and returned so the
- * DB columns keep working, but they no longer affect the ELO math.
- */
+
 
 const K_FACTOR_LOW = 32;
 const K_FACTOR_HIGH = 16;
@@ -43,9 +24,9 @@ export function calculateNewElo(
   const E = expectedScore(playerElo, opponentElo);
   let delta = Math.round(K * (actualScore - E));
 
-  // Winner: floor the gain so a favored player still gets a visible reward.
+  
   if (actualScore === 1.0 && delta < MIN_WIN_GAIN) delta = MIN_WIN_GAIN;
-  // Loser: cap the loss so an underdog doesn't implode on a single defeat.
+  
   if (actualScore === 0.0 && delta < -MAX_LOSS) delta = -MAX_LOSS;
 
   return Math.max(ELO_FLOOR, playerElo + delta);
@@ -85,7 +66,7 @@ export function calculateEloChanges(
   p2Elo?: number,
   winnerLegacy?: 'player1' | 'player2' | 'draw',
 ): EloResult | { player1NewElo: number; player2NewElo: number; player1Delta: number; player2Delta: number } {
-  // Legacy 3-arg signature (supports draws)
+  
   if (typeof p1EloOrInput === 'number') {
     const p1 = p1EloOrInput;
     const p2 = p2Elo!;
@@ -102,7 +83,7 @@ export function calculateEloChanges(
     };
   }
 
-  // Structured signature — vanilla ELO, no multipliers, no clamps besides the floor
+  
   const { player1Elo, player2Elo, winner, player1ConsecWins, player1ConsecLosses,
           player2ConsecWins, player2ConsecLosses } = p1EloOrInput;
 

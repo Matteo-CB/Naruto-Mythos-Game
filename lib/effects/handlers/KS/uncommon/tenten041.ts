@@ -3,28 +3,13 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { defeatCharacterInPlay } from '@/lib/effects/defeatUtils';
 
-/**
- * Card 041/130 - TENTEN (UC)
- * Chakra: 3 | Power: 3
- * Group: Leaf Village | Keywords: Team Guy, Weapon
- *
- * MAIN: Defeat a hidden character in this mission.
- *   - Find ALL hidden characters (both friendly and enemy) in this mission, excluding self.
- *   - If exactly one valid target, auto-apply.
- *   - If multiple targets, require target selection.
- *   - Defeat the target (using defeatCharacterInPlay to respect replacements).
- *
- * UPGRADE: POWERUP 1 another Leaf Village character in play (any mission).
- *   - Find all non-hidden Leaf Village characters across all missions, excluding self.
- *   - If exactly one valid target, auto-apply POWERUP 1.
- *   - If multiple targets, require target selection.
- */
+
 
 function handleTenten041Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
 
-  // Find all hidden characters in this mission (both sides), excluding self
+  
   const validTargets: string[] = [];
 
   for (const char of mission.player1Characters) {
@@ -44,7 +29,7 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -58,7 +43,7 @@ function handleTenten041Main(ctx: EffectContext): EffectResult {
 
 function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
-  // Find all non-hidden Leaf Village characters across all missions, excluding self
+  
   const validTargets: string[] = [];
 
   for (const mission of state.activeMissions) {
@@ -78,7 +63,7 @@ function handleTenten041Upgrade(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'TENTEN', id: 'KS-041-UC' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,

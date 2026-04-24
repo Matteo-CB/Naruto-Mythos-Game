@@ -18,7 +18,7 @@ async function discordFetch(path: string, options?: RequestInit): Promise<Respon
     },
   });
 
-  // Handle rate limiting
+  
   if (res.status === 429) {
     const data = await res.json() as { retry_after?: number };
     const retryAfter = (data.retry_after || 1) * 1000;
@@ -29,9 +29,7 @@ async function discordFetch(path: string, options?: RequestInit): Promise<Respon
   return res;
 }
 
-/**
- * GET — Fetch current Discord role ID mapping from the database.
- */
+
 export async function GET() {
   try {
     const session = await auth();
@@ -45,7 +43,7 @@ export async function GET() {
 
     const roleIdMap = (settings?.discordRoleIds as Record<string, string> | null) ?? {};
 
-    // Also fetch guild roles to show what exists on Discord
+    
     let guildRoles: Array<{ id: string; name: string }> = [];
     if (BOT_TOKEN && GUILD_ID) {
       const res = await discordFetch(`/guilds/${GUILD_ID}/roles`);
@@ -67,10 +65,7 @@ export async function GET() {
   }
 }
 
-/**
- * POST — Create ELO roles on Discord and store their IDs in SiteSettings.
- * If roles already exist (matched by label), reuses them.
- */
+
 export async function POST() {
   try {
     const session = await auth();
@@ -85,7 +80,7 @@ export async function POST() {
       );
     }
 
-    // Fetch existing guild roles
+    
     const rolesRes = await discordFetch(`/guilds/${GUILD_ID}/roles`);
     if (!rolesRes.ok) {
       return NextResponse.json(
@@ -95,13 +90,13 @@ export async function POST() {
     }
     const existingRoles = await rolesRes.json() as Array<{ id: string; name: string }>;
 
-    // Build mapping: try to find existing roles by label, create if missing
+    
     const roleIdMap: Record<string, string> = {};
     const created: string[] = [];
     const reused: string[] = [];
 
     for (const roleDef of ALL_ELO_ROLES) {
-      // Try to find an existing role matching the label
+      
       const existing = existingRoles.find((r) => r.name === roleDef.label);
       if (existing) {
         roleIdMap[roleDef.key] = existing.id;
@@ -109,7 +104,7 @@ export async function POST() {
         continue;
       }
 
-      // Create the role
+      
       const res = await discordFetch(`/guilds/${GUILD_ID}/roles`, {
         method: 'POST',
         body: JSON.stringify({
@@ -130,7 +125,7 @@ export async function POST() {
       }
     }
 
-    // Store the mapping in SiteSettings
+    
     await prisma.siteSettings.upsert({
       where: { key: 'global' },
       update: { discordRoleIds: roleIdMap },
@@ -151,10 +146,7 @@ export async function POST() {
   }
 }
 
-/**
- * PUT — Manually set Discord role ID mapping without creating roles.
- * Body: { roleIdMap: { "unranked": "id", "genin": "id", ... } }
- */
+
 export async function PUT(request: Request) {
   try {
     const session = await auth();
@@ -167,7 +159,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Missing roleIdMap object in body' }, { status: 400 });
     }
 
-    // Validate keys
+    
     const validKeys = new Set(ALL_ELO_ROLES.map((r) => r.key));
     const invalidKeys = Object.keys(body.roleIdMap).filter((k) => !validKeys.has(k));
     if (invalidKeys.length > 0) {

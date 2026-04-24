@@ -14,7 +14,7 @@ import { useTrainingStore } from '@/stores/trainingStore';
 import { useUIStore } from '@/stores/uiStore';
 import { getCharacterById } from '@/lib/data/cardIndex';
 import { playSound } from '@/lib/sound/SoundManager';
-// Lazy-loaded fallback for card image lookup (avoids 192KB in main bundle)
+
 let _cardsJsonCache: Record<string, unknown> = {};
 let _cardsJsonLoaded = false;
 function getCardsJsonFallback(): Record<string, unknown> {
@@ -49,32 +49,32 @@ interface PendingTargetSelection {
     title_fr?: string; title_en?: string;
     chakra: number; power: number; image_file?: string;
     isSummon?: boolean; isMatch?: boolean; isDiscarded?: boolean;
-    // Full-card fields (optional) so the reveal UI can show effects / keywords
-    // when the user clicks a revealed card — used for Sasuke 014 and Itachi 091.
+    
+    
     effects?: Array<{ type: string; description: string }>;
     keywords?: string[]; group?: string; rarity?: string; card_type?: string;
   }>; // for multi-card reveal (Tayuya 065, Kiba 026, Sasuke 014, Itachi 091)
-  // Dedicated confirm UIs (DRAW_CARD / CONFIRM_HIDE / CONFIRM_DEFEAT)
+  
   deckSize?: number; // for DRAW_CARD: shows deck size
   confirmCardData?: { name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number }; // for CONFIRM_HIDE / CONFIRM_DEFEAT
-  // Effect ordering choice (multiple simultaneous effects)
+  
   effectOrderChoices?: Array<{ effectId: string; sourceCardName: string; sourceCardImage?: string; effectType: string; description: string; descriptionKey?: string }>;
-  // Defeat/hide ordering (multiple targets — player chooses order)
+  
   orderTargets?: Array<{ instanceId: string; name_fr: string; name_en?: string; image_file?: string; chakra?: number; power?: number; missionIndex: number; missionRank?: string; isHidden?: boolean; isOwn?: boolean }>;
   sourceCardName?: string;
-  // Raw engine target selection type (for TargetSelector to detect special cases)
+  
   engineTargetSelectionType?: string;
   onSelect: (targetId: string) => void;
   onDecline?: () => void; // for optional effects
   declineLabelKey?: string; // i18n key for the decline button label (overrides default 'game.board.skip')
-  // Multi-select support (Kiba 026 / Tayuya 065 UPGRADE choose)
+  
   isMultiSelect?: boolean;
   minSelections?: number;
   maxSelections?: number;
 }
 
 interface GameStore {
-  // Game state
+  
   gameState: GameState | null;
   visibleState: VisibleGameState | null;
   humanPlayer: PlayerID;
@@ -90,29 +90,29 @@ interface GameStore {
   winner: PlayerID | null;
   playerDisplayNames: { player1: string; player2: string };
 
-  // Replay
+  
   replayInitialState: GameState | null;
 
-  // Animation queue
+  
   animationQueue: AnimationEvent[];
   isAnimating: boolean;
 
-  // Target selection
+  
   pendingTargetSelection: PendingTargetSelection | null;
 
-  // Sealed deck data (for saving after game)
+  
   sealedDeckCardIds: string[] | null;
   sealedDeckMissionIds: string[] | null;
 
-  // AI replay config
+  
   lastAIGameConfig: { config: GameConfig; difficulty: AIDifficulty; playerName?: string } | null;
 
-  // Action error feedback (e.g., name uniqueness violation)
+  
   actionError: string | null;
   actionErrorKey: string | null;
   actionErrorParams: Record<string, string | number> | null;
 
-  // Actions
+  
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => void;
   startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => void;
   confirmHotseatSwitch: () => void;
@@ -133,7 +133,7 @@ interface GameStore {
   resetGame: () => void;
   endAIGameAsForfeit: () => void;
 
-  // Sandbox actions (free mode only)
+  
   sandboxDrawCard: (deckIndex: number) => void;
   sandboxAddChakra: (amount: number) => void;
   sandboxDiscardFromHand: (handIndex: number) => void;
@@ -156,12 +156,10 @@ interface GameStore {
 
 let animationIdCounter = 0;
 
-// AI watchdog timer - detects if the AI is stuck and forces a retry
+
 let aiWatchdogTimer: ReturnType<typeof setTimeout> | null = null;
 
-/**
- * Helper to extract animation data from an action and the current game state.
- */
+
 function getAnimationForAction(
   action: GameAction,
   gameState: GameState,
@@ -203,7 +201,7 @@ function getAnimationForAction(
     }
 
     case 'REVEAL_CHARACTER': {
-      // Find the character being revealed
+      
       const mission = gameState.activeMissions[action.missionIndex];
       if (mission) {
         const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
@@ -250,19 +248,19 @@ function getAnimationForAction(
     }
 
     case 'PASS':
-      // No animation for passing
+      
       return null;
 
     case 'MULLIGAN':
-      // No animation for mulligan
+      
       return null;
 
     case 'SELECT_TARGET':
-      // No animation for target selection itself
+      
       return null;
 
     case 'DECLINE_OPTIONAL_EFFECT':
-      // No animation for declining
+      
       return null;
 
     default:
@@ -270,11 +268,7 @@ function getAnimationForAction(
   }
 }
 
-/**
- * Helper to extract animation data for an AI action.
- * For AI actions, we may not always know card names (hidden info),
- * so we use what we can determine.
- */
+
 function getAnimationForAIAction(
   action: GameAction,
   gameState: GameState,
@@ -367,10 +361,7 @@ function getAnimationForAIAction(
   }
 }
 
-/**
- * Data source abstraction for building pending target selection UI.
- * Online mode provides VisibleGameState, local modes provide full GameState.
- */
+
 interface PendingSelectionDataSource {
   playerHand: Array<{ name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }>;
   playerDiscard: Array<{ name_fr: string; name_en?: string; chakra?: number; power?: number; image_file?: string }>;
@@ -399,7 +390,7 @@ interface PendingEffectData {
   rootOptional?: boolean;
 }
 
-/** Extract full card data for HandCardSelector so details/zoom work properly. */
+
 function fullCardData(card: { name_fr: string; name_en?: string; title_fr?: string; title_en?: string; chakra?: number; power?: number; image_file?: string; id?: string; cardId?: string; number?: number; rarity?: string; keywords?: string[]; group?: string; effects?: Array<{ type: string; description: string }>; card_type?: string }) {
   return {
     name_fr: card.name_fr, name_en: card.name_en, title_fr: card.title_fr, title_en: card.title_en,
@@ -409,11 +400,7 @@ function fullCardData(card: { name_fr: string; name_en?: string; title_fr?: stri
   };
 }
 
-/**
- * Detect multiple simultaneous effects from DIFFERENT source cards.
- * When 2+ pending effects exist with different sourceInstanceIds, the player should choose order.
- * Returns a CHOOSE_EFFECT_ORDER selection, or null if not applicable.
- */
+
 function buildEffectOrderSelection(
   pendingActions: PendingActionData[],
   pendingEffects: Array<{ id: string; sourceInstanceId: string; sourceCardId: string; effectType?: string }>,
@@ -465,10 +452,7 @@ function buildEffectOrderSelection(
   };
 }
 
-/**
- * Shared utility: builds PendingTargetSelection UI from pending action/effect data.
- * Replaces 4 duplicated code paths (updateOnlineState, confirmHotseatSwitch, performAction, processAITurn).
- */
+
 function buildPendingTargetSelectionUI(
   pendingAction: PendingActionData,
   pendingEffect: PendingEffectData | undefined,
@@ -479,7 +463,7 @@ function buildPendingTargetSelectionUI(
 ): PendingTargetSelection {
   const tst = pendingEffect?.targetSelectionType ?? '';
 
-  // END_OF_ROUND_EFFECT_ORDER: render as CHOOSE_EFFECT_ORDER with card thumbnails
+  
   if (tst === 'END_OF_ROUND_EFFECT_ORDER' && pendingEffect) {
     let effectsInfo: Array<{ instanceId: string; type: string; cardName: string; cardImage?: string; cardId: string }> = [];
     try { effectsInfo = JSON.parse(pendingEffect.effectDescription ?? '[]'); } catch { /* ignore */ }
@@ -510,13 +494,13 @@ function buildPendingTargetSelectionUI(
     };
   }
 
-  // Determine selection type flags
+  
   const isEffectChoice = pendingAction.type === 'CHOOSE_EFFECT';
   const isHandSelection = pendingAction.type === 'PUT_CARD_ON_DECK' ||
     pendingAction.type === 'DISCARD_CARD' ||
     pendingAction.type === 'CHOOSE_CARD_FROM_LIST';
 
-  // Build effect choices for copy-effect UI (Kakashi/Sakon)
+  
   let effectChoices: PendingTargetSelection['effectChoices'];
   if (isEffectChoice) {
     effectChoices = pendingAction.options.map((opt) => {
@@ -528,7 +512,7 @@ function buildPendingTargetSelectionUI(
     });
   }
 
-  // Build hand card info for hand selection UI
+  
   let handCards: PendingTargetSelection['handCards'];
   if (isHandSelection) {
     if (tst === 'KABUTO053_CHOOSE_FROM_DISCARD' || tst === 'SAKURA109_CHOOSE_DISCARD' || tst === 'RECOVER_FROM_DISCARD') {
@@ -553,7 +537,7 @@ function buildPendingTargetSelectionUI(
         const storedCard = idx >= 0 && idx < storedCards.length ? storedCards[idx] : null;
         const info = idx >= 0 && idx < topCardsInfo.length ? topCardsInfo[idx] : null;
         const cardId = (storedCard as any)?.id ?? (storedCard as any)?.cardId ?? info?.cardId;
-        // Try cardIndex first, then raw JSON, then storedCard, then topCards info
+        
         let indexCard = cardId ? getCharacterById(cardId) : null;
         if (!indexCard?.image_file && cardId) {
           const rawCard = (getCardsJsonFallback() as any)?.[cardId];
@@ -622,7 +606,7 @@ function buildPendingTargetSelectionUI(
         };
       });
     } else if (tst === 'TAYUYA125_CHOOSE_SOUND') {
-      // Tayuya 125 UPGRADE: mix of hand indices and board:instanceId targets
+      
       let hiddenCharsInfo125: Array<{ instanceId: string; name_fr: string; name_en?: string; chakra: number; power: number; image_file?: string; missionIndex: number }> = [];
       try { hiddenCharsInfo125 = JSON.parse(pendingEffect?.effectDescription ?? '{}').hiddenChars ?? []; } catch { /* ignore */ }
       const missionRanks125 = dataSource.activeMissions.map((m) => m.rank || '?');
@@ -693,12 +677,12 @@ function buildPendingTargetSelectionUI(
     }
   }
 
-  // Detect dedicated confirm UIs
+  
   const isSakura011Draw = tst === 'SAKURA011_DRAW' || tst === 'HAKU088_CONFIRM_DRAW';
   const isKiba113ConfirmHide = tst === 'KIBA113_CONFIRM_HIDE_AKAMARU' || tst === 'KIBA113_CONFIRM_DEFEAT_AKAMARU';
   const isEffectConfirm = tst.includes('_CONFIRM_') && !isKiba113ConfirmHide && !isSakura011Draw;
 
-  // Detect info reveal types
+  
   const isOroReveal = tst === 'OROCHIMARU_REVEAL_RESULT';
   const isItachi091Reveal = tst === 'ITACHI091_HAND_REVEAL';
   const isDosuLookReveal = tst === 'DOSU_LOOK_REVEAL';
@@ -777,7 +761,7 @@ function buildPendingTargetSelectionUI(
     } catch { /* ignore */ }
   }
 
-  // Build revealedCards for multi-select CHOOSE types (Kiba 026 / Tayuya 065 UPGRADE)
+  
   if (isMultiSelectChoose && pendingEffect) {
     try {
       const rd = JSON.parse(pendingEffect.effectDescription);
@@ -801,7 +785,7 @@ function buildPendingTargetSelectionUI(
     } catch { /* ignore */ }
   }
 
-  // Build dedicated confirm UI data
+  
   let deckSize: number | undefined;
   let confirmCardData: PendingTargetSelection['confirmCardData'];
   if (isSakura011Draw) {
@@ -817,7 +801,7 @@ function buildPendingTargetSelectionUI(
     } catch { /* ignore */ }
   }
 
-  // Determine selection type
+  
   const selectionType: PendingTargetSelection['selectionType'] = isInfoReveal
     ? 'INFO_REVEAL'
     : isEffectChoice ? 'CHOOSE_EFFECT'
@@ -828,7 +812,7 @@ function buildPendingTargetSelectionUI(
     : isEffectConfirm ? 'EFFECT_CONFIRM'
     : 'TARGET_CHARACTER';
 
-  // Build decline label key for specific effects
+  
   let declineLabelKey: string | undefined;
   if (tst === 'DOSU069_OPPONENT_CHOICE') {
     declineLabelKey = 'game.effect.dosu069Defeat';
@@ -859,10 +843,10 @@ function buildPendingTargetSelectionUI(
     onSelect,
     onDecline: isMultiSelectChoose
       ? onDecline
-      // Offer Cancel not just for the initial optional confirm popup but for
-      // EVERY descendant of it (rootOptional is propagated automatically by
-      // EffectEngine.applyTargetedEffect). So a player who accepted an
-      // optional effect by mistake can still back out of the target picker.
+      
+      
+      
+      
       : ((pendingEffect?.isOptional || pendingEffect?.rootOptional) ? onDecline : undefined),
     declineLabelKey: isMultiSelectChoose ? 'game.board.skip' : declineLabelKey,
     isMultiSelect: isMultiSelectChoose || undefined,
@@ -898,7 +882,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lastAIGameConfig: null,
 
   startOnlineGame: (visibleState: VisibleGameState, playerRole: PlayerID, playerName?: string, opponentName?: string) => {
-    // Only clear spectator flags — don't call leaveSpectating() which wipes visibleState/gameStarted
+    
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
     const humanName = playerName || 'Player';
@@ -930,8 +914,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const pendingForMe = visibleState.pendingActions.filter((a) => a.player === humanPlayer);
 
     if (pendingForMe.length > 0) {
-      // Detect multiple simultaneous effects from DIFFERENT source cards
-      // Skip if effectOrderResolved (player already chose the order)
+      
+      
       const orderSelOnline = (visibleState as any).effectOrderResolved ? null : buildEffectOrderSelection(
         pendingForMe, visibleState.pendingEffects, visibleState.activeMissions as unknown as GameState['activeMissions'],
         get().playerDisplayNames[humanPlayer],
@@ -989,26 +973,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startAIGame: (config: GameConfig, difficulty: AIDifficulty, playerName?: string) => {
-    // Only clear spectator flags — don't call leaveSpectating() which wipes socket state
+    
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
-    // Reset coin flip flag so the animation plays before mulligan
+    
     useUIStore.getState().setCoinFlipComplete(false);
-    // Disable training mode when starting a normal AI game
-    // (training page will re-enable it explicitly after calling startAIGame)
+    
+    
     useTrainingStore.getState().disable();
 
-    // Reset ID counter before creating game — safe on client (single game, no concurrency).
-    // Server does NOT reset to avoid ID collisions between concurrent games.
+    
+    
     resetIdCounter();
     const state = GameEngine.createGame(config);
     const humanPlayer: PlayerID = config.player1.isAI ? 'player2' : 'player1';
     const aiPlayerSide: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
     const ai = new AIPlayer(difficulty, aiPlayerSide);
 
-    // replayInitialState will be captured AFTER mulligans complete (deterministic point)
+    
     const visible = GameEngine.getVisibleState(state, humanPlayer);
 
-    // Build display names
+    
     const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
     const humanName = playerName || 'Player';
     const aiName = `AI (${difficultyLabel})`;
@@ -1036,9 +1020,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       lastAIGameConfig: { config, difficulty, playerName },
     });
 
-    // If AI goes first during mulligan, let it decide
+    
     if (state.phase === 'mulligan') {
-      // AI auto-decides mulligan
+      
       const aiAction = ai.getAction(state);
       if (aiAction) {
         try {
@@ -1053,7 +1037,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startHotseatGame: (config: GameConfig, player1Name: string, player2Name: string, sandbox?: boolean) => {
-    // Only clear spectator flags
+    
     useSocketStore.setState({ isSpectating: false, spectatingRoomCode: null, spectatorCount: 0 });
     useUIStore.getState().setCoinFlipComplete(false);
     useTrainingStore.getState().disable();
@@ -1099,10 +1083,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingTargetSelection: null,
     });
 
-    // Check for pending actions for the new player
+    
     const pendingActions = gameState.pendingActions.filter((p) => p.player === newPlayer);
     if (pendingActions.length > 0) {
-      // Detect multiple simultaneous effects from DIFFERENT source cards
+      
       const orderSelection = buildEffectOrderSelection(
         pendingActions, gameState.pendingEffects, gameState.activeMissions,
         playerDisplayNames[newPlayer],
@@ -1157,7 +1141,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   performAction: (action: GameAction) => {
-    // Play card sound immediately on player action (instant feedback)
+    
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' ||
         action.type === 'REVEAL_CHARACTER' || action.type === 'UPGRADE_CHARACTER') {
       playSound('cardPlay');
@@ -1165,18 +1149,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const { gameState, humanPlayer, aiPlayer, isAIGame, isOnlineGame, addAnimation } = get();
 
-    // Online mode: send action to server via socket, don't apply locally
+    
     if (isOnlineGame) {
       const socketState = useSocketStore.getState();
       if (socketState.socket && socketState.connected) {
-        // For mulligan, don't block UI - the MulliganDialog uses hasMulliganed from server state
+        
         const skipProcessingBlock = action.type === 'MULLIGAN';
         if (!skipProcessingBlock) {
           set({ isProcessing: true });
         }
         socketState.performAction(action);
 
-        // Safety timeout: if server doesn't respond in 10s, unblock the UI
+        
         if (!skipProcessingBlock) {
           setTimeout(() => {
             if (get().isProcessing && get().isOnlineGame) {
@@ -1187,7 +1171,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       } else {
         console.warn('[gameStore] Socket not connected, retrying action in 1s...');
-        // Retry once after a short delay (socket may be reconnecting)
+        
         setTimeout(() => {
           const ss = useSocketStore.getState();
           if (ss.socket && ss.connected) {
@@ -1206,7 +1190,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               actionErrorKey: 'game.error.connectionLost',
               isProcessing: false,
             });
-            // Auto-clear
+            
             setTimeout(() => {
               if (get().actionError) {
                 set({ actionError: null, actionErrorKey: null, actionErrorParams: null });
@@ -1222,7 +1206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     set({ isProcessing: true });
 
-    // Queue animation for this action BEFORE applying
+    
     const animEvent = getAnimationForAction(action, gameState, humanPlayer);
     if (animEvent) {
       addAnimation(animEvent);
@@ -1237,14 +1221,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Detect rejected play actions.
-    // Use log length instead of hand size: MAIN effects (e.g. Ebisu draw) can restore
-    // hand size after a card is played, causing false "action not allowed" errors.
-    // Every successful action adds at least one log entry; rejected actions add none.
+    
+    
+    
+    
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN' || action.type === 'UPGRADE_CHARACTER') {
       const logGrew = newState.log.length > gameState.log.length;
       if (!logGrew) {
-        // Action was rejected - get the specific validation reason
+        
         let errorReason = '';
         let errorKey: string | null = null;
         let errorParams: Record<string, string | number> | null = null;
@@ -1271,7 +1255,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           actionErrorKey: errorKey || 'game.error.actionNotAllowed',
           actionErrorParams: errorParams,
         });
-        // Auto-clear error after 4 seconds
+        
         setTimeout(() => {
           if (get().actionError) set({ actionError: null, actionErrorKey: null, actionErrorParams: null });
         }, 4000);
@@ -1279,25 +1263,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Capture replay initial state when mulligans complete (deterministic snapshot)
-    // Mulligans use shuffle() which is non-deterministic, so we must capture AFTER.
-    // Also reset the instance ID counter so all post-mulligan IDs are deterministic
-    // from a known starting point, ensuring replay reconstruction matches.
+    
+    
+    
+    
     if (gameState.phase === 'mulligan' && newState.phase !== 'mulligan' && !get().replayInitialState) {
       resetIdCounter();
       const snapshot = deepClone(newState);
       snapshot.actionHistory = []; // Clear - replay starts from this point
       set({ replayInitialState: snapshot });
-      // Reset actionHistory so only post-mulligan actions are recorded
+      
       newState.actionHistory = [];
     }
 
-    // Cap log at 500 entries to prevent unbounded growth
+    
     if (newState.log.length > 500) {
       newState = { ...newState, log: newState.log.slice(-500) };
     }
 
-    // Clear any previous error on successful action
+    
     const newVisible = GameEngine.getVisibleState(newState, humanPlayer);
 
     set({
@@ -1308,7 +1292,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       actionErrorParams: null,
     });
 
-    // Check if game is over
+    
     if (newState.phase === 'gameOver') {
       addAnimation({
         type: 'game-end',
@@ -1322,7 +1306,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Mission scoring complete - show scored state briefly, then auto-advance to End Phase
+    
     if (newState.missionScoringComplete) {
       set({ isProcessing: false });
       setTimeout(() => {
@@ -1340,10 +1324,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             void get().processAITurn();
           }, 500);
         } else {
-          // Check for pending actions (e.g., Rock Lee 117 end-phase move with multiple destinations)
+          
           const humanPendingEndPhase = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
           if (humanPendingEndPhase.length > 0) {
-            // Detect multiple simultaneous effects from DIFFERENT source cards
+            
             const orderSelEnd = buildEffectOrderSelection(
               humanPendingEndPhase, advanced.pendingEffects, advanced.activeMissions,
               get().playerDisplayNames[hp],
@@ -1400,12 +1384,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Check if there are pending target selections for the human player
+    
     const humanPending = newState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPending.length > 0) {
-      // After REORDER_EFFECTS, skip the order selection check — the player already chose
+      
       if (action.type !== 'REORDER_EFFECTS') {
-        // Detect multiple simultaneous effects from DIFFERENT source cards
+        
         const orderSel = buildEffectOrderSelection(
           humanPending, newState.pendingEffects, newState.activeMissions,
           get().playerDisplayNames[humanPlayer],
@@ -1451,15 +1435,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Hotseat / sandbox: check if the other player needs to act next
+    
     if (get().isHotseatGame) {
       const isSandbox = get().isSandboxMode;
       const otherPlayer: PlayerID = humanPlayer === 'player1' ? 'player2' : 'player1';
       const otherPending = newState.pendingActions.filter((p) => p.player === otherPlayer);
 
-      // Sandbox mode: handle other player's pending actions directly (same player controls both)
+      
       if (isSandbox && otherPending.length > 0) {
-        // Switch humanPlayer temporarily to resolve other player's pending
+        
         const pa = otherPending[0];
         const pe = newState.pendingEffects.find((e) => e.id === pa.sourceEffectId);
         const ds: PendingSelectionDataSource = {
@@ -1477,7 +1461,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
 
-      // During mulligan: if current player has mulliganed but the other hasn't, switch
+      
       const mulliganSwitch = newState.phase === 'mulligan' &&
         newState[humanPlayer].hasMulliganed && !newState[otherPlayer].hasMulliganed;
 
@@ -1493,9 +1477,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Process AI response if needed
+    
     if (isAIGame && aiPlayer) {
-      // Delay scales with whether there was an animation
+      
       const delay = animEvent ? 1000 : 500;
       setTimeout(() => {
         void get().processAITurn();
@@ -1512,17 +1496,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Clear any existing watchdog and set a new one.
-    // If processAITurn doesn't complete within 8s, force retry.
+    
+    
     if (aiWatchdogTimer) clearTimeout(aiWatchdogTimer);
     aiWatchdogTimer = setTimeout(() => {
       const s = get();
       if (!s.isAIGame || s.gameOver || !s.gameState || !s.aiPlayer) return;
       const gs = s.gameState;
-      // Only intervene if it's the AI's turn and the game appears stuck
+      
       if (gs.activePlayer === s.aiPlayer.player && gs.phase !== 'gameOver' && !s.isProcessing) {
         console.warn('[gameStore] AI watchdog: game appears stuck, forcing processAITurn retry');
-        // Clean stale pending effects that have no matching pending actions
+        
         if (gs.pendingEffects.length > 0 && gs.pendingActions.length === 0) {
           set({ gameState: { ...gs, pendingEffects: [] } });
         }
@@ -1530,7 +1514,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }, 8000);
 
-    // Let AI take actions until it's the human's turn or game ends
+    
     let currentState = gameState;
     let iterations = 0;
     const maxIterations = 20; // Safety limit
@@ -1538,17 +1522,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     try {
       while (iterations < maxIterations) {
-        // Check if AI has pending target selections to resolve first
+        
         const aiPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
         if (aiPending.length > 0) {
-          // Handle simultaneous effects from different source cards — AI just picks first
+          
           if (aiPending.length >= 2) {
             const aiPendingEffects = aiPending
               .map((pa) => currentState.pendingEffects.find((e) => e.id === pa.sourceEffectId))
               .filter((e): e is NonNullable<typeof e> => !!e);
             const uniqueSources = new Set(aiPendingEffects.map((e) => e.sourceInstanceId));
             if (uniqueSources.size >= 2) {
-              // AI auto-selects first effect (FIFO order)
+              
               currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
                 type: 'REORDER_EFFECTS',
                 selectedEffectId: aiPendingEffects[0].id,
@@ -1559,25 +1543,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           const pendingAction = aiPending[0];
           if (pendingAction.options.length > 0) {
-            // Check if this is an optional effect the Easy AI might decline
+            
             const pendingEffectForOpt = currentState.pendingEffects.find(
               (e) => e.id === pendingAction.sourceEffectId,
             );
 
-            // Special handling for DOSU069_OPPONENT_CHOICE: AI decides whether to pay or let character be defeated
+            
             if (pendingEffectForOpt?.targetSelectionType === 'DOSU069_OPPONENT_CHOICE' && pendingEffectForOpt.isOptional) {
               let shouldDecline = false;
               try {
                 const parsed = JSON.parse(pendingEffectForOpt.effectDescription);
                 const revealCost = parsed.revealCost ?? 0;
                 const aiChakra = currentState[aiPlayer.player].chakra;
-                // Easy: always decline, Medium: decline if cost > 60% chakra, Hard/Impossible: decline if cost > 80% chakra
+                
                 if (aiPlayer.difficulty === 'easy') {
                   shouldDecline = true;
                 } else if (aiPlayer.difficulty === 'medium') {
                   shouldDecline = revealCost > aiChakra * 0.6 || revealCost >= aiChakra;
                 } else {
-                  // Hard/Impossible: decline if paying would leave very little chakra
+                  
                   shouldDecline = revealCost >= aiChakra || (aiChakra - revealCost) < 2;
                 }
               } catch { shouldDecline = Math.random() < 0.5; }
@@ -1590,7 +1574,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 continue;
               }
             } else if (pendingEffectForOpt?.isOptional && aiPlayer.difficulty === 'easy') {
-              // Easy AI: 50% chance to decline optional effects
+              
               if (Math.random() < 0.5) {
                 currentState = GameEngine.applyAction(currentState, aiPlayer.player, {
                   type: 'DECLINE_OPTIONAL_EFFECT',
@@ -1601,7 +1585,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             }
 
-            // Smart AI target selection based on difficulty
+            
             const selectedTarget = aiSelectTarget(
               pendingAction.options,
               pendingAction,
@@ -1617,7 +1601,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             iterations++;
             continue;
           } else {
-            // No valid targets - decline the optional effect or force-cleanup
+            
             const pendingEffect = currentState.pendingEffects.find(
               (e) => e.id === pendingAction.sourceEffectId,
             );
@@ -1627,7 +1611,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 pendingEffectId: pendingEffect.id,
               });
             } else {
-              // Non-optional effect with no valid targets - force cleanup to prevent freeze
+              
               console.warn('[gameStore] AI: force-cleaning non-optional pending with no targets:', pendingAction.id);
               currentState = {
                 ...currentState,
@@ -1642,12 +1626,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
 
-        // If human has pending actions (from AI card effects), break to let them resolve
+        
         const humanPending = currentState.pendingActions.filter((p) => p.player === humanPlayer);
         if (humanPending.length > 0) break;
 
-        // Clean up orphaned pending effects: effects exist but no matching pending actions for any player.
-        // This can happen when effects auto-resolve but the pendingEffects array isn't cleaned up.
+        
+        
         if (currentState.pendingEffects.length > 0 && currentState.pendingActions.length === 0) {
           console.warn('[gameStore] AI: cleaning orphaned pendingEffects with no pending actions:', currentState.pendingEffects.length);
           currentState = {
@@ -1658,17 +1642,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           continue;
         }
 
-        // Mission scoring complete - break to show scored state, then auto-advance
+        
         if (currentState.missionScoringComplete) break;
 
-        // Check if it's the AI's turn
+        
         const aiActions = GameEngine.getValidActions(currentState, aiPlayer.player);
         if (aiActions.length === 0) {
-          // If pending effects/actions are blocking (for the other player), break to let human resolve
+          
           if (currentState.pendingEffects.length > 0 || currentState.pendingActions.length > 0) {
             break;
           }
-          // No valid actions but AI hasn't passed yet — force PASS
+          
           if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
             console.warn('[gameStore] AI has no valid actions, forcing PASS');
             currentState = GameEngine.applyAction(currentState, aiPlayer.player, { type: 'PASS' });
@@ -1678,7 +1662,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
 
-        // Check if human also needs to act (during mulligan both can act)
+        
         if (currentState.phase !== 'mulligan') {
           const humanActions = GameEngine.getValidActions(currentState, humanPlayer);
           if (humanActions.length > 0 && currentState.activePlayer === humanPlayer) break;
@@ -1686,7 +1670,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
         const aiAction = await aiPlayer.getActionAsync(currentState);
         if (!aiAction) {
-          // AI couldn't decide — force PASS to prevent game freeze
+          
           if (currentState.phase === 'action' && currentState.activePlayer === aiPlayer.player && !currentState[aiPlayer.player].hasPassed) {
             console.warn('[gameStore] AI returned null action, forcing PASS');
             currentState = GameEngine.applyAction(currentState, aiPlayer.player, { type: 'PASS' });
@@ -1696,7 +1680,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
 
-        // Capture animation for this AI action
+        
         const animEvent = getAnimationForAIAction(aiAction, currentState, aiPlayer.player);
         if (animEvent) {
           aiAnimations.push(animEvent);
@@ -1705,15 +1689,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const stateBeforeAction = currentState;
         currentState = GameEngine.applyAction(currentState, aiPlayer.player, aiAction);
 
-        // Detect silently rejected actions (executeAction returned unchanged state).
-        // This can happen if the engine rejects the action due to state guards.
+        
+        
         if (currentState === stateBeforeAction) {
           console.warn('[gameStore] AI action was silently rejected:', aiAction.type,
             '| pendingEffects:', currentState.pendingEffects.length,
             '| pendingActions:', currentState.pendingActions.length);
-          // Pop the animation we speculatively added
+          
           if (animEvent) aiAnimations.pop();
-          // If there are orphaned pending effects blocking the AI, clean them up
+          
           if (currentState.pendingEffects.length > 0 && currentState.pendingActions.length === 0) {
             console.warn('[gameStore] Cleaning orphaned pendingEffects after rejected action');
             currentState = { ...currentState, pendingEffects: [] };
@@ -1723,7 +1707,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
 
         if (currentState.phase === 'gameOver') {
-          // Queue all AI animations
+          
           for (const anim of aiAnimations) {
             addAnimation(anim);
           }
@@ -1747,7 +1731,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch (err) {
       console.error('[gameStore] processAITurn error:', err);
-      // Force cleanup any dangling AI pending actions to prevent game freeze
+      
       const danglingAIPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
       if (danglingAIPending.length > 0) {
         console.warn('[gameStore] Cleaning up', danglingAIPending.length, 'dangling AI pending actions after error');
@@ -1760,7 +1744,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Safety: if we hit max iterations with AI pending actions still present, clean up
+    
     if (iterations >= maxIterations) {
       const stuckPending = currentState.pendingActions.filter((p) => p.player === aiPlayer.player);
       if (stuckPending.length > 0) {
@@ -1774,14 +1758,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    // Queue all collected AI animations
+    
     for (const anim of aiAnimations) {
       addAnimation(anim);
     }
 
     const visible = GameEngine.getVisibleState(currentState, humanPlayer);
 
-    // Mission scoring complete - show scored state, then auto-advance to End Phase
+    
     if (currentState.missionScoringComplete) {
       set({
         gameState: currentState,
@@ -1803,10 +1787,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             void get().processAITurn();
           }, 500);
         } else {
-          // Check for pending actions (e.g., Rock Lee 117 end-phase move)
+          
           const humanPendingEnd = advanced.pendingActions.filter((p: { player: string }) => p.player === hp);
           if (humanPendingEnd.length > 0) {
-            // Detect multiple simultaneous effects from DIFFERENT source cards
+            
             const orderSelEnd2 = buildEffectOrderSelection(
               humanPendingEnd, advanced.pendingEffects, advanced.activeMissions,
               get().playerDisplayNames[hp],
@@ -1855,11 +1839,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Check if there are pending target selections for the human player
-    // (e.g. SCORE effects from mission phase that need human input)
+    
+    
     const humanPendingAfterAI = currentState.pendingActions.filter((p) => p.player === humanPlayer);
     if (humanPendingAfterAI.length > 0) {
-      // Detect multiple simultaneous effects from DIFFERENT source cards
+      
       const orderSelAI = buildEffectOrderSelection(
         humanPendingAfterAI, currentState.pendingEffects, currentState.activeMissions,
         get().playerDisplayNames[humanPlayer],
@@ -1909,8 +1893,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Check if game ended during pending action resolution in the AI loop
-    // (e.g. End Phase pending → resolve → endGame, but loop exited before line 787 check)
+    
+    
     if (currentState.phase === 'gameOver') {
       for (const anim of aiAnimations) {
         addAnimation(anim);
@@ -1935,10 +1919,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isProcessing: false,
     });
 
-    // Safety: if it's still the AI's turn after the loop exits, schedule another
-    // processAITurn call. This handles edge cases where phase transitions, effect
-    // cleanup, or max iterations left the AI as the active player with no immediate
-    // actions but more work to do (e.g., start phase auto-transition).
+    
+    
+    
+    
     const humanPendingAfterLoop = currentState.pendingActions.filter((p) => p.player === humanPlayer);
     const isGameDone = (currentState.phase as string) === 'gameOver';
     const stillAITurn = !isGameDone &&
@@ -1965,7 +1949,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       timestamp: now,
     };
     set((state) => ({
-      // Prune old events (>10s) to prevent unbounded queue growth
+      
       animationQueue: [
         ...state.animationQueue.filter((a) => now - a.timestamp < 10_000),
         animEvent,
@@ -1991,9 +1975,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection) {
       const onSelect = pendingTargetSelection.onSelect;
-      // Clear BEFORE calling onSelect - performAction may set a NEW
-      // pendingTargetSelection for chained effects (e.g. MAIN → AMBUSH).
-      // Clearing after would wipe out the new pending.
+      
+      
+      
       set({ pendingTargetSelection: null });
       onSelect(targetId);
     }
@@ -2003,7 +1987,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { pendingTargetSelection } = get();
     if (pendingTargetSelection?.onDecline) {
       const onDecline = pendingTargetSelection.onDecline;
-      // Clear BEFORE calling onDecline - same chained-effect reasoning.
+      
       set({ pendingTargetSelection: null });
       onDecline();
     } else {
@@ -2020,15 +2004,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   resetGame: () => {
-    // Clean up spectator state
+    
     if (useSocketStore.getState().isSpectating) {
       useSocketStore.getState().leaveSpectating();
     }
-    // Disconnect socket if leaving an online game
+    
     if (get().isOnlineGame) {
       useSocketStore.getState().disconnect();
     }
-    // Reset UI state for new game
+    
     useUIStore.getState().resetHandOrder();
     useUIStore.getState().setCoinFlipComplete(false);
     set({
@@ -2061,7 +2045,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ gameOver: true, winner });
   },
 
-  // ─── Sandbox actions (free mode only) ───
+  
 
   sandboxDrawCard: (deckIndex: number) => {
     const { isSandboxMode, gameState, humanPlayer } = get();
@@ -2099,12 +2083,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const s = JSON.parse(JSON.stringify(gameState)) as GameState;
     const mission = s.activeMissions[missionIndex];
     if (!mission) return;
-    // Search in both player1 and player2 characters
+    
     for (const side of ['player1Characters', 'player2Characters'] as const) {
       const idx = mission[side].findIndex((c: CharacterInPlay) => c.instanceId === instanceId);
       if (idx !== -1) {
         const [char] = mission[side].splice(idx, 1);
-        // Discard all cards in the stack to owner's discard
+        
         const owner = char.originalOwner || char.controlledBy;
         s[owner].discardPile.push(char.card);
         if (char.stack) {
@@ -2234,7 +2218,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const s = JSON.parse(JSON.stringify(gameState)) as GameState;
     const mission = s.activeMissions[missionIndex];
     if (!mission) return;
-    // Keep the same rank/bonus but replace the card
+    
     mission.card = JSON.parse(JSON.stringify(newMissionCard));
     mission.basePoints = newMissionCard.points ?? newMissionCard.basePoints ?? 0;
     set({ gameState: s, visibleState: GameEngine.getVisibleState(s, humanPlayer) });

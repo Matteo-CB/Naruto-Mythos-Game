@@ -73,7 +73,7 @@ describe('Ino 020 (UC) - Take Control', () => {
     const state = makeState({ activeMissions: [mockMission({ player1Characters: [myIno], player2Characters: [enemyIno, enemyOther] }), mockMission({ rank: 'C', rankBonus: 2 })] });
     const handler = getEffectHandler('KS-020-UC', 'MAIN');
     const result = handler!({ state, sourcePlayer: 'player1', sourceCard: myIno, sourceMissionIndex: 0, triggerType: 'MAIN', isUpgrade: true });
-    // Now returns CONFIRM popup (pre-filter is re-checked in CONFIRM case)
+    
     expect(result.requiresTargetSelection).toBe(true);
     expect(result.targetSelectionType).toBe('INO020_CONFIRM_MAIN');
   });
@@ -87,18 +87,18 @@ describe('Ino 020 (UC) - Take Control', () => {
       activeMissions: [mockMission({ player1Characters: [i19], player2Characters: [e3] }), mockMission({ rank: 'C', rankBonus: 2 })],
     });
     const afterUpgrade = GameEngine.applyAction(state, 'player1', { type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'i19' });
-    // First pending is the CONFIRM popup
+    
     expect(afterUpgrade.pendingActions.length).toBeGreaterThan(0);
     const confirmPa = afterUpgrade.pendingActions[0];
     expect(confirmPa.player).toBe('player1');
-    // Confirm the MAIN effect
+    
     const afterConfirm = GameEngine.applyAction(afterUpgrade, 'player1', { type: 'SELECT_TARGET', pendingActionId: confirmPa.id, selectedTargets: [confirmPa.options[0]] });
-    // Now should have the UPGRADE confirm popup (Type A: cost 3 instead of 2)
+    
     expect(afterConfirm.pendingActions.length).toBeGreaterThan(0);
     const upgradePa = afterConfirm.pendingActions[0];
-    // Confirm the UPGRADE
+    
     const afterUpgradeConfirm = GameEngine.applyAction(afterConfirm, 'player1', { type: 'SELECT_TARGET', pendingActionId: upgradePa.id, selectedTargets: [upgradePa.options[0]] });
-    // Now should have the actual target selection with cost 3 limit
+    
     expect(afterUpgradeConfirm.pendingActions.length).toBeGreaterThan(0);
     const selectPa = afterUpgradeConfirm.pendingActions[0];
     expect(selectPa.options).toContain('e3');
@@ -109,8 +109,8 @@ describe('Ino 020 (UC) - Take Control', () => {
 
   describe('take-control and controller-leaves-play (advanced ruling)', () => {
     it('hiding the controller does NOT break control — stolen card stays on controller side', () => {
-      // Per the advanced ruling (Marcello, Naruto Mythos TCG): hide does not
-      // return stolen cards anymore. Only an actual leave-play does.
+      
+      
       const itachi = mockChar({
         instanceId: 'itachi-1',
         card: mockCard({ id: 'KS-090-C', number: 90, name_fr: 'ITACHI UCHIWA', chakra: 2, power: 3 }),
@@ -136,11 +136,11 @@ describe('Ino 020 (UC) - Take Control', () => {
 
       const after = EffectEngine.hideCharacterWithLog(state, 'ino-1', 'player1');
 
-      // Ino is hidden, on player2's side.
+      
       const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
       expect(hiddenIno?.isHidden).toBe(true);
 
-      // Itachi stays on player2's side with controller link preserved.
+      
       const itachiStill = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
       expect(itachiStill).toBeDefined();
       expect(itachiStill?.controlledBy).toBe('player2');
@@ -178,7 +178,7 @@ describe('Ino 020 (UC) - Take Control', () => {
 
       const after = checkChoji018PostMoveTrigger(state, choji, 0, 'player1', 'player1');
 
-      // Ino hidden on player2 side; Itachi still under control on the same side.
+      
       const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
       expect(hiddenIno?.isHidden).toBe(true);
 

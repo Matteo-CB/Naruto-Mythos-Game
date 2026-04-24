@@ -36,7 +36,7 @@ export function ActionBar() {
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
-  // Reset pass confirmation when turn/phase changes
+  
   useEffect(() => {
     setConfirmingPass(false);
   }, [visibleState?.phase, visibleState?.activePlayer]);
@@ -55,19 +55,19 @@ export function ActionBar() {
   const hasPassed = myState.hasPassed;
   const actionsBlocked = effectPopupMinimized;
 
-  // Determine available actions
+  
   const hasCardSelected = selectedCardIndex !== null;
   const hasMissionSelected = selectedMissionIndex !== null;
   const hasTargetSelected = selectedTargetId !== null;
   const cardAndMissionReady = hasCardSelected && hasMissionSelected;
 
-  // Get selected card info
+  
   const selectedCard =
     hasCardSelected && selectedCardIndex < myState.hand.length
       ? myState.hand[selectedCardIndex]
       : null;
 
-  // Compute effective cost when card + mission are selected (accounts for Tayuya, Kurenai, etc.)
+  
   const effectiveCost = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState) return selectedCard?.chakra ?? 0;
     try {
@@ -86,7 +86,7 @@ export function ActionBar() {
   const canAffordCard = selectedCard ? myState.chakra >= effectiveCost : false;
   const canAffordHidden = myState.chakra >= 1;
 
-  // Compute upgrade targets: same name (or flexible upgrade), strictly lower cost, on selected mission
+  
   const upgradeTargets = useMemo(() => {
     if (!selectedCard || selectedMissionIndex === null || !visibleState?.activeMissions) return [];
     const mission = visibleState.activeMissions[selectedMissionIndex];
@@ -95,38 +95,38 @@ export function ActionBar() {
     return myChars.filter(c => {
       if (c.controlledBy !== myPlayer) return false;
       if (c.isHidden) return false; // Hidden chars have no name — can't upgrade over them
-      // Use topCard (top of evolution stack) for correct name/cost after prior upgrades
+      
       const charCard = c.topCard ?? c.card;
       if (!charCard) return false;
       let sameNameMatch = charCard.name_fr.toUpperCase() === selectedCard.name_fr.toUpperCase();
-      // Flexible upgrade: Orochimaru 051/138 can upgrade over non-Summon, non-Orochimaru
+      
       const hasFlexRestriction = (selectedCard.number === 51 || selectedCard.number === 138)
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('upgrade'));
       const isFlexible = hasFlexRestriction
         && !(charCard.keywords ?? []).includes('Summon')
         && !charCard.name_fr.toUpperCase().includes('OROCHIMARU');
-      // Orochimaru 051/138 restriction blocks ALL upgrades onto Orochimaru/Summon (including same-name)
+      
       if (hasFlexRestriction && (
         (charCard.keywords ?? []).includes('Summon') || charCard.name_fr.toUpperCase().includes('OROCHIMARU')
       )) {
         sameNameMatch = false;
       }
-      // Akamaru 029 can upgrade over Kiba Inuzuka
+      
       const isAkamaruUpgrade = selectedCard.number === 29
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('Kiba Inuzuka'))
         && charCard.name_fr.toUpperCase().includes('KIBA INUZUKA');
-      // Ichibi 076 can upgrade any Gaara
+      
       const isIchibiUpgrade = selectedCard.number === 76
         && (selectedCard.effects ?? []).some(e => e.type === 'MAIN' && e.description.includes('[⧗]'))
         && charCard.name_fr.toUpperCase() === 'GAARA';
-      // Ukon 063/124 can upgrade any Sound Village character
+      
       const isUkonUpgrade = (selectedCard.number === 63 || selectedCard.number === 124)
         && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
         && (charCard.group ?? '').toLowerCase().includes('sound');
-      // Kyubi 129 can upgrade over any Naruto Uzumaki
+      
       const isKyubiUpgrade = selectedCard.number === 129
         && charCard.name_fr.toUpperCase().includes('NARUTO');
-      // Sakon 127 can upgrade over any Sound Village character
+      
       const isSakonUpgrade = selectedCard.number === 127
         && (selectedCard.effects ?? []).some(e => e.description.includes('[⧗]') && e.description.toLowerCase().includes('upgrade'))
         && (charCard.group ?? '').toLowerCase().includes('sound');
@@ -135,8 +135,8 @@ export function ActionBar() {
       const nameOk = sameNameMatch || isFlexUpgrade;
       if (!nameOk || charCard.chakra >= selectedCard.chakra) return false;
 
-      // For flex upgrades (not same-name), check post-upgrade name conflict:
-      // would placing selectedCard's name on this mission create a duplicate?
+      
+      
       if (!sameNameMatch && isFlexUpgrade) {
         const wouldConflict = myChars.some(other => {
           if (other.instanceId === c.instanceId || other.isHidden) return false;
@@ -150,9 +150,9 @@ export function ActionBar() {
     });
   }, [selectedCard, selectedMissionIndex, visibleState?.activeMissions, myPlayer]);
 
-  // Can reveal: need a hidden character selected as target
+  
   const canReveal = isMyTurn && isActionPhase && hasTargetSelected && !hasPassed;
-  // Compute all reveal upgrade targets and the base reveal cost
+  
   let revealBaseCost = 0;
   const revealUpgradeTargets: { instanceId: string; name: string; cost: number; isSameName: boolean }[] = [];
   if (hasTargetSelected && visibleState.activeMissions) {
@@ -164,7 +164,7 @@ export function ActionBar() {
       if (target && target.isHidden && target.card) {
         const hiddenTopCard = target.topCard ?? target.card;
         revealBaseCost = calculateEffectiveCost(visibleState, myPlayer, hiddenTopCard, mi, true);
-        // Find ALL valid upgrade targets on this mission
+        
         for (const c of myChars) {
           if (c.instanceId === selectedTargetId || c.isHidden) continue;
           const cTop = c.topCard ?? c.card;
@@ -173,7 +173,7 @@ export function ActionBar() {
           const isSameName = cTop.name_fr.toUpperCase() === hiddenTopCard.name_fr.toUpperCase();
           const isFlexible = checkFlexibleUpgrade(hiddenTopCard as any, cTop as any);
           if (isSameName || isFlexible) {
-            // For flex upgrades, check post-upgrade name conflict
+            
             if (isFlexible && !isSameName) {
               const wouldConflict = myChars.some(other => {
                 if (other.instanceId === selectedTargetId || other.instanceId === c.instanceId || other.isHidden) return false;
@@ -184,7 +184,7 @@ export function ActionBar() {
               if (wouldConflict) continue;
             }
             const rawRevUpgCost = Math.max(0, revealBaseCost - (cTop.chakra ?? 0));
-            // Kurenai 034: minimum cost 1 on upgrade display
+            
             const upgradeCost = hasKurenai034CostReduction(visibleState, myPlayer, hiddenTopCard, mi)
               ? Math.max(1, rawRevUpgCost) : rawRevUpgCost;
             revealUpgradeTargets.push({
@@ -199,13 +199,13 @@ export function ActionBar() {
       }
     }
   }
-  // Can show plain "Reveal" button only if NO same-name upgrade targets exist
-  // (same-name upgrade is mandatory - can't have 2 same-name chars on one mission)
+  
+  
   const hasSameNameRevealUpgrade = revealUpgradeTargets.some(t => t.isSameName);
   const canShowPlainReveal = !hasSameNameRevealUpgrade;
   const canAffordReveal = myState.chakra >= revealBaseCost;
 
-  // Handlers
+  
   const handlePlayVisible = () => {
     if (!cardAndMissionReady || !canAffordCard || !isMyTurn || hasPassed || actionsBlocked) return;
     clearActionError();
@@ -215,7 +215,7 @@ export function ActionBar() {
       missionIndex: selectedMissionIndex!,
       hidden: false,
     });
-    // Only clear selection if no error (action was accepted)
+    
     const error = useGameStore.getState().actionError;
     if (!error) clearSelection();
   };
@@ -237,7 +237,7 @@ export function ActionBar() {
       console.warn('[ActionBar] handleReveal blocked:', { canReveal, canAffordReveal, selectedTargetId });
       return;
     }
-    // Find which mission the target is on
+    
     let targetMissionIndex = -1;
     if (visibleState.activeMissions) {
       for (let i = 0; i < visibleState.activeMissions.length; i++) {
@@ -278,7 +278,7 @@ export function ActionBar() {
 
   const handlePass = () => {
     if (!isMyTurn || !isActionPhase || hasPassed || actionsBlocked) return;
-    // If player has chakra remaining, ask for confirmation first
+    
     if (myState.chakra >= 1 && !confirmingPass) {
       setConfirmingPass(true);
       return;
@@ -302,7 +302,7 @@ export function ActionBar() {
     }
   };
 
-  // Don't show during non-action phases (except a minimal display + abandon button)
+  
   if (!isActionPhase) {
     return (
       <>
@@ -360,7 +360,7 @@ export function ActionBar() {
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
       }}
     >
-      {/* Status text */}
+      
       {!isMyTurn && (
         <span className="text-xs" style={{ color: '#888888' }}>
           {t('game.opponentTurn')}
@@ -375,7 +375,7 @@ export function ActionBar() {
 
       {isMyTurn && !hasPassed && (
         <>
-          {/* Action error message */}
+          
           {actionError && (
             <motion.span
               initial={{ opacity: 0, x: -10 }}
@@ -387,7 +387,7 @@ export function ActionBar() {
             </motion.span>
           )}
 
-          {/* Selection hint */}
+          
           {!actionError && !hasCardSelected && !hasTargetSelected && (
             <span className="text-xs" style={{ color: '#888888' }}>
               {t('game.selectTarget')}
@@ -400,16 +400,16 @@ export function ActionBar() {
             </span>
           )}
 
-          {/* Upgrade button(s) - shown first when available */}
+          
           {cardAndMissionReady && upgradeTargets.map((target) => {
             const charCard = target.topCard ?? target.card;
             const isHiddenTarget = target.isHidden;
-            // For hidden targets: pay full effective cost (reveal + upgrade). For visible: pay diff.
-            // Use effectiveCost (which includes Kurenai, Gamakichi, etc. modifiers) instead of raw chakra.
+            
+            
             const rawUpgradeCost = isHiddenTarget
               ? effectiveCost
               : effectiveCost - (charCard?.chakra ?? 0);
-            // Kurenai 034: minimum cost 1 applies to upgrade cost display (matches actual charge)
+            
             const upgradeCost = (!isHiddenTarget && selectedCard && visibleState && selectedMissionIndex !== null
               && hasKurenai034CostReduction(visibleState, myPlayer, selectedCard, selectedMissionIndex))
               ? Math.max(1, rawUpgradeCost) : rawUpgradeCost;
@@ -429,7 +429,7 @@ export function ActionBar() {
             );
           })}
 
-          {/* Play visible button - secondary when upgrade targets exist */}
+          
           {cardAndMissionReady && (
             <ActionButton
               label={`${t('game.play')} (${costLabel} ${t('game.chakra').toLowerCase()})`}
@@ -439,7 +439,7 @@ export function ActionBar() {
             />
           )}
 
-          {/* Play hidden button */}
+          
           {cardAndMissionReady && (
             <ActionButton
               label={t('game.actions.playHiddenCharacter')}
@@ -449,7 +449,7 @@ export function ActionBar() {
             />
           )}
 
-          {/* Reveal upgrade button(s) - one per valid upgrade target */}
+          
           {canReveal && revealUpgradeTargets.map((opt) => {
             const canAfford = myState.chakra >= opt.cost;
             return (
@@ -463,7 +463,7 @@ export function ActionBar() {
             );
           })}
 
-          {/* Plain reveal button */}
+          
           {canReveal && canShowPlainReveal && (
             <ActionButton
               label={`${t('game.reveal')} (${revealBaseCost} ${t('game.chakra').toLowerCase()})`}
@@ -473,7 +473,7 @@ export function ActionBar() {
             />
           )}
 
-          {/* Cancel selection */}
+          
           {(hasCardSelected || hasTargetSelected || hasMissionSelected) && (
             <ActionButton
               label={t('common.cancel')}
@@ -483,12 +483,12 @@ export function ActionBar() {
             />
           )}
 
-          {/* Timer display (online only) */}
+          
           {isOnlineGame && isMyTurn && actionDeadline && (
             <ActionTimer deadline={actionDeadline} />
           )}
 
-          {/* Pass button */}
+          
           {confirmingPass ? (
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] whitespace-nowrap" style={{ color: '#c4a35a' }}>
@@ -518,7 +518,7 @@ export function ActionBar() {
         </>
       )}
 
-      {/* Abandon button (always visible in online games during action phase) */}
+      
       {isOnlineGame && (
         <ActionButton
           label={t('game.actions.abandon')}
@@ -528,7 +528,7 @@ export function ActionBar() {
         />
       )}
 
-      {/* Abandon confirmation dialog */}
+      
       <AnimatePresence>
         {showAbandonConfirm && (
           <AbandonConfirmDialog
@@ -542,7 +542,7 @@ export function ActionBar() {
   );
 }
 
-// ----- Button sub-component -----
+
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'muted';
 
@@ -627,7 +627,7 @@ function ActionButton({
   );
 }
 
-// ----- Timer component -----
+
 
 function ActionTimer({ deadline }: { deadline: number }) {
   const [secondsLeft, setSecondsLeft] = useState(() =>
@@ -663,7 +663,7 @@ function ActionTimer({ deadline }: { deadline: number }) {
   );
 }
 
-// ----- Abandon confirmation dialog -----
+
 
 function AbandonConfirmDialog({
   onConfirm,
@@ -674,8 +674,8 @@ function AbandonConfirmDialog({
   onCancel: () => void;
   t: ReturnType<typeof useTranslations>;
 }) {
-  // Use portal to render at document body level, escaping any stacking context
-  // that could trap the dialog (e.g. parent with backdropFilter or transform)
+  
+  
   return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
@@ -698,7 +698,7 @@ function AbandonConfirmDialog({
           maxWidth: 'min(400px, calc(100vw - 32px))',
         }}
       >
-        {/* Corner brackets */}
+        
         <div style={{ position: 'absolute', top: -1, left: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: -1, right: -1, width: 20, height: 20, borderTop: '2px solid rgba(179, 62, 62, 0.5)', borderRight: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -1, left: -1, width: 20, height: 20, borderBottom: '2px solid rgba(179, 62, 62, 0.5)', borderLeft: '2px solid rgba(179, 62, 62, 0.5)', pointerEvents: 'none' }} />

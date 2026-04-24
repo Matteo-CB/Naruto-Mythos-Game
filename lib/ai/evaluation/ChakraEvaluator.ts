@@ -1,23 +1,18 @@
 import type { GameState, PlayerID, CharacterCard, GameAction } from '../../engine/types';
 
-/**
- * Evaluates chakra efficiency for AI decision-making.
- */
+
 export class ChakraEvaluator {
-  /**
-   * Evaluate the chakra advantage for a player.
-   * Takes into account current chakra, projected income, and spending potential.
-   */
+  
   static evaluateChakraAdvantage(state: GameState, player: PlayerID): number {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
 
     const myChakra = state[player].chakra;
     const oppChakra = state[opponent].chakra;
 
-    // Direct chakra advantage
+    
     let score = myChakra - oppChakra;
 
-    // Projected chakra income (from characters in play with CHAKRA +X)
+    
     const myIncome = ChakraEvaluator.estimateChakraIncome(state, player);
     const oppIncome = ChakraEvaluator.estimateChakraIncome(state, opponent);
     score += (myIncome - oppIncome) * 2;
@@ -25,10 +20,7 @@ export class ChakraEvaluator {
     return score;
   }
 
-  /**
-   * Estimate chakra income for next turn.
-   * 5 base + 1 per character in play + CHAKRA +X bonuses.
-   */
+  
   static estimateChakraIncome(state: GameState, player: PlayerID): number {
     let income = 5; // Base
     let charCount = 0;
@@ -37,7 +29,7 @@ export class ChakraEvaluator {
       const chars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
       charCount += chars.length;
 
-      // Check for CHAKRA +X effects on visible characters
+      
       for (const char of chars) {
         if (char.isHidden) continue;
         const effects = char.card.effects ?? [];
@@ -55,19 +47,13 @@ export class ChakraEvaluator {
     return income;
   }
 
-  /**
-   * Evaluate the cost efficiency of playing a card.
-   * Higher power-per-chakra = more efficient.
-   */
+  
   static evaluateCardEfficiency(card: CharacterCard): number {
     if (card.chakra === 0) return card.power * 2; // Free cards are very efficient
     return card.power / card.chakra;
   }
 
-  /**
-   * Determine if the player can afford to play their best cards.
-   * Returns a measure of "playability" of the hand.
-   */
+  
   static evaluatePlayability(state: GameState, player: PlayerID): number {
     const playerState = state[player];
     let playableCards = 0;
@@ -83,30 +69,25 @@ export class ChakraEvaluator {
     return playableCards * 2 + totalPlayableValue * 0.5;
   }
 
-  /**
-   * Evaluate whether passing now is advisable from a chakra perspective.
-   * NOTE: Chakra resets to 0 at end of each turn, so unspent chakra is WASTED.
-   * The AI should almost never conserve — the only exception is turn 1 with
-   * very limited board value, where passing early to get Edge might matter.
-   */
+  
   static shouldConserveChakra(state: GameState, player: PlayerID): boolean {
     const opponent: PlayerID = player === 'player1' ? 'player2' : 'player1';
 
-    // If we have very little chakra left, passing is fine (nothing to spend)
+    
     if (state[player].chakra <= 1) return false;
 
-    // If opponent already passed, we should ALWAYS spend our chakra (free actions!)
+    
     if (state[opponent].hasPassed) return false;
 
-    // Turns 3-4: NEVER conserve — spend everything, these are the decisive turns.
-    // Chakra resets to 0 at end of turn anyway.
+    
+    
     if (state.turn >= 3) return false;
 
-    // Turn 2: only conserve if we have no playable cards (very rare)
+    
     if (state.turn === 2) return false;
 
-    // Turn 1 only: conserve if we want Edge token and have very few good plays
-    // But only if we have no affordable cards at all
+    
+    
     const hasAffordableCard = state[player].hand.some(
       c => (c.chakra ?? 0) <= state[player].chakra,
     );
@@ -115,27 +96,25 @@ export class ChakraEvaluator {
     return true;
   }
 
-  /**
-   * Score a play action based on chakra efficiency.
-   */
+  
   static scorePlayAction(action: GameAction, state: GameState, player: PlayerID): number {
     if (action.type === 'PLAY_CHARACTER' || action.type === 'PLAY_HIDDEN') {
       const card = state[player].hand[action.cardIndex];
       if (!card) return 0;
 
       if (action.type === 'PLAY_HIDDEN') {
-        // Hidden play costs 1 chakra - value based on potential
+        
         return card.power * 0.3 + (card.effects?.length ?? 0) * 0.5;
       }
 
-      // Face-up play
+      
       return ChakraEvaluator.evaluateCardEfficiency(card) * 3 + card.power;
     }
 
     if (action.type === 'UPGRADE_CHARACTER') {
       const card = state[player].hand[action.cardIndex];
       if (!card) return 0;
-      // Upgrades get power difference bonus
+      
       return card.power * 1.5 + (card.effects?.length ?? 0);
     }
 

@@ -25,7 +25,7 @@ export default function LearnPage() {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>('rules');
 
-  // Quiz state
+  
   const [quizView, setQuizView] = useState<QuizView>('launcher');
   const [bestScores, setBestScores] = useState<Record<number, number>>({});
   const quizDiffRef = useRef<number>(1);
@@ -148,7 +148,7 @@ export default function LearnPage() {
         <LanguageSwitcher />
       </header>
 
-      {/* Tabs */}
+      
       <div
         className="relative z-20 flex justify-center gap-1 px-4 py-2"
         style={{ borderBottom: '1px solid rgba(196, 163, 90, 0.1)' }}

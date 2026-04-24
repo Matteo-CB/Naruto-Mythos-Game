@@ -1,7 +1,4 @@
-/**
- * Rare card effect handlers index.
- * Registers all rare card handlers with the effect registry.
- */
+
 
 import { registerNaruto108Handlers } from './naruto108';
 import { registerGaara120Handlers } from './gaara120';
@@ -36,13 +33,13 @@ import { registerShino115Handlers } from './shino115';
 import { registerSakon127Handlers } from './sakon127';
 
 export function registerAllRareHandlers(): void {
-  // Existing handlers
+  
   registerNaruto108Handlers();    // 108/130 - NARUTO UZUMAKI: Hide enemy P3 / UPGRADE POWERUP X
   registerGaara120Handlers();     // 120/130 - GAARA: Defeat P1 all missions / UPGRADE POWERUP X
   registerSakura109Handlers();    // 109/130 - SAKURA HARUNO: Play Leaf from discard / UPGRADE -2 cost
   registerChoji112Handlers();     // 112/130 - CHOJI AKIMICHI: Discard to POWERUP X / UPGRADE repeat
 
-  // New handlers
+  
   registerTsunade104Handlers();   // 104/130 - TSUNADE: Spend extra chakra as POWERUP
   registerJiraiya105Handlers();   // 105/130 - JIRAYA: Play Summon -3 / UPGRADE move enemy
   registerKakashi106Handlers();   // 106/130 - KAKASHI: Discard top of upgraded enemy / UPGRADE copy

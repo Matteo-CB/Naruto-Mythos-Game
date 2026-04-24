@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 
-// =====================================================================
-// CONSTANTS
-// =====================================================================
+
+
+
 
 const GOLD = '#c4a35a';
 const DARK_BG = '#0a0a0a';
@@ -23,9 +23,9 @@ const DIFFICULTY_COLORS: Record<number, string> = {
   5: '#6a6abb',
 };
 
-// =====================================================================
-// TYPES
-// =====================================================================
+
+
+
 
 interface LeaderboardEntry {
   id: string;
@@ -40,9 +40,9 @@ type FilterTab = 'all' | 1 | 2 | 3 | 4 | 5;
 
 const FILTER_TABS: FilterTab[] = ['all', 1, 2, 3, 4, 5];
 
-// =====================================================================
-// COMPONENT
-// =====================================================================
+
+
+
 
 export function QuizLeaderboard() {
   const t = useTranslations('learn');
@@ -90,7 +90,7 @@ export function QuizLeaderboard() {
 
   return (
     <div className="w-full">
-      {/* Title */}
+      
       <h2
         className="text-lg font-bold uppercase tracking-wider mb-2"
         style={{ color: GOLD }}
@@ -98,7 +98,7 @@ export function QuizLeaderboard() {
         {t('quiz.leaderboard.title')}
       </h2>
 
-      {/* Filter tabs */}
+      
       <div className="flex flex-wrap gap-1 mb-3">
         {FILTER_TABS.map((tab) => {
           const isActive = activeTab === tab;
@@ -126,7 +126,7 @@ export function QuizLeaderboard() {
         })}
       </div>
 
-      {/* Table */}
+      
       <div
         style={{
           border: `1px solid ${BORDER}`,
@@ -134,7 +134,7 @@ export function QuizLeaderboard() {
           overflow: 'hidden',
         }}
       >
-        {/* Header */}
+        
         <div
           className="grid gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 text-xs uppercase tracking-wider"
           style={{
@@ -155,7 +155,7 @@ export function QuizLeaderboard() {
           <span className="text-right">{t('quiz.leaderboard.date')}</span>
         </div>
 
-        {/* Content */}
+        
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div
@@ -233,7 +233,7 @@ export function QuizLeaderboard() {
                         : 'transparent',
                     }}
                   >
-                    {/* Rank */}
+                    
                     <span
                       className="font-bold"
                       style={{ color: isTop3 ? GOLD : TEXT_DIM }}
@@ -241,7 +241,7 @@ export function QuizLeaderboard() {
                       {index + 1}
                     </span>
 
-                    {/* Player */}
+                    
                     <span
                       className="truncate"
                       style={{ color: TEXT_LIGHT }}
@@ -249,7 +249,7 @@ export function QuizLeaderboard() {
                       {entry.username}
                     </span>
 
-                    {/* Score */}
+                    
                     <span
                       className="text-right font-bold"
                       style={{ color: isTop3 ? GOLD : TEXT_LIGHT }}
@@ -257,7 +257,7 @@ export function QuizLeaderboard() {
                       {entry.score}
                     </span>
 
-                    {/* Accuracy */}
+                    
                     <span
                       className="text-right"
                       style={{ color: TEXT_DIM }}
@@ -265,7 +265,7 @@ export function QuizLeaderboard() {
                       {entry.accuracy}%
                     </span>
 
-                    {/* Difficulty badge */}
+                    
                     <div className="flex justify-center">
                       <span
                         className="inline-block px-2 py-0.5 text-xs font-bold uppercase"
@@ -281,7 +281,7 @@ export function QuizLeaderboard() {
                       </span>
                     </div>
 
-                    {/* Date */}
+                    
                     <span
                       className="text-right"
                       style={{ color: TEXT_DIM }}

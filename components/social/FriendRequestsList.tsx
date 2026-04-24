@@ -21,7 +21,7 @@ export function FriendRequestsList() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Incoming Requests */}
+      
       <div>
         <h3
           className="text-sm uppercase tracking-wider mb-3"
@@ -109,7 +109,7 @@ export function FriendRequestsList() {
         )}
       </div>
 
-      {/* Outgoing / Sent Requests */}
+      
       <div>
         <h3
           className="text-sm uppercase tracking-wider mb-3"

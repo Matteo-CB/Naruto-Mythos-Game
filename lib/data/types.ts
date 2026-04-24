@@ -1,4 +1,4 @@
-// Raw JSON types matching card-data.json format
+
 
 export type RawRarity = 'C' | 'UC' | 'R' | 'RA' | 'S' | 'SV' | 'M' | 'MV' | 'L' | 'MMS';
 

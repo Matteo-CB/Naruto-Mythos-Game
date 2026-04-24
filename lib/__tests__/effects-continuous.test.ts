@@ -1,7 +1,4 @@
-/**
- * Comprehensive tests for all continuous [⧗] effects via ContinuousEffects.ts.
- * Tests chakra bonuses, power modifiers, and power token retention.
- */
+
 import { describe, it, expect } from 'vitest';
 import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState } from './testHelpers';
 import {
@@ -16,11 +13,11 @@ function makeMission(rank: 'D' | 'C' | 'B' | 'A' = 'D', p1: CharacterInPlay[] = 
   return { card: mockMission(), rank, basePoints: 3, rankBonus, wonBy: null, player1Characters: p1, player2Characters: p2 };
 }
 
-// ===================================================================
-// CHAKRA BONUSES
-// ===================================================================
+
+
+
 describe('Chakra Bonuses', () => {
-  // 025/130 - KIBA: CHAKRA +1 if Akamaru in same mission
+  
   describe('Kiba 025 - CHAKRA +1 if Akamaru', () => {
     it('should give +1 chakra when Akamaru is in the same mission', () => {
       const kiba = mockCharInPlay({ instanceId: 'kiba-1' }, {
@@ -69,7 +66,7 @@ describe('Chakra Bonuses', () => {
     });
   });
 
-  // 044/130 - ANKO: CHAKRA +1 if another friendly Leaf Village
+  
   describe('Anko 044 - CHAKRA +1 if friendly Leaf Village', () => {
     it('should give +1 when another Leaf Village ally is present', () => {
       const anko = mockCharInPlay({ instanceId: 'anko-1' }, {
@@ -103,7 +100,7 @@ describe('Chakra Bonuses', () => {
     });
   });
 
-  // 064/130 - TAYUYA: CHAKRA +X (X = missions with Sound Four)
+  
   describe('Tayuya 064 - CHAKRA +X (Sound Four missions)', () => {
     it('should give chakra equal to number of missions with Sound Four', () => {
       const tayuya = mockCharInPlay({ instanceId: 'tay-1' }, {
@@ -126,7 +123,7 @@ describe('Chakra Bonuses', () => {
     });
   });
 
-  // 077/130 - KANKURO: CHAKRA +1 if non-hidden enemy in this mission
+  
   describe('Kankuro 077 - CHAKRA +1 if enemy present', () => {
     it('should give +1 when non-hidden enemy present', () => {
       const kankuro = mockCharInPlay({ instanceId: 'kan-1' }, {
@@ -161,11 +158,11 @@ describe('Chakra Bonuses', () => {
   });
 });
 
-// ===================================================================
-// POWER MODIFIERS
-// ===================================================================
+
+
+
 describe('Power Modifiers', () => {
-  // 015/130 - KAKASHI: Other Team 7 +1 Power
+  
   describe('Kakashi 015 - Team 7 +1 Power', () => {
     it('should give +1 power to other Team 7 characters', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
@@ -216,7 +213,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // 042/130 - GAI: Other Team Guy +1 Power
+  
   describe('Gai 042 - Team Guy +1 Power', () => {
     it('should give +1 power to Team Guy characters', () => {
       const gai = mockCharInPlay({ instanceId: 'gai-1' }, {
@@ -236,7 +233,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // 013/130 - SASUKE: -1 Power per other non-hidden friendly
+  
   describe('Sasuke 013 - debuff per friendly', () => {
     it('should lose -1 per other non-hidden friendly', () => {
       const sasuke = mockCharInPlay({ instanceId: 'sas-1' }, {
@@ -269,7 +266,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // 079/130 - TEMARI: +2 Power if you have the Edge
+  
   describe('Temari 079 - +2 Power with Edge', () => {
     it('should give +2 power when player has Edge', () => {
       const temari = mockCharInPlay({ instanceId: 'tem-1' }, {
@@ -301,7 +298,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // 084/130 - YASHAMARU: +2 Power if friendly Gaara
+  
   describe('Yashamaru 084 - +2 Power if Gaara', () => {
     it('should give +2 when friendly Gaara is in the same mission', () => {
       const yashamaru = mockCharInPlay({ instanceId: 'yash-1' }, {
@@ -334,7 +331,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // 101/130 - TON TON: +1 Power if Tsunade or Shizune
+  
   describe('Ton Ton 101 - +1 Power if Tsunade/Shizune', () => {
     it('should give +1 when Tsunade is in the same mission', () => {
       const tonton = mockCharInPlay({ instanceId: 'tt-1' }, {
@@ -382,7 +379,7 @@ describe('Power Modifiers', () => {
     });
   });
 
-  // Combined modifiers
+  
   describe('Combined modifiers', () => {
     it('Kakashi + Gai should stack on a Team 7 + Team Guy character', () => {
       const kakashi = mockCharInPlay({ instanceId: 'kak-1' }, {
@@ -395,8 +392,8 @@ describe('Power Modifiers', () => {
         effects: [{ type: 'MAIN', description: '[⧗] Other Team Guy characters in this mission gain +1 Power.' }],
         keywords: ['Team Guy'],
       });
-      // A character that is both Team 7 and Team Guy doesn't exist in the card data,
-      // but let's test stacking with a Team 7 member
+      
+      
       const naruto = mockCharInPlay({ instanceId: 'nar-1' }, {
         name_fr: 'Naruto', keywords: ['Team 7'],
       });
@@ -410,9 +407,9 @@ describe('Power Modifiers', () => {
   });
 });
 
-// ===================================================================
-// POWER TOKEN RETENTION
-// ===================================================================
+
+
+
 describe('Power Token Retention', () => {
   describe('Rock Lee 039 - retains power tokens', () => {
     it('should retain power tokens when face-visible', () => {
@@ -442,9 +439,9 @@ describe('Power Token Retention', () => {
   });
 });
 
-// ===================================================================
-// Hidden characters should not provide any continuous effects
-// ===================================================================
+
+
+
 describe('Hidden characters', () => {
   it('hidden characters should give 0 chakra bonus', () => {
     const hiddenKiba = mockCharInPlay({ instanceId: 'kiba-h', isHidden: true }, {

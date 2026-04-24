@@ -2,14 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 020/130 - INO YAMANAKA 'Transposition' (UC)
- * Chakra: 3 | Power: 0
- * Group: Leaf Village | Keywords: Team 10, Jutsu
- *
- * MAIN: Take control of an enemy character with cost 2 or less in this mission.
- * UPGRADE: MAIN effect: Instead, the cost limit is 3 or less.
- */
+
 
 function handleIno020Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex, isUpgrade } = ctx;
@@ -22,14 +15,14 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
 
   const costLimit = isUpgrade ? 3 : 2;
 
-  // Collect visible friendly character names for same-name pre-filter
+  
   const friendlyNames = new Set<string>();
   for (const fc of friendlyChars) {
     if (!fc.isHidden) friendlyNames.add(fc.card.name_fr.toUpperCase());
   }
 
-  // Find enemy characters with cost <= costLimit (hidden characters have cost 0 per rules)
-  // Pre-filter: exclude targets that would create a same-name duplicate on our side
+  
+  
   const validTargets: string[] = [];
   for (const char of enemyChars) {
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
@@ -51,7 +44,7 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
   };
   }
 
-  // Confirmation popup before take-control target selection
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -64,7 +57,7 @@ function handleIno020Main(ctx: EffectContext): EffectResult {
 }
 
 function handleIno020UpgradeNoop(ctx: EffectContext): EffectResult {
-  // No-op: MAIN handler already checks isUpgrade to increase cost limit from 2 to 3.
+  
   return { state: ctx.state };
 }
 

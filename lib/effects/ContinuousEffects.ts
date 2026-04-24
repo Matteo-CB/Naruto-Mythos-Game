@@ -1,23 +1,13 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../engine/types';
 import { logAction } from '../engine/utils/gameLog';
 
-/**
- * Centralized continuous effect [⧗] logic.
- *
- * Consolidates all continuous effect calculations that were previously
- * scattered across StartPhase.ts, PowerCalculation.ts, and EndPhase.ts.
- */
 
-// ---------------------
-// Chakra Bonus
-// ---------------------
 
-/**
- * Calculate the CHAKRA +X bonus provided by a single character's continuous effects.
- *
- * Called per character during the Start Phase to determine extra chakra income.
- * Only applies to face-visible characters (hidden characters are skipped by the caller).
- */
+
+
+
+
+
 export function calculateContinuousChakraBonus(
   state: GameState,
   player: PlayerID,
@@ -39,7 +29,7 @@ export function calculateContinuousChakraBonus(
     if (effect.type !== 'MAIN') continue;
     if (!effect.description.includes('[⧗]')) continue;
 
-    // Kiba 025: If Akamaru is in the same mission (friendly or enemy), CHAKRA +1
+    
     if (topCard.id === 'KS-025-C' || topCard.number === 25) {
       const allMissionChars = [...friendlyChars, ...enemyChars];
       const hasAkamaru = allMissionChars.some(
@@ -52,7 +42,7 @@ export function calculateContinuousChakraBonus(
       if (hasAkamaru) bonus += 1;
     }
 
-    // Anko 044: If another friendly Leaf Village in this mission, CHAKRA +1
+    
     if (topCard.id === 'KS-044-C' || topCard.number === 44) {
       const hasOtherLeaf = friendlyChars.some(
         (c) => {
@@ -64,33 +54,33 @@ export function calculateContinuousChakraBonus(
       if (hasOtherLeaf) bonus += 1;
     }
 
-    // Tayuya 064: CHAKRA +X, X = missions with friendly Sound Four
+    
     if (topCard.id === 'KS-064-C' || topCard.number === 64) {
       const soundFourMissions = countMissionsWithKeyword(state, player, 'Sound Four', char.instanceId);
       bonus += soundFourMissions;
     }
 
-    // Kankuro 077: If non-hidden enemy in this mission, CHAKRA +1
+    
     if (topCard.id === 'KS-077-C' || topCard.number === 77) {
       const hasNonHiddenEnemy = enemyChars.some((c) => !c.isHidden);
       if (hasNonHiddenEnemy) bonus += 1;
     }
 
-    // Shizune 005: Unconditional CHAKRA +1
+    
     if (topCard.id === 'KS-005-C' || topCard.number === 5) {
       if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
     }
 
-    // Sakura 012 (UC): Unconditional CHAKRA +1
+    
     if (topCard.id === 'KS-012-UC' || topCard.number === 12) {
       if (effect.description.toLowerCase().includes('chakra') && effect.description.includes('+')) {
         bonus += 1;
       }
     }
 
-    // Sakura 147 (M): If you don't have the Edge, CHAKRA +2
+    
     if (topCard.number === 147 && effect.description.includes('CHAKRA +2') && effect.description.includes('Edge')) {
       if (state.edgeHolder !== player) {
         bonus += 2;
@@ -101,12 +91,7 @@ export function calculateContinuousChakraBonus(
   return bonus;
 }
 
-/**
- * Calculate CHAKRA bonus from mission continuous [⧗] effects.
- * Called once per player per Start Phase (not per character).
- *
- * MSS-10 "Chakra Training": CHAKRA +1 for both players, active as soon as the mission is revealed.
- */
+
 export function calculateMissionChakraBonus(state: GameState, player: PlayerID): number {
   let bonus = 0;
 
@@ -114,7 +99,7 @@ export function calculateMissionChakraBonus(state: GameState, player: PlayerID):
     for (const effect of mission.card.effects ?? []) {
       if (!effect.description.includes('[⧗]')) continue;
 
-      // MSS-10: CHAKRA +1 for both players - applies immediately when mission is in play (MAIN type)
+      
       if (effect.type === 'MAIN'
           && effect.description.includes('CHAKRA +1')
           && effect.description.includes('both players')) {
@@ -126,9 +111,7 @@ export function calculateMissionChakraBonus(state: GameState, player: PlayerID):
   return bonus;
 }
 
-/**
- * Count missions where a player has at least one character with a given keyword.
- */
+
 function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: string, excludeInstanceId?: string): number {
   let count = 0;
   for (const mission of state.activeMissions) {
@@ -146,24 +129,18 @@ function countMissionsWithKeyword(state: GameState, player: PlayerID, keyword: s
   return count;
 }
 
-// ---------------------
-// Power Modifier
-// ---------------------
 
-/**
- * Calculate the continuous power modifier for a single character.
- *
- * Accounts for buffs/debuffs from friendly characters in the same mission
- * (e.g., Kakashi 015, Gai 042) and self-modifiers (e.g., Sasuke 013,
- * Temari 079, Yashamaru 084, Ton Ton 101).
- */
+
+
+
+
 export function calculateContinuousPowerModifier(
   state: GameState,
   player: PlayerID,
   missionIndex: number,
   char: CharacterInPlay,
 ): number {
-  // Hidden characters normally have 0 power, but Kurenai 035 gives them +2
+  
   if (char.isHidden) {
     const mission = state.activeMissions[missionIndex];
     if (!mission) return 0;
@@ -172,7 +149,7 @@ export function calculateContinuousPowerModifier(
     for (const friendly of friendlyChars) {
       if (friendly.isHidden || friendly.instanceId === char.instanceId) continue;
       const fTop = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
-      // Kurenai 035 (UC): Hidden friendly characters in this mission have +2 Power
+      
       if (fTop.number === 35) {
         const hasEffect = (fTop.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+2 Power'),
@@ -180,7 +157,7 @@ export function calculateContinuousPowerModifier(
         if (hasEffect) hiddenBonus += 2;
       }
 
-      // Naruto 145 (M): If Edge holder, hidden friendlies in this mission have +1 Power
+      
       if (fTop.number === 145) {
         const hasEffect = (fTop.effects ?? []).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+1 Power'),
@@ -189,14 +166,14 @@ export function calculateContinuousPowerModifier(
       }
     }
 
-    // Apply -1 Power debuffs from enemy continuous effects (Itachi 128, Sakon 127) to hidden chars too
+    
     const enemyCharsHidden = player === 'player1' ? mission.player2Characters : mission.player1Characters;
     for (const enemy of enemyCharsHidden) {
       if (enemy.isHidden) continue;
       const eTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
       for (const effect of eTop.effects ?? []) {
         if (!effect.description.includes('[⧗]')) continue;
-        // Itachi 128 (MAIN) / 152: Every enemy in this mission has -1 Power
+        
         if ((eTop.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || eTop.number === 152) {
           hiddenBonus -= 1;
         }
@@ -214,7 +191,7 @@ export function calculateContinuousPowerModifier(
 
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
-  // Check all characters (both sides) in the same mission for continuous power effects on others
+  
   const allMissionChars = [...friendlyChars, ...enemyChars];
   for (const otherChar of allMissionChars) {
     if (otherChar.isHidden) continue;
@@ -225,7 +202,7 @@ export function calculateContinuousPowerModifier(
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Kakashi 015: Other Team 7 characters +1 Power
+      
       if (topCard.number === 15 && effect.description.includes('Other Team 7')) {
         const charTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((charTop.keywords ?? []).includes('Team 7')) {
@@ -233,7 +210,7 @@ export function calculateContinuousPowerModifier(
         }
       }
 
-      // Gai 042: Other Team Guy characters +1 Power
+      
       if (topCard.number === 42 && effect.description.includes('Other Team Guy')) {
         const charTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((charTop.keywords ?? []).includes('Team Guy')) {
@@ -243,7 +220,7 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  // Check ENEMY characters for continuous power debuffs on this character
+  
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
@@ -251,20 +228,20 @@ export function calculateContinuousPowerModifier(
     for (const effect of enemyTopCard.effects ?? []) {
       if (!effect.description.includes('[⧗]')) continue;
 
-      // Itachi 128 (R, MAIN) / 152 (M): Every enemy in this mission has -1 Power
+      
       if ((enemyTopCard.number === 128 && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || enemyTopCard.number === 152) {
         modifier -= 1;
       }
 
-      // Rempart 067 (UC): The strongest non-hidden enemy character has Power = 0
-      // We handle this below as a special case since it only affects the strongest
+      
+      
     }
   }
 
-  // Rempart 067 special case: if enemy has Rempart in this mission and this char
-  // is the LOCKED target, it loses all Power tokens and has effective Power = 0.
-  // Per FAQ: Rashomon locks to the strongest enemy when played. Only retargets when
-  // Rashomon moves, or the locked target moves/leaves play.
+  
+  
+  
+  
   let rempartZeroed = false;
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
@@ -274,10 +251,10 @@ export function calculateContinuousPowerModifier(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
       if (hasRempartEffect) {
-        // Use locked target if available, otherwise find strongest (fallback for legacy/migration)
+        
         let targetId = enemy.rempartLockedTargetId;
         if (!targetId || !friendlyChars.some(f => f.instanceId === targetId && !f.isHidden)) {
-          // Locked target missing or no longer valid — retarget to current strongest
+          
           let maxPower = -1;
           for (const f of friendlyChars) {
             if (f.isHidden) continue;
@@ -295,12 +272,12 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  // Check self-modifiers
+  
   const selfTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
   for (const effect of selfTopCard.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-    // Sasuke 013: -1 Power per other non-hidden friendly in this mission
+    
     if (selfTopCard.number === 13 && effect.description.includes('-1 Power for every other')) {
       const otherNonHidden = friendlyChars.filter(
         (c) => c.instanceId !== char.instanceId && !c.isHidden,
@@ -308,14 +285,14 @@ export function calculateContinuousPowerModifier(
       modifier -= otherNonHidden.length;
     }
 
-    // Temari 079: +2 Power if you have the Edge
+    
     if (selfTopCard.number === 79 && effect.description.includes('Edge')) {
       if (state.edgeHolder === player) {
         modifier += 2;
       }
     }
 
-    // Yashamaru 084: +2 Power if friendly Gaara in this mission
+    
     if (selfTopCard.number === 84 && effect.description.includes('Gaara')) {
       const hasGaara = friendlyChars.some(
         (c) => {
@@ -327,7 +304,7 @@ export function calculateContinuousPowerModifier(
       if (hasGaara) modifier += 2;
     }
 
-    // Ton Ton 101: +1 Power if Tsunade or Shizune in this mission
+    
     if (selfTopCard.number === 101 && (effect.description.includes('Tsunade') || effect.description.includes('Shizune'))) {
       const hasTsunadeOrShizune = friendlyChars.some(
         (c) => {
@@ -340,32 +317,32 @@ export function calculateContinuousPowerModifier(
     }
   }
 
-  // -------------------------------------------------------
-  // Mission [⧗] effects that modify power continuously (MAIN type).
-  // Active as soon as the mission is in play - no wonBy guard.
-  // -------------------------------------------------------
+  
+  
+  
+  
   for (const mEffect of mission.card.effects ?? []) {
     if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;
 
-    // MSS-02 "Examen Chunin": All non-hidden characters in this mission have +1 Power
-    // Exception: if Rempart zeroed this character, no bonus applies (power stays 0).
+    
+    
     if (mEffect.description.includes('All non-hidden characters') && mEffect.description.includes('+1 Power')) {
       if (!rempartZeroed) {
         modifier += 1;
       }
     }
 
-    // MSS-09 "Proteger le chef": Characters with 4 Power or more in this mission have +1 Power
-    // Use base power + tokens only (NOT accumulated modifier) for the threshold check.
-    // Exception: if Rempart zeroed this character (loses all tokens + power = 0),
-    // it no longer qualifies for the >= 4 threshold.
+    
+    
+    
+    
     if (mEffect.description.includes('4 Power or more') && mEffect.description.includes('+1 Power')) {
       if (!rempartZeroed) {
         const selfTop = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-        // Use base power + tokens + OTHER continuous modifiers (not MSS09 itself)
-        // to check the >= 4 threshold. This includes Kakashi +1 Team 7, Temari +2 Edge, etc.
+        
+        
         let powerForThreshold = (selfTop.power ?? 0) + char.powerTokens;
-        // Add the modifier accumulated so far (from all effects checked BEFORE this one)
+        
         powerForThreshold += modifier;
         if (powerForThreshold >= 4) {
           modifier += 1;
@@ -377,14 +354,11 @@ export function calculateContinuousPowerModifier(
   return modifier;
 }
 
-// ---------------------
-// Rempart 067 Power Zeroing
-// ---------------------
 
-/**
- * Check if a character is the strongest enemy being zeroed by Rempart 067.
- * Used by getVisibleState to show power tokens as removed in the UI.
- */
+
+
+
+
 export function isRempartZeroed(
   state: GameState,
   missionIndex: number,
@@ -406,10 +380,10 @@ export function isRempartZeroed(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
       if (hasRempartEffect) {
-        // Use locked target if available
+        
         let targetId = enemy.rempartLockedTargetId;
         if (!targetId || !friendlyChars.some(f => f.instanceId === targetId && !f.isHidden)) {
-          // Fallback: find strongest
+          
           let maxPower = -1;
           for (const f of friendlyChars) {
             if (f.isHidden) continue;
@@ -427,23 +401,18 @@ export function isRempartZeroed(
   return false;
 }
 
-// ---------------------
-// Power Token Retention
-// ---------------------
 
-/**
- * Determine whether a character should retain its power tokens at end of round.
- *
- * Rock Lee 039 and Gai Maito 043 both have continuous effects that prevent power token removal.
- * Hidden characters do NOT have their [⧗] effects active, so they always lose tokens.
- */
+
+
+
+
 export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
-  // [⧗] effects are only active when face-visible
+  
   if (char.isHidden) return false;
 
   const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
-  // Rock Lee 039 / Gai Maito 043: doesn't lose power tokens (only when face-visible)
+  
   if (topCard.number === 39 || topCard.number === 43) {
     const hasRetention = (topCard.effects ?? []).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('doesn\'t lose Power tokens'),
@@ -456,19 +425,11 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   return false;
 }
 
-// ---------------------
-// Hide Protection
-// ---------------------
 
-/**
- * Returns true if a friendly character in the target's mission prevents hiding by enemy effects.
- *
- * Shino Aburame 115 (R/RA): [⧗] Friendly characters in this mission cannot be hidden by enemy effects.
- *
- * @param state       Current game state
- * @param targetChar  The character that an enemy effect is trying to hide
- * @param owner       The player who owns the targetChar
- */
+
+
+
+
 export function isProtectedFromEnemyHide(
   state: GameState,
   targetChar: CharacterInPlay,
@@ -485,7 +446,7 @@ export function isProtectedFromEnemyHide(
     if (char.instanceId === targetChar.instanceId) continue; // A character is not friendly to itself
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
 
-    // Shino 115 (R/RA): protects all allies in this mission from being hidden by enemy effects
+    
     if (topCard.number === 115) {
       const hasProtection = (topCard.effects ?? []).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot be hidden by enemy effects'),
@@ -497,18 +458,11 @@ export function isProtectedFromEnemyHide(
   return false;
 }
 
-// ---------------------
-// Hide Immunity (Self)
-// ---------------------
 
-/**
- * Returns true if a character is immune to being hidden by enemy effects.
- *
- * Cards with "[⧗] Can't be hidden or defeated by enemy effects":
- * - Ichibi 076 (UC), Ichibi 130 (R/RA), Kyubi 129 (R/RA), Kyubi 134 (S)
- *
- * Uses text-based matching on effects for robustness.
- */
+
+
+
+
 export function isImmuneToEnemyHideOrDefeat(char: CharacterInPlay): boolean {
   if (char.isHidden) return false;
   const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
@@ -520,14 +474,7 @@ export function isImmuneToEnemyHideOrDefeat(char: CharacterInPlay): boolean {
   );
 }
 
-/**
- * Returns true if a character can be hidden by an enemy effect.
- * Checks self-immunity AND mission-level protection (Shino 115).
- *
- * Use this in handlers to filter valid targets BEFORE presenting them
- * to the player. Does NOT check Gemma 049 sacrifice (that creates a
- * pending choice and cannot be pre-filtered).
- */
+
 export function canBeHiddenByEnemy(
   state: GameState,
   char: CharacterInPlay,
@@ -539,14 +486,7 @@ export function canBeHiddenByEnemy(
   return true;
 }
 
-/**
- * Check if Kurenai 035's continuous effect blocks an ENEMY character from moving
- * out of a given mission. Returns true if movement is blocked.
- *
- * Kurenai 035 (UC) MAIN [⧗]: "Enemy characters cannot move from this mission."
- * Only blocks characters that are enemies relative to Kurenai's controller.
- * @param movedCharOwner - The owner/controller of the character being moved (NOT the effect initiator)
- */
+
 export function isMovementBlockedByKurenai(
   state: GameState,
   sourceMissionIndex: number,
@@ -573,23 +513,14 @@ export function isMovementBlockedByKurenai(
   return false;
 }
 
-// ---------------------
-// On-Play Reactions
-// ---------------------
 
-/**
- * Trigger continuous on-play reactions from opponent's characters.
- * Called when a player plays a non-hidden character on a mission.
- *
- * - Neji 037 (UC): POWERUP 1 when a non-hidden enemy character is played in this mission
- * - Hinata 031 (UC): Gain 1 Chakra when a non-hidden enemy character is played in this mission
- *
- * isReveal: true when a hidden character is revealed (already on the mission).
- * Hinata/Neji only trigger for NEW characters arriving at the mission, not reveals.
- */
+
+
+
+
 export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID, missionIndex: number, _isReveal?: boolean, playedInstanceId?: string): GameState {
-  // Revealing a hidden character counts as "playing a character" per rules.
-  // Hinata 031 and Neji 037 trigger on reveals too.
+  
+  
 
   let newState = { ...state };
   const opponent: PlayerID = playingPlayer === 'player1' ? 'player2' : 'player1';
@@ -603,7 +534,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
     for (const effect of topCard.effects ?? []) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
-      // Neji 037 (UC): POWERUP 1 when a non-hidden enemy plays in this mission
+      
       if (topCard.number === 37 && effect.description.includes('POWERUP 1')) {
         const missions = [...newState.activeMissions];
         const updatedMission = { ...missions[missionIndex] };
@@ -622,7 +553,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
         );
       }
 
-      // Hinata 031 (UC): Gain 1 Chakra when enemy plays non-hidden in this mission
+      
       if (topCard.number === 31 && effect.description.includes('1 Chakra')) {
         const ps = { ...newState[opponent] };
         ps.chakra += 1;
@@ -638,10 +569,10 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
     }
   }
 
-  // Kimimaro 056 protection: when the JUST-PLAYED character has a continuous enemy
-  // power modifier (Itachi 128, Sakon 127), and opponent has Kimimaro 056 on this mission,
-  // the playing player pays 1 chakra. Only checks the just-played card to avoid
-  // re-triggering every time any card is played.
+  
+  
+  
+  
   if (playedInstanceId) {
     const km056Side = playingPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
     const justPlayed = mission[km056Side].find((c: CharacterInPlay) => c.instanceId === playedInstanceId);
@@ -677,12 +608,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
   return newState;
 }
 
-/**
- * Rashomon (067) permanently removes power tokens from the strongest enemy.
- * Called at the start of MissionPhase before scoring.
- * For each mission with a face-visible Rashomon, find the strongest non-hidden
- * enemy character and set their powerTokens to 0.
- */
+
 export function applyRempartTokenRemoval(state: GameState): GameState {
   let newState = state;
   const missions = [...newState.activeMissions];
@@ -694,7 +620,7 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
       const enemySide = playerSide === 'player1' ? 'player2Characters' : 'player1Characters';
       const enemyPlayer = playerSide === 'player1' ? 'player2' : 'player1';
 
-      // Find Rashomon face-visible in this mission
+      
       const rempartChar = missions[mIdx][friendlySide].find((c) => {
         if (c.isHidden) return false;
         const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -706,10 +632,10 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
 
       const enemyChars = missions[mIdx][enemySide];
 
-      // Use locked target, or find strongest if lock is invalid
+      
       let targetId = rempartChar.rempartLockedTargetId;
       if (!targetId || !enemyChars.some(c => c.instanceId === targetId && !c.isHidden)) {
-        // Retarget: find strongest non-hidden enemy
+        
         let maxPower = -1;
         targetId = undefined;
         for (const ec of enemyChars) {
@@ -719,7 +645,7 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
           if (power > maxPower) { maxPower = power; targetId = ec.instanceId; }
         }
 
-        // Update the lock on the Rashomon character
+        
         if (targetId && targetId !== rempartChar.rempartLockedTargetId) {
           if (!changed) {
             newState = { ...newState, activeMissions: [...newState.activeMissions] };

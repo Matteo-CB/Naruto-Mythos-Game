@@ -3,29 +3,12 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isCharacterCopyable } from '@/lib/effects/handlers/KS/shared/copyExclusions';
 
-/**
- * Card 148/130 - KAKASHI HATAKE (M)
- * Chakra: 4, Power: 5
- * Group: Leaf Village, Keywords: Team 7
- *
- * MAIN: Gain the Edge token.
- *   - Sets state.edgeHolder to sourcePlayer.
- *
- * AMBUSH: Copy an instant effect (non-continuous [hourglass]) of another
- *         friendly Team 7 character in play.
- *   - Find all friendly characters across all missions with keyword "Team 7" (not self).
- *   - For each, check their effects: find MAIN or UPGRADE effects that are NOT
- *     continuous ([hourglass]) and NOT SCORE.
- *   - If valid targets found, require target selection for which character to copy from.
- *   - The actual copying/execution of the chosen effect is handled by the
- *     EffectEngine's target resolution pipeline.
- *   - For auto-resolution: pick the first valid Team 7 character with a copyable effect.
- */
+
 
 function kakashi148MainHandler(ctx: EffectContext): EffectResult {
   const state = ctx.state;
 
-  // Return CONFIRM popup first — EffectEngine will handle the actual edge gain
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -42,7 +25,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
   const friendlySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  // Find all friendly Team 7 characters (not self) that have copyable effects
+  
   const validTargets: string[] = [];
 
   for (let i = 0; i < state.activeMissions.length; i++) {
@@ -50,19 +33,19 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
       if (char.instanceId === ctx.sourceCard.instanceId) continue;
       if (char.isHidden) continue;
 
-      // Check if this character has keyword "Team 7"
+      
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
       if (!isCharacterCopyable(topCard)) continue;
 
-      // Check if this character has any copyable instant effects
-      // Kakashi 148 is AMBUSH (always revealed), so AMBUSH effects ARE copyable
+      
+      
       const hasCopyableEffect = topCard.effects.some((effect) => {
         if (effect.type === 'SCORE') return false; // SCORE never copyable
-        // Kakashi 148 CAN copy UPGRADE effects (unlike Kakashi 016)
-        // Skip continuous effects (marked with [⧗] symbol)
+        
+        
         if (effect.description.includes('[⧗]')) return false;
-        // Exclude effect modifiers
+        
         if (effect.description.startsWith('effect:') || effect.description.startsWith('effect.')) return false;
         return true;
       });
@@ -84,7 +67,7 @@ function kakashi148AmbushHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Return CONFIRM popup first — EffectEngine will handle the actual copy target selection
+  
   return {
     state,
     requiresTargetSelection: true,

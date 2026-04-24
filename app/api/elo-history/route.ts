@@ -1,13 +1,4 @@
-/**
- * Public endpoint: a player's ELO history for the last 14 days.
- *
- * GET /api/elo-history?user=<id|username>
- *   Returns the user's per-game ELO deltas, newest first, plus a summary and
- *   daily aggregates for charting.
- *
- * This is the public counterpart of /api/admin/elo-history (which returns the
- * same shape but requires admin auth and allows custom day windows).
- */
+
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
@@ -47,7 +38,7 @@ export async function GET(request: Request) {
     else draws++;
   }
 
-  // Aggregate per day (calendar day in UTC).
+  
   const byDay = new Map<string, { games: number; deltaSum: number; endElo: number; wins: number; losses: number; draws: number }>();
   for (const h of history) {
     const d = h.createdAt.toISOString().slice(0, 10);
@@ -61,7 +52,7 @@ export async function GET(request: Request) {
     byDay.set(d, cur);
   }
 
-  // Opponent breakdown (for UI "who you played against most").
+  
   const oppMap = new Map<string, { username: string; games: number; wins: number; losses: number; deltaSum: number }>();
   for (const h of history) {
     const key = h.opponentId ?? `anon:${h.opponentUsername}`;
@@ -89,7 +80,7 @@ export async function GET(request: Request) {
     opponents: [...oppMap.values()]
       .sort((a, b) => b.games - a.games)
       .slice(0, 20),
-    // Raw points for the line chart: one entry per ranked game, in order.
+    
     points: history.map((h) => ({
       t: h.createdAt.toISOString(),
       elo: h.newElo,

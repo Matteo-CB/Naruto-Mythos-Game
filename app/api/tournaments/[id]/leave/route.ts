@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 
-// POST - leave a tournament (only during registration)
+
 export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -22,7 +22,7 @@ export async function POST(
       return NextResponse.json({ error: 'Cannot leave after tournament started' }, { status: 400 });
     }
 
-    // Cannot leave own tournament as creator
+    
     if (tournament.creatorId === session.user.id) {
       return NextResponse.json({ error: 'Creator cannot leave. Cancel the tournament instead.' }, { status: 400 });
     }

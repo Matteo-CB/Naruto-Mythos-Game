@@ -2,20 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 066/130 - DOKI (UC)
- * Chakra: 2 | Power: 3
- * Group: Sound Village | Keywords: Summon
- *
- * MAIN: If a friendly character with keyword "Sound Four" is in this mission,
- *   steal 1 Chakra from opponent (opponent loses 1, you gain 1).
- *
- * MAIN [hourglass]: At end of round, return this character to hand.
- *   - Continuous effect handled by the engine in EndPhase.
- *   - The handler registers a no-op for the continuous portion.
- *
- * The steal effect only fires once on play. The return-to-hand is passive.
- */
+
 
 function handleDoki066Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
@@ -24,7 +11,7 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
   const friendlyChars = mission[friendlySide];
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
 
-  // Check if any friendly character in this mission has keyword "Sound Four"
+  
   const hasSoundFour = friendlyChars.some((char) => {
     if (char.instanceId === ctx.sourceCard.instanceId) return false; // Don't count self
     if (char.isHidden) return false;
@@ -46,7 +33,7 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup before stealing chakra
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -60,5 +47,5 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
 
 export function registerDoki066Handlers(): void {
   registerEffect('KS-066-UC', 'MAIN', handleDoki066Main);
-  // The continuous [hourglass] return-to-hand effect is handled by EndPhase.ts
+  
 }

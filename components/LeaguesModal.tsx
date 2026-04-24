@@ -40,7 +40,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
+            
             <div
               className="flex items-center justify-between px-6 py-4"
               style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
@@ -60,7 +60,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
               </button>
             </div>
 
-            {/* Subtitle */}
+            
             <p
               className="px-6 pt-3 text-xs"
               style={{ color: '#666' }}
@@ -68,7 +68,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
               {t('subtitle', { count: PLACEMENT_MATCHES_REQUIRED })}
             </p>
 
-            {/* League cards grid */}
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
               {RANK_TIERS.map((tier, i) => {
                 const nextTier = RANK_TIERS[i + 1];
@@ -90,7 +90,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                       boxShadow: `0 0 16px ${tier.glowColor}`,
                     }}
                   >
-                    {/* Top decorative line */}
+                    
                     <div
                       className="absolute top-0 left-0 right-0 h-px rounded-t-lg"
                       style={{
@@ -99,7 +99,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                       }}
                     />
 
-                    {/* League image */}
+                    
                     <Image
                       src={tier.image}
                       alt=""
@@ -109,7 +109,7 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                       style={{ filter: `drop-shadow(0 0 6px ${tier.glowColor})` }}
                     />
 
-                    {/* Info */}
+                    
                     <div className="flex flex-col gap-1 min-w-0">
                       <span
                         className="font-bold uppercase tracking-widest text-sm"

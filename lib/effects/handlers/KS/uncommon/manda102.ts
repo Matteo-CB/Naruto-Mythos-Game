@@ -2,17 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 102/130 - MANDA (UC)
- * Chakra: 4 | Power: 6
- * Group: Independent | Keywords: Summon
- *
- * AMBUSH: Defeat an enemy character with keyword "Summon" in this mission.
- *
- * MAIN [hourglass]: At end of round, must return this character to hand.
- *
- * Confirmation popup before target selection (AMBUSH effects are optional).
- */
+
 
 function handleManda102Ambush(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
@@ -20,7 +10,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
   const enemySide = sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const enemyChars = mission[enemySide];
 
-  // Pre-check: non-hidden enemy characters with keyword "Summon" in this mission?
+  
   const hasSummon = enemyChars.some((char) => {
     if (char.isHidden) return false;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
@@ -38,7 +28,7 @@ function handleManda102Ambush(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup
+  
   return {
     state,
     requiresTargetSelection: true,

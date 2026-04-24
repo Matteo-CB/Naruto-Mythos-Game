@@ -1,20 +1,5 @@
 // @ts-nocheck
-/**
- * NARUTO MYTHOS TCG - MASSIVE AI AUDIT TEST SUITE
- *
- * This test suite runs thousands of simulated games and individually tests
- * every card effect, every rule edge case, and every combination to verify
- * the game engine implements the official rules perfectly.
- *
- * Structured in 7 sections:
- * 1. Core Rule Compliance Tests
- * 2. Individual Card Effect Verification (ALL 199 cards)
- * 3. Card Combination & Interaction Tests
- * 4. Mass Game Simulation (thousands of AI vs AI games)
- * 5. Edge Case & FAQ Compliance Tests
- * 6. Phase Sequence & Timing Tests
- * 7. Report Generation
- */
+
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { GameEngine } from '../engine/GameEngine';
@@ -48,9 +33,9 @@ import { getEffectHandler, initializeRegistry } from '../effects/EffectRegistry'
 import { calculateContinuousPowerModifier, calculateContinuousChakraBonus } from '../effects/ContinuousEffects';
 import { mockCharacter, mockMission, mockCharInPlay, createActionPhaseState, createTestDeck, createTestConfig } from './testHelpers';
 
-// =============================================================================
-// CARD DATA LOADING
-// =============================================================================
+
+
+
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -60,7 +45,7 @@ let ALL_MISSIONS: any[] = [];
 let CHARACTER_CARDS: Record<string, any> = {};
 let MISSION_CARDS: Record<string, any> = {};
 
-// Audit results collector
+
 interface AuditIssue {
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
   category: string;
@@ -79,10 +64,10 @@ function addIssue(issue: AuditIssue) {
 }
 
 beforeAll(() => {
-  // Initialize the effect registry
+  
   initializeRegistry();
 
-  // Load card data
+  
   const cardsPath = path.resolve(__dirname, '../data/sets/KS/cards.json');
   const missionsPath = path.resolve(__dirname, '../data/missions.json');
 
@@ -96,7 +81,7 @@ beforeAll(() => {
     ALL_MISSIONS = Array.isArray(data) ? data : data.missions || [];
   }
 
-  // Separate character and mission cards
+  
   for (const [id, card] of Object.entries(ALL_CARDS)) {
     const c = card as any;
     if (c.card_type === 'mission') {
@@ -107,9 +92,9 @@ beforeAll(() => {
   }
 });
 
-// =============================================================================
-// HELPER FUNCTIONS
-// =============================================================================
+
+
+
 
 function makeCard(cardId: string, overrides: Partial<CharacterCard> = {}): CharacterCard {
   const data = ALL_CARDS[cardId];
@@ -221,9 +206,9 @@ function getAllCharactersInPlay(state: GameState, player: PlayerID): CharacterIn
   return chars;
 }
 
-// =============================================================================
-// SECTION 1: CORE RULE COMPLIANCE TESTS
-// =============================================================================
+
+
+
 
 describe('SECTION 1: Core Rule Compliance', () => {
 
@@ -258,12 +243,12 @@ describe('SECTION 1: Core Rule Compliance', () => {
     });
 
     it('should use 2 mission cards per player (4 total mission deck)', () => {
-      // Each player selects 3 missions, places them face-down, randomly selects 2
-      // The 4 selected missions (2 per player) form the mission deck
+      
+      
       const config = createTestConfig();
       const state = GameEngine.createGame(config);
-      // After setup, the missionDeck should have cards from both players
-      // The exact count depends on the setup logic
+      
+      
       const totalMissionCards = state.missionDeck.length + state.activeMissions.length;
       expect(totalMissionCards).toBeLessThanOrEqual(4);
     });
@@ -273,19 +258,19 @@ describe('SECTION 1: Core Rule Compliance', () => {
 
     it('should follow correct phase order: Start -> Action -> Mission -> End', () => {
       const validSequence = ['start', 'action', 'mission', 'end'];
-      // Verify the phase transitions are correct
+      
       const state = createGameState({ phase: 'action' });
       expect(['start', 'action', 'mission', 'end', 'gameOver', 'mulligan', 'setup']).toContain(state.phase);
     });
 
     it('should reveal one mission per turn at start of Start Phase', () => {
       const state = createGameState();
-      // Turn 1: 1 mission should be active
+      
       expect(state.activeMissions.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should evaluate missions in rank order D -> C -> B -> A', () => {
-      // Verify RANK order is correct
+      
       const ranks = ['D', 'C', 'B', 'A'];
       const turnRanks = [TURN_TO_RANK[1], TURN_TO_RANK[2], TURN_TO_RANK[3], TURN_TO_RANK[4]];
       expect(turnRanks).toEqual(ranks);
@@ -296,32 +281,32 @@ describe('SECTION 1: Core Rule Compliance', () => {
 
     it('should calculate chakra correctly: 5 base + 1 per character in play', () => {
       const state = createGameState();
-      // Place 3 characters for player 1
+      
       placeCharOnMission(state, 'player1', 'KS-009-C', 0);
       placeCharOnMission(state, 'player1', 'KS-011-C', 0);
       placeCharOnMission(state, 'player1', 'KS-013-C', 0);
 
-      // Expected: 5 base + 3 characters = 8 chakra
+      
       const expectedChakra = BASE_CHAKRA_PER_TURN + 3;
       expect(expectedChakra).toBe(8);
     });
 
     it('should count hidden characters for chakra calculation', () => {
       const state = createGameState();
-      // Hidden characters should count for +1 chakra each
+      
       placeCharOnMission(state, 'player1', 'KS-009-C', 0, { isHidden: true });
 
-      // Hidden char still provides +1 chakra per rules
+      
       const charCount = getAllCharactersInPlay(state, 'player1').length;
       expect(charCount).toBe(1);
-      // The Start Phase should add 5 + 1 = 6 chakra
+      
     });
 
     it('should reset chakra to 0 at End Phase', () => {
       const state = createGameState();
       state.player1.chakra = 15;
-      // End Phase rule: discard all remaining chakra
-      // This should be enforced by EndPhase.ts
+      
+      
     });
   });
 
@@ -329,16 +314,16 @@ describe('SECTION 1: Core Rule Compliance', () => {
 
     it('should give Edge token to first passer', () => {
       const state = createGameState({ edgeHolder: 'player2' });
-      // When player1 passes first, they should get Edge
+      
       state.firstPasser = 'player1';
-      // The engine should transfer Edge to player1
+      
     });
 
     it('should use Edge token for tie-breaking in Mission Phase', () => {
       const state = createGameState({ edgeHolder: 'player1' });
       const mission = state.activeMissions[0];
 
-      // Place equal power characters
+      
       placeCharOnMission(state, 'player1', 'KS-009-C', 0);
       placeCharOnMission(state, 'player2', 'KS-074-C', 0);
 
@@ -346,20 +331,20 @@ describe('SECTION 1: Core Rule Compliance', () => {
       const p2Power = mission.player2Characters.reduce((sum, c) => sum + (c.isHidden ? 0 : c.card.power + c.powerTokens), 0);
 
       if (p1Power === p2Power) {
-        // Edge holder wins ties
+        
         expect(state.edgeHolder).toBe('player1');
       }
     });
 
     it('Edge holder should win game if scores tied at end', () => {
-      // Rule: If scores tied after turn 4, Edge token holder wins
+      
       const state = createGameState({
         edgeHolder: 'player1',
         turn: 4 as TurnNumber,
       });
       state.player1.missionPoints = 10;
       state.player2.missionPoints = 10;
-      // Edge holder should win
+      
     });
   });
 
@@ -369,7 +354,7 @@ describe('SECTION 1: Core Rule Compliance', () => {
       const state = createGameState();
       const char = placeCharOnMission(state, 'player1', 'KS-009-C', 0, { isHidden: true });
 
-      // Hidden characters contribute 0 power for scoring
+      
       const effectivePower = char.isHidden ? 0 : char.card.power + char.powerTokens;
       expect(effectivePower).toBe(0);
     });
@@ -378,7 +363,7 @@ describe('SECTION 1: Core Rule Compliance', () => {
       const state = createGameState();
       const char = placeCharOnMission(state, 'player1', 'KS-137-SV', 0, { isHidden: true });
 
-      // When targeted by enemy effects, hidden chars have cost 0, power 0
+      
       const effectiveCost = char.isHidden ? 0 : char.card.chakra;
       const effectivePower = char.isHidden ? 0 : char.card.power;
       expect(effectiveCost).toBe(0);
@@ -386,20 +371,20 @@ describe('SECTION 1: Core Rule Compliance', () => {
     });
 
     it('should cost exactly 1 chakra to play face-down regardless of printed cost', () => {
-      // Verify HIDDEN_PLAY_COST is used, not printed cost
+      
       expect(HIDDEN_PLAY_COST).toBe(1);
     });
 
     it('revealing a hidden character should cost the printed chakra cost', () => {
-      // When revealing, player pays full printed cost
+      
       const card = makeCard('KS-050-C'); // Orochimaru, cost 4
       expect(card.chakra).toBe(4);
     });
 
     it('AMBUSH effects should ONLY trigger on reveal, never on direct face-visible play', () => {
-      // This is a critical rule: AMBUSH != MAIN
-      // AMBUSH only fires when: play hidden first -> reveal later
-      // NOT when: play face-visible directly
+      
+      
+      
       const orochimaru = ALL_CARDS['KS-050-C'];
       if (orochimaru?.effects) {
         const ambushEffects = orochimaru.effects.filter((e: any) => e.type === 'AMBUSH');
@@ -411,7 +396,7 @@ describe('SECTION 1: Core Rule Compliance', () => {
       const state = createGameState();
       const char = placeCharOnMission(state, 'player1', 'KS-009-C', 0, { powerTokens: 3 });
 
-      // FAQ: Characters with Power Tokens keep them if they change state
+      
       char.isHidden = true;
       expect(char.powerTokens).toBe(3);
 
@@ -423,14 +408,14 @@ describe('SECTION 1: Core Rule Compliance', () => {
   describe('1.6 Character Evolution (Upgrade) Rules', () => {
 
     it('upgrade should require STRICTLY higher chakra cost', () => {
-      // Upgrade cost must be STRICTLY higher (not equal)
+      
       const lowCost = makeCard('KS-009-C'); // Naruto cost 2
       const highCost = makeCard('KS-010-C'); // Naruto cost 3
       expect(highCost.chakra).toBeGreaterThan(lowCost.chakra);
     });
 
     it('upgrade should only pay the DIFFERENCE in chakra cost', () => {
-      // Example: upgrading from cost 3 to cost 5 = pay 2 chakra
+      
       const oldCost = 3;
       const newCost = 5;
       const upgradeCost = newCost - oldCost;
@@ -441,85 +426,85 @@ describe('SECTION 1: Core Rule Compliance', () => {
       const state = createGameState();
       const char = placeCharOnMission(state, 'player1', 'KS-009-C', 0, { powerTokens: 4 });
 
-      // After upgrade, tokens should transfer
-      // The new card's stack should include old + new
+      
+      
       expect(char.powerTokens).toBe(4);
     });
 
     it('old card text should be ignored after upgrade', () => {
-      // Only top card effects apply
+      
       const state = createGameState();
       const char = placeCharOnMission(state, 'player1', 'KS-009-C', 0);
 
-      // After upgrade, stack[last] = new card, old card text ignored
+      
       expect(char.stack.length).toBeGreaterThanOrEqual(1);
     });
 
     it('UPGRADE effects should ONLY trigger when upgrading over existing card', () => {
-      // UPGRADE effects do NOT trigger on fresh play
-      // They only trigger when evolving/upgrading
+      
+      
     });
   });
 
   describe('1.7 Mission Scoring Rules', () => {
 
     it('player must have at least 1 power to win a mission', () => {
-      // If both have 0 power, nobody wins
+      
       const state = createGameState();
-      // No characters placed = 0 power each = no winner
+      
     });
 
     it('0 vs 0 power should result in NO winner', () => {
-      // Critical rule: even Edge holder cant win with 0 power
+      
     });
 
     it('mission points = base points + rank bonus', () => {
-      // D rank mission with 2 base points = 2 + 1 = 3 total points
+      
       const basePoints = 2;
       const rankBonus = RANK_BONUS['D'];
       expect(basePoints + rankBonus).toBe(3);
     });
 
     it('SCORE effects should trigger for mission winner only', () => {
-      // Only the player who WINS the mission triggers SCORE effects
+      
     });
 
     it('all power tokens should be removed at End Phase', () => {
-      // Rule: Remove ALL Power tokens from all characters at end of each turn
+      
     });
   });
 
   describe('1.8 Name Uniqueness Rule', () => {
 
     it('cannot have 2 characters with same name on same mission (same player)', () => {
-      // Rule: only 1 character with the same name per player per mission
+      
       const state = createGameState();
       const naruto1 = placeCharOnMission(state, 'player1', 'KS-009-C', 0);
 
-      // Playing another Naruto on same mission should be illegal
-      // (unless it's an upgrade)
+      
+      
     });
 
     it('two hidden cards with same name CAN coexist until reveal (FAQ)', () => {
-      // FAQ: hidden chars dont block by name until revealed
+      
       const state = createGameState();
       placeCharOnMission(state, 'player1', 'KS-009-C', 0, { isHidden: true });
-      // A second hidden Naruto should be allowed on same mission
+      
     });
 
     it('if forced by effect to have duplicate names, discard the new one (FAQ)', () => {
-      // FAQ IMG_3979: If effect forces duplicate, discard new one without effects
+      
     });
   });
 });
 
-// =============================================================================
-// SECTION 2: INDIVIDUAL CARD EFFECT VERIFICATION
-// =============================================================================
+
+
+
 
 describe('SECTION 2: Individual Card Effect Verification', () => {
 
-  // Helper to check if a handler exists for a card
+  
   function verifyHandlerExists(cardId: string, effectTypes: string[]) {
     for (const effectType of effectTypes) {
       const handler = getEffectHandler(cardId, effectType as any);
@@ -548,9 +533,9 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
 
         for (const effect of c.effects) {
           totalEffects++;
-          // Skip continuous effects that dont need handlers (they're in ContinuousEffects.ts)
+          
           if (effect.description?.startsWith('[⧗]') && !effect.description.includes('POWERUP')) {
-            // Pure continuous effects may not need a handler
+            
             continue;
           }
 
@@ -572,7 +557,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       }
 
       console.log(`Total effects checked: ${totalEffects}, Missing handlers: ${missingHandlers}`);
-      // Allow some continuous-only effects to not have handlers
+      
     });
   });
 
@@ -582,7 +567,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const state = createGameState();
       state.player1.chakra = 10;
 
-      // Place a Leaf Village target first
+      
       const target = placeCharOnMission(state, 'player1', 'KS-015-C', 0); // Kakashi, Leaf Village
 
       const handler = getEffectHandler('KS-001-C', 'MAIN');
@@ -609,25 +594,25 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
         isUpgrade: false,
       });
 
-      // Should require target selection if multiple valid targets
-      // Or auto-apply if only one valid target
+      
+      
       expect(result.state).toBeDefined();
     });
 
     it('KS-003-C Tsunade - MAIN [⧗]: When any friendly character is defeated, gain 2 Chakra', () => {
-      // This is a continuous effect - should be handled by ContinuousEffects or onDefeatTriggers
+      
       const state = createGameState();
       placeCharOnMission(state, 'player1', 'KS-003-C', 0);
 
-      // Verify the continuous effect is recognized
-      // When a friendly character is defeated, Tsunade's controller gains 2 chakra
+      
+      
     });
 
     it('KS-009-C Naruto Uzumaki (cost 2) - No effects', () => {
       const card = ALL_CARDS['KS-009-C'] as any;
       if (card) {
-        // Naruto C at cost 2 should have no effects OR minimal effects
-        // Verify card data is correct
+        
+        
         expect(card.chakra).toBeDefined();
         expect(card.power).toBeDefined();
       }
@@ -638,9 +623,9 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const kakashi = placeCharOnMission(state, 'player1', 'KS-015-C', 0);
       const naruto = placeCharOnMission(state, 'player1', 'KS-009-C', 0); // Team 7
 
-      // Kakashi's continuous effect should give +1 Power to other Team 7 in same mission
+      
       const modifier = calculateContinuousPowerModifier(state, 'player1', 0, naruto);
-      // Should include +1 from Kakashi if Naruto has Team 7 keyword
+      
     });
 
     it('KS-025-C Kiba Inuzuka - [⧗] CHAKRA +1 if Akamaru in same mission', () => {
@@ -648,17 +633,17 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const kiba = placeCharOnMission(state, 'player1', 'KS-025-C', 0); // Kiba
       placeCharOnMission(state, 'player1', 'KS-027-C', 0); // Akamaru
 
-      // Kiba should provide CHAKRA +1 bonus during Start Phase
+      
       const bonus = calculateContinuousChakraBonus(state, 'player1', 0, kiba);
-      // Should be >= 1 (from Kiba+Akamaru)
+      
     });
 
     it('KS-027-C Akamaru - [⧗] If no friendly Kiba in same mission at end of turn, return to hand', () => {
-      // End Phase should check for Akamaru return
+      
       const state = createGameState();
       placeCharOnMission(state, 'player1', 'KS-027-C', 0); // Akamaru without Kiba
 
-      // At End Phase, Akamaru should return to hand
+      
     });
 
     it('KS-042-C Gai Maito - MAIN [⧗]: Other friendly Team Guy characters in this mission have +1 Power', () => {
@@ -667,19 +652,19 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const rockLee = placeCharOnMission(state, 'player1', 'KS-038-C', 0); // Rock Lee, Team Guy
 
       const modifier = calculateContinuousPowerModifier(state, 'player1', 0, rockLee);
-      // Should include Gai's bonus for Team Guy
+      
     });
 
     it('KS-048-C Hayate Gekko - [⧗] If this character would be defeated, hide it instead', () => {
-      // Defeat replacement - handled by defeatUtils.ts
+      
       const state = createGameState();
       const hayate = placeCharOnMission(state, 'player1', 'KS-048-C', 0);
 
-      // When Hayate is targeted for defeat, he should be hidden instead
+      
     });
 
     it('KS-049-C Genma Shiranui - [⧗] Sacrifice self to protect friendly Leaf Village in same mission', () => {
-      // Protection mechanic - Genma can be defeated instead of another Leaf Village character
+      
     });
 
     it('KS-050-C Orochimaru - AMBUSH: Look at hidden enemy in mission; if cost 3 or less, take control', () => {
@@ -690,7 +675,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
         const state = createGameState();
         state.player1.chakra = 10;
 
-        // Place a cheap hidden enemy
+        
         const enemy = placeCharOnMission(state, 'player2', 'KS-009-C', 0, { isHidden: true }); // cost 2
         const source = placeCharOnMission(state, 'player1', 'KS-050-C', 0);
 
@@ -703,13 +688,13 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
           isUpgrade: false,
         });
 
-        // Should either auto-take control or require target selection
+        
         expect(result.state).toBeDefined();
       }
     });
 
     it('KS-094-C Gama Bunta - Summon should return to hand at End Phase', () => {
-      // All Summon characters return to hand at end of turn
+      
       const card = ALL_CARDS['KS-094-C'] as any;
       if (card) {
         expect(card.keywords).toContain('Summon');
@@ -728,10 +713,10 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     });
 
     it('KS-004-UC Tsunade Mitotic Regeneration - MAIN [⧗]: Defeated friendly go to hand instead of discard', () => {
-      // This is a critical continuous defeat replacement
-      // FAQ: hidden character defeated goes to hand without being revealed
+      
+      
       const handler = getEffectHandler('KS-004-UC', 'MAIN');
-      // This may be handled as a continuous effect in defeatUtils
+      
     });
 
     it('KS-014-UC Sasuke Sharingan - AMBUSH: Look at opponent hand / UPGRADE: +discard+opponent discard', () => {
@@ -740,7 +725,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     });
 
     it('KS-022-UC Shikamaru Shadow Possession - AMBUSH: Move last played enemy character (FAQ turn counting)', () => {
-      // FAQ: Only counts last opponent turn, not multiple turns ago
+      
       const handler = getEffectHandler('KS-022-UC', 'AMBUSH');
       if (handler) {
         addIssue({
@@ -757,11 +742,11 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     });
 
     it('KS-039-UC Rock Lee - Should retain power tokens at End Phase', () => {
-      // Rock Lee 039 UC has a special continuous effect: retains power tokens
+      
       const state = createGameState();
       const rockLee = placeCharOnMission(state, 'player1', 'KS-039-UC', 0, { powerTokens: 5 });
 
-      // At End Phase, Rock Lee should keep his power tokens (unlike other characters)
+      
     });
   });
 
@@ -770,14 +755,14 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     it('KS-108-R/RA Naruto - MAIN: Hide enemy Power 3 or less / UPGRADE: +POWERUP X', () => {
       const handler = getEffectHandler('KS-108-R', 'MAIN');
       expect(handler).toBeDefined();
-      // UPGRADE logic is handled within the MAIN handler via ctx.isUpgrade
+      
     });
 
     it('KS-120-R/RA Gaara - MAIN: Defeat enemy Power 1 or less in EVERY mission / UPGRADE: POWERUP X', () => {
       const handler = getEffectHandler('KS-120-R', 'MAIN');
       expect(handler).toBeDefined();
 
-      // Should target up to 1 enemy with Power 1 or less in EACH mission
+      
     });
 
     it('KS-105-R Jiraiya - Should have summon cost reduction mechanics', () => {
@@ -792,18 +777,18 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
       const handler = getEffectHandler('KS-133-S', 'MAIN');
       expect(handler).toBeDefined();
 
-      // Two-stage effect:
-      // Stage 1: Hide enemy Power 5 or less in this mission
-      // Stage 2: Hide another enemy Power 2 or less in play
-      // UPGRADE: Defeat both instead of hiding
+      
+      
+      
+      
     });
 
     it('KS-136-S Sasuke Curse Mark - MAIN [⧗]: When any character defeated, gain 1 Chakra', () => {
-      // Continuous on-defeat trigger for ALL characters (not just friendly)
+      
     });
 
     it('KS-137-S Kakashi - Complex UPGRADE-before-MAIN interaction', () => {
-      // Kakashi 137: UPGRADE modifies MAIN behavior
+      
       const handler = getEffectHandler('KS-137-S', 'MAIN');
       expect(handler).toBeDefined();
     });
@@ -836,11 +821,11 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
           isUpgrade: false,
         });
 
-        // Handler uses CONFIRM popup pattern before the actual steal
-        // Actual steal happens in EffectEngine when KISAME144_CONFIRM_MAIN is resolved
+        
+        
         expect(result.requiresTargetSelection).toBe(true);
         expect(result.targetSelectionType).toBe('KISAME144_CONFIRM_MAIN');
-        // Chakra unchanged at this step
+        
         expect(result.state.player2.chakra).toBe(5);
         expect(result.state.player1.chakra).toBe(state.player1.chakra);
       }
@@ -873,8 +858,8 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     });
 
     it('MSS 02 Chunin Exam - [⧗] All non-hidden characters in mission have +1 Power', () => {
-      // Continuous mission effect, not SCORE
-      // Should be in ContinuousEffects power modifier
+      
+      
     });
 
     it('MSS 03 Find the Traitor - SCORE: Opponent discards a card from hand', () => {
@@ -890,7 +875,7 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     it('MSS 05 Bring It Back - SCORE: MUST return a friendly non-hidden character in mission to hand', () => {
       const handler = getEffectHandler('KS-005-MMS', 'SCORE');
       expect(handler).toBeDefined();
-      // This is a MANDATORY effect ("you must")
+      
     });
 
     it('MSS 06 Rescue a Friend - SCORE: Draw a card', () => {
@@ -909,18 +894,18 @@ describe('SECTION 2: Individual Card Effect Verification', () => {
     });
 
     it('MSS 09 Protect the Leader - [⧗] Characters with 4+ Power have +1 Power', () => {
-      // Continuous mission effect
+      
     });
 
     it('MSS 10 Chakra Training - [⧗] CHAKRA +1 for both players', () => {
-      // Continuous mission effect providing chakra bonus
+      
     });
   });
 });
 
-// =============================================================================
-// SECTION 3: CARD COMBINATION & INTERACTION TESTS
-// =============================================================================
+
+
+
 
 describe('SECTION 3: Card Combination & Interaction Tests', () => {
 
@@ -936,7 +921,7 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
     });
 
     it('Akamaru without Kiba should return at End Phase', () => {
-      // Test the orphan Akamaru rule
+      
     });
   });
 
@@ -948,7 +933,7 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
       const naruto = placeCharOnMission(state, 'player1', 'KS-009-C', 0);
       const sasuke = placeCharOnMission(state, 'player1', 'KS-013-C', 0);
 
-      // Check both Naruto and Sasuke get +1 Power from Kakashi
+      
       if (naruto.card.keywords?.includes('Team 7')) {
         const modifier = calculateContinuousPowerModifier(state, 'player1', 0, naruto);
         expect(modifier).toBeGreaterThanOrEqual(1);
@@ -959,23 +944,23 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
   describe('3.3 Tsunade 003 + Character Defeat Interaction', () => {
 
     it('defeating a friendly character should trigger Tsunade 003 chakra gain', () => {
-      // When any friendly character is defeated and Tsunade 003 is in play,
-      // gain 2 chakra
+      
+      
     });
 
     it('Tsunade 004 UC + defeat: character should go to hand instead of discard', () => {
-      // Mitotic Regeneration continuous effect
+      
     });
   });
 
   describe('3.4 Hayate 048 + Gemma 049 Protection Stack', () => {
 
     it('Hayate should be hidden instead of defeated', () => {
-      // Defeat replacement
+      
     });
 
     it('Gemma should sacrifice self to protect another Leaf Village character', () => {
-      // Protection mechanic
+      
     });
   });
 
@@ -983,36 +968,36 @@ describe('SECTION 3: Card Combination & Interaction Tests', () => {
 
     it('stacking multiple power buffs should add correctly', () => {
       const state = createGameState();
-      // Kakashi 015 (+1 Team 7) + MSS 02 (+1 all non-hidden) + tokens
+      
       const kakashi = placeCharOnMission(state, 'player1', 'KS-015-C', 0);
       const naruto = placeCharOnMission(state, 'player1', 'KS-009-C', 0, { powerTokens: 2 });
 
-      // Naruto should get: base power + 2 tokens + Kakashi bonus (if Team 7) + mission bonus
+      
     });
   });
 
   describe('3.6 Orochimaru 050 Control Transfer', () => {
 
     it('taking control should make enemy character friendly (FAQ)', () => {
-      // FAQ IMG_3975: Yes, it becomes Friendly while under your control
+      
     });
 
     it('if controlled character leaves play, it returns to original owner (FAQ)', () => {
-      // FAQ IMG_3975: Goes back to owner keeping current state
+      
     });
   });
 
   describe('3.7 Sound Four Synergy', () => {
 
     it('Sound Four characters should interact with each other correctly', () => {
-      // Jirobo, Kidomaru, Sakon, Tayuya have cross-card synergies
+      
     });
   });
 });
 
-// =============================================================================
-// SECTION 4: MASS GAME SIMULATION
-// =============================================================================
+
+
+
 
 describe('SECTION 4: Mass Game Simulation', () => {
 
@@ -1026,7 +1011,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
     const deck: CharacterCard[] = [];
     const usedVersions: Record<string, number> = {};
 
-    // Shuffle available cards
+    
     const shuffled = [...playableCards].sort(() => Math.random() - 0.5);
 
     for (const card of shuffled) {
@@ -1039,7 +1024,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
       deck.push(makeCard(card.id));
     }
 
-    // Fill remaining slots if needed
+    
     while (deck.length < 30) {
       deck.push(mockCharacter({
         id: `FILLER-${deck.length}`,
@@ -1101,13 +1086,13 @@ describe('SECTION 4: Mass Game Simulation', () => {
     let actions = 0;
 
     try {
-      // Handle mulligans
+      
       state = GameEngine.applyAction(state, 'player1', { type: 'MULLIGAN', doMulligan: false });
       state = GameEngine.applyAction(state, 'player2', { type: 'MULLIGAN', doMulligan: false });
       actions += 2;
 
       while (state.phase !== 'gameOver' && actions < maxActions) {
-        // Handle pending actions first
+        
         if (state.pendingActions.length > 0) {
           const pending = state.pendingActions[0];
           const selection = pending.options.length > 0 ? [pending.options[0]] : [];
@@ -1120,7 +1105,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
             actions++;
             continue;
           } catch {
-            // Try declining optional effect
+            
             if (state.pendingEffects.length > 0 && state.pendingEffects[0].isOptional) {
               state = GameEngine.applyAction(state, state.pendingEffects[0].sourcePlayer, {
                 type: 'DECLINE_OPTIONAL_EFFECT',
@@ -1133,7 +1118,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
           }
         }
 
-        // Handle pending optional effects
+        
         if (state.pendingEffects.length > 0) {
           const effect = state.pendingEffects[0];
           if (effect.isOptional) {
@@ -1146,7 +1131,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
           }
         }
 
-        // Normal phase handling
+        
         if (state.phase === 'start' || state.phase === 'end') {
           state = GameEngine.applyAction(state, state.activePlayer, { type: 'ADVANCE_PHASE' });
           actions++;
@@ -1163,14 +1148,14 @@ describe('SECTION 4: Mass Game Simulation', () => {
           const player = state.activePlayer;
           const playerState = state[player];
 
-          // Try to play a card or pass
+          
           if (!playerState.hasPassed && playerState.hand.length > 0 && playerState.chakra > 0) {
-            // Find a playable card
+            
             let played = false;
             for (let i = 0; i < playerState.hand.length; i++) {
               const card = playerState.hand[i];
               if (card.chakra <= playerState.chakra) {
-                // Try to play on first available mission
+                
                 for (let m = 0; m < state.activeMissions.length; m++) {
                   try {
                     state = GameEngine.applyAction(state, player, {
@@ -1183,7 +1168,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
                     played = true;
                     break;
                   } catch {
-                    // Try hidden
+                    
                     try {
                       state = GameEngine.applyAction(state, player, {
                         type: 'PLAY_HIDDEN',
@@ -1293,7 +1278,7 @@ describe('SECTION 4: Mass Game Simulation', () => {
       results.errors.slice(0, 10).forEach(e => console.log(`  - ${e}`));
     }
 
-    // At least 45% should complete (lowered from 50% due to AI game randomness)
+    
     expect(results.completed).toBeGreaterThanOrEqual(results.total * 0.45);
   }, 120000); // 2 minute timeout
 
@@ -1313,22 +1298,22 @@ describe('SECTION 4: Mass Game Simulation', () => {
   }, 60000);
 });
 
-// =============================================================================
-// SECTION 5: EDGE CASE & FAQ COMPLIANCE TESTS
-// =============================================================================
+
+
+
 
 describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
 
   describe('5.1 FAQ: Effects are all-or-nothing (IMG_3970)', () => {
     it('effects should be applied completely or not at all', () => {
-      // "You must choose if you want to apply the complete effect or not apply it at all"
-      // Cannot cherry-pick parts of an effect
+      
+      
     });
   });
 
   describe('5.2 FAQ: Tsunade 004 hidden character defeat (IMG_3971)', () => {
     it('hidden character defeated with Tsunade 004 should NOT be revealed when going to hand', () => {
-      // FAQ: "The hidden character goes to your hand instead of the discard where it would get revealed"
+      
       addIssue({
         severity: 'HIGH',
         category: 'FAQ Compliance',
@@ -1344,13 +1329,13 @@ describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
 
   describe('5.3 FAQ: Friendly vs "Other Friendly" (IMG_3974)', () => {
     it('friendly and other friendly should have same meaning', () => {
-      // FAQ: "No, it has the same effect"
+      
     });
   });
 
   describe('5.4 FAQ: Weakest/Strongest targeting (IMG_3976)', () => {
     it('when multiple characters tied for weakest/strongest, player chooses', () => {
-      // FAQ: For single target effects, choose among tied. For "all", all tied are affected.
+      
     });
   });
 
@@ -1363,8 +1348,8 @@ describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
     });
 
     it('hidden character is cost 0, power 0 but can have tokens', () => {
-      // "A Hidden Character is a normal Character with cost 1 and Power 0"
-      // Wait - FAQ says cost 1? But rulebook says cost 0 when targeted by enemy effects
+      
+      
       addIssue({
         severity: 'HIGH',
         category: 'Rule Discrepancy',
@@ -1394,19 +1379,19 @@ describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
       const state = createGameState();
       state.player1.deck = []; // Empty deck
 
-      // Drawing should simply not happen, no penalty
+      
     });
   });
 
   describe('5.8 Control transfer ownership (FAQ IMG_3975)', () => {
     it('controlled card returning to original owner should maintain state', () => {
-      // "If it leaves play, it goes back to their owner keeping the current state"
+      
     });
   });
 
   describe('5.9 Card is not friendly to itself (FAQ IMG_3973)', () => {
     it('a character should not be considered friendly to itself', () => {
-      // "A character isn't a Friend of itself"
+      
       addIssue({
         severity: 'MEDIUM',
         category: 'FAQ Compliance',
@@ -1419,55 +1404,55 @@ describe('SECTION 5: Edge Cases & FAQ Compliance', () => {
   });
 });
 
-// =============================================================================
-// SECTION 6: EFFECT TIMING & PRIORITY TESTS
-// =============================================================================
+
+
+
 
 describe('SECTION 6: Effect Timing & Priority', () => {
 
   describe('6.1 Effect Resolution Order', () => {
 
     it('effects on existing cards should trigger BEFORE newly played card effects', () => {
-      // Rule: "Effects on existing cards in play trigger before the effects of the newly played card"
+      
     });
 
     it('effects on a single card should apply top-to-bottom', () => {
-      // Rule: "Effects are applied top-to-bottom on a single card"
+      
     });
 
     it('when multiple effects trigger simultaneously, active player chooses order', () => {
-      // Rule: Active player chooses resolution order for simultaneous effects
+      
     });
   });
 
   describe('6.2 UPGRADE effect interaction with MAIN', () => {
 
     it('UPGRADE effects that modify MAIN should be integrated when applying MAIN', () => {
-      // Rule: "Some UPGRADE effects modify parts of MAIN effects"
-      // Example: KS-133-S Naruto: UPGRADE changes MAIN from "hide" to "defeat"
+      
+      
     });
   });
 
   describe('6.3 SCORE effect timing', () => {
 
     it('SCORE effects require at least 1 power to trigger', () => {
-      // Rule: "Requires at least 1 power to win and trigger SCORE"
+      
     });
 
     it('SCORE effects process in order: mission card first, then winner characters', () => {
-      // Rule: Winner activates mission card SCORE, then character SCORE effects
+      
     });
   });
 });
 
-// =============================================================================
-// SECTION 7: REPORT GENERATION
-// =============================================================================
+
+
+
 
 describe('SECTION 7: Audit Report Generation', () => {
 
   afterAll(() => {
-    // Generate the comprehensive audit report
+    
     const report: string[] = [];
 
     report.push('='.repeat(80));
@@ -1477,7 +1462,7 @@ describe('SECTION 7: Audit Report Generation', () => {
     report.push(`Total Issues Found: ${auditIssues.length}`);
     report.push('');
 
-    // Summary by severity
+    
     const bySeverity: Record<string, AuditIssue[]> = {};
     for (const issue of auditIssues) {
       if (!bySeverity[issue.severity]) bySeverity[issue.severity] = [];
@@ -1491,7 +1476,7 @@ describe('SECTION 7: Audit Report Generation', () => {
     }
     report.push('');
 
-    // Summary by category
+    
     const byCategory: Record<string, AuditIssue[]> = {};
     for (const issue of auditIssues) {
       if (!byCategory[issue.category]) byCategory[issue.category] = [];
@@ -1504,7 +1489,7 @@ describe('SECTION 7: Audit Report Generation', () => {
     }
     report.push('');
 
-    // Detailed issues
+    
     report.push('='.repeat(80));
     report.push('DETAILED ISSUES');
     report.push('='.repeat(80));
@@ -1528,7 +1513,7 @@ describe('SECTION 7: Audit Report Generation', () => {
       }
     }
 
-    // Write report to file
+    
     const reportPath = path.resolve(__dirname, '../../AUDIT_REPORT.txt');
     fs.writeFileSync(reportPath, report.join('\n'), 'utf-8');
 
@@ -1539,7 +1524,7 @@ describe('SECTION 7: Audit Report Generation', () => {
   });
 
   it('should collect all issues for the report', () => {
-    // This test just ensures the report generation runs
+    
     expect(auditIssues).toBeDefined();
   });
 });

@@ -12,7 +12,7 @@ import { DeckSelector } from '@/components/game/DeckSelector';
 import { useGameStore } from '@/stores/gameStore';
 import type { GameConfig, CharacterCard, MissionCard } from '@/lib/engine/types';
 import type { AIDifficulty } from '@/lib/ai/AIPlayer';
-// Ban enforcement is server-side for ranked only
+
 
 interface ResolvedDeck {
   characters: CharacterCard[];
@@ -35,7 +35,7 @@ export default function PlayAIPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [cards, setCards] = useState<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<ResolvedDeck | null>(null);
-  // Ban enforcement is server-side for ranked only — AI games allow all cards
+  
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
@@ -50,7 +50,7 @@ export default function PlayAIPage() {
 
     setIsLoading(true);
 
-    // AI games: no ban enforcement — all cards available
+    
     const allChars = cards.characters;
     const allMissions = cards.missions;
 
@@ -61,10 +61,10 @@ export default function PlayAIPage() {
       ? selectedDeck.missions
       : [...allMissions].sort(() => Math.random() - 0.5).slice(0, 3);
 
-    // AI random deck
+    
     const player2Deck = [...allChars].sort(() => Math.random() - 0.5).slice(0, 30);
 
-    // AI missions: exclude player's missions to ensure no overlap
+    
     const playerMissionIds = new Set(player1Missions.map((m) => m.id));
     const aiMissionPool = allMissions.filter((m) => !playerMissionIds.has(m.id));
     const aiMissions = [...aiMissionPool].sort(() => Math.random() - 0.5);
@@ -104,7 +104,7 @@ export default function PlayAIPage() {
           <p className="text-sm text-[#888888]">{t('playAI.selectDifficultyDesc')}</p>
         </div>
 
-        {/* Difficulty selection */}
+        
         <div className="flex flex-col gap-2 w-full">
           <p className="text-xs text-[#888888] uppercase tracking-wider mb-1">{t('playAI.selectDifficulty')}</p>
           {DIFFICULTIES.map((d) => (
@@ -123,7 +123,7 @@ export default function PlayAIPage() {
           ))}
         </div>
 
-        {/* Deck selection */}
+        
         {cards && (
           <DeckSelector
             onSelect={(deck) => setSelectedDeck(deck)}
@@ -132,14 +132,14 @@ export default function PlayAIPage() {
           />
         )}
 
-        {/* Card count info */}
+        
         {cards && (
           <p className="text-xs text-[#555]">
             {t('playAI.cardsLoaded', { chars: cards.characters.length, missions: cards.missions.length })}
           </p>
         )}
 
-        {/* Actions */}
+        
         <div className="flex gap-3 w-full">
           <button
             onClick={() => router.push('/')}

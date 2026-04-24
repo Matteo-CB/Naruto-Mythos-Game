@@ -10,7 +10,7 @@ export function getIO(): SocketIOServer | null {
   return ioInstance;
 }
 
-// User-to-socket mapping for targeted event delivery
+
 const userSockets = new Map<string, Set<string>>();
 
 export function registerUserSocket(userId: string, socketId: string) {

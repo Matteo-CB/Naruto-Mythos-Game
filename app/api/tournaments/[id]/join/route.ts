@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
 import { isDiscordMember } from '@/lib/discord/tournamentRoles';
 
-// POST - join a tournament
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -33,22 +33,22 @@ export async function POST(
       return NextResponse.json({ error: 'Tournament is full' }, { status: 400 });
     }
 
-    // Private tournament - verify code (public tournaments skip code check)
+    
     if (!tournament.isPublic) {
       if (!body.joinCode || body.joinCode !== tournament.joinCode) {
         return NextResponse.json({ error: 'Invalid join code' }, { status: 403 });
       }
     }
 
-    // Load user for subsequent checks
+    
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { username: true, discordId: true, elo: true },
     });
 
-    // Discord is recommended but not required — joining is always allowed
+    
 
-    // League restriction check (simulator tournaments only)
+    
     if (
       tournament.type === 'simulator' &&
       Array.isArray(tournament.allowedLeagues) &&
@@ -60,7 +60,7 @@ export async function POST(
       }
     }
 
-    // Check tournament ban
+    
     const activeBan = await prisma.userBan.findFirst({
       where: {
         userId: session.user.id,
@@ -75,7 +75,7 @@ export async function POST(
       return NextResponse.json({ error: 'You are banned from tournaments' }, { status: 403 });
     }
 
-    // Check not already joined
+    
     const existing = await prisma.tournamentParticipant.findUnique({
       where: { tournamentId_userId: { tournamentId: id, userId: session.user.id } },
     });

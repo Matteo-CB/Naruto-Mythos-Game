@@ -25,9 +25,7 @@ async function getDiscordMention(userId: string): Promise<string> {
   return '';
 }
 
-/**
- * Send tournament results to Discord via webhook.
- */
+
 export async function sendTournamentResults(
   tournamentName: string,
   podium: PodiumEntry[],

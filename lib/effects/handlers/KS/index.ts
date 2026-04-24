@@ -1,7 +1,4 @@
-/**
- * KS (Konoha Shido) set handler registration.
- * Imports and registers all effect handlers for the KS card set.
- */
+
 import { registerAllCommonHandlers } from './common/index';
 import { registerAllUncommonHandlers } from './uncommon/index';
 import { registerAllRareHandlers } from './rare/index';

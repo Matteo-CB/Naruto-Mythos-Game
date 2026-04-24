@@ -1,9 +1,4 @@
-/**
- * Discord webhook notification for rank-up events.
- *
- * Sends a message + rich embed to a Discord channel when a player reaches a new league tier.
- * Tags the player with @mention if they have linked Discord, otherwise uses **bold** username.
- */
+
 
 import { getRoleForElo, getRankLabel } from './roles';
 
@@ -14,7 +9,7 @@ const DISCORD_API = 'https://discord.com/api/v10';
 const BOT_TOKEN = process.env.BOT_DISCORD_TOKEN;
 const GUILD_ID = process.env.SERVER_DISCORD_ID;
 
-/** Check if a Discord user is actually a member of the guild */
+
 async function isGuildMember(discordId: string): Promise<boolean> {
   if (!BOT_TOKEN || !GUILD_ID) return false;
   try {
@@ -51,16 +46,7 @@ const TIER_SYMBOLS: Record<string, string> = {
   '꧁༒ 𝐖𝐢𝐥𝐥 𝐨𝐟 𝐅𝐢𝐫𝐞 ༒꧂': '༒',
 };
 
-/**
- * Detect rank-up and send a Discord webhook notification.
- *
- * @param username - Player display name
- * @param discordId - Discord user ID (null if not linked)
- * @param oldElo - ELO before game
- * @param newElo - ELO after game
- * @param oldTotalGames - Games before
- * @param newTotalGames - Games after
- */
+
 export async function sendRankUpNotification(
   username: string,
   discordId: string | null,
@@ -80,7 +66,7 @@ export async function sendRankUpNotification(
     const oldRank = getRankLabel(oldElo);
     const newRank = getRankLabel(newElo);
 
-    // Case 1: placement completed
+    
     if (wasUnranked && isNowRanked) {
       await sendWebhook({
         username, discordId, oldRank: null, newRank, newElo,
@@ -90,7 +76,7 @@ export async function sendRankUpNotification(
       return;
     }
 
-    // Case 2: ranked player promoted
+    
     if (!wasUnranked && newRole.minElo > oldRole.minElo) {
       await sendWebhook({
         username, discordId, oldRank, newRank, newElo,
@@ -103,9 +89,7 @@ export async function sendRankUpNotification(
   }
 }
 
-/**
- * Send a rank-up notification for a specific user (testing / manual).
- */
+
 export async function sendRankUpForUser(
   username: string,
   discordId: string | null,
@@ -138,11 +122,11 @@ async function sendWebhook(params: {
   const { username, discordId, oldRank, newRank, newElo, color, isFirstPlacement } = params;
   const symbol = TIER_SYMBOLS[newRank] ?? '';
 
-  // Player mention: @tag if Discord linked AND in the server, **bold name** otherwise
+  
   const inGuild = discordId ? await isGuildMember(discordId) : false;
   const playerMention = (discordId && inGuild) ? `<@${discordId}>` : `**${username}**`;
 
-  // Content message (visible above the embed, triggers the @mention notification)
+  
   let content: string;
   if (isFirstPlacement) {
     content = `${playerMention} has completed placement and entered **${newRank}** ${symbol}`;
@@ -152,7 +136,7 @@ async function sendWebhook(params: {
     content = `${playerMention} reached **${newRank}** ${symbol}`;
   }
 
-  // Decorative separator for the embed description
+  
   const bar = '\u2500'.repeat(20);
 
   const embed = {

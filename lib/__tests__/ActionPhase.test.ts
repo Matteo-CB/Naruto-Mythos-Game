@@ -59,13 +59,13 @@ describe('Action Phase', () => {
         hidden: false,
       });
 
-      // State should be unchanged (action rejected)
+      
       expect(newState.player1.hand.length).toBe(state.player1.hand.length);
     });
 
     it('should not allow two characters with the same name on the same mission', () => {
       const state = createActionPhaseState();
-      // Add a character named 'Naruto' already on mission 0
+      
       state.activeMissions[0].player1Characters.push(
         mockCharInPlay(
           { controlledBy: 'player1', missionIndex: 0 },
@@ -80,7 +80,7 @@ describe('Action Phase', () => {
         hidden: false,
       });
 
-      // Should be rejected
+      
       expect(newState.activeMissions[0].player1Characters.length).toBe(1);
     });
 
@@ -113,7 +113,7 @@ describe('Action Phase', () => {
 
     it('should cost exactly 1 chakra regardless of printed cost', () => {
       const state = createActionPhaseState();
-      // Play Kakashi (cost 5) hidden - should still cost only 1
+      
       const newState = GameEngine.applyAction(state, 'player1', {
         type: 'PLAY_HIDDEN',
         cardIndex: 3, // Kakashi, printed cost 5
@@ -144,7 +144,7 @@ describe('Action Phase', () => {
   describe('Reveal Character', () => {
     it('should reveal a hidden character', () => {
       const state = createActionPhaseState();
-      // First play hidden
+      
       let newState = GameEngine.applyAction(state, 'player1', {
         type: 'PLAY_HIDDEN',
         cardIndex: 4, // Iruka, cost 1
@@ -154,7 +154,7 @@ describe('Action Phase', () => {
       const hiddenChar = newState.activeMissions[0].player1Characters[0];
       expect(hiddenChar.isHidden).toBe(true);
 
-      // Now player 2 passes, then player 1 reveals
+      
       newState = GameEngine.applyAction(newState, 'player2', { type: 'PASS' });
       newState = GameEngine.applyAction(newState, 'player1', {
         type: 'REVEAL_CHARACTER',
@@ -168,7 +168,7 @@ describe('Action Phase', () => {
 
     it('should pay the printed chakra cost on reveal', () => {
       const state = createActionPhaseState();
-      // Play hidden (cost 1)
+      
       let newState = GameEngine.applyAction(state, 'player1', {
         type: 'PLAY_HIDDEN',
         cardIndex: 0, // Naruto, printed cost 3
@@ -178,10 +178,10 @@ describe('Action Phase', () => {
 
       const hiddenChar = newState.activeMissions[0].player1Characters[0];
 
-      // Player 2 passes
+      
       newState = GameEngine.applyAction(newState, 'player2', { type: 'PASS' });
 
-      // Reveal (should cost 3, the printed cost)
+      
       newState = GameEngine.applyAction(newState, 'player1', {
         type: 'REVEAL_CHARACTER',
         missionIndex: 0,
@@ -195,14 +195,14 @@ describe('Action Phase', () => {
   describe('Upgrade Character', () => {
     it('should upgrade a character with a same-name higher-cost card', () => {
       const state = createActionPhaseState();
-      // Place a low-cost Naruto on the board
+      
       const lowNaruto = mockCharInPlay(
         { controlledBy: 'player1', missionIndex: 0 },
         { id: 'KS-010-C', name_fr: 'Naruto', title_fr: 'Genin', chakra: 3, power: 3 },
       );
       state.activeMissions[0].player1Characters.push(lowNaruto);
 
-      // Put a higher-cost Naruto in hand
+      
       state.player1.hand[0] = mockCharacter({
         id: 'KS-011-C',
         name_fr: 'Naruto',
@@ -244,7 +244,7 @@ describe('Action Phase', () => {
         targetInstanceId: lowNaruto.instanceId,
       });
 
-      // Should pay 5 - 3 = 2
+      
       expect(newState.player1.chakra).toBe(8); // 10 - 2
     });
 
@@ -269,7 +269,7 @@ describe('Action Phase', () => {
         targetInstanceId: existingChar.instanceId,
       });
 
-      // Should be rejected
+      
       expect(newState.activeMissions[0].player1Characters[0].card.chakra).toBe(4);
     });
 
@@ -326,18 +326,18 @@ describe('Action Phase', () => {
 
       const newState = GameEngine.applyAction(state, 'player2', { type: 'PASS' });
 
-      // Edge should stay with player1 (first passer)
+      
       expect(newState.edgeHolder).toBe('player1');
     });
 
     it('should allow other player to continue after one passes', () => {
       const state = createActionPhaseState();
-      // Player 1 passes
+      
       let newState = GameEngine.applyAction(state, 'player1', { type: 'PASS' });
       expect(newState.player1.hasPassed).toBe(true);
       expect(newState.activePlayer).toBe('player2');
 
-      // Player 2 should still be able to take actions
+      
       const actions = GameEngine.getValidActions(newState, 'player2');
       expect(actions.length).toBeGreaterThan(0);
       expect(actions.some((a) => a.type !== 'PASS')).toBe(true);
@@ -358,7 +358,7 @@ describe('Action Phase', () => {
         hidden: false,
       });
 
-      // Should be unchanged
+      
       expect(newState.activeMissions[0].player1Characters.length).toBe(
         state.activeMissions[0].player1Characters.length,
       );

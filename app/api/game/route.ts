@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Complete a game and apply ELO changes
+
 export async function PUT(request: NextRequest) {
   try {
     const session = await auth();
@@ -56,7 +56,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Apply ELO changes for non-AI rated games
+    
     let eloChange = 0;
     if (!game.isAiGame && game.player1Id && game.player2Id) {
       const player1 = await prisma.user.findUnique({
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
         );
         eloChange = eloChanges.player1Delta;
 
-        // Update player stats
+        
         const p1Stats =
           result === 'player1'
             ? { wins: { increment: 1 } }
@@ -112,11 +112,11 @@ export async function PUT(request: NextRequest) {
           }),
         ]);
 
-        // Sync Discord roles (fire-and-forget)
+        
         syncDiscordRole(game.player1Id).catch(() => {});
         syncDiscordRole(game.player2Id).catch(() => {});
 
-        // Rank-up webhook notifications (fire-and-forget)
+        
         const p1OldTotal = player1.wins + player1.losses + player1.draws;
         const p2OldTotal = player2.wins + player2.losses + player2.draws;
         sendRankUpNotification(player1.username, player1.discordId, player1.elo, eloChanges.player1NewElo, p1OldTotal, p1OldTotal + 1).catch(() => {});

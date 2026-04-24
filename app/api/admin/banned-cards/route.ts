@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db/prisma';
 const ADMIN_EMAIL = 'matteo.biyikli3224@gmail.com';
 const ADMIN_USERNAMES = ['Kutxyt', 'admin', 'Daiki0'];
 
-// GET - list all banned card IDs (public, needed by all clients)
+
 export async function GET() {
   try {
     const bannedCards = await prisma.bannedCard.findMany() as Array<{ cardId: string; reason?: string | null }>;
@@ -21,7 +21,7 @@ export async function GET() {
   }
 }
 
-// POST - toggle a card's ban status (admin only)
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -39,17 +39,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'cardId is required' }, { status: 400 });
     }
 
-    // Toggle: if banned, unban; if not banned, ban
+    
     const existing = await prisma.bannedCard.findUnique({
       where: { cardId },
     });
 
     if (existing) {
-      // Unban
+      
       await prisma.bannedCard.delete({ where: { cardId } });
       return NextResponse.json({ cardId, banned: false });
     } else {
-      // Ban with optional reason
+      
       await prisma.bannedCard.create({ data: { cardId, reason: typeof reason === 'string' ? reason.trim() || undefined : undefined } as any });
       return NextResponse.json({ cardId, banned: true, reason: reason || null });
     }

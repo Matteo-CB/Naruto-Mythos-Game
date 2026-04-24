@@ -46,7 +46,7 @@ export async function GET(
   }
 }
 
-// Save replay data for an existing game
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -70,12 +70,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    // Verify the user was a player in this game
+    
     if (game.player1Id !== session.user.id && game.player2Id !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Don't overwrite if already saved
+    
     if (game.gameState) {
       return NextResponse.json({ message: 'Replay already saved' });
     }

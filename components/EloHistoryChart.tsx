@@ -47,8 +47,7 @@ const DARK = '#0a0a0a';
 
 interface Props {
   username: string;
-  /** Optional label override, useful when embedding in a profile page where
-   *  the username is already displayed in the header. */
+  
   compact?: boolean;
 }
 
@@ -74,15 +73,15 @@ export function EloHistoryChart({ username, compact }: Props) {
     return () => { cancelled = true; };
   }, [username]);
 
-  // Build the SVG path + axes from the points.
+  
   const chart = useMemo(() => {
     if (!data || data.points.length === 0) return null;
     const W = 720, H = 220, padL = 40, padR = 12, padT = 12, padB = 28;
     const innerW = W - padL - padR;
     const innerH = H - padT - padB;
 
-    // Prepend the user's starting ELO so the chart begins from where they were.
-    // Starting ELO = first point's elo - its delta (i.e. oldElo of the 1st game).
+    
+    
     const first = data.points[0];
     const startElo = first.elo - first.delta;
     const series: Array<{ t: number; elo: number; idx: number | null; point: EloPoint | null }> = [
@@ -93,7 +92,7 @@ export function EloHistoryChart({ username, compact }: Props) {
     const minElo = Math.min(...series.map((s) => s.elo));
     const maxElo = Math.max(...series.map((s) => s.elo));
     const eloRange = Math.max(1, maxElo - minElo);
-    // Y-padding so the line isn't glued to the frame.
+    
     const yTop = maxElo + eloRange * 0.1;
     const yBot = minElo - eloRange * 0.1;
     const ySpan = Math.max(2, yTop - yBot);
@@ -105,12 +104,12 @@ export function EloHistoryChart({ username, compact }: Props) {
     const xOf = (t: number) => padL + ((t - minT) / tSpan) * innerW;
     const yOf = (elo: number) => padT + (1 - (elo - yBot) / ySpan) * innerH;
 
-    // Line path
+    
     const path = series
       .map((s, i) => `${i === 0 ? 'M' : 'L'} ${xOf(s.t).toFixed(1)} ${yOf(s.elo).toFixed(1)}`)
       .join(' ');
 
-    // Nodes (for hover)
+    
     const nodes = series
       .filter((s) => s.idx !== null)
       .map((s) => ({
@@ -120,7 +119,7 @@ export function EloHistoryChart({ username, compact }: Props) {
         point: s.point!,
       }));
 
-    // Y-axis ticks (4 values)
+    
     const ticks = [0.0, 0.33, 0.66, 1.0].map((frac) => {
       const elo = yBot + frac * ySpan;
       return { y: padT + (1 - frac) * innerH, label: Math.round(elo) };
@@ -175,7 +174,7 @@ export function EloHistoryChart({ username, compact }: Props) {
         </div>
       )}
 
-      {/* Summary row */}
+      
       <div className="grid grid-cols-4 gap-3 mb-5">
         <Stat label="games" value={data.summary.games} />
         <Stat label="W / L / D" value={`${data.summary.wins} / ${data.summary.losses} / ${data.summary.draws}`} />
@@ -187,7 +186,7 @@ export function EloHistoryChart({ username, compact }: Props) {
         <Stat label="opponents" value={data.summary.distinctOpponents} />
       </div>
 
-      {/* SVG chart */}
+      
       {chart && (
         <div className="relative mb-5" style={{ backgroundColor: DARK, border: `1px solid #1e1e1e`, padding: '8px' }}>
           <svg
@@ -196,7 +195,7 @@ export function EloHistoryChart({ username, compact }: Props) {
             style={{ display: 'block' }}
             onMouseLeave={() => setHovered(null)}
           >
-            {/* Y-axis gridlines + labels */}
+            
             {chart.ticks.map((tk, i) => (
               <g key={i}>
                 <line
@@ -215,7 +214,7 @@ export function EloHistoryChart({ username, compact }: Props) {
               </g>
             ))}
 
-            {/* Main ELO line */}
+            
             <path
               d={chart.path}
               fill="none"
@@ -225,7 +224,7 @@ export function EloHistoryChart({ username, compact }: Props) {
               strokeLinecap="round"
             />
 
-            {/* Nodes — coloured by result */}
+            
             {chart.nodes.map((n) => {
               const color = n.point.result === 'win' ? GREEN : n.point.result === 'loss' ? RED : GREY;
               const isHover = hovered?.idx === n.idx;
@@ -241,13 +240,13 @@ export function EloHistoryChart({ username, compact }: Props) {
                     stroke={DARK}
                     strokeWidth={isHover ? 1.5 : 1}
                   />
-                  {/* Generous hit target so hovering is easy */}
+                  
                   <circle cx={n.x} cy={n.y} r={10} fill="transparent" />
                 </g>
               );
             })}
 
-            {/* Start / end labels on the X axis */}
+            
             <text
               x={chart.padL} y={chart.H - 10}
               fontSize={9} fill="#555"
@@ -265,13 +264,13 @@ export function EloHistoryChart({ username, compact }: Props) {
             </text>
           </svg>
 
-          {/* Hover tooltip */}
+          
           {hovered && (() => {
             const p = data.points[hovered.idx];
             const dateStr = new Date(p.t).toLocaleString();
             const deltaColor = p.delta > 0 ? GREEN : p.delta < 0 ? RED : GREY;
             const resultColor = p.result === 'win' ? GREEN : p.result === 'loss' ? RED : GREY;
-            // Clamp tooltip position so it stays inside the container
+            
             const pct = (hovered.x / (chart.W || 1)) * 100;
             const onLeft = pct > 60;
             return (
@@ -306,7 +305,7 @@ export function EloHistoryChart({ username, compact }: Props) {
         </div>
       )}
 
-      {/* Top opponents */}
+      
       {data.opponents.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-2">

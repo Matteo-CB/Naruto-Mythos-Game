@@ -2,14 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * MSS 03 - "Trouver le traitre" / "Find the Traitor"
- *
- * SCORE [arrow]: Opponent discards a card from hand.
- *   - The opponent of the scoring player must discard 1 card from their hand.
- *   - For automated play: discard the first card in hand.
- *   - If opponent has no cards in hand, nothing happens.
- */
+
 
 function mss03ScoreHandler(ctx: EffectContext): EffectResult {
   const state = { ...ctx.state };
@@ -30,7 +23,7 @@ function mss03ScoreHandler(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // CONFIRM popup before forcing opponent discard
+  
   return {
     state,
     requiresTargetSelection: true,

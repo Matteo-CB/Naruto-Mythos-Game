@@ -2,26 +2,12 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 
-/**
- * Card 069/130 - DOSU KINUTA "Resonance" (UC)
- * Chakra: 5 | Power: 4
- * Group: Sound Village | Keywords: Team Dosu
- *
- * UPGRADE: Look at a hidden character in play (any player, any mission).
- *   - Select a hidden character anywhere in play, and the source player gets
- *     to see it (informational). Requires target selection.
- *
- * MAIN: Choose a hidden enemy character; opponent must play them (reveal them
- *   paying their printed chakra cost + 2 extra), or defeat them.
- *   - Finds hidden enemy characters in play. Requires target selection.
- *   - The resolution (force reveal at cost+2 or defeat) is handled by the
- *     engine after target selection. This is a forced choice for the opponent.
- */
+
 
 function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer } = ctx;
 
-  // Find all hidden characters in play across all missions
+  
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
@@ -45,7 +31,7 @@ function handleDosu069Upgrade(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup before looking
+  
   return {
     state,
     requiresTargetSelection: true,
@@ -62,7 +48,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
   const enemySide: 'player1Characters' | 'player2Characters' =
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  // Find hidden enemy characters in play (any mission)
+  
   const validTargets: string[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[enemySide]) {
@@ -86,7 +72,7 @@ function handleDosu069Main(ctx: EffectContext): EffectResult {
     return { state: { ...state, log } };
   }
 
-  // Confirmation popup before force reveal/defeat
+  
   return {
     state,
     requiresTargetSelection: true,

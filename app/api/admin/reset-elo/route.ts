@@ -22,7 +22,7 @@ export async function POST() {
       },
     });
 
-    // Auto-sync Discord roles for all users with linked accounts
+    
     const discordUsers = await prisma.user.findMany({
       where: { discordId: { not: null } },
       select: { id: true },

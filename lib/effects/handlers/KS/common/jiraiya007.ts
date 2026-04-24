@@ -7,7 +7,7 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const costReduction = 1;
 
-  // Pre-check: any affordable summons?
+  
   const handTargets = findAffordableSummonsInHand(state, sourcePlayer, costReduction);
   const hiddenTargets = findHiddenSummonsOnBoard(state, sourcePlayer, costReduction);
 
@@ -17,7 +17,7 @@ function handleJiraiya007Main(ctx: EffectContext): EffectResult {
       'game.log.effect.noTarget', { card: 'Jiraiya', id: 'KS-007-C' }) } };
   }
 
-  // Confirmation popup before target selection
+  
   return {
     state,
     requiresTargetSelection: true,
