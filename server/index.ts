@@ -15,13 +15,9 @@ const getAllowedOrigin = () => {
   if (dev) {
     return 'http://localhost:3000';
   }
-  
-  
-  if (process.env.SERVER_DOMAIN) {
-    const domain = process.env.SERVER_DOMAIN;
-    return domain.startsWith('http') ? domain : `https://${domain}`;
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL;
   }
-  
   return '*';
 };
 
