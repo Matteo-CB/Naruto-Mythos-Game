@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-04-24",
+      "title_fr": "Choji 018 : puissance effective prise en compte",
+      "title_en": "Choji 018: effective power now taken into account",
+      "changes_fr": [
+        "Quand Choji Akimichi (018) se déplace sur une mission, son effet qui cache un ennemi de puissance inférieure utilise maintenant la puissance réelle (incluant les bonus/malus continus comme le -1 par allié de Sasuke) au lieu de la puissance imprimée."
+      ],
+      "changes_en": [
+        "When Choji Akimichi (018) moves into a mission, his effect that hides an enemy with less Power now uses the real effective power (including continuous bonuses and penalties like Sasuke's -1 per ally) instead of the printed power."
+      ]
+    },
+    {
+      "date": "2026-04-24",
       "title_fr": "Naruto 133 : sélection des cibles plus claire",
       "title_en": "Naruto 133: clearer target selection",
       "changes_fr": [

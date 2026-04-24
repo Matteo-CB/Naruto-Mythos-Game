@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterInPlay, PendingEffect, PendingAction
 import { logAction } from '../engine/utils/gameLog';
 import { generateInstanceId } from '../engine/utils/id';
 import { canBeHiddenByEnemy } from './ContinuousEffects';
+import { getEffectivePower } from './powerUtils';
 
 
 
@@ -175,17 +176,16 @@ export function checkChoji018PostMoveTrigger(
   const enemySide: 'player1Characters' | 'player2Characters' =
     charController === 'player1' ? 'player2Characters' : 'player1Characters';
 
-  const chojiPower = (topCard.power ?? 0) + movedChar.powerTokens;
+  const chojiPower = getEffectivePower(state, movedChar, charController);
 
   const enemyPlayer: PlayerID = charController === 'player1' ? 'player2' : 'player1';
 
-  
+
   const hideTargets: string[] = [];
   for (const enemy of mission[enemySide]) {
     if (enemy.isHidden) continue;
     if (!canBeHiddenByEnemy(state, enemy, enemyPlayer)) continue;
-    const enemyTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
-    const enemyPower = (enemyTop.power ?? 0) + enemy.powerTokens;
+    const enemyPower = getEffectivePower(state, enemy, enemyPlayer);
     if (enemyPower < chojiPower) {
       hideTargets.push(enemy.instanceId);
     }
