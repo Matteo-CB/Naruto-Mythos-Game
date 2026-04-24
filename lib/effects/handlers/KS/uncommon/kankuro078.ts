@@ -2,7 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
-import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
+import { isMovementBlockedByKurenai, isHiddenRevealBlocked } from '@/lib/effects/ContinuousEffects';
 
 
 
@@ -65,14 +65,16 @@ function handleKankuro078Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard } = ctx;
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  
+
   const validTargets: string[] = [];
-  for (const mission of state.activeMissions) {
+  for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
+    const mission = state.activeMissions[mIdx];
+    if (isHiddenRevealBlocked(state, mIdx, sourcePlayer)) continue;
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
       const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
       const charName = topCard.name_fr.toUpperCase();
-      
+
       const hasNameConflict = mission[friendlySide].some((c) => {
         if (c.instanceId === char.instanceId || c.isHidden) return false;
         const cTop = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;

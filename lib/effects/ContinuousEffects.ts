@@ -487,6 +487,30 @@ export function canBeHiddenByEnemy(
 }
 
 
+export function isHiddenRevealBlocked(
+  state: GameState,
+  missionIndex: number,
+  revealingPlayer: PlayerID,
+): boolean {
+  const mission = state.activeMissions[missionIndex];
+  if (!mission) return false;
+  const opponent = revealingPlayer === 'player1' ? 'player2' : 'player1';
+  const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
+  for (const oc of opponentChars) {
+    if (oc.isHidden) continue;
+    const top = oc.stack?.length > 0 ? oc.stack[oc.stack.length - 1] : oc.card;
+    const hasLock = (top.effects ?? []).some(
+      (e) =>
+        e.type === 'MAIN' &&
+        typeof e.description === 'string' &&
+        e.description.includes('[⧗]') &&
+        e.description.toLowerCase().includes('cannot play characters while hidden'),
+    );
+    if (hasLock) return true;
+  }
+  return false;
+}
+
 export function isMovementBlockedByKurenai(
   state: GameState,
   sourceMissionIndex: number,

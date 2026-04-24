@@ -1,5 +1,6 @@
 import type { GameState, PlayerID } from '@/lib/engine/types';
 import { canAffordAsUpgrade } from './upgradeCheck';
+import { isHiddenRevealBlocked } from '@/lib/effects/ContinuousEffects';
 
 export interface HiddenCharTarget {
   instanceId: string;
@@ -43,6 +44,7 @@ export function findHiddenSummonsOnBoard(
 
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     const mission = state.activeMissions[mIdx];
+    if (isHiddenRevealBlocked(state, mIdx, player)) continue;
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
       if (char.controlledBy !== player) continue;
@@ -99,6 +101,7 @@ export function findHiddenLeafOnBoard(
 
   for (let mIdx = 0; mIdx < state.activeMissions.length; mIdx++) {
     const mission = state.activeMissions[mIdx];
+    if (isHiddenRevealBlocked(state, mIdx, player)) continue;
     for (const char of mission[friendlySide]) {
       if (!char.isHidden) continue;
       if (char.controlledBy !== player) continue;

@@ -9,7 +9,7 @@ import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { checkNinjaHoundsTrigger, checkChoji018PostMoveTrigger } from './moveTriggers';
 import { returnCharacterToHand } from '../engine/phases/EndPhase';
 import { defeatFriendlyCharacter, sortTargetsGemmaLast } from './defeatUtils';
-import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval } from './ContinuousEffects';
+import { isProtectedFromEnemyHide, isImmuneToEnemyHideOrDefeat, canBeHiddenByEnemy, isMovementBlockedByKurenai, triggerOnPlayReactions, applyRempartTokenRemoval, isHiddenRevealBlocked } from './ContinuousEffects';
 import { calculateCharacterPower } from '../engine/phases/PowerCalculation';
 import { getEffectivePower } from './powerUtils';
 import { checkFlexibleUpgrade } from '../engine/rules/PlayValidation';
@@ -5880,12 +5880,19 @@ export class EffectEngine {
             d069mRevealCost = Math.max(0, (d069mTopCard.chakra ?? 0) - (d069mOldTop.chakra ?? 0)) + 2;
           }
           const d069mCanAfford = newState[d069mOpponent].chakra >= d069mRevealCost;
+          const d069mLocked = isHiddenRevealBlocked(newState, d069mCharResult.missionIndex, d069mOpponent);
 
-          if (!d069mCanAfford) {
+          if (!d069mCanAfford || d069mLocked) {
             newState = EffectEngine.defeatCharacter(newState, d069mAutoTargetId, d069mPlayer);
-            newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
-              'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${d069mRevealCost}), character defeated.`,
-              'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(d069mRevealCost) });
+            if (d069mLocked) {
+              newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
+                'EFFECT_DEFEAT', `Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, ${d069mTopCard.name_fr} defeated.`,
+                'game.log.effect.dosu069LockDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: d069mTopCard.name_fr });
+            } else {
+              newState.log = logAction(newState.log, newState.turn, newState.phase, d069mPlayer,
+                'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${d069mRevealCost}), character defeated.`,
+                'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(d069mRevealCost) });
+            }
             break;
           }
 
@@ -13778,6 +13785,13 @@ export class EffectEngine {
           ? hiddenChar_k78.stack[hiddenChar_k78.stack?.length - 1]
           : hiddenChar_k78.card;
 
+        if (isHiddenRevealBlocked(newState, mIdx_k78, pendingEffect.sourcePlayer)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78.name_fr}, Shikamaru Nara is blocking hidden plays in this mission.`,
+            'game.log.effect.shikamaruBlockReveal', { card: topCard_k78.name_fr });
+          break;
+        }
+
         
         const friendlySide_k78 = pendingEffect.sourcePlayer === "player1" ? "player1Characters" : "player2Characters";
         const m_k78_check = newState.activeMissions[mIdx_k78];
@@ -13943,6 +13957,13 @@ export class EffectEngine {
           : charResult_k78r.character.card;
         const side_k78r = charResult_k78r.player === 'player1' ? 'player1Characters' : 'player2Characters';
         const doUpgrade_k78r = targetId !== 'FRESH';
+
+        if (isHiddenRevealBlocked(newState, mIdx_k78r, pendingEffect.sourcePlayer)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_BLOCKED', `Kankuro (078): Cannot reveal ${topCard_k78r.name_fr}, Shikamaru Nara is blocking hidden plays in this mission.`,
+            'game.log.effect.shikamaruBlockReveal', { card: topCard_k78r.name_fr });
+          break;
+        }
 
         let revealCost_k78r: number;
         if (doUpgrade_k78r) {
@@ -14148,13 +14169,19 @@ export class EffectEngine {
           revealCost_dosu = Math.max(0, (topCard_dosu.chakra ?? 0) - (dosuOldTop.chakra ?? 0)) + 2;
         }
         const canAfford_dosu = newState[opponentPlayer_dosu].chakra >= revealCost_dosu;
+        const revealLocked_dosu = isHiddenRevealBlocked(newState, charResult_dosu.missionIndex, opponentPlayer_dosu);
 
-        if (!canAfford_dosu) {
-          
+        if (!canAfford_dosu || revealLocked_dosu) {
           newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
-          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
-            'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost_dosu}), character defeated.`,
-            'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(revealCost_dosu) });
+          if (revealLocked_dosu) {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT', `Dosu Kinuta (069): Reveal blocked by Shikamaru Nara, ${topCard_dosu.name_fr} defeated.`,
+              'game.log.effect.dosu069LockDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', target: topCard_dosu.name_fr });
+          } else {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+              'EFFECT_DEFEAT', `Dosu Kinuta (069): Opponent cannot afford to reveal (cost ${revealCost_dosu}), character defeated.`,
+              'game.log.effect.dosu069AutoDefeat', { card: 'DOSU KINUTA', id: 'KS-069-UC', cost: String(revealCost_dosu) });
+          }
           break;
         }
 
@@ -18893,6 +18920,19 @@ export class EffectEngine {
     const char = charResult.character;
     const mIdx = charResult.missionIndex;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
+
+    if (isHiddenRevealBlocked(newState, mIdx, player)) {
+      return {
+        ...state,
+        log: logAction(
+          state.log, state.turn, state.phase, player,
+          'EFFECT_BLOCKED',
+          `Cannot reveal ${topCard.name_fr}: Shikamaru Nara is blocking hidden plays in this mission.`,
+          'game.log.effect.shikamaruBlockReveal',
+          { card: topCard.name_fr },
+        ),
+      };
+    }
 
     
     const friendlySideRhr = player === "player1" ? "player1Characters" : "player2Characters";

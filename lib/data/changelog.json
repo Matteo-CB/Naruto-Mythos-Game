@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "date": "2026-04-24",
+      "title_fr": "Correction du verrou Shikamaru 111",
+      "title_en": "Shikamaru 111 lock fix",
+      "changes_fr": [
+        "Shikamaru (111) bloque maintenant correctement TOUTES les révélations de cartes cachées sur sa mission, y compris celles déclenchées par des effets comme Jiraiya (jouer une carte Invocation), Hiruzen (jouer un Village de la Feuille) ou Kankuro.",
+        "Dosu Kinuta (069) : si un Shikamaru adverse verrouille la mission, le personnage ciblé est automatiquement vaincu puisque l'option de le révéler n'est plus valide."
+      ],
+      "changes_en": [
+        "Shikamaru (111) now correctly blocks EVERY reveal of hidden characters on his mission, including reveals triggered by effects like Jiraiya (play a Summon), Hiruzen (play a Leaf Village), or Kankuro.",
+        "Dosu Kinuta (069): if an enemy Shikamaru locks the mission, the targeted character is auto-defeated since the reveal option is no longer available."
+      ]
+    },
+    {
       "date": "2026-04-23",
       "title_fr": "Ajustement du système ELO",
       "title_en": "ELO system tuning",
