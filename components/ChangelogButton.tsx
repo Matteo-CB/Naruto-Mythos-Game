@@ -195,7 +195,7 @@ export function ChangelogButton() {
                                 style={{ color: '#bbbbbb' }}
                               >
                                 <span style={{ color: '#c4a35a' }} aria-hidden="true">•</span>
-                                <span>{line}</span>
+                                <span className="font-body">{line}</span>
                               </li>
                             ))}
                           </ul>
