@@ -352,7 +352,7 @@ function handleRevealCharacter(
   ps.chakra -= costToPay;
 
   if (upgradeTarget) {
-    
+
     const upgradeTargetIdx = chars.findIndex((c) => c.instanceId === upgradeTarget.instanceId);
     const upgraded = { ...upgradeTarget };
     upgraded.stack = [...upgraded.stack, ...char.stack];
@@ -360,8 +360,13 @@ function handleRevealCharacter(
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
     upgraded.isHidden = false;
     upgraded.wasRevealedAtLeastOnce = true;
-    
+
     if (upgraded.controllerInstanceId && upgraded.controlledBy === player) {
+      upgraded.controllerInstanceId = undefined;
+    }
+
+    if (upgraded.controlledBy !== upgraded.originalOwner) {
+      upgraded.originalOwner = player;
       upgraded.controllerInstanceId = undefined;
     }
 
@@ -529,6 +534,11 @@ function handleUpgradeCharacter(
   
   
   if (existingChar.controllerInstanceId && existingChar.controlledBy === player) {
+    existingChar.controllerInstanceId = undefined;
+  }
+
+  if (existingChar.controlledBy !== existingChar.originalOwner) {
+    existingChar.originalOwner = player;
     existingChar.controllerInstanceId = undefined;
   }
 

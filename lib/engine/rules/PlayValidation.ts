@@ -223,14 +223,7 @@ export function validateUpgradeCharacter(
     return { valid: false, reason: 'Cannot upgrade opponent\'s character.', reasonKey: 'game.error.cannotUpgradeOpponent' };
   }
 
-  
-  
-  
-  if (target.controlledBy !== target.originalOwner) {
-    return { valid: false, reason: 'Cannot upgrade a controlled character.', reasonKey: 'game.error.cannotUpgradeControlled' };
-  }
 
-  
   if (target.isHidden) {
     return { valid: false, reason: 'Hidden' };
   }

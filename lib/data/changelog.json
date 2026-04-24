@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-04-24",
+      "title_fr": "Correction du contrôle de personnage",
+      "title_en": "Character control fix",
+      "changes_fr": [
+        "Quand un personnage qui contrôle une carte adverse est caché, défait ou retourne en main, la carte volée retourne immédiatement à son propriétaire d'origine, dans la même mission et dans le même état (visible ou cachée).",
+        "Vous pouvez maintenant évoluer une carte adverse que vous avez volée. Dans ce cas la pile vous appartient totalement : si le contrôleur meurt plus tard, la pile ne repart pas à l'adversaire."
+      ],
+      "changes_en": [
+        "When a character controlling a stolen card is hidden, defeated, or returns to hand, the stolen card immediately goes back to its original owner, in the same mission and in the same state (face-up or hidden).",
+        "You can now upgrade onto a stolen enemy card. When you do, the stack becomes fully yours: if the controller dies later, the stack does not return to the opponent."
+      ]
+    },
+    {
+      "date": "2026-04-24",
       "title_fr": "Correction du verrou Shikamaru 111",
       "title_en": "Shikamaru 111 lock fix",
       "changes_fr": [
@@ -45,8 +58,8 @@
     },
     {
       "date": "2026-04-22",
-      "title_fr": "Corrections de règles selon le créateur du jeu",
-      "title_en": "Rule corrections from the game designer",
+      "title_fr": "Ajustements de règles",
+      "title_en": "Rule adjustments",
       "changes_fr": [
         "Sasuke 136 doit désormais défaire un personnage si possible, même si seul un ennemi est une cible valide.",
         "Sakon 062 copie correctement l'embuscade de Kidomaru et les autres effets révélés.",

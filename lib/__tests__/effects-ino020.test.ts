@@ -107,10 +107,8 @@ describe('Ino 020 (UC) - Take Control', () => {
     expect(afterSelect.activeMissions[0].player1Characters.some(c => c.instanceId === 'e3')).toBe(true);
   });
 
-  describe('take-control and controller-leaves-play (advanced ruling)', () => {
-    it('hiding the controller does NOT break control — stolen card stays on controller side', () => {
-      
-      
+  describe('take-control and controller-leaves-play', () => {
+    it('hiding the controller returns the stolen card to its owner', () => {
       const itachi = mockChar({
         instanceId: 'itachi-1',
         card: mockCard({ id: 'KS-090-C', number: 90, name_fr: 'ITACHI UCHIWA', chakra: 2, power: 3 }),
@@ -136,19 +134,19 @@ describe('Ino 020 (UC) - Take Control', () => {
 
       const after = EffectEngine.hideCharacterWithLog(state, 'ino-1', 'player1');
 
-      
       const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
       expect(hiddenIno?.isHidden).toBe(true);
 
-      
-      const itachiStill = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
-      expect(itachiStill).toBeDefined();
-      expect(itachiStill?.controlledBy).toBe('player2');
-      expect(itachiStill?.controllerInstanceId).toBe('ino-1');
-      expect(after.activeMissions[0].player1Characters).toEqual([]);
+      const itachiOnP2 = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
+      expect(itachiOnP2).toBeUndefined();
+
+      const itachiReturned = after.activeMissions[0].player1Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
+      expect(itachiReturned).toBeDefined();
+      expect(itachiReturned?.controlledBy).toBe('player1');
+      expect(itachiReturned?.controllerInstanceId).toBeUndefined();
     });
 
-    it('Choji 018 post-move hide on the controller leaves the stolen card in place', () => {
+    it('Choji 018 post-move hide on the controller returns the stolen card', () => {
       const itachi = mockChar({
         instanceId: 'itachi-1',
         card: mockCard({ id: 'KS-090-C', number: 90, name_fr: 'ITACHI UCHIWA', chakra: 2, power: 5 }),
@@ -178,14 +176,12 @@ describe('Ino 020 (UC) - Take Control', () => {
 
       const after = checkChoji018PostMoveTrigger(state, choji, 0, 'player1', 'player1');
 
-      
       const hiddenIno = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'ino-1');
       expect(hiddenIno?.isHidden).toBe(true);
 
-      const itachiStill = after.activeMissions[0].player2Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
-      expect(itachiStill).toBeDefined();
-      expect(itachiStill?.controlledBy).toBe('player2');
-      expect(itachiStill?.controllerInstanceId).toBe('ino-1');
+      const itachiReturned = after.activeMissions[0].player1Characters.find((c: { instanceId: string }) => c.instanceId === 'itachi-1');
+      expect(itachiReturned).toBeDefined();
+      expect(itachiReturned?.controlledBy).toBe('player1');
     });
   });
 });

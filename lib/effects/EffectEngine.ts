@@ -13897,17 +13897,24 @@ export class EffectEngine {
         if (cidx_k78 !== -1) {
           chars_k78[cidx_k78] = { ...chars_k78[cidx_k78], isHidden: false, wasRevealedAtLeastOnce: true };
 
-          
+
           if (upgradeTarget_k78) {
             const upgradeCharIdx_k78 = chars_k78.findIndex(c => c.instanceId === upgradeTarget_k78.instanceId);
             if (upgradeCharIdx_k78 >= 0) {
               const revealedCharData = chars_k78[cidx_k78];
+              const prev_k78 = chars_k78[upgradeCharIdx_k78];
+              const wasControlled_k78 = prev_k78.controlledBy !== prev_k78.originalOwner;
               chars_k78[upgradeCharIdx_k78] = {
-                ...chars_k78[upgradeCharIdx_k78],
+                ...prev_k78,
                 card: revealedCharData.card,
-                stack: [...chars_k78[upgradeCharIdx_k78].stack, ...revealedCharData.stack],
-                powerTokens: chars_k78[upgradeCharIdx_k78].powerTokens + revealedCharData.powerTokens,
-                controllerInstanceId: chars_k78[upgradeCharIdx_k78].controllerInstanceId && chars_k78[upgradeCharIdx_k78].controlledBy === pendingEffect.sourcePlayer ? undefined : chars_k78[upgradeCharIdx_k78].controllerInstanceId,
+                stack: [...prev_k78.stack, ...revealedCharData.stack],
+                powerTokens: prev_k78.powerTokens + revealedCharData.powerTokens,
+                controllerInstanceId:
+                  wasControlled_k78 ||
+                  (prev_k78.controllerInstanceId && prev_k78.controlledBy === pendingEffect.sourcePlayer)
+                    ? undefined
+                    : prev_k78.controllerInstanceId,
+                originalOwner: wasControlled_k78 ? pendingEffect.sourcePlayer : prev_k78.originalOwner,
               };
               chars_k78.splice(cidx_k78, 1);
             }
@@ -13995,12 +14002,19 @@ export class EffectEngine {
           const upgradeCharIdx_k78r = chars_k78r.findIndex(c => c.instanceId === targetId);
           if (upgradeCharIdx_k78r >= 0) {
             const revealedData_k78r = chars_k78r[cidx_k78r];
+            const prev_k78r = chars_k78r[upgradeCharIdx_k78r];
+            const wasControlled_k78r = prev_k78r.controlledBy !== prev_k78r.originalOwner;
             chars_k78r[upgradeCharIdx_k78r] = {
-              ...chars_k78r[upgradeCharIdx_k78r],
+              ...prev_k78r,
               card: revealedData_k78r.card,
-              stack: [...chars_k78r[upgradeCharIdx_k78r].stack, ...revealedData_k78r.stack],
-              powerTokens: chars_k78r[upgradeCharIdx_k78r].powerTokens + revealedData_k78r.powerTokens,
-              controllerInstanceId: chars_k78r[upgradeCharIdx_k78r].controllerInstanceId && chars_k78r[upgradeCharIdx_k78r].controlledBy === pendingEffect.sourcePlayer ? undefined : chars_k78r[upgradeCharIdx_k78r].controllerInstanceId,
+              stack: [...prev_k78r.stack, ...revealedData_k78r.stack],
+              powerTokens: prev_k78r.powerTokens + revealedData_k78r.powerTokens,
+              controllerInstanceId:
+                wasControlled_k78r ||
+                (prev_k78r.controllerInstanceId && prev_k78r.controlledBy === pendingEffect.sourcePlayer)
+                  ? undefined
+                  : prev_k78r.controllerInstanceId,
+              originalOwner: wasControlled_k78r ? pendingEffect.sourcePlayer : prev_k78r.originalOwner,
             };
             chars_k78r.splice(cidx_k78r, 1);
             isCardUpgrade_k78r = true;
@@ -15834,14 +15848,8 @@ export class EffectEngine {
 
   
   static hideCharacter(state: GameState, targetId: string): GameState {
-    
-    
-    
-    
-    
-    
-    
     const newState = deepClone(state);
+    let found = false;
     for (const mission of newState.activeMissions) {
       for (const char of [...mission.player1Characters, ...mission.player2Characters]) {
         if (char.instanceId === targetId) {
@@ -15853,11 +15861,14 @@ export class EffectEngine {
               }
             }
           }
-          return newState;
+          found = true;
+          break;
         }
       }
+      if (found) break;
     }
-    return state;
+    if (!found) return state;
+    return EffectEngine.restoreControlOnLeave(newState, targetId);
   }
 
   
@@ -16645,12 +16656,18 @@ export class EffectEngine {
     if (existingIdx >= 0) {
       const existing = mission[friendlySide][existingIdx];
       const updatedChars = [...mission[friendlySide]];
+      const existingWasControlled = existing.controlledBy !== existing.originalOwner;
       updatedChars[existingIdx] = {
         ...existing,
         card: card as any,
         stack: [...existing.stack, card as any],
-        
-        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
+
+        controllerInstanceId:
+          existingWasControlled ||
+          (existing.controllerInstanceId && existing.controlledBy === player)
+            ? undefined
+            : existing.controllerInstanceId,
+        originalOwner: existingWasControlled ? player : existing.originalOwner,
       };
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
@@ -16774,9 +16791,15 @@ export class EffectEngine {
       ps.chakra -= actualCost;
 
       const updatedChars = [...mission[friendlySide]];
+      const existingWasControlledU = existing.controlledBy !== existing.originalOwner;
       updatedChars[existingIdx] = {
         ...existing, card: card as any, stack: [...existing.stack, card as any],
-        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
+        controllerInstanceId:
+          existingWasControlledU ||
+          (existing.controllerInstanceId && existing.controlledBy === player)
+            ? undefined
+            : existing.controllerInstanceId,
+        originalOwner: existingWasControlledU ? player : existing.originalOwner,
       };
       mission[friendlySide] = updatedChars;
       missions[missionIndex] = mission;
@@ -17395,11 +17418,17 @@ export class EffectEngine {
     if (existingIdx >= 0) {
       const existing = mission[friendlySide][existingIdx];
       const updatedChars = [...mission[friendlySide]];
+      const existingWasControlled17a = existing.controlledBy !== existing.originalOwner;
       updatedChars[existingIdx] = {
         ...existing,
         card,
         stack: [...existing.stack, card],
-        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
+        controllerInstanceId:
+          existingWasControlled17a ||
+          (existing.controllerInstanceId && existing.controlledBy === player)
+            ? undefined
+            : existing.controllerInstanceId,
+        originalOwner: existingWasControlled17a ? player : existing.originalOwner,
       };
       mission[friendlySide] = updatedChars;
       missions[missionIdx] = mission;
@@ -17579,16 +17608,22 @@ export class EffectEngine {
     let isCardUpgrade = false;
 
     if (existingIdx >= 0) {
-      
+
       const existing = mission[friendlySide_h002][existingIdx];
       const existStackPlace = existing.stack ?? [existing.card];
       const updatedChars = [...mission[friendlySide_h002]];
+      const existingWasControlledH = existing.controlledBy !== existing.originalOwner;
       updatedChars[existingIdx] = {
         ...existing,
         card,
         stack: [...existStackPlace, card],
         powerTokens: existing.powerTokens,
-        controllerInstanceId: existing.controllerInstanceId && existing.controlledBy === player ? undefined : existing.controllerInstanceId,
+        controllerInstanceId:
+          existingWasControlledH ||
+          (existing.controllerInstanceId && existing.controlledBy === player)
+            ? undefined
+            : existing.controllerInstanceId,
+        originalOwner: existingWasControlledH ? player : existing.originalOwner,
       };
       mission[friendlySide_h002] = updatedChars;
       missions[missionIndex] = mission;
@@ -19021,12 +19056,19 @@ export class EffectEngine {
       const upgradeIdx_rhr = chars_rhr.findIndex(c => c.instanceId === upgradeTargetRhr.instanceId);
       if (revealedIdx >= 0 && upgradeIdx_rhr >= 0) {
         const revealedCharData = chars_rhr[revealedIdx];
+        const prev_rhr = chars_rhr[upgradeIdx_rhr];
+        const wasControlled_rhr = prev_rhr.controlledBy !== prev_rhr.originalOwner;
         chars_rhr[upgradeIdx_rhr] = {
-          ...chars_rhr[upgradeIdx_rhr],
+          ...prev_rhr,
           card: revealedCharData.card,
-          stack: [...chars_rhr[upgradeIdx_rhr].stack, ...revealedCharData.stack],
-          powerTokens: chars_rhr[upgradeIdx_rhr].powerTokens + revealedCharData.powerTokens,
-          controllerInstanceId: chars_rhr[upgradeIdx_rhr].controllerInstanceId && chars_rhr[upgradeIdx_rhr].controlledBy === player ? undefined : chars_rhr[upgradeIdx_rhr].controllerInstanceId,
+          stack: [...prev_rhr.stack, ...revealedCharData.stack],
+          powerTokens: prev_rhr.powerTokens + revealedCharData.powerTokens,
+          controllerInstanceId:
+            wasControlled_rhr ||
+            (prev_rhr.controllerInstanceId && prev_rhr.controlledBy === player)
+              ? undefined
+              : prev_rhr.controllerInstanceId,
+          originalOwner: wasControlled_rhr ? player : prev_rhr.originalOwner,
         };
         
         chars_rhr.splice(revealedIdx, 1);
