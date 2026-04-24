@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-24",
+      "title_fr": "Pseudos nettoyés et caractères spéciaux bloqués",
+      "title_en": "Usernames cleaned up, special characters blocked",
+      "changes_fr": [
+        "Les espaces et caractères spéciaux dans les pseudos (@, ., *, #, accents, etc.) causaient des bugs visibles : profil introuvable, liens cassés sur le leaderboard, etc.",
+        "Tous les pseudos existants ont été nettoyés automatiquement : les caractères interdits ont été remplacés par un underscore, et les doublons ont reçu un suffixe. 126 comptes renommés.",
+        "À l'inscription et dans les paramètres, seuls les lettres, chiffres, tirets et underscores sont désormais acceptés. Les caractères invalides sont bloqués directement dans le champ de saisie."
+      ],
+      "changes_en": [
+        "Spaces and special characters in usernames (@, ., *, #, accents, etc.) caused visible bugs: profile not found, broken leaderboard links, and more.",
+        "All existing usernames have been cleaned up automatically: forbidden characters were replaced with underscores, and duplicates got a suffix. 126 accounts renamed.",
+        "During registration and in settings, only letters, digits, hyphens and underscores are now accepted. Invalid characters are blocked directly in the input field."
+      ]
+    },
+    {
+      "date": "2026-04-24",
       "title_fr": "Shino 033 et Kurenai 034 : coût 0 en combo",
       "title_en": "Shino 033 and Kurenai 034: cost 0 combo",
       "changes_fr": [

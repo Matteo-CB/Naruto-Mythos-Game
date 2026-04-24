@@ -69,8 +69,11 @@
     "usernameSaved": "Saved",
     "usernameHint": "3 to 20 characters, letters, numbers, hyphens and underscores only.",
     "usernameLength": "Username must be between 3 and 20 characters",
-    "usernameInvalid": "Username can only contain letters, numbers, hyphens and underscores",
-    "usernameTaken": "This username is already taken"
+    "usernameInvalid": "Username can only contain letters, numbers, hyphens and underscores. No spaces or special characters.",
+    "usernameTaken": "This username is already taken",
+    "USERNAME_TOO_SHORT": "Username must be at least 3 characters",
+    "USERNAME_TOO_LONG": "Username must be at most 20 characters",
+    "USERNAME_INVALID_CHARS": "Username can only contain letters, numbers, hyphens and underscores. No spaces or special characters."
   },
   "game": {
     "turn": "Turn {turn}",

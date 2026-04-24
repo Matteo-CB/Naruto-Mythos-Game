@@ -112,8 +112,14 @@ export default function SettingsPage() {
             <input
               type="text"
               value={usernameInput}
-              onChange={(e) => { setUsernameInput(e.target.value); setUsernameStatus('idle'); setUsernameError(''); }}
+              onChange={(e) => {
+                setUsernameInput(e.target.value.replace(/[^A-Za-z0-9_-]/g, ''));
+                setUsernameStatus('idle');
+                setUsernameError('');
+              }}
+              minLength={3}
               maxLength={20}
+              pattern="[A-Za-z0-9_-]+"
               className="flex-1 px-3 py-1.5 text-sm font-medium outline-none"
               style={{
                 backgroundColor: '#0a0a0a',

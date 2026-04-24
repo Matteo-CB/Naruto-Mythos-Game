@@ -69,8 +69,11 @@
     "usernameSaved": "Sauvegarde",
     "usernameHint": "3 a 20 caracteres, lettres, chiffres, tirets et underscores uniquement.",
     "usernameLength": "Le pseudo doit contenir entre 3 et 20 caracteres",
-    "usernameInvalid": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores",
-    "usernameTaken": "Ce pseudo est deja pris"
+    "usernameInvalid": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores. Pas d'espaces ni de caracteres speciaux.",
+    "usernameTaken": "Ce pseudo est deja pris",
+    "USERNAME_TOO_SHORT": "Le pseudo doit contenir au moins 3 caracteres",
+    "USERNAME_TOO_LONG": "Le pseudo ne peut pas depasser 20 caracteres",
+    "USERNAME_INVALID_CHARS": "Le pseudo ne peut contenir que des lettres, chiffres, tirets et underscores. Pas d'espaces ni de caracteres speciaux."
   },
   "game": {
     "turn": "Tour {turn}",

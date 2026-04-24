@@ -111,10 +111,12 @@ export default function RegisterPage() {
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value.replace(/[^A-Za-z0-9_-]/g, ''))}
               required
               minLength={3}
               maxLength={20}
+              pattern="[A-Za-z0-9_-]+"
+              autoComplete="username"
               className="rounded px-3 py-2 text-sm outline-none"
               style={{
                 backgroundColor: '#0a0a0a',

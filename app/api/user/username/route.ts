@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
+import { validateUsername } from '@/lib/auth/usernameValidator';
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -12,12 +13,15 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const newUsername = typeof body.username === 'string' ? body.username.trim() : '';
 
-    if (newUsername.length < 3 || newUsername.length > 20) {
-      return NextResponse.json({ error: 'Username must be between 3 and 20 characters', errorKey: 'settings.usernameLength' }, { status: 400 });
-    }
-
-    if (!/^[a-zA-Z0-9_-]+$/.test(newUsername)) {
-      return NextResponse.json({ error: 'Username can only contain letters, numbers, hyphens and underscores', errorKey: 'settings.usernameInvalid' }, { status: 400 });
+    const check = validateUsername(newUsername);
+    if (!check.ok) {
+      const errorKey = check.error === 'USERNAME_INVALID_CHARS'
+        ? 'settings.usernameInvalid'
+        : 'settings.usernameLength';
+      const error = check.error === 'USERNAME_INVALID_CHARS'
+        ? 'Username can only contain letters, numbers, hyphens and underscores (no spaces)'
+        : 'Username must be between 3 and 20 characters';
+      return NextResponse.json({ error, errorKey }, { status: 400 });
     }
 
     
