@@ -405,7 +405,12 @@
       "chooseEffectOrder": "Choisir l'ordre des effets",
       "chooseEffectOrderDesc": "Plusieurs effets se declenchent en meme temps. Choisissez lequel resoudre en premier.",
       "orderedDefeat": {
-        "progress": "{selected} / {total} selectionne(s)"
+        "progress": "{selected} / {total} selectionne(s)",
+        "stillNeed": {
+          "g1": "Il faut encore une cible de Puissance 5 ou moins dans cette mission.",
+          "g2": "Il faut encore une cible de Puissance 2 ou moins n'importe ou.",
+          "both": "Il faut encore une cible de Puissance 5 ou moins dans cette mission et une cible de Puissance 2 ou moins n'importe ou."
+        }
       },
       "desc": {
         "chooseEffectOrder": "Plusieurs effets se declenchent simultanement. Choisissez l'ordre de resolution.",

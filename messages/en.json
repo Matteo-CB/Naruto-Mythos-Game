@@ -405,7 +405,12 @@
       "chooseEffectOrder": "Choose Effect Order",
       "chooseEffectOrderDesc": "Multiple effects triggered at the same time. Choose which to resolve first.",
       "orderedDefeat": {
-        "progress": "{selected} / {total} selected"
+        "progress": "{selected} / {total} selected",
+        "stillNeed": {
+          "g1": "Still need a Power 5 or less target in this mission.",
+          "g2": "Still need a Power 2 or less target anywhere.",
+          "both": "Still need both a Power 5 or less target in this mission and a Power 2 or less target anywhere."
+        }
       },
       "desc": {
         "chooseEffectOrder": "Multiple effects triggered simultaneously. Choose resolution order.",

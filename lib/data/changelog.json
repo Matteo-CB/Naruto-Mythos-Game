@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-04-24",
+      "title_fr": "Naruto 133 : sélection des cibles plus claire",
+      "title_en": "Naruto 133: clearer target selection",
+      "changes_fr": [
+        "Quand vous jouez Naruto (133) Rasengan, le popup de sélection des cibles vous indique maintenant explicitement ce qui manque pour valider (une cible Puissance 5 ou moins dans cette mission, ou une cible Puissance 2 ou moins n'importe où).",
+        "Le bouton Confirmer apparaît dès que vos deux choix remplissent correctement les deux créneaux, quel que soit l'ordre dans lequel vous les cliquez."
+      ],
+      "changes_en": [
+        "When you play Naruto (133) Rasengan, the target selection popup now explicitly tells you what is still needed to confirm (a Power 5 or less target in this mission, or a Power 2 or less target anywhere).",
+        "The Confirm button appears as soon as your two picks correctly fill both slots, regardless of the order you clicked them in."
+      ]
+    },
+    {
+      "date": "2026-04-24",
       "title_fr": "Correction du contrôle de personnage",
       "title_en": "Character control fix",
       "changes_fr": [

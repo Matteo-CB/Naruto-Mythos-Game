@@ -302,29 +302,42 @@ function OrderedDefeatPopup({
     return validTargets.filter(t => charMissionMap.get(t) === lockedMission).length;
   }, [lockedMission, validTargets, charMissionMap]);
 
-  
+
+  const naruto133SlotFit = useMemo(() => {
+    const maxSlotsFor = (ids: string[]) => {
+      const g1Only = ids.filter(id => targetGroups.group1.has(id) && !targetGroups.group2.has(id)).length;
+      const g2Only = ids.filter(id => targetGroups.group2.has(id) && !targetGroups.group1.has(id)).length;
+      const both = ids.filter(id => targetGroups.group1.has(id) && targetGroups.group2.has(id)).length;
+      let g1Filled = g1Only >= 1;
+      let g2Filled = g2Only >= 1;
+      let flex = both;
+      if (!g1Filled && flex > 0) { g1Filled = true; flex--; }
+      if (!g2Filled && flex > 0) { g2Filled = true; flex--; }
+      return { g1Filled, g2Filled };
+    };
+    const total = maxSlotsFor(validTargets);
+    const selected = maxSlotsFor(orderedIds);
+    const maxTotal = (total.g1Filled ? 1 : 0) + (total.g2Filled ? 1 : 0);
+    const maxSelected = (selected.g1Filled ? 1 : 0) + (selected.g2Filled ? 1 : 0);
+    return { total, selected, maxTotal, maxSelected };
+  }, [validTargets, orderedIds, targetGroups]);
+
   const canConfirmNaruto133 = useMemo(() => {
     if (mode !== 'naruto133' || orderedIds.length === 0) return false;
-    
-    let g1Filled = false;
-    let g2Filled = false;
-    for (const id of orderedIds) {
-      const inG1 = targetGroups.group1.has(id);
-      const inG2 = targetGroups.group2.has(id);
-      if (inG1 && !g1Filled) g1Filled = true;
-      else if (inG2 && !g2Filled) g2Filled = true;
-    }
-    
-    const remaining = validTargets.filter(t => !orderedIds.includes(t));
-    if (!g1Filled) {
-      if (remaining.some(t => targetGroups.group1.has(t))) return false;
-    }
-    if (!g2Filled) {
-      
-      if (remaining.some(t => targetGroups.group2.has(t))) return false;
-    }
-    return true;
-  }, [mode, orderedIds, validTargets, targetGroups]);
+    return naruto133SlotFit.maxSelected >= naruto133SlotFit.maxTotal;
+  }, [mode, orderedIds, naruto133SlotFit]);
+
+  const naruto133MissingHint = useMemo(() => {
+    if (mode !== 'naruto133') return null;
+    if (orderedIds.length === 0 || canConfirmNaruto133) return null;
+    const { total, selected } = naruto133SlotFit;
+    const needG1 = total.g1Filled && !selected.g1Filled;
+    const needG2 = total.g2Filled && !selected.g2Filled;
+    if (needG1 && needG2) return 'both';
+    if (needG1) return 'g1';
+    if (needG2) return 'g2';
+    return null;
+  }, [mode, orderedIds, canConfirmNaruto133, naruto133SlotFit]);
 
   const canConfirm = mode === 'all-in-mission'
     ? (lockedMission !== undefined && orderedIds.length === missionTargetCount)
@@ -418,6 +431,14 @@ function OrderedDefeatPopup({
               );
             })}
           </motion.div>
+
+          {naruto133MissingHint && !canConfirm && (
+            <div className="text-center mb-2">
+              <span className="text-xs" style={{ color: '#c4a35a' }}>
+                {t(`game.effect.orderedDefeat.stillNeed.${naruto133MissingHint}`)}
+              </span>
+            </div>
+          )}
 
           <div className="flex justify-center gap-3">
             {canConfirm && (
