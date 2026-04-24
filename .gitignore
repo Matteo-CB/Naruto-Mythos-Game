@@ -55,3 +55,6 @@ AUDIT_REPORT.txt
 
 # rulebook / reference PDFs, content lives in the local CLAUDE.md
 *.pdf
+
+# systemd unit and any similar server-only config: kept on the server, not in the repo
+naruto-mythos.service
