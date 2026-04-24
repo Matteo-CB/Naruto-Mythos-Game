@@ -300,6 +300,48 @@ describe('133/130 - Naruto Uzumaki (S)', () => {
     const result = handler(makeCtx(state, 'player1', naruto, 0));
     expect(result.state.activeMissions[0].player2Characters[0].isHidden).toBe(false);
   });
+
+  it('should let a Power <=2 enemy in Naruto\'s own mission satisfy the "anywhere <=2" slot too', async () => {
+    const naruto = mockCharInPlay({ instanceId: 'naruto-s' }, {
+      id: 'KS-133-S', number: 133, name_fr: 'Naruto', power: 6,
+    });
+    const p4InNaruto = mockCharInPlay({ instanceId: 'p4', controlledBy: 'player2', originalOwner: 'player2' }, {
+      name_fr: 'Power4', power: 4,
+    });
+    const p2InNaruto = mockCharInPlay({ instanceId: 'p2-in', controlledBy: 'player2', originalOwner: 'player2' }, {
+      name_fr: 'Power2In', power: 2,
+    });
+    const p2Elsewhere = mockCharInPlay({ instanceId: 'p2-out', controlledBy: 'player2', originalOwner: 'player2' }, {
+      name_fr: 'Power2Out', power: 2,
+    });
+    const state = createActionPhaseState({
+      activeMissions: [
+        makeMission('D', [naruto], [p4InNaruto, p2InNaruto]),
+        makeMission('C', [], [p2Elsewhere]),
+      ],
+    });
+
+    const { getEffectivePower } = await import('../effects/powerUtils');
+
+    const enemySide = 'player2Characters' as const;
+    const thisMission = state.activeMissions[0];
+    const validTarget1 = thisMission[enemySide]
+      .filter((c) => !c.isHidden && getEffectivePower(state, c, 'player2') <= 5)
+      .map((c) => c.instanceId);
+    const validTarget2: string[] = [];
+    for (let i = 0; i < state.activeMissions.length; i++) {
+      for (const ch of state.activeMissions[i][enemySide]) {
+        if (!ch.isHidden && getEffectivePower(state, ch, 'player2') <= 2) {
+          validTarget2.push(ch.instanceId);
+        }
+      }
+    }
+
+    expect(validTarget1).toEqual(expect.arrayContaining(['p4', 'p2-in']));
+    expect(validTarget1).not.toContain('p2-out');
+    expect(validTarget2).toEqual(expect.arrayContaining(['p2-in', 'p2-out']));
+    expect(validTarget2).not.toContain('p4');
+  });
 });
 
 
