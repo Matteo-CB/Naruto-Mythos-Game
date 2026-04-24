@@ -28,78 +28,47 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
   const currentTurn = state.turn;
 
-  
   const playedChars: PlayedChar[] = [];
 
-  
-  let primaryActionIdx = -1;
+  let lastOwnActionIdx = -1;
   for (let i = state.log.length - 1; i >= 0; i--) {
     const entry = state.log[i];
-    if (entry.turn !== currentTurn || entry.phase !== 'action') continue;
-    if (entry.player !== opponent) continue;
-
-    
-    if (entry.action === 'PASS') {
-      break;
-    }
-
-    
-    if (entry.action === 'PLAY_HIDDEN') {
-      primaryActionIdx = i;
-      break;
-    }
-
-    if (PLAY_ACTIONS.has(entry.action)) {
-      primaryActionIdx = i;
+    if (entry.turn !== currentTurn || entry.phase !== 'action') break;
+    if (entry.player !== sourcePlayer) continue;
+    if (
+      entry.action === 'PASS' ||
+      entry.action === 'PLAY_HIDDEN' ||
+      PLAY_ACTIONS.has(entry.action)
+    ) {
+      lastOwnActionIdx = i;
       break;
     }
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  if (primaryActionIdx >= 0) {
-    for (let i = primaryActionIdx; i < state.log.length; i++) {
-      const entry = state.log[i];
-      if (entry.turn !== currentTurn || entry.phase !== 'action') break;
-      if (entry.player !== opponent) continue;
-      
-      
-      if (i > primaryActionIdx && entry.action === 'PASS') break;
-      
-      
-      if (i > primaryActionIdx && (PLAY_ACTIONS.has(entry.action) || entry.action === 'PLAY_HIDDEN')) {
-        
-        
-        
+  for (let i = lastOwnActionIdx + 1; i < state.log.length; i++) {
+    const entry = state.log[i];
+    if (entry.turn !== currentTurn || entry.phase !== 'action') break;
+    if (entry.player !== opponent) continue;
+    if (entry.action === 'PASS') continue;
+
+    const missionNum = entry.messageParams?.mission != null
+      ? Number(entry.messageParams.mission) - 1
+      : null;
+
+    if (entry.action === 'PLAY_HIDDEN') {
+      const instId = entry.messageParams?.instanceId as string | undefined;
+      if (missionNum !== null) {
+        playedChars.push({ instanceId: instId, mission: missionNum });
       }
-
-      const missionNum = entry.messageParams?.mission != null
-        ? Number(entry.messageParams.mission) - 1
-        : null;
-
-      if (entry.action === 'PLAY_HIDDEN') {
-        
-        const instId = entry.messageParams?.instanceId as string | undefined;
-        if (missionNum !== null) {
-          playedChars.push({ instanceId: instId, mission: missionNum });
-        }
-      } else if (PLAY_ACTIONS.has(entry.action)) {
-        const charName = (entry.messageParams?.card as string) ?? null;
-        if (charName && missionNum !== null) {
-          playedChars.push({ name: charName, mission: missionNum });
-        }
-      } else if (EFFECT_PLAY_ACTIONS.has(entry.action)) {
-        const charName = (entry.messageParams?.target as string) ?? null;
-        if (charName && missionNum !== null) {
-          playedChars.push({ name: charName, mission: missionNum });
-        }
+    } else if (PLAY_ACTIONS.has(entry.action)) {
+      const charName = (entry.messageParams?.card as string) ?? null;
+      if (charName && missionNum !== null) {
+        playedChars.push({ name: charName, mission: missionNum });
+      }
+    } else if (EFFECT_PLAY_ACTIONS.has(entry.action)) {
+      const charName = (entry.messageParams?.target as string) ?? null;
+      if (charName && missionNum !== null) {
+        playedChars.push({ name: charName, mission: missionNum });
       }
     }
   }

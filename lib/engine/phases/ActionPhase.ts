@@ -4,7 +4,7 @@ import { deepClone } from '../utils/deepClone';
 import { generateInstanceId } from '../utils/id';
 import { logAction } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
-import { calculateEffectiveCost, hasKurenai034CostReduction } from '../rules/ChakraValidation';
+import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { triggerOnPlayReactions, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 
@@ -341,9 +341,7 @@ function handleRevealCharacter(
     const existingTopCard = upgradeTarget.stack?.length > 0
       ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
-    const rawDiff = Math.max(0, fullCost - existingTopCard.chakra);
-    costToPay = hasKurenai034CostReduction(state, player, charTopCard, missionIndex)
-      ? Math.max(1, rawDiff) : rawDiff;
+    costToPay = Math.max(0, fullCost - existingTopCard.chakra);
   }
 
   
@@ -504,10 +502,7 @@ function handleUpgradeCharacter(
   
   const isHiddenUpgrade = existingChar.isHidden;
   const effectiveNewCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
-  const rawUpgradeDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
-  
-  const costDiff = (!isHiddenUpgrade && hasKurenai034CostReduction(state, player, newCard, missionIndex))
-    ? Math.max(1, rawUpgradeDiff) : rawUpgradeDiff;
+  const costDiff = isHiddenUpgrade ? effectiveNewCost : Math.max(0, effectiveNewCost - existingTopCard.chakra);
 
   
   const ps = { ...playerState };

@@ -2,6 +2,30 @@
   "entries": [
     {
       "date": "2026-04-24",
+      "title_fr": "Shino 033 et Kurenai 034 : coût 0 en combo",
+      "title_en": "Shino 033 and Kurenai 034: cost 0 combo",
+      "changes_fr": [
+        "La réduction de coût de Shino (033) Clones d'Insectes est maintenant traitée comme un effet continu, comme les autres réductions similaires.",
+        "Quand Shino 033 est révélé à côté de Kurenai 034 avec un personnage ennemi Jutsu dans la mission, les deux réductions s'appliquent simultanément : Shino coûte 0 au lieu de 1. Cela vaut aussi pour les autres combos où une autre réduction couvre déjà le minimum de Kurenai."
+      ],
+      "changes_en": [
+        "Shino (033) Bug Clones cost reduction is now treated as a continuous effect, like other similar reductions.",
+        "When Shino 033 is revealed next to Kurenai 034 with an enemy Jutsu character in the mission, both reductions apply simultaneously: Shino costs 0 instead of 1. This also fixes other combos where a larger reduction already covers Kurenai's minimum."
+      ]
+    },
+    {
+      "date": "2026-04-24",
+      "title_fr": "Shikamaru 022 : cible tous les personnages joués par l'adversaire",
+      "title_en": "Shikamaru 022: targets all characters played by the opponent",
+      "changes_fr": [
+        "L'AMBUSH de Shikamaru Nara (022) voit maintenant TOUS les personnages que l'adversaire a joués depuis votre dernière action, pas seulement le tout dernier. Les chaînes (Sakura S qui joue Kabuto qui joue un autre personnage, Kakashi 4C qui copie Kabuto et joue depuis la défausse, etc.) sont correctement suivies jusqu'au bout."
+      ],
+      "changes_en": [
+        "Shikamaru Nara (022) AMBUSH now sees EVERY character the opponent played since your previous action, not only the very last one. Chains (Sakura S playing Kabuto which plays another character, Kakashi 4C copying Kabuto and playing from the discard pile, etc.) are tracked all the way through."
+      ]
+    },
+    {
+      "date": "2026-04-24",
       "title_fr": "Choji 018 : puissance effective prise en compte",
       "title_en": "Choji 018: effective power now taken into account",
       "changes_fr": [

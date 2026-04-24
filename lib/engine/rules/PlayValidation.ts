@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { HIDDEN_PLAY_COST } from '../types';
-import { calculateEffectiveCost, hasKurenai034CostReduction } from './ChakraValidation';
+import { calculateEffectiveCost } from './ChakraValidation';
 import { calculateCharacterPower } from '../phases/PowerCalculation';
 
 export interface ValidationResult {
@@ -174,13 +174,9 @@ export function validateRevealCharacter(
       ? upgradeTarget.stack[upgradeTarget.stack?.length - 1]
       : upgradeTarget.card;
     if (charTopCard.chakra > existingTopCard.chakra) {
-      
-      
+
       const revealCost = calculateEffectiveCost(state, player, charTopCard, missionIndex, true);
-      const revealDiff = Math.max(0, revealCost - existingTopCard.chakra);
-      
-      effectiveCost = hasKurenai034CostReduction(state, player, charTopCard, missionIndex)
-        ? Math.max(1, revealDiff) : revealDiff;
+      effectiveCost = Math.max(0, revealCost - existingTopCard.chakra);
     } else if (sameNameChar) {
       return { valid: false, reason: `Already have a visible ${charTopCard.name_fr} on this mission.`, reasonKey: 'game.error.duplicateNameReveal', reasonParams: { name: charTopCard.name_fr } };
     } else {
@@ -274,10 +270,7 @@ export function validateUpgradeCharacter(
   
   const ps = state[player];
   const effectiveCost = calculateEffectiveCost(state, player, newCard, missionIndex, false);
-  const rawDiff = Math.max(0, effectiveCost - topCard.chakra);
-  
-  const costDiff = hasKurenai034CostReduction(state, player, newCard, missionIndex)
-    ? Math.max(1, rawDiff) : rawDiff;
+  const costDiff = Math.max(0, effectiveCost - topCard.chakra);
   if (ps.chakra < costDiff) {
     return { valid: false, reason: `Not enough chakra. Need ${costDiff} (difference), have ${ps.chakra}.`, reasonKey: 'game.error.notEnoughChakraUpgrade', reasonParams: { need: costDiff, have: ps.chakra } };
   }
