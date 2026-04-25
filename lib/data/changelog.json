@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-25",
+      "title_fr": "Comptes en double fusionnés et liaison Discord/email corrigée",
+      "title_en": "Duplicate accounts merged and Discord/email linking fixed",
+      "changes_fr": [
+        "Si vous vous étiez inscrit avec un email/mot de passe puis que vous vous êtes ensuite connecté via Discord (ou l'inverse), un deuxième compte vide était créé à votre insu. Vos parties, votre ELO et vos decks pouvaient se retrouver répartis sur deux comptes selon la méthode de connexion.",
+        "21 comptes en double ont été fusionnés. Le compte le plus actif a été conservé avec ses parties, son ELO, ses decks et son ban historique, et les decks et l'email/mot de passe de l'autre compte ont été reportés dessus. Vous pouvez maintenant vous connecter avec Discord OU avec votre email et tomber sur le même compte.",
+        "Le flow d'authentification Discord a été corrigé : si l'email Discord correspond déjà à un compte email existant, le Discord est rattaché à ce compte au lieu d'en créer un nouveau."
+      ],
+      "changes_en": [
+        "If you signed up with an email/password and later logged in through Discord (or the other way around), a second empty account was being created without you knowing. Your games, ELO and decks could end up split across two accounts depending on the login method.",
+        "21 duplicate accounts have been merged. The more active account is kept with its games, ELO, decks and ban history, and the decks and email/password from the other account were carried over to it. You can now sign in with Discord OR your email and land on the same account.",
+        "The Discord authentication flow was fixed: if the Discord email already matches an existing email-based account, Discord is now linked to that account instead of creating a new one."
+      ]
+    },
+    {
+      "date": "2026-04-25",
       "title_fr": "Effets continus de Neji et Hinata déclenchés par TOUTES les mises en jeu",
       "title_en": "Neji and Hinata triggered effects fire on EVERY way a character enters play",
       "changes_fr": [

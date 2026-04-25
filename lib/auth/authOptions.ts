@@ -174,13 +174,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const discordEmail = (profile as { email?: string }).email;
-        let email = discordEmail || `discord_${discordId}@naruto-mythos.local`;
+        const emailMatch = discordEmail
+          ? await prisma.user.findUnique({ where: { email: discordEmail } })
+          : null;
 
-        
-        const emailExists = await prisma.user.findUnique({ where: { email } });
-        if (emailExists) {
-          email = `discord_${discordId}@naruto-mythos.local`;
+        if (emailMatch) {
+          await prisma.user.update({
+            where: { id: emailMatch.id },
+            data: { discordId, discordUsername },
+          });
+          await prisma.account.create({
+            data: {
+              userId: emailMatch.id,
+              type: account.type,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+              access_token: account.access_token as string | undefined,
+              refresh_token: account.refresh_token as string | undefined,
+              expires_at: account.expires_at as number | undefined,
+              token_type: account.token_type as string | undefined,
+              scope: account.scope as string | undefined,
+            },
+          });
+          user.id = emailMatch.id;
+          user.name = emailMatch.username;
+          user.email = emailMatch.email;
+          syncDiscordRole(emailMatch.id).catch(() => {});
+          return true;
         }
+
+        const email = discordEmail || `discord_${discordId}@naruto-mythos.local`;
 
         const newUser = await prisma.user.create({
           data: {
