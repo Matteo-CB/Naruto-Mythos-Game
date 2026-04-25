@@ -6,7 +6,7 @@ import { logAction } from '../utils/gameLog';
 import { validatePlayCharacter, validatePlayHidden, validateRevealCharacter, validateUpgradeCharacter, checkFlexibleUpgrade } from '../rules/PlayValidation';
 import { calculateEffectiveCost } from '../rules/ChakraValidation';
 import { EffectEngine } from '../../effects/EffectEngine';
-import { triggerOnPlayReactions, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
+import { applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -183,15 +183,9 @@ function handlePlayCharacter(
     log,
   };
 
-  
   newState = trackLastPlayed(newState, player, charInPlay.instanceId);
 
-  
-  
-  newState = triggerOnPlayReactions(newState, player, missionIndex, false, charInPlay.instanceId);
 
-  
-  
   const updatedMission = newState.activeMissions[missionIndex];
   const updatedChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
   const playedChar = updatedChars[updatedChars.length - 1]; // Just added as last
@@ -399,16 +393,12 @@ function handleRevealCharacter(
     
     newState = trackLastPlayed(newState, player, upgradeTarget.instanceId);
 
-    
-    
-    newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
-    
     const updatedMission = newState.activeMissions[missionIndex];
     const updatedMissionChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
     const upgradedChar = updatedMissionChars.find((c) => c.instanceId === upgradeTarget.instanceId);
     if (upgradedChar) {
-      
+
       newState = EffectEngine.resolveRevealUpgradeEffects(newState, player, upgradedChar, missionIndex);
     }
     return newState;
@@ -445,15 +435,9 @@ function handleRevealCharacter(
     log,
   };
 
-  
   newState = trackLastPlayed(newState, player, characterInstanceId);
 
-  
-  
-  
-  newState = triggerOnPlayReactions(newState, player, missionIndex, true, characterInstanceId);
 
-  
   const revealedMission = newState.activeMissions[missionIndex];
   const revealedChars = player === 'player1' ? revealedMission.player1Characters : revealedMission.player2Characters;
   const revealedChar = revealedChars.find((c) => c.instanceId === characterInstanceId);
@@ -570,11 +554,7 @@ function handleUpgradeCharacter(
   
   newState = trackLastPlayed(newState, player, targetInstanceId);
 
-  
-  
-  newState = triggerOnPlayReactions(newState, player, missionIndex, false, targetInstanceId);
 
-  
   const upgradedMission = newState.activeMissions[missionIndex];
   const upgradedChars = player === 'player1' ? upgradedMission.player1Characters : upgradedMission.player2Characters;
   const upgradedChar = upgradedChars.find((c) => c.instanceId === targetInstanceId);

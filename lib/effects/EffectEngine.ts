@@ -123,6 +123,10 @@ export class EffectEngine {
     const topCard = charStack.length > 0 ? charStack[charStack.length - 1] : character.card;
     if (!topCard) return newState;
 
+    if (!character.isHidden) {
+      newState = triggerOnPlayReactions(newState, player, missionIndex, false, character.instanceId);
+    }
+
     
     
     
@@ -200,6 +204,10 @@ export class EffectEngine {
     let newState = deepClone(state);
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
+    if (!character.isHidden) {
+      newState = triggerOnPlayReactions(newState, player, missionIndex, true, character.instanceId);
+    }
+
     
     
     const relevantTypes = new Set<string>(['MAIN', 'UPGRADE', 'AMBUSH']);
@@ -269,6 +277,10 @@ export class EffectEngine {
     let newState = deepClone(state);
 
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
+
+    if (!character.isHidden) {
+      newState = triggerOnPlayReactions(newState, player, missionIndex, true, character.instanceId);
+    }
 
     
     
@@ -16740,18 +16752,12 @@ export class EffectEngine {
       );
     }
 
-    
     state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
-
-    
-    if (!placedChar.isHidden) {
-      state = triggerOnPlayReactions(state, player, missionIndex, false, placedChar.instanceId);
-    }
 
     return state;
   }
 
-  
+
   private static genericPlaceOnMissionForced(
     state: GameState, player: PlayerID, missionIndex: number,
     cardName: string, cardId: string, costReduction: number,
@@ -16840,11 +16846,6 @@ export class EffectEngine {
     }
 
     state = EffectEngine.resolvePlayEffects(state, player, placedChar, missionIndex, isCardUpgrade);
-
-    
-    if (!placedChar.isHidden) {
-      state = triggerOnPlayReactions(state, player, missionIndex, false, placedChar.instanceId);
-    }
 
     return state;
   }

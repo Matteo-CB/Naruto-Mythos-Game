@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "date": "2026-04-25",
+      "title_fr": "Effets continus de Neji et Hinata déclenchés par TOUTES les mises en jeu",
+      "title_en": "Neji and Hinata triggered effects fire on EVERY way a character enters play",
+      "changes_fr": [
+        "Neji Hyuga (037) POWERUP 1 et Hinata Hyuga (031) +1 Chakra se déclenchent maintenant quand un personnage adverse arrive dans leur mission via n'importe quel effet : Kabuto (053) qui joue depuis la défausse, Jiraiya, Hiruzen (002) qui joue un Village de la Feuille, Sakura (135) qui joue depuis le deck, Kankuro (078) qui révèle un caché, Dosu (069) qui force une révélation, Kakashi (016) qui copie un effet de jeu, etc. Avant, seul un play depuis la main face visible déclenchait ces effets."
+      ],
+      "changes_en": [
+        "Neji Hyuga (037) POWERUP 1 and Hinata Hyuga (031) +1 Chakra now trigger when an enemy character enters their mission through any effect: Kabuto (053) playing from discard, Jiraiya, Hiruzen (002) playing a Leaf Village, Sakura (135) playing from deck, Kankuro (078) revealing a hidden, Dosu (069) forcing a reveal, Kakashi (016) copying a play effect, etc. Previously only a face-up play from hand triggered these effects."
+      ]
+    },
+    {
       "date": "2026-04-24",
       "title_fr": "Pseudos nettoyés et caractères spéciaux bloqués",
       "title_en": "Usernames cleaned up, special characters blocked",
