@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "Shikamaru (022) voit enfin tous les personnages joués lors du dernier tour adverse",
+      "title_en": "Shikamaru (022) now sees every character played during the opponent's last turn",
+      "changes_fr": [
+        "Quand l'adversaire jouait une carte qui en jouait d'autres en chaîne (Sakura S qui ramène 2 personnages, Kakashi 4C qui copie un Kabuto 4C, etc.), Shikamaru ne proposait souvent qu'un seul personnage à déplacer, ou même aucun.",
+        "Le scan du log a été corrigé : il saute maintenant correctement la révélation de Shikamaru lui-même pour remonter jusqu'à la VRAIE action précédente du joueur. Tous les personnages joués entre temps par l'adversaire (action directe + effets en chaîne) sont maintenant ciblables.",
+        "Cas couverts : Sakura Secret qui en joue 2, Kakashi (016) qui copie un effet de jeu de l'adversaire, Hiruzen (002) qui joue un Village de la Feuille, Kabuto (053) qui joue depuis la défausse, et le cas où Shikamaru est révélé en upgrade."
+      ],
+      "changes_en": [
+        "When the opponent played a card that played others in a chain (Sakura Secret pulling 2 characters, Kakashi 4C copying a Kabuto 4C, etc.), Shikamaru often only offered one character to move, or none at all.",
+        "The log scan has been fixed: it now correctly skips Shikamaru's own reveal and walks back to the player's REAL previous action. Every character played by the opponent in between (direct action + chained effects) is now selectable.",
+        "Cases covered: Sakura Secret playing 2, Kakashi (016) copying an opponent's play effect, Hiruzen (002) playing a Leaf Village, Kabuto (053) playing from discard, and the case where Shikamaru is revealed as an upgrade."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "Kabuto Yakushi (054) cache tous les personnages d'un coup",
       "title_en": "Kabuto Yakushi (054) hides all characters at once",
       "changes_fr": [

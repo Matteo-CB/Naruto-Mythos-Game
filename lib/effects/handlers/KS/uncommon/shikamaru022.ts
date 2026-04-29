@@ -31,6 +31,7 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
   const playedChars: PlayedChar[] = [];
 
   let lastOwnActionIdx = -1;
+  let skippedSourceReveal = false;
   for (let i = state.log.length - 1; i >= 0; i--) {
     const entry = state.log[i];
     if (entry.turn !== currentTurn || entry.phase !== 'action') break;
@@ -40,6 +41,10 @@ function handleShikamaru022Ambush(ctx: EffectContext): EffectResult {
       entry.action === 'PLAY_HIDDEN' ||
       PLAY_ACTIONS.has(entry.action)
     ) {
+      if (!skippedSourceReveal) {
+        skippedSourceReveal = true;
+        continue;
+      }
       lastOwnActionIdx = i;
       break;
     }

@@ -3076,36 +3076,40 @@ export class EffectEngine {
         ]);
 
         const s022PlayedChars: { name?: string; instanceId?: string; mission: number }[] = [];
-        let s022PrimaryIdx = -1;
+        let s022LastOwnIdx = -1;
+        let s022SkippedSource = false;
         for (let i = newState.log.length - 1; i >= 0; i--) {
           const entry = newState.log[i];
-          if (entry.turn !== s022Turn || entry.phase !== 'action') continue;
-          if (entry.player !== s022Opponent) continue;
-          if (entry.action === 'PASS') break;
-          if (entry.action === 'PLAY_HIDDEN') { s022PrimaryIdx = i; break; }
-          if (PLAY_ACTIONS_022.has(entry.action)) { s022PrimaryIdx = i; break; }
-        }
-        if (s022PrimaryIdx >= 0) {
-          for (let i = s022PrimaryIdx; i < newState.log.length; i++) {
-            const entry = newState.log[i];
-            if (entry.turn !== s022Turn || entry.phase !== 'action') break;
-            
-            
-            
-            
-            if (entry.player !== s022Opponent) continue;
-            if (i > s022PrimaryIdx && entry.action === 'PASS') break;
-            const missionNum = entry.messageParams?.mission != null ? Number(entry.messageParams.mission) - 1 : null;
-            if (entry.action === 'PLAY_HIDDEN') {
-              const instId = entry.messageParams?.instanceId as string | undefined;
-              if (missionNum !== null) s022PlayedChars.push({ instanceId: instId, mission: missionNum });
-            } else if (PLAY_ACTIONS_022.has(entry.action)) {
-              const charName = (entry.messageParams?.card as string) ?? null;
-              if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
-            } else if (EFFECT_PLAY_ACTIONS_022.has(entry.action)) {
-              const charName = (entry.messageParams?.target as string) ?? null;
-              if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
+          if (entry.turn !== s022Turn || entry.phase !== 'action') break;
+          if (entry.player !== pendingEffect.sourcePlayer) continue;
+          if (
+            entry.action === 'PASS' ||
+            entry.action === 'PLAY_HIDDEN' ||
+            PLAY_ACTIONS_022.has(entry.action)
+          ) {
+            if (!s022SkippedSource) {
+              s022SkippedSource = true;
+              continue;
             }
+            s022LastOwnIdx = i;
+            break;
+          }
+        }
+        for (let i = s022LastOwnIdx + 1; i < newState.log.length; i++) {
+          const entry = newState.log[i];
+          if (entry.turn !== s022Turn || entry.phase !== 'action') break;
+          if (entry.player !== s022Opponent) continue;
+          if (entry.action === 'PASS') continue;
+          const missionNum = entry.messageParams?.mission != null ? Number(entry.messageParams.mission) - 1 : null;
+          if (entry.action === 'PLAY_HIDDEN') {
+            const instId = entry.messageParams?.instanceId as string | undefined;
+            if (missionNum !== null) s022PlayedChars.push({ instanceId: instId, mission: missionNum });
+          } else if (PLAY_ACTIONS_022.has(entry.action)) {
+            const charName = (entry.messageParams?.card as string) ?? null;
+            if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
+          } else if (EFFECT_PLAY_ACTIONS_022.has(entry.action)) {
+            const charName = (entry.messageParams?.target as string) ?? null;
+            if (charName && missionNum !== null) s022PlayedChars.push({ name: charName, mission: missionNum });
           }
         }
 
