@@ -86,6 +86,17 @@
       "mulligan": "Mulligan Phase",
       "gameOver": "Game Over"
     },
+    "missionDeckIntro": {
+      "subtitle": "Pre-game",
+      "title": "Mission Deck",
+      "rank": "Rank",
+      "points": "pts",
+      "fromEdge": "Edge",
+      "fromOther": "Opponent",
+      "rulesRanked": "In ranked play, each player brings 3 missions. 2 are picked at random per player and alternated in the deck. The first mission (D) comes from the player who has the Edge.",
+      "rulesCasual": "In casual play, each player's 2 random missions are shuffled together to form the deck.",
+      "skip": "Skip"
+    },
     "chakra": "Chakra",
     "power": "Power",
     "score": "Score",

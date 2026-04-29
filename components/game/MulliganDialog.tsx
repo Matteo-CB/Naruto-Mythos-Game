@@ -297,10 +297,10 @@ export function MulliganDialog() {
   const performAction = useGameStore((s) => s.performAction);
   const isProcessing = useGameStore((s) => s.isProcessing);
   const coinFlipComplete = useUIStore((s) => s.coinFlipComplete);
+  const missionDeckIntroComplete = useUIStore((s) => s.missionDeckIntroComplete);
   const [selectedCard, setSelectedCard] = useState<CharacterCard | null>(null);
 
-  
-  if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete) return null;
+  if (!visibleState || visibleState.phase !== 'mulligan' || !coinFlipComplete || !missionDeckIntroComplete) return null;
 
   const hand = visibleState.myState.hand;
   const hasMulliganed = visibleState.myState.hasMulliganed;

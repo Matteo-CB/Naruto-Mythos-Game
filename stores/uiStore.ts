@@ -60,6 +60,9 @@ interface UIStore {
   coinFlipComplete: boolean;
   setCoinFlipComplete: (done: boolean) => void;
 
+  missionDeckIntroComplete: boolean;
+  setMissionDeckIntroComplete: (done: boolean) => void;
+
   
   handOrder: number[] | null; // null = natural order; array maps displayIndex → originalIndex
   setHandOrder: (order: number[] | null) => void;
@@ -143,6 +146,9 @@ export const useUIStore = create<UIStore>((set) => ({
 
   coinFlipComplete: false,
   setCoinFlipComplete: (done) => set({ coinFlipComplete: done }),
+
+  missionDeckIntroComplete: false,
+  setMissionDeckIntroComplete: (done) => set({ missionDeckIntroComplete: done }),
 
   handOrder: null,
   setHandOrder: (order) => set({ handOrder: order }),

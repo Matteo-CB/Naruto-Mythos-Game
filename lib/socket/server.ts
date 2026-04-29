@@ -1225,6 +1225,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
               deck: room.guestDeck.characters,
               missionCards: room.guestDeck.missions,
             },
+            gameMode: room.gameMode,
           };
 
           room.gameState = GameEngine.createGame(config);
@@ -1441,6 +1442,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             const config: GameConfig = {
               player1: { userId: room.hostId, isAI: false, deck: room.hostDeck!.characters, missionCards: room.hostDeck!.missions },
               player2: { userId: room.guestId!, isAI: false, deck: room.guestDeck!.characters, missionCards: room.guestDeck!.missions },
+              gameMode: room.gameMode,
             };
             const { resetIdCounter } = require('@/lib/engine/utils/id');
             resetIdCounter();
@@ -1614,6 +1616,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             deck: room.guestDeck.characters,
             missionCards: room.guestDeck.missions,
           },
+          gameMode: room.gameMode,
         };
 
         room.gameState = GameEngine.createGame(config);

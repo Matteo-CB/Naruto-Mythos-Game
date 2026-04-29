@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "Règle officielle du deck de Missions et nouvelle animation d'avant-match",
+      "title_en": "Official Mission Deck rule and new pre-game animation",
+      "changes_fr": [
+        "En partie classée (compétitif) : chaque joueur amène 3 missions différentes avec son deck. Le moteur tire 2 missions au hasard par joueur et les alterne dans le deck final. La première mission révélée (rang D) provient toujours du joueur qui a l'Edge en début de partie, conformément aux règles officielles.",
+        "En partie casual : les missions tirées au hasard sont simplement mélangées, comme avant.",
+        "Nouvelle animation d'avant-match : juste après le tirage de l'Edge, une mini séquence montre la construction du deck de missions (4 emplacements D, C, B, A qui se remplissent un par un). En classé, l'origine de chaque mission (Edge ou Adversaire) est indiquée. L'animation se cale dans la file d'attente des animations existantes et ne se chevauche jamais avec une autre. Bouton \"Passer\" disponible (touches Échap, Espace ou Entrée)."
+      ],
+      "changes_en": [
+        "In ranked play (competitive): each player brings 3 different missions with their deck. The engine picks 2 missions at random per player and alternates them in the final deck. The first revealed mission (rank D) always comes from the player who has the Edge at game start, per the official rules.",
+        "In casual play: the randomly picked missions are simply shuffled together, as before.",
+        "New pre-game animation: right after the Edge coin flip, a short sequence shows the mission deck being built (slots D, C, B, A filled one by one). In ranked, each mission's origin (Edge or Opponent) is indicated. The animation is queued in the existing animation pipeline and never overlaps with another. \"Skip\" button available (Esc, Space, or Enter keys)."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "Gemma (049) ne donne plus un tour supplémentaire à l'attaquant",
       "title_en": "Gemma (049) no longer grants an extra turn to the attacker",
       "changes_fr": [

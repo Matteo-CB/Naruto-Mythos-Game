@@ -56,7 +56,6 @@ export class GameEngine {
     
     const startingPlayer: PlayerID = Math.random() < 0.5 ? 'player1' : 'player2';
 
-    
     const p1Missions = shuffle(config.player1.missionCards);
     const p2Missions = shuffle(config.player2.missionCards);
     const p1SelectedMissions = p1Missions.slice(0, 2);
@@ -64,8 +63,14 @@ export class GameEngine {
     const p1UnusedMission = p1Missions[2] || null;
     const p2UnusedMission = p2Missions[2] || null;
 
-    
-    const missionDeck = shuffle([...p1SelectedMissions, ...p2SelectedMissions]);
+    let missionDeck: MissionCard[];
+    if (config.gameMode === 'ranked') {
+      const edgeMissions = startingPlayer === 'player1' ? p1SelectedMissions : p2SelectedMissions;
+      const otherMissions = startingPlayer === 'player1' ? p2SelectedMissions : p1SelectedMissions;
+      missionDeck = [edgeMissions[0], otherMissions[0], edgeMissions[1], otherMissions[1]].filter(Boolean);
+    } else {
+      missionDeck = shuffle([...p1SelectedMissions, ...p2SelectedMissions]);
+    }
 
     
     const p1Deck = shuffle([...config.player1.deck]);
@@ -111,6 +116,7 @@ export class GameEngine {
 
     const state: GameState = {
       gameId,
+      gameMode: config.gameMode,
       turn: 1 as TurnNumber,
       phase: 'mulligan',
       activePlayer: startingPlayer,
@@ -1708,6 +1714,7 @@ export class GameEngine {
 
     return {
       gameId: state.gameId,
+      gameMode: state.gameMode,
       turn: state.turn,
       phase: state.phase,
       activePlayer: state.activePlayer,

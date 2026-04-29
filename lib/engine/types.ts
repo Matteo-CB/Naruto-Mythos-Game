@@ -130,6 +130,7 @@ export interface MissionScoringProgress {
 
 export interface GameState {
   gameId: string;
+  gameMode?: 'casual' | 'ranked' | 'sealed';
   turn: TurnNumber;
   phase: GamePhase;
   activePlayer: PlayerID;
@@ -308,6 +309,7 @@ export interface GameConfig {
   player1: PlayerConfig;
   player2: PlayerConfig;
   randomSeed?: number;
+  gameMode?: 'casual' | 'ranked' | 'sealed';
 }
 
 
@@ -316,6 +318,7 @@ export interface GameConfig {
 
 export interface VisibleGameState {
   gameId: string;
+  gameMode?: 'casual' | 'ranked' | 'sealed';
   turn: TurnNumber;
   phase: GamePhase;
   activePlayer: PlayerID;

@@ -86,6 +86,17 @@
       "mulligan": "Phase de Mulligan",
       "gameOver": "Fin de Partie"
     },
+    "missionDeckIntro": {
+      "subtitle": "Avant-match",
+      "title": "Deck de Missions",
+      "rank": "Rang",
+      "points": "pts",
+      "fromEdge": "Edge",
+      "fromOther": "Adversaire",
+      "rulesRanked": "En classé, chaque joueur amène 3 missions. 2 sont tirées au hasard par joueur et alternées dans le deck. La première mission (D) vient du joueur qui a l'Edge.",
+      "rulesCasual": "En partie casual, les 2 missions tirées au hasard de chaque joueur sont mélangées ensemble pour former le deck.",
+      "skip": "Passer"
+    },
     "chakra": "Chakra",
     "power": "Puissance",
     "score": "Score",
