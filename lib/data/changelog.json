@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "Kabuto Yakushi (054) cache tous les personnages d'un coup",
+      "title_en": "Kabuto Yakushi (054) hides all characters at once",
+      "changes_fr": [
+        "Avant, quand Kabuto Yakushi (054) cachait les personnages avec moins de Puissance dans la mission, le jeu demandait de choisir lesquels cacher un par un. Si on oubliait de cliquer sur certains, ils restaient visibles.",
+        "Maintenant Kabuto cache instantanément tous les personnages éligibles, alliés comme ennemis, sans aucun choix d'ordre. Conforme à la règle de snapshot : la liste des cibles est figée au moment de l'activation et tous sont cachés simultanément."
+      ],
+      "changes_en": [
+        "Before, when Kabuto Yakushi (054) hid characters with less Power in the mission, the game asked you to pick them one by one. If you forgot to click on some, they stayed visible.",
+        "Now Kabuto instantly hides every eligible character, friend or enemy, with no order choice. Matches the snapshot rule: the target list is locked at activation time and they are all hidden simultaneously."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "K-factor ELO unifié à 32 pour tous les niveaux",
       "title_en": "ELO K-factor unified to 32 at every level",
       "changes_fr": [

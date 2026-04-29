@@ -4672,104 +4672,21 @@ export class EffectEngine {
         }
         if (kb054mGemmaCreated) break;
 
-        
         const kb054mAllTargetIds = kb054mOrdered.map(t => t.instanceId);
-
-        if (kb054mAllTargetIds.length === 1) {
-          
-          newState = EffectEngine.hideCharacterWithLog(newState, kb054mAllTargetIds[0], kb054mPlayer);
-        } else {
-          
-          const kb054mSeqEffId = generateInstanceId();
-          const kb054mSeqActId = generateInstanceId();
-          newState.pendingEffects.push({
-            id: kb054mSeqEffId, sourceCardId: 'KS-054-UC',
-            sourceInstanceId: pendingEffect.sourceInstanceId,
-            sourceMissionIndex: kb054mMI, effectType: 'MAIN' as EffectType,
-            effectDescription: JSON.stringify({
-              remainingTargets: kb054mAllTargetIds,
-              sourcePlayer: kb054mPlayer,
-              selfPower: kb054mSelfPower,
-            }),
-            targetSelectionType: 'KABUTO054_CHOOSE_HIDE_TARGET',
-            sourcePlayer: kb054mPlayer, requiresTargetSelection: true,
-            validTargets: kb054mAllTargetIds,
-            isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
-          });
-          newState.pendingActions.push({
-            id: kb054mSeqActId, type: 'SELECT_TARGET' as PendingAction['type'],
-            player: kb054mPlayer,
-            description: 'Kabuto Yakushi (054): Choose which character to hide first.',
-            descriptionKey: 'game.effect.desc.kabuto054ChooseHideTarget',
-            options: kb054mAllTargetIds,
-            minSelections: 1, maxSelections: 1, sourceEffectId: kb054mSeqEffId,
-          });
+        let kb054mHiddenCount = 0;
+        for (const kb054mTargetId of kb054mAllTargetIds) {
+          newState = EffectEngine.hideCharacterWithLog(newState, kb054mTargetId, kb054mPlayer, true);
+          const kb054mAfter = EffectEngine.findCharByInstanceId(newState, kb054mTargetId);
+          if (kb054mAfter && kb054mAfter.character.isHidden) kb054mHiddenCount++;
         }
-        break;
-      }
-
-      case 'KABUTO054_CHOOSE_HIDE_TARGET': {
-        
-        const kb054sPlayer = pendingEffect.sourcePlayer;
-        let kb054sMeta: { remainingTargets?: string[]; sourcePlayer?: string; selfPower?: number } = {};
-        try { kb054sMeta = JSON.parse(pendingEffect.effectDescription); } catch { /* ignore */ }
-        const kb054sRemaining = (kb054sMeta.remainingTargets ?? []).filter((id: string) => id !== targetId);
-
-        
-        const pendingCountBefore054 = newState.pendingEffects.length;
-        newState = EffectEngine.hideCharacterWithLog(newState, targetId, kb054sPlayer);
-
-        
-        const gemma054Pending = newState.pendingEffects.find(
-          (pe: any) => pe.targetSelectionType === 'GEMMA049_SACRIFICE_HIDE_CHOICE' && !pe.resolved
-            && newState.pendingEffects.length > pendingCountBefore054,
-        );
-        if (gemma054Pending && kb054sRemaining.length > 0) {
-          
-          const existingDesc054 = JSON.parse(gemma054Pending.effectDescription);
-          existingDesc054.batchRemainingTargets = kb054sRemaining;
-          existingDesc054.batchSourcePlayer = kb054sPlayer;
-          gemma054Pending.effectDescription = JSON.stringify(existingDesc054);
-          break;
-        }
-
-        
-        if (kb054sRemaining.length > 0) {
-          
-          const kb054sValidRemaining = kb054sRemaining.filter((id: string) => {
-            const res = EffectEngine.findCharByInstanceId(newState, id);
-            return res && !res.character.isHidden;
-          });
-
-          if (kb054sValidRemaining.length === 1) {
-            
-            newState = EffectEngine.hideCharacterWithLog(newState, kb054sValidRemaining[0], kb054sPlayer);
-          } else if (kb054sValidRemaining.length > 1) {
-            
-            const kb054sNextEffId = generateInstanceId();
-            const kb054sNextActId = generateInstanceId();
-            newState.pendingEffects.push({
-              id: kb054sNextEffId, sourceCardId: 'KS-054-UC',
-              sourceInstanceId: pendingEffect.sourceInstanceId,
-              sourceMissionIndex: pendingEffect.sourceMissionIndex, effectType: 'MAIN' as EffectType,
-              effectDescription: JSON.stringify({
-                remainingTargets: kb054sValidRemaining,
-                sourcePlayer: kb054sPlayer,
-              }),
-              targetSelectionType: 'KABUTO054_CHOOSE_HIDE_TARGET',
-              sourcePlayer: kb054sPlayer, requiresTargetSelection: true,
-              validTargets: kb054sValidRemaining,
-              isOptional: false, isMandatory: true, resolved: false, isUpgrade: false,
-            });
-            newState.pendingActions.push({
-              id: kb054sNextActId, type: 'SELECT_TARGET' as PendingAction['type'],
-              player: kb054sPlayer,
-              description: 'Kabuto Yakushi (054): Choose next character to hide.',
-              descriptionKey: 'game.effect.desc.kabuto054ChooseHideTarget',
-              options: kb054sValidRemaining,
-              minSelections: 1, maxSelections: 1, sourceEffectId: kb054sNextEffId,
-            });
-          }
+        if (kb054mHiddenCount > 0) {
+          newState.log = logAction(
+            newState.log, newState.turn, newState.phase, kb054mPlayer,
+            'EFFECT_HIDE',
+            `Kabuto Yakushi (054): Hid ${kb054mHiddenCount} character(s) in this mission.`,
+            'game.log.effect.hide',
+            { card: 'KABUTO YAKUSHI', id: 'KS-054-UC', count: String(kb054mHiddenCount) },
+          );
         }
         break;
       }
