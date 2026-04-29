@@ -130,10 +130,13 @@ export function MissionDeckIntro() {
 
               return (
                 <div key={label} className="flex flex-col items-center gap-2">
-                  <div className="relative h-[160px] w-[112px] md:h-[200px] md:w-[140px]">
+                  <div className="text-[10px] tracking-[0.35em] uppercase font-semibold" style={{ color: `${accent}cc` }}>
+                    {label} <span className="text-white/30 font-normal">{RANK_BONUSES[i]}</span>
+                  </div>
+                  <div className="relative mission-aspect w-[140px] md:w-[180px]">
                     <div
-                      className="absolute inset-0 rounded-md border border-white/5"
-                      style={{ background: 'rgba(20,18,15,0.4)' }}
+                      className="absolute inset-0 rounded-md border border-dashed border-white/10"
+                      style={{ background: 'rgba(20,18,15,0.35)' }}
                     />
                     <AnimatePresence>
                       {revealed && (
@@ -153,32 +156,24 @@ export function MissionDeckIntro() {
                             damping: 22,
                             mass: 0.9,
                           }}
-                          className="absolute inset-0 rounded-md overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.7)]"
+                          className="absolute inset-0 rounded-md overflow-hidden"
                           style={{
-                            border: `1px solid ${accent}55`,
-                            background:
-                              'linear-gradient(135deg, #1a1610 0%, #14110b 50%, #0d0b07 100%)',
+                            border: `1px solid ${accent}66`,
+                            boxShadow: `0 10px 30px rgba(0,0,0,0.7), 0 0 18px ${accent}33`,
                           }}
                         >
+                          <img
+                            src="/images/card-back.webp"
+                            alt={t('card.back')}
+                            draggable={false}
+                            className="w-full h-full object-cover select-none"
+                          />
                           <div
-                            className="absolute inset-0 opacity-40"
+                            className="absolute inset-0 pointer-events-none"
                             style={{
-                              background: `radial-gradient(circle at 50% 35%, ${accent}33 0%, transparent 65%)`,
+                              background: `radial-gradient(circle at 50% 50%, transparent 35%, ${accent}1a 100%)`,
                             }}
                           />
-                          <div className="absolute inset-2 rounded border" style={{ borderColor: `${accent}33` }} />
-                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
-                            <div
-                              className="text-3xl md:text-4xl font-semibold tracking-wider"
-                              style={{ color: accent, textShadow: `0 0 12px ${accent}66` }}
-                            >
-                              {label}
-                            </div>
-                            <div className="text-[10px] tracking-[0.3em] text-white/50 uppercase">
-                              {t('game.missionDeckIntro.rank')}
-                            </div>
-                            <div className="mt-1 text-[10px] text-white/40">{RANK_BONUSES[i]} {t('game.missionDeckIntro.points')}</div>
-                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
