@@ -15713,6 +15713,7 @@ export class EffectEngine {
       id: actId,
       type: 'SELECT_TARGET' as PendingAction['type'],
       player: chooser,
+      originPlayer: effectSourcePlayer,
       description: `Choose the order for ${actualCount} defeated cards in the discard pile. Last selected = top of pile.`,
       descriptionKey: 'game.effect.desc.reorderDiscard',
       descriptionParams: { count: String(actualCount) },

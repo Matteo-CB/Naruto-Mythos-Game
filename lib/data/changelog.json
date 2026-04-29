@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "date": "2026-04-29",
+      "title_fr": "Itachi Secret (140) ne donne plus un tour supplémentaire à son joueur",
+      "title_en": "Itachi Secret (140) no longer grants an extra turn to its player",
+      "changes_fr": [
+        "Quand Itachi Uchiwa (140) faisait défausser et repiocher la main de l'adversaire, et que ce dernier devait choisir l'ordre de sa pile de défausse, le tour repassait par erreur à celui qui avait joué Itachi au lieu de passer à l'adversaire.",
+        "Le tour passe désormais correctement à l'adversaire après qu'il ait fini de réordonner sa défausse."
+      ],
+      "changes_en": [
+        "When Itachi Uchiwa (140) made the opponent discard and redraw their hand, and the opponent had to choose the order of their discard pile, the turn was incorrectly handed back to the Itachi player instead of passing to the opponent.",
+        "The turn now correctly passes to the opponent once they finish reordering their discard."
+      ]
+    },
+    {
       "date": "2026-04-25",
       "title_fr": "Comptes en double fusionnés et liaison Discord/email corrigée",
       "title_en": "Duplicate accounts merged and Discord/email linking fixed",
