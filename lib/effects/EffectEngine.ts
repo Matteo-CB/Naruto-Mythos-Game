@@ -109,6 +109,18 @@ function isMissionValidForPlay(
 }
 
 
+function isAmbushLinkedUpgrade(description: string): boolean {
+  const lower = description.toLowerCase().trimStart();
+  return (
+    lower.startsWith('ambush effect:') ||
+    lower.startsWith('effet embuscade :') ||
+    lower.startsWith('effet embuscade:') ||
+    lower.startsWith('effet ambuscade :') ||
+    lower.startsWith('effet ambuscade:')
+  );
+}
+
+
 export class EffectEngine {
   
   static resolvePlayEffects(
@@ -134,8 +146,10 @@ export class EffectEngine {
     const orderedTypes: EffectType[] = [];
     for (const effect of (topCard.effects ?? [])) {
       if (relevantTypes.has(effect.type) && !orderedTypes.includes(effect.type as EffectType)) {
-        
         if (effect.type === 'MAIN' && (effect.description.startsWith('effect:') || effect.description.startsWith('effect.'))) {
+          continue;
+        }
+        if (effect.type === 'UPGRADE' && isAmbushLinkedUpgrade(effect.description)) {
           continue;
         }
         orderedTypes.push(effect.type as EffectType);

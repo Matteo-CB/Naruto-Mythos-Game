@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "Effets UPGRADE liés à un AMBUSH bloqués sur upgrade depuis la main",
+      "title_en": "AMBUSH-linked UPGRADE effects blocked when upgrading from hand",
+      "changes_fr": [
+        "Règle générale appliquée au moteur : si l'effet UPGRADE d'une carte est la continuité d'un AMBUSH (texte commençant par \"AMBUSH effect:\" / \"Effet EMBUSCADE :\"), il ne s'active plus quand la carte est jouée comme upgrade face visible depuis la main, sans révélation. Il ne s'active que dans le cadre d'un AMBUSH, donc lors d'une révélation.",
+        "Cas couverts : Sasuke Uchiwa (014) Sharingan, Kidomaru (124) et son variant rare art (KS-124-RA). Pour ces cartes, jouer la carte directement comme upgrade depuis la main n'active plus le bonus discard / power limit lié à l'embuscade.",
+        "Les effets UPGRADE classiques non liés à un AMBUSH (Kakashi 016, etc.) continuent de s'activer normalement sur upgrade depuis la main."
+      ],
+      "changes_en": [
+        "General rule enforced at the engine level: if a card's UPGRADE effect is the continuation of an AMBUSH (text starting with \"AMBUSH effect:\" / \"Effet EMBUSCADE :\"), it no longer activates when the card is played as a face-up upgrade from hand without being revealed. It only activates as part of an AMBUSH, that is on reveal.",
+        "Cases covered: Sasuke Uchiwa (014) Sharingan, Kidomaru (124) and its rare art variant (KS-124-RA). For these cards, playing the card directly as a face-up upgrade from hand no longer triggers the AMBUSH-linked discard / power-limit bonus.",
+        "Regular UPGRADE effects not linked to an AMBUSH (Kakashi 016, etc.) keep firing normally on upgrade from hand."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "Shikamaru (022) voit enfin tous les personnages joués lors du dernier tour adverse",
       "title_en": "Shikamaru (022) now sees every character played during the opponent's last turn",
       "changes_fr": [
