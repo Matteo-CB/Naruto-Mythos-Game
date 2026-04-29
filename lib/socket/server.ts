@@ -291,7 +291,52 @@ async function finalizeGameEnd(
         prisma.user.findUnique({ where: { id: room.guestId! } }),
       ]);
 
-      if (player1 && player2) {
+      const onlyOneExists = (player1 && !player2) || (!player1 && player2);
+      if (onlyOneExists) {
+        const survivor = player1 ?? player2!;
+        const survivorIsP1 = !!player1;
+        const survivorWon = (survivorIsP1 && winner === 'player1') || (!survivorIsP1 && winner === 'player2');
+        const result: 'win' | 'loss' = survivorWon ? 'win' : 'loss';
+        const delta = survivorWon ? 10 : -25;
+        const newElo = Math.max(100, survivor.elo + delta);
+        const stats = survivorWon ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+        const updated = await prisma.user.update({
+          where: { id: survivor.id },
+          data: {
+            elo: newElo, ...stats,
+            consecutiveWins: survivorWon ? (survivor.consecutiveWins ?? 0) + 1 : 0,
+            consecutiveLosses: survivorWon ? 0 : (survivor.consecutiveLosses ?? 0) + 1,
+          },
+        });
+        eloData = {
+          player1Delta: survivorIsP1 ? (newElo - survivor.elo) : 0,
+          player2Delta: survivorIsP1 ? 0 : (newElo - survivor.elo),
+          player1NewElo: survivorIsP1 ? updated.elo : 0,
+          player2NewElo: survivorIsP1 ? 0 : updated.elo,
+          player1TotalGames: survivorIsP1 ? updated.wins + updated.losses + updated.draws : 0,
+          player2TotalGames: survivorIsP1 ? 0 : updated.wins + updated.losses + updated.draws,
+        };
+        prisma.eloHistory.create({
+          data: {
+            userId: survivor.id,
+            opponentId: survivorIsP1 ? room.guestId! : room.hostId,
+            opponentUsername: 'deleted_user',
+            opponentElo: 0,
+            oldElo: survivor.elo,
+            newElo: updated.elo,
+            delta: newElo - survivor.elo,
+            result,
+            myScore: survivorIsP1 ? p1Score : p2Score,
+            opponentScore: survivorIsP1 ? p2Score : p1Score,
+            isRanked: true,
+          },
+        }).catch((err) => {
+          console.warn('[Socket] EloHistory write failed (one-side):', err instanceof Error ? err.message : err);
+        });
+        syncDiscordRole(survivor.id).catch(() => {});
+        const oldTotal = survivor.wins + survivor.losses + survivor.draws;
+        sendRankUpNotification(survivor.username, survivor.discordId, survivor.elo, updated.elo, oldTotal, oldTotal + 1).catch(() => {});
+      } else if (player1 && player2) {
         const changes = calculateEloChanges({
           player1Elo: player1.elo,
           player2Elo: player2.elo,

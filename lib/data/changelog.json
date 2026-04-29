@@ -2,6 +2,34 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "Gemma (049) ne donne plus un tour supplémentaire à l'attaquant",
+      "title_en": "Gemma (049) no longer grants an extra turn to the attacker",
+      "changes_fr": [
+        "Quand Gemma Shiranui (049) déclenchait son sacrifice optionnel pour protéger un Village de la Feuille (face à un effet ennemi de défaite ou de cache, dont Kabuto 054), une fois le choix résolu par le défenseur, le tour repassait par erreur à l'attaquant.",
+        "Le tour passe maintenant correctement au défenseur, comme prévu après son action."
+      ],
+      "changes_en": [
+        "When Gemma Shiranui (049) prompted its optional sacrifice to protect a Leaf Village character (against an enemy defeat or hide effect, including Kabuto 054), once the defender resolved the choice, the turn was incorrectly handed back to the attacker.",
+        "The turn now properly passes to the defender, as expected after their action."
+      ]
+    },
+    {
+      "date": "2026-04-29",
+      "title_fr": "Parties contre un compte supprimé : ELO et stats appliqués correctement",
+      "title_en": "Games against a deleted account: ELO and stats applied properly",
+      "changes_fr": [
+        "Si un joueur terminait une partie classée contre un adversaire dont le compte avait été supprimé entre-temps (notamment lors de la fusion de comptes en double), aucun ELO ni statistique n'était mis à jour : la partie comptait pour 0 point.",
+        "Désormais le joueur encore présent reçoit le minimum garanti : +10 ELO en cas de victoire, -25 ELO en cas de défaite, avec mise à jour normale des wins/losses et de la série en cours.",
+        "17 parties récentes ont été corrigées rétroactivement et l'ELO des joueurs concernés a été ajusté."
+      ],
+      "changes_en": [
+        "If a player finished a ranked game against an opponent whose account had since been deleted (notably during duplicate account merges), no ELO or stats were applied — the game counted for 0 points.",
+        "The remaining player now receives the guaranteed minimum: +10 ELO on a win, -25 ELO on a loss, with normal updates to wins/losses and the current streak.",
+        "17 recent games have been retroactively corrected and the affected players' ELO has been adjusted."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "Effets UPGRADE liés à un AMBUSH bloqués sur upgrade depuis la main",
       "title_en": "AMBUSH-linked UPGRADE effects blocked when upgrading from hand",
       "changes_fr": [
