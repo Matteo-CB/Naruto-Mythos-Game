@@ -45,17 +45,16 @@ describe('ELO System', () => {
       expect(newElo).toBe(1000); // Exactly 0.5 expected, 0.5 actual
     });
 
-    it('should use K=32 for players below 2000', () => {
+    it('should use K=32 at low ELO', () => {
       const newElo = calculateNewElo(1000, 1000, 1.0);
-      
+
       expect(newElo).toBe(1016);
     });
 
-    it('should use K=16 for players at/above 2000', () => {
+    it('should still use K=32 at/above 2000 ELO', () => {
       const newElo = calculateNewElo(2000, 2000, 1.0);
-      
-      
-      expect(newElo).toBe(2010);
+
+      expect(newElo).toBe(2016);
     });
 
     it('should never go below 100 (ELO floor)', () => {

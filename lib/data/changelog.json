@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-04-29",
+      "title_fr": "K-factor ELO unifié à 32 pour tous les niveaux",
+      "title_en": "ELO K-factor unified to 32 at every level",
+      "changes_fr": [
+        "Avant, dès qu'un joueur dépassait 2000 ELO, le K-factor passait de 32 à 16. Conséquence : un joueur à 2200+ ELO ne pouvait plus perdre que -16 par défaite, même contre un adversaire à 500 ELO. Les pertes restaient plafonnées à -16 et le clamp -25 ne pouvait jamais s'appliquer en haut du classement.",
+        "Le K-factor est maintenant fixé à 32 partout. Un joueur top peut désormais perdre jusqu'à -25 contre un adversaire beaucoup plus faible, et un joueur faible peut gagner jusqu'à +25 en battant un top. Le ladder devient plus dynamique et plus juste en haut du classement."
+      ],
+      "changes_en": [
+        "Previously, as soon as a player crossed 2000 ELO, the K-factor dropped from 32 to 16. As a result, a 2200+ ELO player could only lose -16 per defeat, even against a 500 ELO opponent. Losses were stuck at -16 and the -25 clamp could never apply at the top of the ladder.",
+        "The K-factor is now fixed at 32 everywhere. A top player can now lose up to -25 against a much weaker opponent, and a weaker player can gain up to +25 for beating a top one. The ladder becomes more dynamic and fairer at the top."
+      ]
+    },
+    {
+      "date": "2026-04-29",
       "title_fr": "Itachi Secret (140) ne donne plus un tour supplémentaire à son joueur",
       "title_en": "Itachi Secret (140) no longer grants an extra turn to its player",
       "changes_fr": [

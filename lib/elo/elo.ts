@@ -1,14 +1,12 @@
 
 
-const K_FACTOR_LOW = 32;
-const K_FACTOR_HIGH = 16;
-const K_THRESHOLD = 2000;
+const K_FACTOR = 32;
 const ELO_FLOOR = 100;
 const MIN_WIN_GAIN = 10;
 const MAX_LOSS = 25;
 
-function getKFactor(elo: number): number {
-  return elo < K_THRESHOLD ? K_FACTOR_LOW : K_FACTOR_HIGH;
+function getKFactor(_elo: number): number {
+  return K_FACTOR;
 }
 
 export function expectedScore(playerElo: number, opponentElo: number): number {
