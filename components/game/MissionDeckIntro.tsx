@@ -166,7 +166,15 @@ export function MissionDeckIntro() {
                             src="/images/card-back.webp"
                             alt={t('card.back')}
                             draggable={false}
-                            className="w-full h-full object-cover select-none"
+                            className="absolute select-none"
+                            style={{
+                              top: '50%',
+                              left: '50%',
+                              width: '100%',
+                              height: 'auto',
+                              transform: 'translate(-50%, -50%) rotate(-90deg)',
+                              transformOrigin: 'center',
+                            }}
                           />
                           <div
                             className="absolute inset-0 pointer-events-none"
