@@ -114,18 +114,13 @@ export interface ScoreEffectSource {
 }
 
 export interface MissionScoringProgress {
-  
   currentRankIndex: number;
-  
   missionCardScoreDone: boolean;
-  
   processedCharacterIds: string[];
-  
   winner: PlayerID;
-  
   pendingScoreEffects?: ScoreEffectSource[];
-  
   pendingScoreAfterOrochimaru?: { winner: PlayerID; missionIndex: number; rankIndex: number };
+  currentRankComplete?: boolean;
 }
 
 export interface GameState {

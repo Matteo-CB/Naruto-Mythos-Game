@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-30",
+      "title_fr": "Orochimaru Permutation (051) : les missions suivantes sont maintenant correctement notées",
+      "title_en": "Orochimaru Substitution (051): subsequent missions are now correctly scored",
+      "changes_fr": [
+        "Quand Orochimaru (051, coût 5) perdait sa mission et devait choisir une nouvelle mission de destination, le moteur n'enregistrait pas l'état d'avancement du score. Conséquence : une fois le déplacement validé, les missions suivantes (rang C, B, etc.) n'étaient plus notées du tout. Seule la première mission comptait au score.",
+        "Le moteur conserve désormais correctement l'avancement de la phase d'évaluation pendant le déplacement d'Orochimaru. Toutes les missions du tour sont notées dans l'ordre prévu, même quand son effet déclenche un choix au milieu du score.",
+        "Couvre aussi le cas particulier où la mission est nulle et où Orochimaru bouge quand même."
+      ],
+      "changes_en": [
+        "When Orochimaru (051, cost 5) lost his mission and had to pick a destination, the engine wasn't saving the scoring-phase progress. As a result, once the move was confirmed, the remaining missions (rank C, B, etc.) were never scored. Only the first mission counted toward the score.",
+        "The engine now correctly preserves the mission-evaluation progress while Orochimaru is moving. Every mission in the turn is scored in the proper order, even when his effect prompts a destination choice mid-evaluation.",
+        "Also covers the edge case where the mission is a draw and Orochimaru still moves."
+      ]
+    },
+    {
+      "date": "2026-04-30",
       "title_fr": "Replays 100% fidèles : couverture totale de la partie y compris le mulligan",
       "title_en": "Replays 100% faithful: full game coverage including the mulligan",
       "changes_fr": [

@@ -46,7 +46,6 @@ export function resumeMissionScoring(state: GameState): GameState {
   const missionIdx = newState.activeMissions.findIndex((m) => m.rank === currentRank);
 
   if (missionIdx !== -1) {
-    
     if (progress.pendingScoreAfterOrochimaru) {
       const { winner: scoreWinner, missionIndex: scoreMissionIdx, rankIndex: scoreRankIdx } = progress.pendingScoreAfterOrochimaru;
       newState = { ...newState, missionScoringProgress: undefined };
@@ -54,25 +53,29 @@ export function resumeMissionScoring(state: GameState): GameState {
       if (newState.pendingActions.length > 0) {
         return newState;
       }
-      
-    } else {
-      
+    } else if (!progress.currentRankComplete) {
       newState = resolveRemainingScoreEffects(newState, progress.winner, missionIdx, progress);
 
       if (newState.pendingActions.length > 0) {
         return newState;
       }
 
-      
       const mission = newState.activeMissions[missionIdx];
       const missionWinner = mission.wonBy ?? null;
       if (missionWinner && missionWinner !== 'draw') {
         const missionLoser: PlayerID = missionWinner === 'player1' ? 'player2' : 'player1';
-        
+
         if (!(newState.edgeHolder === missionLoser && checkOrochimaru051OnMission(newState, missionIdx, missionLoser))) {
           newState = handleOrochimaru051Move(newState, missionIdx, missionWinner);
-          
+
           if (newState.pendingActions.length > 0) {
+            newState.missionScoringProgress = {
+              currentRankIndex: progress.currentRankIndex,
+              missionCardScoreDone: true,
+              processedCharacterIds: [],
+              winner: progress.winner,
+              currentRankComplete: true,
+            };
             return newState;
           }
         }
@@ -210,19 +213,36 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
         return newState;
       }
     } else {
-      
       newState = resolveScoreEffectsWithProgress(newState, winner, missionIndex, rankIndex);
 
       if (newState.pendingActions.length > 0) {
         return newState;
       }
 
-      
       newState = handleOrochimaru051Move(newState, missionIndex, winner);
+      if (newState.pendingActions.length > 0) {
+        newState.missionScoringProgress = {
+          currentRankIndex: rankIndex,
+          missionCardScoreDone: true,
+          processedCharacterIds: [],
+          winner,
+          currentRankComplete: true,
+        };
+        return newState;
+      }
     }
   } else {
-    
     newState = handleOrochimaru051Move(newState, missionIndex, winner);
+    if (newState.pendingActions.length > 0) {
+      newState.missionScoringProgress = {
+        currentRankIndex: rankIndex,
+        missionCardScoreDone: true,
+        processedCharacterIds: [],
+        winner: state.edgeHolder,
+        currentRankComplete: true,
+      };
+      return newState;
+    }
   }
 
   return newState;
