@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-04-30",
+      "title_fr": "Mobile : scroll des popups fluide à nouveau (plus de saccades ni de bips)",
+      "title_en": "Mobile: popup scrolling is smooth again (no more lag or boundary beeps)",
+      "changes_fr": [
+        "La correction précédente qui rendait les popups scrollables sur mobile avait introduit deux conteneurs de scroll imbriqués (overlay + frame), ce qui causait des saccades importantes et des bips de bord d'écran (rubber-band) sur iOS Safari. Plusieurs joueurs ont signalé un comportement très désagréable.",
+        "Maintenant un seul conteneur scrolle (le frame du popup), avec momentum scrolling natif iOS activé. Le scroll redevient fluide. Le bouton Confirmer reste toujours accessible quand le contenu dépasse l'écran (correction Gaara préservée)."
+      ],
+      "changes_en": [
+        "The previous fix that made popups scrollable on mobile had introduced two nested scroll containers (overlay + frame), causing significant lag and rubber-band boundary beeps on iOS Safari. Several players reported a very unpleasant feel.",
+        "Now only one container scrolls (the popup frame), with native iOS momentum scrolling enabled. Scrolling is smooth again. The Confirm button still stays accessible when content overflows (Gaara fix preserved)."
+      ]
+    },
+    {
+      "date": "2026-04-30",
       "title_fr": "Mobile : popups d'effet scrollables, bouton confirmer toujours accessible (Gaara, etc.)",
       "title_en": "Mobile: effect popups now scrollable, confirm button always reachable (Gaara, etc.)",
       "changes_fr": [

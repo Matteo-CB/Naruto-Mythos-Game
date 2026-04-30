@@ -29,8 +29,7 @@ export function PopupOverlay({
       style={{
         backgroundColor: 'rgba(4, 4, 8, 0.92)',
         boxShadow: 'inset 0 0 200px 60px rgba(0,0,0,0.4)',
-        overflow: 'auto',
-        overscrollBehavior: 'contain',
+        overflow: 'hidden',
       }}
     >
       {children}
@@ -109,7 +108,7 @@ export function PopupCornerFrame({
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
         overflowY: 'auto',
-        overscrollBehavior: 'contain',
+        WebkitOverflowScrolling: 'touch',
       }}
     >
       <Corner position="tl" color={accentColor} />
