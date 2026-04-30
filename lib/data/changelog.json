@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-04-30",
+      "title_fr": "Phase de notation des missions : plus de blocage en fin de partie",
+      "title_en": "Mission scoring phase: no more blocked games at the end",
+      "changes_fr": [
+        "La phase de notation peut maintenant toujours se finaliser, même si un effet de score a laissé un état résiduel. La partie passe à la phase de fin et est sauvegardée dans l'historique."
+      ],
+      "changes_en": [
+        "The scoring phase can now always finalize, even if a score effect left a residual state. The game advances to the End phase and is saved to history."
+      ]
+    },
+    {
+      "date": "2026-04-30",
       "title_fr": "Popups d'effet : scroll seulement si nécessaire, compteur Gaara corrigé",
       "title_en": "Effect popups: scroll only when needed, Gaara counter fixed",
       "changes_fr": [

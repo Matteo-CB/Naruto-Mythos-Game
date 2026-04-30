@@ -309,17 +309,27 @@ export class GameEngine {
         
         if (action.type === 'SELECT_TARGET' || action.type === 'DECLINE_OPTIONAL_EFFECT') {
           newState = GameEngine.handlePendingAction(newState, player, action);
-          
-          if (newState.pendingActions.length === 0 && newState.pendingEffects.length === 0) {
+
+          if (newState.pendingActions.length === 0) {
+            if (newState.pendingEffects.length > 0) {
+              newState.pendingEffects = [];
+            }
             if (newState.missionScoringProgress) {
-              
               newState = resumeMissionScoring(newState);
-              
               if (newState.pendingActions.length > 0) break;
             }
-            
             newState.missionScoringComplete = true;
           }
+        }
+
+        if (
+          newState.phase === 'mission' &&
+          newState.pendingActions.length === 0 &&
+          !newState.missionScoringProgress &&
+          !newState.missionScoringComplete
+        ) {
+          newState.pendingEffects = [];
+          newState.missionScoringComplete = true;
         }
         break;
 
