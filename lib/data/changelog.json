@@ -2,75 +2,39 @@
   "entries": [
     {
       "date": "2026-04-30",
-      "title_fr": "Mobile : scroll des popups fluide à nouveau (plus de saccades ni de bips)",
-      "title_en": "Mobile: popup scrolling is smooth again (no more lag or boundary beeps)",
+      "title_fr": "Popups d'effet : scroll seulement si nécessaire, compteur Gaara corrigé",
+      "title_en": "Effect popups: scroll only when needed, Gaara counter fixed",
       "changes_fr": [
-        "La correction précédente qui rendait les popups scrollables sur mobile avait introduit deux conteneurs de scroll imbriqués (overlay + frame), ce qui causait des saccades importantes et des bips de bord d'écran (rubber-band) sur iOS Safari. Plusieurs joueurs ont signalé un comportement très désagréable.",
-        "Maintenant un seul conteneur scrolle (le frame du popup), avec momentum scrolling natif iOS activé. Le scroll redevient fluide. Le bouton Confirmer reste toujours accessible quand le contenu dépasse l'écran (correction Gaara préservée)."
+        "Les popups d'effet restent dans l'écran et activent un scroll uniquement si leur contenu dépasse la fenêtre. Le bouton Confirmer reste toujours accessible.",
+        "Compteur de cibles corrigé sur Gaara (120) : il reflète désormais le maximum réellement atteignable selon la règle (1 personnage par mission)."
       ],
       "changes_en": [
-        "The previous fix that made popups scrollable on mobile had introduced two nested scroll containers (overlay + frame), causing significant lag and rubber-band boundary beeps on iOS Safari. Several players reported a very unpleasant feel.",
-        "Now only one container scrolls (the popup frame), with native iOS momentum scrolling enabled. Scrolling is smooth again. The Confirm button still stays accessible when content overflows (Gaara fix preserved)."
+        "Effect popups stay inside the screen and only enable scrolling if the content overflows. The Confirm button stays reachable.",
+        "Fixed Gaara (120) target counter: it now reflects the actual maximum reachable per the rule (1 character per mission)."
       ]
     },
     {
       "date": "2026-04-30",
-      "title_fr": "Mobile : popups d'effet scrollables, bouton confirmer toujours accessible (Gaara, etc.)",
-      "title_en": "Mobile: effect popups now scrollable, confirm button always reachable (Gaara, etc.)",
+      "title_fr": "Replays fidèles à la partie",
+      "title_en": "Replays faithful to the actual game",
       "changes_fr": [
-        "Sur mobile, certaines popups d'effet (Gaara qui cible des personnages dans toutes les missions, choix multiples, etc.) dépassaient la hauteur de l'écran et le bouton Confirmer ou Passer se retrouvait masqué sous l'écran. Plusieurs joueurs étaient bloqués et perdaient la partie.",
-        "Toutes les popups respectent maintenant la hauteur du viewport et défilent verticalement à l'intérieur si le contenu est trop grand. Le bouton Confirmer reste toujours accessible.",
-        "Spécifique à Gaara (120, coût 8) : la popup affichait un compteur \"X sur Y sélectionnés\" qui comptait toutes les cibles valides au lieu du maximum réellement atteignable selon la règle (1 personnage par mission). Si vous aviez 2 missions et 3 cibles valides, l'interface affichait \"X sur 3\" alors que vous ne pouviez sélectionner que 2 personnages au maximum. Le compteur reflète maintenant le vrai maximum (2 dans cet exemple), donc le bouton Confirmer s'affiche dès que vous avez choisi votre/vos cible(s)."
+        "Le serveur enregistre une photo de l'état après chaque action et le replay les rejoue directement. Plus de personnages dupliqués ou d'états incohérents.",
+        "Le mulligan est aussi capté. Les anciennes parties continuent de fonctionner avec l'ancien système."
       ],
       "changes_en": [
-        "On mobile, some effect popups (Gaara targeting characters across missions, multi-target picks, etc.) exceeded screen height and the Confirm or Skip button ended up hidden below the screen. Several players were stuck and lost games as a result.",
-        "All popups now respect viewport height and scroll vertically inside if their content is too tall. The Confirm button always stays reachable.",
-        "Specific to Gaara (120, cost 8): the popup showed a \"X of Y selected\" counter that counted all valid targets instead of the actual rule-bound maximum (1 character per mission). With 2 missions and 3 valid targets, the UI displayed \"X of 3\" even though you could only ever select 2 characters. The counter now reflects the real maximum (2 in that example), so the Confirm button appears as soon as you've made your pick(s)."
+        "The server records a state snapshot after every action and the replay plays them back directly. No more duplicate characters or incoherent states.",
+        "The mulligan is also captured. Older games keep working with the legacy system."
       ]
     },
     {
       "date": "2026-04-30",
-      "title_fr": "Orochimaru Permutation (051) : les missions suivantes sont maintenant correctement notées",
-      "title_en": "Orochimaru Substitution (051): subsequent missions are now correctly scored",
+      "title_fr": "Orochimaru Permutation (051) : les missions suivantes sont notées",
+      "title_en": "Orochimaru Substitution (051): remaining missions get scored",
       "changes_fr": [
-        "Quand Orochimaru (051, coût 5) perdait sa mission et devait choisir une nouvelle mission de destination, le moteur n'enregistrait pas l'état d'avancement du score. Conséquence : une fois le déplacement validé, les missions suivantes (rang C, B, etc.) n'étaient plus notées du tout. Seule la première mission comptait au score.",
-        "Le moteur conserve désormais correctement l'avancement de la phase d'évaluation pendant le déplacement d'Orochimaru. Toutes les missions du tour sont notées dans l'ordre prévu, même quand son effet déclenche un choix au milieu du score.",
-        "Couvre aussi le cas particulier où la mission est nulle et où Orochimaru bouge quand même."
+        "Quand Orochimaru perdait sa mission et choisissait une mission de destination, les missions suivantes du tour n'étaient plus notées. Toutes les missions sont maintenant évaluées dans l'ordre prévu."
       ],
       "changes_en": [
-        "When Orochimaru (051, cost 5) lost his mission and had to pick a destination, the engine wasn't saving the scoring-phase progress. As a result, once the move was confirmed, the remaining missions (rank C, B, etc.) were never scored. Only the first mission counted toward the score.",
-        "The engine now correctly preserves the mission-evaluation progress while Orochimaru is moving. Every mission in the turn is scored in the proper order, even when his effect prompts a destination choice mid-evaluation.",
-        "Also covers the edge case where the mission is a draw and Orochimaru still moves."
-      ]
-    },
-    {
-      "date": "2026-04-30",
-      "title_fr": "Replays 100% fidèles : couverture totale de la partie y compris le mulligan",
-      "title_en": "Replays 100% faithful: full game coverage including the mulligan",
-      "changes_fr": [
-        "Le snapshot du serveur démarre désormais dès la création de la partie, pas seulement après le mulligan. La phase de mulligan est captée image par image et les choix de mulligan sont rejoués visuellement.",
-        "Plus de double frame redondante en début de replay (l'ancien système affichait l'état initial deux fois). Chaque image montrée correspond à un état réel du serveur, dans l'ordre exact des actions.",
-        "Couvre les parties classées et les parties de tournoi de la même manière. Pas d'image synthétique \"phase de début\" inventée par le client."
-      ],
-      "changes_en": [
-        "The server snapshot now starts at game creation, not just after the mulligan. The mulligan phase is captured frame by frame and the mulligan choices are visually replayed.",
-        "No more redundant duplicate frame at the start of the replay (the old system showed the initial state twice). Every shown frame corresponds to a real server state, in the exact order of actions.",
-        "Covers ranked games and tournament games the same way. No synthetic \"start phase\" frame invented by the client."
-      ]
-    },
-    {
-      "date": "2026-04-30",
-      "title_fr": "Replays fiables : on rejoue désormais l'état réel du serveur, plus une re-simulation",
-      "title_en": "Reliable replays: we now play back the real server state, not a re-simulation",
-      "changes_fr": [
-        "Ancienne approche : le replay rejouait les actions sur l'état initial pour reconstituer chaque étape. Cela divergeait parfois (deux personnages identiques sur la même mission, état affiché qui ne correspondait pas à ce qui s'était passé) à cause de la fragilité du remappage d'identifiants.",
-        "Nouvelle approche : le serveur enregistre désormais une photo de l'état après chaque action pendant la partie. Le replay affiche directement ces photos, sans rien recalculer. Ce qui s'affiche est exactement ce qui était sur le plateau au moment de l'action.",
-        "Les anciennes parties (sans photos) continuent de fonctionner en mode legacy avec la re-simulation. Toutes les nouvelles parties bénéficient du nouveau système. Si la partie devient trop volumineuse, les photos sont retirées en priorité avant le journal d'actions pour respecter la limite MongoDB."
-      ],
-      "changes_en": [
-        "Old approach: the replay re-applied actions to the initial state to reconstruct each step. It sometimes drifted (two identical characters on the same mission, displayed state that did not match what actually happened) because the ID remapping was fragile.",
-        "New approach: the server now stores a state snapshot after every action during the game. The replay shows those snapshots directly, with no recomputation. What you see is exactly what was on the board at that moment.",
-        "Old games without snapshots keep working in legacy mode with re-simulation. All new games use the snapshot system. If a game grows too large for MongoDB, snapshots are dropped first before the action log to respect the size limit."
+        "When Orochimaru lost his mission and was picking a destination, the remaining missions of the turn were no longer scored. All missions are now evaluated in the proper order."
       ]
     },
     {

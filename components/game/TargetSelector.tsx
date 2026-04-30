@@ -19,6 +19,7 @@ import {
   PopupMinimizePill,
   PopupMinimizeX,
   PopupTargetCount,
+  useNeedsScroll,
 } from './PopupPrimitives';
 import { TargetOrderPopup } from './TargetOrderPopup';
 
@@ -227,6 +228,7 @@ function OrderedDefeatPopup({
   const mode = constraintMode ?? 'free';
   const minRequired = minSelections ?? validTargets.length;
   const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
+  const odMissionRow = useNeedsScroll();
 
   const charMissionMap = useMemo(() => {
     const map = new Map<string, number>();
@@ -395,10 +397,12 @@ function OrderedDefeatPopup({
           </div>
 
           <motion.div
+            ref={odMissionRow.ref}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1, type: 'spring', stiffness: 180, damping: 18 }}
-            className="flex justify-center gap-4 overflow-x-auto px-2 py-3 mb-4"
+            className="flex justify-center gap-4 px-2 py-3 mb-4"
+            style={{ overflowX: odMissionRow.needsX ? 'auto' : 'hidden' }}
           >
             {missions.map((mission, mIdx) => {
               const oppChars = myPlayer === 'player1' ? mission.player2Characters : mission.player1Characters;
@@ -689,6 +693,7 @@ export function TargetSelector() {
   const selectTarget = useGameStore((s) => s.selectTarget);
   const declineTarget = useGameStore((s) => s.declineTarget);
   const visibleState = useGameStore((s) => s.visibleState);
+  const tsMissionRow = useNeedsScroll();
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
   const minimizeEffectPopup = useUIStore((s) => s.minimizeEffectPopup);
@@ -1742,11 +1747,12 @@ export function TargetSelector() {
 
           
           <motion.div
+            ref={tsMissionRow.ref}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, type: 'spring', stiffness: 180, damping: 18 }}
-            className="flex justify-center gap-4 overflow-x-auto px-2 py-3 mb-4"
-            style={{ maxWidth: '100%' }}
+            className="flex justify-center gap-4 px-2 py-3 mb-4"
+            style={{ maxWidth: '100%', overflowX: tsMissionRow.needsX ? 'auto' : 'hidden' }}
           >
             {visibleState.activeMissions.map((mission, index) => (
               <TargetMissionLane

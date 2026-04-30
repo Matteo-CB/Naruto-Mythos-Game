@@ -1,7 +1,42 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+
+
+export function useNeedsScroll(): {
+  ref: React.RefObject<HTMLDivElement | null>;
+  needsX: boolean;
+  needsY: boolean;
+} {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [needsX, setNeedsX] = useState(false);
+  const [needsY, setNeedsY] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const el = ref.current;
+    if (!el) return;
+    const check = () => {
+      setNeedsX(el.scrollWidth > el.clientWidth + 1);
+      setNeedsY(el.scrollHeight > el.clientHeight + 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    for (const child of Array.from(el.children)) {
+      if (child instanceof HTMLElement) ro.observe(child);
+    }
+    window.addEventListener('resize', check);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', check);
+    };
+  }, []);
+
+  return { ref, needsX, needsY };
+}
 
 
 
@@ -92,8 +127,11 @@ export function PopupCornerFrame({
   fitContent?: boolean;
   maxHeight?: string;
 }) {
+  const { ref, needsY } = useNeedsScroll();
+
   return (
     <motion.div
+      ref={ref}
       initial={{ scale: 0.96, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.05 }}
@@ -107,7 +145,7 @@ export function PopupCornerFrame({
         boxSizing: 'border-box' as const,
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
-        overflowY: 'auto',
+        overflowY: needsY ? 'auto' : 'hidden',
         WebkitOverflowScrolling: 'touch',
       }}
     >
