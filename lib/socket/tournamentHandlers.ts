@@ -127,6 +127,8 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             player1DisconnectCount: 0,
             player2DisconnectCount: 0,
             replayInitialState: null,
+            replayStateSnapshots: null,
+            replaySnapshotLogLengths: null,
             isSealed: false,
             sealedBoosterCount: 5,
             sealedTimer: null,

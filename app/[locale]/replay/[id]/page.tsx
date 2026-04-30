@@ -56,6 +56,8 @@ interface GameData {
     finalMissions?: MissionResult[];
     initialState?: GameState;
     actionHistory?: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
+    stateSnapshots?: GameState[] | null;
+    snapshotLogLengths?: number[] | null;
   } | null;
 }
 
@@ -732,6 +734,8 @@ function VisualReplay({
   backgroundUrl,
   game,
   defaultViewAs,
+  stateSnapshots,
+  snapshotLogLengths,
 }: {
   initialState: GameState;
   actionHistory: Array<{ player: PlayerID; action: GameAction; createdIds?: string[] }>;
@@ -740,6 +744,8 @@ function VisualReplay({
   backgroundUrl?: string;
   game: GameData;
   defaultViewAs?: PlayerID;
+  stateSnapshots?: GameState[] | null;
+  snapshotLogLengths?: number[] | null;
 }) {
   const tr = useTranslations('replay');
   const t = useTranslations();
@@ -756,6 +762,24 @@ function VisualReplay({
   }, []);
 
   const states = useMemo(() => {
+    if (stateSnapshots && stateSnapshots.length > 0) {
+      const fullLog = log;
+      const lengths = snapshotLogLengths ?? [];
+      const result: GameState[] = [
+        { ...initialState, phase: 'start' as GamePhase, log: [] as unknown as GameState['log'] },
+        initialState,
+      ];
+      for (let i = 0; i < stateSnapshots.length; i++) {
+        const snap = stateSnapshots[i];
+        const len = lengths[i] ?? fullLog.length;
+        result.push({
+          ...snap,
+          log: fullLog.slice(0, len) as unknown as GameState['log'],
+        });
+      }
+      return result;
+    }
+
     resetIdCounter();
 
     const turn1Start: GameState = { ...initialState, phase: 'start' as GamePhase };
@@ -1200,7 +1224,7 @@ function VisualReplay({
     }
 
     return result;
-  }, [initialState, actionHistory]);
+  }, [initialState, actionHistory, stateSnapshots, snapshotLogLengths, log]);
 
   const turnStarts = useMemo(() => {
     const starts: Array<{ turn: number; step: number }> = [];
@@ -1683,6 +1707,8 @@ export default function ReplayPage({
         backgroundUrl={gameBackgroundUrl}
         game={game}
         defaultViewAs={defaultViewAs}
+        stateSnapshots={game.gameState.stateSnapshots ?? null}
+        snapshotLogLengths={game.gameState.snapshotLogLengths ?? null}
       />
     );
   }

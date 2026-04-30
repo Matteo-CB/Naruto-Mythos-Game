@@ -42,6 +42,8 @@ export interface RoomData {
   player2DisconnectCount: number;
   
   replayInitialState: GameState | null;
+  replayStateSnapshots: GameState[] | null;
+  replaySnapshotLogLengths: number[] | null;
   
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
@@ -484,6 +486,8 @@ async function finalizeGameEnd(
         })),
         initialState: room.replayInitialState,
         actionHistory: room.gameState.actionHistory ?? [],
+        stateSnapshots: room.replayStateSnapshots ?? null,
+        snapshotLogLengths: room.replaySnapshotLogLengths ?? null,
       } : null;
 
       const gameRecord = await prisma.game.create({
@@ -499,11 +503,16 @@ async function finalizeGameEnd(
           completedAt: new Date(),
           gameState: replayForDb ? (() => {
             try {
-              const serialized = JSON.stringify(replayForDb);
-              
+              let serialized = JSON.stringify(replayForDb);
               if (serialized.length > 12_000_000) {
-                console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), saving without actionHistory`);
-                return JSON.parse(JSON.stringify({ ...replayForDb, actionHistory: [] }));
+                console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping stateSnapshots`);
+                const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
+                serialized = JSON.stringify(trimmed);
+                if (serialized.length > 12_000_000) {
+                  console.warn(`[Socket] Still too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping actionHistory`);
+                  return JSON.parse(JSON.stringify({ ...trimmed, actionHistory: [] }));
+                }
+                return JSON.parse(serialized);
               }
               return JSON.parse(serialized);
             } catch (e) {
@@ -1230,6 +1239,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
           room.gameState = GameEngine.createGame(config);
           room.replayInitialState = null;
+          room.replayStateSnapshots = null;
+          room.replaySnapshotLogLengths = null;
 
 
 
@@ -1309,6 +1320,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         player1DisconnectCount: 0,
         player2DisconnectCount: 0,
         replayInitialState: null,
+        replayStateSnapshots: null,
+        replaySnapshotLogLengths: null,
         isSealed: gameMode === 'sealed',
         sealedBoosterCount: data.sealedBoosterCount ?? 6,
         sealedTimer: null,
@@ -1448,6 +1461,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
             resetIdCounter();
             room.gameState = GameEngine.createGame(config);
             room.replayInitialState = deepClone(room.gameState);
+            room.replayStateSnapshots = [];
+            room.replaySnapshotLogLengths = [];
             const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
             const p2State = GameEngine.getVisibleState(room.gameState, 'player2');
             const playerNames = { player1: hostName, player2: guestName };
@@ -1622,6 +1637,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
         room.gameState = GameEngine.createGame(config);
         
         room.replayInitialState = null;
+          room.replayStateSnapshots = null;
+          room.replaySnapshotLogLengths = null;
 
 
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
@@ -1797,6 +1814,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.replayInitialState = deepClone(room.gameState);
           room.replayInitialState.actionHistory = [];
           room.gameState.actionHistory = [];
+          room.replayStateSnapshots = [];
+          room.replaySnapshotLogLengths = [];
+        }
+
+        if (room.replayStateSnapshots && room.replaySnapshotLogLengths) {
+          room.replaySnapshotLogLengths.push(room.gameState.log.length);
+          const snap = deepClone(room.gameState);
+          snap.log = [];
+          snap.actionHistory = [];
+          room.replayStateSnapshots.push(snap);
         }
 
         
@@ -1999,6 +2026,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.hostDeck = null;
       room.guestDeck = null;
       room.replayInitialState = null;
+          room.replayStateSnapshots = null;
+          room.replaySnapshotLogLengths = null;
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
@@ -2159,6 +2188,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
           player1DisconnectCount: 0,
           player2DisconnectCount: 0,
           replayInitialState: null,
+          replayStateSnapshots: null,
+          replaySnapshotLogLengths: null,
           isSealed: false,
           sealedBoosterCount: 6,
           sealedTimer: null,

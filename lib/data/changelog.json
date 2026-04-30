@@ -1,6 +1,21 @@
 {
   "entries": [
     {
+      "date": "2026-04-30",
+      "title_fr": "Replays fiables : on rejoue désormais l'état réel du serveur, plus une re-simulation",
+      "title_en": "Reliable replays: we now play back the real server state, not a re-simulation",
+      "changes_fr": [
+        "Ancienne approche : le replay rejouait les actions sur l'état initial pour reconstituer chaque étape. Cela divergeait parfois (deux personnages identiques sur la même mission, état affiché qui ne correspondait pas à ce qui s'était passé) à cause de la fragilité du remappage d'identifiants.",
+        "Nouvelle approche : le serveur enregistre désormais une photo de l'état après chaque action pendant la partie. Le replay affiche directement ces photos, sans rien recalculer. Ce qui s'affiche est exactement ce qui était sur le plateau au moment de l'action.",
+        "Les anciennes parties (sans photos) continuent de fonctionner en mode legacy avec la re-simulation. Toutes les nouvelles parties bénéficient du nouveau système. Si la partie devient trop volumineuse, les photos sont retirées en priorité avant le journal d'actions pour respecter la limite MongoDB."
+      ],
+      "changes_en": [
+        "Old approach: the replay re-applied actions to the initial state to reconstruct each step. It sometimes drifted (two identical characters on the same mission, displayed state that did not match what actually happened) because the ID remapping was fragile.",
+        "New approach: the server now stores a state snapshot after every action during the game. The replay shows those snapshots directly, with no recomputation. What you see is exactly what was on the board at that moment.",
+        "Old games without snapshots keep working in legacy mode with re-simulation. All new games use the snapshot system. If a game grows too large for MongoDB, snapshots are dropped first before the action log to respect the size limit."
+      ]
+    },
+    {
       "date": "2026-04-29",
       "title_fr": "Règle officielle du deck de Missions et nouvelle animation d'avant-match",
       "title_en": "Official Mission Deck rule and new pre-game animation",
