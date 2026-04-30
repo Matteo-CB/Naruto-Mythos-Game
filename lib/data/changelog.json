@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-30",
+      "title_fr": "Mobile : popups d'effet scrollables, bouton confirmer toujours accessible (Gaara, etc.)",
+      "title_en": "Mobile: effect popups now scrollable, confirm button always reachable (Gaara, etc.)",
+      "changes_fr": [
+        "Sur mobile, certaines popups d'effet (Gaara qui cible des personnages dans toutes les missions, choix multiples, etc.) dépassaient la hauteur de l'écran et le bouton Confirmer ou Passer se retrouvait masqué sous l'écran. Plusieurs joueurs étaient bloqués et perdaient la partie.",
+        "Toutes les popups respectent maintenant la hauteur du viewport et défilent verticalement à l'intérieur si le contenu est trop grand. Le bouton Confirmer reste toujours accessible.",
+        "Spécifique à Gaara (120, coût 8) : la popup affichait un compteur \"X sur Y sélectionnés\" qui comptait toutes les cibles valides au lieu du maximum réellement atteignable selon la règle (1 personnage par mission). Si vous aviez 2 missions et 3 cibles valides, l'interface affichait \"X sur 3\" alors que vous ne pouviez sélectionner que 2 personnages au maximum. Le compteur reflète maintenant le vrai maximum (2 dans cet exemple), donc le bouton Confirmer s'affiche dès que vous avez choisi votre/vos cible(s)."
+      ],
+      "changes_en": [
+        "On mobile, some effect popups (Gaara targeting characters across missions, multi-target picks, etc.) exceeded screen height and the Confirm or Skip button ended up hidden below the screen. Several players were stuck and lost games as a result.",
+        "All popups now respect viewport height and scroll vertically inside if their content is too tall. The Confirm button always stays reachable.",
+        "Specific to Gaara (120, cost 8): the popup showed a \"X of Y selected\" counter that counted all valid targets instead of the actual rule-bound maximum (1 character per mission). With 2 missions and 3 valid targets, the UI displayed \"X of 3\" even though you could only ever select 2 characters. The counter now reflects the real maximum (2 in that example), so the Confirm button appears as soon as you've made your pick(s)."
+      ]
+    },
+    {
+      "date": "2026-04-30",
       "title_fr": "Orochimaru Permutation (051) : les missions suivantes sont maintenant correctement notées",
       "title_en": "Orochimaru Substitution (051): subsequent missions are now correctly scored",
       "changes_fr": [

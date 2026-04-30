@@ -24,13 +24,13 @@ export function PopupOverlay({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-2"
       onClick={onClickBg}
       style={{
         backgroundColor: 'rgba(4, 4, 8, 0.92)',
-        
         boxShadow: 'inset 0 0 200px 60px rgba(0,0,0,0.4)',
-        overflow: 'hidden',
+        overflow: 'auto',
+        overscrollBehavior: 'contain',
       }}
     >
       {children}
@@ -82,6 +82,7 @@ export function PopupCornerFrame({
   className = '',
   backgroundColor = 'rgba(8, 8, 14, 0.85)',
   fitContent = false,
+  maxHeight,
 }: {
   children: React.ReactNode;
   accentColor?: string;
@@ -90,6 +91,7 @@ export function PopupCornerFrame({
   className?: string;
   backgroundColor?: string;
   fitContent?: boolean;
+  maxHeight?: string;
 }) {
   return (
     <motion.div
@@ -101,10 +103,13 @@ export function PopupCornerFrame({
         maxWidth: `min(${maxWidth}, calc(100vw - 24px))`,
         width: fitContent ? 'fit-content' : '90vw',
         minWidth: fitContent ? '220px' : undefined,
+        maxHeight: maxHeight ?? 'calc(100dvh - 24px)',
         padding,
         boxSizing: 'border-box' as const,
         backgroundColor,
         boxShadow: '0 12px 48px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.04)',
+        overflowY: 'auto',
+        overscrollBehavior: 'contain',
       }}
     >
       <Corner position="tl" color={accentColor} />

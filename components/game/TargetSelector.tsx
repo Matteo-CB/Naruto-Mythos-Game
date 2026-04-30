@@ -228,7 +228,6 @@ function OrderedDefeatPopup({
   const minRequired = minSelections ?? validTargets.length;
   const targetGroups = targetGroupsProp ?? { group1: new Set<string>(), group2: new Set<string>() };
 
-  
   const charMissionMap = useMemo(() => {
     const map = new Map<string, number>();
     missions.forEach((m, mIdx) => {
@@ -236,6 +235,31 @@ function OrderedDefeatPopup({
     });
     return map;
   }, [missions]);
+
+  const practicalMax = useMemo(() => {
+    if (mode === 'one-per-mission') {
+      const missionsWithValidTarget = new Set<number>();
+      for (const t of validTargets) {
+        const mi = charMissionMap.get(t);
+        if (mi !== undefined) missionsWithValidTarget.add(mi);
+      }
+      return missionsWithValidTarget.size;
+    }
+    if (mode === 'all-in-mission') {
+      const counts = new Map<number, number>();
+      for (const t of validTargets) {
+        const mi = charMissionMap.get(t);
+        if (mi !== undefined) counts.set(mi, (counts.get(mi) ?? 0) + 1);
+      }
+      let maxCount = 0;
+      counts.forEach(c => { if (c > maxCount) maxCount = c; });
+      return maxCount;
+    }
+    if (mode === 'naruto133') {
+      return Math.min(2, validTargets.length);
+    }
+    return validTargets.length;
+  }, [mode, validTargets, charMissionMap]);
 
   
   const lockedTargets = useMemo(() => {
@@ -358,7 +382,7 @@ function OrderedDefeatPopup({
   return (
     <AnimatePresence>
       <PopupOverlay>
-        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="20px 16px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
+        <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.25)" maxWidth="90vw" padding="16px 12px" backgroundColor="rgba(4, 4, 8, 0.95)" fitContent>
           <PopupMinimizeX onClick={minimizeEffectPopup} />
           <PopupTitle accentColor="#c4a35a" size="lg">
             {descriptionKey ? t(descriptionKey, descriptionParams ?? {}) : description}
@@ -366,7 +390,7 @@ function OrderedDefeatPopup({
 
           <div className="text-center mb-3">
             <span className="text-xs" style={{ color: '#888' }}>
-              {t('game.effect.orderedDefeat.progress', { selected: String(orderedIds.length), total: String(validTargets.length) })}
+              {t('game.effect.orderedDefeat.progress', { selected: String(orderedIds.length), total: String(practicalMax) })}
             </span>
           </div>
 
