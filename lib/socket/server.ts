@@ -1238,10 +1238,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
           };
 
           room.gameState = GameEngine.createGame(config);
-          room.replayInitialState = null;
-          room.replayStateSnapshots = null;
-          room.replaySnapshotLogLengths = null;
-
+          room.replayInitialState = deepClone(room.gameState);
+          room.replayInitialState.actionHistory = [];
+          room.replayStateSnapshots = [];
+          room.replaySnapshotLogLengths = [];
 
 
           let hostName = 'Player 1';
@@ -1461,6 +1461,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             resetIdCounter();
             room.gameState = GameEngine.createGame(config);
             room.replayInitialState = deepClone(room.gameState);
+            room.replayInitialState.actionHistory = [];
             room.replayStateSnapshots = [];
             room.replaySnapshotLogLengths = [];
             const p1State = GameEngine.getVisibleState(room.gameState, 'player1');
@@ -1635,11 +1636,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         };
 
         room.gameState = GameEngine.createGame(config);
-        
-        room.replayInitialState = null;
-          room.replayStateSnapshots = null;
-          room.replaySnapshotLogLengths = null;
-
+        room.replayInitialState = deepClone(room.gameState);
+        room.replayInitialState.actionHistory = [];
+        room.replayStateSnapshots = [];
+        room.replaySnapshotLogLengths = [];
 
         console.log(`[Socket] Game created, phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
         console.log(`[Socket] P1 hand: ${room.gameState.player1.hand.length}, P2 hand: ${room.gameState.player2.hand.length}`);
@@ -1801,8 +1801,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const oldLogLength = room.gameState.log.length;
         const prevState = room.gameState;
 
-        
-        const prevPhase = room.gameState.phase;
         room.gameState = GameEngine.applyAction(
           room.gameState,
           player,
@@ -1810,14 +1808,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         );
 
         
-        if (prevPhase === 'mulligan' && room.gameState.phase !== 'mulligan' && !room.replayInitialState) {
-          room.replayInitialState = deepClone(room.gameState);
-          room.replayInitialState.actionHistory = [];
-          room.gameState.actionHistory = [];
-          room.replayStateSnapshots = [];
-          room.replaySnapshotLogLengths = [];
-        }
-
         if (room.replayStateSnapshots && room.replaySnapshotLogLengths) {
           room.replaySnapshotLogLengths.push(room.gameState.log.length);
           const snap = deepClone(room.gameState);
@@ -2026,8 +2016,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.hostDeck = null;
       room.guestDeck = null;
       room.replayInitialState = null;
-          room.replayStateSnapshots = null;
-          room.replaySnapshotLogLengths = null;
+      room.replayStateSnapshots = null;
+      room.replaySnapshotLogLengths = null;
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 

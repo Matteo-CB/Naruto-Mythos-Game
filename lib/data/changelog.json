@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-04-30",
+      "title_fr": "Replays 100% fidèles : couverture totale de la partie y compris le mulligan",
+      "title_en": "Replays 100% faithful: full game coverage including the mulligan",
+      "changes_fr": [
+        "Le snapshot du serveur démarre désormais dès la création de la partie, pas seulement après le mulligan. La phase de mulligan est captée image par image et les choix de mulligan sont rejoués visuellement.",
+        "Plus de double frame redondante en début de replay (l'ancien système affichait l'état initial deux fois). Chaque image montrée correspond à un état réel du serveur, dans l'ordre exact des actions.",
+        "Couvre les parties classées et les parties de tournoi de la même manière. Pas d'image synthétique \"phase de début\" inventée par le client."
+      ],
+      "changes_en": [
+        "The server snapshot now starts at game creation, not just after the mulligan. The mulligan phase is captured frame by frame and the mulligan choices are visually replayed.",
+        "No more redundant duplicate frame at the start of the replay (the old system showed the initial state twice). Every shown frame corresponds to a real server state, in the exact order of actions.",
+        "Covers ranked games and tournament games the same way. No synthetic \"start phase\" frame invented by the client."
+      ]
+    },
+    {
+      "date": "2026-04-30",
       "title_fr": "Replays fiables : on rejoue désormais l'état réel du serveur, plus une re-simulation",
       "title_en": "Reliable replays: we now play back the real server state, not a re-simulation",
       "changes_fr": [

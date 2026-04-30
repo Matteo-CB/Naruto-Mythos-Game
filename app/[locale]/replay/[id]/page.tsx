@@ -765,10 +765,7 @@ function VisualReplay({
     if (stateSnapshots && stateSnapshots.length > 0) {
       const fullLog = log;
       const lengths = snapshotLogLengths ?? [];
-      const result: GameState[] = [
-        { ...initialState, phase: 'start' as GamePhase, log: [] as unknown as GameState['log'] },
-        initialState,
-      ];
+      const result: GameState[] = [initialState];
       for (let i = 0; i < stateSnapshots.length; i++) {
         const snap = stateSnapshots[i];
         const len = lengths[i] ?? fullLog.length;
