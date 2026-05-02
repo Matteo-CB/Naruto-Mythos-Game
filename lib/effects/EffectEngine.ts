@@ -18399,10 +18399,17 @@ export class EffectEngine {
     }
 
     if (validMissions.length === 0) {
+      ps.discardPile.push(chosenCard);
+      newState.log = logAction(
+        newState.log, newState.turn, newState.phase, player,
+        'EFFECT',
+        `Sakura Haruno (135): ${chosenCard.name_fr} cannot be played (No Repetition or insufficient chakra), discarded.`,
+        'game.log.effect.sakura135ForcedDiscard',
+        { card: 'SAKURA HARUNO', id: 'KS-135-S', target: chosenCard.name_fr },
+      );
       return newState;
     }
 
-    
     ps.discardPile.push(chosenCard);
 
     if (validMissions.length === 1) {

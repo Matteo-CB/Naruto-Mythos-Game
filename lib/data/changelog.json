@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-01",
+      "title_fr": "Sakura Secret (135) : carte forcée non jouable est défaussée, plus disparue",
+      "title_en": "Sakura Secret (135): forced card that cannot be played is now discarded, no longer vanishes",
+      "changes_fr": [
+        "Quand l'effet de Sakura forçait à jouer une carte qui ne pouvait l'être nulle part (No Repetition ou chakra insuffisant), la carte disparaissait sans aller dans la défausse. Conforme à la règle, elle part maintenant à la défausse."
+      ],
+      "changes_en": [
+        "When Sakura's effect forced a card that could not be played anywhere (No Repetition or not enough chakra), the card vanished instead of going to the discard pile. Per the rules, it now goes to the discard pile."
+      ]
+    },
+    {
+      "date": "2026-05-01",
       "title_fr": "Tournois : timer pre-game, plus de blocage si un joueur ne rejoint pas",
       "title_en": "Tournaments: pre-game timer, no more blocked games if a player doesn't join",
       "changes_fr": [

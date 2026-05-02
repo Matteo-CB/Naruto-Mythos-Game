@@ -266,6 +266,7 @@
         "nameConflictBlocked": "{card} ({id}) : Impossible de jouer {target}, meme nom deja present sur cette mission.",
         "controlReturned": "{card} retourne au proprietaire d'origine (controleur quitte le jeu).",
         "controlReturnedConflict": "{card} retourne au proprietaire mais conflit avec personnage existant — vaincu.",
+        "sakura135ForcedDiscard": "Sakura Haruno ({id}) : {target} ne peut pas etre joue (No Repetition ou chakra insuffisant), defausse.",
         "orochimaru051Pending": "Orochimaru (051) : A perdu cette mission. Choisissez une mission de destination.",
         "revealHiddenReduced": "{card} revele sur mission {mission} pour {cost} chakra (cout reduit de {reduction}).",
         "shino033CostReduction": "{card} ({id}) : Le prochain personnage coute {reduction} chakra de moins.",
