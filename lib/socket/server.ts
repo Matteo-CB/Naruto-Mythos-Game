@@ -44,6 +44,7 @@ export interface RoomData {
   replayInitialState: GameState | null;
   replayStateSnapshots: GameState[] | null;
   replaySnapshotLogLengths: number[] | null;
+  finalized: boolean;
   
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
@@ -255,6 +256,11 @@ async function finalizeGameEnd(
   winReason: 'score' | 'forfeit' | 'timeout' = 'score',
 ): Promise<void> {
   if (!room.gameState) return;
+  if (room.finalized) {
+    console.log(`[Socket] finalizeGameEnd skipped for room ${code}: already finalized`);
+    return;
+  }
+  room.finalized = true;
 
   clearActionTimer(room);
   
@@ -276,7 +282,6 @@ async function finalizeGameEnd(
   const p2Score = room.gameState.player2.missionPoints;
 
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
-  let gameRecordId: string | null = null;
 
   
   try {
@@ -468,9 +473,59 @@ async function finalizeGameEnd(
     }
   }
 
-  
-  try {
-    if (room.hostId && room.guestId) {
+  const replayData = room.gameState ? {
+    log: room.gameState.log,
+    playerNames: {
+      player1: room.hostName ?? 'Player 1',
+      player2: room.guestName ?? 'Player 2',
+    },
+    finalMissions: room.gameState.activeMissions.map(m => ({
+      name_fr: m.card.name_fr,
+      rank: m.rank,
+      basePoints: m.basePoints,
+      rankBonus: m.rankBonus,
+      wonBy: m.wonBy ?? null,
+    })),
+    initialState: room.replayInitialState,
+    actionHistory: room.gameState.actionHistory ?? [],
+  } : null;
+
+  if (room.hostSocket) {
+    io.to(room.hostSocket).emit('game:ended', {
+      winner,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      isRanked: room.isRanked,
+      eloDelta: eloData?.player1Delta ?? null,
+      newElo: eloData?.player1NewElo,
+      totalGames: eloData?.player1TotalGames,
+      winReason,
+      gameId: null,
+      replayData,
+      tournamentId: room.tournamentId ?? null,
+    });
+  }
+  if (room.guestSocket) {
+    io.to(room.guestSocket).emit('game:ended', {
+      winner,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      isRanked: room.isRanked,
+      eloDelta: eloData?.player2Delta ?? null,
+      newElo: eloData?.player2NewElo,
+      totalGames: eloData?.player2TotalGames,
+      winReason,
+      gameId: null,
+      replayData,
+      tournamentId: room.tournamentId ?? null,
+    });
+  }
+
+  broadcastActiveGames(io);
+
+  (async () => {
+    try {
+      if (!room.hostId || !room.guestId) return;
       const replayForDb = room.gameState ? {
         log: room.gameState.log,
         playerNames: {
@@ -490,6 +545,26 @@ async function finalizeGameEnd(
         snapshotLogLengths: room.replaySnapshotLogLengths ?? null,
       } : null;
 
+      const gameState = replayForDb ? (() => {
+        try {
+          let serialized = JSON.stringify(replayForDb);
+          if (serialized.length > 12_000_000) {
+            console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping stateSnapshots`);
+            const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
+            serialized = JSON.stringify(trimmed);
+            if (serialized.length > 12_000_000) {
+              console.warn(`[Socket] Still too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping actionHistory`);
+              return JSON.parse(JSON.stringify({ ...trimmed, actionHistory: [] }));
+            }
+            return JSON.parse(serialized);
+          }
+          return JSON.parse(serialized);
+        } catch (e) {
+          console.error('[Socket] Replay serialization error:', e instanceof Error ? e.message : e);
+          return null;
+        }
+      })() : undefined;
+
       const gameRecord = await prisma.game.create({
         data: {
           player1Id: room.hostId,
@@ -501,93 +576,25 @@ async function finalizeGameEnd(
           player2Score: p2Score,
           eloChange: eloData?.player1Delta ?? 0,
           completedAt: new Date(),
-          gameState: replayForDb ? (() => {
-            try {
-              let serialized = JSON.stringify(replayForDb);
-              if (serialized.length > 12_000_000) {
-                console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping stateSnapshots`);
-                const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
-                serialized = JSON.stringify(trimmed);
-                if (serialized.length > 12_000_000) {
-                  console.warn(`[Socket] Still too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping actionHistory`);
-                  return JSON.parse(JSON.stringify({ ...trimmed, actionHistory: [] }));
-                }
-                return JSON.parse(serialized);
-              }
-              return JSON.parse(serialized);
-            } catch (e) {
-              console.error('[Socket] Replay serialization error:', e instanceof Error ? e.message : e);
-              return null;
-            }
-          })() : undefined,
+          gameState,
         },
       });
-      gameRecordId = gameRecord.id;
-      console.log(`[Socket] Game saved: ${gameRecordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
-      
-      if (room.tournamentId && room.tournamentMatchId && gameRecordId) {
+      const recordId = gameRecord.id;
+      console.log(`[Socket] Game saved: ${recordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
+
+      if (room.hostSocket) io.to(room.hostSocket).emit('game:replay-ready', { gameId: recordId });
+      if (room.guestSocket) io.to(room.guestSocket).emit('game:replay-ready', { gameId: recordId });
+
+      if (room.tournamentId && room.tournamentMatchId) {
         const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
-        handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, gameRecordId).catch(err => {
+        handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, recordId).catch(err => {
           console.error('[Socket] Tournament match end error:', err);
         });
       }
+    } catch (saveErr) {
+      console.error('[Socket] Error saving game record:', saveErr instanceof Error ? saveErr.message : saveErr, saveErr instanceof Error ? saveErr.stack : '');
     }
-  } catch (saveErr) {
-    console.error('[Socket] Error saving game record:', saveErr instanceof Error ? saveErr.message : saveErr, saveErr instanceof Error ? saveErr.stack : '');
-  }
-
-  
-  const replayData = room.gameState ? {
-    log: room.gameState.log,
-    playerNames: {
-      player1: room.hostName ?? 'Player 1',
-      player2: room.guestName ?? 'Player 2',
-    },
-    finalMissions: room.gameState.activeMissions.map(m => ({
-      name_fr: m.card.name_fr,
-      rank: m.rank,
-      basePoints: m.basePoints,
-      rankBonus: m.rankBonus,
-      wonBy: m.wonBy ?? null,
-    })),
-    
-    initialState: room.replayInitialState,
-    actionHistory: room.gameState.actionHistory ?? [],
-  } : null;
-
-  if (room.hostSocket) {
-    io.to(room.hostSocket).emit('game:ended', {
-      winner,
-      player1Score: p1Score,
-      player2Score: p2Score,
-      isRanked: room.isRanked,
-      eloDelta: eloData?.player1Delta ?? null,
-      newElo: eloData?.player1NewElo,
-      totalGames: eloData?.player1TotalGames,
-      winReason,
-      gameId: gameRecordId,
-      replayData,
-      tournamentId: room.tournamentId ?? null,
-    });
-  }
-  if (room.guestSocket) {
-    io.to(room.guestSocket).emit('game:ended', {
-      winner,
-      player1Score: p1Score,
-      player2Score: p2Score,
-      isRanked: room.isRanked,
-      eloDelta: eloData?.player2Delta ?? null,
-      newElo: eloData?.player2NewElo,
-      totalGames: eloData?.player2TotalGames,
-      winReason,
-      gameId: gameRecordId,
-      replayData,
-      tournamentId: room.tournamentId ?? null,
-    });
-  }
-
-  
-  broadcastActiveGames(io);
+  })();
 }
 
 
@@ -1322,6 +1329,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         replayInitialState: null,
         replayStateSnapshots: null,
         replaySnapshotLogLengths: null,
+        finalized: false,
         isSealed: gameMode === 'sealed',
         sealedBoosterCount: data.sealedBoosterCount ?? 6,
         sealedTimer: null,
@@ -2018,6 +2026,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.replayInitialState = null;
       room.replayStateSnapshots = null;
       room.replaySnapshotLogLengths = null;
+      room.finalized = false;
       room.coinFlipDone = { player1: false, player2: false };
       clearActionTimer(room);
 
@@ -2180,6 +2189,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           replayInitialState: null,
           replayStateSnapshots: null,
           replaySnapshotLogLengths: null,
+        finalized: false,
           isSealed: false,
           sealedBoosterCount: 6,
           sealedTimer: null,

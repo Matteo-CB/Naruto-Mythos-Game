@@ -40,7 +40,7 @@ interface SocketStore {
     newElo?: number;
     totalGames?: number;
     winReason?: 'score' | 'forfeit' | 'timeout';
-    gameId?: string;
+    gameId?: string | null;
     replayData?: unknown;
     tournamentId?: string | null;
   } | null;
@@ -403,17 +403,23 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           isRanked?: boolean;
           eloDelta?: number | null;
           winReason?: 'score' | 'forfeit' | 'timeout';
-          gameId?: string;
+          gameId?: string | null;
           replayData?: unknown;
           tournamentId?: string | null;
         }) => {
           console.log('[Socket] Game ended, winner:', data.winner, 'reason:', data.winReason, 'gameId:', data.gameId, 'tournament:', data.tournamentId ?? 'none');
-          
           const resyncT = get()._resyncTimer;
           if (resyncT) { clearInterval(resyncT); }
           set({ gameEnded: true, gameResult: data, actionDeadline: null, _resyncTimer: null, opponentDisconnected: false, opponentDisconnectDeadline: null });
         },
       );
+
+      socket.on('game:replay-ready', (data: { gameId: string }) => {
+        const result = get().gameResult;
+        if (result) {
+          set({ gameResult: { ...result, gameId: data.gameId } });
+        }
+      });
 
       
 

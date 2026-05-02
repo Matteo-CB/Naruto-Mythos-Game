@@ -1,6 +1,19 @@
 {
   "entries": [
     {
+      "date": "2026-05-01",
+      "title_fr": "Forfait : un seul clic suffit, plus de défaites en chaîne",
+      "title_en": "Forfeit: one click is enough, no more chained losses",
+      "changes_fr": [
+        "Cliquer plusieurs fois sur Abandonner ne crée plus plusieurs parties terminées avec plusieurs défaites. La fin de partie n'est traitée qu'une seule fois par room.",
+        "L'écran de fin de partie s'affiche dès que l'ELO est calculé, sans attendre la sauvegarde complète de la partie. Le bouton de replay devient actif quelques secondes plus tard."
+      ],
+      "changes_en": [
+        "Clicking Forfeit multiple times no longer creates multiple finished games with stacked losses. End-of-game is processed only once per room.",
+        "The end-of-game screen now appears as soon as ELO is computed, without waiting for the full game record save. The replay button becomes active a few seconds later."
+      ]
+    },
+    {
       "date": "2026-04-30",
       "title_fr": "Phase de notation des missions : plus de blocage en fin de partie",
       "title_en": "Mission scoring phase: no more blocked games at the end",

@@ -129,6 +129,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             replayInitialState: null,
             replayStateSnapshots: null,
             replaySnapshotLogLengths: null,
+            finalized: false,
             isSealed: false,
             sealedBoosterCount: 5,
             sealedTimer: null,
