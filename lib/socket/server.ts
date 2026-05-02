@@ -45,6 +45,7 @@ export interface RoomData {
   replayStateSnapshots: GameState[] | null;
   replaySnapshotLogLengths: number[] | null;
   finalized: boolean;
+  pendingEloHistoryIds?: string[];
   
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
@@ -392,9 +393,9 @@ async function finalizeGameEnd(
         
         const p1Result: 'win' | 'loss' = winner === 'player1' ? 'win' : 'loss';
         const p2Result: 'win' | 'loss' = winner === 'player2' ? 'win' : 'loss';
-        prisma.eloHistory.createMany({
-          data: [
-            {
+        const [e1, e2] = await Promise.all([
+          prisma.eloHistory.create({
+            data: {
               userId: room.hostId!,
               opponentId: room.guestId!,
               opponentUsername: player2.username,
@@ -407,7 +408,9 @@ async function finalizeGameEnd(
               opponentScore: p2Score,
               isRanked: true,
             },
-            {
+          }).catch((err) => { console.warn('[Socket] EloHistory write 1 failed:', err instanceof Error ? err.message : err); return null; }),
+          prisma.eloHistory.create({
+            data: {
               userId: room.guestId!,
               opponentId: room.hostId!,
               opponentUsername: player1.username,
@@ -420,10 +423,9 @@ async function finalizeGameEnd(
               opponentScore: p1Score,
               isRanked: true,
             },
-          ],
-        }).catch((err) => {
-          console.warn('[Socket] EloHistory write failed:', err instanceof Error ? err.message : err);
-        });
+          }).catch((err) => { console.warn('[Socket] EloHistory write 2 failed:', err instanceof Error ? err.message : err); return null; }),
+        ]);
+        room.pendingEloHistoryIds = [e1?.id, e2?.id].filter((x): x is string => !!x);
 
         
         syncDiscordRole(room.hostId).catch(() => {});
@@ -524,75 +526,97 @@ async function finalizeGameEnd(
   broadcastActiveGames(io);
 
   (async () => {
-    try {
-      if (!room.hostId || !room.guestId) return;
-      const replayForDb = room.gameState ? {
-        log: room.gameState.log,
-        playerNames: {
-          player1: room.hostName ?? 'Player 1',
-          player2: room.guestName ?? 'Player 2',
-        },
-        finalMissions: room.gameState.activeMissions.map(m => ({
-          name_fr: m.card.name_fr,
-          rank: m.rank,
-          basePoints: m.basePoints,
-          rankBonus: m.rankBonus,
-          wonBy: m.wonBy ?? null,
-        })),
-        initialState: room.replayInitialState,
-        actionHistory: room.gameState.actionHistory ?? [],
-        stateSnapshots: room.replayStateSnapshots ?? null,
-        snapshotLogLengths: room.replaySnapshotLogLengths ?? null,
-      } : null;
+    if (!room.hostId || !room.guestId) return;
 
-      const gameState = replayForDb ? (() => {
-        try {
-          let serialized = JSON.stringify(replayForDb);
-          if (serialized.length > 12_000_000) {
-            console.warn(`[Socket] Replay data too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping stateSnapshots`);
-            const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
-            serialized = JSON.stringify(trimmed);
-            if (serialized.length > 12_000_000) {
-              console.warn(`[Socket] Still too large (${(serialized.length / 1_000_000).toFixed(1)}MB), dropping actionHistory`);
-              return JSON.parse(JSON.stringify({ ...trimmed, actionHistory: [] }));
-            }
-            return JSON.parse(serialized);
-          }
-          return JSON.parse(serialized);
-        } catch (e) {
-          console.error('[Socket] Replay serialization error:', e instanceof Error ? e.message : e);
-          return null;
-        }
-      })() : undefined;
+    const replayForDb = room.gameState ? {
+      log: room.gameState.log,
+      playerNames: {
+        player1: room.hostName ?? 'Player 1',
+        player2: room.guestName ?? 'Player 2',
+      },
+      finalMissions: room.gameState.activeMissions.map(m => ({
+        name_fr: m.card.name_fr,
+        rank: m.rank,
+        basePoints: m.basePoints,
+        rankBonus: m.rankBonus,
+        wonBy: m.wonBy ?? null,
+      })),
+      initialState: room.replayInitialState,
+      actionHistory: room.gameState.actionHistory ?? [],
+      stateSnapshots: room.replayStateSnapshots ?? null,
+      snapshotLogLengths: room.replaySnapshotLogLengths ?? null,
+    } : null;
 
-      const gameRecord = await prisma.game.create({
-        data: {
-          player1Id: room.hostId,
-          player2Id: room.guestId,
-          isAiGame: false,
-          status: 'completed',
-          winnerId: winner === 'player1' ? room.hostId : room.guestId,
-          player1Score: p1Score,
-          player2Score: p2Score,
-          eloChange: eloData?.player1Delta ?? 0,
-          completedAt: new Date(),
-          gameState,
-        },
+    const baseData = {
+      player1Id: room.hostId,
+      player2Id: room.guestId,
+      isAiGame: false,
+      status: 'completed',
+      winnerId: winner === 'player1' ? room.hostId : room.guestId,
+      player1Score: p1Score,
+      player2Score: p2Score,
+      eloChange: eloData?.player1Delta ?? 0,
+      completedAt: new Date(),
+    };
+
+    const tryStates: Array<() => unknown> = [];
+    if (replayForDb) {
+      tryStates.push(() => {
+        const s = JSON.stringify(replayForDb);
+        if (s.length > 8_000_000) throw new Error(`size ${(s.length / 1_000_000).toFixed(1)}MB`);
+        return JSON.parse(s);
       });
-      const recordId = gameRecord.id;
-      console.log(`[Socket] Game saved: ${recordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
+      tryStates.push(() => {
+        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
+        const s = JSON.stringify(trimmed);
+        if (s.length > 8_000_000) throw new Error(`size ${(s.length / 1_000_000).toFixed(1)}MB`);
+        return JSON.parse(s);
+      });
+      tryStates.push(() => {
+        const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null, actionHistory: [], log: replayForDb.log.slice(-200) };
+        return JSON.parse(JSON.stringify(trimmed));
+      });
+    }
+    tryStates.push(() => null);
 
-      if (room.hostSocket) io.to(room.hostSocket).emit('game:replay-ready', { gameId: recordId });
-      if (room.guestSocket) io.to(room.guestSocket).emit('game:replay-ready', { gameId: recordId });
-
-      if (room.tournamentId && room.tournamentMatchId) {
-        const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
-        handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, recordId).catch(err => {
-          console.error('[Socket] Tournament match end error:', err);
-        });
+    let recordId: string | null = null;
+    let lastErr: unknown = null;
+    for (let i = 0; i < tryStates.length; i++) {
+      try {
+        const gameState = tryStates[i]();
+        const record = await prisma.game.create({ data: { ...baseData, gameState: gameState ?? undefined } });
+        recordId = record.id;
+        if (i > 0) console.warn(`[Socket] Game saved on attempt ${i + 1} (replay data trimmed)`);
+        break;
+      } catch (err) {
+        lastErr = err;
       }
-    } catch (saveErr) {
-      console.error('[Socket] Error saving game record:', saveErr instanceof Error ? saveErr.message : saveErr, saveErr instanceof Error ? saveErr.stack : '');
+    }
+
+    if (!recordId) {
+      console.error('[Socket] All Game.create attempts failed:', lastErr instanceof Error ? lastErr.message : lastErr);
+      return;
+    }
+
+    console.log(`[Socket] Game saved: ${recordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
+
+    if (room.pendingEloHistoryIds && room.pendingEloHistoryIds.length > 0) {
+      await prisma.eloHistory.updateMany({
+        where: { id: { in: room.pendingEloHistoryIds } },
+        data: { gameId: recordId },
+      }).catch((err) => {
+        console.warn('[Socket] EloHistory link to gameId failed:', err instanceof Error ? err.message : err);
+      });
+    }
+
+    if (room.hostSocket) io.to(room.hostSocket).emit('game:replay-ready', { gameId: recordId });
+    if (room.guestSocket) io.to(room.guestSocket).emit('game:replay-ready', { gameId: recordId });
+
+    if (room.tournamentId && room.tournamentMatchId) {
+      const tournamentWinnerId = winner === 'player1' ? room.hostId : room.guestId!;
+      handleTournamentMatchEnd(io, room.tournamentId, room.tournamentMatchId, tournamentWinnerId, recordId).catch(err => {
+        console.error('[Socket] Tournament match end error:', err);
+      });
     }
   })();
 }

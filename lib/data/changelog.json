@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-01",
+      "title_fr": "Sauvegarde des parties plus fiable : replays disponibles plus souvent",
+      "title_en": "Game saves more reliable: replays available more often",
+      "changes_fr": [
+        "Beaucoup de parties ne créaient pas de sauvegarde, donc pas de replay et pas d'entrée d'historique cliquable. Le serveur essaie désormais plusieurs niveaux de réduction de taille avant d'abandonner (snapshots, journal, etc.).",
+        "Les entrées d'historique ELO sont maintenant liées à leur partie sauvegardée, ce qui permet d'ouvrir le replay depuis le profil."
+      ],
+      "changes_en": [
+        "Many games failed to create a save record, leaving no replay and no clickable history entry. The server now tries multiple levels of payload trimming before giving up (snapshots, log, etc.).",
+        "ELO history entries are now linked to their saved game, so replays can be opened directly from the profile."
+      ]
+    },
+    {
+      "date": "2026-05-01",
       "title_fr": "Forfait : un seul clic suffit, plus de défaites en chaîne",
       "title_en": "Forfeit: one click is enough, no more chained losses",
       "changes_fr": [
