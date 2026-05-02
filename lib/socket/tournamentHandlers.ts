@@ -156,6 +156,24 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
         io.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
           matchId, status: 'in_progress', roomCode,
         });
+
+        const createdRoom = rooms.get(roomCode);
+        if (createdRoom && !createdRoom.tournamentJoinTimer) {
+          const TOURNAMENT_JOIN_TIMEOUT_MS = 5 * 60_000;
+          createdRoom.tournamentJoinDeadline = Date.now() + TOURNAMENT_JOIN_TIMEOUT_MS;
+          createdRoom.tournamentJoinTimer = setTimeout(async () => {
+            const r = rooms.get(roomCode);
+            if (!r) return;
+            if (r.gameState && r.gameState.phase !== 'mulligan') return;
+            const hostJoined = !!r.hostSocket;
+            const guestJoined = !!r.guestSocket;
+            if (hostJoined && guestJoined) return;
+            const absentPlayerId = !hostJoined ? r.hostId : r.guestId;
+            if (!absentPlayerId) return;
+            console.log(`[Tournament] Match ${matchId} forfeit: player ${absentPlayerId} did not join within ${TOURNAMENT_JOIN_TIMEOUT_MS}ms`);
+            await handleMatchForfeit(io, tournamentId, matchId, absentPlayerId);
+          }, TOURNAMENT_JOIN_TIMEOUT_MS);
+        }
       }
     } catch (err) {
       console.error('[Tournament] Ready handler error:', err);

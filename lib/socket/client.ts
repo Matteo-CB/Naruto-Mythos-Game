@@ -59,6 +59,7 @@ interface SocketStore {
 
   
   isSealedRoom: boolean;
+  tournamentMatchRoom: boolean;
   sealedBoosters: unknown[] | null;
   sealedAllCards: unknown[] | null;
   sealedDeckSubmitted: boolean;
@@ -136,6 +137,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   gameResult: null,
   actionDeadline: null,
   isSealedRoom: false,
+  tournamentMatchRoom: false,
   publicRooms: [],
   maintenanceWarning: false,
   rematchState: 'none',
@@ -268,6 +270,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       socket.on('room:created', (data: { code: string }) => {
         console.log('[Socket] Room created:', data.code);
         set({ roomCode: data.code, playerRole: 'player1' });
+      });
+
+      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null }) => {
+        console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none');
+        set({ roomCode: data.code, playerRole: data.playerRole, tournamentMatchRoom: !!data.tournamentId });
       });
 
       socket.on('room:player-joined', () => {
@@ -665,6 +672,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         maintenanceWarning: false,
         rematchState: 'none',
         isSealedRoom: false,
+        tournamentMatchRoom: false,
         sealedBoosters: null,
         sealedAllCards: null,
         sealedDeckSubmitted: false,

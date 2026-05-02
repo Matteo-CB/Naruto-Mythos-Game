@@ -47,6 +47,7 @@ export default function PlayOnlinePage() {
     error,
     bannedCardsError,
     publicRooms,
+    tournamentMatchRoom,
     connect,
     disconnect,
     createRoom,
@@ -241,7 +242,13 @@ export default function PlayOnlinePage() {
   const rankedRooms = publicRooms.filter((r) => r.gameMode === 'ranked');
 
   
-  const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards;
+  const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards && !tournamentMatchRoom;
+
+  useEffect(() => {
+    if (tournamentMatchRoom && !deckSelected) {
+      setDeckSelected(true);
+    }
+  }, [tournamentMatchRoom, deckSelected]);
 
   const modeStyle = (mode: GameMode) => ({
     backgroundColor: selectedMode === mode ? '#1a1a1a' : '#0a0a0a',

@@ -46,6 +46,10 @@ export interface RoomData {
   replaySnapshotLogLengths: number[] | null;
   finalized: boolean;
   pendingEloHistoryIds?: string[];
+  mulliganTimer?: ReturnType<typeof setTimeout> | null;
+  mulliganDeadline?: number | null;
+  tournamentJoinTimer?: ReturnType<typeof setTimeout> | null;
+  tournamentJoinDeadline?: number | null;
   
   isSealed: boolean;
   sealedBoosterCount: 4 | 5 | 6;
@@ -71,6 +75,8 @@ export interface RoomData {
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
+const MULLIGAN_TIMEOUT_MS = 90_000; // 90 seconds for the mulligan + edge phase
+const TOURNAMENT_JOIN_TIMEOUT_MS = 5 * 60_000; // 5 minutes after room creation to actually join and start
 const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
 const DISCONNECT_GRACE_MS = 120_000; // 2 minutes before disconnect = forfeit
@@ -246,6 +252,16 @@ function clearActionTimer(room: RoomData): void {
     clearTimeout(room.actionTimer);
     room.actionTimer = null;
     room.timerDeadline = null;
+  }
+  if (room.mulliganTimer) {
+    clearTimeout(room.mulliganTimer);
+    room.mulliganTimer = null;
+    room.mulliganDeadline = null;
+  }
+  if (room.tournamentJoinTimer) {
+    clearTimeout(room.tournamentJoinTimer);
+    room.tournamentJoinTimer = null;
+    room.tournamentJoinDeadline = null;
   }
 }
 
@@ -622,17 +638,62 @@ async function finalizeGameEnd(
 }
 
 
+function startMulliganTimer(
+  room: RoomData,
+  code: string,
+  io: SocketIOServer,
+): void {
+  if (room.mulliganTimer) {
+    clearTimeout(room.mulliganTimer);
+    room.mulliganTimer = null;
+  }
+  if (!room.gameState || room.gameState.phase !== 'mulligan') return;
+  const deadline = Date.now() + MULLIGAN_TIMEOUT_MS;
+  room.mulliganDeadline = deadline;
+  if (room.hostSocket) io.to(room.hostSocket).emit('game:mulligan-deadline', { deadline, durationMs: MULLIGAN_TIMEOUT_MS });
+  if (room.guestSocket) io.to(room.guestSocket).emit('game:mulligan-deadline', { deadline, durationMs: MULLIGAN_TIMEOUT_MS });
+  room.mulliganTimer = setTimeout(async () => {
+    if (!rooms.has(code)) return;
+    if (!room.gameState || room.gameState.phase !== 'mulligan') return;
+    const p1Done = room.gameState.player1.hasMulliganed;
+    const p2Done = room.gameState.player2.hasMulliganed;
+    console.log(`[Socket] Mulligan timeout in room ${code} | p1Done=${p1Done} p2Done=${p2Done}`);
+    if (!p1Done && !p2Done) {
+      try { room.gameState = GameEngine.applyAction(room.gameState, 'player1', { type: 'MULLIGAN', doMulligan: false }); } catch { /* ignore */ }
+      try { room.gameState = GameEngine.applyAction(room.gameState, 'player2', { type: 'MULLIGAN', doMulligan: false }); } catch { /* ignore */ }
+      broadcastState(room, io);
+      if (room.gameState.phase === 'action') startActionTimer(room, code, io);
+      return;
+    }
+    const absent: 'player1' | 'player2' | null = !p1Done ? 'player1' : !p2Done ? 'player2' : null;
+    if (!absent) return;
+    console.log(`[Socket] Auto-forfeit ${absent} in room ${code} (mulligan timeout)`);
+    room.gameState = GameEngine.applyAction(room.gameState, absent, { type: 'FORFEIT', reason: 'timeout' });
+    broadcastState(room, io);
+    await finalizeGameEnd(room, code, io, 'timeout');
+  }, MULLIGAN_TIMEOUT_MS);
+}
+
+function clearMulliganTimer(room: RoomData): void {
+  if (room.mulliganTimer) {
+    clearTimeout(room.mulliganTimer);
+    room.mulliganTimer = null;
+  }
+  room.mulliganDeadline = null;
+}
+
 function startActionTimer(
   room: RoomData,
   code: string,
   io: SocketIOServer,
 ): void {
   clearActionTimer(room);
+  clearMulliganTimer(room);
 
   if (!room.gameState) return;
-  
+
   if (room.gameState.phase !== 'action') return;
-  
+
   if (!room.timerEnabled) return;
 
   const activePlayer = room.gameState.activePlayer;
@@ -1503,7 +1564,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
             io.to(room.guestSocket!).emit('game:state-update', { visibleState: p2State, playerRole: 'player2', playerNames });
             io.to(data.code).emit('game:started');
             console.log(`[Socket] Tournament game auto-started in room ${data.code}`);
-            
+
+            if (room.gameState && room.gameState.phase === 'mulligan') {
+              startMulliganTimer(room, data.code, io);
+            }
+
             const matchTimeLimit = 1800000;
             (room as any).tournamentGameTimer = setTimeout(async () => {
               if (!rooms.has(data.code) || !room.gameState || room.gameState.phase === 'gameOver') return;
@@ -1723,10 +1788,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] Game started event emitted to room ${code}`);
         broadcastActiveGames(io);
 
-        
-        
         if (room.gameState.phase === 'action') {
           startActionTimer(room, code, io);
+        } else if (room.gameState.phase === 'mulligan') {
+          startMulliganTimer(room, code, io);
         }
 
         

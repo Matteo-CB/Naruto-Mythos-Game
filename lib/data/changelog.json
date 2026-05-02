@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-01",
+      "title_fr": "Tournois : timer pre-game, plus de blocage si un joueur ne rejoint pas",
+      "title_en": "Tournaments: pre-game timer, no more blocked games if a player doesn't join",
+      "changes_fr": [
+        "Une fois le match lancé, un timer surveille la phase d'avant-match. Si un joueur ne rejoint pas la salle dans les 5 minutes, il est forfait automatiquement.",
+        "La phase mulligan a aussi un timer (90 secondes). Si un joueur reste inactif, il est forfait automatiquement et le match continue.",
+        "Plus de demande de choix de deck dans une salle de tournoi : le deck est déjà fixé à l'inscription / au sealed."
+      ],
+      "changes_en": [
+        "Once a tournament match starts, a pre-game timer watches the room. If a player does not join within 5 minutes, they auto-forfeit.",
+        "The mulligan phase also has a timer (90 seconds). If a player stays inactive, they auto-forfeit and the match proceeds.",
+        "No more deck-selection prompt in a tournament room: the deck is already locked from registration / sealed."
+      ]
+    },
+    {
+      "date": "2026-05-01",
       "title_fr": "Sauvegarde des parties plus fiable : replays disponibles plus souvent",
       "title_en": "Game saves more reliable: replays available more often",
       "changes_fr": [
