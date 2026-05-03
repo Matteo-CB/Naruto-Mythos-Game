@@ -51,48 +51,66 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const gameFilter = {
-      OR: [{ player1Id: user.id }, { player2Id: user.id }],
-      status: 'completed' as const,
-    };
+    const baseGameSelect = {
+      id: true,
+      player1: { select: { username: true } },
+      player2: { select: { username: true } },
+      isAiGame: true,
+      aiDifficulty: true,
+      winnerId: true,
+      player1Score: true,
+      player2Score: true,
+      eloChange: true,
+      completedAt: true,
+    } as const;
 
-    
-    
-    const [totalGames, games, gamesWithReplay] = await Promise.all([
-      prisma.game.count({ where: gameFilter }),
+    const limit = page * perPage;
+
+    const [countAsP1, countAsP2, gamesAsP1, gamesAsP2] = await Promise.all([
+      prisma.game.count({ where: { player1Id: user.id, status: 'completed' } }),
+      prisma.game.count({ where: { player2Id: user.id, status: 'completed' } }),
       prisma.game.findMany({
-        where: gameFilter,
-        select: {
-          id: true,
-          player1: { select: { username: true } },
-          player2: { select: { username: true } },
-          isAiGame: true,
-          aiDifficulty: true,
-          winnerId: true,
-          player1Score: true,
-          player2Score: true,
-          eloChange: true,
-          completedAt: true,
-        },
+        where: { player1Id: user.id, status: 'completed' },
+        select: baseGameSelect,
         orderBy: { completedAt: 'desc' },
-        skip: (page - 1) * perPage,
-        take: perPage,
+        take: limit,
       }),
       prisma.game.findMany({
-        where: { ...gameFilter, gameState: { not: null } },
-        select: { id: true },
+        where: { player2Id: user.id, status: 'completed' },
+        select: baseGameSelect,
+        orderBy: { completedAt: 'desc' },
+        take: limit,
       }),
     ]);
 
-    const replayIds = new Set(gamesWithReplay.map((g) => g.id));
+    const totalGames = countAsP1 + countAsP2;
+    const merged = [...gamesAsP1, ...gamesAsP2].sort((a, b) => {
+      const ta = a.completedAt ? a.completedAt.getTime() : 0;
+      const tb = b.completedAt ? b.completedAt.getTime() : 0;
+      return tb - ta;
+    });
+    const pageGames = merged.slice((page - 1) * perPage, limit);
 
-    const recentGames = games.map((game) => ({
+    let replayIds = new Set<string>();
+    if (pageGames.length > 0) {
+      const withReplay = await prisma.game.findMany({
+        where: {
+          id: { in: pageGames.map((g) => g.id) },
+          gameState: { not: null },
+        },
+        select: { id: true },
+      });
+      replayIds = new Set(withReplay.map((g) => g.id));
+    }
+
+    const recentGames = pageGames.map((game) => ({
       ...game,
       hasReplay: replayIds.has(game.id),
     }));
 
     return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });
-  } catch {
+  } catch (err) {
+    console.error('[profile] error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

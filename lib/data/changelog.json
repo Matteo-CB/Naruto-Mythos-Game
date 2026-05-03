@@ -1,6 +1,17 @@
 {
   "entries": [
     {
+      "date": "2026-05-02",
+      "title_fr": "Profils : page accessible pour tous les joueurs, plus d'erreur 'Joueur introuvable'",
+      "title_en": "Profiles: page works for every player, no more 'Player not found' error",
+      "changes_fr": [
+        "Certains profils renvoyaient 'Joueur introuvable' à cause d'une requête trop lourde côté base de données. La requête a été réécrite et les profils s'ouvrent désormais pour tout le monde."
+      ],
+      "changes_en": [
+        "Some profiles returned 'Player not found' because of a database query that was too heavy. The query has been rewritten and profiles now open for everyone."
+      ]
+    },
+    {
       "date": "2026-05-01",
       "title_fr": "Sakura Secret (135) : carte forcée non jouable est défaussée, plus disparue",
       "title_en": "Sakura Secret (135): forced card that cannot be played is now discarded, no longer vanishes",
