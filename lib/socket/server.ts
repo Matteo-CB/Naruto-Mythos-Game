@@ -460,8 +460,16 @@ async function finalizeGameEnd(
     
     if (errMsg.includes('quota') || errMsg.includes('AtlasError')) {
       try {
-        console.log('[Socket] DB quota exceeded — force deleting old games and retrying ELO...');
-        await prisma.game.deleteMany({ where: { status: 'completed' } });
+        console.log('[Socket] DB quota exceeded — deleting oldest 200 completed games and retrying ELO...');
+        const oldest = await prisma.game.findMany({
+          where: { status: 'completed' },
+          orderBy: { completedAt: 'asc' },
+          select: { id: true },
+          take: 200,
+        });
+        if (oldest.length > 0) {
+          await prisma.game.deleteMany({ where: { id: { in: oldest.map((g) => g.id) } } });
+        }
         if (room.isRanked && room.hostId && room.guestId) {
           const [p1Retry, p2Retry] = await Promise.all([
             prisma.user.findUnique({ where: { id: room.hostId } }),
@@ -597,6 +605,7 @@ async function finalizeGameEnd(
 
     let recordId: string | null = null;
     let lastErr: unknown = null;
+    let quotaRescueDone = false;
     for (let i = 0; i < tryStates.length; i++) {
       try {
         const gameState = tryStates[i]();
@@ -606,6 +615,26 @@ async function finalizeGameEnd(
         break;
       } catch (err) {
         lastErr = err;
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!quotaRescueDone && (msg.includes('quota') || msg.includes('AtlasError'))) {
+          quotaRescueDone = true;
+          try {
+            const oldest = await prisma.game.findMany({
+              where: { status: 'completed' },
+              orderBy: { completedAt: 'asc' },
+              select: { id: true },
+              take: 200,
+            });
+            if (oldest.length > 0) {
+              await prisma.game.deleteMany({ where: { id: { in: oldest.map((g) => g.id) } } });
+              console.warn(`[Socket] Quota rescue: deleted ${oldest.length} oldest games, retrying save`);
+              i = -1;
+              continue;
+            }
+          } catch (rescueErr) {
+            console.error('[Socket] Quota rescue failed:', rescueErr instanceof Error ? rescueErr.message : rescueErr);
+          }
+        }
       }
     }
 

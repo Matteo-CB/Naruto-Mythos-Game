@@ -14,7 +14,6 @@ export async function GET(
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
     const perPage = 20;
 
-    
     const now = Date.now();
     if (now - lastCleanup > 5 * 60 * 1000) {
       lastCleanup = now;
@@ -37,11 +36,7 @@ export async function GET(
         discordUsername: true,
         createdAt: true,
         decks: {
-          select: {
-            id: true,
-            name: true,
-            createdAt: true,
-          },
+          select: { id: true, name: true, createdAt: true },
           orderBy: { updatedAt: 'desc' },
         },
       },
@@ -51,62 +46,112 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const baseGameSelect = {
-      id: true,
-      player1: { select: { username: true } },
-      player2: { select: { username: true } },
-      isAiGame: true,
-      aiDifficulty: true,
-      winnerId: true,
-      player1Score: true,
-      player2Score: true,
-      eloChange: true,
-      completedAt: true,
-    } as const;
-
     const limit = page * perPage;
 
-    const [countAsP1, countAsP2, gamesAsP1, gamesAsP2] = await Promise.all([
-      prisma.game.count({ where: { player1Id: user.id, status: 'completed' } }),
-      prisma.game.count({ where: { player2Id: user.id, status: 'completed' } }),
+    const [totalRanked, eloRows, aiGamesAsP1, aiGamesAsP2] = await Promise.all([
+      prisma.eloHistory.count({ where: { userId: user.id } }),
+      prisma.eloHistory.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      }),
       prisma.game.findMany({
-        where: { player1Id: user.id, status: 'completed' },
-        select: baseGameSelect,
+        where: { player1Id: user.id, status: 'completed', isAiGame: true },
+        select: {
+          id: true,
+          isAiGame: true,
+          aiDifficulty: true,
+          winnerId: true,
+          player1Score: true,
+          player2Score: true,
+          eloChange: true,
+          completedAt: true,
+        },
         orderBy: { completedAt: 'desc' },
         take: limit,
       }),
       prisma.game.findMany({
-        where: { player2Id: user.id, status: 'completed' },
-        select: baseGameSelect,
+        where: { player2Id: user.id, status: 'completed', isAiGame: true },
+        select: {
+          id: true,
+          isAiGame: true,
+          aiDifficulty: true,
+          winnerId: true,
+          player1Score: true,
+          player2Score: true,
+          eloChange: true,
+          completedAt: true,
+        },
         orderBy: { completedAt: 'desc' },
         take: limit,
       }),
     ]);
 
-    const totalGames = countAsP1 + countAsP2;
-    const merged = [...gamesAsP1, ...gamesAsP2].sort((a, b) => {
-      const ta = a.completedAt ? a.completedAt.getTime() : 0;
-      const tb = b.completedAt ? b.completedAt.getTime() : 0;
-      return tb - ta;
+    const candidateGameIds = eloRows
+      .map((r) => r.gameId)
+      .filter((x): x is string => !!x);
+
+    const existingGames = candidateGameIds.length > 0
+      ? await prisma.game.findMany({
+          where: { id: { in: candidateGameIds } },
+          select: { id: true, gameState: true },
+        })
+      : [];
+    const replayableSet = new Set(
+      existingGames.filter((g) => g.gameState !== null).map((g) => g.id),
+    );
+
+    type Entry = {
+      id: string;
+      player1: { username: string } | null;
+      player2: { username: string } | null;
+      isAiGame: boolean;
+      aiDifficulty: string | null;
+      winnerId: string | null;
+      player1Score: number;
+      player2Score: number;
+      eloChange: number | null;
+      completedAt: string;
+      hasReplay: boolean;
+    };
+
+    const pvpEntries: Entry[] = eloRows.map((r) => {
+      const won = r.result === 'win';
+      const isP1 = true;
+      return {
+        id: r.gameId ?? r.id,
+        player1: { username: user.username },
+        player2: { username: r.opponentUsername },
+        isAiGame: false,
+        aiDifficulty: null,
+        winnerId: won ? user.id : (r.opponentId ?? null),
+        player1Score: r.myScore,
+        player2Score: r.opponentScore,
+        eloChange: isP1 ? r.delta : -r.delta,
+        completedAt: r.createdAt.toISOString(),
+        hasReplay: r.gameId ? replayableSet.has(r.gameId) : false,
+      };
     });
-    const pageGames = merged.slice((page - 1) * perPage, limit);
 
-    let replayIds = new Set<string>();
-    if (pageGames.length > 0) {
-      const withReplay = await prisma.game.findMany({
-        where: {
-          id: { in: pageGames.map((g) => g.id) },
-          gameState: { not: null },
-        },
-        select: { id: true },
-      });
-      replayIds = new Set(withReplay.map((g) => g.id));
-    }
-
-    const recentGames = pageGames.map((game) => ({
-      ...game,
-      hasReplay: replayIds.has(game.id),
+    const aiEntries: Entry[] = [...aiGamesAsP1, ...aiGamesAsP2].map((g) => ({
+      id: g.id,
+      player1: { username: user.username },
+      player2: null,
+      isAiGame: true,
+      aiDifficulty: g.aiDifficulty,
+      winnerId: g.winnerId,
+      player1Score: g.player1Score,
+      player2Score: g.player2Score,
+      eloChange: g.eloChange,
+      completedAt: g.completedAt ? g.completedAt.toISOString() : new Date(0).toISOString(),
+      hasReplay: false,
     }));
+
+    const merged = [...pvpEntries, ...aiEntries].sort(
+      (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+    );
+    const totalGames = totalRanked + aiGamesAsP1.length + aiGamesAsP2.length;
+    const recentGames = merged.slice((page - 1) * perPage, limit);
 
     return NextResponse.json({ ...user, recentGames, totalGames, page, perPage });
   } catch (err) {

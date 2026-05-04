@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-04",
+      "title_fr": "Historique du profil : les parties classées s'affichent même si la partie a été purgée",
+      "title_en": "Profile history: ranked games show up even if the game record was purged",
+      "changes_fr": [
+        "L'historique du profil utilise maintenant le journal ELO (gardé 14 jours) au lieu des parties brutes (gardées 72h ou supprimées en cas de surcharge DB). Tu vois donc beaucoup plus de parties, avec score et delta d'ELO, même si le replay n'est plus disponible.",
+        "Quand la base de données arrive à saturation, le serveur supprime maintenant les 200 parties les plus anciennes au lieu de tout effacer d'un coup. Plus de purge totale qui faisait disparaître les parties récentes."
+      ],
+      "changes_en": [
+        "Profile history now reads from the ELO journal (kept for 14 days) instead of raw game records (72h TTL or deleted under DB load). You see way more games, with score and ELO delta, even when the replay is no longer available.",
+        "When the database hits its quota, the server now deletes the 200 oldest games instead of wiping them all. No more global purge that erased recent games."
+      ]
+    },
+    {
+      "date": "2026-05-04",
       "title_fr": "ELO rééquilibré : moins de farming des bas ELO, gains plus généreux pour les écarts moyens",
       "title_en": "ELO rebalanced: less farming of low-ELO players, more generous gains for mid-gaps",
       "changes_fr": [
