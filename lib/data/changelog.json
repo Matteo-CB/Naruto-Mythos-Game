@@ -1,6 +1,21 @@
 {
   "entries": [
     {
+      "date": "2026-05-04",
+      "title_fr": "ELO rééquilibré : moins de farming des bas ELO, gains plus généreux pour les écarts moyens",
+      "title_en": "ELO rebalanced: less farming of low-ELO players, more generous gains for mid-gaps",
+      "changes_fr": [
+        "Le minimum gagné sur une victoire descend de +10 à +5, mais ne s'applique qu'aux écarts d'ELO très importants (>=1500 points). Pour les écarts moyens (500-1000), le gain monte à +12/+13 au lieu de +10.",
+        "Le maximum perdu sur une défaite peut maintenant atteindre -32 (au lieu de -25), mais uniquement quand l'écart est très important (perdre contre quelqu'un >=1500 ELO en dessous de soi). Les défaites sur écarts proches restent à -16/-25 comme avant.",
+        "Les parties à ELO proche (écart < 200) ne changent pas."
+      ],
+      "changes_en": [
+        "The minimum win gain drops from +10 to +5, but only applies for very large ELO gaps (>=1500 points). For mid-gaps (500-1000), the gain goes up to +12/+13 instead of +10.",
+        "The maximum loss on a defeat can now reach -32 (instead of -25), but only for very large gaps (losing to someone >=1500 ELO below you). Close-gap losses stay at -16/-25 like before.",
+        "Close-ELO matches (gap < 200) are unchanged."
+      ]
+    },
+    {
       "date": "2026-05-02",
       "title_fr": "Profils : page accessible pour tous les joueurs, plus d'erreur 'Joueur introuvable'",
       "title_en": "Profiles: page works for every player, no more 'Player not found' error",

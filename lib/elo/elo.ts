@@ -2,8 +2,6 @@
 
 const K_FACTOR = 32;
 const ELO_FLOOR = 100;
-const MIN_WIN_GAIN = 10;
-const MAX_LOSS = 25;
 
 function getKFactor(_elo: number): number {
   return K_FACTOR;
@@ -11,6 +9,25 @@ function getKFactor(_elo: number): number {
 
 export function expectedScore(playerElo: number, opponentElo: number): number {
   return 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
+}
+
+export function getMinWinGain(myElo: number, opponentElo: number): number {
+  const gap = myElo - opponentElo;
+  if (gap >= 1500) return 5;
+  if (gap >= 1200) return 7;
+  if (gap >= 1000) return 9;
+  if (gap >= 700) return 12;
+  if (gap >= 400) return 13;
+  return 10;
+}
+
+export function getMaxLoss(myElo: number, opponentElo: number): number {
+  const gap = myElo - opponentElo;
+  if (gap >= 1500) return 32;
+  if (gap >= 1200) return 30;
+  if (gap >= 1000) return 28;
+  if (gap >= 700) return 26;
+  return 25;
 }
 
 export function calculateNewElo(
@@ -22,10 +39,14 @@ export function calculateNewElo(
   const E = expectedScore(playerElo, opponentElo);
   let delta = Math.round(K * (actualScore - E));
 
-  
-  if (actualScore === 1.0 && delta < MIN_WIN_GAIN) delta = MIN_WIN_GAIN;
-  
-  if (actualScore === 0.0 && delta < -MAX_LOSS) delta = -MAX_LOSS;
+  if (actualScore === 1.0) {
+    const minGain = getMinWinGain(playerElo, opponentElo);
+    if (delta < minGain) delta = minGain;
+  }
+  if (actualScore === 0.0) {
+    const maxLoss = getMaxLoss(playerElo, opponentElo);
+    if (delta < -maxLoss) delta = -maxLoss;
+  }
 
   return Math.max(ELO_FLOOR, playerElo + delta);
 }
@@ -34,7 +55,7 @@ export interface EloInput {
   player1Elo: number;
   player2Elo: number;
   winner: 'player1' | 'player2';
-  player1Score: number; // kept for back-compat; unused in vanilla formula
+  player1Score: number;
   player2Score: number;
   player1ConsecWins: number;
   player1ConsecLosses: number;
@@ -64,7 +85,7 @@ export function calculateEloChanges(
   p2Elo?: number,
   winnerLegacy?: 'player1' | 'player2' | 'draw',
 ): EloResult | { player1NewElo: number; player2NewElo: number; player1Delta: number; player2Delta: number } {
-  
+
   if (typeof p1EloOrInput === 'number') {
     const p1 = p1EloOrInput;
     const p2 = p2Elo!;
@@ -81,7 +102,7 @@ export function calculateEloChanges(
     };
   }
 
-  
+
   const { player1Elo, player2Elo, winner, player1ConsecWins, player1ConsecLosses,
           player2ConsecWins, player2ConsecLosses } = p1EloOrInput;
 

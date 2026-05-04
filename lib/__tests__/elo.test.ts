@@ -74,17 +74,25 @@ describe('ELO System', () => {
       expect(gainVsHigh).toBeGreaterThan(gainVsEqual);
     });
 
-    it('should floor win gain at +10 against a much lower-rated opponent', () => {
-      
-      const gain = calculateNewElo(1500, 100, 1.0) - 1500;
-      expect(gain).toBe(10);
+    it('should floor win gain at +5 only for very large gaps (>=1500)', () => {
+      const gain = calculateNewElo(1700, 100, 1.0) - 1700;
+      expect(gain).toBe(5);
     });
 
-    it('should cap a favored player\'s upset loss at -25', () => {
-      
-      
-      const hardLoss = calculateNewElo(1500, 100, 0.0) - 1500;
-      expect(hardLoss).toBe(-25);
+    it('should give meaningful gain at moderate gap (~800)', () => {
+      const gain = calculateNewElo(2000, 1200, 1.0) - 2000;
+      expect(gain).toBeGreaterThanOrEqual(10);
+      expect(gain).toBeLessThanOrEqual(15);
+    });
+
+    it('should cap a favored player\'s upset loss at -32 for very large gaps', () => {
+      const hardLoss = calculateNewElo(1700, 100, 0.0) - 1700;
+      expect(hardLoss).toBe(-32);
+    });
+
+    it('should keep -25 max loss for moderate gaps', () => {
+      const loss = calculateNewElo(1500, 1000, 0.0) - 1500;
+      expect(loss).toBe(-25);
     });
 
     it('should not apply clamps to draws', () => {
