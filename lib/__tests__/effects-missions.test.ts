@@ -207,6 +207,66 @@ describe('MSS 05 - Bring it Back', () => {
     const result = handler(makeCtx(state, 'player1', 0));
     expect(result.state.activeMissions[0].player1Characters.length).toBe(1);
   });
+
+  it('should return a controlled enemy character to its original owner\'s hand (single-target path)', () => {
+    const stolen = mockCharInPlay(
+      { instanceId: 'stolen-1', controlledBy: 'player1', originalOwner: 'player2' },
+      { name_fr: 'StolenChar', power: 4 },
+    );
+    const baseState = createActionPhaseState();
+    const state: GameState = {
+      ...baseState,
+      player1: { ...baseState.player1, hand: [], charactersInPlay: 1 },
+      player2: { ...baseState.player2, hand: [], charactersInPlay: 0 },
+      activeMissions: [makeMission('D', [stolen])],
+    };
+
+    const handler = getEffectHandler('KS-005-MMS', 'SCORE')!;
+    const result = handler(makeCtx(state, 'player1', 0));
+
+    expect(result.state.activeMissions[0].player1Characters.length).toBe(0);
+    expect(result.state.player1.hand.length).toBe(0);
+    expect(result.state.player2.hand.length).toBe(1);
+    expect(result.state.player2.hand[0].name_fr).toBe('StolenChar');
+  });
+
+  it('should return a controlled enemy character to its original owner\'s hand (multi-target path)', async () => {
+    const { EffectEngine } = await import('../effects/EffectEngine');
+    const ownChar = mockCharInPlay(
+      { instanceId: 'own-1', controlledBy: 'player1', originalOwner: 'player1' },
+      { name_fr: 'OwnChar', power: 3 },
+    );
+    const stolen = mockCharInPlay(
+      { instanceId: 'stolen-1', controlledBy: 'player1', originalOwner: 'player2' },
+      { name_fr: 'StolenChar', power: 4 },
+    );
+    const baseState = createActionPhaseState();
+    const state: GameState = {
+      ...baseState,
+      player1: { ...baseState.player1, hand: [], charactersInPlay: 2 },
+      player2: { ...baseState.player2, hand: [], charactersInPlay: 0 },
+      activeMissions: [makeMission('D', [ownChar, stolen])],
+    };
+
+    const pending = {
+      sourcePlayer: 'player1' as const,
+      sourceCardId: 'KS-005-MMS',
+      sourceInstanceId: 'mss05-instance',
+      sourceMissionIndex: 0,
+      effectType: 'SCORE' as const,
+      effectIndex: 0,
+      effectDescription: '',
+    };
+
+    const result = EffectEngine.mss05ReturnToHand(state, pending as never, 'stolen-1');
+
+    expect(result.activeMissions[0].player1Characters.length).toBe(1);
+    expect(result.activeMissions[0].player1Characters[0].instanceId).toBe('own-1');
+    expect(result.player1.hand.length).toBe(0);
+    expect(result.player2.hand.length).toBe(1);
+    expect(result.player2.hand[0].name_fr).toBe('StolenChar');
+    expect(result.player1.charactersInPlay).toBe(1);
+  });
 });
 
 

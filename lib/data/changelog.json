@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "MSS 05 (Ramener) : un perso contrôlé revient bien dans la main de son propriétaire d'origine",
+      "title_en": "MSS 05 (Bring it Back): a controlled character returns to its original owner's hand",
+      "changes_fr": [
+        "Quand l'effet de la mission Ramener renvoyait un personnage volé à l'adversaire, il atterrissait dans la main du joueur qui contrôlait, pas dans celle du propriétaire d'origine. Conforme à la règle, il revient maintenant dans la main du propriétaire d'origine."
+      ],
+      "changes_en": [
+        "When the Bring it Back mission returned a character that had been taken from the opponent, the card landed in the hand of the controlling player instead of the original owner's. Per the rules, it now goes back to the original owner's hand."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Sauvegarde des parties : ELO toujours garanti, replays conservés 24h",
       "title_en": "Game saves: ELO always guaranteed, replays kept for 24h",
       "changes_fr": [

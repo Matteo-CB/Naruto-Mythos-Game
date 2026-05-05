@@ -17674,18 +17674,22 @@ export class EffectEngine {
     stateAfterRestore.activeMissions = [...stateAfterRestore.activeMissions];
     stateAfterRestore.activeMissions[finalMissionIdx] = mission;
 
-    
-    const ps = stateAfterRestore[player];
+    const owner = removedTarget.originalOwner;
+    const controller = removedTarget.controlledBy;
     const topCard = removedTarget.stack?.length > 0 ? removedTarget.stack[removedTarget.stack?.length - 1] : removedTarget.card;
     const underCards = removedTarget.stack?.length > 1 ? removedTarget.stack.slice(0, -1) : [];
-    ps.hand = [...ps.hand, topCard];
-    ps.discardPile = [...ps.discardPile, ...underCards];
-    ps.charactersInPlay = Math.max(0, ps.charactersInPlay - 1);
+
+    const ownerPs = stateAfterRestore[owner];
+    ownerPs.hand = [...ownerPs.hand, topCard];
+    ownerPs.discardPile = [...ownerPs.discardPile, ...underCards];
+
+    const controllerPs = stateAfterRestore[controller];
+    controllerPs.charactersInPlay = Math.max(0, controllerPs.charactersInPlay - 1);
 
     stateAfterRestore.log = logAction(
       stateAfterRestore.log, stateAfterRestore.turn, stateAfterRestore.phase, player,
       'SCORE_RETURN',
-      `MSS 05 (Bring it Back): Returned ${topCard.name_fr} to hand (mandatory).`,
+      `MSS 05 (Bring it Back): Returned ${topCard.name_fr} to ${owner === controller ? 'hand' : 'original owner\'s hand'} (mandatory).`,
       'game.log.score.returnToHand',
       { card: 'Ramener', target: topCard.name_fr },
     );
