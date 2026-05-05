@@ -457,27 +457,17 @@ async function finalizeGameEnd(
   } catch (eloErr) {
     const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
     console.error('[Socket] ELO update error:', errMsg);
-    
+
     if (room.isRanked && room.hostId && room.guestId) {
-      try {
-        if (errMsg.includes('quota') || errMsg.includes('AtlasError') || errMsg.includes('disk')) {
-          try {
-            const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
-            const cutoff = new Date(Date.now() - GAME_TTL_MS);
-            const purge = await prisma.game.deleteMany({
-              where: { completedAt: { lt: cutoff }, status: 'completed' },
-            });
-            console.warn(`[Socket] Quota recovery (ELO): purged ${purge.count} TTL-expired games before retry`);
-          } catch (cleanupErr) {
-            console.error('[Socket] Quota recovery cleanup failed:', cleanupErr instanceof Error ? cleanupErr.message : cleanupErr);
-          }
-        }
-        await new Promise((resolve) => setTimeout(resolve, 250));
-        const [p1Retry, p2Retry] = await Promise.all([
-          prisma.user.findUnique({ where: { id: room.hostId } }),
-          prisma.user.findUnique({ where: { id: room.guestId! } }),
-        ]);
-        if (p1Retry && p2Retry) {
+      const isQuotaErr = (m: string) => m.includes('quota') || m.includes('AtlasError') || m.includes('disk');
+
+      const attemptEloUpdate = async (label: string): Promise<boolean> => {
+        try {
+          const [p1Retry, p2Retry] = await Promise.all([
+            prisma.user.findUnique({ where: { id: room.hostId! } }),
+            prisma.user.findUnique({ where: { id: room.guestId! } }),
+          ]);
+          if (!p1Retry || !p2Retry) return false;
           const retryChanges = calculateEloChanges({
             player1Elo: p1Retry.elo, player2Elo: p2Retry.elo,
             winner: winner === 'player1' ? 'player1' : 'player2',
@@ -488,28 +478,58 @@ async function finalizeGameEnd(
           const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
           const [uP1, uP2] = await Promise.all([
-            prisma.user.update({ where: { id: room.hostId }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
+            prisma.user.update({ where: { id: room.hostId! }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
             prisma.user.update({ where: { id: room.guestId! }, data: { elo: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } }),
           ]);
           eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: uP1.elo, player2NewElo: uP2.elo, player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
-          console.log('[Socket] ELO retry succeeded');
+          console.log(`[Socket] ELO retry (${label}) succeeded`);
           prisma.eloHistory.create({
             data: {
-              userId: room.hostId, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2Retry.elo,
+              userId: room.hostId!, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2Retry.elo,
               oldElo: p1Retry.elo, newElo: retryChanges.player1NewElo, delta: retryChanges.player1Delta,
               result: winner === 'player1' ? 'win' : 'loss', myScore: p1Score, opponentScore: p2Score, isRanked: true,
             },
-          }).catch((e) => console.warn('[Socket] EloHistory write 1 (retry) failed:', e instanceof Error ? e.message : e));
+          }).catch((e) => console.warn(`[Socket] EloHistory write 1 (${label}) failed:`, e instanceof Error ? e.message : e));
           prisma.eloHistory.create({
             data: {
-              userId: room.guestId!, opponentId: room.hostId, opponentUsername: p1Retry.username, opponentElo: p1Retry.elo,
+              userId: room.guestId!, opponentId: room.hostId!, opponentUsername: p1Retry.username, opponentElo: p1Retry.elo,
               oldElo: p2Retry.elo, newElo: retryChanges.player2NewElo, delta: retryChanges.player2Delta,
               result: winner === 'player2' ? 'win' : 'loss', myScore: p2Score, opponentScore: p1Score, isRanked: true,
             },
-          }).catch((e) => console.warn('[Socket] EloHistory write 2 (retry) failed:', e instanceof Error ? e.message : e));
+          }).catch((e) => console.warn(`[Socket] EloHistory write 2 (${label}) failed:`, e instanceof Error ? e.message : e));
+          return true;
+        } catch (retryErr) {
+          const m = retryErr instanceof Error ? retryErr.message : String(retryErr);
+          console.error(`[Socket] ELO retry (${label}) failed:`, m);
+          return isQuotaErr(m);
         }
-      } catch (retryErr) {
-        console.error('[Socket] ELO retry also failed (no replay deletion done):', retryErr instanceof Error ? retryErr.message : retryErr);
+      };
+
+      if (isQuotaErr(errMsg)) {
+        try {
+          const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
+          const cutoff = new Date(Date.now() - GAME_TTL_MS);
+          const purge = await prisma.game.deleteMany({ where: { completedAt: { lt: cutoff }, status: 'completed' } });
+          console.warn(`[Socket] Quota recovery (ELO tier-1): purged ${purge.count} TTL-expired games before retry`);
+        } catch (cleanupErr) {
+          console.error('[Socket] Quota recovery cleanup failed:', cleanupErr instanceof Error ? cleanupErr.message : cleanupErr);
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const tier1Ok = await attemptEloUpdate('tier-1');
+
+      if (!tier1Ok && !eloData) {
+        try {
+          const purge = await prisma.game.deleteMany({ where: { status: 'completed' } });
+          console.warn(`[Socket] Last-resort recovery (ELO tier-2): purged ALL ${purge.count} completed games to save ELO`);
+        } catch (nukeErr) {
+          console.error('[Socket] Last-resort purge failed:', nukeErr instanceof Error ? nukeErr.message : nukeErr);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        const tier2Ok = await attemptEloUpdate('tier-2');
+        if (!tier2Ok && !eloData) {
+          console.error('[Socket] ELO update failed after full purge — DB unrecoverable');
+        }
       }
     }
   }
@@ -621,6 +641,7 @@ async function finalizeGameEnd(
     let recordId: string | null = null;
     let lastErr: unknown = null;
     let ttlPurgeDone = false;
+    let fullPurgeDone = false;
     for (let i = 0; i < tryStates.length; i++) {
       try {
         const gameState = tryStates[i]();
@@ -631,7 +652,8 @@ async function finalizeGameEnd(
       } catch (err) {
         lastErr = err;
         const msg = err instanceof Error ? err.message : String(err);
-        if (!ttlPurgeDone && (msg.includes('quota') || msg.includes('AtlasError') || msg.includes('disk'))) {
+        const isQuota = msg.includes('quota') || msg.includes('AtlasError') || msg.includes('disk');
+        if (!ttlPurgeDone && isQuota) {
           ttlPurgeDone = true;
           try {
             const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
@@ -639,11 +661,21 @@ async function finalizeGameEnd(
             const purge = await prisma.game.deleteMany({
               where: { completedAt: { lt: cutoff }, status: 'completed' },
             });
-            console.warn(`[Socket] Quota recovery (save): purged ${purge.count} TTL-expired games, retrying`);
+            console.warn(`[Socket] Quota recovery (save tier-1): purged ${purge.count} TTL-expired games, retrying`);
             i = -1;
             continue;
           } catch (cleanupErr) {
             console.error('[Socket] Quota recovery cleanup failed:', cleanupErr instanceof Error ? cleanupErr.message : cleanupErr);
+          }
+        } else if (!fullPurgeDone && isQuota) {
+          fullPurgeDone = true;
+          try {
+            const purge = await prisma.game.deleteMany({ where: { status: 'completed' } });
+            console.warn(`[Socket] Last-resort recovery (save tier-2): purged ALL ${purge.count} completed games`);
+            i = -1;
+            continue;
+          } catch (nukeErr) {
+            console.error('[Socket] Last-resort purge failed:', nukeErr instanceof Error ? nukeErr.message : nukeErr);
           }
         }
       }
