@@ -460,6 +460,18 @@ async function finalizeGameEnd(
     
     if (room.isRanked && room.hostId && room.guestId) {
       try {
+        if (errMsg.includes('quota') || errMsg.includes('AtlasError') || errMsg.includes('disk')) {
+          try {
+            const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
+            const cutoff = new Date(Date.now() - GAME_TTL_MS);
+            const purge = await prisma.game.deleteMany({
+              where: { completedAt: { lt: cutoff }, status: 'completed' },
+            });
+            console.warn(`[Socket] Quota recovery (ELO): purged ${purge.count} TTL-expired games before retry`);
+          } catch (cleanupErr) {
+            console.error('[Socket] Quota recovery cleanup failed:', cleanupErr instanceof Error ? cleanupErr.message : cleanupErr);
+          }
+        }
         await new Promise((resolve) => setTimeout(resolve, 250));
         const [p1Retry, p2Retry] = await Promise.all([
           prisma.user.findUnique({ where: { id: room.hostId } }),
@@ -608,6 +620,7 @@ async function finalizeGameEnd(
 
     let recordId: string | null = null;
     let lastErr: unknown = null;
+    let ttlPurgeDone = false;
     for (let i = 0; i < tryStates.length; i++) {
       try {
         const gameState = tryStates[i]();
@@ -617,6 +630,22 @@ async function finalizeGameEnd(
         break;
       } catch (err) {
         lastErr = err;
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!ttlPurgeDone && (msg.includes('quota') || msg.includes('AtlasError') || msg.includes('disk'))) {
+          ttlPurgeDone = true;
+          try {
+            const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
+            const cutoff = new Date(Date.now() - GAME_TTL_MS);
+            const purge = await prisma.game.deleteMany({
+              where: { completedAt: { lt: cutoff }, status: 'completed' },
+            });
+            console.warn(`[Socket] Quota recovery (save): purged ${purge.count} TTL-expired games, retrying`);
+            i = -1;
+            continue;
+          } catch (cleanupErr) {
+            console.error('[Socket] Quota recovery cleanup failed:', cleanupErr instanceof Error ? cleanupErr.message : cleanupErr);
+          }
+        }
       }
     }
 

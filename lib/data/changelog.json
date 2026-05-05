@@ -2,18 +2,18 @@
   "entries": [
     {
       "date": "2026-05-05",
-      "title_fr": "Sauvegarde des parties : plus de purge surprise, replays conservés 24h",
-      "title_en": "Game saves: no more surprise purge, replays kept for 24h",
+      "title_fr": "Sauvegarde des parties : plus de purge surprise, replays conservés 24h, ELO toujours enregistré",
+      "title_en": "Game saves: no more surprise purge, 24h replay window, ELO always recorded",
       "changes_fr": [
         "Une ancienne logique de récupération supprimait toutes les parties terminées d'un coup quand la base de données était en surcharge. Cette purge est retirée, les replays restent jusqu'à leur expiration normale.",
-        "Quand la mise à jour ELO échoue, le serveur réessaie une fois après une courte pause au lieu d'effacer des données. L'historique ELO est aussi recréé en cas de retry réussi.",
-        "L'historique du profil lit désormais le journal ELO (14 jours) en plus des parties brutes, donc les parties classées restent visibles même si l'enregistrement de la partie a échoué.",
+        "Quand la base est saturée, le serveur lance le nettoyage 24h en avance au lieu d'attendre la prochaine heure planifiée, puis réessaie d'enregistrer. Aucun replay récent n'est supprimé.",
+        "Si la sauvegarde de la partie échoue malgré tout, on enregistre la partie sans replay (score, vainqueur, ELO) plutôt que de la perdre. Tu vois toujours la partie dans l'historique du profil.",
         "Les parties terminées sont maintenant conservées 24h au lieu de 72h. L'historique ELO du profil reste sur 14 jours."
       ],
       "changes_en": [
         "An old recovery path deleted all completed games at once when the database was under load. That purge is removed, replays now stay until their normal expiry.",
-        "When the ELO update fails, the server now retries once after a short pause instead of wiping data. The ELO history is also re-created on a successful retry.",
-        "The profile history now reads from the ELO journal (14 days) on top of raw game records, so ranked games stay visible even if the game record save failed.",
+        "When the database is full, the server runs the 24h cleanup early instead of waiting for the scheduled hour, then retries the save. No recent replay is removed.",
+        "If the game save still fails, we record the game without the replay (score, winner, ELO) rather than losing it entirely. You still see the game in your profile history.",
         "Completed games are now kept for 24h instead of 72h. Profile ELO history still goes back 14 days."
       ]
     },
