@@ -1,16 +1,18 @@
 {
   "entries": [
     {
-      "date": "2026-05-04",
-      "title_fr": "Historique du profil : les parties classées s'affichent même si la partie a été purgée",
-      "title_en": "Profile history: ranked games show up even if the game record was purged",
+      "date": "2026-05-05",
+      "title_fr": "Sauvegarde des parties : plus de purge automatique des replays, ELO mieux enregistré",
+      "title_en": "Game saves: no more auto-purge of replays, ELO recorded more reliably",
       "changes_fr": [
-        "L'historique du profil utilise maintenant le journal ELO (gardé 14 jours) au lieu des parties brutes (gardées 72h ou supprimées en cas de surcharge DB). Tu vois donc beaucoup plus de parties, avec score et delta d'ELO, même si le replay n'est plus disponible.",
-        "Quand la base de données arrive à saturation, le serveur supprime maintenant les 200 parties les plus anciennes au lieu de tout effacer d'un coup. Plus de purge totale qui faisait disparaître les parties récentes."
+        "Une ancienne logique de récupération supprimait toutes les parties terminées d'un coup quand la base de données était en surcharge. Cette purge est retirée, les replays sont conservés.",
+        "Quand la mise à jour ELO échoue, le serveur réessaie une fois après une courte pause au lieu d'effacer des données. L'historique ELO est aussi recréé en cas de retry réussi.",
+        "L'historique du profil lit désormais le journal ELO (14 jours) en plus des parties brutes, donc les parties classées restent visibles même si l'enregistrement de la partie a échoué."
       ],
       "changes_en": [
-        "Profile history now reads from the ELO journal (kept for 14 days) instead of raw game records (72h TTL or deleted under DB load). You see way more games, with score and ELO delta, even when the replay is no longer available.",
-        "When the database hits its quota, the server now deletes the 200 oldest games instead of wiping them all. No more global purge that erased recent games."
+        "An old recovery path deleted all completed games at once when the database was under load. That purge is removed, replays are preserved.",
+        "When the ELO update fails, the server now retries once after a short pause instead of wiping data. The ELO history is also re-created on a successful retry.",
+        "The profile history now reads from the ELO journal (14 days) on top of raw game records, so ranked games stay visible even if the game record save failed."
       ]
     },
     {

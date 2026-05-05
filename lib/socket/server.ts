@@ -458,43 +458,46 @@ async function finalizeGameEnd(
     const errMsg = eloErr instanceof Error ? eloErr.message : String(eloErr);
     console.error('[Socket] ELO update error:', errMsg);
     
-    if (errMsg.includes('quota') || errMsg.includes('AtlasError')) {
+    if (room.isRanked && room.hostId && room.guestId) {
       try {
-        console.log('[Socket] DB quota exceeded — deleting oldest 200 completed games and retrying ELO...');
-        const oldest = await prisma.game.findMany({
-          where: { status: 'completed' },
-          orderBy: { completedAt: 'asc' },
-          select: { id: true },
-          take: 200,
-        });
-        if (oldest.length > 0) {
-          await prisma.game.deleteMany({ where: { id: { in: oldest.map((g) => g.id) } } });
-        }
-        if (room.isRanked && room.hostId && room.guestId) {
-          const [p1Retry, p2Retry] = await Promise.all([
-            prisma.user.findUnique({ where: { id: room.hostId } }),
-            prisma.user.findUnique({ where: { id: room.guestId! } }),
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        const [p1Retry, p2Retry] = await Promise.all([
+          prisma.user.findUnique({ where: { id: room.hostId } }),
+          prisma.user.findUnique({ where: { id: room.guestId! } }),
+        ]);
+        if (p1Retry && p2Retry) {
+          const retryChanges = calculateEloChanges({
+            player1Elo: p1Retry.elo, player2Elo: p2Retry.elo,
+            winner: winner === 'player1' ? 'player1' : 'player2',
+            player1Score: p1Score, player2Score: p2Score,
+            player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
+            player2ConsecWins: p2Retry.consecutiveWins ?? 0, player2ConsecLosses: p2Retry.consecutiveLosses ?? 0,
+          });
+          const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+          const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
+          const [uP1, uP2] = await Promise.all([
+            prisma.user.update({ where: { id: room.hostId }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
+            prisma.user.update({ where: { id: room.guestId! }, data: { elo: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } }),
           ]);
-          if (p1Retry && p2Retry) {
-            const retryChanges = calculateEloChanges({
-              player1Elo: p1Retry.elo, player2Elo: p2Retry.elo,
-              winner: winner === 'player1' ? 'player1' : 'player2',
-              player1Score: p1Score, player2Score: p2Score,
-              player1ConsecWins: p1Retry.consecutiveWins ?? 0, player1ConsecLosses: p1Retry.consecutiveLosses ?? 0,
-              player2ConsecWins: p2Retry.consecutiveWins ?? 0, player2ConsecLosses: p2Retry.consecutiveLosses ?? 0,
-            });
-            const p1S = winner === 'player1' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-            const p2S = winner === 'player2' ? { wins: { increment: 1 } } : { losses: { increment: 1 } };
-            const [uP1, uP2] = await Promise.all([
-              prisma.user.update({ where: { id: room.hostId }, data: { elo: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses } }),
-              prisma.user.update({ where: { id: room.guestId! }, data: { elo: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses } }),
-            ]);
-            eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: uP1.elo, player2NewElo: uP2.elo, player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
-            console.log('[Socket] ELO retry succeeded after quota cleanup');
-          }
+          eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: uP1.elo, player2NewElo: uP2.elo, player1TotalGames: uP1.wins + uP1.losses + uP1.draws, player2TotalGames: uP2.wins + uP2.losses + uP2.draws };
+          console.log('[Socket] ELO retry succeeded');
+          prisma.eloHistory.create({
+            data: {
+              userId: room.hostId, opponentId: room.guestId!, opponentUsername: p2Retry.username, opponentElo: p2Retry.elo,
+              oldElo: p1Retry.elo, newElo: retryChanges.player1NewElo, delta: retryChanges.player1Delta,
+              result: winner === 'player1' ? 'win' : 'loss', myScore: p1Score, opponentScore: p2Score, isRanked: true,
+            },
+          }).catch((e) => console.warn('[Socket] EloHistory write 1 (retry) failed:', e instanceof Error ? e.message : e));
+          prisma.eloHistory.create({
+            data: {
+              userId: room.guestId!, opponentId: room.hostId, opponentUsername: p1Retry.username, opponentElo: p1Retry.elo,
+              oldElo: p2Retry.elo, newElo: retryChanges.player2NewElo, delta: retryChanges.player2Delta,
+              result: winner === 'player2' ? 'win' : 'loss', myScore: p2Score, opponentScore: p1Score, isRanked: true,
+            },
+          }).catch((e) => console.warn('[Socket] EloHistory write 2 (retry) failed:', e instanceof Error ? e.message : e));
         }
       } catch (retryErr) {
-        console.error('[Socket] ELO retry also failed:', retryErr instanceof Error ? retryErr.message : retryErr);
+        console.error('[Socket] ELO retry also failed (no replay deletion done):', retryErr instanceof Error ? retryErr.message : retryErr);
       }
     }
   }
@@ -605,7 +608,6 @@ async function finalizeGameEnd(
 
     let recordId: string | null = null;
     let lastErr: unknown = null;
-    let quotaRescueDone = false;
     for (let i = 0; i < tryStates.length; i++) {
       try {
         const gameState = tryStates[i]();
@@ -615,26 +617,6 @@ async function finalizeGameEnd(
         break;
       } catch (err) {
         lastErr = err;
-        const msg = err instanceof Error ? err.message : String(err);
-        if (!quotaRescueDone && (msg.includes('quota') || msg.includes('AtlasError'))) {
-          quotaRescueDone = true;
-          try {
-            const oldest = await prisma.game.findMany({
-              where: { status: 'completed' },
-              orderBy: { completedAt: 'asc' },
-              select: { id: true },
-              take: 200,
-            });
-            if (oldest.length > 0) {
-              await prisma.game.deleteMany({ where: { id: { in: oldest.map((g) => g.id) } } });
-              console.warn(`[Socket] Quota rescue: deleted ${oldest.length} oldest games, retrying save`);
-              i = -1;
-              continue;
-            }
-          } catch (rescueErr) {
-            console.error('[Socket] Quota rescue failed:', rescueErr instanceof Error ? rescueErr.message : rescueErr);
-          }
-        }
       }
     }
 
