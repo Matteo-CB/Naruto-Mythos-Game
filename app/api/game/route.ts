@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
         player2Score,
         eloChange,
         completedAt: new Date(),
-        ...(gameLog ? { gameState: gameLog } : {}),
+        ...(gameLog && !game.isAiGame ? { gameState: gameLog } : {}),
       },
     });
 

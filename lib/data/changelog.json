@@ -2,6 +2,17 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Parties contre l'IA : plus de replay enregistré",
+      "title_en": "AI games: replay no longer saved",
+      "changes_fr": [
+        "Les parties contre l'IA n'enregistrent plus le replay. La partie reste visible dans ton historique avec le score et la difficulté, mais sans bouton de replay. Cela libère de la place en base et accélère la fin de partie."
+      ],
+      "changes_en": [
+        "AI games no longer save the replay. The game still shows up in your history with the score and difficulty, but without a replay button. This frees database space and speeds up end-of-game."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Performances : fin de partie plus rapide, profil et historique plus fluides",
       "title_en": "Performance: faster end-of-game, smoother profile and history loading",
       "changes_fr": [

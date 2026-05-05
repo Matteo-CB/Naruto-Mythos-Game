@@ -82,20 +82,6 @@ export function GameEndScreen() {
 
     try {
       if (isAIGame && gameState) {
-        const replayData = {
-          log: gameState.log,
-          playerNames: playerDisplayNames,
-          finalMissions: gameState.activeMissions.map(m => ({
-            name_fr: m.card.name_fr,
-            rank: m.rank,
-            basePoints: m.basePoints,
-            rankBonus: m.rankBonus,
-            wonBy: m.wonBy ?? null,
-          })),
-          initialState: replayInitialState,
-          actionHistory: gameState.actionHistory ?? [],
-        };
-
         const aiDifficulty = gameState.player2.isAI
           ? gameState.player2.aiDifficulty
           : gameState.player1.aiDifficulty;
@@ -116,10 +102,9 @@ export function GameEndScreen() {
             winnerId: winner === 'player1' ? session?.user?.id : null,
             player1Score: gameState.player1.missionPoints,
             player2Score: gameState.player2.missionPoints,
-            gameLog: replayData,
           }),
         });
-        if (!completeRes.ok) throw new Error('Failed to save replay');
+        if (!completeRes.ok) throw new Error('Failed to save game');
 
         setSavedGameId(game.id);
         setSaveState('saved');
