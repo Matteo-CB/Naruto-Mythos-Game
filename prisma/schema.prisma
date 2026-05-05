@@ -46,7 +46,7 @@ model User {
   consecutiveLosses  Int          @default(0)
 }
 
-/// Per-game ELO snapshot. Survives the Game row purge (72h) up to 14 days so
+/// Per-game ELO snapshot. Survives the Game row purge (24h) up to 14 days so
 /// admins can audit a player's recent ELO trajectory even after the source
 /// Game has been deleted. Purged by cleanupOldEloHistory in lib/db/gameCleanup.ts.
 model EloHistory {

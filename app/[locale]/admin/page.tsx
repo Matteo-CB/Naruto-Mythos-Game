@@ -1096,7 +1096,7 @@ function SuspiciousPanel() {
           Suspicious activity detector
         </h2>
         <p className="text-[11px] mb-3" style={{ color: '#666' }}>
-          Heuristics: same email base / Discord ID across accounts, accounts created minutes apart that played each other, repeat opponents (last 72h), sub-60s ranked forfeits (last 72h), new accounts with abnormally high win rates. Completed ranked games older than 72h are purged by the server, so game-based signals only cover the most recent window.
+          Heuristics: same email base / Discord ID across accounts, accounts created minutes apart that played each other, repeat opponents (last 24h), sub-60s ranked forfeits (last 24h), new accounts with abnormally high win rates. Completed ranked games older than 24h are purged by the server, so game-based signals only cover the most recent window.
         </p>
         <div className="flex items-center gap-2">
           <input
