@@ -3,7 +3,7 @@ import { prisma } from './prisma';
 
 
 
-export const GAME_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+export const GAME_TTL_MS = 72 * 60 * 60 * 1000; // 72 hours
 
 
 
@@ -28,7 +28,7 @@ export async function cleanupOldGames(): Promise<void> {
       },
     });
     if (result.count > 0) {
-      console.log(`[GameCleanup] Deleted ${result.count} games older than 24 hours`);
+      console.log(`[GameCleanup] Deleted ${result.count} games older than 72 hours`);
     }
 
     

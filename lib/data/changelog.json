@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Replays gardés 3 jours, anciens replays non compressés purgés",
+      "title_en": "Replays kept for 3 days, old uncompressed replays purged",
+      "changes_fr": [
+        "Maintenant que les replays sont compressés, ils tiennent plus facilement en base. Le délai de conservation repasse à 3 jours (72h) au lieu de 24h.",
+        "Les anciens replays au format non compressé ont été supprimés en une fois pour libérer la place. Les nouveaux replays sont enregistrés au format compressé et seront conservés 3 jours."
+      ],
+      "changes_en": [
+        "Now that replays are compressed, they take far less space in the database. Retention is back up to 3 days (72h) instead of 24h.",
+        "Old uncompressed replays have been purged in a one-time cleanup to free space. New replays are stored compressed and kept for 3 days."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Replays compressés : sauvegarde et chargement bien plus rapides, sans perte",
       "title_en": "Compressed replays: much faster save and load, lossless",
       "changes_fr": [
