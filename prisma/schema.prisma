@@ -116,6 +116,10 @@ model Game {
   eloChange    Int?
   createdAt    DateTime  @default(now())
   completedAt  DateTime?
+
+  @@index([status, completedAt])
+  @@index([player1Id, completedAt])
+  @@index([player2Id, completedAt])
 }
 
 model Room {

@@ -2,6 +2,19 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Performances : fin de partie plus rapide, profil et historique plus fluides",
+      "title_en": "Performance: faster end-of-game, smoother profile and history loading",
+      "changes_fr": [
+        "Le nettoyage des anciennes parties ne bloque plus la fin de partie. L'écran de victoire et l'ELO s'affichent immédiatement, le ménage tourne en arrière-plan.",
+        "La base de données a maintenant des index sur les parties (par joueur et par date). Les requêtes du profil, du leaderboard et des replays sont beaucoup plus rapides, en particulier pour les comptes avec beaucoup d'historique."
+      ],
+      "changes_en": [
+        "End-of-game no longer waits for the old-game cleanup to finish. The win screen and ELO show up immediately, the cleanup runs in the background.",
+        "The database now has indexes on games (by player and by date). Profile, leaderboard, and replay queries are much faster, especially for accounts with a lot of history."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "MSS 05 (Ramener) : un perso contrôlé revient bien dans la main de son propriétaire d'origine",
       "title_en": "MSS 05 (Bring it Back): a controlled character returns to its original owner's hand",
       "changes_fr": [

@@ -300,12 +300,9 @@ async function finalizeGameEnd(
 
   let eloData: { player1Delta: number; player2Delta: number; player1NewElo: number; player2NewElo: number; player1TotalGames: number; player2TotalGames: number } | null = null;
 
-  
-  try {
-    const { GAME_TTL_MS } = await import('@/lib/db/gameCleanup');
-    const cutoff = new Date(Date.now() - GAME_TTL_MS);
-    await prisma.game.deleteMany({ where: { completedAt: { lt: cutoff }, status: 'completed' } });
-  } catch { /* ignore cleanup errors */ }
+  import('@/lib/db/gameCleanup')
+    .then(({ cleanupOldGames }) => cleanupOldGames())
+    .catch(() => {});
 
   
   try {
