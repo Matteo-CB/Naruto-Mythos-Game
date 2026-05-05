@@ -111,6 +111,7 @@ model Game {
   status       String
   winnerId     String?   @db.ObjectId
   gameState    Json?
+  gameStateGz  Bytes?
   player1Score Int       @default(0)
   player2Score Int       @default(0)
   eloChange    Int?

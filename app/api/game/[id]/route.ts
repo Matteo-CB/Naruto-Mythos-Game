@@ -26,6 +26,7 @@ export async function GET(
         player2Score: true,
         eloChange: true,
         gameState: true,
+        gameStateGz: true,
         createdAt: true,
         completedAt: true,
         player1: { select: { username: true } },
@@ -37,7 +38,10 @@ export async function GET(
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    return NextResponse.json(game);
+    const { getReplayPayload } = await import('@/lib/db/replayCompression');
+    const replayState = getReplayPayload(game);
+    const { gameStateGz: _gz, gameState: _gs, ...rest } = game;
+    return NextResponse.json({ ...rest, gameState: replayState });
   } catch {
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -75,14 +79,16 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    
-    if (game.gameState) {
+    if (game.gameState || game.gameStateGz) {
       return NextResponse.json({ message: 'Replay already saved' });
     }
 
+    const { compressReplay } = await import('@/lib/db/replayCompression');
+    const compressed = compressReplay(gameState);
+
     await prisma.game.update({
       where: { id },
-      data: { gameState },
+      data: { gameStateGz: compressed },
     });
 
     return NextResponse.json({ message: 'Replay saved' });

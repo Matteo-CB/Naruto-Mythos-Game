@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Replays compressés : sauvegarde et chargement bien plus rapides, sans perte",
+      "title_en": "Compressed replays: much faster save and load, lossless",
+      "changes_fr": [
+        "Les replays sont désormais compressés en gzip avant d'être stockés. Sur un replay typique le poids passe de plusieurs Mo à quelques centaines de Ko (gain d'environ 15 à 18×). Aucune donnée n'est perdue.",
+        "Plus de place en base, sauvegardes de fin de partie plus rapides, ouverture du replay plus rapide aussi (transfert plus léger).",
+        "Les replays existants non compressés restent lisibles : le serveur sait lire les deux formats."
+      ],
+      "changes_en": [
+        "Replays are now gzip-compressed before being stored. A typical replay drops from several MB to a few hundred KB (about 15-18× smaller). No data is lost.",
+        "More room in the database, faster end-of-game saves, and quicker replay loading too (smaller payload over the wire).",
+        "Existing uncompressed replays still work: the server reads both formats."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Parties contre l'IA : plus de replay enregistré",
       "title_en": "AI games: replay no longer saved",
       "changes_fr": [

@@ -615,22 +615,25 @@ async function finalizeGameEnd(
       completedAt: new Date(),
     };
 
-    const tryStates: Array<() => unknown> = [];
+    const { compressReplay } = await import('@/lib/db/replayCompression');
+    type CompressedBuf = Uint8Array<ArrayBuffer>;
+
+    const tryStates: Array<() => CompressedBuf | null> = [];
     if (replayForDb) {
       tryStates.push(() => {
-        const s = JSON.stringify(replayForDb);
-        if (s.length > 8_000_000) throw new Error(`size ${(s.length / 1_000_000).toFixed(1)}MB`);
-        return JSON.parse(s);
+        const buf = compressReplay(replayForDb);
+        if (buf.length > 12_000_000) throw new Error(`compressed size ${(buf.length / 1_000_000).toFixed(1)}MB`);
+        return buf;
       });
       tryStates.push(() => {
         const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null };
-        const s = JSON.stringify(trimmed);
-        if (s.length > 8_000_000) throw new Error(`size ${(s.length / 1_000_000).toFixed(1)}MB`);
-        return JSON.parse(s);
+        const buf = compressReplay(trimmed);
+        if (buf.length > 12_000_000) throw new Error(`compressed size ${(buf.length / 1_000_000).toFixed(1)}MB`);
+        return buf;
       });
       tryStates.push(() => {
         const trimmed = { ...replayForDb, stateSnapshots: null, snapshotLogLengths: null, actionHistory: [], log: replayForDb.log.slice(-200) };
-        return JSON.parse(JSON.stringify(trimmed));
+        return compressReplay(trimmed);
       });
     }
     tryStates.push(() => null);
@@ -641,8 +644,8 @@ async function finalizeGameEnd(
     let fullPurgeDone = false;
     for (let i = 0; i < tryStates.length; i++) {
       try {
-        const gameState = tryStates[i]();
-        const record = await prisma.game.create({ data: { ...baseData, gameState: gameState ?? undefined } });
+        const gameStateGz = tryStates[i]();
+        const record = await prisma.game.create({ data: { ...baseData, gameStateGz: gameStateGz ?? undefined } });
         recordId = record.id;
         if (i > 0) console.warn(`[Socket] Game saved on attempt ${i + 1} (replay data trimmed)`);
         break;

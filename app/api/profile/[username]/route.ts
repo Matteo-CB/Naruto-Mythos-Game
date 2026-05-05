@@ -93,13 +93,14 @@ export async function GET(
 
     const existingGames = candidateGameIds.length > 0
       ? await prisma.game.findMany({
-          where: { id: { in: candidateGameIds } },
-          select: { id: true, gameState: true },
+          where: {
+            id: { in: candidateGameIds },
+            OR: [{ gameState: { not: null } }, { gameStateGz: { not: null } }],
+          },
+          select: { id: true },
         })
       : [];
-    const replayableSet = new Set(
-      existingGames.filter((g) => g.gameState !== null).map((g) => g.id),
-    );
+    const replayableSet = new Set(existingGames.map((g) => g.id));
 
     type Entry = {
       id: string;
