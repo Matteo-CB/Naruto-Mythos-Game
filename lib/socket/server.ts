@@ -75,11 +75,11 @@ export interface RoomData {
 }
 
 const ACTION_TIMEOUT_MS = 120_000; // 2 minutes per action
-const MULLIGAN_TIMEOUT_MS = 90_000; // 90 seconds for the mulligan + edge phase
+const MULLIGAN_TIMEOUT_MS = 60_000; // 1 minute for the mulligan + edge phase
 const TOURNAMENT_JOIN_TIMEOUT_MS = 5 * 60_000; // 5 minutes after room creation to actually join and start
 const EFFECT_TIMEOUT_MS = 60_000; // 1 minute per effect resolution
 const MAX_CONSECUTIVE_TIMEOUTS = 3; // 3 timeouts = auto-forfeit
-const DISCONNECT_GRACE_MS = 120_000; // 2 minutes before disconnect = forfeit
+const DISCONNECT_GRACE_MS = 60_000; // 1 minute before disconnect = forfeit
 const MAX_DISCONNECTS = 2; // More than 2 in-game disconnects = instant forfeit (anti-troll)
 const SEALED_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes for sealed deck building
 
@@ -1022,7 +1022,7 @@ function startEffectTimer(
   }, EFFECT_TIMEOUT_MS);
 }
 
-const MISSION_PHASE_TIMEOUT_MS = 120_000; // 2 minutes for mission phase choices
+const MISSION_PHASE_TIMEOUT_MS = 60_000; // 1 minute for mission phase choices
 
 
 function startMissionPhaseTimer(

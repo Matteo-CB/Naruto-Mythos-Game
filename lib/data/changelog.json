@@ -2,6 +2,21 @@
   "entries": [
     {
       "date": "2026-05-05",
+      "title_fr": "Timers raccourcis : mulligan, mission et déconnexion à 1 minute",
+      "title_en": "Shorter timers: mulligan, mission and disconnect at 1 minute",
+      "changes_fr": [
+        "La phase de mulligan + Edge passe de 90 à 60 secondes. Si un joueur ne joue pas, il est forfait.",
+        "La phase de mission (choix d'effets de score) passe de 2 minutes à 1 minute par décision.",
+        "Le délai de reconnexion après déconnexion passe de 2 minutes à 1 minute. Plus d'attente interminable quand l'adversaire quitte."
+      ],
+      "changes_en": [
+        "Mulligan + Edge phase goes from 90 to 60 seconds. A player who doesn't play in time is auto-forfeited.",
+        "Mission phase (score-effect choices) goes from 2 minutes to 1 minute per decision.",
+        "Reconnect grace after a disconnect goes from 2 minutes to 1 minute. No more endless wait when the opponent leaves."
+      ]
+    },
+    {
+      "date": "2026-05-05",
       "title_fr": "Sakura Secret (135) plus de boucle infinie + Kakashi ne peut plus copier Kakashi",
       "title_en": "Sakura Secret (135) no longer loops + Kakashi can't copy Kakashi anymore",
       "changes_fr": [
